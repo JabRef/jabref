@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -167,7 +169,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
-    private BackgroundTask<ParserResult> dataLoadingTask;
+    private BackgroundTask<?> dataLoadingTask;
 
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
@@ -308,13 +310,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     private static void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
-        text.append(bibDatabaseContext.getDBMSSynchronizer().getDBName());
+        Optional.ofNullable(bibDatabaseContext.getDBMSSynchronizer())
+                .map(synchronizer -> synchronizer.getDBName())
+                .ifPresent(text::append);
         text.append(" [");
         text.append(Localization.lang("shared"));
         text.append("]");
     }
 
-    private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
+    private void setDataLoadingTask(BackgroundTask<?> dataLoadingTask) {
         this.loading.set(true);
         this.dataLoadingTask = dataLoadingTask;
     }
@@ -1201,6 +1205,54 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onSuccess(newTab::onDatabaseLoadingSucceed)
                        .onFailure(newTab::onDatabaseLoadingFailed)
+                       .executeWith(taskExecutor);
+
+        return newTab;
+    }
+
+    /// Creates a shared-library tab that displays the main table's loading indicator until `dataLoadingTask` has connected.
+    public static LibraryTab createLibraryTab(BackgroundTask<BibDatabaseContext> dataLoadingTask,
+                                              BibDatabaseContext dummyContext,
+                                              DialogService dialogService,
+                                              AiService aiService,
+                                              GuiPreferences preferences,
+                                              StateManager stateManager,
+                                              LibraryTabContainer tabContainer,
+                                              FileUpdateMonitor fileUpdateMonitor,
+                                              BibEntryTypesManager entryTypesManager,
+                                              ClipBoardManager clipBoardManager,
+                                              TaskExecutor taskExecutor,
+                                              GitHandlerRegistry gitHandlerRegistry,
+                                              BiConsumer<LibraryTab, BibDatabaseContext> onSuccess,
+                                              Consumer<Exception> onFailure) {
+        LibraryTab newTab = new LibraryTab(
+                dummyContext,
+                tabContainer,
+                dialogService,
+                aiService,
+                preferences,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                clipBoardManager,
+                taskExecutor,
+                gitHandlerRegistry,
+                true);
+
+        newTab.setDataLoadingTask(dataLoadingTask);
+        dataLoadingTask.onSuccess(loadedContext -> {
+                           newTab.setDatabaseContext(loadedContext);
+                           Optional.ofNullable(newTab.autoCompleterChangedListener).ifPresent(Runnable::run);
+                           newTab.loading.set(false);
+                           newTab.dataLoadingTask = null;
+                           onSuccess.accept(newTab, loadedContext);
+                       })
+                       .onFailure(ex -> {
+                           newTab.loading.set(false);
+                           newTab.dataLoadingTask = null;
+                           tabContainer.closeTab(newTab);
+                           onFailure.accept(ex);
+                       })
                        .executeWith(taskExecutor);
 
         return newTab;

@@ -711,23 +711,37 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             String sharedDatabaseId = reconnection.sharedDatabaseId();
             SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
             // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
-            // The callbacks check the stage: a quit while the attempt is pending must neither add a tab nor pop a dialog.
-            BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()))
-                          .onSuccess(bibDatabaseContext -> {
-                              if (!mainStage.isShowing()) {
-                                  bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
-                                  return;
-                              }
-                              sessionService.restoreSharedDatabaseId(manager.openTab(bibDatabaseContext).getBibDatabaseContext(), sharedDatabaseId);
-                          })
-                          .onFailure(exception -> {
-                              LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
-                              if (mainStage.isShowing()) {
-                                  dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                                          Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
-                              }
-                          })
-                          .executeWith(taskExecutor);
+            // The callbacks check the stage so a connection that completes during shutdown is closed with its loading tab.
+            BackgroundTask<BibDatabaseContext> backgroundTask = BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()));
+            BibDatabaseContext dummyContext = manager.createDummyContext(reconnection.connectionProperties());
+            LibraryTab newTab = LibraryTab.createLibraryTab(
+                    backgroundTask,
+                    dummyContext,
+                    dialogService,
+                    aiService,
+                    preferences,
+                    stateManager,
+                    this,
+                    fileUpdateMonitor,
+                    entryTypesManager,
+                    clipBoardManager,
+                    taskExecutor,
+                    gitHandlerRegistry,
+                    (tab, bibDatabaseContext) -> {
+                        if (!mainStage.isShowing()) {
+                            closeTab(tab);
+                            return;
+                        }
+                        sessionService.restoreSharedDatabaseId(bibDatabaseContext, sharedDatabaseId);
+                    },
+                    exception -> {
+                        LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
+                        if (mainStage.isShowing()) {
+                            dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
+                                    Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
+                        }
+                    });
+            addTab(newTab, true);
         }
     }
 

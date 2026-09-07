@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -94,6 +95,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private Notifier notifier;
     private String dbName;
     private OfflineChanges offlineChanges;
+    private boolean sharedDatabaseOpen;
 
     private MetaData metaData;
     private final BibDatabaseContext bibDatabaseContext;
@@ -596,7 +598,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
         Optional<BibEntry> localEntry = bibDatabase.getEntriesSnapshot().stream()
-                                                   .filter(entry -> fieldChange.bibEntryId().equals(entry.getSharedBibEntryData().getSharedIdAsString()))
+                                                   .filter(entry -> Objects.equals(fieldChange.bibEntryId(), entry.getSharedBibEntryData().getSharedIdAsString()))
                                                    .findFirst();
         if (localEntry.isEmpty()) {
             // Entry unknown locally - e.g. inserted remotely after our last pull
@@ -931,10 +933,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
         this.offlineChanges = OfflineChanges.load(offlineChangesDirectory, connection.getProperties());
         initializeDatabases();
+        sharedDatabaseOpen = true;
     }
 
     @Override
     public void closeSharedDatabase() {
+        if (!sharedDatabaseOpen) {
+            return;
+        }
+        sharedDatabaseOpen = false;
         closed = true;
         applySaveActionsToBufferedEntry();
         BibEntry bufferedEntry = entryWithPendingChanges.get();
@@ -979,6 +986,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     @Override
     public String getDBName() {
         return dbName;
+    }
+
+    @Override
+    public void setDBName(String dbName) {
+        this.dbName = dbName;
     }
 
     @Override

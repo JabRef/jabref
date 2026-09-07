@@ -212,6 +212,13 @@ public class SharedDatabaseUIManager {
         parserResult.setDatabaseContext(bibDatabaseContext);
     }
 
+    public BibDatabaseContext createDummyContext(DBMSConnectionProperties connectionProperties) {
+        BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
+        DatabaseSynchronizer synchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        synchronizer.setDBName(connectionProperties.getDatabase());
+        return bibDatabaseContext;
+    }
+
     private BibDatabaseContext getBibDatabaseContextForSharedDatabase() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setMode(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());

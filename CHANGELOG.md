@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added automatic reconnection to shared databases that were still connected when JabRef was closed. [#16801](https://github.com/JabRef/jabref/pull/16801)
+- We added a loading spinner while shared libraries connect to their database. [TODO]
 - We added the ability to auto-inject and manually infer the used CSL style in the LibreOffice document. [#16640](https://github.com/JabRef/jabref/issues/16640)
 - We added subset search for CSL styles. [#16693](https://github.com/JabRef/jabref/issues/16693)
 - We added a per-library keyword separator to the library properties, so opening a library no longer rewrites keyword fields. [#16835](https://github.com/JabRef/jabref/pull/16835)

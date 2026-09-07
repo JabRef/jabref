@@ -68,7 +68,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BooleanProperty autosave = new SimpleBooleanProperty();
     private final BooleanProperty rememberPassword = new SimpleBooleanProperty();
     private final boolean keyringAvailable = OS.isKeyringAvailable();
-    private final BooleanProperty loading = new SimpleBooleanProperty();
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
     private final BooleanProperty expertMode = new SimpleBooleanProperty();
     private final StringProperty jdbcUrl = new SimpleStringProperty("");
@@ -188,7 +187,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 && DBMSConnectionUrl.parse(input).isPresent());
     }
 
-    /// Connects in the background; `onConnected` runs on the JavaFX thread once the dialog can be closed
+    /// Connects in the background after `onConnected` closes the dialog and reveals a loading tab.
     public void openDatabase(Runnable onConnected) {
         DBMSConnectionProperties connectionProperties = new DBMSConnectionPropertiesBuilder()
                 .setType(DBMSType.POSTGRESQL)
@@ -224,11 +223,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                         Localization.lang("Overwrite file"),
                         Localization.lang("Cancel"));
                 if (!overwriteFilePressed) {
-                    onConnected.run();
                     return;
                 }
             }
         }
+
+        onConnected.run();
 
         SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
                 tabContainer,
@@ -242,33 +242,42 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 taskExecutor,
                 gitHandlerRegistry);
 
-        loading.set(true);
-        BackgroundTask.wrap(() -> manager.connect(connectionProperties))
-                      .onSuccess(bibDatabaseContext -> {
-                          loading.set(false);
-                          LibraryTab libraryTab = manager.openTab(bibDatabaseContext);
-                          setPreferences(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
-                          if (!autosavePath.isEmpty() && shouldAutosave) {
-                              try {
-                                  new SaveDatabaseAction(
-                                          libraryTab,
-                                          dialogService,
-                                          preferences,
-                                          entryTypesManager,
-                                          stateManager,
-                                          journalAbbreviationRepository
-                                  ).saveAs(Path.of(autosavePath));
-                              } catch (Throwable e) {
-                                  LOGGER.error("Error while saving the database", e);
-                              }
-                          }
-                          onConnected.run();
-                      })
-                      .onFailure(exception -> {
-                          loading.set(false);
-                          showConnectionFailure(exception, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected);
-                      })
-                      .executeWith(taskExecutor);
+        BackgroundTask<BibDatabaseContext> backgroundTask = BackgroundTask.wrap(() -> manager.connect(connectionProperties));
+        BibDatabaseContext dummyContext = manager.createDummyContext(connectionProperties);
+
+        LibraryTab libraryTab = LibraryTab.createLibraryTab(
+                backgroundTask,
+                dummyContext,
+                dialogService,
+                aiService,
+                preferences,
+                stateManager,
+                tabContainer,
+                fileUpdateMonitor,
+                entryTypesManager,
+                clipBoardManager,
+                taskExecutor,
+                gitHandlerRegistry,
+                (tab, bibDatabaseContext) -> {
+                    dialogService.notify(Localization.lang("Connection to %0 server established.", connectionProperties.getType().toString()));
+                    setPreferences(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
+                    if (!autosavePath.isEmpty() && shouldAutosave) {
+                        try {
+                            new SaveDatabaseAction(
+                                    tab,
+                                    dialogService,
+                                    preferences,
+                                    entryTypesManager,
+                                    stateManager,
+                                    journalAbbreviationRepository
+                            ).saveAs(Path.of(autosavePath));
+                        } catch (Throwable e) {
+                            LOGGER.error("Error while saving the database", e);
+                        }
+                    }
+                },
+                exception -> showConnectionFailure(exception, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
+        tabContainer.addTab(libraryTab, true);
     }
 
     private void showConnectionFailure(Exception exception, DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
@@ -412,10 +421,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public BooleanProperty useSSLProperty() {
         return useSSL;
-    }
-
-    public BooleanProperty loadingProperty() {
-        return loading;
     }
 
     public ValidationStatus dbValidation() {

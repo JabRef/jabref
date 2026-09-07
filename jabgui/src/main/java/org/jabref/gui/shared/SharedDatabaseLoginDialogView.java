@@ -80,17 +80,10 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
         ControlHelper.setAction(connectButton, this.getDialogPane(), event -> openDatabase());
         Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
-        Button btnClose = (Button) this.getDialogPane().lookupButton(ButtonType.CLOSE);
-        // must be set here, because in initialize the button is still null
-        btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not().or(viewModel.loadingProperty()));
-        btnConnect.textProperty().bind(EasyBind.map(viewModel.loadingProperty(), loading -> loading ? Localization.lang("Connecting...") : Localization.lang("Connect")));
-        btnClose.disableProperty().bind(viewModel.loadingProperty());
-        setOnCloseRequest(event -> {
-            if (viewModel.loadingProperty().get()) {
-                event.consume();
-            } else {
-                resizeGeneration++;
-            }
+        // must be set here, because in initializing the button is still null
+        btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
+        setOnCloseRequest(_ -> {
+            resizeGeneration++;
         });
     }
 
