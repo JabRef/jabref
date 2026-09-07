@@ -30,6 +30,7 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     private double widthHint = -1;
     private int collapsedRows = Integer.MAX_VALUE;
     private boolean expanded;
+    private boolean resetPending;
     /// Variable that contains user-defined behavior for paste action.
     private Runnable pasteActionHandler = () -> {
         // Set empty paste behavior by default
@@ -57,11 +58,14 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     /// the width the same field had before, so a rebuilt editor is right in its very first frame.
     /// Until the area is focused for the first time it shows at most `collapsedRows` rows (with
     /// its own scrollbar); the first focus expands it to the full text and it stays expanded, so
-    /// moving the focus on never shrinks a row under the mouse.
-    public void setGrowWithContent(double widthHint, int collapsedRows) {
+    /// moving the focus on never shrinks a row under the mouse. `initiallyExpanded` starts it expanded —
+    /// editors are rebuilt for the same entry (adding a field, "Show more"), and the caller
+    /// remembers which fields the user already expanded.
+    public void setGrowWithContent(double widthHint, int collapsedRows, boolean initiallyExpanded) {
         this.growWithContent = true;
         this.widthHint = widthHint;
         this.collapsedRows = collapsedRows;
+        this.expanded = initiallyExpanded;
         setPrefRowCount(1);
         // The real width only exists after the first layout; if it differs from the hint the
         // wrapped height changes, so ask for another pass.
@@ -80,11 +84,14 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     }
 
     private void showBeginningWhileCollapsed() {
-        if (expanded) {
+        if (expanded || resetPending) {
             return;
         }
-        // After the pending layout, which is what scrolls the caret into view.
+        // One pending reset at a time; it runs after the pending layout, which is what scrolls
+        // the caret into view.
+        resetPending = true;
         Platform.runLater(() -> {
+            resetPending = false;
             if (!expanded) {
                 positionCaret(0);
                 setScrollTop(0);

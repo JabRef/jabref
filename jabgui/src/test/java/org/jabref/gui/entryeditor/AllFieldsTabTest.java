@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -187,48 +188,48 @@ class AllFieldsTabTest {
 
     @Test
     void abstractEditorIsOneRowWhenEmpty() throws InterruptedException {
-        double oneRow = abstractEditorHeight("");
-
-        assertEquals(oneRow, abstractEditorHeight(""), 0.5);
-        assertTrue(abstractEditorHeight("one\ntwo") > oneRow);
+        assertEquals(0, abstractEditorExtraRows(""), 0.1);
     }
 
     @Test
     void abstractEditorGrowsWithWrappedContentUpToFiveRowsUntilFocused() throws InterruptedException {
-        double oneRow = abstractEditorHeight("");
-        double rowHeight = abstractEditorHeight("one\ntwo") - oneRow;
-
-        // Tolerance: the skin snaps each height to whole pixels.
-        assertEquals(oneRow + 4 * rowHeight, abstractEditorHeight("word ".repeat(300)), 1.0);
+        assertEquals(4, abstractEditorExtraRows("word ".repeat(300)), 0.1);
     }
 
     @Test
     void abstractEditorCountsEveryParagraph() throws InterruptedException {
-        double oneRow = abstractEditorHeight("");
-        double rowHeight = abstractEditorHeight("one\ntwo") - oneRow;
-
-        assertEquals(oneRow + 3 * rowHeight, abstractEditorHeight("one\ntwo\nthree\nfour"), 0.5);
+        assertEquals(3, abstractEditorExtraRows("one\ntwo\nthree\nfour"), 0.1);
     }
 
     /// Lays the abstract editor out in a scene of fixed width so the text area's skin exists and
-    /// its text is wrapped, then reads back the resulting height.
-    private double abstractEditorHeight(String abstractText) throws InterruptedException {
+    /// its text is wrapped, then returns how many rows beyond the first the area got: its height
+    /// minus the empty area's height, in units of the font's line height. The layout snaps heights
+    /// to whole pixels, so the rows are only reliable as a rounded quotient, never as raw pixels.
+    private double abstractEditorExtraRows(String abstractText) throws InterruptedException {
+        double[] result = new double[1];
+        runOnFxThreadAndWait(() -> {
+            TextArea filled = layoutAbstractEditor(abstractText);
+            TextArea empty = layoutAbstractEditor("");
+            Text row = new Text("X");
+            row.setFont(filled.getFont());
+            result[0] = Math.round((filled.getHeight() - empty.getHeight()) / row.getLayoutBounds().getHeight());
+        });
+        return result[0];
+    }
+
+    private TextArea layoutAbstractEditor(String abstractText) {
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021")
                                                              .withField(StandardField.ABSTRACT, abstractText);
-        double[] height = new double[1];
-        runOnFxThreadAndWait(() -> {
-            tab.bindToEntry(entry);
-            Node editor = tab.editors.get(StandardField.ABSTRACT).getNode();
-            // VBox (not StackPane): a StackPane would stretch the editor to the scene height.
-            VBox root = new VBox(editor);
-            new Scene(root, 400, 600);
-            root.applyCss();
-            // Two passes: the first gives the area its width, the second wraps the text at it.
-            root.layout();
-            root.layout();
-            height[0] = ((TextArea) editor.lookup(".text-area")).getHeight();
-        });
-        return height[0];
+        tab.bindToEntry(entry);
+        Node editor = tab.editors.get(StandardField.ABSTRACT).getNode();
+        // VBox (not StackPane): a StackPane would stretch the editor to the scene height.
+        VBox root = new VBox(editor);
+        new Scene(root, 400, 600);
+        root.applyCss();
+        // Two passes: the first gives the area its width, the second wraps the text at it.
+        root.layout();
+        root.layout();
+        return (TextArea) editor.lookup(".text-area");
     }
 
     @Test

@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -120,6 +121,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     private final Set<Field> userAddedFields = new LinkedHashSet<>();
     private @Nullable BibEntry entryOfUserAddedFields;
 
+    /// Multiline fields the user has focused (and thereby expanded) while editing the current
+    /// entry; editors are rebuilt for the same entry, so the expansion must outlive them.
+    private final Set<Field> expandedFields = new HashSet<>();
+
     /// Required fields of the current entry's type, refreshed on every [#determineFieldsToShow];
     /// used to keep the remove-field button (see [#wrapWithRemoveButton]) off required rows.
     private final Set<Field> requiredFields = new LinkedHashSet<>();
@@ -180,6 +185,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         if (entry != entryOfUserAddedFields) {
             userAddedFields.clear();
+            expandedFields.clear();
             sectionExpandOverrides.clear();
             entryOfUserAddedFields = entry;
         }
@@ -683,7 +689,12 @@ public class AllFieldsTab extends FieldsEditorTab {
             textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
             // Editors are rebuilt on every entry switch; the width the field had for the previous
             // entry lets the new area wrap correctly before its own first layout.
-            textArea.setGrowWithContent(textAreaWidths.getOrDefault(field, -1.0), COLLAPSED_MULTILINE_ROWS);
+            textArea.setGrowWithContent(textAreaWidths.getOrDefault(field, -1.0), COLLAPSED_MULTILINE_ROWS, expandedFields.contains(field));
+            textArea.focusedProperty().addListener((_, _, focused) -> {
+                if (focused) {
+                    expandedFields.add(field);
+                }
+            });
             textArea.widthProperty().addListener((_, _, width) -> {
                 if (width.doubleValue() > 0) {
                     textAreaWidths.put(field, width.doubleValue());
