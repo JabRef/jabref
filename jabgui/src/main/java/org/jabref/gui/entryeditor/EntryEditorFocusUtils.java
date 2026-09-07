@@ -14,8 +14,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
