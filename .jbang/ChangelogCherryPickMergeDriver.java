@@ -20,11 +20,14 @@ import java.util.Optional;
 /// - Git's own strategies (`merge=union` from `.gitattributes`, `-X ours`/`-X theirs`,
 ///   `--ignore-space-change`) are line-based: union duplicates whole blocks of the conflicting
 ///   hunk, the others drop one side's entries.
-/// - maven-flow/changelog-merge-driver (used when merging `main` into a PR branch) merges the
+/// - [maven-flow/changelog-merge-driver](https://github.com/maven-flow/changelog-merge-driver)
+///   (used when merging `main` into a PR branch) merges the
 ///   two "Unreleased" sections as a union of entries; applied to a cherry-pick, it would copy
 ///   every unreleased entry of the source branch, not only the one the commit added.
-/// - heylogs and clparse only read a changelog (lint, extract a version); neither merges.
-/// - Generators such as git-cliff or conventional-changelog derive entries from commit
+/// - [heylogs](https://github.com/nbbrd/heylogs) and [clparse](https://github.com/marcaddeo/clparse)
+///   only read a changelog (lint, extract a version); neither merges.
+/// - Generators such as [git-cliff](https://github.com/orhun/git-cliff) or
+///   [conventional-changelog](https://github.com/conventional-changelog/conventional-changelog) derive entries from commit
 ///   messages; JabRef writes its entries by hand in the PR, so there is nothing to generate from.
 ///
 /// This driver is a true three-way merge on entry level: it applies the entries that the
