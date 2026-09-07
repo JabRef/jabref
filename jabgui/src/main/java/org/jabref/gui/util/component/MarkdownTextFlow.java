@@ -293,7 +293,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         private void visit(Heading heading) {
             addNewlinesBetweenBlocks(heading);
             String text = heading.getText().toString();
-            addTextNode(text, heading, "markdown-h" + heading.getLevel());
+            addTextNode(text, heading, "h" + heading.getLevel(), "bold");
             previousBlock = heading;
         }
 
@@ -320,15 +320,15 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         }
 
         private void visit(Emphasis emphasis) {
-            addTextNode(emphasis.getText().toString(), emphasis, "markdown-italic");
+            addTextNode(emphasis.getText().toString(), emphasis, "italic");
         }
 
         private void visit(StrongEmphasis strong) {
-            addTextNode(strong.getText().toString(), strong, "markdown-bold");
+            addTextNode(strong.getText().toString(), strong, "bold");
         }
 
         private void visit(Code code) {
-            addTextNode(code.getText().toString(), code, "markdown-code");
+            addTextNode(code.getText().toString(), code, "markdown-code", "font-monospace");
         }
 
         private void visit(Link link) {
@@ -351,7 +351,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
                 processedContent = content.substring(1, content.length() - 2);
             }
-            addTextNode(processedContent, codeBlock, "markdown-code-block");
+            addTextNode(processedContent, codeBlock, "markdown-code-block", "font-monospace");
             previousBlock = codeBlock;
         }
 
@@ -363,7 +363,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
                 processedContent = content.substring(1, content.length() - 2);
             }
-            addTextNode(processedContent, codeBlock, "markdown-code-block");
+            addTextNode(processedContent, codeBlock, "markdown-code-block", "font-monospace");
             previousBlock = codeBlock;
         }
 
@@ -442,12 +442,12 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         }
 
         private void visit(HtmlInline html) {
-            addTextNode(html.getChars().toString(), html, "markdown-code");
+            addTextNode(html.getChars().toString(), html, "markdown-code", "font-monospace");
         }
 
         private void visit(HtmlBlock html) {
             addNewlinesBetweenBlocks(html);
-            addTextNode(html.getChars().toString(), html, "markdown-code-block");
+            addTextNode(html.getChars().toString(), html, "markdown-code-block", "font-monospace");
             previousBlock = html;
         }
 

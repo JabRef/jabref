@@ -365,8 +365,92 @@ class GuiPreferencesMigrationsTest {
 
         PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
 
-        verify(preferences).put("entryEditorCustomTabs",
-                "{\"General\":[\"keywords\",\"doi\"],\"Abstract\":[\"abstract\"]}");
+        // "Abstract" with its stock field is a former default tab and is dropped
+        verify(preferences).put("entryEditorCustomTabs", "{\"General\":[\"keywords\",\"doi\"]}");
+    }
+
+    @Test
+    void upgradeEntryEditorCustomTabsDropsFormerDefaultGeneralTab() {
+        when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn(null);
+        when(preferences.get(eq("customTabName_0"), any())).thenReturn("Allgemein");
+        // the v6.0-alpha.3 default set (stored unordered)
+        when(preferences.getStringList("customTabFields_0")).thenReturn(List.of(
+                "printed", "priority", "qualityassured", "ranking", "readstatus", "relevance",
+                "doi", "icore", "crossref", "keywords", "eprint", "url", "file", "groups", "owner", "timestamp"));
+        when(preferences.get(eq("customTabName_1"), any())).thenReturn("Mine");
+        when(preferences.getStringList("customTabFields_1")).thenReturn(List.of("keywords", "comment-.*"));
+        when(preferences.get(eq("customTabName_2"), any())).thenReturn(null);
+
+        PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
+
+        verify(preferences).put("entryEditorCustomTabs", "{\"Mine\":[\"keywords\",\"comment-.*\"]}");
+    }
+
+    @Test
+    void upgradeEntryEditorCustomTabsKeepsCustomizedTabsResemblingDefaults() {
+        when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn(null);
+        // stock field set, but user-defined name
+        when(preferences.get(eq("customTabName_0"), any())).thenReturn("My summary");
+        when(preferences.getStringList("customTabFields_0")).thenReturn(List.of("abstract"));
+        // stock name, but a field removed from the v5 default set
+        when(preferences.get(eq("customTabName_1"), any())).thenReturn("General");
+        when(preferences.getStringList("customTabFields_1")).thenReturn(List.of(
+                "printed", "priority", "qualityassured", "ranking", "readstatus", "relevance",
+                "crossref", "keywords", "eprint", "url", "file", "groups", "owner", "timestamp"));
+        // cross-match: a stock "Abstract" name (German) paired with a shipped General field set
+        when(preferences.get(eq("customTabName_2"), any())).thenReturn("Zusammenfassung");
+        when(preferences.getStringList("customTabFields_2")).thenReturn(List.of(
+                "printed", "priority", "qualityassured", "ranking", "readstatus", "relevance",
+                "doi", "crossref", "keywords", "eprint", "url", "file", "groups", "owner", "timestamp"));
+        when(preferences.get(eq("customTabName_3"), any())).thenReturn(null);
+
+        PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
+
+        verify(preferences).put(eq("entryEditorCustomTabs"), eq(
+                "{\"My summary\":[\"abstract\"],\"General\":[\"printed\",\"priority\",\"qualityassured\",\"ranking\",\"readstatus\",\"relevance\",\"crossref\",\"keywords\",\"eprint\",\"url\",\"file\",\"groups\",\"owner\",\"timestamp\"],"
+                        + "\"Zusammenfassung\":[\"printed\",\"priority\",\"qualityassured\",\"ranking\",\"readstatus\",\"relevance\",\"doi\",\"crossref\",\"keywords\",\"eprint\",\"url\",\"file\",\"groups\",\"owner\",\"timestamp\"]}"));
+    }
+
+    @Test
+    void upgradeEntryEditorCustomTabsDropsJabRef3DefaultTabs() {
+        when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn(null);
+        // the JabRef 3.8.2 defaults, stored under a German UI ("Review" localized "Überprüfung")
+        when(preferences.get(eq("customTabName_0"), any())).thenReturn("Allgemein");
+        when(preferences.getStringList("customTabFields_0")).thenReturn(List.of(
+                "crossref", "keywords", "file", "doi", "url", "comment", "owner", "timestamp"));
+        when(preferences.get(eq("customTabName_1"), any())).thenReturn("Zusammenfassung");
+        when(preferences.getStringList("customTabFields_1")).thenReturn(List.of("abstract"));
+        when(preferences.get(eq("customTabName_2"), any())).thenReturn("Überprüfung");
+        when(preferences.getStringList("customTabFields_2")).thenReturn(List.of("review"));
+        when(preferences.get(eq("customTabName_3"), any())).thenReturn(null);
+
+        PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
+
+        verify(preferences).put("entryEditorCustomTabs", "{}");
+    }
+
+    @Test
+    void upgradeEntryEditorCustomTabsDropsJabRef5DefaultCommentsTab() {
+        when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn(null);
+        when(preferences.get(eq("customTabName_0"), any())).thenReturn("Comments");
+        when(preferences.getStringList("customTabFields_0")).thenReturn(List.of("comment"));
+        when(preferences.get(eq("customTabName_1"), any())).thenReturn(null);
+
+        PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
+
+        verify(preferences).put("entryEditorCustomTabs", "{}");
+    }
+
+    @Test
+    void upgradeEntryEditorCustomTabsStoresEmptyMapWhenOnlyDefaultsWereStored() {
+        when(preferences.get(eq("entryEditorCustomTabs"), any())).thenReturn(null);
+        when(preferences.get(eq("customTabName_0"), any())).thenReturn("Abstract");
+        when(preferences.getStringList("customTabFields_0")).thenReturn(List.of("abstract"));
+        when(preferences.get(eq("customTabName_1"), any())).thenReturn(null);
+
+        PreferencesMigrations.upgradeEntryEditorCustomTabs(preferences);
+
+        verify(preferences).put("entryEditorCustomTabs", "{}");
     }
 
     @Test

@@ -72,6 +72,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private StackPane getRelatedArticlesPane(BibEntry entry) {
         StackPane root = new StackPane();
         root.setId("related-articles-tab");
+        root.getStyleClass().add("padding-20");
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
@@ -116,17 +117,17 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
         String heading = fetcher.getHeading();
         Text headingText = new Text(heading);
-        headingText.getStyleClass().add("heading");
+        headingText.getStyleClass().addAll("h3", "bold");
         String description = fetcher.getDescription();
         Text descriptionText = new Text(description);
-        descriptionText.getStyleClass().add("description");
+        descriptionText.getStyleClass().add("italic");
         vBox.getChildren().add(headingText);
         vBox.getChildren().add(descriptionText);
 
         for (BibEntry entry : list) {
             HBox hBox = new HBox();
             hBox.setSpacing(5.0);
-            hBox.getStyleClass().add("recommendation-item");
+            hBox.getStyleClass().add("padding-left-20");
 
             String title = entry.getTitle().orElse("");
             String journal = entry.getField(StandardField.JOURNAL).orElse("");
@@ -166,7 +167,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vBox.setSpacing(20.0);
 
         Text descriptionText = new Text(Localization.lang("No recommendations received from Mr. DLib for this entry."));
-        descriptionText.getStyleClass().add("description");
+        descriptionText.getStyleClass().add("italic");
         vBox.getChildren().add(descriptionText);
         scrollPane.setContent(vBox);
 
@@ -180,15 +181,16 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private ScrollPane getPrivacyDialog(BibEntry entry) {
         ScrollPane root = new ScrollPane();
         root.setId("related-articles-tab");
+        root.getStyleClass().add("padding-20");
         VBox vbox = new VBox();
-        vbox.getStyleClass().add("gdpr-notice");
+        vbox.getStyleClass().addAll("gdpr-notice", "h4", "padding-12");
         vbox.setSpacing(20.0);
 
         HBox hbox = new HBox();
         hbox.setSpacing(10.0);
 
         Text title = new Text(Localization.lang("Mr. DLib Privacy settings"));
-        title.getStyleClass().add("heading");
+        title.getStyleClass().addAll("h3", "bold");
 
         Button button = new Button(Localization.lang("I agree"));
         button.setDefaultButton(true);

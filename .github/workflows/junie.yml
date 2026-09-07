@@ -24,12 +24,12 @@ jobs:
       issues: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 1
 
       - name: Run Junie
         id: junie
-        uses: JetBrains/junie-github-action@v1.7.5
+        uses: JetBrains/junie-github-action@63e8e2dd7c6739640604c56591248c4e2d0d7e30 # v1.7.6
         with:
           junie_api_key: ${{ secrets.JUNIE_API_KEY }}

@@ -11,11 +11,12 @@ public abstract class ThreeWayMergeCell extends HBox {
     public static final String EVEN_PSEUDO_CLASS = "even";
     public static final int HEADER_ROW = -1;
     private static final String DEFAULT_STYLE_CLASS = "field-cell";
+    private static final String PADDING_STYLE_CLASS = "padding-8";
 
     private final ThreeWayMergeCellViewModel viewModel;
 
     public ThreeWayMergeCell(String text, int rowIndex) {
-        getStyleClass().add(DEFAULT_STYLE_CLASS);
+        getStyleClass().addAll(DEFAULT_STYLE_CLASS, PADDING_STYLE_CLASS);
         viewModel = new ThreeWayMergeCellViewModel(text, rowIndex);
 
         EasyBind.subscribe(viewModel.oddProperty(), isOdd -> pseudoClassStateChanged(PseudoClass.getPseudoClass(ODD_PSEUDO_CLASS), isOdd));

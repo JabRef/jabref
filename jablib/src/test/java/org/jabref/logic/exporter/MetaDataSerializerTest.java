@@ -64,6 +64,13 @@ public class MetaDataSerializerTest {
     }
 
     @Test
+    void serializeKeywordSeparator() {
+        metaData.setKeywordSeparator(';');
+
+        assertEquals(Map.of("keywordSeparator", "\\;;"), MetaDataSerializer.getSerializedStringMap(metaData, pattern));
+    }
+
+    @Test
     void serializeSingleSaveAction() {
         FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));

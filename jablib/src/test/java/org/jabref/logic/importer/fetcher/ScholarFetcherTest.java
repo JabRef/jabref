@@ -20,7 +20,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import com.airhacks.afterburner.injection.Injector;
 import kong.unirest.core.json.JSONObject;
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@FetcherTest
+@ExternalServicesTest
 public class ScholarFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     ImporterPreferences importerPreferences = mock(ImporterPreferences.class);

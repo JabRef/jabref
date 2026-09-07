@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -55,10 +56,11 @@ public class FXDialog extends Alert {
             initModality(Modality.NONE);
         }
 
-        dialogWindow.getScene().setOnKeyPressed(event -> {
+        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
                 dialogWindow.close();
+                event.consume();
             }
         });
         this.setOnShowing(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));

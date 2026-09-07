@@ -43,7 +43,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
                         .checkbox(Localization.lang("Overwrite existing keys"), viewModel.overwriteAllowProperty())
                         .checkbox(Localization.lang("Warn before overwriting existing keys"), viewModel.overwriteWarningProperty(),
                                 warn -> warn.disableWhen(viewModel.overwriteAllowProperty().not())
-                                            .styleClass("prefIndent"))
+                                            .styleClass("padding-left-20"))
                         .checkbox(Localization.lang("Generate keys before saving (only for entries without a key)"), viewModel.generateOnSaveProperty())
                         .checkbox(Localization.lang("Generate new keys for imported entries (overwriting their default)"), viewModel.generateKeyOnImportProperty())
 
@@ -53,7 +53,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
                                                 .radio(Localization.lang("Start on second duplicate key with letter A (a, b, ...)"), viewModel.letterStartAProperty())
                                                 .radio(Localization.lang("Start on second duplicate key with letter B (b, c, ...)"), viewModel.letterStartBProperty())
                                                 .radio(Localization.lang("Always add letter (a, b, ...) to generated keys"), viewModel.letterAlwaysAddProperty())),
-                                indent -> indent.styleClass("prefIndent"))
+                                indent -> indent.styleClass("padding-left-20"))
 
                         // `[regex] by [replacement]` — one labelled field, so the two stay adjacent.
                         .stringField(Localization.lang("Replace (regular expression)"), viewModel.keyPatternRegexProperty(),

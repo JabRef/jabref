@@ -20,7 +20,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.support.DisabledOnCIServer;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@FetcherTest
+@ExternalServicesTest
 public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     private static final String DOI = "10.23919/IFIPNetworking52078.2021.9472772";

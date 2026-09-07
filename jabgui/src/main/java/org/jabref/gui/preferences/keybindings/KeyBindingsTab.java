@@ -1,9 +1,7 @@
 package org.jabref.gui.preferences.keybindings;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import java.util.List;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -19,13 +17,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
-import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -66,12 +62,6 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
             setCategoriesExpanded(!searchTerm.isEmpty() || previousText.isEmpty());
         });
 
-        ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
-        StringProperty flashingColorStringProperty = ColorUtil.createFlashingColorStringProperty(flashingColor);
-        searchBox.styleProperty().bind(
-                new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
-        );
-
         setUpTable();
 
         return new VBox(GAP, searchBox, keyBindingsTable);
@@ -98,7 +88,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
         new ViewModelTreeTableCellFactory<KeyBindingViewModel>()
                 .withGraphic(keyBinding -> keyBinding.getResetIcon().map(JabRefIcon::getGraphicNode).orElse(null))
                 .withOnMouseClickedEvent(keyBinding -> _ -> keyBinding.resetToDefault())
-                .withStyleClass(_ -> "keybinding-table-icon-cell")
+                .withStyleClasses(() -> List.of("align-center-right", "padding-right-6"))
                 .install(resetColumn);
 
         TreeTableColumn<KeyBindingViewModel, KeyBindingViewModel> clearColumn = new TreeTableColumn<>();
@@ -108,7 +98,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
         new ViewModelTreeTableCellFactory<KeyBindingViewModel>()
                 .withGraphic(keyBinding -> keyBinding.getClearIcon().map(JabRefIcon::getGraphicNode).orElse(null))
                 .withOnMouseClickedEvent(keyBinding -> _ -> keyBinding.clear())
-                .withStyleClass(_ -> "keybinding-table-icon-cell")
+                .withStyleClasses(() -> List.of("align-center-right", "padding-right-6"))
                 .install(clearColumn);
 
         keyBindingsTable.getColumns().add(actionColumn);
