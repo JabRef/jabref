@@ -1,5 +1,6 @@
 name: Label bug fixes for stable
 
+# [impl->req~ci.port-to-other-branch.label-driven-ports~1]
 # Adds "dev: into-stable" (ADR-0072) when a PR into main links an issue of type "bug" for the
 # first time: at creation, or when an edit of the body adds a new issue link. A push never
 # triggers this, and a link that was already there never counts again - so a maintainer's
@@ -52,7 +53,8 @@ jobs:
                 repository(owner: "JabRef", name: "jabref") { issue(number: $number) { issueType { name } } }
               }' --jq '.data.repository.issue.issueType.name // "none"' || echo "unknown")
             echo "Newly linked #$issue has type \`$type\`" >> "$GITHUB_STEP_SUMMARY"
-            if [ "$type" = "bug" ]; then
+            # GitHub stores the type name in lower case ("bug") while the issue template writes "Bug"
+            if [ "${type,,}" = "bug" ]; then
               gh pr edit "$PR_NUMBER" --add-label "dev: into-stable"
               echo "Added \`dev: into-stable\`" >> "$GITHUB_STEP_SUMMARY"
               exit 0

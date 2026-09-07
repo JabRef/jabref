@@ -457,7 +457,7 @@ jobs:
             ]
           }'
 
-          if [[ "$GITHUB_REF" != "refs/heads/main" && "$SHOULD_NOTARIZE" != "true" ]]; then
+          if [[ "$GITHUB_REF" != "refs/heads/main" && "$GITHUB_REF" != "refs/heads/stable" && "$SHOULD_NOTARIZE" != "true" ]]; then
             # drop macos-15-intel
             MATRIX_JSON="$(jq -c ' .include |= map(select(.os != "macos-15-intel")) ' <<<"$MATRIX_JSON")"
           else

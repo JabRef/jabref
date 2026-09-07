@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jspecify.annotations.NullMarked;
+
 //JAVA 21+
+//DEPS org.jspecify:jspecify:1.0.0
 
 /// Git merge driver for `CHANGELOG.md` when a change is ported between `main` and `stable`
 /// (see `.github/workflows/port-to-other-branch.yml` and ADR-0072).
@@ -35,6 +38,7 @@ import java.util.Optional;
 /// per `### Section`. Everything outside `## [Unreleased]` is expected to be unchanged by the
 /// commit; if it is not, the driver falls back to `git merge-file` and lets Git report the
 /// conflict. Invoked by Git as `driver <base> <ours> <theirs>`; the result replaces `<ours>`.
+@NullMarked
 public class ChangelogCherryPickMergeDriver {
 
     private static final String UNRELEASED_HEADING = "## [Unreleased]";
@@ -87,8 +91,14 @@ public class ChangelogCherryPickMergeDriver {
         for (String heading : headings) {
             List<String> baseItems = base.get().sections().getOrDefault(heading, List.of());
             List<String> theirItems = theirs.get().sections().getOrDefault(heading, List.of());
-            List<String> removed = baseItems.stream().filter(item -> !theirItems.contains(item)).toList();
-            List<String> added = theirItems.stream().filter(item -> !baseItems.contains(item)).toList();
+            // Multiset difference: a commit that drops one of two equal entries removes exactly one here, too
+            List<String> removed = new ArrayList<>(baseItems);
+            List<String> added = new ArrayList<>();
+            for (String item : theirItems) {
+                if (!removed.remove(item)) {
+                    added.add(item);
+                }
+            }
             if (added.isEmpty() && removed.isEmpty()) {
                 continue;
             }
@@ -101,7 +111,7 @@ public class ChangelogCherryPickMergeDriver {
                 insertInSectionOrder(result, heading, ourItems);
             }
             // An entry removed by the commit that never reached this branch is simply absent here
-            ourItems.removeAll(removed);
+            removed.forEach(ourItems::remove);
             for (String item : added) {
                 if (!ourItems.contains(item)) {
                     ourItems.add(item);
@@ -245,6 +255,11 @@ public class ChangelogCherryPickMergeDriver {
         String opened = merge(base, released, theirs).orElseThrow();
         if (!opened.contains("## [Unreleased]\n\n### Added\n\n- We added feature B.") || !opened.contains("- We fixed the crash. [#4](https://github.com/JabRef/jabref/issues/4)\n\n## [6.0] - 2026-01-01")) {
             throw new AssertionError("A branch without [Unreleased] must get the section created:\n" + opened);
+        }
+        String duplicated = base.replace("- We fixed the old bug. [#2](https://github.com/JabRef/jabref/issues/2)\n", "- We fixed the old bug. [#2](https://github.com/JabRef/jabref/issues/2)\n".repeat(2));
+        String oneCopyDropped = merge(duplicated, duplicated, base).orElseThrow();
+        if (!oneCopyDropped.equals(base)) {
+            throw new AssertionError("Dropping one of two equal entries must remove exactly one copy:\n" + oneCopyDropped);
         }
         if (!actual.equals(merge(base, actual, theirs).orElseThrow())) {
             throw new AssertionError("Applying the same change twice must be a no-op");
