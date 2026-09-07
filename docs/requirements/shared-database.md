@@ -59,4 +59,5 @@ A shared database that is still connected when JabRef closes is reconnected on t
 
 Needs: impl
 
+||||||| 02a34f79b6
 <!-- markdownlint-disable-file MD022 -->
