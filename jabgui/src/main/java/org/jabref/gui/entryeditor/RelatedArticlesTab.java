@@ -112,8 +112,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
         ScrollPane scrollPane = new ScrollPane();
 
-        VBox vBox = new VBox();
-        vBox.setSpacing(4);
+        VBox vBox = new VBox(4);
 
         String heading = fetcher.getHeading();
         Text headingText = new Text(heading);
@@ -125,9 +124,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vBox.getChildren().add(descriptionText);
 
         for (BibEntry entry : list) {
-            HBox hBox = new HBox();
-            hBox.setSpacing(4);
-            hBox.getStyleClass().add("padding-left-16");
+            HBox hBox = new HBox(4);
+            hBox.getStyleClass().add("padding-left-12");
 
             String title = entry.getTitle().orElse("");
             String journal = entry.getField(StandardField.JOURNAL).orElse("");

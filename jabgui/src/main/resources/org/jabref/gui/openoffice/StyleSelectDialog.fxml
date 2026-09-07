@@ -96,7 +96,7 @@
                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                             </columnResizePolicy>
                         </TableView>
-                        <HBox alignment="CENTER_LEFT" spacing="16.0">
+                        <HBox alignment="CENTER_LEFT" spacing="12">
                             <Label text="%Citation format"/>
                             <RadioButton fx:id="numericFormatButton" text="%Numeric [1]"/>
                             <RadioButton fx:id="authorYearFormatButton" text="%Author-year"/>

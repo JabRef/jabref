@@ -353,7 +353,7 @@ public class WelcomeTab extends Tab {
     }
 
     private HBox createTextLinksContainer() {
-        HBox container = new HBox(16);
+        HBox container = new HBox(12);
         container.getStyleClass().addAll("align-center-left");
 
         Hyperlink devVersionLink = createFooterLink(Localization.lang("Download development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);

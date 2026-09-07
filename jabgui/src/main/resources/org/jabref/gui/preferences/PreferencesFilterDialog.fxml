@@ -22,7 +22,7 @@
                 </HBox>
             </bottom>
             <top>
-                <HBox spacing="16">
+                <HBox spacing="12">
                     <TextField fx:id="searchField" promptText="%Search"/>
                     <VBox alignment="CENTER">
                         <CheckBox fx:id="showOnlyDeviatingPreferenceOptions"
