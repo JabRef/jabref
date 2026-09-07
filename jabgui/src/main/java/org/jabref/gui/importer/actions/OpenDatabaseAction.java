@@ -54,7 +54,6 @@ public class OpenDatabaseAction extends SimpleCommand {
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = List.of(
-            // Offer conversions of libraries written by older JabRef versions
             new LibraryMigrationAction(),
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),

@@ -24,7 +24,7 @@ Needs: impl, utest
 ## Libraries of older JabRef versions are converted after confirmation
 `req~import.legacy-library-migration~1`
 
-When a library uses a data format of an older JabRef version (group tree of JabRef 3, `__markedentry` field of JabRef 4, special field values stored in `keywords` by JabRef 5.2 and older), JabRef lists the necessary conversions in a dialog after loading the library. The user selects which conversions to perform; a conversion whose old format JabRef no longer writes is always performed. Performed conversions mark the library as changed.
+When a library uses a data format of an older JabRef version (group tree of JabRef 3, `__markedentry` field of JabRef 4, special field values stored in `keywords` by JabRef 5.2 and older), JabRef lists the necessary conversions in a dialog after loading the library. The user selects which conversions to perform; a conversion whose old format JabRef no longer writes is always performed. Declined conversions are recorded in the library's metadata and not offered again. Performed conversions and recorded choices mark the library as changed.
 
 Needs: impl, utest
 

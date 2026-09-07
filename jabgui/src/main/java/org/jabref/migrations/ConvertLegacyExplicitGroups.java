@@ -25,6 +25,11 @@ public class ConvertLegacyExplicitGroups implements PostOpenMigration {
     }
 
     @Override
+    public String getId() {
+        return "legacyGroups";
+    }
+
+    @Override
     public String getDescription() {
         return Localization.lang("Groups are stored in the format of JabRef 3. Convert them to the current format, which stores the members of a group in the field 'groups' of each entry.");
     }

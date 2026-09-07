@@ -72,6 +72,9 @@ public class MetaDataSerializer {
         metaData.getBlgFilePaths().forEach((user, path) -> stringyMetaData.put(MetaData.BLG_FILE_PATH + "-" + user, List.of(path.toString().trim())));
         metaData.getAiLibraryId().ifPresent(
                 id -> stringyMetaData.put(MetaData.AI_LIBRARY_ID, List.of(id)));
+        if (!metaData.getSkippedMigrations().isEmpty()) {
+            stringyMetaData.put(MetaData.SKIPPED_MIGRATIONS, metaData.getSkippedMigrations());
+        }
 
         for (ContentSelector selector : metaData.getContentSelectorsSorted()) {
             stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());

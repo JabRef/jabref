@@ -25,11 +25,16 @@ import org.jspecify.annotations.NonNull;
 /// Converts the markings of JabRef 4 and older (field `__markedentry`) to groups.
 public class ConvertMarkingToGroups implements PostOpenMigration {
 
-    private static final Pattern MARKING_PATTERN = Pattern.compile("\\[(.*):(\\d+)\\]");
+    private static final Pattern MARKING_PATTERN = Pattern.compile("\\[([^\\[\\]]*):(\\d+)\\]");
 
     @Override
     public boolean isMigrationNecessary(ParserResult parserResult) {
         return parserResult.getDatabase().getEntries().stream().anyMatch(entry -> entry.hasField(InternalField.MARKED_INTERNAL));
+    }
+
+    @Override
+    public String getId() {
+        return "markings";
     }
 
     @Override
@@ -75,14 +80,15 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
                 continue;
             }
 
+            // JabRef 2/3 concatenated one "[owner:level]" token per user; older versions stored the bare user name.
+            // Every token becomes a group, and whatever is left over is kept as its own group so nothing is lost.
             Matcher matcher = MARKING_PATTERN.matcher(marking.get());
-            if (matcher.find()) {
-                String owner = matcher.group(1);
-                String number = matcher.group(2);
-                markings.put(owner + ":" + number, entry);
-            } else {
-                // Not in the expected format, so just add it to not loose information
-                markings.put(marking.get(), entry);
+            while (matcher.find()) {
+                markings.put(matcher.group(1) + ":" + matcher.group(2), entry);
+            }
+            String remainder = matcher.replaceAll("").trim();
+            if (!remainder.isEmpty()) {
+                markings.put(remainder, entry);
             }
         }
 

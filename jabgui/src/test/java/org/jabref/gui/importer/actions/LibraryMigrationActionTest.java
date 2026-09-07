@@ -49,6 +49,15 @@ class LibraryMigrationActionTest {
     }
 
     @Test
+    void declinedMigrationsAreNotOfferedAgain() {
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        ParserResult parserResult = new ParserResult(Set.of(new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]")));
+        parserResult.getMetaData().setSkippedMigrations(List.of("markings"));
+
+        assertEquals(List.of(), LibraryMigrationAction.getNecessaryMigrations(parserResult, preferences));
+    }
+
+    @Test
     void legacyGroupTreeIsDetectedFromMetaData() {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));

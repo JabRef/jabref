@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ParserResult;
@@ -18,6 +19,10 @@ import org.jabref.model.entry.field.SpecialFieldValue;
 /// Moves special field values (`prio1`, `rank3`, `printed`, ...) that JabRef 5.2 and older stored in the
 /// `keywords` field into the special fields themselves.
 public class SpecialFieldsToSeparateFields implements PostOpenMigration {
+    /// Plain English words that JabRef 5.2 also used as special field values. On their own they do not prove
+    /// that a library stores special fields in `keywords`, so they never trigger the offer to migrate.
+    private static final Set<String> AMBIGUOUS_KEYWORDS = Set.of("printed", "read", "skimmed", "relevant");
+
     private final KeywordList possibleKeywordsToMigrate;
     private final Character keywordDelimiter;
     private final Map<String, SpecialField> migrationTable = getMigrationTable();
@@ -38,6 +43,11 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
     }
 
     @Override
+    public String getId() {
+        return "specialFieldsInKeywords";
+    }
+
+    @Override
     public String getDescription() {
         return Localization.lang("Special fields (ranking, priority, read status, ...) are stored in the field 'keywords' (JabRef 5.2 and older). Move them to their own fields.");
     }
@@ -49,17 +59,29 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
 
     private boolean hasKeywordToMigrate(BibEntry entry) {
         KeywordList keywords = entry.getKeywords(keywordDelimiter);
-        return possibleKeywordsToMigrate.stream().anyMatch(keywords::contains);
+        return possibleKeywordsToMigrate.stream()
+                                        .filter(keyword -> !AMBIGUOUS_KEYWORDS.contains(keyword.get()))
+                                        .anyMatch(keywords::contains);
     }
 
     private void migrateEntry(BibEntry entry) {
+        KeywordList keywords = entry.getKeywords(keywordDelimiter);
+        KeywordList migratedKeywords = new KeywordList();
         for (Keyword keyword : possibleKeywordsToMigrate) {
-            if (entry.getKeywords(keywordDelimiter).contains(keyword) && migrationTable.containsKey(keyword.get())) {
-                entry.setField(migrationTable.get(keyword.get()), keyword.get());
+            if (!keywords.contains(keyword) || !migrationTable.containsKey(keyword.get())) {
+                continue;
+            }
+            SpecialField field = migrationTable.get(keyword.get());
+            Optional<String> currentValue = entry.getField(field);
+            if (currentValue.isEmpty()) {
+                entry.setField(field, keyword.get());
+            }
+            // A different value in the special field is not overwritten; the keyword stays so that nothing is lost
+            if (currentValue.orElse(keyword.get()).equals(keyword.get())) {
+                migratedKeywords.add(keyword);
             }
         }
-
-        entry.removeKeywords(possibleKeywordsToMigrate, keywordDelimiter);
+        entry.removeKeywords(migratedKeywords, keywordDelimiter);
     }
 
     /// Mapping of special field values (contained in the keywords) to their corresponding special field

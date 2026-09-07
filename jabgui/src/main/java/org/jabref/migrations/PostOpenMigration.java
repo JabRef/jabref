@@ -11,6 +11,9 @@ public interface PostOpenMigration {
     /// Checks, without modifying anything, whether [#performMigration] would change the library.
     boolean isMigrationNecessary(ParserResult parserResult);
 
+    /// Stable identifier stored in the library's metadata when the user declines the migration.
+    String getId();
+
     /// Explains to the user what the migration changes.
     String getDescription();
 

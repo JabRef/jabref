@@ -174,6 +174,8 @@ public class MetaDataParser {
                 metaData.setVersionDBStructure(getSingleItem(values));
             } else if (MetaData.AI_LIBRARY_ID.equals(entry.getKey())) {
                 metaData.setAiLibraryId(getSingleItem(values));
+            } else if (MetaData.SKIPPED_MIGRATIONS.equals(entry.getKey())) {
+                metaData.setSkippedMigrations(values);
             } else {
                 // Keep meta data items that we do not know in the file
                 metaData.putUnknownMetaDataItem(entry.getKey(), values);

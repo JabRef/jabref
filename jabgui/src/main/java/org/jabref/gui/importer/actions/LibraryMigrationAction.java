@@ -1,6 +1,7 @@
 package org.jabref.gui.importer.actions;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
         Map<PostOpenMigration, CheckBox> checkBoxes = new LinkedHashMap<>();
         VBox content = new VBox(10);
         content.setPrefWidth(600);
-        content.getChildren().add(wrappingLabel(Localization.lang("This library uses data formats of older JabRef versions. Select the conversions to perform:")));
+        content.getChildren().add(wrappingLabel(Localization.lang("This library uses data formats of older JabRef versions. Select the conversions to perform.")));
         for (PostOpenMigration migration : getNecessaryMigrations(parserResult, preferences)) {
             CheckBox checkBox = new CheckBox(migration.getDescription());
             // Descriptions name fields such as "__markedentry"; an underscore must not become a mnemonic marker
@@ -56,6 +57,7 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
         if (checkBoxes.keySet().stream().anyMatch(migration -> !migration.isOptional())) {
             content.getChildren().add(wrappingLabel(Localization.lang("Disabled conversions are always performed, because JabRef no longer writes the old format.")));
         }
+        content.getChildren().add(wrappingLabel(Localization.lang("Deselected conversions are remembered in the library and not offered again.")));
         DialogPane dialogPane = new DialogPane();
         dialogPane.setContent(content);
 
@@ -66,21 +68,28 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
                                                .filter(migrate::equals)
                                                .isPresent();
 
+        List<String> skippedMigrations = new ArrayList<>(parserResult.getMetaData().getSkippedMigrations());
         for (Map.Entry<PostOpenMigration, CheckBox> entry : checkBoxes.entrySet()) {
             PostOpenMigration migration = entry.getKey();
             if (!migration.isOptional() || (migrateSelected && entry.getValue().isSelected())) {
                 migration.performMigration(parserResult);
-                parserResult.setChangedOnMigration(true);
+            } else {
+                skippedMigrations.add(migration.getId());
             }
         }
+        // The declined conversions are part of the library, so the choice survives a reopen
+        parserResult.getMetaData().setSkippedMigrations(skippedMigrations);
+        parserResult.setChangedOnMigration(true);
     }
 
     static List<PostOpenMigration> getNecessaryMigrations(ParserResult parserResult, CliPreferences preferences) {
         Character keywordSeparator = parserResult.getDatabaseContext().getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator());
+        List<String> skippedMigrations = parserResult.getMetaData().getSkippedMigrations();
         return Stream.of(
                              new ConvertLegacyExplicitGroups(),
                              new ConvertMarkingToGroups(),
                              new SpecialFieldsToSeparateFields(keywordSeparator))
+                     .filter(migration -> !skippedMigrations.contains(migration.getId()))
                      .filter(migration -> migration.isMigrationNecessary(parserResult))
                      .toList();
     }

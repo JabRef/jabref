@@ -52,6 +52,7 @@ public class MetaData {
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
     public static final String GROUPS_SEARCH_SYNTAX_VERSION = "groups-search-syntax-version";
+    public static final String SKIPPED_MIGRATIONS = "skippedMigrations";
     public static final String FILE_DIRECTORY = "fileDirectory";
     public static final String FILE_DIRECTORY_LATEX = "fileDirectoryLatex";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
@@ -95,6 +96,7 @@ public class MetaData {
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
     private boolean groupsInLegacyFormat;
+    private List<String> skippedMigrations = List.of();
     @Nullable private String versionDBStructure;
     @Nullable private String aiLibraryId;
     private boolean containsSearchGroups;
@@ -147,6 +149,16 @@ public class MetaData {
 
     public void setGroupsInLegacyFormat(boolean groupsInLegacyFormat) {
         this.groupsInLegacyFormat = groupsInLegacyFormat;
+    }
+
+    /// Ids of the library migrations the user declined; they are not offered again when the library is opened.
+    public List<String> getSkippedMigrations() {
+        return skippedMigrations;
+    }
+
+    public void setSkippedMigrations(List<String> skippedMigrations) {
+        this.skippedMigrations = List.copyOf(skippedMigrations);
+        postChange();
     }
 
     public Optional<Version> getGroupSearchSyntaxVersion() {
@@ -496,6 +508,7 @@ public class MetaData {
                 && Objects.equals(contentSelectors, that.contentSelectors)
                 && Objects.equals(versionDBStructure, that.versionDBStructure)
                 && Objects.equals(aiLibraryId, that.aiLibraryId)
+                && Objects.equals(skippedMigrations, that.skippedMigrations)
                 && (gitAutoPull == that.gitAutoPull)
                 && (gitAutoCommit == that.gitAutoCommit)
                 && (gitAutoPush == that.gitAutoPush);
@@ -504,12 +517,12 @@ public class MetaData {
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId, gitAutoPull, gitAutoCommit, gitAutoPush);
+                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId, skippedMigrations, gitAutoPull, gitAutoCommit, gitAutoPush);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + ", gitAutoPull=" + gitAutoPull + ", gitAutoCommit=" + gitAutoCommit + ", gitAutoPush=" + gitAutoPush + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + ", skippedMigrations=" + skippedMigrations + ", gitAutoPull=" + gitAutoPull + ", gitAutoCommit=" + gitAutoCommit + ", gitAutoPush=" + gitAutoPush + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {
