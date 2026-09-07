@@ -167,7 +167,8 @@ class GroupTreeSharedDatabaseProfileTest {
                 fieldPreferences,
                 GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
                 new DummyFileUpdateMonitor(),
-                "PerformanceProfile");
+                "PerformanceProfile",
+                new CurrentThreadTaskExecutor());
     }
 
     private GroupTreeViewModel createGroupTree(BibDatabaseContext context) throws InterruptedException {

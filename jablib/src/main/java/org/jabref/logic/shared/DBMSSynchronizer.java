@@ -34,7 +34,9 @@ import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
 import org.jabref.logic.shared.notifications.FieldChange;
 import org.jabref.logic.shared.notifications.Notifier;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
@@ -80,6 +82,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);
 
+    private static final long INITIAL_RECONNECT_DELAY_MILLIS = 1_000L;
     private static final long MAX_RECONNECT_DELAY_MILLIS = 30_000L;
 
     private DatabaseConnection dbmsConnection;
@@ -114,6 +117,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final String userAndHost;
     private final Executor remoteUpdateExecutor;
     private final Executor syncExecutor;
+    private final TaskExecutor taskExecutor;
     private final @Nullable ExecutorService ownedSyncExecutor;
 
     /// What the shared database has that the local library has not. Determined on the database
@@ -131,9 +135,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             FieldPreferences fieldPreferences,
                             @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
                             FileUpdateMonitor fileMonitor,
-                            String userAndHost) {
+                            String userAndHost,
+                            TaskExecutor taskExecutor) {
         // Direct executors keep everything synchronous - for tests and headless use
-        this(bibDatabaseContext, keywordSeparator, fieldPreferences, globalCiteKeyPattern, fileMonitor, userAndHost,
+        this(bibDatabaseContext, keywordSeparator, fieldPreferences, globalCiteKeyPattern, fileMonitor, userAndHost, taskExecutor,
                 Runnable::run, Runnable::run, Directories.getSharedDatabaseDirectory());
     }
 
@@ -143,9 +148,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
                             FileUpdateMonitor fileMonitor,
                             String userAndHost,
+                            TaskExecutor taskExecutor,
                             Executor remoteUpdateExecutor) {
         // One background worker so that typing never waits for the database (which may be remote)
-        this(bibDatabaseContext, keywordSeparator, fieldPreferences, globalCiteKeyPattern, fileMonitor, userAndHost, remoteUpdateExecutor,
+        this(bibDatabaseContext, keywordSeparator, fieldPreferences, globalCiteKeyPattern, fileMonitor, userAndHost, taskExecutor, remoteUpdateExecutor,
                 Executors.newSingleThreadExecutor(runnable -> Thread.ofVirtual().name("JabRef - shared database writer").unstarted(runnable)),
                 Directories.getSharedDatabaseDirectory());
     }
@@ -157,9 +163,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                      @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
                      FileUpdateMonitor fileMonitor,
                      String userAndHost,
+                     TaskExecutor taskExecutor,
                      Executor remoteUpdateExecutor,
                      Executor syncExecutor,
                      Path offlineChangesDirectory) {
+        this.taskExecutor = taskExecutor;
         this.syncExecutor = syncExecutor;
         this.ownedSyncExecutor = (syncExecutor instanceof ExecutorService executorService) ? executorService : null;
         this.bibDatabaseContext = bibDatabaseContext;
@@ -604,39 +612,38 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Takes the synchronizer offline: from now on changes are recorded instead of written, and
-    /// a background loop tries to get a new connection.
+    /// a scheduled task tries to get a new connection.
     private void goOffline() {
         if (!connected.compareAndSet(true, false)) {
             return;
         }
         LOGGER.warn("Lost the connection to the shared database - keeping changes locally until it is back");
         eventBus.post(new ConnectionLostEvent(bibDatabaseContext));
-        Thread.ofVirtual().name("JabRef - shared database reconnect").start(this::reconnect);
+        scheduleReconnect(INITIAL_RECONNECT_DELAY_MILLIS);
     }
 
+    /// One attempt per scheduled task, so that waiting for the next one occupies no thread
     // [impl->req~shared-database.automatic-reconnect~1]
-    private void reconnect() {
-        long delayMillis = 1000;
-        while (!closed) {
-            try {
-                Thread.sleep(delayMillis);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-            delayMillis = Math.min(delayMillis * 2, MAX_RECONNECT_DELAY_MILLIS);
-            DatabaseConnection newConnection;
-            try {
-                newConnection = dbmsConnection.openNewConnection();
-            } catch (SQLException e) {
-                LOGGER.debug("Reconnecting to the shared database failed - next attempt in {} ms", delayMillis, e);
-                continue;
-            }
-            // On the database worker: queued writes recorded themselves offline, the swap must
-            // not interleave with them
-            syncExecutor.execute(() -> useConnection(newConnection));
+    private void scheduleReconnect(long delayMillis) {
+        taskExecutor.schedule(BackgroundTask.wrap(() -> reconnect(delayMillis)), delayMillis, TimeUnit.MILLISECONDS);
+    }
+
+    private void reconnect(long delayMillis) {
+        if (closed) {
             return;
         }
+        DatabaseConnection newConnection;
+        try {
+            newConnection = dbmsConnection.openNewConnection();
+        } catch (SQLException e) {
+            long nextDelayMillis = Math.min(delayMillis * 2, MAX_RECONNECT_DELAY_MILLIS);
+            LOGGER.debug("Reconnecting to the shared database failed - next attempt in {} ms", nextDelayMillis, e);
+            scheduleReconnect(nextDelayMillis);
+            return;
+        }
+        // On the database worker: queued writes recorded themselves offline, the swap must
+        // not interleave with them
+        syncExecutor.execute(() -> useConnection(newConnection));
     }
 
     /// Database worker: replaces the dead connection, then synchronizes what happened meanwhile

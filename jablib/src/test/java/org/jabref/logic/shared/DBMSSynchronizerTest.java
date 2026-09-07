@@ -23,6 +23,7 @@ import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
 import org.jabref.logic.shared.notifications.FieldChange;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.logic.util.VirtualThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -85,7 +86,7 @@ class DBMSSynchronizerTest {
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
 
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost");
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", new VirtualThreadTaskExecutor());
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
@@ -156,6 +157,7 @@ class DBMSSynchronizerTest {
                 pattern,
                 new DummyFileUpdateMonitor(),
                 "UserAndHost",
+                new VirtualThreadTaskExecutor(),
                 remoteUpdates::add);
         remoteDatabase.registerListener(remoteSynchronizer);
         remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
@@ -320,7 +322,7 @@ class DBMSSynchronizerTest {
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         // Database work synchronous, model updates captured
-        DBMSSynchronizer synchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", remoteUpdates::add, Runnable::run, offlineChangesDirectory);
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", new VirtualThreadTaskExecutor(), remoteUpdates::add, Runnable::run, offlineChangesDirectory);
         database.registerListener(synchronizer);
         synchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
 
@@ -353,7 +355,7 @@ class DBMSSynchronizerTest {
     private DBMSSynchronizer newSynchronousSynchronizer(BibDatabaseContext context) {
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
-        DBMSSynchronizer synchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", Runnable::run, Runnable::run, offlineChangesDirectory);
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", new VirtualThreadTaskExecutor(), Runnable::run, Runnable::run, offlineChangesDirectory);
         context.getDatabase().registerListener(synchronizer);
         return synchronizer;
     }

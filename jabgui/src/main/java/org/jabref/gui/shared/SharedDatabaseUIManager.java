@@ -221,6 +221,7 @@ public class SharedDatabaseUIManager {
                 preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
                 fileUpdateMonitor,
                 preferences.getFilePreferences().getUserAndHost(),
+                taskExecutor,
                 UiTaskExecutor::runNowOrInJavaFXThread);
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
         return bibDatabaseContext;
