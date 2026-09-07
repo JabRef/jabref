@@ -339,9 +339,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         scanGeneration++;
         monitoredPath.ifPresent(path -> {
             fileMonitor.removeListener(path, this);
-            if (database.getLocation() == DatabaseLocation.LOCAL) {
-                preferences.getLibraryPreferences().autoSaveProperty().removeListener(synchronizingListener);
-            }
+            // Unconditionally: the library may have been converted to a shared one since the listener was added,
+            // and removing a listener that was never added is a no-op
+            preferences.getLibraryPreferences().autoSaveProperty().removeListener(synchronizingListener);
         });
     }
 }
