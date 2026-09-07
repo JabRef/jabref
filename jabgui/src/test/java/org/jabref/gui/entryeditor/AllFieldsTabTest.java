@@ -1,12 +1,10 @@
 package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
@@ -48,6 +46,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
+import de.sandec.jmemorybuddy.JMemoryBuddy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,7 +54,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 import org.testfx.framework.junit5.ApplicationExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -194,24 +192,22 @@ class AllFieldsTabTest {
                 .withField(StandardField.JOURNAL, "Journal")
                 .withField(StandardField.YEAR, "2021");
 
-        List<WeakReference<FieldEditorFX>> editorsEverCreated = new ArrayList<>();
+        List<FieldEditorFX> everCreated = new ArrayList<>();
         for (int rebuild = 0; rebuild < 10; rebuild++) {
             runOnFxThreadAndWait(() -> {
                 tab.bindToEntry(entry);
-                tab.editors.values().forEach(editor -> editorsEverCreated.add(new WeakReference<>(editor)));
+                everCreated.addAll(tab.editors.values());
             });
         }
-        int currentGeneration = tab.editors.size();
 
-        long stillAlive = editorsEverCreated.size();
-        for (int attempt = 0; (attempt < 20) && (stillAlive > currentGeneration); attempt++) {
-            System.gc();
-            Thread.sleep(50);
-            stillAlive = editorsEverCreated.stream().map(WeakReference::get).filter(Objects::nonNull).count();
-        }
-
-        assertEquals(currentGeneration, stillAlive,
-                "only the editors currently shown may survive; " + (editorsEverCreated.size() - currentGeneration) + " were discarded");
+        JMemoryBuddy.memoryTest(checker -> {
+            everCreated.stream()
+                       .filter(editor -> !tab.editors.containsValue(editor))
+                       .forEach(checker::assertCollectable);
+            tab.editors.values().forEach(checker::setAsReferenced);
+            // The list itself must not keep the discarded editors alive
+            everCreated.clear();
+        });
     }
 
     @Test
