@@ -30,12 +30,13 @@ env:
 jobs:
   check:
     name: Would merge into ${{ github.event.pull_request.base.ref == 'stable' && 'main' || 'stable' }}
-    # A port PR (head "port-*") carries a change the other branch already has - never port it back.
+    # A port PR (head "port-*" in this repository - a fork branch of that name is just a branch)
+    # carries a change the other branch already has - never port it back.
     if: >
       github.repository == 'JabRef/jabref' &&
       github.event.action != 'closed' &&
       github.event.pull_request.state == 'open' &&
-      !startsWith(github.event.pull_request.head.ref, 'port-') &&
+      !(github.event.pull_request.head.repo.full_name == 'JabRef/jabref' && startsWith(github.event.pull_request.head.ref, 'port-')) &&
       (
         github.event.pull_request.base.ref == 'stable' ||
         (github.event.pull_request.base.ref == 'main' && contains(github.event.pull_request.labels.*.name, 'dev: into-stable'))
@@ -85,7 +86,7 @@ jobs:
       github.repository == 'JabRef/jabref' &&
       github.event.action == 'closed' &&
       github.event.pull_request.merged &&
-      !startsWith(github.event.pull_request.head.ref, 'port-') &&
+      !(github.event.pull_request.head.repo.full_name == 'JabRef/jabref' && startsWith(github.event.pull_request.head.ref, 'port-')) &&
       (
         github.event.pull_request.base.ref == 'stable' ||
         (github.event.pull_request.base.ref == 'main' && contains(github.event.pull_request.labels.*.name, 'dev: into-stable'))

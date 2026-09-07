@@ -88,7 +88,7 @@ The fix is made on the release branch and merged forward, the approach Fowler de
 
 Setting up the branch (once, by an administrator):
 
-1. Create `stable` from the current release tag: `git push origin v6.0-alpha.6:refs/heads/stable`, and re-add an empty `## [Unreleased]` section to its `CHANGELOG.md`.
+1. Create `stable` at the next regular release from the release commit on `main`: `git push origin <release tag>:refs/heads/stable`. The workflows, the composite action, and the merge driver must be present on `stable`, because `pull_request_target` runs the workflow of the base branch; an older release tag lacks them, so creating `stable` from it requires porting this infrastructure by hand first. Then re-add an empty `## [Unreleased]` section to its `CHANGELOG.md`.
 2. Copy the branch protection of `main` to `stable`: the same required status checks, the merge queue, and "Allow auto-merge". Without it, the `automerge` label on a clean port pull request has nothing to wait for and GitHub refuses to enable auto-merge.
 3. Create the label `dev: into-stable`.
 

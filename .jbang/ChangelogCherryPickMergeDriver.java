@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
 
-//JAVA 21+
+//JAVA 25+
 //DEPS org.jspecify:jspecify:1.0.0
 
 /// Git merge driver for `CHANGELOG.md` when a change is ported between `main` and `stable`
@@ -161,18 +161,23 @@ public class ChangelogCherryPickMergeDriver {
             end++;
         }
         LinkedHashMap<String, List<String>> sections = new LinkedHashMap<>();
-        List<String> items = null;
+        // Collects entries that precede the first "### " heading; any such entry makes the file unparsable
+        List<String> beforeFirstSection = new ArrayList<>();
+        List<String> items = beforeFirstSection;
         for (String line : lines.subList(firstVersion + 1, end)) {
             if (line.startsWith("### ")) {
                 items = sections.computeIfAbsent(line, heading -> new ArrayList<>());
-            } else if (line.startsWith("- ") && items != null) {
+            } else if (line.startsWith("- ")) {
                 items.add(line);
-            } else if (line.startsWith(" ") && items != null && !items.isEmpty()) {
+            } else if (line.startsWith(" ") && !items.isEmpty()) {
                 // Continuation line of a wrapped entry
                 items.set(items.size() - 1, items.getLast() + "\n" + line);
             } else if (!line.isBlank()) {
                 return Optional.empty();
             }
+        }
+        if (!beforeFirstSection.isEmpty()) {
+            return Optional.empty();
         }
         return Optional.of(new Changelog(lines.subList(0, firstVersion), sections, lines.subList(end, lines.size())));
     }

@@ -21,7 +21,7 @@ jobs:
     if: >
       github.repository == 'JabRef/jabref' &&
       github.event.pull_request.base.ref == 'main' &&
-      !startsWith(github.event.pull_request.head.ref, 'port-') &&
+      !(github.event.pull_request.head.repo.full_name == 'JabRef/jabref' && startsWith(github.event.pull_request.head.ref, 'port-')) &&
       (github.event.action == 'opened' || github.event.changes.body)
     runs-on: ubuntu-slim
     steps:
