@@ -441,7 +441,7 @@ public class GroupTreeView extends BorderPane {
             List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
             List<GroupNodeViewModel> changedGroups = new LinkedList<>();
             // One drag is one undo step, however many groups it moved.
-            viewModel.recordTreeChange(Localization.lang("Move group"), _ -> {
+            viewModel.recordTreeChange(Localization.lang("Move group"), () -> {
                 for (String pathToSource : pathToSources) {
                     Optional<GroupNodeViewModel> source = viewModel
                             .rootGroupProperty().get()

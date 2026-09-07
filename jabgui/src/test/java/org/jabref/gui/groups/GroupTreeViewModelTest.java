@@ -42,6 +42,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -124,6 +125,26 @@ class GroupTreeViewModelTest {
         assertTrue(journal.canUndo(), "the sort was not recorded");
         journal.undo();
         assertEquals(List.of("B", "A"), childNames());
+    }
+
+    /// A step that describes only half of what happened is worse than none: the library would hold
+    /// a tree the journal cannot take back.
+    @Test
+    void aFailingOperationStillRecordsWhatItChanged() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
+        databaseContext.getMetaData().setGroups(root);
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+
+        assertThrows(IllegalStateException.class, () -> groupTree.recordTreeChange("failing", () -> {
+            databaseContext.getMetaData().getGroups().orElseThrow()
+                           .addSubgroup(new ExplicitGroup("Books", GroupHierarchyType.INDEPENDENT, ','));
+            throw new IllegalStateException("operation failed");
+        }));
+
+        assertEquals(List.of("Books"), childNames());
+        assertTrue(journal.canUndo(), "what the failed operation changed was not recorded");
+        journal.undo();
+        assertEquals(List.of(), childNames());
     }
 
     private List<String> childNames() {

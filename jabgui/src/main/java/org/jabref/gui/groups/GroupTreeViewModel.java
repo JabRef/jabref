@@ -25,6 +25,7 @@ import javafx.stage.WindowEvent;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
@@ -279,11 +280,24 @@ public class GroupTreeViewModel extends AbstractViewModel {
             MetaData metaData = database.getMetaData();
             Optional<GroupTreeNode> before = metaData.getGroups().map(GroupTreeNode::copySubtree);
             stateManager.getUndoManager(database).addEdit(name, edit -> {
-                operation.accept(edit);
-                writeGroupChangesToMetaData();
-                edit.addEdit(new UndoableGroupTreeChange(metaData, before, metaData.getGroups()));
+                try {
+                    operation.accept(edit);
+                } finally {
+                    // Also when the operation failed part-way: the tree holds what it managed to
+                    // change, and a step that took back only the entry assignments would leave the
+                    // library in a state nothing describes. The journal hands over a failed block's
+                    // changes for the same reason.
+                    writeGroupChangesToMetaData();
+                    edit.addEdit(new UndoableGroupTreeChange(metaData, before, metaData.getGroups()));
+                }
             });
         });
+    }
+
+    /// For a gesture handler that has no changes of its own to hand over — see
+    /// [#recordTreeChange(String,Consumer)].
+    public void recordTreeChange(String name, Runnable operation) {
+        recordTreeChange(name, _ -> operation.run());
     }
 
     private boolean isGroupTypeEqual(AbstractGroup oldGroup, AbstractGroup newGroup) {
@@ -718,13 +732,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// TODO: warn before assigning to a group whose membership is written to a field other than
     /// `keywords`, since that edits the entries in a way the user may not expect.
     public void addSelectedEntries(GroupNodeViewModel group) {
-        recordEntryChange(Localization.lang("Assign entries to group"),
+        recordEntryChange(StandardActions.GROUP_ENTRIES_ADD.getText(),
                 edit -> edit.addAll(group.getGroupNode().addEntriesToGroup(stateManager.getSelectedEntries())));
     }
 
     /// See [#addSelectedEntries] for the warning this still owes the user.
     public void removeSelectedEntries(GroupNodeViewModel group) {
-        recordEntryChange(Localization.lang("Remove entries from group"),
+        recordEntryChange(StandardActions.GROUP_ENTRIES_REMOVE.getText(),
                 edit -> edit.addAll(group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries())));
     }
 
@@ -737,7 +751,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     Localization.lang("Clear"));
             if (confirmation) {
                 List<BibEntry> entriesInGroup = groupNode.getEntriesInGroup(this.currentDatabase.get().getEntries());
-                recordEntryChange(Localization.lang("Clear group"),
+                recordEntryChange(StandardActions.GROUP_ENTRIES_CLEAR.getText(),
                         edit -> edit.addAll(groupNode.removeEntriesFromGroup(entriesInGroup)));
                 dialogService.notify(Localization.lang("Cleared group \"%0\".", group.getDisplayName()));
             }

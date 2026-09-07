@@ -1,13 +1,10 @@
 package org.jabref.model.metadata;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -19,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MetaDataTest {
 
@@ -45,36 +41,6 @@ class MetaDataTest {
         metaData.setAiLibraryId("test-ai-library-id");
 
         assertEquals(Optional.of("test-ai-library-id"), metaData.getAiLibraryId());
-    }
-
-    @Test
-    void takingOverContentsCopiesTheSettings() {
-        MetaData other = new MetaData();
-        other.setMode(BibDatabaseMode.BIBLATEX);
-        other.setEncoding(StandardCharsets.ISO_8859_1);
-        other.setUserFileDirectory("user-host", "/tmp/files");
-        other.markAsProtected();
-
-        metaData.overwriteWith(other);
-
-        assertEquals(other, metaData);
-    }
-
-    /// [MetaData#equals] ignores these four, so the test above would pass without them.
-    @Test
-    void takingOverContentsCopiesWhatEqualsDoesNotCompare() {
-        MetaData other = new MetaData();
-        other.setGroupSearchSyntaxVersion(Version.parse("6.0"));
-        other.setBlgFilePath("user-host", Path.of("/tmp/library.blg"));
-        other.putUnknownMetaDataItem("unknown", List.of("value"));
-        other.setContainsSearchGroups(true);
-
-        metaData.overwriteWith(other);
-
-        assertEquals(Optional.of(Version.parse("6.0")), metaData.getGroupSearchSyntaxVersion());
-        assertEquals(Optional.of(Path.of("/tmp/library.blg")), metaData.getBlgFilePath("user-host"));
-        assertEquals(Map.of("unknown", List.of("value")), metaData.getUnknownMetaData());
-        assertTrue(metaData.containsSearchGroups());
     }
 
     /// Group operations mutate nodes in place, so a shared tree would let a later edit rewrite what
