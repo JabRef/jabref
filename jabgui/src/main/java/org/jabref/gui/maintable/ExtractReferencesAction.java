@@ -135,7 +135,7 @@ public class ExtractReferencesAction extends SimpleCommand {
             // subsequent files are just appended to result
             Iterator<Path> fileListIterator = fileList.iterator();
             fileListIterator.next(); // skip first file
-            extractReferences(fileListIterator, result, currentEntry);
+            extractReferences(databaseContext, fileListIterator, result, currentEntry);
 
             // handle subsequent entries
             Iterator<BibEntry> selectedEntriesIterator = selectedEntries.iterator();
@@ -144,21 +144,22 @@ public class ExtractReferencesAction extends SimpleCommand {
                 currentEntry = selectedEntriesIterator.next();
                 fileList = FileUtil.getListOfLinkedFiles(List.of(currentEntry), databaseContext.getFileDirectories(preferences.getFilePreferences()));
                 fileListIterator = fileList.iterator();
-                extractReferences(fileListIterator, result, currentEntry);
+                extractReferences(databaseContext, fileListIterator, result, currentEntry);
             }
 
             return result;
         };
     }
 
-    private void extractReferences(Iterator<Path> fileListIterator, ParserResult result, BibEntry currentEntry) {
+    private void extractReferences(BibDatabaseContext databaseContext, Iterator<Path> fileListIterator, ParserResult result, BibEntry currentEntry) {
         while (fileListIterator.hasNext()) {
             result.getDatabase().insertEntries(ruleBasedBibliographyPdfImporter.importDatabase(fileListIterator.next()).getDatabase().getEntries());
         }
 
         String cites = getCites(result.getDatabase().getEntries(), currentEntry);
+        // The library the entry belongs to, not whichever is active when this finishes.
         UiTaskExecutor.runInJavaFXThread(() ->
-                stateManager.getUndoManager(stateManager.getActiveDatabase().orElseThrow())
+                stateManager.getUndoManager(databaseContext)
                             .applyEdit(new UndoableFieldChange(currentEntry, StandardField.CITES,
                                     currentEntry.getField(StandardField.CITES).orElse(null), cites)));
     }

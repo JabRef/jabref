@@ -26,13 +26,16 @@ public final class GroupChange extends DatabaseChange {
     public void applyChange(CompoundEdit undoEdit) {
         GroupTreeNode newRoot = groupDiff.getNewGroupRoot();
 
+        // Before the root below is installed: a library that had no groups has to end up with none
+        // again when this change is undone, not with the empty root accepting it created.
+        Optional<GroupTreeNode> before = databaseContext.getMetaData().getGroups().map(GroupTreeNode::copySubtree);
+
         GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
             GroupTreeNode groupTreeNode = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
             databaseContext.getMetaData().setGroups(groupTreeNode);
             return groupTreeNode;
         });
 
-        GroupTreeNode before = root.copySubtree();
         root.removeAllChildren();
         if (newRoot == null) {
             // I think setting root to null is not possible
@@ -48,7 +51,7 @@ public final class GroupChange extends DatabaseChange {
         // is undone silently once a later operation installs a fresh tree, and those nodes are then
         // no longer the ones the library holds.
         undoEdit.addEdit(new UndoableGroupTreeChange(
-                databaseContext.getMetaData(), Optional.of(before), databaseContext.getMetaData().getGroups()));
+                databaseContext.getMetaData(), before, databaseContext.getMetaData().getGroups()));
     }
 
     public GroupDiff getGroupDiff() {
