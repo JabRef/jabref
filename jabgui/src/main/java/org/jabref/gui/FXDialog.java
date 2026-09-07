@@ -56,14 +56,8 @@ public class FXDialog extends Alert {
             initModality(Modality.NONE);
         }
 
-        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                dialogWindow.close();
-                event.consume();
-            }
-        });
-        this.setOnShowing(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));
+        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> BaseDialog.closeOnKeyBindingMatch(event, this));
+        this.setOnShown(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));
     }
 
     public FXDialog(AlertType type) {
