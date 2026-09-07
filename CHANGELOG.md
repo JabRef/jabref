@@ -78,7 +78,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We re-added the conversion of libraries written by JabRef 3 and 4 (groups, marked entries, special fields stored in keywords) and now ask which conversions to perform before changing the library. [#TODO](https://github.com/JabRef/jabref/pull/TODO)
+- We re-added the conversion of libraries written by JabRef 3 and 4 (groups, marked entries, special fields stored in keywords) and now ask which conversions to perform before changing the library. [#16941](https://github.com/JabRef/jabref/pull/16941)
 - We removed the keystore fields, the server timezone, and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We changed remembered shared database passwords to use the operating system credential store. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We moved zotero-related settings from openoffice panel to openoffice/libreoffice preference tab. [#16352](https://github.com/JabRef/jabref/issues/16352)
