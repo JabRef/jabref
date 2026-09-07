@@ -27,7 +27,7 @@
             </Button>
             <Pane prefHeight="10" VBox.vgrow="ALWAYS"/>
             <Group>
-                <Label fx:id="typeLabel" rotate="270" styleClass="h5,padding-2">
+                <Label fx:id="typeLabel" rotate="270" styleClass="h5,padding-4">
                     <tooltip>
                         <Tooltip text="%Change entry type"/>
                     </tooltip>

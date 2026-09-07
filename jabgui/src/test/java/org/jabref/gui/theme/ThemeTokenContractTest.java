@@ -30,11 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 /// jabref-base.css styles JabRef's own controls exclusively through `-color-*` tokens that the
 /// active theme declares per color scheme. Two things have to hold for a theme to be swappable:
 ///
-/// 1. The base stylesheet must not declare colors of its own. It is installed last, so anything it
-///    declares would silently win over the theme.
+/// 1. The base stylesheet must not declare colors of its own.
+///    It is installed last, so anything it declares would silently win over the theme.
 /// 2. Every theme must declare every token that is used, otherwise JavaFX falls back to a default
-///    and the control silently loses its color. Those warnings are suppressed at runtime by
-///    [org.jabref.gui.logging.JavaFxCssLogFilter], so nothing else would report the gap.
+///    and the control silently loses its color.
+/// 3. Every token a theme declares must be read by someone.
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 class ThemeTokenContractTest {
 
@@ -42,11 +42,11 @@ class ThemeTokenContractTest {
 
     private static final String BASE_CSS = "internal/jabref-base.css";
 
-    /// A `-color-…` token. The look-behind keeps `-fx-body-color-bottomup` from reading as a use of `-color-bottomup`.
+    /// A `-color-*` token.
     private static final Pattern TOKEN = Pattern.compile("(?<![A-Za-z0-9])(-color-[a-z0-9-]*[a-z0-9])");
     private static final Pattern COMMENT = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
 
-    /// Hex literals, `rgb()`/`rgba()` literals, and the CSS color keywords JabRef used to hardcode.
+    /// Hex literals, `rgb()`/`rgba()` literals, and the CSS color keywords JabRef should not hardcode.
     private static final Pattern LITERAL_COLOR = Pattern.compile(
             "#[0-9A-Fa-f]{3,8}\\b"
                     + "|rgba?\\(\\s*[0-9]"
@@ -56,11 +56,7 @@ class ThemeTokenContractTest {
     /// them. They follow whatever the theme sets, so they are not part of the contract.
     private static final Pattern DERIVED_IN_BASE = Pattern.compile("-color-(?:match|ai-message)-.*");
 
-    /// JavaFX's own color variables, as read on the value side of a declaration. Each of these is a
-    /// plain alias that the theme's `.root` assigns straight from a token, so reading the token
-    /// instead is equivalent -- and keeps the color visible where a theme author looks for it.
-    ///
-    /// [#LADDER_COLOR] is deliberately not part of this list.
+    /// JavaFX's own color variables, as read on the value side of a declaration.
     private static final Pattern JAVAFX_COLOR = Pattern.compile(
             "-fx-(?:base|background|color|accent|body-color|control-inner-background(?:-alt)?"
                     + "|(?:dark|mid|light)-text-color|focused-text-base-color"
@@ -71,23 +67,20 @@ class ThemeTokenContractTest {
 
     /// Modena computes these three with `ladder()`, picking light, dark or mid-text according to the
     /// brightness of `-fx-color`, `-fx-background` and `-fx-control-inner-background` respectively.
-    ///
-    /// They are welcome in JabRef's stylesheets. Every input to those ladders -- the three surfaces
-    /// and the three `-fx-*-text-color` outputs -- is something the theme sets from a token, so the
-    /// result is fully theme-controlled, exactly like the derived tokens above. Pinning them to a
-    /// single foreground would throw away the automatic light/dark flip that keeps text readable when
-    /// a control's surface changes underneath it (hover, pressed, selected).
     private static final Pattern LADDER_COLOR = Pattern.compile("-fx-text-(?:base|inner|background)-color(?![a-z0-9-])");
 
     /// The right-hand side of every `-property: value;` declaration.
     private static final Pattern DECLARATION = Pattern.compile("^\\s*-[a-z-]+\\s*:(.*)$", Pattern.MULTILINE);
+
+    /// Primer's raw color ramps -- `-color-base-0` - `-color-base-9`.
+    private static final Pattern PALETTE_RAMP = Pattern.compile("-color-(?:base|accent|success|warning|danger)-[0-9]|-color-(?:dark|light)");
 
     @BeforeEach
     void beforeEach() {
         CssParser.errorsProperty().clear();
     }
 
-    /// @return the body of `@media (prefers-color-scheme: <colorScheme>) { … }`, comments stripped
+    /// @return the body of `@media (prefers-color-scheme: <colorScheme>) { ... }`, comments stripped
     private static String colorSchemeBlock(String css, String colorScheme) {
         String content = withoutComments(read(css));
         String header = "@media (prefers-color-scheme: %s)".formatted(colorScheme);
@@ -186,6 +179,29 @@ class ThemeTokenContractTest {
         assertEquals(Set.of(), undeclared, "%s reads -color- tokens it never declares".formatted(themeCss));
     }
 
+    /// The other direction of [#themeDeclaresEveryTokenTheBaseStylesheetUses]: that test only looks at
+    /// tokens something already uses, so a token every theme declares but nobody reads is invisible to
+    /// it.
+    @ParameterizedTest
+    @EnumSource(ThemePreset.class)
+    void themeDeclaresNoTokenNobodyReads(ThemePreset theme) {
+        String themeCss = theme.getStyleSheet().getName();
+
+        Set<String> read = new TreeSet<>(tokens(BASE_CSS, Kind.USE));
+        read.addAll(tokens(ThemePreset.JABREF.getStyleSheet().getName(), Kind.USE));
+        read.addAll(tokens(themeCss, Kind.USE));
+
+        for (String colorScheme : List.of("light", "dark")) {
+            Set<String> unread = new TreeSet<>(tokensIn(colorSchemeBlock(themeCss, colorScheme), Kind.DECLARATION));
+            unread.removeAll(read);
+            unread.removeIf(token -> PALETTE_RAMP.matcher(token).matches());
+
+            assertEquals(Set.of(), unread,
+                    "%s declares -color- tokens for 'prefers-color-scheme: %s' that no stylesheet reads"
+                            .formatted(themeCss, colorScheme));
+        }
+    }
+
     @Test
     void baseStylesheetDeclaresNoThemeColors() {
         Set<String> declared = new TreeSet<>(tokens(BASE_CSS, Kind.DECLARATION));
@@ -211,9 +227,6 @@ class ThemeTokenContractTest {
                 "jabref-base.css should read the -color- token these JavaFX variables are aliases for");
     }
 
-    /// Guards the exception rather than just tolerating it: if these stop being ladders -- because a
-    /// theme pinned them in `.root`, say -- the reasoning in [#LADDER_COLOR] no longer holds and the
-    /// uses in jabref-base.css should be revisited.
     @ParameterizedTest
     @EnumSource(ThemePreset.class)
     void themeLeavesTheLadderColorsToModena(ThemePreset theme) {
