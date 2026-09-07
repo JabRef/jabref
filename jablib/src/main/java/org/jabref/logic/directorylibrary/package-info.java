@@ -1,6 +1,6 @@
 /// Opens a directory as a library: each Hayagriva `.yml` or Markdown sidecar
 /// ([org.jabref.logic.directorylibrary.MarkdownSidecar]) next to a PDF holds one or more entries,
-/// and the folder tree is mirrored as groups. Design: <https://devdocs.jabref.org/decisions/0071-directory-as-library-with-hayagriva-sidecars.html>,
+/// and the folder tree is mirrored as groups. Design: <https://devdocs.jabref.org/decisions/0072-directory-as-library-with-hayagriva-sidecars.html>,
 /// requirements: <https://devdocs.jabref.org/requirements/directory-library.html>.
 ///
 /// Entry points:
