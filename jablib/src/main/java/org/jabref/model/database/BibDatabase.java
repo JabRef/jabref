@@ -58,8 +58,8 @@ public class BibDatabase {
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
 
     // BibEntryId to BibEntry
-    private final Map<String, BibEntry> entriesId = new HashMap<>();
-    private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
+    private final Map<String, BibEntry> entryIdToBibEntry = new HashMap<>();
+    private Map<String, BibtexString> stringToBibtexString = new ConcurrentHashMap<>();
 
     // Not included in equals, because it is not relevant for the content of the database
     private final EventBus eventBus = new EventBus();
@@ -87,7 +87,7 @@ public class BibDatabase {
     }
 
     public BibDatabase() {
-        this.registerListener(new KeyChangeListener(this));
+        this.registerListener(new CitationKeyListener(this));
     }
 
     /// Returns the number of entries.
@@ -187,7 +187,7 @@ public class BibDatabase {
         eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
         entries.addAll(newEntries);
         newEntries.forEach(entry -> {
-                    entriesId.put(entry.getId(), entry);
+                    entryIdToBibEntry.put(entry.getId(), entry);
                     indexEntry(entry);
                 }
         );
@@ -229,7 +229,7 @@ public class BibDatabase {
         }
 
         toBeDeleted.forEach(entry -> {
-            entriesId.remove(entry.getId());
+            entryIdToBibEntry.remove(entry.getId());
             removeEntryFromIndex(entry);
         });
 
@@ -313,11 +313,11 @@ public class BibDatabase {
             throw new KeyCollisionException("A string with that label already exists", id);
         }
 
-        if (bibtexStrings.containsKey(id)) {
+        if (stringToBibtexString.containsKey(id)) {
             throw new KeyCollisionException("Duplicate BibTeX string id.", id);
         }
 
-        bibtexStrings.put(id, string);
+        stringToBibtexString.put(id, string);
     }
 
     /// Replaces the existing lists of BibTexString with the given one
@@ -325,30 +325,30 @@ public class BibDatabase {
     ///
     /// @param stringsToAdd The collection of strings to set
     public void setStrings(List<BibtexString> stringsToAdd) {
-        bibtexStrings = new ConcurrentHashMap<>();
+        stringToBibtexString = new ConcurrentHashMap<>();
         stringsToAdd.forEach(this::addString);
     }
 
     /// Removes the string with the given id.
     public void removeString(String id) {
-        bibtexStrings.remove(id);
+        stringToBibtexString.remove(id);
     }
 
     /// Returns a Set of keys to all BibtexString objects in the database.
     /// These are in no sorted order.
     public Set<String> getStringKeySet() {
-        return bibtexStrings.keySet();
+        return stringToBibtexString.keySet();
     }
 
     /// Returns a Collection of all BibtexString objects in the database.
     /// These are in no particular order.
     public Collection<BibtexString> getStringValues() {
-        return bibtexStrings.values();
+        return stringToBibtexString.values();
     }
 
     /// Returns the string with the given id.
     public Optional<BibtexString> getString(String id) {
-        return Optional.ofNullable(bibtexStrings.get(id));
+        return Optional.ofNullable(stringToBibtexString.get(id));
     }
 
     /// Returns the string with the given name/label
@@ -358,12 +358,12 @@ public class BibDatabase {
 
     /// Returns the number of strings.
     public int getStringCount() {
-        return bibtexStrings.size();
+        return stringToBibtexString.size();
     }
 
     /// Check if there are strings.
     public boolean hasNoStrings() {
-        return bibtexStrings.isEmpty();
+        return stringToBibtexString.isEmpty();
     }
 
     /// Copies the preamble of another BibDatabase.
@@ -375,7 +375,7 @@ public class BibDatabase {
 
     /// Returns true if a string with the given label already exists.
     public synchronized boolean hasStringByName(String label) {
-        return bibtexStrings.values().stream().anyMatch(value -> value.getName().equals(label));
+        return stringToBibtexString.values().stream().anyMatch(value -> value.getName().equals(label));
     }
 
     /// Resolves any references to strings contained in this field content,
@@ -400,7 +400,7 @@ public class BibDatabase {
             }
         }
 
-        return allUsedIds.stream().map(bibtexStrings::get).toList();
+        return allUsedIds.stream().map(stringToBibtexString::get).toList();
     }
 
     /// Take the given collection of BibEntry and resolve any string
@@ -445,7 +445,7 @@ public class BibDatabase {
     /// If the string is undefined, returns null.
     @NonNull
     private Optional<String> resolveString(@NonNull String label, @NonNull Set<String> usedIds, @NonNull Set<String> allUsedIds) {
-        for (BibtexString string : bibtexStrings.values()) {
+        for (BibtexString string : stringToBibtexString.values()) {
             if (string.getName().equalsIgnoreCase(label)) {
                 // First, check if this string label has been resolved
                 // earlier in this recursion. If so, we have a
@@ -675,7 +675,7 @@ public class BibDatabase {
     }
 
     public Optional<BibEntry> getEntryById(String id) {
-        return Optional.ofNullable(entriesId.get(id));
+        return Optional.ofNullable(entryIdToBibEntry.get(id));
     }
 
     @Override
@@ -687,7 +687,7 @@ public class BibDatabase {
             return false;
         }
         return Objects.equals(entries, that.entries)
-                && Objects.equals(bibtexStrings, that.bibtexStrings)
+                && Objects.equals(stringToBibtexString, that.stringToBibtexString)
                 && Objects.equals(preamble, that.preamble)
                 && Objects.equals(epilog, that.epilog)
                 && Objects.equals(sharedDatabaseID, that.sharedDatabaseID)
@@ -696,6 +696,6 @@ public class BibDatabase {
 
     @Override
     public int hashCode() {
-        return Objects.hash(entries, bibtexStrings, preamble, epilog, sharedDatabaseID, newLineSeparator);
+        return Objects.hash(entries, stringToBibtexString, preamble, epilog, sharedDatabaseID, newLineSeparator);
     }
 }

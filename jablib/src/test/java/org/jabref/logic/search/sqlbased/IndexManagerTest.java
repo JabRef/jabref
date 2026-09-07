@@ -72,7 +72,7 @@ class IndexManagerTest {
 
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "old");
         databaseContext.getDatabase().insertEntry(entry);
-        indexManager.updateEntry(new FieldChangedEvent(entry, StandardField.TITLE, "new", "old"));
+        indexManager.updateEntry(new FieldChangedEvent(entry, StandardField.TITLE, "old", "new"));
 
         DelayTaskThrottler throttler = getPrivateField(indexManager, "indexUpdateThrottler", DelayTaskThrottler.class);
         ScheduledFuture<?> scheduledTaskBeforeClose = getPrivateField(throttler, "scheduledTask", ScheduledFuture.class);

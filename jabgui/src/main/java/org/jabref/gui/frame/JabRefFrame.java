@@ -47,9 +47,9 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
@@ -59,6 +59,9 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.SharedDatabaseSessionService;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -96,7 +99,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private final Stage mainStage;
     private final StateManager stateManager;
-    private final GuiUndoManager undoManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -124,7 +126,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        GuiPreferences preferences,
                        AiService aiService,
                        StateManager stateManager,
-                       GuiUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
@@ -136,7 +137,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.preferences = preferences;
         this.aiService = aiService;
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
@@ -155,7 +155,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this::getOpenDatabaseAction,
                 entryTypesManager,
                 fileUpdateMonitor,
-                undoManager,
                 clipBoardManager,
                 taskExecutor);
         Injector.setModelOrService(UiMessageHandler.class, this);
@@ -170,14 +169,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this,
                 stateManager,
                 this.preferences,
-                undoManager,
                 dialogService,
                 SearchType.NORMAL_SEARCH);
 
         this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
                 // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager),
-                new RedoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager));
+                new UndoAction(dialogService, stateManager),
+                new RedoAction(dialogService, stateManager));
         Injector.setModelOrService(EntryEditor.class, entryEditor);
 
         this.sidePane = new SidePane(
@@ -191,7 +189,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager);
+                gitHandlerRegistry);
 
         this.pushToApplicationCommand = new GuiPushToApplicationCommand(
                 stateManager,
@@ -233,8 +231,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 taskExecutor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager,
-                journalAbbreviationRepository);
+                journalAbbreviationRepository,
+                gitHandlerRegistry);
 
         MainMenu mainMenu = new MainMenu(
                 this,
@@ -248,7 +246,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 journalAbbreviationRepository,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 this::getOpenDatabaseAction,
                 aiService,
@@ -428,6 +425,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
                 stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
+                // The editor keeps its last entry on an empty selection (req~entry-editor.keep-showing~1), which
+                // would leave another library's entry on screen here; the new library has nothing to edit yet.
+                if (libraryTab.getSelectedEntries().isEmpty()) {
+                    stateManager.getEditorShowing().set(false);
+                }
 
                 // Update active search query when switching between databases
                 if (preferences.getSearchPreferences().shouldKeepSearchString()) {
@@ -558,9 +560,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 taskExecutor,
+                gitHandlerRegistry,
                 fileHistory,
                 Injector.instantiateModelOrService(BuildInfo.class),
                 preferences.getWorkspacePreferences());
@@ -581,9 +583,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
         addTab(libraryTab, raisePanel);
     }
 
@@ -685,9 +687,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
     }
 
     /// Refreshes the ui after preferences changes
@@ -699,11 +701,34 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void openLastEditedDatabases() {
         List<Path> lastFiles = preferences.getLastFilesOpenedPreferences().getLastFilesOpened();
-        if (lastFiles.isEmpty()) {
-            return;
+        if (!lastFiles.isEmpty()) {
+            getOpenDatabaseAction().openFiles(lastFiles);
         }
 
-        getOpenDatabaseAction().openFiles(lastFiles);
+        // [impl->req~shared-database.reopen-on-startup~1]
+        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService();
+        for (SharedDatabaseSessionService.Reconnection reconnection : sessionService.getDatabasesToReconnect(preferences.getLastFilesOpenedPreferences())) {
+            String sharedDatabaseId = reconnection.sharedDatabaseId();
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
+            // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
+            // The callbacks check the stage: a quit while the attempt is pending must neither add a tab nor pop a dialog.
+            BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()))
+                          .onSuccess(bibDatabaseContext -> {
+                              if (!mainStage.isShowing()) {
+                                  bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+                                  return;
+                              }
+                              sessionService.restoreSharedDatabaseId(manager.openTab(bibDatabaseContext).getBibDatabaseContext(), sharedDatabaseId);
+                          })
+                          .onFailure(exception -> {
+                              LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
+                              if (mainStage.isShowing()) {
+                                  dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
+                                          Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
+                              }
+                          })
+                          .executeWith(taskExecutor);
+        }
     }
 
     @Deprecated

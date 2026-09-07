@@ -1,10 +1,14 @@
-name: "Merge upstream main"
-description: "Merges upstream/main into the current branch, resolving CHANGELOG.md conflicts semantically, and pushes the merge commit. The changelog merge driver is run from source via jbang, so driver fixes apply without waiting for a maven-flow/merge release."
+name: "Merge upstream branch"
+description: "Merges a branch of JabRef/jabref (the PR's base branch, main by default) into the current branch, resolving CHANGELOG.md conflicts semantically, and pushes the merge commit. The changelog merge driver is run from source via jbang, so driver fixes apply without waiting for a maven-flow/merge release."
 
 inputs:
   target-branch:
     description: "Branch to push the merge commit to"
     required: true
+  base-branch:
+    description: "Branch of JabRef/jabref to merge - the PR's base branch, which is another PR's head branch for stacked PRs"
+    required: false
+    default: "main"
   driver-revision:
     description: "Commit of maven-flow/changelog-merge-driver to run (immutable pin; bump explicitly to pick up driver fixes)"
     required: false
@@ -30,13 +34,17 @@ runs:
         path: ~/.jbang
         key: jbang-changelog-merge-driver-${{ inputs.driver-revision }}
 
-    - name: Merge upstream/main
+    - name: Merge upstream/${{ inputs.base-branch }}
       shell: bash
       env:
         TARGET_BRANCH: ${{ inputs.target-branch }}
+        BASE_BRANCH: ${{ inputs.base-branch }}
         DRIVER_REVISION: ${{ inputs.driver-revision }}
       run: |
         set -ex
+        # The PR head may live in a fork; the base branch always comes from JabRef/jabref
+        git remote add upstream "https://github.com/JabRef/jabref.git" || true
+        git fetch upstream "$BASE_BRANCH"
         jbang trust add https://github.com/maven-flow/changelog-merge-driver/
         # Pinned to an immutable commit - never the repo's mutable HEAD/alias - since the
         # driver runs with a push-capable token in this job.
@@ -45,5 +53,5 @@ runs:
         echo "CHANGELOG.md merge=changelog" >> "$(git rev-parse --git-dir)/info/attributes"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git config user.name "github-actions[bot]"
-        git merge --no-ff --no-edit upstream/main
+        git merge --no-ff --no-edit "upstream/$BASE_BRANCH"
         git push origin "HEAD:refs/heads/$TARGET_BRANCH"

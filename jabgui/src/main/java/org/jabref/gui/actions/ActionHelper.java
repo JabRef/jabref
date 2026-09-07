@@ -3,14 +3,18 @@ package org.jabref.gui.actions;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.slr.StudyCatalogItem;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -38,6 +42,26 @@ public class ActionHelper {
     public static BooleanExpression needsSharedDatabase(StateManager stateManager) {
         EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getLocation() == DatabaseLocation.SHARED).isPresent());
         return BooleanExpression.booleanExpression(binding);
+    }
+
+    /// Whether the active library has anything to undo.
+    public static BooleanExpression needsUndo(StateManager stateManager) {
+        return journalState(stateManager, GuiUndoManager::undoableProperty);
+    }
+
+    /// Whether the active library has anything to redo.
+    public static BooleanExpression needsRedo(StateManager stateManager) {
+        return journalState(stateManager, GuiUndoManager::redoableProperty);
+    }
+
+    /// Follows the active library, so that enablement tracks the journal of the library in front
+    /// rather than the one that happened to be open when the menu was built.
+    private static BooleanExpression journalState(StateManager stateManager,
+                                                  Function<GuiUndoManager, ReadOnlyBooleanProperty> state) {
+        return BooleanExpression.booleanExpression(
+                stateManager.activeDatabaseProperty().flatMap(
+                        database -> database.map(context -> state.apply(stateManager.getUndoManager(context)))
+                                            .orElse(new SimpleBooleanProperty(false))));
     }
 
     public static BooleanExpression needsMultipleDatabases(StateManager stateManager) {

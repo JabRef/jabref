@@ -270,7 +270,7 @@
       "type": "org.jabref.model.database.BibDatabase"
     },
     {
-      "type": "org.jabref.model.database.KeyChangeListener"
+      "type": "org.jabref.model.database.CitationKeyListener"
     },
     {
       "type": "sun.text.resources.cldr.FormatData"

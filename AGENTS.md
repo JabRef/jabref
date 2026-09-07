@@ -443,6 +443,23 @@ When a significant design or implementation decision is made, create a new MADR 
 2. Fill in **Context and Problem Statement**, **Considered Options**, and **Decision Outcome**.
 3. Add an entry to `docs/decisions/index.md`.
 
+To link code to a decision, give the ADR an OpenFastTrace identifier directly below its title (no blank line in between)
+and declare what has to cover it:
+
+```markdown
+# Hardcode `StandardField` names
+`adr~hardcode-fieldnames~1`
+
+Needs: impl
+```
+
+```java
+// [impl->adr~hardcode-fieldnames~1]
+```
+
+The identifier's name part must not start with a digit, so drop the file's number prefix.
+Add `<!-- markdownlint-disable-file MD022 -->` at the end of the ADR.
+
 See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.md) for the rationale and [adr-template.md](docs/decisions/adr-template.md) for the full template.
 
 ---
@@ -461,6 +478,7 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 - Plain `git pull` is acceptable for updating the branch as long as your local config does not set `pull.rebase=true` (the enforcement hook blocks the explicit rebase variants regardless).
 - Resolve conflicts inside the merge commit. Do not squash or reorder existing commits.
+- Before committing the merge, make sure no conflict marker is left: with `merge.conflictStyle=diff3` (the default here) a hunk has **four** markers — `<<<<<<<`, `|||||||` (the common-ancestor block), `=======`, `>>>>>>>` — and a resolution that only removes the outer ones leaves the ancestor block in the file. `git diff --cached --check` reports every leftover marker; run it after staging the resolved files.
 
 ### Commits
 
@@ -481,11 +499,12 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 1. Read `.github/PULL_REQUEST_TEMPLATE.md`.
 2. Fill every section: \"Related issues and pull requests\", \"PR Description\", \"Steps to test\", \"AI usage\".
 3. The PR Description must explain **intent**, not implementation trivia. Do not list modified classes one by one.
-4. Fill \"AI usage\": disclose every AI tool used **and the exact model ID** (for example `Claude Code (model claude-opus-4-7)`).
-5. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
-6. Remove **all** HTML comments before opening the PR.
-7. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
-8. Only if the CHANGELOG.md entry used a `TODO` placeholder (meaning no issue has been confidently identified yet — an existing issue link always stays): immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change. If an issue is identified or created later, switch the link to the issue per the precedence rule above.
+4. \"Steps to test\" is a numbered list of concrete steps ending in what the reviewer should see, plus a screenshot cropped to the relevant UI area for every visible change. Never a video: reviewers relate a failure to a step number (\"at step 3 I could not click X\"), which a video does not allow. A video is acceptable only when the interaction involves another program (drag and drop from a file manager, push to a word processor, ...) and the steps are still listed.
+5. Fill \"AI usage\": disclose every AI tool used **and the exact model ID** (for example `Claude Code (model claude-opus-4-7)`).
+6. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
+7. Remove **all** HTML comments before opening the PR.
+8. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
+9. Only if the CHANGELOG.md entry used a `TODO` placeholder (meaning no issue has been confidently identified yet — an existing issue link always stays): create the PR with `--draft` (an automated review starts as soon as a PR is ready and would flag the placeholder), immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change, then mark the PR ready (`gh pr ready <number>`). If an issue is identified or created later, switch the link to the issue per the precedence rule above.
 
 ---
 
@@ -533,6 +552,10 @@ For complex flows or new architecture, consider adding a Mermaid sequence or cla
 - `docs/code-howtos/` — localization, testing, fetchers, tools
 - `docs/decisions/` — Architecture Decision Records
 - `docs/requirements/` — Requirements (OpenFastTrace)
+
+When adding a package or changing a package's or module's public surface, add or update its `package-info.java` / `module-info.java` Javadoc following [skills/developers/module-documentation/SKILL.md](skills/developers/module-documentation/SKILL.md).
+
+When adding or editing a `uses:` line in a workflow, follow [skills/developers/github-actions/SKILL.md](skills/developers/github-actions/SKILL.md) — external actions are pinned to a full commit SHA.
 
 ---
 
