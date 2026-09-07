@@ -67,8 +67,9 @@ public class OfflineChanges {
 
     /// Everything recorded up to a [#take]. New entries are keyed by their local entry id, so
     /// that a reconnect without restart finds them in the local library.
+    ///
     /// @param removedEntries the shared version each removed entry had when it was removed: the
-     ///                       optimistic lock needs it to notice that the shared entry moved on
+    ///                       optimistic lock needs it to notice that the shared entry moved on
     public record Recorded(Map<Integer, EntryState> changedEntries,
                            Map<String, EntryState> newEntries,
                            Map<Integer, Integer> removedEntries,
