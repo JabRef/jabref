@@ -38,7 +38,6 @@ import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -242,11 +241,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 taskExecutor,
                 gitHandlerRegistry);
 
-        BackgroundTask<BibDatabaseContext> backgroundTask = BackgroundTask.wrap(() -> manager.connect(connectionProperties));
         BibDatabaseContext dummyContext = manager.createDummyContext(connectionProperties);
 
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
-                backgroundTask,
+                () -> manager.connect(connectionProperties),
                 dummyContext,
                 dialogService,
                 aiService,
@@ -261,6 +259,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 (tab, _) -> handleSharedDatabaseConnectionSuccess(tab, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath),
                 exception -> showConnectionFailure(exception, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
         tabContainer.addTab(libraryTab, true);
+        libraryTab.startDataLoadingTask();
     }
 
     private void handleSharedDatabaseConnectionSuccess(LibraryTab libraryTab,

@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -113,6 +114,7 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,10 +173,45 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private BackgroundTask<?> dataLoadingTask;
 
-    private record SharedDatabaseLoadingCallbacks(LibraryTab tab,
-                                                  BiConsumer<LibraryTab, BibDatabaseContext> onSuccess,
-                                                  Consumer<Exception> onFailure) {
+    @NullMarked
+    private static final class SharedDatabaseLoadingCallbacks {
+        private final LibraryTab tab;
+        private final BiConsumer<LibraryTab, BibDatabaseContext> onSuccess;
+        private final Consumer<Exception> onFailure;
+        private Optional<BibDatabaseContext> connectedContext = Optional.empty();
+        private boolean cancelled;
+
+        private SharedDatabaseLoadingCallbacks(LibraryTab tab,
+                                               BiConsumer<LibraryTab, BibDatabaseContext> onSuccess,
+                                               Consumer<Exception> onFailure) {
+            this.tab = tab;
+            this.onSuccess = onSuccess;
+            this.onFailure = onFailure;
+        }
+
+        private void onConnected(BibDatabaseContext bibDatabaseContext) {
+            boolean closeContext;
+            synchronized (this) {
+                closeContext = cancelled;
+                if (!closeContext) {
+                    connectedContext = Optional.of(bibDatabaseContext);
+                }
+            }
+            if (closeContext) {
+                closeSharedDatabase(bibDatabaseContext);
+            }
+        }
+
         private void onDatabaseLoadingSucceed(BibDatabaseContext loadedContext) {
+            boolean closeContext;
+            synchronized (this) {
+                closeContext = cancelled;
+                connectedContext = Optional.empty();
+            }
+            if (closeContext) {
+                closeSharedDatabase(loadedContext);
+                return;
+            }
             tab.setDatabaseContext(loadedContext);
             Optional.ofNullable(tab.autoCompleterChangedListener).ifPresent(Runnable::run);
             tab.loading.set(false);
@@ -187,6 +224,40 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             tab.dataLoadingTask = null;
             tab.tabContainer.closeTab(tab);
             onFailure.accept(exception);
+        }
+
+        private void cancel() {
+            Optional<BibDatabaseContext> contextToClose;
+            synchronized (this) {
+                cancelled = true;
+                contextToClose = connectedContext;
+                connectedContext = Optional.empty();
+            }
+            contextToClose.ifPresent(LibraryTab::closeSharedDatabase);
+        }
+    }
+
+    @NullMarked
+    private static final class SharedDatabaseLoadingTask extends BackgroundTask<BibDatabaseContext> {
+        private final Callable<BibDatabaseContext> connectionTask;
+        private final SharedDatabaseLoadingCallbacks callbacks;
+
+        private SharedDatabaseLoadingTask(Callable<BibDatabaseContext> connectionTask, SharedDatabaseLoadingCallbacks callbacks) {
+            this.connectionTask = connectionTask;
+            this.callbacks = callbacks;
+        }
+
+        @Override
+        public BibDatabaseContext call() throws Exception {
+            BibDatabaseContext bibDatabaseContext = connectionTask.call();
+            callbacks.onConnected(bibDatabaseContext);
+            return bibDatabaseContext;
+        }
+
+        @Override
+        public void cancel(boolean mayInterruptIfRunning) {
+            super.cancel(mayInterruptIfRunning);
+            callbacks.cancel();
         }
     }
 
@@ -799,9 +870,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             dataLoadingTask.cancel();
         }
         if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
-            bibDatabaseContext.convertToLocalDatabase();
-            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
-            bibDatabaseContext.clearDBMSSynchronizer();
+            closeSharedDatabase(bibDatabaseContext);
         }
         try {
             changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
@@ -847,6 +916,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
+    }
+
+    private static void closeSharedDatabase(BibDatabaseContext bibDatabaseContext) {
+        bibDatabaseContext.convertToLocalDatabase();
+        bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+        bibDatabaseContext.clearDBMSSynchronizer();
     }
 
     /// Get an array containing the currently selected entries. The array is stable and not changed if the selection changes
@@ -1229,8 +1304,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return newTab;
     }
 
-    /// Creates a shared-library tab that displays the main table's loading indicator until `dataLoadingTask` has connected.
-    public static LibraryTab createLibraryTab(BackgroundTask<BibDatabaseContext> dataLoadingTask,
+    /// Creates a shared-library tab that displays the main table's loading indicator until `connectionTask` has connected.
+    public static LibraryTab createLibraryTab(Callable<BibDatabaseContext> connectionTask,
                                               BibDatabaseContext dummyContext,
                                               DialogService dialogService,
                                               AiService aiService,
@@ -1259,12 +1334,18 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 true);
 
         SharedDatabaseLoadingCallbacks callbacks = new SharedDatabaseLoadingCallbacks(newTab, onSuccess, onFailure);
+        BackgroundTask<BibDatabaseContext> dataLoadingTask = new SharedDatabaseLoadingTask(connectionTask, callbacks);
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onSuccess(callbacks::onDatabaseLoadingSucceed)
                        .onFailure(callbacks::onDatabaseLoadingFailed)
-                       .executeWith(taskExecutor);
 
         return newTab;
+    }
+
+    /// Starts a loading task after its tab has been added to the tab container.
+    public void startDataLoadingTask() {
+        assert dataLoadingTask != null;
+        dataLoadingTask.executeWith(taskExecutor);
     }
 
     public static LibraryTab createLibraryTab(@NonNull BibDatabaseContext databaseContext,

@@ -61,7 +61,6 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.SharedDatabaseSessionService;
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -712,10 +711,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
             // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
             // The callbacks check the stage so a connection that completes during shutdown is closed with its loading tab.
-            BackgroundTask<BibDatabaseContext> backgroundTask = BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()));
             BibDatabaseContext dummyContext = manager.createDummyContext(reconnection.connectionProperties());
             LibraryTab newTab = LibraryTab.createLibraryTab(
-                    backgroundTask,
+                    () -> manager.connect(reconnection.connectionProperties()),
                     dummyContext,
                     dialogService,
                     aiService,
@@ -730,6 +728,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     (tab, bibDatabaseContext) -> handleSharedDatabaseReconnectionSuccess(sessionService, reconnection, tab, bibDatabaseContext),
                     exception -> handleSharedDatabaseReconnectionFailure(reconnection, exception));
             addTab(newTab, true);
+            newTab.startDataLoadingTask();
         }
     }
 
