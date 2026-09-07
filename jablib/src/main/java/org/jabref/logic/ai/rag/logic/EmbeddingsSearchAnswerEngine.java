@@ -1,6 +1,5 @@
 package org.jabref.logic.ai.rag.logic;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,8 +10,6 @@ import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.RelevantInformation;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.util.ListUtil;
 
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -54,23 +51,12 @@ public class EmbeddingsSearchAnswerEngine implements AnswerEngine {
             String query,
             List<FullBibEntry> entriesFilter
     ) {
-        List<BibEntry> entries = entriesFilter
-                .stream()
-                .map(FullBibEntry::entry)
-                .toList();
-
-        List<LinkedFile> linkedFiles = ListUtil.getLinkedFiles(entries).toList();
-
         // Compute file hashes for filtering
-        List<String> fileHashes = linkedFiles
+        List<String> fileHashes = entriesFilter
                 .stream()
-                .flatMap(linkedFile ->
-                        entriesFilter.stream()
-                                     .flatMap(fullEntry -> {
-                                         Optional<Path> path = linkedFile.findIn(fullEntry.databaseContext(), filePreferences);
-                                         return path.flatMap(FileHasher::computeHash).stream();
-                                     })
-                )
+                .flatMap(fullEntry -> fullEntry.entry().getFiles().stream()
+                        .flatMap(linkedFile -> linkedFile.findIn(fullEntry.databaseContext(), filePreferences).stream()))
+                .flatMap(path -> FileHasher.computeHash(path).stream())
                 .distinct()
                 .toList();
 
@@ -115,24 +101,21 @@ public class EmbeddingsSearchAnswerEngine implements AnswerEngine {
     /// @param entries  the entries to search
     /// @param fileHash the SHA-256 hash of the file
     /// @return the entry if found
-    private Optional<BibEntry> findEntryByFileHash(List<FullBibEntry> entries, String fileHash) {
+    Optional<BibEntry> findEntryByFileHash(List<FullBibEntry> entries, String fileHash) {
         return entries
                 .stream()
-                .flatMap(fullEntry ->
-                        fullEntry.databaseContext()
-                                 .getEntries()
+                .filter(fullEntry ->
+                        fullEntry.entry()
+                                 .getFiles()
                                  .stream()
-                                 .filter(entry ->
-                                         entry.getFiles()
-                                              .stream()
-                                              .anyMatch(linkedFile ->
-                                                      linkedFile.findIn(fullEntry.databaseContext(), filePreferences)
-                                                                .flatMap(FileHasher::computeHash)
-                                                                .filter(hash -> hash.equals(fileHash))
-                                                                .isPresent()
-                                              )
+                                 .anyMatch(linkedFile ->
+                                         linkedFile.findIn(fullEntry.databaseContext(), filePreferences)
+                                                   .flatMap(FileHasher::computeHash)
+                                                   .filter(hash -> hash.equals(fileHash))
+                                                   .isPresent()
                                  )
                 )
+                .map(FullBibEntry::entry)
                 .findFirst();
     }
 

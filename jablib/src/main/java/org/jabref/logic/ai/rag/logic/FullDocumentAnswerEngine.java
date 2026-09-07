@@ -7,7 +7,6 @@ import org.jabref.logic.ai.ingestion.logic.parsing.UniversalContentParser;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.RelevantInformation;
-import org.jabref.model.entry.BibEntry;
 
 // [impl->feat~ai.answer-engines.full-document~1]
 public class FullDocumentAnswerEngine implements AnswerEngine {
@@ -35,7 +34,7 @@ public class FullDocumentAnswerEngine implements AnswerEngine {
                                         linkedFile
                                                 .findIn(entryIdentifier.databaseContext(), filePreferences)
                                                 .flatMap(universalContentParser::parse)
-                                                .map(c -> new RelevantInformation(FullBibEntry.findEntryByLink(entryIdentifier, linkedFile.getLink()).flatMap(BibEntry::getCitationKey).orElse(null), c))
+                                                .map(c -> new RelevantInformation(entryIdentifier.entry().getCitationKey().orElse(null), c))
                                                 .stream()
                                 )
                 )

@@ -27,8 +27,8 @@ public record FullBibEntry(BibDatabaseContext databaseContext, BibEntry entry) {
 
     public static Optional<BibEntry> findEntryByLink(List<FullBibEntry> entries, String link) {
         return entries.stream()
-                      .flatMap(identifier -> identifier.databaseContext().getEntries().stream())
-                      .filter(entry -> entry.getFiles().stream().anyMatch(file -> file.getLink().equals(link)))
+                      .filter(identifier -> identifier.entry().getFiles().stream().anyMatch(file -> file.getLink().equals(link)))
+                      .map(FullBibEntry::entry)
                       .findFirst();
     }
 
