@@ -35,6 +35,13 @@ public interface UndoManager {
     /// @return what was applied, and what was not — see [BibChange#apply]
     ApplyResult applyEdit(BibChange change);
 
+    /// Marks the library as changed by something this journal cannot take back — a migration on
+    /// load, an external change the user denied, a setting written without being recorded.
+    ///
+    /// The modified marker derives from the saved position, so a write nobody recorded has to say
+    /// so here, or the library looks saved. Saving is what clears it again.
+    void markChanged();
+
     /// Suspends undo and redo for this library while the caller applies changes it has not yet
     /// handed over. The undo UI reads the other end of this through `GuiUndoManager#suspendedBy`.
     ///

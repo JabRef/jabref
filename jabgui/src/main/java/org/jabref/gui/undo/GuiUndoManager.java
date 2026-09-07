@@ -42,9 +42,6 @@ public interface GuiUndoManager extends UndoManager {
     /// Marks the current position as saved.
     void markUnchanged();
 
-    /// Marks the library as changed by something the journal cannot take back.
-    void markChanged();
-
     /// Whether the journal is applying a change on this thread right now.
     boolean isApplying();
 

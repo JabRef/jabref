@@ -207,6 +207,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
         if (resolvedChangesMatchDisk) {
             libraryTab.resetChangedProperties();
+        } else {
+            // Nothing on the stack describes a denied change - denying one records nothing - but the
+            // file no longer matches what the user chose to keep, so the library still needs saving.
+            undoManager.markChanged();
         }
     }
 
