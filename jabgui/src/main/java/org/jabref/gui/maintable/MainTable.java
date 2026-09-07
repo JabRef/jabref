@@ -225,13 +225,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         libraryTab.getLoading().addListener((_, _, _) -> updatePlaceholder(placeholderBox, loadingPlaceholder));
 
-        // Matches float to the top (or are the only rows left), so a table scrolled down before searching would show none of them.
-        // Only scroll when the top is actually out of view, so the table does not jump while typing a query
-        libraryTab.searchQueryProperty().addListener((_, _, query) -> query.ifPresent(_ -> {
-            if (!isFirstRowVisible()) {
-                scrollTo(0);
-            }
-        }));
+        model.searchResultsVersionProperty().addListener(_ -> showSearchMatchesIfNoneVisible());
 
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
@@ -381,11 +375,23 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
     }
 
-    private boolean isFirstRowVisible() {
-        return Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow"))
-                       .map(VirtualFlow::getFirstVisibleCell)
-                       .map(cell -> cell.getIndex() == 0)
-                       .orElse(true);
+    /// Search matches are sorted to the top (or are the only rows left), so a table scrolled down before searching shows none of them.
+    /// The table stays where it is as long as at least one match is in view, and otherwise moves the minimal distance, to avoid jumping around while a query is typed.
+    private void showSearchMatchesIfNoneVisible() {
+        int lastMatchIndex = -1;
+        for (BibEntryTableViewModel entry : getItems()) {
+            if (!entry.isMatchedBySearch().get()) {
+                break;
+            }
+            lastMatchIndex++;
+        }
+        if (lastMatchIndex < 0) {
+            return;
+        }
+        int lastMatch = lastMatchIndex;
+        Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow"))
+                .filter(flow -> Optional.ofNullable(flow.getFirstVisibleCell()).map(cell -> cell.getIndex() > lastMatch).orElse(false))
+                .ifPresent(flow -> flow.scrollTo(lastMatch));
     }
 
     private void scrollToNextMatchCategory() {
