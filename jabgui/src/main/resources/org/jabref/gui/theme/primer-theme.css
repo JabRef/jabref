@@ -3043,15 +3043,13 @@ Text {
     -fx-opacity: 1;
 }
 
-.scroll-pane,
-.scroll-pane:focused {
+.scroll-pane {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-padding: 0;
 }
-.scroll-pane > .viewport,
-.scroll-pane:focused > .viewport{
+.scroll-pane > .viewport {
     -fx-background-color: transparent;
 }
 .scroll-pane > .corner {
