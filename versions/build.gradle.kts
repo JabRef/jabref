@@ -64,7 +64,7 @@ dependencies.constraints {
     api("com.google.errorprone:error_prone_core:2.50.0")
     api("com.google.guava:guava:33.7.1-jre")
     api("com.googlecode.plist:dd-plist:1.30")
-    api("com.h2database:h2-mvstore:2.4.240")
+    api("com.h2database:h2-mvstore:2.5.250")
     api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.10.1")
     api("com.konghq:unirest-modules-gson:4.10.1")
