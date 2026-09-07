@@ -47,13 +47,13 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private GuiPreferences preferences;
-    @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
     private Optional<BibEntry> entry = Optional.empty();
 
     public IdentifierEditor(Field field,
                             SuggestionProvider<?> suggestionProvider,
-                            FieldCheckers fieldCheckers) {
+                            FieldCheckers fieldCheckers,
+                            UndoManager undoManager) {
 
         // Viewloader must be called after the viewmodel is loaded,
         // but we need the injected vars to create the viewmodels.

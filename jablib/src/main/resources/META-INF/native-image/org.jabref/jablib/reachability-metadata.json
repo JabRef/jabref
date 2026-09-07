@@ -278,7 +278,7 @@
       ]
     },
     {
-      "type": "org.jabref.model.database.KeyChangeListener",
+      "type": "org.jabref.model.database.CitationKeyListener",
       "methods": [
         {
           "name": "listen",

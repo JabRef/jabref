@@ -32,7 +32,6 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -55,7 +54,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private final RedoAction redoAction;
     private final GuiPreferences preferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private final UndoManager undoManager;
 
     private Collection<Field> fields = new ArrayList<>();
 
@@ -63,7 +61,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private Subscription dividerPositionSubscription;
 
     public FieldsEditorTab(boolean compressed,
-                           @NonNull UndoManager undoManager,
                            UndoAction undoAction,
                            RedoAction redoAction,
                            @NonNull GuiPreferences preferences,
@@ -72,7 +69,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                            PreviewPanel previewPanel) {
         super(stateManager, previewPanel);
         this.isCompressed = compressed;
-        this.undoManager = undoManager;
         this.undoAction = undoAction;
         this.redoAction = redoAction;
         this.preferences = preferences;
@@ -155,7 +151,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                 databaseContext,
                 entry.getType(),
                 suggestionProviders,
-                undoManager,
+                stateManager.getUndoManager(databaseContext),
                 undoAction,
                 redoAction);
         fieldEditor.bindToEntry(entry);
@@ -232,7 +228,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private void initPanel() {
         if (gridPane == null) {
             gridPane = new GridPane();
-            gridPane.getStyleClass().add("editorPane");
+            gridPane.getStyleClass().addAll("editorPane", "gap-8", "padding-4");
 
             // Wrap everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();
