@@ -42,6 +42,13 @@ Requires JDK 25+ for Gradle (the wrapper downloads a JDK itself):
 - **Architecture decisions:** documented as ADRs in `docs/decisions/`; add a new ADR when making an architecturally significant choice.
 - **Localization:** user-visible strings go through `Localization.lang(...)`; add keys to `jablib/src/main/resources/l10n/JabRef_en.properties` only — other languages are translated via Crowdin.
 
+## Branches
+
+- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes and only receives pull requests for changes that make no sense on `main`.
+- CI labels a pull request into `main` with `dev: into-stable` when it links an issue of type "bug"; after the merge, CI ports it to `stable` in a separate port pull request. Maintainers add or remove the label by hand; never add it to a port pull request (`port-<number>-to-<branch>`).
+- Add the `CHANGELOG.md` entry once, in the branch the pull request targets; the port carries it over.
+- Details: <https://devdocs.jabref.org/contributing.html#branching-strategy>.
+
 ## Stacked pull requests
 
 When a PR is based on another open PR's branch and that base PR is squash-merged, merging `main` back in produces spurious conflicts — Git no longer sees the branch's commits in `main`. Do **not** use GitHub's "Rebase" button for this; it rewrites the branch and usually multiplies the conflicts.
