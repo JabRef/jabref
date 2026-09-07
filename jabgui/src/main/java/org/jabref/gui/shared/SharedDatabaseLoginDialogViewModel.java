@@ -170,9 +170,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     /// Prefills the connection URL field from the clipboard, so a copied URL only has to be confirmed.
     public void applyClipboardConnectionUrl() {
         String contents = ClipBoardManager.getContents();
-        if (DBMSConnectionUrl.parse(contents).isPresent()) {
-            connectionUrl.set(contents);
-        }
+        DBMSConnectionUrl.parse(contents).ifPresent(_ -> connectionUrl.set(contents));
     }
 
     private void applyConnectionUrl(DBMSConnectionUrl url) {
