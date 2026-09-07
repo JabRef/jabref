@@ -1,9 +1,9 @@
 package org.jabref.gui.help;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
-import javafx.scene.Node;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
