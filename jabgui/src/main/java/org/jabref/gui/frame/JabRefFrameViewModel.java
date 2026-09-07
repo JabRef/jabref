@@ -95,14 +95,17 @@ public class JabRefFrameViewModel {
         this.taskExecutor = taskExecutor;
     }
 
-    void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase) {
+    /// @param selectedEntries citation keys of the selected entries, aligned with `filenames` by index
+    void storeLastOpenedFiles(List<Path> filenames, List<String> selectedEntries, Path focusedDatabase) {
         if (preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
                 preferences.getLastFilesOpenedPreferences().getLastFilesOpened().clear();
+                preferences.getLastFilesOpenedPreferences().getLastSelectedEntries().clear();
             } else {
                 preferences.getLastFilesOpenedPreferences().setLastFilesOpened(filenames);
+                preferences.getLastFilesOpenedPreferences().setLastSelectedEntries(selectedEntries);
                 preferences.getLastFilesOpenedPreferences().setLastFocusedFile(focusedDatabase);
             }
         }
@@ -125,12 +128,17 @@ public class JabRefFrameViewModel {
         }
 
         // Read the opened and focused databases before closing them
-        List<Path> openedLibraries = tabContainer.getLibraryTabs().stream()
-                                                 .map(LibraryTab::getBibDatabaseContext)
-                                                 .map(BibDatabaseContext::getDatabasePath)
-                                                 .flatMap(Optional::stream)
-                                                 .map(Path::toAbsolutePath)
+        List<LibraryTab> savedTabs = tabContainer.getLibraryTabs().stream()
+                                                 .filter(tab -> tab.getBibDatabaseContext().getDatabasePath().isPresent())
                                                  .toList();
+        List<Path> openedLibraries = savedTabs.stream()
+                                              .map(tab -> tab.getBibDatabaseContext().getDatabasePath().orElseThrow().toAbsolutePath())
+                                              .toList();
+        List<String> selectedEntries = savedTabs.stream()
+                                                .map(tab -> tab.getSelectedEntries().stream().findFirst()
+                                                               .flatMap(BibEntry::getCitationKey)
+                                                               .orElse(""))
+                                                .toList();
         Path focusedLibraries = Optional.ofNullable(tabContainer.getCurrentLibraryTab())
                                         .map(LibraryTab::getBibDatabaseContext)
                                         .flatMap(BibDatabaseContext::getDatabasePath)
@@ -142,7 +150,7 @@ public class JabRefFrameViewModel {
             return false;
         }
 
-        storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
+        storeLastOpenedFiles(openedLibraries, selectedEntries, focusedLibraries); // store only if successfully having closed the libraries
 
         ProcessingLibraryDialog processingLibraryDialog = new ProcessingLibraryDialog(dialogService);
         processingLibraryDialog.showAndWait(tabContainer.getLibraryTabs());

@@ -333,6 +333,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;
+
+        restoreLastSelectedEntry();
+    }
+
+    /// Restores the entry that was selected in this library when JabRef was closed the last time. The selection is
+    /// only written at shutdown, so a crash simply leaves the library without a restored selection.
+    private void restoreLastSelectedEntry() {
+        bibDatabaseContext.getDatabasePath()
+                          .map(Path::toAbsolutePath)
+                          .flatMap(path -> preferences.getLastFilesOpenedPreferences().getLastSelectedEntry(path))
+                          .flatMap(citationKey -> bibDatabaseContext.getDatabase().getEntries().stream()
+                                                                    .filter(entry -> entry.getCitationKey().filter(citationKey::equals).isPresent())
+                                                                    .findFirst())
+                          .ifPresent(this::clearAndSelect);
     }
 
     public void createSearchContext() {

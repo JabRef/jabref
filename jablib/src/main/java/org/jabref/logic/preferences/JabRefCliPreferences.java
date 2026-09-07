@@ -332,6 +332,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String LAST_EDITED = "lastEdited";
     private static final String LAST_FOCUSED = "lastFocused";
     private static final String RECENT_DATABASES = "recentDatabases";
+    private static final String LAST_SELECTED_ENTRIES = "lastSelectedEntries";
     // endregion
 
     // region ProxyPreferences
@@ -2057,12 +2058,20 @@ public class JabRefCliPreferences implements CliPreferences {
 
         lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
                 getStringList(LAST_EDITED).stream().map(Path::of).toList(),
+                getStringList(LAST_SELECTED_ENTRIES),
                 getPath(LAST_FOCUSED, defaultValues.getLastFocusedFile()),
                 FileHistory.of(getStringList(RECENT_DATABASES).stream().map(Path::of).toList()));
 
         bindPathList(lastFilesOpenedPreferences.getLastFilesOpened(), LAST_EDITED, defaultValues.getLastFilesOpened());
+        bindCustomList(lastFilesOpenedPreferences.getLastSelectedEntries(), LAST_SELECTED_ENTRIES, defaultValues.getLastSelectedEntries(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindPathList(lastFilesOpenedPreferences.getFileHistory(), RECENT_DATABASES, defaultValues.getFileHistory());
         bindPath(lastFilesOpenedPreferences.lastFocusedFileProperty(), LAST_FOCUSED, defaultValues.getLastFocusedFile());
+
+        // The file history is the only preference a user expects to survive a crash: it changes on opening or saving a
+        // library, which are rare enough that writing the whole store through is cheap. Without this, a kill (task
+        // manager, power loss) before the next scheduled sync loses the just-opened library from "Recent libraries".
+        lastFilesOpenedPreferences.getFileHistory().addListener((ListChangeListener<Path>) _ -> flush());
 
         return lastFilesOpenedPreferences;
     }
