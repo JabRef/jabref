@@ -35,6 +35,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
@@ -529,7 +531,7 @@ class DirectoryLibrarySynchronizerTest {
         // relying on unfiltered events would strand the burst's tail (it never gets one)
         entry.setField(StandardField.NOTE, "typed letter by letter", EntriesEventSource.LOCAL);
         FieldChangedEvent keystroke = new FieldChangedEvent(entry, StandardField.NOTE, "typed letter by letter", "first version");
-        keystroke.setFilteredOut(true);
+        keystroke.setFiltered(true);
         synchronizer.listen(keystroke);
         synchronizer.awaitPendingEvents();
         assertEquals(List.of(), synchronizer.flush());
@@ -557,6 +559,7 @@ class DirectoryLibrarySynchronizerTest {
     }
 
     @Test
+    @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Windows ignores setWritable(false) for the file owner")
     void unwritableSidecarStaysPendingAndIsReported() throws IOException {
         Path sidecar = root.resolve("smith2020.yml");
         Files.writeString(sidecar, ARTICLE_YAML);

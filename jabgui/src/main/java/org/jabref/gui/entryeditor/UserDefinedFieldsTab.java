@@ -15,7 +15,6 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -45,7 +44,6 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
     private final AtomicBoolean refreshQueued = new AtomicBoolean();
 
     public UserDefinedFieldsTab(EntryEditorTabModel.CustomizedFieldsTab model,
-                                UndoManager undoManager,
                                 UndoAction undoAction,
                                 RedoAction redoAction,
                                 GuiPreferences preferences,
@@ -54,7 +52,6 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
                                 PreviewPanel previewPanel) {
         super(
                 false,
-                undoManager,
                 undoAction,
                 redoAction,
                 preferences,

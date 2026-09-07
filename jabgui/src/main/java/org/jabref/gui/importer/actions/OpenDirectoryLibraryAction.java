@@ -17,7 +17,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -25,6 +24,7 @@ import org.jabref.logic.directorylibrary.DirectoryLibraryScanner;
 import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
 import org.jabref.logic.directorylibrary.PdfEnrichmentTask;
 import org.jabref.logic.directorylibrary.PdfEntryFactory;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DirectoryMonitor;
@@ -52,7 +52,7 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
-    private final GuiUndoManager undoManager;
+    private final GitHandlerRegistry gitHandlerRegistry;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
@@ -63,7 +63,7 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                                       StateManager stateManager,
                                       FileUpdateMonitor fileUpdateMonitor,
                                       BibEntryTypesManager entryTypesManager,
-                                      GuiUndoManager undoManager,
+                                      GitHandlerRegistry gitHandlerRegistry,
                                       ClipBoardManager clipBoardManager,
                                       TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
@@ -73,7 +73,7 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.undoManager = undoManager;
+        this.gitHandlerRegistry = gitHandlerRegistry;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
     }
@@ -142,9 +142,9 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
         tabContainer.addTab(libraryTab, true);
         // No change event follows the synchronous tab creation, so set the initial title here
         libraryTab.updateTabTitle(false);

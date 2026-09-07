@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -31,6 +32,7 @@ import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.KeywordImportNormalizer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
@@ -60,7 +62,6 @@ import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
-import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,7 +121,7 @@ public class BibtexParser implements Parser {
     public BibtexParser(@NonNull ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = importFormatPreferences;
         this.metaDataParser = new MetaDataParser(fileMonitor);
-        this.parsedBibDeskGroups = new HashMap<>();
+        this.parsedBibDeskGroups = new LinkedHashMap<>();
     }
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences) {
@@ -266,15 +267,24 @@ public class BibtexParser implements Parser {
             skipWhitespace();
         }
 
-        addBibDeskGroupEntriesToJabRefGroups();
-
         int startLine = line;
         int startColumn = column;
         try {
+            // A library without a declared separator keeps the one its keyword fields already use, so opening it does not rewrite them
+            Optional<Character> guessedSeparator = KeywordImportNormalizer.guessSeparator(database.getEntries(), importFormatPreferences.bibEntryPreferences());
             MetaData metaData = metaDataParser.parse(
                     meta,
-                    importFormatPreferences.bibEntryPreferences().getKeywordSeparator(),
+                    guessedSeparator.orElse(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()),
                     importFormatPreferences.filePreferences().getUserAndHost());
+            if (metaData.getKeywordSeparator().isEmpty()) {
+                guessedSeparator.ifPresent(metaData::setKeywordSeparator);
+            }
+            if (!parsedBibDeskGroups.isEmpty()) {
+                Character keywordSeparator = metaData.getKeywordSeparator()
+                                                     .orElse(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+                createBibDeskGroupTree(keywordSeparator);
+                addBibDeskGroupEntriesToJabRefGroups(keywordSeparator);
+            }
             if (bibDeskGroupTreeNode != null) {
                 metaData.getGroups().ifPresentOrElse(existingGroupTree -> {
                             String existingGroups = meta.get(MetaData.GROUPSTREE);
@@ -352,6 +362,7 @@ public class BibtexParser implements Parser {
             String errorMessage = Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
+            dumpTextReadSoFarToString();
         }
     }
 
@@ -360,7 +371,7 @@ public class BibtexParser implements Parser {
         int startLine = line;
         int startColumn = column;
         try {
-            buffer = parseBracketedFieldContent();
+            buffer = parseBracketedFieldContent(false);
         } catch (IOException e) {
             // if we get an IO Exception here, then we have an unbracketed comment,
             // which means that we should just return and the comment will be picked up as arbitrary text
@@ -409,7 +420,7 @@ public class BibtexParser implements Parser {
     }
 
     /// Adds BibDesk group entries to the JabRef database
-    private void addBibDeskGroupEntriesToJabRefGroups() {
+    private void addBibDeskGroupEntriesToJabRefGroups(Character keywordSeparator) {
         for (String groupName : parsedBibDeskGroups.keySet()) {
             String[] citationKeys = parsedBibDeskGroups.get(groupName).split(",");
             for (String citation : citationKeys) {
@@ -419,11 +430,17 @@ public class BibtexParser implements Parser {
                     bibEntry.flatMap(entry -> entry.setField(StandardField.GROUPS, groupName));
                 } else if (!groupValue.get().contains(groupName)) {
                     // if the citation does belong to a group already and is not yet assigned to the same group, we concatenate
-                    String concatGroup = groupValue.get() + "," + groupName;
+                    String concatGroup = groupValue.get() + keywordSeparator + groupName;
                     bibEntry.flatMap(entryByCitationKey -> entryByCitationKey.setField(StandardField.GROUPS, concatGroup));
                 }
             }
         }
+    }
+
+    private void createBibDeskGroupTree(Character keywordSeparator) {
+        bibDeskGroupTreeNode = GroupTreeNode.fromGroup(new ExplicitGroup(BIB_DESK_ROOT_GROUP_NAME, GroupHierarchyType.INDEPENDENT, keywordSeparator));
+        parsedBibDeskGroups.keySet().forEach(groupName ->
+                bibDeskGroupTreeNode.addSubgroup(new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, keywordSeparator)));
     }
 
     /// Parses comment types found in BibDesk, to migrate BibDesk Static Groups to JabRef.
@@ -436,8 +453,6 @@ public class BibtexParser implements Parser {
 
             NodeList dictList = doc.getElementsByTagName("dict");
             meta.putIfAbsent(MetaData.DATABASE_TYPE, "bibtex;");
-            bibDeskGroupTreeNode = GroupTreeNode.fromGroup(new ExplicitGroup(BIB_DESK_ROOT_GROUP_NAME, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
-
             // Since each static group has their own dict element, we iterate through them
             for (int i = 0; i < dictList.getLength(); i++) {
                 Element dictElement = (Element) dictList.item(i);
@@ -451,8 +466,6 @@ public class BibtexParser implements Parser {
                 for (int j = 0; j < keyList.getLength(); j++) {
                     if (keyList.item(j).getTextContent().matches("group name")) {
                         groupName = stringList.item(j).getTextContent();
-                        ExplicitGroup staticGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
-                        bibDeskGroupTreeNode.addSubgroup(staticGroup);
                     } else if (keyList.item(j).getTextContent().matches("keys")) {
                         citationKeys = stringList.item(j).getTextContent(); // adds group entries
                     }
@@ -744,7 +757,7 @@ public class BibtexParser implements Parser {
         return result;
     }
 
-    @ADR(49)
+    // [impl->adr~hardcode-fieldnames~1]
     private void parseField(BibEntry entry) throws IOException {
         int startLine = line;
         int startColumn = column;
@@ -821,7 +834,7 @@ public class BibtexParser implements Parser {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside a field, so we need to count the
                 // brackets to know when the string is finished.
-                StringBuilder text = parseBracketedFieldContent();
+                StringBuilder text = parseBracketedFieldContent(true);
                 value.append(text.toString());
             } else if (Character.isDigit((char) character)) { // value is a number
                 String number = parseTextToken();
@@ -1061,7 +1074,7 @@ public class BibtexParser implements Parser {
 
     /// This is called if a field in the form of `field = {content}` is parsed.
     /// The global variable `character` contains `{`.
-    private StringBuilder parseBracketedFieldContent() throws IOException {
+    private StringBuilder parseBracketedFieldContent(boolean recoverAtEntryStart) throws IOException {
         StringBuilder value = new StringBuilder();
 
         consume('{');
@@ -1069,9 +1082,16 @@ public class BibtexParser implements Parser {
         int brackets = 0;
         char character;
         char lastCharacter = '\0';
+        boolean potentialEntryEnd = false;
+        boolean lineContainsOnlyWhitespace = false;
 
         while (true) {
             character = (char) read();
+
+            if (recoverAtEntryStart && potentialEntryEnd && lineContainsOnlyWhitespace && (character == '@') && isEntryStart()) {
+                unread(character);
+                throw new IOException("Error in line " + line + ": Unmatched opening bracket in field content");
+            }
 
             boolean isClosingBracket = false;
             if (character == '}') {
@@ -1107,12 +1127,38 @@ public class BibtexParser implements Parser {
                 brackets++;
             } else if (isClosingBracket) {
                 brackets--;
+                potentialEntryEnd = (brackets == 0) && lineContainsOnlyWhitespace;
+            } else if (!Character.isWhitespace(character)) {
+                potentialEntryEnd = false;
             }
 
             value.append(character);
 
+            if ((character == '\r') || (character == '\n')) {
+                lineContainsOnlyWhitespace = true;
+            } else if (!Character.isWhitespace(character)) {
+                lineContainsOnlyWhitespace = false;
+            }
             lastCharacter = character;
         }
+    }
+
+    private boolean isEntryStart() throws IOException {
+        StringBuilder entryStart = new StringBuilder(parseTextToken());
+        int character;
+        // @formatter:off
+        do {
+            character = read();
+            if (isEOFCharacter(character)) {
+                unreadBuffer(entryStart);
+                return false;
+            }
+            entryStart.append((char) character);
+        } while (Character.isWhitespace((char) character));
+        // @formatter:on
+        boolean isEntryStart = (entryStart.length() > 1) && ((character == '{') || (character == '('));
+        unreadBuffer(entryStart);
+        return isEntryStart;
     }
 
     private boolean isEscapeSymbol(char character) {

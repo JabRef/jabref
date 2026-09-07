@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -27,15 +28,18 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
                                      BibDatabaseContext oldDatabaseContext,
                                      BibDatabaseContext newDatabaseContext,
                                      GuiPreferences preferences,
-                                     BibEntryTypesManager entryTypesManager) {
-        Label committedVersion = new Label(Localization.lang("Committed version"));
-        committedVersion.getStyleClass().add("lib-change-header");
-        Label savedFile = new Label(Localization.lang("Saved file"));
-        savedFile.getStyleClass().add("lib-change-header");
+                                     BibEntryTypesManager entryTypesManager,
+                                     String oldVersionLabel,
+                                     String newVersionLabel,
+                                     DiffHighlighter.BasicDiffMethod diffMethod) {
+        Label committedVersion = new Label(oldVersionLabel);
+        committedVersion.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
+        Label savedFile = new Label(newVersionLabel);
+        savedFile.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
 
         StyleClassedTextArea oldSourceArea = createConfiguredTextArea(oldEntry, oldDatabaseContext, preferences, entryTypesManager);
         StyleClassedTextArea newSourceArea = createConfiguredTextArea(newEntry, newDatabaseContext, preferences, entryTypesManager);
-        new SplitDiffHighlighter(oldSourceArea, newSourceArea, DiffHighlighter.BasicDiffMethod.CHARS).highlight();
+        new SplitDiffHighlighter(oldSourceArea, newSourceArea, diffMethod).highlight();
 
         ScrollPane leftScrollPane = createScrollPane(oldSourceArea);
         ScrollPane rightScrollPane = createScrollPane(newSourceArea);
@@ -46,7 +50,7 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
         splitPane.setDividerPositions(0.5);
 
         Label legendLabel = new Label(Localization.lang("Red: Removed, Blue: Changed, Green: Added"));
-        legendLabel.getStyleClass().add("lib-change-legend");
+        legendLabel.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_LEGEND);
 
         VBox resultContainer = new VBox(splitPane, legendLabel);
         resultContainer.setSpacing(5);
