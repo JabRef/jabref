@@ -31,7 +31,7 @@ public class BaseDialog<T> extends Dialog<T> {
         });
         setupKeyBindings(getDialogPane());
 
-        this.setOnShown(_ -> applyButtonFix(this.getDialogPane()));
+        setOnShown(_ -> applyButtonFix(this.getDialogPane()));
 
         setDialogIcon(IconTheme.getJabRefIcon());
         setResizable(true);

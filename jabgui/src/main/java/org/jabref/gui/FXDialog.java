@@ -7,11 +7,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.BaseDialog;
-
-import com.airhacks.afterburner.injection.Injector;
 
 /// This class provides a super class for all dialogs implemented in JavaFX.
 ///
@@ -57,7 +53,7 @@ public class FXDialog extends Alert {
         }
 
         getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> BaseDialog.closeOnKeyBindingMatch(event, this));
-        this.setOnShown(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));
+        setOnShown(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));
     }
 
     public FXDialog(AlertType type) {
