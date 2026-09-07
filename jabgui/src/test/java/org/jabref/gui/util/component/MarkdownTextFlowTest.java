@@ -102,7 +102,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
         interact(() -> textFlow.setMarkdown("**bold**"));
 
         assertEquals("bold", renderedText(textFlow));
-        assertTrue(hasChildWithStyleClass(textFlow, "markdown-bold"));
+        assertTrue(hasChildWithStyleClass(textFlow, "bold"));
     }
 
     @Test
@@ -142,7 +142,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
         // Now interpreted verbatim: markup is visible and no bold styling remains.
         assertEquals(1, childCount(textFlow));
         assertEquals("**bold**", renderedText(textFlow));
-        assertFalse(hasChildWithStyleClass(textFlow, "markdown-bold"));
+        assertFalse(hasChildWithStyleClass(textFlow, "bold"));
     }
 
     @Test
@@ -155,7 +155,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
         });
 
         assertEquals("bold", renderedText(textFlow));
-        assertTrue(hasChildWithStyleClass(textFlow, "markdown-bold"));
+        assertTrue(hasChildWithStyleClass(textFlow, "bold"));
     }
 
     @Test

@@ -8,6 +8,8 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.git.util.GitExceptionUtil;
+import org.jabref.logic.l10n.Localization;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
@@ -28,6 +30,21 @@ public class GitStatusChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitStatusChecker.class);
 
     public static GitStatusSnapshot checkStatus(GitHandler gitHandler) {
+        try {
+            return checkStatusOrThrow(gitHandler);
+        } catch (JabRefException e) {
+            LOGGER.warn("Failed to check Git status", e);
+            return new GitStatusSnapshot(
+                    GitStatusSnapshot.TRACKING,
+                    SyncStatus.UNKNOWN,
+                    !GitStatusSnapshot.CONFLICT,
+                    !GitStatusSnapshot.UNCOMMITTED,
+                    Optional.empty()
+            );
+        }
+    }
+
+    public static GitStatusSnapshot checkStatusOrThrow(GitHandler gitHandler) throws JabRefException {
         try (Git git = Git.open(gitHandler.getRepositoryPathAsFile())) {
             Repository repo = git.getRepository();
             Status status = git.status().call();
@@ -54,15 +71,8 @@ public class GitStatusChecker {
                     hasUncommittedChanges,
                     Optional.ofNullable(localHead).map(ObjectId::getName)
             );
-        } catch (IOException | GitAPIException e) {
-            LOGGER.warn("Failed to check Git status", e);
-            return new GitStatusSnapshot(
-                    GitStatusSnapshot.TRACKING,
-                    SyncStatus.UNKNOWN,
-                    !GitStatusSnapshot.CONFLICT,
-                    !GitStatusSnapshot.UNCOMMITTED,
-                    Optional.empty()
-            );
+        } catch (IOException | GitAPIException | JGitInternalException e) {
+            throw translateStatusFailure(e);
         }
     }
 
@@ -78,9 +88,9 @@ public class GitStatusChecker {
                          ));
     }
 
-    public static GitStatusSnapshot checkStatusAndFetch(GitHandler gitHandler) throws IOException, JabRefException {
+    public static GitStatusSnapshot checkStatusAndFetch(GitHandler gitHandler) throws JabRefException {
         gitHandler.fetchOnCurrentBranch();
-        return checkStatus(gitHandler);
+        return checkStatusOrThrow(gitHandler);
     }
 
     /// The remote is only consulted to tell "remote exists but is empty" apart from "cannot tell".
@@ -143,5 +153,25 @@ public class GitStatusChecker {
             }
             return empty;
         }
+    }
+
+    private static JabRefException translateStatusFailure(Exception exception) {
+        LOGGER.warn("Failed to check Git status", exception);
+        if (GitExceptionUtil.isLockFailure(exception)) {
+            return new JabRefException(
+                    "Failed to check Git status because the repository is locked",
+                    Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again."),
+                    exception);
+        }
+        if (GitExceptionUtil.isMissingObjectFailure(exception)) {
+            return new JabRefException(
+                    "Failed to check Git status because the repository is incomplete or corrupted",
+                    Localization.lang("The local Git repository is incomplete or corrupted. Remove the broken .git directory in that folder or choose another folder, then try again."),
+                    exception);
+        }
+        return new JabRefException(
+                "Failed to check Git status",
+                Localization.lang("Could not read the Git repository status. Please check the repository and try again."),
+                exception);
     }
 }

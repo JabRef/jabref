@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -13,6 +15,7 @@ import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class BibChangeTest {
 
@@ -44,6 +48,7 @@ class BibChangeTest {
                 new UndoableInsertString(database, string),
                 new UndoableRemoveString(database, string),
                 new UndoableStringChange(string, UndoableStringChange.Part.CONTENT, "content", "other"),
+                new UndoableMetaDataChange(new BibDatabaseContext(), new MetaData(), metaDataWithMode()),
                 new ChangeSet("group", List.of(
                         new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
                         new UndoableChangeType(entry, StandardEntryType.Article, StandardEntryType.Book))));
@@ -59,6 +64,25 @@ class BibChangeTest {
     @MethodSource("changes")
     void invertingOnceIsNotIdentity(BibChange change) {
         assertNotEquals(change, change.inverted());
+    }
+
+    private static MetaData metaDataWithMode() {
+        MetaData metaData = new MetaData();
+        metaData.setMode(BibDatabaseMode.BIBLATEX);
+        return metaData;
+    }
+
+    @Test
+    void undoingAMetaDataChangePutsTheLibrarySettingsBack() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        MetaData before = databaseContext.getMetaData();
+        UndoableMetaDataChange change = new UndoableMetaDataChange(databaseContext, before, metaDataWithMode());
+
+        change.apply();
+        assertEquals(BibDatabaseMode.BIBLATEX, databaseContext.getMetaData().getMode().orElseThrow());
+
+        change.inverted().apply();
+        assertSame(before, databaseContext.getMetaData());
     }
 
     @Test
