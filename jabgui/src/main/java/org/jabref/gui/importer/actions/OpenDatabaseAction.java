@@ -166,7 +166,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Directories are directory libraries (e.g. restored from the last session)
         // [impl->req~directory-library.session-restore~1]
         OpenDirectoryLibraryAction openDirectoryLibraryAction = new OpenDirectoryLibraryAction(tabContainer, dialogService, preferences,
-                aiService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipboardManager, taskExecutor);
+                aiService, stateManager, fileUpdateMonitor, entryTypesManager, gitHandlerRegistry, clipboardManager, taskExecutor);
         filesToOpen.stream()
                    .map(FileUtil::resolveIfShortcut)
                    .filter(Files::isDirectory)

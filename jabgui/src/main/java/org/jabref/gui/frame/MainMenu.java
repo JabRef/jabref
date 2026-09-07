@@ -169,7 +169,7 @@ public class MainMenu extends MenuBar {
         file.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
                 factory.createMenuItem(StandardActions.OPEN_LIBRARY, openDatabaseActionSupplier.get()),
-                factory.createMenuItem(StandardActions.OPEN_FOLDER_AS_LIBRARY, new OpenDirectoryLibraryAction(frame, dialogService, preferences, aiService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.OPEN_FOLDER_AS_LIBRARY, new OpenDirectoryLibraryAction(frame, dialogService, preferences, aiService, stateManager, fileUpdateMonitor, entryTypesManager, gitHandlerRegistry, clipBoardManager, taskExecutor)),
                 fileHistoryMenu,
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager, entryTypesManager, journalAbbreviationRepository)),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager, entryTypesManager, journalAbbreviationRepository)),
