@@ -185,7 +185,18 @@ public class BibDatabase {
             entry.registerListener(this);
         }
         eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
-        entries.addAll(newEntries);
+        // The list is kept sorted by id so that indexOf can use binary search. A batch may arrive in a different
+        // order than its entries were created (e.g. after per-entry background duplicate checks), so appending
+        // is only correct when every new id is higher than the last one in the list.
+        List<BibEntry> sortedNewEntries = newEntries.stream().sorted(Comparator.comparing(BibEntry::getId)).toList();
+        if (entries.isEmpty() || entries.getLast().getId().compareTo(sortedNewEntries.getFirst().getId()) < 0) {
+            entries.addAll(sortedNewEntries);
+        } else {
+            for (BibEntry entry : sortedNewEntries) {
+                int position = Collections.binarySearch(entries, entry, Comparator.comparing(BibEntry::getId));
+                entries.add(position < 0 ? -position - 1 : position, entry);
+            }
+        }
         newEntries.forEach(entry -> {
                     entryIdToBibEntry.put(entry.getId(), entry);
                     indexEntry(entry);
@@ -659,11 +670,8 @@ public class BibDatabase {
     }
 
     /// @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
-    /// @implNote New entries are always added to the end of the list and always get a higher ID.
-    /// See [BibEntry][org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType)],
-    /// [IdGenerator][org.jabref.model.entry.IdGenerator],
-    /// [insertEntries][BibDatabase#insertEntries(List, EntriesEventSource)].
-    /// Therefore, using binary search to find the index.
+    /// @implNote [insertEntries][BibDatabase#insertEntries(List, EntriesEventSource)] keeps the list sorted by the
+    /// ids handed out by [IdGenerator][org.jabref.model.entry.IdGenerator], so binary search finds the index.
     /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
     public int indexOf(@NonNull BibEntry bibEntry) {
         int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));

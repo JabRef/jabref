@@ -547,6 +547,23 @@ class BibDatabaseTest {
     }
 
     @Test
+    void entriesInsertedOutOfCreationOrderAreFoundByIndexOf() {
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        BibEntry entryB = new BibEntry(StandardEntryType.Article);
+        BibEntry entryC = new BibEntry(StandardEntryType.Article);
+        BibEntry entryD = new BibEntry(StandardEntryType.Article);
+
+        database.insertEntries(entryB, entryD);
+        database.insertEntries(entryC, entryA);
+
+        assertEquals(List.of(entryA, entryB, entryC, entryD), database.getEntries());
+        assertEquals(0, database.indexOf(entryA));
+        assertEquals(1, database.indexOf(entryB));
+        assertEquals(2, database.indexOf(entryC));
+        assertEquals(3, database.indexOf(entryD));
+    }
+
+    @Test
     void crossrefChangeUpdatesCitationIndex() {
         BibDatabase database = new BibDatabase();
         BibEntry parent = new BibEntry(StandardEntryType.Proceedings)
