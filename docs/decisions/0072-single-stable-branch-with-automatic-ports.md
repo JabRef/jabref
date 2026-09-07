@@ -1,9 +1,8 @@
 ---
 nav_order: 72
 parent: Decision Records
-status: proposed
 date: 2026-09-07
-decision-makers: Siedlerchr, koppor, calixtus
+decision-makers: "@Siedlerchr, @koppor, @calixtus"
 ---
 
 # Use a single `stable` branch with label-driven, automated ports
