@@ -324,3 +324,13 @@
           - 'jablib/src/test/latex/Texlivefile'
           - 'AGENTS.md'
           - 'CHECKLIST.md'
+
+# Packaging and delivery of the built application: the store/package manifests
+# and the per-OS resources jpackage bundles into the installers.
+"dev: distribution":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'flatpak/**'
+          - 'snap/**'
+          - 'jabgui/buildres/**'
+
