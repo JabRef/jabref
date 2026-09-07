@@ -765,13 +765,11 @@ public class StringUtil {
         return Optional.ofNullable(string).orElse("");
     }
 
-    /**
-     * Abbreviates a file path by replacing middle directories with "...".
-     *
-     * @param fullPath  the full file path to abbreviate
-     * @param maxLength the maximum allowed length
-     * @return the abbreviated path, or {@code null} if {@code fullPath} is null
-     */
+    /// Abbreviates a file path by replacing middle directories with "...".
+    ///
+    /// @param fullPath  the full file path to abbreviate
+    /// @param maxLength the maximum allowed length
+    /// @return the abbreviated path, or null if fullPath is null
     public static String abbreviatePath(String fullPath, int maxLength) {
         if (fullPath == null || fullPath.length() <= maxLength) {
             return fullPath;
