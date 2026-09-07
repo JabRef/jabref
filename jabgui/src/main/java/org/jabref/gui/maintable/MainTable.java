@@ -224,6 +224,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         libraryTab.getLoading().addListener((_, _, _) -> updatePlaceholder(placeholderBox, loadingPlaceholder));
 
+        // Matches float to the top (or are the only rows left), so a table scrolled down before searching would show none of them
+        libraryTab.searchQueryProperty().addListener((_, _, query) -> query.ifPresent(_ -> scrollTo(0)));
+
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
         // The default comparator of the SortedList does not consider the insertion index of entries that are equal according to the comparator.
