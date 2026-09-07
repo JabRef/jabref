@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: 'Add "dev: into-stable" for a newly linked bug'
         env:
-          # PAT: a label added with GITHUB_TOKEN would not trigger the "Would merge into stable" check
+          # PAT: a label added with GITHUB_TOKEN would not trigger the "Would merge into the other branch" check
           GH_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}

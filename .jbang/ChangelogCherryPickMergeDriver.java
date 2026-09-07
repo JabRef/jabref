@@ -59,14 +59,13 @@ public class ChangelogCherryPickMergeDriver {
         Path ours = Path.of(args[1]);
         Path theirs = Path.of(args[2]);
         Optional<String> merged = merge(Files.readString(base), Files.readString(ours), Files.readString(theirs));
-        if (merged.isPresent()) {
-            Files.writeString(ours, merged.get());
-            return;
+        if (merged.isEmpty()) {
+            // Not a plain entry change - leave the decision (and the conflict markers) to Git's own three-way merge
+            int conflicts = new ProcessBuilder("git", "merge-file", ours.toString(), base.toString(), theirs.toString())
+                    .inheritIO().start().waitFor();
+            System.exit(conflicts == 0 ? 0 : 1);
         }
-        // Not a plain entry change - leave the decision (and the conflict markers) to Git's own three-way merge
-        int conflicts = new ProcessBuilder("git", "merge-file", ours.toString(), base.toString(), theirs.toString())
-                .inheritIO().start().waitFor();
-        System.exit(conflicts == 0 ? 0 : 1);
+        Files.writeString(ours, merged.orElseThrow());
     }
 
     /// Everything before the "Unreleased" heading, the sections below it, and everything from the next version on.

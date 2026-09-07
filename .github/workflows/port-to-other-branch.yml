@@ -8,51 +8,86 @@ name: Port to other branch
 #
 # pull_request_target: the port needs a push-capable token, and the PR may come from a fork.
 # Nothing from the PR head is executed - the workspace is the base branch, and the merge
-# driver is copied out of it before any other tree is checked out.
+# driver is copied out of it before any other tree is checked out. On merge_group the
+# workspace is the queued commit (base plus the approved PR); that job has read-only
+# permissions and uses no secret beyond GITHUB_TOKEN.
 
 on:
   pull_request_target:
     types: [ opened, reopened, synchronize, labeled, unlabeled, closed ]
-
-permissions:
-  contents: write
-  pull-requests: write
+  # The check is a required status, so the merge queue needs it on its own commit as well
+  merge_group:
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.event.pull_request.number }}-${{ github.event.action == 'closed' && 'port' || 'check' }}"
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.event.merge_group.head_ref }}-${{ github.event.action == 'closed' && 'port' || 'check' }}"
   cancel-in-progress: ${{ github.event.action != 'closed' }}
-
-env:
-  TARGET: ${{ github.event.pull_request.base.ref == 'stable' && 'main' || 'stable' }}
-  PR_NUMBER: ${{ github.event.pull_request.number }}
-  GH_REPO: ${{ github.repository }}
 
 jobs:
   check:
-    name: Would merge into ${{ github.event.pull_request.base.ref == 'stable' && 'main' || 'stable' }}
-    # A port PR (head "port-*" in this repository - a fork branch of that name is just a branch)
-    # carries a change the other branch already has - never port it back.
-    if: >
-      github.repository == 'JabRef/jabref' &&
-      github.event.action != 'closed' &&
-      github.event.pull_request.state == 'open' &&
-      !(github.event.pull_request.head.repo.full_name == 'JabRef/jabref' && startsWith(github.event.pull_request.head.ref, 'port-')) &&
-      (
-        github.event.pull_request.base.ref == 'stable' ||
-        (github.event.pull_request.base.ref == 'main' && contains(github.event.pull_request.labels.*.name, 'dev: into-stable'))
-      )
+    # Fixed name: it is listed as a required status check, whichever branch is the target
+    name: Would merge into the other branch
+    if: github.repository == 'JabRef/jabref' && github.event.action != 'closed'
     runs-on: ubuntu-slim
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
+      # Decides here, not in the job's "if": on merge_group the labels are not in the event, and a
+      # required check has to report (success) on every PR anyway.
+      - name: Resolve the pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          QUEUE_REF: ${{ github.event.merge_group.head_ref }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "merge_group" ]; then
+            # gh-readonly-queue/<base>/pr-<N>-<sha>, same parsing as on-pr-awaiting-second-review-check.yml
+            PR_NUMBER=$(sed -E 's#.*/pr-([0-9]+)-.*#\1#' <<< "$QUEUE_REF")
+          fi
+          gh pr view "$PR_NUMBER" --json state,baseRefName,headRefName,headRepositoryOwner,headRepository,labels \
+            --jq '"state=\(.state|@sh)\nbase=\(.baseRefName|@sh)\nhead_repo=\("\(.headRepositoryOwner.login)/\(.headRepository.name)"|@sh)\nhead_ref=\(.headRefName|@sh)\ninto_stable=\(any(.labels[]; .name == "dev: into-stable"))"' > pr.env
+          # shellcheck disable=SC1091
+          source pr.env
+          port=false
+          # A port PR (head "port-*" in this repository - a fork branch of that name is just a branch)
+          # carries a change the other branch already has - never port it back.
+          if [ "$state" = "OPEN" ] && ! { [ "$head_repo" = "JabRef/jabref" ] && [[ "$head_ref" == port-* ]]; }; then
+            if [ "$base" = "stable" ] || { [ "$base" = "main" ] && [ "$into_stable" = "true" ]; }; then
+              port=true
+            fi
+          fi
+          target=main
+          [ "$base" = "main" ] && target=stable
+          {
+            echo "number=$PR_NUMBER"
+            echo "base=$base"
+            echo "target=$target"
+            echo "port=$port"
+          } >> "$GITHUB_OUTPUT"
+          if [ "$port" != "true" ]; then
+            echo "Nothing to check for #$PR_NUMBER: not a port candidate (base \`$base\`, label \`dev: into-stable\` $([ "$into_stable" = true ] && echo present || echo absent))" >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: steps.pr.outputs.port == 'true'
         with:
           fetch-depth: 0
           submodules: 'false'
           show-progress: 'false'
       - uses: ./.github/actions/changelog-cherry-pick-driver
+        if: steps.pr.outputs.port == 'true'
       - name: Simulate the port
+        if: steps.pr.outputs.port == 'true'
         env:
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          BASE_REF: ${{ steps.pr.outputs.base }}
+          TARGET: ${{ steps.pr.outputs.target }}
+          # On merge_group, the queued commit is the PR merged onto the base; its diff to base_sha is the PR's change
+          HEAD_SHA: ${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha }}
+          QUEUE_BASE_SHA: ${{ github.event.merge_group.base_sha }}
           GIT_AUTHOR_NAME: github-actions[bot]
           GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
           GIT_COMMITTER_NAME: github-actions[bot]
@@ -63,9 +98,15 @@ jobs:
             echo "Branch \`$TARGET\` does not exist yet - nothing to check" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          git fetch --no-tags origin "$TARGET" "+refs/pull/$PR_NUMBER/head:refs/remotes/pr/$PR_NUMBER"
+          if [ -n "$QUEUE_BASE_SHA" ]; then
+            git fetch --no-tags origin "$TARGET"
+            parent="$QUEUE_BASE_SHA"
+          else
+            git fetch --no-tags origin "$TARGET" "+refs/pull/$PR_NUMBER/head:refs/remotes/pr/$PR_NUMBER"
+            parent=$(git merge-base "origin/$BASE_REF" "$HEAD_SHA")
+          fi
           # The PR as it lands: one commit carrying the PR's whole change (squash merge)
-          squash=$(git commit-tree "$HEAD_SHA^{tree}" -p "$(git merge-base "origin/$BASE_REF" "$HEAD_SHA")" -m "Squash of #$PR_NUMBER")
+          squash=$(git commit-tree "$HEAD_SHA^{tree}" -p "$parent" -m "Squash of #$PR_NUMBER")
           git checkout -q "origin/$TARGET"
           if git cherry-pick --no-commit "$squash"; then
             echo "✅ PR #$PR_NUMBER applies cleanly to \`$TARGET\`" >> "$GITHUB_STEP_SUMMARY"
@@ -82,6 +123,13 @@ jobs:
 
   port:
     name: Port to ${{ github.event.pull_request.base.ref == 'stable' && 'main' || 'stable' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      TARGET: ${{ github.event.pull_request.base.ref == 'stable' && 'main' || 'stable' }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      GH_REPO: ${{ github.repository }}
     if: >
       github.repository == 'JabRef/jabref' &&
       github.event.action == 'closed' &&
