@@ -18,6 +18,9 @@ public record UndoableRemoveString(BibDatabase database, BibtexString string) im
 
     @Override
     public ApplyResult apply() {
+        if (database.getStringByName(string.getName()).isEmpty()) {
+            return ApplyResult.of(this, "no string named '%s' is in the library".formatted(string.getName()));
+        }
         database.removeString(string.getId());
         return ApplyResult.SUCCESS;
     }

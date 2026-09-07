@@ -353,7 +353,7 @@ public class JabRefUndoManager implements UndoManager {
             UndoJournalEntry journalEntry = undoStack.getFirst();
             result = new UndoResult(
                     BibChangeDescriber.describe(journalEntry.change()),
-                    journalEntry.change().inverted().apply().isComplete());
+                    journalEntry.change().inverted().apply().complete());
             undoStack.pop();
             // Moved with its id, so redoing returns to the position it came from rather than to
             // a new one that only looks the same.
@@ -374,7 +374,7 @@ public class JabRefUndoManager implements UndoManager {
             UndoJournalEntry journalEntry = redoStack.getFirst();
             result = new UndoResult(
                     BibChangeDescriber.describe(journalEntry.change()),
-                    journalEntry.change().apply().isComplete());
+                    journalEntry.change().apply().complete());
             redoStack.pop();
             undoStack.push(journalEntry);
         }

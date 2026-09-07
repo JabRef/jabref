@@ -38,11 +38,14 @@ public sealed interface BibChange permits
     /// Implementations hold whatever they need to act on — an entry, a string, the database —
     /// so that recording a change never requires plumbing a context to the call site.
     ///
-    /// A change that describes one value refuses when the library no longer holds the state it
-    /// recorded: a command writing on a background thread can have moved that value on since,
-    /// and writing over it would produce a library no step on the stack describes. Changes that
-    /// describe a collection or a whole subtree apply unconditionally, because comparing the
-    /// whole of it on every apply costs more than the case is worth.
+    /// **A change that describes one value refuses when the library no longer holds that value**,
+    /// because a command writing on a background thread can have moved it on since, and writing
+    /// over it would produce a library no step on the stack describes. A change that describes a
+    /// collection or a whole subtree applies unconditionally: comparing all of it on every apply
+    /// costs more than the case is worth, and a partial comparison would only look like a check.
+    ///
+    /// That is the line — one value is verified, many are not — and it is why the two string
+    /// records verify while the two entry-list records do not.
     ///
     /// A change describing one modification performs it or throws, and so always returns
     /// [ApplyResult#SUCCESS]. Only [ChangeSet] can apply part of what it describes, and the

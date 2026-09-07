@@ -1,4 +1,4 @@
-package org.jabref.gui.undo;
+package org.jabref.logic.undo;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,9 +12,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jabref.logic.undo.JabRefUndoManager;
-import org.jabref.logic.undo.UndoResult;
-import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
@@ -215,9 +212,31 @@ class JabRefUndoManagerTest {
     }
 
     /// A change that throws while being reverted must stay undoable rather than disappear from
-    /// both stacks. Re-inserting a removed string collides once the name is taken again.
+    /// both stacks. Re-inserting a removed string collides when its id has been taken since - a
+    /// name collision is refused rather than thrown, which the test below covers.
     @Test
     void aFailingUndoLeavesTheChangeOnTheStack() {
+        BibDatabase database = new BibDatabase();
+        BibtexString removed = new BibtexString("label", "content");
+        database.addString(removed);
+
+        UndoableRemoveString removal = new UndoableRemoveString(database, removed);
+        removal.apply();
+        BibtexString sameId = new BibtexString("other label", "something else");
+        sameId.setId(removed.getId());
+        database.addString(sameId);
+        undoRedoManager.addEdit(removal);
+
+        assertThrows(KeyCollisionException.class, undoRedoManager::undo);
+        assertTrue(undoRedoManager.canUndo());
+        assertFalse(undoRedoManager.canRedo());
+    }
+
+    /// The same situation the library can actually get into: the name is taken again, so putting
+    /// the string back would overwrite someone else's. That is reported, and the step is spent -
+    /// leaving it on the stack would make the next Ctrl+Z look broken.
+    @Test
+    void anUndoThatCannotBeAppliedIsReportedAndSpent() {
         BibDatabase database = new BibDatabase();
         BibtexString removed = new BibtexString("label", "content");
         database.addString(removed);
@@ -227,9 +246,13 @@ class JabRefUndoManagerTest {
         database.addString(new BibtexString("label", "something else"));
         undoRedoManager.addEdit(removal);
 
-        assertThrows(KeyCollisionException.class, undoRedoManager::undo);
-        assertTrue(undoRedoManager.canUndo());
-        assertFalse(undoRedoManager.canRedo());
+        UndoResult result = undoRedoManager.undo().orElseThrow();
+
+        assertFalse(result.complete());
+        assertEquals("something else", database.getStringByName("label").orElseThrow().getContent(),
+                "the undo overwrote the string that took the name");
+        assertFalse(undoRedoManager.canUndo());
+        assertTrue(undoRedoManager.canRedo());
     }
 
     /// The stack keeps the BibEntry objects of removed entries alive, so it is bounded.

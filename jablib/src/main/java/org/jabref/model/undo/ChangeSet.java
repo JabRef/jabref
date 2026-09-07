@@ -46,8 +46,10 @@ public record ChangeSet(String name, List<BibChange> changes) implements BibChan
     /// through a set has no meaningful recovery; they are returned, because a caller that
     /// believes the whole set was applied has been told something untrue.
     ///
-    /// Failures of nested sets travel up as they are, so what comes back names the changes that
-    /// failed rather than the sets that contained them.
+    /// Two things come back as failures: an element that threw, and an element that refused
+    /// because the library no longer holds what it recorded. Failures of nested sets travel up as
+    /// they are, so what comes back names the changes that failed rather than the sets that
+    /// contained them.
     @Override
     public ApplyResult apply() {
         List<ApplyResult.Failure> failures = new ArrayList<>();

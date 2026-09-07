@@ -196,8 +196,27 @@ class BibChangeTest {
         UndoableChangeType change = new UndoableChangeType(entry, StandardEntryType.Article, StandardEntryType.Book);
         entry.setType(StandardEntryType.Thesis);
 
-        assertFalse(change.apply().isComplete());
+        assertFalse(change.apply().complete());
         assertEquals(StandardEntryType.Thesis, entry.getType());
+    }
+
+    @Test
+    void insertingAStringRefusesWhenOneOfThatNameIsAlreadyThere() {
+        BibDatabase database = new BibDatabase();
+        UndoableInsertString change = new UndoableInsertString(database, new BibtexString("name", "content"));
+        database.addString(new BibtexString("name", "something else"));
+
+        assertFalse(change.apply().complete());
+        assertEquals(1, database.getStringCount(), "the insert went ahead over the string already there");
+    }
+
+    @Test
+    void removingAStringRefusesWhenItIsNoLongerThere() {
+        BibDatabase database = new BibDatabase();
+        BibtexString string = new BibtexString("name", "content");
+        UndoableRemoveString change = new UndoableRemoveString(database, string);
+
+        assertFalse(change.apply().complete(), "removing a string that is not there reported success");
     }
 
     /// A set keeps going: one element being stale says nothing about the others.
@@ -223,9 +242,9 @@ class BibChangeTest {
         BibEntry entry = entry();
         UndoableFieldChange change = new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr");
 
-        assertTrue(change.apply().isComplete());
-        assertTrue(change.inverted().apply().isComplete());
-        assertTrue(change.apply().isComplete(), "redo refused although the library was where the change left it");
+        assertTrue(change.apply().complete());
+        assertTrue(change.inverted().apply().complete());
+        assertTrue(change.apply().complete(), "redo refused although the library was where the change left it");
     }
 
     @Test
@@ -276,7 +295,7 @@ class BibChangeTest {
         ChangeSet changeSet = new ChangeSet("edit", List.of(
                 new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr")));
 
-        assertTrue(changeSet.apply().isComplete());
+        assertTrue(changeSet.apply().complete());
     }
 
     @Test
