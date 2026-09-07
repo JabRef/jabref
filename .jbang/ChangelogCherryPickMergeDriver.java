@@ -35,6 +35,10 @@ import org.jspecify.annotations.NullMarked;
 ///   [conventional-changelog](https://github.com/conventional-changelog/conventional-changelog) derive entries from commit
 ///   messages; JabRef writes its entries by hand in the PR, so there is nothing to generate from.
 ///
+/// The same logic is proposed upstream as a `--cherry-pick` mode of maven-flow/changelog-merge-driver
+/// (<https://github.com/maven-flow/changelog-merge-driver/pull/13>); once released, this script can be
+/// replaced by that driver, pinned like in `.github/actions/merge-upstream-branch`.
+///
 /// This driver is a true three-way merge on entry level: it applies the entries that the
 /// cherry-picked commit added to or removed from `## [Unreleased]` (base → theirs) onto ours,
 /// per `### Section`. Everything outside `## [Unreleased]` is expected to be unchanged by the
