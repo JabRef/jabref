@@ -7,9 +7,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -86,6 +89,24 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
             });
         }
         throwAsynchronousFailures();
+    }
+
+    public static <T extends Node> List<T> lookupAll(Parent root, String selector, Class<T> nodeType) {
+        return lookupAll(root, selector, nodeType, node -> true);
+    }
+
+    public static <T extends Node> List<T> lookupAll(Parent root, String selector, Class<T> nodeType, Predicate<T> matcher) {
+        return callAndWait(() -> root.lookupAll(selector).stream()
+                                     .filter(nodeType::isInstance)
+                                     .map(nodeType::cast)
+                                     .filter(matcher)
+                                     .toList());
+    }
+
+    public static <T extends Node> T lookup(Parent root, String selector, Class<T> nodeType, Predicate<T> matcher) {
+        return lookupAll(root, selector, nodeType, matcher).stream()
+                                                           .findFirst()
+                                                           .orElseThrow();
     }
 
     private static synchronized void initializeToolkit() throws InterruptedException {
