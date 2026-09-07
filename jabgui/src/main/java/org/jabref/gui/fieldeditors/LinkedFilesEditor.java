@@ -276,7 +276,9 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
         HBox info = new HBox(8);
         HBox.setHgrow(info, Priority.ALWAYS);
-        info.getStyleClass().add("padding-6-0"); // To align with buttons below which also have 0.5em padding
+        // Centered rather than padded to the buttons' own padding, so the row stays aligned
+        // whatever padding '.icon-button' carries.
+        info.getStyleClass().add("align-center-left");
         info.getChildren().setAll(label, progressIndicator);
 
         Button acceptAutoLinkedFile = ControlHelper.iconButton(IconTheme.JabRefIcons.AUTO_LINKED_FILE);
