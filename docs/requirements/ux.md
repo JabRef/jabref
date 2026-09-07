@@ -76,6 +76,12 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+## Pressing Escape when a combo box popup is open closes only the combo box
+`req~ux.combobox.escape-closes-popup-only~1`
+
+When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
+The enclosing dialog must remain open.
+
 ## Saving keeps external change detection active
 `req~ux.external-library-changes.after-save~1`
 
@@ -95,6 +101,14 @@ Needs: impl
 `req~ux.textdialogs.focus~1`
 
 When a dialog with text input as a main component is opened, the text field should be focused.
+
+Needs: impl
+
+## Text filtering is case-insensitive and separator-aware
+`req~ux.text-filtering.case-insensitive-separators~1`
+
+When users filter textual lists, matching must ignore case and treat punctuation or whitespace separators as equivalent.
+For example, a search for `Springer lecture` or `SPRINGER LECTURE` or `springer lecture` should match `Springer - Lecture Notes in Computer Science`.
 
 Needs: impl
 

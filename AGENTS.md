@@ -553,6 +553,8 @@ For complex flows or new architecture, consider adding a Mermaid sequence or cla
 
 When adding a package or changing a package's or module's public surface, add or update its `package-info.java` / `module-info.java` Javadoc following [skills/developers/module-documentation/SKILL.md](skills/developers/module-documentation/SKILL.md).
 
+When adding or editing a `uses:` line in a workflow, follow [skills/developers/github-actions/SKILL.md](skills/developers/github-actions/SKILL.md) — external actions are pinned to a full commit SHA.
+
 ---
 
 ## Authority

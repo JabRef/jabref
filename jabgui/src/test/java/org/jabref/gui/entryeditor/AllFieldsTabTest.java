@@ -23,10 +23,12 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.undo.JabRefUndoManager;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -113,21 +115,21 @@ class AllFieldsTabTest {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
         when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
+        when(stateManager.getUndoManager(any())).thenReturn(new HeadlessGuiUndoManager());
 
         taskExecutor = new DeferringTaskExecutor();
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);
         Injector.setModelOrService(GuiPreferences.class, preferences);
         Injector.setModelOrService(DialogService.class, mock(DialogService.class));
         Injector.setModelOrService(StateManager.class, stateManager);
+        Injector.setModelOrService(UndoManager.class, new JabRefUndoManager());
         Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
-        Injector.setModelOrService(org.jabref.logic.undo.UndoManager.class, new JabRefUndoManager());
         Injector.setModelOrService(KeyBindingRepository.class, new KeyBindingRepository());
         Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
         Injector.setModelOrService(JournalAbbreviationRepository.class, mock(JournalAbbreviationRepository.class));
         Injector.setModelOrService(FileUpdateMonitor.class, new DummyFileUpdateMonitor());
 
         tab = new AllFieldsTab(
-                new JabRefUndoManager(),
                 mock(UndoAction.class),
                 mock(RedoAction.class),
                 preferences,
