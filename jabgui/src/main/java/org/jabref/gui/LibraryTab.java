@@ -114,7 +114,6 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,17 +172,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private BackgroundTask<?> dataLoadingTask;
 
-    @NullMarked
-    private static final class SharedDatabaseLoadingCallbacks {
+    static final class SharedDatabaseLoadingCallbacks {
         private final LibraryTab tab;
         private final BiConsumer<LibraryTab, BibDatabaseContext> onSuccess;
         private final Consumer<Exception> onFailure;
         private Optional<BibDatabaseContext> connectedContext = Optional.empty();
         private boolean cancelled;
 
-        private SharedDatabaseLoadingCallbacks(LibraryTab tab,
-                                               BiConsumer<LibraryTab, BibDatabaseContext> onSuccess,
-                                               Consumer<Exception> onFailure) {
+        SharedDatabaseLoadingCallbacks(LibraryTab tab,
+                                       BiConsumer<LibraryTab, BibDatabaseContext> onSuccess,
+                                       Consumer<Exception> onFailure) {
             this.tab = tab;
             this.onSuccess = onSuccess;
             this.onFailure = onFailure;
@@ -237,12 +235,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    @NullMarked
-    private static final class SharedDatabaseLoadingTask extends BackgroundTask<BibDatabaseContext> {
+    static final class SharedDatabaseLoadingTask extends BackgroundTask<BibDatabaseContext> {
         private final Callable<BibDatabaseContext> connectionTask;
         private final SharedDatabaseLoadingCallbacks callbacks;
 
-        private SharedDatabaseLoadingTask(Callable<BibDatabaseContext> connectionTask, SharedDatabaseLoadingCallbacks callbacks) {
+        SharedDatabaseLoadingTask(Callable<BibDatabaseContext> connectionTask, SharedDatabaseLoadingCallbacks callbacks) {
             this.connectionTask = connectionTask;
             this.callbacks = callbacks;
         }
@@ -1305,6 +1302,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Creates a shared-library tab that displays the main table's loading indicator until `connectionTask` has connected.
+    /// The dummy context is replaced with the connected context on success; cancellation closes the connected context instead.
     public static LibraryTab createLibraryTab(Callable<BibDatabaseContext> connectionTask,
                                               BibDatabaseContext dummyContext,
                                               DialogService dialogService,
