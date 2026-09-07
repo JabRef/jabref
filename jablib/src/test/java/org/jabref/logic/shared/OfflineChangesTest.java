@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -58,7 +59,7 @@ class OfflineChangesTest {
         changes.recordInsert(List.of(added));
         changes.recordMetaData(Map.of("databaseType", "bibtex;"));
 
-        OfflineChanges.Recorded recorded = OfflineChanges.load(directory, properties).take();
+        OfflineChanges.Recorded recorded = OfflineChanges.load(directory, properties).peek();
 
         assertEquals(Map.of(1, new OfflineChanges.EntryState(3, "article", Map.of("title", "Title 1"))), recorded.changedEntries());
         assertEquals(Map.of(added.getId(), new OfflineChanges.EntryState(1, "book", Map.of("author", "Ada"))), recorded.newEntries());
@@ -67,12 +68,21 @@ class OfflineChangesTest {
     }
 
     @Test
-    void takeForgetsEverythingAndRemovesTheFile() throws Exception {
+    void peekKeepsEverythingUntilItIsForgotten() throws Exception {
+        BibEntry changed = sharedEntry(1, 1);
         OfflineChanges changes = OfflineChanges.load(directory, properties);
-        changes.recordChange(sharedEntry(1, 1));
-        assertTrue(Files.exists(directory.resolve(OfflineChanges.fileName(properties))));
+        changes.recordChange(changed);
+        changes.recordRemoval(List.of(sharedEntry(2, 1)));
+        changes.recordMetaData(Map.of("databaseType", "bibtex;"));
 
-        changes.take();
+        changes.peek();
+
+        assertFalse(changes.isEmpty());
+        assertFalse(OfflineChanges.load(directory, properties).isEmpty());
+
+        changes.forget(changed);
+        changes.forgetRemovals(Set.of(2));
+        changes.forgetMetaData();
 
         assertTrue(changes.isEmpty());
         assertTrue(OfflineChanges.load(directory, properties).isEmpty());
@@ -88,7 +98,7 @@ class OfflineChangesTest {
 
         changes.recordChange(entry);
 
-        OfflineChanges.EntryState state = changes.take().changedEntries().get(1);
+        OfflineChanges.EntryState state = changes.peek().changedEntries().get(1);
         assertEquals(4, state.baseVersion());
         assertEquals("Edited twice", state.fields().get("title"));
     }

@@ -459,45 +459,53 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Database worker
-    private void insertSharedEntries(List<BibEntry> bibEntries) {
+    ///
+    /// @return whether the entries reached the shared database
+    private boolean insertSharedEntries(List<BibEntry> bibEntries) {
         // A replayed entry carries the version of the shared row it was recorded against; the row
         // it gets here is a new one, which the database starts at version 1
         bibEntries.stream()
                   .filter(bibEntry -> bibEntry.getSharedBibEntryData().getSharedIdAsInt() == -1)
                   .forEach(bibEntry -> bibEntry.getSharedBibEntryData().setVersion(1));
-        writeOrRecord("Could not insert entries into the shared database",
+        return writeOrRecord("Could not insert entries into the shared database",
                 () -> dbmsProcessor.insertEntries(bibEntries),
                 () -> offlineChanges.recordInsert(bibEntries));
     }
 
     /// Database worker
-    private void removeSharedEntries(List<BibEntry> bibEntries) {
-        writeOrRecord("Could not remove entries from the shared database",
+    ///
+    /// @return whether the removal reached the shared database
+    private boolean removeSharedEntries(List<BibEntry> bibEntries) {
+        return writeOrRecord("Could not remove entries from the shared database",
                 () -> dbmsProcessor.removeEntries(bibEntries),
                 () -> offlineChanges.recordRemoval(bibEntries));
     }
 
     /// Database worker. Other clients are notified by the database function (see DBMSProcessor.setUp).
-    private void writeSharedMetaData(Map<String, String> serializedMetaData) {
-        writeOrRecord("Could not write metadata to the shared database",
+    private boolean writeSharedMetaData(Map<String, String> serializedMetaData) {
+        return writeOrRecord("Could not write metadata to the shared database",
                 () -> dbmsProcessor.setSharedMetaData(serializedMetaData),
                 () -> offlineChanges.recordMetaData(serializedMetaData));
     }
 
     /// Database worker: runs the write and asks other clients to pull, or records the change
     /// when the connection is gone
-    private void writeOrRecord(String failureMessage, DatabaseWrite write, Runnable record) {
+    ///
+    /// @return whether the write reached the shared database
+    private boolean writeOrRecord(String failureMessage, DatabaseWrite write, Runnable record) {
         if (!connected.get()) {
             record.run();
-            return;
+            return false;
         }
         try {
             write.run();
             // Insertions and removals are not described by a single field change, so other
             // clients have to pull; for metadata, the notification is a harmless duplicate
             notifier.notifyClientsToPull();
+            return true;
         } catch (SQLException e) {
             handleWriteFailure(failureMessage, e, record);
+            return false;
         }
     }
 
@@ -680,9 +688,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// (database worker) - a shared entry that moved on meanwhile refuses the write and the
     /// user merges, like any other conflict. Ends with a pull.
     ///
+    /// Every record is dropped only once it reached the shared database, so that closing, a crash
+    /// or a refused write in between leaves it recorded for the next attempt.
+    ///
     /// @return whether there was anything to replay
     private boolean replayOfflineChanges() {
-        OfflineChanges.Recorded recorded = offlineChanges.take();
+        OfflineChanges.Recorded recorded = offlineChanges.peek();
         if (recorded.isEmpty()) {
             return false;
         }
@@ -719,6 +730,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                     BibEntry restoredEntry = state.toBibEntry();
                     bibDatabase.insertEntries(List.of(restoredEntry), EntriesEventSource.SHARED);
                     entriesToInsert.add(restoredEntry);
+                    // The insert records itself again should it fail
+                    offlineChanges.forgetChange(sharedId);
                     return;
                 }
                 // After a reconnect the local entry already is in this state; after a restart
@@ -741,13 +754,19 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             }
 
             syncExecutor.execute(() -> {
-                List<BibEntry> stillUnchangedEntries = onlyUnchangedSharedEntries(entriesToRemove);
-                if (!stillUnchangedEntries.isEmpty()) {
-                    removeSharedEntries(stillUnchangedEntries);
+                if (!entriesToRemove.isEmpty()) {
+                    try {
+                        List<BibEntry> stillUnchangedEntries = onlyUnchangedSharedEntries(entriesToRemove);
+                        if (stillUnchangedEntries.isEmpty() || removeSharedEntries(stillUnchangedEntries)) {
+                            offlineChanges.forgetRemovals(recorded.removedEntries().keySet());
+                        }
+                    } catch (SQLException e) {
+                        LOGGER.error("Could not check which recorded removals are still up to date", e);
+                    }
                 }
                 reviveEntriesDeletedMeanwhile(entriesToWrite, entriesToInsert);
-                if (!entriesToInsert.isEmpty()) {
-                    insertSharedEntries(entriesToInsert);
+                if (!entriesToInsert.isEmpty() && insertSharedEntries(entriesToInsert)) {
+                    entriesToInsert.forEach(offlineChanges::forget);
                 }
                 boolean written = false;
                 for (BibEntry bibEntry : entriesToWrite) {
@@ -756,8 +775,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 if (written) {
                     notifier.notifyClientsToPull();
                 }
-                if (recorded.metaData() != null) {
-                    writeSharedMetaData(recorded.metaData());
+                if ((recorded.metaData() != null) && writeSharedMetaData(recorded.metaData())) {
+                    offlineChanges.forgetMetaData();
                 }
                 pullChanges();
             });
@@ -770,17 +789,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /// ends the replay brings it back locally, rather than the collaborator losing their work.
     ///
     /// @return the entries whose shared version still is the one the removal was recorded against
-    private List<BibEntry> onlyUnchangedSharedEntries(List<BibEntry> entriesToRemove) {
-        if (!connected.get() || entriesToRemove.isEmpty()) {
+    private List<BibEntry> onlyUnchangedSharedEntries(List<BibEntry> entriesToRemove) throws SQLException {
+        if (!connected.get()) {
             return entriesToRemove;
         }
-        Map<Integer, Integer> sharedVersions;
-        try {
-            sharedVersions = sharedVersionsOf(entriesToRemove);
-        } catch (SQLException e) {
-            LOGGER.error("Could not check which recorded removals are still up to date", e);
-            return List.of();
-        }
+        Map<Integer, Integer> sharedVersions = sharedVersionsOf(entriesToRemove);
         List<BibEntry> unchangedEntries = new ArrayList<>();
         for (BibEntry bibEntry : entriesToRemove) {
             Integer sharedVersion = sharedVersions.get(bibEntry.getSharedBibEntryData().getSharedIdAsInt());
@@ -833,6 +846,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             // Inserted below, which assigns a fresh shared id and version
             bibEntry.getSharedBibEntryData().setSharedId(-1);
             sharedIdsInConflict.remove(sharedId);
+            // The insert records itself again should it fail
+            offlineChanges.forgetChange(sharedId);
             entriesToInsert.add(bibEntry);
             iterator.remove();
         }

@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,16 +174,34 @@ public class OfflineChanges {
         }
     }
 
-    /// Hands out everything recorded so far and forgets it: the caller synchronizes the changes,
-    /// and whatever fails again is recorded again
-    public synchronized Recorded take() {
-        Recorded recorded = new Recorded(new LinkedHashMap<>(changedEntries), new LinkedHashMap<>(newEntries), new LinkedHashMap<>(removedEntries), metaData);
-        changedEntries.clear();
-        newEntries.clear();
-        removedEntries.clear();
-        metaData = null;
-        save();
-        return recorded;
+    /// Drops the record of a change that is written as an insert instead, because the shared entry
+    /// it was recorded against is gone
+    public synchronized void forgetChange(int sharedId) {
+        if (changedEntries.remove(sharedId) != null) {
+            save();
+        }
+    }
+
+    /// Drops the records of removals that reached the shared database (or need not, because the
+    /// shared entry is gone or was kept)
+    public synchronized void forgetRemovals(Collection<Integer> sharedIds) {
+        if (removedEntries.keySet().removeAll(sharedIds)) {
+            save();
+        }
+    }
+
+    /// Drops the recorded metadata after it reached the shared database
+    public synchronized void forgetMetaData() {
+        if (metaData != null) {
+            metaData = null;
+            save();
+        }
+    }
+
+    /// Hands out everything recorded so far. The records are kept until each of them is written
+    /// (see the `forget` methods), so that nothing is lost when the replay fails or is interrupted.
+    public synchronized Recorded peek() {
+        return new Recorded(new LinkedHashMap<>(changedEntries), new LinkedHashMap<>(newEntries), new LinkedHashMap<>(removedEntries), metaData);
     }
 
     private void save() {
