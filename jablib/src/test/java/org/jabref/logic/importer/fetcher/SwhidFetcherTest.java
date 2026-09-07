@@ -56,7 +56,7 @@ public class SwhidFetcherTest {
         assertEquals(Optional.of(BiblatexSoftwareEntryType.SoftwareVersion), fetchedEntry.map(BibEntry::getType));
         assertEquals(Optional.of(PARMAP_SWHID), fetchedEntry.flatMap(entry -> entry.getField(BiblatexSoftwareField.SWHID)));
         assertEquals(Optional.empty(), fetchedEntry.flatMap(entry -> entry.getField(new UnknownField("swhid"))));
-        assertEquals(1, fetchedEntry.get().getFields().stream().filter(f -> f.getName().equalsIgnoreCase("swhid")).count());
+        assertEquals(1, fetchedEntry.get().getFields().stream().filter(f -> "swhid".equalsIgnoreCase("swhid")).count());
     }
 
     @Test
