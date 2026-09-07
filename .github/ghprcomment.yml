@@ -96,7 +96,7 @@
     The `CHANGELOG.md` checklist item and the actual `CHANGELOG.md` change do not match: either you ticked the item without adding an entry, or you added an entry without ticking the item.
 
 
-    If you made changes that are visible to the user, please add a brief description to the `CHANGELOG.md` file, along with the issue number when one exists; otherwise link the pull request, and keep the checklist item ticked (`[x]`) in the wording of the pull request template.
+    If you made changes that are visible to the user, please add a brief description to the `CHANGELOG.md` file, along with the issue number when one exists; otherwise link the pull request.
     If you did not, please replace the cross (`[x]`) by a slash (`[/]`) to indicate that no `CHANGELOG.md` entry is necessary.
     More details can be found in our [Developer Documentation about the changelog](https://devdocs.jabref.org/decisions/0007-human-readable-changelog.html).
 - jobName: 'CHANGELOG.md - only unreleased touched'
