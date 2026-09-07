@@ -93,10 +93,15 @@ public class PdfContentImporter extends PdfImporter {
     /// Turns a typeset byline into a BibTeX author list.
     ///
     /// [org.jabref.logic.importer.AuthorListParser] is not usable here: it expects a BibTeX author field, where a
-    /// comma separates family and given names. A byline "Karen A. Cooper1, Jennifer L. Donovan2 and Gary
-    /// Williamson1*" comes back as two persons with the affiliation markers kept, "Anke Lüdeling Merja Kytö"
-    /// (names separated by spaces only) as one person, and "et al." stays literal. So the byline is split
-    /// heuristically first; the result is a plain BibTeX list that AuthorList can parse afterwards.
+    /// comma separates family and given names, and it keeps affiliation markers. Fed with raw bylines it yields:
+    ///
+    /// | Byline                                                          | AuthorListParser result                   |
+    /// |-----------------------------------------------------------------|-------------------------------------------|
+    /// | `Karen A. Cooper1, Jennifer L. Donovan2 and Gary Williamson1*` | 2 persons, affiliation digits kept        |
+    /// | `Anke Lüdeling Merja Kytö` (separated by spaces only)           | 1 person                                  |
+    /// | `John Smith et al.`                                             | 1 person named "John Smith et al."        |
+    ///
+    /// So the byline is split heuristically first; the result is a plain BibTeX list that AuthorList can parse afterwards.
     private String streamlineNames(String names) {
         String res;
         // supported formats:
