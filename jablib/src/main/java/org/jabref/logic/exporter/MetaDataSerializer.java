@@ -27,7 +27,7 @@ public class MetaDataSerializer {
     private MetaDataSerializer() {
     }
 
-    /// Writes all data in the format &lt;key, serialized data>.
+    /// Writes all data in the format `<key, serialized data>`.
     /// Also serializes user-defined .blg file paths (if present).
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
                                                              GlobalCitationKeyPatterns globalCiteKeyPatterns) {
@@ -44,6 +44,15 @@ public class MetaDataSerializer {
                 saveActions -> stringyMetaData.put(MetaData.SAVE_ACTIONS, getAsStringList(saveActions, OS.NEWLINE)));
         if (metaData.isProtected()) {
             stringyMetaData.put(MetaData.PROTECTED_FLAG_META, List.of("true"));
+        }
+        if (metaData.isGitAutoPull()) {
+            stringyMetaData.put(MetaData.GIT_AUTO_PULL, List.of("true"));
+        }
+        if (metaData.isGitAutoCommit()) {
+            stringyMetaData.put(MetaData.GIT_AUTO_COMMIT, List.of("true"));
+        }
+        if (metaData.isGitAutoPush()) {
+            stringyMetaData.put(MetaData.GIT_AUTO_PUSH, List.of("true"));
         }
         stringyMetaData.putAll(serializeCiteKeyPatterns(metaData, globalCiteKeyPatterns));
         metaData.getMode().ifPresent(

@@ -14,7 +14,6 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -67,7 +66,6 @@ class BackupUIManagerTest extends ApplicationTest {
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
-                mock(UndoManager.class),
                 mock(StateManager.class)));
 
         verify(dialogService).showErrorDialogAndWait(
