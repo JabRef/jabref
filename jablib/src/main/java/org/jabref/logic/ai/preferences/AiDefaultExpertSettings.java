@@ -18,6 +18,7 @@ public class AiDefaultExpertSettings {
 
     public static final DocumentSplitterKind DOCUMENT_SPLITTER_KIND = DocumentSplitterKind.SLIDING_WINDOW;
     public static final int DOCUMENT_SPLITTER_CHUNK_SIZE = 300;
+    public static final int DOCUMENT_SPLITTER_MAX_CHUNK_SIZE = 512;
     public static final int DOCUMENT_SPLITTER_OVERLAP_SIZE = 100;
 
     public static final ResponseEngineKind RESPONSE_ENGINE_KIND = ResponseEngineKind.EMBEDDINGS_SEARCH;

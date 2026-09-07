@@ -326,8 +326,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.documentSplitterChunkSizeValidator = new FunctionBasedValidator<>(
                 documentSplitterChunkSize,
-                size -> size.intValue() > 0,
-                ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0")));
+                size -> size.intValue() > 0 && size.intValue() <= AiDefaultExpertSettings.DOCUMENT_SPLITTER_MAX_CHUNK_SIZE,
+                ValidationMessage.error(Localization.lang("Document splitter chunk size must be between 1 and 512")));
 
         this.documentSplitterOverlapSizeValidator = new FunctionBasedValidator<>(
                 documentSplitterOverlapSize,
