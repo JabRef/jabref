@@ -93,3 +93,5 @@ Setting up the branch (once, by an administrator):
 3. Create the label `dev: into-stable`.
 
 The maintainer workflow is documented in [Branching strategy](https://devdocs.jabref.org/contributing.html#branching-strategy).
+
+<!-- markdownlint-disable-file MD022 -->
