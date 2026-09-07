@@ -129,8 +129,6 @@ class UndoRedoActionTest {
         assertEquals(Optional.of("Meitner"), entryInB.getField(StandardField.AUTHOR));
     }
 
-    /// The message names the step, so that an undo of something that finished while the user was
-    /// elsewhere - an import, a cleanup - says what was taken back.
     @Test
     void theNotificationSaysWhatWasUndoneAndRedone() {
         journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
@@ -143,7 +141,6 @@ class UndoRedoActionTest {
         verify(dialogService).notify("Redone: Change field Author");
     }
 
-    /// A step recorded as a set is named by the control the user activated.
     @Test
     void theNotificationNamesTheCommandWhenTheStepIsASet() {
         journalOfA.addEdit(Localization.lang("Replace string"), edit -> edit.addEdit(setAuthor(entryInA, "Bohr")));
@@ -154,8 +151,6 @@ class UndoRedoActionTest {
         verify(dialogService).notify("Undone: Replace string");
     }
 
-    /// A set applies best-effort, so an undo can take back less than its name promises. The
-    /// message has to say so, or it describes a library the user does not have.
     @Test
     void theNotificationSaysWhenPartOfTheStepCouldNotBeUndone() {
         BibtexString string = new BibtexString("name", "content");
@@ -170,8 +165,6 @@ class UndoRedoActionTest {
         verify(dialogService).notify("Undone: Remove string (some changes could not be applied)");
     }
 
-    /// "Nothing to undo" would be untrue while a command holds the library: there is something to
-    /// undo, and the reason it cannot happen yet is worth naming.
     @Test
     void theNotificationNamesTheCommandHoldingTheLibrary() {
         journalOfA.addEdit(setAuthor(entryInA, "Bohr"));

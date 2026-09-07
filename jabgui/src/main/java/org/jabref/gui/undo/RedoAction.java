@@ -5,7 +5,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.ChangeOutcome;
+import org.jabref.logic.undo.StepOutcome;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -42,20 +42,20 @@ public class RedoAction extends SimpleCommand {
                 () -> redo(libraryTab, undoManager));
     }
 
+    /// See [UndoAction#undo]: an empty outcome is the journal saying there was nothing to redo.
     private void redo(LibraryTab libraryTab, GuiUndoManager undoManager) {
-        if (undoManager.canRedo()) {
-            undoManager.redo().ifPresent(outcome -> dialogService.notify(message(outcome)));
-        } else {
-            dialogService.notify(Localization.lang("Nothing to redo") + '.');
-        }
-        libraryTab.markChangedOrUnChanged();
+        undoManager.redo().ifPresentOrElse(
+                step -> {
+                    dialogService.notify(message(step));
+                    libraryTab.markChangedOrUnChanged();
+                },
+                () -> dialogService.notify(Localization.lang("Nothing to redo") + '.'));
     }
 
     /// See [UndoAction#message].
-    private static String message(ChangeOutcome outcome) {
-        if (outcome.result().isComplete()) {
-            return Localization.lang("Redone: %0", outcome.description());
-        }
-        return Localization.lang("Redone: %0 (some changes could not be applied)", outcome.description());
+    private static String message(StepOutcome step) {
+        return step.complete()
+                ? Localization.lang("Redone: %0", step.name())
+                : Localization.lang("Redone: %0 (some changes could not be applied)", step.name());
     }
 }

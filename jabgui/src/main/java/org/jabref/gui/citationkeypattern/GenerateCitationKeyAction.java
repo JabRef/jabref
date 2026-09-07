@@ -108,14 +108,10 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     }
 
     private BackgroundTask<Void> generateKeysInBackground(BibDatabaseContext databaseContext) {
-        // Taken here, while the library is certainly open: asking for a journal once it has closed
-        // would create one nothing can reach.
         UndoManager undoManager = stateManager.getUndoManager(databaseContext);
-        // Taken here for the same reason: the keys are generated for, and recorded against, the library
-        // the action started on, so that is the tab to mark changed - not whichever is in front when the
-        // task finishes.
         LibraryTab libraryTab = tabSupplier.get();
         CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
+
         // The keys are written entry by entry in call() and handed over in the success handler, so
         // the library is held against undo across both. Closed on every path out of the task.
         WriteReservation reserved = undoManager.reserveWrites(StandardActions.GENERATE_CITE_KEYS.getText());

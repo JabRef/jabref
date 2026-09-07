@@ -332,16 +332,16 @@ public class JabRefUndoManager implements UndoManager {
     ///         afterwards, it would describe whichever step another thread has since pushed.
     ///         Only a name leaves the journal, so nothing outside it starts reading the contents
     ///         of the stacks.
-    public Optional<ChangeOutcome> undo() {
-        ChangeOutcome outcome;
+    public Optional<StepOutcome> undo() {
+        StepOutcome outcome;
         synchronized (this) {
             if ((openWriters > 0) || undoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = undoStack.getFirst();
-            outcome = new ChangeOutcome(
+            outcome = new StepOutcome(
                     BibChangeDescriber.describe(journalEntry.change()),
-                    journalEntry.change().inverted().apply());
+                    journalEntry.change().inverted().apply().isComplete());
             undoStack.pop();
             // Moved with its id, so redoing returns to the position it came from rather than to
             // a new one that only looks the same.
@@ -353,16 +353,16 @@ public class JabRefUndoManager implements UndoManager {
 
     /// @return what was redone, in the shape [#undo] returns it, or empty if there was nothing
     ///         to redo or a command is holding the library
-    public Optional<ChangeOutcome> redo() {
-        ChangeOutcome outcome;
+    public Optional<StepOutcome> redo() {
+        StepOutcome outcome;
         synchronized (this) {
             if ((openWriters > 0) || redoStack.isEmpty()) {
                 return Optional.empty();
             }
             UndoJournalEntry journalEntry = redoStack.getFirst();
-            outcome = new ChangeOutcome(
+            outcome = new StepOutcome(
                     BibChangeDescriber.describe(journalEntry.change()),
-                    journalEntry.change().apply());
+                    journalEntry.change().apply().isComplete());
             redoStack.pop();
             undoStack.push(journalEntry);
         }
