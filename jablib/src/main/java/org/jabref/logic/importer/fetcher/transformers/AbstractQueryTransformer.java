@@ -142,7 +142,7 @@ public abstract class AbstractQueryTransformer {
     protected String handleYearRange(String yearRange) {
         parseYearRange(yearRange);
         if (endYear == Integer.MAX_VALUE) {
-            //invalid year range
+            // invalid year range
             return yearRange;
         }
         StringJoiner resultBuilder = new StringJoiner(getLogicalOrOperator());
