@@ -323,38 +323,16 @@ tasks.test {
 }
 
 // region community themes
-// themes.jabref.org is a submodule; only its two-scheme themes (directly below themes/<Name>/) are
-// bundled. DarkTheme/ and LightTheme/ hold single-scheme themes, which cannot follow the color scheme.
-val themesJabRefOrgDir = layout.projectDirectory.dir("themes.jabref.org/themes")
-val generateCommunityThemes = tasks.register("generateCommunityThemes") {
-    group = "JabRef"
-    description = "Bundles the two-scheme themes of themes.jabref.org together with an index of them"
-    val targetDir = layout.buildDirectory.dir("generated/resources/community-themes")
-    inputs.dir(themesJabRefOrgDir)
-    outputs.dir(targetDir)
-    // Plain File values: the configuration cache cannot serialize references to script-level objects.
-    val source = themesJabRefOrgDir.asFile
-    val target = targetDir.get().dir("org/jabref/gui/theme/community").asFile
-    doLast {
-        target.deleteRecursively()
-        target.mkdirs()
-        val index = mutableListOf<String>()
-        val themeDirs = source.listFiles { file -> file.isDirectory && file.name != "DarkTheme" && file.name != "LightTheme" }
-        if (themeDirs == null) {
-            logger.warn("No community themes bundled: submodule {} is not checked out (git submodule update --init)", source)
-        }
-        (themeDirs ?: emptyArray())
-            .sortedBy { it.name }
-            .forEach { dir ->
-                val cssFiles = dir.listFiles { file -> file.extension == "css" }!!.sortedBy { it.name }
-                cssFiles.forEach { css ->
-                    css.copyTo(target.resolve(css.name))
-                    val name = if (cssFiles.size == 1) dir.name else "${dir.name}: ${css.nameWithoutExtension}"
-                    index += "$name|${css.name}"
-                }
-            }
-        target.resolve("index.txt").writeText(index.joinToString("\n", postfix = "\n"))
+// themes.jabref.org is a submodule. Its two-scheme themes (directly below themes/<Name>/) are bundled
+// flat under org/jabref/gui/theme/community/; ThemePreset lists them, ThemePresetTest keeps both in sync.
+// DarkTheme/ and LightTheme/ hold single-scheme themes, which cannot follow the color scheme.
+tasks.processResources {
+    from(layout.projectDirectory.dir("themes.jabref.org/themes")) {
+        include("*/*.css")
+        exclude("DarkTheme/**", "LightTheme/**")
+        // `path` is relative to the task's destination, so the target directory is part of it.
+        eachFile { path = "org/jabref/gui/theme/community/$name" }
+        includeEmptyDirs = false
     }
 }
-sourceSets["main"].resources.srcDir(generateCommunityThemes)
 // endregion

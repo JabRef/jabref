@@ -171,7 +171,7 @@ public class ThemeManager {
         ThemePreset newTheme = Optional.ofNullable(workspacePreferences.getTheme()).orElse(ThemePreset.JABREF);
 
         boolean cssChanged = false;
-        if (!theme.equals(newTheme)) {
+        if (theme != newTheme) {
             if (themeCssLiveUpdate != null) {
                 removeStylesheetFromWatchList(theme.getStyleSheet(), themeCssLiveUpdate);
             }

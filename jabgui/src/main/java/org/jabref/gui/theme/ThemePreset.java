@@ -1,102 +1,93 @@
 package org.jabref.gui.theme;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
-import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.logic.l10n.Localization;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /// A theme the user can select: one of the two built-in themes, or one of the community themes
-/// from <https://themes.jabref.org/> that the build bundles (see `generateCommunityThemes` in
-/// `jabgui/build.gradle.kts`, which also writes the index read here).
+/// from <https://themes.jabref.org/> that the build bundles from the `jabgui/themes.jabref.org`
+/// submodule (see `processResources` in `jabgui/build.gradle.kts`).
 ///
-/// Built-in themes declare the complete `-color-*` token contract. Community themes only override
-/// what differs from the JabRef theme, so [ThemeManager] layers them on top of it.
-@AllowedToUseClassGetResource("Reads the build-time index of the bundled community themes.")
-public final class ThemePreset {
-    public static final ThemePreset JABREF = new ThemePreset("JABREF", Localization.lang("JabRef theme"), "jabref-theme.css");
-    public static final ThemePreset PRIMER = new ThemePreset("PRIMER", Localization.lang("Primer theme"), "primer-theme.css");
+/// The community constants are a hand-maintained mirror of that submodule -- `ThemePresetTest`
+/// fails when the two drift apart -- so that the set of themes is fixed at compile time and no
+/// classpath scanning happens at startup. Built-in themes declare the complete `-color-*` token
+/// contract; community themes only override what differs from the JabRef theme, so [ThemeManager]
+/// layers them on top of it.
+public enum ThemePreset {
+    JABREF(Localization.lang("JabRef theme"), "jabref-theme.css", true),
+    PRIMER(Localization.lang("Primer theme"), "primer-theme.css", true),
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ThemePreset.class);
+    CHOCOLATE_HONEY("Chocolate Honey", "chocolate-honey.css"),
+    DINOGIRLS_CHOCOLATEBROWN_CONTRASTTEXT("DinoGirls: chocolatebrown / darksalmon, contrast text", "chocolatebrown-darksalmon-contrasttext.css"),
+    DINOGIRLS_CHOCOLATEBROWN_GREYTEXT("DinoGirls: chocolatebrown / darksalmon, grey text", "chocolatebrown-darksalmon-greytext.css"),
+    DINOGIRLS_FUCHSIAPURPLE_CONTRASTTEXT("DinoGirls: fuchsiapurple / japanesesakura, contrast text", "fuchsiapurple-japanesesakura-contrasttext.css"),
+    DINOGIRLS_FUCHSIAPURPLE_GREYTEXT("DinoGirls: fuchsiapurple / japanesesakura, grey text", "fuchsiapurple-japanesesakura-greytext.css"),
+    DINOGIRLS_JABREFDARK_CONTRASTTEXT("DinoGirls: jabrefdark / jabreflight, contrast text", "jabrefdark-jabreflight-contrasttext.css"),
+    DINOGIRLS_JABREFDARK_GREYTEXT("DinoGirls: jabrefdark / jabreflight, grey text", "jabrefdark-jabreflight-greytext.css"),
+    DINOGIRLS_LIGHTBLUE_CONTRASTTEXT("DinoGirls: lightblue / iceage, contrast text", "lightblue-iceage-contrasttext.css"),
+    DINOGIRLS_LIGHTBLUE_GREYTEXT("DinoGirls: lightblue / iceage, grey text", "lightblue-iceage-greytext.css"),
+    DINOGIRLS_LIGHTSEAGREEN_CONTRASTTEXT("DinoGirls: lightseagreen / limegreen, contrast text", "lightseagreen-limegreen-contrasttext.css"),
+    DINOGIRLS_LIGHTSEAGREEN_GREYTEXT("DinoGirls: lightseagreen / limegreen, grey text", "lightseagreen-limegreen-greytext.css"),
+    DINOGIRLS_PREHISTORICAMBER_CONTRASTTEXT("DinoGirls: prehistoricamber / peachorange, contrast text", "prehistoricamber-peachorange-contrasttext.css"),
+    DINOGIRLS_PREHISTORICAMBER_GREYTEXT("DinoGirls: prehistoricamber / peachorange, grey text", "prehistoricamber-peachorange-greytext.css"),
+    DINOGIRLS_TWILIGHTLAVENDER_CONTRASTTEXT("DinoGirls: twilightlavender / neon, contrast text", "twilightlavender-neon-contrasttext.css"),
+    DINOGIRLS_TWILIGHTLAVENDER_GREYTEXT("DinoGirls: twilightlavender / neon, grey text", "twilightlavender-neon-greytext.css"),
+    DINOGIRLS_WINERED_CONTRASTTEXT("DinoGirls: winered / icedstrawberry, contrast text", "winered-icedstrawberry-contrasttext.css"),
+    DINOGIRLS_WINERED_GREYTEXT("DinoGirls: winered / icedstrawberry, grey text", "winered-icedstrawberry-greytext.css"),
+    EVERFOREST("Everforest", "everforest.css"),
+    NORD("Nord", "nord.css");
+
     private static final String COMMUNITY_DIRECTORY = "community/";
-    private static final String COMMUNITY_INDEX = COMMUNITY_DIRECTORY + "index.txt";
 
-    private static List<ThemePreset> values;
-
-    private final String preferenceName;
     private final String themeName;
     private final String css;
+    private final boolean builtIn;
 
     private StyleSheet styleSheet;
 
-    private ThemePreset(String preferenceName, String themeName, String css) {
-        this.preferenceName = preferenceName;
+    ThemePreset(String themeName, String css, boolean builtIn) {
         this.themeName = themeName;
-        this.css = css;
+        this.css = builtIn ? css : COMMUNITY_DIRECTORY + css;
+        this.builtIn = builtIn;
+    }
+
+    /// A community theme; theme names are proper nouns and stay untranslated.
+    ThemePreset(String themeName, String css) {
+        this(themeName, css, false);
+    }
+
+    public static ThemePreset of(String themePreset) {
+        if (themePreset == null) {
+            return JABREF;
+        }
+
+        try {
+            return valueOf(themePreset);
+        } catch (IllegalArgumentException e) {
+            return JABREF;
+        }
     }
 
     public static List<ThemePreset> builtIn() {
-        return List.of(JABREF, PRIMER);
-    }
-
-    /// The built-in themes followed by the bundled community themes, in a stable order.
-    ///
-    /// [impl->req~ux.themes.bundled-community-themes~1]
-    public static synchronized List<ThemePreset> values() {
-        if (values == null) {
-            List<ThemePreset> all = new ArrayList<>(builtIn());
-            all.addAll(communityThemes());
-            values = List.copyOf(all);
-        }
-        return values;
-    }
-
-    /// One theme per line: `Display name|file.css`, the file living next to the index.
-    private static List<ThemePreset> communityThemes() {
-        InputStream index = ThemePreset.class.getResourceAsStream(COMMUNITY_INDEX);
-        if (index == null) {
-            LOGGER.warn("No bundled community themes found");
-            return List.of();
-        }
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(index, StandardCharsets.UTF_8))) {
-            return reader.lines()
-                         .filter(line -> line.contains("|"))
-                         .map(line -> line.split("\\|", 2))
-                         .map(parts -> new ThemePreset(parts[1], parts[0], COMMUNITY_DIRECTORY + parts[1]))
-                         .toList();
-        } catch (IOException e) {
-            LOGGER.warn("Could not read the index of the bundled community themes", e);
-            return List.of();
-        }
-    }
-
-    /// @return the theme stored under that preference name, or the JabRef theme if there is none
-    public static ThemePreset of(String themePreset) {
-        return values().stream()
-                       .filter(theme -> theme.preferenceName.equals(themePreset))
-                       .findFirst()
-                       .orElse(JABREF);
+        return Arrays.stream(values()).filter(ThemePreset::isBuiltIn).toList();
     }
 
     public boolean isBuiltIn() {
-        return builtIn().contains(this);
+        return builtIn;
     }
 
     public String getPreferenceName() {
-        return preferenceName;
+        return name();
     }
 
     public String getLocalizedName() {
         return themeName;
+    }
+
+    /// The CSS file name of a community theme as it appears in the submodule, `null` for a built-in theme.
+    String getCommunityFileName() {
+        return builtIn ? null : css.substring(COMMUNITY_DIRECTORY.length());
     }
 
     public StyleSheet getStyleSheet() {
@@ -104,20 +95,5 @@ public final class ThemePreset {
             styleSheet = StyleSheet.create(css).orElseThrow();
         }
         return styleSheet;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return o instanceof ThemePreset other && preferenceName.equals(other.preferenceName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(preferenceName);
-    }
-
-    @Override
-    public String toString() {
-        return preferenceName;
     }
 }

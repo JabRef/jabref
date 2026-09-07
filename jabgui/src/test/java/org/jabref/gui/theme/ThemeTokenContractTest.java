@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -149,11 +150,11 @@ class ThemeTokenContractTest {
     }
 
     static List<ThemePreset> allThemes() {
-        return ThemePreset.values();
+        return List.of(ThemePreset.values());
     }
 
     static List<ThemePreset> communityThemes() {
-        return ThemePreset.values().stream().filter(theme -> !theme.isBuiltIn()).toList();
+        return Arrays.stream(ThemePreset.values()).filter(theme -> !theme.isBuiltIn()).toList();
     }
 
     /// A community theme setting a token nobody reads is a typo or a stale port; it would silently
