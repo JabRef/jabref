@@ -56,21 +56,30 @@ class EntryEditorTabModelTest {
     }
 
     @Test
-    void fieldsOnCustomTabsUnitesCustomTabsAndIgnoresBuiltInTabs() {
+    void fieldsOnCustomTabsUnitesExtractedPatternsAndIgnoresBuiltInTabs() {
         List<EntryEditorTabModel> tabModels = List.of(
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.ALL_FIELDS, true),
-                new EntryEditorTabModel.CustomizedFieldsTab("One", List.of("author", "url")),
-                new EntryEditorTabModel.CustomizedFieldsTab("Two", List.of("comment-.*")));
+                new EntryEditorTabModel.CustomizedFieldsTab("One", List.of("author", "url"), Set.of("author", "url")),
+                new EntryEditorTabModel.CustomizedFieldsTab("Two", List.of("comment-.*"), Set.of("comment-.*")));
         assertEquals(
                 Set.of(StandardField.AUTHOR, StandardField.URL,
                         new UserSpecificCommentField("alice"), new UserSpecificCommentField("bob")),
                 EntryEditorTabModel.fieldsOnCustomTabs(tabModels, entry));
     }
 
+    // [utest->req~entry-editor.custom-tabs.extract-field~1]
     @Test
-    void regexCapturesFieldOnlyOnceItHasAValue() {
+    void nonExtractedPatternsLeaveTheMainTabAlone() {
         List<EntryEditorTabModel> tabModels = List.of(
-                new EntryEditorTabModel.CustomizedFieldsTab("Notes", List.of("note.*")));
+                new EntryEditorTabModel.CustomizedFieldsTab("One", List.of("author", "comment-.*")),
+                new EntryEditorTabModel.CustomizedFieldsTab("Two", List.of("url", "comment"), Set.of("comment")));
+        assertEquals(Set.of(StandardField.COMMENT), EntryEditorTabModel.fieldsOnCustomTabs(tabModels, entry));
+    }
+
+    @Test
+    void extractedRegexCapturesFieldOnlyOnceItHasAValue() {
+        List<EntryEditorTabModel> tabModels = List.of(
+                new EntryEditorTabModel.CustomizedFieldsTab("Notes", List.of("note.*"), Set.of("note.*")));
         BibEntry withoutNote = new BibEntry(StandardEntryType.Article);
         assertEquals(Set.of(), EntryEditorTabModel.fieldsOnCustomTabs(tabModels, withoutNote));
         // First typed character sets the field; from then on it belongs to the custom tab

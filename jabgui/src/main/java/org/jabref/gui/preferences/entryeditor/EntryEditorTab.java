@@ -271,6 +271,40 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         patternColumn.setReorderable(false);
         patternColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
 
+        // [impl->req~entry-editor.custom-tabs.extract-field~1]
+        TableColumn<String, String> extractColumn = new TableColumn<>(Localization.lang("Extract field"));
+        extractColumn.setMinWidth(130.0);
+        extractColumn.setMaxWidth(130.0);
+        extractColumn.setResizable(false);
+        extractColumn.setSortable(false);
+        extractColumn.setReorderable(false);
+        extractColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
+        extractColumn.setCellFactory(_ -> new TableCell<>() {
+            private final CheckBox checkBox = new CheckBox();
+
+            {
+                checkBox.setTooltip(new Tooltip(Localization.lang("If checked, the field is not shown in the \"Main\" tab anymore.")));
+                checkBox.setOnAction(_ -> {
+                    EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
+                    if (tab != null) {
+                        tab.setExtracted(getItem(), checkBox.isSelected());
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(String pattern, boolean empty) {
+                super.updateItem(pattern, empty);
+                if (empty || (pattern == null)) {
+                    setGraphic(null);
+                    return;
+                }
+                EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
+                checkBox.setSelected((tab != null) && tab.isExtracted(pattern));
+                setGraphic(checkBox);
+            }
+        });
+
         TableColumn<String, String> warningColumn = new TableColumn<>();
         warningColumn.setMinWidth(40.0);
         warningColumn.setMaxWidth(40.0);
@@ -307,6 +341,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                 .install(actionsColumn);
 
         fieldsTable.getColumns().add(patternColumn);
+        fieldsTable.getColumns().add(extractColumn);
         fieldsTable.getColumns().add(warningColumn);
         fieldsTable.getColumns().add(actionsColumn);
 

@@ -32,14 +32,15 @@ public sealed interface EntryEditorTabModel
         ) && type == BuiltIn.PREVIEW;
     }
 
-    /// Union of the fields resolved by all [CustomizedFieldsTab]s in the given tab list.
-    /// A field shown on a custom tab is *moved* there: the Main tab uses this to exclude
-    /// it from its field list and add-chips, so no field is displayed twice.
+    /// Union of the fields resolved by all [CustomizedFieldsTab]s' *extracted* patterns in the given
+    /// tab list. An extracted field is *moved* to its custom tab: the Main tab uses this to exclude
+    /// it from its field list and add-chips, so no field is displayed twice. Non-extracted patterns
+    /// (the default) leave the Main tab untouched.
     static Set<Field> fieldsOnCustomTabs(List<EntryEditorTabModel> tabModels, BibEntry entry) {
         Set<Field> result = new LinkedHashSet<>();
         for (EntryEditorTabModel model : tabModels) {
             if (model instanceof CustomizedFieldsTab customTab) {
-                result.addAll(customTab.resolveFields(entry));
+                result.addAll(customTab.resolveExtractedFields(entry));
             }
         }
         return result;
@@ -116,7 +117,11 @@ public sealed interface EntryEditorTabModel
     /// A pattern is either a plain field name (always shown, even while unset on the entry) or a
     /// regular expression (contains regex metacharacters), which captures every *set* field of the
     /// entry whose name matches it — e.g. `comment-.*` for all user-specific comment fields.
-    record CustomizedFieldsTab(String name, List<String> fieldPatterns)
+    ///
+    /// A pattern in `extractedFieldPatterns` is additionally *extracted*: the fields it resolves
+    /// to leave the Main tab. Patterns are not extracted by default, so a custom tab initially only
+    /// mirrors its fields.
+    record CustomizedFieldsTab(String name, List<String> fieldPatterns, Set<String> extractedFieldPatterns)
             implements EntryEditorTabModel {
 
         /// A pattern without any regex metacharacter is a plain field name.
@@ -124,6 +129,12 @@ public sealed interface EntryEditorTabModel
 
         public CustomizedFieldsTab {
             fieldPatterns = List.copyOf(fieldPatterns);
+            extractedFieldPatterns = Set.copyOf(extractedFieldPatterns);
+        }
+
+        /// A tab with no extracted patterns (the default for newly configured fields).
+        public CustomizedFieldsTab(String name, List<String> fieldPatterns) {
+            this(name, fieldPatterns, Set.of());
         }
 
         @Override
@@ -140,8 +151,18 @@ public sealed interface EntryEditorTabModel
         /// the fields captured by one regex pattern are sorted by name. Invalid regexes resolve to nothing.
         // [impl->req~entry-editor.custom-tabs~1]
         public SequencedSet<Field> resolveFields(BibEntry entry) {
+            return resolve(fieldPatterns, entry);
+        }
+
+        /// Resolves only the *extracted* patterns — the fields the Main tab must no longer show.
+        // [impl->req~entry-editor.custom-tabs.extract-field~1]
+        public SequencedSet<Field> resolveExtractedFields(BibEntry entry) {
+            return resolve(fieldPatterns.stream().filter(extractedFieldPatterns::contains).toList(), entry);
+        }
+
+        private SequencedSet<Field> resolve(List<String> patterns, BibEntry entry) {
             SequencedSet<Field> result = new LinkedHashSet<>();
-            for (String pattern : fieldPatterns) {
+            for (String pattern : patterns) {
                 if (PLAIN_FIELD_NAME.matcher(pattern).matches()) {
                     result.add(FieldFactory.parseField(entry.getType(), pattern));
                     continue;

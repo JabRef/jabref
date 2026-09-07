@@ -87,9 +87,16 @@ Needs: impl, utest
 ## Custom tabs show a user-defined list of field patterns
 `req~entry-editor.custom-tabs~1`
 
-Users can define custom entry editor tabs in the preferences ("Entry editor" → "Editor tabs"): a "Tabs" column lists all tabs (built-in tabs with a visibility checkbox, custom tabs with a delete action) and supports adding custom tabs and reordering all tabs via drag and drop; a "Fields" column edits the selected custom tab's ordered field list, also reorderable via drag and drop. A field entry is either a plain field name (always shown on the tab, even while unset) or a regular expression (e.g. `comment-.*`), which shows every set field of the entry whose name matches. A field listed on more than one tab is marked with a warning sign. A field shown on a custom tab is moved there: the "Main" tab shows neither an editor nor an add-chip for it. Custom tabs configured in JabRef versions before the "Main" tab rework are picked up again on upgrade — except stored tabs that are exactly one of the former default tabs "General", "Abstract", "Comments", or "Review" (localized name paired with the field set shipped in JabRef ≤ 5.x or a 6.0 alpha), which are dropped, since the "Main" tab already shows all their fields.
+Users can define custom entry editor tabs in the preferences ("Entry editor" → "Editor tabs"): a "Tabs" column lists all tabs (built-in tabs with a visibility checkbox, custom tabs with a delete action) and supports adding custom tabs and reordering all tabs via drag and drop; a "Fields" column edits the selected custom tab's ordered field list, also reorderable via drag and drop. A field entry is either a plain field name (always shown on the tab, even while unset) or a regular expression (e.g. `comment-.*`), which shows every set field of the entry whose name matches. A field listed on more than one tab is marked with a warning sign. Custom tabs configured in JabRef versions before the "Main" tab rework are picked up again on upgrade — except stored tabs that are exactly one of the former default tabs "General", "Abstract", "Comments", or "Review" (localized name paired with the field set shipped in JabRef ≤ 5.x or a 6.0 alpha), which are dropped, since the "Main" tab already shows all their fields.
 
 Needs: impl
+
+## Extracted custom-tab fields leave the Main tab
+`req~entry-editor.custom-tabs.extract-field~1`
+
+The "Fields" column offers an "Extract field" checkbox per field pattern, unchecked by default; its tooltip explains that a checked field is not shown in the "Main" tab anymore. The fields resolved by a checked pattern are moved to the custom tab: the "Main" tab shows neither an editor nor an add-chip for them. Unchecked patterns only mirror their fields on the custom tab, leaving the "Main" tab unchanged.
+
+Needs: impl, utest
 
 ## Special fields are edited with the same icon controls as the main table
 `req~entry-editor.special-field-editors~1`

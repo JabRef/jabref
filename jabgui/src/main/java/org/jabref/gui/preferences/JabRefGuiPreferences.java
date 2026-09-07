@@ -80,7 +80,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPreferences {
@@ -120,11 +120,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiPreferences.class);
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    /// JSON shape of [#ENTRY_EDITOR_CUSTOM_TABS]; Jackson reads JSON objects into insertion-ordered maps,
-    /// so the tabs' display order survives the round-trip.
-    private static final TypeReference<LinkedHashMap<String, List<String>>> CUSTOM_TABS_TYPE = new TypeReference<>() {
-    };
 
     // region WorkspacePreferences
     private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
@@ -310,8 +305,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private MathSciNetPreferences mathSciNetPreferences;
 
     /// @deprecated Never ever add a call to this method. There should be only one caller.
-    /// All other usages should get the preferences passed (or injected).
-    /// The JabRef team leaves the `@deprecated` annotation to have IntelliJ listing this method with a strike-through.
+     /// All other usages should get the preferences passed (or injected).
+     /// The JabRef team leaves the `@deprecated` annotation to have IntelliJ listing this method with a strike-through.
     @Deprecated
     public static JabRefGuiPreferences getInstance() {
         if (JabRefGuiPreferences.singleton == null) {
@@ -457,14 +452,43 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         String storedCustomTabs = get(ENTRY_EDITOR_CUSTOM_TABS, "");
         if (StringUtil.isNotBlank(storedCustomTabs)) {
             try {
-                OBJECT_MAPPER.readValue(storedCustomTabs, CUSTOM_TABS_TYPE).forEach((name, fieldPatterns) ->
-                        tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fieldPatterns)));
+                tabModels.addAll(parseCustomTabs(storedCustomTabs));
             } catch (JacksonException e) {
                 LOGGER.warn("Could not read the custom entry editor tabs, dropping them", e);
             }
         }
 
         return applyStoredTabOrder(tabModels, getStringList(ENTRY_EDITOR_TAB_ORDER));
+    }
+
+    /// Parses [#ENTRY_EDITOR_CUSTOM_TABS]: a JSON object mapping tab name to a pattern list (JSON
+    /// objects keep insertion order, so the tabs' display order survives the round-trip). A list item
+    /// is either a plain pattern string or `{"pattern": ..., "extract": true}` for a pattern whose
+    /// fields are extracted from the Main tab; plain strings keep stores written before the extract
+    /// flag existed readable.
+    @VisibleForTesting
+    static List<EntryEditorTabModel.CustomizedFieldsTab> parseCustomTabs(String storedCustomTabs) {
+        List<EntryEditorTabModel.CustomizedFieldsTab> tabs = new ArrayList<>();
+        JsonNode root = OBJECT_MAPPER.readTree(storedCustomTabs);
+        for (Map.Entry<String, JsonNode> tabEntry : root.properties()) {
+            List<String> fieldPatterns = new ArrayList<>();
+            Set<String> extractedPatterns = new HashSet<>();
+            for (JsonNode item : tabEntry.getValue().values()) {
+                if (item.isObject()) {
+                    String pattern = item.path("pattern").asString("");
+                    if (!pattern.isEmpty()) {
+                        fieldPatterns.add(pattern);
+                        if (item.path("extract").asBoolean(false)) {
+                            extractedPatterns.add(pattern);
+                        }
+                    }
+                } else {
+                    fieldPatterns.add(item.asString());
+                }
+            }
+            tabs.add(new EntryEditorTabModel.CustomizedFieldsTab(tabEntry.getKey(), fieldPatterns, extractedPatterns));
+        }
+        return tabs;
     }
 
     /// Reorders `tabModels` to match `storedOrder` (see [#ENTRY_EDITOR_TAB_ORDER]). The Preview tab stays
@@ -509,11 +533,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     boolean _
             ) ->
                     type.name();
-            case EntryEditorTabModel.CustomizedFieldsTab(
-                    String name,
-                    List<String> _
-            ) ->
-                    "custom:" + name;
+            case EntryEditorTabModel.CustomizedFieldsTab customTab ->
+                    "custom:" + customTab.name();
         };
     }
 
@@ -523,9 +544,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                                                                           .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
                                                                           .toList();
         // Keyed by name, so a duplicate tab name cannot exist in the stored format (the preferences UI
-        // prevents creating duplicates; legacy duplicates merge here, last one wins).
-        SequencedMap<String, List<String>> customTabsByName = new LinkedHashMap<>();
-        customTabs.forEach(tab -> customTabsByName.put(tab.name(), tab.fieldPatterns()));
+        // prevents creating duplicates; legacy duplicates merge here, last one wins). Non-extracted
+        // patterns stay plain strings (see parseCustomTabs), so the store only grows where the new
+        // flag is actually used.
+        SequencedMap<String, List<Object>> customTabsByName = new LinkedHashMap<>();
+        customTabs.forEach(tab -> customTabsByName.put(tab.name(), tab.fieldPatterns().stream()
+                                                                      .<Object>map(pattern -> tab.extractedFieldPatterns().contains(pattern)
+                                                                                              ? Map.of("pattern", pattern, "extract", true)
+                                                                                              : pattern)
+                                                                      .toList()));
         put(ENTRY_EDITOR_CUSTOM_TABS, OBJECT_MAPPER.writeValueAsString(customTabsByName));
 
         putStringList(ENTRY_EDITOR_TAB_ORDER, configs.stream()
