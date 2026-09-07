@@ -10,6 +10,8 @@ The Entry Editor should "always" show a valid entry.
 
 When users search or select a group not containing the entry shown in the Entry Editor, the Entry Editor should keep showing until user select a new entry explicitly.
 
+This holds within one library only: switching to a library tab without a selected entry closes the Entry Editor instead of showing an entry of another library.
+
 Needs: impl
 
 ## Validation decoration is initialized before opening the entry editor
@@ -19,10 +21,10 @@ ControlsFX validation decoration is initialized during GUI startup, so opening t
 
 Needs: impl
 
-## Citations tab should show citation preview on hover
-`req~entry-editor.citations.hover-preview~1`
+## Citations tab should show citation preview on click
+`req~entry-editor.citations.click-preview~1`
 
-When the user hovers over a citation entry inside the Entry Editor's "Citations" tab, a tooltip containing the entry preview rendered in the current selected style should be displayed.
+When the user clicks the preview icon on a citation entry inside the Entry Editor's "Citations" tab, a tooltip containing the entry preview rendered in the currently selected style should be displayed. The preview is not shown automatically on hover, because a large floating card popping up on every hover is too intrusive.
 
 Needs: impl
 

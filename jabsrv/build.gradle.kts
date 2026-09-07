@@ -54,13 +54,17 @@ tasks.register<Test>("nativeSmokeTest") {
         exceptionFormat = TestExceptionFormat.FULL
     }
 
-    val smokePort = (project.findProperty("jabsrv.native.smoke") as String?)?.toIntOrNull()
-        ?: throw GradleException("nativeSmokeTest requires -Pjabsrv.native.smoke=<port> (the port the running native jabsrv binary serves on).")
-    systemProperty(
-        "jersey.config.test.container.factory",
-        "org.glassfish.jersey.test.external.ExternalTestContainerFactory"
-    )
-    systemProperty("jersey.config.test.container.port", smokePort.toString())
+    val smokePort = providers.gradleProperty("jabsrv.native.smoke")
+    inputs.property("jabsrv.native.smoke", smokePort.orElse(""))
+    doFirst {
+        val port = smokePort.orNull?.toIntOrNull()
+            ?: throw GradleException("nativeSmokeTest requires -Pjabsrv.native.smoke=<port> (the port the running native jabsrv binary serves on).")
+        systemProperty(
+            "jersey.config.test.container.factory",
+            "org.glassfish.jersey.test.external.ExternalTestContainerFactory"
+        )
+        systemProperty("jersey.config.test.container.port", port.toString())
+    }
 
     // Skip the tests that cannot pass against a GUI-less standalone binary.
     val excludeFile = layout.projectDirectory.file("src/test/nativeimage/smoke-excluded-tests.txt")

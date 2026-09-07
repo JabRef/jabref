@@ -33,12 +33,12 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private DialogService dialogService;
-    @Inject private UndoManager undoManager;
 
     public CitationKeyEditor(Field field,
                              SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
                              BibDatabaseContext databaseContext,
+                             UndoManager undoManager,
                              UndoAction undoAction,
                              RedoAction redoAction) {
 

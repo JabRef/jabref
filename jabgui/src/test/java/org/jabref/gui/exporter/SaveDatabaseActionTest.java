@@ -27,9 +27,12 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -46,6 +49,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -66,6 +70,7 @@ class SaveDatabaseActionTest {
     private LibraryTab libraryTab = mock(LibraryTab.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
+    private MetaData metaData;
 
     @BeforeEach
     void setUp() {
@@ -73,7 +78,7 @@ class SaveDatabaseActionTest {
         when(filePreferences.getWorkingDirectory()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getExportPreferences()).thenReturn(mock(ExportPreferences.class));
-        saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, dialogService, preferences, mock(BibEntryTypesManager.class), stateManager, mock(JournalAbbreviationRepository.class)));
+        saveDatabaseAction = spy(newSaveDatabaseAction(libraryTab, mock(BibEntryTypesManager.class)));
     }
 
     @Test
@@ -105,11 +110,11 @@ class SaveDatabaseActionTest {
         when(preferences.getLibraryPreferences()).thenReturn(libraryPreferences);
         when(libraryPreferences.autoSaveProperty()).thenReturn(new SimpleBooleanProperty(false));
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(file));
-        doReturn(true).when(saveDatabaseAction).saveAs(any(), any());
+        doReturn(true).when(saveDatabaseAction).saveAs(any(), any(), anyBoolean());
 
         saveDatabaseAction.save();
 
-        verify(saveDatabaseAction, times(1)).saveAs(file, SaveDatabaseAction.SaveDatabaseMode.NORMAL);
+        verify(saveDatabaseAction, times(1)).saveAs(file, SaveDatabaseAction.SaveDatabaseMode.NORMAL, true);
     }
 
     @Test
@@ -151,7 +156,7 @@ class SaveDatabaseActionTest {
         // In case a "thenReturn" is modified, the whole mock has to be recreated
         dbContext = mock(BibDatabaseContext.class);
         libraryTab = mock(LibraryTab.class);
-        MetaData metaData = mock(MetaData.class);
+        metaData = mock(MetaData.class);
         when(saveConfiguration.withSaveType(any(BibDatabaseWriter.SaveType.class))).thenReturn(saveConfiguration);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         GlobalCitationKeyPatterns emptyGlobalCitationKeyPatterns = GlobalCitationKeyPatterns.fromPattern("");
@@ -171,10 +176,22 @@ class SaveDatabaseActionTest {
         when(preferences.getFieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         when(preferences.getLibraryPreferences()).thenReturn(mock(LibraryPreferences.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
-        when(libraryTab.getUndoManager()).thenReturn(mock(GuiUndoManager.class));
+        when(stateManager.getUndoManager(dbContext)).thenReturn(mock(GuiUndoManager.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
-        saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, mock(BibEntryTypesManager.class), stateManager, mock(JournalAbbreviationRepository.class));
+        saveDatabaseAction = newSaveDatabaseAction(libraryTab, mock(BibEntryTypesManager.class));
         return saveDatabaseAction;
+    }
+
+    private SaveDatabaseAction newSaveDatabaseAction(LibraryTab libraryTab, BibEntryTypesManager entryTypesManager) {
+        return new SaveDatabaseAction(
+                libraryTab,
+                dialogService,
+                preferences,
+                entryTypesManager,
+                stateManager,
+                mock(JournalAbbreviationRepository.class),
+                new GitHandlerRegistry(mock(GitPreferences.class)),
+                new CurrentThreadTaskExecutor());
     }
 
     @Test
