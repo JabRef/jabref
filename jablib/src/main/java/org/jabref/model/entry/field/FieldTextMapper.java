@@ -32,8 +32,9 @@ public class FieldTextMapper {
                 default ->
                         StringUtil.capitalizeFirst(field.getName());
             };
-        } else if (field == InternalField.KEY_FIELD) {
-            return "Citationkey";
+        } else if (field instanceof InternalField) {
+            // Internal fields are JabRef's own names, not user-defined ones, so they get the same casing as standard fields
+            return StringUtil.capitalizeFirst(field.getName());
         }
 
         return field.getName();
