@@ -139,10 +139,8 @@ class GroupTreeSharedDatabaseProfileTest {
             }
 
             @Override
-            public java.sql.Connection openNewConnection() {
-                java.sql.Connection connection = postgres.getConnection();
-                assertNotNull(connection);
-                return connection;
+            public DatabaseConnection openNewConnection() {
+                return openConnection(postgres);
             }
         };
     }
@@ -169,7 +167,8 @@ class GroupTreeSharedDatabaseProfileTest {
                 fieldPreferences,
                 GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
                 new DummyFileUpdateMonitor(),
-                "PerformanceProfile");
+                "PerformanceProfile",
+                new CurrentThreadTaskExecutor());
     }
 
     private GroupTreeViewModel createGroupTree(BibDatabaseContext context) throws InterruptedException {
