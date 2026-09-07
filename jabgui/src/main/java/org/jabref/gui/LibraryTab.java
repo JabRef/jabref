@@ -501,17 +501,24 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         });
     }
 
-    /// Sets the marker for the changes the journal does not know about.
+    /// Marks the changes the journal does not know about, so that [#changedProperty] can derive
+    /// the rest from it.
     ///
-    /// Everything the user does through the GUI is recorded, and [#changedProperty] derives from
-    /// the journal, so an edit needs nothing here. Two kinds do not reach the journal: metadata
-    /// written by the library properties dialog, and entries arriving from a shared database.
+    /// Metadata is where the marker cannot be derived: the library properties dialog writes
+    /// settings without recording them, and a metadata change is a metadata change whatever wrote
+    /// it. So all of them mark, which errs on the safe side and costs one wart: undoing a group
+    /// edit or an accepted external change leaves the marker set until the library is saved,
+    /// although the library is back where it was. Journalling what the properties dialog writes
+    /// would remove both the wart and this listener.
+    ///
+    /// Entries carry a source, so they need no such guess: only the ones pushed in from a shared
+    /// database arrive without anyone recording them.
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        boolean journalled = !(event instanceof MetaDataChangedEvent)
-                && !((event instanceof EntriesEvent entriesEvent)
+        boolean unrecorded = (event instanceof MetaDataChangedEvent)
+                || ((event instanceof EntriesEvent entriesEvent)
                 && (entriesEvent.getEntriesEventSource() == EntriesEventSource.SHARED));
-        if (!journalled) {
+        if (unrecorded) {
             journal().markChanged();
         }
     }
