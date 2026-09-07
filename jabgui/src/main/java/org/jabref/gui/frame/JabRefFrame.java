@@ -60,6 +60,8 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.shared.DatabaseConnectionProperties;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.SharedDatabaseSessionService;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
@@ -591,6 +593,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public void addTab(@NonNull LibraryTab libraryTab, boolean raisePanel) {
+        removeSharedDatabaseErrorTabFor(libraryTab.getBibDatabaseContext());
         tabbedPane.getTabs().add(libraryTab);
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
@@ -599,6 +602,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
+    }
+
+    /// Drops the placeholder of a failed reconnection once its shared database is open, no matter whether that
+    /// happened through the placeholder's retry or through the connection dialog. Leaving it behind would remember
+    /// the same database twice at quit and reconnect it twice on the next start.
+    private void removeSharedDatabaseErrorTabFor(BibDatabaseContext databaseContext) {
+        if (databaseContext.getLocation() != DatabaseLocation.SHARED) {
+            return;
+        }
+        DatabaseConnectionProperties connectionProperties = databaseContext.getDBMSSynchronizer().getConnectionProperties();
+        tabbedPane.getTabs().removeIf(tab -> (tab instanceof SharedDatabaseErrorTab errorTab)
+                && errorTab.getConnectionProperties().equals(connectionProperties));
     }
 
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
@@ -726,21 +741,21 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // The callbacks check the stage: a quit while the attempt is pending must neither add a tab nor pop a dialog.
         BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()))
                       .onSuccess(bibDatabaseContext -> {
-                          if (!mainStage.isShowing()) {
+                          if (isAttemptAbandoned(errorTab)) {
                               bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
                               return;
                           }
-                          tabbedPane.getTabs().remove(errorTab);
+                          // The error tab is dropped by #addTab, which recognizes it by the connection properties.
                           sessionService.restoreSharedDatabaseId(manager.openTab(bibDatabaseContext).getBibDatabaseContext(), sharedDatabaseId);
                       })
                       .onFailure(exception -> {
                           LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
-                          if (!mainStage.isShowing()) {
+                          if (isAttemptAbandoned(errorTab)) {
                               return;
                           }
                           SharedDatabaseErrorTab tab = errorTab;
                           if (tab == null) {
-                              tab = new SharedDatabaseErrorTab(sharedDatabaseId, reconnection.connectionProperties().getDatabase());
+                              tab = new SharedDatabaseErrorTab(sharedDatabaseId, reconnection.connectionProperties());
                               tabbedPane.getTabs().add(tab);
                           }
                           SharedDatabaseErrorTab tabToRetry = tab;
@@ -748,6 +763,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                           tab.showError(exception);
                       })
                       .executeWith(taskExecutor);
+    }
+
+    /// A connection attempt outlives the reason to complete it once the window is gone (a quit while it was pending)
+    /// or once the user closed the error tab it belongs to. Its result must then neither open a library nor bring
+    /// the discarded tab back.
+    private boolean isAttemptAbandoned(@Nullable SharedDatabaseErrorTab errorTab) {
+        return !mainStage.isShowing() || ((errorTab != null) && !tabbedPane.getTabs().contains(errorTab));
     }
 
     @Override

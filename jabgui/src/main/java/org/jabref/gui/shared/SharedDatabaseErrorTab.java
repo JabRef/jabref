@@ -13,6 +13,7 @@ import javafx.scene.text.TextAlignment;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DBMSConnectionProperties;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -26,14 +27,17 @@ import org.jspecify.annotations.NullMarked;
 public class SharedDatabaseErrorTab extends Tab {
 
     private final String sharedDatabaseId;
+    private final DBMSConnectionProperties connectionProperties;
     private final Label message = new Label();
     private final Button retryButton = new Button(Localization.lang("Retry"));
 
     private Runnable retryAction = () -> {
     };
 
-    public SharedDatabaseErrorTab(String sharedDatabaseId, String databaseName) {
+    public SharedDatabaseErrorTab(String sharedDatabaseId, DBMSConnectionProperties connectionProperties) {
         this.sharedDatabaseId = sharedDatabaseId;
+        this.connectionProperties = connectionProperties;
+        String databaseName = connectionProperties.getDatabase();
 
         setText(databaseName);
         setGraphic(IconTheme.JabRefIcons.ERROR.getGraphicNode());
@@ -64,6 +68,10 @@ public class SharedDatabaseErrorTab extends Tab {
 
     public String getSharedDatabaseId() {
         return sharedDatabaseId;
+    }
+
+    public DBMSConnectionProperties getConnectionProperties() {
+        return connectionProperties;
     }
 
     public void showError(Exception exception) {
