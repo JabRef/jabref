@@ -142,7 +142,7 @@ public class WelcomeTab extends Tab {
 
     private void initializeColumns() {
         GridPane grid = new GridPane(4, 4);
-        grid.getStyleClass().addAll( "align-top-center");
+        grid.getStyleClass().add("align-top-center");
 
         VBox leftColumn = createLeftColumn();
         GridPane.setHgrow(leftColumn, Priority.ALWAYS);
@@ -171,7 +171,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createLeftColumn() {
-        VBox leftColumn = new VBox(24,
+        VBox leftColumn = new VBox(12,
                 createWelcomeStartBox(),
                 createWelcomeRecentBox()
         );
@@ -182,7 +182,7 @@ public class WelcomeTab extends Tab {
     private VBox createRightColumn() {
         this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);
         this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
-        VBox rightColumn = new VBox(24, quickSettings, walkthroughs);
+        VBox rightColumn = new VBox(12, quickSettings, walkthroughs);
         rightColumn.getStyleClass().addAll("align-top-left");
         return rightColumn;
     }
