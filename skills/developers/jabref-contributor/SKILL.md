@@ -14,7 +14,7 @@ Conventions for working on the [JabRef](https://github.com/JabRef/jabref) codeba
 ## Modules
 
 | Module | Purpose |
-|---|---|
+| --- | --- |
 | `jablib` | Core library — logic, model, importers/exporters |
 | `jabgui` | JavaFX desktop GUI |
 | `jabkit` | CLI application |
