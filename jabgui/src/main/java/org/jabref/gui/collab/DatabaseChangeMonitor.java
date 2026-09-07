@@ -93,6 +93,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             } catch (IOException e) {
                 LOGGER.error("Error while trying to monitor {}", path, e);
             }
+            // Registered once per monitor; a tab replacing its monitor calls unregister() on the old one first, which
+            // removes this listener again, so the preference never accumulates listeners
             if (database.getLocation() == DatabaseLocation.LOCAL) {
                 preferences.getLibraryPreferences().autoSaveProperty().addListener(synchronizingListener);
             }
@@ -240,15 +242,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         if (scannedBaseline != null && isSynchronizing()) {
             // [impl->req~ux.external-library-changes.synchronize~1]
             BackgroundTask.wrap(() -> scanner.scanForChanges(this::awaitStableFile))
-                          .onSuccess(changes -> {
-                              if (generation != scanGeneration) {
-                                  LOGGER.debug("Discarding result of a scan overtaken by a newer file change");
-                                  return;
-                              }
-                              // Sorting the changes on the FX thread right before applying them leaves no window
-                              // for a user edit to slip in between classification and application
-                              synchronize(scannedBaseline, scanner.triage(scannedBaseline, changes));
-                          })
+                          .onSuccess(changes -> onScannedForSynchronization(generation, scanner, scannedBaseline, changes))
                           .onFailure(e -> LOGGER.error("Error while synchronizing with the library file", e))
                           .executeWith(taskExecutor);
             return;
@@ -261,6 +255,16 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                       })
                       .onFailure(e -> LOGGER.error("Error while watching for changes", e))
                       .executeWith(taskExecutor);
+    }
+
+    /// Sorting the changes on the FX thread right before applying them leaves no window for a user edit to slip in
+    /// between classification and application.
+    private void onScannedForSynchronization(int generation, ChangeScanner scanner, LibraryBaseline scannedBaseline, List<DatabaseChange> changes) {
+        if (generation != scanGeneration) {
+            LOGGER.debug("Discarding result of a scan overtaken by a newer file change");
+            return;
+        }
+        synchronize(scannedBaseline, scanner.triage(scannedBaseline, changes));
     }
 
     /// Sync clients and editors may write the file in several steps. A file that is still growing must not be parsed:
