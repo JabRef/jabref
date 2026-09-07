@@ -40,6 +40,15 @@ This provides immediate keyboard interaction capabilities (such as Ctrl+V for pa
 
 Needs: impl
 
+## Main table column headers are user-friendly
+`req~maintable.column-headers.user-friendly~1`
+
+Column headers of the main table show readable names, not raw BibTeX field names.
+JabRef-internal fields such as the entry type and the citation key are shown as "Entry Type" and "Citation Key".
+Headers use Title Case, as an exception to the sentence-case rule for UI text, so they read like the other headers ("Author/Editor").
+
+Needs: impl
+
 ## Critical startup failures show an error dialog
 `req~ux.startup.critical-error-dialog~1`
 
@@ -101,6 +110,14 @@ Needs: impl
 `req~ux.textdialogs.focus~1`
 
 When a dialog with text input as a main component is opened, the text field should be focused.
+
+Needs: impl
+
+## Text filtering is case-insensitive and separator-aware
+`req~ux.text-filtering.case-insensitive-separators~1`
+
+When users filter textual lists, matching must ignore case and treat punctuation or whitespace separators as equivalent.
+For example, a search for `Springer lecture` or `SPRINGER LECTURE` or `springer lecture` should match `Springer - Lecture Notes in Computer Science`.
 
 Needs: impl
 

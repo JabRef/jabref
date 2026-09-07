@@ -560,6 +560,66 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseContinuesAfterEntryWithUnmatchedOpenBracket() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{broken,
+                  title = {accuracy of multilingual models by 3 to 15{{\\%}.
+                }
+                @article{valid,
+                  title = {Valid entry}
+                }
+                """));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("valid")
+                .withField(StandardField.TITLE, "Valid entry");
+
+        assertTrue(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseContinuesAfterUnmatchedOpenBracketWithIndentedEntryAndSeparateDelimiter() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{broken,
+                  title = {accuracy of multilingual models by 3 to 15{{\\%}.
+                }
+                    @article
+                    {valid,
+                      title = {Valid entry}
+                    }
+                """));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("valid")
+                .withField(StandardField.TITLE, "Valid entry");
+
+        assertTrue(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseRetainsLineLeadingBibtexLikeTextInBracedField() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{test,
+                  title = {prefix
+                @foo{bar}
+                suffix}
+                }
+                """));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.TITLE, """
+                        prefix
+                        @foo{bar}
+                        suffix""");
+
+        assertFalse(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
     void parseAddsEscapedOpenBracketToFieldValue() throws IOException {
         ParserResult result = parser
                 .parse(Reader.of("@article{test,review={escaped \\{ bracket}}"));
@@ -1854,6 +1914,30 @@ class BibtexParserTest {
     }
 
     @Test
+    void integrationTestGitAutoPull() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoPull:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoPull());
+    }
+
+    @Test
+    void integrationTestGitAutoCommit() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoCommit:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoCommit());
+    }
+
+    @Test
+    void integrationTestGitAutoPush() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoPush:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoPush());
+    }
+
+    @Test
     void integrationTestContentSelectors() throws IOException {
         ParserResult result = parser.parse(
                 Reader.of("@Comment{jabref-meta: selector_pubstate:approved;captured;received;status;}"));
@@ -2047,12 +2131,13 @@ class BibtexParserTest {
         ParserResult result = parser.parse(Reader.of(bibtex));
 
         assertFalse(result.hasWarnings());
-        assertEquals(1, result.getDatabase().getEntries().size());
+        BibEntry expected = new BibEntry(StandardEntryType.Online)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Foo Bar");
+        expected.setCommentsBeforeEntry("% Type of BibLaTeX entries    : @online\n");
 
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
-
-        assertEquals(Optional.of("test"), entry.getCitationKey());
-        assertEquals(Optional.of("Foo Bar"), entry.getField(StandardField.AUTHOR));
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+        assertEquals(bibtex, result.getDatabase().getEntries().getFirst().getParsedSerialization());
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
@@ -2118,10 +2203,11 @@ class BibtexParserTest {
     // [utest->req~import.bibtex.percent-comments~1]
     @Test
     void parseDoesNotPreserveEscapeStateAcrossWhitespace() throws IOException {
-        String bibtex = "\\\n"
-                + "% First comment @article{fakeOne}\n"
-                + "\\   % Second comment @article{fakeTwo}\n"
-                + "@article{real, author = {Real Author}}";
+        String bibtex = """
+                \\
+                % First comment @article{fakeOne}
+                \\   % Second comment @article{fakeTwo}
+                @article{real, author = {Real Author}}""";
 
         ParserResult result = parser.parse(Reader.of(bibtex));
 
@@ -2129,6 +2215,25 @@ class BibtexParserTest {
         assertEquals(1, result.getDatabase().getEntries().size());
         assertEquals(Optional.of("real"),
                 result.getDatabase().getEntries().getFirst().getCitationKey());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"%\n", "%   \n", "%\t\n", "%\r\n", "%   \r\n", "%\r", "%\n%\t\n",
+            "% Encoding:\n", "% Encoding: \t\r\n", "% DBID:\n", "% DBID: \t\r\n"})
+    void parsePreservesEntryAfterBlankPercentComment(String comment) throws IOException {
+        String entry = "@article{real, author = {Real Author}}";
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("real")
+                .withField(StandardField.AUTHOR, "Real Author");
+        if (!comment.contains(SaveConfiguration.ENCODING_PREFIX) && !comment.contains(BibDatabaseWriter.DATABASE_ID_PREFIX)) {
+            expected.setCommentsBeforeEntry(comment);
+        }
+
+        ParserResult result = parser.parse(Reader.of(comment + entry));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
