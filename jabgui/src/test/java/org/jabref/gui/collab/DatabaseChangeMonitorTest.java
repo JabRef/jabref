@@ -61,7 +61,7 @@ class DatabaseChangeMonitorTest {
                 fileUpdateMonitor,
                 mock(TaskExecutor.class),
                 mock(DialogService.class),
-                mock(GuiPreferences.class),
+                mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(LibraryTab.class));
