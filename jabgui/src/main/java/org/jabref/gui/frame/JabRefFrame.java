@@ -391,7 +391,17 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         }
                         break;
                     case CLOSE_DATABASE:
-                        new CloseDatabaseAction(this, stateManager).execute();
+                        if (getCurrentLibraryTab() == null) {
+                            // The welcome tab is no LibraryTab, so CloseDatabaseAction cannot close it
+                            Tab selectedTab = tabbedPane.getSelectionModel().getSelectedItem();
+                            if ((selectedTab != null) && selectedTab.isClosable()) {
+                                tabbedPane.getTabs().remove(selectedTab);
+                                // Removing a tab programmatically does not fire the closed event the tab uses to release its resources
+                                Event.fireEvent(selectedTab, new Event(this, selectedTab, Tab.CLOSED_EVENT));
+                            }
+                        } else {
+                            new CloseDatabaseAction(this, stateManager).execute();
+                        }
                         event.consume();
                         break;
                     default:
