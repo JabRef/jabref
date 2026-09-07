@@ -34,9 +34,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ImportService;
@@ -194,6 +196,11 @@ class GitMergeDriver implements Callable<Integer> {
             reasons.add(Localization.lang("Cannot merge %0: the file was not parsed without warnings.", join(withWarnings)));
         }
 
+        List<Path> withUnusedEntryTypes = filesWhere(base, current, other, (_, result) -> hasUnusedCustomEntryTypes(result));
+        if (!withUnusedEntryTypes.isEmpty()) {
+            reasons.add(Localization.lang("Cannot merge %0: a custom entry type without entries is not preserved.", join(withUnusedEntryTypes)));
+        }
+
         List<Path> withDroppedComments = filesWhere(base, current, other, GitMergeDriver::hasCommentBeforeCommentBlock);
         if (!withDroppedComments.isEmpty()) {
             reasons.add(Localization.lang("Cannot merge %0: a comment in front of an @Comment block is not preserved.", join(withDroppedComments)));
@@ -215,6 +222,17 @@ class GitMergeDriver implements Callable<Integer> {
 
     private static String join(List<Path> files) {
         return files.stream().map(Path::toString).collect(Collectors.joining(", "));
+    }
+
+    /// [BibDatabaseWriter][org.jabref.logic.exporter.BibDatabaseWriter] writes the definition of a
+    /// custom entry type only when an entry uses that type, so a standalone definition would be lost.
+    private static boolean hasUnusedCustomEntryTypes(ParserResult result) {
+        Set<EntryType> usedTypes = result.getDatabaseContext().getDatabase().getEntries().stream()
+                                         .map(BibEntry::getType)
+                                         .collect(Collectors.toSet());
+        return result.getEntryTypes().stream()
+                     .map(BibEntryType::getType)
+                     .anyMatch(type -> !usedTypes.contains(type));
     }
 
     /// The parser attaches a comment to the entry or `@String` following it, but drops it in front

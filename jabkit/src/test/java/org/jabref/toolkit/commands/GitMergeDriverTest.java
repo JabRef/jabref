@@ -331,6 +331,19 @@ class GitMergeDriverTest extends AbstractJabKitTest {
     }
 
     @Test
+    void reportsConflictOnCustomEntryTypeWithoutEntries(@TempDir Path tempDir) throws IOException {
+        Path source = getClassResourceAsPath("merge-unused-entry-type.bib");
+        Path base = copyToMergeFile(source, tempDir, "base");
+        Path current = copyToMergeFile(source, tempDir, "current");
+        Path other = copyToMergeFile(source, tempDir, "other");
+
+        int exitCode = commandLine.executeToLog("git", "merge-driver", "--porcelain", base.toString(), current.toString(), other.toString());
+
+        assertEquals(1, exitCode);
+        assertEquals(Files.readString(source), Files.readString(current));
+    }
+
+    @Test
     void gitWithoutSubcommandFails() {
         int exitCode = commandLine.executeToLog("git");
 
