@@ -33,7 +33,11 @@ jobs:
           BODY_BEFORE: ${{ github.event.changes.body.from }}
         run: |
           set -euo pipefail
-          # Same link forms as link-issue.yml; #13109 is the template's example
+          # The body regex of link-issue.yml (koppor/ticket-check-action) without "refs", which does
+          # not fix an issue; #13109 is the template's example. The action itself cannot be reused:
+          # it only reads the event's PR, and the "before" set has to come from the previous body.
+          # GitHub's own closingIssuesReferences is not used either: it also holds issues linked via
+          # the sidebar, which have no "before" state, so every description edit would re-add the label.
           linked_issues() {
             printf '%s\n' "$1" | grep -Eio '(fixes|closes|resolves)\s+<?(https?://github\.com/JabRef/jabref/issues/)?#?[0-9]+' | grep -Eo '[0-9]+$' | grep -Ev '^13109$' | sort -u || true
           }
