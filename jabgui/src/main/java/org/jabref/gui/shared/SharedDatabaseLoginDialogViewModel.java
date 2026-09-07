@@ -29,7 +29,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -87,7 +86,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
@@ -107,7 +105,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
-                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor,
                                               JournalAbbreviationRepository journalAbbreviationRepository,
@@ -119,7 +116,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
@@ -213,7 +209,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
-                    undoManager,
                     clipBoardManager,
                     taskExecutor,
                     gitHandlerRegistry);

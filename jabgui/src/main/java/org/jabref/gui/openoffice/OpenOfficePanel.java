@@ -33,7 +33,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -103,7 +102,6 @@ public class OpenOfficePanel {
 
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
-    private final GuiUndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
     private final AiService aiService;
     private final JStyleLoader jStyleLoader;
@@ -128,7 +126,6 @@ public class OpenOfficePanel {
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
                            ClipBoardManager clipBoardManager,
-                           GuiUndoManager undoManager,
                            GitHandlerRegistry gitHandlerRegistry) {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -136,7 +133,6 @@ public class OpenOfficePanel {
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
-        this.undoManager = undoManager;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.aiService = aiService;
@@ -361,7 +357,6 @@ public class OpenOfficePanel {
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,
-                    undoManager,
                     clipBoardManager,
                     taskExecutor,
                     gitHandlerRegistry);
@@ -648,24 +643,26 @@ public class OpenOfficePanel {
                 Localization.lang("Generate keys"),
                 Localization.lang("Cancel"));
 
-        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
-        if (citePressed && databaseContext.isPresent()) {
+        if (!citePressed) {
+            // The user canceled
+            return false;
+        }
+
+        return stateManager.getActiveDatabase().map(databaseContext -> {
             // Generate keys
-            undoManager.addEdit(Localization.lang("Cite"), edit -> {
+            stateManager.getUndoManager(databaseContext).addEdit(Localization.lang("Cite"), edit -> {
                 for (BibEntry entry : entries) {
                     if (entry.getCitationKey().isEmpty()) {
                         // Generate key
-                        edit.addEdit(new CitationKeyGenerator(databaseContext.get(), citationKeyPatternPreferences)
+                        edit.addEdit(new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences)
                                 .generateAndSetKey(entry));
                     }
                 }
             });
             // Now every entry has a key
             return true;
-        } else {
-            // No, we canceled (or there is no panel to get the database from, highly unlikely)
-            return false;
-        }
+            // There is no panel to get the database from, highly unlikely
+        }).orElse(false);
     }
 
     private ContextMenu createSettingsPopup() {

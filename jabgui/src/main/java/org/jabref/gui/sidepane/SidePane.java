@@ -14,7 +14,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -41,7 +40,6 @@ public class SidePane extends VBox {
                     FileUpdateMonitor fileUpdateMonitor,
                     BibEntryTypesManager entryTypesManager,
                     ClipBoardManager clipBoardManager,
-                    GuiUndoManager undoManager,
                     GitHandlerRegistry gitHandlerRegistry) {
         this.stateManager = stateManager;
         this.preferences = preferences;
@@ -56,7 +54,6 @@ public class SidePane extends VBox {
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager,
                 gitHandlerRegistry);
 
         stateManager.getVisibleSidePaneComponents().addListener((ListChangeListener<SidePaneType>) c -> updateView());

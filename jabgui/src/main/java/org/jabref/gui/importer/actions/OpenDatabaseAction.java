@@ -20,7 +20,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -69,7 +68,6 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
-    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipboardManager;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
@@ -81,7 +79,6 @@ public class OpenDatabaseAction extends SimpleCommand {
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
                               BibEntryTypesManager entryTypesManager,
-                              GuiUndoManager undoManager,
                               ClipBoardManager clipBoardManager,
                               TaskExecutor taskExecutor,
                               GitHandlerRegistry gitHandlerRegistry) {
@@ -92,7 +89,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.undoManager = undoManager;
         this.clipboardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
@@ -251,7 +247,6 @@ public class OpenDatabaseAction extends SimpleCommand {
                 tabContainer,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipboardManager,
                 taskExecutor,
                 gitHandlerRegistry);
@@ -270,7 +265,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, undoManager, stateManager)
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, stateManager)
                                           .orElse(null);
         }
 
@@ -303,7 +298,6 @@ public class OpenDatabaseAction extends SimpleCommand {
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
-                    undoManager,
                     clipboardManager,
                     taskExecutor,
                     gitHandlerRegistry);
@@ -319,7 +313,6 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
-                                          GuiUndoManager undoManager,
                                           ClipBoardManager clipBoardManager,
                                           TaskExecutor taskExecutor,
                                           GitHandlerRegistry gitHandlerRegistry)
@@ -333,7 +326,6 @@ public class OpenDatabaseAction extends SimpleCommand {
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
-                    undoManager,
                     clipBoardManager,
                     taskExecutor,
                     gitHandlerRegistry)

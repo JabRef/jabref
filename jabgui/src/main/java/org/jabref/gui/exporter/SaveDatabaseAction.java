@@ -290,7 +290,7 @@ public class SaveDatabaseAction {
 
             FileSnapshot committedState = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getSaveOrder(), null);
 
-            libraryTab.getUndoManager().markUnchanged();
+            stateManager.getUndoManager(libraryTab.getBibDatabaseContext()).markUnchanged();
             libraryTab.resetChangedProperties(committedState);
             if (mayAutoCommit) {
                 commitToGit(targetPath);

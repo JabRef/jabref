@@ -74,6 +74,7 @@ import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -120,7 +121,6 @@ import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 public class LibraryTab extends Tab implements CommandSelectionTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
-    private final GuiUndoManager undoManager;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -193,14 +193,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
-                       GuiUndoManager undoManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
                        GitHandlerRegistry gitHandlerRegistry,
                        boolean isDummyContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.tabContainer = tabContainer;
-        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
@@ -247,7 +245,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 bibDatabaseContext,
                 preferences,
                 fileUpdateMonitor,
-                undoManager,
+                getUndoManager(),
                 stateManager,
                 dialogService,
                 taskExecutor);
@@ -381,6 +379,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         stateManager.getOpenDatabases().removeIf(databaseContext -> databaseContext == previousDatabaseContext);
+
+        // The context being replaced is the placeholder this tab showed while the file loaded. Its
+        // journal describes a library that is about to stop existing, and nothing else can reach it
+        // once the tab moves on, so it goes with the context rather than staying for the session.
+        stateManager.removeUndoManager(previousDatabaseContext);
 
         this.bibDatabaseContext = bibDatabaseContext;
 
@@ -604,7 +607,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     /// Put an asterisk behind the filename to indicate the database has changed.
     public synchronized void markChangedOrUnChanged() {
-        if (undoManager.hasChanged()) {
+        if (journal().hasChanged()) {
             this.changedProperty.setValue(true);
         } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
             this.changedProperty.setValue(false);
@@ -790,6 +793,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when closing search context", e);
         }
 
+        stateManager.removeUndoManager(bibDatabaseContext);
+
         try {
             AutosaveManager.shutdown(bibDatabaseContext);
         } catch (RuntimeException e) {
@@ -845,8 +850,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return loading;
     }
 
-    public GuiUndoManager getUndoManager() {
-        return undoManager;
+    /// The journal to record a change to this library on.
+    ///
+    /// Recording is what a tab's collaborators do with the journal. The few classes that undo, redo
+    /// or track the saved position name the library to the state manager instead.
+    public UndoManager getUndoManager() {
+        return journal();
+    }
+
+    private GuiUndoManager journal() {
+        return stateManager.getUndoManager(bibDatabaseContext);
     }
 
     public MainTable getMainTable() {
@@ -877,7 +890,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 taskExecutor,
                 dialogService,
                 preferences,
-                undoManager,
+                getUndoManager(),
                 stateManager,
                 this));
     }
@@ -1019,17 +1032,22 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         );
     }
 
+    /// Copies the selection to the clipboard, then removes it from the library. The delete is
+    /// reached only once the copy has succeeded, so a cut that cannot reach the clipboard leaves
+    /// the entries where they are — there is no half-done cut to compensate for.
     public void cutEntry() {
-        int entriesCopied = doCopyEntry(TransferMode.MOVE, getSelectedEntries());
-        int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
+        List<BibEntry> selectedEntries = getSelectedEntries();
 
-        if (entriesCopied == entriesDeleted) {
-            dialogService.notify(Localization.lang("Cut %0 entry(s)", entriesCopied));
-        } else {
-            dialogService.notify(Localization.lang("Cut failed", entriesCopied));
-            undoManager.undo();
-            clipBoardManager.setContent("");
+        int entriesCopied = doCopyEntry(TransferMode.MOVE, selectedEntries);
+        if (entriesCopied < 0) {
+            // Nothing to clean up: the clipboard is written only after the entries have been
+            // serialized, so a failure leaves it holding whatever the user put there earlier.
+            dialogService.notify(Localization.lang("Cut failed"));
+            return;
         }
+
+        int entriesDeleted = doDeleteEntry(StandardActions.CUT, selectedEntries);
+        dialogService.notify(Localization.lang("Cut %0 entry(s)", entriesDeleted));
     }
 
     /// Removes the selected entries and files linked to selected entries from the database
@@ -1160,7 +1178,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor,
                                               GitHandlerRegistry gitHandlerRegistry) {
@@ -1176,7 +1193,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 taskExecutor,
                 gitHandlerRegistry,
@@ -1198,7 +1214,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor,
                                               GitHandlerRegistry gitHandlerRegistry) {
@@ -1211,7 +1226,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 taskExecutor,
                 gitHandlerRegistry,
