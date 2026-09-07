@@ -115,6 +115,8 @@ public class ContextAction extends SimpleCommand {
                     linkedFile.askForNameAndRename();
             case DELETE_FILE ->
                     viewModel.deleteFile(linkedFile);
+            case LINK_FILE ->
+                    linkedFile.acceptAsLinked();
             case REMOVE_LINK,
                  REMOVE_LINKS ->
                     viewModel.removeFileLink(linkedFile);

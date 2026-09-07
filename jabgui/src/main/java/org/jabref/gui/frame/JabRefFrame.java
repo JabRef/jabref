@@ -47,6 +47,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.RedoAction;
@@ -58,6 +59,9 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.SharedDatabaseSessionService;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -390,6 +394,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                             event.consume();
                         }
                         break;
+                    case JUMP_TO_FIELD:
+                        // Handled here so that it also fires when the keyboard focus is outside the entry editor
+                        if (!stateManager.getSelectedEntries().isEmpty()) {
+                            // Jumping to a field is only meaningful with a visible editor, so open it if it is closed
+                            stateManager.getEditorShowing().set(true);
+                            entryEditor.openJumpToFieldDialog();
+                            event.consume();
+                        }
+                        break;
                     case CLOSE_DATABASE:
                         if (getCurrentLibraryTab() == null) {
                             closeSelectedNonLibraryTab(tabbedPane);
@@ -425,6 +438,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
                 stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
+                // The editor keeps its last entry on an empty selection (req~entry-editor.keep-showing~1), which
+                // would leave another library's entry on screen here; the new library has nothing to edit yet.
+                if (libraryTab.getSelectedEntries().isEmpty()) {
+                    stateManager.getEditorShowing().set(false);
+                }
 
                 // Update active search query when switching between databases
                 if (preferences.getSearchPreferences().shouldKeepSearchString()) {
@@ -707,11 +725,34 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void openLastEditedDatabases() {
         List<Path> lastFiles = preferences.getLastFilesOpenedPreferences().getLastFilesOpened();
-        if (lastFiles.isEmpty()) {
-            return;
+        if (!lastFiles.isEmpty()) {
+            getOpenDatabaseAction().openFiles(lastFiles);
         }
 
-        getOpenDatabaseAction().openFiles(lastFiles);
+        // [impl->req~shared-database.reopen-on-startup~1]
+        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService();
+        for (SharedDatabaseSessionService.Reconnection reconnection : sessionService.getDatabasesToReconnect(preferences.getLastFilesOpenedPreferences())) {
+            String sharedDatabaseId = reconnection.sharedDatabaseId();
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
+            // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
+            // The callbacks check the stage: a quit while the attempt is pending must neither add a tab nor pop a dialog.
+            BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()))
+                          .onSuccess(bibDatabaseContext -> {
+                              if (!mainStage.isShowing()) {
+                                  bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+                                  return;
+                              }
+                              sessionService.restoreSharedDatabaseId(manager.openTab(bibDatabaseContext).getBibDatabaseContext(), sharedDatabaseId);
+                          })
+                          .onFailure(exception -> {
+                              LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
+                              if (mainStage.isShowing()) {
+                                  dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
+                                          Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
+                              }
+                          })
+                          .executeWith(taskExecutor);
+        }
     }
 
     @Deprecated
