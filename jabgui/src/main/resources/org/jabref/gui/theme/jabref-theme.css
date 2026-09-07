@@ -352,7 +352,9 @@
 
 /* JavaFX Layout container */
 .scroll-pane,
+.scroll-pane:focused,
 .scroll-pane > .viewport,
+.scroll-pane:focused > .viewport,
 .split-pane {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
