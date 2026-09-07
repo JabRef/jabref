@@ -34,7 +34,7 @@ How do we ship a fix for the current release without shipping the development st
 Chosen option: "A single `stable` branch, ports driven by a label and done by CI", because it isolates releases from `main` with one branch and keeps the contributor workflow unchanged: a pull request still targets `main`; a label decides whether the change also reaches the release.
 
 * `main` is the development branch. Every pull request targets `main` unless the change only makes sense for the released version.
-* `stable` is the last regular release plus the fixes ported to it. A regular release merges `main` into `stable` and tags on `stable`; a hotfix release tags `stable` as it is.
+* `stable` is the last regular release plus the fixes ported to it. A regular release merges `main` into `stable` and tags on `stable`; a hotfix release tags `stable` as it is. In the terms of Martin Fowler's [branching patterns](https://martinfowler.com/articles/branching-patterns.html), `stable` is a [long-lived release branch](https://martinfowler.com/articles/branching-patterns.html#long-lived-release-branch), and a fix follows the [hotfix branch](https://martinfowler.com/articles/branching-patterns.html#hotfix-branch) recommendation: it is made on the [mainline](https://martinfowler.com/articles/branching-patterns.html#mainline) and cherry-picked to the release branch.
 * A pull request into `main` labeled `dev: into-stable` is ported to `stable` after the merge. A pull request into `stable` is always ported to `main` after the merge, so `main` never lacks a fix that users have.
 * Before the merge, the port is simulated as a required check ("Would merge into stable/main"), so a conflict is visible on the pull request itself. After the merge, CI cherry-picks the squash commit into a port pull request, which auto-merges when CI passes. If the cherry-pick conflicts, the port pull request is opened as a draft with the conflict committed, and the workflow run fails: a maintainer resolves the conflict in that pull request.
 * `CHANGELOG.md` keeps one `## [Unreleased]` section per branch. heylogs rejects a second unreleased section on `main` in every spelling (`unique-release` for a duplicate `[Unreleased]`, `date-displayed` for a variant such as `[Unreleased (stable)]`), and it would only mirror what `stable`'s own changelog already shows. A changelog entry is written once, in the branch the pull request targets; the port carries it over with a merge driver that applies the added and removed entries of `## [Unreleased]` on entry level (`.jbang/ChangelogCherryPickMergeDriver.java`). A plain cherry-pick would always conflict there, because the neighbouring entries differ between the branches.
@@ -69,13 +69,15 @@ Chosen option: "A single `stable` branch, ports driven by a label and done by CI
 
 ### One release branch per version (`v5`, `v6`, ...), ports per branch
 
-This is the git-flow / GitLab-flow release-branch model.
+This is the git-flow / GitLab-flow release-branch model: a [release branch](https://martinfowler.com/articles/branching-patterns.html#release-branch) per release.
 
 * Good, because older releases can be fixed as well.
 * Bad, because the team does not maintain older releases; the branches would exist without receiving ports.
 * Bad, because every port has to name its target branches, and every branch needs its own protection rules and CI budget.
 
 ### Fix on `stable` first and merge `stable` into `main` regularly
+
+The fix is made on the release branch and merged forward, the approach Fowler describes as the common one under time pressure.
 
 * Good, because a fix can never be forgotten on `main`: the merge carries everything.
 * Bad, because contributors would need to know where to open a pull request, and most changes are not fixes.
