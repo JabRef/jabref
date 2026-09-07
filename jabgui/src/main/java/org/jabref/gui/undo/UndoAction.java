@@ -52,7 +52,7 @@ public class UndoAction extends SimpleCommand {
 
     private static String message(UndoStep step) {
         return step.complete()
-                ? Localization.lang("Undone: %0", step.name())
-                : Localization.lang("Undone: %0 (some changes could not be applied)", step.name());
+               ? Localization.lang("Undone: %0", step.name())
+               : Localization.lang("Undone: %0 (some changes could not be applied)", step.name());
     }
 }

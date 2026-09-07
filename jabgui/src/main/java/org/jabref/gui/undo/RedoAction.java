@@ -50,7 +50,7 @@ public class RedoAction extends SimpleCommand {
 
     private static String message(UndoStep step) {
         return step.complete()
-                ? Localization.lang("Redone: %0", step.name())
-                : Localization.lang("Redone: %0 (some changes could not be applied)", step.name());
+               ? Localization.lang("Redone: %0", step.name())
+               : Localization.lang("Redone: %0 (some changes could not be applied)", step.name());
     }
 }
