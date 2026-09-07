@@ -14,7 +14,7 @@
                   BorderPane.alignment="CENTER"/>
     </content>
     <header>
-        <Label fx:id="descriptionLabel" styleClass="info-section,h5,padding-8-12"
+        <Label fx:id="descriptionLabel" styleClass="info-section,h5,padding-8"
                text="%The event log displays information regarding JabRef's internal processes. This data can be useful for debugging. If you encounter a problem, please consider reporting it to the development team."
                wrapText="true"/>
     </header>
