@@ -14,6 +14,10 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -52,7 +56,10 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -165,6 +172,57 @@ class AllFieldsTabTest {
         runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
 
         assertTrue(tab.editors.containsKey(StandardField.ABSTRACT));
+    }
+
+    @Test
+    void abstractEditorHasNoRemoveButtonUnlikeOptionalFields() throws InterruptedException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021")
+                                                             .withField(StandardField.NOTE, "A note");
+
+        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+
+        assertNull(tab.editors.get(StandardField.ABSTRACT).getNode().lookup(".field-remove-button"));
+        assertNotNull(tab.editors.get(StandardField.NOTE).getNode().lookup(".field-remove-button"));
+    }
+
+    @Test
+    void abstractEditorIsOneRowWhenEmpty() throws InterruptedException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
+
+        assertEquals(1, abstractPrefRowCount(entry));
+    }
+
+    @Test
+    void abstractEditorGrowsWithWrappedContent() throws InterruptedException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021")
+                                                             .withField(StandardField.ABSTRACT, "word ".repeat(300));
+
+        assertTrue(abstractPrefRowCount(entry) > 3);
+    }
+
+    @Test
+    void abstractEditorCountsEveryParagraph() throws InterruptedException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021")
+                                                             .withField(StandardField.ABSTRACT, "one\ntwo\nthree\nfour");
+
+        assertEquals(4, abstractPrefRowCount(entry));
+    }
+
+    /// Lays the abstract editor out in a scene of fixed width so the text area's skin exists and
+    /// its text is wrapped, then reads back the resulting preferred row count.
+    private int abstractPrefRowCount(BibEntry entry) throws InterruptedException {
+        int[] rows = new int[1];
+        runOnFxThreadAndWait(() -> {
+            tab.bindToEntry(entry);
+            Node editor = tab.editors.get(StandardField.ABSTRACT).getNode();
+            StackPane root = new StackPane(editor);
+            new Scene(root, 400, 600);
+            root.applyCss();
+            root.layout();
+            root.layout();
+            rows[0] = ((TextArea) editor.lookup(".text-area")).getPrefRowCount();
+        });
+        return rows[0];
     }
 
     @Test

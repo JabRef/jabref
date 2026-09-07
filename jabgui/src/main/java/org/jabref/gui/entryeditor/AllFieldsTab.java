@@ -685,7 +685,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Sizes the text area to its wrapped text: one row when empty, growing as text is typed
     /// (the scroll list scrolls, so the area never needs an inner scrollbar). The row count is
-    /// derived from the skin's internal [Text] node, the only place that knows the wrapped
+    /// derived from the skin's paragraph container, the only place that knows the wrapped
     /// line count; a [Text] of the same font gives the height of one row.
     private static void growWithContent(TextArea textArea) {
         textArea.setPrefRowCount(1);
@@ -698,14 +698,19 @@ public class AllFieldsTab extends FieldsEditorTab {
                     || !(scrollPane.getContent().lookup(".text") instanceof Text text)) {
                 return;
             }
+            // The parent group holds one Text per rendered paragraph (a single one in current JavaFX);
+            // its layout bounds span all of them and change whenever any paragraph is added or re-wrapped.
+            Parent paragraphs = text.getParent();
             Runnable resize = () -> {
                 Text oneRow = new Text("X");
                 oneRow.setFont(text.getFont());
                 double rowHeight = oneRow.getLayoutBounds().getHeight();
-                int rows = (int) Math.round(text.getLayoutBounds().getHeight() / rowHeight);
+                int rows = (int) Math.round(paragraphs.getLayoutBounds().getHeight() / rowHeight);
                 textArea.setPrefRowCount(Math.max(1, rows));
             };
-            text.layoutBoundsProperty().addListener(_ -> resize.run());
+            // No removal handle: the listener lives on the text area's own skin nodes and only touches
+            // that text area, so it is collected together with the editor (or the replaced skin).
+            paragraphs.layoutBoundsProperty().addListener(_ -> resize.run());
             resize.run();
         });
     }
