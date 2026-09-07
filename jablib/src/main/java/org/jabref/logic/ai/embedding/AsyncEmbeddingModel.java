@@ -2,6 +2,7 @@ package org.jabref.logic.ai.embedding;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -11,7 +12,6 @@ import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncEmbeddingModel.class);
 
-    private final PredefinedEmbeddingModel embeddingModelKind;
+    private final String modelName;
     private final NotificationService notificationService;
     private final TaskExecutor taskExecutor;
 
@@ -43,12 +43,12 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private String errorWhileBuildingModel = "";
 
     public AsyncEmbeddingModel(
-            PredefinedEmbeddingModel embeddingModelKind,
+            String modelName,
             AiPreferences aiPreferences,
             NotificationService notificationService,
             TaskExecutor taskExecutor
     ) {
-        this.embeddingModelKind = embeddingModelKind;
+        this.modelName = modelName;
         this.notificationService = notificationService;
         this.taskExecutor = taskExecutor;
 
@@ -60,7 +60,7 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     public void startRebuildingTask() {
         predictorProperty.set(Optional.empty());
 
-        new UpdateEmbeddingModelTask(embeddingModelKind.getName())
+        new UpdateEmbeddingModelTask(modelName)
                 .onSuccess(model -> {
                     predictorProperty.set(Optional.of(model));
                     errorWhileBuildingModel = "";
@@ -76,6 +76,19 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
 
     public boolean isPresent() {
         return predictorProperty.get().isPresent();
+    }
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    public OptionalInt getMaxSnippetTokens() {
+        return predictorProperty.get()
+                .map(DeepJavaEmbeddingModel::getMaxSnippetTokens)
+                .orElseGet(() -> EmbeddingModelMetadataService.getInstance()
+                        .getMetadata(modelName)
+                        .map(EmbeddingModelMetadata::maxSnippetTokens)
+                        .orElseGet(OptionalInt::empty));
     }
 
     public boolean hadErrorWhileBuildingModel() {

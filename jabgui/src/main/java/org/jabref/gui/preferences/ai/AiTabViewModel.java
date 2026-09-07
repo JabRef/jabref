@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.ai;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -21,6 +20,7 @@ import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.models.AiModelService;
 import org.jabref.logic.ai.models.FetchAiModelsBackgroundTask;
 import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
@@ -30,7 +30,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.LocalizedNumbersUtils;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
@@ -75,9 +74,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
 
-    private final ListProperty<PredefinedEmbeddingModel> embeddingModelsList =
-            new SimpleListProperty<>(FXCollections.observableArrayList(PredefinedEmbeddingModel.values()));
-    private final ObjectProperty<PredefinedEmbeddingModel> selectedEmbeddingModel = new SimpleObjectProperty<>();
+    private final ListProperty<String> embeddingModelsList =
+            new SimpleListProperty<>(FXCollections.observableArrayList(
+                    EmbeddingModelMetadataService.getInstance().getAvailableModels()));
+    private final StringProperty selectedEmbeddingModel = new SimpleStringProperty();
 
     private final StringProperty currentApiBaseUrl = new SimpleStringProperty();
     private final BooleanProperty disableApiBaseUrl = new SimpleBooleanProperty(true); // HuggingFaceChatModel and GoogleAiGeminiChatModel don't support setting an API base URL
@@ -305,7 +305,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.embeddingModelValidator = new FunctionBasedValidator<>(
                 selectedEmbeddingModel,
-                Objects::nonNull,
+                model -> !StringUtil.isBlank(model),
                 ValidationMessage.error(Localization.lang("Embedding model has to be provided")));
 
         this.temperatureTypeValidator = new FunctionBasedValidator<>(
@@ -474,6 +474,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         summarizationAlgorithmProperty.set(AiDefaultExpertSettings.SUMMARIZATOR_KIND);
         tokenEstimationAlgorithmProperty.set(AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND);
+        selectedEmbeddingModel.set(AiDefaultExpertSettings.EMBEDDING_MODEL);
         temperature.set(LocalizedNumbersUtils.doubleToString(AiDefaultExpertSettings.TEMPERATURE));
         documentSplitterChunkSize.set(AiDefaultExpertSettings.DOCUMENT_SPLITTER_CHUNK_SIZE);
         documentSplitterOverlapSize.set(AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE);
@@ -616,11 +617,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return customizeExpertSettings;
     }
 
-    public ReadOnlyListProperty<PredefinedEmbeddingModel> embeddingModelsProperty() {
+    public ReadOnlyListProperty<String> embeddingModelsProperty() {
         return embeddingModelsList;
     }
 
-    public ObjectProperty<PredefinedEmbeddingModel> selectedEmbeddingModelProperty() {
+    public StringProperty selectedEmbeddingModelProperty() {
         return selectedEmbeddingModel;
     }
 

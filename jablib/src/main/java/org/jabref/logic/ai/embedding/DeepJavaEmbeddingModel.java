@@ -3,8 +3,10 @@ package org.jabref.logic.ai.embedding;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 
 import org.jabref.logic.util.ProgressCounter;
+import org.jabref.logic.util.strings.StringUtil;
 
 import ai.djl.MalformedModelException;
 import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory;
@@ -25,6 +27,7 @@ public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeepJavaEmbeddingModel.class);
 
+    private final String modelName;
     private final ZooModel<String, float[]> model;
     private final Predictor<String, float[]> predictor;
 
@@ -32,6 +35,7 @@ public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
             String modelName,
             ProgressCounter progressCounter
     ) throws ModelNotFoundException, MalformedModelException, IOException {
+        this.modelName = modelName;
         Criteria<String, float[]> criteria = makeCriteriaBuilder()
                 .optModelUrls(DJL_EMBEDDING_MODEL_URL_PREFIX + modelName)
                 .optProgress(progressCounter)
@@ -39,6 +43,26 @@ public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
 
         this.model = criteria.loadModel();
         this.predictor = model.newPredictor();
+    }
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    /// Returns the maximum snippet size (sequence length in tokens) supported by this embedding model.
+    public OptionalInt getMaxSnippetTokens() {
+        String prop = model.getProperty("maxLength");
+        if (StringUtil.isNotBlank(prop)) {
+            try {
+                return OptionalInt.of(Integer.parseInt(prop.trim()));
+            } catch (NumberFormatException e) {
+                LOGGER.debug("Could not parse maxLength property '{}'", prop, e);
+            }
+        }
+        return EmbeddingModelMetadataService.getInstance()
+                                            .getMetadata(modelName)
+                                            .map(EmbeddingModelMetadata::maxSnippetTokens)
+                                            .orElseGet(OptionalInt::empty);
     }
 
     public static boolean isDownloaded(String modelName) {

@@ -35,4 +35,11 @@ User needs to adjust the underlying prompt structures to refine AI outputs.
 
 Needs: impl
 
+## User can discover and select embedding models with dynamic size and token limits
+`feat~ai.expert-settings.embedding-models~1`
+
+Embedding models are discovered dynamically at runtime, displaying their download size and maximum snippet token limit.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

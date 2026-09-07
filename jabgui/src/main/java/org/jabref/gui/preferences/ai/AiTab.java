@@ -24,10 +24,11 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -97,7 +98,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                 .searchableCombo(Localization.lang("Embedding model"),
                                                         viewModel.embeddingModelsProperty(),
                                                         viewModel.selectedEmbeddingModelProperty(),
-                                                        PredefinedEmbeddingModel::fullInfo,
+                                                        modelName -> EmbeddingModelMetadataService.getInstance()
+                                                                                                  .getMetadata(modelName)
+                                                                                                  .map(EmbeddingModelMetadata::displayLabel)
+                                                                                                  .orElse(modelName),
                                                         embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
                                                 .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
                                                 // The six numeric expert settings, as two columns of caption-above-field cells.

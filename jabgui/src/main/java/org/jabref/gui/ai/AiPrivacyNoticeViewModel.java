@@ -13,8 +13,9 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,11 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
     }
 
     private void setupBindings() {
-        embeddingModelSize.bind(aiPreferences.embeddingModelProperty().map(PredefinedEmbeddingModel::sizeInfo));
+        embeddingModelSize.bind(aiPreferences.embeddingModelProperty().map(modelName ->
+                EmbeddingModelMetadataService.getInstance()
+                                            .getMetadata(modelName)
+                                            .map(EmbeddingModelMetadata::sizeInfo)
+                                            .orElse("")));
     }
 
     public void onPrivacyAgree() {

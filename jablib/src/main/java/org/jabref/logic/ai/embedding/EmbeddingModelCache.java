@@ -6,13 +6,12 @@ import java.util.Map;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 
-/// Session-scoped cache for [AsyncEmbeddingModel] instances, keyed by [PredefinedEmbeddingModel].
+/// Session-scoped cache for [AsyncEmbeddingModel] instances, keyed by embedding model name.
 ///
-/// When multiple components request an embedding model for the same [PredefinedEmbeddingModel],
+/// When multiple components request an embedding model for the same model name,
 /// this cache ensures only *one* [AsyncEmbeddingModel] instance—and therefore only one
-/// background download/load task—is ever created for that model kind.
+/// background download/load task—is ever created for that model name.
 ///
 /// Without this cache, each caller that independently reacts to preference changes would
 /// instantiate its own [AsyncEmbeddingModel], spawning a duplicate
@@ -22,7 +21,7 @@ import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 /// to release all cached model resources.
 public class EmbeddingModelCache implements AutoCloseable {
 
-    private final Map<PredefinedEmbeddingModel, AsyncEmbeddingModel> cache = new HashMap<>();
+    private final Map<String, AsyncEmbeddingModel> cache = new HashMap<>();
 
     private final AiPreferences aiPreferences;
     private final NotificationService notificationService;
@@ -37,16 +36,16 @@ public class EmbeddingModelCache implements AutoCloseable {
         this.taskExecutor = taskExecutor;
     }
 
-    /// Returns the cached [AsyncEmbeddingModel] for `kind`, creating it on first access.
+    /// Returns the cached [AsyncEmbeddingModel] for `modelName`, creating it on first access.
     ///
-    /// Calling this method multiple times with the same `kind` always returns the
+    /// Calling this method multiple times with the same `modelName` always returns the
     /// *same* instance; no additional background tasks are launched.
     ///
-    /// @param kind the requested embedding model kind
-    /// @return a (possibly still-loading) [AsyncEmbeddingModel] for `kind`
-    public AsyncEmbeddingModel getOrCreate(PredefinedEmbeddingModel kind) {
-        return cache.computeIfAbsent(kind,
-                k -> new AsyncEmbeddingModel(k, aiPreferences, notificationService, taskExecutor));
+    /// @param modelName the requested embedding model name
+    /// @return a (possibly still-loading) [AsyncEmbeddingModel] for `modelName`
+    public AsyncEmbeddingModel getOrCreate(String modelName) {
+        return cache.computeIfAbsent(modelName,
+                name -> new AsyncEmbeddingModel(name, aiPreferences, notificationService, taskExecutor));
     }
 
     /// Closes all cached [AsyncEmbeddingModel] instances and clears the cache.
