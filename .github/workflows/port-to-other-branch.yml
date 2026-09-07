@@ -75,7 +75,7 @@ jobs:
             echo
             git diff --name-only --diff-filter=U | sed 's/^/- `/; s/$/`/'
             echo
-            echo "After the merge, the port PR is opened with the conflict committed; a maintainer resolves it there (see <https://devdocs.jabref.org/contributing.html#branching-strategy>)."
+            echo "After the merge, the port PR is opened as a draft containing the conflict markers; a maintainer resolves them there (see <https://devdocs.jabref.org/contributing.html#branching-strategy>)."
           } | tee -a "$GITHUB_STEP_SUMMARY"
           exit 1
 
@@ -122,7 +122,7 @@ jobs:
           pull_description: |
             Port of #${pull_number} to `${target_branch}`, see [Branching strategy](https://devdocs.jabref.org/contributing.html#branching-strategy).
 
-            If this PR is a draft, the cherry-pick conflicted: the conflict is committed as is. Resolve it locally, push, and mark the PR ready.
+            If this PR is a draft, the cherry-pick conflicted: the conflicting files are committed with Git's conflict markers left in. Resolve the markers locally, push, and mark the PR ready.
           # A PR branch usually contains merges from main; the squash commit is what gets ported
           merge_commits: skip
           experimental: >

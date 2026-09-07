@@ -18,7 +18,7 @@ Open the pull request against `main` as usual. CI adds the label `dev: into-stab
 The label triggers two things:
 
 1. The check "Would merge into stable" simulates the port. If it fails, the fix conflicts with `stable`; resolve that before or after the merge, as described below.
-2. After the merge, CI cherry-picks the change into a pull request `[Port to stable] ...` from the branch `port-<number>-to-stable`. A clean port carries the `automerge` label and merges once CI passes. A conflicting port is opened as a draft with the conflict committed, and the workflow run of the original pull request fails.
+2. After the merge, CI cherry-picks the change into a pull request `[Port to stable] ...` from the branch `port-<number>-to-stable`. A clean port carries the `automerge` label and merges once CI passes. A conflicting port is opened as a draft whose commit contains the conflicting files with Git's conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) left in, so the diff shows exactly what needs resolving; the workflow run of the original pull request fails.
 
 A pull request against `stable` is always ported to `main` the same way, so `main` never lacks a fix that users have.
 
