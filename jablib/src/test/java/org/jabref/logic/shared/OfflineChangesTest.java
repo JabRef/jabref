@@ -48,6 +48,47 @@ class OfflineChangesTest {
     }
 
     @Test
+    void fileHoldsEveryKindOfRecordAsJson() throws Exception {
+        OfflineChanges changes = OfflineChanges.load(directory, properties);
+        changes.recordChange(sharedEntry(1, 3).withField(StandardField.YEAR, "2026"));
+        BibEntry newEntry = new BibEntry(StandardEntryType.Book).withField(StandardField.TITLE, "New");
+        newEntry.setId("local-id");
+        changes.recordInsert(List.of(newEntry));
+        changes.recordRemoval(List.of(sharedEntry(2, 5)));
+        changes.recordMetaData(Map.of("databaseType", "bibtex"));
+
+        String expected = """
+                {
+                  "changedEntries": {
+                    "1": {
+                      "baseVersion": 3,
+                      "entryType": "article",
+                      "fields": {
+                        "year": "2026",
+                        "title": "Title 1"
+                      }
+                    }
+                  },
+                  "newEntries": {
+                    "local-id": {
+                      "baseVersion": 1,
+                      "entryType": "book",
+                      "fields": {
+                        "title": "New"
+                      }
+                    }
+                  },
+                  "removedEntries": {
+                    "2": 5
+                  },
+                  "metaData": {
+                    "databaseType": "bibtex"
+                  }
+                }""";
+        assertEquals(expected, Files.readString(directory.resolve(OfflineChanges.fileName(properties))));
+    }
+
+    @Test
     void recordedChangesSurviveReload() {
         BibEntry changed = sharedEntry(1, 3);
         BibEntry removed = sharedEntry(2, 1);
