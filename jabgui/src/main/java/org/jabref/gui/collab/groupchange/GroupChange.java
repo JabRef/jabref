@@ -1,5 +1,7 @@
 package org.jabref.gui.collab.groupchange;
 
+import java.util.Optional;
+
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.logic.bibtex.comparator.GroupDiff;
@@ -8,7 +10,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.undo.CompoundEdit;
-import org.jabref.model.undo.UndoableModifySubtree;
+import org.jabref.model.undo.UndoableGroupTreeChange;
 
 public final class GroupChange extends DatabaseChange {
     private final GroupDiff groupDiff;
@@ -42,9 +44,11 @@ public final class GroupChange extends DatabaseChange {
                 child.copySubtree().moveTo(root);
             }
         }
-        GroupTreeNode after = root.copySubtree();
-
-        undoEdit.addEdit(new UndoableModifySubtree(root, root.getIndexedPathFromRoot(), before, after));
+        // Recorded as the whole tree, like every other group operation: a record that holds nodes
+        // is undone silently once a later operation installs a fresh tree, and those nodes are then
+        // no longer the ones the library holds.
+        undoEdit.addEdit(new UndoableGroupTreeChange(
+                databaseContext.getMetaData(), Optional.of(before), databaseContext.getMetaData().getGroups()));
     }
 
     public GroupDiff getGroupDiff() {

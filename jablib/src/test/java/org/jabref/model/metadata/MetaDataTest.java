@@ -9,6 +9,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
@@ -43,6 +44,29 @@ class MetaDataTest {
         metaData.setAiLibraryId("test-ai-library-id");
 
         assertEquals(Optional.of("test-ai-library-id"), metaData.getAiLibraryId());
+    }
+
+    /// The group panel writes its tree back after every operation, usually handing back the node
+    /// already installed. Subscribing again each time would make one later edit post an event per
+    /// operation performed - and the panel rebuild itself from inside its own rebuild.
+    @Test
+    void installingTheSameGroupRootAgainDoesNotSubscribeTwice() {
+        List<GroupUpdatedEvent> events = new ArrayList<>();
+        metaData.registerListener(new Object() {
+            @Subscribe
+            public void listen(GroupUpdatedEvent event) {
+                events.add(event);
+            }
+        });
+        GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
+        metaData.setGroups(root);
+        metaData.setGroups(root);
+        metaData.setGroups(root);
+        events.clear();
+
+        root.addSubgroup(new ExplicitGroup("Books", GroupHierarchyType.INDEPENDENT, ','));
+
+        assertEquals(1, events.size(), "one edit posted an event per write-back");
     }
 
     /// Group operations mutate nodes in place, so a shared tree would let a later edit rewrite what

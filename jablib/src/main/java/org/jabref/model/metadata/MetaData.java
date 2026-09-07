@@ -126,9 +126,15 @@ public class MetaData {
 
     /// Sets a new group root node. **WARNING **: This invalidates everything returned by getGroups() so far!!!
     public void setGroups(@NonNull GroupTreeNode root) {
-        groupsRoot.setValue(root);
-        root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
-        root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+        // Subscribed once per node. The group panel writes its tree back after every operation, and
+        // most of those hand back the node already installed: subscribing again each time would
+        // multiply the listeners on it, so one edit would then post as many events as operations
+        // had been performed, and the panel would rebuild itself from inside its own rebuild.
+        if (groupsRoot.getValue() != root) {
+            groupsRoot.setValue(root);
+            root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
+            root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+        }
         eventBus.post(new GroupUpdatedEvent(this));
         postChange();
     }

@@ -607,8 +607,12 @@ class JabRefUndoManagerTest {
         assertTrue(undoRedoManager.canRedo());
 
         try (UndoSuspension suspended = undoRedoManager.suspendUndo("Import entries")) {
-            assertFalse(undoRedoManager.canUndo());
-            assertFalse(undoRedoManager.canRedo());
+            // The steps are still there, and the menu item stays enabled on purpose: a disabled
+            // item swallows its accelerator, and Ctrl+Z doing nothing silently is what this is
+            // meant to avoid. What declines is the operation.
+            assertTrue(undoRedoManager.canUndo());
+            assertTrue(undoRedoManager.canRedo());
+            assertEquals(Optional.empty(), undoRedoManager.undo());
             assertEquals(Optional.empty(), undoRedoManager.redo());
             assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy());
         }
@@ -645,12 +649,12 @@ class JabRefUndoManagerTest {
         UndoSuspension second = undoRedoManager.suspendUndo("Look up DOI");
         first.close();
 
-        assertFalse(undoRedoManager.canUndo(), "undo returned while a command was still writing");
+        assertEquals(Optional.empty(), undoRedoManager.undo(), "undo ran while a command was still writing");
         assertEquals(Optional.of("Look up DOI"), undoRedoManager.suspendedBy(),
                 "named a command that had already finished");
 
         second.close();
-        assertTrue(undoRedoManager.canUndo());
+        assertTrue(undoRedoManager.undo().isPresent(), "undo still declined after both had handed over");
     }
 
     /// Of several commands writing at once, the message names the one still running that the user
@@ -674,12 +678,12 @@ class JabRefUndoManagerTest {
         undoRedoManager.addEdit(setAuthor("Bohr"));
 
         undoRedoManager.addEdit("Import entries", edit -> {
-            assertFalse(undoRedoManager.canUndo(), "the block did not hold the library");
+            assertEquals(Optional.empty(), undoRedoManager.undo(), "the block did not hold the library");
             assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy());
             edit.addEdit(setAuthor("Planck"));
         });
 
-        assertTrue(undoRedoManager.canUndo());
+        assertTrue(undoRedoManager.undo().isPresent(), "the block did not release the library");
         assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
     }
 

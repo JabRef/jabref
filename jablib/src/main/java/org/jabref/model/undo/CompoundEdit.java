@@ -47,7 +47,10 @@ public final class CompoundEdit {
     /// @return what was applied, and what was not — see [BibChange#apply]
     public ApplyResult applyEdit(BibChange change) {
         ApplyResult result = change.apply();
-        addEdit(change);
+        // Only what happened: see the same rule in the journal's applyEdit.
+        if (result.complete() || (change instanceof ChangeSet)) {
+            addEdit(change);
+        }
         return result;
     }
 

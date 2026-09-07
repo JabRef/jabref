@@ -191,7 +191,12 @@ public class JabRefUndoManager implements UndoManager {
         ApplyResult result;
         synchronized (this) {
             result = applying(change::apply);
-            push(change);
+            // A change that refused did nothing to the library, so there is nothing to take back:
+            // recording it would spend the next Ctrl+Z and clear the redo stack for no reason. A
+            // set that applied in part is different - what it did apply has to stay undoable.
+            if (result.complete() || (change instanceof ChangeSet)) {
+                push(change);
+            }
         }
         notifyListeners();
         return result;
@@ -331,14 +336,18 @@ public class JabRefUndoManager implements UndoManager {
         }
     }
 
-    /// Whether there is a step to take back *and* the library is free to take it back — see
-    /// [#suspendUndo].
+    /// Whether there is a step to take back.
+    ///
+    /// Deliberately not "and the library is free to take it back": menu enablement binds to this,
+    /// and a disabled menu item swallows its accelerator, so a suspension would leave Ctrl+Z doing
+    /// nothing at all instead of saying which command is holding the library. [#undo] is where the
+    /// suspension is enforced, and [#suspendedBy] is what that message is built from.
     public synchronized boolean canUndo() {
-        return suspensions.isEmpty() && !undoStack.isEmpty();
+        return !undoStack.isEmpty();
     }
 
     public synchronized boolean canRedo() {
-        return suspensions.isEmpty() && !redoStack.isEmpty();
+        return !redoStack.isEmpty();
     }
 
     /// Applies the inverse before moving the change across, so a change that throws stays
@@ -405,7 +414,9 @@ public class JabRefUndoManager implements UndoManager {
     /// marker from [#hasChanged] has to hear about the one moment the answer turns false.
     public void markUnchanged() {
         synchronized (this) {
-            savedId = currentPosition();
+            // Not while a command is mid-write: what it has applied is not on the stack yet, so the
+            // position being stamped does not describe what was just written to disk.
+            savedId = suspensions.isEmpty() ? currentPosition() : NEVER_SAVED;
         }
         notifyListeners();
     }

@@ -388,33 +388,27 @@ class BibChangeTest {
         return GroupTreeNode.fromGroup(new ExplicitGroup(name, GroupHierarchyType.INDEPENDENT, ','));
     }
 
+    /// Both were recorded against the same library: the first by the external-changes dialog, the
+    /// second by the group panel. Undoing them in turn has to undo both, which a record holding
+    /// nodes could not do once the second one installed a fresh tree.
     @Test
-    void replacingAGroupSubtreeCanBeUndoneAndRedone() {
-        GroupTreeNode root = group("root");
-        root.addChild(group("original"));
+    void anExternalGroupChangeStaysUndoableAfterALaterLocalOperation() {
+        MetaData metaData = new MetaData();
+        metaData.setGroups(group("All"));
 
-        GroupTreeNode before = root.copySubtree();
-        root.removeAllChildren();
-        root.addChild(group("replacement"));
-        UndoableModifySubtree change = new UndoableModifySubtree(root, root.getIndexedPathFromRoot(), before, root.copySubtree());
+        Optional<GroupTreeNode> beforeExternal = metaData.getGroups().map(GroupTreeNode::copySubtree);
+        metaData.getGroups().orElseThrow().addChild(group("FromRemote"));
+        UndoableGroupTreeChange external = new UndoableGroupTreeChange(metaData, beforeExternal, metaData.getGroups());
 
-        change.inverted().apply();
-        assertEquals(List.of("original"), childNames(root));
+        Optional<GroupTreeNode> beforeLocal = metaData.getGroups().map(GroupTreeNode::copySubtree);
+        metaData.getGroups().orElseThrow().addChild(group("Local"));
+        UndoableGroupTreeChange local = new UndoableGroupTreeChange(metaData, beforeLocal, metaData.getGroups());
 
-        change.apply();
-        assertEquals(List.of("replacement"), childNames(root));
-    }
+        local.inverted().apply();
+        assertEquals(List.of("FromRemote"), childNames(metaData));
 
-    @Test
-    void redoingASubtreeReplacementWithoutUndoingFirstIsHarmless() {
-        GroupTreeNode root = group("root");
-        GroupTreeNode before = root.copySubtree();
-        root.addChild(group("replacement"));
-        UndoableModifySubtree change = new UndoableModifySubtree(root, root.getIndexedPathFromRoot(), before, root.copySubtree());
-
-        change.apply();
-
-        assertEquals(List.of("replacement"), childNames(root));
+        external.inverted().apply();
+        assertEquals(List.of(), childNames(metaData), "the earlier change was undone silently");
     }
 
     private static List<String> childNames(GroupTreeNode node) {

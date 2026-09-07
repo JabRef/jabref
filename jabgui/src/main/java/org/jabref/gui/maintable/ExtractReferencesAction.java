@@ -26,6 +26,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -156,9 +157,10 @@ public class ExtractReferencesAction extends SimpleCommand {
         }
 
         String cites = getCites(result.getDatabase().getEntries(), currentEntry);
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            currentEntry.setField(StandardField.CITES, cites);
-        });
+        UiTaskExecutor.runInJavaFXThread(() ->
+                stateManager.getUndoManager(stateManager.getActiveDatabase().orElseThrow())
+                            .applyEdit(new UndoableFieldChange(currentEntry, StandardField.CITES,
+                                    currentEntry.getField(StandardField.CITES).orElse(null), cites)));
     }
 
     /// Creates the field content for the "cites" field. The field contains the citation keys of the imported entries.

@@ -14,8 +14,10 @@ import org.jspecify.annotations.NullMarked;
 /// [MetaData#setGroups]. One record therefore covers adding, removing, moving and reordering, and
 /// undoing any of them is installing the tree that was there before.
 ///
-/// Both states are copies: nodes are mutated in place, so a shared tree would let a later edit
-/// rewrite what this change restores.
+/// Both states are copies of the *structure*: nodes are mutated in place, so a shared tree would
+/// let a later edit rewrite what this change restores. The [org.jabref.model.groups.AbstractGroup]
+/// each node carries is shared with the live tree, which is enough while operations replace a
+/// node's group rather than mutate it.
 ///
 /// The generated `equals` and `hashCode` walk both trees and the metadata, whose hash changes as
 /// the library does — fine for comparing two changes, but do not put these in a hash-based

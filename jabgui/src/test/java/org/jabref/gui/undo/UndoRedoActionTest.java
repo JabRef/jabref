@@ -180,17 +180,20 @@ class UndoRedoActionTest {
         assertEquals(Optional.of("Bohr"), entryInA.getField(StandardField.AUTHOR), "the undo ran anyway");
     }
 
+    /// Enablement stays on while a command holds the library, so that pressing Ctrl+Z reaches the
+    /// action and the user is told why nothing happened. A disabled menu item swallows its
+    /// accelerator, which would make the keystroke do nothing at all.
     @Test
-    void enablementIsOffWhileACommandHoldsTheActiveLibrary() {
+    void enablementStaysOnWhileACommandHoldsTheActiveLibrary() {
         journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
         showLibrary(tabA, libraryA);
-        assertTrue(undoAction.executableProperty().get());
 
         try (UndoSuspension suspended = journalOfA.suspendUndo("Import entries")) {
-            assertFalse(undoAction.executableProperty().get(), "enabled while the library was being written");
+            assertTrue(undoAction.executableProperty().get(), "the keystroke could not reach the action");
+            undoAction.execute();
+            verify(dialogService).notify("Cannot undo while Import entries is running");
+            assertEquals(Optional.of("Bohr"), entryInA.getField(StandardField.AUTHOR), "the undo ran anyway");
         }
-
-        assertTrue(undoAction.executableProperty().get());
     }
 
     @Test
