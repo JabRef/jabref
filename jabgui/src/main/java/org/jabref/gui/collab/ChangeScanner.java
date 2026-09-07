@@ -10,6 +10,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.sync.LibraryBaseline;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -66,9 +67,9 @@ public class ChangeScanner {
         return DatabaseChangeList.compareAndGetChanges(database, result.getDatabaseContext(), databaseChangeResolverFactory);
     }
 
-    /// @return the given external changes sorted by the side they happened on, see [LibraryBaseline#triage]
-    public LibraryBaseline.Triage triage(LibraryBaseline baseline, List<DatabaseChange> changes) {
-        return baseline.triage(changes, database, databaseChangeResolverFactory);
+    /// @return the given external changes sorted by the side they happened on, see [ChangeTriage#triage]
+    public ChangeTriage.Triage triage(LibraryBaseline baseline, List<DatabaseChange> changes) {
+        return ChangeTriage.triage(baseline, changes, database, databaseChangeResolverFactory);
     }
 
     public List<DatabaseChange> getDatabaseChanges(Path fileToCompare) throws IOException {

@@ -19,6 +19,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.sync.LibraryBaseline;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -152,9 +153,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                         Localization.lang("External Changes Resolver"));
                 Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
                 if (areAllChangesResolved.orElse(false)) {
-                    applyResolvedChanges(
-                            databaseChangesResolverDialog.getResolvedChanges(),
-                            fromLibraryFile && databaseChangesResolverDialog.resolvedChangesMatchDisk());
+                    List<DatabaseChange> resolved = databaseChangesResolverDialog.getResolvedChanges();
+                    applyResolvedChanges(resolved, fromLibraryFile && databaseChangesResolverDialog.resolvedChangesMatchDisk());
+                    rebaseAfterReview(resolved);
 
                     clearActiveNotification(this);
                     afterReview.run();
@@ -220,12 +221,23 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// Synchronization switched on for an open library needs a baseline right away: as long as the library is
     /// unmodified, it still matches its file. Otherwise the next save establishes the baseline.
     private void onSynchronizingChanged(boolean enabled) {
+        boolean captured = false;
         synchronized (database) {
             if (!enabled) {
                 baseline = null;
                 scanGeneration++;
             } else if (baseline == null && !libraryTab.isModified()) {
                 baseline = captureBaseline();
+                captured = baseline != null;
+            }
+        }
+        if (captured) {
+            // A review offered while synchronization was off holds changes computed against an older state; from now
+            // on the scan decides, so the pending review is withdrawn and the file is looked at again
+            Optional.ofNullable(activeNotification).ifPresent(ExternalLibraryChangeNotification::remove);
+            activeNotification = null;
+            synchronized (database) {
+                scanForChanges();
             }
         }
         mergeConflictedCopies(baseline);
@@ -318,12 +330,12 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     /// Applies what changed on disk only, and offers the review for what changed on both sides.
-    private void synchronize(LibraryBaseline scannedBaseline, LibraryBaseline.Triage triage) {
+    private void synchronize(LibraryBaseline scannedBaseline, ChangeTriage.Triage triage) {
         synchronize(scannedBaseline, triage, Localization.lang("Merged %0 change(s) from the library file", String.valueOf(triage.diskOnly().size())), null);
     }
 
     /// @param conflictedCopy the merged file when it is a conflicted copy rather than the library file itself; its changes needing review are announced as such, and the copy is offered for deletion once nothing of it is left to review
-    private void synchronize(LibraryBaseline scannedBaseline, LibraryBaseline.Triage triage, String mergedMessage, @Nullable Path conflictedCopy) {
+    private void synchronize(LibraryBaseline scannedBaseline, ChangeTriage.Triage triage, String mergedMessage, @Nullable Path conflictedCopy) {
         List<DatabaseChange> unresolved = new ArrayList<>(triage.bothSides());
         unresolved.addAll(triage.memoryOnly());
         // A conflicted copy is never the file the library must match, so the library stays marked as changed
@@ -335,7 +347,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         synchronized (database) {
             LibraryBaseline updated = captureBaseline();
             if (updated != null) {
-                updated.keepUnresolved(scannedBaseline, unresolved);
+                ChangeTriage.keepUnresolved(updated, scannedBaseline, unresolved);
             }
             baseline = updated;
         }
@@ -392,7 +404,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                               mergedConflictedCopies.remove(copy);
                               return;
                           }
-                          LibraryBaseline.Triage triage = scanner.triage(scannedBaseline, changes);
+                          ChangeTriage.Triage triage = scanner.triage(scannedBaseline, changes);
                           synchronize(scannedBaseline, triage,
                                   Localization.lang("Merged %0 change(s) from the conflicted copy '%1'", String.valueOf(triage.diskOnly().size()), copy.getFileName().toString()),
                                   copy);
@@ -427,6 +439,19 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 }
                 return OnClickBehaviour.REMOVE;
             }));
+        }
+    }
+
+    /// After a review, the accepted changes are in memory and must not count as a divergence anymore; the rejected
+    /// ones keep their ancestor, so that the next scan reports them again instead of taking memory for the ancestor.
+    private void rebaseAfterReview(List<DatabaseChange> resolved) {
+        synchronized (database) {
+            LibraryBaseline previous = baseline;
+            LibraryBaseline updated = captureBaseline();
+            if (updated != null && previous != null) {
+                ChangeTriage.keepUnresolved(updated, previous, resolved.stream().filter(change -> !change.isAccepted()).toList());
+            }
+            baseline = updated;
         }
     }
 
