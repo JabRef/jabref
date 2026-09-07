@@ -13,6 +13,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -101,6 +103,14 @@ class OfflineChangesTest {
         changes.recordRemoval(List.of(added));
 
         assertTrue(changes.isEmpty());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"null", "{}", "{\"changedEntries\": null}", "not json at all"})
+    void unusableFileLoadsAsEmpty(String content) throws Exception {
+        Files.writeString(directory.resolve(OfflineChanges.fileName(properties)), content);
+
+        assertTrue(OfflineChanges.load(directory, properties).isEmpty());
     }
 
     @Test

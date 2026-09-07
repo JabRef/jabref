@@ -26,6 +26,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Objects.requireNonNullElse;
+
 /// Local changes that have not reached the shared database because the connection was down.
 /// Kept in memory and mirrored to one file per database, so that they survive a restart and are
 /// synchronized on the next connect (see [DBMSSynchronizer]).
@@ -92,10 +94,15 @@ public class OfflineChanges {
             return changes;
         }
         try {
+            // Gson returns null for a file holding JSON null, and leaves absent members null
             Recorded recorded = GSON.fromJson(Files.readString(changes.file), Recorded.class);
-            changes.changedEntries.putAll(recorded.changedEntries());
-            changes.newEntries.putAll(recorded.newEntries());
-            changes.removedIds.addAll(recorded.removedIds());
+            if (recorded == null) {
+                LOGGER.error("The changes recorded for the shared database in {} are empty", changes.file);
+                return changes;
+            }
+            changes.changedEntries.putAll(requireNonNullElse(recorded.changedEntries(), Map.of()));
+            changes.newEntries.putAll(requireNonNullElse(recorded.newEntries(), Map.of()));
+            changes.removedIds.addAll(requireNonNullElse(recorded.removedIds(), Set.of()));
             changes.metaData = recorded.metaData();
         } catch (IOException | JsonParseException e) {
             LOGGER.error("Could not read the changes recorded for the shared database from {}", changes.file, e);
