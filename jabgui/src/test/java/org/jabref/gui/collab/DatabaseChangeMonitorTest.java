@@ -9,11 +9,15 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -147,6 +151,23 @@ class DatabaseChangeMonitorTest {
     }
 
     @Test
+    void monitorInstalledAfterBackupRestoreDoesNotScheduleExternalChangeReview(@TempDir Path tempDir) throws Exception {
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@misc{original,}");
+        Path backupDirectory = tempDir.resolve("backups");
+        Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDirectory);
+        Files.writeString(backupFile, "@misc{restored,}");
+
+        assertEquals(new BackupManager.RestoreResult.Restored(), BackupManager.restoreBackup(originalFile, backupDirectory));
+
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+        DatabaseChangeMonitor monitor = createMonitor(originalFile, mock(FileUpdateMonitor.class), taskExecutor);
+        monitor.fileUpdated();
+
+        verifyNoInteractions(taskExecutor);
+    }
+
+    @Test
     void markConsistentWithDiskSuppressesScanForOwnSave(@TempDir Path tempDir) throws Exception {
         Path monitoredPath = tempDir.resolve("library.bib");
         Files.writeString(monitoredPath, "@misc{a,}");
@@ -173,7 +194,7 @@ class DatabaseChangeMonitorTest {
         EntryChange mergedChange = new EntryChange(oldEntry, mergedEntry, databaseContext);
         mergedChange.accept();
 
-        UndoManager undoManager = new UndoManager();
+        JabRefUndoManager undoManager = new JabRefUndoManager();
         undoManager.markUnchanged();
         LibraryTab libraryTab = mock(LibraryTab.class);
         DatabaseChangeMonitor monitor = new DatabaseChangeMonitor(
@@ -205,7 +226,7 @@ class DatabaseChangeMonitorTest {
         EntryChange diskChange = new EntryChange(oldEntry, diskEntry, databaseContext);
         diskChange.accept();
 
-        UndoManager undoManager = new UndoManager();
+        JabRefUndoManager undoManager = new JabRefUndoManager();
         undoManager.markUnchanged();
         LibraryTab libraryTab = mock(LibraryTab.class);
         DatabaseChangeMonitor monitor = new DatabaseChangeMonitor(

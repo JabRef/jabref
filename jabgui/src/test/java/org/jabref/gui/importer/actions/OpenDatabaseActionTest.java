@@ -13,7 +13,8 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -49,9 +50,9 @@ public class OpenDatabaseActionTest {
                 mock(StateManager.class),
                 mock(FileUpdateMonitor.class),
                 mock(BibEntryTypesManager.class),
-                mock(UndoManager.class),
                 mock(ClipBoardManager.class),
-                mock(TaskExecutor.class)
+                mock(TaskExecutor.class),
+                new GitHandlerRegistry(mock(GitPreferences.class))
         ));
     }
 

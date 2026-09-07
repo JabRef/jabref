@@ -1,0 +1,127 @@
+name: JabSrv Native Smoke Test
+
+on:
+  push:
+    branches:
+      - main
+      - main-release
+    paths:
+      - 'jabsrv/**'
+      - 'jabsrv-cli/**'
+      - 'jablib/**'
+      - '!jablib/src/test/**'
+      - 'versions/**'
+      - '.github/workflows/jabsrv-native-smoke-test.yml'
+  pull_request:
+    paths:
+      - 'jabsrv/**'
+      - 'jabsrv-cli/**'
+      - 'jablib/**'
+      - '!jablib/src/test/**'
+      - 'versions/**'
+      - '.github/workflows/jabsrv-native-smoke-test.yml'
+  merge_group:
+  workflow_dispatch:
+    inputs:
+      upload-as-artifact:
+        description: "Upload the native binary as a workflow artifact"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+# native-image on the macOS runner is the slowest build and mac runners are scarce, so the
+# macOS entry is dropped for pull_request and merge_group (not merely skipped: a skipped-steps
+# job would still occupy a macos-15 runner slot, see #16784 and #16788). It still runs on
+# push to main/main-release and workflow_dispatch.
+
+jobs:
+  native-smoke-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON((github.event_name == 'pull_request' || github.event_name == 'merge_group') && '["ubuntu-22.04"]' || '["ubuntu-22.04", "macos-15"]') }}
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} JabSrv native smoke test
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          submodules: 'true'
+          show-progress: 'false'
+
+      - uses: ./.github/actions/setup-gradle
+
+      # In graalvm/setup-graalvm, distribution "liberica" means Liberica NIK; jdk+fx is the
+      # Full package, needed because the jabsrv image bundles the CAYW JavaFX picker (GraalVM CE
+      # cannot compile JavaFX's Glass toolkit). AWT native libs still aren't bundled, so CAYW
+      # detects headless defensively at runtime.
+      - name: Set up Liberica NIK (native-image with AWT + JavaFX support)
+        uses: graalvm/setup-graalvm@0426e2e191540e8514dff98dc52a5f5146a2a276 # v1.6.6
+        with:
+          distribution: 'liberica'
+          java-package: 'jdk+fx'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # The jabsrv image bundles the CAYW JavaFX picker, so native-image links against JavaFX's
+      # GTK/X11/GL toolkit. GitHub's Linux runners lack those -dev libraries (macOS links system
+      # frameworks instead). Only needed to link the binary; the headless data plane never loads them.
+      - name: Install JavaFX native link libraries (Linux)
+        if: runner.os == 'Linux'
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+        with:
+          packages: libgtk-3-dev libglib2.0-dev libpango1.0-dev libcairo2-dev libatk1.0-dev libgdk-pixbuf-2.0-dev libharfbuzz-dev libxtst-dev libgl1-mesa-dev
+          version: 1.0
+
+      - name: Build JabSrv native binary
+        run: gradle :jabsrv-cli:nativeCompile -PuseLibericaJdkFull=true
+
+      - name: Run JabSrv native smoke test
+        run: |
+          # The native binary is an external Jersey test container: start it
+          # serving the union of the test .bib files, then run the reused
+          # *ResourceTest classes against it. Absolute paths are required so the
+          # library ids match TestBibFile (id = hash of the path). AWT native libs
+          # aren't bundled in the image; CAYW detects headless defensively, so no
+          # -Djava.awt.headless flag is needed.
+          "$GITHUB_WORKSPACE/jabsrv-cli/build/native/nativeCompile/jabsrv" -p 9998 \
+            "$GITHUB_WORKSPACE/jabsrv/src/test/resources/org/jabref/http/server/general-server-test.bib" \
+            "$GITHUB_WORKSPACE/jabsrv/src/test/resources/org/jabref/http/server/groups-server-test.bib" \
+            "$GITHUB_WORKSPACE/jabsrv/src/test/resources/org/jabref/http/server/xss-server-test.bib" \
+            "$GITHUB_WORKSPACE/jablib/src/main/resources/Chocolate.bib" &
+          server_pid=$!
+          trap "kill $server_pid 2>/dev/null || true" EXIT
+
+          # Wait for the server to accept requests (up to ~30s).
+          server_ready=false
+          for _ in $(seq 1 30); do
+            if curl -sf http://localhost:9998/libraries >/dev/null; then
+              echo "jabsrv is serving"
+              server_ready=true
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$server_ready" != "true" ]; then
+            echo "jabsrv did not start within 30 seconds"
+            exit 1
+          fi
+
+          gradle :jabsrv:nativeSmokeTest -Pjabsrv.native.smoke=9998 -PuseLibericaJdkFull=true
+
+      - name: Upload JabSrv native binary
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload-as-artifact }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: jabsrv-native-${{ matrix.os }}
+          path: jabsrv-cli/build/native/nativeCompile/
+          if-no-files-found: error

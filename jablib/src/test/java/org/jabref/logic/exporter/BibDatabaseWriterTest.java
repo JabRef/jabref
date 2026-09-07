@@ -66,7 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/// Tests for reading can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
+/// Tests for reading can be found at [org.jabref.logic.importer.fileformat.BibtexImporterTest]
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("exporter")
 class BibDatabaseWriterTest {
@@ -843,6 +843,36 @@ class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(bibtexContext, List.of());
 
         assertEquals("@Comment{jabref-meta: protectedFlag:true;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void writeGitAutoPull() throws IOException {
+        metaData.setGitAutoPull(true);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: gitAutoPull:true;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void writeGitAutoCommit() throws IOException {
+        metaData.setGitAutoCommit(true);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: gitAutoCommit:true;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void writeGitAutoPush() throws IOException {
+        metaData.setGitAutoPush(true);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: gitAutoPush:true;}" + OS.NEWLINE,
                 stringWriter.toString());
     }
 

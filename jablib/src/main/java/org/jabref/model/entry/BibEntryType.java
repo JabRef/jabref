@@ -27,7 +27,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
 
     /// Provides an enriched EntryType with information about defined standards as mandatory fields etc.
     ///
-    /// A builder is available at {@link BibEntryTypeBuilder}
+    /// A builder is available at [BibEntryTypeBuilder]
     ///
     /// @param type           The EntryType this BibEntryType is wrapped around.
     /// @param allFields      A BibFields list of all fields, including the required fields

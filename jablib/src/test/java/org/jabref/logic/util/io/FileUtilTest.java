@@ -72,6 +72,19 @@ class FileUtilTest {
     }
 
     @Test
+    void getFileSizeReturnsHumanReadableSize(@TempDir Path tempDir) throws IOException {
+        Path file = tempDir.resolve("library.bib");
+        Files.write(file, new byte[1024]);
+
+        assertEquals(Optional.of("1 KB"), FileUtil.getFileSize(file));
+    }
+
+    @Test
+    void getFileSizeReturnsEmptyForMissingFile(@TempDir Path tempDir) {
+        assertEquals(Optional.empty(), FileUtil.getFileSize(tempDir.resolve("missing.bib")));
+    }
+
+    @Test
     void extensionBakAddedCorrectlyToAFileContainedInTmpDirectory() {
         assertEquals(Path.of("tmp", "demo.bib.bak"),
                 FileUtil.addExtension(Path.of("tmp", "demo.bib"), ".bak"));
@@ -662,7 +675,7 @@ class FileUtilTest {
         assertEquals(secretFile, result);
     }
 
-    /// @implNote Tests inspired by {@link org.jabref.model.database.BibDatabaseContextTest#getFileDirectoriesWithRelativeMetadata}
+    /// @implNote Tests inspired by [org.jabref.model.database.BibDatabaseContextTest#getFileDirectoriesWithRelativeMetadata]
     public static Stream<Arguments> relativize() {
         Path bibPath = bibTempDir.resolve("bibliography.bib");
         Path filesPath = bibTempDir.resolve("files").resolve("pdfs");

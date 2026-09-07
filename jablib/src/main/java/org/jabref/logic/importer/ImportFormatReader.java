@@ -55,7 +55,7 @@ public class ImportFormatReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportFormatReader.class);
 
     /// All import formats.
-    /// Sorted accordingly to {@link Importer#compareTo}, which defaults to alphabetically by the name
+    /// Sorted accordingly to [Importer#compareTo], which defaults to alphabetically by the name
     private final List<Importer> importers = new ArrayList<>(30);
 
     private final ImporterPreferences importerPreferences;

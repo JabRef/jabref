@@ -17,7 +17,7 @@ import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationMessage;
 import org.controlsfx.validation.decoration.GraphicValidationDecoration;
 
-/// This class is similar to {@link GraphicValidationDecoration} but with a different style and font-based icon.
+/// This class is similar to [GraphicValidationDecoration] but with a different style and font-based icon.
 public class IconValidationDecorator extends GraphicValidationDecoration {
 
     private final Pos position;
@@ -37,7 +37,7 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
         Node graphic = Severity.ERROR == message.getSeverity()
                        ? IconTheme.JabRefIcons.ERROR.getGraphicNode()
                        : IconTheme.JabRefIcons.WARNING.getGraphicNode();
-        graphic.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "error-icon" : "warning-icon");
+        graphic.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "text-danger" : "text-warning");
         Label label = new Label();
         label.setGraphic(graphic);
         label.setTooltip(createTooltip(message));

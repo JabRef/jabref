@@ -11,8 +11,6 @@
 //REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
-// see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
-//DEPS io.github.adr:e-adr:2.0.0
 
 // requirements needed by jabkit project need to be listed; requirements by jablib are loaded transitively
 //DEPS info.picocli:picocli:4.7.7
@@ -20,6 +18,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CaseInsensitiveEnumConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CitationFetcherTypeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/ExtractionModeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/KeySuffixConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Check.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
@@ -27,6 +26,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CitationKeys.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Convert.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/DoiToBibtex.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/ExtractionMode.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Fetch.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateBibFromAux.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateCitationKeys.java
@@ -35,6 +35,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/InputOption.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabKit.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pdf.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/PdfExtractReferences.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/PdfUpdate.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Preferences.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pseudonymize.java

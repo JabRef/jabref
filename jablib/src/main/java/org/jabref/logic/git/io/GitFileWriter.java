@@ -17,7 +17,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 public class GitFileWriter {
     private static final ConcurrentHashMap<Path, Object> FILE_LOCKS = new ConcurrentHashMap<>();
 
-    /// @implNote this should be in sync with {@link org.jabref.gui.exporter.SaveDatabaseAction#saveDatabase}
+    /// @implNote this should be in sync with [org.jabref.gui.exporter.SaveDatabaseAction#saveDatabase]
     public static void write(Path file, BibDatabaseContext bibDatabaseContext, ImportFormatPreferences importPrefs) throws IOException {
         SelfContainedSaveConfiguration saveConfiguration = new SelfContainedSaveConfiguration();
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);

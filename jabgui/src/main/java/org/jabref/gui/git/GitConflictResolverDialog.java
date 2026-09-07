@@ -13,7 +13,7 @@ import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-/// A wrapper around {@link MergeEntriesDialog} for Git feature
+/// A wrapper around [MergeEntriesDialog] for Git feature
 ///
 /// Receives a semantic conflict (ThreeWayEntryConflict), pops up an interactive GUI (belonging to mergeentries), and returns a user-confirmed BibEntry merge result.
 public class GitConflictResolverDialog {

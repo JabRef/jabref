@@ -60,7 +60,7 @@ public interface CliPreferences {
 
     Map<String, Object> getDefaults();
 
-    /// Returns the export configuration. The contained SaveConfiguration is a {@link org.jabref.model.metadata.SelfContainedSaveOrder}
+    /// Returns the export configuration. The contained SaveConfiguration is a [org.jabref.model.metadata.SelfContainedSaveOrder]
     SelfContainedSaveConfiguration getSelfContainedExportConfiguration();
 
     BibEntryTypesManager getCustomEntryTypesRepository();

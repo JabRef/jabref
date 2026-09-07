@@ -38,7 +38,7 @@ public class DBMSConnection implements DatabaseConnection {
             }
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
-            // Therefore a stable error determination is not possible.
+            // Therefore, a stable error determination is not possible.
             LOGGER.error("Could not connect to database: {} - Error code: {}", e.getMessage(), e.getErrorCode(), e);
             throw e;
         }
@@ -50,11 +50,21 @@ public class DBMSConnection implements DatabaseConnection {
     }
 
     @Override
+    public Connection openNewConnection() throws SQLException {
+        try {
+            return new DBMSConnection(properties).getConnection();
+        } catch (InvalidDBMSConnectionPropertiesException e) {
+            // Cannot happen: this connection was already opened from the very same properties
+            throw new SQLException(e);
+        }
+    }
+
+    @Override
     public DBMSConnectionProperties getProperties() {
         return this.properties;
     }
 
-    /// Returns a Set of {@link DBMSType} which is supported by available drivers.
+    /// Returns a Set of [DBMSType] which is supported by available drivers.
     public static Set<DBMSType> getAvailableDBMSTypes() {
         Set<DBMSType> dbmsTypes = new HashSet<>();
 

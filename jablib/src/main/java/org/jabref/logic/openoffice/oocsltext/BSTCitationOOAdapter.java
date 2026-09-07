@@ -48,6 +48,7 @@ public class BSTCitationOOAdapter {
     /// Matches a rendered `\\bibitem`, capturing its optional display label and required key.
     ///
     /// Examples:
+    ///
     /// - `\\bibitem{smith2020}` → label absent, key `smith2020`
     /// - `\\bibitem[SG20]{smith2020}` → label `SG20`, key `smith2020`
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem(?:\\[(?<label>[^\\]]*)\\])?\\{(?<key>[^}]+)}");
@@ -71,6 +72,7 @@ public class BSTCitationOOAdapter {
     }
 
     /// Inserts an in-text citation mark. Format depends on [OpenOfficePreferences#getBstCitationFormat]:
+    ///
     /// - [BstCitationFormat#NUMERIC]: `[1]`, `[1, 3]`, ...
     /// - [BstCitationFormat#AUTHOR_YEAR]: `(Cooper et al., 2007)`, ...
     /// - [BstCitationFormat#STYLE_DEFINED]: `[ABC20]`, `[ABC20a]`, ...

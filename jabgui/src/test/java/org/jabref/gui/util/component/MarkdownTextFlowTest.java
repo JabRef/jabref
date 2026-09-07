@@ -62,7 +62,7 @@ class MarkdownTextFlowTest {
         return textFlowReference.get();
     }
 
-    /// Concatenation of the text of every {@link Text} child, i.e. what the user actually sees.
+    /// Concatenation of the text of every [Text] child, i.e. what the user actually sees.
     private static String renderedText(FxRobot robot, MarkdownTextFlow textFlow) {
         AtomicReference<String> renderedTextReference = new AtomicReference<>();
         robot.interact(() -> {
@@ -104,7 +104,7 @@ class MarkdownTextFlowTest {
         robot.interact(() -> textFlow.setMarkdown("**bold**"));
 
         assertEquals("bold", renderedText(robot, textFlow));
-        assertTrue(hasChildWithStyleClass(robot, textFlow, "markdown-bold"));
+        assertTrue(hasChildWithStyleClass(robot, textFlow, "bold"));
     }
 
     @Test
@@ -144,7 +144,7 @@ class MarkdownTextFlowTest {
         // Now interpreted verbatim: markup is visible and no bold styling remains.
         assertEquals(1, childCount(robot, textFlow));
         assertEquals("**bold**", renderedText(robot, textFlow));
-        assertFalse(hasChildWithStyleClass(robot, textFlow, "markdown-bold"));
+        assertFalse(hasChildWithStyleClass(robot, textFlow, "bold"));
     }
 
     @Test
@@ -157,7 +157,7 @@ class MarkdownTextFlowTest {
         });
 
         assertEquals("bold", renderedText(robot, textFlow));
-        assertTrue(hasChildWithStyleClass(robot, textFlow, "markdown-bold"));
+        assertTrue(hasChildWithStyleClass(robot, textFlow, "bold"));
     }
 
     @Test

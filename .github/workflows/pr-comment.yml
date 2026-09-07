@@ -7,8 +7,11 @@ name: Comment on PR
 
 on:
   workflow_run:
+    # Review activity (Qodo submitting a review, the PR author replying in a thread) is relevant
+    # too, but its pull_request_review* runs are unprivileged on fork PRs - "PR Review Activity"
+    # bridges them into this list.
     # note when updating via a PR and testing - `workflow_run` executes from the `main` branch and not the PR branch
-    workflows: [ "Source Code Tests", "On PR opened/updated", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md" ]
+    workflows: [ "Source Code Tests", "On PR opened/updated", "Check PR Format", "Link PR to Issue", "Check PR Modifications", "Check PR CHANGELOG.md", "PR Review Activity" ]
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
     types: [ completed ]
   workflow_dispatch:
@@ -19,10 +22,22 @@ on:
       workflow_run_id:
         description: 'Workflow run id'
         required: true
+      head_sha:
+        description: 'PR head SHA the dispatching run evaluated; the run does nothing if the PR moved on or conflicts again'
+        required: false
 
 jobs:
   comment:
     if: ${{ github.repository == 'JabRef/jabref' }}
+    # The label decision reads live review-thread state and writes it back minutes later, so two
+    # runs for the same PR would race and the slower one would restore the state it started from.
+    # Same group as "Auto-remove ready-for-review", so a draft conversion cannot interleave with the
+    # label evaluation below (which re-reads isDraft right before writing the label).
+    # The PR number is only known after the artifact is read, too late for a group expression -
+    # head repository plus head branch identifies the same pull request just as well, for fork PRs too.
+    concurrency:
+      group: pr-status-${{ github.event.workflow_run.head_repository.full_name || github.repository }}-${{ github.event.workflow_run.head_branch || github.event.inputs.pr_number }}
+      cancel-in-progress: false
     runs-on: ubuntu-slim
     permissions:
       actions: read
@@ -49,8 +64,8 @@ jobs:
           echo "Workflow $WORKFLOW" >> $GITHUB_STEP_SUMMARY
 
       - name: Download PR number
-        if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions/download-artifact@v8
+        if: ${{ github.event_name == 'workflow_run' }}
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         continue-on-error: true
         with:
           name: pr_number
@@ -59,7 +74,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Read pr_number.txt
-        if: ${{ github.event_name != 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'workflow_run' }}
         id: read-pr_number
         run: |
           ARTIFACT_FILE="${{ runner.temp }}/pr-artifacts/pr_number.txt"
@@ -95,17 +110,17 @@ jobs:
 
       - name: Checkout
         # required for gh tool and .github/ghprcomment.yml
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+      - uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
           packages: jq
           version: 1.0
       - name: Is PR from forked?
-        if: ${{ github.event_name != 'workflow_dispatch' && steps.read-pr_number.outputs.pr_number != '' }}
+        if: ${{ github.event_name == 'workflow_run' && steps.read-pr_number.outputs.pr_number != '' }}
         id: isCrossRepository
         run: |
           isCrossRepository=$(gh pr view $pr_number --json isCrossRepository --jq '.isCrossRepository')
@@ -117,7 +132,7 @@ jobs:
 
       # Set a common variable for PR number and workflow_run_id from either event.
       - name: Set variables
-        if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.read-pr_number.outputs.pr_number != '' }}
         id: set-vars
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -129,7 +144,7 @@ jobs:
           fi
 
       - name: "Check if PR has 'dev: no-bot-comments' label"
-        if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' && github.event.workflow_run.name != 'PR Review Activity') }}
         id: check-label
         run: |
           has_label=$(gh pr view "${{ steps.set-vars.outputs.pr_number }}" --json labels -q \
@@ -139,19 +154,19 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # No setup-gradle here: this job never runs Gradle, it only needs a JDK and JBang.
-      - uses: actions/setup-java@v6
-        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' && github.event.workflow_run.name != 'PR Review Activity') }}
         with:
           distribution: 'corretto'
           java-version: '25'
       - name: Generate JBang cache key
-        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' && github.event.workflow_run.name != 'PR Review Activity') }}
         id: cache-key
         run: echo "cache_key=jbang-ghprcomment-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Cache JBang
         # Own key: ghprcomment pulls different dependencies than the other JBang jobs.
-        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
-        uses: actions/cache@v6
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' && github.event.workflow_run.name != 'PR Review Activity') }}
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -159,26 +174,87 @@ jobs:
             jbang-ghprcomment-
       - name: Resolve //DEPS into the cached directory
         # JBang resolves script dependencies into ~/.m2, which is not cached here.
-        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' && github.event.workflow_run.name != 'PR Review Activity') }}
         run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
       - name: Setup JBang
-        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' && github.event.workflow_run.name != 'PR Review Activity') }}
         uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
 
       - name: ghprcomment@main
-        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || (steps.check-label.outputs.has_label == 'false' && steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true' && github.event.workflow_run.name != 'PR Review Activity') }}
         run: |
+          # A dispatched cleanup runs asynchronously; a newer push may have made the PR conflicting
+          # again in the meantime, and a stale run must not remove that conflict's comment or labels.
+          # Checked here, right before mutating, so the setup steps above leave no stale-check window.
+          # Fail closed: only a confirmed MERGEABLE state at the dispatched head SHA may proceed.
+          if [ -n "$HEAD_SHA" ]; then
+            # Retry a few times until mergeable != UNKNOWN
+            # See https://github.com/cli/cli/discussions/8020#discussioncomment-7057040 for details
+            for i in 1 2 3 4 5; do
+              PR=$(gh pr view "$PR_NUMBER" --json headRefOid,mergeable)
+              MERGEABLE=$(jq -r .mergeable <<< "$PR")
+              if [ "$MERGEABLE" != "UNKNOWN" ]; then break; fi
+              sleep 5
+            done
+            if [ "$(jq -r .headRefOid <<< "$PR")" != "$HEAD_SHA" ] || [ "$MERGEABLE" != "MERGEABLE" ]; then
+              echo "⊘ PR moved on since dispatch - skipping" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
+          fi
           jbang trust add https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java
           jbang https://github.com/koppor/ghprcomment/blob/main/ghprcomment.java -r JabRef/jabref -p ${{ steps.set-vars.outputs.pr_number }} -w ${{ steps.set-vars.outputs.workflow_run_id }}
         env:
           GITHUB_OAUTH: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
+          HEAD_SHA: ${{ github.event.inputs.head_sha }}
 
       - name: 'Adapt label "status: changes-required"'
-        if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.name == 'Source Code Tests' && (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
+        # Every workflow in this workflow's workflow_run trigger list is a label-relevant producer:
+        # the pending guard below defers evaluation to whichever of them finishes last, so each of
+        # their completion events must be allowed to run this step - not only Source Code Tests.
+        # Deliberately not restricted to fork PRs (unlike ghprcomment, which only forks need):
+        # labels are computed nowhere else, and with the restriction a same-repo PR whose Qodo
+        # review arrived while a check was still running never got a second chance to be labelled.
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.read-pr_number.outputs.pr_number != '' }}
         run: |
+          # Same stale-dispatch guard as in ghprcomment@main above, re-checked immediately before
+          # this step's own mutations (ghprcomment may have run for a while in between).
+          if [ -n "$HEAD_SHA" ]; then
+            for i in 1 2 3 4 5; do
+              PR=$(gh pr view "$PR_NUMBER" --json headRefOid,mergeable)
+              MERGEABLE=$(jq -r .mergeable <<< "$PR")
+              if [ "$MERGEABLE" != "UNKNOWN" ]; then break; fi
+              sleep 5
+            done
+            if [ "$(jq -r .headRefOid <<< "$PR")" != "$HEAD_SHA" ] || [ "$MERGEABLE" != "MERGEABLE" ]; then
+              echo "⊘ PR moved on since dispatch - skipping" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
+          fi
+
           echo "PR #$PR_NUMBER" >> $GITHUB_STEP_SUMMARY
 
           REPO="${{ github.repository }}"
+
+          # The labels reflect the complete picture only once every producer of bot comments is done.
+          # Whatever is still pending re-triggers this workflow when it finishes (workflow_run for the
+          # workflows below, "PR Review Activity" for Qodo), so skipping here loses nothing.
+          PENDING=$(gh pr checks --repo $REPO $PR_NUMBER --json state,workflow \
+            --jq '[.[] | select(.state == "IN_PROGRESS" or .state == "QUEUED" or .state == "PENDING")
+                        | select(.workflow == "Source Code Tests" or .workflow == "On PR opened/updated" or .workflow == "Check PR Format"
+                                 or .workflow == "Link PR to Issue" or .workflow == "Check PR Modifications" or .workflow == "Check PR CHANGELOG.md")
+                        | .workflow] | unique | join(", ")')
+          if gh api repos/$REPO/issues/$PR_NUMBER/comments --paginate \
+               --jq '.[] | select(.user.login == "qodo-free-for-open-source-projects[bot]") | .body' \
+             | grep -q "Qodo is busy working"; then
+            PENDING="${PENDING:+$PENDING, }Qodo"
+          fi
+          if [ -n "$PENDING" ]; then
+            echo "⏳ Still pending: $PENDING - labels are evaluated when the last one finishes"
+            echo "⏳ Still pending: $PENDING - labels are evaluated when the last one finishes" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
 
           COMMENTS=$(gh api \
             repos/$REPO/issues/$PR_NUMBER/comments \
@@ -213,25 +289,31 @@ jobs:
 
           if [[ -n "$COMMENTS" || "$QODO_THREADS" -gt 0 ]]; then
             echo "Bot comments - adding label changes-required"
-            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments,status: stale" --add-label "status: changes-required"
+            gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: stale" --add-label "status: changes-required"
             echo "Bot comments - added label changes-required" >> $GITHUB_STEP_SUMMARY
           else
             # A PR without bot comments is ready for review unless it is a draft, a human requested changes,
-            # or it already progressed further in the review process.
+            # or it already progressed further in the review process. Drafts and pending human re-reviews
+            # end up without any status label ("nothing for the bots, a human decides what is next");
+            # progressed PRs keep their awaiting-second-review / to-be-merged label.
             PR_STATE=$(gh pr view --repo $REPO $PR_NUMBER --json isDraft,reviewDecision,labels \
               --jq 'if .isDraft or .reviewDecision == "CHANGES_REQUESTED"
                        or ([.labels[].name] | any(. == "status: awaiting-second-review" or . == "status: to-be-merged"))
                     then "not-ready" else "ready" end')
             if [ "$PR_STATE" = "ready" ]; then
               echo "No bot comments and PR is ready for review - adding label ready-for-review"
-              gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale,status: no-bot-comments" --add-label "status: ready-for-review"
+              gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale" --add-label "status: ready-for-review"
               echo "No bot comments - removed label changes-required and added ready-for-review" >> $GITHUB_STEP_SUMMARY
             else
-              echo "No bot comments, but PR is draft, has changes requested, or is already further in review - adding label no-bot-comments"
-              gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale,status: ready-for-review" --add-label "status: no-bot-comments"
-              echo "No bot comments - removed label changes-required and added no-bot-comments" >> $GITHUB_STEP_SUMMARY
+              echo "No bot comments, but PR is draft, has changes requested, or is already further in review - removing changes-required, stale and ready-for-review"
+              gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale,status: ready-for-review"
+              echo "No bot comments, but not ready for review - removed changes-required, stale and ready-for-review" >> $GITHUB_STEP_SUMMARY
             fi
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Labels set by the PAT do emit "labeled" events, which is harmless here: the only
+          # listener acting on a status label ("Adapt PR status") marks drafts ready for review,
+          # and this step never puts "status: ready-for-review" on a draft.
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
+          HEAD_SHA: ${{ github.event.inputs.head_sha }}

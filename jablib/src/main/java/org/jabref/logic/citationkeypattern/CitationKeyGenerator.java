@@ -36,19 +36,29 @@ public class CitationKeyGenerator extends BracketedPattern {
     private final BibDatabase database;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final String unwantedCharacters;
+    private final Character keywordSeparator;
 
     public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),
                 bibDatabaseContext.getDatabase(),
-                citationKeyPatternPreferences);
+                citationKeyPatternPreferences,
+                bibDatabaseContext.getKeywordSeparator(citationKeyPatternPreferences.getKeywordSeparator()));
     }
 
     public CitationKeyGenerator(@NonNull AbstractCitationKeyPatterns citeKeyPattern,
                                 @NonNull BibDatabase database,
                                 @NonNull CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this(citeKeyPattern, database, citationKeyPatternPreferences, citationKeyPatternPreferences.getKeywordSeparator());
+    }
+
+    private CitationKeyGenerator(AbstractCitationKeyPatterns citeKeyPattern,
+                                 BibDatabase database,
+                                 CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                 Character keywordSeparator) {
         this.citeKeyPattern = citeKeyPattern;
         this.database = database;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+        this.keywordSeparator = keywordSeparator;
         this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
     }
 
@@ -139,9 +149,9 @@ public class CitationKeyGenerator extends BracketedPattern {
         return CharMatcher.whitespace().removeFrom(removeUnwantedCharacters(key, unwantedCharacters));
     }
 
-    /// Generate a citation key for the given {@link BibEntry}.
+    /// Generate a citation key for the given [BibEntry].
     ///
-    /// @param entry a {@link BibEntry}
+    /// @param entry a [BibEntry]
     /// @return a citation key based on the user's preferences
     public String generateKey(@NonNull BibEntry entry) {
         String currentKey = entry.getCitationKey().orElse(null);
@@ -231,12 +241,12 @@ public class CitationKeyGenerator extends BracketedPattern {
         return expandBrackets(citationKeyPattern.stringRepresentation(), expandBracketContent(entry));
     }
 
-    /// A helper method to create a {@link Function} that takes a single bracketed expression, expands it, and cleans the key.
+    /// A helper method to create a [Function] that takes a single bracketed expression, expands it, and cleans the key.
     ///
-    /// @param entry the {@link BibEntry} that a citation key is generated for
-    /// @return a cleaned citation key for the given {@link BibEntry}
+    /// @param entry the [BibEntry] that a citation key is generated for
+    /// @return a cleaned citation key for the given [BibEntry]
     private Function<String, String> expandBracketContent(BibEntry entry) {
-        Character keywordDelimiter = citationKeyPatternPreferences.getKeywordSeparator();
+        Character keywordDelimiter = keywordSeparator;
 
         return (String bracket) -> {
             String expandedPattern;

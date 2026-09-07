@@ -23,9 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Fetcher to generate the Bibtex entry from an ISBN.
-/// The default fetcher is the {@link OpenLibraryIsbnFetcher}.
-/// If the entry is not found in the {@link OpenLibraryIsbnFetcher}.
-/// Alternative fetcher can be specified with the {@link IsbnFetcher#addRetryFetcher(AbstractIsbnFetcher)} method.
+/// The default fetcher is the [OpenLibraryIsbnFetcher].
+/// If the entry is not found in the [OpenLibraryIsbnFetcher].
+/// Alternative fetcher can be specified with the [IsbnFetcher#addRetryFetcher(AbstractIsbnFetcher)] method.
 public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsbnFetcher.class);

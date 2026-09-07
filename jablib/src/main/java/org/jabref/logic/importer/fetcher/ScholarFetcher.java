@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParseException;
@@ -35,18 +36,19 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyFetcher {
+public class ScholarFetcher implements FulltextFetcher, PagedSearchBasedFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "ScholarAPI";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScholarFetcher.class);
 
     private static final String LIST_URL = "https://scholarapi.net/api/v1/list";
+    private static final String SEARCH_URL = "https://scholarapi.net/api/v1/search";
+    private static final String PDF_URL = "https://scholarapi.net/api/v1/pdf";
 
     private static final int NO_YEAR_BOUND = Integer.MIN_VALUE;
 
@@ -169,33 +171,29 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
         if (query.isBlank() && startYear.isEmpty() && endYear.isEmpty()) {
             return new Page<>(query, pageNumber, List.of());
         }
+        SearchEndpoint endpoint = query.isBlank() ? SearchEndpoint.LIST : SearchEndpoint.SEARCH;
         if (pageNumber == 0) {
             int keyStartYear = startYear.orElse(NO_YEAR_BOUND);
             int keyEndYear = endYear.orElse(NO_YEAR_BOUND);
             cursorCacheMap.keySet().removeIf(key ->
-                    key.query().equals(query) && key.startYear() == keyStartYear && key.endYear() == keyEndYear);
+                    key.endpoint() == endpoint && key.query().equals(query) && key.startYear() == keyStartYear && key.endYear() == keyEndYear);
         }
         URL url;
         try {
-            url = buildSearchUrl(query, pageNumber, startYear, endYear);
+            url = buildSearchUrl(endpoint, query, pageNumber, startYear, endYear);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Invalid URL", e);
         }
 
-        JSONObject response = callListApi(url);
+        JSONObject response = callApi(url);
 
         try {
             JSONArray results = response.optJSONArray("results");
-            int resultCount = results == null ? 0 : results.length();
-            boolean isLastPage = resultCount < getPageSize();
-
-            if (!isLastPage) {
-                Optional.ofNullable(response.optString("next_indexed_after", null))
-                        .filter(StringUtil::isNotBlank)
-                        .ifPresent(cursor -> cursorCacheMap.put(
-                                new PageKey(query, startYear.orElse(NO_YEAR_BOUND), endYear.orElse(NO_YEAR_BOUND), pageNumber + 1),
-                                cursor));
-            }
+            Optional.ofNullable(response.optString(endpoint.nextCursorResponseParameter(), null))
+                    .filter(StringUtil::isNotBlank)
+                    .ifPresent(cursor -> cursorCacheMap.put(
+                            new PageKey(endpoint, query, startYear.orElse(NO_YEAR_BOUND), endYear.orElse(NO_YEAR_BOUND), pageNumber + 1),
+                            cursor));
 
             List<BibEntry> entries = new ArrayList<>();
             if (results != null) {
@@ -211,11 +209,9 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
         }
     }
 
-    private JSONObject callListApi(URL url) throws FetcherException {
+    private JSONObject callApi(URL url) throws FetcherException {
         URLDownload urlDownload = new URLDownload(url);
-        importerPreferences.getApiKey(getName())
-                           .filter(key -> !key.isBlank())
-                           .ifPresent(key -> urlDownload.addHeader("X-API-Key", key));
+        urlDownload.addHeader("X-API-Key", getApiKey().orElseThrow(() -> new FetcherException("ScholarAPI API key is missing")));
 
         try (InputStream stream = urlDownload.asInputStream()) {
             return JsonReader.toJsonObject(stream);
@@ -225,7 +221,7 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
     }
 
     @Override
-    public boolean isValidKey(@NonNull String apiKey) {
+    public boolean isValidKey(String apiKey) {
         try {
             URLDownload urlDownload = new URLDownload(getTestUrl());
             urlDownload.addHeader("X-API-Key", apiKey);
@@ -245,9 +241,9 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
         return FETCHER_NAME;
     }
 
-    private URL buildSearchUrl(String query, int pageNumber, Optional<Integer> startYear, Optional<Integer> endYear)
+    private URL buildSearchUrl(SearchEndpoint endpoint, String query, int pageNumber, Optional<Integer> startYear, Optional<Integer> endYear)
             throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(LIST_URL);
+        URIBuilder uriBuilder = new URIBuilder(endpoint.url());
         if (StringUtil.isNotBlank(query)) {
             uriBuilder.setParameter("q", query);
         }
@@ -256,16 +252,74 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
         endYear.ifPresent(year -> uriBuilder.addParameter("published_before", (year + 1) + "-01-01"));
 
         if (pageNumber > 0) {
-            String cursor = cursorCacheMap.get(new PageKey(query, startYear.orElse(NO_YEAR_BOUND), endYear.orElse(NO_YEAR_BOUND), pageNumber));
+            String cursor = cursorCacheMap.get(new PageKey(endpoint, query, startYear.orElse(NO_YEAR_BOUND), endYear.orElse(NO_YEAR_BOUND), pageNumber));
             if (cursor == null) {
                 throw new FetcherException(
                         "Page " + pageNumber + " was requested before its cursor was available; pages must be fetched sequentially");
             }
-            uriBuilder.addParameter("indexed_after", cursor);
+            uriBuilder.addParameter(endpoint.cursorRequestParameter(), cursor);
         }
         return uriBuilder.build().toURL();
     }
 
-    private record PageKey(String query, int startYear, int endYear, int pageNumber) {
+    @Override
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
+        Optional<String> id = entry.getField(new UnknownField("scholarapi")).filter(StringUtil::isNotBlank);
+        boolean hasPdf = entry.getField(new UnknownField("scholarApiHasPdf")).map(Boolean::parseBoolean).orElse(false);
+        if (id.isEmpty() || !hasPdf) {
+            return Optional.empty();
+        }
+        if (getApiKey().isEmpty()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(new URIBuilder(PDF_URL).appendPathSegments(id.orElseThrow()).build().toURL());
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Invalid ScholarAPI PDF URL", e);
+        }
+    }
+
+    @Override
+    public Map<String, String> getDownloadHeaders() {
+        return getApiKey().map(key -> Map.of("X-API-Key", key)).orElse(Map.of());
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
+    }
+
+    private Optional<String> getApiKey() {
+        return importerPreferences.getApiKey(getName()).filter(StringUtil::isNotBlank);
+    }
+
+    private record PageKey(SearchEndpoint endpoint, String query, int startYear, int endYear, int pageNumber) {
+    }
+
+    private enum SearchEndpoint {
+        LIST(LIST_URL, "indexed_after", "next_indexed_after"),
+        SEARCH(SEARCH_URL, "cursor", "next_cursor");
+
+        private final String url;
+        private final String cursorRequestParameter;
+        private final String nextCursorResponseParameter;
+
+        SearchEndpoint(String url, String cursorRequestParameter, String nextCursorResponseParameter) {
+            this.url = url;
+            this.cursorRequestParameter = cursorRequestParameter;
+            this.nextCursorResponseParameter = nextCursorResponseParameter;
+        }
+
+        String url() {
+            return url;
+        }
+
+        String cursorRequestParameter() {
+            return cursorRequestParameter;
+        }
+
+        String nextCursorResponseParameter() {
+            return nextCursorResponseParameter;
+        }
     }
 }

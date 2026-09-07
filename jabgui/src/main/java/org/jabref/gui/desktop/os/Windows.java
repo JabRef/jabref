@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 /// This class contains Windows specific implementations for file directories and file/application open handling methods.
 ///
-/// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
+/// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the [JabKit#initLogging].
 /// The configuration of tinylog will become immutable as soon as the first log entry is issued.
 /// https://tinylog.org/v2/configuration/
 public class Windows extends NativeDesktop {
@@ -34,6 +34,12 @@ public class Windows extends NativeDesktop {
             String quotePath = "\"" + filePath + "\"";
             new ProcessBuilder("explorer.exe", quotePath).start();
         }
+    }
+
+    @Override
+    public void openUrlWithSystemHandler(String url) throws IOException {
+        // quote String so explorer handles URL query strings correctly
+        new ProcessBuilder("explorer.exe", "\"" + url + "\"").start();
     }
 
     @Override
@@ -64,7 +70,8 @@ public class Windows extends NativeDesktop {
 
     @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
-        new ProcessBuilder(Path.of(application).toString(), Path.of(filePath).toString()).start();
+        // filePath may be a URL; Path.of would throw on query characters and mangle the scheme
+        new ProcessBuilder(Path.of(application).toString(), filePath).start();
     }
 
     @Override

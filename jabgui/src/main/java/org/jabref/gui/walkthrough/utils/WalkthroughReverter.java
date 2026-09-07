@@ -28,6 +28,7 @@ public class WalkthroughReverter {
     /// [00fc407](https://github.com/JabRef/jabref/tree/00fc407620b3132c0cdea8c65750d0e5616bb597):
     ///
     /// If the "Add Group" walkthrough is launched, the following action is performed:
+    ///
     /// 1. Launch walkthrough
     /// 2. Create the new group "Research Papers"
     /// 3. In step 8 (i.e., immediately after the new group is created), click on other

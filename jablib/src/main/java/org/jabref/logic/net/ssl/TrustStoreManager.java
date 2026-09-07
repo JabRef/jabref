@@ -27,7 +27,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// @implNote SSL certificates are installed at {@link TrustStoreManager#configureTrustStore(Path)}
+/// @implNote SSL certificates are installed at [TrustStoreManager#configureTrustStore(Path)]
 public class TrustStoreManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrustStoreManager.class);

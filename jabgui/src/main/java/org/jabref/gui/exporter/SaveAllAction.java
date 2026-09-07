@@ -39,8 +39,7 @@ public class SaveAllAction extends SimpleCommand {
 
         for (LibraryTab libraryTab : tabsSupplier.get()) {
             SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
-            boolean saveResult = saveDatabaseAction.save();
-            if (!saveResult) {
+            if (saveDatabaseAction.save() == SaveDatabaseAction.SaveResult.FAILURE) {
                 dialogService.notify(Localization.lang("Could not save file."));
             }
         }

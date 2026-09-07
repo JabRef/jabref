@@ -1,64 +1,55 @@
 package org.jabref.gui.undo;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.undo.UndoManager;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Exposes an [UndoManager]'s state as JavaFX properties, for binding menu and toolbar
-/// enablement.
+/// The undo journal as the GUI needs it: the stacks can be driven, and their state can be
+/// observed as JavaFX properties for menu and toolbar enablement.
 ///
-/// Deliberately separate from the manager, for the marshalling rather than the properties.
-/// JavaFX properties themselves are just observable values and need no toolkit, but hopping to
-/// the JavaFX thread does — and the manager used to do that on every push, so recording a
-/// change from a plain unit test threw "Toolkit not initialized". Only an observer that feeds
-/// the UI needs that hop, so it lives with the observer. The journal stays plain Java.
+/// Layered the way JabRef layers preferences — [org.jabref.logic.preferences.CliPreferences] to
+/// `GuiPreferences`, `JabRefCliPreferences` to `JabRefGuiPreferences`. [UndoManager] in jablib
+/// is the recording half that the ~118 classes editing the library depend on; this adds what
+/// only the undo UI needs, so a class's declared type still says what it does with the journal.
+///
+/// The control methods are declared here rather than inherited because an interface cannot
+/// inherit from a class: [org.jabref.logic.undo.JabRefUndoManager] already implements every one
+/// of them, and [JabRefGuiUndoManager] brings the two together.
 @NullMarked
-public class GuiUndoManager {
+public interface GuiUndoManager extends UndoManager {
 
-    private final UndoManager undoManager;
-    private final ReadOnlyBooleanWrapper undoable;
-    private final ReadOnlyBooleanWrapper redoable;
+    /// Reverses the change on top of the undo stack.
+    void undo();
 
-    public GuiUndoManager(UndoManager undoManager) {
-        this.undoManager = undoManager;
-        this.undoable = new ReadOnlyBooleanWrapper(undoManager.canUndo());
-        this.redoable = new ReadOnlyBooleanWrapper(undoManager.canRedo());
+    /// Re-applies the change last undone.
+    void redo();
 
-        undoManager.addListener(this::refresh);
-    }
+    boolean canUndo();
 
-    public UndoManager getUndoManager() {
-        return undoManager;
-    }
+    boolean canRedo();
 
-    public ReadOnlyBooleanProperty undoableProperty() {
-        return undoable.getReadOnlyProperty();
-    }
+    /// Whether the library differs from the last saved position.
+    boolean hasChanged();
 
-    public ReadOnlyBooleanProperty redoableProperty() {
-        return redoable.getReadOnlyProperty();
-    }
+    /// Marks the current position as saved.
+    void markUnchanged();
 
-    /// Reads the stacks on the JavaFX thread rather than where the notification arrived, so that
-    /// what is written is what the manager holds at the moment of writing. Reading first and
-    /// carrying the values over would let a thread that read an older state post after one that
-    /// read a newer state, leaving the menu enabled over an empty stack until the next edit.
+    /// Discards both stacks and the saved position.
     ///
-    /// Applied inline when the edit was already made on the JavaFX thread, so a caller that
-    /// records a change and then reads the property in the same event does not see the previous
-    /// value. Deferring unconditionally would leave the menu stale for a pulse.
-    ///
-    /// A burst of edits therefore queues one update per edit, and they are not coalesced: each
-    /// reads the current state, so every update after the first sets the value already there,
-    /// which a JavaFX property ignores without notifying anything.
-    private void refresh() {
-        UiTaskExecutor.runNowOrInJavaFXThread(() -> {
-            undoable.set(undoManager.canUndo());
-            redoable.set(undoManager.canRedo());
-        });
-    }
+    /// Nothing calls this today, which is a defect rather than a spare method: closing a library
+    /// leaves its changes on the stack, so a later undo re-applies them against a database that
+    /// is gone, and the entries they hold stay alive for the session. Calling it on close needs
+    /// the journal to belong to a library first — one journal currently serves them all.
+    void clear();
+
+    /// Notified after every change to either stack, from whichever thread made it.
+    void addListener(Runnable listener);
+
+    /// Whether there is anything to undo, for binding menu and toolbar enablement.
+    ReadOnlyBooleanProperty undoableProperty();
+
+    /// Whether there is anything to redo.
+    ReadOnlyBooleanProperty redoableProperty();
 }

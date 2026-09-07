@@ -56,6 +56,10 @@ public class MainTableTooltip extends Tooltip {
         return this;
     }
 
+    public boolean shouldAlwaysShowTooltip() {
+        return preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip();
+    }
+
     public Tooltip createPreviewTooltip(BibDatabaseContext databaseContext, BibEntry entry) {
         preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
         preview.setDatabaseContext(databaseContext);

@@ -27,6 +27,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -84,6 +85,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     private final BibDatabaseContext databaseContext;
     private final SuggestionProvider<?> suggestionProvider;
     private final FieldCheckers fieldCheckers;
+    private final UndoManager undoManager;
 
     @Inject
     private DialogService dialogService;
@@ -95,8 +97,6 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     private JournalAbbreviationRepository abbreviationRepository;
     @Inject
     private TaskExecutor taskExecutor;
-    @Inject
-    private UndoManager undoManager;
     @Inject
     private FileUpdateMonitor fileUpdateMonitor;
     @Inject
@@ -112,11 +112,13 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     public LinkedFilesEditor(Field field,
                              BibDatabaseContext databaseContext,
                              SuggestionProvider<?> suggestionProvider,
-                             FieldCheckers fieldCheckers) {
+                             FieldCheckers fieldCheckers,
+                             UndoManager undoManager) {
         this.field = field;
         this.databaseContext = databaseContext;
         this.suggestionProvider = suggestionProvider;
         this.fieldCheckers = fieldCheckers;
+        this.undoManager = undoManager;
 
         ViewLoader.view(this)
                   .root(this)
@@ -157,6 +159,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
+                .withPseudoClass(PseudoClass.getPseudoClass("auto-found"), LinkedFileViewModel::isAutomaticallyFoundProperty)
                 .withGraphic(this::createFileDisplay)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
                 .setOnDragDetected(this::handleOnDragDetected)
@@ -169,11 +172,20 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         // Size the list to exactly the number of files, so it ends right after the content instead of leaving blank
         // space, but cap it at MAX_VISIBLE_ROWS so large file lists scroll internally rather than growing the layout.
         // The row height comes from the CSS-driven fixed cell size, so theming and font scaling adjust it naturally.
+        // The list's own insets (CSS padding/border) must be added on top: they are not part of the viewport, and
+        // leaving them out makes the viewport a few pixels shorter than the rows, which shows a vertical scrollbar
+        // and, since that bar narrows the viewport, a horizontal one as well.
         listView.prefHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> Math.min(listView.getItems().size(), MAX_VISIBLE_ROWS) * listView.getFixedCellSize(),
+                () -> listView.getItems().isEmpty()
+                      ? 0
+                      : Math.min(listView.getItems().size(), MAX_VISIBLE_ROWS) * listView.getFixedCellSize() + verticalInsets(listView),
                 listView.getItems(),
-                listView.fixedCellSizeProperty()));
-        listView.maxHeightProperty().bind(listView.fixedCellSizeProperty().multiply(MAX_VISIBLE_ROWS));
+                listView.fixedCellSizeProperty(),
+                listView.insetsProperty()));
+        listView.maxHeightProperty().bind(Bindings.createDoubleBinding(
+                () -> MAX_VISIBLE_ROWS * listView.getFixedCellSize() + verticalInsets(listView),
+                listView.fixedCellSizeProperty(),
+                listView.insetsProperty()));
         // Allow the list to collapse completely when there are no files; the button row below stays visible.
         listView.setMinHeight(0);
 
@@ -185,6 +197,10 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
 
         setUpKeyBindings();
+    }
+
+    private static double verticalInsets(Region region) {
+        return region.getInsets().getTop() + region.getInsets().getBottom();
     }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
@@ -260,7 +276,9 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
         HBox info = new HBox(8);
         HBox.setHgrow(info, Priority.ALWAYS);
-        info.getStyleClass().add("linked-files-info"); // To align with buttons below which also have 0.5em padding
+        // Centered rather than padded to the buttons' own padding, so the row stays aligned
+        // whatever padding '.icon-button' carries.
+        info.getStyleClass().add("align-center-left");
         info.getChildren().setAll(label, progressIndicator);
 
         Button acceptAutoLinkedFile = ControlHelper.iconButton(IconTheme.JabRefIcons.AUTO_LINKED_FILE);
@@ -293,9 +311,8 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         });
         parsePdfMetadata.getStyleClass().setAll("icon-button");
 
-        HBox container = new HBox(2);
+        HBox container = new HBox(4);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
-        container.maxWidthProperty().bind(listView.widthProperty().subtract(20d));
         container.getChildren().addAll(acceptAutoLinkedFile, info, writeMetadataToPdf, parsePdfMetadata);
 
         return container;
@@ -439,4 +456,3 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         return 3;
     }
 }
-

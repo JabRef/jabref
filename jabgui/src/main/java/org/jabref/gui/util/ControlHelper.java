@@ -17,13 +17,14 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.DragEvent;
 
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.theme.StyleClasses;
 
 public class ControlHelper {
 
     // Pseudo-classes for drag and drop
-    private static PseudoClass dragOverBottom = PseudoClass.getPseudoClass("dragOver-bottom");
-    private static PseudoClass dragOverCenter = PseudoClass.getPseudoClass("dragOver-center");
-    private static PseudoClass dragOverTop = PseudoClass.getPseudoClass("dragOver-top");
+    private static final PseudoClass DRAG_OVER_BOTTOM = PseudoClass.getPseudoClass("drag-over-bottom");
+    private static final PseudoClass DRAG_OVER_CENTER = PseudoClass.getPseudoClass("drag-over-center");
+    private static final PseudoClass DRAG_OVER_TOP = PseudoClass.getPseudoClass("drag-over-top");
 
     public enum EllipsisPosition { BEGINNING, CENTER, ENDING }
 
@@ -43,7 +44,7 @@ public class ControlHelper {
         return button;
     }
 
-    /// A {@link #labelledIconButton} forced to `prefWidth`, so that the buttons of one row come out
+    /// A [#labelledIconButton] forced to `prefWidth`, so that the buttons of one row come out
     /// uniformly wide however long their individual captions are.
     public static Button labelledIconButton(JabRefIcon icon, String text, double prefWidth, Runnable action) {
         Button button = labelledIconButton(icon, text, action);
@@ -55,7 +56,7 @@ public class ControlHelper {
     public static Button narrowIconButton(JabRefIcon icon, String tooltip, Runnable action) {
         Button button = new Button();
         button.setGraphic(icon.getGraphicNode());
-        button.getStyleClass().addAll("icon-button", "narrow");
+        button.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         button.setPrefSize(20.0, 20.0);
         button.setTooltip(new Tooltip(tooltip));
         button.setOnAction(_ -> action.run());
@@ -122,24 +123,24 @@ public class ControlHelper {
         removeDroppingPseudoClasses(cell);
         switch (getDroppingMouseLocation(cell, event)) {
             case BOTTOM:
-                cell.pseudoClassStateChanged(dragOverBottom, true);
+                cell.pseudoClassStateChanged(DRAG_OVER_BOTTOM, true);
                 break;
             case CENTER:
-                cell.pseudoClassStateChanged(dragOverCenter, true);
+                cell.pseudoClassStateChanged(DRAG_OVER_CENTER, true);
                 break;
             case TOP:
-                cell.pseudoClassStateChanged(dragOverTop, true);
+                cell.pseudoClassStateChanged(DRAG_OVER_TOP, true);
                 break;
         }
     }
 
     public static void setDroppingPseudoClasses(Cell<?> cell) {
         removeDroppingPseudoClasses(cell);
-        cell.pseudoClassStateChanged(dragOverCenter, true);
+        cell.pseudoClassStateChanged(DRAG_OVER_CENTER, true);
     }
 
     public static void removeDroppingPseudoClasses(Cell<?> cell) {
-        removePseudoClasses(cell, dragOverBottom, dragOverCenter, dragOverTop);
+        removePseudoClasses(cell, DRAG_OVER_BOTTOM, DRAG_OVER_CENTER, DRAG_OVER_TOP);
     }
 
     /// If needed, truncates a given string to `maxCharacters`, adding `ellipsisString` instead.

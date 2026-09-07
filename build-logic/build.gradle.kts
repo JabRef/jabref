@@ -8,8 +8,10 @@ repositories {
     // to repo.maven.apache.org, which enforces consumption limits since 2026.
     // See https://central.sonatype.org/faq/429-error/ and gradle/gradle#37880.
     maven { url = uri("https://maven-central.storage-download.googleapis.com/maven2/") }
-
     gradlePluginPortal()
+
+    mavenCentral()
+
     maven { url = uri("https://jitpack.io") }
 }
 
@@ -26,4 +28,9 @@ dependencies {
     implementation("org.gradlex:java-module-testing:1.8.1")
     implementation("org.gradlex:jvm-dependency-conflict-resolution:2.5")
     implementation("org.gradle.toolchains:foojay-resolver:1.0.0")
+    implementation("org.itsallcode:openfasttrace-gradle:3.2.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace-api:4.9.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace-core:4.9.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace-exporter-specobject:4.9.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace:4.9.0")
 }

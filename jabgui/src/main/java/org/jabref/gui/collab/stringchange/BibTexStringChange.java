@@ -27,7 +27,7 @@ public final class BibTexStringChange extends DatabaseChange {
 
     @Override
     public void applyChange(CompoundEdit undoEdit) {
-        undoEdit.apply(new UndoableStringChange(oldString, UndoableStringChange.Part.CONTENT, oldString.getContent(), newString.getContent()));
+        undoEdit.applyEdit(new UndoableStringChange(oldString, UndoableStringChange.Part.CONTENT, oldString.getContent(), newString.getContent()));
     }
 
     public BibtexString getOldString() {

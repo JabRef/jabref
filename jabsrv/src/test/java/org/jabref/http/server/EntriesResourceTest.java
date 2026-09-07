@@ -69,7 +69,7 @@ class EntriesResourceTest extends ServerTest {
     }
 
     /// Rebinds the standalone null object ([UiMessageHandler#NONE], not GUI-connected) and restarts
-    /// the test container so the resource sees it. Mirrors {@link ServerTest#setAvailableLibraries}.
+    /// the test container so the resource sees it. Mirrors [ServerTest#setAvailableLibraries].
     private void useStandaloneMode() throws Exception {
         tearDown();
         uiMessageHandler = UiMessageHandler.NONE;

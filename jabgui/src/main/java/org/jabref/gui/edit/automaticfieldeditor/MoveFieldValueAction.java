@@ -40,8 +40,8 @@ public class MoveFieldValueAction extends SimpleCommand {
             String toFieldValue = entry.getField(toField).orElse("");
             if (StringUtil.isNotBlank(fromFieldValue)) {
                 if (overwriteToFieldContent || toFieldValue.isEmpty()) {
-                    edits.apply(new UndoableFieldChange(entry, toField, toFieldValue, fromFieldValue));
-                    edits.apply(new UndoableFieldChange(entry, fromField, fromFieldValue, null));
+                    edits.applyEdit(new UndoableFieldChange(entry, toField, toFieldValue, fromFieldValue));
+                    edits.applyEdit(new UndoableFieldChange(entry, fromField, fromFieldValue, null));
                     affectedEntriesCount++;
                 }
             }

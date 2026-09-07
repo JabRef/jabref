@@ -58,7 +58,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.search.SearchPreferences;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
@@ -91,7 +91,6 @@ public class GlobalSearchBar extends HBox {
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final StateManager stateManager;
     private final GuiPreferences preferences;
-    private final UndoManager undoManager;
     private final LibraryTabContainer tabContainer;
     private final SearchPreferences searchPreferences;
     private final DialogService dialogService;
@@ -104,7 +103,6 @@ public class GlobalSearchBar extends HBox {
     public GlobalSearchBar(LibraryTabContainer tabContainer,
                            StateManager stateManager,
                            GuiPreferences preferences,
-                           UndoManager undoManager,
                            DialogService dialogService,
                            SearchType searchType) {
         super();
@@ -112,7 +110,6 @@ public class GlobalSearchBar extends HBox {
         this.preferences = preferences;
         this.searchPreferences = preferences.getSearchPreferences();
         this.filePreferences = preferences.getFilePreferences();
-        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.tabContainer = tabContainer;
         this.searchType = searchType;
@@ -218,7 +215,7 @@ public class GlobalSearchBar extends HBox {
             this.getChildren().addAll(searchField, currentResults);
         }
 
-        this.setSpacing(4.0);
+        this.setSpacing(4);
         this.setAlignment(Pos.CENTER_LEFT);
 
         Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), this::updateSearchQuery);
@@ -345,7 +342,7 @@ public class GlobalSearchBar extends HBox {
         }
         globalSearchActive.setValue(true);
         if (globalSearchResultDialog == null) {
-            globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
+            globalSearchResultDialog = new GlobalSearchResultDialog(tabContainer);
         }
         stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(query ->
                 stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).set(Optional.of(query)));
@@ -378,8 +375,8 @@ public class GlobalSearchBar extends HBox {
         LOGGER.debug("Flags: {}", searchPreferences.getSearchFlags());
         LOGGER.debug("Updated search query: {}", searchField.getText());
 
-        // An empty search field should cause the search to be cleared.
-        if (searchField.getText().isEmpty()) {
+        // A blank search field should cause the search to be cleared.
+        if (StringUtil.isBlank(searchField.getText())) {
             stateManager.activeSearchQuery(searchType).set(Optional.empty());
             illegalSearch.set(false);
             return;
@@ -401,7 +398,7 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    /// The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
+    /// The popup has private access in [AutoCompletionBinding], so we use reflection to access it.
     @SuppressWarnings("unchecked")
     private <T> AutoCompletePopup<T> getPopup(AutoCompletionBinding<T> autoCompletionBinding) {
         try {

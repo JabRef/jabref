@@ -1,0 +1,31 @@
+# Tests that cannot pass against a standalone (GUI-less) native jabsrv binary.
+# Consumed by the `nativeSmokeTest` task in jabsrv/build.gradle.kts, one
+# `excludeTestsMatching` pattern per non-comment line. `#` starts a comment.
+#
+# These stay green in the normal `:jabsrv:test` (in-process Grizzly, mocked
+# GUI) run — they are excluded only from the native smoke gate.
+
+# --- GUI-gated: standalone has UiMessageHandler.NONE, so the write/select
+# endpoints return 400 "Only possible in GUI mode." before reaching the
+# 204/404/410/200 logic the assertions expect. ---
+org.jabref.http.server.CitationsResourceTest.addToDemoLibraryReturns404
+org.jabref.http.server.CitationsResourceTest.addToUnknownLibraryReturns404
+org.jabref.http.server.CitationsResourceTest.addToOpenLibraryWithExpiredKeyReturns410
+org.jabref.http.server.EntriesResourceTest.importToOpenLibrarySwitchesToThatLibrary
+org.jabref.http.server.EntriesResourceTest.importToCurrentLibraryHasEmptyTarget
+org.jabref.http.server.EntriesResourceTest.importCslJsonConvertsEntryType
+org.jabref.http.server.EntriesResourceTest.importToUnknownLibraryReturns404
+org.jabref.http.server.cayw.CAYWResourceTest.biblatex
+org.jabref.http.server.cayw.CAYWResourceTest.servedLibraryPathIsAccepted
+
+# --- Harness: the external test container is one already-running process, so
+# ServerTest.setAvailableLibraries (tearDown + setUp) is a no-op and the binary
+# always serves the union of all test libraries. These two assert the exact
+# GET /libraries membership, which that union breaks. ---
+org.jabref.http.server.LibrariesResourceTest.defaultOneTestLibrary
+org.jabref.http.server.LibrariesResourceTest.twoExplicitTestLibraries
+
+# --- Mock-dependent: stubs SrvStateManager.getOpenDatabases() to empty, which the
+# external binary ignores (it serves real, non-empty libraries with shared static
+# state), so the empty-databases scenario can't be reproduced here. ---
+org.jabref.http.server.cayw.CAYWResourceTest.emptyOpenDatabasesDoesNotCrash

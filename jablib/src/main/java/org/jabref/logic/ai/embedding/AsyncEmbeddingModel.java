@@ -17,19 +17,19 @@ import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.output.Response;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// An {@link EmbeddingModel} that downloads/loads its underlying model asynchronously via a background task.
+/// An [EmbeddingModel] that downloads/loads its underlying model asynchronously via a background task.
 ///
-/// The constructor immediately schedules an {@link UpdateEmbeddingModelTask}. Call
-/// {@link #embedAll(List)} only once the model is ready (check {@link #isPresent()}).
+/// The constructor immediately schedules an [UpdateEmbeddingModelTask]. Call
+/// [#embedAll(List)] only once the model is ready (check [#isPresent()]).
 ///
 /// Does not listen to any preferences; the owner is responsible for reacting to preference
 /// changes and creating a new instance if needed.
 ///
-/// Implements {@link AutoCloseable}; close it to release the loaded model.
+/// Implements [AutoCloseable]; close it to release the loaded model.
 public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncEmbeddingModel.class);
 
@@ -87,7 +87,7 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     }
 
     @Override
-    public Response<@NotNull List<Embedding>> embedAll(List<TextSegment> list) {
+    public Response<@NonNull List<Embedding>> embedAll(List<TextSegment> list) {
         if (predictorProperty.get().isEmpty()) {
             // The rationale for RuntimeException here:
             // 1. langchain4j error handling is a mess, and it uses RuntimeExceptions

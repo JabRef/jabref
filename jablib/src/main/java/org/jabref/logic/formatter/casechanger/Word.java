@@ -52,7 +52,7 @@ public final class Word {
         }
     }
 
-    /// Case-insensitive check against {@link Word#SMALLER_WORDS}. Checks for common function words.
+    /// Case-insensitive check against [Word#SMALLER_WORDS]. Checks for common function words.
     public static boolean isSmallerWord(String word) {
         return SMALLER_WORDS.contains(word.toLowerCase(Locale.ROOT));
     }

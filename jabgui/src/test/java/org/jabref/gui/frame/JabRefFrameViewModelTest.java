@@ -12,9 +12,9 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -52,7 +52,7 @@ class JabRefFrameViewModelTest extends ApplicationTest {
         Supplier<OpenDatabaseAction> openDatabaseAction = mock(Supplier.class);
         BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
         FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
-        UndoManager undoManager = mock(UndoManager.class);
+        GuiUndoManager undoManager = mock(GuiUndoManager.class);
         ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
         taskExecutor = mock(TaskExecutor.class);
 
@@ -64,9 +64,9 @@ class JabRefFrameViewModelTest extends ApplicationTest {
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
-        Injector.setModelOrService(UndoManager.class, undoManager);
 
         when(stateManager.getOpenDatabases()).thenReturn(FXCollections.observableArrayList());
+        when(stateManager.getUndoManager(any())).thenReturn(undoManager);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
 
         viewModel = new JabRefFrameViewModel(
@@ -78,7 +78,6 @@ class JabRefFrameViewModelTest extends ApplicationTest {
                 openDatabaseAction,
                 entryTypesManager,
                 fileUpdateMonitor,
-                undoManager,
                 clipBoardManager,
                 taskExecutor
         );

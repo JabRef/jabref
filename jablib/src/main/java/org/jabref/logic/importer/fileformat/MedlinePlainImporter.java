@@ -398,9 +398,9 @@ public class MedlinePlainImporter extends Importer {
         }
     }
 
-    /// Parses a MeSH term from MEDLINE plain format (e.g. {@code *Kidney Diseases/diagnosis/epidemiology})
-    /// into a {@link MeshHeading} and renders it as individual keywords
-    /// (e.g. {@code ["Kidney Diseases*/diagnosis", "Kidney Diseases*/epidemiology"]}).
+    /// Parses a MeSH term from MEDLINE plain format (e.g. `*Kidney Diseases/diagnosis/epidemiology`)
+    /// into a [MeshHeading] and renders it as individual keywords
+    /// (e.g. `["Kidney Diseases*/diagnosis", "Kidney Diseases*/epidemiology"]`).
     private List<String> parseMeshTerm(String meshTerm) {
         String term = meshTerm.trim();
         boolean descriptorMajor = term.startsWith("*");

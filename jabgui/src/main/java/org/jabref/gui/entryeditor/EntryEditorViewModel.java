@@ -30,7 +30,6 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -47,41 +46,39 @@ public class EntryEditorViewModel extends AbstractViewModel {
     /// Display name of the current entry's type — the single source for the entry editor's type label.
     private final SimpleStringProperty typeLabelText = new SimpleStringProperty("");
 
-    /// The current entry's type, updated by the single {@link #typeSubscription}. The editor observes this to
-    /// rebuild its toolbar, so there is no second listener on the entry's {@code typeProperty}.
+    /// The current entry's type, updated by the single [#typeSubscription]. The editor observes this to
+    /// rebuild its toolbar, so there is no second listener on the entry's `typeProperty`.
     private final ObjectProperty<@Nullable EntryType> currentEntryType = new SimpleObjectProperty<>();
 
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
-    private final UndoManager undoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final Supplier<LibraryTab> tabSupplier;
     private final EntryEditorTabFactory tabFactory;
 
     /// Every tab that can possibly be shown for the current entry, in display order.
     private final List<EntryEditorTab> allPossibleTabs = new ArrayList<>();
-    /// One subscription per tab, observing its {@link EntryEditorTab#visibility()}.
+    /// One subscription per tab, observing its [EntryEditorTab#visibility()].
     private final List<Subscription> shouldShowSubscriptions = new ArrayList<>();
-    /// The subset of {@link #allPossibleTabs} currently shown — mutated incrementally so a bound TabPane
+    /// The subset of [#allPossibleTabs] currently shown — mutated incrementally so a bound TabPane
     /// replays adds/removes one by one (a full replace causes an ugly shift-in animation).
     private final ObservableList<Tab> visibleTabs = FXCollections.observableArrayList();
-    /// Read-only view handed to the editor for {@code Bindings.bindContent}. Held in a field on purpose: the
-    /// unmodifiable wrapper keeps only a weak listener on {@link #visibleTabs}, so it must stay strongly
+    /// Read-only view handed to the editor for `Bindings.bindContent`. Held in a field on purpose: the
+    /// unmodifiable wrapper keeps only a weak listener on [#visibleTabs], so it must stay strongly
     /// referenced or a GC silently kills the content binding (the TabPane would stop updating).
     private final ObservableList<Tab> unmodifiableVisibleTabs = FXCollections.unmodifiableObservableList(visibleTabs);
     private @Nullable SourceTab sourceTab;
 
-    /// Single subscription to the current entry's {@code typeProperty}; feeds both the type label and
-    /// {@link #currentEntryType}.
+    /// Single subscription to the current entry's `typeProperty`; feeds both the type label and
+    /// [#currentEntryType].
     private @Nullable Subscription typeSubscription;
 
     public EntryEditorViewModel(StateManager stateManager,
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
                                 DialogService dialogService,
-                                UndoManager undoManager,
                                 JournalAbbreviationRepository journalAbbreviationRepository,
                                 Supplier<LibraryTab> tabSupplier,
                                 EntryEditorTabFactory tabFactory) {
@@ -89,7 +86,6 @@ public class EntryEditorViewModel extends AbstractViewModel {
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
-        this.undoManager = undoManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.tabSupplier = tabSupplier;
         this.tabFactory = tabFactory;
@@ -114,7 +110,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
     }
 
     /// (Re)subscribes the single listener on the current entry's type, driving both the type label and the
-    /// {@link #currentEntryType} property that the editor observes.
+    /// [#currentEntryType] property that the editor observes.
     private void rebindToEntryType(@Nullable BibEntry entry) {
         if (typeSubscription != null) {
             typeSubscription.unsubscribe();
@@ -155,13 +151,13 @@ public class EntryEditorViewModel extends AbstractViewModel {
     }
 
     /// The current entry's type, exposed so the editor can rebuild its toolbar when the type changes. Backed by
-    /// the single {@link #typeSubscription} shared with the type label — no duplicate listener on the entry.
+    /// the single [#typeSubscription] shared with the type label — no duplicate listener on the entry.
     public ObservableValue<@Nullable EntryType> currentEntryTypeProperty() {
         return currentEntryType;
     }
 
     /// Live, ordered list of the tabs that should currently be shown for the edited entry. The
-    /// {@link EntryEditor} binds its {@code TabPane} to this; it is mutated incrementally to avoid a full replace.
+    /// [EntryEditor] binds its `TabPane` to this; it is mutated incrementally to avoid a full replace.
     public ObservableList<Tab> visibleTabs() {
         return unmodifiableVisibleTabs;
     }
@@ -209,7 +205,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
     }
 
     /// Unsubscribes the visibility listeners and unbinds each tab's entry property before the old tab
-    /// instances are dropped, so discarded tabs are not kept alive by the binding to {@code currentlyEditedEntry}.
+    /// instances are dropped, so discarded tabs are not kept alive by the binding to `currentlyEditedEntry`.
     private void disposeTabs() {
         shouldShowSubscriptions.forEach(Subscription::unsubscribe);
         shouldShowSubscriptions.clear();
@@ -257,7 +253,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
         if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
             GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
         }
-        new FetchAndMergeEntry(activeDatabaseContext(), taskExecutor, preferences, dialogService, undoManager, stateManager)
+        new FetchAndMergeEntry(activeDatabaseContext(), taskExecutor, preferences, dialogService, stateManager.getUndoManager(activeDatabaseContext()), stateManager)
                 .fetchAndMerge(entry, fetcher);
     }
 
@@ -266,7 +262,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
         if (entry == null) {
             return;
         }
-        new GenerateCitationKeySingleAction(entry, tabSupplier.get().getBibDatabaseContext(), dialogService, preferences, undoManager).execute();
+        new GenerateCitationKeySingleAction(entry, tabSupplier.get().getBibDatabaseContext(), dialogService, preferences, tabSupplier.get().getUndoManager()).execute();
     }
 
     public void cleanup() {
@@ -274,7 +270,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
         if (entry == null) {
             return;
         }
-        new CleanupSingleAction(entry, preferences, dialogService, stateManager, undoManager, journalAbbreviationRepository).execute();
+        new CleanupSingleAction(entry, preferences, dialogService, stateManager, stateManager.getUndoManager(activeDatabaseContext()), journalAbbreviationRepository).execute();
     }
 
     public void deleteEntry() {
