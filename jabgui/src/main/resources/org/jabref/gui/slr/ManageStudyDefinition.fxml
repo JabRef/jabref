@@ -32,7 +32,7 @@
                         <ScrollPane
                                 fitToWidth="true"
                                 fitToHeight="true"
-                                styleClass="slr-tab">
+                                styleClass="padding-12">
                             <VBox spacing="20.0">
                                 <GridPane
                                         hgap="10.0"
@@ -108,7 +108,7 @@
                         <ScrollPane
                                 fitToWidth="true"
                                 fitToHeight="true"
-                                styleClass="slr-tab">
+                                styleClass="padding-12">
                             <VBox spacing="20.0">
                                 <HBox alignment="CENTER_LEFT"
                                       spacing="20.0">
@@ -157,7 +157,7 @@
                         <ScrollPane
                                 fitToWidth="true"
                                 fitToHeight="true"
-                                styleClass="slr-tab">
+                                styleClass="padding-12">
                             <VBox spacing="20.0">
                                 <HBox alignment="CENTER_LEFT"
                                       spacing="20.0">
@@ -212,7 +212,7 @@
                         <ScrollPane
                                 fitToWidth="true"
                                 fitToHeight="true"
-                                styleClass="slr-tab">
+                                styleClass="padding-12">
                             <VBox spacing="20.0">
                                 <Label text="%Select Catalogs:"/>
                                 <HBox alignment="CENTER_LEFT">
@@ -249,7 +249,7 @@
                         <ScrollPane
                                 fitToWidth="true"
                                 fitToHeight="true"
-                                styleClass="slr-tab">
+                                styleClass="padding-12">
                             <VBox spacing="20.0">
                                 <HBox alignment="CENTER_LEFT"
                                       spacing="20.0">
@@ -283,12 +283,12 @@
                                 <Label fx:id="directoryWarning"
                                        text="%Warning: The selected directory is not empty."
                                        visible="false"
-                                       styleClass="warning-message"/>
+                                       styleClass="text-warning"/>
                                 <VBox spacing="5.0"
                                       fx:id="validationContainer">
                                     <Label fx:id="validationHeaderLabel"
                                            text="%In order to proceed:"
-                                           styleClass="bold error-message"
+                                           styleClass="bold text-danger"
                                            visible="false"
                                            managed="false"/>
                                     <VBox spacing="3.0">
