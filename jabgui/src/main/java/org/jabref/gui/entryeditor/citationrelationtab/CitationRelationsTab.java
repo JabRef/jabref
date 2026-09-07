@@ -310,8 +310,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         Label titleLabel = new Label(Localization.lang("Error"));
         titleLabel.getStyleClass().addAll("h3", "bold", "text-danger");
         Text errorMessageText = new Text(citationsRelationsTabViewModel.searchErrorProperty().get());
-        VBox errorMessageBox = new VBox(24, titleLabel, errorMessageText);
-        errorMessageBox.getStyleClass().add("padding-24");
+        VBox errorMessageBox = new VBox(4, titleLabel, errorMessageText);
+        errorMessageBox.getStyleClass().add("padding-4");
         return errorMessageBox;
     }
 
