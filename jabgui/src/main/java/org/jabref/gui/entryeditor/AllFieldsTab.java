@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -25,8 +26,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
@@ -40,10 +39,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
+import org.jabref.gui.fieldeditors.EditorTextArea;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.fieldeditors.TagsEditor;
@@ -73,7 +72,6 @@ import org.jabref.model.entry.field.UserSpecificCommentField;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
-import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -129,6 +127,9 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Sticky per tab instance: whether the secondary-optional chips are expanded.
     private boolean showSecondaryOptionalChips;
+
+    /// Last laid-out width of each field's growing text area (see [#normalizeInputHeights]).
+    private final Map<Field, Double> textAreaWidths = new HashMap<>();
 
     /// The entry whose event bus this tab is currently subscribed to (for live refresh
     /// when fields are set/unset from outside, e.g. Source tab, fetchers, undo).
@@ -346,7 +347,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
         listContainer.getChildren().add(createFreeFormAddRow(bibDatabaseContext, entry));
 
-        editors.values().forEach(AllFieldsTab::applyNaturalHeight);
+        editors.forEach(this::applyNaturalHeight);
     }
 
     /// Label/editor rows with natural heights, label column as narrow as its content.
@@ -657,8 +658,8 @@ public class AllFieldsTab extends FieldsEditorTab {
         return stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
     }
 
-    private static void applyNaturalHeight(FieldEditorFX editor) {
-        normalizeInputHeights(editor.getNode());
+    private void applyNaturalHeight(Field field, FieldEditorFX editor) {
+        normalizeInputHeights(field, editor.getNode());
         if (editor instanceof LinkedFilesEditor || editor instanceof TagsEditor) {
             // Sizes itself to the file rows plus the trailing button row; a fixed weight-based height would override that.
             return;
@@ -672,46 +673,21 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// an infinite pref height ([org.jabref.gui.fieldeditors.EditorTextField]); in the
     /// natural-height list that blows up the rows' preferred heights, so reset text fields to
     /// their computed size and let text areas grow with their content.
-    private static void normalizeInputHeights(Node node) {
-        if (node instanceof TextArea textArea) {
+    private void normalizeInputHeights(Field field, Node node) {
+        if (node instanceof EditorTextArea textArea) {
             textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
-            growWithContent(textArea);
+            // Editors are rebuilt on every entry switch; the width the field had for the previous
+            // entry lets the new area wrap correctly before its own first layout.
+            textArea.setGrowWithContent(textAreaWidths.getOrDefault(field, -1.0));
+            textArea.widthProperty().addListener((_, _, width) -> {
+                if (width.doubleValue() > 0) {
+                    textAreaWidths.put(field, width.doubleValue());
+                }
+            });
         } else if (node instanceof TextField textField) {
             textField.setPrefHeight(Region.USE_COMPUTED_SIZE);
         } else if (node instanceof Parent parent) {
-            parent.getChildrenUnmodifiable().forEach(AllFieldsTab::normalizeInputHeights);
+            parent.getChildrenUnmodifiable().forEach(child -> normalizeInputHeights(field, child));
         }
-    }
-
-    /// Sizes the text area to its wrapped text: one row when empty, growing as text is typed
-    /// (the scroll list scrolls, so the area never needs an inner scrollbar). The row count is
-    /// derived from the skin's paragraph container, the only place that knows the wrapped
-    /// line count; a [Text] of the same font gives the height of one row.
-    private static void growWithContent(TextArea textArea) {
-        textArea.setPrefRowCount(1);
-        // Subscribe (not listen): editors are reused across rebuilds, so the skin may already exist.
-        EasyBind.subscribe(textArea.skinProperty(), skin -> {
-            // The skin's scroll pane has no skin of its own yet, so its content is not reachable via
-            // lookup from the text area; go through the content node directly.
-            if (skin == null
-                    || !(textArea.lookup(".scroll-pane") instanceof ScrollPane scrollPane)
-                    || !(scrollPane.getContent().lookup(".text") instanceof Text text)) {
-                return;
-            }
-            // The parent group holds one Text per rendered paragraph (a single one in current JavaFX);
-            // its layout bounds span all of them and change whenever any paragraph is added or re-wrapped.
-            Parent paragraphs = text.getParent();
-            Runnable resize = () -> {
-                Text oneRow = new Text("X");
-                oneRow.setFont(text.getFont());
-                double rowHeight = oneRow.getLayoutBounds().getHeight();
-                int rows = (int) Math.round(paragraphs.getLayoutBounds().getHeight() / rowHeight);
-                textArea.setPrefRowCount(Math.max(1, rows));
-            };
-            // No removal handle: the listener lives on the text area's own skin nodes and only touches
-            // that text area, so it is collected together with the editor (or the replaced skin).
-            paragraphs.layoutBoundsProperty().addListener(_ -> resize.run());
-            resize.run();
-        });
     }
 }

@@ -17,7 +17,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -187,42 +187,47 @@ class AllFieldsTabTest {
 
     @Test
     void abstractEditorIsOneRowWhenEmpty() throws InterruptedException {
-        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
+        double oneRow = abstractEditorHeight("");
 
-        assertEquals(1, abstractPrefRowCount(entry));
+        assertEquals(oneRow, abstractEditorHeight(""), 0.5);
+        assertTrue(abstractEditorHeight("one\ntwo") > oneRow);
     }
 
     @Test
     void abstractEditorGrowsWithWrappedContent() throws InterruptedException {
-        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021")
-                                                             .withField(StandardField.ABSTRACT, "word ".repeat(300));
+        double oneRow = abstractEditorHeight("");
+        double twoRows = abstractEditorHeight("one\ntwo");
 
-        assertTrue(abstractPrefRowCount(entry) > 3);
+        assertTrue(abstractEditorHeight("word ".repeat(300)) > oneRow + 3 * (twoRows - oneRow));
     }
 
     @Test
     void abstractEditorCountsEveryParagraph() throws InterruptedException {
-        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021")
-                                                             .withField(StandardField.ABSTRACT, "one\ntwo\nthree\nfour");
+        double oneRow = abstractEditorHeight("");
+        double rowHeight = abstractEditorHeight("one\ntwo") - oneRow;
 
-        assertEquals(4, abstractPrefRowCount(entry));
+        assertEquals(oneRow + 3 * rowHeight, abstractEditorHeight("one\ntwo\nthree\nfour"), 0.5);
     }
 
     /// Lays the abstract editor out in a scene of fixed width so the text area's skin exists and
-    /// its text is wrapped, then reads back the resulting preferred row count.
-    private int abstractPrefRowCount(BibEntry entry) throws InterruptedException {
-        int[] rows = new int[1];
+    /// its text is wrapped, then reads back the resulting height.
+    private double abstractEditorHeight(String abstractText) throws InterruptedException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021")
+                                                             .withField(StandardField.ABSTRACT, abstractText);
+        double[] height = new double[1];
         runOnFxThreadAndWait(() -> {
             tab.bindToEntry(entry);
             Node editor = tab.editors.get(StandardField.ABSTRACT).getNode();
-            StackPane root = new StackPane(editor);
+            // VBox (not StackPane): a StackPane would stretch the editor to the scene height.
+            VBox root = new VBox(editor);
             new Scene(root, 400, 600);
             root.applyCss();
+            // Two passes: the first gives the area its width, the second wraps the text at it.
             root.layout();
             root.layout();
-            rows[0] = ((TextArea) editor.lookup(".text-area")).getPrefRowCount();
+            height[0] = ((TextArea) editor.lookup(".text-area")).getHeight();
         });
-        return rows[0];
+        return height[0];
     }
 
     @Test
