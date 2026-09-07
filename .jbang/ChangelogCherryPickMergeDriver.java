@@ -15,7 +15,9 @@ import org.jspecify.annotations.NullMarked;
 //DEPS org.jspecify:jspecify:1.0.0
 
 /// Git merge driver for `CHANGELOG.md` when a change is ported between `main` and `stable`
-/// (see `.github/workflows/port-to-other-branch.yml` and ADR-0072).
+/// (see `.github/workflows/port-to-other-branch.yml`).
+///
+/// [impl->adr~single-stable-branch-with-automatic-ports~1]
 ///
 /// A line-based cherry-pick of a changelog entry always conflicts: the entry's neighbours in
 /// `## [Unreleased]` differ between the two branches. No existing tool covers this case:

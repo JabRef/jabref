@@ -1,7 +1,8 @@
 name: Label bug fixes for stable
 
 # [impl->req~ci.port-to-other-branch.label-driven-ports~1]
-# Adds "dev: into-stable" (ADR-0072) when a PR into main links an issue of type "bug" for the
+# [impl->adr~single-stable-branch-with-automatic-ports~1]
+# Adds "dev: into-stable" when a PR into main links an issue of type "bug" for the
 # first time: at creation, or when an edit of the body adds a new issue link. A push never
 # triggers this, and a link that was already there never counts again - so a maintainer's
 # decision to remove (or add) the label by hand sticks.

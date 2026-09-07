@@ -1,7 +1,8 @@
 name: Port to other branch
 
 # [impl->req~ci.port-to-other-branch.label-driven-ports~1]
-# Keeps "main" and "stable" in sync (ADR-0072): a PR into main labeled "dev: into-stable" is
+# [impl->adr~single-stable-branch-with-automatic-ports~1]
+# Keeps "main" and "stable" in sync: a PR into main labeled "dev: into-stable" is
 # ported to stable once merged; a PR into stable is always ported to main once merged.
 # Before the merge, the port is simulated, so a conflict shows up as a failed check on the PR.
 #

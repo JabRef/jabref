@@ -6,6 +6,7 @@ decision-makers: "@Siedlerchr, @koppor, @calixtus"
 ---
 
 # Use a single `stable` branch with label-driven, automated ports
+`adr~single-stable-branch-with-automatic-ports~1`
 
 ## Context and Problem Statement
 
