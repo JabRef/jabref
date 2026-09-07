@@ -428,8 +428,8 @@ public class MetaData {
         keywordSeparator = other.keywordSeparator;
         isProtected = other.isProtected;
         librarySpecificFileDirectory = other.librarySpecificFileDirectory;
-        versionDBStructure = other.versionDBStructure;
         aiLibraryId = other.aiLibraryId;
+        versionDBStructure = other.versionDBStructure;
         containsSearchGroups = other.containsSearchGroups;
         gitAutoPull = other.gitAutoPull;
         gitAutoCommit = other.gitAutoCommit;

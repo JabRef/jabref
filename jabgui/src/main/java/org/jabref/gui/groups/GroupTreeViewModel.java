@@ -240,7 +240,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     null,
                     groupDialogHeader));
 
-            newGroup.ifPresent(group -> recordGroupChange(Localization.lang("Add group"), _ -> {
+            newGroup.ifPresent(group -> recordTreeChange(Localization.lang("Add group"), _ -> {
                 GroupTreeNode newSubgroup = parent.addSubgroup(group);
                 // [impl->req~ux.groups.create-explicit-from-selection~1]
                 selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
@@ -256,12 +256,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     /// Records entry assignments as one undo step. The tree is untouched, so only the entries'
-    /// group fields are recorded — [#recordGroupChange] is for operations that change the tree.
-    private void recordEntryAssignment(String name, Consumer<CompoundEdit> operation) {
+    /// group fields are recorded — [#recordTreeChange] is for operations that change the tree.
+    private void recordEntryChange(String name, Consumer<CompoundEdit> operation) {
         currentDatabase.ifPresent(database -> stateManager.getUndoManager(database).addEdit(name, operation));
     }
 
-    /// Runs a group operation and records it as one undo step.
+    /// Runs a group operation and records it as one undo step, tree and entries together.
+    ///
+    /// Public because the gesture and the operation do not always belong to the same class: a drag
+    /// moves several groups at once, and that is one step, opened here by the view that handles the
+    /// drop.
     ///
     /// The tree is recorded as a whole because that is how every operation reaches the model: the
     /// nodes are edited in place and the root is written back afterwards. Operations that also
@@ -270,7 +274,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     ///
     /// The prior tree is copied before the operation runs — it is the very tree the operation is
     /// about to mutate.
-    private void recordGroupChange(String name, Consumer<CompoundEdit> operation) {
+    public void recordTreeChange(String name, Consumer<CompoundEdit> operation) {
         currentDatabase.ifPresent(database -> {
             MetaData metaData = database.getMetaData();
             Optional<GroupTreeNode> before = metaData.getGroups().map(GroupTreeNode::copySubtree);
@@ -397,10 +401,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     // We found more than 2 groups, so we cannot simply remove old assignment
                     boolean removePreviousAssignments = groupsWithSameName < 2;
 
-                    recordGroupChange(Localization.lang("Modify group"), edit -> {
+                    boolean keepPreviousAssignments = true;
+                    recordTreeChange(Localization.lang("Modify group"), edit -> {
                         edit.addAll(oldGroup.getGroupNode().setGroup(
                                 group,
-                                true,
+                                keepPreviousAssignments,
                                 removePreviousAssignments,
                                 database.getEntries()));
 
@@ -412,11 +417,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 }
 
                 if (groupTypeEqual && onlyMinorChanges(oldGroup.getGroupNode().getGroup(), group)) {
-                    recordGroupChange(Localization.lang("Modify group"), edit ->
+                    boolean keepPreviousAssignments = true;
+                    boolean removePreviousAssignments = true;
+                    recordTreeChange(Localization.lang("Modify group"), edit ->
                             edit.addAll(oldGroup.getGroupNode().setGroup(
                                     group,
-                                    true,
-                                    true,
+                                    keepPreviousAssignments,
+                                    removePreviousAssignments,
                                     database.getEntries())));
 
                     refresh();
@@ -462,7 +469,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 boolean keepPreviousAssignments = previousAssignments.isPresent()
                         && (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.YES);
                 boolean removeAssignmentsFromOldGroup = removePreviousAssignments;
-                recordGroupChange(Localization.lang("Modify group"), edit -> {
+                recordTreeChange(Localization.lang("Modify group"), edit -> {
                     if (previousAssignments.isPresent()) {
                         edit.addAll(oldGroup.getGroupNode().setGroup(
                                 group,
@@ -578,7 +585,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 Localization.lang("Remove subgroups"),
                 Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
         if (confirmation) {
-            recordGroupChange(Localization.lang("Remove subgroups"), edit -> {
+            recordTreeChange(Localization.lang("Remove subgroups"), edit -> {
                 for (GroupNodeViewModel child : group.getChildren()) {
                     removeGroupsAndSubGroupsFromEntries(child, edit);
                 }
@@ -603,7 +610,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
 
         if (confirmed) {
-            recordGroupChange(Localization.lang("Remove groups"), _ -> {
+            recordTreeChange(Localization.lang("Remove groups"), _ -> {
                 List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
                 selectedGroupNodes.forEach(eachNode -> {
                     GroupTreeNode groupNode = eachNode.getGroupNode();
@@ -638,7 +645,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
 
         if (confirmed) {
-            recordGroupChange(Localization.lang("Remove groups"), edit -> {
+            recordTreeChange(Localization.lang("Remove groups"), edit -> {
                 List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
                 selectedGroupNodes.forEach(eachNode -> {
                     removeGroupsAndSubGroupsFromEntries(eachNode, edit);
@@ -670,7 +677,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
 
         if (confirmed) {
-            recordGroupChange(Localization.lang("Remove groups"), edit -> {
+            recordTreeChange(Localization.lang("Remove groups"), edit -> {
                 List<GroupNodeViewModel> selectedGroupNodes = new ArrayList<>(selectedGroups);
                 selectedGroupNodes.forEach(eachNode -> {
                     removeGroupsAndSubGroupsFromEntries(eachNode, edit);
@@ -711,13 +718,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// TODO: warn before assigning to a group whose membership is written to a field other than
     /// `keywords`, since that edits the entries in a way the user may not expect.
     public void addSelectedEntries(GroupNodeViewModel group) {
-        recordEntryAssignment(Localization.lang("Assign entries to group"),
+        recordEntryChange(Localization.lang("Assign entries to group"),
                 edit -> edit.addAll(group.getGroupNode().addEntriesToGroup(stateManager.getSelectedEntries())));
     }
 
     /// See [#addSelectedEntries] for the warning this still owes the user.
     public void removeSelectedEntries(GroupNodeViewModel group) {
-        recordEntryAssignment(Localization.lang("Remove entries from group"),
+        recordEntryChange(Localization.lang("Remove entries from group"),
                 edit -> edit.addAll(group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries())));
     }
 
@@ -730,7 +737,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     Localization.lang("Clear"));
             if (confirmation) {
                 List<BibEntry> entriesInGroup = groupNode.getEntriesInGroup(this.currentDatabase.get().getEntries());
-                recordEntryAssignment(Localization.lang("Clear group"),
+                recordEntryChange(Localization.lang("Clear group"),
                         edit -> edit.addAll(groupNode.removeEntriesFromGroup(entriesInGroup)));
                 dialogService.notify(Localization.lang("Cleared group \"%0\".", group.getDisplayName()));
             }
@@ -738,18 +745,18 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void sortAlphabeticallyRecursive(GroupTreeNode group) {
-        recordGroupChange(Localization.lang("Sort subgroups"), _ -> group.sortChildren(compAlphabetIgnoreCase, true));
+        recordTreeChange(Localization.lang("Sort subgroups"), _ -> group.sortChildren(compAlphabetIgnoreCase, true));
     }
 
     public void sortReverseAlphabeticallyRecursive(GroupTreeNode group) {
-        recordGroupChange(Localization.lang("Sort subgroups"), _ -> group.sortChildren(compAlphabetIgnoreCaseReverse, true));
+        recordTreeChange(Localization.lang("Sort subgroups"), _ -> group.sortChildren(compAlphabetIgnoreCaseReverse, true));
     }
 
     public void sortEntriesRecursive(GroupTreeNode group) {
-        recordGroupChange(Localization.lang("Sort subgroups"), _ -> group.sortChildren(compEntries, true));
+        recordTreeChange(Localization.lang("Sort subgroups"), _ -> group.sortChildren(compEntries, true));
     }
 
     public void sortReverseEntriesRecursive(GroupTreeNode group) {
-        recordGroupChange(Localization.lang("Sort subgroups"), _ -> group.sortChildren(compEntriesReverse, true));
+        recordTreeChange(Localization.lang("Sort subgroups"), _ -> group.sortChildren(compEntriesReverse, true));
     }
 }

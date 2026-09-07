@@ -16,6 +16,10 @@ import org.jspecify.annotations.NullMarked;
 ///
 /// Both states are copies: nodes are mutated in place, so a shared tree would let a later edit
 /// rewrite what this change restores.
+///
+/// The generated `equals` and `hashCode` walk both trees and the metadata, whose hash changes as
+/// the library does — fine for comparing two changes, but do not put these in a hash-based
+/// collection.
 @NullMarked
 public record UndoableGroupTreeChange(MetaData metaData, Optional<GroupTreeNode> before, Optional<GroupTreeNode> after) implements BibChange {
 
