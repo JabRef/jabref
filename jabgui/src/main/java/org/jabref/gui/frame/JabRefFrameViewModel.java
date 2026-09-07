@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
@@ -159,6 +160,7 @@ public class JabRefFrameViewModel {
                                         .map(Path::toAbsolutePath)
                                         .orElse(null);
         SequencedMap<String, DatabaseConnectionProperties> sharedDatabases = collectSharedDatabases(tabContainer.getLibraryTabs());
+        List<String> unconnectedSharedDatabaseIds = tabContainer.getUnconnectedSharedDatabaseIds();
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         if (!tabContainer.closeTabs(tabContainer.getLibraryTabs(), false)) {
@@ -166,7 +168,10 @@ public class JabRefFrameViewModel {
         }
 
         new SharedDatabaseSessionService().persistConnections(sharedDatabases);
-        storeLastOpenedFiles(openedLibraries, focusedLibraries, List.copyOf(sharedDatabases.keySet())); // store only if successfully having closed the libraries
+        // Shared databases that failed to reconnect have no tab, but their connection settings are still stored and
+        // must stay in the list so that the next start tries them again.
+        List<String> sharedDatabaseIds = Stream.concat(sharedDatabases.keySet().stream(), unconnectedSharedDatabaseIds.stream()).toList();
+        storeLastOpenedFiles(openedLibraries, focusedLibraries, sharedDatabaseIds); // store only if successfully having closed the libraries
 
         ProcessingLibraryDialog processingLibraryDialog = new ProcessingLibraryDialog(dialogService);
         processingLibraryDialog.showAndWait(tabContainer.getLibraryTabs());

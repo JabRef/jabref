@@ -47,6 +47,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
+import org.jabref.gui.shared.SharedDatabaseErrorTab;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
@@ -59,7 +60,6 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.SharedDatabaseSessionService;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
@@ -75,6 +75,7 @@ import com.tobiasdiez.easybind.EasyObservableList;
 import com.tobiasdiez.easybind.Subscription;
 import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -708,27 +709,53 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // [impl->req~shared-database.reopen-on-startup~1]
         SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService();
         for (SharedDatabaseSessionService.Reconnection reconnection : sessionService.getDatabasesToReconnect(preferences.getLastFilesOpenedPreferences())) {
-            String sharedDatabaseId = reconnection.sharedDatabaseId();
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
-            // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
-            // The callbacks check the stage: a quit while the attempt is pending must neither add a tab nor pop a dialog.
-            BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()))
-                          .onSuccess(bibDatabaseContext -> {
-                              if (!mainStage.isShowing()) {
-                                  bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
-                                  return;
-                              }
-                              sessionService.restoreSharedDatabaseId(manager.openTab(bibDatabaseContext).getBibDatabaseContext(), sharedDatabaseId);
-                          })
-                          .onFailure(exception -> {
-                              LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
-                              if (mainStage.isShowing()) {
-                                  dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                                          Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
-                              }
-                          })
-                          .executeWith(taskExecutor);
+            reconnectSharedDatabase(sessionService, reconnection, null);
         }
+    }
+
+    /// Reconnects to one remembered shared database. A failure does not pop a dialog but leaves a
+    /// [SharedDatabaseErrorTab] in place, so the connection can be retried and is remembered for the next session.
+    ///
+    /// @param errorTab the tab of a previous failed attempt to reuse, or null for the first attempt
+    private void reconnectSharedDatabase(SharedDatabaseSessionService sessionService,
+                                         SharedDatabaseSessionService.Reconnection reconnection,
+                                         @Nullable SharedDatabaseErrorTab errorTab) {
+        String sharedDatabaseId = reconnection.sharedDatabaseId();
+        SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
+        // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
+        // The callbacks check the stage: a quit while the attempt is pending must neither add a tab nor pop a dialog.
+        BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()))
+                      .onSuccess(bibDatabaseContext -> {
+                          if (!mainStage.isShowing()) {
+                              bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+                              return;
+                          }
+                          tabbedPane.getTabs().remove(errorTab);
+                          sessionService.restoreSharedDatabaseId(manager.openTab(bibDatabaseContext).getBibDatabaseContext(), sharedDatabaseId);
+                      })
+                      .onFailure(exception -> {
+                          LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
+                          if (!mainStage.isShowing()) {
+                              return;
+                          }
+                          SharedDatabaseErrorTab tab = errorTab;
+                          if (tab == null) {
+                              tab = new SharedDatabaseErrorTab(sharedDatabaseId, reconnection.connectionProperties().getDatabase());
+                              tabbedPane.getTabs().add(tab);
+                          }
+                          SharedDatabaseErrorTab tabToRetry = tab;
+                          tab.setRetryAction(() -> reconnectSharedDatabase(sessionService, reconnection, tabToRetry));
+                          tab.showError(exception);
+                      })
+                      .executeWith(taskExecutor);
+    }
+
+    @Override
+    public List<String> getUnconnectedSharedDatabaseIds() {
+        return tabbedPane.getTabs().stream()
+                         .filter(SharedDatabaseErrorTab.class::isInstance)
+                         .map(tab -> ((SharedDatabaseErrorTab) tab).getSharedDatabaseId())
+                         .toList();
     }
 
     @Deprecated
