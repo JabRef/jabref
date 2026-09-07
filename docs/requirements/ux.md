@@ -104,6 +104,14 @@ When a dialog with text input as a main component is opened, the text field shou
 
 Needs: impl
 
+## Text filtering is case-insensitive and separator-aware
+`req~ux.text-filtering.case-insensitive-separators~1`
+
+When users filter textual lists, matching must ignore case and treat punctuation or whitespace separators as equivalent.
+For example, a search for `Springer lecture` or `SPRINGER LECTURE` or `springer lecture` should match `Springer - Lecture Notes in Computer Science`.
+
+Needs: impl
+
 ## Show unsaved changes before closing a library
 `req~ux.close.show-diff~1`
 
