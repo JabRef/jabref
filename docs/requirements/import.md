@@ -14,11 +14,4 @@ Delimiter characters that are part of a keyword remain part of that keyword and 
 
 Needs: impl, utest
 
-## PDF URL import metadata extraction without target directory
-`req~jabgui.externalfiles.pdf-url-import.temp-download~1`
-
-When importing a reference from a full-text PDF URL and no target library file directory is configured, JabRef temporarily downloads the PDF file to extract metadata (including DOI and full bibliographic details), links the online PDF URL in the entry, and deletes the temporary file upon completion.
-
-Needs: impl, utest
-
 <!-- markdownlint-disable-file MD022 -->

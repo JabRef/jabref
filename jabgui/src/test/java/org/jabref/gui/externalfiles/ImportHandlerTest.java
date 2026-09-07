@@ -337,7 +337,6 @@ class ImportHandlerTest {
         assertFalse(importHandler.canImportAsBibEntry(Path.of("test.unknown")));
     }
 
-    // [utest->req~jabgui.externalfiles.pdf-url-import.temp-download~1]
     @Test
     void handleStringDataWithPdfUrlWhenNoTargetDirectoryPresent() throws Exception {
         when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.empty());

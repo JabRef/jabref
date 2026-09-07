@@ -658,7 +658,6 @@ public class ImportHandler {
         rememberedBatchDuplicateDecision = BREAK;
     }
 
-    // [impl->req~jabgui.externalfiles.pdf-url-import.temp-download~1]
     private List<BibEntry> handlePdfUrl(String pdfUrl) throws IOException {
         Optional<Path> targetDirectory = targetBibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
         Path targetFile;
@@ -688,11 +687,10 @@ public class ImportHandler {
             if (parserResult.hasWarnings()) {
                 LOGGER.warn("PDF import had warnings: {}", parserResult.getErrorMessage());
             }
-            List<BibEntry> entries = new ArrayList<>(parserResult.getDatabase().getEntries());
+            List<BibEntry> entries = parserResult.getDatabase().getEntries();
             if (!entries.isEmpty()) {
-                boolean finalIsTemporaryFile = isTemporaryFile;
                 entries.forEach(entry -> {
-                    if (finalIsTemporaryFile) {
+                    if (isTemporaryFile) {
                         List<LinkedFile> updatedFiles = new ArrayList<>();
                         for (LinkedFile file : entry.getFiles()) {
                             if (file.getLink().equalsIgnoreCase(targetFile.toString())) {
@@ -708,11 +706,7 @@ public class ImportHandler {
                 });
             } else {
                 BibEntry emptyEntry = new BibEntry();
-                if (isTemporaryFile) {
-                    emptyEntry.addFile(new LinkedFile("", pdfUrl, StandardFileType.PDF.getName()));
-                } else {
-                    emptyEntry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
-                }
+                emptyEntry.addFile(new LinkedFile("", isTemporaryFile ? pdfUrl : targetFile.toString(), StandardFileType.PDF.getName()));
                 entries.add(emptyEntry);
             }
             return entries;
