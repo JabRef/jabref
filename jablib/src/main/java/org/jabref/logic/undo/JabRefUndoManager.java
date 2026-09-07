@@ -234,10 +234,10 @@ public class JabRefUndoManager implements UndoManager {
         CompoundEdit compoundEdit = new CompoundEdit(name);
 
         // The block applies as it goes and pushes only at the end, so the library holds writes
-        // this journal does not know about for as long as the body runs. Only the outermost block
-        // reserves: a nested one is inside its caller's window already, and releasing at its end
-        // would reopen the window while the outer block is still writing.
-        WriteReservation reservation = enclosing == null ? reserveWrites(name) : null;
+        // this journal does not know about for as long as the body runs. A nested block is inside
+        // its caller's window already and takes a reservation that does nothing: releasing a real
+        // one at its end would reopen the window while the outer block is still writing.
+        WriteReservation reservation = enclosing == null ? reserveWrites(name) : () -> { };
 
         active.set(compoundEdit);
         try {
@@ -261,9 +261,7 @@ public class JabRefUndoManager implements UndoManager {
             } finally {
                 // After the push, so the window does not reopen between the last write and the
                 // record; and in a finally, so a block that failed does not hold the library.
-                if (reservation != null) {
-                    reservation.close();
-                }
+                reservation.close();
             }
         }
         return compoundEdit.hasEdits();

@@ -1,7 +1,5 @@
 package org.jabref.gui.undo;
 
-import java.util.Optional;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -39,14 +37,14 @@ public class UndoAction extends SimpleCommand {
         LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
         GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
 
-        Optional<String> writing = undoManager.writeInProgress();
-        if (writing.isPresent()) {
-            // Checked before canUndo(), which a reservation also makes false: the stack is not
-            // empty, the library is busy, and saying "nothing to undo" would be untrue.
-            dialogService.notify(Localization.lang("Cannot undo while %0 is running", writing.get()));
-            return;
-        }
+        // A command holding the library is asked about before the stacks: a reservation makes
+        // canUndo() false as well, and "nothing to undo" would then be untrue.
+        undoManager.writeInProgress().ifPresentOrElse(
+                command -> dialogService.notify(Localization.lang("Cannot undo while %0 is running", command)),
+                () -> undo(libraryTab, undoManager));
+    }
 
+    private void undo(LibraryTab libraryTab, GuiUndoManager undoManager) {
         if (!undoManager.canUndo()) {
             dialogService.notify(Localization.lang("Nothing to undo") + '.');
             return;
