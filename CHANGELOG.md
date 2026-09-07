@@ -232,7 +232,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where saving one library cleared the modified marker of another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where entry added by "add entry using" was not selected. [#16035](https://github.com/JabRef/jabref/issues/16035)
 - We fixed an issue where the "Connect to shared database" dialog froze while connecting. [#16800](https://github.com/JabRef/jabref/pull/16800)
-- We fixed an issue where the "Entrytype" column header was shown in lower case. [#16894](https://github.com/JabRef/jabref/pull/16894)
 
 ### Removed
 
