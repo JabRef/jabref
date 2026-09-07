@@ -322,3 +322,5 @@
           - 'Dockerfile.*'
           - '.dockerignore'
           - 'jablib/src/test/latex/Texlivefile'
+          - 'AGENTS.md'
+          - 'CHECKLIST.md'
