@@ -171,6 +171,25 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private BackgroundTask<?> dataLoadingTask;
 
+    private record SharedDatabaseLoadingCallbacks(LibraryTab tab,
+                                                  BiConsumer<LibraryTab, BibDatabaseContext> onSuccess,
+                                                  Consumer<Exception> onFailure) {
+        private void onDatabaseLoadingSucceed(BibDatabaseContext loadedContext) {
+            tab.setDatabaseContext(loadedContext);
+            Optional.ofNullable(tab.autoCompleterChangedListener).ifPresent(Runnable::run);
+            tab.loading.set(false);
+            tab.dataLoadingTask = null;
+            onSuccess.accept(tab, loadedContext);
+        }
+
+        private void onDatabaseLoadingFailed(Exception exception) {
+            tab.loading.set(false);
+            tab.dataLoadingTask = null;
+            tab.tabContainer.closeTab(tab);
+            onFailure.accept(exception);
+        }
+    }
+
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
@@ -1239,20 +1258,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 gitHandlerRegistry,
                 true);
 
+        SharedDatabaseLoadingCallbacks callbacks = new SharedDatabaseLoadingCallbacks(newTab, onSuccess, onFailure);
         newTab.setDataLoadingTask(dataLoadingTask);
-        dataLoadingTask.onSuccess(loadedContext -> {
-                           newTab.setDatabaseContext(loadedContext);
-                           Optional.ofNullable(newTab.autoCompleterChangedListener).ifPresent(Runnable::run);
-                           newTab.loading.set(false);
-                           newTab.dataLoadingTask = null;
-                           onSuccess.accept(newTab, loadedContext);
-                       })
-                       .onFailure(ex -> {
-                           newTab.loading.set(false);
-                           newTab.dataLoadingTask = null;
-                           tabContainer.closeTab(newTab);
-                           onFailure.accept(ex);
-                       })
+        dataLoadingTask.onSuccess(callbacks::onDatabaseLoadingSucceed)
+                       .onFailure(callbacks::onDatabaseLoadingFailed)
                        .executeWith(taskExecutor);
 
         return newTab;

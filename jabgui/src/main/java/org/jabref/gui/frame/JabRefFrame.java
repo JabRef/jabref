@@ -727,21 +727,28 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     clipBoardManager,
                     taskExecutor,
                     gitHandlerRegistry,
-                    (tab, bibDatabaseContext) -> {
-                        if (!mainStage.isShowing()) {
-                            closeTab(tab);
-                            return;
-                        }
-                        sessionService.restoreSharedDatabaseId(bibDatabaseContext, sharedDatabaseId);
-                    },
-                    exception -> {
-                        LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
-                        if (mainStage.isShowing()) {
-                            dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                                    Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
-                        }
-                    });
+                    (tab, bibDatabaseContext) -> handleSharedDatabaseReconnectionSuccess(sessionService, reconnection, tab, bibDatabaseContext),
+                    exception -> handleSharedDatabaseReconnectionFailure(reconnection, exception));
             addTab(newTab, true);
+        }
+    }
+
+    private void handleSharedDatabaseReconnectionSuccess(SharedDatabaseSessionService sessionService,
+                                                          SharedDatabaseSessionService.Reconnection reconnection,
+                                                          LibraryTab tab,
+                                                          BibDatabaseContext bibDatabaseContext) {
+        if (!mainStage.isShowing()) {
+            closeTab(tab);
+            return;
+        }
+        sessionService.restoreSharedDatabaseId(bibDatabaseContext, reconnection.sharedDatabaseId());
+    }
+
+    private void handleSharedDatabaseReconnectionFailure(SharedDatabaseSessionService.Reconnection reconnection, Exception exception) {
+        LOGGER.error("Could not reconnect to shared database {}", reconnection.sharedDatabaseId(), exception);
+        if (mainStage.isShowing()) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
+                    Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
         }
     }
 

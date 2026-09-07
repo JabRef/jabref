@@ -82,9 +82,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
         // must be set here, because in initializing the button is still null
         btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
-        setOnCloseRequest(_ -> {
-            resizeGeneration++;
-        });
+        setOnCloseRequest(_ -> resizeGeneration++);
     }
 
     @FXML

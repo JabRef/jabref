@@ -258,26 +258,32 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 clipBoardManager,
                 taskExecutor,
                 gitHandlerRegistry,
-                (tab, bibDatabaseContext) -> {
-                    dialogService.notify(Localization.lang("Connection to %0 server established.", connectionProperties.getType().toString()));
-                    setPreferences(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
-                    if (!autosavePath.isEmpty() && shouldAutosave) {
-                        try {
-                            new SaveDatabaseAction(
-                                    tab,
-                                    dialogService,
-                                    preferences,
-                                    entryTypesManager,
-                                    stateManager,
-                                    journalAbbreviationRepository
-                            ).saveAs(Path.of(autosavePath));
-                        } catch (Throwable e) {
-                            LOGGER.error("Error while saving the database", e);
-                        }
-                    }
-                },
+                (tab, _) -> handleSharedDatabaseConnectionSuccess(tab, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath),
                 exception -> showConnectionFailure(exception, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
         tabContainer.addTab(libraryTab, true);
+    }
+
+    private void handleSharedDatabaseConnectionSuccess(LibraryTab libraryTab,
+                                                        DBMSConnectionProperties connectionProperties,
+                                                        boolean shouldRememberPassword,
+                                                        boolean shouldAutosave,
+                                                        String autosavePath) {
+        dialogService.notify(Localization.lang("Connection to %0 server established.", connectionProperties.getType().toString()));
+        setPreferences(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
+        if (!autosavePath.isEmpty() && shouldAutosave) {
+            try {
+                new SaveDatabaseAction(
+                        libraryTab,
+                        dialogService,
+                        preferences,
+                        entryTypesManager,
+                        stateManager,
+                        journalAbbreviationRepository
+                ).saveAs(Path.of(autosavePath));
+            } catch (Throwable e) {
+                LOGGER.error("Error while saving the database", e);
+            }
+        }
     }
 
     private void showConnectionFailure(Exception exception, DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
