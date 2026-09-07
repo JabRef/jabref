@@ -167,6 +167,14 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         EasyBind.subscribe(connectionUrl, text -> DBMSConnectionUrl.parse(text).ifPresent(this::applyConnectionUrl));
     }
 
+    /// Prefills the connection URL field from the clipboard, so a copied URL only has to be confirmed.
+    public void applyClipboardConnectionUrl() {
+        String contents = ClipBoardManager.getContents();
+        if (DBMSConnectionUrl.parse(contents).isPresent()) {
+            connectionUrl.set(contents);
+        }
+    }
+
     private void applyConnectionUrl(DBMSConnectionUrl url) {
         host.set(url.host());
         port.set(Integer.toString(url.port()));
