@@ -81,4 +81,37 @@ class AiTabViewModelTest {
 
         assertFalse(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
     }
+
+    @Test
+    void documentSplitterChunkSizeInvalidWhenExceedingMaxSnippetTokensEvenIfSetFirst() {
+        viewModel.documentSplitterChunkSizeProperty().set(300);
+        viewModel.selectedEmbeddingModelProperty().set("test-model");
+
+        assertFalse(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+    }
+
+    @Test
+    void documentSplitterChunkSizeRevalidatesWhenModelChanges() {
+        when(embeddingModelMetadataService.getMetadata("small-model")).thenReturn(
+                Optional.of(new EmbeddingModelMetadata("small-model", OptionalLong.of(1024), OptionalInt.of(128)))
+        );
+
+        viewModel.documentSplitterChunkSizeProperty().set(200);
+        viewModel.selectedEmbeddingModelProperty().set("test-model");
+        assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+
+        viewModel.selectedEmbeddingModelProperty().set("small-model");
+        assertFalse(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+    }
+
+    @Test
+    void validateSettingsFailsWhenChunkSizeExceedsModelMax() {
+        viewModel.enableAi().set(true);
+        viewModel.customizeExpertSettingsProperty().set(true);
+        viewModel.selectedChatModelProperty().set("gpt-4o");
+        viewModel.documentSplitterChunkSizeProperty().set(300);
+        viewModel.selectedEmbeddingModelProperty().set("test-model");
+
+        assertFalse(viewModel.validateSettings());
+    }
 }

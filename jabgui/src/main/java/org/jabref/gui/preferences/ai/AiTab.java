@@ -109,7 +109,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                         embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
                                                 .field(Localization.lang("Embedding model size"), embeddingModelSizeLabel)
                                                 .field(Localization.lang("Embedding model maximum chunk size"), embeddingModelMaxChunkSizeLabel)
-                                                .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
                                                 // The six numeric expert settings, as two columns of caption-above-field cells.
                                                 // [impl->feat~ai.expert-settings.chat-inference-global~1]
                                                 // [impl->feat~ai.expert-settings.rag-global~1]
@@ -201,8 +200,19 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     /// primitive property in both directions, mapping `null` to zero.
     private IntegerInputField integerField(IntegerProperty value) {
         IntegerInputField field = new IntegerInputField();
-        field.valueProperty().addListener((_, _, newValue) -> value.set(newValue == null ? 0 : newValue));
-        value.addListener((_, _, newValue) -> field.valueProperty().set(newValue == null ? 0 : newValue.intValue()));
+        field.setValue(value.getValue());
+        field.valueProperty().addListener((_, _, newValue) -> {
+            int newInt = newValue == null ? 0 : newValue;
+            if (value.get() != newInt) {
+                value.set(newInt);
+            }
+        });
+        value.addListener((_, _, newValue) -> {
+            int newInt = newValue == null ? 0 : newValue.intValue();
+            if (field.getValue() == null || field.getValue() != newInt) {
+                field.setValue(newInt);
+            }
+        });
         return field;
     }
 
