@@ -2,10 +2,13 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 
@@ -13,6 +16,8 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.NodeTraversalUtils;
+import org.jabref.gui.util.ScrollUtils;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
@@ -137,11 +142,25 @@ public interface FieldEditorFX {
     Parent getNode();
 
     default void focus() {
-        getNode().getChildrenUnmodifiable()
-                 .stream()
-                 .findFirst()
-                 .orElse(getNode())
-                 .requestFocus();
+        Node target = NodeTraversalUtils.findFirstTextInput(getNode())
+                                        .map(input -> (Node) input)
+                                        .orElseGet(() -> getNode().getChildrenUnmodifiable()
+                                                                  .stream()
+                                                                  .findFirst()
+                                                                  .orElse(getNode()));
+        target.requestFocus();
+        Platform.runLater(() -> Optional.ofNullable(target.getScene()).ifPresent(_ -> scrollToVisible(target)));
+    }
+
+    private static void scrollToVisible(Node node) {
+        Node current = node.getParent();
+        while (current != null) {
+            if (current instanceof ScrollPane scrollPane) {
+                ScrollUtils.scrollIntoScrollPane(scrollPane, node.localToScene(node.getBoundsInLocal()));
+                return;
+            }
+            current = current.getParent();
+        }
     }
 
     /// Returns relative size of the field editor in terms of display space.
