@@ -16,27 +16,17 @@ import org.jabref.logic.l10n.Localization;
 /// layers them on top of it.
 public enum ThemePreset {
     JABREF(Localization.lang("JabRef theme"), "jabref-theme.css", true),
-    PRIMER(Localization.lang("Primer theme"), "primer-theme.css", true),
-
-    CHOCOLATE_HONEY("Chocolate Honey", "chocolate-honey.css"),
-    DINOGIRLS_CHOCOLATEBROWN_CONTRASTTEXT("DinoGirls: chocolatebrown / darksalmon, contrast text", "chocolatebrown-darksalmon-contrasttext.css"),
-    DINOGIRLS_CHOCOLATEBROWN_GREYTEXT("DinoGirls: chocolatebrown / darksalmon, grey text", "chocolatebrown-darksalmon-greytext.css"),
-    DINOGIRLS_FUCHSIAPURPLE_CONTRASTTEXT("DinoGirls: fuchsiapurple / japanesesakura, contrast text", "fuchsiapurple-japanesesakura-contrasttext.css"),
-    DINOGIRLS_FUCHSIAPURPLE_GREYTEXT("DinoGirls: fuchsiapurple / japanesesakura, grey text", "fuchsiapurple-japanesesakura-greytext.css"),
-    DINOGIRLS_JABREFDARK_CONTRASTTEXT("DinoGirls: jabrefdark / jabreflight, contrast text", "jabrefdark-jabreflight-contrasttext.css"),
-    DINOGIRLS_JABREFDARK_GREYTEXT("DinoGirls: jabrefdark / jabreflight, grey text", "jabrefdark-jabreflight-greytext.css"),
-    DINOGIRLS_LIGHTBLUE_CONTRASTTEXT("DinoGirls: lightblue / iceage, contrast text", "lightblue-iceage-contrasttext.css"),
-    DINOGIRLS_LIGHTBLUE_GREYTEXT("DinoGirls: lightblue / iceage, grey text", "lightblue-iceage-greytext.css"),
-    DINOGIRLS_LIGHTSEAGREEN_CONTRASTTEXT("DinoGirls: lightseagreen / limegreen, contrast text", "lightseagreen-limegreen-contrasttext.css"),
-    DINOGIRLS_LIGHTSEAGREEN_GREYTEXT("DinoGirls: lightseagreen / limegreen, grey text", "lightseagreen-limegreen-greytext.css"),
-    DINOGIRLS_PREHISTORICAMBER_CONTRASTTEXT("DinoGirls: prehistoricamber / peachorange, contrast text", "prehistoricamber-peachorange-contrasttext.css"),
-    DINOGIRLS_PREHISTORICAMBER_GREYTEXT("DinoGirls: prehistoricamber / peachorange, grey text", "prehistoricamber-peachorange-greytext.css"),
-    DINOGIRLS_TWILIGHTLAVENDER_CONTRASTTEXT("DinoGirls: twilightlavender / neon, contrast text", "twilightlavender-neon-contrasttext.css"),
-    DINOGIRLS_TWILIGHTLAVENDER_GREYTEXT("DinoGirls: twilightlavender / neon, grey text", "twilightlavender-neon-greytext.css"),
-    DINOGIRLS_WINERED_CONTRASTTEXT("DinoGirls: winered / icedstrawberry, contrast text", "winered-icedstrawberry-contrasttext.css"),
-    DINOGIRLS_WINERED_GREYTEXT("DinoGirls: winered / icedstrawberry, grey text", "winered-icedstrawberry-greytext.css"),
     EVERFOREST("Everforest", "everforest.css"),
-    NORD("Nord", "nord.css");
+    NORD("Nord", "nord.css"),
+    PRIMER(Localization.lang("Primer theme"), "primer-theme.css", true),
+    CHOCOLATE_HONEY("Chocolate Honey", "chocolate-honey.css"),
+    DINOGIRLS_CHOCOLATEBROWN("DinoGirls: Chocolate Brown / Dark Salmon", "chocolatebrown-darksalmon-contrasttext.css"),
+    DINOGIRLS_FUCHSIAPURPLE("DinoGirls: Fuchsia Purple / Japanese Sakura", "fuchsiapurple-japanesesakura-contrasttext.css"),
+    DINOGIRLS_LIGHTBLUE("DinoGirls: Light Blue / Ice Age", "lightblue-iceage-contrasttext.css"),
+    DINOGIRLS_LIGHTSEAGREEN("DinoGirls: Light Sea Green / Lime Green", "lightseagreen-limegreen-contrasttext.css"),
+    DINOGIRLS_PREHISTORICAMBER("DinoGirls: Prehistoric Amber / Peach Orange", "prehistoricamber-peachorange-contrasttext.css"),
+    DINOGIRLS_TWILIGHTLAVENDER("DinoGirls: Twilight Lavender / Neon", "twilightlavender-neon-contrasttext.css"),
+    DINOGIRLS_WINERED("DinoGirls: Wine Red / Iced Strawberry", "winered-icedstrawberry-contrasttext.css");
 
     private static final String COMMUNITY_DIRECTORY = "community/";
 
