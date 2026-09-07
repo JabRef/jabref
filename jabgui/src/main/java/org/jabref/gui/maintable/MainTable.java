@@ -27,6 +27,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
@@ -45,6 +46,7 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -176,6 +178,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .setOnMouseDragEntered(this::handleOnDragEntered)
                 .install(this);
 
+        this.setOnMouseClicked(event -> {
+            if ((event.getButton() == MouseButton.PRIMARY) && (event.getClickCount() == 2) && isOnEmptyRow(event)) {
+                new NewEntryAction(true, () -> libraryTab, dialogService, preferences, stateManager).execute();
+            }
+        });
+
         this.getSortOrder().clear();
 
         // force match category column to be the first sort order, (match_category column is always the first column)
@@ -276,6 +284,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
+    }
+
+    /// Whether the click landed on one of the filler rows below the last entry.
+    /// Clicks on an entry are already handled by the row factory, and clicks on the column headers never reach a row.
+    private boolean isOnEmptyRow(MouseEvent event) {
+        Node node = event.getPickResult().getIntersectedNode();
+        while ((node != null) && (node != this)) {
+            if (node instanceof TableRow<?> row) {
+                return row.isEmpty();
+            }
+            node = node.getParent();
+        }
+        return false;
     }
 
     private void restoreConfiguredSortOrder(MainTablePreferences mainTablePreferences) {
