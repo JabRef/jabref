@@ -40,6 +40,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
     private static final int STABLE_FILE_ATTEMPTS = 20;
     private static final long STABLE_FILE_INTERVAL_MILLIS = 250;
+    /// A writer pausing between two chunks must not pass as finished: the file has to look the same this many times in a row
+    private static final int STABLE_FILE_CONFIRMATIONS = 2;
 
     private final BibDatabaseContext database;
     private final FileUpdateMonitor fileMonitor;
@@ -269,13 +271,13 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         int generation = ++scanGeneration;
         if (scannedBaseline != null && isSynchronizing()) {
             // [impl->req~ux.external-library-changes.synchronize~1]
-            BackgroundTask.wrap(() -> scanner.scanForChanges(this::awaitStableLibraryFile))
+            BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
                           .onSuccess(changes -> onScannedForSynchronization(generation, scanner, scannedBaseline, changes))
                           .onFailure(e -> LOGGER.error("Error while synchronizing with the library file", e))
                           .executeWith(taskExecutor);
             return;
         }
-        BackgroundTask.wrap(() -> scanner.scanForChanges(this::awaitStableLibraryFile))
+        BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
                       .onSuccess(changes -> {
                           if (!changes.isEmpty()) {
                               listeners.forEach(listener -> listener.databaseChanged(changes));
@@ -288,43 +290,49 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// Sorting the changes on the FX thread right before applying them leaves no window for a user edit to slip in
     /// between classification and application.
     private void onScannedForSynchronization(int generation, ChangeScanner scanner, LibraryBaseline scannedBaseline, List<DatabaseChange> changes) {
-        if (generation != scanGeneration) {
-            LOGGER.debug("Discarding result of a scan overtaken by a newer file change");
-            return;
+        // The lock keeps a file event from starting a newer scan between the check and the application
+        synchronized (database) {
+            if (generation != scanGeneration) {
+                LOGGER.debug("Discarding result of a scan overtaken by a newer file change");
+                return;
+            }
+            synchronize(scannedBaseline, scanner.triage(scannedBaseline, changes));
         }
-        synchronize(scannedBaseline, scanner.triage(scannedBaseline, changes));
     }
 
     /// Sync clients and editors may write a file in several steps. A file that is still growing must not be parsed:
     /// half of a library parses fine and would look like every later entry had been deleted. Waits (bounded) until
-    /// size and modification time stop changing.
+    /// size and modification time have stopped changing for a while.
     ///
     /// @return the last state seen
     private static @Nullable FileSnapshot awaitStableFile(Path path) {
         FileSnapshot last = FileSnapshot.read(path);
-        for (int attempt = 0; attempt < STABLE_FILE_ATTEMPTS; attempt++) {
+        int unchanged = 0;
+        for (int attempt = 0; attempt < STABLE_FILE_ATTEMPTS && unchanged < STABLE_FILE_CONFIRMATIONS; attempt++) {
             try {
                 Thread.sleep(STABLE_FILE_INTERVAL_MILLIS);
             } catch (InterruptedException e) {
+                LOGGER.debug("Interrupted while waiting for {} to stop changing; the scan is abandoned", path, e);
                 Thread.currentThread().interrupt();
                 return last;
             }
             FileSnapshot current = FileSnapshot.read(path);
-            if (Objects.equals(current, last)) {
-                break;
-            }
+            unchanged = Objects.equals(current, last) ? unchanged + 1 : 0;
             last = current;
         }
         return last;
     }
 
-    /// The last state seen of the library file becomes the known disk state, so that the events of the write just
-    /// waited for do not trigger another scan.
-    private void awaitStableLibraryFile() {
+    /// The state seen becomes the known disk state, so that the events of the write just waited for do not trigger
+    /// another scan; only for the current scan, since a scan already overtaken will not apply what it sees, and
+    /// recording it would make the next event look handled.
+    private void awaitStableLibraryFile(int generation) {
         monitoredPath.ifPresent(path -> {
             FileSnapshot state = awaitStableFile(path);
             synchronized (database) {
-                knownDiskState = state;
+                if (generation == scanGeneration) {
+                    knownDiskState = state;
+                }
             }
         });
     }
@@ -400,14 +408,16 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                           return scanner.scanFile(copy);
                       })
                       .onSuccess(changes -> {
-                          if (generation != scanGeneration) {
-                              mergedConflictedCopies.remove(copy);
-                              return;
+                          synchronized (database) {
+                              if (generation != scanGeneration) {
+                                  mergedConflictedCopies.remove(copy);
+                                  return;
+                              }
+                              ChangeTriage.Triage triage = scanner.triage(scannedBaseline, changes);
+                              synchronize(scannedBaseline, triage,
+                                      Localization.lang("Merged %0 change(s) from the conflicted copy '%1'", String.valueOf(triage.diskOnly().size()), copy.getFileName().toString()),
+                                      copy);
                           }
-                          ChangeTriage.Triage triage = scanner.triage(scannedBaseline, changes);
-                          synchronize(scannedBaseline, triage,
-                                  Localization.lang("Merged %0 change(s) from the conflicted copy '%1'", String.valueOf(triage.diskOnly().size()), copy.getFileName().toString()),
-                                  copy);
                       })
                       .onFailure(e -> {
                           LOGGER.error("Error while merging conflicted copy {}", copy, e);

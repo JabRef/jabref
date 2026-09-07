@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.MetaDataSerializer;
@@ -48,14 +49,16 @@ public final class LibraryBaseline {
 
     /// What the comparison needs of an entry; a `BibEntry` copy would carry an event bus, caches, and properties per
     /// entry, which for a large library adds up to far more than the bibliographic data itself.
-    private record EntrySnapshot(EntryType type, Map<Field, String> fields) {
+    /// The comments written before the entry in the file count as content: they are kept by the parser and written
+    /// back, so an external edit of them is an external change like any other.
+    private record EntrySnapshot(EntryType type, Map<Field, String> fields, String comments) {
         static EntrySnapshot of(BibEntry entry) {
-            return new EntrySnapshot(entry.getType(), Map.copyOf(entry.getFieldMap()));
+            return new EntrySnapshot(entry.getType(), Map.copyOf(entry.getFieldMap()), entry.getUserComments());
         }
 
         /// Wraps the live field map without copying, for a comparison made right away
         static EntrySnapshot view(BibEntry entry) {
-            return new EntrySnapshot(entry.getType(), entry.getFieldMap());
+            return new EntrySnapshot(entry.getType(), entry.getFieldMap(), entry.getUserComments());
         }
 
         Optional<String> citationKey() {
@@ -69,12 +72,14 @@ public final class LibraryBaseline {
             }
             Map<Field, String> rest = new HashMap<>(fields);
             rest.remove(InternalField.KEY_FIELD);
-            return new EntrySnapshot(type, rest);
+            return new EntrySnapshot(type, rest, comments);
         }
 
         /// Only needed as the common ancestor of a field-level merge, which is the rare both-sides case
         BibEntry toEntry() {
-            return new BibEntry(type).withFields(fields);
+            BibEntry entry = new BibEntry(type).withFields(fields);
+            entry.setCommentsBeforeEntry(comments);
+            return entry;
         }
     }
 
@@ -112,18 +117,19 @@ public final class LibraryBaseline {
     /// over a set of changes, so that each lookup is O(1) instead of a scan over the library.
     public final class Lookup {
         private final Map<String, List<Map.Entry<String, EntrySnapshot>>> byKey = new HashMap<>();
-        private final Map<EntrySnapshot, Map.Entry<String, EntrySnapshot>> byContentExceptKey = new HashMap<>();
+        private final Map<EntrySnapshot, List<Map.Entry<String, EntrySnapshot>>> byContentExceptKey = new HashMap<>();
 
         private Lookup() {
             for (Map.Entry<String, EntrySnapshot> entry : entriesById.entrySet()) {
                 entry.getValue().citationKey().ifPresent(key -> byKey.computeIfAbsent(key, _ -> new ArrayList<>()).add(entry));
-                byContentExceptKey.putIfAbsent(entry.getValue().withoutKey(), entry);
+                byContentExceptKey.computeIfAbsent(entry.getValue().withoutKey(), _ -> new ArrayList<>()).add(entry);
             }
         }
 
-        /// The id of the in-memory entry the given disk entry was taken from: by citation key (preferring identical
-        /// content, as keys need not be unique), or else by the remaining content, which covers entries without a
-        /// key as well as a key changed on disk.
+        /// The id of the in-memory entry the given disk entry was taken from: by citation key, or else by the
+        /// remaining content, which covers entries without a key as well as a key changed on disk. Among several
+        /// candidates (keys need not be unique, entries may be duplicated) the one with identical content wins;
+        /// when that leaves more than one, the entry is not associated at all rather than with the wrong one.
         public Optional<String> baseIdOf(BibEntry remote) {
             return find(remote).map(Map.Entry::getKey);
         }
@@ -137,11 +143,17 @@ public final class LibraryBaseline {
 
         private Optional<Map.Entry<String, EntrySnapshot>> find(BibEntry remote) {
             EntrySnapshot snapshot = EntrySnapshot.view(remote);
-            Optional<Map.Entry<String, EntrySnapshot>> byKeyMatch = snapshot.citationKey()
-                                                                            .map(key -> byKey.getOrDefault(key, List.of()))
-                                                                            .flatMap(candidates -> candidates.stream().filter(entry -> entry.getValue().equals(snapshot)).findFirst()
-                                                                                                             .or(() -> candidates.stream().findFirst()));
-            return byKeyMatch.or(() -> Optional.ofNullable(byContentExceptKey.get(snapshot.withoutKey())));
+            List<Map.Entry<String, EntrySnapshot>> byKeyCandidates = snapshot.citationKey().map(key -> byKey.getOrDefault(key, List.of())).orElse(List.of());
+            if (!byKeyCandidates.isEmpty()) {
+                return unambiguous(byKeyCandidates, snapshot);
+            }
+            return unambiguous(byContentExceptKey.getOrDefault(snapshot.withoutKey(), List.of()), snapshot);
+        }
+
+        private static Optional<Map.Entry<String, EntrySnapshot>> unambiguous(List<Map.Entry<String, EntrySnapshot>> candidates, EntrySnapshot snapshot) {
+            List<Map.Entry<String, EntrySnapshot>> identical = candidates.stream().filter(entry -> entry.getValue().equals(snapshot)).toList();
+            List<Map.Entry<String, EntrySnapshot>> chosen = identical.isEmpty() ? candidates : identical;
+            return chosen.size() == 1 ? Optional.of(chosen.getFirst()) : Optional.empty();
         }
     }
 
@@ -182,6 +194,9 @@ public final class LibraryBaseline {
         if (!ancestor.getType().equals(remote.getType())) {
             merged.setType(remote.getType());
         }
+        if (ancestor.getUserComments().equals(local.getUserComments())) {
+            merged.setCommentsBeforeEntry(remote.getUserComments());
+        }
         FieldPatchComputer.compute(ancestor, local, remote).forEach((field, value) -> {
             if (value == null) {
                 merged.clearField(field);
@@ -204,6 +219,20 @@ public final class LibraryBaseline {
     /// @param remote the content on disk, `null` when the string does not exist on disk
     public Side sideOfString(String name, @Nullable String local, @Nullable String remote) {
         return sideOf(strings.get(name), local, remote);
+    }
+
+    /// A string that exists on disk only. The two-way comparison cannot see that it is the renamed form of a baseline
+    /// string when memory deleted that string, so the content is matched against the baseline: a deletion in memory
+    /// against a rename on disk is a conflict.
+    ///
+    /// @param existsInMemory whether memory has a string of the given name
+    public Side sideOfAddedString(String name, String content, Predicate<String> existsInMemory) {
+        if (strings.containsKey(name)) {
+            return sideOf(strings.get(name), null, content);
+        }
+        boolean renamedFromDeleted = strings.entrySet().stream()
+                                            .anyMatch(base -> base.getValue().equals(content) && !existsInMemory.test(base.getKey()));
+        return renamedFromDeleted ? Side.BOTH : Side.DISK;
     }
 
     /// A string renamed on disk is taken over only if memory neither touched the old string nor already uses the new name.

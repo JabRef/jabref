@@ -12,6 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableChangeType;
+import org.jabref.model.undo.UndoableCommentsChange;
 import org.jabref.model.undo.UndoableFieldChange;
 
 public final class EntryChange extends DatabaseChange {
@@ -57,6 +58,9 @@ public final class EntryChange extends DatabaseChange {
             if (!Objects.equals(before, after)) {
                 entryEdit.applyEdit(new UndoableFieldChange(oldEntry, field, before, after));
             }
+        }
+        if (!oldEntry.getUserComments().equals(newEntry.getUserComments())) {
+            entryEdit.applyEdit(new UndoableCommentsChange(oldEntry, oldEntry.getUserComments(), newEntry.getUserComments()));
         }
         undoEdit.addEdit(entryEdit);
     }

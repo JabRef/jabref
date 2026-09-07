@@ -71,7 +71,8 @@ public final class ChangeTriage {
                 case PreambleChange preambleChange ->
                         baseline.sideOfPreamble(local.getDatabase().getPreamble().orElse(null), preambleChange.getPreambleDiff().getNewPreamble());
                 case BibTexStringAdd stringAdd ->
-                        baseline.sideOfString(stringAdd.getAddedString().getName(), null, stringAdd.getAddedString().getContent());
+                        baseline.sideOfAddedString(stringAdd.getAddedString().getName(), stringAdd.getAddedString().getContent(),
+                                name -> local.getDatabase().getStringByName(name).isPresent());
                 case BibTexStringDelete stringDelete ->
                         baseline.sideOfString(stringDelete.getDeletedString().getName(), stringDelete.getDeletedString().getContent(), null);
                 case BibTexStringChange stringChange ->
