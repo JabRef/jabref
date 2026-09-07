@@ -14,6 +14,8 @@ import org.jabref.logic.l10n.Localization;
 /// classpath scanning happens at startup. Built-in themes declare the complete `-color-*` token
 /// contract; community themes only override what differs from the JabRef theme, so [ThemeManager]
 /// layers them on top of it.
+///
+/// [impl->req~ux.themes.bundled-community-themes~1]
 public enum ThemePreset {
     JABREF(Localization.lang("JabRef theme"), "jabref-theme.css", true),
     EVERFOREST("Everforest", "everforest.css"),
