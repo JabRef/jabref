@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -53,6 +53,7 @@ public class BibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+    private static final Comparator<BibEntry> ENTRY_ID_COMPARATOR = Comparator.comparing(BibEntry::getId);
     private static final int BATCH_REPLACEMENT_THRESHOLD = 10;
 
     /// State attributes
@@ -190,19 +191,82 @@ public class BibDatabase {
         // order than its entries were created (e.g. after per-entry background duplicate checks), so appending
         // is only correct when every new id is higher than the last one in the list.
         // [impl->req~import.entries.sorted-by-id~1]
-        List<BibEntry> sortedNewEntries = newEntries.stream().sorted(Comparator.comparing(BibEntry::getId)).toList();
+        List<BibEntry> sortedNewEntries = sortEntriesById(newEntries);
         if (entries.isEmpty() || entries.getLast().getId().compareTo(sortedNewEntries.getFirst().getId()) < 0) {
             entries.addAll(sortedNewEntries);
+        } else if (sortedNewEntries.size() <= BATCH_REPLACEMENT_THRESHOLD) {
+            insertSmallBatch(sortedNewEntries);
         } else {
             // One bulk replacement instead of per-entry inserts: this runs on the JavaFX thread for large imports.
-            // The stable sort detects the two already-sorted runs, so this is a linear merge.
-            entries.setAll(Stream.concat(entries.stream(), sortedNewEntries.stream()).sorted(Comparator.comparing(BibEntry::getId)).toList());
+            entries.setAll(mergeSortedEntries(sortedNewEntries));
         }
         newEntries.forEach(entry -> {
                     entryIdToBibEntry.put(entry.getId(), entry);
                     indexEntry(entry);
                 }
         );
+    }
+
+    private List<BibEntry> sortEntriesById(List<BibEntry> newEntries) {
+        if (isSortedById(newEntries)) {
+            return newEntries;
+        }
+
+        List<BibEntry> sortedEntries = new ArrayList<>(newEntries);
+        sortedEntries.sort(ENTRY_ID_COMPARATOR);
+        return sortedEntries;
+    }
+
+    private boolean isSortedById(List<BibEntry> entries) {
+        Iterator<BibEntry> iterator = entries.iterator();
+        if (!iterator.hasNext()) {
+            return true;
+        }
+
+        BibEntry previousEntry = iterator.next();
+        while (iterator.hasNext()) {
+            BibEntry currentEntry = iterator.next();
+            if (ENTRY_ID_COMPARATOR.compare(previousEntry, currentEntry) > 0) {
+                return false;
+            }
+            previousEntry = currentEntry;
+        }
+        return true;
+    }
+
+    private void insertSmallBatch(List<BibEntry> sortedNewEntries) {
+        for (BibEntry entry : sortedNewEntries) {
+            int position = Collections.binarySearch(entries, entry, ENTRY_ID_COMPARATOR);
+            entries.add(position < 0 ? -position - 1 : position, entry);
+        }
+    }
+
+    private List<BibEntry> mergeSortedEntries(List<BibEntry> sortedNewEntries) {
+        List<BibEntry> mergedEntries = new ArrayList<>(entries.size() + sortedNewEntries.size());
+        Iterator<BibEntry> existingEntries = entries.iterator();
+        Iterator<BibEntry> newEntries = sortedNewEntries.iterator();
+
+        BibEntry existingEntry = existingEntries.next();
+        BibEntry newEntry = newEntries.next();
+        while (true) {
+            if (ENTRY_ID_COMPARATOR.compare(existingEntry, newEntry) <= 0) {
+                mergedEntries.add(existingEntry);
+                if (!existingEntries.hasNext()) {
+                    mergedEntries.add(newEntry);
+                    newEntries.forEachRemaining(mergedEntries::add);
+                    return mergedEntries;
+                }
+                existingEntry = existingEntries.next();
+            } else {
+                mergedEntries.add(newEntry);
+                if (!newEntries.hasNext()) {
+                    mergedEntries.add(existingEntry);
+                    existingEntries.forEachRemaining(mergedEntries::add);
+                    return mergedEntries;
+                }
+                newEntry = newEntries.next();
+            }
+        }
     }
 
     public synchronized void removeEntry(BibEntry bibEntry) {
@@ -675,7 +739,7 @@ public class BibDatabase {
     /// ids handed out by [IdGenerator][org.jabref.model.entry.IdGenerator], so binary search finds the index.
     /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
     public int indexOf(@NonNull BibEntry bibEntry) {
-        int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
+        int index = Collections.binarySearch(entries, bibEntry, ENTRY_ID_COMPARATOR);
         if (index >= 0) {
             return index;
         }

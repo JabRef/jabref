@@ -566,6 +566,26 @@ class BibDatabaseTest {
 
     // [utest->req~import.entries.sorted-by-id~1]
     @Test
+    void smallOutOfOrderBatchDoesNotReplaceEntriesList() {
+        BibEntry firstEntry = new BibEntry(StandardEntryType.Article);
+        BibEntry secondEntry = new BibEntry(StandardEntryType.Article);
+        database.insertEntry(secondEntry);
+
+        List<Boolean> replacementChanges = new ArrayList<>();
+        database.getEntries().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                replacementChanges.add(change.wasReplaced());
+            }
+        });
+
+        database.insertEntry(firstEntry);
+
+        assertEquals(List.of(false), replacementChanges);
+        assertEquals(List.of(firstEntry, secondEntry), database.getEntries());
+    }
+
+    // [utest->req~import.entries.sorted-by-id~1]
+    @Test
     void largeBatchInsertedInReverseOrderIsSortedById() {
         List<BibEntry> created = new ArrayList<>();
         for (int i = 0; i < 2000; i++) {
