@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -15,7 +16,10 @@ import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -28,6 +32,7 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.JabRefUndoManager;
@@ -55,6 +60,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -94,6 +100,7 @@ class AllFieldsTabTest {
     private GuiPreferences preferences;
     private DeferringTaskExecutor taskExecutor;
     private AllFieldsTab tab;
+    private BibDatabaseContext databaseContext;
 
     @BeforeEach
     void setUp(@TempDir Path fileDirectory) {
@@ -110,7 +117,7 @@ class AllFieldsTabTest {
         when(preferences.getAutoLinkPreferences()).thenReturn(
                 new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
 
-        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+        databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of(fileDirectory));
         when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBTEX);
         when(databaseContext.getMetaData()).thenReturn(new MetaData());
@@ -218,6 +225,31 @@ class AllFieldsTabTest {
         runOnFxThreadAndWait(() -> filesAndLinksPane().setExpanded(true));
 
         assertTrue(tab.editors.containsKey(StandardField.FILE));
+    }
+
+    /// The section's row labels, top to bottom (labels sit in the grid's first column).
+    private List<String> filesAndLinksRowLabels() {
+        GridPane grid = (GridPane) ((VBox) filesAndLinksPane().getContent()).getChildren().getFirst();
+        return grid.getChildren().stream()
+                   .filter(node -> Integer.valueOf(0).equals(GridPane.getColumnIndex(node)))
+                   .sorted(Comparator.comparingInt(GridPane::getRowIndex))
+                   .map(node -> ((Label) node).getText())
+                   .toList();
+    }
+
+    /// BibLaTeX `Online` requires `url`, so the section opens for a field that is not set.
+    // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
+    @Test
+    void fileEditorAppearsForRequiredButUnsetLinkField() throws InterruptedException {
+        when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
+        BibEntry entry = new BibEntry(StandardEntryType.Online).withCitationKey("CiteKey2021");
+
+        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+
+        assertTrue(tab.editors.containsKey(StandardField.FILE));
+        assertEquals(
+                List.of(FieldsUtil.getDisplayName(StandardField.FILE), FieldsUtil.getDisplayName(StandardField.URL)),
+                filesAndLinksRowLabels());
     }
 
     // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]

@@ -12,7 +12,6 @@ import java.util.SequencedCollection;
 import java.util.SequencedSet;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -191,27 +190,28 @@ public class AllFieldsTab extends FieldsEditorTab {
                      .filter(setFields::contains)
                      .forEach(fields::add);
         });
-        // Added before the remaining set fields so the file editor heads its section.
-        // [impl->req~entry-editor.main-tab.file-editor-always-shown~1]
-        if (isFilesAndLinksSectionOpen(entry)) {
-            fields.add(StandardField.FILE);
-        }
         setFields.stream()
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
         fields.addAll(userAddedFields);
+        // [impl->req~entry-editor.main-tab.file-editor-always-shown~1]
+        if (isFilesAndLinksSectionOpen(fields)) {
+            fields.add(StandardField.FILE);
+        }
         return fields;
     }
 
     /// An open files-and-links section always shows the file editor: its own buttons
     /// (add / search / download) are what a "+ File" chip could only reach by popping up a
-    /// file dialog. Mirrors the expanded state [#createSectionPane] derives, so both agree
-    /// on whether the section is open before any editor exists.
-    private boolean isFilesAndLinksSectionOpen(BibEntry entry) {
+    /// file dialog. Decided from the fields the section would show anyway — required ones
+    /// included, so an entry type requiring `url` (BibLaTeX `Online`) counts even while that
+    /// field is unset — which is the same set [#createSectionPane] derives its expanded state
+    /// from, so the two cannot disagree.
+    private boolean isFilesAndLinksSectionOpen(SequencedSet<Field> shownFields) {
         return sectionExpandOverrides.getOrDefault(
                 FieldListSections.SectionType.FILES_AND_LINKS,
-                Stream.concat(entry.getFields().stream(), userAddedFields.stream())
-                      .anyMatch(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.FILES_AND_LINKS));
+                shownFields.stream()
+                           .anyMatch(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.FILES_AND_LINKS));
     }
 
     @Override
@@ -340,6 +340,13 @@ public class AllFieldsTab extends FieldsEditorTab {
             buckets.put(type, new LinkedHashSet<>());
         }
         editors.keySet().forEach(field -> buckets.get(FieldListSections.sectionOf(field)).add(field));
+        // Buckets inherit the global field order, in which the file field trails the link fields
+        // an entry type requires (BibLaTeX `Online` requires `url`); its editor heads the section.
+        // [impl->req~entry-editor.main-tab.file-editor-always-shown~1]
+        SequencedSet<Field> filesAndLinks = buckets.get(FieldListSections.SectionType.FILES_AND_LINKS);
+        if (filesAndLinks.contains(StandardField.FILE)) {
+            filesAndLinks.addFirst(StandardField.FILE);
+        }
 
         // Main section rows go into the (already cleared) inherited gridPane.
         // The list variant sits flush in its scroll pane, unlike the padded grid of the other tabs.
