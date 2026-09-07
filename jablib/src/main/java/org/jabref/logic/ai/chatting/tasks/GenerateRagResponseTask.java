@@ -95,8 +95,12 @@ public class GenerateRagResponseTask extends BackgroundTask<ChatMessage> {
                 .map(Optional::get)
                 .toList();
 
+        LOGGER.debug("Sending {} chat message(s) to AI model: {}", chatMessages.size(), chatMessages);
+
         ChatResponse response = chatModel.chat(chatMessages);
         String content = response.aiMessage().text();
+
+        LOGGER.debug("Received AI response: {}", content);
 
         return ChatMessage.aiMessage(
                 content,

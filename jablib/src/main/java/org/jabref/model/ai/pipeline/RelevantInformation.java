@@ -11,4 +11,16 @@ public record RelevantInformation(
     public @Nullable String source() {
         return citationKey;
     }
+
+    public @Nullable String getSource() {
+        return citationKey;
+    }
+
+    public @Nullable String getCitationKey() {
+        return citationKey;
+    }
+
+    public String getText() {
+        return text;
+    }
 }

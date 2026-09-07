@@ -64,7 +64,7 @@ class EmbeddingsSearchAnswerEngineTest {
     }
 
     @Test
-    void findEntryByFileHashReturnsEmptyForNonMatchingHash() throws IOException {
+    void findEntryByFileHashFallsBackToSingleEntryWhenHashNotMatched() throws IOException {
         Path file = tempDir.resolve("paper.pdf");
         Files.writeString(file, "test content for hashing");
 
@@ -75,6 +75,28 @@ class EmbeddingsSearchAnswerEngineTest {
         FullBibEntry fullEntry = new FullBibEntry(new BibDatabaseContext(), entry);
 
         Optional<BibEntry> result = engine.findEntryByFileHash(List.of(fullEntry), "nonexistenthash");
+
+        assertEquals(Optional.of(entry), result);
+    }
+
+    @Test
+    void findEntryByFileHashReturnsEmptyForNonMatchingHashWhenMultipleEntries() throws IOException {
+        Path file1 = tempDir.resolve("paper1.pdf");
+        Files.writeString(file1, "content 1");
+        Path file2 = tempDir.resolve("paper2.pdf");
+        Files.writeString(file2, "content 2");
+
+        BibEntry entry1 = new BibEntry()
+                .withCitationKey("Smith2024")
+                .withFiles(List.of(new LinkedFile("", file1, "PDF")));
+        BibEntry entry2 = new BibEntry()
+                .withCitationKey("Doe2025")
+                .withFiles(List.of(new LinkedFile("", file2, "PDF")));
+
+        FullBibEntry fullEntry1 = new FullBibEntry(new BibDatabaseContext(), entry1);
+        FullBibEntry fullEntry2 = new FullBibEntry(new BibDatabaseContext(), entry2);
+
+        Optional<BibEntry> result = engine.findEntryByFileHash(List.of(fullEntry1, fullEntry2), "nonexistenthash");
 
         assertEquals(Optional.empty(), result);
     }
