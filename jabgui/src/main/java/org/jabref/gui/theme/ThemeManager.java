@@ -85,12 +85,12 @@ public class ThemeManager {
     ///
     /// The theme stylesheet comes first, the user's custom stylesheet on top of it, and the base
     /// stylesheet last -- the base sheet only maps JabRef's own selectors onto the color tokens the
-    /// theme defines, so it has to win over both. A community theme declares only the tokens it
-    /// changes, so the JabRef theme goes beneath it to supply the rest.
+    /// theme defines, so it has to win over both. The JabRef theme always goes beneath the selected
+    /// one: community themes declare only the tokens they change and take the rest from it.
     public void updateCssOnScene(Scene scene) {
         List<String> toAdd = new ArrayList<>(4);
 
-        if (!theme.isBuiltIn()) {
+        if (theme != ThemePreset.JABREF) {
             toAdd.add(ThemePreset.JABREF.getStyleSheet().getSceneStylesheetLocation());
         }
         toAdd.add(theme.getStyleSheet().getSceneStylesheetLocation());

@@ -19,6 +19,9 @@ class ThemePresetTest {
     /// The submodule, relative to the module directory Gradle runs the tests in.
     private static final Path THEMES_JABREF_ORG = Path.of("src", "main", "themes.jabref.org", "themes");
 
+    /// Where the build copies the community themes to, relative to the theme package.
+    private static final String COMMUNITY_DIRECTORY = "community/";
+
     /// Offered by the submodule but deliberately not bundled: the grey-text DinoGirls variants read
     /// worse than their contrast-text twins, and the jabrefdark/jabreflight pair is JabRef's own look.
     private static final Set<String> NOT_BUNDLED = Set.of(
@@ -61,8 +64,9 @@ class ThemePresetTest {
 
         Set<String> listed = new TreeSet<>();
         Arrays.stream(ThemePreset.values())
-              .filter(theme -> !theme.isBuiltIn())
-              .map(ThemePreset::getCommunityFileName)
+              .map(theme -> theme.getStyleSheet().getName())
+              .filter(css -> css.startsWith(COMMUNITY_DIRECTORY))
+              .map(css -> css.substring(COMMUNITY_DIRECTORY.length()))
               .forEach(listed::add);
 
         assertEquals(offered, listed, "ThemePreset does not list exactly the two-scheme themes of themes.jabref.org");

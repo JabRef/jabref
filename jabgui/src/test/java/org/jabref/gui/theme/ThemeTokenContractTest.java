@@ -143,10 +143,10 @@ class ThemeTokenContractTest {
         return StyleSheet.class.getResourceAsStream(css);
     }
 
-    /// Built-in themes must declare the complete token contract; community themes are layered on
+    /// JabRef's own themes must declare the complete token contract; community themes are layered on
     /// top of the JabRef theme and may declare a subset.
     static List<ThemePreset> builtInThemes() {
-        return ThemePreset.builtIn();
+        return List.of(ThemePreset.JABREF, ThemePreset.PRIMER);
     }
 
     static List<ThemePreset> allThemes() {
@@ -154,7 +154,7 @@ class ThemeTokenContractTest {
     }
 
     static List<ThemePreset> communityThemes() {
-        return Arrays.stream(ThemePreset.values()).filter(theme -> !theme.isBuiltIn()).toList();
+        return Arrays.stream(ThemePreset.values()).filter(theme -> !builtInThemes().contains(theme)).toList();
     }
 
     /// A community theme setting a token nobody reads is a typo or a stale port; it would silently
