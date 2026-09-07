@@ -215,7 +215,7 @@ public class GlobalSearchBar extends HBox {
             this.getChildren().addAll(searchField, currentResults);
         }
 
-        this.setSpacing(4.0);
+        this.setSpacing(4);
         this.setAlignment(Pos.CENTER_LEFT);
 
         Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), this::updateSearchQuery);
