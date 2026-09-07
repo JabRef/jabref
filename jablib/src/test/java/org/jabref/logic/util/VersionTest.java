@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.support.DisabledOnCIServer;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.ExternalServicesTest;
 
 import org.junit.jupiter.api.Test;
 
@@ -334,7 +334,7 @@ class VersionTest {
     }
 
     @Test
-    @FetcherTest
+    @ExternalServicesTest
     @DisabledOnCIServer("GitHub puts a low rate limit on unauthenticated calls")
     void getAllAvailableVersionsReturnsSomething() throws IOException {
         assertNotEquals(List.of(), Version.getAllAvailableVersions());

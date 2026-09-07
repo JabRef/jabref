@@ -62,7 +62,7 @@ public class GitSyncService {
         GitHandler gitHandler = gitHandlerRegistry.get(repoRoot.get());
 
         gitHandler.fetchOnCurrentBranch();
-        GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
+        GitStatusSnapshot status = GitStatusChecker.checkStatusOrThrow(gitHandler);
 
         if (!status.tracking()) {
             throw new JabRefException("Pull aborted: The file is not under Git version control.");
@@ -152,12 +152,12 @@ public class GitSyncService {
         gitHandler.fetchOnCurrentBranch();
 
         if (GitStatusChecker.isRemoteEmpty(gitHandler)) {
-            // [impl->req~ux.git-push.empty-remote~1]
+            // [impl->req~git.push.empty-remote~1]
             gitHandler.pushCurrentBranchCreatingUpstream();
             return PushResult.pushed();
         }
 
-        GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
+        GitStatusSnapshot status = GitStatusChecker.checkStatusOrThrow(gitHandler);
 
         if (!status.tracking()) {
             throw new JabRefException("Push aborted: The file is not under Git version control.");

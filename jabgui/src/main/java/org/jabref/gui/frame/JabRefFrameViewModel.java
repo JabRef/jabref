@@ -43,7 +43,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -71,7 +70,6 @@ public class JabRefFrameViewModel {
     private final Supplier<OpenDatabaseAction> openDatabaseAction;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
@@ -83,7 +81,6 @@ public class JabRefFrameViewModel {
                                 Supplier<OpenDatabaseAction> openDatabaseAction,
                                 BibEntryTypesManager entryTypesManager,
                                 FileUpdateMonitor fileUpdateMonitor,
-                                UndoManager undoManager,
                                 ClipBoardManager clipBoardManager,
                                 TaskExecutor taskExecutor) {
         this.preferences = preferences;
@@ -94,7 +91,6 @@ public class JabRefFrameViewModel {
         this.openDatabaseAction = openDatabaseAction;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
     }
@@ -288,7 +284,7 @@ public class JabRefFrameViewModel {
         if (StringUtil.isNotBlank(targetGroup)) {
             // TODO: if an existing group is not assignable (e.g. a search or automatic group),
             //       the assignment silently does nothing - no error is reported to the caller.
-            GroupsHelper.assignEntriesToGroup(databaseContext, entries, targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator());
+            GroupsHelper.assignEntriesToGroup(databaseContext, entries, targetGroup, databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()));
         }
     }
 
@@ -297,7 +293,7 @@ public class JabRefFrameViewModel {
                 databaseContext,
                 preferences,
                 fileUpdateMonitor,
-                undoManager,
+                stateManager.getUndoManager(databaseContext),
                 stateManager,
                 dialogService,
                 taskExecutor);

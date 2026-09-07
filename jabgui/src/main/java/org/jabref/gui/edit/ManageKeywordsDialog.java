@@ -9,13 +9,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.TextFieldTableCell;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -30,7 +30,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
     @FXML private TableView<String> keywordsTable;
     @FXML private ToggleGroup displayType;
     @Inject private CliPreferences preferences;
-    @Inject private UndoManager undoManager;
+    @Inject private StateManager stateManager;
     private ManageKeywordsViewModel viewModel;
 
     public ManageKeywordsDialog(List<BibEntry> entries) {
@@ -51,7 +51,10 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ManageKeywordsViewModel(preferences.getBibEntryPreferences(), entries, undoManager);
+        Character keywordSeparator = stateManager.getActiveDatabase()
+                                                 .map(databaseContext -> databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))
+                                                 .orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
+        viewModel = new ManageKeywordsViewModel(keywordSeparator, entries, stateManager.getActiveDatabase().map(stateManager::getUndoManager).orElseThrow());
 
         viewModel.displayTypeProperty().bind(
                 EasyBind.map(displayType.selectedToggleProperty(), toggle -> {
