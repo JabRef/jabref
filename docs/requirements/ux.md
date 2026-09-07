@@ -49,6 +49,14 @@ Headers use Title Case, as an exception to the sentence-case rule for UI text, s
 
 Needs: impl
 
+## Double click below the last entry adds an entry
+`req~maintable.doubleclick-empty-space.add-entry~1`
+
+A double click on the empty space below the last row of the main table adds a new entry of the last used entry type and opens it in the entry editor.
+This makes the empty area of the table act like the "Add entry" menu item, at the place where the pointer already is.
+
+Needs: impl
+
 ## Critical startup failures show an error dialog
 `req~ux.startup.critical-error-dialog~1`
 

@@ -179,6 +179,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .install(this);
 
         this.setOnMouseClicked(event -> {
+            // [impl->req~maintable.doubleclick-empty-space.add-entry~1]
             if ((event.getButton() == MouseButton.PRIMARY) && (event.getClickCount() == 2) && isOnEmptyRow(event)) {
                 new NewEntryAction(true, () -> libraryTab, dialogService, preferences, stateManager).execute();
             }
