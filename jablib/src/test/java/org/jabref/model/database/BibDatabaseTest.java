@@ -546,6 +546,7 @@ class BibDatabaseTest {
         assertEquals(-1, database.indexOf(entryA));
     }
 
+    // [utest->req~import.entries.sorted-by-id~1]
     @Test
     void entriesInsertedOutOfCreationOrderAreFoundByIndexOf() {
         BibEntry entryA = new BibEntry(StandardEntryType.Article);
@@ -561,6 +562,21 @@ class BibDatabaseTest {
         assertEquals(1, database.indexOf(entryB));
         assertEquals(2, database.indexOf(entryC));
         assertEquals(3, database.indexOf(entryD));
+    }
+
+    // [utest->req~import.entries.sorted-by-id~1]
+    @Test
+    void largeBatchInsertedInReverseOrderIsSortedById() {
+        List<BibEntry> created = new ArrayList<>();
+        for (int i = 0; i < 2000; i++) {
+            created.add(new BibEntry(StandardEntryType.Article));
+        }
+        database.insertEntries(created.subList(1000, 2000));
+        database.insertEntries(created.subList(0, 1000).reversed());
+
+        assertEquals(created, database.getEntries());
+        assertEquals(1500, database.indexOf(created.get(1500)));
+        assertEquals(7, database.indexOf(created.get(7)));
     }
 
     @Test

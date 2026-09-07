@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -188,14 +189,14 @@ public class BibDatabase {
         // The list is kept sorted by id so that indexOf can use binary search. A batch may arrive in a different
         // order than its entries were created (e.g. after per-entry background duplicate checks), so appending
         // is only correct when every new id is higher than the last one in the list.
+        // [impl->req~import.entries.sorted-by-id~1]
         List<BibEntry> sortedNewEntries = newEntries.stream().sorted(Comparator.comparing(BibEntry::getId)).toList();
         if (entries.isEmpty() || entries.getLast().getId().compareTo(sortedNewEntries.getFirst().getId()) < 0) {
             entries.addAll(sortedNewEntries);
         } else {
-            for (BibEntry entry : sortedNewEntries) {
-                int position = Collections.binarySearch(entries, entry, Comparator.comparing(BibEntry::getId));
-                entries.add(position < 0 ? -position - 1 : position, entry);
-            }
+            // One bulk replacement instead of per-entry inserts: this runs on the JavaFX thread for large imports.
+            // The stable sort detects the two already-sorted runs, so this is a linear merge.
+            entries.setAll(Stream.concat(entries.stream(), sortedNewEntries.stream()).sorted(Comparator.comparing(BibEntry::getId)).toList());
         }
         newEntries.forEach(entry -> {
                     entryIdToBibEntry.put(entry.getId(), entry);
