@@ -40,13 +40,17 @@ public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
     ) throws ModelNotFoundException, MalformedModelException, IOException {
         this.modelName = modelName;
         this.metadataService = metadataService;
-        Criteria<String, float[]> criteria = makeCriteriaBuilder()
-                .optModelUrls(DJL_EMBEDDING_MODEL_URL_PREFIX + modelName)
-                .optProgress(progressCounter)
-                .build();
+        try {
+            Criteria<String, float[]> criteria = makeCriteriaBuilder()
+                    .optModelUrls(DJL_EMBEDDING_MODEL_URL_PREFIX + modelName)
+                    .optProgress(progressCounter)
+                    .build();
 
-        this.model = criteria.loadModel();
-        this.predictor = model.newPredictor();
+            this.model = criteria.loadModel();
+            this.predictor = model.newPredictor();
+        } catch (IllegalArgumentException e) {
+            throw new ModelNotFoundException("Invalid embedding model URL: " + modelName, e);
+        }
     }
 
     public String getModelName() {
@@ -74,6 +78,9 @@ public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
             return makeCriteria(modelUrl).isDownloaded();
         } catch (IOException | ModelNotFoundException e) {
             LOGGER.error("Got an error while checking if an embedding model is downloaded", e);
+            return false;
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Invalid embedding model URL: {}", modelName, e);
             return false;
         }
     }

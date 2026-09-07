@@ -2168,7 +2168,10 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void migrateEmbeddingModelName() {
-        if ("SENTENCE_TRANSFORMERS_ALL_MINILM_L6_V2".equalsIgnoreCase(get(AI_EMBEDDING_MODEL, ""))) {
+        String currentModel = get(AI_EMBEDDING_MODEL, "");
+        if ("SENTENCE_TRANSFORMERS_ALL_MINILM_L12_V2".equalsIgnoreCase(currentModel)) {
+            put(AI_EMBEDDING_MODEL, "sentence-transformers/all-MiniLM-L12-v2");
+        } else if ("SENTENCE_TRANSFORMERS_ALL_MINILM_L6_V2".equalsIgnoreCase(currentModel)) {
             put(AI_EMBEDDING_MODEL, "sentence-transformers/all-MiniLM-L6-v2");
         }
     }
