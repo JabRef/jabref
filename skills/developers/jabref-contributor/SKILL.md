@@ -48,6 +48,7 @@ Work through every point of `CHECKLIST.md` in the repository root — it is the 
 
 - Add a `CHANGELOG.md` entry (unreleased section) for user-visible changes.
 - Reference the issue the PR fixes.
+- Write "Steps to test" as a numbered list with a cropped screenshot of the result for visible changes. No videos (only when another program is involved, such as drag and drop or push to an external application).
 - Run `./gradlew rewriteRun` if the build reports OpenRewrite violations.
 
 ## Further reading
