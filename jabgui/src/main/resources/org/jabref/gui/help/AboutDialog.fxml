@@ -22,7 +22,7 @@
     <content>
         <VBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
             <AnchorPane>
-                <VBox alignment="CENTER_LEFT" spacing="1.0" styleClass="padding-bottom-16"
+                <VBox alignment="CENTER_LEFT" spacing="4.0" styleClass="padding-bottom-12"
                       AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0">
                     <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="h1,about-heading,text-accent" text="${controller.viewModel.heading}" wrapText="true">
                         <cursor>

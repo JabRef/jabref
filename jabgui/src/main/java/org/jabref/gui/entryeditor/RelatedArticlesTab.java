@@ -72,7 +72,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private StackPane getRelatedArticlesPane(BibEntry entry) {
         StackPane root = new StackPane();
         root.setId("related-articles-tab");
-        root.getStyleClass().add("padding-24");
+        root.getStyleClass().add("padding-4");
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
@@ -112,8 +112,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
         ScrollPane scrollPane = new ScrollPane();
 
-        VBox vBox = new VBox();
-        vBox.setSpacing(20.0);
+        VBox vBox = new VBox(4);
 
         String heading = fetcher.getHeading();
         Text headingText = new Text(heading);
@@ -125,9 +124,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vBox.getChildren().add(descriptionText);
 
         for (BibEntry entry : list) {
-            HBox hBox = new HBox();
-            hBox.setSpacing(5.0);
-            hBox.getStyleClass().add("padding-left-24");
+            HBox hBox = new HBox(4);
+            hBox.getStyleClass().add("padding-left-12");
 
             String title = entry.getTitle().orElse("");
             String journal = entry.getField(StandardField.JOURNAL).orElse("");
@@ -163,8 +161,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private ScrollPane getErrorInfo() {
         ScrollPane scrollPane = new ScrollPane();
 
-        VBox vBox = new VBox();
-        vBox.setSpacing(20.0);
+        VBox vBox = new VBox(16);
 
         Text descriptionText = new Text(Localization.lang("No recommendations received from Mr. DLib for this entry."));
         descriptionText.getStyleClass().add("italic");
@@ -181,13 +178,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private ScrollPane getPrivacyDialog(BibEntry entry) {
         ScrollPane root = new ScrollPane();
         root.setId("related-articles-tab");
-        root.getStyleClass().add("padding-24");
-        VBox vbox = new VBox();
-        vbox.getStyleClass().addAll("gdpr-notice", "h4", "padding-12");
-        vbox.setSpacing(20.0);
+        root.getStyleClass().add("padding-4");
+        VBox vbox = new VBox(4);
+        vbox.getStyleClass().addAll("gdpr-notice", "h4", "padding-4");
 
-        HBox hbox = new HBox();
-        hbox.setSpacing(10.0);
+        HBox hbox = new HBox(4);
 
         Text title = new Text(Localization.lang("Mr. DLib Privacy settings"));
         title.getStyleClass().addAll("h3", "bold");
@@ -214,7 +209,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 dialogService.showErrorDialogAndWait(e);
             }
         });
-        VBox vb = new VBox();
+        VBox vb = new VBox(4);
         CheckBox cbTitle = new CheckBox(Localization.lang("Entry Title (Required to deliver recommendations.)"));
         cbTitle.setSelected(true);
         cbTitle.setDisable(true);
@@ -225,7 +220,6 @@ public class RelatedArticlesTab extends EntryEditorTab {
         CheckBox cbOS = new CheckBox(Localization.lang("Operating System (Provides for better recommendations by giving an indication of user's system set-up.)"));
         CheckBox cbTimezone = new CheckBox(Localization.lang("Timezone (Provides for better recommendations by indicating the time of day the request is being made.)"));
         vb.getChildren().addAll(cbTitle, cbVersion, cbLanguage, cbOS, cbTimezone);
-        vb.setSpacing(10);
 
         button.setOnAction(_ -> {
             MrDlibPreferences mrDlibPreferences = preferences.getMrDlibPreferences();

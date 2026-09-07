@@ -13,13 +13,13 @@ Conventions for working on the [JabRef](https://github.com/JabRef/jabref) codeba
 
 ## Modules
 
-| Module | Purpose |
-|---|---|
+| Module   | Purpose                                          |
+| -------- | ------------------------------------------------ |
 | `jablib` | Core library — logic, model, importers/exporters |
-| `jabgui` | JavaFX desktop GUI |
-| `jabkit` | CLI application |
-| `jabls` | Language Server Protocol implementation |
-| `jabsrv` | HTTP server |
+| `jabgui` | JavaFX desktop GUI                               |
+| `jabkit` | CLI application                                  |
+| `jabls`  | Language Server Protocol implementation          |
+| `jabsrv` | HTTP server                                      |
 
 Key paths: `jablib/src/main/java/org/jabref/logic/` (business logic), `jablib/src/main/java/org/jabref/model/` (data model), `jabgui/src/main/java/org/jabref/gui/` (GUI), `docs/` (developer docs and ADRs).
 

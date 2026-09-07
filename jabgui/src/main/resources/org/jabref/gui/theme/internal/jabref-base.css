@@ -87,8 +87,6 @@
 .padding-4 { -fx-padding: 0.333em; }
 .padding-8 { -fx-padding: 0.667em; }
 .padding-12 { -fx-padding: 1em; }
-.padding-16 { -fx-padding: 1.333em; }
-.padding-24 { -fx-padding: 2em; }
 
 /* Padding: <vertical>-<horizontal>. Added on demand -- only the pairs in use exist. */
 .padding-0-4 { -fx-padding: 0 0.333em; }
@@ -102,20 +100,15 @@
 .padding-top-12 { -fx-padding: 1em 0 0 0; }
 
 .padding-right-4 { -fx-padding: 0 0.333em 0 0; }
-.padding-right-16 { -fx-padding: 0 1.333em 0 0; }
 
 .padding-bottom-4 { -fx-padding: 0 0 0.333em 0; }
-.padding-bottom-16 { -fx-padding: 0 0 1.333em 0; }
-.padding-bottom-24 { -fx-padding: 0 0 2em 0; }
 
 .padding-left-12 { -fx-padding: 0 0 0 1em; }
-.padding-left-24 { -fx-padding: 0 0 0 2em; }
 
 /* Gap between the cells of a GridPane / FlowPane / TilePane */
 .gap-4 { -fx-hgap: 0.333em; -fx-vgap: 0.333em; }
 .gap-8 { -fx-hgap: 0.667em; -fx-vgap: 0.667em; }
 .gap-12 { -fx-hgap: 1em; -fx-vgap: 1em; }
-.gap-16 { -fx-hgap: 1.333em; -fx-vgap: 1.333em; }
 
 /* Alignment */
 .align-center { -fx-alignment: center; }

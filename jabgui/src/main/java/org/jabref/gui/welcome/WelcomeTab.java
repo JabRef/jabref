@@ -114,8 +114,8 @@ public class WelcomeTab extends Tab {
         this.recentLibrariesBox = new VBox(8);
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
-        main = new VBox(24, createTopTitles(), new VBox(), createCommunityBox());
-        main.getStyleClass().addAll("welcome-main-container", "align-center", "padding-24");
+        main = new VBox(4, createTopTitles(), new VBox(), createCommunityBox());
+        main.getStyleClass().addAll("welcome-main-container", "align-center", "padding-4");
         initializeColumns();
 
         VBox container = new VBox(main);
@@ -135,14 +135,14 @@ public class WelcomeTab extends Tab {
         welcomeLabel.getStyleClass().addAll("h1", "text-accent");
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("h2");
-        VBox topTitles = new VBox(12, welcomeLabel, descriptionLabel);
-        topTitles.getStyleClass().addAll("align-top-left", "padding-bottom-24");
+        VBox topTitles = new VBox(4, welcomeLabel, descriptionLabel);
+        topTitles.getStyleClass().addAll("align-top-left", "padding-bottom-4");
         return topTitles;
     }
 
     private void initializeColumns() {
-        GridPane grid = new GridPane();
-        grid.getStyleClass().addAll("gap-16", "align-top-center");
+        GridPane grid = new GridPane(4, 4);
+        grid.getStyleClass().add("align-top-center");
 
         VBox leftColumn = createLeftColumn();
         GridPane.setHgrow(leftColumn, Priority.ALWAYS);
@@ -171,7 +171,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createLeftColumn() {
-        VBox leftColumn = new VBox(24,
+        VBox leftColumn = new VBox(12,
                 createWelcomeStartBox(),
                 createWelcomeRecentBox()
         );
@@ -182,7 +182,7 @@ public class WelcomeTab extends Tab {
     private VBox createRightColumn() {
         this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);
         this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
-        VBox rightColumn = new VBox(24, quickSettings, walkthroughs);
+        VBox rightColumn = new VBox(12, quickSettings, walkthroughs);
         rightColumn.getStyleClass().addAll("align-top-left");
         return rightColumn;
     }
@@ -353,7 +353,7 @@ public class WelcomeTab extends Tab {
     }
 
     private HBox createTextLinksContainer() {
-        HBox container = new HBox(16);
+        HBox container = new HBox(12);
         container.getStyleClass().addAll("align-center-left");
 
         Hyperlink devVersionLink = createFooterLink(Localization.lang("Download development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);
