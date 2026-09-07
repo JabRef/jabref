@@ -19,7 +19,7 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -142,6 +142,38 @@ class ThemeTokenContractTest {
         return StyleSheet.class.getResourceAsStream(css);
     }
 
+    /// Built-in themes must declare the complete token contract; community themes are layered on
+    /// top of the JabRef theme and may declare a subset.
+    static List<ThemePreset> builtInThemes() {
+        return ThemePreset.builtIn();
+    }
+
+    static List<ThemePreset> allThemes() {
+        return ThemePreset.values();
+    }
+
+    static List<ThemePreset> communityThemes() {
+        return ThemePreset.values().stream().filter(theme -> !theme.isBuiltIn()).toList();
+    }
+
+    /// A community theme setting a token nobody reads is a typo or a stale port; it would silently
+    /// fall back to the JabRef theme's color.
+    @ParameterizedTest
+    @MethodSource("communityThemes")
+    void communityThemeDeclaresOnlyTokensSomeoneReads(ThemePreset theme) {
+        String themeCss = theme.getStyleSheet().getName();
+
+        Set<String> read = new TreeSet<>(tokens(BASE_CSS, Kind.USE));
+        read.addAll(tokens(ThemePreset.JABREF.getStyleSheet().getName(), Kind.USE));
+        read.addAll(tokens(themeCss, Kind.USE));
+
+        Set<String> unread = new TreeSet<>(tokens(themeCss, Kind.DECLARATION));
+        unread.removeAll(read);
+        unread.removeIf(token -> PALETTE_RAMP.matcher(token).matches());
+
+        assertEquals(Set.of(), unread, "%s declares -color- tokens that no stylesheet reads".formatted(themeCss));
+    }
+
     private static URL resource(String css) {
         return StyleSheet.class.getResource(css);
     }
@@ -150,7 +182,7 @@ class ThemeTokenContractTest {
     /// *both* color schemes. Declaring it only in the light block leaves the control unstyled in dark
     /// mode, which is the failure mode this whole token set exists to prevent.
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("builtInThemes")
     void themeDeclaresEveryTokenTheBaseStylesheetUses(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -169,7 +201,7 @@ class ThemeTokenContractTest {
     /// A theme may introduce tokens of its own (Primer scopes a good number of them to single controls),
     /// but it must not read one it never declares.
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("builtInThemes")
     void themeDeclaresEveryTokenItUsesItself(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -183,7 +215,7 @@ class ThemeTokenContractTest {
     /// tokens something already uses, so a token every theme declares but nobody reads is invisible to
     /// it.
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("builtInThemes")
     void themeDeclaresNoTokenNobodyReads(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -228,7 +260,7 @@ class ThemeTokenContractTest {
     }
 
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("builtInThemes")
     void themeLeavesTheLadderColorsToModena(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -255,7 +287,7 @@ class ThemeTokenContractTest {
     }
 
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("allThemes")
     void themeStylesheetParses(ThemePreset theme) {
         ObservableList<CssParser.ParseError> errors = CssParser.errorsProperty();
 

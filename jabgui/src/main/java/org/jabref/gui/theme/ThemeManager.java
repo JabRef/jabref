@@ -85,10 +85,14 @@ public class ThemeManager {
     ///
     /// The theme stylesheet comes first, the user's custom stylesheet on top of it, and the base
     /// stylesheet last -- the base sheet only maps JabRef's own selectors onto the color tokens the
-    /// theme defines, so it has to win over both.
+    /// theme defines, so it has to win over both. A community theme declares only the tokens it
+    /// changes, so the JabRef theme goes beneath it to supply the rest.
     public void updateCssOnScene(Scene scene) {
-        List<String> toAdd = new ArrayList<>(3);
+        List<String> toAdd = new ArrayList<>(4);
 
+        if (!theme.isBuiltIn()) {
+            toAdd.add(ThemePreset.JABREF.getStyleSheet().getSceneStylesheetLocation());
+        }
         toAdd.add(theme.getStyleSheet().getSceneStylesheetLocation());
         if (customTheme != null) {
             toAdd.add(customTheme.getSceneStylesheetLocation());
@@ -167,7 +171,7 @@ public class ThemeManager {
         ThemePreset newTheme = Optional.ofNullable(workspacePreferences.getTheme()).orElse(ThemePreset.JABREF);
 
         boolean cssChanged = false;
-        if (theme != newTheme) {
+        if (!theme.equals(newTheme)) {
             if (themeCssLiveUpdate != null) {
                 removeStylesheetFromWatchList(theme.getStyleSheet(), themeCssLiveUpdate);
             }
