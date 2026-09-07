@@ -401,8 +401,9 @@ public class MetaData {
         return copy;
     }
 
-    /// Overwrites this instance's contents with those of `other`. The identity survives
-    /// of the overwritten object survives and with everything registered on its [EventBus].
+    /// Overwrites this instance's contents with those of `other`. **This instance survives**, and
+    /// with it everything registered on its [EventBus] — installing `other` in the library instead
+    /// would orphan every listener of the instance it replaced.
     public void overwriteWith(@NonNull MetaData other) {
         citeKeyPatterns.clear();
         citeKeyPatterns.putAll(other.citeKeyPatterns);
@@ -437,7 +438,7 @@ public class MetaData {
 
         other.getGroups()
              .map(GroupTreeNode::copySubtree)
-             .ifPresentOrElse(this::setGroups, () -> groupsRoot.setValue(null));
+             .ifPresentOrElse(this::setGroups, this::clearGroups);
 
         postChange();
     }

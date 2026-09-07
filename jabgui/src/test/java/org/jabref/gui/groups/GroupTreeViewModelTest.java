@@ -110,6 +110,7 @@ class GroupTreeViewModelTest {
     /// they are recorded as the tree they produced - one step, undone by installing the tree that
     /// was there before.
     @Test
+    // [utest->req~logic.undo.group-operations-recorded~1]
     void reorderingSubgroupsIsUndoable() {
         GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
         root.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));

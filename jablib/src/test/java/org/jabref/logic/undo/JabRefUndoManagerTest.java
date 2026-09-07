@@ -511,6 +511,7 @@ class JabRefUndoManagerTest {
     /// writes - after which the command's push discards the undone change with the redo stack.
     @Test
     @Timeout(value = 10, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    // [utest->req~logic.undo.writes-reserved-against-undo~1]
     void anUndoCannotLandBetweenACommandsWritesAndItsPush() {
         undoRedoManager.addEdit(setAuthor("Bohr"));
         CountDownLatch blockStarted = new CountDownLatch(1);

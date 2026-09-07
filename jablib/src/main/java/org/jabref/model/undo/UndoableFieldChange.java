@@ -23,6 +23,7 @@ public record UndoableFieldChange(BibEntry entry, Field field, @Nullable String 
     }
 
     @Override
+    // [impl->req~logic.undo.stale-change-refused~1]
     public ApplyResult apply() {
         String current = entry.getField(field).orElse(null);
         if (!Objects.equals(current, before)) {

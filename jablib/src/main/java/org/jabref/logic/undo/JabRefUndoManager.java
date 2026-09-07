@@ -278,6 +278,7 @@ public class JabRefUndoManager implements UndoManager {
     /// has to fall while a command holds the library and rise again afterwards — so both notify,
     /// and both do so after the monitor is released.
     @Override
+    // [impl->req~logic.undo.writes-reserved-against-undo~1]
     public UndoSuspension suspendUndo(String name) {
         Suspension suspension = new Suspension(name);
         synchronized (this) {

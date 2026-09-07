@@ -272,6 +272,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
         Platform.runLater(() -> {
+            // [impl->req~logic.undo.modified-marker-derived~1]
             changedProperty.bind(journal().hasChangedProperty());
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ ->
@@ -323,12 +324,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
+        setDatabaseContext(result.getDatabaseContext());
         if (result.getChangedOnMigration()) {
-            // Rewritten while loading, so there is no step to undo it with.
+            // Rewritten while loading, so there is no step to undo it with. After the context is
+            // installed: until then, journal() answers for the loading placeholder, whose journal
+            // setDatabaseContext then discards.
             journal().markChanged();
         }
-
-        setDatabaseContext(result.getDatabaseContext());
         // Notify listeners that the auto-completer may have changed
         if (autoCompleterChangedListener != null) {
             autoCompleterChangedListener.run();
@@ -940,8 +942,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        importHandler.importCleanedEntries(null, entries);
-        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+        // One step, opened around the insert so that the automatic assignment it sets off is
+        // recorded inside it rather than as a second step the user has to undo separately.
+        getUndoManager().addEdit(Localization.lang("Import entries"), edit -> {
+            importHandler.importCleanedEntries(null, entries);
+            edit.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+        });
         stateManager.setSelectedEntries(entries);
 
         // Only show/select individual entry for single-entry imports.

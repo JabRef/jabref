@@ -23,6 +23,7 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.SaveOrder.OrderType;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 ///
 /// The fields are enumerated reflectively, so adding one without extending `overwriteWith` - or
 /// without populating it here - fails.
+@NullMarked
 class MetaDataOverwriteWithTest {
 
     /// Not contents: the listeners registered on an instance, the binding derived from the group

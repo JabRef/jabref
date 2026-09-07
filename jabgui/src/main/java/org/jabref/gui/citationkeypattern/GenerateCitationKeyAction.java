@@ -109,15 +109,26 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     private BackgroundTask<Void> generateKeysInBackground(BibDatabaseContext databaseContext) {
         UndoManager undoManager = stateManager.getUndoManager(databaseContext);
-        LibraryTab libraryTab = tabSupplier.get();
         CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
-        // The keys are written entry by entry in call() and handed over in the success handler, so
-        // the library is held against undo across both. Closed on every path out of the task.
+        // The keys are written entry by entry in call(), which is also where they are handed over
+        // and the library released: cancelling the task reaches neither the success nor the failure
+        // handler, and the keys written before it still have to be undoable.
         UndoSuspension suspended = undoManager.suspendUndo(StandardActions.GENERATE_CITE_KEYS.getText());
 
         BackgroundTask<Void> backgroundTask = new BackgroundTask<>() {
             @Override
             public Void call() {
+                try {
+                    return generateKeys();
+                } finally {
+                    if (compound.hasEdits()) {
+                        undoManager.addEdit(compound.toChangeSet());
+                    }
+                    suspended.close();
+                }
+            }
+
+            private Void generateKeys() {
                 if (isCanceled) {
                     return null;
                 }
@@ -147,20 +158,8 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             }
         };
 
-        return backgroundTask
-                .onSuccess(_ -> {
-                    try {
-                        // register the undo event only if new citation keys were generated
-                        if (compound.hasEdits()) {
-                            undoManager.addEdit(compound.toChangeSet());
-                        }
-
-                        dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
-                    } finally {
-                        suspended.close();
-                    }
-                })
-                .onFailure(_ -> suspended.close());
+        return backgroundTask.onSuccess(_ ->
+                dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size())));
     }
 
     private String formatOutputMessage(String start, int count) {

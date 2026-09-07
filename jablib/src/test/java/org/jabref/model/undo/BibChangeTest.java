@@ -179,6 +179,7 @@ class BibChangeTest {
     /// the same field meanwhile, and the step recorded for one of them no longer describes what the
     /// library holds. Writing over it would produce a state no step on the stack describes.
     @Test
+    // [utest->req~logic.undo.stale-change-refused~1]
     void aChangeRefusesWhenTheLibraryMovedOnUnderIt() {
         BibEntry entry = entry();
         UndoableFieldChange change = new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr");

@@ -275,6 +275,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     ///
     /// The prior tree is copied before the operation runs — it is the very tree the operation is
     /// about to mutate.
+    // [impl->req~logic.undo.group-operations-recorded~1]
     public void recordTreeChange(String name, Consumer<CompoundEdit> operation) {
         currentDatabase.ifPresent(database -> {
             MetaData metaData = database.getMetaData();

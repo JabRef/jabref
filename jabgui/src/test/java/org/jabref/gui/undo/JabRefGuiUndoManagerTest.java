@@ -46,6 +46,7 @@ class JabRefGuiUndoManagerTest {
     /// The tab draws its modified marker from this, so it has to follow both edits and saves.
     /// Driven from the test thread, so each step waits for the queued update, as above.
     @Test
+    // [utest->req~logic.undo.modified-marker-derived~1]
     void theChangedPropertyFollowsTheSavedPosition() {
         assertFalse(undoManager.hasChangedProperty().get());
 

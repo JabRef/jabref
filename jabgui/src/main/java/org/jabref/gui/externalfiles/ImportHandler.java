@@ -162,11 +162,20 @@ public class ImportHandler {
             public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
                 String name = Localization.lang("Import entries");
-                // Closed on the JavaFX thread once the entries are actually in the database, which
-                // happens after this method returns - not with a try-with-resources here, which
-                // would release while the insert is still queued.
+                // Released on the JavaFX thread once the entries are actually in the database,
+                // which happens after this method returns - and by the catch below if anything
+                // fails before that runnable is dispatched.
                 UndoSuspension suspended = undoManager.suspendUndo(name);
                 CompoundEdit compoundEdit = new CompoundEdit(name);
+                try {
+                    return importFiles(files, transferMode, compoundEdit, suspended);
+                } catch (RuntimeException | Error e) {
+                    suspended.close();
+                    throw e;
+                }
+            }
+
+            private List<ImportFilesResultItemViewModel> importFiles(List<Path> files, TransferMode transferMode, CompoundEdit compoundEdit, UndoSuspension suspended) {
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
@@ -262,23 +271,21 @@ public class ImportHandler {
                     counter++;
                 }
 
-                try {
-                    // The whole import is one undo step, so this is pushed once, after the loop.
-                    undoManager.addEdit(compoundEdit.toChangeSet());
-                    // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
-                    // That method does a clone() on each entry
-                    UiTaskExecutor.runInJavaFXThread(() -> {
-                        try {
+                // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
+                // That method does a clone() on each entry
+                UiTaskExecutor.runInJavaFXThread(() -> {
+                    try {
+                        // One step for the whole import, opened here so that what the insert sets
+                        // off - group assignment, and the tab's automatic assignment to the
+                        // selected groups - is recorded inside it rather than after it.
+                        undoManager.addEdit(Localization.lang("Import entries"), edit -> {
+                            edit.addEdit(compoundEdit.toChangeSet());
                             importEntries(allEntriesToAdd);
-                        } finally {
-                            suspended.close();
-                        }
-                    });
-                } catch (RuntimeException | Error e) {
-                    // The queued insert never got dispatched, so nothing else will release it.
-                    suspended.close();
-                    throw e;
-                }
+                        });
+                    } finally {
+                        suspended.close();
+                    }
+                });
                 return results;
             }
 
