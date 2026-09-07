@@ -413,7 +413,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     // [impl->req~entry-editor.main-tab.remove-field~1]
     private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Node editorNode = editors.get(field).getNode();
-        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)) {
+        // The file row exists only inside an open files and links section, which re-adds it on every
+        // rebuild — removing it would bring it straight back, so it gets no remove button either.
+        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)
+                || (StandardField.FILE == field)) {
             return editorNode;
         }
 

@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
@@ -62,6 +63,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -252,10 +254,29 @@ class AllFieldsTabTest {
                 filesAndLinksRowLabels());
     }
 
+    /// An unwrapped editor node means no remove button was overlaid on the row.
+    // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
+    @Test
+    void fileEditorRowOffersNoRemoveButton() throws InterruptedException {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("CiteKey2021")
+                .withField(StandardField.URL, "https://example.org");
+
+        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+
+        GridPane grid = (GridPane) ((VBox) filesAndLinksPane().getContent()).getChildren().getFirst();
+        Node fileRow = grid.getChildren().stream()
+                           .filter(node -> Integer.valueOf(1).equals(GridPane.getColumnIndex(node))
+                                   && Integer.valueOf(0).equals(GridPane.getRowIndex(node)))
+                           .findFirst()
+                           .orElseThrow();
+
+        assertSame(tab.editors.get(StandardField.FILE).getNode(), fileRow);
+    }
+
     // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
     @Test
     void fileEditorAppearsWhenFilesAndLinksSectionIsOpen() throws InterruptedException {
-        // A set URL opens the files and links section, which always shows the file editor.
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withCitationKey("CiteKey2021")
                 .withField(StandardField.URL, "https://example.org");
