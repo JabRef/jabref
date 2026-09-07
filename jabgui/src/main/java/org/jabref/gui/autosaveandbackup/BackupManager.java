@@ -40,6 +40,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +84,7 @@ public class BackupManager {
     // During writing, the less recent backup file is deleted
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
     private boolean needsBackup = false;
+    private Subscription modifiedSubscription = Subscription.EMPTY;
 
     BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -115,7 +117,7 @@ public class BackupManager {
         coarseChangeFilter.registerListener(backupManager);
         // A save or an undo back to the saved state makes the disk current, so a backup scheduled by the
         // change events before it would only duplicate the file.
-        EasyBind.subscribe(libraryTab.modifiedProperty(), modified -> {
+        backupManager.modifiedSubscription = EasyBind.subscribe(libraryTab.modifiedProperty(), modified -> {
             if (!modified) {
                 backupManager.clearPendingBackup();
             }
@@ -329,9 +331,27 @@ public class BackupManager {
 
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        if (!event.isFiltered()) {
-            this.needsBackup = true;
+        if (event.isFiltered()) {
+            return;
         }
+        if (!needsBackup) {
+            // A discard marker only covers the backups written before it. This manager may have been
+            // reinstalled after a shutdown that discarded (a failed "Save as"), so a change from now
+            // on makes the marker stale and the next backup worth offering again.
+            removeDiscardMarker();
+        }
+        this.needsBackup = true;
+    }
+
+    private void removeDiscardMarker() {
+        bibDatabaseContext.getDatabasePath().ifPresent(path -> {
+            Path marker = determineDiscardedFile(path, preferences.getFilePreferences().getBackupDirectory());
+            try {
+                Files.deleteIfExists(marker);
+            } catch (IOException e) {
+                LOGGER.warn("Could not remove discard marker {}", marker, e);
+            }
+        });
     }
 
     synchronized void clearPendingBackup() {
@@ -361,6 +381,7 @@ public class BackupManager {
     /// @param createBackup If the backup manager should still perform a backup
     private void shutdown(Path backupDir, boolean createBackup) {
         coarseChangeFilter.unregisterListener(this);
+        modifiedSubscription.unsubscribe();
         executor.shutdown();
 
         if (!libraryTab.isModified()) {

@@ -301,4 +301,23 @@ class BackupManagerTest {
 
         assertEquals(List.of(), Files.list(backupDir).toList());
     }
+
+    @Test
+    void aChangeAfterADiscardMakesTheNextBackupWorthOffering(@TempDir Path customDir) throws IOException {
+        Path backupDir = customDir.resolve("subBackupDir");
+        Files.createDirectories(backupDir);
+        Path libraryPath = customDir.resolve("Bibfile.bib");
+        Files.writeString(libraryPath, "@Article{key, title = {Title}}");
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.setDatabasePath(libraryPath);
+
+        BackupManager manager = BackupManager.start(modifiedTab(true), databaseContext, mock(CoarseChangeFilter.class), mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS), preferencesWithBackupDir(backupDir));
+        manager.discardBackup(backupDir);
+        manager.listen(new MetaDataChangedEvent(new MetaData()));
+        manager.determineBackupPathForNewBackup(backupDir).ifPresent(manager::performBackup);
+        Path backup = Files.list(backupDir).findFirst().orElseThrow();
+        Files.setLastModifiedTime(backup, FileTime.fromMillis(Files.getLastModifiedTime(libraryPath).toMillis() + 10_000));
+
+        assertTrue(BackupManager.backupFileDiffers(libraryPath, backupDir));
+    }
 }

@@ -617,10 +617,37 @@ class JabRefUndoManagerTest {
     }
 
     @Test
-    void aDerivedChangeOutsideAStepIsNotRecorded() {
+    void aDerivedChangeOutsideAStepIsNotAStepOfItsOwn() {
         undoRedoManager.addDerivedEdit(setAuthor("Bohr"));
 
         assertFalse(undoRedoManager.canUndo());
+    }
+
+    @Test
+    void aDerivedChangeJoinsTheChangeRecordedAfterIt() {
+        entry.registerListener(new YearStamper());
+
+        // The listener reacts while the field is set, before the change reaches the journal
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        undoRedoManager.undo();
+
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
+        assertFalse(undoRedoManager.canUndo());
+    }
+
+    @Test
+    void aDerivedChangeOfAnotherEntryDoesNotJoin() {
+        entry.registerListener(new YearStamper());
+        BibEntry other = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Bohr");
+        entry.setField(StandardField.AUTHOR, "Planck");
+
+        other.setField(StandardField.AUTHOR, "Heisenberg");
+        undoRedoManager.addEdit(new UndoableFieldChange(other, StandardField.AUTHOR, "Bohr", "Heisenberg"));
+        undoRedoManager.undo();
+
+        assertEquals(Optional.of("Bohr"), other.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("1905"), entry.getField(StandardField.YEAR));
     }
 
     @Test

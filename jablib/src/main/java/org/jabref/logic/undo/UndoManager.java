@@ -33,9 +33,10 @@ public interface UndoManager {
     void applyEdit(BibChange change);
 
     /// Records a change that another change caused, such as a timestamp a listener writes in
-    /// reaction to an edit. It joins the step being applied or recorded on this thread, so undoing
-    /// that step reverses the cause and the effect together. Outside such a step nothing is
-    /// recorded: the causing change is not undoable, so its effect must not become undoable alone.
+    /// reaction to an edit. It joins the step being applied or recorded on this thread, or the
+    /// next change recorded on this thread for the same entry, so undoing that step reverses the
+    /// cause and the effect together. It never becomes a step of its own: a derived change whose
+    /// cause is not recorded belongs to a change that is not undoable.
     void addDerivedEdit(BibChange change);
 
     /// Whether this thread is currently undoing or redoing. A listener that reacts to library
