@@ -49,7 +49,7 @@ public class BibEntryView {
 
         entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -> {
             Node summary = createSummary(summaryText);
-            summary.getStyleClass().add("padding-top-6");
+            summary.getStyleClass().add("padding-top-4");
             entryContainer.getChildren().add(summary);
         });
 

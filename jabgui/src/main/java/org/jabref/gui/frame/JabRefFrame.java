@@ -2,7 +2,6 @@ package org.jabref.gui.frame;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -61,10 +60,8 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.DBMSConnectionProperties;
-import org.jabref.logic.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.shared.SharedDatabaseSessionService;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -428,6 +425,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
                 stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
+                // The editor keeps its last entry on an empty selection (req~entry-editor.keep-showing~1), which
+                // would leave another library's entry on screen here; the new library has nothing to edit yet.
+                if (libraryTab.getSelectedEntries().isEmpty()) {
+                    stateManager.getEditorShowing().set(false);
+                }
 
                 // Update active search query when switching between databases
                 if (preferences.getSearchPreferences().shouldKeepSearchString()) {
@@ -704,18 +706,28 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         // [impl->req~shared-database.reopen-on-startup~1]
-        // ponytail: connects on the FX thread like the login dialog does; move to a BackgroundTask if startup stalls on unreachable servers
-        for (String sharedDatabaseId : List.copyOf(preferences.getLastFilesOpenedPreferences().getLastSharedDatabasesOpened())) {
-            DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseId));
-            try {
-                SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
-                LibraryTab libraryTab = manager.openTab(manager.connect(connectionProperties));
-                libraryTab.getDatabase().setSharedDatabaseID(sharedDatabaseId);
-            } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException e) {
-                LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, e);
-                dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                        Localization.lang("Could not reconnect to shared database %0.", connectionProperties.getDatabase()), e);
-            }
+        SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService();
+        for (SharedDatabaseSessionService.Reconnection reconnection : sessionService.getDatabasesToReconnect(preferences.getLastFilesOpenedPreferences())) {
+            String sharedDatabaseId = reconnection.sharedDatabaseId();
+            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
+            // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
+            // The callbacks check the stage: a quit while the attempt is pending must neither add a tab nor pop a dialog.
+            BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()))
+                          .onSuccess(bibDatabaseContext -> {
+                              if (!mainStage.isShowing()) {
+                                  bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+                                  return;
+                              }
+                              sessionService.restoreSharedDatabaseId(manager.openTab(bibDatabaseContext).getBibDatabaseContext(), sharedDatabaseId);
+                          })
+                          .onFailure(exception -> {
+                              LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
+                              if (mainStage.isShowing()) {
+                                  dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
+                                          Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
+                              }
+                          })
+                          .executeWith(taskExecutor);
         }
     }
 

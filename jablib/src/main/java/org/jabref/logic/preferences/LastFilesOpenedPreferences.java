@@ -36,6 +36,12 @@ public class LastFilesOpenedPreferences {
 
     public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
                                       @Nullable Path lastFocusedFile,
+                                      FileHistory fileHistory) {
+        this(lastFilesOpened, lastFocusedFile, List.of(), fileHistory);
+    }
+
+    public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
+                                      @Nullable Path lastFocusedFile,
                                       List<String> lastSharedDatabasesOpened,
                                       FileHistory fileHistory) {
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
