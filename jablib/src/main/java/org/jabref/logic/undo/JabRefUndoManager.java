@@ -1,14 +1,19 @@
 package org.jabref.logic.undo;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.undo.BibChange;
 import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableChangeType;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -110,6 +115,15 @@ public class JabRefUndoManager implements UndoManager {
     /// step, and would have two threads appending to one recorder's list.
     private final ThreadLocal<@Nullable CompoundEdit> active = new ThreadLocal<>();
 
+    /// Set while [#undo] or [#redo] applies a change on this thread. See [#isReplaying].
+    private final ThreadLocal<Boolean> replaying = ThreadLocal.withInitial(() -> false);
+
+    /// Derived changes made outside a step, waiting for the change that caused them. Many callers
+    /// modify the library first and record the change afterwards, so the effect arrives before its
+    /// cause; [#addEdit(BibChange)] joins them by entry. Cleared by every other journal operation:
+    /// a derived change nothing records afterwards came from a change that is not undoable.
+    private final ThreadLocal<List<BibChange>> pendingDerived = ThreadLocal.withInitial(ArrayList::new);
+
     /// Records a single change as its own undo step, or as part of the enclosing step when
     /// called inside [#addEdit].
     ///
@@ -117,6 +131,10 @@ public class JabRefUndoManager implements UndoManager {
     /// several changes together, and its name describes that grouping to the user.
     @Override
     public void addEdit(BibChange change) {
+        if (isReplaying()) {
+            LOGGER.debug("Dropping change recorded while undoing or redoing: {}", change);
+            return;
+        }
         CompoundEdit compound = active.get();
         if (compound != null) {
             compound.addEdit(change);
@@ -125,10 +143,40 @@ public class JabRefUndoManager implements UndoManager {
         if (isEmptyStep(change)) {
             return;
         }
+        BibChange step = withPendingDerived(change);
         synchronized (this) {
-            push(change);
+            push(step);
         }
         notifyListeners();
+    }
+
+    /// Folds the pending derived changes that concern the same entries as `change` into one step
+    /// with it, ordered so that undoing reverses `change` first and the derived changes after it.
+    private BibChange withPendingDerived(BibChange change) {
+        List<BibChange> pending = pendingDerived.get();
+        pendingDerived.remove();
+        List<BibEntry> entries = entriesOf(change).toList();
+        List<BibChange> joined = new ArrayList<>(pending.stream()
+                                                        .filter(derived -> entriesOf(derived).anyMatch(derivedEntry -> entries.stream().anyMatch(entry -> entry == derivedEntry)))
+                                                        .toList());
+        if (joined.isEmpty()) {
+            return change;
+        }
+        joined.add(change);
+        return new ChangeSet(change instanceof ChangeSet changeSet ? changeSet.name() : "", joined);
+    }
+
+    private static Stream<BibEntry> entriesOf(BibChange change) {
+        return switch (change) {
+            case UndoableFieldChange fieldChange ->
+                    Stream.of(fieldChange.entry());
+            case UndoableChangeType typeChange ->
+                    Stream.of(typeChange.entry());
+            case ChangeSet changeSet ->
+                    changeSet.changes().stream().flatMap(JabRefUndoManager::entriesOf);
+            default ->
+                    Stream.empty();
+        };
     }
 
     /// Performs `change` and records it in one go, so that the write to the library and the
@@ -156,6 +204,12 @@ public class JabRefUndoManager implements UndoManager {
     @Override
     // [impl->req~logic.undo.apply-and-record-atomically~1]
     public void applyEdit(BibChange change) {
+        if (isReplaying()) {
+            // Pushing here would put the change above the step being undone, and the pop that
+            // follows would remove it instead of that step.
+            LOGGER.debug("Dropping change applied while undoing or redoing: {}", change);
+            return;
+        }
         CompoundEdit compound = active.get();
         if (compound != null) {
             compound.applyEdit(change);
@@ -164,11 +218,41 @@ public class JabRefUndoManager implements UndoManager {
         if (isEmptyStep(change)) {
             return;
         }
+        pendingDerived.remove();
         synchronized (this) {
-            change.apply();
-            push(change);
+            // A recorder is open while the change runs so that whatever listeners change in
+            // reaction (see addDerivedEdit) lands in this step rather than becoming a step of its own.
+            CompoundEdit step = new CompoundEdit("");
+            step.addEdit(change);
+            active.set(step);
+            try {
+                change.apply();
+            } finally {
+                active.remove();
+            }
+            ChangeSet changeSet = step.toChangeSet();
+            push(changeSet.changes().size() == 1 ? change : changeSet);
         }
         notifyListeners();
+    }
+
+    @Override
+    // [impl->req~logic.undo.derived-changes-join-their-step~1]
+    public void addDerivedEdit(BibChange change) {
+        if (isReplaying()) {
+            return;
+        }
+        CompoundEdit compound = active.get();
+        if (compound != null) {
+            compound.addEdit(change);
+        } else {
+            pendingDerived.get().add(change);
+        }
+    }
+
+    @Override
+    public boolean isReplaying() {
+        return replaying.get();
     }
 
     /// Whether `change` would be an undo step that does nothing.
@@ -257,7 +341,7 @@ public class JabRefUndoManager implements UndoManager {
                 return;
             }
             UndoJournalEntry journalEntry = undoStack.getFirst();
-            journalEntry.change().inverted().apply();
+            replay(journalEntry.change().inverted());
             undoStack.pop();
             // Moved with its id, so redoing returns to the position it came from rather than to
             // a new one that only looks the same.
@@ -272,11 +356,21 @@ public class JabRefUndoManager implements UndoManager {
                 return;
             }
             UndoJournalEntry journalEntry = redoStack.getFirst();
-            journalEntry.change().apply();
+            replay(journalEntry.change());
             redoStack.pop();
             undoStack.push(journalEntry);
         }
         notifyListeners();
+    }
+
+    private void replay(BibChange change) {
+        pendingDerived.remove();
+        replaying.set(true);
+        try {
+            change.apply();
+        } finally {
+            replaying.remove();
+        }
     }
 
     /// Registers a listener, from any thread and at any time — including from inside another

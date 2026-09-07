@@ -27,4 +27,12 @@ No other thread can observe the library holding a change the journal does not ye
 
 Needs: impl, utest
 
+## A change caused by another change is undone together with it
+`req~logic.undo.derived-changes-join-their-step~1`
+
+When applying or recording a change makes a listener change the library in turn, such as updating an entry's modification date, that derived change belongs to the same undo step.
+Undoing the step reverses both, so the library is back at exactly the state before the edit, and undoing or redoing a step never triggers the listener again.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

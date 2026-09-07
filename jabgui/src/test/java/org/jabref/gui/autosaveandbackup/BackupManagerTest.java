@@ -10,6 +10,9 @@ import java.nio.file.attribute.FileTime;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
@@ -192,7 +195,7 @@ class BackupManagerTest {
         when(filePreferences.shouldCreateBackup()).thenReturn(false);
 
         BackupManager manager = BackupManager.start(
-                mock(LibraryTab.class),
+                modifiedTab(true),
                 databaseContext,
                 mock(CoarseChangeFilter.class),
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
@@ -220,7 +223,7 @@ class BackupManagerTest {
         when(filePreferences.shouldCreateBackup()).thenReturn(true);
 
         BackupManager manager = BackupManager.start(
-                mock(LibraryTab.class),
+                modifiedTab(true),
                 databaseContext,
                 mock(CoarseChangeFilter.class),
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
@@ -237,5 +240,84 @@ class BackupManagerTest {
         // we only know the first backup path because the second one is created on shutdown
         // due to timing issues we cannot test that reliable
         assertEquals(fullBackupPath.get(), files.getFirst());
+    }
+
+    private static LibraryTab modifiedTab(boolean modified) {
+        return tab(new SimpleBooleanProperty(modified));
+    }
+
+    private static LibraryTab tab(BooleanProperty modified) {
+        LibraryTab libraryTab = mock(LibraryTab.class);
+        when(libraryTab.modifiedProperty()).thenReturn(modified);
+        when(libraryTab.isModified()).thenAnswer(_ -> modified.get());
+        return libraryTab;
+    }
+
+    private static CliPreferences preferencesWithBackupDir(Path backupDir) {
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
+        when(filePreferences.shouldCreateBackup()).thenReturn(true);
+        return preferences;
+    }
+
+    // [utest->req~jabgui.autosaveandbackup.discard-on-clean-close~1]
+    @Test
+    void closingAnUnmodifiedLibraryDiscardsTheBackup(@TempDir Path customDir) throws IOException {
+        Path backupDir = customDir.resolve("subBackupDir");
+        Files.createDirectories(backupDir);
+        Path libraryPath = customDir.resolve("Bibfile.bib");
+        Files.writeString(libraryPath, "@Article{key, title = {Title}}");
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.setDatabasePath(libraryPath);
+        BooleanProperty modified = new SimpleBooleanProperty(true);
+
+        BackupManager manager = BackupManager.start(tab(modified), databaseContext, mock(CoarseChangeFilter.class), mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS), preferencesWithBackupDir(backupDir));
+        manager.listen(new MetaDataChangedEvent(new MetaData()));
+        manager.determineBackupPathForNewBackup(backupDir).ifPresent(manager::performBackup);
+        Path backup = Files.list(backupDir).findFirst().orElseThrow();
+        Files.setLastModifiedTime(backup, FileTime.fromMillis(Files.getLastModifiedTime(libraryPath).toMillis() + 10_000));
+        assertTrue(BackupManager.backupFileDiffers(libraryPath, backupDir));
+
+        modified.set(false);
+        BackupManager.shutdown(databaseContext, backupDir, true);
+
+        assertFalse(BackupManager.backupFileDiffers(libraryPath, backupDir));
+    }
+
+    @Test
+    void aLibraryBackToItsSavedStateNeedsNoBackup(@TempDir Path customDir) throws IOException {
+        Path backupDir = customDir.resolve("subBackupDir");
+        Files.createDirectories(backupDir);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.setDatabasePath(customDir.resolve("Bibfile.bib"));
+        BooleanProperty modified = new SimpleBooleanProperty(true);
+
+        BackupManager manager = BackupManager.start(tab(modified), databaseContext, mock(CoarseChangeFilter.class), mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS), preferencesWithBackupDir(backupDir));
+        manager.listen(new MetaDataChangedEvent(new MetaData()));
+        modified.set(false);
+        manager.determineBackupPathForNewBackup(backupDir).ifPresent(manager::performBackup);
+
+        assertEquals(List.of(), Files.list(backupDir).toList());
+    }
+
+    @Test
+    void aChangeAfterADiscardMakesTheNextBackupWorthOffering(@TempDir Path customDir) throws IOException {
+        Path backupDir = customDir.resolve("subBackupDir");
+        Files.createDirectories(backupDir);
+        Path libraryPath = customDir.resolve("Bibfile.bib");
+        Files.writeString(libraryPath, "@Article{key, title = {Title}}");
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.setDatabasePath(libraryPath);
+
+        BackupManager manager = BackupManager.start(modifiedTab(true), databaseContext, mock(CoarseChangeFilter.class), mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS), preferencesWithBackupDir(backupDir));
+        manager.discardBackup(backupDir);
+        manager.listen(new MetaDataChangedEvent(new MetaData()));
+        manager.determineBackupPathForNewBackup(backupDir).ifPresent(manager::performBackup);
+        Path backup = Files.list(backupDir).findFirst().orElseThrow();
+        Files.setLastModifiedTime(backup, FileTime.fromMillis(Files.getLastModifiedTime(libraryPath).toMillis() + 10_000));
+
+        assertTrue(BackupManager.backupFileDiffers(libraryPath, backupDir));
     }
 }

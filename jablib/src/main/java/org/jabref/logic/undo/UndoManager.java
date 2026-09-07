@@ -31,4 +31,16 @@ public interface UndoManager {
 
     /// Performs `change` and records it in one go.
     void applyEdit(BibChange change);
+
+    /// Records a change that another change caused, such as a timestamp a listener writes in
+    /// reaction to an edit. It joins the step being applied or recorded on this thread, or the
+    /// next change recorded on this thread for the same entry, so undoing that step reverses the
+    /// cause and the effect together. It never becomes a step of its own: a derived change whose
+    /// cause is not recorded belongs to a change that is not undoable.
+    void addDerivedEdit(BibChange change);
+
+    /// Whether this thread is currently undoing or redoing. A listener that reacts to library
+    /// changes by making further changes must stay silent then: the replayed step already contains
+    /// the effect, and reacting again would leave the library in a state that was never recorded.
+    boolean isReplaying();
 }
