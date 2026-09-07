@@ -59,7 +59,7 @@ Needs: impl
 
 Whenever the files and links section is expanded, it shows the file editor as its first row, also when the entry has no file linked. The editor's own buttons add, search for, or download a file; no file dialog opens on its own.
 
-Needs: impl
+Needs: impl, utest
 
 ## Arbitrary fields can be added via a field-name box
 `req~entry-editor.main-tab.free-form-add~1`
