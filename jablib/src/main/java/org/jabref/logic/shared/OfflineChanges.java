@@ -91,24 +91,37 @@ public class OfflineChanges {
     /// Loads the changes recorded for the given database, if any
     public static OfflineChanges load(Path directory, DatabaseConnectionProperties properties) {
         OfflineChanges changes = new OfflineChanges(directory.resolve(fileName(properties)));
-        if (!Files.exists(changes.file)) {
-            return changes;
+        changes.reload();
+        return changes;
+    }
+
+    /// Takes over what is on disk, so that a change is never applied to a snapshot another JabRef
+    /// session has meanwhile written to. Called before every modification.
+    ///
+    /// ponytail: read and write are not one atomic step - two sessions recording at the very same
+    /// moment can still lose a record; a lock file would close that window
+    private void reload() {
+        changedEntries.clear();
+        newEntries.clear();
+        removedEntries.clear();
+        metaData = null;
+        if (!Files.exists(file)) {
+            return;
         }
         try {
             // Gson returns null for a file holding JSON null, and leaves absent members null
-            Recorded recorded = GSON.fromJson(Files.readString(changes.file), Recorded.class);
+            Recorded recorded = GSON.fromJson(Files.readString(file), Recorded.class);
             if (recorded == null) {
-                LOGGER.error("The changes recorded for the shared database in {} are empty", changes.file);
-                return changes;
+                LOGGER.error("The changes recorded for the shared database in {} are empty", file);
+                return;
             }
-            changes.changedEntries.putAll(requireNonNullElse(recorded.changedEntries(), Map.of()));
-            changes.newEntries.putAll(requireNonNullElse(recorded.newEntries(), Map.of()));
-            changes.removedEntries.putAll(requireNonNullElse(recorded.removedEntries(), Map.of()));
-            changes.metaData = recorded.metaData();
+            changedEntries.putAll(requireNonNullElse(recorded.changedEntries(), Map.of()));
+            newEntries.putAll(requireNonNullElse(recorded.newEntries(), Map.of()));
+            removedEntries.putAll(requireNonNullElse(recorded.removedEntries(), Map.of()));
+            metaData = recorded.metaData();
         } catch (IOException | JsonParseException e) {
-            LOGGER.error("Could not read the changes recorded for the shared database from {}", changes.file, e);
+            LOGGER.error("Could not read the changes recorded for the shared database from {}", file, e);
         }
-        return changes;
     }
 
     /// One file per database: identified by user, host, port and database name (or the JDBC URL
@@ -125,6 +138,7 @@ public class OfflineChanges {
     }
 
     public synchronized void recordChange(BibEntry entry) {
+        reload();
         int sharedId = entry.getSharedBibEntryData().getSharedIdAsInt();
         if ((sharedId == -1) || newEntries.containsKey(entry.getId())) {
             // Not yet on the shared side
@@ -138,6 +152,7 @@ public class OfflineChanges {
     }
 
     public synchronized void recordInsert(List<BibEntry> entries) {
+        reload();
         for (BibEntry entry : entries) {
             newEntries.put(entry.getId(), EntryState.of(entry));
         }
@@ -145,6 +160,7 @@ public class OfflineChanges {
     }
 
     public synchronized void recordRemoval(List<BibEntry> entries) {
+        reload();
         for (BibEntry entry : entries) {
             if (newEntries.remove(entry.getId()) != null) {
                 // Never reached the shared side - nothing to remove there
@@ -161,12 +177,14 @@ public class OfflineChanges {
     }
 
     public synchronized void recordMetaData(Map<String, String> serializedMetaData) {
+        reload();
         metaData = serializedMetaData;
         save();
     }
 
     /// Drops the record of an entry that reached the shared database after all
     public synchronized void forget(BibEntry entry) {
+        reload();
         boolean removed = newEntries.remove(entry.getId()) != null;
         removed |= changedEntries.remove(entry.getSharedBibEntryData().getSharedIdAsInt()) != null;
         if (removed) {
@@ -177,6 +195,7 @@ public class OfflineChanges {
     /// Drops the record of a change that is written as an insert instead, because the shared entry
     /// it was recorded against is gone
     public synchronized void forgetChange(int sharedId) {
+        reload();
         if (changedEntries.remove(sharedId) != null) {
             save();
         }
@@ -185,6 +204,7 @@ public class OfflineChanges {
     /// Drops the records of removals that reached the shared database (or need not, because the
     /// shared entry is gone or was kept)
     public synchronized void forgetRemovals(Collection<Integer> sharedIds) {
+        reload();
         if (removedEntries.keySet().removeAll(sharedIds)) {
             save();
         }
@@ -192,6 +212,7 @@ public class OfflineChanges {
 
     /// Drops the recorded metadata after it reached the shared database
     public synchronized void forgetMetaData() {
+        reload();
         if (metaData != null) {
             metaData = null;
             save();
@@ -201,6 +222,7 @@ public class OfflineChanges {
     /// Hands out everything recorded so far. The records are kept until each of them is written
     /// (see the `forget` methods), so that nothing is lost when the replay fails or is interrupted.
     public synchronized Recorded peek() {
+        reload();
         return new Recorded(new LinkedHashMap<>(changedEntries), new LinkedHashMap<>(newEntries), new LinkedHashMap<>(removedEntries), metaData);
     }
 

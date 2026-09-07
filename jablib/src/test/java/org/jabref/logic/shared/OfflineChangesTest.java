@@ -123,6 +123,17 @@ class OfflineChangesTest {
     }
 
     @Test
+    void secondSessionDoesNotOverwriteTheRecordsOfTheFirst() {
+        OfflineChanges first = OfflineChanges.load(directory, properties);
+        OfflineChanges second = OfflineChanges.load(directory, properties);
+
+        first.recordChange(sharedEntry(1, 1));
+        second.recordChange(sharedEntry(2, 1));
+
+        assertEquals(Set.of(1, 2), OfflineChanges.load(directory, properties).peek().changedEntries().keySet());
+    }
+
+    @Test
     void differentDatabasesUseDifferentFiles() {
         DBMSConnectionProperties other = new DBMSConnectionPropertiesBuilder()
                 .setType(DBMSType.POSTGRESQL)
