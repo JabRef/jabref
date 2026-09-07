@@ -55,15 +55,16 @@ class JavaFxExtensionTest {
     void lookupFindsNodesBySelectorTypeAndMatcher() {
         HBox root = new HBox();
         Button expectedButton = new Button("Expected");
+        Button otherButton = new Button("Other");
 
         JavaFxExtension.invokeAndWait(() -> {
             Label label = new Label("Label");
-            Button otherButton = new Button("Other");
             root.getChildren().addAll(label, otherButton, expectedButton);
             root.getChildren().forEach(node -> node.getStyleClass().add("candidate"));
         });
 
         assertEquals(2, JavaFxExtension.lookupAll(root, ".candidate", Button.class).size());
+        assertEquals(otherButton, JavaFxExtension.lookup(root, ".candidate", Button.class));
         assertEquals(
                 expectedButton,
                 JavaFxExtension.lookup(root, ".candidate", Button.class, button -> "Expected".equals(button.getText())));

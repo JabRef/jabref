@@ -95,6 +95,10 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
         return lookupAll(root, selector, nodeType, node -> true);
     }
 
+    public static <T extends Node> T lookup(Parent root, String selector, Class<T> nodeType) {
+        return lookup(root, selector, nodeType, node -> true);
+    }
+
     public static <T extends Node> List<T> lookupAll(Parent root, String selector, Class<T> nodeType, Predicate<T> matcher) {
         return callAndWait(() -> root.lookupAll(selector).stream()
                                      .filter(nodeType::isInstance)

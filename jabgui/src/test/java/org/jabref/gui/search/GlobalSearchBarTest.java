@@ -87,7 +87,7 @@ class GlobalSearchBarTest {
         stateManager.clearSearchHistory();
         String searchQuery = "Smith";
         // Track the node, that the search query will be typed into
-        TextInputControl searchField = (TextInputControl) hBox.lookup("#searchField");
+        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#searchField", TextInputControl.class);
 
         // The focus is on searchField node, as we click on the search box
         invokeAndWait(searchField::requestFocus);
@@ -108,7 +108,7 @@ class GlobalSearchBarTest {
     void emptyQueryIsNotRecorded() {
         stateManager.clearSearchHistory();
         String searchQuery = "";
-        TextInputControl searchField = (TextInputControl) hBox.lookup("#searchField");
+        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#searchField", TextInputControl.class);
 
         invokeAndWait(searchField::requestFocus);
         invokeAndWait(() -> searchField.appendText(searchQuery));
@@ -121,7 +121,7 @@ class GlobalSearchBarTest {
 
     @Test
     void blankQueryClearsActiveSearch() throws InterruptedException {
-        TextInputControl searchField = (TextInputControl) hBox.lookup("#searchField");
+        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#searchField", TextInputControl.class);
 
         invokeAndWait(searchField::requestFocus);
         invokeAndWait(() -> searchField.appendText("abc"));

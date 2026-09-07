@@ -3,6 +3,7 @@ package org.jabref.gui.help;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.Node;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
@@ -10,6 +11,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Language;
@@ -69,7 +71,7 @@ class AboutDialogViewTest extends JavaFxTest {
 
     @Test
     void aboutDialogHeading() {
-        assertTrue(aboutDialogView.getDialogPane().lookup(".about-heading").isVisible());
+        assertTrue(JavaFxExtension.lookup(aboutDialogView.getDialogPane(), ".about-heading", Node.class).isVisible());
     }
 
     @Test
@@ -112,11 +114,10 @@ class AboutDialogViewTest extends JavaFxTest {
     }
 
     private Button button(String text) {
-        return aboutDialogView.getDialogPane().lookupAll(".button")
-                              .stream()
-                              .map(Button.class::cast)
-                              .filter(button -> button.getText().equals(text))
-                              .findFirst()
-                              .orElseThrow();
+        return JavaFxExtension.lookup(
+                aboutDialogView.getDialogPane(),
+                ".button",
+                Button.class,
+                button -> text.equals(button.getText()));
     }
 }
