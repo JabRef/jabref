@@ -160,13 +160,14 @@ public class SharedDatabaseUIManager {
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        // Before opening: replaying changes recorded by an earlier session may already ask for a merge
+        dbmsSynchronizer.registerListener(this);
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         return bibDatabaseContext;
     }
 
     /// Shows a database returned by [#connect(DBMSConnectionProperties)] in a new tab. JavaFX thread only.
     public LibraryTab openTab(BibDatabaseContext bibDatabaseContext) {
-        dbmsSynchronizer.registerListener(this);
         dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsSynchronizer.getConnectionProperties().getType().toString()));
 
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
@@ -204,8 +205,8 @@ public class SharedDatabaseUIManager {
         bibDatabaseContext.setDatabasePath(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
-        dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dbmsSynchronizer.registerListener(this);
+        dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
 
         parserResult.setDatabaseContext(bibDatabaseContext);
