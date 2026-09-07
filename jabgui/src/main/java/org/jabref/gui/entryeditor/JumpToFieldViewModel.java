@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -36,6 +37,16 @@ public class JumpToFieldViewModel extends AbstractViewModel {
                                      .distinct()
                                      .sorted()
                                      .toList();
+    }
+
+    /// `true` when jumping to `fieldName` would add a field the entry editor does not offer,
+    /// that is: a custom field that does not exist yet.
+    public boolean isNewField(String fieldName) {
+        if (StringUtil.isBlank(fieldName)) {
+            return false;
+        }
+        String normalizedFieldName = fieldName.trim();
+        return getFieldNames().stream().noneMatch(normalizedFieldName::equalsIgnoreCase);
     }
 
     private List<Field> suggestedFields(BibEntry entry) {

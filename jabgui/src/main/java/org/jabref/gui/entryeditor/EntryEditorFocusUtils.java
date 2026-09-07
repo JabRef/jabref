@@ -113,10 +113,8 @@ class EntryEditorFocusUtils {
                .findFirst()
                .ifPresent(allFieldsTab -> {
                    BibDatabaseMode mode = allFieldsTab.getDatabaseMode();
+                   // Custom field names are added as they are typed, like the tab's free-form add row does.
                    Field canonicalField = canonicalFieldForActiveMode(field, mode);
-                   if (!FieldFactory.getAllFieldsWithOutInternal().contains(canonicalField)) {
-                       return;
-                   }
                    tabPane.getSelectionModel().select(allFieldsTab);
                    allFieldsTab.addFieldAndFocus(canonicalField);
                });
