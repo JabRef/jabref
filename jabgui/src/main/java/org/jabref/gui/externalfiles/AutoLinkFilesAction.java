@@ -34,14 +34,12 @@ public class AutoLinkFilesAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
 
-    public AutoLinkFilesAction(DialogService dialogService, GuiPreferences preferences, StateManager stateManager, UndoManager undoManager, UiTaskExecutor taskExecutor) {
+    public AutoLinkFilesAction(DialogService dialogService, GuiPreferences preferences, StateManager stateManager, UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager)));
@@ -51,7 +49,8 @@ public class AutoLinkFilesAction extends SimpleCommand {
     @Override
     public void execute() {
         final BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        final List<BibEntry> entries = stateManager.getSelectedEntries();
+        final UndoManager undoManager = stateManager.getUndoManager(database);
+        final List<BibEntry> entries = List.copyOf(stateManager.getSelectedEntries());
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 database,

@@ -15,19 +15,15 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.field.Field;
 
-import com.airhacks.afterburner.injection.Injector;
-
 public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewModel> {
-
-    private final UndoManager undoManager = Injector.instantiateModelOrService(UndoManager.class);
 
     private TableView<Field> filterList;
 
@@ -68,7 +64,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
         fieldColumn.setReorderable(false);
         fieldColumn.setCellValueFactory(cellData -> BindingsHelper.constantOf(cellData.getValue()));
         new ValueTableCellFactory<Field, Field>()
-                .withText(item -> FieldsUtil.getNameWithType(item, preferences, undoManager))
+                .withText(FieldsUtil::getNameWithType)
                 .install(fieldColumn);
 
         TableColumn<Field, Field> actionsColumn = new TableColumn<>();
@@ -100,7 +96,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
         addFieldName.setEditable(true);
         addFieldName.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());
         new ViewModelListCellFactory<Field>()
-                .withText(item -> FieldsUtil.getNameWithType(item, preferences, undoManager))
+                .withText(FieldsUtil::getNameWithType)
                 .install(addFieldName);
         addFieldName.itemsProperty().bind(viewModel.availableFieldsProperty());
         addFieldName.valueProperty().bindBidirectional(viewModel.addFieldNameProperty());
@@ -117,7 +113,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
 
         Button addField = new Button();
         addField.setGraphic(IconTheme.JabRefIcons.ADD_NOBOX.getGraphicNode());
-        addField.getStyleClass().addAll("icon-button", "narrow");
+        addField.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         addField.setPrefSize(25.0, 25.0);
         addField.setTooltip(new Tooltip(Localization.lang("Add field to filter list")));
         addField.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());

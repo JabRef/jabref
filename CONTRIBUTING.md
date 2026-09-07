@@ -179,6 +179,8 @@ In short, please keep these two principles in mind when you contribute:
 
 More reading on that is available at <https://roe.dev/blog/using-ai-in-open-source>.
 
+The [Don't paste the AI, please.](https://dontpastetheai.com/) website offers a practical perspective on using AI as an assistant rather than copying its output.
+
 We reserve the right to reject pull requests that contain little or no genuine and original contribution from the contributor.
 
 ### After submission of a pull request
@@ -228,7 +230,9 @@ We need that information for our package maintainers (e.g., those of the [debian
 In case you add a library or do major code rewrites, we ask you to document your decision. Recommended reading: [https://adr.github.io/](https://adr.github.io).
 
 We simply ask to create a new markdown file in `docs/adr` following the template presented at [https://adr.github.io/madr/](https://adr.github.io/madr/).
-You can link that ADR using `@ADR({num})` as annotation.
+You can link code to that ADR with OpenFastTrace: put the identifier `adr~{short-title}~1` directly below the ADR's title, add `Needs: impl`,
+and mark the implementation with `// [impl->adr~{short-title}~1]`.
+See [the requirements documentation](docs/requirements/index.md) for details.
 
 #### When adding a new `Localization.lang` entry
 

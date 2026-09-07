@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -132,33 +133,51 @@ public class KeywordList implements Iterable<Keyword> {
     private static List<String> splitByDelimiters(@NonNull String keywordString, @NonNull List<Character> delimiters) {
         List<String> keywordTokens = new ArrayList<>();
         StringBuilder currentToken = new StringBuilder();
-        AtomicBoolean isEscaping = new AtomicBoolean(false);
+        scanTopLevel(keywordString, delimiters,
+                currentToken::append,
+                () -> addTokenIfNotBlank(keywordTokens, currentToken));
+        addTokenIfNotBlank(keywordTokens, currentToken);
+        return keywordTokens;
+    }
+
+    /// Counts how often the delimiter occurs as an effective delimiter, i.e., at top level: not escaped and not inside braces.
+    /// Uses the same recognition rules as [#parseWithMultipleDelimiters(String, List)].
+    public static long countEffectiveDelimiters(@NonNull String keywordString, @NonNull Character delimiter) {
+        long[] count = {0};
+        scanTopLevel(keywordString, List.of(delimiter), _ -> {
+        }, () -> count[0]++);
+        return count[0];
+    }
+
+    /// Walks the string, reporting each character either as content or as an effective (top-level, unescaped) delimiter.
+    private static void scanTopLevel(@NonNull String keywordString,
+                                     @NonNull List<Character> delimiters,
+                                     @NonNull Consumer<Character> onContent,
+                                     @NonNull Runnable onDelimiter) {
+        boolean isEscaping = false;
         int braceDepth = 0;
 
         for (char currentChar : keywordString.toCharArray()) {
-            if (isEscaping.get()) {
-                currentToken.append(currentChar);
-                isEscaping.set(false);
+            if (isEscaping) {
+                onContent.accept(currentChar);
+                isEscaping = false;
             } else if (currentChar == Keyword.DEFAULT_ESCAPE_SYMBOL) {
-                currentToken.append(currentChar);
-                isEscaping.set(true);
+                onContent.accept(currentChar);
+                isEscaping = true;
             } else if (currentChar == OPENING_BRACE) {
-                currentToken.append(currentChar);
+                onContent.accept(currentChar);
                 braceDepth++;
             } else if (currentChar == CLOSING_BRACE) {
-                currentToken.append(currentChar);
+                onContent.accept(currentChar);
                 if (braceDepth > 0) {
                     braceDepth--;
                 }
             } else if ((braceDepth == 0) && delimiters.contains(currentChar)) {
-                addTokenIfNotBlank(keywordTokens, currentToken);
+                onDelimiter.run();
             } else {
-                currentToken.append(currentChar);
+                onContent.accept(currentChar);
             }
         }
-
-        addTokenIfNotBlank(keywordTokens, currentToken);
-        return keywordTokens;
     }
 
     private static void addTokenIfNotBlank(List<String> keywordTokens, StringBuilder currentToken) {

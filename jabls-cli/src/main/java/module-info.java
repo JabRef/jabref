@@ -1,3 +1,8 @@
+/// Standalone launcher for the language server in `org.jabref.jabls`.
+///
+/// Entry point: [org.jabref.languageserver.cli.ServerCli].
+///
+/// @see <a href="https://devdocs.jabref.org/architecture-and-components.html">Architecture and components</a>
 module org.jabref.jabls.cli {
     opens org.jabref.languageserver.cli to info.picocli;
 

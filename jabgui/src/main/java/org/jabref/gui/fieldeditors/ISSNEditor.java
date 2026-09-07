@@ -35,7 +35,6 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
-    @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private StateManager stateManager;
 
@@ -44,6 +43,7 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
     public ISSNEditor(Field field,
                       SuggestionProvider<?> suggestionProvider,
                       FieldCheckers fieldCheckers,
+                      UndoManager undoManager,
                       UndoAction undoAction,
                       RedoAction redoAction) {
 

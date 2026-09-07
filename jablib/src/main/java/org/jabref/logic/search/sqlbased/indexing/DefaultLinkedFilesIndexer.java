@@ -279,7 +279,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         }
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
-            LOGGER.debug("Could not resolve path of linked file {}. The file will not be indexed.", linkedFile.getLink());
+            LOGGER.warn("Could not resolve path of linked file {}. The file will not be indexed.", linkedFile.getLink());
             return null;
         }
         try {

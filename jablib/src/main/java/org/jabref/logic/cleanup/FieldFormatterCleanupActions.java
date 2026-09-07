@@ -13,6 +13,7 @@ import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeIssn;
+import org.jabref.logic.formatter.bibtexfields.NormalizeKeywordDelimitersFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
@@ -25,6 +26,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,7 @@ public class FieldFormatterCleanupActions {
                 new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
                 new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
                 new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()),
+                new FieldFormatterCleanup(StandardField.KEYWORDS, new NormalizeKeywordDelimitersFormatter()),
                 new FieldFormatterCleanup(StandardField.KEYWORDS, new ConvertMSCCodesFormatter()),
                 new FieldFormatterCleanup(StandardField.ISSN, new NormalizeIssn()));
 
@@ -84,18 +87,36 @@ public class FieldFormatterCleanupActions {
         return Collections.unmodifiableList(actions);
     }
 
+    /// The configured actions with every [KeywordSeparatorAware] formatter bound to the given library separator.
+    /// `null` leaves the actions unbound, so those formatters use the global preference.
+    public List<FieldFormatterCleanup> getConfiguredActions(@Nullable Character libraryKeywordSeparator) {
+        if (libraryKeywordSeparator == null) {
+            return getConfiguredActions();
+        }
+        return actions.stream()
+                      .map(action -> action.getFormatter() instanceof KeywordSeparatorAware aware
+                                     ? new FieldFormatterCleanup(action.getField(), aware.withKeywordSeparator(libraryKeywordSeparator))
+                                     : action)
+                      .toList();
+    }
+
     public List<FieldChange> applySaveActions(BibEntry entry) {
+        return applySaveActions(entry, null);
+    }
+
+    /// @param libraryKeywordSeparator the separator declared by the library the entry belongs to, or `null` for the global preference
+    public List<FieldChange> applySaveActions(BibEntry entry, @Nullable Character libraryKeywordSeparator) {
         if (enabled) {
-            return applyAllActions(entry);
+            return applyAllActions(entry, libraryKeywordSeparator);
         } else {
             return List.of();
         }
     }
 
-    private List<FieldChange> applyAllActions(BibEntry entry) {
+    private List<FieldChange> applyAllActions(BibEntry entry, @Nullable Character libraryKeywordSeparator) {
         List<FieldChange> result = new ArrayList<>();
 
-        for (FieldFormatterCleanup action : actions) {
+        for (FieldFormatterCleanup action : getConfiguredActions(libraryKeywordSeparator)) {
             result.addAll(action.cleanup(entry));
         }
 
