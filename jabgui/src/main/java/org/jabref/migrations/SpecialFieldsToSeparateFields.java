@@ -72,14 +72,12 @@ public class SpecialFieldsToSeparateFields implements PostOpenMigration {
                 continue;
             }
             SpecialField field = migrationTable.get(keyword.get());
-            Optional<String> currentValue = entry.getField(field);
-            if (currentValue.isEmpty()) {
-                entry.setField(field, keyword.get());
+            if (entry.getField(field).filter(value -> !value.equals(keyword.get())).isPresent()) {
+                // A different value in the special field is not overwritten; the keyword stays so that nothing is lost
+                continue;
             }
-            // A different value in the special field is not overwritten; the keyword stays so that nothing is lost
-            if (currentValue.orElse(keyword.get()).equals(keyword.get())) {
-                migratedKeywords.add(keyword);
-            }
+            entry.setField(field, keyword.get());
+            migratedKeywords.add(keyword);
         }
         entry.removeKeywords(migratedKeywords, keywordDelimiter);
     }

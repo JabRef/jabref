@@ -89,7 +89,8 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
                              new ConvertLegacyExplicitGroups(),
                              new ConvertMarkingToGroups(),
                              new SpecialFieldsToSeparateFields(keywordSeparator))
-                     .filter(migration -> !skippedMigrations.contains(migration.getId()))
+                     // A stored skip never silences a mandatory conversion: without it, saving would lose data
+                     .filter(migration -> !migration.isOptional() || !skippedMigrations.contains(migration.getId()))
                      .filter(migration -> migration.isMigrationNecessary(parserResult))
                      .toList();
     }

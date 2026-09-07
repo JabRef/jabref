@@ -47,27 +47,28 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
         ObservableList<BibEntry> entries = parserResult.getDatabase().getEntries();
         Multimap<String, BibEntry> markings = getMarkingWithEntries(entries);
         if (!markings.isEmpty()) {
-            GroupTreeNode markingRoot = GroupTreeNode.fromGroup(
-                    new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, ','));
-
+            GroupTreeNode root = parserResult.getMetaData().getGroups()
+                                             .orElseGet(() -> GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
+            // Group names are unique per library, so an existing "Markings" tree (e.g., from a partial earlier run) is extended
+            GroupTreeNode markingRoot = childNamed(root, Localization.lang("Markings"))
+                    .orElseGet(() -> {
+                        GroupTreeNode node = GroupTreeNode.fromGroup(new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, ','));
+                        root.addChild(node, 0);
+                        return node;
+                    });
             for (Map.Entry<String, Collection<BibEntry>> marking : markings.asMap().entrySet()) {
-                String markingName = marking.getKey();
-                Collection<BibEntry> markingMatchedEntries = marking.getValue();
-
-                GroupTreeNode markingGroup = markingRoot.addSubgroup(
-                        new ExplicitGroup(markingName, GroupHierarchyType.INCLUDING, ','));
-                markingGroup.addEntriesToGroup(markingMatchedEntries);
+                GroupTreeNode markingGroup = childNamed(markingRoot, marking.getKey())
+                        .orElseGet(() -> markingRoot.addSubgroup(new ExplicitGroup(marking.getKey(), GroupHierarchyType.INCLUDING, ',')));
+                markingGroup.addEntriesToGroup(marking.getValue());
             }
-
-            if (parserResult.getMetaData().getGroups().isEmpty()) {
-                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup()));
-            }
-            GroupTreeNode root = parserResult.getMetaData().getGroups().get();
-            root.addChild(markingRoot, 0);
             parserResult.getMetaData().setGroups(root);
-
-            clearMarkings(entries);
         }
+        // Blank markings carry no information, but the field has to go, otherwise the migration is offered on every open
+        clearMarkings(entries);
+    }
+
+    private static Optional<GroupTreeNode> childNamed(GroupTreeNode parent, String name) {
+        return parent.getChildren().stream().filter(child -> child.getName().equals(name)).findFirst();
     }
 
     /// Looks for markings (such as __markedentry = {[Nicolas:6]}) in the given list of entries.

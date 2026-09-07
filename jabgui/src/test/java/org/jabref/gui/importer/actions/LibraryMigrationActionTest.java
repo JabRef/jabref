@@ -58,6 +58,18 @@ class LibraryMigrationActionTest {
     }
 
     @Test
+    void mandatoryMigrationIgnoresStoredSkip() {
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));
+        parserResult.getMetaData().setGroupsInLegacyFormat(true);
+        parserResult.getMetaData().setSkippedMigrations(List.of("legacyGroups"));
+
+        List<PostOpenMigration> offered = LibraryMigrationAction.getNecessaryMigrations(parserResult, preferences);
+
+        assertEquals(List.of(ConvertLegacyExplicitGroups.class), offered.stream().map(PostOpenMigration::getClass).toList());
+    }
+
+    @Test
     void legacyGroupTreeIsDetectedFromMetaData() {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));
