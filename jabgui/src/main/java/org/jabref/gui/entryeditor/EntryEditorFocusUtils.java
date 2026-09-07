@@ -117,16 +117,16 @@ class EntryEditorFocusUtils {
                .map(AllFieldsTab.class::cast)
                .findFirst()
                .ifPresentOrElse(allFieldsTab -> {
-                   BibDatabaseMode mode = allFieldsTab.getDatabaseMode();
-                   // Custom field names are added as they are typed, like the tab's free-form add row does.
-                   Field canonicalField = canonicalFieldForActiveMode(field, mode);
-                   tabPane.getSelectionModel().select(allFieldsTab);
-                   allFieldsTab.addFieldAndFocus(canonicalField);
-               },
-               // No other tab can show a field it was not configured for, so say why nothing happens
-               // instead of swallowing the jump.
-               () -> notificationService.notify(Localization.lang("Cannot show \"%0\" because the \"%1\" tab is hidden",
-                       FieldTextMapper.getDisplayName(field), EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName())));
+                           BibDatabaseMode mode = allFieldsTab.getDatabaseMode();
+                           // Custom field names are added as they are typed, like the tab's free-form add row does.
+                           Field canonicalField = canonicalFieldForActiveMode(field, mode);
+                           tabPane.getSelectionModel().select(allFieldsTab);
+                           allFieldsTab.addFieldAndFocus(canonicalField);
+                       },
+                       // No other tab can show a field it was not configured for, so say why nothing happens
+                       // instead of swallowing the jump.
+                       () -> notificationService.notify(Localization.lang("Cannot show \"%0\" because the \"%1\" tab is hidden",
+                               FieldTextMapper.getDisplayName(field), EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName())));
     }
 
     private void selectTabAndField(FieldsEditorTab tab, Field field) {
