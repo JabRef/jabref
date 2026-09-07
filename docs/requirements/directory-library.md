@@ -19,7 +19,7 @@ online and the metadata behind it fills only the fields the PDF did not provide.
 and `.md` files without a Hayagriva frontmatter
 are skipped; unparseable Hayagriva files are reported as warnings without aborting the scan.
 Scanning must not write or modify any file in the directory.
-See [ADR 71](../decisions/0071-directory-as-library-with-hayagriva-sidecars.md) for more details.
+See [ADR 72](../decisions/0072-directory-as-library-with-hayagriva-sidecars.md) for more details.
 
 Needs: impl
 
