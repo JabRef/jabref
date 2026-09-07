@@ -38,6 +38,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.shared.prefs;
     exports org.jabref.logic.util;
     exports org.jabref.logic.util.io;
+    exports org.jabref.logic.sync;
     exports org.jabref.logic.xmp;
     exports org.jabref.model.database;
     exports org.jabref.model.entry;
@@ -126,6 +127,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.icore;
     exports org.jabref.model.icore;
     exports org.jabref.logic.git.merge.planning;
+    exports org.jabref.logic.git.merge.planning.util;
     exports org.jabref.logic.git.merge.execution;
     exports org.jabref.model.sciteTallies;
     exports org.jabref.logic.bibtex.comparator.plausibility;

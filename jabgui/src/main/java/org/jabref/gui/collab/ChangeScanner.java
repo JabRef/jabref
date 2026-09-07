@@ -10,6 +10,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.sync.LibraryBaseline;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -34,9 +35,16 @@ public class ChangeScanner {
     }
 
     public List<DatabaseChange> scanForChanges() {
+        return scanForChanges(() -> {
+        });
+    }
+
+    /// @param beforeParsing run right before the file is parsed, e.g. to wait until a sync client has finished writing it
+    public List<DatabaseChange> scanForChanges(Runnable beforeParsing) {
         if (database.getDatabasePath().isEmpty()) {
             return List.of();
         }
+        beforeParsing.run();
 
         try {
             return getDatabaseChanges(database.getDatabasePath().get());
@@ -44,6 +52,11 @@ public class ChangeScanner {
             LOGGER.warn("Error while parsing changed file.", e);
             return List.of();
         }
+    }
+
+    /// @return the given external changes sorted by the side they happened on, see [ChangeTriage#triage]
+    public ChangeTriage.Triage triage(LibraryBaseline baseline, List<DatabaseChange> changes) {
+        return ChangeTriage.triage(baseline, changes, database, databaseChangeResolverFactory);
     }
 
     public List<DatabaseChange> getDatabaseChanges(Path fileToCompare) throws IOException {
