@@ -41,10 +41,10 @@ public class FieldChangedEvent extends EntryChangedEvent {
     }
 
     public FieldChangedEvent(EntriesEventSource source, FieldChange fieldChange) {
-        super(fieldChange.getEntry(), source);
-        this.field = fieldChange.getField();
-        this.newValue = fieldChange.getNewValue();
-        this.oldValue = fieldChange.getOldValue();
+        super(fieldChange.entry(), source);
+        this.field = fieldChange.field();
+        this.newValue = fieldChange.newValue();
+        this.oldValue = fieldChange.oldValue();
         this.charactersChangedCount = computeMajorCharacterChange(oldValue, newValue);
     }
 
