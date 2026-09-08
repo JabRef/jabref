@@ -1,21 +1,13 @@
 package org.jabref.logic.shared;
 
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.shared.security.Password;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// Keeps all essential data for establishing a new connection to a DBMS using [DBMSConnection].
 public class DBMSConnectionProperties implements DatabaseConnectionProperties {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DBMSConnectionProperties.class);
 
     private DBMSType type;
     private String host;
@@ -24,13 +16,9 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     private String user;
     private String password;
     private boolean allowPublicKeyRetrieval;
-    private final boolean useSSL;
-    private String serverTimezone = "";
+    private boolean useSSL;
     private String jdbcUrl = "";
-    private final boolean expertMode;
-
-    // Not needed for connection, but stored for future login
-    private String keyStore;
+    private boolean expertMode;
 
     /// Gets all required data from [SharedDatabasePreferences] and sets them if present.
     public DBMSConnectionProperties(SharedDatabasePreferences prefs) {
@@ -42,33 +30,19 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         prefs.getHost().ifPresent(theHost -> this.host = theHost);
         prefs.getPort().ifPresent(thePort -> this.port = Integer.parseInt(thePort));
         prefs.getName().ifPresent(theDatabase -> this.database = theDatabase);
-        prefs.getKeyStoreFile().ifPresent(theKeystore -> this.keyStore = theKeystore);
-        prefs.getServerTimezone().ifPresent(theServerTimezone -> this.serverTimezone = theServerTimezone);
         prefs.getJdbcUrl().ifPresent(theJdbcUrl -> this.jdbcUrl = theJdbcUrl);
 
         this.expertMode = prefs.isUseExpertMode();
         this.useSSL = prefs.isUseSSL();
 
-        if (prefs.getUser().isPresent()) {
-            this.user = prefs.getUser().get();
-            if (prefs.getPassword().isPresent()) {
-                try {
-                    this.password = new Password(prefs.getPassword().get().toCharArray(), prefs.getUser().get()).decrypt();
-                } catch (UnsupportedEncodingException | GeneralSecurityException e) {
-                    LOGGER.error("Could not decrypt password", e);
-                }
-            }
-        }
-
-        if (prefs.getPassword().isEmpty()) {
-            // Some DBMS require a non-null value as a password (in case of using an empty string).
-            this.password = "";
-        }
+        prefs.getUser().ifPresent(theUser -> this.user = theUser);
+        // The driver requires a non-null password even when none is stored
+        this.password = prefs.getPassword().orElse("");
     }
 
     DBMSConnectionProperties(DBMSType type, String host, int port, String database, String user,
                              String password, boolean useSSL, boolean allowPublicKeyRetrieval,
-                             String serverTimezone, String keyStore, String jdbcUrl, boolean expertMode) {
+                             String jdbcUrl, boolean expertMode) {
         this.type = type;
         this.host = host;
         this.port = port;
@@ -77,8 +51,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         this.password = password;
         this.useSSL = useSSL;
         this.allowPublicKeyRetrieval = allowPublicKeyRetrieval;
-        this.serverTimezone = serverTimezone;
-        this.keyStore = keyStore;
         this.jdbcUrl = jdbcUrl;
         this.expertMode = expertMode;
     }
@@ -124,11 +96,6 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     }
 
     @Override
-    public String getServerTimezone() {
-        return serverTimezone;
-    }
-
-    @Override
     public String getJdbcUrl() {
         return jdbcUrl;
     }
@@ -149,20 +116,28 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         Properties props = new Properties();
         props.setProperty("user", user);
         props.setProperty("password", password);
-        props.setProperty("serverTimezone", serverTimezone);
+        // Without keepalives, NAT/firewall timeouts silently kill idle connections
+        // (issue #11211: connection lost after ~2h)
+        props.setProperty("tcpKeepAlive", Boolean.toString(true));
+        // Fail fast on half-dead connections instead of blocking a thread indefinitely.
+        // The socket timeout has to stay above the notification listener's 12 s poll.
+        props.setProperty("connectTimeout", "10");
+        props.setProperty("socketTimeout", "30");
+        // Every connection - the notification listener's as well as one to a database another
+        // client set up - has to resolve the unqualified table names (see DBMSProcessor.setUp)
+        props.setProperty("currentSchema", "jabref");
         if (useSSL) {
-            props.setProperty("ssl", Boolean.toString(true));
-            props.setProperty("useSSL", Boolean.toString(true));
+            // Encrypt without authenticating the server - the same default as psql/libpq.
+            // Managed PostgreSQL providers use private CAs, which strict validation would
+            // reject out of the box. For strict validation, use the expert-mode JDBC URL with
+            // sslmode=verify-full, or sslfactory=org.postgresql.ssl.DefaultJavaSSLFactory to
+            // validate against the certificates configured in JabRef's preferences.
+            props.setProperty("sslmode", "require");
         }
         if (allowPublicKeyRetrieval) {
             props.setProperty("allowPublicKeyRetrieval", Boolean.toString(true));
         }
         return props;
-    }
-
-    @Override
-    public String getKeyStore() {
-        return keyStore;
     }
 
     /// Compares all properties except the password.
@@ -182,15 +157,13 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
                 && Objects.equals(user, properties.getUser())
                 && Objects.equals(useSSL, properties.isUseSSL())
                 && Objects.equals(allowPublicKeyRetrieval, properties.isAllowPublicKeyRetrieval())
-                && Objects.equals(serverTimezone, properties.getServerTimezone())
-                && Objects.equals(keyStore, properties.getKeyStore())
                 && Objects.equals(jdbcUrl, properties.getJdbcUrl())
                 && Objects.equals(expertMode, properties.isUseExpertMode());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, host, port, database, user, useSSL, allowPublicKeyRetrieval, serverTimezone, keyStore, jdbcUrl, expertMode);
+        return Objects.hash(type, host, port, database, user, useSSL, allowPublicKeyRetrieval, jdbcUrl, expertMode);
     }
 
     @Override

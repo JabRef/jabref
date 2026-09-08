@@ -29,15 +29,19 @@ testModuleInfo {
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
-    requires("org.hamcrest")
-
-    requires("org.testfx")
-    requires("org.testfx.junit5")
 
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
 
     runtimeOnly("com.tngtech.archunit.junit5.engine")
+}
+
+tasks.named<Test>("test") {
+    if (project.hasProperty("sharedDatabaseProfile")) {
+        maxHeapSize = "4g"
+        systemProperty("sharedDatabaseProfile", "true")
+        jvmArgs("-XX:StartFlightRecording=filename=/tmp/group-tree-shared-database-profile.jfr,settings=profile,dumponexit=true")
+    }
 }
 
 // Opt-in (-PuseLibericaJdkFull=true): JavaFX comes from the JDK (e.g. Liberica Full), not from patched Maven jars.
@@ -297,11 +301,11 @@ tasks.named("check") {
 }
 
 tasks.test {
+    systemProperty("glass.platform", "Headless")
+    systemProperty("prism.order", "sw")
+
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
-
-        // Source: https://github.com/TestFX/TestFX/issues/638#issuecomment-433744765
-        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
 
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",

@@ -8,11 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -23,10 +20,13 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.testutils.JavaFxExtension;
+import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.undo.JabRefUndoManager;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -48,7 +48,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,7 +56,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // [utest->req~entry-editor.main-tab.autolink-suggestions~1]
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class AllFieldsTabTest {
 
     /// Runs probes synchronously, but can hold them back so a test can change entry state
@@ -99,11 +98,9 @@ class AllFieldsTabTest {
         when(preferences.getEntryEditorPreferences().autoLinkFilesEnabled()).thenReturn(true);
         when(preferences.getCitationKeyPatternPreferences().getUnwantedCharacters()).thenReturn("");
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
-        when(externalApplicationsPreferences.getExternalFileTypes())
-                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
-        when(preferences.getAutoLinkPreferences()).thenReturn(
-                new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
+        when(preferences.getAutoLinkPreferences()).thenReturn(new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
 
         BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of(fileDirectory));
@@ -113,79 +110,63 @@ class AllFieldsTabTest {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
         when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
+        when(stateManager.getUndoManager(any())).thenReturn(new HeadlessGuiUndoManager());
 
         taskExecutor = new DeferringTaskExecutor();
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);
         Injector.setModelOrService(GuiPreferences.class, preferences);
         Injector.setModelOrService(DialogService.class, mock(DialogService.class));
         Injector.setModelOrService(StateManager.class, stateManager);
+        Injector.setModelOrService(UndoManager.class, new JabRefUndoManager());
         Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
-        Injector.setModelOrService(org.jabref.logic.undo.UndoManager.class, new JabRefUndoManager());
         Injector.setModelOrService(KeyBindingRepository.class, new KeyBindingRepository());
         Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
         Injector.setModelOrService(JournalAbbreviationRepository.class, mock(JournalAbbreviationRepository.class));
         Injector.setModelOrService(FileUpdateMonitor.class, new DummyFileUpdateMonitor());
 
-        tab = new AllFieldsTab(
-                new JabRefUndoManager(),
-                mock(UndoAction.class),
-                mock(RedoAction.class),
-                preferences,
-                new BibEntryTypesManager(),
-                mock(JournalAbbreviationRepository.class),
-                stateManager,
-                mock(PreviewPanel.class));
-    }
-
-    private void runOnFxThreadAndWait(Runnable action) throws InterruptedException {
-        CountDownLatch done = new CountDownLatch(1);
-        Platform.runLater(() -> {
-            action.run();
-            done.countDown();
-        });
-        assertTrue(done.await(30, TimeUnit.SECONDS));
+        tab = new AllFieldsTab(mock(UndoAction.class), mock(RedoAction.class), preferences, new BibEntryTypesManager(), mock(JournalAbbreviationRepository.class), stateManager, mock(PreviewPanel.class));
     }
 
     @Test
-    void fileEditorAppearsWhenAutolinkFindsUnlinkedFile() throws IOException, InterruptedException {
+    void fileEditorAppearsWhenAutolinkFindsUnlinkedFile() throws IOException {
         Files.createFile(fileDirectory.resolve("CiteKey2021.pdf"));
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertTrue(tab.editors.containsKey(StandardField.FILE));
     }
 
     @Test
-    void fileEditorStaysHiddenWithoutMatchingFile() throws InterruptedException {
+    void fileEditorStaysHiddenWithoutMatchingFile() {
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertFalse(tab.editors.containsKey(StandardField.FILE));
     }
 
     @Test
-    void fileEditorStaysHiddenWhenAutolinkIsDisabled() throws IOException, InterruptedException {
+    void fileEditorStaysHiddenWhenAutolinkIsDisabled() throws IOException {
         when(preferences.getEntryEditorPreferences().autoLinkFilesEnabled()).thenReturn(false);
         Files.createFile(fileDirectory.resolve("CiteKey2021.pdf"));
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertFalse(tab.editors.containsKey(StandardField.FILE));
     }
 
     @Test
-    void staleProbeResultDoesNotAddFileEditor() throws IOException, InterruptedException {
+    void staleProbeResultDoesNotAddFileEditor() throws IOException {
         Files.createFile(fileDirectory.resolve("CiteKey2021.pdf"));
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("OtherKey");
 
         taskExecutor.deferUpcomingTasks();
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
         // The probe for "OtherKey" is still pending; by the time it runs, the key has changed
         // and its (now matching) result must be discarded.
-        runOnFxThreadAndWait(() -> {
+        JavaFxExtension.invokeAndWait(() -> {
             entry.setCitationKey("CiteKey2021");
             taskExecutor.runNextDeferredTask();
         });

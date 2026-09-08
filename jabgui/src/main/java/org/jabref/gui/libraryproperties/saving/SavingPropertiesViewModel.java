@@ -110,12 +110,12 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     @Override
     public void storeSettings() {
-        MetaData newMetaData = databaseContext.getMetaData();
+        MetaData metaData = databaseContext.getMetaData();
 
         if (libraryProtectedProperty.getValue()) {
-            newMetaData.markAsProtected();
+            metaData.markAsProtected();
         } else {
-            newMetaData.markAsNotProtected();
+            metaData.markAsNotProtected();
         }
 
         FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(
@@ -123,13 +123,13 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
                 cleanupsProperty());
 
         if (FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanupActions.getConfiguredActions())) {
-            newMetaData.clearSaveActions();
+            metaData.clearSaveActions();
         } else {
             // if all actions have been removed, remove the save actions from the MetaData
             if (fieldFormatterCleanupActions.getConfiguredActions().isEmpty()) {
-                newMetaData.clearSaveActions();
+                metaData.clearSaveActions();
             } else {
-                newMetaData.setSaveActions(fieldFormatterCleanupActions);
+                metaData.setSaveActions(fieldFormatterCleanupActions);
             }
         }
 
@@ -139,20 +139,18 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
         if (!newSaveOrder.equals(saveOrder)) {
             if (newSaveOrder.equals(SaveOrder.getDefaultSaveOrder())) {
-                newMetaData.clearSaveOrder();
+                metaData.clearSaveOrder();
             } else {
-                newMetaData.setSaveOrder(newSaveOrder);
+                metaData.setSaveOrder(newSaveOrder);
             }
         }
 
         AbbreviationType abbreviationType = journalAbbreviationOnSaveProperty.getValue();
         if (abbreviationType != null) {
-            newMetaData.setLibraryAbbreviationType(abbreviationType);
+            metaData.setLibraryAbbreviationType(abbreviationType);
         } else {
-            newMetaData.clearLibraryAbbreviationType();
+            metaData.clearLibraryAbbreviationType();
         }
-
-        databaseContext.setMetaData(newMetaData);
     }
 
     public BooleanProperty protectDisableProperty() {

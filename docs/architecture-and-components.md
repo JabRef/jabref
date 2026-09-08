@@ -10,9 +10,9 @@ Note that components are seen as "logical" components and summarize features and
 
 JabRef's code is structured into these packages:
 
-- The `model` package encompasses the most important data structures (`BibDatases`, `BibEntries`, `Events`, and related aspects) and has minimal logic attached.
+- The `model` package encompasses the most important data structures (`BibDatabases`, `BibEntries`, `Events`, and related aspects) and has minimal logic attached.
 - The `logic` package is responsible for business logic such as reading/writing/importing/exporting and manipulating the `model`, and it is structured often as an API the `gui` can call and use.
-- Only the `gui` knows the user and their preferences and can interact with them to help them solving tasks.
+- The `gui` package is the only one that has access to the user and their preferences and can interact with them to help them solving tasks.
 - For each layer, we form packages according to their responsibility, i.e., vertical structuring.
 - The `model` classes should have no dependencies to other classes of JabRef and the `logic` classes should only depend on `model` classes.
 - The `cli` package bundles classes that are responsible for JabRef's command line interface.
@@ -26,21 +26,25 @@ Note that we are currently switching to JavaFX's observables, as we aim for a st
 
 Permitted dependencies in our architecture are:
 
-```monospaced
-gui --> logic --> model
-gui ------------> model
-gui ------------> preferences
-gui ------------> cli
-gui ------------> global classes
+```mermaid
+flowchart TD
+    subgraph shared["Accessible from every layer"]
+        direction TD
+        preferences["Preferences"]
+        global["Global Classes"]
+    end
+    gui["gui"] --> logic["logic"]
+    cli["cli"] --> logic
+    logic --> model["model"]
+    model ~~~ shared
 
-logic ------------> model
+    preferences:::component
+    global:::component
+    gui:::layer
+    logic:::component
+    cli:::layer
+    model:::component
 
-global classes ------------> everywhere
-
-cli ------------> model
-cli ------------> logic
-cli ------------> global classes
-cli ------------> preferences
 ```
 
 All packages and classes which are currently not part of these packages (we are still in the process of structuring) are considered as gui classes from a dependency standpoint.
@@ -60,8 +64,8 @@ General information about architectural decision records is available at <https:
 
 ## Components
 
-We regard each "larger" feature as component.
-Each such component gets a label "component: {component-name}" to enable ease issue searching of it.
+We regard each "larger" feature as a component.
+Each such component gets a label "component: {component-name}" to make it easier to search for issues related to it.
 
 ### AI
 
@@ -278,6 +282,8 @@ This component refers to the central entry table in JabRef, including its layout
 - Open issues: [component: microsoft-word-integration](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+microsoft-word-integration%22)
 - Docs: <https://docs.jabref.org/cite/export-to-microsoft-word>
 
+This component manages exporting JabRef entries as MS Office 2007 XML so they can be used as citation sources in Microsoft Word's built-in bibliography tools.
+
 ### PDF Viewer
 
 - Open issues: [component: pdf-viewer](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+pdf-viewer%22)
@@ -290,7 +296,7 @@ This component relates to the built-in PDF viewer functionality in JabRef, inclu
 - Open issues: [component: preferences](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+preferences%22)
 - Docs: TBD
 
-Covers all aspects of configuration settings for features, appearance, and behavior.
+This component covers all aspects of configuration settings for features, appearance, and behavior.
 
 ### Search
 

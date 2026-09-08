@@ -34,11 +34,11 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
-    @Inject private UndoManager undoManager;
 
     public JournalEditor(Field field,
                          SuggestionProvider<?> suggestionProvider,
                          FieldCheckers fieldCheckers,
+                         UndoManager undoManager,
                          UndoAction undoAction,
                          RedoAction redoAction) {
 

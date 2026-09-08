@@ -19,8 +19,8 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -49,7 +49,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager,
                              ClipBoardManager clipBoardManager,
-                             GuiUndoManager undoManager) {
+                             GitHandlerRegistry gitHandlerRegistry) {
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
@@ -64,7 +64,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
-                undoManager);
+                gitHandlerRegistry);
 
         preferences.getSidePanePreferences().visiblePanes().forEach(this::show);
         getPanes().addListener((ListChangeListener<? super SidePaneType>) change -> {

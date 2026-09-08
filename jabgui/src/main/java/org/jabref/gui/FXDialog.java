@@ -1,16 +1,15 @@
 package org.jabref.gui;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.BaseDialog;
-
-import com.airhacks.afterburner.injection.Injector;
 
 /// This class provides a super class for all dialogs implemented in JavaFX.
 ///
@@ -45,27 +44,32 @@ public class FXDialog extends Alert {
     public FXDialog(AlertType type, boolean isModal) {
         super(type);
 
+        dialogPaneProperty().addListener((_, _, newPane) -> {
+            if (newPane != null) {
+                setupKeyBindings(newPane);
+            }
+        });
+        setupKeyBindings(getDialogPane());
+
         setDialogIcon(IconTheme.getJabRefIcon());
 
         Stage dialogWindow = getDialogWindow();
-        dialogWindow.setOnCloseRequest(evt -> this.close());
+        dialogWindow.addEventHandler(WindowEvent.WINDOW_SHOWN, _ -> BaseDialog.fitWindowToContent(this.getDialogPane()));
+        dialogWindow.setOnCloseRequest(_ -> this.close());
+
         if (isModal) {
             initModality(Modality.APPLICATION_MODAL);
         } else {
             initModality(Modality.NONE);
         }
-
-        dialogWindow.getScene().setOnKeyPressed(event -> {
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                dialogWindow.close();
-            }
-        });
-        this.setOnShowing(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));
     }
 
     public FXDialog(AlertType type) {
         this(type, true);
+    }
+
+    private void setupKeyBindings(DialogPane newPane) {
+        newPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> BaseDialog.closeOnKeyBindingMatch(event, this));
     }
 
     private void setDialogIcon(Image image) {

@@ -179,6 +179,8 @@ In short, please keep these two principles in mind when you contribute:
 
 More reading on that is available at <https://roe.dev/blog/using-ai-in-open-source>.
 
+The [Don't paste the AI, please.](https://dontpastetheai.com/) website offers a practical perspective on using AI as an assistant rather than copying its output.
+
 We reserve the right to reject pull requests that contain little or no genuine and original contribution from the contributor.
 
 ### After submission of a pull request

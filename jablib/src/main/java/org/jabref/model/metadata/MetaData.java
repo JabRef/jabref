@@ -64,6 +64,10 @@ public class MetaData {
     public static final String BLG_FILE_PATH = "blgFilePath";
     public static final String AI_LIBRARY_ID = "aiLibraryId";
 
+    public static final String GIT_AUTO_PULL = "gitAutoPull";
+    public static final String GIT_AUTO_COMMIT = "gitAutoCommit";
+    public static final String GIT_AUTO_PUSH = "gitAutoPush";
+
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
@@ -94,6 +98,10 @@ public class MetaData {
     @Nullable private String aiLibraryId;
     private boolean containsSearchGroups;
 
+    private boolean gitAutoPull;
+    private boolean gitAutoCommit;
+    private boolean gitAutoPush;
+
     /// Constructs an empty metadata.
     public MetaData() {
         // Do nothing
@@ -118,9 +126,23 @@ public class MetaData {
 
     /// Sets a new group root node. **WARNING **: This invalidates everything returned by getGroups() so far!!!
     public void setGroups(@NonNull GroupTreeNode root) {
-        groupsRoot.setValue(root);
-        root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
-        root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+        // Subscribed once per node. The group panel writes its tree back after every operation, and
+        // most of those hand back the node already installed: subscribing again each time would
+        // multiply the listeners on it, so one edit would then post as many events as operations
+        // had been performed, and the panel would rebuild itself from inside its own rebuild.
+        if (groupsRoot.getValue() != root) {
+            groupsRoot.setValue(root);
+            root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
+            root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+        }
+        eventBus.post(new GroupUpdatedEvent(this));
+        postChange();
+    }
+
+    /// Removes the group tree, so that the library has no groups at all — the state it is in before
+    /// the first group is created.
+    public void clearGroups() {
+        groupsRoot.setValue(null);
         eventBus.post(new GroupUpdatedEvent(this));
         postChange();
     }
@@ -140,6 +162,33 @@ public class MetaData {
 
     public void setContainsSearchGroups(boolean containsSearchGroups) {
         this.containsSearchGroups = containsSearchGroups;
+    }
+
+    public boolean isGitAutoPull() {
+        return gitAutoPull;
+    }
+
+    public void setGitAutoPull(boolean gitAutoPull) {
+        this.gitAutoPull = gitAutoPull;
+        postChange();
+    }
+
+    public boolean isGitAutoCommit() {
+        return gitAutoCommit;
+    }
+
+    public void setGitAutoCommit(boolean gitAutoCommit) {
+        this.gitAutoCommit = gitAutoCommit;
+        postChange();
+    }
+
+    public boolean isGitAutoPush() {
+        return gitAutoPush;
+    }
+
+    public void setGitAutoPush(boolean gitAutoPush) {
+        this.gitAutoPush = gitAutoPush;
+        postChange();
     }
 
     /// @return the stored label patterns
@@ -351,6 +400,55 @@ public class MetaData {
         postChange();
     }
 
+    /// A detached copy of `other` with new identity and without listeners.
+    public static MetaData copyOf(@NonNull MetaData other) {
+        MetaData copy = new MetaData();
+        copy.overwriteWith(other);
+        return copy;
+    }
+
+    /// Overwrites this instance's contents with those of `other`. **This instance survives**, and
+    /// with it everything registered on its [EventBus] — installing `other` in the library instead
+    /// would orphan every listener of the instance it replaced.
+    public void overwriteWith(@NonNull MetaData other) {
+        citeKeyPatterns.clear();
+        citeKeyPatterns.putAll(other.citeKeyPatterns);
+        userFileDirectory.clear();
+        userFileDirectory.putAll(other.userFileDirectory);
+        latexFileDirectory.clear();
+        latexFileDirectory.putAll(other.latexFileDirectory);
+        blgFilePathMap.clear();
+        blgFilePathMap.putAll(other.blgFilePathMap);
+        unknownMetaData.clear();
+        unknownMetaData.putAll(other.unknownMetaData);
+
+        contentSelectors.setAll(other.contentSelectors.getContentSelectors());
+
+        groupSearchSyntaxVersion = other.groupSearchSyntaxVersion;
+        encoding = other.encoding;
+        encodingExplicitlySupplied = other.encodingExplicitlySupplied;
+        saveOrder = other.saveOrder;
+        defaultCiteKeyPattern = other.defaultCiteKeyPattern;
+        saveActions = other.saveActions;
+        mode = other.mode;
+        libraryAbbreviationType = other.libraryAbbreviationType;
+        keywordSeparator = other.keywordSeparator;
+        isProtected = other.isProtected;
+        librarySpecificFileDirectory = other.librarySpecificFileDirectory;
+        aiLibraryId = other.aiLibraryId;
+        versionDBStructure = other.versionDBStructure;
+        containsSearchGroups = other.containsSearchGroups;
+        gitAutoPull = other.gitAutoPull;
+        gitAutoCommit = other.gitAutoCommit;
+        gitAutoPush = other.gitAutoPush;
+
+        other.getGroups()
+             .map(GroupTreeNode::copySubtree)
+             .ifPresentOrElse(this::setGroups, this::clearGroups);
+
+        postChange();
+    }
+
     /// Posts a new [MetaDataChangedEvent] on the [EventBus].
     private void postChange() {
         if (isEventPropagationEnabled) {
@@ -449,18 +547,21 @@ public class MetaData {
                 && Objects.equals(librarySpecificFileDirectory, that.librarySpecificFileDirectory)
                 && Objects.equals(contentSelectors, that.contentSelectors)
                 && Objects.equals(versionDBStructure, that.versionDBStructure)
-                && Objects.equals(aiLibraryId, that.aiLibraryId);
+                && Objects.equals(aiLibraryId, that.aiLibraryId)
+                && (gitAutoPull == that.gitAutoPull)
+                && (gitAutoCommit == that.gitAutoCommit)
+                && (gitAutoPush == that.gitAutoPush);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId);
+                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId, gitAutoPull, gitAutoCommit, gitAutoPush);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + ", gitAutoPull=" + gitAutoPull + ", gitAutoCommit=" + gitAutoCommit + ", gitAutoPush=" + gitAutoPush + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {
