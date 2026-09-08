@@ -276,13 +276,11 @@
 }
 
 .button:default:hover {
-    -fx-background: -color-button-default;
-    -fx-background-color: -fx-background, -color-button-hover;
+    -fx-background-color: -color-button-default, -color-button-hover;
 }
 
 .button:default:armed {
-    -fx-background: -color-button-default;
-    -fx-background-color: -fx-background, -color-button-pressed;
+    -fx-background-color: -color-button-default, -color-button-pressed;
 }
 
 /* JavaFX ToggleButton */
