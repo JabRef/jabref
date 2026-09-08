@@ -15,7 +15,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class ThemePreviewView extends HBox {
 
-    private static final double PREVIEW_WIDTH = 280;
+    private static final double PREVIEW_WIDTH = 256;
 
     public ThemePreviewView() {
         setSpacing(8);

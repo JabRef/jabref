@@ -48,7 +48,7 @@ public class ThemeDialogViewModel extends AbstractViewModel {
         this.workspacePreferences = preferences.getWorkspacePreferences();
         this.dialogService = dialogService;
 
-        selectedThemeColorSchemeProperty.addListener(_ -> relabelThemes());
+        selectedThemeColorSchemeProperty.addListener(_ -> refreshThemeNames());
 
         initializeFromCurrentTheme();
     }
@@ -63,7 +63,7 @@ public class ThemeDialogViewModel extends AbstractViewModel {
     /// Paired themes are named after the hue of the current color scheme, and the combo box re-reads the
     /// names of its entries when the item list changes. The selection is left alone: its own cell is
     /// refreshed by the view, so that the theme never passes through an invalid null in between.
-    private void relabelThemes() {
+    private void refreshThemeNames() {
         themesListProperty.setAll(ThemePreset.values());
     }
 

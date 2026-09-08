@@ -75,7 +75,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                         themeName(),
                                         theme -> {
                                             theme.validate(viewModel.themeValidationStatus());
-                                            relabelOnColorSchemeChange(theme.getNode());
+                                            refreshThemeNameOnColorSchemeChange(theme.getNode());
                                         })
                                 .field(Localization.lang("Preview"), buildThemePreview())
                                 .checkWithField(Localization.lang("Custom theme"), viewModel.customThemeEnabledProperty(), viewModel.customPathToThemeProperty(),
@@ -140,7 +140,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
     /// A [ComboBox] renders its button cell -- the collapsed row showing the selection -- only when that
     /// cell's item changes. Names that follow the color scheme therefore need a fresh cell; the entries in
     /// the popup are re-rendered by the view model refreshing the item list.
-    private void relabelOnColorSchemeChange(ComboBox<ThemePreset> themes) {
+    private void refreshThemeNameOnColorSchemeChange(ComboBox<ThemePreset> themes) {
         viewModel.selectedThemeColorSchemeProperty().addListener(_ -> themes.setButtonCell(
                 new ViewModelListCellFactory<ThemePreset>()
                         .withText(themeName())

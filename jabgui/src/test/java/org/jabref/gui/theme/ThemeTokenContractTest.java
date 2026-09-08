@@ -160,9 +160,9 @@ class ThemeTokenContractTest {
         return StyleSheet.class.getResourceAsStream(css);
     }
 
-    /// Themes without a parent must declare the complete token contract; the others are layered on
-    /// top of their parent and may declare a subset.
-    static List<ThemePreset> builtInThemes() {
+    /// A theme without a parent stands on its own and must declare the complete token contract; a
+    /// layered one takes what it does not declare from its parent.
+    static List<ThemePreset> unlayeredThemes() {
         return Arrays.stream(ThemePreset.values()).filter(theme -> theme.getParent().isEmpty()).toList();
     }
 
@@ -170,15 +170,16 @@ class ThemeTokenContractTest {
         return List.of(ThemePreset.values());
     }
 
-    static List<ThemePreset> communityThemes() {
+    static List<ThemePreset> layeredThemes() {
         return Arrays.stream(ThemePreset.values()).filter(theme -> theme.getParent().isPresent()).toList();
     }
 
-    /// A community theme setting a token nobody reads is a typo or a stale port; it would silently
-    /// fall back to the JabRef theme's color.
+    /// A layered theme setting a token nobody reads is a typo or a stale port; the control would
+    /// silently keep the parent's color. Unlike [#themeDeclaresNoTokenNobodyReads] this looks at every
+    /// declaration, not only at those inside the color scheme blocks.
     @ParameterizedTest
-    @MethodSource("communityThemes")
-    void communityThemeDeclaresOnlyTokensSomeoneReads(ThemePreset theme) {
+    @MethodSource("layeredThemes")
+    void layeredThemeDeclaresOnlyTokensSomeoneReads(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
         Set<String> read = new TreeSet<>(tokens(BASE_CSS, Kind.USE));
@@ -200,7 +201,7 @@ class ThemeTokenContractTest {
     /// *both* color schemes. Declaring it only in the light block leaves the control unstyled in dark
     /// mode, which is the failure mode this whole token set exists to prevent.
     @ParameterizedTest
-    @MethodSource("builtInThemes")
+    @MethodSource("unlayeredThemes")
     void themeDeclaresEveryTokenTheBaseStylesheetUses(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -237,7 +238,7 @@ class ThemeTokenContractTest {
     /// tokens something already uses, so a token every theme declares but nobody reads is invisible to
     /// it.
     @ParameterizedTest
-    @MethodSource("builtInThemes")
+    @MethodSource("unlayeredThemes")
     void themeDeclaresNoTokenNobodyReads(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
