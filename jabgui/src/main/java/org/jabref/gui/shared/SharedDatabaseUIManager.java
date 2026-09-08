@@ -23,6 +23,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSSynchronizer;
+import org.jabref.logic.shared.DatabaseConnectionProperties;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
@@ -166,8 +168,24 @@ public class SharedDatabaseUIManager {
         return bibDatabaseContext;
     }
 
+    /// The tab already connected to the database `connectionProperties` points at, if any
+    public Optional<LibraryTab> findOpenTab(DatabaseConnectionProperties connectionProperties) {
+        return tabContainer.getLibraryTabs().stream()
+                           .filter(tab -> tab.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED)
+                           .filter(tab -> DBMSConnectionProperties.isSameDatabase(connectionProperties, tab.getBibDatabaseContext().getDBMSSynchronizer().getConnectionProperties()))
+                           .findFirst();
+    }
+
     /// Shows a database returned by [#connect(DBMSConnectionProperties)] in a new tab. JavaFX thread only.
+    /// If the database is meanwhile open in another tab (e.g. two remembered connections to the same database),
+    /// the new connection is dropped and that tab is shown instead.
     public LibraryTab openTab(BibDatabaseContext bibDatabaseContext) {
+        Optional<LibraryTab> alreadyOpen = findOpenTab(dbmsSynchronizer.getConnectionProperties());
+        if (alreadyOpen.isPresent()) {
+            dbmsSynchronizer.closeSharedDatabase();
+            tabContainer.showLibraryTab(alreadyOpen.get());
+            return alreadyOpen.get();
+        }
         dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsSynchronizer.getConnectionProperties().getType().toString()));
 
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
@@ -198,6 +216,9 @@ public class SharedDatabaseUIManager {
 
         String sharedDatabaseID = sharedDatabaseIDOptional.get();
         DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseID));
+        if (findOpenTab(dbmsConnectionProperties).isPresent()) {
+            throw new SQLException(Localization.lang("You are already connected to a database using entered connection details."));
+        }
 
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
 

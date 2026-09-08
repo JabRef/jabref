@@ -35,13 +35,11 @@ import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
 import org.jabref.logic.shared.DBMSConnectionUrl;
 import org.jabref.logic.shared.DBMSType;
-import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -208,9 +206,22 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private void openSharedDatabase(DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
-        if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
+        SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
+                tabContainer,
+                dialogService,
+                preferences,
+                aiService,
+                stateManager,
+                entryTypesManager,
+                fileUpdateMonitor,
+                clipBoardManager,
+                taskExecutor,
+                gitHandlerRegistry);
+        Optional<LibraryTab> alreadyOpen = manager.findOpenTab(connectionProperties);
+        if (alreadyOpen.isPresent()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
                     Localization.lang("You are already connected to a database using entered connection details."));
+            tabContainer.showLibraryTab(alreadyOpen.get());
             onConnected.run();
             return;
         }
@@ -229,18 +240,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 }
             }
         }
-
-        SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
-                tabContainer,
-                dialogService,
-                preferences,
-                aiService,
-                stateManager,
-                entryTypesManager,
-                fileUpdateMonitor,
-                clipBoardManager,
-                taskExecutor,
-                gitHandlerRegistry);
 
         loading.set(true);
         BackgroundTask.wrap(() -> manager.connect(connectionProperties))
@@ -352,16 +351,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         sharedDatabaseFolder.ifPresent(folder::set);
         autosave.set(sharedDatabaseAutosave);
-    }
-
-    private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
-        List<LibraryTab> libraryTabs = tabContainer.getLibraryTabs();
-        return libraryTabs.parallelStream().anyMatch(panel -> {
-            BibDatabaseContext context = panel.getBibDatabaseContext();
-
-            return (context.getLocation() == DatabaseLocation.SHARED) &&
-                    connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties());
-        });
     }
 
     public void showSaveDbToFileDialog() {

@@ -1,5 +1,8 @@
 package org.jabref.logic.shared;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -107,6 +110,31 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     public String getUrl() {
         return type.getUrl(host, port, database);
+    }
+
+    /// Whether both point at the same data: same server, database, and user - regardless of whether the connection
+    /// was entered as form fields or as a JDBC URL, and of password or SSL settings. [#equals(Object)] tells those apart.
+    public static boolean isSameDatabase(DatabaseConnectionProperties first, DatabaseConnectionProperties second) {
+        return databaseIdentity(first).equals(databaseIdentity(second));
+    }
+
+    private static List<String> databaseIdentity(DatabaseConnectionProperties properties) {
+        String host = properties.getHost();
+        int port = properties.getPort();
+        String database = properties.getDatabase();
+        String user = properties.getUser();
+        if (properties.isUseExpertMode()) {
+            // In expert mode only the JDBC URL is authoritative; the fields may be empty or hold defaults
+            Optional<DBMSConnectionUrl> url = DBMSConnectionUrl.parse(properties.getJdbcUrl());
+            if (url.isEmpty()) {
+                return Arrays.asList(properties.getJdbcUrl(), user);
+            }
+            host = url.get().host();
+            port = url.get().port();
+            database = url.get().database();
+            user = url.get().user().orElse(user);
+        }
+        return Arrays.asList(host == null ? null : host.toLowerCase(Locale.ROOT), Integer.toString(port), database, user);
     }
 
     /// Returns username, password and ssl as Properties Object
