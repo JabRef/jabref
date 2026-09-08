@@ -21,6 +21,9 @@ jobs:
   # and branch of the run that triggered it - the same PR head this event carries.
   # Not in the job below: that one re-adds "automerge" after pushing a conflict resolution, which a
   # removal queued behind an unrelated status evaluation could undo.
+  # A group keeps only one pending member, so a "Comment on PR" run queued meanwhile can cancel this
+  # job while it waits. That only costs the label-free window - every evaluation reads the live check
+  # state, so the last one to run writes the verdict for the current head either way.
   clear_status_labels:
     if: github.repository == 'JabRef/jabref' && github.event.action == 'synchronize' && github.event.sender.login != 'jabref-machine'
     name: 'Clear stale status labels'
