@@ -174,8 +174,9 @@ public class SharedDatabasePreferences {
         internalPrefs.putBoolean(SHARED_DATABASE_USE_SSL, useSSL);
     }
 
-    public void clearPassword() {
-        setPassword("");
+    /// @return whether the password was removed from the system keyring
+    public boolean clearPassword() {
+        return setPassword("");
     }
 
     public void setExpertMode(boolean expertMode) {
@@ -199,10 +200,44 @@ public class SharedDatabasePreferences {
         internalPrefs.clear();
     }
 
-    /// Removes this connection's stored settings, including the password, from the preferences tree.
-    public void remove() throws BackingStoreException {
-        clearPassword();
+    /// Removes this connection's stored settings from the preferences tree.
+    ///
+    /// The password is deleted first: should removing the settings fail afterwards, the connection is still
+    /// listed, but its credential is gone rather than left behind for an entry the user asked to delete.
+    ///
+    /// @return whether the password was removed from the system keyring
+    /// @throws BackingStoreException if the settings could not be removed
+    public boolean remove() throws BackingStoreException {
+        boolean passwordCleared = clearPassword();
         internalPrefs.removeNode();
+        return passwordCleared;
+    }
+
+    /// Whether this stored connection addresses the same database as `properties`. The password is not part of
+    /// the comparison, and neither are driver settings that do not identify the database (such as SSL).
+    public boolean addresses(DatabaseConnectionProperties properties) {
+        if (isUseExpertMode() != properties.isUseExpertMode()) {
+            return false;
+        }
+        if (!getUser().orElse("").equals(properties.getUser())) {
+            return false;
+        }
+        if (isUseExpertMode()) {
+            return getJdbcUrl().orElse("").equals(properties.getJdbcUrl());
+        }
+        return getHost().orElse("").equalsIgnoreCase(properties.getHost())
+                && getPort().orElse("").equals(String.valueOf(properties.getPort()))
+                && getName().orElse("").equals(properties.getDatabase());
+    }
+
+    /// Finds the stored connection for a database that has been connected to before. Connecting to it again
+    /// updates that connection instead of adding a second, indistinguishable one to the list.
+    ///
+    /// @return the identifier the connection is stored under, empty if the database is not stored yet
+    public static Optional<String> findSavedId(DatabaseConnectionProperties properties) {
+        return listSavedIds().stream()
+                             .filter(sharedDatabaseId -> new SharedDatabasePreferences(sharedDatabaseId).addresses(properties))
+                             .findFirst();
     }
 
     /// @return the identifiers of all stored connections, without the "last used" default node

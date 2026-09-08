@@ -76,7 +76,7 @@ Needs: impl
 ## Used connections are offered again
 `req~shared-database.saved-connections~1`
 
-Every shared database that was connected to is stored and offered in the login dialog, so it can be connected to again without retyping the connection details. A stored connection can be deleted, which also removes its password and stops it from being reopened on startup.
+Every shared database that was connected to is stored and offered in the login dialog, so it can be connected to again without retyping the connection details. Connecting to a database that is already stored updates that entry instead of adding a second, indistinguishable one. A stored connection can be deleted, which also removes its password and stops it from being reopened on startup.
 
 Needs: impl
 

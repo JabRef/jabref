@@ -55,6 +55,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,9 +255,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                           LibraryTab libraryTab = manager.openTab(bibDatabaseContext);
                           setPreferences(sharedDatabasePreferences, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
                           // Store the connection right away, so it is remembered even if JabRef never reaches a clean quit.
-                          // The id is generated here if the database has none yet; quit reuses it (JabRefFrameViewModel#collectSharedDatabases).
+                          // A database already stored keeps its identifier, otherwise the list would grow an
+                          // indistinguishable second entry on every reconnect. Quit and "Save as" reuse it too.
                           String sharedDatabaseId = bibDatabaseContext.getDatabase().getSharedDatabaseID()
+                                                                      .or(() -> SharedDatabasePreferences.findSavedId(connectionProperties))
                                                                       .orElseGet(() -> bibDatabaseContext.getDatabase().generateSharedDatabaseID());
+                          bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseId);
                           setPreferences(new SharedDatabasePreferences(sharedDatabaseId), connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
                           if (!autosavePath.isEmpty() && shouldAutosave) {
                               try {
@@ -365,10 +369,27 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     public void removeSavedConnection(SavedConnection savedConnection) {
+        SharedDatabasePreferences savedPreferences = new SharedDatabasePreferences(savedConnection.id());
+        DBMSConnectionProperties removedProperties = new DBMSConnectionProperties(savedPreferences);
+        boolean passwordCleared;
         try {
-            new SharedDatabasePreferences(savedConnection.id()).remove();
+            passwordCleared = savedPreferences.remove();
         } catch (BackingStoreException e) {
             LOGGER.warn("Could not remove the stored shared database connection", e);
+            // The connection stays in the list: hiding an entry that is still stored would offer it again on the next start
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not remove the saved connection."), e);
+            return;
+        }
+        if (keyringAvailable && !passwordCleared) {
+            dialogService.notify(Localization.lang("The password of the removed connection is still stored in the credential store."));
+        }
+        // The default node holds the connection used last, password included, and prefills the dialog
+        if (sharedDatabasePreferences.addresses(removedProperties)) {
+            try {
+                sharedDatabasePreferences.clear();
+            } catch (BackingStoreException e) {
+                LOGGER.warn("Could not clear the last used shared database connection", e);
+            }
         }
         // Without this, JabRef would try to reconnect to the removed database on the next start
         preferences.getLastFilesOpenedPreferences().getLastSharedDatabasesOpened().remove(savedConnection.id());
@@ -376,6 +397,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     /// A stored connection as shown in the "Saved connections" list; [#toString()] is the list entry's text.
+    @NullMarked
     public record SavedConnection(String id, String label) {
         static SavedConnection of(String id) {
             SharedDatabasePreferences prefs = new SharedDatabasePreferences(id);

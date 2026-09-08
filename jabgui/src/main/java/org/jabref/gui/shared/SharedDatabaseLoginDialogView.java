@@ -122,7 +122,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 journalAbbreviationRepository,
                 gitHandlerRegistry);
         savedConnections.setItems(viewModel.getSavedConnections());
-        // Nothing to pick from until a second connection has been used
         savedConnectionsPane.visibleProperty().bind(Bindings.isNotEmpty(viewModel.getSavedConnections()));
         savedConnectionsPane.managedProperty().bind(savedConnectionsPane.visibleProperty());
         removeSavedConnection.disableProperty().bind(savedConnections.getSelectionModel().selectedItemProperty().isNull());
