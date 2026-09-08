@@ -8,9 +8,10 @@ import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.Nullable;
 
-/// A theme the user can select: one of the two built-in themes, or one of the community themes
-/// from <https://themes.jabref.org/> that the build bundles from the `jabgui/src/main/themes.jabref.org`
-/// submodule (see `processResources` in `jabgui/build.gradle.kts`).
+/// A theme the user can select: JabRef's own, or one of the themes from <https://themes.jabref.org/>
+/// that the build bundles from the `jabgui/src/main/themes.jabref.org` submodule (see
+/// `processResources` in `jabgui/build.gradle.kts`). The Primer theme lives there as well; it is the
+/// one bundled theme that declares the token contract in full and therefore has no parent.
 ///
 /// The community constants are a hand-maintained mirror of that submodule -- `ThemePresetTest`
 /// fails when the two drift apart -- so that the set of themes is fixed at compile time and no
@@ -25,7 +26,7 @@ public enum ThemePreset {
     EVERFOREST("Everforest", "community/everforest.css", JABREF),
     NORD("Nord", "community/nord.css", JABREF),
     PAPERS("Papers", "community/papers.css", JABREF),
-    PRIMER("Primer", "primer-theme.css", null),
+    PRIMER("Primer", "community/primer.css", null),
     CHOCOLATE_HONEY("Chocolate Honey", "community/chocolate-honey.css", JABREF),
     DINOGIRLS_CHOCOLATEBROWN("Dino Girl's", "Chocolate Brown", "Dark Salmon", "community/chocolatebrown-darksalmon-contrasttext.css", JABREF),
     DINOGIRLS_FUCHSIAPURPLE("Dino Girl's", "Fuchsia Purple", "Japanese Sakura", "community/fuchsiapurple-japanesesakura-contrasttext.css", JABREF),

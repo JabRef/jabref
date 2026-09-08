@@ -6,7 +6,7 @@
 * never declare a color of their own -- that is what makes a theme swappable.
 *
 * A theme is therefore a single file that assigns a value to every token listed below.
-* See primer-theme.css for a second implementation of the same contract.
+* See the Primer theme on https://themes.jabref.org/ for a second implementation of the same contract.
 */
 
 @media (prefers-color-scheme: light) {
