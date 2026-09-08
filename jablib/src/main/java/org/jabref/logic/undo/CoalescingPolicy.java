@@ -18,6 +18,10 @@ import org.jspecify.annotations.Nullable;
 /// a change *is* — which is why it lives here rather than as a `merge` method on
 /// [org.jabref.model.undo.ChangeSet]. A second rule can arrive without touching the value model.
 ///
+/// [org.jabref.logic.util.CoarseChangeFilter] answers the same question for autosave, backup and
+/// shared-database writes, and deliberately answers it differently: see there for why the two
+/// rules are not shared.
+///
 /// The journal decides *when* to ask: only for a change recorded as [EditSource#TYPING], never
 /// inside a recording block, never across a save, and never across a boundary a caller drew with
 /// [UndoManager#endStep]. A command that writes the field the user was typing in is therefore its
