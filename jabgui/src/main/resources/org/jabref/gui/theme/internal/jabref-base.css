@@ -1484,6 +1484,11 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* Walkthrough Styles */
+.walkthrough-panel {
+    -fx-background-color: -color-bg-overlay;
+    -fx-effect: dropshadow(gaussian, -color-shadow-subtle, 10, 0, 0, 2);
+}
+
 .walkthrough-title-container {
     -fx-max-width: infinity;
 }
