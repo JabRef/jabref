@@ -87,11 +87,11 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
 
     public OptionalInt getMaxSnippetTokens() {
         return predictorProperty.get()
-                .map(DeepJavaEmbeddingModel::getMaxSnippetTokens)
-                .orElseGet(() -> metadataService
-                        .getMetadata(modelName)
-                        .map(EmbeddingModelMetadata::maxSnippetTokens)
-                        .orElseGet(OptionalInt::empty));
+                                .map(DeepJavaEmbeddingModel::getMaxSnippetTokens)
+                                .orElseGet(() -> metadataService
+                                        .getMetadata(modelName)
+                                        .map(EmbeddingModelMetadata::maxSnippetTokens)
+                                        .orElseGet(OptionalInt::empty));
     }
 
     public boolean hadErrorWhileBuildingModel() {
