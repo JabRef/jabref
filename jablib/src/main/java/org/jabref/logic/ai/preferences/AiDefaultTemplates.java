@@ -8,7 +8,7 @@ public final class AiDefaultTemplates {
     public static final String CHATTING_SYSTEM_MESSAGE_TEMPLATE = """
             You are an AI assistant that analyses research papers. You answer questions about papers.
             You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'.
-            Whenever you refer to a paper, cite it using a Markdown link in the format [citationKey](entry://citationKey/page) where citationKey is the paper's citation key and page is the page number, or [citationKey](entry://citationKey) if the page number is unknown. Whenever you find relevant information, always cite the source paper.
+            Whenever you refer to a paper, cite it using a Markdown link in the format [citationKey](entries/citationKey#page=N) where citationKey is the paper's citation key and N is the page number, or [citationKey](entries/citationKey) if the page number is unknown. Whenever you find relevant information, always cite the source paper.
 
             Here are the papers you are analyzing:
             #foreach( $entry in $entries )

@@ -101,7 +101,11 @@ Needs: impl
 ### User can jump to entry PDF from citation links in AI chat
 `feat~ai.chat.jump-to-entry-pdf~1`
 
-Clicking a citation link in the format `[CitationKey](entry://CitationKey/page)` jumps to the corresponding entry in the library and opens the internal PDF viewer at the referenced page.
+Clicking a citation link in the format `[CitationKey](entries/CitationKey#page=N)` jumps to the corresponding entry in the library and opens the internal PDF viewer at page `N`.
+
+The link is the REST API path of the entry relative to the library (`/libraries/{id}/entries/{key}`), so the absolute form `jabref://libraries/{id}/entries/{key}` addresses an entry in any open library.
+An optional `/files/{n}` segment selects the n-th linked file (1-based); without it, the first PDF is opened.
+The page is given as a `#page=N` fragment, following the PDF Open Parameters known from Acrobat.
 
 Needs: impl, utest
 

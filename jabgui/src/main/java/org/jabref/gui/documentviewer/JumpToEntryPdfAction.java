@@ -1,11 +1,15 @@
 package org.jabref.gui.documentviewer;
 
 import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URISyntaxException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -21,10 +25,23 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// Opens the PDF of an entry addressed by an in-app link.
+///
+/// The link mirrors the REST API path of the entry (`/libraries/{id}/entries/{key}`) so that the same address
+/// works in jabsrv, cite-as-you-write and JabMap:
+///
+/// - `jabref://libraries/{libraryId}/entries/{citationKey}` (absolute, `libraryId` as in [BibDatabaseContext#getLibraryId])
+/// - `entries/{citationKey}` (relative to the active library, what the AI chat emits)
+///
+/// Both forms accept an optional `/files/{n}` segment selecting the n-th linked file (1-based, default: first PDF)
+/// and a `#page=N` fragment as in the PDF Open Parameters understood by Acrobat.
 // [impl->feat~ai.chat.jump-to-entry-pdf~1]
 @NullMarked
 public class JumpToEntryPdfAction extends SimpleCommand {
+    public static final String SCHEME = "jabref";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JumpToEntryPdfAction.class);
+    private static final Pattern PAGE_FRAGMENT = Pattern.compile("(?:^|&)page=(\\d+)(?:&|$)");
 
     private final String url;
     private final StateManager stateManager;
@@ -38,100 +55,124 @@ public class JumpToEntryPdfAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        Optional<EntryCitationUrl> parsedOpt = parseUrl(url);
-        if (parsedOpt.isEmpty()) {
-            LOGGER.warn("Could not parse citation entry URL: {}", url);
+        Optional<EntryLink> linkOpt = parseUrl(url);
+        if (linkOpt.isEmpty()) {
+            LOGGER.warn("Could not parse entry link: {}", url);
             dialogService.notify(Localization.lang("Invalid URL"));
             return;
         }
+        EntryLink link = linkOpt.get();
 
-        EntryCitationUrl parsed = parsedOpt.get();
-        Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
-        if (activeDatabaseOpt.isEmpty()) {
+        Optional<BibDatabaseContext> databaseOpt = link.libraryId()
+                                                       .map(id -> stateManager.getOpenDatabases().stream()
+                                                                              .filter(context -> context.getLibraryId().filter(id::equals).isPresent())
+                                                                              .findFirst())
+                                                       .orElseGet(stateManager::getActiveDatabase);
+        if (databaseOpt.isEmpty()) {
             dialogService.notify(Localization.lang("No library open"));
             return;
         }
 
-        BibDatabaseContext databaseContext = activeDatabaseOpt.get();
-        Optional<BibEntry> entryOpt = databaseContext.getDatabase().getEntryByCitationKey(parsed.citationKey());
+        Optional<BibEntry> entryOpt = databaseOpt.get().getDatabase().getEntryByCitationKey(link.citationKey());
         if (entryOpt.isEmpty()) {
-            dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", parsed.citationKey()));
+            dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", link.citationKey()));
             return;
         }
 
-        BibEntry entry = entryOpt.get();
-        Optional<LinkedFile> pdfFileOpt = entry.getFiles().stream()
-                                               .filter(file -> {
-                                                   try {
-                                                       return FileUtil.isPDFFile(Path.of(file.getLink()));
-                                                   } catch (InvalidPathException e) {
-                                                       return false;
-                                                   }
-                                               })
-                                               .findFirst();
-
+        List<LinkedFile> files = entryOpt.get().getFiles();
+        Optional<LinkedFile> pdfFileOpt = link.fileIndex()
+                                              .filter(index -> index <= files.size())
+                                              .map(index -> files.get(index - 1))
+                                              .or(() -> files.stream().filter(JumpToEntryPdfAction::isPdf).findFirst());
         if (pdfFileOpt.isEmpty()) {
             dialogService.notify(Localization.lang("No PDF files available"));
             return;
         }
 
-        openInDocumentViewer(pdfFileOpt.get(), parsed.pageNumber());
+        openInDocumentViewer(pdfFileOpt.get(), link.page().orElse(1));
     }
 
-    private void openInDocumentViewer(LinkedFile pdfFile, Optional<Integer> pageNumber) {
-        int targetPage = pageNumber.filter(p -> p > 0).orElse(1);
+    private static boolean isPdf(LinkedFile file) {
+        try {
+            return FileUtil.isPDFFile(Path.of(file.getLink()));
+        } catch (InvalidPathException e) {
+            LOGGER.debug("Skipping file link that is not a path: {}", file.getLink(), e);
+            return false;
+        }
+    }
+
+    private void openInDocumentViewer(LinkedFile pdfFile, int page) {
         DocumentViewerView viewerView = new DocumentViewerView();
         viewerView.switchToFile(pdfFile);
-        viewerView.gotoPage(targetPage);
+        viewerView.gotoPage(page);
         dialogService.showCustomDialog(viewerView);
     }
 
-    public static Optional<EntryCitationUrl> parseUrl(@Nullable String rawUrl) {
+    /// @return empty if the url is not an entry link (callers then fall back to opening it in the browser)
+    public static Optional<EntryLink> parseUrl(@Nullable String rawUrl) {
         if (rawUrl == null || rawUrl.isBlank()) {
             return Optional.empty();
         }
-
         URI uri;
         try {
-            uri = URI.create(rawUrl.trim());
-        } catch (IllegalArgumentException e) {
+            uri = new URI(rawUrl.trim());
+        } catch (URISyntaxException e) {
             return Optional.empty();
         }
 
-        if (!"entry".equalsIgnoreCase(uri.getScheme())) {
-            return Optional.empty();
-        }
-
-        String citationKey = uri.getHost() != null ? uri.getHost() : uri.getAuthority();
-        if (citationKey == null || citationKey.isBlank()) {
-            return Optional.empty();
-        }
-
-        try {
-            citationKey = URLDecoder.decode(citationKey, StandardCharsets.UTF_8);
-        } catch (IllegalArgumentException e) {
-            LOGGER.debug("Could not URL-decode citation key '{}'", citationKey, e);
-        }
-
-        Optional<Integer> pageNumber = Optional.empty();
-        String path = uri.getPath();
-        if (path != null && path.startsWith("/")) {
-            String pageStr = path.substring(1).trim();
-            if (!pageStr.isEmpty()) {
-                try {
-                    int parsedPage = Integer.parseInt(pageStr);
-                    if (parsedPage > 0) {
-                        pageNumber = Optional.of(parsedPage);
-                    }
-                } catch (NumberFormatException e) {
-                    LOGGER.debug("Could not parse page number '{}'", pageStr, e);
-                }
+        List<String> segments = new ArrayList<>();
+        boolean absolute = uri.getScheme() != null;
+        if (absolute) {
+            if (!SCHEME.equalsIgnoreCase(uri.getScheme())) {
+                return Optional.empty();
             }
+            // "jabref://libraries/..." parses "libraries" as authority
+            segments.add(uri.getAuthority());
+        }
+        String path = uri.getPath();
+        if (path != null) {
+            segments.addAll(Arrays.stream(path.split("/")).filter(s -> !s.isEmpty()).toList());
         }
 
-        return Optional.of(new EntryCitationUrl(citationKey, pageNumber));
+        Optional<String> libraryId = Optional.empty();
+        if (absolute) {
+            if (segments.size() < 2 || !"libraries".equals(segments.get(0))) {
+                return Optional.empty();
+            }
+            libraryId = Optional.of(segments.get(1));
+            segments = segments.subList(2, segments.size());
+        }
+        if (segments.size() < 2 || !"entries".equals(segments.get(0))) {
+            return Optional.empty();
+        }
+        String citationKey = segments.get(1);
+
+        Optional<Integer> fileIndex = Optional.empty();
+        if (segments.size() == 4 && "files".equals(segments.get(2))) {
+            fileIndex = parsePositiveInt(segments.get(3));
+        } else if (segments.size() != 2) {
+            return Optional.empty();
+        }
+
+        Optional<Integer> page = Optional.ofNullable(uri.getFragment())
+                                         .map(PAGE_FRAGMENT::matcher)
+                                         .filter(Matcher::find)
+                                         .flatMap(matcher -> parsePositiveInt(matcher.group(1)));
+
+        return Optional.of(new EntryLink(libraryId, citationKey, fileIndex, page));
     }
 
-    public record EntryCitationUrl(String citationKey, Optional<Integer> pageNumber) {
+    private static Optional<Integer> parsePositiveInt(String value) {
+        try {
+            return Optional.of(Integer.parseInt(value)).filter(number -> number > 0);
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /// @param libraryId empty for links relative to the active library
+    /// @param fileIndex 1-based index into the entry's linked files, empty for "first PDF"
+    /// @param page      1-based page number
+    public record EntryLink(Optional<String> libraryId, String citationKey, Optional<Integer> fileIndex, Optional<Integer> page) {
     }
 }

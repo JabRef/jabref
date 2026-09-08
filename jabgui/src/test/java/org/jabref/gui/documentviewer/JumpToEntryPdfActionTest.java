@@ -7,6 +7,8 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.documentviewer.JumpToEntryPdfAction.EntryLink;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -15,10 +17,10 @@ import org.jabref.model.entry.LinkedFile;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,114 +40,111 @@ class JumpToEntryPdfActionTest {
     }
 
     @Test
-    void parseUrlWithCitationKeyAndPage() {
-        Optional<JumpToEntryPdfAction.EntryCitationUrl> result =
-                JumpToEntryPdfAction.parseUrl("entry://Smith2024/12");
-
-        assertTrue(result.isPresent());
-        assertEquals("Smith2024", result.get().citationKey());
-        assertEquals(Optional.of(12), result.get().pageNumber());
+    void parseRelativeLinkWithPage() {
+        assertEquals(Optional.of(new EntryLink(Optional.empty(), "Smith2024", Optional.empty(), Optional.of(12))),
+                JumpToEntryPdfAction.parseUrl("entries/Smith2024#page=12"));
     }
 
     @Test
-    void parseUrlWithCitationKeyOnly() {
-        Optional<JumpToEntryPdfAction.EntryCitationUrl> result =
-                JumpToEntryPdfAction.parseUrl("entry://Smith2024");
-
-        assertTrue(result.isPresent());
-        assertEquals("Smith2024", result.get().citationKey());
-        assertEquals(Optional.empty(), result.get().pageNumber());
+    void parseRelativeLinkWithoutPage() {
+        assertEquals(Optional.of(new EntryLink(Optional.empty(), "Smith2024", Optional.empty(), Optional.empty())),
+                JumpToEntryPdfAction.parseUrl("entries/Smith2024"));
     }
 
     @Test
-    void parseUrlWithUnderscoreInCitationKey() {
-        Optional<JumpToEntryPdfAction.EntryCitationUrl> result =
-                JumpToEntryPdfAction.parseUrl("entry://Smith_2024/5");
+    void parseAbsoluteLinkWithLibraryFileAndPage() {
+        assertEquals(Optional.of(new EntryLink(Optional.of("Chocolate.bib-1a2b3c4d"), "Heyl:2023aa", Optional.of(2), Optional.of(3))),
+                JumpToEntryPdfAction.parseUrl("jabref://libraries/Chocolate.bib-1a2b3c4d/entries/Heyl:2023aa/files/2#page=3"));
+    }
 
-        assertTrue(result.isPresent());
-        assertEquals("Smith_2024", result.get().citationKey());
-        assertEquals(Optional.of(5), result.get().pageNumber());
+    @ParameterizedTest
+    @ValueSource(strings = {"Smith_2024", "Heyl:2023aa", "smith.2024", "Sm+ith", "M%C3%BCller2020"})
+    void parseKeepsCitationKeyCharacters(String key) {
+        String expected = "M%C3%BCller2020".equals(key) ? "Müller2020" : key;
+        assertEquals(Optional.of(expected), JumpToEntryPdfAction.parseUrl("entries/" + key).map(EntryLink::citationKey));
     }
 
     @Test
-    void parseUrlWithColonInCitationKey() {
-        Optional<JumpToEntryPdfAction.EntryCitationUrl> result =
-                JumpToEntryPdfAction.parseUrl("entry://Heyl:2023aa/3");
+    void parseIgnoresInvalidPageAndFileIndex() {
+        assertEquals(Optional.of(new EntryLink(Optional.empty(), "Key", Optional.empty(), Optional.empty())),
+                JumpToEntryPdfAction.parseUrl("entries/Key/files/0#page=abc"));
+    }
 
-        assertTrue(result.isPresent());
-        assertEquals("Heyl:2023aa", result.get().citationKey());
-        assertEquals(Optional.of(3), result.get().pageNumber());
+    @ParameterizedTest
+    @ValueSource(strings = {"https://example.com/paper.pdf", "entry://Smith2024/5", "jabref://entries/Smith2024", "jabref://libraries/id/groups/Foo", "entries/Key/foo", "libraries/id", "", "   "})
+    void parseRejectsOtherLinks(String url) {
+        assertEquals(Optional.empty(), JumpToEntryPdfAction.parseUrl(url));
     }
 
     @Test
-    void parseUrlWithInvalidSchemeReturnsEmpty() {
-        assertTrue(JumpToEntryPdfAction.parseUrl("https://example.com/paper.pdf").isEmpty());
-    }
-
-    @Test
-    void parseUrlWithNullOrBlankReturnsEmpty() {
-        assertTrue(JumpToEntryPdfAction.parseUrl(null).isEmpty());
-        assertTrue(JumpToEntryPdfAction.parseUrl("").isEmpty());
-        assertTrue(JumpToEntryPdfAction.parseUrl("   ").isEmpty());
+    void parseRejectsNull() {
+        assertEquals(Optional.empty(), JumpToEntryPdfAction.parseUrl(null));
     }
 
     @Test
     void executeWithInvalidUrlNotifiesUser() {
-        JumpToEntryPdfAction action = new JumpToEntryPdfAction("invalid-url", stateManager, dialogService);
-        action.execute();
+        new JumpToEntryPdfAction("invalid-url", stateManager, dialogService).execute();
 
-        verify(dialogService).notify(anyString());
+        verify(dialogService).notify(Localization.lang("Invalid URL"));
     }
 
     @Test
     void executeWithNoLibraryOpenNotifiesUser() {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
 
-        JumpToEntryPdfAction action = new JumpToEntryPdfAction("entry://Key1", stateManager, dialogService);
-        action.execute();
+        new JumpToEntryPdfAction("entries/Key1", stateManager, dialogService).execute();
 
-        verify(dialogService).notify(anyString());
+        verify(dialogService).notify(Localization.lang("No library open"));
+    }
+
+    @Test
+    void executeWithUnknownLibraryIdNotifiesUser() {
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext()));
+
+        new JumpToEntryPdfAction("jabref://libraries/unknown/entries/Key1", stateManager, dialogService).execute();
+
+        verify(dialogService).notify(Localization.lang("No library open"));
     }
 
     @Test
     void executeWithEntryNotFoundNotifiesUser() {
-        BibDatabaseContext databaseContext = new BibDatabaseContext();
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext()));
 
-        JumpToEntryPdfAction action = new JumpToEntryPdfAction("entry://MissingKey", stateManager, dialogService);
-        action.execute();
+        new JumpToEntryPdfAction("entries/MissingKey", stateManager, dialogService).execute();
 
-        verify(dialogService).notify(anyString());
+        verify(dialogService).notify(Localization.lang("Citation key '%0' to select not found in open libraries.", "MissingKey"));
     }
 
     @Test
     void executeWithEntryHavingNoPdfFilesNotifiesUser() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry = new BibEntry().withCitationKey("Key1");
-        database.insertEntry(entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        database.insertEntry(new BibEntry().withCitationKey("Key1"));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext(database)));
 
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
+        new JumpToEntryPdfAction("entries/Key1", stateManager, dialogService).execute();
 
-        JumpToEntryPdfAction action = new JumpToEntryPdfAction("entry://Key1", stateManager, dialogService);
-        action.execute();
-
-        verify(dialogService).notify(anyString());
+        verify(dialogService).notify(Localization.lang("No PDF files available"));
     }
 
     @Test
     void executeWithEntryHavingNonPdfFileNotifiesUser() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry = new BibEntry().withCitationKey("Key1");
-        entry.setFiles(List.of(new LinkedFile("Notes", "notes.txt", "TXT")));
-        database.insertEntry(entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        database.insertEntry(new BibEntry().withCitationKey("Key1").withFiles(List.of(new LinkedFile("Notes", "notes.txt", "TXT"))));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext(database)));
 
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
+        new JumpToEntryPdfAction("entries/Key1", stateManager, dialogService).execute();
 
-        JumpToEntryPdfAction action = new JumpToEntryPdfAction("entry://Key1", stateManager, dialogService);
-        action.execute();
+        verify(dialogService).notify(Localization.lang("No PDF files available"));
+    }
 
-        verify(dialogService).notify(anyString());
+    @Test
+    void executeWithFileIndexOutOfRangeFallsBackToFirstPdfNotification() {
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(new BibEntry().withCitationKey("Key1").withFiles(List.of(new LinkedFile("Notes", "notes.txt", "TXT"))));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext(database)));
+
+        new JumpToEntryPdfAction("entries/Key1/files/5", stateManager, dialogService).execute();
+
+        verify(dialogService).notify(Localization.lang("No PDF files available"));
     }
 }

@@ -118,7 +118,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
         MarkdownAwareHyperlink hyperlink = new MarkdownAwareHyperlink(text, astNode);
         hyperlink.setOnAction(_ -> {
-            if (url != null && url.startsWith("entry://")) {
+            if (JumpToEntryPdfAction.parseUrl(url).isPresent()) {
                 new JumpToEntryPdfAction(
                         url,
                         Injector.instantiateModelOrService(StateManager.class),
