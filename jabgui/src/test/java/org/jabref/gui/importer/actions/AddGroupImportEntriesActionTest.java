@@ -1,14 +1,16 @@
 package org.jabref.gui.importer.actions;
 
-import org.jabref.gui.DialogService;
-import org.jabref.logic.importer.ParserResult;
+import java.util.List;
+
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.groups.GroupTreeNode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -17,7 +19,8 @@ import static org.mockito.Mockito.when;
 class AddGroupImportEntriesActionTest {
 
     private final AddGroupImportEntriesAction action = new AddGroupImportEntriesAction();
-    private final ParserResult parserResult = new ParserResult();
+    private final BibDatabaseContext databaseContext = new BibDatabaseContext();
+
     private CliPreferences preferences;
 
     @BeforeEach
@@ -28,35 +31,38 @@ class AddGroupImportEntriesActionTest {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
     }
 
-    /// The group is written into a library the user has not changed, and this runs before the tab
-    /// is attached to it, so nothing else can report that the library differs from its file.
-    @Test
-    void addingTheGroupMarksTheLibraryAsChanged() {
-        action.performAction(parserResult, mock(DialogService.class), preferences);
-
-        assertTrue(parserResult.getChangedOnMigration());
+    private List<String> groupNames() {
+        return databaseContext.getMetaData().getGroups()
+                              .map(root -> root.getChildren().stream().map(GroupTreeNode::getName).toList())
+                              .orElse(List.of());
     }
 
-    /// A library that already has the group is left alone, and must not be reported as changed.
+    /// A library without the group gets it, as the first child of the root.
     @Test
-    void aLibraryThatAlreadyHasTheGroupIsNotMarked() {
-        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
+    void theGroupIsCreatedWhenItIsMissing() {
+        assertTrue(action.addImportedEntriesGroupIfNeeded(databaseContext, preferences));
+
+        assertEquals(List.of("Imported entries"), groupNames());
+    }
+
+    /// A library that already has the group is left alone, so that importing twice does not build a
+    /// second one.
+    @Test
+    void aLibraryThatAlreadyHasTheGroupIsLeftAlone() {
         action.addImportedEntriesGroupIfNeeded(databaseContext, preferences);
 
-        ParserResult reopened = new ParserResult();
-        reopened.setMetaData(databaseContext.getMetaData());
-        action.performAction(reopened, mock(DialogService.class), preferences);
+        assertFalse(action.addImportedEntriesGroupIfNeeded(databaseContext, preferences));
 
-        assertFalse(reopened.getChangedOnMigration());
+        assertEquals(List.of("Imported entries"), groupNames());
     }
 
-    /// Nothing is written, and nothing is reported, when the preference is off.
+    /// Nothing is written when the preference is off.
     @Test
-    void nothingIsMarkedWhenTheFeatureIsOff() {
+    void nothingIsWrittenWhenTheFeatureIsOff() {
         when(preferences.getLibraryPreferences().shouldAddImportedEntries()).thenReturn(false);
 
-        action.performAction(parserResult, mock(DialogService.class), preferences);
+        assertFalse(action.addImportedEntriesGroupIfNeeded(databaseContext, preferences));
 
-        assertFalse(parserResult.getChangedOnMigration());
+        assertEquals(List.of(), groupNames());
     }
 }

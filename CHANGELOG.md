@@ -79,6 +79,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 - We redesigned the "About JabRef" dialog. [#16950](https://github.com/JabRef/jabref/pull/16950)
+- We now create the group for imported entries when entries are imported, instead of when a library is opened. [#16988](https://github.com/JabRef/jabref/pull/16988)
 - We removed the keystore fields, the server timezone, and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We changed remembered shared database passwords to use the operating system credential store. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We changed undo and redo to name the step they take back instead of only saying "Undo". [#16936](https://github.com/JabRef/jabref/pull/16936)
