@@ -49,6 +49,14 @@ Headers use Title Case, as an exception to the sentence-case rule for UI text, s
 
 Needs: impl
 
+## Double click below the last entry adds an entry
+`req~maintable.doubleclick-empty-space.add-entry~1`
+
+A double click on the empty space below the last row of the main table adds a new entry of the last used entry type and opens it in the entry editor.
+This makes the empty area of the table act like the "Add entry" menu item, at the place where the pointer already is.
+
+Needs: impl
+
 ## Critical startup failures show an error dialog
 `req~ux.startup.critical-error-dialog~1`
 
@@ -134,6 +142,13 @@ Needs: impl
 When a dialog with text input as a main component is opened, and it is expected that while working with it, the user will paste from clipboard, JabRef should already automatically paste it.
 
 Example: new entry dialog by ID. It is expected that user would copy some paper ID (from browser, PDF, etc.), and then paste it in the dialog. As said above, JabRef automatically pastes the ID into the text field.
+
+Needs: impl
+
+### Citation key is focused for a newly added entry
+`req~newentry.focus.citation-key~1`
+
+When a new entry is added and the entry editor opens for it, the citation key field receives keyboard focus, so the key can be typed without clicking into the field first.
 
 Needs: impl
 
