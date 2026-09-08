@@ -1,6 +1,6 @@
 ---
-title: Changes pulled from a shared database stay out of the undo journal
 nav_order: 72
+parent: Decision Records
 ---
 
 # Changes pulled from a shared database stay out of the undo journal
