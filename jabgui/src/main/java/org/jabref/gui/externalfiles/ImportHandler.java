@@ -539,7 +539,7 @@ public class ImportHandler {
                                  taskExecutor,
                                  dialogService,
                                  preferences
-                         ).download(false)
+                         ).download(false, undoManager)
                  );
         }
     }

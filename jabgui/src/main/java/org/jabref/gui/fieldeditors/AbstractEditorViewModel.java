@@ -12,6 +12,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.integrity.ValueChecker;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.undo.UndoableFieldChange;
@@ -72,7 +73,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                         // Normalised for the comparison only: the change has to record the value the
                         // entry actually holds, or it describes a state the library was never in -
                         // and a change that does not match the library refuses to apply.
-                        String comparable = stored.map(value -> value.replace("\r\n", "\n")).orElse(null);
+                        String comparable = stored.map(value -> StringUtil.unifyLineBreaks(value, "\n")).orElse(null);
                         if (!newValue.equals(comparable)) {
                             undoManager.applyEdit(new UndoableFieldChange(entry, field, stored.orElse(null), newValue));
                         }
