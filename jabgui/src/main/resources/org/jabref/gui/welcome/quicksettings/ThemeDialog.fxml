@@ -49,9 +49,9 @@
                         </Button>
                     </HBox>
                     <Label text="%Color scheme"
-                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                     <ComboBox fx:id="themeColorScheme" prefWidth="200.0"
-                              GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                              GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                 </children>
             </GridPane>
         </VBox>

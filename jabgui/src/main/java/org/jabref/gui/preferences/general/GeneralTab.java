@@ -10,7 +10,6 @@ import javafx.util.converter.IntegerStringConverter;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.theme.ThemeColorScheme;
-import org.jabref.gui.theme.ThemePreset;
 import org.jabref.gui.util.URLs;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
@@ -60,16 +59,16 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                         viewModel.languagesListProperty(),
                                         viewModel.selectedLanguageProperty(),
                                         Language::getDisplayName)
-                                .combo(Localization.lang("Theme"),
-                                        viewModel.themesListProperty(),
-                                        viewModel.selectedThemeProperty(),
-                                        ThemePreset::getLocalizedName,
-                                        theme -> theme.validate(viewModel.themeValidationStatus()))
                                 .combo(Localization.lang("Color scheme"),
                                         viewModel.colorSchemeListProperty(),
                                         viewModel.selectedThemeColorSchemeProperty(),
                                         ThemeColorScheme::getLocalizedName,
                                         colorScheme -> colorScheme.validate(viewModel.themeColorSchemeValidationStatus()))
+                                .combo(Localization.lang("Theme"),
+                                        viewModel.themesListProperty(),
+                                        viewModel.selectedThemeProperty(),
+                                        theme -> theme.getLocalizedName(viewModel.selectedThemeColorSchemeProperty().get()),
+                                        theme -> theme.validate(viewModel.themeValidationStatus()))
                                 .checkWithField(Localization.lang("Custom theme"), viewModel.customThemeEnabledProperty(), viewModel.customPathToThemeProperty(),
                                         path -> path
                                                 .browse(viewModel::importCSSFile)

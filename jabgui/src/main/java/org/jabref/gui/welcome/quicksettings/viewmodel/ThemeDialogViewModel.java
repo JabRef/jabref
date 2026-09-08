@@ -54,8 +54,18 @@ public class ThemeDialogViewModel extends AbstractViewModel {
     private void initializeFromCurrentTheme() {
         selectedThemeProperty.set(workspacePreferences.getTheme());
         selectedThemeColorSchemeProperty.set(workspacePreferences.getColorScheme());
+        selectedThemeColorSchemeProperty.addListener(_ -> relabelThemes());
         customThemeEnabled.setValue(workspacePreferences.getCustomTheme().isPresent());
         customPathToThemeProperty.setValue(workspacePreferences.getCustomTheme().map(StyleSheet::getName).orElse(""));
+    }
+
+    /// Paired themes are named after the hue of the current color scheme; the combo box only re-reads
+    /// the names when its items or value change, so both are reset.
+    private void relabelThemes() {
+        ThemePreset selected = selectedThemeProperty.get();
+        themesListProperty.setAll(ThemePreset.values());
+        selectedThemeProperty.set(null);
+        selectedThemeProperty.set(selected);
     }
 
     public ReadOnlyListProperty<ThemePreset> themesListProperty() {

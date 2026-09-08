@@ -55,7 +55,7 @@ public class ThemeDialog extends FXDialog {
         viewModel = new ThemeDialogViewModel(preferences, dialogService);
 
         new ViewModelListCellFactory<ThemePreset>()
-                .withText(ThemePreset::getLocalizedName)
+                .withText(preset -> preset.getLocalizedName(viewModel.selectedThemeColorSchemeProperty().get()))
                 .install(theme);
         theme.itemsProperty().bind(viewModel.themesListProperty());
         theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());

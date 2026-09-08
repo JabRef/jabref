@@ -216,6 +216,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         selectedThemeProperty.setValue(workspacePreferences.getTheme());
         selectedThemeColorSchemeProperty.setValue(workspacePreferences.getColorScheme());
+        selectedThemeColorSchemeProperty.addListener(_ -> relabelThemes());
         customThemeEnabled.setValue(workspacePreferences.getCustomTheme().isPresent());
         customPathToThemeProperty.setValue(workspacePreferences.getCustomTheme().map(StyleSheet::getName).orElse(""));
 
@@ -397,6 +398,15 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<Language> selectedLanguageProperty() {
         return this.selectedLanguageProperty;
+    }
+
+    /// Paired themes are named after the hue of the current color scheme; the combo box only re-reads
+    /// the names when its items or value change, so both are reset.
+    private void relabelThemes() {
+        ThemePreset selected = selectedThemeProperty.get();
+        themesListProperty.setAll(ThemePreset.values());
+        selectedThemeProperty.set(null);
+        selectedThemeProperty.set(selected);
     }
 
     public ReadOnlyListProperty<ThemePreset> themesListProperty() {
