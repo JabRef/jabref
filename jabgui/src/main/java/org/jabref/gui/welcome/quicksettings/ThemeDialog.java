@@ -52,13 +52,20 @@ public class ThemeDialog extends FXDialog {
         });
     }
 
+    /// Themes that pair a dark and a light hue are named after the hue of the selected color scheme.
+    private String themeName(ThemePreset preset) {
+        return preset.getLocalizedName(viewModel.selectedThemeColorSchemeProperty().get());
+    }
+
     @FXML
     private void initialize() {
         viewModel = new ThemeDialogViewModel(preferences, dialogService);
 
-        new ViewModelListCellFactory<ThemePreset>()
-                .withText(preset -> preset.getLocalizedName(viewModel.selectedThemeColorSchemeProperty().get()))
-                .install(theme);
+        new ViewModelListCellFactory<ThemePreset>().withText(this::themeName).install(theme);
+        // The button cell renders only when its item changes, so a name following the color scheme
+        // needs a fresh cell; the popup entries are re-rendered when the view model refreshes the list.
+        viewModel.selectedThemeColorSchemeProperty().addListener(_ -> theme.setButtonCell(
+                new ViewModelListCellFactory<ThemePreset>().withText(this::themeName).call(null)));
         theme.itemsProperty().bind(viewModel.themesListProperty());
         theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
 

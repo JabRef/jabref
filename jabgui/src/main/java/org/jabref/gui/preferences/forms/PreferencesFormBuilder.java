@@ -850,6 +850,11 @@ public class PreferencesFormBuilder {
             this.node = node;
         }
 
+        /// The control itself, for the rare caller that has to reach past the builder.
+        public N getNode() {
+            return node;
+        }
+
         /// Adds `condition` to the combination of things that disable this element; see
         /// [#combinedDisable].
         final void addDisableCondition(ObservableValue<? extends Boolean> condition) {
