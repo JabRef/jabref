@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.collections.FXCollections;
@@ -336,5 +337,12 @@ class ImportHandlerTest {
     @Test
     void canImportAsBibEntryReturnsFalseForUnknownFile() {
         assertFalse(importHandler.canImportAsBibEntry(Path.of("test.unknown")));
+    }
+
+    @Test
+    void handleStringDataWithPdfUrlWhenNoTargetDirectoryPresent() throws Exception {
+        when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.empty());
+        List<BibEntry> entries = importHandler.handleStringData("https://invalid.domain.example/test.pdf");
+        assertEquals(List.of(), entries);
     }
 }

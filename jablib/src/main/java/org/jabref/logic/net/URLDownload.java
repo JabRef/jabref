@@ -308,7 +308,16 @@ public class URLDownload {
             throw new FetcherException("Could not create temporary file", e);
         }
         file.toFile().deleteOnExit();
-        toFile(file);
+        try {
+            toFile(file);
+        } catch (FetcherException e) {
+            try {
+                Files.deleteIfExists(file);
+            } catch (IOException ioException) {
+                LOGGER.debug("Could not delete temporary file {}", file, ioException);
+            }
+            throw e;
+        }
 
         return file;
     }

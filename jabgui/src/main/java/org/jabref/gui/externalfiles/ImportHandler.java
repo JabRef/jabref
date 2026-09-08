@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -684,19 +685,27 @@ public class ImportHandler {
 
     private List<BibEntry> handlePdfUrl(String pdfUrl) throws IOException {
         Optional<Path> targetDirectory = targetBibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
-        if (targetDirectory.isEmpty()) {
-            LOGGER.warn("File directory not available while downloading {}.", pdfUrl);
-            return List.of();
+        Path targetFile;
+        boolean isTemporaryFile = targetDirectory.isEmpty();
+
+        if (isTemporaryFile) {
+            try {
+                targetFile = new URLDownload(pdfUrl).toTemporaryFile();
+            } catch (FetcherException fe) {
+                LOGGER.error("Error downloading PDF from URL to temporary file", fe);
+                return List.of();
+            }
+        } else {
+            String filename = FileUtil.getFileNameFromUrl(pdfUrl).orElse(FILENAME_FALLBACK);
+            targetFile = targetDirectory.orElseThrow().resolve(filename);
+            try {
+                new URLDownload(pdfUrl).toFile(targetFile);
+            } catch (FetcherException fe) {
+                LOGGER.error("Error downloading PDF from URL", fe);
+                return List.of();
+            }
         }
-        URLDownload urlDownload = new URLDownload(pdfUrl);
-        String filename = FileUtil.getFileNameFromUrl(pdfUrl).orElse(FILENAME_FALLBACK);
-        Path targetFile = targetDirectory.get().resolve(filename);
-        try {
-            urlDownload.toFile(targetFile);
-        } catch (FetcherException fe) {
-            LOGGER.error("Error downloading PDF from URL", fe);
-            return List.of();
-        }
+
         try {
             PdfMergeMetadataImporter importer = new PdfMergeMetadataImporter(preferences.getImportFormatPreferences());
             ParserResult parserResult = importer.importDatabase(targetFile, targetBibDatabaseContext, preferences.getFilePreferences());
@@ -706,19 +715,37 @@ public class ImportHandler {
             List<BibEntry> entries = parserResult.getDatabase().getEntries();
             if (!entries.isEmpty()) {
                 entries.forEach(entry -> {
-                    if (entry.getFiles().isEmpty()) {
+                    if (isTemporaryFile) {
+                        List<LinkedFile> updatedFiles = new ArrayList<>();
+                        for (LinkedFile file : entry.getFiles()) {
+                            if (file.getLink().equalsIgnoreCase(targetFile.toString())) {
+                                updatedFiles.add(new LinkedFile("", pdfUrl, StandardFileType.PDF.getName()));
+                            } else {
+                                updatedFiles.add(file);
+                            }
+                        }
+                        entry.setFiles(updatedFiles);
+                    } else if (entry.getFiles().isEmpty()) {
                         entry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
                     }
                 });
             } else {
                 BibEntry emptyEntry = new BibEntry();
-                emptyEntry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
+                emptyEntry.addFile(new LinkedFile("", isTemporaryFile ? pdfUrl : targetFile.toString(), StandardFileType.PDF.getName()));
                 entries.add(emptyEntry);
             }
             return entries;
         } catch (IOException ex) {
             LOGGER.error("Error importing PDF from URL - IO issue", ex);
             return List.of();
+        } finally {
+            if (isTemporaryFile) {
+                try {
+                    Files.deleteIfExists(targetFile);
+                } catch (IOException e) {
+                    LOGGER.warn("Could not delete temporary PDF file {}", targetFile, e);
+                }
+            }
         }
     }
 
