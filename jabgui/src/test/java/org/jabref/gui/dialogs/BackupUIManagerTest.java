@@ -15,15 +15,24 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.backup.BackupResolverDialog;
+import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preview.PreviewPreferences;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackupFileType;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.controlsfx.control.HyperlinkLabel;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -36,7 +45,9 @@ import org.testfx.framework.junit5.ApplicationTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,6 +63,13 @@ class BackupUIManagerTest extends ApplicationTest {
         dialogService = mock(DialogService.class);
         preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getExternalApplicationsPreferences()).thenReturn(mock(ExternalApplicationsPreferences.class));
+
+        Injector.setModelOrService(DialogService.class, dialogService);
+        Injector.setModelOrService(GuiPreferences.class, preferences);
+        Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
+        Injector.setModelOrService(TaskExecutor.class, new CurrentThreadTaskExecutor());
+        Injector.setModelOrService(KeyBindingRepository.class, mock(KeyBindingRepository.class));
+        Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
     }
 
     @Test
@@ -141,5 +159,64 @@ class BackupUIManagerTest extends ApplicationTest {
 
         verify(tabContainer).showLibraryTab(targetTab);
     }
-}
 
+    @Test
+    void showReviewBackupDialogResetsChangeMonitorOnlyOnTargetTab(@TempDir Path tempDir) throws IOException {
+        // [utest->req~jabgui.autosaveandbackup.focus-backup-library-tab~1]
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+
+        org.jabref.logic.preview.TextBasedPreviewLayout layout = new org.jabref.logic.preview.TextBasedPreviewLayout(mock(org.jabref.logic.layout.Layout.class));
+        PreviewPreferences previewPreferences = new PreviewPreferences(
+                java.util.List.of(layout),
+                0,
+                "",
+                false,
+                false,
+                java.util.List.of(),
+                false);
+        when(preferences.getPreviewPreferences()).thenReturn(previewPreferences);
+
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@article{test, title = {Original}}");
+        Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
+        Files.writeString(backupFile, "@article{test, title = {Backup}}");
+
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.REVIEW_BACKUP));
+        when(dialogService.showCustomDialogAndWait(any(DatabaseChangesResolverDialog.class)))
+                .thenAnswer(invocation -> {
+                    DatabaseChangesResolverDialog dialog = invocation.getArgument(0);
+                    dialog.denyChanges();
+                    return Optional.of(true);
+                });
+
+        LibraryTab targetTab = mock(LibraryTab.class);
+        BibDatabaseContext context = mock(BibDatabaseContext.class);
+        when(targetTab.getBibDatabaseContext()).thenReturn(context);
+        when(context.getDatabasePath()).thenReturn(Optional.of(originalFile));
+
+        LibraryTab otherTab = mock(LibraryTab.class);
+        BibDatabaseContext otherContext = mock(BibDatabaseContext.class);
+        when(otherTab.getBibDatabaseContext()).thenReturn(otherContext);
+        when(otherContext.getDatabasePath()).thenReturn(Optional.of(tempDir.resolve("other.bib")));
+
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(otherTab, targetTab));
+
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.getUndoManager(any())).thenReturn(mock(GuiUndoManager.class));
+
+        interact(() -> BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                tabContainer,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                stateManager));
+
+        verify(tabContainer, atLeastOnce()).showLibraryTab(targetTab);
+        verify(targetTab).resetChangeMonitor();
+        verify(otherTab, never()).resetChangeMonitor();
+    }
+}

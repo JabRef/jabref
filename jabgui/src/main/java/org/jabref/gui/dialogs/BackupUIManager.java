@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javafx.scene.control.ButtonType;
 
@@ -37,6 +39,7 @@ import org.slf4j.LoggerFactory;
 @NullMarked
 public class BackupUIManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
+    private static final Lock BACKUP_RESOLVER_LOCK = new ReentrantLock();
 
     private BackupUIManager() {
     }
@@ -48,45 +51,50 @@ public class BackupUIManager {
                                                                  GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  StateManager stateManager) {
-        Optional<ButtonType> actionOpt = showBackupResolverDialog(
-                dialogService,
-                tabContainer,
-                preferences.getExternalApplicationsPreferences(),
-                originalPath,
-                preferences.getFilePreferences().getBackupDirectory());
-        return actionOpt.flatMap(action -> {
-            if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
-                BackupManager.RestoreResult result = BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
-                switch (result) {
-                    case BackupManager.RestoreResult.Empty(
-                            Path backupPath
-                    ) ->
-                            dialogService.showErrorDialogAndWait(
-                                    Localization.lang("Restore backup"),
-                                    Localization.lang("The backup file '%0' is empty and was not restored.", backupPath));
-                    case BackupManager.RestoreResult.Failed(
-                            Path backupPath,
-                            IOException exception
-                    ) ->
-                            dialogService.showErrorDialogAndWait(
-                                    Localization.lang("Restore backup"),
-                                    Localization.lang("Could not restore the backup file '%0'.", backupPath),
-                                    exception);
-                    case BackupManager.RestoreResult.NotFound(
-                            Path missingOriginalPath
-                    ) ->
-                            dialogService.showErrorDialogAndWait(
-                                    Localization.lang("Restore backup"),
-                                    Localization.lang("No backup file was found for '%0'.", missingOriginalPath));
-                    case BackupManager.RestoreResult.Restored _ -> {
+        BACKUP_RESOLVER_LOCK.lock();
+        try {
+            Optional<ButtonType> actionOpt = showBackupResolverDialog(
+                    dialogService,
+                    tabContainer,
+                    preferences.getExternalApplicationsPreferences(),
+                    originalPath,
+                    preferences.getFilePreferences().getBackupDirectory());
+            return actionOpt.flatMap(action -> {
+                if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
+                    BackupManager.RestoreResult result = BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                    switch (result) {
+                        case BackupManager.RestoreResult.Empty(
+                                Path backupPath
+                        ) ->
+                                dialogService.showErrorDialogAndWait(
+                                        Localization.lang("Restore backup"),
+                                        Localization.lang("The backup file '%0' is empty and was not restored.", backupPath));
+                        case BackupManager.RestoreResult.Failed(
+                                Path backupPath,
+                                IOException exception
+                        ) ->
+                                dialogService.showErrorDialogAndWait(
+                                        Localization.lang("Restore backup"),
+                                        Localization.lang("Could not restore the backup file '%0'.", backupPath),
+                                        exception);
+                        case BackupManager.RestoreResult.NotFound(
+                                Path missingOriginalPath
+                        ) ->
+                                dialogService.showErrorDialogAndWait(
+                                        Localization.lang("Restore backup"),
+                                        Localization.lang("No backup file was found for '%0'.", missingOriginalPath));
+                        case BackupManager.RestoreResult.Restored _ -> {
+                        }
                     }
+                    return Optional.empty();
+                } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
+                    return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
                 }
                 return Optional.empty();
-            } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
-            }
-            return Optional.empty();
-        });
+            });
+        } finally {
+            BACKUP_RESOLVER_LOCK.unlock();
+        }
     }
 
     private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService,
@@ -101,15 +109,10 @@ public class BackupUIManager {
     }
 
     private static Optional<LibraryTab> findLibraryTabForPath(LibraryTabContainer tabContainer, Path originalPath) {
-        if (tabContainer.getLibraryTabs() == null) {
-            return Optional.empty();
-        }
         return tabContainer.getLibraryTabs().stream()
-                           .filter(tab -> tab.getBibDatabaseContext() != null
-                                          && tab.getBibDatabaseContext().getDatabasePath() != null
-                                          && tab.getBibDatabaseContext().getDatabasePath()
-                                                .map(Path::toAbsolutePath)
-                                                .equals(Optional.of(originalPath.toAbsolutePath())))
+                           .filter(tab -> tab.getBibDatabaseContext().getDatabasePath()
+                                             .map(Path::toAbsolutePath)
+                                             .equals(Optional.of(originalPath.toAbsolutePath())))
                            .findFirst();
     }
 
@@ -165,4 +168,3 @@ public class BackupUIManager {
         }
     }
 }
-
