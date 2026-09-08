@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 @NullMarked
 public class EmbeddingModelMetadataService {
     public static final String DJL_PYTORCH_GROUP_ID = "ai.djl.huggingface.pytorch";
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddingModelMetadataService.class);
 
     private static final Set<String> CONFIG_AND_TOKENIZER_FILES = Set.of(
@@ -190,11 +190,11 @@ public class EmbeddingModelMetadataService {
                 if (element.isJsonObject()) {
                     JsonObject fileObj = element.getAsJsonObject();
                     String path = fileObj.has("path") && fileObj.get("path").isJsonPrimitive()
-                            ? fileObj.get("path").getAsString()
-                            : "";
+                                  ? fileObj.get("path").getAsString()
+                                  : "";
                     long size = fileObj.has("size") && fileObj.get("size").isJsonPrimitive() && fileObj.get("size").getAsJsonPrimitive().isNumber()
-                            ? fileObj.get("size").getAsLong()
-                            : 0;
+                                ? fileObj.get("size").getAsLong()
+                                : 0;
 
                     String lowerPath = path.toLowerCase(Locale.ROOT);
                     if (lowerPath.endsWith(".safetensors")) {
