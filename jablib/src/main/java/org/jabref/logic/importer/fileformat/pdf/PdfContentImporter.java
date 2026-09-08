@@ -86,8 +86,12 @@ public class PdfContentImporter extends PdfImporter {
         return result;
     }
 
+    /// Converts an author line as found in a PDF into a BibTeX author list, mapping a trailing `et al.` to `others`.
+    ///
+    /// [org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter] (via
+    /// [org.jabref.logic.importer.AuthorListParser#normalizeSimply]) covers the comma-separated cases including
+    /// `et al.`, but not the space-separated fallback below, so it cannot replace this method as is.
     private String streamlineNames(String names) {
-        // TODO: replace with NormalizeNamesFormatter?!
         String res;
         // supported formats:
         //   Matthias Schrepfer1, Johannes Wolf1, Jan Mendling1, and Hajo A. Reijers2
