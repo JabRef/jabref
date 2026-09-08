@@ -120,11 +120,7 @@ class OjsSubmissionFetcherTest {
                         items.append(",");
                     }
                     int id = requestIndex * 100 + i;
-                    items.append("{\"id\": ")
-                         .append(id)
-                         .append(", \"stageId\": 1, \"publications\": [{\"id\": 1, \"title\": {\"en_US\": \"T")
-                         .append(id)
-                         .append("\"}}]}");
+                    items.append("{\"id\": ").append(id).append(", \"stageId\": 1, \"publications\": [{\"id\": 1, \"title\": {\"en_US\": \"T").append(id).append("\"}}]}");
                 }
                 String responseBody = "{\"itemsMax\": 150, \"items\": [" + items + "]}";
                 byte[] responseBytes = responseBody.getBytes(StandardCharsets.UTF_8);
