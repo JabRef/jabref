@@ -81,47 +81,47 @@ public class SwhidFetcher implements IdBasedFetcher {
             throw new FetcherException("Invalid URL constructed for SWHID: " + canonicalSwhid, e);
         }
 
-            try {
-                URLDownload urlDownload = new URLDownload(url);
-                // Software Heritage uses anti-bot protection that blocks default browser user agents.
-                // Explicitly setting the user-Agent to JabRef identifies us as an API client and allows retrieving the JSON response.
-                urlDownload.addHeader("User-Agent", USER_AGENT);
-                String response = urlDownload.asString();
+        try {
+            URLDownload urlDownload = new URLDownload(url);
+            // Software Heritage uses anti-bot protection that blocks default browser user agents.
+            // Explicitly setting the user-Agent to JabRef identifies us as an API client and allows retrieving the JSON response.
+            urlDownload.addHeader("User-Agent", USER_AGENT);
+            String response = urlDownload.asString();
 
-                JSONObject jsonObject = new JSONObject(response);
-                String bibtexContext = jsonObject.optString("content", "");
+            JSONObject jsonObject = new JSONObject(response);
+            String bibtexContext = jsonObject.optString("content", "");
 
-                if (bibtexContext.isBlank()) {
-                    return Optional.empty();
-                }
-
-                BibtexParser parser = new BibtexParser(importFormatPreferences);
-                List<BibEntry> entries = parser.parseEntries(bibtexContext);
-
-                if (entries.isEmpty()) {
-                    return Optional.empty();
-                }
-
-                BibEntry entry = entries.getFirst();
-
-                entry.clearField(new UnknownField("swhid"));
-                if (!entry.hasField(BiblatexSoftwareField.SWHID)) {
-                    entry = entry.withField(BiblatexSoftwareField.SWHID, canonicalSwhid);
-                }
-
-                return Optional.of(entry);
-            } catch (FetcherClientException e) {
-                boolean isNotFound = e.getHttpResponse()
-                                      .map(response -> response.statusCode() == 404)
-                                      .orElse(false);
-                if (isNotFound) {
-                    LOGGER.debug("No citation metadata found for SWHID: {}", canonicalSwhid, e);
-                    return Optional.empty();
-                }
-                throw e;
-            } catch (JSONException | ParseException e) {
-                LOGGER.info("Error fetching or parsing SWHID response for {}", canonicalSwhid, e);
-                throw new FetcherException("Failed to retrieve or parse metadata from Software Heritage", e);
+            if (bibtexContext.isBlank()) {
+                return Optional.empty();
             }
+
+            BibtexParser parser = new BibtexParser(importFormatPreferences);
+            List<BibEntry> entries = parser.parseEntries(bibtexContext);
+
+            if (entries.isEmpty()) {
+                return Optional.empty();
+            }
+
+            BibEntry entry = entries.getFirst();
+
+            entry.clearField(new UnknownField("swhid"));
+            if (!entry.hasField(BiblatexSoftwareField.SWHID)) {
+                entry = entry.withField(BiblatexSoftwareField.SWHID, canonicalSwhid);
+            }
+
+            return Optional.of(entry);
+        } catch (FetcherClientException e) {
+            boolean isNotFound = e.getHttpResponse()
+                                  .map(response -> response.statusCode() == 404)
+                                  .orElse(false);
+            if (isNotFound) {
+                LOGGER.debug("No citation metadata found for SWHID: {}", canonicalSwhid, e);
+                return Optional.empty();
+            }
+            throw e;
+        } catch (JSONException | ParseException e) {
+            LOGGER.info("Error fetching or parsing SWHID response for {}", canonicalSwhid, e);
+            throw new FetcherException("Failed to retrieve or parse metadata from Software Heritage", e);
+        }
     }
 }
