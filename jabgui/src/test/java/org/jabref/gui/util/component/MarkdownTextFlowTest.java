@@ -231,6 +231,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
         });
     }
 
+    /// The bounds of the first rendered line in screen coordinates.
     private static Bounds firstTextBounds(MarkdownTextFlow textFlow) {
         AtomicReference<Bounds> boundsReference = new AtomicReference<>();
         JavaFxExtension.invokeAndWait(() -> {

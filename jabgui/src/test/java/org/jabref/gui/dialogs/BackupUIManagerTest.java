@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.scene.layout.StackPane;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.backup.BackupResolverDialog;
@@ -84,8 +86,9 @@ class BackupUIManagerTest extends JavaFxTest {
         AtomicReference<@Nullable String> dialogContent = new AtomicReference<>();
         interact(() -> {
             BackupResolverDialog dialog = new BackupResolverDialog(originalFile, backupFile.getParent(), mock(ExternalApplicationsPreferences.class));
-            HyperlinkLabel content = (HyperlinkLabel) dialog.getDialogPane().getContent();
-            dialogContent.set(content.getText());
+            StackPane content = (StackPane) dialog.getDialogPane().getContent();
+            HyperlinkLabel hyperlink = (HyperlinkLabel) content.getChildren().getFirst();
+            dialogContent.set(hyperlink.getText());
         });
 
         assertEquals("""

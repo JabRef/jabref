@@ -41,6 +41,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
@@ -467,18 +468,18 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     /// @implNote Similar method [org.jabref.gui.linkedfile.RedownloadMissingFilesAction#redownloadMissing]
-    public void redownload() {
+    public void redownload(UndoManager undoManager) {
         LOGGER.info("Redownloading file from {}", linkedFile.getSourceUrl());
         if (linkedFile.getSourceUrl().isEmpty() || !LinkedFile.isOnlineLink(linkedFile.getSourceUrl())) {
             throw new UnsupportedOperationException("In order to download the file, the source url has to be an online link");
         }
 
-        DownloadLinkedFileAction downloadLinkedFileAction = getDownloadLinkedFileAction();
+        DownloadLinkedFileAction downloadLinkedFileAction = getDownloadLinkedFileAction(undoManager);
         downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
         downloadLinkedFileAction.execute();
     }
 
-    private DownloadLinkedFileAction getDownloadLinkedFileAction() {
+    private DownloadLinkedFileAction getDownloadLinkedFileAction(UndoManager undoManager) {
         String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
 
         return new DownloadLinkedFileAction(
@@ -491,14 +492,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 preferences.getFilePreferences(),
                 taskExecutor,
                 fileName,
-                true);
+                true,
+                undoManager);
     }
 
-    public void download(boolean keepHtmlLink) {
-        download(keepHtmlLink, Map.of());
+    public void download(boolean keepHtmlLink, UndoManager undoManager) {
+        download(keepHtmlLink, Map.of(), undoManager);
     }
 
-    public void download(boolean keepHtmlLink, Map<String, String> headers) {
+    public void download(boolean keepHtmlLink, Map<String, String> headers, UndoManager undoManager) {
         LOGGER.info("Downloading file from {}", linkedFile.getSourceUrl());
         if (!linkedFile.isOnlineLink()) {
             throw new UnsupportedOperationException("In order to download the file it has to be an online link");
@@ -514,7 +516,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 preferences.getFilePreferences(),
                 taskExecutor,
                 "",
-                keepHtmlLink);
+                keepHtmlLink,
+                undoManager);
         downloadLinkedFileAction.setDownloadHeaders(headers);
         downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
         downloadLinkedFileAction.execute();
