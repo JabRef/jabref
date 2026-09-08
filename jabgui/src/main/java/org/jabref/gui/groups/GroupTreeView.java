@@ -66,7 +66,6 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -99,7 +98,6 @@ public class GroupTreeView extends BorderPane {
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
-    private final UndoManager undoManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final KeyBindingRepository keyBindingRepository;
     private final BibEntryTypesManager entryTypesManager;
@@ -114,8 +112,6 @@ public class GroupTreeView extends BorderPane {
     private CustomLocalDragboard localDragboard;
     private DragExpansionHandler dragExpansionHandler;
     private Timer scrollTimer;
-    private ImportHandler importHandler;
-    private BibDatabaseContext database;
     private double scrollVelocity = 0;
     private double scrollableAreaHeight;
     private double upperBorder;
@@ -128,7 +124,6 @@ public class GroupTreeView extends BorderPane {
                          GuiPreferences preferences,
                          DialogService dialogService,
                          AiService aiService,
-                         UndoManager undoManager,
                          FileUpdateMonitor fileUpdateMonitor,
                          TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
@@ -136,7 +131,6 @@ public class GroupTreeView extends BorderPane {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
-        this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
@@ -392,22 +386,6 @@ public class GroupTreeView extends BorderPane {
                 });
         text.getStyleClass().setAll("text");
 
-        text.styleProperty().bind(Bindings.createStringBinding(() -> {
-            double reducedFontSize;
-            double font_size = preferences.getWorkspacePreferences().getMainFontSize();
-            // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
-            if (font_size > 26.0) {
-                reducedFontSize = 0.25;
-            } else if (font_size > 22.0) {
-                reducedFontSize = 0.35;
-            } else if (font_size > 18.0) {
-                reducedFontSize = 0.55;
-            } else {
-                reducedFontSize = 0.75;
-            }
-            return "-fx-font-size: %fem;".formatted(reducedFontSize);
-        }, preferences.getWorkspacePreferences().mainFontSizeProperty()));
-
         node.getChildren().add(text);
         node.setMaxWidth(Control.USE_PREF_SIZE);
         return node;
@@ -470,12 +448,12 @@ public class GroupTreeView extends BorderPane {
         }
 
         if (dragboard.hasFiles()) {
-            this.database = stateManager.getActiveDatabase().orElse(null);
-            this.importHandler = new ImportHandler(
+            BibDatabaseContext database = stateManager.getActiveDatabase().orElse(null);
+            ImportHandler importHandler = new ImportHandler(
                     database,
                     preferences,
                     fileUpdateMonitor,
-                    undoManager,
+                    stateManager.getUndoManager(database),
                     stateManager,
                     dialogService,
                     taskExecutor);

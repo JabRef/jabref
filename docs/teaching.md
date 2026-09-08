@@ -106,7 +106,7 @@ Course [SENG371: Software Evolution](https://heat.csc.uvic.ca/coview/course/2024
 Course [10915-01: Software Engineering](https://dmi.unibas.ch/de/studium/computer-science-informatik/lehrangebot-hs18/vorlesung-software-engineering/), 2019 to 2023
 
 * Lecture Materials: [https://github.com/unibas-marcelluethi/software-engineering](https://github.com/unibas-marcelluethi/software-engineering)
-* Excercise touching JabRef:
+* Exercise touching JabRef:
   * General idea: identify a feature missing in JabRef and develop the specification, system design, and implementation of the feature.
   * Introduction to JabRef's code: [Exercise 5](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week5/exercises/practical-exercises.md): Introduction into JabRef code.
   * Prominent feature implemented: Parse full-text references using Grobid. PR [#5614](https://github.com/JabRef/jabref/pull/5614).

@@ -4,8 +4,10 @@ parent: Decision Records
 ---
 
 # Store Chats in MVStore
-<!-- dsn->req~ai.summarization.general.storage~1 -->
-<!-- dsn->req~ai.chat.entries.history-storage~1 -->
+
+<!-- [dsn->req~ai.summarization.general.storage~1] -->
+<!-- [dsn->req~ai.chat.entries.history-storage~1] -->
+<!-- [dsn->req~ai.chat.groups.history-storage~1] -->
 
 ## Context and Problem Statement
 

@@ -45,8 +45,8 @@ import org.slf4j.LoggerFactory;
 
 /// This class provides methods to expand bracketed expressions, such as
 /// `[year]_[author]_[firstpage]`, using information from a provided BibEntry. The above-mentioned expression would yield
-/// `2017_Kitsune_123` when expanded using the BibTeX entry <code>@Article{ authors = {O. Kitsune}, year = {2017},
-/// pages={123-6}}</code>.
+/// `2017_Kitsune_123` when expanded using the BibTeX entry `@Article{ authors = {O. Kitsune}, year = {2017},
+/// pages={123-6}}`.
 ///
 /// The embedding in JabRef is explained at <a href="https://docs.jabref.org/setup/citationkeypatterns">Customize the citation key generator</a>.
 ///
@@ -1213,23 +1213,18 @@ public class BracketedPattern {
     ///
     ///
     /// Each part is examined separately:
-    /// <ol>
-    ///
-    /// - We remove all tokens of a part which are one of the defined ignore words (the, press), which end with a dot
-    /// (ltd., co., ...) and which first character is lowercase (of, on, di, ...).
-    /// - We detect the types of the part: university, technology institute,
-    /// department, school, rest
-    ///
-    /// - University: `"Uni[NameOfTheUniversity]"`
-    /// - Department: If the institution value contains more than one comma separated part, the department will be an
-    /// abbreviation of all words beginning with the uppercase letter except of words:
-    /// `d[ei]p.*`, school, faculty
-    /// - School: same as department
-    /// - Rest: If there are less than 3 tokens in such part than the result
-    /// is a concatenation of those tokens. Otherwise, the result will be built
-    /// from the first letter in each token.
-    ///
-    /// </ol>
+    /// 1. We remove all tokens of a part which are one of the defined ignore words (the, press), which end with a dot
+    ///    (ltd., co., ...) and which first character is lowercase (of, on, di, ...).
+    /// 2. We detect the types of the part: university, technology institute,
+    ///    department, school, rest
+    ///     - University: `"Uni[NameOfTheUniversity]"`
+    ///     - Department: If the institution value contains more than one comma separated part, the department will be an
+    ///       abbreviation of all words beginning with the uppercase letter except of words:
+    ///       `d[ei]p.*`, school, faculty
+    ///     - School: same as department
+    ///     - Rest: If there are less than 3 tokens in such part than the result
+    ///       is a concatenation of those tokens. Otherwise, the result will be built
+    ///       from the first letter in each token.
     ///
     /// Parts are concatenated together in the following way:
     ///

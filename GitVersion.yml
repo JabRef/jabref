@@ -1,9 +1,14 @@
-assembly-versioning-format: '{major}.{minor}.{WeightedPreReleaseNumber}'
-assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
-mode: ContinuousDeployment
+assembly-versioning-format: '{Major}.{Minor}.{WeightedPreReleaseNumber}'
+assembly-informational-format: '{Major}.{Minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
+# GitVersion 5 "ContinuousDeployment" (pre-release number counts commits) is called "ContinuousDelivery" in GitVersion 6
+mode: ContinuousDelivery
+# JabRef tags two-component versions (v5.15, v6.0-alpha.6); the GitVersion 6 default (Strict) ignores them
+semantic-version-format: Loose
+# Default strategies minus MergeMessage, which mis-reads old merge commits (e.g. "Merge pull request #7115 from JabRef/hotfix-7114" -> base version 7114.0.0)
+strategies: [ConfiguredNextVersion, TaggedCommit, TrackReleaseBranches, VersionInBranchName, Fallback]
 
 branches:
   main:
     regex: ^main
-    tag: 'alpha' # Update this to the tag prefix for the alpha/beta release (e.g., "alpha2") or leave empty
+    label: 'alpha' # Update this to the label for the alpha/beta release (e.g., "alpha2") or leave empty
     pre-release-weight: 34000 # 0 after stable release, 15000 before alpha release, 30000 before beta release, 50000 before stable release

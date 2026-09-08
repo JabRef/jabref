@@ -388,7 +388,8 @@ public class StringUtil {
         return LINE_BREAKS.matcher(s).replaceAll(newline);
     }
 
-    /// Checks if the given String has exactly one pair of surrounding curly braces <br>
+    /// Checks if the given String has exactly one pair of surrounding curly braces
+    ///
     /// Strings with escaped characters in curly braces at the beginning and end are respected, too
     ///
     /// @param toCheck The string to check
@@ -520,7 +521,7 @@ public class StringUtil {
 
     /// @param buffer    String to be tokenized
     /// @param delimiter Delimiter string
-    /// @return list      [java.util.List] of <tt>String</tt>
+    /// @return list      [java.util.List] of `String`
     public static List<String> tokenizeToList(String buffer, String delimiter) {
         // delimiter is a set of characters, so it is turned into a character class.
         // \Q...\E keeps any regex metacharacter inside the class literal.

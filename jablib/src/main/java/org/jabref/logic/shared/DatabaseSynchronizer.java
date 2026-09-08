@@ -1,18 +1,20 @@
 package org.jabref.logic.shared;
 
+import java.sql.SQLException;
+
 import org.jabref.model.entry.BibEntry;
 
 public interface DatabaseSynchronizer {
 
     String getDBName();
 
-    void pullChanges();
+    void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException, SQLException;
 
     void closeSharedDatabase();
 
-    void registerListener(Object listener);
+    void pullChanges();
 
-    void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException;
+    void registerListener(Object listener);
 
     void synchronizeSharedEntry(BibEntry bibEntry);
 

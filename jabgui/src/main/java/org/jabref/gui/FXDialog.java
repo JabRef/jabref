@@ -2,15 +2,12 @@ package org.jabref.gui;
 
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.BaseDialog;
-
-import com.airhacks.afterburner.injection.Injector;
 
 /// This class provides a super class for all dialogs implemented in JavaFX.
 ///
@@ -55,13 +52,8 @@ public class FXDialog extends Alert {
             initModality(Modality.NONE);
         }
 
-        dialogWindow.getScene().setOnKeyPressed(event -> {
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                dialogWindow.close();
-            }
-        });
-        this.setOnShowing(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));
+        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> BaseDialog.closeOnKeyBindingMatch(event, this));
+        setOnShown(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));
     }
 
     public FXDialog(AlertType type) {

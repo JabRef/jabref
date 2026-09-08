@@ -74,19 +74,19 @@
         </center>
 
         <bottom>
-            <VBox spacing="10">
+            <VBox spacing="8">
                 <padding>
-                    <Insets top="10"/>
+                    <Insets top="8"/>
                 </padding>
 
                 <HBox fx:id="followUpQuestionsArea"
-                      spacing="5"
+                      spacing="4"
                       alignment="CENTER">
                     <Label text="%Follow-up questions"/>
 
                     <SimpleListView
                             fx:id="followUpQuestionsSimpleListView"
-                            spacing="10"/>
+                            spacing="8"/>
                 </HBox>
 
 

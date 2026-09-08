@@ -2,11 +2,11 @@ package org.jabref.gui.bibtexhighlighter;
 
 import java.util.List;
 
-import javafx.beans.property.SimpleStringProperty;
-
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.search.SearchType;
 import org.jabref.logic.search.SearchPreferences;
+import org.jabref.logic.util.OptionalObjectProperty;
 
 import com.airhacks.afterburner.injection.Injector;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
@@ -42,7 +42,7 @@ class BibTeXHighlighterTest {
         syntaxHighlighter = mock(BibTeXSyntaxHighlighter.class);
         model = mock(CodeTextModel.class);
 
-        when(stateManager.searchQueryProperty()).thenReturn(new SimpleStringProperty(""));
+        when(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)).thenReturn(OptionalObjectProperty.empty());
         highlighter = new BibTeXHighlighter(stateManager, syntaxHighlighter);
     }
 

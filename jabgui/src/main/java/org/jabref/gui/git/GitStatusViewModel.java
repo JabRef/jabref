@@ -24,12 +24,10 @@ import org.jabref.model.database.BibDatabaseContext;
 /// ViewModel that holds current Git sync status for the open .bib database.
 /// It maintains the state of the GitHandler bound to the current file path, including:
 ///
-/// <ul>
-///   <li>Whether the current file is inside a Git repository</li>
-///   <li>Whether the file is tracked by Git</li>
-///   <li>Whether there are unresolved merge conflicts</li>
-///   <li>The current sync status (e.g., `UP_TO_DATE`, `DIVERGED`, etc.)</li>
-/// </ul>
+/// - Whether the current file is inside a Git repository
+/// - Whether the file is tracked by Git
+/// - Whether there are unresolved merge conflicts
+/// - The current sync status (e.g., `UP_TO_DATE`, `DIVERGED`, etc.)
 public class GitStatusViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
