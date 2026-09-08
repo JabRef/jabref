@@ -51,6 +51,10 @@ public class StringUtil {
     // A sentence ends with a .?!;, but not in the case of "Mr.", "Ms.", "Mrs.", "Dr.", "st.", "jr.", "co.", "inc.", and "ltd."
     private static final Pattern SPLIT_TEXT_PATTERN = Pattern.compile("(?<=[\\.!;\\?])(?<![Mm](([Rr]|[Rr][Ss])|[Ss])\\.|[Dd][Rr]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+");
 
+    private static final String ELLIPSIS = "...";
+    private static final int MIN_TRUNCATED_FILENAME_LENGTH = 3;
+    private static final int MIN_PARENT_LENGTH = 5;
+
     public static String booleanToBinaryString(boolean expression) {
         return expression ? "1" : "0";
     }
@@ -783,21 +787,29 @@ public class StringUtil {
             lastSeparator = fullPath.lastIndexOf(fallbackSeparator);
         }
 
-        String parent = fullPath.substring(0, lastSeparator);
+        if (lastSeparator == -1) {
+            return maxLength > MIN_TRUNCATED_FILENAME_LENGTH
+                   ? fullPath.substring(0, maxLength - ELLIPSIS.length()) + ELLIPSIS
+                   : fullPath;
+        }
+
         String fileName = fullPath.substring(lastSeparator + 1);
         char separator = fullPath.charAt(lastSeparator);
 
         if (fileName.length() >= maxLength) {
-            return maxLength > 3 ? fileName.substring(0, maxLength - 3) + "..." : fileName;
+            return maxLength > MIN_TRUNCATED_FILENAME_LENGTH
+                   ? fileName.substring(0, maxLength - ELLIPSIS.length()) + ELLIPSIS
+                   : fileName;
         }
 
         int availableLengthForParent = maxLength - fileName.length() - 1;
 
-        if (availableLengthForParent < 5) {
-            return "..." + separator + fileName;
+        if (availableLengthForParent < MIN_PARENT_LENGTH) {
+            return ELLIPSIS + separator + fileName;
         }
 
-        String shortenedParent = abbreviateMiddle(parent, "...", availableLengthForParent);
+        String parent = fullPath.substring(0, lastSeparator);
+        String shortenedParent = abbreviateMiddle(parent, ELLIPSIS, availableLengthForParent);
         return shortenedParent + separator + fileName;
     }
 
