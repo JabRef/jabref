@@ -320,7 +320,7 @@ class SynchronizationSimulatorTest {
         }
     }
 
-    /// Issue #9738: text typed character by character arrived truncated on the shared side
+    /// https://github.com/JabRef/jabref/issues/9738: text typed character by character arrived truncated on the shared side
     @Test
     void simulateTypedTextReachesSharedSideCompletely() throws Exception {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
@@ -350,7 +350,7 @@ class SynchronizationSimulatorTest {
         assertEquals(bibEntryOfClientA.getSharedBibEntryData().getVersion(), sharedEntry.getSharedBibEntryData().getVersion());
     }
 
-    /// Issue #9738: two users typing into the same field must end with one complete text on the
+    /// https://github.com/JabRef/jabref/issues/9738: two users typing into the same field must end with one complete text on the
     /// shared side and a conflict for the other user - not with a mix of both or a truncation
     @Test
     void simulateConcurrentTypingIntoSameField() throws Exception {
