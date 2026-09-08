@@ -813,7 +813,6 @@ public class StringUtil {
         return shortenedParent + separator + fileName;
     }
 
-    @AllowedToUseApacheCommonsLang3("No Guava equivalent existing")
     public static String abbreviateMiddle(String str, String middle, int length) {
         return StringUtils.abbreviateMiddle(str, middle, length);
     }
