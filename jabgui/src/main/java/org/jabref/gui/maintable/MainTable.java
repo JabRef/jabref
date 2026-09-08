@@ -348,6 +348,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 if (index >= 0) {
                     getSelectionModel().clearAndSelect(index);
                     scrollTo(index);
+                    requestFocus();
                 }
             });
         }
