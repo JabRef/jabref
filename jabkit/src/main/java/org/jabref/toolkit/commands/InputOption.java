@@ -19,6 +19,8 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.toolkit.exception.ImportServiceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -41,6 +43,8 @@ import picocli.CommandLine.Parameters;
 ///
 /// See ADR-0057 (which supersedes ADR-0045) and ADR-0065 for the rationale.
 class InputOption {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(InputOption.class);
 
     @ArgGroup(exclusive = true, multiplicity = "1")
     private InputSource inputSource;
@@ -67,9 +71,11 @@ class InputOption {
     // [impl->adr~download-url-input-files~1]
     // [impl->adr~shared-database-url-as-jabkit-input~1]
     static Path resolveInput(String input, CliPreferences preferences) throws ImportServiceException {
-        Optional<DBMSConnectionUrl> connectionUrl = DBMSConnectionUrl.parse(input);
-        if (connectionUrl.isPresent()) {
-            return pullSharedDatabase(connectionUrl.orElseThrow(), preferences);
+        if (isPostgreSqlUrl(input)) {
+            Optional<DBMSConnectionUrl> connectionUrl = DBMSConnectionUrl.parse(input);
+            if (connectionUrl.isPresent()) {
+                return pullSharedDatabase(connectionUrl.orElseThrow(), preferences);
+            }
         }
 
         if (URLUtil.isURL(input)) {
@@ -96,12 +102,23 @@ class InputOption {
         }
     }
 
+    /// [DBMSConnectionUrl#parse] is deliberately permissive: it finds a PostgreSQL URL anywhere in a
+    /// pasted text and also accepts libpq's `host=... dbname=...` keyword form, which the GUI needs.
+    /// On the command line that would swallow local files whose name happens to contain such a
+    /// fragment, so only an argument that starts with the scheme is offered to it.
+    private static boolean isPostgreSqlUrl(String input) {
+        return input.regionMatches(true, 0, "postgres", 0, "postgres".length())
+                || input.regionMatches(true, 0, "jdbc:postgres", 0, "jdbc:postgres".length());
+    }
+
     private static Path pullSharedDatabase(DBMSConnectionUrl connectionUrl, CliPreferences preferences) throws ImportServiceException {
-        // The JDBC URL keeps host, port and database, but not the password, so it is safe to print
+        // The JDBC URL keeps host, port and database, but not the user and the password, so it is safe to print
         String redactedInput = connectionUrl.toJdbcUrl();
         try {
             return SharedDatabaseExport.pullToTemporaryBib(connectionUrl, preferences);
         } catch (SQLException | InvalidDBMSConnectionPropertiesException | DatabaseNotSupportedException | IOException e) {
+            // The CLI prints the messages only; the stack trace of a failed connection is what makes it diagnosable
+            LOGGER.error("Could not read the shared database {}", redactedInput, e);
             throw new ImportServiceException(
                     "Problem reading the shared database " + redactedInput + ": " + e.getLocalizedMessage(),
                     Localization.lang("Problem reading the shared database %0: %1", redactedInput, e.getLocalizedMessage()),
