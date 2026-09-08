@@ -84,6 +84,7 @@ public class JabRefDialogService implements DialogService {
     private final NotificationGroup<Path, Notifications.FileNotification> fileNotifications = new NotificationGroup<>(Localization.lang("Files"));
     private final NotificationGroup<Object, Notifications.UiNotification> uiNotifications = new NotificationGroup<>(Localization.lang("Preview"));
     private final NotificationGroup<Task<?>, Notifications.TaskNotification> taskNotifications = new NotificationGroup<>(Localization.lang("Tasks"));
+    private final NotificationGroup<Object, Notifications.DonationNotification> donationNotifications = new NotificationGroup<>(Localization.lang("Support JabRef"));
 
     private final ObservableList<Notification<?>> persistentNotifications;
 
@@ -93,6 +94,7 @@ public class JabRefDialogService implements DialogService {
         this.mainWindow = mainWindow;
 
         taskNotifications.setViewFactory(Notifications.TaskNotificationView::new);
+        donationNotifications.setViewFactory(Notifications.DonationNotificationView::new);
         persistentNotifications = EasyBind.concat(fileNotifications.getNotifications());
     }
 
@@ -468,6 +470,8 @@ public class JabRefDialogService implements DialogService {
                     uiNotifications.getNotifications().add(uiNotification);
             case Notifications.TaskNotification taskNotification ->
                     taskNotifications.getNotifications().add(taskNotification);
+            case Notifications.DonationNotification donationNotification ->
+                    donationNotifications.getNotifications().add(donationNotification);
             default ->
                     undefinedNotifications.getNotifications().add(new Notifications.UndefinedNotification(notification.getTitle(), notification.getSummary()));
         }
@@ -579,7 +583,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     public List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups() {
-        return List.of(undefinedNotifications, fileNotifications, uiNotifications, taskNotifications);
+        return List.of(undefinedNotifications, fileNotifications, uiNotifications, taskNotifications, donationNotifications);
     }
 
     public ObservableList<? extends Notification<?>> getPersistentNotifications() {

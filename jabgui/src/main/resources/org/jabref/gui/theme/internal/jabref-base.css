@@ -861,46 +861,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: derive(-color-accent, -20%);
 }
 
-/* donation toast */
-.donation-toast {
-    -fx-background-radius: 0.8333333333em;
-    -fx-effect: dropshadow(gaussian, -color-shadow-subtle, 20, 0.25, 0, 6);
-    -fx-border-color: derive(-color-bg-tertiary, -10%);
-    -fx-border-radius: 0.8333333333em;
-    -fx-max-height: 4em;
-}
-
-.donation-toast .label {
-    -fx-text-fill: -fx-text-base-color;
-}
-
-.donation-btn-primary,
-.donation-btn-secondary,
-.donation-btn-ghost {
-    -fx-background-radius: 0.5em;
-    -fx-border-radius: 0.5em;
-}
-
-.donation-btn-primary {
-    -fx-background-color: -color-accent;
-}
-
-.donation-btn-secondary {
-    -fx-background-color: derive(-color-bg-secondary, -6%);
-}
-
-.donation-btn-ghost {
-    -fx-background-color: transparent;
-    -fx-text-fill: -color-border-default;
-    -fx-stroke-width: 0;
-    -fx-border-width: 0
-}
-
-.donation-btn-ghost:hover {
-    -fx-background-color: transparent;
-    -fx-text-fill: -color-fg-subtle;
-}
-
 /* AboutDialog */
 #aboutDialog .about-heading:pressed {
     -fx-text-fill: -color-selection;
@@ -1699,6 +1659,13 @@ We want to have a look that matches our icons in the tool-bar */
 .info-center-view .notification-view > .content > .text-container > .actions-box .button {
     -fx-background: -color-button-default;
     -fx-background-color: -color-button-default;
+}
+
+/* Primary action of a notification, e.g. "Donate" - highlighted to stand out from the other actions. */
+.info-center-view .notification-view > .content > .text-container > .actions-box .button.notification-action-primary {
+    -fx-background: -color-accent;
+    -fx-background-color: -color-accent;
+    -fx-text-fill: -color-fg-emphasis;
 }
 
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;

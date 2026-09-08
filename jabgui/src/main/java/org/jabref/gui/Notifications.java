@@ -8,9 +8,11 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.util.Duration;
 
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DelayedExecution;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -36,6 +38,30 @@ public class Notifications {
         public FileNotification(String title, String description) {
             super(title, description);
             setOnClick(_ -> OnClickBehaviour.NONE);
+        }
+    }
+
+    /// Notification asking for a donation. Its last action is rendered as the highlighted (accent colored) button,
+    /// see [DonationNotificationView].
+    public static class DonationNotification extends Notification<Object> {
+        public DonationNotification(String title, String description) {
+            super(title, description);
+            setOnClick(_ -> OnClickBehaviour.NONE);
+        }
+    }
+
+    /// Renders a [DonationNotification] with the JabRef donation icon and highlights the primary action.
+    ///
+    /// GemsFX creates one plain button per notification action, in the order of [Notification#getActions()].
+    /// There is no per-action styling hook, so the button of the last action is tagged here and colored by
+    /// `jabref-base.css`.
+    public static class DonationNotificationView extends NotificationView<Object, DonationNotification> {
+        public DonationNotificationView(DonationNotification notification) {
+            super(notification);
+            setGraphic(IconTheme.JabRefIcons.DONATE.getGraphicNode());
+            if (lookup(".actions-box") instanceof Pane actionsBox && !actionsBox.getChildren().isEmpty()) {
+                actionsBox.getChildren().getLast().getStyleClass().add("notification-action-primary");
+            }
         }
     }
 
