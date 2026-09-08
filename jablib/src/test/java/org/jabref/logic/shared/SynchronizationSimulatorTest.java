@@ -20,9 +20,11 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
@@ -158,6 +160,41 @@ class SynchronizationSimulatorTest {
 
         waitUntil(() -> clientContextB.getMetaData().getGroups().map(root -> root.getNumberOfChildren() == 2).orElse(false));
         assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+    }
+
+    @Test
+    void simulateLiveGroupEditPropagation() throws Exception {
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        GroupTreeNode groupNodeOfClientA = rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+
+        // client A edits name, icon, color and hierarchy of the group; the edit dialog replaces the
+        // node's group and the group panel writes the (same) root back
+        ExplicitGroup editedGroup = new ExplicitGroup("Renamed group", GroupHierarchyType.INCLUDING, ',');
+        editedGroup.setIconName("star");
+        editedGroup.setColor("#ff0000");
+        groupNodeOfClientA.setGroup(editedGroup);
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> Optional.of(editedGroup).equals(groupOfClientB()));
+        assertEquals(Optional.of(editedGroup), groupOfClientB());
+
+        // client A changes the group type
+        WordKeywordGroup keywordGroup = new WordKeywordGroup("Keyword group", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "fpga", false, ',', false);
+        groupNodeOfClientA.setGroup(keywordGroup);
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> Optional.of(keywordGroup).equals(groupOfClientB()));
+        assertEquals(Optional.of(keywordGroup), groupOfClientB());
+    }
+
+    /// The group of the first (and only) child of client B's group tree
+    private Optional<AbstractGroup> groupOfClientB() {
+        return clientContextB.getMetaData().getGroups()
+                             .filter(root -> root.getNumberOfChildren() == 1)
+                             .map(root -> root.getChildAt(0).orElseThrow().getGroup());
     }
 
     @Test
