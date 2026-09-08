@@ -51,7 +51,7 @@ class InputOption {
         return resolveInput(inputSource.positionalInput != null
                             ? inputSource.positionalInput
                             : inputSource.optionInput,
-                            preferences);
+                preferences);
     }
 
     /// Resolves a single input argument to a local file: a URL is downloaded to a temporary file,
