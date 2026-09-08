@@ -68,6 +68,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
@@ -450,7 +451,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     private void removeFieldRow(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         userAddedFields.remove(field);
         if (entry.hasField(field)) {
-            entry.clearField(field);
+            // Recorded like every other field edit: the modified marker derives from the journal,
+            // so a write nobody records leaves the library looking saved.
+            stateManager.getUndoManager(bibDatabaseContext)
+                        .applyEdit(new UndoableFieldChange(entry, field, entry.getField(field).orElse(null), null));
         }
         rebuildPanel(bibDatabaseContext, entry);
     }

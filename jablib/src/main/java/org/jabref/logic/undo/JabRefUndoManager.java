@@ -2,10 +2,15 @@ package org.jabref.logic.undo;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import org.jabref.model.undo.ApplyResult;
 import org.jabref.model.undo.BibChange;
 import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.CompoundEdit;
@@ -17,40 +22,33 @@ import org.slf4j.LoggerFactory;
 
 /// The undo journal: a stack of changes, and the API for putting changes on it.
 ///
-/// Recording and undoing live on the same object on purpose. A command already has to be handed
-/// the journal in order to record anything, so giving the recording API its own *object* would
-/// mean threading a second handle everywhere the first one already goes. Its own *interface*
-/// costs nothing, and [UndoManager] is that: the recording half, which is all that the ~120
-/// classes holding a handle need to be able to do. This type is for the few that also drive the
-/// stacks.
+/// Recording and undoing live on the same object on purpose: a command already holds the journal
+/// in order to record, so a separate recording *object* would mean threading a second handle
+/// everywhere the first one goes. A separate *interface* costs nothing, and [UndoManager] is
+/// that — the recording half, which is all the ~120 classes holding a handle need. This type is
+/// for the few that also drive the stacks.
 ///
-/// Plain Java on purpose. Nothing here hops to the JavaFX thread, so recording a change works
-/// in a plain unit test and the journal could in time be used outside the GUI. Menu enablement
-/// subscribes through [org.jabref.gui.undo.GuiUndoManager], which owns that hop.
+/// Plain Java on purpose. Nothing here hops to the JavaFX thread, so recording works in a plain
+/// unit test and the journal could in time be used outside the GUI. Menu enablement subscribes
+/// through [org.jabref.gui.undo.GuiUndoManager], which owns that hop.
 ///
-/// Commands push from background tasks — cleanup and import both do — so each operation takes
-/// this object's monitor for exactly as long as it touches the stacks, and no longer:
+/// Commands push from background tasks, so each operation holds this object's monitor for
+/// exactly as long as it touches the stacks:
 ///
-///   - Applying the change is inside the lock, in [#applyEdit], [#undo] and [#redo] alike. It
-///     has to be: if the stack transition and the model write could interleave, two threads
+///   - Applying is inside the lock, in [#applyEdit], [#undo] and [#redo] alike, or two threads
 ///     could undo the same change, or an undo could land between a change being applied and
-///     being recorded.
+///     being recorded. The price is a constraint on [BibChange#apply]: it must write to the
+///     model and return, never wait for another thread — one that waited for the JavaFX thread
+///     would deadlock against a menu refresh already inside [#canUndo].
 ///
-///     The price is a constraint on [BibChange#apply]: it must write to the model and return,
-///     never wait for another thread. A change that hopped to the JavaFX thread and waited
-///     would deadlock against a menu refresh already inside [#canUndo] — the journal's monitor
-///     held here, the JavaFX thread held there. Every change today is a plain model write.
+///   - Everything else runs outside the lock: [#addEdit(String,Consumer)] never holds it while
+///     calling `mutations`, and [#notifyListeners] runs after it is released, because a listener
+///     may wait for the JavaFX thread.
 ///
-///   - Everything else this class does not own runs outside the lock.
-///     [#addEdit(String,Consumer)] never holds it while calling `mutations`, and
-///     [#notifyListeners] runs after the monitor is released, because a listener may well wait
-///     for the JavaFX thread and a lock held across such a call is a deadlock waiting for the
-///     other thread to want the journal.
-///
-/// Listeners are told *that* the stacks changed, never what changed, so they read the state
-/// they need when they run. Two threads recording concurrently may therefore notify in the
-/// opposite order to the one in which they pushed, and it does not matter: every listener
-/// still reads the latest state, so the worst case is being told twice about the same one.
+/// Listeners are told *that* the stacks changed, never what changed, so they read the state they
+/// need when they run. Two threads recording concurrently may therefore notify in the opposite
+/// order to the one they pushed in, which does not matter: the worst case is being told twice
+/// about the same state.
 @NullMarked
 public class JabRefUndoManager implements UndoManager {
 
@@ -63,6 +61,11 @@ public class JabRefUndoManager implements UndoManager {
     /// The id of the empty stack before anything was ever pushed. Distinct from every id
     /// [#nextId] hands out, so "nothing has been done yet" is a position like any other.
     private static final long ORIGIN = 0L;
+
+    /// A saved position no position will ever match, so the library counts as changed until it is
+    /// saved again. [#markChanged] stamps it; ids only ever grow from [#ORIGIN], so no push can
+    /// reach it.
+    private static final long NEVER_SAVED = -1L;
 
     /// A change together with the identity of the position it occupies in the history.
     ///
@@ -103,6 +106,19 @@ public class JabRefUndoManager implements UndoManager {
     /// The position the library was last saved at, as an id rather than a count. Compared by
     /// [#hasChanged].
     private long savedId = ORIGIN;
+
+    /// The commands currently applying changes they have not yet handed over, in the order they
+    /// started. Guarded by this object's monitor.
+    ///
+    /// A collection rather than a flag: two background commands can write to one library at the
+    /// same time, and undo may only return once both have handed over. Ordered, so the message
+    /// names the command the user has been waiting on longest — and one that has finished is no
+    /// longer in it to be named.
+    private final Set<Suspension> suspensions = new LinkedHashSet<>();
+
+    /// Set while this journal is applying a change *on this thread*, in [#applyEdit], [#undo] or
+    /// [#redo]. See [#isApplying] for what it is for and why a thread-local is sound here.
+    private final ThreadLocal<Boolean> applying = ThreadLocal.withInitial(() -> false);
 
     /// Set exactly while a [#addEdit] block is in progress *on this thread*. Per-thread because
     /// there is one manager for the application and long commands record from background tasks:
@@ -146,29 +162,33 @@ public class JabRefUndoManager implements UndoManager {
     /// describes a library state that never existed. `addEdit` cannot offer this — by the time
     /// it hears about the change, the caller made it long ago.
     ///
-    /// Inside an [#addEdit] block no lock is taken, and the window is *not* closed there: the
-    /// change reaches the library at once while the step reaches the stack only when the block
-    /// ends. What the thread-local recorder rules out is two threads writing one recorder, not
-    /// an undo interleaving with a block's writes. A block that mutates off the JavaFX thread
-    /// therefore still races a concurrent undo, which is a defect this class cannot fix alone:
-    /// only the command knows when its block ends, so reserving a command's writes against undo
-    /// and redo has to happen above this class, not inside it.
+    /// Inside an [#addEdit] block the change still reaches the library at once while the step
+    /// reaches the stack only when the block ends; the block holds the library against undo for
+    /// that whole window instead.
+    ///
+    /// @return what was applied, and what was not — see [BibChange#apply]
     @Override
     // [impl->req~logic.undo.apply-and-record-atomically~1]
-    public void applyEdit(BibChange change) {
+    public ApplyResult applyEdit(BibChange change) {
         CompoundEdit compound = active.get();
         if (compound != null) {
-            compound.applyEdit(change);
-            return;
+            return compound.applyEdit(change);
         }
         if (isEmptyStep(change)) {
-            return;
+            return ApplyResult.SUCCESS;
         }
+        ApplyResult result;
         synchronized (this) {
-            change.apply();
-            push(change);
+            result = applying(change::apply);
+            // A change that refused did nothing to the library, so there is nothing to take back:
+            // recording it would spend the next Ctrl+Z and clear the redo stack for no reason. A
+            // set that applied in part is different - what it did apply has to stay undoable.
+            if (result.complete() || (change instanceof ChangeSet)) {
+                push(change);
+            }
         }
         notifyListeners();
+        return result;
     }
 
     /// Whether `change` would be an undo step that does nothing.
@@ -219,6 +239,10 @@ public class JabRefUndoManager implements UndoManager {
         CompoundEdit enclosing = active.get();
         CompoundEdit compoundEdit = new CompoundEdit(name);
 
+        // The block applies as it goes and pushes only at the end, so the library holds writes
+        // this journal does not know about for as long as the body runs.
+        UndoSuspension suspension = enclosing == null ? suspendUndo(name) : UndoSuspension.NONE;
+
         active.set(compoundEdit);
         try {
             mutations.accept(compoundEdit);
@@ -229,18 +253,84 @@ public class JabRefUndoManager implements UndoManager {
                 active.set(enclosing);
             }
 
-            // Handing over from the finally block rather than after a catch: whatever ended the
-            // block — a return, a RuntimeException, an Error — the library already holds what
-            // was recorded so far, and the failure travels on afterwards untouched.
-            // `active` is restored first, so this lands in the enclosing block if there is one.
-            ChangeSet changeSet = compoundEdit.toChangeSet();
-            if (!changeSet.isEmpty()) {
-                addEdit(changeSet);
+            try {
+                // Handing over from the finally block rather than after a catch: whatever ended
+                // the block — a return, a RuntimeException, an Error — the library already holds
+                // what was recorded so far, and the failure travels on afterwards untouched.
+                // `active` is restored first, so this lands in the enclosing block if there is one.
+                ChangeSet changeSet = compoundEdit.toChangeSet();
+                if (!changeSet.isEmpty()) {
+                    addEdit(changeSet);
+                }
+            } finally {
+                // After the push, so the window does not reopen between the last write and the
+                // record; and in a finally, so a block that failed does not hold the library.
+                suspension.close();
             }
         }
         return compoundEdit.hasEdits();
     }
 
+    /// Suspends undo and redo for this library until the returned suspension is closed.
+    ///
+    /// Opening and closing are both stack changes as far as observers are concerned — enablement
+    /// has to fall while a command holds the library and rise again afterwards — so both notify,
+    /// and both do so after the monitor is released.
+    @Override
+    // [impl->req~logic.undo.writes-reserved-against-undo~1]
+    public UndoSuspension suspendUndo(String name) {
+        Suspension suspension = new Suspension(name);
+        synchronized (this) {
+            suspensions.add(suspension);
+        }
+        notifyListeners();
+        return suspension;
+    }
+
+    /// The command currently holding this library, if one is: of those still writing, the one that
+    /// started first.
+    ///
+    /// For the Undo and Redo actions, which have to tell "nothing to undo" from "not while this is
+    /// running" — both of which make [#canUndo] false.
+    public synchronized Optional<String> suspendedBy() {
+        return suspensions.stream().findFirst().map(Suspension::name);
+    }
+
+    /// One command's claim on this library, ended by [#close].
+    private final class Suspension implements UndoSuspension {
+
+        private final String name;
+        private boolean closed;
+
+        private Suspension(String name) {
+            this.name = name;
+        }
+
+        private String name() {
+            return name;
+        }
+
+        @Override
+        public void close() {
+            synchronized (JabRefUndoManager.this) {
+                // Idempotent: a task can finish through success, failure or cancellation, and
+                // closing on each of them is easier to get right than closing on exactly one.
+                if (closed) {
+                    return;
+                }
+                closed = true;
+                suspensions.remove(this);
+            }
+            notifyListeners();
+        }
+    }
+
+    /// Whether there is a step to take back — the stack only, not whether a command is holding
+    /// the library.
+    ///
+    /// Menu enablement binds to this, and a disabled menu item swallows its accelerator, so
+    /// answering false during a suspension would leave Ctrl+Z doing nothing at all. [#undo]
+    /// enforces the suspension, and [#suspendedBy] says which command to name.
     public synchronized boolean canUndo() {
         return !undoStack.isEmpty();
     }
@@ -251,32 +341,52 @@ public class JabRefUndoManager implements UndoManager {
 
     /// Applies the inverse before moving the change across, so a change that throws stays
     /// undoable instead of vanishing from both stacks.
-    public void undo() {
+    ///
+    /// A change that *refuses* — because the library no longer holds what it recorded — does move
+    /// across: the step was consumed, retrying it would refuse again, and the caller is told
+    /// through the result that not all of it applied.
+    ///
+    /// @return what was undone — its name for the user, and what of it could not be applied —
+    ///         or empty if there was nothing to undo, or a command is holding the library (see
+    ///         [#suspendUndo]; [#suspendedBy] tells the two apart). The name is taken inside the
+    ///         monitor, and it is all that leaves the journal, so nothing outside reads the
+    ///         stacks.
+    public Optional<UndoStep> undo() {
+        UndoStep step;
         synchronized (this) {
-            if (undoStack.isEmpty()) {
-                return;
+            if (!suspensions.isEmpty() || undoStack.isEmpty()) {
+                return Optional.empty();
             }
             UndoJournalEntry journalEntry = undoStack.getFirst();
-            journalEntry.change().inverted().apply();
+            step = new UndoStep(
+                    BibChangeDescriber.describe(journalEntry.change()),
+                    applying(() -> journalEntry.change().inverted().apply()).complete());
             undoStack.pop();
             // Moved with its id, so redoing returns to the position it came from rather than to
             // a new one that only looks the same.
             redoStack.push(journalEntry);
         }
         notifyListeners();
+        return Optional.of(step);
     }
 
-    public void redo() {
+    /// @return what was redone, in the shape [#undo] returns it, or empty if there was nothing
+    ///         to redo or a command is holding the library
+    public Optional<UndoStep> redo() {
+        UndoStep step;
         synchronized (this) {
-            if (redoStack.isEmpty()) {
-                return;
+            if (!suspensions.isEmpty() || redoStack.isEmpty()) {
+                return Optional.empty();
             }
             UndoJournalEntry journalEntry = redoStack.getFirst();
-            journalEntry.change().apply();
+            step = new UndoStep(
+                    BibChangeDescriber.describe(journalEntry.change()),
+                    applying(journalEntry.change()::apply).complete());
             redoStack.pop();
             undoStack.push(journalEntry);
         }
         notifyListeners();
+        return Optional.of(step);
     }
 
     /// Registers a listener, from any thread and at any time — including from inside another
@@ -286,8 +396,50 @@ public class JabRefUndoManager implements UndoManager {
     }
 
     /// Marks the current position as saved.
-    public synchronized void markUnchanged() {
-        savedId = currentPosition();
+    ///
+    /// Notifies, like every other move of the saved position: a listener deriving the modified
+    /// marker from [#hasChanged] has to hear about the one moment the answer turns false.
+    public void markUnchanged() {
+        synchronized (this) {
+            // Not while a command is mid-write: what it has applied is not on the stack yet, so the
+            // position being stamped does not describe what was just written to disk.
+            savedId = suspensions.isEmpty() ? currentPosition() : NEVER_SAVED;
+        }
+        notifyListeners();
+    }
+
+    /// Whether this journal is applying a change on this thread right now.
+    ///
+    /// For listeners that a model write reaches synchronously, on the applying thread, while
+    /// [#undo] or [#redo] is between reading the stack and moving the entry across: recording
+    /// anything from there clears the redo stack under the operation that is still using it.
+    /// A thread-local answers exactly that question — the event is posted inside `apply`, on this
+    /// thread, before it returns — and it is not a substitute for a change knowing where it came
+    /// from, which is what [org.jabref.model.entry.event.EntriesEventSource] is for.
+    public boolean isApplying() {
+        return applying.get();
+    }
+
+    private ApplyResult applying(Supplier<ApplyResult> apply) {
+        applying.set(true);
+        try {
+            return apply.get();
+        } finally {
+            applying.remove();
+        }
+    }
+
+    /// Marks the library as changed by something this journal cannot take back — a migration on
+    /// load, a shared-database update, a setting written without being recorded.
+    ///
+    /// The stack is left alone; what moves is the saved position, to one no position can equal.
+    /// Undoing every step therefore no longer means "back to what was saved", which is the truth:
+    /// the change is still there. Saving is what clears it.
+    public void markChanged() {
+        synchronized (this) {
+            savedId = NEVER_SAVED;
+        }
+        notifyListeners();
     }
 
     /// Whether the library differs from the last saved position.

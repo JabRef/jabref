@@ -1,4 +1,4 @@
-package org.jabref.gui.undo;
+package org.jabref.logic.undo;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +12,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
@@ -213,9 +212,31 @@ class JabRefUndoManagerTest {
     }
 
     /// A change that throws while being reverted must stay undoable rather than disappear from
-    /// both stacks. Re-inserting a removed string collides once the name is taken again.
+    /// both stacks. Re-inserting a removed string collides when its id has been taken since - a
+    /// name collision is refused rather than thrown, which the test below covers.
     @Test
     void aFailingUndoLeavesTheChangeOnTheStack() {
+        BibDatabase database = new BibDatabase();
+        BibtexString removed = new BibtexString("label", "content");
+        database.addString(removed);
+
+        UndoableRemoveString removal = new UndoableRemoveString(database, removed);
+        removal.apply();
+        BibtexString sameId = new BibtexString("other label", "something else");
+        sameId.setId(removed.getId());
+        database.addString(sameId);
+        undoRedoManager.addEdit(removal);
+
+        assertThrows(KeyCollisionException.class, undoRedoManager::undo);
+        assertTrue(undoRedoManager.canUndo());
+        assertFalse(undoRedoManager.canRedo());
+    }
+
+    /// The same situation the library can actually get into: the name is taken again, so putting
+    /// the string back would overwrite someone else's. That is reported, and the step is spent -
+    /// leaving it on the stack would make the next Ctrl+Z look broken.
+    @Test
+    void anUndoThatCannotBeAppliedIsReportedAndSpent() {
         BibDatabase database = new BibDatabase();
         BibtexString removed = new BibtexString("label", "content");
         database.addString(removed);
@@ -225,9 +246,13 @@ class JabRefUndoManagerTest {
         database.addString(new BibtexString("label", "something else"));
         undoRedoManager.addEdit(removal);
 
-        assertThrows(KeyCollisionException.class, undoRedoManager::undo);
-        assertTrue(undoRedoManager.canUndo());
-        assertFalse(undoRedoManager.canRedo());
+        UndoStep step = undoRedoManager.undo().orElseThrow();
+
+        assertFalse(step.complete());
+        assertEquals("something else", database.getStringByName("label").orElseThrow().getContent(),
+                "the undo overwrote the string that took the name");
+        assertFalse(undoRedoManager.canUndo());
+        assertTrue(undoRedoManager.canRedo());
     }
 
     /// The stack keeps the BibEntry objects of removed entries alive, so it is bounded.
@@ -479,6 +504,211 @@ class JabRefUndoManagerTest {
 
         assertTrue(undoRedoManager.canUndo());
         assertEquals(1, reached.get());
+    }
+
+    /// The defect suspending guards against: a background command applies its changes long before it
+    /// pushes them, and an undo arriving in that window takes back a change *underneath* those
+    /// writes - after which the command's push discards the undone change with the redo stack.
+    @Test
+    @Timeout(value = 10, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    // [utest->req~logic.undo.writes-reserved-against-undo~1]
+    void anUndoCannotLandBetweenACommandsWritesAndItsPush() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        CountDownLatch blockStarted = new CountDownLatch(1);
+        CountDownLatch undoAttempted = new CountDownLatch(1);
+
+        try (ExecutorService background = Executors.newSingleThreadExecutor()) {
+            Future<?> block = background.submit(() -> undoRedoManager.addEdit("Import entries", edit -> {
+                edit.addEdit(setAuthor("Planck"));
+                blockStarted.countDown();
+                await(undoAttempted, "the recording block was never released");
+            }));
+
+            await(blockStarted, "the recording block never started");
+            assertEquals(Optional.empty(), undoRedoManager.undo(), "undo ran while the library was being written");
+            assertEquals(Optional.of("Planck"), entry.getField(StandardField.AUTHOR),
+                    "the undo reverted a change underneath the command's writes");
+
+            undoAttempted.countDown();
+            assertTrue(completes(block), "the recording block never finished");
+        }
+
+        // Both steps survived: the command's, and the one it would have discarded.
+        undoRedoManager.undo();
+        assertEquals(Optional.of("Bohr"), entry.getField(StandardField.AUTHOR));
+        undoRedoManager.undo();
+        assertEquals(Optional.of("Einstein"), entry.getField(StandardField.AUTHOR));
+    }
+
+    /// The library moved on under a recorded step - a background command wrote the same field - so
+    /// undoing it takes back what it can and says the rest did not apply.
+    @Test
+    void undoingAStepTheLibraryMovedOnFromReportsIt() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        entry.setField(StandardField.AUTHOR, "Planck");
+
+        UndoStep step = undoRedoManager.undo().orElseThrow();
+
+        assertFalse(step.complete(), "the undo claimed to have taken the step back");
+        assertEquals(Optional.of("Planck"), entry.getField(StandardField.AUTHOR), "undo wrote over the newer value");
+        assertFalse(undoRedoManager.canUndo(), "the step was not consumed");
+        assertTrue(undoRedoManager.canRedo());
+    }
+
+    /// A change the journal cannot take back is a saved position no position can reach: undoing
+    /// everything does not mean "back to what was saved", because that change is still there.
+    @Test
+    void aChangeTheJournalCannotTakeBackKeepsTheLibraryChanged() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        undoRedoManager.markUnchanged();
+        assertFalse(undoRedoManager.hasChanged());
+
+        undoRedoManager.markChanged();
+        assertTrue(undoRedoManager.hasChanged());
+
+        undoRedoManager.undo();
+        assertTrue(undoRedoManager.hasChanged(), "undoing cleared a marker the journal cannot clear");
+        assertTrue(undoRedoManager.canRedo(), "the stack was discarded rather than left alone");
+
+        undoRedoManager.markUnchanged();
+        assertFalse(undoRedoManager.hasChanged(), "saving did not clear it");
+    }
+
+    @Test
+    void markingTheLibraryChangedNotifiesListeners() {
+        AtomicInteger notifications = new AtomicInteger();
+        undoRedoManager.addListener(notifications::incrementAndGet);
+
+        undoRedoManager.markChanged();
+
+        assertEquals(1, notifications.get());
+    }
+
+    /// A marker derived from the journal has to hear about the one moment the answer turns false.
+    @Test
+    void markingTheCurrentPositionSavedNotifiesListeners() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        AtomicInteger notifications = new AtomicInteger();
+        undoRedoManager.addListener(notifications::incrementAndGet);
+
+        undoRedoManager.markUnchanged();
+
+        assertFalse(undoRedoManager.hasChanged());
+        assertEquals(1, notifications.get(), "the saved position moved without telling anyone");
+    }
+
+    @Test
+    void aReservationMakesUndoAndRedoDecline() {
+        // One step on each stack, so neither answer can be right for the wrong reason.
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+        undoRedoManager.addEdit(setAuthor("Planck"));
+        undoRedoManager.undo();
+        assertTrue(undoRedoManager.canUndo());
+        assertTrue(undoRedoManager.canRedo());
+
+        try (UndoSuspension suspended = undoRedoManager.suspendUndo("Import entries")) {
+            // The steps are still there, and the menu item stays enabled on purpose: a disabled
+            // item swallows its accelerator, and Ctrl+Z doing nothing silently is what this is
+            // meant to avoid. What declines is the operation.
+            assertTrue(undoRedoManager.canUndo());
+            assertTrue(undoRedoManager.canRedo());
+            assertEquals(Optional.empty(), undoRedoManager.undo());
+            assertEquals(Optional.empty(), undoRedoManager.redo());
+            assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy());
+        }
+
+        assertTrue(undoRedoManager.canUndo());
+        assertTrue(undoRedoManager.canRedo());
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
+    }
+
+    /// Enablement has to fall when a command takes the library and rise when it gives it back, so
+    /// both ends are stack changes as far as an observer is concerned.
+    @Test
+    void takingAndReleasingAReservationNotifiesListeners() {
+        AtomicInteger notifications = new AtomicInteger();
+        undoRedoManager.addListener(notifications::incrementAndGet);
+
+        UndoSuspension suspended = undoRedoManager.suspendUndo("Import entries");
+        assertEquals(1, notifications.get());
+
+        suspended.close();
+        assertEquals(2, notifications.get());
+
+        // Idempotent, so a task closing on more than one of its outcomes says nothing twice.
+        suspended.close();
+        assertEquals(2, notifications.get());
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
+    }
+
+    @Test
+    void twoCommandsHoldTheLibraryUntilBothHaveHandedOver() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+
+        UndoSuspension first = undoRedoManager.suspendUndo("Import entries");
+        UndoSuspension second = undoRedoManager.suspendUndo("Look up DOI");
+        first.close();
+
+        assertEquals(Optional.empty(), undoRedoManager.undo(), "undo ran while a command was still writing");
+        assertEquals(Optional.of("Look up DOI"), undoRedoManager.suspendedBy(),
+                "named a command that had already finished");
+
+        second.close();
+        assertTrue(undoRedoManager.undo().isPresent(), "undo still declined after both had handed over");
+    }
+
+    /// Of several commands writing at once, the message names the one still running that the user
+    /// has been waiting on longest.
+    @Test
+    void theCommandNamedIsTheOldestStillWriting() {
+        UndoSuspension first = undoRedoManager.suspendUndo("Import entries");
+        UndoSuspension second = undoRedoManager.suspendUndo("Look up DOI");
+
+        assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy());
+
+        second.close();
+        assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy());
+
+        first.close();
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
+    }
+
+    @Test
+    void aBlockHoldsTheLibraryForItsWholeDurationAndReleasesItAfterThePush() {
+        undoRedoManager.addEdit(setAuthor("Bohr"));
+
+        undoRedoManager.addEdit("Import entries", edit -> {
+            assertEquals(Optional.empty(), undoRedoManager.undo(), "the block did not hold the library");
+            assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy());
+            edit.addEdit(setAuthor("Planck"));
+        });
+
+        assertTrue(undoRedoManager.undo().isPresent(), "the block did not release the library");
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
+    }
+
+    /// A nested block is inside its caller's window already; releasing at its end would reopen the
+    /// window while the outer block is still writing.
+    @Test
+    void aNestedBlockDoesNotReleaseTheLibraryWhenItEnds() {
+        undoRedoManager.addEdit("Import entries", edit -> {
+            undoRedoManager.addEdit("Merge entries", nested -> nested.addEdit(setAuthor("Planck")));
+            assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy(),
+                    "the nested block released the library its caller was holding");
+        });
+
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
+    }
+
+    @Test
+    void aBlockThatFailsDoesNotKeepHoldingTheLibrary() {
+        assertThrows(IllegalStateException.class, () -> undoRedoManager.addEdit("Import entries", edit -> {
+            edit.addEdit(setAuthor("Planck"));
+            throw new IllegalStateException("import failed");
+        }));
+
+        assertEquals(Optional.empty(), undoRedoManager.suspendedBy());
+        assertTrue(undoRedoManager.canUndo(), "what the failed block managed to change stayed undoable");
     }
 
     /// A listener that waits for another thread to read the manager. Were listeners still run
