@@ -28,7 +28,7 @@
                 <RowConstraints vgrow="ALWAYS"/>
             </rowConstraints>
 
-            <VBox spacing="8" styleClass="bg-accent,padding-8" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <VBox spacing="8" styleClass="bg-accent,padding-8,corner-radius" GridPane.columnIndex="0" GridPane.rowIndex="0">
                 <Button onAction="#openJabrefWebsite" styleClass="btn-transparent,padding-4">
                     <cursor>
                         <Cursor fx:constant="HAND"/>
