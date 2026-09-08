@@ -23,7 +23,7 @@ import org.jspecify.annotations.NullMarked;
 /// Names a change as the user would recognise it, for the message the Undo and Redo actions show.
 ///
 /// The text lives here rather than on the change records: a [BibChange] is a model value and
-/// carries no user-facing text, which is what the deleted Swing presentation names got wrong.
+/// carries no user-facing text.
 ///
 /// A [ChangeSet] describes itself, because its name is the label of the control the user
 /// activated and no derived text can beat that. Everything else is a change recorded on its own,

@@ -175,7 +175,7 @@ class BibChangeTest {
         assertSame(before, databaseContext.getMetaData());
     }
 
-    /// The case reservations cannot cover: a command writes on a background thread, the user edits
+    /// The case a suspension cannot cover: a command writes on a background thread, the user edits
     /// the same field meanwhile, and the step recorded for one of them no longer describes what the
     /// library holds. Writing over it would produce a state no step on the stack describes.
     @Test

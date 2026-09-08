@@ -22,40 +22,33 @@ import org.slf4j.LoggerFactory;
 
 /// The undo journal: a stack of changes, and the API for putting changes on it.
 ///
-/// Recording and undoing live on the same object on purpose. A command already has to be handed
-/// the journal in order to record anything, so giving the recording API its own *object* would
-/// mean threading a second handle everywhere the first one already goes. Its own *interface*
-/// costs nothing, and [UndoManager] is that: the recording half, which is all that the ~120
-/// classes holding a handle need to be able to do. This type is for the few that also drive the
-/// stacks.
+/// Recording and undoing live on the same object on purpose: a command already holds the journal
+/// in order to record, so a separate recording *object* would mean threading a second handle
+/// everywhere the first one goes. A separate *interface* costs nothing, and [UndoManager] is
+/// that — the recording half, which is all the ~120 classes holding a handle need. This type is
+/// for the few that also drive the stacks.
 ///
-/// Plain Java on purpose. Nothing here hops to the JavaFX thread, so recording a change works
-/// in a plain unit test and the journal could in time be used outside the GUI. Menu enablement
-/// subscribes through [org.jabref.gui.undo.GuiUndoManager], which owns that hop.
+/// Plain Java on purpose. Nothing here hops to the JavaFX thread, so recording works in a plain
+/// unit test and the journal could in time be used outside the GUI. Menu enablement subscribes
+/// through [org.jabref.gui.undo.GuiUndoManager], which owns that hop.
 ///
-/// Commands push from background tasks — cleanup and import both do — so each operation takes
-/// this object's monitor for exactly as long as it touches the stacks, and no longer:
+/// Commands push from background tasks, so each operation holds this object's monitor for
+/// exactly as long as it touches the stacks:
 ///
-///   - Applying the change is inside the lock, in [#applyEdit], [#undo] and [#redo] alike. It
-///     has to be: if the stack transition and the model write could interleave, two threads
+///   - Applying is inside the lock, in [#applyEdit], [#undo] and [#redo] alike, or two threads
 ///     could undo the same change, or an undo could land between a change being applied and
-///     being recorded.
+///     being recorded. The price is a constraint on [BibChange#apply]: it must write to the
+///     model and return, never wait for another thread — one that waited for the JavaFX thread
+///     would deadlock against a menu refresh already inside [#canUndo].
 ///
-///     The price is a constraint on [BibChange#apply]: it must write to the model and return,
-///     never wait for another thread. A change that hopped to the JavaFX thread and waited
-///     would deadlock against a menu refresh already inside [#canUndo] — the journal's monitor
-///     held here, the JavaFX thread held there. Every change today is a plain model write.
+///   - Everything else runs outside the lock: [#addEdit(String,Consumer)] never holds it while
+///     calling `mutations`, and [#notifyListeners] runs after it is released, because a listener
+///     may wait for the JavaFX thread.
 ///
-///   - Everything else this class does not own runs outside the lock.
-///     [#addEdit(String,Consumer)] never holds it while calling `mutations`, and
-///     [#notifyListeners] runs after the monitor is released, because a listener may well wait
-///     for the JavaFX thread and a lock held across such a call is a deadlock waiting for the
-///     other thread to want the journal.
-///
-/// Listeners are told *that* the stacks changed, never what changed, so they read the state
-/// they need when they run. Two threads recording concurrently may therefore notify in the
-/// opposite order to the one in which they pushed, and it does not matter: every listener
-/// still reads the latest state, so the worst case is being told twice about the same one.
+/// Listeners are told *that* the stacks changed, never what changed, so they read the state they
+/// need when they run. Two threads recording concurrently may therefore notify in the opposite
+/// order to the one they pushed in, which does not matter: the worst case is being told twice
+/// about the same state.
 @NullMarked
 public class JabRefUndoManager implements UndoManager {
 
@@ -169,13 +162,9 @@ public class JabRefUndoManager implements UndoManager {
     /// describes a library state that never existed. `addEdit` cannot offer this — by the time
     /// it hears about the change, the caller made it long ago.
     ///
-    /// Inside an [#addEdit] block no lock is taken, and the window is *not* closed there: the
-    /// change reaches the library at once while the step reaches the stack only when the block
-    /// ends. What the thread-local recorder rules out is two threads writing one recorder, not
-    /// an undo interleaving with a block's writes. A block that mutates off the JavaFX thread
-    /// therefore still races a concurrent undo, which is a defect this class cannot fix alone:
-    /// only the command knows when its block ends, so reserving a command's writes against undo
-    /// and redo has to happen above this class, not inside it.
+    /// Inside an [#addEdit] block the change still reaches the library at once while the step
+    /// reaches the stack only when the block ends; the block holds the library against undo for
+    /// that whole window instead.
     ///
     /// @return what was applied, and what was not — see [BibChange#apply]
     @Override
@@ -336,12 +325,12 @@ public class JabRefUndoManager implements UndoManager {
         }
     }
 
-    /// Whether there is a step to take back.
+    /// Whether there is a step to take back — the stack only, not whether a command is holding
+    /// the library.
     ///
-    /// Deliberately not "and the library is free to take it back": menu enablement binds to this,
-    /// and a disabled menu item swallows its accelerator, so a suspension would leave Ctrl+Z doing
-    /// nothing at all instead of saying which command is holding the library. [#undo] is where the
-    /// suspension is enforced, and [#suspendedBy] is what that message is built from.
+    /// Menu enablement binds to this, and a disabled menu item swallows its accelerator, so
+    /// answering false during a suspension would leave Ctrl+Z doing nothing at all. [#undo]
+    /// enforces the suspension, and [#suspendedBy] says which command to name.
     public synchronized boolean canUndo() {
         return !undoStack.isEmpty();
     }
@@ -359,11 +348,9 @@ public class JabRefUndoManager implements UndoManager {
     ///
     /// @return what was undone — its name for the user, and what of it could not be applied —
     ///         or empty if there was nothing to undo, or a command is holding the library (see
-    ///         [#suspendUndo] — [#suspendedBy] tells the two apart). The name is taken
-    ///         inside the monitor: read
-    ///         afterwards, it would describe whichever step another thread has since pushed.
-    ///         Only a name leaves the journal, so nothing outside it starts reading the contents
-    ///         of the stacks.
+    ///         [#suspendUndo]; [#suspendedBy] tells the two apart). The name is taken inside the
+    ///         monitor, and it is all that leaves the journal, so nothing outside reads the
+    ///         stacks.
     public Optional<UndoStep> undo() {
         UndoStep step;
         synchronized (this) {

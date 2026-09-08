@@ -12,9 +12,6 @@ import org.jspecify.annotations.NullMarked;
 /// one modification refuses when the library no longer holds the state it recorded, rather than
 /// writing over whatever is there now.
 ///
-/// Reporting either is what keeps an implementation substitutable: it says what it delivered
-/// instead of the success its siblings guarantee.
-///
 /// @param failures the changes that were not applied, in the order they were attempted
 @NullMarked
 public record ApplyResult(List<Failure> failures) {

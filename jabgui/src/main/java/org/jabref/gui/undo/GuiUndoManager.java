@@ -42,7 +42,7 @@ public interface GuiUndoManager extends UndoManager {
     /// Marks the current position as saved.
     void markUnchanged();
 
-    /// Whether the journal is applying a change on this thread right now.
+    /// See [org.jabref.logic.undo.JabRefUndoManager#isApplying].
     boolean isApplying();
 
     /// Discards both stacks and the saved position.

@@ -6,8 +6,7 @@ import org.jspecify.annotations.NullMarked;
 ///
 /// Implementations are value objects: they hold the data needed to perform the change and the
 /// data needed to undo it, and derive the undo direction from that rather than implementing it
-/// separately. Undoing is therefore not a distinct operation — it is
-/// `change.inverted().applyTo(context)`.
+/// separately. Undoing is therefore not a distinct operation — it is `change.inverted().apply()`.
 ///
 /// Implementations carry no user-facing text. A description exists only at the granularity a
 /// user acts in, as the name of the enclosing [ChangeSet].
@@ -43,9 +42,6 @@ public sealed interface BibChange permits
     /// over it would produce a library no step on the stack describes. A change that describes a
     /// collection or a whole subtree applies unconditionally: comparing all of it on every apply
     /// costs more than the case is worth, and a partial comparison would only look like a check.
-    ///
-    /// That is the line — one value is verified, many are not — and it is why the two string
-    /// records verify while the two entry-list records do not.
     ///
     /// A change describing one modification performs it or throws, and so always returns
     /// [ApplyResult#SUCCESS]. Only [ChangeSet] can apply part of what it describes, and the

@@ -17,11 +17,10 @@ import org.slf4j.LoggerFactory;
 /// `name` is the only text in the change model, and it exists at this granularity because that
 /// is the granularity the user acts in: "Merge entries", not "change field author of entry X".
 ///
-/// Today it is read in one place, the warning [#apply] logs when part of a set fails, so it is a
-/// diagnostic that is written to be shown. Naming it as the user would recognise the action —
-/// from [org.jabref.gui.actions.Action#getText] where the step comes from a command, from a
-/// localized string otherwise — is what keeps it usable the day something renders it, which is
-/// what the postponed P5 does. A developer token here is a defect, not a shortcut.
+/// It is shown to the user: the notification after an undo names the step, and the warning
+/// [#apply] logs when part of a set fails carries it too. So it is named as the user would
+/// recognise the action — from [org.jabref.gui.actions.Action#getText] where the step comes from
+/// a command, from a localized string otherwise. A developer token here is a defect.
 @NullMarked
 public record ChangeSet(String name, List<BibChange> changes) implements BibChange {
 

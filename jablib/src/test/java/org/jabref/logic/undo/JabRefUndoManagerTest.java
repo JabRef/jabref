@@ -506,7 +506,7 @@ class JabRefUndoManagerTest {
         assertEquals(1, reached.get());
     }
 
-    /// The defect this reserves against: a background command applies its changes long before it
+    /// The defect suspending guards against: a background command applies its changes long before it
     /// pushes them, and an undo arriving in that window takes back a change *underneath* those
     /// writes - after which the command's push discards the undone change with the redo stack.
     @Test

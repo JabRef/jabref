@@ -10,10 +10,9 @@ import org.jspecify.annotations.NullMarked;
 /// Replaces a library's string constants as a whole, which is how the library properties dialog
 /// writes them: the tab hands over the list it built, rather than the edits that produced it.
 ///
-/// Named for the operation, beside [UndoableInsertString] and [UndoableRemoveString], so that it
-/// cannot be read as [UndoableStringChange] — that one changes the name or the content of a single
-/// constant and, being a single value, verifies it before writing. This one is a collection and
-/// applies unconditionally; see [BibChange#apply].
+/// Not to be confused with [UndoableStringChange], which changes the name or the content of a
+/// single constant and, being a single value, verifies it before writing. This one is a collection
+/// and applies unconditionally; see [BibChange#apply].
 @NullMarked
 public record UndoableReplaceStrings(BibDatabase database, List<BibtexString> before, List<BibtexString> after) implements BibChange {
 

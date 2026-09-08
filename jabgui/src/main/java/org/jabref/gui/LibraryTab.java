@@ -1267,7 +1267,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
             // Automatically add new entries to the selected group (or set of groups)
             if (preferences.getGroupsPreferences().shouldAutoAssignGroup()) {
-                // The entries arrived through an event, so whatever added them has pushed its own step already.
+                // A step of its own, which nests into the caller's block when the insert opened one
+                // (import, paste), so the assignment is taken back together with the entries.
                 getUndoManager().addEdit(Localization.lang("Assign entries to group"), edit ->
                         stateManager.getSelectedGroups(bibDatabaseContext).forEach(
                                 selectedGroup -> edit.addAll(selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()))));

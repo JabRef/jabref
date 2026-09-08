@@ -11,10 +11,10 @@ import org.jspecify.annotations.NullMarked;
 /// The journal, plus the JavaFX properties the menus bind to.
 ///
 /// The properties live in jabgui, and the marshalling is the reason: JavaFX properties are just
-/// observable values and need no toolkit, but hopping to the JavaFX thread does — and the
-/// Swing-era manager did that on every push, so recording a change from a plain unit test threw
-/// "Toolkit not initialized". Only an observer that feeds the UI needs the hop, so it lives with
-/// the observer while [JabRefUndoManager] stays plain Java.
+/// observable values and need no toolkit, but hopping to the JavaFX thread does, and a manager
+/// that hops on every push cannot record a change in a plain unit test — it throws "Toolkit not
+/// initialized". Only an observer that feeds the UI needs the hop, so it lives with the observer
+/// while [JabRefUndoManager] stays plain Java.
 ///
 /// Extends rather than wraps, following `JabRefGuiPreferences extends JabRefCliPreferences`.
 /// Wrapping meant every caller reached through a `getUndoManager()` accessor to do anything, and
