@@ -226,12 +226,10 @@ public class DuplicateSearch extends SimpleCommand {
             // Now, do the actual removal:
             if (!result.getToRemove().isEmpty()) {
                 edit.applyEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
-                libraryTab.markBaseChanged();
             }
             // and adding merged entries:
             if (!result.getToAdd().isEmpty()) {
                 edit.applyEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
-                libraryTab.markBaseChanged();
             }
         });
 

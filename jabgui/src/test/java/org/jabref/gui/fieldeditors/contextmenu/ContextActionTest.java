@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -106,12 +107,12 @@ class ContextActionTest {
         LinkedFileViewModel onlineViewModel = mockOnlineLinkViewModel("https://host/file.pdf");
         ContextAction onlineAction = newAction(StandardActions.DOWNLOAD_FILE, onlineViewModel);
         onlineAction.execute();
-        verify(onlineViewModel).download(true);
+        verify(onlineViewModel).download(eq(true), any());
 
         LinkedFileViewModel offlineViewModel = mockOfflineExistingFileViewModel();
         ContextAction offlineAction = newAction(StandardActions.DOWNLOAD_FILE, offlineViewModel);
         offlineAction.execute();
-        verify(offlineViewModel, never()).download(anyBoolean());
+        verify(offlineViewModel, never()).download(anyBoolean(), any());
     }
 
     @Test
@@ -120,13 +121,13 @@ class ContextActionTest {
         when(viewModelWithSource.getFile().getSourceUrl()).thenReturn("https://host/file.pdf");
         ContextAction actionWithSource = newAction(StandardActions.REDOWNLOAD_FILE, viewModelWithSource);
         actionWithSource.execute();
-        verify(viewModelWithSource).redownload();
+        verify(viewModelWithSource).redownload(any());
 
         LinkedFileViewModel viewModelWithoutSource = mockOnlineLinkViewModel("");
         when(viewModelWithoutSource.getFile().getSourceUrl()).thenReturn("");
         ContextAction actionWithoutSource = newAction(StandardActions.REDOWNLOAD_FILE, viewModelWithoutSource);
         actionWithoutSource.execute();
-        verify(viewModelWithoutSource, never()).redownload();
+        verify(viewModelWithoutSource, never()).redownload(any());
     }
 
     @Test
