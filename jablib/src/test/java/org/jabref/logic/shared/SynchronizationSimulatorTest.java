@@ -134,6 +134,7 @@ class SynchronizationSimulatorTest {
 
     /// [Issue 9452](https://github.com/JabRef/jabref/issues/9452): groups created by one client have to
     /// show up at the other client without reconnecting
+    // [utest->req~shared-database.live-propagation~1]
     @Test
     void simulateLiveGroupCreationPropagation() throws Exception {
         // client A creates the group tree; the group panel writes it back via MetaData.setGroups
@@ -145,6 +146,7 @@ class SynchronizationSimulatorTest {
         assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
     }
 
+    // [utest->req~shared-database.live-propagation~1]
     @Test
     void simulateLiveSubgroupAdditionPropagation() throws Exception {
         // A root without children is not serialized at all, so the initial tree needs one group
@@ -162,6 +164,7 @@ class SynchronizationSimulatorTest {
         assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
     }
 
+    // [utest->req~shared-database.live-propagation~1]
     @Test
     void simulateLiveGroupEditPropagation() throws Exception {
         GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
