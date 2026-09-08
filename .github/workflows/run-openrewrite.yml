@@ -3,11 +3,16 @@ name: Run OpenRewrite
 permissions:
   contents: write
   pull-requests: read
+  actions: read
 
 on:
   pull_request:
     paths:
       - '.github/workflows/run-openrewrite.yml'
+  # Auto-fix formatting/OpenRewrite failures on branches living in this repository
+  workflow_run:
+    workflows: [ "Source Code Tests" ]
+    types: [ completed ]
   workflow_dispatch:
     inputs:
       branch:
@@ -16,12 +21,44 @@ on:
         type: string
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}"
+  group: "${{ github.workflow }}-${{ github.event.workflow_run.head_branch || github.head_ref || github.ref }}-${{ github.event_name }}"
   cancel-in-progress: true
 
 jobs:
+  # Determines whether the failed "Source Code Tests" run failed at formatting or OpenRewrite - only those are fixable here.
+  check:
+    if: >
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-slim
+    outputs:
+      fixable: ${{ steps.failed-jobs.outputs.fixable }}
+    steps:
+      - name: Check failed jobs
+        id: failed-jobs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          failed=$(gh api --paginate "repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/jobs" --jq '.jobs[] | select(.conclusion == "failure") | .name')
+          echo "Failed jobs: $failed"
+          if grep -qxE 'format|OpenRewrite' <<< "$failed"; then
+            echo "fixable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "fixable=false" >> "$GITHUB_OUTPUT"
+          fi
+
   rewrite:
-    if: github.event_name == 'workflow_dispatch' || github.repository == 'JabRef/jabref'
+    needs: check
+    # `always()`, because `check` is skipped for `workflow_dispatch` and `pull_request`
+    if: >
+      always() &&
+      (
+        github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) ||
+        needs.check.outputs.fixable == 'true'
+      )
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +66,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           submodules: 'true'
-          ref: ${{ inputs.branch || github.event.pull_request.head.ref }}
+          ref: ${{ inputs.branch || github.event.workflow_run.head_branch || github.event.pull_request.head.ref }}
           token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
 
       - uses: ./.github/actions/setup-gradle
