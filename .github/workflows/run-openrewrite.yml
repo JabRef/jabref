@@ -21,7 +21,8 @@ on:
         type: string
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.event.workflow_run.head_branch || github.head_ref || github.ref }}-${{ github.event_name }}"
+  # The head repository is part of the group: a fork branch of the same name must not cancel an auto-fix run of this repository.
+  group: "${{ github.workflow }}-${{ github.event.workflow_run.head_repository.full_name || github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.event.workflow_run.head_branch || github.head_ref || github.ref }}-${{ github.event_name }}"
   cancel-in-progress: true
 
 jobs:
