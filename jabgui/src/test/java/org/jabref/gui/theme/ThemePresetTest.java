@@ -2,6 +2,7 @@ package org.jabref.gui.theme;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -11,11 +12,13 @@ import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@NullMarked
 @AllowedToUseClassGetResource("Lists the bundled theme files next to the theme package.")
 class ThemePresetTest {
 
@@ -29,7 +32,7 @@ class ThemePresetTest {
     /// or excluded from the build.
     @Test
     void communityConstantsMatchTheBundledFiles() throws IOException, URISyntaxException {
-        var communityDirectory = ThemePreset.class.getResource(COMMUNITY_DIRECTORY);
+        URL communityDirectory = ThemePreset.class.getResource(COMMUNITY_DIRECTORY);
         assertNotNull(communityDirectory, "No community themes bundled -- is the themes.jabref.org submodule checked out?");
 
         Set<String> bundled = new TreeSet<>();
