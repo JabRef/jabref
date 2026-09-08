@@ -54,9 +54,10 @@
  * default root font (9pt = 12px, see ThemeManager). The value itself is
  * written in `em`, so all spacing scales with the user's font size setting:
  *
- *     0 -> 0          12 -> 1em
- *     4 -> 0.333em    16 -> 1.333em
- *     8 -> 0.667em    24 -> 2em
+ * 0 -> 0
+ * 4 -> 0.333em
+ * 8 -> 0.667em
+ * 12 -> 1em
  * ========================================================================== */
 
 /* Type scale */
@@ -310,10 +311,6 @@
 
 .ikonli-font-icon {
     -fx-icon-color: -fx-text-base-color;
-}
-
-.text-button {
-    -fx-border-width: 0;
 }
 
 .icon-button {
@@ -1373,7 +1370,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .three-way-merge .field-name .glyph-icon,
 .three-way-merge .field-name .ikonli-font-icon {
-    -fx-icon-size: 17;
+    -fx-icon-size: 18;
     -fx-icon-color: -color-accent;
 }
 
@@ -1413,8 +1410,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .add-certificate {
-    -fx-pref-width: 17em;
-    -fx-min-width: 17em;
+    -fx-pref-width: 18em;
+    -fx-min-width: 18em;
 }
 
 /* Quick Settings */
