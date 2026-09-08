@@ -73,4 +73,11 @@ A shared database that is still connected when JabRef closes is reconnected on t
 
 Needs: impl
 
+## A database is open in one tab only
+`req~shared-database.single-tab~1`
+
+A shared database is never opened in a second tab, whichever way the connection is entered (form fields, JDBC URL, a library file carrying its id, or a remembered connection at startup). Instead, the tab that is already connected is shown.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

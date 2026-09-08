@@ -173,6 +173,7 @@ public class SharedDatabaseUIManager {
     }
 
     /// The tab already connected to the database `connectionProperties` points at, if any
+    // [impl->req~shared-database.single-tab~1]
     public Optional<LibraryTab> findOpenTab(DatabaseConnectionProperties connectionProperties) {
         return tabContainer.getLibraryTabs().stream()
                            .filter(tab -> tab.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED)
