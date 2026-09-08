@@ -147,7 +147,7 @@
 
 .btn-transparent {
     -fx-background: transparent;
-    -fx-background-color: -fx-background;
+    -fx-background-color: transparent;
     -fx-border-width: 0;
     -fx-background-insets: 0;
     -fx-background-radius: 0.25em;
