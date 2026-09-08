@@ -2,12 +2,16 @@ package org.jabref.gui.util.component;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -225,18 +229,29 @@ class MarkdownTextFlowTest {
         Bounds bounds = firstTextBounds(robot, textFlow);
         double centerY = bounds.getMinY() + (bounds.getHeight() / 2);
 
-        robot.moveTo(bounds.getMinX() + 1, centerY)
-             .press(MouseButton.PRIMARY)
-             .moveTo(bounds.getMaxX() - 1, centerY)
-             .release(MouseButton.PRIMARY);
+        robot.interact(() -> {
+            fireMouseEvent(textFlow, MouseEvent.MOUSE_PRESSED, bounds.getMinX() + 1, centerY, true);
+            fireMouseEvent(textFlow, MouseEvent.MOUSE_DRAGGED, bounds.getMaxX() - 1, centerY, true);
+            fireMouseEvent(textFlow, MouseEvent.MOUSE_RELEASED, bounds.getMaxX() - 1, centerY, false);
+        });
     }
 
+    private static void fireMouseEvent(MarkdownTextFlow textFlow, EventType<MouseEvent> type, double x, double y, boolean buttonDown) {
+        Point2D onScreen = textFlow.localToScreen(x, y);
+        Event.fireEvent(textFlow, new MouseEvent(
+                type, x, y, onScreen.getX(), onScreen.getY(), MouseButton.PRIMARY, 1,
+                false, false, false, false,
+                buttonDown, false, false,
+                false, false, false, null));
+    }
+
+    /// The bounds of the first rendered line, in the coordinate space of the text flow.
     private static Bounds firstTextBounds(FxRobot robot, MarkdownTextFlow textFlow) {
         AtomicReference<Bounds> boundsReference = new AtomicReference<>();
         robot.interact(() -> {
             for (Node child : textFlow.getChildren()) {
-                Bounds childBounds = child.localToScreen(child.getBoundsInLocal());
-                if (childBounds != null && childBounds.getWidth() > 2) {
+                Bounds childBounds = child.getBoundsInParent();
+                if (childBounds.getWidth() > 2) {
                     boundsReference.set(childBounds);
                     return;
                 }
