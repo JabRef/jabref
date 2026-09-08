@@ -20,24 +20,32 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.application.Platform;
+
 import org.jabref.support.DisabledOnCIServerWindows;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Need to run on JavaFX thread since we are parsing FXML files
-@ExtendWith(ApplicationExtension.class)
 @DisabledOnCIServerWindows("Needs DISPLAY variable to be set")
 @ResourceLock("Localization.lang")
 class LocalizationConsistencyTest {
+
+    @BeforeAll
+    static void initializeJavaFx() {
+        try {
+            Platform.startup(() -> Platform.setImplicitExit(false));
+        } catch (IllegalStateException exception) {
+            Platform.setImplicitExit(false);
+        }
+    }
 
     @Test
     void allFilesMustBeInLanguages() throws IOException {
