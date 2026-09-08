@@ -75,7 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a fetcher for the Bielefeld Academic Search Engine (BASE). [#15016](https://github.com/JabRef/jabref/issues/15016)
 - We added a Git section to the library properties for automatic commit, pull and push. [#12630](https://github.com/JabRef/jabref/issues/12630)
 - We added connection URL pasting to the shared database login dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
-- We changed connecting to a shared database to run in the background: the dialog closes immediately and the library tab shows the progress. [#16800](https://github.com/JabRef/jabref/pull/16800), [TODO](https://github.com/JabRef/jabref/pull/TODO)
+- We changed connecting to a shared database to run in the background: the dialog closes immediately and the library tab shows the progress. [#16800](https://github.com/JabRef/jabref/pull/16800), [#16968](https://github.com/JabRef/jabref/pull/16968)
 
 ### Changed
 
