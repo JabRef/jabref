@@ -386,22 +386,6 @@ public class GroupTreeView extends BorderPane {
                 });
         text.getStyleClass().setAll("text");
 
-        text.styleProperty().bind(Bindings.createStringBinding(() -> {
-            double reducedFontSize;
-            double font_size = preferences.getWorkspacePreferences().getMainFontSize();
-            // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
-            if (font_size > 26.0) {
-                reducedFontSize = 0.25;
-            } else if (font_size > 22.0) {
-                reducedFontSize = 0.35;
-            } else if (font_size > 18.0) {
-                reducedFontSize = 0.55;
-            } else {
-                reducedFontSize = 0.75;
-            }
-            return "-fx-font-size: %fem;".formatted(reducedFontSize);
-        }, preferences.getWorkspacePreferences().mainFontSizeProperty()));
-
         node.getChildren().add(text);
         node.setMaxWidth(Control.USE_PREF_SIZE);
         return node;

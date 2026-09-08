@@ -127,7 +127,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
     private Spinner<Integer> buildFontSizeSpinner() {
         Spinner<Integer> fontSize = new Spinner<>();
         fontSize.setValueFactory(GeneralTabViewModel.fontSizeValueFactory);
-        fontSize.getStyleClass().add("fontsizeSpinner");
         fontSize.setEditable(true);
         fontSize.setMaxWidth(100.0);
         fontSize.getEditor().setAlignment(Pos.CENTER_RIGHT);
