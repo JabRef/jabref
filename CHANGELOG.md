@@ -126,6 +126,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We moved the Git settings into their own preferences tab. [#12630](https://github.com/JabRef/jabref/issues/12630)
 - "Get fulltext", groups "Attach file", "Attach file from URL", "Open folder(s)" and "Open file" commands in right click menu have been moved into a "More file operations..." submenu. [#16829](https://github.com/JabRef/jabref/pull/16829)
 - We changed the logging during full-text search indexing to identify which linked files cause errors. [#15680](https://github.com/JabRef/jabref/issues/15680)
+- We unified the Button style. All Buttons have rounded corners, a hover, pressed and focused color. [#16980](https://github.com/JabRef/jabref/pull/16980)
 
 ### Fixed
 
