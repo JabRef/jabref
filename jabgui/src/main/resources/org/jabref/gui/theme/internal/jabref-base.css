@@ -54,9 +54,10 @@
  * default root font (9pt = 12px, see ThemeManager). The value itself is
  * written in `em`, so all spacing scales with the user's font size setting:
  *
- *     0 -> 0          12 -> 1em
- *     4 -> 0.333em    16 -> 1.333em
- *     8 -> 0.667em    24 -> 2em
+ * 0 -> 0
+ * 4 -> 0.333em
+ * 8 -> 0.667em
+ * 12 -> 1em
  * ========================================================================== */
 
 /* Type scale */
@@ -148,9 +149,6 @@
 .btn-transparent {
     -fx-background: transparent;
     -fx-background-color: transparent;
-    -fx-border-width: 0;
-    -fx-background-insets: 0;
-    -fx-background-radius: 0.25em;
 }
 
 /* JavaFX with custom components */
@@ -312,20 +310,13 @@
     -fx-icon-color: -fx-text-base-color;
 }
 
-.text-button {
-    -fx-border-width: 0;
-}
-
-.contained-button {
-    -fx-background-color: -color-accent-subtle;
-    -fx-border-color: -color-accent-subtle;
-}
-
 .icon-button {
-    -fx-border-width: 0;
     -fx-background: transparent;
     -fx-background-color: transparent;
     -fx-padding: 0.5em;
+    -fx-border-radius: 0.25em;
+    -fx-border-width: 0.0625em;
+    -fx-border-color: transparent;
 }
 
 .icon-button:hover {
@@ -343,6 +334,10 @@
     -fx-background-color: -color-overlay-hover;
     -fx-text-fill: -color-fg-emphasis;
     -fx-fill: -color-fg-emphasis;
+}
+
+.icon-button:focused {
+    -fx-border-color: -color-accent;
 }
 
 .icon-button:disabled {
@@ -466,7 +461,7 @@
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
     /* `!important` is override library's default font size */
-    -fx-font-size: 1.7em!important;
+    -fx-font-size: 1.8em!important;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
     -fx-icon-color: -color-accent;
@@ -924,8 +919,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #entryEditor .all-fields-add-chip {
-    -fx-background-radius: 3;
-    -fx-border-radius: 3;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
 #entryEditor Text {
@@ -1085,7 +1080,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-insets: 0;
     -fx-background-insets: 0;
     -fx-border-image-insets: 0;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
 /* ParseLatexResult */
@@ -1375,7 +1371,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .three-way-merge .field-name .glyph-icon,
 .three-way-merge .field-name .ikonli-font-icon {
-    -fx-icon-size: 17;
+    -fx-icon-size: 18;
     -fx-icon-color: -color-accent;
 }
 
@@ -1387,8 +1383,8 @@ We want to have a look that matches our icons in the tool-bar */
 
 .exampleQuestionStyle {
     -fx-background-color: transparent;
-    -fx-background-radius: 20px;
-    -fx-border-radius: 20px;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
     -fx-border-width: 0.062em;
     -fx-border-color: -color-border-default;
     -fx-font-weight: bold;
@@ -1400,6 +1396,14 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-button-hover;
 }
 
+.exampleQuestionStyle:armed {
+    -fx-background-color: -color-button-pressed;
+}
+
+.refresh {
+    -fx-background-color: transparent;
+}
+
 .text-button-blue {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
@@ -1407,8 +1411,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .add-certificate {
-    -fx-pref-width: 17em;
-    -fx-min-width: 17em;
+    -fx-pref-width: 18em;
+    -fx-min-width: 18em;
 }
 
 /* Quick Settings */
@@ -1416,8 +1420,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-bg-alt;
     -fx-border-color: -color-border-default;
     -fx-border-width: 0.08333em;
-    -fx-border-radius: 0.333em;
-    -fx-background-radius: 0.333em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
     -fx-graphic-text-gap: 0.667em;
     -fx-text-fill: -fx-text-base-color;
     -fx-cursor: hand;
@@ -1425,6 +1429,10 @@ We want to have a look that matches our icons in the tool-bar */
 
 .quick-settings-button:hover {
     -fx-border-color: -color-accent-subtle;
+}
+
+.quick-settings-button:armed {
+    -fx-background-color: -color-bg-alt, -color-button-pressed;
 }
 
 .quick-settings-button .glyph-icon,
@@ -1538,6 +1546,14 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 0.25em;
 }
 
+.walkthrough-continue-button:hover {
+    -fx-background-color: -color-accent, -color-button-hover;
+}
+
+.walkthrough-continue-button:armed {
+    -fx-background-color: -color-accent, -color-button-pressed;
+}
+
 .walkthrough-skip-button {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
@@ -1547,11 +1563,27 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 0.25em;
 }
 
+.walkthrough-skip-button:hover {
+    -fx-background-color: -color-button-hover;
+}
+
+.walkthrough-skip-button:armed {
+    -fx-background-color: -color-button-pressed;
+}
+
 .walkthrough-back-button {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
+}
+
+.walkthrough-back-button:hover {
+    -fx-background-color: -color-button-hover;
+}
+
+.walkthrough-back-button:armed {
+    -fx-background-color: -color-button-pressed;
 }
 
 .walkthrough-quit-button {
@@ -1570,7 +1602,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: derive(-color-bg-tertiary, -20%);
 }
 
-.walkthrough-quit-button:pressed {
+.walkthrough-quit-button:armed {
     -fx-background-color: derive(-color-bg-tertiary, 30%);
 }
 
@@ -1662,6 +1694,14 @@ We want to have a look that matches our icons in the tool-bar */
 .info-center-view .notification-view > .content > .text-container > .actions-box .button {
     -fx-background: -color-button-default;
     -fx-background-color: -color-button-default;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button:hover {
+    -fx-background-color: -color-button-default, -color-button-hover;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button:armed {
+    -fx-background-color: -color-button-default, -color-button-pressed;
 }
 
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
