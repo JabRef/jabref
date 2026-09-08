@@ -357,7 +357,7 @@ public class GroupTreeView extends BorderPane {
 
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
-        node.getStyleClass().add("hits");
+        node.getStyleClass().addAll("hits", "padding-4");
         Text text = new Text();
         if (!group.isRoot()) {
             // The text carries the pseudo-classes as well: JavaFX does not re-style a descendant when a

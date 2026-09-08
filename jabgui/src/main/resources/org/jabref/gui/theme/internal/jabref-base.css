@@ -505,7 +505,6 @@
 
 /* search text */
 .global-search-bar .label {
-    -fx-padding: 0em 1.8em 0em 0em;
 }
 
 .global-search-bar:illegal-search {
@@ -946,14 +945,12 @@ We want to have a look that matches our icons in the tool-bar */
 #entryEditor .all-fields-section-pane > .title {
     -fx-background-color: transparent;
     -fx-font-weight: bold;
-    -fx-padding: 0.5em 0 0.333em 0;
     -fx-border-color: transparent transparent -color-border-default transparent;
 }
 
 #entryEditor .all-fields-section-pane > *.content {
     -fx-background-color: transparent;
     -fx-border-width: 0;
-    -fx-padding: 0.5em 0 0.333em 1.333em;
 }
 
 #entryEditor .all-fields-add-chip {
@@ -1153,14 +1150,12 @@ We want to have a look that matches our icons in the tool-bar */
 
 #groupTree .numberColumn {
     -fx-alignment: top-right;
-    -fx-padding: 0.35em 0.2em 0.25em 0em;
 }
 
 #groupTree .numberColumn > .hits {
     -fx-font-size: 0.75em;
     -fx-background: -color-badge-bg;
     -fx-background-color: -color-badge-bg;
-    -fx-padding: 0.4em 0.4em 0.4em 0.4em;
     -fx-background-insets: 0;
     -fx-background-radius: 0.7em;
 }
@@ -1182,10 +1177,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.20em 0em 0.20em 0em;
 }
 
-#groupTree .tree-table-row-cell:sub > .numberColumn {
-    -fx-padding: 0.20em 0.2em 0.20em 0em;
-}
-
 #groupTree .tree-table-row-cell:root {
     -fx-border-width: 0 0 1 0;
     -fx-border-color: -color-border-muted;
@@ -1193,10 +1184,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 #groupTree .tree-table-row-cell:root > .tree-table-cell {
     -fx-padding: 0.65em 0em 0.65em 1em;
-}
-
-#groupTree .tree-table-row-cell:root > .numberColumn {
-    -fx-padding: 0.40em 0.2em 0.40em 0em;
 }
 
 #groupTree .tree-table-row-cell:root > .expansionNodeColumn {
@@ -1401,7 +1388,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .three-way-merge .merge-header-cell .label {
     -fx-font-weight: bold;
-    -fx-padding: 0.167em 0 0.167em 0;
 }
 
 .three-way-merge .field-name .glyph-icon,

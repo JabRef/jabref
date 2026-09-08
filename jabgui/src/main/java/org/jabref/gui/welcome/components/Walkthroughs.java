@@ -58,7 +58,7 @@ public class Walkthroughs extends VBox {
 
     private VBox createWalkthroughContent() {
         VBox content = new VBox(4);
-        content.getStyleClass().add("align-top-left");
+        content.getStyleClass().addAll("align-top-left", "padding-4");
 
         Button mainFileDirWalkthroughButton = createWalkthroughButton(
                 Localization.lang("Set main file directory"),

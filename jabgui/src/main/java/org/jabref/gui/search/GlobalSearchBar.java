@@ -205,7 +205,7 @@ public class GlobalSearchBar extends HBox {
 
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
-        searchField.getStyleClass().add("global-search-bar");
+        searchField.getStyleClass().addAll("global-search-bar", "padding-4");
         searchField.setMinWidth(100);
         HBox.setHgrow(searchField, Priority.ALWAYS);
 

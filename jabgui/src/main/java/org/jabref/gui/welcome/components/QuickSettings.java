@@ -111,7 +111,7 @@ public class QuickSettings extends VBox {
                 entryTableButton,
                 pushApplicationButton,
                 onlineServicesButton);
-        newContent.getStyleClass().add("align-top-left");
+        newContent.getStyleClass().addAll("align-top-left", "padding-4");
         return newContent;
     }
 
