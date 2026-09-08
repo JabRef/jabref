@@ -20,6 +20,9 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
@@ -125,6 +128,33 @@ class SynchronizationSimulatorTest {
         Optional<BibDatabaseMode> expected = Optional.of(BibDatabaseMode.BIBLATEX);
         waitUntil(() -> expected.equals(clientContextB.getMetaData().getMode()));
         assertEquals(expected, clientContextB.getMetaData().getMode());
+    }
+
+    /// [Issue 9452](https://github.com/JabRef/jabref/issues/9452): groups created by one client have to
+    /// show up at the other client without reconnecting
+    @Test
+    void simulateLiveGroupCreationPropagation() throws Exception {
+        // client A creates the group tree; the group panel writes it back via MetaData.setGroups
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+    }
+
+    @Test
+    void simulateLiveSubgroupAdditionPropagation() throws Exception {
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+
+        // client A adds a subgroup to the existing tree; the group panel writes the (same) root back
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().map(root -> root.getNumberOfChildren() == 1).orElse(false));
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
     }
 
     @Test
