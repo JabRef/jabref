@@ -316,11 +316,6 @@
     -fx-border-width: 0;
 }
 
-.contained-button {
-    -fx-background-color: -color-accent-subtle;
-    -fx-border-color: -color-accent-subtle;
-}
-
 .icon-button {
     -fx-border-width: 0;
     -fx-background: transparent;
