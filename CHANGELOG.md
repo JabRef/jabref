@@ -130,7 +130,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where entries imported in the background could not be selected or updated in the main table. [#16893](https://github.com/JabRef/jabref/pull/16893)
 - We fixed an issue where editing a library's string constants could not be undone. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where undoing could overwrite a newer value when a background operation had changed the same field. [#16936](https://github.com/JabRef/jabref/pull/16936)
-- We fixed an issue where the same shared database could be opened in a second tab, e.g. via a JDBC URL or at startup. [TODO](TODO)
+- We fixed an issue where the same shared database could be opened in a second tab, e.g. via a JDBC URL or at startup. [#16967](https://github.com/JabRef/jabref/pull/16967)
 - We fixed an issue where adding, removing, moving, sorting or editing groups could not be undone. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where Ctrl+Z and Ctrl+Y only worked while the entry editor had focus. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where the entry editor kept showing an entry of another library after switching libraries. [#16892](https://github.com/JabRef/jabref/pull/16892)
