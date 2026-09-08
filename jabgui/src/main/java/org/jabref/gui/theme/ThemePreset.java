@@ -1,8 +1,5 @@
 package org.jabref.gui.theme;
 
-import javafx.application.ColorScheme;
-import javafx.application.Platform;
-
 import org.jabref.logic.l10n.Localization;
 
 /// A theme the user can select: one of the two built-in themes, or one of the community themes
@@ -71,17 +68,17 @@ public enum ThemePreset {
         return darkName.equals(lightName) ? darkName : darkName + " / " + lightName;
     }
 
-    /// The name matching the color scheme the user would see the theme in.
+    /// The name matching the color scheme the user would see the theme in; when following the system,
+    /// both hues are shown as "dark / light".
     public String getLocalizedName(ThemeColorScheme colorScheme) {
-        boolean dark = switch (colorScheme) {
+        return switch (colorScheme) {
             case DARK ->
-                    true;
+                    darkName;
             case LIGHT ->
-                    false;
+                    lightName;
             case FOLLOW_SYSTEM ->
-                    Platform.getPreferences().getColorScheme() == ColorScheme.DARK;
+                    getLocalizedName();
         };
-        return dark ? darkName : lightName;
     }
 
     public StyleSheet getStyleSheet() {
