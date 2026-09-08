@@ -29,7 +29,7 @@
                 <RowConstraints vgrow="ALWAYS"/>
             </rowConstraints>
 
-            <VBox spacing="8" styleClass="bg-accent,padding-16" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <VBox spacing="8" styleClass="bg-accent,padding-12" GridPane.columnIndex="0" GridPane.rowIndex="0">
                 <Button onAction="#openJabrefWebsite" styleClass="btn-transparent,padding-0">
                     <cursor>
                         <Cursor fx:constant="HAND"/>
@@ -76,7 +76,7 @@
                 </VBox>
             </VBox>
 
-            <VBox spacing="4" styleClass="bg-secondary,padding-16" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <VBox spacing="4" styleClass="bg-secondary,padding-12" GridPane.columnIndex="1" GridPane.rowIndex="0">
                 <VBox spacing="4">
                     <Label fx:id="maintainersCaption" styleClass="bold,text-accent"/>
                     <Label text="${controller.viewModel.maintainers}" wrapText="true"/>

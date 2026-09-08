@@ -105,7 +105,6 @@
 .padding-4 { -fx-padding: 0.333em; }
 .padding-8 { -fx-padding: 0.667em; }
 .padding-12 { -fx-padding: 1em; }
-.padding-16 { -fx-padding: 1.333em; }
 
 /* Padding: <vertical>-<horizontal>. Added on demand -- only the pairs in use exist. */
 .padding-0-4 { -fx-padding: 0 0.333em; }
