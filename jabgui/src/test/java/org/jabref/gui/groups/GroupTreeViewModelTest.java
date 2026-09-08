@@ -124,11 +124,14 @@ class GroupTreeViewModelTest {
         // changes only through Platform.runLater - so it is rebuilt here rather than waited on.
         groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
 
-        groupTree.sortAlphabeticallyRecursive(databaseContext.getMetaData().getGroups().orElseThrow());
+        // Both operations edit the tree the queued refresh reads. Run them on the JavaFX thread, so
+        // that the refresh either has finished or has not started - it must not walk a list of
+        // children while this thread is reordering it.
+        JavaFxExtension.invokeAndWait(() -> groupTree.sortAlphabeticallyRecursive(databaseContext.getMetaData().getGroups().orElseThrow()));
         assertEquals(List.of("A", "B"), childNames());
 
         assertTrue(journal.canUndo(), "the sort was not recorded");
-        journal.undo();
+        JavaFxExtension.invokeAndWait(journal::undo);
         assertEquals(List.of("B", "A"), childNames());
     }
 

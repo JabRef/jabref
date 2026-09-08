@@ -235,7 +235,7 @@ public class JabRefUndoManager implements UndoManager {
     /// again — so the step goes rather than sitting on the stack doing nothing.
     ///
     /// Callers hold this object's monitor.
-    // [impl->req~logic.undo.typing-is-one-step~1]
+    // [impl->req~logic.undo.typing-is-one-step~2]
     private void record(BibChange change, EditSource source) {
         assert Thread.holdsLock(this);
 

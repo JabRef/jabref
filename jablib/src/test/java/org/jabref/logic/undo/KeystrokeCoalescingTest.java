@@ -44,7 +44,7 @@ class KeystrokeCoalescingTest {
         return entry.getField(StandardField.TITLE);
     }
 
-    // [utest->req~logic.undo.typing-is-one-step~1]
+    // [utest->req~logic.undo.typing-is-one-step~2]
     @Test
     void aRunOfKeystrokesIsOneStep() {
         type("Relativity");
@@ -55,6 +55,21 @@ class KeystrokeCoalescingTest {
 
         assertEquals(Optional.empty(), title(), "undo took back one keystroke rather than the run");
         assertFalse(journal.canUndo(), "the run left more than one step behind");
+    }
+
+    /// A finished word ends the run, so Ctrl+Z on a typo does not take back the paragraph before it.
+    // [utest->req~logic.undo.typing-is-one-step~2]
+    @Test
+    void aFinishedWordEndsTheRun() {
+        type("Special relativity");
+
+        journal.undo();
+
+        assertEquals(Optional.of("Special "), title(), "undo took back more than the word that was typed");
+
+        journal.undo();
+
+        assertEquals(Optional.empty(), title(), "the earlier word was not a step of its own");
     }
 
     /// And forward again: the merged step redoes as a whole.

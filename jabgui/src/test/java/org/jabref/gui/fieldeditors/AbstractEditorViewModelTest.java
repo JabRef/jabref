@@ -45,7 +45,7 @@ class AbstractEditorViewModelTest {
 
     /// The editor records one change per keystroke; the journal makes one step of the run.
     @Test
-    // [utest->req~logic.undo.typing-is-one-step~1]
+    // [utest->req~logic.undo.typing-is-one-step~2]
     void typingAWordIsOneUndoStep() {
         BibEntry entry = new BibEntry();
         HeadlessGuiUndoManager journal = new HeadlessGuiUndoManager();

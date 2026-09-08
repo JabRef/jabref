@@ -159,7 +159,7 @@ class JabRefGuiUndoManagerTest {
             undoManager.addEdit(setField(StandardField.YEAR, String.valueOf(1900 + i)));
         }
         release.countDown();
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
 
         assertTrue(undoManager.undoableProperty().get());
         assertTrue(undoManager.hasChangedProperty().get());

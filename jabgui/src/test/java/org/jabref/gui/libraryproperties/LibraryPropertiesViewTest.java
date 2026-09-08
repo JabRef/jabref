@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
+import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.JabRefGuiUndoManager;
 import org.jabref.logic.l10n.Language;
@@ -26,7 +28,6 @@ import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
-import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.when;
 ///
 /// The view model's own test drives it with stub tabs; this one builds the seven real ones and
 /// changes the settings through their controls.
-class LibraryPropertiesViewTest extends ApplicationTest {
+class LibraryPropertiesViewTest extends JavaFxTest {
 
     private final BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
     private final JabRefGuiUndoManager journal = new JabRefGuiUndoManager();
@@ -78,8 +79,8 @@ class LibraryPropertiesViewTest extends ApplicationTest {
     @Test
     // [utest->req~logic.undo.library-settings-recorded~1]
     void acceptingTheDialogRecordsOneUndoableStep() {
-        ComboBox<BibDatabaseMode> mode = lookup("#databaseMode").queryComboBox();
-        TextField keywordSeparator = lookup("#keywordSeparator").query();
+        ComboBox<BibDatabaseMode> mode = JavaFxExtension.lookup(view.getDialogPane(), "#databaseMode", ComboBox.class);
+        TextField keywordSeparator = JavaFxExtension.lookup(view.getDialogPane(), "#keywordSeparator", TextField.class);
 
         interact(() -> {
             mode.setValue(BibDatabaseMode.BIBLATEX);
