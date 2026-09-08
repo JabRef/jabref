@@ -47,23 +47,30 @@ public class LibraryPropertiesViewModel {
 
     /// Stores every tab as one undo step.
     ///
-    /// The settings themselves are recorded as a snapshot pair rather than field by field: the
-    /// tabs write straight to the [MetaData] and there is no per-setting change to collect, while
-    /// a pair of copies describes whatever the dialog did, however many tabs took part. What the
-    /// tabs record themselves — the preamble, the string constants, the entries the keyword
-    /// separator migration rewrites — joins the same step.
+    /// The tabs write into a copy of the library's settings, and the step installs that copy. Two
+    /// things follow from the copy. The dialog reaches the library through one door — the change
+    /// record — instead of through a dozen setters, so the library sees one change, correctly
+    /// described as journalled, rather than one event per setting that nothing can attribute. And
+    /// the settings are recorded as the pair of states they went between, which is the only shape
+    /// available: seven tabs write straight into the metadata, so there is no per-setting change
+    /// to collect.
+    ///
+    /// What the tabs record themselves — the preamble, the string constants, the entries the
+    /// keyword separator migration rewrites — joins the same step, since those are not settings
+    /// and the block collects whatever is recorded inside it.
     // [impl->req~logic.undo.library-settings-recorded~1]
     public void storeAllSettings() {
         MetaData before = MetaData.copyOf(databaseContext.getMetaData());
+        MetaData edited = MetaData.copyOf(databaseContext.getMetaData());
         undoManager.addEdit(Localization.lang("Change library settings"), edit -> {
             for (PropertiesTab propertiesTab : propertiesTabs) {
-                propertiesTab.storeSettings();
+                propertiesTab.storeSettings(edited);
             }
-            // Last, so that undoing puts the settings back before the changes the tabs recorded
-            // are reverted on top of them. Nothing is recorded when the dialog is accepted
-            // without a setting having been touched.
-            if (!before.equals(databaseContext.getMetaData())) {
-                edit.addEdit(new UndoableMetaDataChange(databaseContext, before, databaseContext.getMetaData()));
+            // Applied through the record rather than written first and described afterwards, so
+            // that the one write the library sees is the one the journal can take back. Nothing
+            // is recorded, and nothing is written, when no setting was touched.
+            if (!before.equals(edited)) {
+                edit.applyEdit(new UndoableMetaDataChange(databaseContext, before, edited));
             }
         });
     }

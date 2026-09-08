@@ -7,14 +7,21 @@ import org.jabref.model.metadata.MetaData;
 public class MetaDataChangedEvent extends BibDatabaseContextChangedEvent {
 
     private final MetaData metaData;
+    private final MetaDataChangeSource source;
 
     /// @param metaData Affected instance
-    public MetaDataChangedEvent(MetaData metaData) {
+    /// @param source   who is behind the change — see [MetaDataChangeSource]
+    public MetaDataChangedEvent(MetaData metaData, MetaDataChangeSource source) {
         super();
         this.metaData = metaData;
+        this.source = source;
     }
 
     public MetaData getMetaData() {
         return this.metaData;
+    }
+
+    public MetaDataChangeSource getSource() {
+        return this.source;
     }
 }

@@ -96,7 +96,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void storeSettings() {
+    public void storeSettings(MetaData metaData) {
         metaData.setEncoding(selectedEncodingProperty.getValue());
         metaData.setMode(selectedDatabaseModeProperty.getValue());
 
@@ -144,7 +144,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         }
         KeywordSeparatorMigration.migrateEntryFields(databaseContext, previousEffectiveSeparator, newEffectiveSeparator)
                                  .forEach(fieldChange -> undoManager.addEdit(new UndoableFieldChange(fieldChange)));
-        KeywordSeparatorMigration.migrateGroupSeparators(databaseContext, newEffectiveSeparator);
+        KeywordSeparatorMigration.migrateGroupSeparators(metaData, newEffectiveSeparator);
     }
 
     ValidationStatus librarySpecificFileDirectoryStatus() {

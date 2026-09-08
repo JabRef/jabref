@@ -64,7 +64,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void storeSettings() {
+    public void storeSettings(MetaData metaData) {
         List<Field> metaDataFields = metaData.getContentSelectors().getFieldsWithSelectors();
         List<Field> fieldNamesToRemove;
 

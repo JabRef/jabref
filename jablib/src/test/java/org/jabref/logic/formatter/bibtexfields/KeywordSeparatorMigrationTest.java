@@ -37,7 +37,7 @@ class KeywordSeparatorMigrationTest {
                 .stream()
                 .map(UndoableFieldChange::new)
                 .toList();
-        KeywordSeparatorMigration.migrateGroupSeparators(databaseContext, ';');
+        KeywordSeparatorMigration.migrateGroupSeparators(databaseContext.getMetaData(), ';');
 
         assertEquals("topic; subtopic", entry.getField(StandardField.KEYWORDS).orElseThrow());
         assertEquals("library; selected", entry.getField(StandardField.GROUPS).orElseThrow());
@@ -46,7 +46,7 @@ class KeywordSeparatorMigrationTest {
         assertEquals(new AutomaticKeywordGroup("automatic", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ';', '/'), root.getChildren().get(2).getGroup());
 
         fieldChanges.reversed().forEach(change -> change.inverted().apply());
-        KeywordSeparatorMigration.migrateGroupSeparators(databaseContext, ',');
+        KeywordSeparatorMigration.migrateGroupSeparators(databaseContext.getMetaData(), ',');
 
         assertEquals("topic, subtopic", entry.getField(StandardField.KEYWORDS).orElseThrow());
         assertEquals("library, selected", entry.getField(StandardField.GROUPS).orElseThrow());

@@ -75,7 +75,7 @@ class ConstantsPropertiesViewModelTest {
         ListProperty<ConstantsItemModel> stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("KTH", "Royal Institute of Technology"));
 
-        model.storeSettings();
+        model.storeSettings(context.getMetaData());
 
         List<BibtexString> actual = context.getDatabase().getStringValues().stream().toList();
         assertEquals(List.of(new BibtexString("KTH", "Royal Institute of Technology")), actual);

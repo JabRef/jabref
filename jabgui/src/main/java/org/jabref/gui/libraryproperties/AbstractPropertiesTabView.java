@@ -5,6 +5,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.metadata.MetaData;
 
 import jakarta.inject.Inject;
 
@@ -26,8 +27,8 @@ public abstract class AbstractPropertiesTabView<T extends PropertiesTabViewModel
     }
 
     @Override
-    public void storeSettings() {
-        viewModel.storeSettings();
+    public void storeSettings(MetaData metaData) {
+        viewModel.storeSettings(metaData);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +33,11 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.undo.CompoundEdit;
 
+import com.google.common.eventbus.Subscribe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -161,6 +165,30 @@ class GroupTreeViewModelTest {
         groupTree.sortAlphabeticallyRecursive(databaseContext.getMetaData().getGroups().orElseThrow());
 
         assertFalse(journal.canUndo(), "sorting an already sorted group became an undo step");
+    }
+
+    /// A group operation writes its tree back and records a step for it, so the library is told
+    /// the journal is behind the write. Were it told nothing, the tab would mark the library and
+    /// undoing the operation would leave the marker set.
+    @Test
+    void aRecordedGroupOperationSaysTheJournalIsBehindIt() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        databaseContext.getMetaData().setGroups(root);
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        List<MetaDataChangedEvent> events = new ArrayList<>();
+        databaseContext.getMetaData().registerListener(new Object() {
+            @Subscribe
+            public void listen(MetaDataChangedEvent event) {
+                events.add(event);
+            }
+        });
+
+        groupTree.sortAlphabeticallyRecursive(databaseContext.getMetaData().getGroups().orElseThrow());
+
+        assertEquals(List.of(MetaDataChangeSource.JOURNAL),
+                events.stream().map(MetaDataChangedEvent::getSource).distinct().toList());
     }
 
     private List<String> childNames() {

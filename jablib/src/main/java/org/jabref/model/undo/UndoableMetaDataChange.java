@@ -2,6 +2,7 @@ package org.jabref.model.undo;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -23,7 +24,7 @@ public record UndoableMetaDataChange(BibDatabaseContext databaseContext, MetaDat
 
     @Override
     public ApplyResult apply() {
-        databaseContext.getMetaData().overwriteWith(after);
+        databaseContext.getMetaData().overwriteWith(after, MetaDataChangeSource.JOURNAL);
         return ApplyResult.SUCCESS;
     }
 }

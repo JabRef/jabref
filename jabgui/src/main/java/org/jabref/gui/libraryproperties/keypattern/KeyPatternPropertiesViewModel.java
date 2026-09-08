@@ -12,6 +12,7 @@ import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.metadata.MetaData;
 
 public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
 
@@ -36,7 +37,7 @@ public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void storeSettings() {
+    public void storeSettings(MetaData metaData) {
         DatabaseCitationKeyPatterns newKeyPattern = new DatabaseCitationKeyPatterns(preferences.getCitationKeyPatternPreferences().getKeyPatterns());
 
         patternListProperty.forEach(item -> {
@@ -54,7 +55,7 @@ public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());
         }
 
-        databaseContext.getMetaData().setCiteKeyPattern(newKeyPattern);
+        metaData.setCiteKeyPattern(newKeyPattern);
     }
 
     public ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty() {

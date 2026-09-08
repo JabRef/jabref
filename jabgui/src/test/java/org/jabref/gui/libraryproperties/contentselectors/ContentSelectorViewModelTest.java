@@ -123,7 +123,7 @@ class ContentSelectorViewModelTest {
         addField(testField);
         addKeyword(testField, "test1");
         addKeyword(testField, "test2");
-        viewModel.storeSettings();
+        viewModel.storeSettings(databaseContext.getMetaData());
 
         List<String> result = databaseContext.getMetaData()
                                              .getContentSelectorValuesForField(testField);

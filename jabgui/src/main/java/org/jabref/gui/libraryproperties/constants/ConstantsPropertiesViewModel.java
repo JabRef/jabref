@@ -24,6 +24,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.undo.UndoableReplaceStrings;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -91,7 +92,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void storeSettings() {
+    public void storeSettings(MetaData metaData) {
         List<BibtexString> strings = stringsListProperty.stream()
                                                         .map(this::fromBibtexStringViewModel)
                                                         .toList();

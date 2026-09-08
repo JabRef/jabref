@@ -38,7 +38,7 @@ class GitPropertiesViewModelTest {
         viewModel.autoCommitProperty().setValue(true);
         viewModel.autoPushProperty().setValue(true);
 
-        viewModel.storeSettings();
+        viewModel.storeSettings(metaData);
 
         assertTrue(metaData.isGitAutoCommit());
         assertTrue(metaData.isGitAutoPush());

@@ -109,9 +109,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void storeSettings() {
-        MetaData metaData = databaseContext.getMetaData();
-
+    public void storeSettings(MetaData metaData) {
         if (libraryProtectedProperty.getValue()) {
             metaData.markAsProtected();
         } else {

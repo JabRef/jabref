@@ -35,7 +35,7 @@ class GeneralPropertiesViewModelTest {
         GeneralPropertiesViewModel viewModel = new GeneralPropertiesViewModel(databaseContext, mock(DialogService.class), preferences, mock(UndoManager.class));
 
         viewModel.setValues();
-        viewModel.storeSettings();
+        viewModel.storeSettings(databaseContext.getMetaData());
 
         assertEquals("", viewModel.keywordSeparatorProperty().get());
         assertEquals(Optional.empty(), databaseContext.getMetaData().getKeywordSeparator());
@@ -58,7 +58,7 @@ class GeneralPropertiesViewModelTest {
 
         viewModel.setValues();
         viewModel.keywordSeparatorProperty().set(";");
-        viewModel.storeSettings();
+        viewModel.storeSettings(databaseContext.getMetaData());
 
         assertEquals(Optional.of(';'), databaseContext.getMetaData().getKeywordSeparator());
         assertEquals(Optional.of("topic; subtopic"), entry.getField(StandardField.KEYWORDS));

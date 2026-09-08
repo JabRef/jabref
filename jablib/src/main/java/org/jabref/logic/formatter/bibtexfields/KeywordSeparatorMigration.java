@@ -12,6 +12,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -37,8 +38,8 @@ public final class KeywordSeparatorMigration {
     /// Records nothing: the nodes are edited in place, and a record holding them would be undone
     /// silently once a later group operation installed a fresh tree. The caller records the tree,
     /// or the metadata holding it, as a whole.
-    public static void migrateGroupSeparators(BibDatabaseContext databaseContext, Character newSeparator) {
-        databaseContext.getMetaData().getGroups().ifPresent(root -> root.iterateOverTree().forEach(node -> {
+    public static void migrateGroupSeparators(MetaData metaData, Character newSeparator) {
+        metaData.getGroups().ifPresent(root -> root.iterateOverTree().forEach(node -> {
             AbstractGroup previousGroup = node.getGroup();
             AbstractGroup newGroup = withKeywordSeparator(previousGroup, newSeparator);
             if (previousGroup != newGroup) {
