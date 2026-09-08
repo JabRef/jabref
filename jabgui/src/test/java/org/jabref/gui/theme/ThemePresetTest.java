@@ -36,7 +36,7 @@ class ThemePresetTest {
     @Test
     void communityConstantsMatchTheBundledFiles() throws IOException, URISyntaxException {
         URL communityDirectory = ThemePreset.class.getResource(COMMUNITY_DIRECTORY);
-        assertNotNull(communityDirectory, "No community themes bundled -- is the themes.jabref.org submodule checked out?");
+        assertNotNull(communityDirectory, "No community themes bundled, although processResources refuses to run without them");
 
         Set<String> bundled = new TreeSet<>();
         try (Stream<Path> files = Files.list(Path.of(communityDirectory.toURI()))) {

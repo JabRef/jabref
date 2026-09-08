@@ -145,6 +145,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.remoteListenerServerManager = remoteListenerServerManager;
         this.stateManager = stateManager;
 
+        // Registered once: setValues() runs again on every import or reset of the preferences.
+        selectedThemeColorSchemeProperty.addListener(_ -> relabelThemes());
+
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
                 _ -> {
@@ -216,7 +219,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         selectedThemeProperty.setValue(workspacePreferences.getTheme());
         selectedThemeColorSchemeProperty.setValue(workspacePreferences.getColorScheme());
-        selectedThemeColorSchemeProperty.addListener(_ -> relabelThemes());
         customThemeEnabled.setValue(workspacePreferences.getCustomTheme().isPresent());
         customPathToThemeProperty.setValue(workspacePreferences.getCustomTheme().map(StyleSheet::getName).orElse(""));
 
@@ -400,13 +402,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return this.selectedLanguageProperty;
     }
 
-    /// Paired themes are named after the hue of the current color scheme; the combo box only re-reads
-    /// the names when its items or value change, so both are reset.
+    /// Paired themes are named after the hue of the current color scheme, and the combo box re-reads the
+    /// names of its entries when the item list changes. The selection is left alone: its own cell is
+    /// refreshed by the view, so that the theme never passes through an invalid null in between.
     private void relabelThemes() {
-        ThemePreset selected = selectedThemeProperty.get();
         themesListProperty.setAll(ThemePreset.values());
-        selectedThemeProperty.set(null);
-        selectedThemeProperty.set(selected);
     }
 
     public ReadOnlyListProperty<ThemePreset> themesListProperty() {

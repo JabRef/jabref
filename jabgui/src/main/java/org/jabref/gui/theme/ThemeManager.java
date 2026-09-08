@@ -55,6 +55,7 @@ public class ThemeManager {
 
     private final FileUpdateListener baseCssLiveUpdate = () -> cssLiveUpdate(JABREF_BASE_STYLE_SHEET);
     private @Nullable FileUpdateListener themeCssLiveUpdate;
+    private @Nullable FileUpdateListener parentCssLiveUpdate;
     private @Nullable FileUpdateListener customCssLiveUpdate;
 
     private ThemePreset theme = ThemePreset.JABREF;
@@ -167,10 +168,7 @@ public class ThemeManager {
 
         boolean cssChanged = false;
         if (theme != newTheme) {
-            if (themeCssLiveUpdate != null) {
-                removeStylesheetFromWatchList(theme.getStyleSheet(), themeCssLiveUpdate);
-            }
-
+            removeThemeStylesheetsFromWatchList(theme);
             addThemeStylesheetToWatchlist(newTheme);
 
             cssChanged = true;
@@ -250,6 +248,25 @@ public class ThemeManager {
         StyleSheet themeStyleSheet = theme.getStyleSheet();
         themeCssLiveUpdate = () -> cssLiveUpdate(themeStyleSheet);
         addStylesheetToWatchlist(themeStyleSheet, themeCssLiveUpdate);
+
+        // The parent supplies every token the theme itself does not declare, so an edit there changes
+        // the look just as much as one in the selected theme.
+        theme.getParent().ifPresent(parent -> {
+            StyleSheet parentStyleSheet = parent.getStyleSheet();
+            parentCssLiveUpdate = () -> cssLiveUpdate(parentStyleSheet);
+            addStylesheetToWatchlist(parentStyleSheet, parentCssLiveUpdate);
+        });
+    }
+
+    private void removeThemeStylesheetsFromWatchList(ThemePreset theme) {
+        if (themeCssLiveUpdate != null) {
+            removeStylesheetFromWatchList(theme.getStyleSheet(), themeCssLiveUpdate);
+            themeCssLiveUpdate = null;
+        }
+        if (parentCssLiveUpdate != null) {
+            theme.getParent().ifPresent(parent -> removeStylesheetFromWatchList(parent.getStyleSheet(), parentCssLiveUpdate));
+            parentCssLiveUpdate = null;
+        }
     }
 
     private void cssLiveUpdate(StyleSheet styleSheet) {
