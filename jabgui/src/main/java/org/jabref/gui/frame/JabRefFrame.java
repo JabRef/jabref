@@ -60,8 +60,8 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.shared.DatabaseConnectionProperties;
-import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.SharedDatabaseSessionService;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
@@ -608,12 +608,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     /// happened through the placeholder's retry or through the connection dialog. Leaving it behind would remember
     /// the same database twice at quit and reconnect it twice on the next start.
     private void removeSharedDatabaseErrorTabFor(BibDatabaseContext databaseContext) {
-        if (databaseContext.getLocation() != DatabaseLocation.SHARED) {
-            return;
-        }
-        DatabaseConnectionProperties connectionProperties = databaseContext.getDBMSSynchronizer().getConnectionProperties();
-        tabbedPane.getTabs().removeIf(tab -> (tab instanceof SharedDatabaseErrorTab errorTab)
-                && errorTab.getConnectionProperties().equals(connectionProperties));
+        // Only a shared database carries a synchronizer, so its absence already rules out a matching placeholder.
+        Optional.ofNullable(databaseContext.getDBMSSynchronizer())
+                .map(DatabaseSynchronizer::getConnectionProperties)
+                .ifPresent(connectionProperties -> tabbedPane.getTabs().removeIf(
+                        tab -> (tab instanceof SharedDatabaseErrorTab errorTab)
+                                && errorTab.getConnectionProperties().equals(connectionProperties)));
     }
 
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
@@ -753,6 +753,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                           if (isAttemptAbandoned(errorTab)) {
                               return;
                           }
+                          // The tab alone is easy to miss among the libraries that did open, so the failure is announced as well.
+                          dialogService.notify(Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()));
                           SharedDatabaseErrorTab tab = errorTab;
                           if (tab == null) {
                               tab = new SharedDatabaseErrorTab(sharedDatabaseId, reconnection.connectionProperties());

@@ -26,6 +26,9 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class SharedDatabaseErrorTab extends Tab {
 
+    /// Identifies the label carrying the connection error, for lookups in tests.
+    static final String MESSAGE_ID = "shared-database-error-message";
+
     private final String sharedDatabaseId;
     private final DBMSConnectionProperties connectionProperties;
     private final Label message = new Label();
@@ -42,6 +45,7 @@ public class SharedDatabaseErrorTab extends Tab {
         setText(databaseName);
         setGraphic(IconTheme.JabRefIcons.ERROR.getGraphicNode());
 
+        message.setId(MESSAGE_ID);
         message.setWrapText(true);
         message.setMaxWidth(600);
         message.setTextAlignment(TextAlignment.CENTER);

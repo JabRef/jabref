@@ -39,7 +39,7 @@ class SharedDatabaseErrorTabTest extends ApplicationTest {
     }
 
     private Label message() {
-        return (Label) tab.getContent().lookupAll(".label").stream().skip(1).findFirst().orElseThrow();
+        return (Label) tab.getContent().lookup("#" + SharedDatabaseErrorTab.MESSAGE_ID);
     }
 
     @Test
