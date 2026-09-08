@@ -13,7 +13,7 @@
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView"
             prefHeight="500.0" prefWidth="800.0"
-            styleClass="multi-merge-entries">
+            id="multiMergeEntries" styleClass="multi-merge-entries">
 
     <content>
         <VBox spacing="12">

@@ -10,7 +10,7 @@
 <DialogPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.jabref.gui.texparser.ParseLatexResultView"
             prefWidth="900.0" prefHeight="600.0"
-            styleClass="parse-latex-result-dialog">
+            id="parseLatexResultDialog" styleClass="parse-latex-result-dialog">
     <content>
         <SplitPane dividerPositions="0.2">
             <ListView fx:id="referenceListView" prefWidth="200.0"/>
