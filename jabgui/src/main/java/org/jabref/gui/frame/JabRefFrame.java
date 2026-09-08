@@ -394,6 +394,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                             event.consume();
                         }
                         break;
+                    case JUMP_TO_FIELD:
+                        // Handled here so that it also fires when the keyboard focus is outside the entry editor
+                        if (!stateManager.getSelectedEntries().isEmpty()) {
+                            // Jumping to a field is only meaningful with a visible editor, so open it if it is closed
+                            stateManager.getEditorShowing().set(true);
+                            entryEditor.openJumpToFieldDialog();
+                            event.consume();
+                        }
+                        break;
                     case CLOSE_DATABASE:
                         new CloseDatabaseAction(this, stateManager).execute();
                         event.consume();
