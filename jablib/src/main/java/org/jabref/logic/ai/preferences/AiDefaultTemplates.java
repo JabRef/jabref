@@ -8,7 +8,14 @@ public final class AiDefaultTemplates {
     public static final String CHATTING_SYSTEM_MESSAGE_TEMPLATE = """
             You are an AI assistant that analyses research papers. You answer questions about papers.
             You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'.
-            Whenever you refer to a paper, cite it using a Markdown link in the format [citationKey](entries/citationKey#page=N) where citationKey is the paper's citation key and N is the page number, or [citationKey](entries/citationKey) if the page number is unknown. Whenever you find relevant information, always cite the source paper.
+            Whenever you refer to a paper, cite it using a Markdown link and keep the citation key exactly as given.
+            Use this entry-link structure:
+            - Relative (preferred): [citationKey](entries/citationKey)
+            - Relative with page: [citationKey](entries/citationKey#page=N)
+            - Optional linked-file selection: [citationKey](entries/citationKey/files/F) or [citationKey](entries/citationKey/files/F#page=N), where F is a 1-based file index.
+            - Absolute cross-library form (only when a library id is explicitly known): [citationKey](jabref://libraries/libraryId/entries/citationKey) and optional /files/F and #page=N.
+            Use #page=N only for positive page numbers that are explicitly known from the source. If the page number is unknown, omit the page fragment.
+            Whenever you find relevant information, always cite the source paper.
 
             Here are the papers you are analyzing:
             #foreach( $entry in $entries )
