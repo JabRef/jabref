@@ -145,6 +145,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.remoteListenerServerManager = remoteListenerServerManager;
         this.stateManager = stateManager;
 
+        // Registered once: setValues() runs again on every import or reset of the preferences.
+        selectedThemeColorSchemeProperty.addListener(_ -> relabelThemes());
+
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
                 _ -> {
@@ -216,7 +219,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         selectedThemeProperty.setValue(workspacePreferences.getTheme());
         selectedThemeColorSchemeProperty.setValue(workspacePreferences.getColorScheme());
-        selectedThemeColorSchemeProperty.addListener(_ -> relabelThemes());
         customThemeEnabled.setValue(workspacePreferences.getCustomTheme().isPresent());
         customPathToThemeProperty.setValue(workspacePreferences.getCustomTheme().map(StyleSheet::getName).orElse(""));
 

@@ -48,13 +48,14 @@ public class ThemeDialogViewModel extends AbstractViewModel {
         this.workspacePreferences = preferences.getWorkspacePreferences();
         this.dialogService = dialogService;
 
+        selectedThemeColorSchemeProperty.addListener(_ -> relabelThemes());
+
         initializeFromCurrentTheme();
     }
 
     private void initializeFromCurrentTheme() {
         selectedThemeProperty.set(workspacePreferences.getTheme());
         selectedThemeColorSchemeProperty.set(workspacePreferences.getColorScheme());
-        selectedThemeColorSchemeProperty.addListener(_ -> relabelThemes());
         customThemeEnabled.setValue(workspacePreferences.getCustomTheme().isPresent());
         customPathToThemeProperty.setValue(workspacePreferences.getCustomTheme().map(StyleSheet::getName).orElse(""));
     }
