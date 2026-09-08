@@ -28,6 +28,13 @@ When the autosave manager is shut down, its periodic task must stop and pending 
 
 Needs: impl, utest
 
+## Backup resolution focuses the associated library tab
+`req~jabgui.autosaveandbackup.focus-backup-library-tab~1`
+
+When a backup is found and the restore or review backup dialog is shown, the tab for the library associated with the backup must be focused and shown to the user. When backup changes are reviewed and applied, the modification state must be updated on that specific library tab rather than whichever tab was previously active.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
 
 ## Keyword delimiter normalization is a cleanup

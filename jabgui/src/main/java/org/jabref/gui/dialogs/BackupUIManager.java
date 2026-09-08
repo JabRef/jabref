@@ -9,6 +9,7 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupResolverDialog;
@@ -29,17 +30,21 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Stores all user dialogs related to [BackupManager].
+@NullMarked
 public class BackupUIManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
 
     private BackupUIManager() {
     }
 
+    // [impl->req~jabgui.autosaveandbackup.focus-backup-library-tab~1]
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
+                                                                 LibraryTabContainer tabContainer,
                                                                  Path originalPath,
                                                                  GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
@@ -47,6 +52,7 @@ public class BackupUIManager {
                                                                  StateManager stateManager) {
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
+                tabContainer,
                 preferences.getExternalApplicationsPreferences(),
                 originalPath,
                 preferences.getFilePreferences().getBackupDirectory());
@@ -79,22 +85,39 @@ public class BackupUIManager {
                 }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
             }
             return Optional.empty();
         });
     }
 
     private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService,
+                                                                 LibraryTabContainer tabContainer,
                                                                  ExternalApplicationsPreferences externalApplicationsPreferences,
                                                                  Path originalPath,
                                                                  Path backupDir) {
-        return UiTaskExecutor.runInJavaFXThread(
-                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences)));
+        return UiTaskExecutor.runInJavaFXThread(() -> {
+            findLibraryTabForPath(tabContainer, originalPath).ifPresent(tabContainer::showLibraryTab);
+            return dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences));
+        });
+    }
+
+    private static Optional<LibraryTab> findLibraryTabForPath(LibraryTabContainer tabContainer, Path originalPath) {
+        if (tabContainer.getLibraryTabs() == null) {
+            return Optional.empty();
+        }
+        return tabContainer.getLibraryTabs().stream()
+                           .filter(tab -> tab.getBibDatabaseContext() != null
+                                          && tab.getBibDatabaseContext().getDatabasePath() != null
+                                          && tab.getBibDatabaseContext().getDatabasePath()
+                                                .map(Path::toAbsolutePath)
+                                                .equals(Optional.of(originalPath.toAbsolutePath())))
+                           .findFirst();
     }
 
     private static Optional<ParserResult> showReviewBackupDialog(
             DialogService dialogService,
+            LibraryTabContainer tabContainer,
             Path originalPath,
             GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
@@ -114,6 +137,9 @@ public class BackupUIManager {
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager);
 
             return UiTaskExecutor.runInJavaFXThread(() -> {
+                Optional<LibraryTab> targetTabOpt = findLibraryTabForPath(tabContainer, originalPath);
+                targetTabOpt.ifPresent(tabContainer::showLibraryTab);
+
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
@@ -122,22 +148,21 @@ public class BackupUIManager {
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.orElse(false)) {
                     List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
-                    LibraryTab saveState = stateManager.activeTabProperty().get().get();
                     undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
                             resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
-                        saveState.resetChangeMonitor();
+                        targetTabOpt.ifPresent(LibraryTab::resetChangeMonitor);
                     } else {
                         // In case any change of the backup is accepted, this means, the in-memory file differs from the file on disk (which is not the backup file)
-                        saveState.markBaseChanged();
+                        targetTabOpt.ifPresent(LibraryTab::markBaseChanged);
                     }
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
                     return Optional.of(originalParserResult);
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);
@@ -145,3 +170,4 @@ public class BackupUIManager {
         }
     }
 }
+

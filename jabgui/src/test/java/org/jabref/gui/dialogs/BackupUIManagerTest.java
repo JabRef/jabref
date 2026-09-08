@@ -7,7 +7,11 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -17,6 +21,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.controlsfx.control.HyperlinkLabel;
@@ -62,8 +67,12 @@ class BackupUIManagerTest extends ApplicationTest {
         Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
         Files.writeString(backupFile, "@article{backup}");
 
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList());
+
         interact(() -> BackupUIManager.showRestoreBackupDialog(
                 dialogService,
+                tabContainer,
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
@@ -98,4 +107,40 @@ class BackupUIManagerTest extends ApplicationTest {
 
                 Do you want to recover the library from the backup file?""".formatted(backupFile.getFileName()), dialogContent.get());
     }
+
+    @Test
+    void showRestoreBackupDialogFocusesAssociatedLibraryTab(@TempDir Path tempDir) {
+        // [utest->req~jabgui.autosaveandbackup.focus-backup-library-tab~1]
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.IGNORE_BACKUP));
+
+        Path originalFile = tempDir.resolve("library.bib");
+
+        LibraryTab targetTab = mock(LibraryTab.class);
+        BibDatabaseContext context = mock(BibDatabaseContext.class);
+        when(targetTab.getBibDatabaseContext()).thenReturn(context);
+        when(context.getDatabasePath()).thenReturn(Optional.of(originalFile));
+
+        LibraryTab otherTab = mock(LibraryTab.class);
+        BibDatabaseContext otherContext = mock(BibDatabaseContext.class);
+        when(otherTab.getBibDatabaseContext()).thenReturn(otherContext);
+        when(otherContext.getDatabasePath()).thenReturn(Optional.of(tempDir.resolve("other.bib")));
+
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(otherTab, targetTab));
+
+        interact(() -> BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                tabContainer,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                mock(UndoManager.class),
+                mock(StateManager.class)));
+
+        verify(tabContainer).showLibraryTab(targetTab);
+    }
 }
+
