@@ -145,15 +145,18 @@ class SynchronizationSimulatorTest {
 
     @Test
     void simulateLiveSubgroupAdditionPropagation() throws Exception {
+        // A root without children is not serialized at all, so the initial tree needs one group
         GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
-        clientContextA.getMetaData().setGroups(rootOfClientA);
-        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
-
-        // client A adds a subgroup to the existing tree; the group panel writes the (same) root back
         rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
         clientContextA.getMetaData().setGroups(rootOfClientA);
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
 
-        waitUntil(() -> clientContextB.getMetaData().getGroups().map(root -> root.getNumberOfChildren() == 1).orElse(false));
+        // client A adds a subgroup to the existing tree; the group panel writes the (same) root back
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group B", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().map(root -> root.getNumberOfChildren() == 2).orElse(false));
         assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
     }
 
