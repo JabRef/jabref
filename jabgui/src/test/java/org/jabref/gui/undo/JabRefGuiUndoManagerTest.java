@@ -50,15 +50,15 @@ class JabRefGuiUndoManagerTest {
         assertFalse(undoManager.hasChangedProperty().get());
 
         undoManager.addEdit(setAuthor("Bohr"));
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
         assertTrue(undoManager.hasChangedProperty().get());
 
         undoManager.markUnchanged();
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
         assertFalse(undoManager.hasChangedProperty().get(), "saving left the marker set");
 
         undoManager.undo();
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
         assertTrue(undoManager.hasChangedProperty().get(), "undoing away from the saved position left the marker clear");
     }
 

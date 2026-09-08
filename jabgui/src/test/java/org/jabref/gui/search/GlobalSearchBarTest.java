@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -111,13 +111,16 @@ class GlobalSearchBarTest {
     /// all whenever this field has nothing to undo, which is how Ctrl+Z came to work only inside the
     /// entry editor.
     @Test
-    void theContextMenuClaimsNoGlobalShortcut(FxRobot robot) {
-        TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
+    void theContextMenuClaimsNoGlobalShortcut() {
+        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#searchField", TextInputControl.class);
+        AtomicReference<List<Boolean>> accelerators = new AtomicReference<>();
 
-        List<MenuItem> items = searchField.getContextMenu().getItems();
+        invokeAndWait(() -> accelerators.set(searchField.getContextMenu().getItems().stream()
+                                                        .map(item -> item.getAccelerator() != null)
+                                                        .toList()));
 
-        assertFalse(items.isEmpty(), "the context menu was not installed");
-        assertEquals(List.of(), items.stream().filter(item -> item.getAccelerator() != null).toList());
+        assertFalse(accelerators.get().isEmpty(), "the context menu was not installed");
+        assertEquals(List.of(), accelerators.get().stream().filter(Boolean::booleanValue).toList());
     }
 
     @Test
