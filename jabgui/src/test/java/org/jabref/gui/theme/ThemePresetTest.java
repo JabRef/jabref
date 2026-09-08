@@ -55,6 +55,13 @@ class ThemePresetTest {
         assertEquals(bundled, listed, "ThemePreset does not list exactly the bundled community themes");
     }
 
+    /// The stored color scheme can be absent, and the preferences read that as "follow system".
+    @Test
+    void unsetColorSchemeNamesAThemeAsFollowSystemDoes() {
+        assertEquals(ThemePreset.DINOGIRLS_WINERED.getLocalizedName(ThemeColorScheme.FOLLOW_SYSTEM),
+                ThemePreset.DINOGIRLS_WINERED.getLocalizedName(null));
+    }
+
     @ParameterizedTest
     @EnumSource(ThemePreset.class)
     void everyThemeHasAPreviewPerColorScheme(ThemePreset theme) {

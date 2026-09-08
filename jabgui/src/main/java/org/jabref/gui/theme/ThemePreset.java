@@ -1,6 +1,7 @@
 package org.jabref.gui.theme;
 
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
@@ -87,8 +88,10 @@ public enum ThemePreset {
 
     /// The name matching the color scheme the user would see the theme in; when following the system,
     /// both hues are shown as "dark / light".
-    public String getLocalizedName(ThemeColorScheme colorScheme) {
-        return switch (colorScheme) {
+    ///
+    /// @param colorScheme the scheme the theme is shown in; an unset one is read as [ThemeColorScheme#FOLLOW_SYSTEM], as everywhere else
+    public String getLocalizedName(@Nullable ThemeColorScheme colorScheme) {
+        return switch (Objects.requireNonNullElse(colorScheme, ThemeColorScheme.FOLLOW_SYSTEM)) {
             case DARK ->
                     darkName;
             case LIGHT ->
