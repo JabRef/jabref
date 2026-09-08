@@ -8,7 +8,7 @@
 <DialogPane prefHeight="500.0" prefWidth="1080.0"
             xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.60"
             fx:controller="org.jabref.gui.errorconsole.ErrorConsoleView"
-            id="errorConsole">
+            styleClass="error-console">
     <content>
         <ListView fx:id="messagesListView" onKeyPressed="#copySelectedLogEntries" styleClass="padding-0"
                   BorderPane.alignment="CENTER"/>

@@ -142,7 +142,7 @@ public class GroupTreeView extends BorderPane {
     private void createNodes() {
         searchField = SearchTextField.create(keyBindingRepository, IconTheme.JabRefIcons.FILTER);
         searchField.setPromptText(Localization.lang("Filter groups..."));
-        searchField.setId("groupFilterBar");
+        searchField.getStyleClass().add("group-filter-bar");
         this.setTop(searchField);
 
         mainColumn = new TreeTableColumn<>();
@@ -169,7 +169,7 @@ public class GroupTreeView extends BorderPane {
         addSubgroupColumn.setResizable(false);
 
         groupTree = new TreeTableView<>();
-        groupTree.setId("groupTree");
+        groupTree.getStyleClass().add("group-tree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, addSubgroupColumn, expansionNodeColumn));
         groupTree.setOnKeyPressed(event -> {
@@ -195,7 +195,7 @@ public class GroupTreeView extends BorderPane {
         addNewGroup.setOnAction(event -> addNewGroup());
 
         HBox groupBar = new HBox(addNewGroup);
-        groupBar.setId("groupBar");
+        groupBar.getStyleClass().add("group-bar");
         this.setBottom(groupBar);
     }
 

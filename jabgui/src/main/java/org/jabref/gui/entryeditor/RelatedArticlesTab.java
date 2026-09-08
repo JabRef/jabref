@@ -71,7 +71,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     /// @return A StackPane with related article information to be displayed in the Related Articles tab.
     private StackPane getRelatedArticlesPane(BibEntry entry) {
         StackPane root = new StackPane();
-        root.setId("related-articles-tab");
+        root.getStyleClass().add("related-articles-tab");
         root.getStyleClass().add("padding-4");
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
@@ -177,7 +177,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     /// @return StackPane returned to be placed into Related Articles tab.
     private ScrollPane getPrivacyDialog(BibEntry entry) {
         ScrollPane root = new ScrollPane();
-        root.setId("related-articles-tab");
+        root.getStyleClass().add("related-articles-tab");
         root.getStyleClass().add("padding-4");
         VBox vbox = new VBox(4);
         vbox.getStyleClass().addAll("gdpr-notice", "h4", "padding-4");

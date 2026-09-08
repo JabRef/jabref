@@ -14,7 +14,7 @@
 <fx:root type="BorderPane"
          xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.entryeditor.EntryEditor" minHeight="50"
-         id="entryEditor">
+         styleClass="entry-editor">
     <left>
         <ToolBar orientation="VERTICAL">
             <Button styleClass="icon-button,narrow" onAction="#close">
@@ -27,7 +27,7 @@
             </Button>
             <Pane prefHeight="10" VBox.vgrow="ALWAYS"/>
             <Group>
-                <Label fx:id="typeLabel" rotate="270" styleClass="h5,padding-4">
+                <Label fx:id="typeLabel" rotate="270" styleClass="entry-type-label,h5,padding-4">
                     <tooltip>
                         <Tooltip text="%Change entry type"/>
                     </tooltip>

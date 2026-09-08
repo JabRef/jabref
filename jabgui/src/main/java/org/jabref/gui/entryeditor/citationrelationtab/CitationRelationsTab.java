@@ -180,7 +180,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         column.setHalignment(HPos.CENTER);
 
         sciteResultsPane.getColumnConstraints().setAll(column);
-        sciteResultsPane.setId("scitePane");
+        sciteResultsPane.getStyleClass().add("scite-pane");
         setContent(sciteResultsPane);
 
         EasyBind.subscribe(citationsRelationsTabViewModel.statusProperty(), status -> {
