@@ -23,17 +23,17 @@ class WalkthroughNodeIdsTest {
     /// Each id and the file that declares it on a node.
     private static Stream<Object[]> declarations() {
         return Map.of(
-                WalkthroughNodeIds.COLUMNS_LIST, "java/org/jabref/gui/preferences/table/TableTab.java",
-                WalkthroughNodeIds.MAIN_FILE_DIRECTORY_RADIO, "java/org/jabref/gui/preferences/linkedfiles/LinkedFilesTab.java",
-                WalkthroughNodeIds.LINKED_FILE_BROWSE, "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
-                WalkthroughNodeIds.LINKED_FILE_DESCRIPTION, "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
-                WalkthroughNodeIds.LINKED_FILE_TYPE, "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
-                WalkthroughNodeIds.LINKED_FILE_SOURCE_URL, "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
-                WalkthroughNodeIds.GROUP_NAME, "resources/org/jabref/gui/groups/GroupDialog.fxml",
-                WalkthroughNodeIds.GROUP_DESCRIPTION, "resources/org/jabref/gui/groups/GroupDialog.fxml",
-                WalkthroughNodeIds.GROUP_EXPLICIT_RADIO, "resources/org/jabref/gui/groups/GroupDialog.fxml")
+                          WalkthroughNodeIds.COLUMNS_LIST, "java/org/jabref/gui/preferences/table/TableTab.java",
+                          WalkthroughNodeIds.MAIN_FILE_DIRECTORY_RADIO, "java/org/jabref/gui/preferences/linkedfiles/LinkedFilesTab.java",
+                          WalkthroughNodeIds.LINKED_FILE_BROWSE, "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
+                          WalkthroughNodeIds.LINKED_FILE_DESCRIPTION, "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
+                          WalkthroughNodeIds.LINKED_FILE_TYPE, "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
+                          WalkthroughNodeIds.LINKED_FILE_SOURCE_URL, "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
+                          WalkthroughNodeIds.GROUP_NAME, "resources/org/jabref/gui/groups/GroupDialog.fxml",
+                          WalkthroughNodeIds.GROUP_DESCRIPTION, "resources/org/jabref/gui/groups/GroupDialog.fxml",
+                          WalkthroughNodeIds.GROUP_EXPLICIT_RADIO, "resources/org/jabref/gui/groups/GroupDialog.fxml")
                   .entrySet().stream()
-                  .map(entry -> new Object[]{entry.getKey(), entry.getValue()});
+                  .map(entry -> new Object[] {entry.getKey(), entry.getValue()});
     }
 
     /// FXML repeats the literal, Java sets the id from the constant — so each declaration is
@@ -44,8 +44,8 @@ class WalkthroughNodeIdsTest {
         Path file = MAIN.resolve(declaringFile);
         String content = Files.readString(file);
         String declaration = declaringFile.endsWith(".fxml")
-                ? "id=\"" + id + "\""
-                : "setId(WalkthroughNodeIds." + constantName(id) + ")";
+                             ? "id=\"" + id + "\""
+                             : "setId(WalkthroughNodeIds." + constantName(id) + ")";
         assertTrue(content.contains(declaration),
                 file + " does not contain " + declaration + ", so no node carries the walkthrough id \"" + id + "\"");
     }
