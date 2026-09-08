@@ -35,7 +35,8 @@ class KeystrokeCoalescingTest {
     private void type(StandardField field, String text) {
         for (int length = 1; length <= text.length(); length++) {
             String value = text.substring(0, length);
-            journal.applyEdit(new UndoableFieldChange(entry, field, entry.getField(field).orElse(null), value));
+            journal.applyEdit(new UndoableFieldChange(entry, field, entry.getField(field).orElse(null), value),
+                    EditSource.TYPING);
         }
     }
 
@@ -118,8 +119,10 @@ class KeystrokeCoalescingTest {
         entry.setField(StandardField.TITLE, "Relativity");
         journal.markUnchanged();
 
-        journal.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, "Relativity", "Relativit"));
-        journal.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, "Relativit", "Relativity"));
+        journal.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, "Relativity", "Relativit"),
+                EditSource.TYPING);
+        journal.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, "Relativit", "Relativity"),
+                EditSource.TYPING);
 
         assertEquals(Optional.of("Relativity"), title());
         assertFalse(journal.canUndo(), "a step that does nothing is on the stack");
@@ -159,13 +162,45 @@ class KeystrokeCoalescingTest {
         assertFalse(journal.canUndo());
     }
 
+    /// A command that writes the field the user was typing in is a user action of its own, even
+    /// though its change looks exactly like the next keystroke. Type a citation key, then generate
+    /// one: the first undo has to give back the typed key, not remove both.
+    @Test
+    void aCommandDoesNotContinueWhatWasBeingTyped() {
+        type(StandardField.KEYWORDS, "phys");
+
+        // How GenerateCitationKeySingleAction, ExtractReferencesAction and the special-field
+        // commands record: applyEdit with no source, which is EditSource.COMMAND.
+        journal.applyEdit(new UndoableFieldChange(entry, StandardField.KEYWORDS, "phys", "physics"));
+
+        journal.undo();
+        assertEquals(Optional.of("phys"), entry.getField(StandardField.KEYWORDS),
+                "the command's change was folded into what was typed");
+
+        journal.undo();
+        assertEquals(Optional.empty(), entry.getField(StandardField.KEYWORDS));
+    }
+
+    /// And the run does not resume afterwards: what is typed next starts its own step rather than
+    /// continuing across the command.
+    @Test
+    void typingAfterACommandStartsANewStep() {
+        type(StandardField.KEYWORDS, "phys");
+        journal.applyEdit(new UndoableFieldChange(entry, StandardField.KEYWORDS, "phys", "physics"));
+        type(StandardField.KEYWORDS, "physics!");
+
+        journal.undo();
+
+        assertEquals(Optional.of("physics"), entry.getField(StandardField.KEYWORDS));
+    }
+
     /// The rule is a policy, and a journal can be given a different one.
     @Test
     void withoutThePolicyEveryKeystrokeIsAStep() {
         JabRefUndoManager plain = new JabRefUndoManager(CoalescingPolicy.NONE);
 
-        plain.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, null, "R"));
-        plain.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, "R", "Re"));
+        plain.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, null, "R"), EditSource.TYPING);
+        plain.applyEdit(new UndoableFieldChange(entry, StandardField.TITLE, "R", "Re"), EditSource.TYPING);
 
         plain.undo();
 

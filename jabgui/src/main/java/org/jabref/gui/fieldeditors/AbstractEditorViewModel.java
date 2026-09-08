@@ -11,6 +11,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.integrity.ValueChecker;
+import org.jabref.logic.undo.EditSource;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
@@ -76,7 +77,8 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                         // and a change that does not match the library refuses to apply.
                         String comparable = stored.map(value -> StringUtil.unifyLineBreaks(value, "\n")).orElse(null);
                         if (!newValue.equals(comparable)) {
-                            undoManager.applyEdit(new UndoableFieldChange(entry, field, stored.orElse(null), newValue));
+                            undoManager.applyEdit(new UndoableFieldChange(entry, field, stored.orElse(null), newValue),
+                                    EditSource.TYPING);
                         }
                     }
                 });

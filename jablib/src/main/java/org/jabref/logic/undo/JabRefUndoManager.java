@@ -164,7 +164,7 @@ public class JabRefUndoManager implements UndoManager {
             return;
         }
         synchronized (this) {
-            record(change);
+            record(change, EditSource.COMMAND);
         }
         notifyListeners();
     }
@@ -191,7 +191,7 @@ public class JabRefUndoManager implements UndoManager {
     /// @return what was applied, and what was not — see [BibChange#apply]
     @Override
     // [impl->req~logic.undo.apply-and-record-atomically~1]
-    public ApplyResult applyEdit(BibChange change) {
+    public ApplyResult applyEdit(BibChange change, EditSource source) {
         CompoundEdit compound = active.get();
         if (compound != null) {
             return compound.applyEdit(change);
@@ -206,7 +206,7 @@ public class JabRefUndoManager implements UndoManager {
             // recording it would spend the next Ctrl+Z and clear the redo stack for no reason. A
             // set that applied in part is different - what it did apply has to stay undoable.
             if (result.complete() || (change instanceof ChangeSet)) {
-                record(change);
+                record(change, source);
             }
         }
         notifyListeners();
@@ -236,12 +236,13 @@ public class JabRefUndoManager implements UndoManager {
     ///
     /// Callers hold this object's monitor.
     // [impl->req~logic.undo.typing-is-one-step~1]
-    private void record(BibChange change) {
+    private void record(BibChange change, EditSource source) {
         assert Thread.holdsLock(this);
 
-        if (change instanceof ChangeSet) {
-            // A block is a whole user action, so it neither continues the step below it nor
-            // invites the next change to continue it.
+        if ((source == EditSource.COMMAND) || (change instanceof ChangeSet)) {
+            // A command is a whole user action, and so is a block: neither continues the step
+            // below it, nor invites the next change to continue it. Only typing does, which is
+            // why a command writing the field the user was typing in gets a step of its own.
             push(change);
             stepFinished = true;
             return;

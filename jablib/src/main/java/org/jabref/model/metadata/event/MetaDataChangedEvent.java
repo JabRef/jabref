@@ -3,7 +3,10 @@ package org.jabref.model.metadata.event;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.metadata.MetaData;
 
+import org.jspecify.annotations.NullMarked;
+
 /// [MetaDataChangedEvent] is fired when a tuple of metadata has been put or removed.
+@NullMarked
 public class MetaDataChangedEvent extends BibDatabaseContextChangedEvent {
 
     private final MetaData metaData;

@@ -30,10 +30,21 @@ public interface UndoManager {
     /// @return whether anything was recorded, for callers that report the outcome to the user
     boolean addEdit(String name, Consumer<CompoundEdit> mutations);
 
-    /// Performs `change` and records it in one go.
+    /// Performs `change` and records it in one go, as one user action.
     ///
     /// @return what was applied, and what was not — see [BibChange#apply]
-    ApplyResult applyEdit(BibChange change);
+    default ApplyResult applyEdit(BibChange change) {
+        return applyEdit(change, EditSource.COMMAND);
+    }
+
+    /// Performs `change` and records it in one go, saying who is recording it.
+    ///
+    /// Only [EditSource#TYPING] may continue the step on top of the stack; everything else is a
+    /// step of its own, so a command that writes the field the user was just typing in does not
+    /// join what they typed.
+    ///
+    /// @return what was applied, and what was not — see [BibChange#apply]
+    ApplyResult applyEdit(BibChange change, EditSource source);
 
     /// Ends the step being collected, so that the next change starts one of its own.
     ///
