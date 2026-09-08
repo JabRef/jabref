@@ -4,6 +4,7 @@ nav_order: 72
 ---
 
 # Changes pulled from a shared database stay out of the undo journal
+
 `adr~shared-changes-are-not-undoable~1`
 
 Needs: impl
@@ -37,11 +38,12 @@ A local undo would take back something the shared database still holds; deciding
 The journal stays a record of the local this user's actions.
 
 Instead the local user will encounter:
+
 * Their own recorded change **refuses** to apply once a pulled change has moved the value on, and says so — "field author holds 'X', not the recorded 'Y'" — rather than overwriting the newer value (`req~logic.undo.stale-change-refused~1`).
   Thus undo after a remote overwrite reports that the library has moved on, and the colleague's edit survives.
 * The pulled change **marks the library as needing a save**, because it arrives as `EntriesEventSource.SHARED` and `LibraryTab` treats a change nobody recorded as one only saving can settle (`req~logic.undo.modified-marker-derived~1`).
 
-### Confirmation
+## Confirmation
 
 `DBMSSynchronizer` carries the tag `[impl->adr~shared-changes-are-not-undoable~1]` at the point where a pulled change is applied to the local model, and its class javadoc states the decision.
 The two behaviours the decision leans on are traced separately and covered by tests: refusal by `req~logic.undo.stale-change-refused~1`, and the modified marker by `req~logic.undo.modified-marker-derived~1`.
