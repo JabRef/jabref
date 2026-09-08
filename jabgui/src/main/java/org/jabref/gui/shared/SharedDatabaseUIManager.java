@@ -41,6 +41,7 @@ import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.Nullable;
 
 public class SharedDatabaseUIManager {
 
@@ -127,7 +128,11 @@ public class SharedDatabaseUIManager {
                 mergedBibEntry.getSharedBibEntryData().setSharedId(sharedBibEntry.getSharedBibEntryData().getSharedIdAsString());
                 mergedBibEntry.getSharedBibEntryData().setVersion(sharedBibEntry.getSharedBibEntryData().getVersion());
 
-                DatabaseSynchronizer synchronizer = updateRefusedEvent.bibDatabaseContext().getDBMSSynchronizer();
+                @Nullable DatabaseSynchronizer synchronizer = updateRefusedEvent.bibDatabaseContext().getDBMSSynchronizer();
+                // The library may have closed while the event waited for the JavaFX thread.
+                if (synchronizer == null) {
+                    return;
+                }
                 synchronizer.synchronizeSharedEntry(mergedBibEntry);
                 synchronizer.synchronizeLocalDatabase();
             });
@@ -160,6 +165,7 @@ public class SharedDatabaseUIManager {
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        assert dbmsSynchronizer != null;
         // Before opening: replaying changes recorded by an earlier session may already ask for a merge
         dbmsSynchronizer.registerListener(this);
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
@@ -168,6 +174,7 @@ public class SharedDatabaseUIManager {
 
     /// Shows a database returned by [#connect(DBMSConnectionProperties)] in a new tab. JavaFX thread only.
     public LibraryTab openTab(BibDatabaseContext bibDatabaseContext) {
+        assert dbmsSynchronizer != null;
         dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsSynchronizer.getConnectionProperties().getType().toString()));
 
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
@@ -205,6 +212,7 @@ public class SharedDatabaseUIManager {
         bibDatabaseContext.setDatabasePath(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        assert dbmsSynchronizer != null;
         dbmsSynchronizer.registerListener(this);
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
@@ -216,6 +224,7 @@ public class SharedDatabaseUIManager {
     public BibDatabaseContext createDummyContext(DBMSConnectionProperties connectionProperties) {
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
         DatabaseSynchronizer synchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        assert synchronizer != null;
         synchronizer.setDBName(connectionProperties.getDatabase());
         return bibDatabaseContext;
     }
