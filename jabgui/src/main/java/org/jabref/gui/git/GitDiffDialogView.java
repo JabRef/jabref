@@ -170,7 +170,7 @@ public class GitDiffDialogView extends BaseDialog<Void> {
                             getDiffMethod()
                     );
             case GroupChange groupChange ->
-                    new GroupChangeDetailsView(groupChange, groupChange.getName() + '.');
+                    new GroupChangeDetailsView(groupChange, groupChange.getName() + '.', oldVersionLabel, newVersionLabel, getDiffMethod());
             case PreambleChange preambleChange ->
                     new PreambleChangeDetailsView(preambleChange);
             case BibTexStringAdd stringAdd ->

@@ -24,7 +24,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -48,7 +47,6 @@ public class BackupUIManager {
                                                                  Path originalPath,
                                                                  GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
-                                                                 UndoManager undoManager,
                                                                  StateManager stateManager) {
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
@@ -85,7 +83,7 @@ public class BackupUIManager {
                 }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
             }
             return Optional.empty();
         });
@@ -121,7 +119,6 @@ public class BackupUIManager {
             Path originalPath,
             GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
-            UndoManager undoManager,
             StateManager stateManager) {
         try {
             ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
@@ -148,7 +145,7 @@ public class BackupUIManager {
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.orElse(false)) {
                     List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
-                    undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
+                    stateManager.getUndoManager(originalDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
                             resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
@@ -157,12 +154,13 @@ public class BackupUIManager {
                         // In case any change of the backup is accepted, this means, the in-memory file differs from the file on disk (which is not the backup file)
                         targetTabOpt.ifPresent(LibraryTab::markBaseChanged);
                     }
+
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
                     return Optional.of(originalParserResult);
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);

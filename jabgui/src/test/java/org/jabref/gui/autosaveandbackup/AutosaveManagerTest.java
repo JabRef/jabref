@@ -58,7 +58,7 @@ class AutosaveManagerTest {
 
         // A single typed character, which the filter marks as minor
         FieldChangedEvent keystroke = new FieldChangedEvent(new BibEntry(), StandardField.TITLE, "T", "");
-        keystroke.setFilteredOut(true);
+        keystroke.setFiltered(true);
         autosaveManager.listen(keystroke);
 
         assertTrue(autosaveManager.isSavePending());

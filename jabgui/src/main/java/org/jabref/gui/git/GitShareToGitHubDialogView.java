@@ -4,9 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 
@@ -25,19 +23,12 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class GitShareToGitHubDialogView extends BaseDialog<Void> {
-    private static final String GITHUB_PAT_DOCS_URL =
-            "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens";
-
     private static final String GITHUB_NEW_REPO_URL = "https://github.com/new";
 
+    @FXML private Label credentialsHint;
     @FXML private TextField repositoryUrl;
-    @FXML private TextField username;
-    @FXML private PasswordField personalAccessToken;
     @FXML private ButtonType shareButton;
     @FXML private Button checkGitHubAccessButton;
-    @FXML private Label patHelpIcon;
-    @FXML private Tooltip patHelpTooltip;
-    @FXML private CheckBox rememberSettingsCheck;
     @FXML private Label repoHelpIcon;
     @FXML private Tooltip repoHelpTooltip;
 
@@ -72,6 +63,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
 
         this.setTitle(Localization.lang("Share this Library to GitHub"));
         checkGitHubAccessButton.setText(Localization.lang("Check GitHub access"));
+        credentialsHint.setText(Localization.lang("The GitHub credentials configured in Preferences > Git are used."));
 
         // See "javafx.md"
         this.setResultConverter(button -> {
@@ -85,13 +77,6 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
             return null;
         });
 
-        patHelpTooltip.setText(
-                Localization.lang("Click to open GitHub Personal Access Token documentation")
-        );
-
-        username.setPromptText(Localization.lang("Your GitHub username"));
-        personalAccessToken.setPromptText(Localization.lang("PAT with repo access"));
-
         repoHelpTooltip.setText(
                 Localization.lang("Create an empty repository on GitHub, then copy the HTTPS URL (ends with .git). Click to open GitHub.")
         );
@@ -104,19 +89,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
                 )
         );
 
-        Tooltip.install(patHelpIcon, patHelpTooltip);
-        patHelpIcon.setOnMouseClicked(e ->
-                NativeDesktop.openBrowserShowPopup(
-                        GITHUB_PAT_DOCS_URL,
-                        dialogService,
-                        preferences.getExternalApplicationsPreferences()
-                )
-        );
-
         repositoryUrl.textProperty().bindBidirectional(viewModel.repositoryUrlProperty());
-        username.textProperty().bindBidirectional(viewModel.usernameProperty());
-        personalAccessToken.textProperty().bindBidirectional(viewModel.patProperty());
-        rememberSettingsCheck.selectedProperty().bindBidirectional(viewModel.rememberPatProperty());
 
         viewModel.setValues();
 
@@ -124,14 +97,30 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
             visualizer.setDecoration(new IconValidationDecorator());
 
             visualizer.initVisualization(viewModel.repositoryUrlValidation(), repositoryUrl, true);
-            visualizer.initVisualization(viewModel.githubUsernameValidation(), username, true);
-            visualizer.initVisualization(viewModel.githubPatValidation(), personalAccessToken, true);
+
+            // The button is null in initialize, so it has to be looked up afterwards
+            Button share = (Button) this.getDialogPane().lookupButton(shareButton);
+            share.disableProperty().bind(viewModel.repositoryUrlValidation().validProperty().not());
         });
     }
 
     @FXML
     private void shareToGitHub() {
-        viewModel.shareToGitHub(this::close);
+        viewModel.shareToGitHub(this::onShared);
+    }
+
+    /// The library is inside a Git repository only after it has been shared, so the scheduler
+    /// cannot have been started when the library was opened
+    private void onShared() {
+        stateManager.activeTabProperty().get().ifPresent(tab ->
+                GitPullScheduler.start(tab.getBibDatabaseContext(),
+                        dialogService,
+                        preferences,
+                        stateManager,
+                        taskExecutor,
+                        gitHandlerRegistry,
+                        tab::isModified));
+        close();
     }
 
     @FXML
