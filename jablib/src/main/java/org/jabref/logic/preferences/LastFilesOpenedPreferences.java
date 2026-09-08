@@ -24,6 +24,9 @@ public class LastFilesOpenedPreferences {
     /// An empty string means "nothing to restore" (no selection, or an entry without a citation key).
     private final ObservableList<String> lastSelectedEntries;
 
+    // shared databases (by their id in SharedDatabasePreferences) that were connected without a local file when jabref closed
+    private final ObservableList<String> lastSharedDatabasesOpened;
+
     // observable list last files opened in the file menu
     private final FileHistory fileHistory;
 
@@ -32,17 +35,40 @@ public class LastFilesOpenedPreferences {
                 List.of(),                // No last files opened on startup
                 List.of(),                // No last selected entries
                 null,                     // No last focused file
+                List.of(),                // No shared databases connected
                 FileHistory.of(List.of()) // Empty file history
         );
+    }
+
+    public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
+                                      @Nullable Path lastFocusedFile,
+                                      FileHistory fileHistory) {
+        this(lastFilesOpened, List.of(), lastFocusedFile, List.of(), fileHistory);
     }
 
     public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
                                       List<String> lastSelectedEntries,
                                       @Nullable Path lastFocusedFile,
                                       FileHistory fileHistory) {
+        this(lastFilesOpened, lastSelectedEntries, lastFocusedFile, List.of(), fileHistory);
+    }
+
+    public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
+                                      @Nullable Path lastFocusedFile,
+                                      List<String> lastSharedDatabasesOpened,
+                                      FileHistory fileHistory) {
+        this(lastFilesOpened, List.of(), lastFocusedFile, lastSharedDatabasesOpened, fileHistory);
+    }
+
+    public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
+                                      List<String> lastSelectedEntries,
+                                      @Nullable Path lastFocusedFile,
+                                      List<String> lastSharedDatabasesOpened,
+                                      FileHistory fileHistory) {
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastSelectedEntries = FXCollections.observableArrayList(lastSelectedEntries);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
+        this.lastSharedDatabasesOpened = FXCollections.observableArrayList(lastSharedDatabasesOpened);
         this.fileHistory = fileHistory;
     }
 
@@ -85,6 +111,14 @@ public class LastFilesOpenedPreferences {
 
     public void setLastFocusedFile(Path lastFocusedFile) {
         this.lastFocusedFile.set(lastFocusedFile);
+    }
+
+    public ObservableList<String> getLastSharedDatabasesOpened() {
+        return lastSharedDatabasesOpened;
+    }
+
+    public void setLastSharedDatabasesOpened(List<String> sharedDatabaseIds) {
+        lastSharedDatabasesOpened.setAll(sharedDatabaseIds);
     }
 
     public FileHistory getFileHistory() {

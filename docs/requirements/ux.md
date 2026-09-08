@@ -40,6 +40,15 @@ This provides immediate keyboard interaction capabilities (such as Ctrl+V for pa
 
 Needs: impl
 
+## Main table column headers are user-friendly
+`req~maintable.column-headers.user-friendly~1`
+
+Column headers of the main table show readable names, not raw BibTeX field names.
+JabRef-internal fields such as the entry type and the citation key are shown as "Entry Type" and "Citation Key".
+Headers use Title Case, as an exception to the sentence-case rule for UI text, so they read like the other headers ("Author/Editor").
+
+Needs: impl
+
 ## Critical startup failures show an error dialog
 `req~ux.startup.critical-error-dialog~1`
 

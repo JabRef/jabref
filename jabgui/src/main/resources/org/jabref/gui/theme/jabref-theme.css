@@ -27,7 +27,6 @@
         -color-fg-muted: #404040;
         -color-fg-subtle: #808080;
         -color-fg-emphasis: #FFFFFF;
-        -color-fg-menu-active: #000000;
 
         /* Borders */
         -color-border-default: #DDDDDD;
@@ -75,16 +74,13 @@
         -color-syntax-string: #008000;
         -color-syntax-comment: #008080;
         -color-syntax-punctuation: #808080;
-        -color-search-highlight-bg: #FFFF00;
-        -color-search-highlight-fg: #7800A9;
 
         /* Scrollbars */
         -color-scrollbar-thumb: #999999;
         -color-scrollbar-track: #FCFCFC;
 
-        /* Tooltips */
+        /* Tooltip background; the text uses -color-fg-default. */
         -color-tooltip-bg: #A3B7E6;
-        -color-tooltip-fg: #000000;
 
         /* Drag & drop targets */
         -color-drag-target: #A3B7E6;
@@ -92,7 +88,6 @@
 
         /* Group hit-count badge */
         -color-badge-bg: #6F6F6F;
-        -color-badge-fg: #FFFFFF;
         /* Text on the green badge of a group that contains selected entries */
         -color-badge-selected-fg: #000000;
 
@@ -121,7 +116,6 @@
         -color-fg-muted: #7D8591;
         -color-fg-subtle: #6B7280;
         -color-fg-emphasis: #E5E7EA;
-        -color-fg-menu-active: #EFF1F5;
 
         /* Borders */
         -color-border-default: #424758;
@@ -169,16 +163,13 @@
         -color-syntax-string: #7EE787;
         -color-syntax-comment: #6FD8D2;
         -color-syntax-punctuation: #8B949E;
-        -color-search-highlight-bg: #7A6A00;
-        -color-search-highlight-fg: #E9C7FF;
 
         /* Scrollbars */
         -color-scrollbar-thumb: #E5E7EA;
         -color-scrollbar-track: #040406;
 
-        /* Tooltips */
+        /* Tooltip background; the text uses -color-fg-default. */
         -color-tooltip-bg: #255652;
-        -color-tooltip-fg: #EFF1F5;
 
         /* Drag & drop targets */
         -color-drag-target: #255652;
@@ -186,7 +177,6 @@
 
         /* Group hit-count badge */
         -color-badge-bg: #151924;
-        -color-badge-fg: #E5E7EA;
         /* Text on the green badge of a group that contains selected entries */
         -color-badge-selected-fg: #000000;
 
@@ -411,7 +401,7 @@ TextFlow > .tooltip-text-monospaced {
     -fx-font-size: 1em;
     -fx-font-family: sans-serif;
     -fx-font-weight: normal;
-    -fx-text-fill: -color-tooltip-fg;
+    -fx-text-fill: -color-fg-default;
     -fx-show-delay: 300ms;
     -fx-hide-delay: 300ms;
 }
@@ -492,7 +482,7 @@ TextFlow > .tooltip-text-monospaced {
 .menu-bar > .container > .menu-button:hover > .label,
 .menu-bar > .container > .menu-button:focused > .label,
 .menu-bar > .container > .menu-button:showing > .label {
-    -fx-text-fill: -color-fg-menu-active;
+    -fx-text-fill: -color-fg-default;
 }
 
 .menu-item {
@@ -507,10 +497,6 @@ TextFlow > .tooltip-text-monospaced {
     -fx-text-fill: -color-border-default;
     -fx-background: -color-border-default;
     -fx-background-color: -fx-background;
-}
-
-.menu-item:focused > .label {
-    -fx-text-fill: -color-fg-menu-active;
 }
 
 .menu-button > .label {

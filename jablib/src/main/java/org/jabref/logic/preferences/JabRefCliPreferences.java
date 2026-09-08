@@ -331,6 +331,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // region last files opened
     private static final String LAST_EDITED = "lastEdited";
     private static final String LAST_FOCUSED = "lastFocused";
+    private static final String LAST_SHARED_DATABASES = "lastSharedDatabases";
     private static final String RECENT_DATABASES = "recentDatabases";
     private static final String LAST_SELECTED_ENTRIES = "lastSelectedEntries";
     // endregion
@@ -2060,6 +2061,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getStringList(LAST_EDITED).stream().map(Path::of).toList(),
                 getStringList(LAST_SELECTED_ENTRIES),
                 getPath(LAST_FOCUSED, defaultValues.getLastFocusedFile()),
+                getStringList(LAST_SHARED_DATABASES),
                 FileHistory.of(getStringList(RECENT_DATABASES).stream().map(Path::of).toList()));
 
         bindPathList(lastFilesOpenedPreferences.getLastFilesOpened(), LAST_EDITED, defaultValues.getLastFilesOpened());
@@ -2067,6 +2069,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindPathList(lastFilesOpenedPreferences.getFileHistory(), RECENT_DATABASES, defaultValues.getFileHistory());
         bindPath(lastFilesOpenedPreferences.lastFocusedFileProperty(), LAST_FOCUSED, defaultValues.getLastFocusedFile());
+        bindCustomList(lastFilesOpenedPreferences.getLastSharedDatabasesOpened(), LAST_SHARED_DATABASES, defaultValues.getLastSharedDatabasesOpened(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
 
         // The file history is the only preference a user expects to survive a crash: it changes on opening or saving a
         // library, which are rare enough that writing the whole store through is cheap. Without this, a kill (task
