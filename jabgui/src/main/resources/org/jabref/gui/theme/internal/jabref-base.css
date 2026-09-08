@@ -326,6 +326,8 @@
     -fx-background: transparent;
     -fx-background-color: transparent;
     -fx-padding: 0.5em;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
 .icon-button:hover {
@@ -924,8 +926,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #entryEditor .all-fields-add-chip {
-    -fx-background-radius: 3;
-    -fx-border-radius: 3;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
 #entryEditor Text {
@@ -1085,7 +1087,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-insets: 0;
     -fx-background-insets: 0;
     -fx-border-image-insets: 0;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
 /* ParseLatexResult */
@@ -1387,8 +1390,8 @@ We want to have a look that matches our icons in the tool-bar */
 
 .exampleQuestionStyle {
     -fx-background-color: transparent;
-    -fx-background-radius: 20px;
-    -fx-border-radius: 20px;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
     -fx-border-width: 0.062em;
     -fx-border-color: -color-border-default;
     -fx-font-weight: bold;
@@ -1416,8 +1419,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-bg-alt;
     -fx-border-color: -color-border-default;
     -fx-border-width: 0.08333em;
-    -fx-border-radius: 0.333em;
-    -fx-background-radius: 0.333em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
     -fx-graphic-text-gap: 0.667em;
     -fx-text-fill: -fx-text-base-color;
     -fx-cursor: hand;

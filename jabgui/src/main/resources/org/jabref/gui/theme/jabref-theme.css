@@ -237,7 +237,7 @@
     -fx-background-color: -color-bg-primary;
 }
 
-/* JavaFX Button-like */
+/* JavaFX Button-like. */
 .button,
 .toggle-button,
 .menu-button,
@@ -248,6 +248,7 @@
     -fx-background-color: -fx-background;
     -fx-background-insets: 0;
     -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
 /* JavaFX Button */
@@ -416,7 +417,7 @@ TextFlow > .tooltip-text-monospaced {
 .color-picker:focused,
 .color-picker {
     -fx-background-color: transparent;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
     -fx-background-insets: 0;
     -fx-effect: null;
 }
@@ -464,7 +465,7 @@ TextFlow > .tooltip-text-monospaced {
 .menu-bar .menu-button {
     -fx-border-color: transparent;
     -fx-border-width: 0;
-    -fx-border-radius: 0;
+    -fx-border-radius: 0.25em;
 }
 
 
@@ -587,7 +588,7 @@ TextFlow > .tooltip-text-monospaced {
 .combo-box-base {
     -fx-background-color: -color-border-default, -color-bg-secondary;
     -fx-background-insets: 0, 1;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .combo-box > .list-cell {
@@ -626,7 +627,7 @@ TextFlow > .tooltip-text-monospaced {
 .date-picker > .text-field {
     -fx-background-color: -color-border-default, -color-bg-secondary;
     -fx-background-insets: 0, 1;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .combo-box-base:editable:focused > .text-field,
@@ -634,7 +635,7 @@ TextFlow > .tooltip-text-monospaced {
 .date-picker > .text-field:focused {
     -fx-background-color: -color-accent-subtle, -color-bg-secondary;
     -fx-background-insets: 0, 2;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .date-picker:focused > .text-field {
