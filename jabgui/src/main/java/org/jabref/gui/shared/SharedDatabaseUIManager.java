@@ -41,7 +41,6 @@ import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.Subscribe;
-import org.jspecify.annotations.Nullable;
 
 public class SharedDatabaseUIManager {
 
@@ -128,7 +127,7 @@ public class SharedDatabaseUIManager {
                 mergedBibEntry.getSharedBibEntryData().setSharedId(sharedBibEntry.getSharedBibEntryData().getSharedIdAsString());
                 mergedBibEntry.getSharedBibEntryData().setVersion(sharedBibEntry.getSharedBibEntryData().getVersion());
 
-                @Nullable DatabaseSynchronizer synchronizer = updateRefusedEvent.bibDatabaseContext().getDBMSSynchronizer();
+                DatabaseSynchronizer synchronizer = updateRefusedEvent.bibDatabaseContext().getDBMSSynchronizer();
                 // The library may have closed while the event waited for the JavaFX thread.
                 if (synchronizer == null) {
                     return;
