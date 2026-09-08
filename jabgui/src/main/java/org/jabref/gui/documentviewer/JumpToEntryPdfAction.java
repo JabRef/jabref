@@ -5,11 +5,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
-
-import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -30,8 +26,6 @@ import org.slf4j.LoggerFactory;
 public class JumpToEntryPdfAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JumpToEntryPdfAction.class);
 
-    private static @Nullable DocumentViewerView activeDocumentViewerView;
-
     private final String url;
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -47,6 +41,7 @@ public class JumpToEntryPdfAction extends SimpleCommand {
         Optional<EntryCitationUrl> parsedOpt = parseUrl(url);
         if (parsedOpt.isEmpty()) {
             LOGGER.warn("Could not parse citation entry URL: {}", url);
+            dialogService.notify(Localization.lang("Invalid URL"));
             return;
         }
 
@@ -60,28 +55,11 @@ public class JumpToEntryPdfAction extends SimpleCommand {
         BibDatabaseContext databaseContext = activeDatabaseOpt.get();
         Optional<BibEntry> entryOpt = databaseContext.getDatabase().getEntryByCitationKey(parsed.citationKey());
         if (entryOpt.isEmpty()) {
-            for (BibDatabaseContext otherDb : stateManager.getOpenDatabases()) {
-                if (otherDb != databaseContext) {
-                    entryOpt = otherDb.getDatabase().getEntryByCitationKey(parsed.citationKey());
-                    if (entryOpt.isPresent()) {
-                        databaseContext = otherDb;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (entryOpt.isEmpty()) {
             dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", parsed.citationKey()));
             return;
         }
 
         BibEntry entry = entryOpt.get();
-        stateManager.activeTabProperty().get().ifPresentOrElse(
-                tab -> tab.clearAndSelect(entry),
-                () -> stateManager.setSelectedEntries(List.of(entry))
-        );
-
         Optional<LinkedFile> pdfFileOpt = entry.getFiles().stream()
                 .filter(file -> {
                     try {
@@ -102,26 +80,10 @@ public class JumpToEntryPdfAction extends SimpleCommand {
 
     private void openInDocumentViewer(LinkedFile pdfFile, Optional<Integer> pageNumber) {
         int targetPage = pageNumber.filter(p -> p > 0).orElse(1);
-        if (activeDocumentViewerView != null && activeDocumentViewerView.isShowing()) {
-            activeDocumentViewerView.switchToFile(pdfFile);
-            activeDocumentViewerView.gotoPage(targetPage);
-            Window window = activeDocumentViewerView.getDialogPane().getScene().getWindow();
-            if (window instanceof Stage stage) {
-                stage.toFront();
-                stage.requestFocus();
-            }
-        } else {
-            DocumentViewerView viewerView = new DocumentViewerView();
-            activeDocumentViewerView = viewerView;
-            viewerView.setOnHidden(_ -> {
-                if (activeDocumentViewerView == viewerView) {
-                    activeDocumentViewerView = null;
-                }
-            });
-            viewerView.switchToFile(pdfFile);
-            viewerView.gotoPage(targetPage);
-            dialogService.showCustomDialog(viewerView);
-        }
+        DocumentViewerView viewerView = new DocumentViewerView();
+        viewerView.switchToFile(pdfFile);
+        viewerView.gotoPage(targetPage);
+        dialogService.showCustomDialog(viewerView);
     }
 
     public static Optional<EntryCitationUrl> parseUrl(@Nullable String rawUrl) {
