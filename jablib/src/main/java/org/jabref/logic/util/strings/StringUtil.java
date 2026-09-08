@@ -805,7 +805,8 @@ public class StringUtil {
         int availableLengthForParent = maxLength - fileName.length() - 1;
 
         if (availableLengthForParent < MIN_PARENT_LENGTH) {
-            return ELLIPSIS + separator + fileName;
+            String fallback = ELLIPSIS + separator + fileName;
+            return fallback.length() <= maxLength ? fallback : fileName;
         }
 
         String parent = fullPath.substring(0, lastSeparator);

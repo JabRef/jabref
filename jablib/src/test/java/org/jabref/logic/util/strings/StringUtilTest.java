@@ -22,6 +22,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -497,8 +498,30 @@ class StringUtilTest {
         String path = "very/long/directory/structure/file.bib";
         String result = StringUtil.abbreviatePath(path, 25);
 
+        assertNotNull(result);
         assertTrue(result.length() <= 25);
         assertTrue(result.endsWith("file.bib"));
         assertTrue(result.contains("..."));
+    }
+
+    @Test
+    void abbreviatePathReturnsFilenameOnlyWhenEllipsisWouldOverflow() {
+        String fileName = "a".repeat(29) + ".bib";
+        String path = "very/long/path/to/folder/" + fileName;
+        String result = StringUtil.abbreviatePath(path, 35);
+
+        assertNotNull(result);
+        assertTrue(result.length() <= 35);
+        assertEquals(fileName, result);
+    }
+
+    @Test
+    void abbreviatePathTruncatesFileNameWhenFilenameExceedsMaxLength() {
+        String path = "folder/extremely_long_file_name_exceeding_limit.bib";
+        String result = StringUtil.abbreviatePath(path, 20);
+
+        assertNotNull(result);
+        assertTrue(result.length() <= 20);
+        assertTrue(result.endsWith("..."));
     }
 }
