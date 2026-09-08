@@ -13,6 +13,7 @@ import javafx.stage.Window;
 import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.util.DialogButtonAssertions;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -21,14 +22,12 @@ import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testfx.framework.junit5.ApplicationTest;
-import org.testfx.util.WaitForAsyncUtils;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
-class BackupResolverDialogTest extends ApplicationTest {
+class BackupResolverDialogTest extends JavaFxTest {
 
     private static final String FONT_SIZE_CLASS = "font-size-12";
 
@@ -70,7 +69,7 @@ class BackupResolverDialogTest extends ApplicationTest {
     @AfterEach
     void removeRaisedFontSizeListener() {
         if (raisedFontSizeListener != null) {
-            Window.getWindows().removeListener(raisedFontSizeListener);
+            interact(() -> Window.getWindows().removeListener(raisedFontSizeListener));
             raisedFontSizeListener = null;
         }
     }
@@ -79,19 +78,21 @@ class BackupResolverDialogTest extends ApplicationTest {
     /// size the raised font needs.
     @Test
     void buttonCaptionsAreNotTruncatedAtARaisedFontSize() {
-        WaitForAsyncUtils.waitForFxEvents();
+        awaitEvents();
 
-        DialogButtonAssertions.assertCaptionsAreNotTruncated(backupResolverDialog.getDialogPane());
+        interact(() -> DialogButtonAssertions.assertCaptionsAreNotTruncated(backupResolverDialog.getDialogPane()));
     }
 
     @Test
     void windowIsAsWideAsItsContentNeeds() {
-        WaitForAsyncUtils.waitForFxEvents();
+        awaitEvents();
 
-        DialogPane pane = backupResolverDialog.getDialogPane();
-        double windowWidth = pane.getScene().getWindow().getWidth();
-        assertTrue(windowWidth >= pane.prefWidth(-1),
-                "Window is %.1fpx wide, but its content needs %.1fpx".formatted(windowWidth, pane.prefWidth(-1)));
+        interact(() -> {
+            DialogPane pane = backupResolverDialog.getDialogPane();
+            double windowWidth = pane.getScene().getWindow().getWidth();
+            assertTrue(windowWidth >= pane.prefWidth(-1),
+                    "Window is %.1fpx wide, but its content needs %.1fpx".formatted(windowWidth, pane.prefWidth(-1)));
+        });
     }
 
     private static String stylesheet(String path) {

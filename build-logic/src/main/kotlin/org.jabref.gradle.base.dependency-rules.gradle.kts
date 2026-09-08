@@ -102,9 +102,6 @@ jvmDependencyConflicts.patch {
             removeDependency("org.slf4j:jcl-over-slf4j")
         }
     }
-    module("org.testfx:testfx-core") {
-        removeDependency("org.osgi:org.osgi.core")
-    }
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
@@ -342,19 +339,6 @@ extraJavaModuleInfo {
     }
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
 
-    module("org.testfx:testfx-core", "org.testfx") {
-        exportAllPackages()
-        // Content based on https://github.com/TestFX/TestFX/commit/bf4a08aa82c008fdd3c296aaafee1d222f3824cb
-        requires("java.desktop")
-        requiresTransitive("javafx.controls")
-        requiresTransitive("org.hamcrest")
-    }
-    module("org.testfx:testfx-junit5", "org.testfx.junit5") {
-        exportAllPackages()
-        requires("org.junit.jupiter.api")
-        requiresTransitive("org.testfx")
-    }
-
     module("org.xmlunit:xmlunit-core", "org.xmlunit") {
         exportAllPackages()
         requires("java.xml")
@@ -518,7 +502,6 @@ extraJavaModuleInfo {
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         preserveExisting()
         exports("com.sun.javafx.scene")
-        opens("com.sun.javafx.application", "org.testfx")
         opens("javafx.scene", "org.controlsfx.controls")
     }
 
