@@ -262,22 +262,38 @@
     -fx-background: -color-button-hover;
 }
 
-.button:focused,
-.button:pressed {
+.button:armed {
     -fx-background: -color-button-pressed;
 }
 
-.button:default,
-.button:default:hover,
-.button:default:focused,
-.button:default:pressed {
+.button:focused {
+    -fx-border-color: -color-accent;
+}
+
+.button:default {
     -fx-background: -color-button-default;
+    -fx-background-color: -fx-background;
+}
+
+.button:default:hover {
+    -fx-background: -color-button-default;
+    -fx-background-color: -fx-background, -color-button-hover;
+}
+
+.button:default:armed {
+    -fx-background: -color-button-default;
+    -fx-background-color: -fx-background, -color-button-pressed;
 }
 
 /* JavaFX ToggleButton */
 .toggle-button:hover,
 .toggle-button:selected:hover {
     -fx-background-color: -color-overlay-hover;
+}
+
+.toggle-button:armed,
+.toggle-button:selected:armed {
+    -fx-background-color: -color-overlay-armed;
 }
 
 .toggle-button:selected {

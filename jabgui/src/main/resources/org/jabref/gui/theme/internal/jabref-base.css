@@ -1403,6 +1403,14 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-button-hover;
 }
 
+.exampleQuestionStyle:armed {
+    -fx-background-color: -color-button-pressed;
+}
+
+.refresh {
+    -fx-background-color: transparent;
+}
+
 .text-button-blue {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
@@ -1428,6 +1436,10 @@ We want to have a look that matches our icons in the tool-bar */
 
 .quick-settings-button:hover {
     -fx-border-color: -color-accent-subtle;
+}
+
+.quick-settings-button:armed {
+    -fx-background-color: -color-bg-alt, -color-button-pressed;
 }
 
 .quick-settings-button .glyph-icon,
@@ -1541,6 +1553,14 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 0.25em;
 }
 
+.walkthrough-continue-button:hover {
+    -fx-background-color: -color-accent, -color-button-hover;
+}
+
+.walkthrough-continue-button:armed {
+    -fx-background-color: -color-accent, -color-button-pressed;
+}
+
 .walkthrough-skip-button {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
@@ -1550,11 +1570,27 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 0.25em;
 }
 
+.walkthrough-skip-button:hover {
+    -fx-background-color: -color-button-hover;
+}
+
+.walkthrough-skip-button:armed {
+    -fx-background-color: -color-button-pressed;
+}
+
 .walkthrough-back-button {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
+}
+
+.walkthrough-back-button:hover {
+    -fx-background-color: -color-button-hover;
+}
+
+.walkthrough-back-button:armed {
+    -fx-background-color: -color-button-pressed;
 }
 
 .walkthrough-quit-button {
@@ -1573,7 +1609,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: derive(-color-bg-tertiary, -20%);
 }
 
-.walkthrough-quit-button:pressed {
+.walkthrough-quit-button:armed {
     -fx-background-color: derive(-color-bg-tertiary, 30%);
 }
 
@@ -1665,6 +1701,14 @@ We want to have a look that matches our icons in the tool-bar */
 .info-center-view .notification-view > .content > .text-container > .actions-box .button {
     -fx-background: -color-button-default;
     -fx-background-color: -color-button-default;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button:hover {
+    -fx-background-color: -color-button-default, -color-button-hover;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button:armed {
+    -fx-background-color: -color-button-default, -color-button-pressed;
 }
 
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
