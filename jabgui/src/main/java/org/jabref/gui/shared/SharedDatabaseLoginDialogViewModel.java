@@ -355,6 +355,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         autosave.set(prefs.getAutosave());
     }
 
+    // [impl->req~shared-database.saved-connections~1]
     public ObservableList<SavedConnection> getSavedConnections() {
         return savedConnections;
     }

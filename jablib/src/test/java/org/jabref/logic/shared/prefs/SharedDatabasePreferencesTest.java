@@ -1,6 +1,7 @@
 package org.jabref.logic.shared.prefs;
 
 import java.util.List;
+import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
 import org.junit.jupiter.api.AfterEach;
@@ -27,7 +28,7 @@ class SharedDatabasePreferencesTest {
 
         List<String> savedIds = SharedDatabasePreferences.listSavedIds();
 
-        assertEquals(List.of(ID), savedIds.stream().filter(id -> id.equals(ID) || "default".equals(id)).toList());
+        assertEquals(List.of(ID), savedIds.stream().filter(id -> Set.of(ID, "default").contains(id)).toList());
     }
 
     @Test
