@@ -17,6 +17,7 @@ public enum ThemePreset {
     JABREF(Localization.lang("JabRef theme"), "jabref-theme.css"),
     EVERFOREST("Everforest", "community/everforest.css"),
     NORD("Nord", "community/nord.css"),
+    PAPERS("Papers", "community/papers.css"),
     PRIMER(Localization.lang("Primer theme"), "primer-theme.css"),
     CHOCOLATE_HONEY("Chocolate Honey", "community/chocolate-honey.css"),
     DINOGIRLS_CHOCOLATEBROWN("DinoGirls: Chocolate Brown / Dark Salmon", "community/chocolatebrown-darksalmon-contrasttext.css"),
