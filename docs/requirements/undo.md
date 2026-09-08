@@ -59,4 +59,12 @@ The marker is derived from that rather than set by each command, so no undo path
 
 Needs: impl, utest
 
+## Library settings are one undo step
+`req~logic.undo.library-settings-recorded~1`
+
+Accepting the Library properties dialog goes on the undo stack as a single step covering every tab, and undoing it restores the settings the library had before the dialog was opened.
+The settings are written straight to the library's metadata by seven tabs at once, so recording them as one snapshot pair is what makes the dialog undoable at all — and what keeps the modified marker honest for a change no command would otherwise report.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

@@ -13,7 +13,6 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.undo.UndoableFieldChange;
-import org.jabref.model.undo.UndoableGroupChange;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +37,7 @@ class KeywordSeparatorMigrationTest {
                 .stream()
                 .map(UndoableFieldChange::new)
                 .toList();
-        List<UndoableGroupChange> groupChanges = KeywordSeparatorMigration.migrateGroupSeparators(databaseContext, ';');
+        KeywordSeparatorMigration.migrateGroupSeparators(databaseContext, ';');
 
         assertEquals("topic; subtopic", entry.getField(StandardField.KEYWORDS).orElseThrow());
         assertEquals("library; selected", entry.getField(StandardField.GROUPS).orElseThrow());
@@ -46,8 +45,8 @@ class KeywordSeparatorMigrationTest {
         assertEquals(new WordKeywordGroup("topic", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "topic", true, ';', true), root.getChildren().get(1).getGroup());
         assertEquals(new AutomaticKeywordGroup("automatic", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ';', '/'), root.getChildren().get(2).getGroup());
 
-        groupChanges.reversed().forEach(change -> change.inverted().apply());
         fieldChanges.reversed().forEach(change -> change.inverted().apply());
+        KeywordSeparatorMigration.migrateGroupSeparators(databaseContext, ',');
 
         assertEquals("topic, subtopic", entry.getField(StandardField.KEYWORDS).orElseThrow());
         assertEquals("library, selected", entry.getField(StandardField.GROUPS).orElseThrow());
