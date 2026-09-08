@@ -227,10 +227,9 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         Label label = new Label(Localization.lang("Looking up DOI..."));
 
-        VBox vBox = new VBox();
+        VBox vBox = new VBox(4);
         vBox.getChildren().add(progressIndicator);
         vBox.getChildren().add(label);
-        vBox.setSpacing(2d);
         vBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(vBox, 0, 0);
@@ -250,10 +249,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
         link.setOnAction(_ -> triggerDoiLookup());
 
-        HBox hBox = new HBox();
+        HBox hBox = new HBox(4);
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
-        hBox.setSpacing(2d);
         hBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(hBox, 0, 0);
@@ -308,11 +306,10 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private VBox getErrorPane() {
         Label titleLabel = new Label(Localization.lang("Error"));
-        titleLabel.setId("scite-error-label");
-        titleLabel.getStyleClass().addAll("h3", "bold");
+        titleLabel.getStyleClass().addAll("h3", "bold", "text-danger");
         Text errorMessageText = new Text(citationsRelationsTabViewModel.searchErrorProperty().get());
-        VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
-        errorMessageBox.getStyleClass().add("padding-32");
+        VBox errorMessageBox = new VBox(4, titleLabel, errorMessageText);
+        errorMessageBox.getStyleClass().add("padding-4");
         return errorMessageBox;
     }
 
@@ -637,7 +634,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     vContainer.getChildren().addLast(showEntrySource);
 
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
-                    hContainer.getStyleClass().add("padding-6-0");
+                    hContainer.getStyleClass().add("padding-4-0");
 
                     return hContainer;
                 })
@@ -750,7 +747,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// @param label       label to style
     /// @param tooltipText tooltip text
     private void styleLabel(Label label, String tooltipText) {
-        label.getStyleClass().add("padding-6");
+        label.getStyleClass().add("padding-4");
         label.setAlignment(Pos.CENTER);
         label.setTooltip(new Tooltip(tooltipText));
         label.setMaxWidth(Double.MAX_VALUE);
@@ -834,7 +831,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         hideNodes(citationComponents.abortButton(), citationComponents.progress());
         showNodes(citationComponents.refreshButton());
 
-        HBox hBox = new HBox();
+        HBox hBox = new HBox(4);
         Label label = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
         Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
 
@@ -842,7 +839,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
-        hBox.setSpacing(2d);
         hBox.getStyleClass().add("align-center");
         hBox.setFillHeight(true);
 

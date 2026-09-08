@@ -26,6 +26,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.URLUtil;
@@ -228,7 +229,7 @@ class LinkedFileViewModelTest {
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
 
-        viewModel.download(keepHtmlLink);
+        viewModel.download(keepHtmlLink, new JabRefUndoManager());
 
         verify(dialogService, atLeastOnce()).notify(warningText);
     }
@@ -308,7 +309,7 @@ class LinkedFileViewModelTest {
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
 
-        viewModel.download(keepHtml);
+        viewModel.download(keepHtml, new JabRefUndoManager());
 
         // Loop through downloaded files to check for filetype='pdf'
         List<LinkedFile> linkedFiles = entry.getFiles();
