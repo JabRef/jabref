@@ -847,6 +847,36 @@ class BibDatabaseWriterTest {
     }
 
     @Test
+    void writeGitAutoPull() throws IOException {
+        metaData.setGitAutoPull(true);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: gitAutoPull:true;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void writeGitAutoCommit() throws IOException {
+        metaData.setGitAutoCommit(true);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: gitAutoCommit:true;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    void writeGitAutoPush() throws IOException {
+        metaData.setGitAutoPush(true);
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: gitAutoPush:true;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
     void writeAiLibraryId() throws IOException {
         metaData.setAiLibraryId("test-ai-library-id");
 

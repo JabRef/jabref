@@ -3,7 +3,9 @@ package org.jabref.gui.libraryproperties.constants;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -19,8 +21,10 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.undo.UndoableReplaceStrings;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -34,12 +38,14 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     private final BooleanProperty validProperty = new SimpleBooleanProperty();
 
     private final BibDatabaseContext databaseContext;
+    private final UndoManager undoManager;
 
     private final DialogService dialogService;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
-    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
+    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences, UndoManager undoManager) {
         this.databaseContext = databaseContext;
+        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
 
@@ -89,7 +95,17 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
         List<BibtexString> strings = stringsListProperty.stream()
                                                         .map(this::fromBibtexStringViewModel)
                                                         .toList();
-        databaseContext.getDatabase().setStrings(strings);
+        List<BibtexString> before = List.copyOf(databaseContext.getDatabase().getStringValues());
+        // By name and content only: `BibtexString.equals` also compares the parsed serialization and
+        // the changed flag, and the library's own list comes out of a map in no particular order, so
+        // comparing the objects would report a change every time this dialog is accepted.
+        if (!contentsOf(before).equals(contentsOf(strings))) {
+            undoManager.applyEdit(new UndoableReplaceStrings(databaseContext.getDatabase(), before, strings));
+        }
+    }
+
+    private static Map<String, String> contentsOf(List<BibtexString> strings) {
+        return strings.stream().collect(Collectors.toMap(BibtexString::getName, BibtexString::getContent, (first, _) -> first));
     }
 
     private BibtexString fromBibtexStringViewModel(ConstantsItemModel viewModel) {

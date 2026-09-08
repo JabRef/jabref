@@ -45,6 +45,7 @@ import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.git.GitDiffDialogView;
+import org.jabref.gui.git.GitPullScheduler;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -58,6 +59,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.command.CommandSelectionTab;
 import org.jabref.logic.git.diff.GitDiffChecker;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -72,6 +74,7 @@ import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -91,12 +94,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableRemoveEntries;
@@ -118,7 +123,6 @@ import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 public class LibraryTab extends Tab implements CommandSelectionTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
-    private final GuiUndoManager undoManager;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -127,7 +131,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
-    private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     private final NavigationHistory navigationHistory = new NavigationHistory();
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
@@ -169,6 +172,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     private final AiService aiService;
 
@@ -190,13 +194,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
-                       GuiUndoManager undoManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
+                       GitHandlerRegistry gitHandlerRegistry,
                        boolean isDummyContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.tabContainer = tabContainer;
-        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
@@ -205,6 +208,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
         this.aiService = aiService;
 
         this.journalAbbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
@@ -242,7 +246,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 bibDatabaseContext,
                 preferences,
                 fileUpdateMonitor,
-                undoManager,
+                getUndoManager(),
                 stateManager,
                 dialogService,
                 taskExecutor);
@@ -268,6 +272,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
         Platform.runLater(() -> {
+            // [impl->req~logic.undo.modified-marker-derived~1]
+            changedProperty.bind(journal().hasChangedProperty());
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ ->
                     updateTabTitle(changedProperty.getValue()));
@@ -318,11 +324,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
-        if (result.getChangedOnMigration()) {
-            this.markBaseChanged();
-        }
-
         setDatabaseContext(result.getDatabaseContext());
+        if (result.getChangedOnMigration()) {
+            // Rewritten while loading, so there is no step to undo it with. After the context is
+            // installed: until then, journal() answers for the loading placeholder, whose journal
+            // setDatabaseContext then discards.
+            journal().markChanged();
+        }
         // Notify listeners that the auto-completer may have changed
         if (autoCompleterChangedListener != null) {
             autoCompleterChangedListener.run();
@@ -377,6 +385,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         stateManager.getOpenDatabases().removeIf(databaseContext -> databaseContext == previousDatabaseContext);
 
+        // The context being replaced is the placeholder this tab showed while the file loaded. Its
+        // journal describes a library that is about to stop existing, and nothing else can reach it
+        // once the tab moves on, so it goes with the context rather than staying for the session.
+        stateManager.removeUndoManager(previousDatabaseContext);
+
         this.bibDatabaseContext = bibDatabaseContext;
 
         initializeComponentsAndListeners(false);
@@ -403,6 +416,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
         }
+
+        GitPullScheduler.start(bibDatabaseContext,
+                dialogService,
+                preferences,
+                stateManager,
+                taskExecutor,
+                gitHandlerRegistry,
+                this::isModified);
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -482,9 +503,26 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         });
     }
 
+    /// Marks the changes the journal does not know about, so that [#changedProperty] can derive
+    /// the rest from it.
+    ///
+    /// Metadata is where the marker cannot be derived: the library properties dialog writes
+    /// settings without recording them, and a metadata change is a metadata change whatever wrote
+    /// it. So all of them mark, which errs on the safe side and costs one wart: undoing a group
+    /// edit or an accepted external change leaves the marker set until the library is saved,
+    /// although the library is back where it was. Journalling what the properties dialog writes
+    /// would remove both the wart and this listener.
+    ///
+    /// Entries carry a source, so they need no such guess: only the ones pushed in from a shared
+    /// database arrive without anyone recording them.
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        this.changedProperty.setValue(true);
+        boolean unrecorded = (event instanceof MetaDataChangedEvent)
+                || ((event instanceof EntriesEvent entriesEvent)
+                && (entriesEvent.getEntriesEventSource() == EntriesEventSource.SHARED));
+        if (unrecorded) {
+            journal().markChanged();
+        }
     }
 
     /// Returns a collection of suggestion providers, which are populated from the current library.
@@ -542,7 +580,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
-                this.changedProperty.setValue(true);
+                journal().markChanged();
             }
         }
     }
@@ -590,13 +628,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Put an asterisk behind the filename to indicate the database has changed.
-    public synchronized void markChangedOrUnChanged() {
-        if (undoManager.hasChanged()) {
-            this.changedProperty.setValue(true);
-        } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
-            this.changedProperty.setValue(false);
-        }
-    }
 
     public BibDatabase getDatabase() {
         return bibDatabaseContext.getDatabase();
@@ -777,6 +808,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when closing search context", e);
         }
 
+        stateManager.removeUndoManager(bibDatabaseContext);
+
         try {
             AutosaveManager.shutdown(bibDatabaseContext);
         } catch (RuntimeException e) {
@@ -788,6 +821,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                     preferences.getFilePreferences().shouldCreateBackup());
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down backup manager", e);
+        }
+
+        try {
+            GitPullScheduler.shutdown(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down Git pull scheduler", e);
         }
 
         if (tableModel != null) {
@@ -826,8 +865,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return loading;
     }
 
-    public GuiUndoManager getUndoManager() {
-        return undoManager;
+    /// The journal to record a change to this library on.
+    ///
+    /// Recording is what a tab's collaborators do with the journal. The few classes that undo, redo
+    /// or track the saved position name the library to the state manager instead.
+    public UndoManager getUndoManager() {
+        return journal();
+    }
+
+    private GuiUndoManager journal() {
+        return stateManager.getUndoManager(bibDatabaseContext);
     }
 
     public MainTable getMainTable() {
@@ -858,7 +905,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 taskExecutor,
                 dialogService,
                 preferences,
-                undoManager,
+                getUndoManager(),
                 stateManager,
                 this));
     }
@@ -895,9 +942,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        importHandler.importCleanedEntries(null, entries);
-        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-        markBaseChanged();
+        // One step, opened around the insert so that the automatic assignment it sets off is
+        // recorded inside it rather than as a second step the user has to undo separately.
+        getUndoManager().addEdit(Localization.lang("Import entries"), edit -> {
+            importHandler.importCleanedEntries(null, entries);
+            edit.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+        });
         stateManager.setSelectedEntries(entries);
 
         // Only show/select individual entry for single-entry imports.
@@ -1000,17 +1050,22 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         );
     }
 
+    /// Copies the selection to the clipboard, then removes it from the library. The delete is
+    /// reached only once the copy has succeeded, so a cut that cannot reach the clipboard leaves
+    /// the entries where they are — there is no half-done cut to compensate for.
     public void cutEntry() {
-        int entriesCopied = doCopyEntry(TransferMode.MOVE, getSelectedEntries());
-        int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
+        List<BibEntry> selectedEntries = getSelectedEntries();
 
-        if (entriesCopied == entriesDeleted) {
-            dialogService.notify(Localization.lang("Cut %0 entry(s)", entriesCopied));
-        } else {
-            dialogService.notify(Localization.lang("Cut failed", entriesCopied));
-            undoManager.undo();
-            clipBoardManager.setContent("");
+        int entriesCopied = doCopyEntry(TransferMode.MOVE, selectedEntries);
+        if (entriesCopied < 0) {
+            // Nothing to clean up: the clipboard is written only after the entries have been
+            // serialized, so a failure leaves it holding whatever the user put there earlier.
+            dialogService.notify(Localization.lang("Cut failed"));
+            return;
         }
+
+        int entriesDeleted = doDeleteEntry(StandardActions.CUT, selectedEntries);
+        dialogService.notify(Localization.lang("Cut %0 entry(s)", entriesDeleted));
     }
 
     /// Removes the selected entries and files linked to selected entries from the database
@@ -1054,8 +1109,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
         }
 
-        markBaseChanged();
-
         // prevent the main table from loosing focus
         mainTable.requestFocus();
 
@@ -1066,15 +1119,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return changedProperty.getValue();
     }
 
-    public void markBaseChanged() {
-        this.changedProperty.setValue(true);
-    }
-
-    public void markNonUndoableBaseChanged() {
-        this.nonUndoableChangeProperty.setValue(true);
-        this.changedProperty.setValue(true);
-    }
-
     public void resetChangedProperties() {
         resetChangedProperties(null);
     }
@@ -1083,8 +1127,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     ///
     /// @param diskState the on-disk state the library matches, as reported by the writer that committed it; `null` to determine it from the file (e.g. after merging all external changes)
     public void resetChangedProperties(@Nullable FileSnapshot diskState) {
-        this.nonUndoableChangeProperty.setValue(false);
-        this.changedProperty.setValue(false);
+        // The marker derives from the saved position, so stamping it is what clears the marker -
+        // including a change the journal could not have taken back.
+        journal().markUnchanged();
         changeMonitor.ifPresent(monitor -> monitor.markConsistentWithDisk(diskState));
     }
 
@@ -1141,9 +1186,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
-                                              TaskExecutor taskExecutor) {
+                                              TaskExecutor taskExecutor,
+                                              GitHandlerRegistry gitHandlerRegistry) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
@@ -1156,9 +1201,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 taskExecutor,
+                gitHandlerRegistry,
                 true);
 
         newTab.setDataLoadingTask(dataLoadingTask);
@@ -1177,9 +1222,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              GuiUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
-                                              TaskExecutor taskExecutor) {
+                                              TaskExecutor taskExecutor,
+                                              GitHandlerRegistry gitHandlerRegistry) {
         return new LibraryTab(
                 databaseContext,
                 tabContainer,
@@ -1189,9 +1234,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 taskExecutor,
+                gitHandlerRegistry,
                 false);
     }
 
@@ -1212,10 +1257,21 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 return;
             }
 
+            // Nor when the journal is replaying an insertion: a redo reads its stack, applies, and
+            // then moves the entry across, so recording anything here would clear the stack it is
+            // still holding. The entries are back either way; assigning them again is not this
+            // listener's business.
+            if (getUndoManager() instanceof GuiUndoManager journal && journal.isApplying()) {
+                return;
+            }
+
             // Automatically add new entries to the selected group (or set of groups)
             if (preferences.getGroupsPreferences().shouldAutoAssignGroup()) {
-                stateManager.getSelectedGroups(bibDatabaseContext).forEach(
-                        selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
+                // A step of its own, which nests into the caller's block when the insert opened one
+                // (import, paste), so the assignment is taken back together with the entries.
+                getUndoManager().addEdit(Localization.lang("Assign entries to group"), edit ->
+                        stateManager.getSelectedGroups(bibDatabaseContext).forEach(
+                                selectedGroup -> edit.addAll(selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()))));
             }
         }
     }

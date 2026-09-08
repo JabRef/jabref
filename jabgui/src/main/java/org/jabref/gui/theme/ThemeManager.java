@@ -110,17 +110,14 @@ public class ThemeManager {
     }
 
     private void updateFontStyleForScene(@NonNull Scene scene) {
+        scene.getRoot().getStyleClass().removeIf(str -> str.startsWith("font-size-"));
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
-            scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
-        } else {
-            int mainFontSize = WorkspacePreferences.getDefault().getMainFontSize();
-            LOGGER.debug("Using default font size of {}pt", mainFontSize);
-            scene.getRoot().setStyle("-fx-font-size: " + mainFontSize + "pt;");
+            scene.getRoot().getStyleClass().add("font-size-" + workspacePreferences.getMainFontSize());
         }
 
         if (scene.getRoot() instanceof DialogPane dialogPane) {
-            BaseDialog.applyButtonFix(dialogPane);
+            BaseDialog.fitWindowToContent(dialogPane);
         }
     }
 

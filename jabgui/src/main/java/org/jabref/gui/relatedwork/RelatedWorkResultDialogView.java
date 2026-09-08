@@ -8,13 +8,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.relatedwork.RelatedWorkMatchResult;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -33,7 +33,7 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
     @FXML private ButtonType insertButtonType;
 
     @Inject private DialogService dialogService;
-    @Inject private UndoManager undoManager;
+    @Inject private StateManager stateManager;
 
     private RelatedWorkResultDialogViewModel viewModel;
 
@@ -62,7 +62,7 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
                 matchedResults,
                 userName,
                 dialogService,
-                undoManager
+                stateManager.getActiveDatabase().map(stateManager::getUndoManager).orElseThrow()
         );
 
         this.matchedReferenceTable.setItems(viewModel.matchedReferencesProperty());

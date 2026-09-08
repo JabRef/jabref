@@ -18,7 +18,13 @@ plugins {
 
     id("com.vanniktech.maven.publish") version "0.37.0"
 
-    id("dev.jbang") version "0.4.0"
+    // Applied with "apply false": we only need the JBangTask type, not the plugin.
+    // Applying it displays a banner that reads and increments
+    // <gradleUserHome>/caches/kordamp/jbang/<version>/marker.txt at configuration time,
+    // which invalidates the Gradle configuration cache on every single build.
+    // (-Dorg.kordamp.banner=false only silences the output, the file is still written.)
+    // See https://github.com/jbangdev/jbang-gradle-plugin/issues/20
+    id("dev.jbang") version "0.4.0" apply false
 
     id("net.ltgt.errorprone") version "5.1.1"
     id("net.ltgt.nullaway") version "3.2.0"
@@ -174,6 +180,11 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
 // Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
 sourceSets["main"].resources {
     srcDir(layout.buildDirectory.dir("generated/resources"))
+
+    // JabRef only reads the top-level styles (CitationStyleCatalogGenerator scans with depth 1),
+    // but these ~8000 unused files dominate the cost of processResources on Windows.
+    exclude("csl-styles/dependent/**")
+    exclude("csl-styles/spec/**")
 }
 
 // region processResources

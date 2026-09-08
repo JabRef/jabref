@@ -17,6 +17,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.push.GuiPushToApplication;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
@@ -82,7 +83,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         citeCommand.textProperty().bindBidirectional(viewModel.citeCommandProperty());
 
         Button citeHelp = new Button();
-        citeHelp.getStyleClass().addAll("icon-button", "narrow");
+        citeHelp.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         citeHelp.setPrefSize(20.0, 20.0);
         new ActionFactory().configureIconButton(
                 StandardActions.HELP_PUSH_TO_APPLICATION,

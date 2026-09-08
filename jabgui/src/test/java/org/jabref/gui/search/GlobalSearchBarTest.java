@@ -2,11 +2,15 @@ package org.jabref.gui.search;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -19,10 +23,10 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.search.SearchPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +37,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -67,7 +72,6 @@ public class GlobalSearchBarTest {
                 mock(LibraryTabContainer.class),
                 stateManager,
                 preferences,
-                mock(UndoManager.class),
                 mock(DialogService.class),
                 SearchType.NORMAL_SEARCH
         );
@@ -102,6 +106,20 @@ public class GlobalSearchBarTest {
         assertEquals(List.of("Smith"), lastSearchHistory);
     }
 
+    /// A MenuItem's accelerator is global: JavaFX keeps one entry per key combination for the whole
+    /// scene. An item here carrying Ctrl+Z would take it from the Edit menu and then do nothing at
+    /// all whenever this field has nothing to undo, which is how Ctrl+Z came to work only inside the
+    /// entry editor.
+    @Test
+    void theContextMenuClaimsNoGlobalShortcut(FxRobot robot) {
+        TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
+
+        List<MenuItem> items = searchField.getContextMenu().getItems();
+
+        assertFalse(items.isEmpty(), "the context menu was not installed");
+        assertEquals(List.of(), items.stream().filter(item -> item.getAccelerator() != null).toList());
+    }
+
     @Test
     void emptyQueryIsNotRecorded(FxRobot robot) {
         stateManager.clearSearchHistory();
@@ -115,5 +133,36 @@ public class GlobalSearchBarTest {
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
         assertEquals(List.of(), lastSearchHistory);
+    }
+
+    @Test
+    void blankQueryClearsActiveSearch(FxRobot robot) throws InterruptedException {
+        TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
+
+        FxRobotInterface searchFieldRobot = robot.clickOn(searchField);
+        searchFieldRobot.write("abc");
+        awaitActiveSearchQuery(Optional.of(new SearchQuery("abc")));
+        assertEquals(Optional.of(new SearchQuery("abc")), stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
+
+        searchFieldRobot.eraseText(3);
+        searchFieldRobot.write("   ");
+        awaitActiveSearchQuery(Optional.empty());
+
+        assertEquals(Optional.empty(), stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
+    }
+
+    private void awaitActiveSearchQuery(Optional<SearchQuery> expected) throws InterruptedException {
+        if (expected.equals(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get())) {
+            return;
+        }
+
+        CountDownLatch updated = new CountDownLatch(1);
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener((_, _, current) -> {
+            if (expected.equals(current)) {
+                updated.countDown();
+            }
+        });
+
+        assertTrue(updated.await(5, TimeUnit.SECONDS), "Active search query was not updated in time");
     }
 }

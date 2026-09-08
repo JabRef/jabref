@@ -32,7 +32,6 @@ public class DateEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextField textField;
     @FXML private TemporalAccessorPicker datePicker;
 
-    @Inject private UndoManager undoManager;
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
 
@@ -42,6 +41,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
                       DateTimeFormatter dateFormatter,
                       SuggestionProvider<?> suggestionProvider,
                       FieldCheckers fieldCheckers,
+                      UndoManager undoManager,
                       UndoAction undoAction,
                       RedoAction redoAction) {
         ViewLoader.view(this)

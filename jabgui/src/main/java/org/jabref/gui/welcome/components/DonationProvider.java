@@ -66,49 +66,45 @@ public class DonationProvider {
         preferences.getDonationPreferences().setLastShownEpochDay((int) LocalDate.now().toEpochDay());
 
         Label title = new Label(Localization.lang("Support JabRef"));
-        title.getStyleClass().add("donation-toast-title");
+        title.getStyleClass().add("bold");
         Label subtitle = new Label(Localization.lang("Help us improve JabRef by donating."));
-        subtitle.getStyleClass().add("donation-toast-desc");
-        VBox textBox = new VBox(title, subtitle);
-        textBox.getStyleClass().add("donation-toast-text");
+        VBox textBox = new VBox(4, title, subtitle);
 
         Node iconNode = IconTheme.JabRefIcons.DONATE.getGraphicNode();
-        HBox leftContent = new HBox(10, iconNode, textBox);
+        HBox leftContent = new HBox(4, iconNode, textBox);
         leftContent.setAlignment(Pos.CENTER_LEFT);
 
         Button neverButton = new Button(Localization.lang("Never show again"));
-        neverButton.getStyleClass().add("donation-btn-ghost");
+        neverButton.getStyleClass().addAll("btn-transparent");
         neverButton.setOnAction(_ -> {
             preferences.getDonationPreferences().setNeverShowAgain(true);
             hideToast();
         });
 
         Button cancelButton = new Button(Localization.lang("Cancel"));
-        cancelButton.getStyleClass().add("donation-btn-secondary");
+        cancelButton.getStyleClass().addAll("bg-secondary");
         cancelButton.setOnAction(_ -> hideToast());
 
         Button donateButton = new Button(Localization.lang("Donate"));
-        donateButton.getStyleClass().add("donation-btn-primary");
         donateButton.setDefaultButton(true);
         donateButton.setOnAction(_ -> {
             new OpenBrowserAction(DONATION_URL, dialogService, preferences.getExternalApplicationsPreferences()).execute();
             hideToast();
         });
 
-        HBox rightButtons = new HBox(8, neverButton, cancelButton, donateButton);
+        HBox rightButtons = new HBox(4, neverButton, cancelButton, donateButton);
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
 
         Region textSpacer = new Region();
         HBox.setHgrow(textSpacer, Priority.ALWAYS);
 
-        donationToast = new HBox(leftContent, textSpacer, rightButtons);
-        donationToast.getStyleClass().add("donation-toast");
+        donationToast = new HBox(4, leftContent, textSpacer, rightButtons);
+        donationToast.getStyleClass().addAll("donation-toast", "padding-12", "align-center-left");
         donationToast.setMaxWidth(Region.USE_PREF_SIZE);
         donationToast.setMinWidth(Region.USE_PREF_SIZE);
-        donationToast.setTranslateY(-40);
 
         StackPane.setAlignment(donationToast, Pos.TOP_CENTER);
-        StackPane.setMargin(donationToast, new Insets(16));
+        StackPane.setMargin(donationToast, new Insets(8));
         rootPane.getChildren().add(donationToast);
 
         TranslateTransition slideDown = new TranslateTransition(Duration.millis(DONATION_POPUP_ANIM_MS), donationToast);
