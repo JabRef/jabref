@@ -217,15 +217,15 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 clipBoardManager,
                 taskExecutor,
                 gitHandlerRegistry);
-        Optional<LibraryTab> alreadyOpen = manager.findOpenTab(connectionProperties);
-        if (alreadyOpen.isPresent()) {
+        manager.findOpenTab(connectionProperties).ifPresentOrElse(alreadyOpen -> {
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
                     Localization.lang("You are already connected to a database using entered connection details."));
-            tabContainer.showLibraryTab(alreadyOpen.get());
+            tabContainer.showLibraryTab(alreadyOpen);
             onConnected.run();
-            return;
-        }
+        }, () -> connect(manager, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
+    }
 
+    private void connect(SharedDatabaseUIManager manager, DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
         if (shouldAutosave) {
             Path localFilePath = Path.of(autosavePath);
 

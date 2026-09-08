@@ -9,6 +9,8 @@ import java.util.Properties;
 
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 
+import org.jspecify.annotations.Nullable;
+
 /// Keeps all essential data for establishing a new connection to a DBMS using [DBMSConnection].
 public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
@@ -119,22 +121,17 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     }
 
     private static List<String> databaseIdentity(DatabaseConnectionProperties properties) {
-        String host = properties.getHost();
-        int port = properties.getPort();
-        String database = properties.getDatabase();
-        String user = properties.getUser();
         if (properties.isUseExpertMode()) {
             // In expert mode only the JDBC URL is authoritative; the fields may be empty or hold defaults
-            Optional<DBMSConnectionUrl> url = DBMSConnectionUrl.parse(properties.getJdbcUrl());
-            if (url.isEmpty()) {
-                return Arrays.asList(properties.getJdbcUrl(), user);
-            }
-            host = url.get().host();
-            port = url.get().port();
-            database = url.get().database();
-            user = url.get().user().orElse(user);
+            return DBMSConnectionUrl.parse(properties.getJdbcUrl())
+                                    .map(url -> identity(url.host(), url.port(), url.database(), url.user().orElse(properties.getUser())))
+                                    .orElseGet(() -> Arrays.asList(properties.getJdbcUrl(), properties.getUser()));
         }
-        return Arrays.asList(host == null ? null : host.toLowerCase(Locale.ROOT), Integer.toString(port), database, user);
+        return identity(properties.getHost(), properties.getPort(), properties.getDatabase(), properties.getUser());
+    }
+
+    private static List<String> identity(@Nullable String host, int port, @Nullable String database, @Nullable String user) {
+        return Arrays.asList(Objects.toString(host, "").toLowerCase(Locale.ROOT), Integer.toString(port), database, user);
     }
 
     /// Returns username, password and ssl as Properties Object

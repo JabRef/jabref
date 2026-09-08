@@ -180,12 +180,16 @@ public class SharedDatabaseUIManager {
     /// If the database is meanwhile open in another tab (e.g. two remembered connections to the same database),
     /// the new connection is dropped and that tab is shown instead.
     public LibraryTab openTab(BibDatabaseContext bibDatabaseContext) {
-        Optional<LibraryTab> alreadyOpen = findOpenTab(dbmsSynchronizer.getConnectionProperties());
-        if (alreadyOpen.isPresent()) {
-            dbmsSynchronizer.closeSharedDatabase();
-            tabContainer.showLibraryTab(alreadyOpen.get());
-            return alreadyOpen.get();
-        }
+        return findOpenTab(dbmsSynchronizer.getConnectionProperties())
+                .map(alreadyOpen -> {
+                    dbmsSynchronizer.closeSharedDatabase();
+                    tabContainer.showLibraryTab(alreadyOpen);
+                    return alreadyOpen;
+                })
+                .orElseGet(() -> createTab(bibDatabaseContext));
+    }
+
+    private LibraryTab createTab(BibDatabaseContext bibDatabaseContext) {
         dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsSynchronizer.getConnectionProperties().getType().toString()));
 
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
