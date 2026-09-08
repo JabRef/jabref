@@ -4,7 +4,7 @@ import org.jabref.logic.ocr.docling.DoclingEngine;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Factory for any engine that implements {@code OcrEngine}
+/// Factory for any engine that implements [OcrEngine]
 @NullMarked
 public final class OcrEngineFactory {
 
