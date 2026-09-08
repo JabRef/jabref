@@ -16,7 +16,7 @@
 
     <Button fx:id="shortenDOIButton"
             onAction="#shortenID"
-            styleClass="icon-button"
+            styleClass="icon-button, entry-editor-field-button"
             disable="${controller.viewModel.isInvalidIdentifier}"
             managed="${controller.viewModel.canShortenIdentifier}"
             visible="${controller.viewModel.canShortenIdentifier}">
@@ -27,7 +27,7 @@
 
     <Button disable="${controller.viewModel.isInvalidIdentifier}"
             onAction="#openExternalLink"
-            styleClass="icon-button">
+            styleClass="icon-button, entry-editor-field-button">
         <graphic>
             <JabRefIconView glyph="OPEN_LINK"/>
         </graphic>
@@ -38,7 +38,7 @@
 
     <Button fx:id="lookupIdentifierButton"
             onAction="#lookupIdentifier"
-            styleClass="icon-button"
+            styleClass="icon-button, entry-editor-field-button"
             visible="${controller.viewModel.canLookupIdentifier}"
             managed="${controller.viewModel.canLookupIdentifier}">
         <graphic>
@@ -53,7 +53,7 @@
 
     <Button fx:id="fetchInformationByIdentifierButton"
             onAction="#fetchInformationByIdentifier"
-            styleClass="icon-button"
+            styleClass="icon-button, entry-editor-field-button"
             disable="${controller.viewModel.isInvalidIdentifier}"
             managed="${controller.viewModel.canFetchBibliographyInformationById}"
             visible="${controller.viewModel.canFetchBibliographyInformationById}">

@@ -337,6 +337,10 @@
     -fx-opacity: 0.4;
 }
 
+.entry-editor-field-button {
+    -fx-padding: 0.333em 0.5em;
+}
+
 /* Selected state is signalled by the icon color alone (set in code), not by a background. */
 .addEntryButton:selected {
     -fx-background-color: transparent;

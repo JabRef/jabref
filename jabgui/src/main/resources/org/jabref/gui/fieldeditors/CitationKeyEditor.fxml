@@ -8,5 +8,5 @@
          alignment="CENTER_LEFT"
          fx:controller="org.jabref.gui.fieldeditors.CitationKeyEditor">
     <EditorTextField fx:id="textField"/>
-    <Button fx:id="generateCitationKeyButton" text="%Generate" styleClass="icon-button"/>
+    <Button fx:id="generateCitationKeyButton" text="%Generate" styleClass="icon-button, entry-editor-field-button"/>
 </fx:root>

@@ -13,7 +13,7 @@
     <HBox>
         <Button fx:id="journalInfoButton"
                 onAction="#showJournalInfo"
-                styleClass="icon-button">
+                styleClass="icon-button, entry-editor-field-button">
             <graphic>
                 <JabRefIconView glyph="VIEW_JOURNAL_INFO"/>
             </graphic>
@@ -22,7 +22,7 @@
             </tooltip>
         </Button>
         <Button onAction="#toggleAbbreviation"
-                styleClass="icon-button">
+                styleClass="icon-button, entry-editor-field-button">
             <graphic>
                 <JabRefIconView glyph="TOGGLE_ABBREVIATION"/>
             </graphic>

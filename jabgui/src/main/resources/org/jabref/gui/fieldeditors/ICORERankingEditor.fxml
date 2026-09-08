@@ -11,14 +11,14 @@
     <EditorTextField fx:id="textField"/>
         <Button fx:id="lookupICORERankButton"
                 onAction="#lookupRank"
-                styleClass="icon-button">
+                styleClass="icon-button, entry-editor-field-button">
             <graphic>
                 <JabRefIconView glyph="LOOKUP_IDENTIFIER"/>
             </graphic>
         </Button>
         <Button fx:id="visitICOREConferencePageButton"
                 onAction="#openExternalLink"
-                styleClass="icon-button">
+                styleClass="icon-button, entry-editor-field-button">
             <graphic>
                 <JabRefIconView glyph="OPEN_LINK"/>
             </graphic>

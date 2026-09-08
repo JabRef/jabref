@@ -12,7 +12,7 @@
     <EditorTextField fx:id="textField"/>
         <Button fx:id="journalInfoButton"
                 onAction="#showJournalInfo"
-                styleClass="icon-button">
+                styleClass="icon-button, entry-editor-field-button">
             <graphic>
                 <JabRefIconView glyph="VIEW_JOURNAL_INFO"/>
             </graphic>
@@ -22,7 +22,7 @@
         </Button>
         <Button fx:id="fetchInformationByIdentifierButton"
                 onAction="#fetchInformationByIdentifier"
-                styleClass="icon-button">
+                styleClass="icon-button, entry-editor-field-button">
             <graphic>
                 <JabRefIconView glyph="FETCH_BY_IDENTIFIER"/>
             </graphic>
