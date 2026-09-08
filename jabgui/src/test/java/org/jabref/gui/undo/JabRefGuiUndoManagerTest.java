@@ -141,11 +141,11 @@ class JabRefGuiUndoManagerTest {
         assertEquals(List.of(), undoableValues);
     }
 
-    /// A burst off the JavaFX thread queues one update, not one per edit. What the property ends
-    /// up holding is the same either way — each update reads the stacks when it runs — so what
-    /// this pins is that coalescing does not lose the last state.
+    /// A burst of edits off the JavaFX thread leaves the properties at the state the journal ends
+    /// in, however many updates that took. The updates are not coalesced, and this is what says
+    /// that they need not be.
     @Test
-    void aBurstOfEditsQueuesOneUpdate() throws InterruptedException {
+    void aBurstOfEditsLeavesThePropertiesAtTheLastState() throws InterruptedException {
         CountDownLatch release = new CountDownLatch(1);
         Platform.runLater(() -> {
             try {

@@ -33,17 +33,17 @@ public interface CoalescingPolicy {
     /// change spans the run: from the value the field held before the first keystroke to the value
     /// it holds after the last.
     CoalescingPolicy CONSECUTIVE_FIELD_EDITS = (previous, next) -> {
-        if (!(previous instanceof UndoableFieldChange first) || !(next instanceof UndoableFieldChange second)) {
-            return Optional.empty();
+        if ((previous instanceof UndoableFieldChange first)
+                && (next instanceof UndoableFieldChange second)
+                && (first.entry() == second.entry())
+                && first.field().equals(second.field())
+                // The run has to be unbroken: if what the first change produced is not what the
+                // second takes as its prior value, something happened in between that a single
+                // change cannot describe.
+                && Objects.equals(first.after(), second.before())) {
+            return Optional.of(new UndoableFieldChange(first.entry(), first.field(), first.before(), second.after()));
         }
-        boolean sameTarget = (first.entry() == second.entry()) && first.field().equals(second.field());
-        // The run has to be unbroken: if what the first change produced is not what the second
-        // takes as its prior value, something happened in between that this cannot describe.
-        boolean continues = Objects.equals(first.after(), second.before());
-        if (!sameTarget || !continues) {
-            return Optional.empty();
-        }
-        return Optional.of(new UndoableFieldChange(first.entry(), first.field(), first.before(), second.after()));
+        return Optional.empty();
     };
 
     /// @return the change to replace the top of the stack with, or empty to push `next` as a step

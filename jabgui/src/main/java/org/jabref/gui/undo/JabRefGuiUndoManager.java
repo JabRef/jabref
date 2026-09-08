@@ -1,11 +1,9 @@
 package org.jabref.gui.undo;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.undo.JabRefUndoManager;
 
 import org.jspecify.annotations.NullMarked;
@@ -27,9 +25,6 @@ public class JabRefGuiUndoManager extends JabRefUndoManager implements GuiUndoMa
     private final ReadOnlyBooleanWrapper undoable = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper redoable = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper changed = new ReadOnlyBooleanWrapper(false);
-
-    /// Whether an update is queued and has not yet read the stacks.
-    private final AtomicBoolean pendingRefresh = new AtomicBoolean();
 
     public JabRefGuiUndoManager() {
         // Subscribing to itself rather than refreshing inside the push: listeners are notified
@@ -63,27 +58,16 @@ public class JabRefGuiUndoManager extends JabRefUndoManager implements GuiUndoMa
     /// records a change and then reads the property in the same event does not see the previous
     /// value. Deferring unconditionally would leave the menu stale for a pulse.
     ///
-    /// A burst of edits off the JavaFX thread queues **one** update, not one per edit: an update
-    /// that has not run yet will read the stacks when it does, so a second one would set the same
-    /// values. The flag is cleared inside the runnable *before* the stacks are read, so an edit
-    /// arriving while the update is in flight still queues a fresh one — the invariant being that
-    /// the last state wins, never that the last runnable does.
+    /// A burst of edits off the JavaFX thread therefore queues one update per edit, uncoalesced.
+    /// That costs queue pressure and nothing else: each update reads the current state, so every
+    /// one after the first sets the value already there, which a JavaFX property ignores without
+    /// notifying anything. The burst worth worrying about was one push per keystroke, and typing
+    /// is one step now; a command pushes once, however long it ran.
     private void refresh() {
-        if (Platform.isFxApplicationThread()) {
-            apply();
-            return;
-        }
-        if (pendingRefresh.compareAndSet(false, true)) {
-            Platform.runLater(() -> {
-                pendingRefresh.set(false);
-                apply();
-            });
-        }
-    }
-
-    private void apply() {
-        undoable.set(canUndo());
-        redoable.set(canRedo());
-        changed.set(hasChanged());
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            undoable.set(canUndo());
+            redoable.set(canRedo());
+            changed.set(hasChanged());
+        });
     }
 }
