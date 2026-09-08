@@ -97,39 +97,35 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     @Override
     public void storeSettings() {
-        MetaData newMetaData = databaseContext.getMetaData();
-
-        newMetaData.setEncoding(selectedEncodingProperty.getValue());
-        newMetaData.setMode(selectedDatabaseModeProperty.getValue());
+        metaData.setEncoding(selectedEncodingProperty.getValue());
+        metaData.setMode(selectedDatabaseModeProperty.getValue());
 
         String librarySpecificFileDirectory = librarySpecificDirectoryProperty.getValue().trim();
         if (librarySpecificFileDirectory.isEmpty()) {
-            newMetaData.clearLibrarySpecificFileDirectory();
+            metaData.clearLibrarySpecificFileDirectory();
         } else if (librarySpecificFileDirectoryStatus().isValid()) {
-            newMetaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
+            metaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
         }
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
-            newMetaData.clearUserFileDirectory(preferences.getFilePreferences().getUserAndHost());
+            metaData.clearUserFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else if (userSpecificFileDirectoryStatus().isValid()) {
-            newMetaData.setUserFileDirectory(preferences.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
+            metaData.setUserFileDirectory(preferences.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
         }
 
         String latexFileDirectory = laTexFileDirectoryProperty.getValue();
         if (latexFileDirectory.isEmpty()) {
-            newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
+            metaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else if (laTexFileDirectoryStatus().isValid()) {
-            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
+            metaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
         }
 
-        storeKeywordSeparator(newMetaData);
-
-        databaseContext.setMetaData(newMetaData);
+        storeKeywordSeparator(metaData);
     }
 
-    private void storeKeywordSeparator(MetaData newMetaData) {
-        Optional<Character> previousSeparator = newMetaData.getKeywordSeparator();
+    private void storeKeywordSeparator(MetaData metaData) {
+        Optional<Character> previousSeparator = metaData.getKeywordSeparator();
         Optional<Character> newSeparator = Optional.of(keywordSeparatorProperty.getValue().trim())
                                                    .filter(separator -> !separator.isEmpty())
                                                    .map(separator -> separator.charAt(0));
@@ -140,7 +136,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         Character previousEffectiveSeparator = previousSeparator.orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
         Character newEffectiveSeparator = newSeparator.orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
         undoManager.addEdit(Localization.lang("Change keyword separator"), edit -> {
-            edit.applyEdit(new UndoableKeywordSeparatorChange(newMetaData, previousSeparator, newSeparator));
+            edit.applyEdit(new UndoableKeywordSeparatorChange(metaData, previousSeparator, newSeparator));
             if (!previousEffectiveSeparator.equals(newEffectiveSeparator)) {
                 KeywordSeparatorMigration.migrateEntryFields(databaseContext, previousEffectiveSeparator, newEffectiveSeparator)
                                          .forEach(fieldChange -> edit.addEdit(fieldChange));

@@ -101,12 +101,12 @@ public class ContextAction extends SimpleCommand {
                     linkedFile.openFolder();
             case DOWNLOAD_FILE -> {
                 if (linkedFile.getFile().isOnlineLink()) {
-                    linkedFile.download(true);
+                    linkedFile.download(true, viewModel.getUndoManager());
                 }
             }
             case REDOWNLOAD_FILE -> {
                 if (!linkedFile.getFile().getSourceUrl().isEmpty()) {
-                    linkedFile.redownload();
+                    linkedFile.redownload(viewModel.getUndoManager());
                 }
             }
             case RENAME_FILE_TO_PATTERN ->

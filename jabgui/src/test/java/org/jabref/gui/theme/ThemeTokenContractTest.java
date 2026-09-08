@@ -5,11 +5,15 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javafx.collections.ObservableList;
 import javafx.css.CssParser;
@@ -35,6 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 /// 2. Every theme must declare every token that is used, otherwise JavaFX falls back to a default
 ///    and the control silently loses its color.
 /// 3. Every token a theme declares must be read by someone.
+///
+/// The fourth one is not about the stylesheets at all: nothing may set an inline style, because an inline
+/// style outranks every stylesheet and would put the color out of the theme's reach for good.
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 class ThemeTokenContractTest {
 
@@ -74,6 +81,16 @@ class ThemeTokenContractTest {
 
     /// Primer's raw color ramps -- `-color-base-0` - `-color-base-9`.
     private static final Pattern PALETTE_RAMP = Pattern.compile("-color-(?:base|accent|success|warning|danger)-[0-9]|-color-(?:dark|light)");
+
+    /// All modules holding Java sources and FXML files that may build a scene graph.
+    private static final List<String> MODULES = List.of("jablib", "jabkit", "jabsrv", "jabgui", "jabls");
+
+    /// JavaFX's three entry points to a node's inline style.
+    private static final Pattern INLINE_STYLE_API = Pattern.compile(
+            "\\.(?:setStyle\\s*\\(|getStyle\\s*\\(\\s*\\)|styleProperty\\s*\\(\\s*\\))");
+
+    /// FXML's inline style, the same thing spelled declaratively.
+    private static final Pattern INLINE_STYLE_ATTRIBUTE = Pattern.compile("\\sstyle\\s*=\\s*\"");
 
     @BeforeEach
     void beforeEach() {
@@ -200,6 +217,50 @@ class ThemeTokenContractTest {
                     "%s declares -color- tokens for 'prefers-color-scheme: %s' that no stylesheet reads"
                             .formatted(themeCss, colorScheme));
         }
+    }
+
+    /// Walks `src/main/<sourceSet>` of every module and reports every line matching `forbidden`.
+    ///
+    /// @return `<module>/<path>:<line>: <line content>` for each hit, in file order
+    private static List<String> matchesInSources(String sourceSet, String extension, Pattern forbidden) throws IOException {
+        List<String> matches = new ArrayList<>();
+        for (String module : MODULES) {
+            Path root = Path.of("..", module, "src", "main", sourceSet).normalize();
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            // Files.walk holds a directory handle, thus the stream needs to be closed
+            try (Stream<Path> paths = Files.walk(root)) {
+                for (Path path : paths.filter(candidate -> candidate.toString().endsWith(extension)).toList()) {
+                    List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+                    for (int line = 0; line < lines.size(); line++) {
+                        if (forbidden.matcher(lines.get(line)).find()) {
+                            matches.add("%s:%d: %s".formatted(path, line + 1, lines.get(line).strip()));
+                        }
+                    }
+                }
+            }
+        }
+        return matches;
+    }
+
+    /// An inline style is applied with INLINE origin, which outranks the author stylesheets a theme is made of.
+    /// A control styled that way therefore keeps its hardcoded color in every theme and in both color schemes --
+    /// the failure this whole token set exists to prevent. Style classes and `-color-*` tokens are the way in.
+    ///
+    /// There is no exception: even the user's main font size goes through a `font-size-<n>` class.
+    @Test
+    void noSourceFileUsesTheInlineStyleApi() throws IOException {
+        assertEquals(List.of(), matchesInSources("java", ".java", INLINE_STYLE_API),
+                "an inline style cannot be themed: give the node a style class and let the stylesheets color it");
+    }
+
+    /// The declarative half of [#noSourceFileUsesTheInlineStyleApi]: `style="..."` in FXML is the same INLINE
+    /// origin, just written in the layout instead of in code.
+    @Test
+    void noFxmlFileUsesTheInlineStyleAttribute() throws IOException {
+        assertEquals(List.of(), matchesInSources("resources", ".fxml", INLINE_STYLE_ATTRIBUTE),
+                "an inline style cannot be themed: use styleClass and let the stylesheets color it");
     }
 
     @Test

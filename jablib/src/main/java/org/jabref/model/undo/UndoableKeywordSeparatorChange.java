@@ -1,5 +1,6 @@
 package org.jabref.model.undo;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.metadata.MetaData;
@@ -16,7 +17,11 @@ public record UndoableKeywordSeparatorChange(MetaData metaData, Optional<Charact
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
+        if (!Objects.equals(metaData.getKeywordSeparator(), before)) {
+            return ApplyResult.of(this, "the keyword separator is %s, not the recorded %s".formatted(metaData.getKeywordSeparator(), before));
+        }
         after.ifPresentOrElse(metaData::setKeywordSeparator, metaData::clearKeywordSeparator);
+        return ApplyResult.SUCCESS;
     }
 }

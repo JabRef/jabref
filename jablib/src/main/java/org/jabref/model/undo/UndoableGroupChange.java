@@ -17,8 +17,12 @@ public record UndoableGroupChange(GroupTreeNode node, AbstractGroup before, Abst
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
+        if (!Objects.equals(node.getGroup(), before)) {
+            return ApplyResult.of(this, "the group is '%s', not the recorded '%s'".formatted(node.getGroup().getName(), before.getName()));
+        }
         node.setGroup(after);
+        return ApplyResult.SUCCESS;
     }
 
     @Override
