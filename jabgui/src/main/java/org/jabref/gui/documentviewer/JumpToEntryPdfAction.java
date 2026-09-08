@@ -30,11 +30,11 @@ import org.slf4j.LoggerFactory;
 /// The link mirrors the REST API path of the entry (`/libraries/{id}/entries/{key}`) so that the same address
 /// works in jabsrv, cite-as-you-write and JabMap:
 ///
-/// - `jabref://libraries/{libraryId}/entries/{citationKey}` (absolute, `libraryId` as in [BibDatabaseContext#getLibraryId])
-/// - `entries/{citationKey}` (relative to the active library, what the AI chat emits)
+/// - `jabref://libraries/{id}/entries/{key}` (absolute, `{id}` as in [BibDatabaseContext#getLibraryId])
+/// - `entries/{key}` (relative to the active library, what the AI chat emits)
 ///
-/// Both forms accept an optional `/files/{n}` segment selecting the n-th linked file (1-based, default: first PDF)
-/// and a `#page=N` fragment as in the PDF Open Parameters understood by Acrobat.
+/// Both forms accept an optional `/files/{n}` segment selecting the `{n}`-th linked file (1-based, default: first PDF)
+/// and a `#page={page}` fragment as in the PDF Open Parameters understood by Acrobat.
 // [impl->feat~ai.chat.jump-to-entry-pdf~1]
 @NullMarked
 public class JumpToEntryPdfAction extends SimpleCommand {
