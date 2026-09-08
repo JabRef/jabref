@@ -254,8 +254,8 @@ public class JabRefUndoManager implements UndoManager {
                 if (!isNoOp(merged.get())) {
                     push(merged.get());
                 } else {
+                    // The redo stack is already empty: the first keystroke of the run pushed.
                     stepFinished = true;
-                    redoStack.clear();
                 }
                 return;
             }

@@ -35,7 +35,7 @@ The two copies would disagree until the next push, at which point the local reve
 
 Chosen option: "leave pulled changes off the journal", because making them undoable answers a synchronisation question by accident.
 A local undo would take back something the shared database still holds; deciding what happens next — push the revert, or refuse it — is the shared-database design's call, and no part of it is decided by how the journal is built.
-The journal stays a record of the local this user's actions.
+The journal stays a record of this user's own actions.
 
 Instead the local user will encounter:
 
@@ -43,7 +43,7 @@ Instead the local user will encounter:
   Thus undo after a remote overwrite reports that the library has moved on, and the colleague's edit survives.
 * The pulled change **marks the library as needing a save**, because it arrives as `EntriesEventSource.SHARED` and `LibraryTab` treats a change nobody recorded as one only saving can settle (`req~logic.undo.modified-marker-derived~1`).
 
-## Confirmation
+### Confirmation
 
 `DBMSSynchronizer` carries the tag `[impl->adr~shared-changes-are-not-undoable~1]` at the point where a pulled change is applied to the local model, and its class javadoc states the decision.
 The two behaviours the decision leans on are traced separately and covered by tests: refusal by `req~logic.undo.stale-change-refused~1`, and the modified marker by `req~logic.undo.modified-marker-derived~1`.
