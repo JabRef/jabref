@@ -1,5 +1,7 @@
 package org.jabref.gui.documentviewer;
 
+import java.util.Objects;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -115,7 +117,13 @@ public class DocumentViewerView extends BaseDialog<Void> {
     }
 
     public void switchToFile(LinkedFile file) {
-        fileChoice.getSelectionModel().select(file);
+        fileChoice.getItems().stream()
+                  .filter(f -> Objects.equals(f.getLink(), file.getLink()))
+                  .findFirst()
+                  .ifPresentOrElse(
+                          f -> fileChoice.getSelectionModel().select(f),
+                          () -> viewModel.switchToFile(file)
+                  );
     }
 
     public void gotoPage(int pageNumber) {

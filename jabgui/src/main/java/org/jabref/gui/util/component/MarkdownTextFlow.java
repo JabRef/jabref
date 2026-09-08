@@ -10,7 +10,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.documentviewer.JumpToEntryPdfAction;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.SelectableTextFlow;
@@ -115,12 +117,20 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         }
 
         MarkdownAwareHyperlink hyperlink = new MarkdownAwareHyperlink(text, astNode);
-        hyperlink.setOnAction(_ -> new OpenBrowserAction(
-                url,
-                Injector.instantiateModelOrService(DialogService.class),
-                Injector.instantiateModelOrService(GuiPreferences.class)
-                        .getExternalApplicationsPreferences()).execute()
-        );
+        hyperlink.setOnAction(_ -> {
+            if (url != null && url.startsWith("entry://")) {
+                new JumpToEntryPdfAction(
+                        url,
+                        Injector.instantiateModelOrService(StateManager.class),
+                        Injector.instantiateModelOrService(DialogService.class)).execute();
+            } else {
+                new OpenBrowserAction(
+                        url,
+                        Injector.instantiateModelOrService(DialogService.class),
+                        Injector.instantiateModelOrService(GuiPreferences.class)
+                                .getExternalApplicationsPreferences()).execute();
+            }
+        });
 
         if (styleClasses != null) {
             for (String styleClass : styleClasses) {

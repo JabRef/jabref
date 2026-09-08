@@ -98,6 +98,13 @@ This requirement ensures that the AI has context to answer a question.
 
 Needs: impl
 
+### User can jump to entry PDF from citation links in AI chat
+`feat~ai.chat.jump-to-entry-pdf~1`
+
+Clicking a citation link in the format `[CitationKey](entry://CitationKey/page)` jumps to the corresponding entry in the library and opens the internal PDF viewer at the referenced page.
+
+Needs: impl, utest
+
 ## AI chat with entries
 `feat~ai.chatting.entries~1`
 
