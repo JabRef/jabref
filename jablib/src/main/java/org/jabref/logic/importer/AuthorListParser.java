@@ -43,7 +43,9 @@ public class AuthorListParser {
 
     private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\\s*\\n\\s*");
 
-    private static final Pattern ET_AL_SUFFIX = Pattern.compile("[,;\\s]+et\\s+al\\.?$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern ET_AL_SUFFIX = Pattern.compile("[,;\\s]++et\\s++al\\.?+$", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern COMMA_SEPARATOR = Pattern.compile("\\s*+,\\s*+");
 
     /// the raw bibtex author/editor field
     private String original;
@@ -110,7 +112,7 @@ public class AuthorListParser {
             andOthersPresent = true;
             listOfNames = listOfNames.substring(0, etAlMatcher.start());
             // "Z. Yao, D. S. Weld, et al.": without the "et al." nothing marks the commas as name separators
-            String[] names = listOfNames.split(", ");
+            String[] names = COMMA_SEPARATOR.split(listOfNames);
             if (!listOfNames.toUpperCase(Locale.ENGLISH).contains(" AND ")
                     && Arrays.stream(names).allMatch(name -> STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH.matcher(name).find())) {
                 listOfNames = String.join(" and ", names);

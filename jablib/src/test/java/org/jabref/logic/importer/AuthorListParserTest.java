@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -53,9 +54,14 @@ class AuthorListParserTest {
         assertEquals(Optional.of("Z. Yao and D. S. Weld and W-P. Chen and H. Sun"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, W-P. Chen, and H. Sun"));
     }
 
-    @Test
-    void etAlNormalizedToAndOthers() {
-        assertEquals(Optional.of("Z. Yao and D. S. Weld and others"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, et al."));
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Z. Yao, D. S. Weld, et al.",
+            "Z. Yao,D. S. Weld, et al.",
+            "Z. Yao,   D. S. Weld, et al."
+    })
+    void etAlNormalizedToAndOthers(String input) {
+        assertEquals(Optional.of("Z. Yao and D. S. Weld and others"), AuthorListParser.normalizeSimply(input));
     }
 
     @Test
