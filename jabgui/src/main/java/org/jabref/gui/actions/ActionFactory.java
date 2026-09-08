@@ -164,14 +164,7 @@ public class ActionFactory {
     public Button createIconButton(Action action, Command command) {
         Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);
 
-        button.getStyleClass().setAll("icon-button");
-
-        // For some reason the graphic is not set correctly, so let's fix this
-        button.graphicProperty().unbind();
-        action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
-
-        // Prevent the buttons from stealing the focus
-        button.setFocusTraversable(false);
+        initButton(action, button);
 
         return button;
     }
@@ -183,13 +176,15 @@ public class ActionFactory {
                 button,
                 ActionUtils.ActionTextBehavior.HIDE);
 
-        button.getStyleClass().add("icon-button");
-
-        // For some reason the graphic is not set correctly, so let's fix this
-        // ToDO: Find a way to reuse JabRefIconView
-        button.graphicProperty().unbind();
-        action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
+        initButton(action, button);
 
         return button;
+    }
+
+    private static void initButton(Action action, ButtonBase button) {
+        button.setFocusTraversable(true);
+        button.getStyleClass().add("icon-button");
+        button.graphicProperty().unbind();
+        action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
     }
 }

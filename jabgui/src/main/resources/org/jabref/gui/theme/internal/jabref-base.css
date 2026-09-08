@@ -149,9 +149,6 @@
 .btn-transparent {
     -fx-background: transparent;
     -fx-background-color: transparent;
-    -fx-border-width: 0;
-    -fx-background-insets: 0;
-    -fx-background-radius: 0.25em;
 }
 
 /* JavaFX with custom components */
@@ -314,12 +311,12 @@
 }
 
 .icon-button {
-    -fx-border-width: 0;
     -fx-background: transparent;
     -fx-background-color: transparent;
     -fx-padding: 0.5em;
-    -fx-background-radius: 0.25em;
     -fx-border-radius: 0.25em;
+    -fx-border-width: 0.0625em;
+    -fx-border-color: transparent;
 }
 
 .icon-button:hover {
@@ -337,6 +334,10 @@
     -fx-background-color: -color-overlay-hover;
     -fx-text-fill: -color-fg-emphasis;
     -fx-fill: -color-fg-emphasis;
+}
+
+.icon-button:focused {
+    -fx-border-color: -color-accent;
 }
 
 .icon-button:disabled {
@@ -460,7 +461,7 @@
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
     /* `!important` is override library's default font size */
-    -fx-font-size: 1.7em!important;
+    -fx-font-size: 1.8em!important;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
     -fx-icon-color: -color-accent;

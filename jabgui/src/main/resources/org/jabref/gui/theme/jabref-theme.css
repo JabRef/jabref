@@ -943,8 +943,3 @@ TextFlow > .tooltip-text-monospaced {
     -fx-alignment: center-left;
     -fx-text-fill: -fx-text-inner-color;
 }
-
-/* JavaFX WebView */
-.web-view {
-    -fx-page-fill: -color-fg-emphasis;
-}
