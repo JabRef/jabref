@@ -12,6 +12,11 @@ on:
 
 permissions: {}
 
+# Rapid pushes start overlapping runs; only the newest one should get to label.
+concurrency:
+  group: pr-labeler-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   labeler:
     name: Label PR by changed files
@@ -37,7 +42,9 @@ jobs:
       - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           script: |
-            const pr = context.payload.pull_request;
+            // Fetched instead of taken from the event payload: an older payload
+            // would classify by outdated line counts and labels.
+            const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: context.payload.pull_request.number});
             const changes = pr.additions + pr.deletions;
             const wanted = changes <= 100 ? 'size: small' : changes <= 500 ? 'size: medium' : 'size: big';
             const present = pr.labels.map(label => label.name);
