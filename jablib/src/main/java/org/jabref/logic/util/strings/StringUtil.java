@@ -775,9 +775,12 @@ public class StringUtil {
             return fullPath;
         }
 
-        int lastSeparator = Math.max(fullPath.lastIndexOf('/'), fullPath.lastIndexOf('\\'));
+        char primarySeparator = OS.WINDOWS ? '\\' : '/';
+        char fallbackSeparator = OS.WINDOWS ? '/' : '\\';
+
+        int lastSeparator = fullPath.lastIndexOf(primarySeparator);
         if (lastSeparator == -1) {
-            return limitStringLength(fullPath, maxLength);
+            lastSeparator = fullPath.lastIndexOf(fallbackSeparator);
         }
 
         String parent = fullPath.substring(0, lastSeparator);
