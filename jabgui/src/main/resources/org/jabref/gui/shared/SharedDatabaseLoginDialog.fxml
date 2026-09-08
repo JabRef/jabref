@@ -19,9 +19,10 @@
         <VBox spacing="10.0">
             <GridPane fx:id="savedConnectionsPane" hgap="8.0" vgap="8.0">
                 <columnConstraints>
-                    <ColumnConstraints hgrow="NEVER" minWidth="-Infinity"/>
-                    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="260.0"/>
-                    <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="80.0"/>
+                    <ColumnConstraints hgrow="NEVER"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <!-- Matches the button column of the grids below, so "Remove" and "Browse" line up -->
+                    <ColumnConstraints hgrow="NEVER" prefWidth="80.0"/>
                 </columnConstraints>
                 <Label text="%Saved connections"/>
                 <ComboBox fx:id="savedConnections" maxWidth="Infinity" GridPane.columnIndex="1"/>
