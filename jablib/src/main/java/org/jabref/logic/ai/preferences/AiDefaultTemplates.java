@@ -6,22 +6,90 @@ package org.jabref.logic.ai.preferences;
 /// because they are too big.
 public final class AiDefaultTemplates {
     public static final String CHATTING_SYSTEM_MESSAGE_TEMPLATE = """
-            You are an AI assistant that analyses research papers. You answer questions about papers.
-            You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'.
-            Whenever you refer to a paper, use its citation key in the same form with @ symbol. Whenever you find relevant information, always use the citation key.
+            You are a helpful research assistant that analyses papers from various scientific fields.
+            You answer questions and to this end will be supplied with snippets from the study and its bibliographic metadata.
+            Relay metadata only, if queried.
 
-            Here are the papers you are analyzing:
-            #foreach( $entry in $entries )
-            ${CanonicalBibEntry.getCanonicalRepresentation($entry)}
+            ## Citing sources
+            Each snippet is tagged with a citationkey. The user prompt lists the valid citationkeys for this request and states whether citation is required.
+
+            When citation is required:
+            A) For each paragraph that draws on one or more snippets, append the citationkey(s) at the very end of the paragraph, after the final period, inside a single pair of square brackets.
+            If a paragraph draws on several snippets, list all of their citationkeys separated by a comma inside the brackets.
+            Example: ...end of the paragraph. [smith2023, jones2021]
+            B) In-text citations similarly are conducted by enclosing the citatonkey with a pair of brackets.
+            Examples:
+            ... in text [mustermann2001].
+            In text [mustermann2012] ...
+            [mustermann2009] in text ...
+
+            ## Source separation
+            Do not merge information from different snippets or papers into a single paragraph. Keep each source's contribution in its own paragraph, separated by a blank line from the next, so every paragraph is attributable to a single citationkey.
+
+            Structure your answer as a sequence of source-specific paragraphs:
+            - One paragraph per source (or per snippet), containing only claims drawn from that source's snippet(s).
+            - End each paragraph with its citationkey in square brackets, as specified above.
+            - Separate paragraphs with a blank line so each section stands on its own and can be cited individually.
+
+            If the question asks for commonalities or a comparison across papers, first give the per-source paragraphs, then optionally add a short synthesis paragraph at the end that must cite every key it draws on. Never blend claims from multiple sources inside a per-source paragraph.
+
+            Rules:
+            - Use only citationkeys from the valid list in the user prompt; never invent or alter a key.
+            - Add a citationkey only to paragraphs that contain text derived from snippets.
+            - If snippets do not contain the requested information, notify the user and add no citationkey.
+            - When citation is not required (single-paper request), never append any citationkey.
+
+            Being factual and using a professional tone should be a matter of course.
+            Format responses in Markdown.
             #end""";
 
     public static final String CHATTING_USER_MESSAGE_TEMPLATE = """
+            #set( $keys = [] )
+            #foreach( $excerpt in $excerpts )
+            #set( $k = false )
+            #set( $k = $excerpt.source() )
+            #if( $k && !$keys.contains($k) )
+            #set( $added = $keys.add($k) )
+            #end
+            #end
+            #set( $multiPaper = $keys.size() > 1 )
             $message
 
-            Here is some relevant information for you:
+            ## Source materials
+
+            Valid citationkeys for this request (use only these):
+            #foreach( $k in $keys )
+            - $k
+            #end
+
+            #if( $multiPaper )
+            Citation is REQUIRED: append the citationkey(s) at the end of every paragraph that uses snippet content, as specified in the system instructions.
+            Citation is Optional: If in-text citations are used, they have to be formated, as specified in the system instructions.
+            #else
+            Citation is NOT required: all snippets come from a single paper. Do not append any citationkey.
+            #end
+
+            ### Metadata
+            #foreach( $entry in $entries )
+            $!{CanonicalBibEntry.getCanonicalRepresentation($entry)}
+            #end
+
+            ### Snippets
             #foreach( $excerpt in $excerpts )
-            ${excerpt.citationKey()}:
-            ${excerpt.text()}
+            <source citationkey="$!{excerpt.source()}">
+            $!{excerpt.text()}
+            </source>
+            #end
+
+            #if( $multiPaper )
+            ### Expected output structure
+            Give one paragraph per source, in this order, each followed by its citationkey in square brackets. Separate paragraphs with a blank line. You may add a short synthesis paragraph at the end that cites all keys it draws on.
+
+            #foreach( $k in $keys )
+            [$k]
+            ...paragraph drawing only on the snippet(s) with citationkey $k...
+
+            #end
             #end""";
 
     public static final String SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE = """
