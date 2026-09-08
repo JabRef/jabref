@@ -139,7 +139,7 @@ class OjsSubmissionFetcherTest {
             List<OjsSubmission> submissions = fetcher.fetchSubmissions(journalUrl, "s3cr3t-token");
 
             assertEquals(2, requestCount.get());
-            assertEquals("count=100&offset=0", receivedQueries.get(0).get());
+            assertEquals("count=100&offset=0", receivedQueries.getFirst().get());
             assertEquals("count=100&offset=100", receivedQueries.get(1).get());
             assertEquals(150, submissions.size());
         } finally {
