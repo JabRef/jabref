@@ -273,19 +273,7 @@ public class ImportHandler {
 
                 // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                 // That method does a clone() on each entry
-                UiTaskExecutor.runInJavaFXThread(() -> {
-                    try {
-                        // One step for the whole import, opened here so that what the insert sets
-                        // off - group assignment, and the tab's automatic assignment to the
-                        // selected groups - is recorded inside it rather than after it.
-                        undoManager.addEdit(Localization.lang("Import entries"), edit -> {
-                            edit.addEdit(compoundEdit.toChangeSet());
-                            importEntries(allEntriesToAdd);
-                        });
-                    } finally {
-                        suspended.close();
-                    }
-                });
+                UiTaskExecutor.runInJavaFXThread(() -> insertImported(allEntriesToAdd, compoundEdit, suspended));
                 return results;
             }
 
@@ -294,6 +282,22 @@ public class ImportHandler {
                 results.add(result);
             }
         };
+    }
+
+    /// Inserts the imported entries as one undo step and releases the library the import held.
+    ///
+    /// The step is opened around the insert so that what the insert sets off — group assignment,
+    /// and the tab's automatic assignment to the selected groups — is recorded inside it rather
+    /// than after it.
+    private void insertImported(List<BibEntry> entriesToAdd, CompoundEdit compoundEdit, UndoSuspension suspended) {
+        try {
+            undoManager.addEdit(Localization.lang("Import entries"), edit -> {
+                edit.addEdit(compoundEdit.toChangeSet());
+                importEntries(entriesToAdd);
+            });
+        } finally {
+            suspended.close();
+        }
     }
 
     private BibEntry createEmptyEntryWithLink(Path file) {

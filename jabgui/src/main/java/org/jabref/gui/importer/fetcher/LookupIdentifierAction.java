@@ -88,35 +88,49 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         try (UndoSuspension suspended = undoManager.suspendUndo(name)) {
             for (BibEntry bibEntry : bibEntries) {
                 count++;
-                final String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
-                        fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-                UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(statusMessage));
-                Optional<T> identifier = Optional.empty();
-                try {
-                    identifier = fetcher.findIdentifier(bibEntry);
-                } catch (FetcherException e) {
-                    LOGGER.error("Could not fetch {}", fetcher.getIdentifierName(), e);
-                }
-                if (identifier.isPresent()) {
-                    T foundIdentifier = identifier.get();
-                    // BibEntry uses an ObservableMap which notifies JavaFX listeners.
-                    Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> {
-                        if (bibEntry.hasField(foundIdentifier.getDefaultField())) {
-                            return Optional.empty();
-                        }
-                        return bibEntry.setField(foundIdentifier.getDefaultField(), foundIdentifier.asString());
-                    });
-                    if (fieldChange != null && fieldChange.isPresent()) {
-                        compoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
-                        foundCount++;
-                        final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
-                                fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-                        UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(nextStatusMessage));
-                    }
+                notifyProgress(count, totalCount, foundCount);
+                if (lookUpAndRecord(bibEntry, compoundEdit)) {
+                    foundCount++;
+                    notifyProgress(count, totalCount, foundCount);
                 }
             }
             undoManager.addEdit(compoundEdit.toChangeSet());
         }
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
+    }
+
+    /// Looks the identifier up for one entry and writes it, unless the entry already has one.
+    ///
+    /// @return whether the entry gained an identifier
+    private boolean lookUpAndRecord(BibEntry bibEntry, CompoundEdit compoundEdit) {
+        Optional<T> identifier;
+        try {
+            identifier = fetcher.findIdentifier(bibEntry);
+        } catch (FetcherException e) {
+            LOGGER.error("Could not fetch {}", fetcher.getIdentifierName(), e);
+            return false;
+        }
+        if (identifier.isEmpty()) {
+            return false;
+        }
+        T foundIdentifier = identifier.get();
+        // BibEntry uses an ObservableMap which notifies JavaFX listeners.
+        Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> {
+            if (bibEntry.hasField(foundIdentifier.getDefaultField())) {
+                return Optional.empty();
+            }
+            return bibEntry.setField(foundIdentifier.getDefaultField(), foundIdentifier.asString());
+        });
+        if (fieldChange == null || fieldChange.isEmpty()) {
+            return false;
+        }
+        compoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
+        return true;
+    }
+
+    private void notifyProgress(int count, String totalCount, int foundCount) {
+        String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
+                fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
+        UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(statusMessage));
     }
 }

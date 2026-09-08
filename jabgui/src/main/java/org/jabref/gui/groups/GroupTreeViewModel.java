@@ -284,16 +284,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 try {
                     operation.accept(edit);
                 } finally {
-                    // Also when the operation failed part-way: the tree holds what it managed to
-                    // change, and a step that took back only the entry assignments would leave the
-                    // library in a state nothing describes. The journal hands over a failed block's
-                    // changes for the same reason.
-                    writeGroupChangesToMetaData();
-                    // Sorting an already sorted group, or dropping one where it already is, changes
-                    // nothing: recording that would enable Undo over a step that does nothing.
-                    if (!before.equals(metaData.getGroups())) {
-                        edit.addEdit(new UndoableGroupTreeChange(metaData, before, metaData.getGroups()));
-                    }
+                    writeBackAndRecord(metaData, before, edit);
                 }
             });
         });
@@ -303,6 +294,20 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// [#recordTreeChange(String,Consumer)].
     public void recordTreeChange(String name, Runnable operation) {
         recordTreeChange(name, _ -> operation.run());
+    }
+
+    /// Writes the view models back to the metadata and records the tree change, if there is one.
+    ///
+    /// Called also when the operation failed part-way: the tree holds what it managed to change,
+    /// and a step that took back only the entry assignments would leave the library in a state
+    /// nothing describes. The journal hands over a failed block's changes for the same reason.
+    private void writeBackAndRecord(MetaData metaData, Optional<GroupTreeNode> before, CompoundEdit edit) {
+        writeGroupChangesToMetaData();
+        // Sorting an already sorted group, or dropping one where it already is, changes nothing:
+        // recording that would enable Undo over a step that does nothing.
+        if (!before.equals(metaData.getGroups())) {
+            edit.addEdit(new UndoableGroupTreeChange(metaData, before, metaData.getGroups()));
+        }
     }
 
     private boolean isGroupTypeEqual(AbstractGroup oldGroup, AbstractGroup newGroup) {
