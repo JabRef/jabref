@@ -139,6 +139,7 @@ Agents **must not**:
 
 - Do not add trivial comments just restating the code line in plain English.
 - When commenting, focus on the "why" and general idea.
+- Reference issues and pull requests by full URL (`https://github.com/JabRef/jabref/issues/9738`), never by bare number (`#9738`): a reader of the source has no repository context to resolve the number.
 
 Example for trivial comments (to be avoided):
 
