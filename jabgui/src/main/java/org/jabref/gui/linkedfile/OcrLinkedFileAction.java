@@ -72,8 +72,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not find a file to OCR"));
             return;
         }
-        OcrEngine ocrEngine = OcrEngineFactory.create(preferences.getOcrPreferences(),
-                preferences.getOcrPreferences().getEngineSelection());
+        OcrEngine ocrEngine = OcrEngineFactory.create(preferences.getOcrPreferences());
 
         BackgroundTask<OcrResult> ocrTask = BackgroundTask.wrap(() -> ocrEngine.performOcrAndEmbedText(pdfPath.get()));
 
