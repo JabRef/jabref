@@ -43,8 +43,12 @@ import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SharedDatabaseUIManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SharedDatabaseUIManager.class);
 
     private final LibraryTabContainer tabContainer;
     private DatabaseSynchronizer dbmsSynchronizer;
@@ -182,6 +186,7 @@ public class SharedDatabaseUIManager {
     public LibraryTab openTab(BibDatabaseContext bibDatabaseContext) {
         return findOpenTab(dbmsSynchronizer.getConnectionProperties())
                 .map(alreadyOpen -> {
+                    LOGGER.info("Shared database {} is already open in another tab, dropping the second connection", dbmsSynchronizer.getConnectionProperties().getDatabase());
                     dbmsSynchronizer.closeSharedDatabase();
                     tabContainer.showLibraryTab(alreadyOpen);
                     return alreadyOpen;
