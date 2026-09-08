@@ -2076,7 +2076,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         AiPreferences defaultValues = AiPreferences.getDefault();
         migrateLegacyAiResponseEngineKind(defaultValues);
-        migrateEmbeddingModelName();
+        migrateEmbeddingModelName(defaultValues);
 
         aiPreferences = new AiPreferences(
                 getBoolean(AI_ENABLED, defaultValues.getAiFeaturesEnabled()),
@@ -2167,12 +2167,14 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    private void migrateEmbeddingModelName() {
+    private void migrateEmbeddingModelName(AiPreferences defaultValues) {
         String currentModel = get(AI_EMBEDDING_MODEL, "");
         if ("SENTENCE_TRANSFORMERS_ALL_MINILM_L12_V2".equalsIgnoreCase(currentModel)) {
             put(AI_EMBEDDING_MODEL, "sentence-transformers/all-MiniLM-L12-v2");
         } else if ("SENTENCE_TRANSFORMERS_ALL_MINILM_L6_V2".equalsIgnoreCase(currentModel)) {
             put(AI_EMBEDDING_MODEL, "sentence-transformers/all-MiniLM-L6-v2");
+        } else if (StringUtil.isNotBlank(currentModel) && !currentModel.contains("/")) {
+            put(AI_EMBEDDING_MODEL, defaultValues.getEmbeddingModel());
         }
     }
     // endregion

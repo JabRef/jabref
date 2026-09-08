@@ -2,12 +2,19 @@ package org.jabref.logic.preferences;
 
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("Preferences")
 class PreferenceMigrationTest {
     private static final String AI_ANSWER_ENGINE_KIND = "aiAnswerEngineKind";
     private static final String AI_RESPONSE_ENGINE_KIND = "aiResponseEngineKind";
@@ -89,6 +96,17 @@ class PreferenceMigrationTest {
 
         assertEquals("sentence-transformers/all-MiniLM-L6-v2", embeddingModel);
         assertEquals("sentence-transformers/all-MiniLM-L6-v2", preferences.get(AI_EMBEDDING_MODEL, UNUSED_DEFAULT_VALUE));
+    }
+
+    @Test
+    void getAiPreferencesMigratesOtherLegacyEmbeddingModelToDefault() {
+        JabRefCliPreferences preferences = new JabRefCliPreferences();
+        preferences.put(AI_EMBEDDING_MODEL, "BAAI_BGE_LARGE_EN_V1_5");
+
+        String embeddingModel = preferences.getAiPreferences().getEmbeddingModel();
+
+        assertEquals("sentence-transformers/all-MiniLM-L12-v2", embeddingModel);
+        assertEquals("sentence-transformers/all-MiniLM-L12-v2", preferences.get(AI_EMBEDDING_MODEL, UNUSED_DEFAULT_VALUE));
     }
 
     private void restorePreference(JabRefCliPreferences preferences, String key, boolean hasValue, String value) {
