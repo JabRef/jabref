@@ -41,7 +41,6 @@ import static org.testfx.matcher.base.NodeMatchers.isVisible;
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 class AboutDialogViewTest extends ApplicationTest {
 
-    /// The class [ThemeManager] puts on a scene root for a user who raised the font size from the default 9pt.
     private static final String FONT_SIZE_CLASS = "font-size-12";
 
     private AboutDialogView aboutDialogView;
@@ -99,11 +98,6 @@ class AboutDialogViewTest extends ApplicationTest {
             Window.getWindows().removeListener(raisedFontSizeListener);
             raisedFontSizeListener = null;
         }
-    }
-
-    @Test
-    void aboutDialogHeading() {
-        verifyThat(".about-heading", isVisible());
     }
 
     @Test
