@@ -1,66 +1,43 @@
 package org.jabref.gui.theme;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.jabref.architecture.AllowedToUseClassGetResource;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@AllowedToUseClassGetResource("Lists the bundled theme files next to the theme package.")
 class ThemePresetTest {
-
-    /// The submodule, relative to the module directory Gradle runs the tests in.
-    private static final Path THEMES_JABREF_ORG = Path.of("src", "main", "themes.jabref.org", "themes");
 
     /// Where the build copies the community themes to, relative to the theme package.
     private static final String COMMUNITY_DIRECTORY = "community/";
 
-    /// Offered by the submodule but deliberately not bundled: the grey-text variants of Dino Girl's themes read
-    /// worse than their contrast-text twins, and the jabrefdark/jabreflight pair is JabRef's own look.
-    private static final Set<String> NOT_BUNDLED = Set.of(
-            "chocolatebrown-darksalmon-greytext.css",
-            "fuchsiapurple-japanesesakura-greytext.css",
-            "jabrefdark-jabreflight-contrasttext.css",
-            "jabrefdark-jabreflight-greytext.css",
-            "lightblue-iceage-greytext.css",
-            "lightseagreen-limegreen-greytext.css",
-            "prehistoricamber-peachorange-greytext.css",
-            "twilightlavender-neon-greytext.css",
-            "winered-icedstrawberry-greytext.css");
-
     /// The community constants of [ThemePreset] are written by hand so that the set of themes is
-    /// fixed at compile time. This test is what keeps them in step with the submodule: after a
-    /// submodule bump it fails until the enum lists exactly the two-scheme themes on offer -- or
-    /// [#NOT_BUNDLED] names the ones left out on purpose.
+    /// fixed at compile time; which files of the `themes.jabref.org` submodule get bundled is decided
+    /// by the excludes in `jabgui/build.gradle.kts`. This test keeps the two in step: after a
+    /// submodule bump that brings a new theme, it fails until the theme is either listed in the enum
+    /// or excluded from the build.
     @Test
-    void communityThemesMirrorTheSubmodule() throws IOException {
-        assertTrue(Files.isDirectory(THEMES_JABREF_ORG), "Submodule not checked out: git submodule update --init");
+    void communityConstantsMatchTheBundledFiles() throws IOException, URISyntaxException {
+        var communityDirectory = ThemePreset.class.getResource(COMMUNITY_DIRECTORY);
+        assertNotNull(communityDirectory, "No community themes bundled -- is the themes.jabref.org submodule checked out?");
 
-        Set<String> offered = new TreeSet<>();
-        try (Stream<Path> dirs = Files.list(THEMES_JABREF_ORG)) {
-            for (Path dir : dirs.filter(Files::isDirectory).toList()) {
-                // Single-scheme themes live in these two folders and cannot follow the color scheme.
-                if (dir.endsWith("DarkTheme") || dir.endsWith("LightTheme")) {
-                    continue;
-                }
-                try (Stream<Path> files = Files.list(dir)) {
-                    files.map(file -> file.getFileName().toString())
-                         .filter(name -> name.endsWith(".css"))
-                         .forEach(offered::add);
-                }
-            }
+        Set<String> bundled = new TreeSet<>();
+        try (Stream<Path> files = Files.list(Path.of(communityDirectory.toURI()))) {
+            files.map(file -> file.getFileName().toString())
+                 .filter(name -> name.endsWith(".css"))
+                 .forEach(bundled::add);
         }
-
-        assertEquals(Set.of(), NOT_BUNDLED.stream().filter(name -> !offered.contains(name)).collect(Collectors.toSet()),
-                "NOT_BUNDLED names themes the submodule no longer offers");
-        offered.removeAll(NOT_BUNDLED);
 
         Set<String> listed = new TreeSet<>();
         Arrays.stream(ThemePreset.values())
@@ -69,6 +46,6 @@ class ThemePresetTest {
               .map(css -> css.substring(COMMUNITY_DIRECTORY.length()))
               .forEach(listed::add);
 
-        assertEquals(offered, listed, "ThemePreset does not list exactly the two-scheme themes of themes.jabref.org");
+        assertEquals(bundled, listed, "ThemePreset does not list exactly the bundled community themes");
     }
 }

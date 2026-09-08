@@ -324,12 +324,17 @@ tasks.test {
 
 // region community themes
 // themes.jabref.org is a submodule. Its two-scheme themes (directly below themes/<Name>/) are bundled
-// flat under org/jabref/gui/theme/community/; ThemePreset lists them, ThemePresetTest keeps both in sync.
-// DarkTheme/ and LightTheme/ hold single-scheme themes, which cannot follow the color scheme.
+// flat under org/jabref/gui/theme/community/; ThemePreset lists every bundled file and ThemePresetTest
+// fails when the two differ, so a submodule bump that brings a new theme ends up either as a new
+// constant or as an exclude below. DarkTheme/ and LightTheme/ hold single-scheme themes, which
+// cannot follow the color scheme.
 tasks.processResources {
     from(layout.projectDirectory.dir("src/main/themes.jabref.org/themes")) {
         include("*/*.css")
         exclude("DarkTheme/**", "LightTheme/**")
+        // Left out on purpose: the grey-text variants of Dino Girl's themes read worse than their
+        // contrast-text twins, and the jabrefdark/jabreflight pair is JabRef's own look.
+        exclude("**/*-greytext.css", "**/jabrefdark-jabreflight-*.css")
         // `path` is relative to the task's destination, so the target directory is part of it.
         eachFile { path = "org/jabref/gui/theme/community/$name" }
         includeEmptyDirs = false
