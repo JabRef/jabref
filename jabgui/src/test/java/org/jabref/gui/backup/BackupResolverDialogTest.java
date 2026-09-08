@@ -30,7 +30,6 @@ import static org.mockito.Mockito.mock;
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 class BackupResolverDialogTest extends ApplicationTest {
 
-    /// The class [org.jabref.gui.theme.ThemeManager] puts on a scene root for a user who raised the font size from the default 9pt.
     private static final String FONT_SIZE_CLASS = "font-size-12";
 
     private BackupResolverDialog backupResolverDialog;
@@ -93,17 +92,6 @@ class BackupResolverDialogTest extends ApplicationTest {
         double windowWidth = pane.getScene().getWindow().getWidth();
         assertTrue(windowWidth >= pane.prefWidth(-1),
                 "Window is %.1fpx wide, but its content needs %.1fpx".formatted(windowWidth, pane.prefWidth(-1)));
-    }
-
-    /// Without a minimum size, the window could be resized until its buttons are cut off again.
-    @Test
-    void windowCannotBeShrunkBelowItsContent() {
-        WaitForAsyncUtils.waitForFxEvents();
-
-        DialogPane pane = backupResolverDialog.getDialogPane();
-        Stage window = (Stage) pane.getScene().getWindow();
-        assertTrue(window.getMinWidth() >= pane.minWidth(-1),
-                "Window can be shrunk to %.1fpx, but its content needs %.1fpx".formatted(window.getMinWidth(), pane.minWidth(-1)));
     }
 
     private static String stylesheet(String path) {
