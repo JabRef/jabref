@@ -34,6 +34,9 @@ testModuleInfo {
     requires("org.testfx")
     requires("org.testfx.junit5")
 
+    // Reachability assertions (JMemoryBuddy) - comes in transitively with TestFX
+    requires("de.sandec.jmemorybuddy")
+
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
 
