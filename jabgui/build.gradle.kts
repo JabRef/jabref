@@ -336,6 +336,14 @@ val themesJabRefOrgDir = layout.projectDirectory.dir("src/main/themes.jabref.org
 // contrast-text twins, and the jabrefdark/jabreflight pair is JabRef's own look.
 val themesLeftOut = listOf("**/*-greytext*", "**/jabrefdark-jabreflight-*")
 tasks.processResources {
+    // Without this the themes would be missing from the jar and JabRef would only notice when the user
+    // picks one. The other submodules fail the build the same way, just with Gradle's own wording.
+    val themesDirectory = themesJabRefOrgDir.asFile
+    doFirst {
+        if (themesDirectory.list().isNullOrEmpty()) {
+            throw GradleException("$themesDirectory is empty. Run: git submodule update --init")
+        }
+    }
     from(themesJabRefOrgDir) {
         include("*/*.css")
         exclude("DarkTheme/**", "LightTheme/**")
