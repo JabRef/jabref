@@ -20,13 +20,13 @@ public enum ThemePreset {
     PAPERS("Papers", "community/papers.css"),
     PRIMER(Localization.lang("Primer theme"), "primer-theme.css"),
     CHOCOLATE_HONEY("Chocolate Honey", "community/chocolate-honey.css"),
-    DINOGIRLS_CHOCOLATEBROWN("DinoGirls: Chocolate Brown / Dark Salmon", "community/chocolatebrown-darksalmon-contrasttext.css"),
-    DINOGIRLS_FUCHSIAPURPLE("DinoGirls: Fuchsia Purple / Japanese Sakura", "community/fuchsiapurple-japanesesakura-contrasttext.css"),
-    DINOGIRLS_LIGHTBLUE("DinoGirls: Light Blue / Ice Age", "community/lightblue-iceage-contrasttext.css"),
-    DINOGIRLS_LIGHTSEAGREEN("DinoGirls: Light Sea Green / Lime Green", "community/lightseagreen-limegreen-contrasttext.css"),
-    DINOGIRLS_PREHISTORICAMBER("DinoGirls: Prehistoric Amber / Peach Orange", "community/prehistoricamber-peachorange-contrasttext.css"),
-    DINOGIRLS_TWILIGHTLAVENDER("DinoGirls: Twilight Lavender / Neon", "community/twilightlavender-neon-contrasttext.css"),
-    DINOGIRLS_WINERED("DinoGirls: Wine Red / Iced Strawberry", "community/winered-icedstrawberry-contrasttext.css");
+    DINOGIRLS_CHOCOLATEBROWN("Dino Girl's Chocolate Brown / Dark Salmon", "community/chocolatebrown-darksalmon-contrasttext.css"),
+    DINOGIRLS_FUCHSIAPURPLE("Dino Girl's Fuchsia Purple / Japanese Sakura", "community/fuchsiapurple-japanesesakura-contrasttext.css"),
+    DINOGIRLS_LIGHTBLUE("Dino Girl's Light Blue / Ice Age", "community/lightblue-iceage-contrasttext.css"),
+    DINOGIRLS_LIGHTSEAGREEN("Dino Girl's Light Sea Green / Lime Green", "community/lightseagreen-limegreen-contrasttext.css"),
+    DINOGIRLS_PREHISTORICAMBER("Dino Girl's Prehistoric Amber / Peach Orange", "community/prehistoricamber-peachorange-contrasttext.css"),
+    DINOGIRLS_TWILIGHTLAVENDER("Dino Girl's Twilight Lavender / Neon", "community/twilightlavender-neon-contrasttext.css"),
+    DINOGIRLS_WINERED("Dino Girl's Wine Red / Iced Strawberry", "community/winered-icedstrawberry-contrasttext.css");
 
     private final String themeName;
     private final String css;

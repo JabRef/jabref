@@ -22,7 +22,7 @@ class ThemePresetTest {
     /// Where the build copies the community themes to, relative to the theme package.
     private static final String COMMUNITY_DIRECTORY = "community/";
 
-    /// Offered by the submodule but deliberately not bundled: the grey-text DinoGirls variants read
+    /// Offered by the submodule but deliberately not bundled: the grey-text variants of Dino Girl's themes read
     /// worse than their contrast-text twins, and the jabrefdark/jabreflight pair is JabRef's own look.
     private static final Set<String> NOT_BUNDLED = Set.of(
             "chocolatebrown-darksalmon-greytext.css",
