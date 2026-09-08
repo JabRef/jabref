@@ -372,6 +372,12 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, control), config);
     }
 
+    /// A labeled row whose value is not a control, e.g. an image; nothing to validate or focus.
+    public PreferencesFormBuilder field(String label, Node node) {
+        addField(label, node);
+        return this;
+    }
+
     private void addField(@Nullable String label, Node control) {
         GridPane grid = ensureGrid();
         int row = grid.getRowCount();

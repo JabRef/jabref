@@ -14,9 +14,12 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @NullMarked
 @AllowedToUseClassGetResource("Lists the bundled theme files next to the theme package.")
@@ -50,5 +53,12 @@ class ThemePresetTest {
               .forEach(listed::add);
 
         assertEquals(bundled, listed, "ThemePreset does not list exactly the bundled community themes");
+    }
+
+    @ParameterizedTest
+    @EnumSource(ThemePreset.class)
+    void everyThemeHasAPreviewPerColorScheme(ThemePreset theme) {
+        assertTrue(theme.getPreview(ThemeColorScheme.DARK).isPresent(), theme + " has no dark preview");
+        assertTrue(theme.getPreview(ThemeColorScheme.LIGHT).isPresent(), theme + " has no light preview");
     }
 }

@@ -10,6 +10,7 @@ import javafx.util.converter.IntegerStringConverter;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreviewView;
 import org.jabref.gui.util.URLs;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
@@ -69,6 +70,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                         viewModel.selectedThemeProperty(),
                                         theme -> theme.getLocalizedName(viewModel.selectedThemeColorSchemeProperty().get()),
                                         theme -> theme.validate(viewModel.themeValidationStatus()))
+                                .field(Localization.lang("Preview"), buildThemePreview())
                                 .checkWithField(Localization.lang("Custom theme"), viewModel.customThemeEnabledProperty(), viewModel.customPathToThemeProperty(),
                                         path -> path
                                                 .browse(viewModel::importCSSFile)
@@ -121,6 +123,12 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                         .disableWhen(viewModel.createBackupProperty().not())))
 
                 .build());
+    }
+
+    private ThemePreviewView buildThemePreview() {
+        ThemePreviewView preview = new ThemePreviewView();
+        preview.bind(viewModel.selectedThemeProperty(), viewModel.selectedThemeColorSchemeProperty());
+        return preview;
     }
 
     private Spinner<Integer> buildFontSizeSpinner() {

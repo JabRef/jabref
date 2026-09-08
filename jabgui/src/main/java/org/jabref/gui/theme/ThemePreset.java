@@ -1,7 +1,9 @@
 package org.jabref.gui.theme;
 
+import java.net.URL;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.Nullable;
@@ -17,6 +19,7 @@ import org.jspecify.annotations.Nullable;
 /// JabRef theme, which [ThemeManager] installs beneath them.
 ///
 /// [impl->req~ux.themes.bundled-community-themes~1]
+@AllowedToUseClassGetResource("The previews are bundled next to the themes.")
 public enum ThemePreset {
     JABREF(Localization.lang("JabRef theme"), "jabref-theme.css", null),
     EVERFOREST("Everforest", "community/everforest.css", JABREF),
@@ -24,16 +27,17 @@ public enum ThemePreset {
     PAPERS("Papers", "community/papers.css", JABREF),
     PRIMER("Primer", "primer-theme.css", null),
     CHOCOLATE_HONEY("Chocolate Honey", "community/chocolate-honey.css", JABREF),
-    DINOGIRLS_CHOCOLATEBROWN("Dino Girl's Chocolate Brown", "Dino Girl's Dark Salmon", "community/chocolatebrown-darksalmon-contrasttext.css", JABREF),
-    DINOGIRLS_FUCHSIAPURPLE("Dino Girl's Fuchsia Purple", "Dino Girl's Japanese Sakura", "community/fuchsiapurple-japanesesakura-contrasttext.css", JABREF),
-    DINOGIRLS_LIGHTBLUE("Dino Girl's Light Blue", "Dino Girl's Ice Age", "community/lightblue-iceage-contrasttext.css", JABREF),
-    DINOGIRLS_LIGHTSEAGREEN("Dino Girl's Light Sea Green", "Dino Girl's Lime Green", "community/lightseagreen-limegreen-contrasttext.css", JABREF),
-    DINOGIRLS_PREHISTORICAMBER("Dino Girl's Prehistoric Amber", "Dino Girl's Peach Orange", "community/prehistoricamber-peachorange-contrasttext.css", JABREF),
-    DINOGIRLS_TWILIGHTLAVENDER("Dino Girl's Twilight Lavender", "Dino Girl's Neon", "community/twilightlavender-neon-contrasttext.css", JABREF),
-    DINOGIRLS_WINERED("Dino Girl's Wine Red", "Dino Girl's Iced Strawberry", "community/winered-icedstrawberry-contrasttext.css", JABREF);
+    DINOGIRLS_CHOCOLATEBROWN("Dino Girl's", "Chocolate Brown", "Dark Salmon", "community/chocolatebrown-darksalmon-contrasttext.css", JABREF),
+    DINOGIRLS_FUCHSIAPURPLE("Dino Girl's", "Fuchsia Purple", "Japanese Sakura", "community/fuchsiapurple-japanesesakura-contrasttext.css", JABREF),
+    DINOGIRLS_LIGHTBLUE("Dino Girl's", "Light Blue", "Ice Age", "community/lightblue-iceage-contrasttext.css", JABREF),
+    DINOGIRLS_LIGHTSEAGREEN("Dino Girl's", "Light Sea Green", "Lime Green", "community/lightseagreen-limegreen-contrasttext.css", JABREF),
+    DINOGIRLS_PREHISTORICAMBER("Dino Girl's", "Prehistoric Amber", "Peach Orange", "community/prehistoricamber-peachorange-contrasttext.css", JABREF),
+    DINOGIRLS_TWILIGHTLAVENDER("Dino Girl's", "Twilight Lavender", "Neon", "community/twilightlavender-neon-contrasttext.css", JABREF),
+    DINOGIRLS_WINERED("Dino Girl's", "Wine Red", "Iced Strawberry", "community/winered-icedstrawberry-contrasttext.css", JABREF);
 
     private final String darkName;
     private final String lightName;
+    private final String bothNames;
     private final String css;
     private final @Nullable ThemePreset parent;
 
@@ -41,15 +45,20 @@ public enum ThemePreset {
 
     /// @param parent the theme this one only overrides tokens of, `null` for a theme declaring the complete token contract
     ThemePreset(String themeName, String css, @Nullable ThemePreset parent) {
-        this(themeName, themeName, css, parent);
+        this.darkName = themeName;
+        this.lightName = themeName;
+        this.bothNames = themeName;
+        this.css = css;
+        this.parent = parent;
     }
 
     /// Dino Girl published her dark and light hues as separate themes; the port pairs each dark hue with
     /// the closest light one in a single file, so such a theme carries one name per color scheme.
     /// Community theme names are proper nouns and stay untranslated.
-    ThemePreset(String darkName, String lightName, String css, @Nullable ThemePreset parent) {
-        this.darkName = darkName;
-        this.lightName = lightName;
+    ThemePreset(String collection, String darkHue, String lightHue, String css, @Nullable ThemePreset parent) {
+        this.darkName = collection + " " + darkHue;
+        this.lightName = collection + " " + lightHue;
+        this.bothNames = collection + " " + darkHue + " / " + lightHue;
         this.css = css;
         this.parent = parent;
     }
@@ -72,7 +81,7 @@ public enum ThemePreset {
 
     /// Both names of a paired theme, e.g. for lists that are not tied to a color scheme.
     public String getLocalizedName() {
-        return darkName.equals(lightName) ? darkName : darkName + " / " + lightName;
+        return bothNames;
     }
 
     /// The name matching the color scheme the user would see the theme in; when following the system,
@@ -92,6 +101,14 @@ public enum ThemePreset {
     /// declare come from there. Empty for the JabRef and Primer themes, which declare every token.
     public Optional<ThemePreset> getParent() {
         return Optional.ofNullable(parent);
+    }
+
+    /// The bundled screenshot of this theme in the given color scheme, scaled to preview size by the
+    /// build (`generateThemePreviews` in `jabgui/build.gradle.kts`). Following the system yields the dark one.
+    public Optional<URL> getPreview(ThemeColorScheme colorScheme) {
+        String baseName = css.substring(css.lastIndexOf('/') + 1, css.length() - ".css".length());
+        String scheme = colorScheme == ThemeColorScheme.LIGHT ? "light" : "dark";
+        return Optional.ofNullable(ThemePreset.class.getResource("preview/" + baseName + "-" + scheme + ".png"));
     }
 
     public StyleSheet getStyleSheet() {

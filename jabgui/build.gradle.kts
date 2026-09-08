@@ -1,3 +1,6 @@
+import java.awt.Image as AwtImage
+import java.awt.image.BufferedImage
+import javax.imageio.ImageIO
 import org.gradlex.javamodule.packaging.tasks.Jpackage
 import org.jabref.gradle.EmbeddedPostgresBinaries
 import org.jabref.gradle.VerifyJpackageJavaOptions
@@ -328,16 +331,49 @@ tasks.test {
 // fails when the two differ, so a submodule bump that brings a new theme ends up either as a new
 // constant or as an exclude below. DarkTheme/ and LightTheme/ hold single-scheme themes, which
 // cannot follow the color scheme.
+val themesJabRefOrgDir = layout.projectDirectory.dir("src/main/themes.jabref.org/themes")
+// Left out on purpose: the grey-text variants of Dino Girl's themes read worse than their
+// contrast-text twins, and the jabrefdark/jabreflight pair is JabRef's own look.
+val themesLeftOut = listOf("**/*-greytext*", "**/jabrefdark-jabreflight-*")
 tasks.processResources {
-    from(layout.projectDirectory.dir("src/main/themes.jabref.org/themes")) {
+    from(themesJabRefOrgDir) {
         include("*/*.css")
         exclude("DarkTheme/**", "LightTheme/**")
-        // Left out on purpose: the grey-text variants of Dino Girl's themes read worse than their
-        // contrast-text twins, and the jabrefdark/jabreflight pair is JabRef's own look.
-        exclude("**/*-greytext.css", "**/jabrefdark-jabreflight-*.css")
+        exclude(themesLeftOut)
         // `path` is relative to the task's destination, so the target directory is part of it.
         eachFile { path = "org/jabref/gui/theme/community/$name" }
         includeEmptyDirs = false
     }
 }
+
+// The theme previews shown in the preferences: the screenshots themes.jabref.org keeps next to each
+// theme plus JabRef's own in src/main/theme-previews, scaled down so they add well under 1 MB.
+val generateThemePreviews = tasks.register("generateThemePreviews") {
+    group = "JabRef"
+    description = "Scales the theme screenshots down to preview size"
+    val screenshots = fileTree(themesJabRefOrgDir) {
+        include("*/*.png")
+        exclude("DarkTheme/**", "LightTheme/**")
+        exclude(themesLeftOut)
+    } + fileTree(layout.projectDirectory.dir("src/main/theme-previews")) { include("*.png") }
+    val targetRoot = layout.buildDirectory.dir("generated/resources/theme-previews").get().asFile
+    val targetDir = targetRoot.resolve("org/jabref/gui/theme/preview")
+    val previewWidth = 400
+    inputs.files(screenshots)
+    outputs.dir(targetRoot)
+    doLast {
+        targetDir.deleteRecursively()
+        targetDir.mkdirs()
+        screenshots.files.forEach { png ->
+            val image = ImageIO.read(png)
+            val height = image.height * previewWidth / image.width
+            val scaled = BufferedImage(previewWidth, height, BufferedImage.TYPE_INT_RGB)
+            val graphics = scaled.createGraphics()
+            graphics.drawImage(image.getScaledInstance(previewWidth, height, AwtImage.SCALE_SMOOTH), 0, 0, null)
+            graphics.dispose()
+            ImageIO.write(scaled, "png", targetDir.resolve(png.name))
+        }
+    }
+}
+sourceSets["main"].resources.srcDir(generateThemePreviews)
 // endregion
