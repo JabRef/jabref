@@ -61,14 +61,14 @@ public class JumpToEntryPdfAction extends SimpleCommand {
 
         BibEntry entry = entryOpt.get();
         Optional<LinkedFile> pdfFileOpt = entry.getFiles().stream()
-                .filter(file -> {
-                    try {
-                        return FileUtil.isPDFFile(Path.of(file.getLink()));
-                    } catch (InvalidPathException e) {
-                        return false;
-                    }
-                })
-                .findFirst();
+                                               .filter(file -> {
+                                                   try {
+                                                       return FileUtil.isPDFFile(Path.of(file.getLink()));
+                                                   } catch (InvalidPathException e) {
+                                                       return false;
+                                                   }
+                                               })
+                                               .findFirst();
 
         if (pdfFileOpt.isEmpty()) {
             dialogService.notify(Localization.lang("No PDF files available"));
