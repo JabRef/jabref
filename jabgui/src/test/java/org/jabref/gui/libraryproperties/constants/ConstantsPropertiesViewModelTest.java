@@ -7,6 +7,7 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
@@ -31,7 +32,7 @@ class ConstantsPropertiesViewModelTest {
         BibDatabaseContext context = new BibDatabaseContext(db);
         List<String> expected = List.of(string2.getName(), string1.getName()); // ICSE before TSE
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences);
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences, new HeadlessGuiUndoManager());
         model.setValues();
 
         List<String> actual = model.stringsListProperty().stream()
@@ -49,7 +50,7 @@ class ConstantsPropertiesViewModelTest {
         BibDatabaseContext context = new BibDatabaseContext(db);
         List<String> expected = List.of("ICSE", "TSE");
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences);
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences, new HeadlessGuiUndoManager());
         ListProperty<ConstantsItemModel> stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("TSE", "Transactions on Software Engineering"));
         stringsList.add(new ConstantsItemModel("ICSE", "International Conference on Software Engineering"));
@@ -69,7 +70,7 @@ class ConstantsPropertiesViewModelTest {
         BibDatabase db = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(db);
 
-        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences);
+        ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences, new HeadlessGuiUndoManager());
 
         ListProperty<ConstantsItemModel> stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("KTH", "Royal Institute of Technology"));

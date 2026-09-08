@@ -424,26 +424,28 @@ public class GroupTreeView extends BorderPane {
         if (dragboard.hasContent(DragAndDropDataFormats.GROUP) && row.getItem().canAddGroupsIn()) {
             List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
             List<GroupNodeViewModel> changedGroups = new LinkedList<>();
-            for (String pathToSource : pathToSources) {
-                Optional<GroupNodeViewModel> source = viewModel
-                        .rootGroupProperty().get()
-                        .getChildByPath(pathToSource);
-                if (source.isPresent() && source.get().canBeDragged()) {
-                    source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
-                    changedGroups.add(source.get());
-                    success = true;
+            // One drag is one undo step, however many groups it moved.
+            viewModel.recordTreeChange(Localization.lang("Move group"), () -> {
+                for (String pathToSource : pathToSources) {
+                    Optional<GroupNodeViewModel> source = viewModel
+                            .rootGroupProperty().get()
+                            .getChildByPath(pathToSource);
+                    if (source.isPresent() && source.get().canBeDragged()) {
+                        source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
+                        changedGroups.add(source.get());
+                    }
                 }
-            }
+            });
+            success = !changedGroups.isEmpty();
             groupTree.getSelectionModel().clearSelection();
             changedGroups.forEach(value -> selectNode(value, true));
-            if (success) {
-                viewModel.writeGroupChangesToMetaData();
-            }
         }
 
         if (localDragboard.hasBibEntries()) {
             List<BibEntry> entries = localDragboard.getBibEntries();
-            row.getItem().addEntriesToGroup(entries);
+            stateManager.getActiveDatabase().ifPresent(database ->
+                    stateManager.getUndoManager(database).addEdit(Localization.lang("Assign entries to group"),
+                            edit -> edit.addAll(row.getItem().addEntriesToGroup(entries))));
             success = true;
         }
 

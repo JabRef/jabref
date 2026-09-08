@@ -27,4 +27,36 @@ No other thread can observe the library holding a change the journal does not ye
 
 Needs: impl, utest
 
+## A command's writes are reserved against undo
+`req~logic.undo.writes-reserved-against-undo~1`
+
+While a command is applying changes it has not yet handed to the journal, undo and redo decline for that library and say which command holds it.
+Taking a change back over writes that are not yet recorded would leave the library in a state no step on the stack describes, and the push that follows would discard the undone change.
+
+Needs: impl, utest
+
+## A change that the library has moved on from is refused, not applied
+`req~logic.undo.stale-change-refused~1`
+
+A change describing one value applies only while the library still holds the value it recorded, and reports the mismatch instead of writing.
+A command writing on a background thread can have moved that value on since, and overwriting it would replace a newer value with an older one behind the user's back.
+
+Needs: impl, utest
+
+## Every group operation is one undo step
+`req~logic.undo.group-operations-recorded~1`
+
+Adding, removing, moving, sorting and editing groups each go on the undo stack as a single step, together with the entry assignments the operation changed.
+Undoing one restores the tree that was there before it, and the assignments with it.
+
+Needs: impl, utest
+
+## The modified marker follows the journal
+`req~logic.undo.modified-marker-derived~1`
+
+A library counts as modified exactly when its journal stands away from the saved position, or when it was changed by something the journal could not record.
+The marker is derived from that rather than set by each command, so no undo path has to remember to correct it afterwards.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
