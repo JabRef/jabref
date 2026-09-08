@@ -10,7 +10,6 @@ import java.util.Optional;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.FetcherRetry;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -82,8 +81,6 @@ public class SwhidFetcher implements IdBasedFetcher {
             throw new FetcherException("Invalid URL constructed for SWHID: " + canonicalSwhid, e);
         }
 
-        // [impl->req~fetchers.identifier-rate-limit-retries~1]
-        return FetcherRetry.executeWithRateLimitRetry(() -> {
             try {
                 URLDownload urlDownload = new URLDownload(url);
                 // Software Heritage uses anti-bot protection that blocks default browser user agents.
@@ -126,6 +123,5 @@ public class SwhidFetcher implements IdBasedFetcher {
                 LOGGER.info("Error fetching or parsing SWHID response for {}", canonicalSwhid, e);
                 throw new FetcherException("Failed to retrieve or parse metadata from Software Heritage", e);
             }
-        });
     }
 }
