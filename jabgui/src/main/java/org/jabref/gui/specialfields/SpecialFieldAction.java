@@ -67,7 +67,6 @@ public class SpecialFieldAction extends SimpleCommand {
                 }
             });
             if (anyChange) {
-                tabSupplier.get().markBaseChanged();
                 String outText;
                 if (nullFieldIfValueIsTheSame || value == null) {
                     outText = getTextDone(specialField, Integer.toString(bes.size()));

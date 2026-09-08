@@ -5,11 +5,16 @@ import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Replaces a library's metadata as a whole, which is how the library's own settings — mode,
-/// encoding, citation key pattern, file directories, save actions, content selectors, protection —
-/// arrive when they are read from a file rather than edited field by field.
+/// Replaces a library's settings as a whole, which is how they arrive from a file rather than
+/// edited field by field. Only the contents are replaced, never the [MetaData] instance, to keep
+/// listeners registered on it.
 @NullMarked
 public record UndoableMetaDataChange(BibDatabaseContext databaseContext, MetaData before, MetaData after) implements BibChange {
+
+    public UndoableMetaDataChange {
+        before = MetaData.copyOf(before);
+        after = MetaData.copyOf(after);
+    }
 
     @Override
     public UndoableMetaDataChange inverted() {
@@ -17,7 +22,8 @@ public record UndoableMetaDataChange(BibDatabaseContext databaseContext, MetaDat
     }
 
     @Override
-    public void apply() {
-        databaseContext.setMetaData(after);
+    public ApplyResult apply() {
+        databaseContext.getMetaData().overwriteWith(after);
+        return ApplyResult.SUCCESS;
     }
 }

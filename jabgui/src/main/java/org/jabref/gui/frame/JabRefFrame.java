@@ -253,8 +253,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 journalAbbreviationRepository
         );
 
-        VBox head = new VBox(mainMenu, mainToolBar);
-        head.setSpacing(0d);
+        VBox head = new VBox(0, mainMenu, mainToolBar);
         setTop(head);
 
         verticalSplit.getItems().addAll(tabbedPane);
@@ -390,6 +389,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         if (!(getScene().getFocusOwner() instanceof TextInputControl)
                                 && !(getScene().getFocusOwner() instanceof CodeArea)) {
                             Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
+                            event.consume();
+                        }
+                        break;
+                    case JUMP_TO_FIELD:
+                        // Handled here so that it also fires when the keyboard focus is outside the entry editor
+                        if (!stateManager.getSelectedEntries().isEmpty()) {
+                            // Jumping to a field is only meaningful with a visible editor, so open it if it is closed
+                            stateManager.getEditorShowing().set(true);
+                            entryEditor.openJumpToFieldDialog();
                             event.consume();
                         }
                         break;

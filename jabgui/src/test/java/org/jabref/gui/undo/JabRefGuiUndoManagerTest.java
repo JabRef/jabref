@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
 
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -16,8 +17,6 @@ import org.jabref.model.undo.UndoableFieldChange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.util.WaitForAsyncUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /// Unlike [UndoManagerTest], this needs a live toolkit: the point of this class is the hop onto
 /// the JavaFX thread, and `Platform.runLater` is what requires one. The properties themselves
 /// would not.
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class JabRefGuiUndoManagerTest {
 
     private final JabRefGuiUndoManager undoManager = new JabRefGuiUndoManager();
@@ -43,6 +42,26 @@ class JabRefGuiUndoManagerTest {
         return new UndoableFieldChange(entry, StandardField.AUTHOR, before, value);
     }
 
+    /// The tab draws its modified marker from this, so it has to follow both edits and saves.
+    /// Driven from the test thread, so each step waits for the queued update, as above.
+    @Test
+    // [utest->req~logic.undo.modified-marker-derived~1]
+    void theChangedPropertyFollowsTheSavedPosition() {
+        assertFalse(undoManager.hasChangedProperty().get());
+
+        undoManager.addEdit(setAuthor("Bohr"));
+        JavaFxExtension.awaitEvents();
+        assertTrue(undoManager.hasChangedProperty().get());
+
+        undoManager.markUnchanged();
+        JavaFxExtension.awaitEvents();
+        assertFalse(undoManager.hasChangedProperty().get(), "saving left the marker set");
+
+        undoManager.undo();
+        JavaFxExtension.awaitEvents();
+        assertTrue(undoManager.hasChangedProperty().get(), "undoing away from the saved position left the marker clear");
+    }
+
     @Test
     void propertiesStartOutMatchingAnEmptyManager() {
         assertFalse(undoManager.undoableProperty().get());
@@ -54,17 +73,17 @@ class JabRefGuiUndoManagerTest {
     @Test
     void propertiesFollowTheStacks() {
         undoManager.addEdit(setAuthor("Bohr"));
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
         assertTrue(undoManager.undoableProperty().get());
         assertFalse(undoManager.redoableProperty().get());
 
         undoManager.undo();
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
         assertFalse(undoManager.undoableProperty().get());
         assertTrue(undoManager.redoableProperty().get());
 
         undoManager.redo();
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
         assertTrue(undoManager.undoableProperty().get());
         assertFalse(undoManager.redoableProperty().get());
     }
@@ -75,11 +94,11 @@ class JabRefGuiUndoManagerTest {
     void propertiesFollowTheStacksWithoutADelayOnTheJavaFxThread() {
         AtomicBoolean undoableImmediatelyAfterTheEdit = new AtomicBoolean();
 
-        WaitForAsyncUtils.asyncFx(() -> {
+        Platform.runLater(() -> {
             undoManager.addEdit(setAuthor("Bohr"));
             undoableImmediatelyAfterTheEdit.set(undoManager.undoableProperty().get());
         });
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
 
         assertTrue(undoableImmediatelyAfterTheEdit.get());
     }
@@ -91,9 +110,9 @@ class JabRefGuiUndoManagerTest {
     @Test
     void aQueuedUpdateAppliesTheStateItFindsWhenItRuns() throws InterruptedException {
         List<Boolean> undoableValues = new CopyOnWriteArrayList<>();
-        WaitForAsyncUtils.asyncFx(() -> undoManager.undoableProperty().addListener(
+        Platform.runLater(() -> undoManager.undoableProperty().addListener(
                 (_, _, added) -> undoableValues.add(added)));
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
 
         CountDownLatch release = new CountDownLatch(1);
         Platform.runLater(() -> {
@@ -109,7 +128,7 @@ class JabRefGuiUndoManagerTest {
         undoManager.addEdit(setAuthor("Bohr"));
         undoManager.undo();
         release.countDown();
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
 
         assertFalse(undoManager.undoableProperty().get());
         assertEquals(List.of(), undoableValues);
