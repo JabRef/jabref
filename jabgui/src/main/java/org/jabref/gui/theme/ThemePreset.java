@@ -21,7 +21,7 @@ public enum ThemePreset {
     EVERFOREST("Everforest", "community/everforest.css"),
     NORD("Nord", "community/nord.css"),
     PAPERS("Papers", "community/papers.css"),
-    PRIMER(Localization.lang("Primer theme"), "primer-theme.css"),
+    PRIMER("Primer", "primer-theme.css"),
     CHOCOLATE_HONEY("Chocolate Honey", "community/chocolate-honey.css"),
     DINOGIRLS_CHOCOLATEBROWN("Dino Girl\'s Chocolate Brown", "Dino Girl\'s Dark Salmon", "community/chocolatebrown-darksalmon-contrasttext.css"),
     DINOGIRLS_FUCHSIAPURPLE("Dino Girl\'s Fuchsia Purple", "Dino Girl\'s Japanese Sakura", "community/fuchsiapurple-japanesesakura-contrasttext.css"),
