@@ -326,7 +326,7 @@ class ThemeTokenContractTest {
     }
 
     @ParameterizedTest
-    @MethodSource("builtInThemes")
+    @MethodSource("allThemes")
     void themeLeavesTheLadderColorsToModena(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
