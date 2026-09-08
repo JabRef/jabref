@@ -167,7 +167,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         // add header
         int columnIndex = supplierHeader.getChildren().size();
         ToggleButton header = generateEntryHeader(entrySourceColumn, columnIndex);
-        header.getStyleClass().addAll("toggle-button", "padding-6");
+        header.getStyleClass().addAll("toggle-button", "padding-4");
         HBox.setHgrow(header, Priority.ALWAYS);
         supplierHeader.getChildren().add(header);
         header.setMinWidth(250);

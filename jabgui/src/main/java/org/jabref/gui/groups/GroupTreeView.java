@@ -386,22 +386,6 @@ public class GroupTreeView extends BorderPane {
                 });
         text.getStyleClass().setAll("text");
 
-        text.styleProperty().bind(Bindings.createStringBinding(() -> {
-            double reducedFontSize;
-            double font_size = preferences.getWorkspacePreferences().getMainFontSize();
-            // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
-            if (font_size > 26.0) {
-                reducedFontSize = 0.25;
-            } else if (font_size > 22.0) {
-                reducedFontSize = 0.35;
-            } else if (font_size > 18.0) {
-                reducedFontSize = 0.55;
-            } else {
-                reducedFontSize = 0.75;
-            }
-            return "-fx-font-size: %fem;".formatted(reducedFontSize);
-        }, preferences.getWorkspacePreferences().mainFontSizeProperty()));
-
         node.getChildren().add(text);
         node.setMaxWidth(Control.USE_PREF_SIZE);
         return node;
@@ -440,26 +424,28 @@ public class GroupTreeView extends BorderPane {
         if (dragboard.hasContent(DragAndDropDataFormats.GROUP) && row.getItem().canAddGroupsIn()) {
             List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
             List<GroupNodeViewModel> changedGroups = new LinkedList<>();
-            for (String pathToSource : pathToSources) {
-                Optional<GroupNodeViewModel> source = viewModel
-                        .rootGroupProperty().get()
-                        .getChildByPath(pathToSource);
-                if (source.isPresent() && source.get().canBeDragged()) {
-                    source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
-                    changedGroups.add(source.get());
-                    success = true;
+            // One drag is one undo step, however many groups it moved.
+            viewModel.recordTreeChange(Localization.lang("Move group"), () -> {
+                for (String pathToSource : pathToSources) {
+                    Optional<GroupNodeViewModel> source = viewModel
+                            .rootGroupProperty().get()
+                            .getChildByPath(pathToSource);
+                    if (source.isPresent() && source.get().canBeDragged()) {
+                        source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
+                        changedGroups.add(source.get());
+                    }
                 }
-            }
+            });
+            success = !changedGroups.isEmpty();
             groupTree.getSelectionModel().clearSelection();
             changedGroups.forEach(value -> selectNode(value, true));
-            if (success) {
-                viewModel.writeGroupChangesToMetaData();
-            }
         }
 
         if (localDragboard.hasBibEntries()) {
             List<BibEntry> entries = localDragboard.getBibEntries();
-            row.getItem().addEntriesToGroup(entries);
+            stateManager.getActiveDatabase().ifPresent(database ->
+                    stateManager.getUndoManager(database).addEdit(Localization.lang("Assign entries to group"),
+                            edit -> edit.addAll(row.getItem().addEntriesToGroup(entries))));
             success = true;
         }
 
