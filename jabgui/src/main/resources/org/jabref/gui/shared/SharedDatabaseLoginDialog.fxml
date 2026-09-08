@@ -3,6 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
@@ -16,6 +17,17 @@
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.shared.SharedDatabaseLoginDialogView">
     <content>
         <VBox spacing="10.0">
+            <GridPane fx:id="savedConnectionsPane" hgap="10.0" vgap="8.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="-Infinity"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="260.0"/>
+                    <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="80.0"/>
+                </columnConstraints>
+                <Label text="%Saved connections"/>
+                <ComboBox fx:id="savedConnections" maxWidth="Infinity" GridPane.columnIndex="1"/>
+                <Button fx:id="removeSavedConnection" mnemonicParsing="false" onAction="#removeSavedConnection"
+                        text="%Remove" maxWidth="Infinity" GridPane.columnIndex="2"/>
+            </GridPane>
             <GridPane hgap="10.0" vgap="8.0">
                 <columnConstraints>
                     <ColumnConstraints hgrow="NEVER" minWidth="-Infinity"/>

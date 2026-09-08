@@ -1,16 +1,19 @@
 package org.jabref.gui.shared;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.GridPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
@@ -52,6 +55,9 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private CheckBox expertMode;
     @FXML private TextField connectionUrl;
     @FXML private TitledPane advancedPane;
+    @FXML private GridPane savedConnectionsPane;
+    @FXML private ComboBox<SharedDatabaseLoginDialogViewModel.SavedConnection> savedConnections;
+    @FXML private Button removeSavedConnection;
 
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
@@ -115,6 +121,17 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 taskExecutor,
                 journalAbbreviationRepository,
                 gitHandlerRegistry);
+        savedConnections.setItems(viewModel.getSavedConnections());
+        // Nothing to pick from until a second connection has been used
+        savedConnectionsPane.visibleProperty().bind(Bindings.isNotEmpty(viewModel.getSavedConnections()));
+        savedConnectionsPane.managedProperty().bind(savedConnectionsPane.visibleProperty());
+        removeSavedConnection.disableProperty().bind(savedConnections.getSelectionModel().selectedItemProperty().isNull());
+        EasyBind.subscribe(savedConnections.getSelectionModel().selectedItemProperty(), selected -> {
+            if (selected != null) {
+                viewModel.applySavedConnection(selected);
+            }
+        });
+
         connectionUrl.textProperty().bindBidirectional(viewModel.connectionUrlProperty());
         database.textProperty().bindBidirectional(viewModel.databaseproperty());
         host.textProperty().bindBidirectional(viewModel.hostProperty());
@@ -186,6 +203,11 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 getDialogPane().getScene().getWindow().sizeToScene();
             }
         });
+    }
+
+    @FXML
+    private void removeSavedConnection() {
+        viewModel.removeSavedConnection(savedConnections.getSelectionModel().getSelectedItem());
     }
 
     @FXML

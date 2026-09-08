@@ -2,6 +2,8 @@ package org.jabref.logic.shared.prefs;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -195,6 +197,24 @@ public class SharedDatabasePreferences {
     public void clear() throws BackingStoreException {
         clearPassword();
         internalPrefs.clear();
+    }
+
+    /// Removes this connection's stored settings, including the password, from the preferences tree.
+    public void remove() throws BackingStoreException {
+        clearPassword();
+        internalPrefs.removeNode();
+    }
+
+    /// @return the identifiers of all stored connections, without the "last used" default node
+    public static List<String> listSavedIds() {
+        try {
+            return Arrays.stream(Preferences.userRoot().node(PREFERENCES_PATH_NAME).childrenNames())
+                         .filter(id -> !DEFAULT_NODE.equals(id))
+                         .toList();
+        } catch (BackingStoreException e) {
+            LOGGER.warn("Could not read the stored shared database connections", e);
+            return List.of();
+        }
     }
 
     private Optional<String> getOptionalValue(String key) {
