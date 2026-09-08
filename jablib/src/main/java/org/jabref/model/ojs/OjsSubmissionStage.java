@@ -3,11 +3,14 @@ package org.jabref.model.ojs;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Maps the numeric `stageId` returned by the OJS 3.1+ `submissions` REST endpoint
 /// to a human-readable workflow status.
 ///
 /// 1 = Submission, 2 = Internal Review, 3 = External (Peer) Review, 4 = Editing (Copyediting), 5 = Production.
 /// Internal and external review are both surfaced as "Peer Review" here.
+@NullMarked
 public enum OjsSubmissionStage {
     SUBMISSION(1, "Submission"),
     PEER_REVIEW_INTERNAL(2, "Peer Review"),

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 /// https://docs.pkp.sfu.ca/dev/api/ojs/3.4#tag/Submissions), so parsing here is
 /// defensive: fields that cannot be found are left empty rather than failing
 /// the whole submission.
+@NullMarked
 public record OjsSubmission(
         int id,
         String journalName,
