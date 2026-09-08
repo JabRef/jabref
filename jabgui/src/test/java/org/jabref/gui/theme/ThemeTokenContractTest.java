@@ -217,14 +217,20 @@ class ThemeTokenContractTest {
     }
 
     /// A theme may introduce tokens of its own (Primer scopes a good number of them to single controls),
-    /// but it must not read one it never declares.
+    /// but it must not read one it never declares. A community theme sits on top of the JabRef theme,
+    /// so that theme's declarations count for it as well.
     @ParameterizedTest
-    @MethodSource("builtInThemes")
+    @MethodSource("allThemes")
     void themeDeclaresEveryTokenItUsesItself(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
+        Set<String> declared = new TreeSet<>(tokens(themeCss, Kind.DECLARATION));
+        if (!builtInThemes().contains(theme)) {
+            declared.addAll(tokens(ThemePreset.JABREF.getStyleSheet().getName(), Kind.DECLARATION));
+        }
+
         Set<String> undeclared = new TreeSet<>(tokens(themeCss, Kind.USE));
-        undeclared.removeAll(tokens(themeCss, Kind.DECLARATION));
+        undeclared.removeAll(declared);
 
         assertEquals(Set.of(), undeclared, "%s reads -color- tokens it never declares".formatted(themeCss));
     }
