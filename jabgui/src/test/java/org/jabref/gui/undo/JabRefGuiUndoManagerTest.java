@@ -43,6 +43,26 @@ class JabRefGuiUndoManagerTest {
         return new UndoableFieldChange(entry, StandardField.AUTHOR, before, value);
     }
 
+    /// The tab draws its modified marker from this, so it has to follow both edits and saves.
+    /// Driven from the test thread, so each step waits for the queued update, as above.
+    @Test
+    // [utest->req~logic.undo.modified-marker-derived~1]
+    void theChangedPropertyFollowsTheSavedPosition() {
+        assertFalse(undoManager.hasChangedProperty().get());
+
+        undoManager.addEdit(setAuthor("Bohr"));
+        WaitForAsyncUtils.waitForFxEvents();
+        assertTrue(undoManager.hasChangedProperty().get());
+
+        undoManager.markUnchanged();
+        WaitForAsyncUtils.waitForFxEvents();
+        assertFalse(undoManager.hasChangedProperty().get(), "saving left the marker set");
+
+        undoManager.undo();
+        WaitForAsyncUtils.waitForFxEvents();
+        assertTrue(undoManager.hasChangedProperty().get(), "undoing away from the saved position left the marker clear");
+    }
+
     @Test
     void propertiesStartOutMatchingAnEmptyManager() {
         assertFalse(undoManager.undoableProperty().get());

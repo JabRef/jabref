@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -36,6 +37,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -102,6 +104,20 @@ public class GlobalSearchBarTest {
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
         assertEquals(List.of("Smith"), lastSearchHistory);
+    }
+
+    /// A MenuItem's accelerator is global: JavaFX keeps one entry per key combination for the whole
+    /// scene. An item here carrying Ctrl+Z would take it from the Edit menu and then do nothing at
+    /// all whenever this field has nothing to undo, which is how Ctrl+Z came to work only inside the
+    /// entry editor.
+    @Test
+    void theContextMenuClaimsNoGlobalShortcut(FxRobot robot) {
+        TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
+
+        List<MenuItem> items = searchField.getContextMenu().getItems();
+
+        assertFalse(items.isEmpty(), "the context menu was not installed");
+        assertEquals(List.of(), items.stream().filter(item -> item.getAccelerator() != null).toList());
     }
 
     @Test

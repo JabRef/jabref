@@ -17,8 +17,13 @@ public record UndoablePreambleChange(BibDatabase database, @Nullable String befo
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
+        String current = database.getPreamble().orElse(null);
+        if (!Objects.equals(current, before)) {
+            return ApplyResult.of(this, "the preamble holds '%s', not the recorded '%s'".formatted(current, before));
+        }
         database.setPreamble(after);
+        return ApplyResult.SUCCESS;
     }
 
     @Override
