@@ -57,14 +57,12 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final UndoManager undoManager;
 
     private final BibDatabaseContext databaseContext;
-    private final MetaData metaData;
 
     GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences, UndoManager undoManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.undoManager = undoManager;
         this.databaseContext = databaseContext;
-        this.metaData = databaseContext.getMetaData();
 
         librarySpecificFileDirectoryValidator = new FunctionBasedValidator<>(
                 librarySpecificDirectoryProperty,
@@ -83,7 +81,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void setValues() {
+    public void setValues(MetaData metaData) {
         boolean isShared = databaseContext.getLocation() == DatabaseLocation.SHARED;
         encodingDisableProperty.setValue(isShared); // the encoding of shared database is always UTF-8
 

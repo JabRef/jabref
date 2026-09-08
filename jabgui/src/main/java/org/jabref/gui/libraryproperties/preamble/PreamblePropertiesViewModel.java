@@ -21,7 +21,7 @@ public class PreamblePropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void setValues() {
+    public void setValues(MetaData metaData) {
         preambleProperty.setValue(databaseContext.getDatabase().getPreamble().orElse(""));
     }
 

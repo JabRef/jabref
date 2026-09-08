@@ -22,7 +22,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
@@ -32,7 +31,6 @@ import org.jabref.model.metadata.MetaData;
 
 public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
-    private final MetaData metaData;
 
     private final DialogService dialogService;
 
@@ -44,13 +42,12 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
     private final StringProperty selectedKeyword = new SimpleStringProperty();
 
-    ContentSelectorViewModel(BibDatabaseContext databaseContext, DialogService dialogService) {
-        this.metaData = databaseContext.getMetaData();
+    ContentSelectorViewModel(DialogService dialogService) {
         this.dialogService = dialogService;
     }
 
     @Override
-    public void setValues() {
+    public void setValues(MetaData metaData) {
         // Populate field names keyword map
         fieldKeywordsMap = ContentSelectors.getFieldKeywordsMap(metaData.getContentSelectors().getContentSelectors());
 
@@ -72,10 +69,10 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
             // Remove all fields of the content selector
             fieldNamesToRemove = metaData.getContentSelectorsSorted().stream().map(ContentSelector::getField).toList();
         } else {
-            fieldNamesToRemove = determineFieldsToRemove();
+            fieldNamesToRemove = determineFieldsToRemove(metaData);
         }
 
-        fieldKeywordsMap.forEach((field, keywords) -> updateMetaDataContentSelector(metaDataFields, field, keywords));
+        fieldKeywordsMap.forEach((field, keywords) -> updateMetaDataContentSelector(metaData, metaDataFields, field, keywords));
         fieldNamesToRemove.forEach(metaData::clearContentSelectors);
     }
 
@@ -192,7 +189,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     /// - Fields that are not in the new list of fields and
     /// - >all default fields that have no associated keywords
     ///
-    private List<Field> determineFieldsToRemove() {
+    private List<Field> determineFieldsToRemove(MetaData metaData) {
         Set<Field> newlyAddedKeywords = fieldKeywordsMap.keySet();
 
         // Remove all content selectors that are not in the new list
@@ -208,19 +205,19 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
         return result;
     }
 
-    private void updateMetaDataContentSelector(List<Field> existingFields, Field field, List<String> keywords) {
+    private void updateMetaDataContentSelector(MetaData metaData, List<Field> existingFields, Field field, List<String> keywords) {
         boolean fieldNameDoNotExists = !existingFields.contains(field);
         if (fieldNameDoNotExists) {
             metaData.addContentSelector(new ContentSelector(field, keywords));
         }
 
-        if (keywordsHaveChanged(field, keywords)) {
+        if (keywordsHaveChanged(metaData, field, keywords)) {
             metaData.clearContentSelectors(field);
             metaData.addContentSelector(new ContentSelector(field, keywords));
         }
     }
 
-    private boolean keywordsHaveChanged(Field field, List<String> keywords) {
+    private boolean keywordsHaveChanged(MetaData metaData, Field field, List<String> keywords) {
         HashSet<String> keywordsSet = asHashSet(keywords);
         List<String> existingKeywords = metaData.getContentSelectorValuesForField(field);
         if (!keywordsSet.equals(asHashSet(existingKeywords))) {

@@ -56,7 +56,7 @@ public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void setValues() {
+    public void setValues(MetaData metaData) {
         stringsListProperty.addAll(databaseContext.getDatabase().getStringValues().stream()
                                                   .sorted(new BibtexStringComparator(false))
                                                   .map(this::convertFromBibTexString)

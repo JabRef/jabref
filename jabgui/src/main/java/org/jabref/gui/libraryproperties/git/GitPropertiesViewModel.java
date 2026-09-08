@@ -22,8 +22,7 @@ public class GitPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void setValues() {
-        MetaData metaData = databaseContext.getMetaData();
+    public void setValues(MetaData metaData) {
         autoCommitProperty.setValue(metaData.isGitAutoCommit());
         autoPushProperty.setValue(metaData.isGitAutoPush());
         autoPullProperty.setValue(metaData.isGitAutoPull());

@@ -33,7 +33,7 @@ class ConstantsPropertiesViewModelTest {
         List<String> expected = List.of(string2.getName(), string1.getName()); // ICSE before TSE
 
         ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences, new HeadlessGuiUndoManager());
-        model.setValues();
+        model.setValues(context.getMetaData());
 
         List<String> actual = model.stringsListProperty().stream()
                                    .map(ConstantsItemModel::labelProperty)

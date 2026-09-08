@@ -22,8 +22,8 @@ public abstract class AbstractPropertiesTabView<T extends PropertiesTabViewModel
     }
 
     @Override
-    public void setValues() {
-        viewModel.setValues();
+    public void setValues(MetaData metaData) {
+        viewModel.setValues(metaData);
     }
 
     @Override

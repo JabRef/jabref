@@ -44,7 +44,7 @@ class LibraryPropertiesViewModelTest {
         }
 
         @Override
-        public void setValues() {
+        public void setValues(MetaData metaData) {
         }
 
         @Override

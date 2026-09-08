@@ -39,9 +39,12 @@ public class LibraryPropertiesViewModel {
         this.propertiesTabs = propertiesTabs;
     }
 
+    /// Fills the tabs from the library's settings as they stand. The copy the tabs write to is
+    /// made in [#storeAllSettings], so that it holds whatever the library has when the dialog is
+    /// accepted rather than what it had when the dialog was opened.
     public void setValues() {
         for (PropertiesTab propertiesTab : propertiesTabs) {
-            propertiesTab.setValues();
+            propertiesTab.setValues(databaseContext.getMetaData());
         }
     }
 

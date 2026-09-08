@@ -34,7 +34,7 @@ class GeneralPropertiesViewModelTest {
         when(preferences.getFilePreferences().getUserAndHost()).thenReturn("user");
         GeneralPropertiesViewModel viewModel = new GeneralPropertiesViewModel(databaseContext, mock(DialogService.class), preferences, mock(UndoManager.class));
 
-        viewModel.setValues();
+        viewModel.setValues(databaseContext.getMetaData());
         viewModel.storeSettings(databaseContext.getMetaData());
 
         assertEquals("", viewModel.keywordSeparatorProperty().get());
@@ -56,7 +56,7 @@ class GeneralPropertiesViewModelTest {
         JabRefUndoManager undoManager = new JabRefUndoManager();
         GeneralPropertiesViewModel viewModel = new GeneralPropertiesViewModel(databaseContext, mock(DialogService.class), preferences, undoManager);
 
-        viewModel.setValues();
+        viewModel.setValues(databaseContext.getMetaData());
         viewModel.keywordSeparatorProperty().set(";");
         viewModel.storeSettings(databaseContext.getMetaData());
 
