@@ -35,6 +35,10 @@ public interface LibraryTabContainer {
     /// @return true if closing the tabs was successful
     boolean closeTabs(List<LibraryTab> tabs, boolean showWelcomeTab);
 
+    /// Ids of the shared databases whose reconnection failed and that are still shown as an error tab.
+    /// They have no library tab, but must stay remembered for the next session.
+    List<String> getUnconnectedSharedDatabaseIds();
+
     /// Refreshes the ui after changes to the preferences
     void refresh();
 }
