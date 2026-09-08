@@ -136,13 +136,13 @@ public class JumpToEntryPdfAction extends SimpleCommand {
 
         Optional<String> libraryId = Optional.empty();
         if (absolute) {
-            if (segments.size() < 2 || !"libraries".equals(segments.get(0))) {
+            if (segments.size() < 2 || !"libraries".equals(segments.getFirst())) {
                 return Optional.empty();
             }
             libraryId = Optional.of(segments.get(1));
             segments = segments.subList(2, segments.size());
         }
-        if (segments.size() < 2 || !"entries".equals(segments.get(0))) {
+        if (segments.size() < 2 || !"entries".equals(segments.getFirst())) {
             return Optional.empty();
         }
         String citationKey = segments.get(1);
