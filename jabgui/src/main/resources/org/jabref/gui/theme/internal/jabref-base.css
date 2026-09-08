@@ -96,6 +96,9 @@
 .text-warning { -fx-text-fill: -color-warning; -fx-fill: -color-warning; }
 .text-success { -fx-text-fill: -color-success; -fx-fill: -color-success; }
 
+.bg-accent { -fx-background: -color-accent; -fx-background-color: -color-accent; }
+.bg-secondary { -fx-background: -color-bg-secondary; -fx-background-color: -color-bg-secondary; }
+
 /* Padding: all sides */
 .padding-0 { -fx-padding: 0; }
 .padding-4 { -fx-padding: 0.333em; }
@@ -133,12 +136,21 @@
 .align-baseline-left { -fx-alignment: baseline-left; }
 
 /* Surface */
-.bg-transparent { -fx-background-color: transparent; }
+.bg-transparent { -fx-background: transparent; -fx-background-color: transparent; }
 .bordered { -fx-border-width: 1; -fx-border-color: -color-border-default; }
+.corner-radius { -fx-background-radius: 0.25em; }
 
 .root {
     /* Default JabRef font size. */
     -fx-font-size: 9pt;
+}
+
+.btn-transparent {
+    -fx-background: transparent;
+    -fx-background-color: -fx-background;
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0.25em;
 }
 
 /* JavaFX with custom components */
@@ -342,7 +354,6 @@
     -fx-background-color: transparent;
     -fx-fill: -color-selection;
 }
-
 
 .icon-button.no-space-bottom {
     -fx-padding: 0.5em 0.5em -0.1em 0.5em;
@@ -870,53 +881,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-max-height: 4em;
 }
 
-.donation-toast .label {
-    -fx-text-fill: -fx-text-base-color;
-}
-
-.donation-btn-primary,
-.donation-btn-secondary,
-.donation-btn-ghost {
-    -fx-background-radius: 0.5em;
-    -fx-border-radius: 0.5em;
-}
-
-.donation-btn-primary {
-    -fx-background-color: -color-accent;
-}
-
-.donation-btn-secondary {
-    -fx-background-color: derive(-color-bg-secondary, -6%);
-}
-
-.donation-btn-ghost {
-    -fx-background-color: transparent;
-    -fx-text-fill: -color-border-default;
-    -fx-stroke-width: 0;
-    -fx-border-width: 0
-}
-
-.donation-btn-ghost:hover {
-    -fx-background-color: transparent;
-    -fx-text-fill: -color-fg-subtle;
-}
-
-/* AboutDialog */
-#aboutDialog .about-heading:pressed {
-    -fx-text-fill: -color-selection;
-}
-
-/* Pulls the developer list up against its heading -- the spacing scale has no negative steps. */
-#aboutDialog .dev-heading {
-    -fx-padding: -0.833em 0 0 0;
-}
-
-#aboutDialog .logo-pane {
-    -fx-fill: transparent;
-}
-
-#aboutDialog .logo-pane SVGPath {
-    -fx-fill: -color-accent;
+/* The logo is a single SvgNode; its shape is filled with -fx-color, not -fx-fill. */
+.jabref-logo {
+    -fx-color: -color-accent;
 }
 
 /* DocumentViewer */
@@ -1431,10 +1398,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .exampleQuestionStyle:hover {
     -fx-background-color: -color-button-hover;
-}
-
-.refresh {
-    -fx-background-color: transparent;
 }
 
 .text-button-blue {

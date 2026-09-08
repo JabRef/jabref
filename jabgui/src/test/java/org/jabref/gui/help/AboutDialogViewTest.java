@@ -1,36 +1,53 @@
 package org.jabref.gui.help;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
-import javafx.stage.Stage;
+import java.util.List;
+import java.util.Objects;
 
+import javafx.collections.ListChangeListener;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.DialogPane;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+
+import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.util.DialogButtonAssertions;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
+import org.testfx.util.WaitForAsyncUtils;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.base.NodeMatchers.isVisible;
 
+@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 class AboutDialogViewTest extends ApplicationTest {
+
+    /// The class [ThemeManager] puts on a scene root for a user who raised the font size from the default 9pt.
+    private static final String FONT_SIZE_CLASS = "font-size-12";
 
     private AboutDialogView aboutDialogView;
     private ClipBoardManager clipBoardManager;
+
+    private ListChangeListener<Window> raisedFontSizeListener;
 
     @BeforeEach
     void initLocalization() {
@@ -38,7 +55,7 @@ class AboutDialogViewTest extends ApplicationTest {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         GuiPreferences preferences = mock(GuiPreferences.class);
         DialogService dialogService = mock(DialogService.class);
         clipBoardManager = mock(ClipBoardManager.class);
@@ -55,18 +72,33 @@ class AboutDialogViewTest extends ApplicationTest {
         Injector.setModelOrService(KeyBindingRepository.class, keyBindingRepository);
         Injector.setModelOrService(StateManager.class, stateManager);
 
-        aboutDialogView = new AboutDialogView();
+        Scene mainWindowScene = new Scene(new StackPane(), 1024, 768);
+        mainWindowScene.getStylesheets().addAll(
+                stylesheet("/org/jabref/gui/theme/jabref-theme.css"),
+                stylesheet("/org/jabref/gui/theme/internal/jabref-base.css"));
+        stage.setScene(mainWindowScene);
+
+        raisedFontSizeListener = change -> {
+            while (change.next()) {
+                change.getAddedSubList().stream()
+                      .map(Window::getScene)
+                      .filter(Objects::nonNull)
+                      .forEach(scene -> scene.getRoot().getStyleClass().add(FONT_SIZE_CLASS));
+            }
+        };
+        Window.getWindows().addListener(raisedFontSizeListener);
 
         aboutDialogView = new AboutDialogView();
+        aboutDialogView.initOwner(stage);
+        interact(aboutDialogView::show);
+    }
 
-        DialogPane pane = aboutDialogView.getDialogPane();
-
-        // 1. Load the CSS into the DialogPane
-        pane.getStylesheets().add(AboutDialogView.class.getResource("/org/jabref/gui/theme/jabref-theme.css").toExternalForm());
-        // 2. Force the 10pt font style
-        pane.setStyle("-fx-font-size: 10pt;");
-        // 3. Show the dialog (this triggers BaseDialog's DIALOG_SHOWING listener)
-        interact(() -> aboutDialogView.show());
+    @AfterEach
+    void removeRaisedFontSizeListener() {
+        if (raisedFontSizeListener != null) {
+            Window.getWindows().removeListener(raisedFontSizeListener);
+            raisedFontSizeListener = null;
+        }
     }
 
     @Test
@@ -77,37 +109,41 @@ class AboutDialogViewTest extends ApplicationTest {
     @Test
     void copyVersionButton() {
         verifyThat("Copy Version", isVisible());
-        clickOn("Copy Version");
+
+        interact(() -> buttonOf("Copy Version").fire());
+
         verify(clipBoardManager).setContent(anyString());
     }
 
     @Test
     void closeButton() {
         verifyThat("Close", isVisible());
-        clickOn("Close");
+
+        interact(() -> buttonOf("Close").fire());
+
+        assertFalse(aboutDialogView.isShowing());
     }
 
     @Test
-    void buttonsAreNotTruncatedAt10ptFont() throws InterruptedException {
+    void buttonCaptionsAreNotTruncatedAtARaisedFontSize() {
+        WaitForAsyncUtils.waitForFxEvents();
         DialogPane pane = aboutDialogView.getDialogPane();
-        for (ButtonType type : pane.getButtonTypes()) {
-            Button button = (Button) pane.lookupButton(type);
 
-            // We need to wait for a layout pulse to ensure CSS is applied
-            interact(() -> {
-                button.applyCss();
-                double prefWidth = button.prefWidth(-1);
-                double actualWidth = button.getWidth();
+        assertEquals(List.of("Copy Version", "Close"),
+                DialogButtonAssertions.buttonsOf(pane).stream().map(Button::getText).toList());
+        DialogButtonAssertions.assertCaptionsAreNotTruncated(pane);
+    }
 
-                // Assert that the actual rendered width is at least as large
-                // as the width required by the 10pt text.
-                // If actualWidth < prefWidth, JavaFX will truncate the text.
-                assertTrue(actualWidth >= prefWidth,
-                        "Button [%s] is truncated! Actual: %.2f, Pref: %.2f".formatted(
-                                button.getText(), actualWidth, prefWidth));
-            });
-            // for debugging purpises
-            // Thread.sleep(4000);
-        }
+    /// The buttons are fired rather than clicked: a robot click needs the window manager to let the
+    /// application move the pointer, which is not the case on every desktop the tests run on.
+    private Button buttonOf(String caption) {
+        return DialogButtonAssertions.buttonsOf(aboutDialogView.getDialogPane()).stream()
+                                     .filter(button -> caption.equals(button.getText()))
+                                     .findFirst()
+                                     .orElseThrow(() -> new AssertionError("No button '%s' on the dialog".formatted(caption)));
+    }
+
+    private static String stylesheet(String path) {
+        return Objects.requireNonNull(AboutDialogViewTest.class.getResource(path)).toExternalForm();
     }
 }
