@@ -67,4 +67,12 @@ The settings are written straight to the library's metadata by seven tabs at onc
 
 Needs: impl, utest
 
+## Typing a field is one undo step
+`req~logic.undo.typing-is-one-step~1`
+
+A run of keystrokes in one field of one entry goes on the undo stack as a single step, so undoing takes back what was typed rather than the last character.
+The run ends when the editor moves to something else, when the library is saved at that point, or when a command records a step of its own; a run that ends where it started leaves no step behind.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

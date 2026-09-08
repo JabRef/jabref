@@ -37,6 +37,12 @@ class JabRefGuiUndoManagerTest {
         entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Einstein");
     }
 
+    private UndoableFieldChange setField(StandardField field, String value) {
+        String before = entry.getField(field).orElse(null);
+        entry.setField(field, value);
+        return new UndoableFieldChange(entry, field, before, value);
+    }
+
     private UndoableFieldChange setAuthor(String value) {
         String before = entry.getField(StandardField.AUTHOR).orElse(null);
         entry.setField(StandardField.AUTHOR, value);
@@ -133,5 +139,30 @@ class JabRefGuiUndoManagerTest {
 
         assertFalse(undoManager.undoableProperty().get());
         assertEquals(List.of(), undoableValues);
+    }
+
+    /// A burst off the JavaFX thread queues one update, not one per edit. What the property ends
+    /// up holding is the same either way — each update reads the stacks when it runs — so what
+    /// this pins is that coalescing does not lose the last state.
+    @Test
+    void aBurstOfEditsQueuesOneUpdate() throws InterruptedException {
+        CountDownLatch release = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                release.await(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        // While the JavaFX thread is blocked, so every update these produce is still queued.
+        for (int i = 0; i < 20; i++) {
+            undoManager.addEdit(setField(StandardField.YEAR, String.valueOf(1900 + i)));
+        }
+        release.countDown();
+        WaitForAsyncUtils.waitForFxEvents();
+
+        assertTrue(undoManager.undoableProperty().get());
+        assertTrue(undoManager.hasChangedProperty().get());
     }
 }

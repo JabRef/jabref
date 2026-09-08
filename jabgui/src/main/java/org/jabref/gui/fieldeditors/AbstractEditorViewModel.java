@@ -56,6 +56,9 @@ public class AbstractEditorViewModel extends AbstractViewModel {
     }
 
     public void bindToEntry(BibEntry entry) {
+        // Whatever was being typed before belongs to the entry that was open then: the run ends
+        // here, so the first keystroke in this entry starts a step of its own.
+        undoManager.endStep();
         this.entry = entry;
 
         // We need to keep a reference to the binding since it otherwise gets discarded
