@@ -92,7 +92,7 @@ public class AiService implements AutoCloseable {
         this.aiPreferences = aiPreferences;
         this.taskExecutor = taskExecutor;
         this.notificationService = notificationService;
-        this.embeddingModelMetadataService = new EmbeddingModelMetadataService();
+        this.embeddingModelMetadataService = new EmbeddingModelMetadataService(aiPreferences);
 
         // Chatting components
         this.mvStoreChatHistoryRepository = new MVStoreChatHistoryRepository(

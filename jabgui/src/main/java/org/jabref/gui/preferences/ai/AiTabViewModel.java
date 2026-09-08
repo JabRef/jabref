@@ -417,7 +417,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         customizeExpertSettings.setValue(workingAiPreferences.getCustomizeExpertSettings());
 
         selectedEmbeddingModel.setValue(workingAiPreferences.getEmbeddingModel());
-        updateSelectedEmbeddingModelMetadata(selectedEmbeddingModel.get());
 
         chattingSystemMessageTemplate.set(workingAiPreferences.getChattingSystemMessageTemplate());
         chattingUserMessageTemplate.set(workingAiPreferences.getChattingUserMessageTemplate());
@@ -829,6 +828,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         }
 
         selectedEmbeddingModelSize.set(Localization.lang("Loading..."));
+        selectedEmbeddingModelMaxChunkSize.set(DEFAULT_MAX_CHUNK_SIZE);
         BackgroundTask.wrap(() -> embeddingModelMetadataService.getMetadata(modelName))
                       .onSuccess(metadataOpt -> {
                           if (modelName.equals(selectedEmbeddingModel.get())) {

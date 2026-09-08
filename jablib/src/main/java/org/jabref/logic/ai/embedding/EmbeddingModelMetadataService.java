@@ -13,6 +13,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.strings.StringUtil;
@@ -24,6 +25,7 @@ import ai.djl.repository.zoo.ModelZoo;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -48,9 +50,19 @@ public class EmbeddingModelMetadataService {
             "sentence_bert_config.json"
     );
 
+    private final AiPreferences aiPreferences;
     private final Map<String, EmbeddingModelMetadata> metadataCache = new ConcurrentHashMap<>();
 
+    public EmbeddingModelMetadataService(AiPreferences aiPreferences) {
+        this.aiPreferences = aiPreferences;
+    }
+
     public EmbeddingModelMetadataService() {
+        this(AiPreferences.getDefault());
+    }
+
+    private boolean isAiEnabled() {
+        return aiPreferences.getAiFeaturesEnabled() || aiPreferences.getAiFeaturesEnabledCurrently();
     }
 
     /// Returns the list of available embedding models discovered from the DJL HuggingFace Model Zoo.
@@ -71,7 +83,7 @@ public class EmbeddingModelMetadataService {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             LOGGER.debug("Could not retrieve available embedding models from DJL ModelZoo", e);
         }
 
@@ -81,7 +93,7 @@ public class EmbeddingModelMetadataService {
     /// Queries metadata (download size in bytes and maximum snippet length in tokens)
     /// for the given embedding model from DJL ModelZoo, falling back to the Hugging Face Hub REST API.
     public Optional<EmbeddingModelMetadata> getMetadata(String modelName) {
-        if (StringUtil.isBlank(modelName)) {
+        if (!isAiEnabled() || StringUtil.isBlank(modelName)) {
             return Optional.empty();
         }
 
@@ -124,7 +136,9 @@ public class EmbeddingModelMetadataService {
         }
 
         EmbeddingModelMetadata metadata = new EmbeddingModelMetadata(modelName, downloadSize, maxTokens);
-        metadataCache.put(modelName, metadata);
+        if (downloadSize.isPresent() || maxTokens.isPresent()) {
+            metadataCache.put(modelName, metadata);
+        }
         return Optional.of(metadata);
     }
 
@@ -162,31 +176,43 @@ public class EmbeddingModelMetadataService {
         try {
             URLDownload download = new URLDownload(new URI(treeUrl).toURL());
             String response = download.asString();
-            JsonArray filesArray = JsonParser.parseString(response).getAsJsonArray();
+            JsonElement parsed = JsonParser.parseString(response);
+            if (!parsed.isJsonArray()) {
+                return OptionalLong.empty();
+            }
+            JsonArray filesArray = parsed.getAsJsonArray();
 
-            long totalBytes = 0;
-            boolean foundWeights = false;
+            long safetensorsBytes = 0;
+            long binBytes = 0;
+            long configBytes = 0;
 
             for (JsonElement element : filesArray) {
                 if (element.isJsonObject()) {
                     JsonObject fileObj = element.getAsJsonObject();
-                    String path = fileObj.has("path") ? fileObj.get("path").getAsString() : "";
-                    long size = fileObj.has("size") ? fileObj.get("size").getAsLong() : 0;
+                    String path = fileObj.has("path") && fileObj.get("path").isJsonPrimitive()
+                            ? fileObj.get("path").getAsString()
+                            : "";
+                    long size = fileObj.has("size") && fileObj.get("size").isJsonPrimitive() && fileObj.get("size").getAsJsonPrimitive().isNumber()
+                            ? fileObj.get("size").getAsLong()
+                            : 0;
 
-                    // Prioritize model.safetensors or pytorch_model.bin
-                    if ("model.safetensors".equalsIgnoreCase(path) || "pytorch_model.bin".equalsIgnoreCase(path)) {
-                        totalBytes += size;
-                        foundWeights = true;
+                    String lowerPath = path.toLowerCase(Locale.ROOT);
+                    if (lowerPath.endsWith(".safetensors")) {
+                        safetensorsBytes += size;
+                    } else if (lowerPath.endsWith(".bin") && (lowerPath.contains("model") || lowerPath.contains("pytorch"))) {
+                        binBytes += size;
                     } else if (isTokenizerOrConfigFile(path)) {
-                        totalBytes += size;
+                        configBytes += size;
                     }
                 }
             }
 
-            if (foundWeights && totalBytes > 0) {
-                return OptionalLong.of(totalBytes);
+            if (safetensorsBytes > 0) {
+                return OptionalLong.of(safetensorsBytes + configBytes);
+            } else if (binBytes > 0) {
+                return OptionalLong.of(binBytes + configBytes);
             }
-        } catch (FetcherException | IOException | URISyntaxException e) {
+        } catch (JsonParseException | NumberFormatException | FetcherException | IOException | URISyntaxException e) {
             LOGGER.debug("Could not fetch model size from Hugging Face tree API for {}", modelName, e);
         }
         return OptionalLong.empty();
@@ -221,11 +247,15 @@ public class EmbeddingModelMetadataService {
         try {
             URLDownload download = new URLDownload(new URI(url).toURL());
             String response = download.asString();
-            JsonObject obj = JsonParser.parseString(response).getAsJsonObject();
-            if (obj.has(fieldName)) {
+            JsonElement parsed = JsonParser.parseString(response);
+            if (!parsed.isJsonObject()) {
+                return OptionalInt.empty();
+            }
+            JsonObject obj = parsed.getAsJsonObject();
+            if (obj.has(fieldName) && obj.get(fieldName).isJsonPrimitive() && obj.get(fieldName).getAsJsonPrimitive().isNumber()) {
                 return OptionalInt.of(obj.get(fieldName).getAsInt());
             }
-        } catch (FetcherException | IOException | URISyntaxException e) {
+        } catch (JsonParseException | NumberFormatException | FetcherException | IOException | URISyntaxException e) {
             LOGGER.debug("Could not fetch or parse {} from {}", fieldName, url, e);
         }
         return OptionalInt.empty();

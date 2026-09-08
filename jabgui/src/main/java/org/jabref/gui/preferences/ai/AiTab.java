@@ -25,6 +25,7 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -50,7 +51,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                 workingAiPreferences,
                 aiService.getModelService(),
                 taskExecutor,
-                aiService.getEmbeddingModelMetadataService());
+                new EmbeddingModelMetadataService(workingAiPreferences));
         this.aiDisabled = viewModel.enableAi().not();
 
         buildView();
