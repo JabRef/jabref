@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.SequencedMap;
 import java.util.Set;
@@ -62,7 +61,9 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
+import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.strings.StringUtil;
@@ -90,6 +91,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     // region Preview - public for pref migrations
     public static final String PREVIEW_STYLE = "previewStyle";
+    public static final String PREVIEW_STYLE_CUSTOMIZED_ID = "previewStyleCustomizedId";
+    public static final String PREVIEW_STYLE_CUSTOMIZED_NAME = "previewStyleCustomizedName";
+    public static final String PREVIEW_STYLE_CUSTOMIZED_TEXT = "previewStyleCustomizedText";
+    public static final String PREVIEW_STYLE_CUSTOMIZED_MIGRATED = "previewStyleCustomizedMigrated";
     public static final String PREVIEW_CYCLE_POS = "cyclePreviewPos";
     public static final String PREVIEW_CYCLE = "cyclePreview";
     public static final String PREVIEW_AS_TAB = "previewAsTab";
@@ -954,8 +959,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
         // Mutable lists required
-        String customPreviewLayout = get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout());
-        List<PreviewLayout> layouts = getPreviewLayouts(getStringList(PREVIEW_CYCLE), customPreviewLayout);
+        List<CustomizedPreviewStyle> customizedLayouts = getCustomizedPreviewStyle(defaultValues.getCustomizedPreviewStyles());
+        List<PreviewLayout> layouts = getPreviewLayouts(getStringList(PREVIEW_CYCLE), customizedLayouts);
         if (layouts.isEmpty()) {
             layouts = new ArrayList<>(defaultValues.getLayoutCycle());
         }
@@ -970,7 +975,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         this.previewPreferences = new PreviewPreferences(
                 layouts,
                 getPreviewCyclePosition(layouts, getInt(PREVIEW_CYCLE_POS, defaultValues.getLayoutCyclePosition())),
-                customPreviewLayout,
+                customizedLayouts,
                 getBoolean(PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab()),
                 getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip()),
                 bstPaths,
@@ -981,7 +986,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindCustomList(previewPreferences.getLayoutCycle(), PREVIEW_CYCLE, defaultValues.getLayoutCycle(),
                 boundList -> putStringList(PREVIEW_CYCLE, previewLayoutsToStrings(boundList)),
                 () -> {
-                    List<PreviewLayout> stored = getPreviewLayouts(getStringList(PREVIEW_CYCLE), get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout()));
+                    List<PreviewLayout> stored = getPreviewLayouts(getStringList(PREVIEW_CYCLE), getCustomizedPreviewStyle(defaultValues.getCustomizedPreviewStyles()));
                     return stored.isEmpty() ? defaultValues.getLayoutCycle() : stored;
                 });
         // layoutCyclePosition is clamped to the current cycle on load, so it needs a custom binding.
@@ -989,15 +994,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 (_, _, newValue) -> putInt(PREVIEW_CYCLE_POS, newValue.intValue()),
                 () -> previewPreferences.layoutCyclePositionProperty().set(getPreviewCyclePosition(previewPreferences.getLayoutCycle(), defaultValues.getLayoutCyclePosition())),
                 () -> previewPreferences.layoutCyclePositionProperty().set(defaultValues.getLayoutCyclePosition()));
-        // customPreviewLayout is stored with __NEWLINE__ instead of \n so that our migration correctly triggers; in getText it is replaced back by \n.
         // FIXME: serializer/deserializer are not inverse: the persist listener encodes \n -> __NEWLINE__, but the load
         //   does not decode __NEWLINE__ -> \n. The property therefore holds the encoded form after a load but the raw
         //   \n form once the preview editor sets it, so PreferencesFilter reports a false deviation from the default.
         //   Followup: pick one canonical in-memory form (decode on load, encode on persist, default in the same form).
-        bindCustom(previewPreferences.customPreviewLayoutProperty(), PREVIEW_STYLE, defaultValues.getCustomPreviewLayout(),
-                (_, _, newValue) -> put(PREVIEW_STYLE, newValue.replace("\n", "__NEWLINE__")),
-                () -> previewPreferences.customPreviewLayoutProperty().set(get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout())),
-                () -> previewPreferences.customPreviewLayoutProperty().set(defaultValues.getCustomPreviewLayout()));
+        bindCustomList(previewPreferences.getCustomizedPreviewStyles(), PREVIEW_STYLE_CUSTOMIZED_ID, defaultValues.getCustomizedPreviewStyles(),
+                this::storeCustomizedPreviewStyle,
+                () -> getCustomizedPreviewStyle(defaultValues.getCustomizedPreviewStyles()));
         bindBoolean(previewPreferences.showPreviewAsExtraTabProperty(), PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab());
         bindBoolean(previewPreferences.showPreviewEntryTableTooltip(), PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip());
         bindCustomList(previewPreferences.getBstPreviewLayoutPaths(), PREVIEW_BST_LAYOUT_PATHS, defaultValues.getBstPreviewLayoutPaths(),
@@ -1014,33 +1017,40 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         putStringList(PREVIEW_BST_LAYOUT_PATHS, bstPaths.stream().map(Path::toAbsolutePath).map(Path::toString).toList());
     }
 
-    private List<PreviewLayout> getPreviewLayouts(List<String> cycle, String customPreviewLayout) {
+    private List<PreviewLayout> getPreviewLayouts(List<String> cycle, List<CustomizedPreviewStyle> customizedLayouts) {
         // For backwards compatibility always add at least the default preview to the cycle
         if (cycle.isEmpty()) {
-            cycle.addAll(List.of(TextBasedPreviewLayout.NAME, CSLStyleLoader.DEFAULT_STYLE));
+            if (customizedLayouts.isEmpty()) {
+                CustomizedPreviewStyle defaultStyle = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
+                        TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT);
+                customizedLayouts.add(defaultStyle);
+                cycle.add(defaultStyle.id());
+            } else {
+                cycle.add(customizedLayouts.getFirst().id());
+            }
+            cycle.add(CSLStyleLoader.DEFAULT_STYLE);
         }
 
         return cycle.stream()
-                    .map(layout -> PreviewLayout.of(
-                            layout,
-                            customPreviewLayout,
+                    .map(layout -> PreviewLayout.of(layout, customizedLayouts,
                             getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList(),
                             getLayoutFormatterPreferences(),
                             Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
-                            Injector.instantiateModelOrService(BibEntryTypesManager.class))
-                    ).filter(Objects::nonNull)
+                            Injector.instantiateModelOrService(BibEntryTypesManager.class)))
+                    .flatMap(Optional::stream)
                     .collect(Collectors.toList());
     }
 
-    private List<String> previewLayoutsToStrings(List<PreviewLayout> previewCycle) {
-        return previewCycle.stream()
-                           .map(layout -> {
-                               if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
-                                   return citationStyleLayout.getFilePath();
-                               } else {
-                                   return layout.getName();
-                               }
-                           }).toList();
+    private List<String> previewLayoutsToStrings(List<PreviewLayout> previewList) {
+        return previewList.stream()
+                          .map(layout -> switch (layout) {
+                              case CitationStylePreviewLayout csl ->
+                                      csl.getFilePath();
+                              case TextBasedPreviewLayout text ->
+                                      text.getId();
+                              case BstPreviewLayout bst ->
+                                      bst.getFilePath().toString();
+                          }).toList();
     }
 
     private int getPreviewCyclePosition(List<PreviewLayout> layouts, int defaultPosition) {
@@ -1050,6 +1060,68 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         } else {
             return 0; // fallback if stored position is no longer valid
         }
+    }
+
+    private List<CustomizedPreviewStyle> getCustomizedPreviewStyle(List<CustomizedPreviewStyle> defaults) {
+        // hasKey() can't distinguish "never migrated" from "empty customized styles". storeCustomizedPreviewStyle purges the numbered series when the list is emptied.
+        // The PREVIEW_STYLE_CUSTOMIZED_MIGRATED key is written once by migrateLegacyCustomLayout and is never purged, so it survives
+        // an emptied list and prevents the legacy PREVIEW_STYLE key from being re-migrated on a later startup.
+        if (!hasKey(PREVIEW_STYLE_CUSTOMIZED_ID + "0") && !getBoolean(PREVIEW_STYLE_CUSTOMIZED_MIGRATED, false)) {
+            return migrateLegacyCustomLayout(defaults);
+        }
+        // reads a numbered series independently, one key prefix at a time
+        // fetches through concurrent existing keys until it misses,
+        List<String> ids = getSeries(PREVIEW_STYLE_CUSTOMIZED_ID);
+        List<String> names = getSeries(PREVIEW_STYLE_CUSTOMIZED_NAME);
+        List<String> texts = getSeries(PREVIEW_STYLE_CUSTOMIZED_TEXT);
+        // min is precautionary, helps to not be indexOutOfBounds in the case storing these keys failed mid run
+        int count = Math.min(ids.size(), Math.min(names.size(), texts.size()));
+
+        List<CustomizedPreviewStyle> result = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            // On retrieval, we must replace __NEWLINE__ with \n to correctly display text
+            CustomizedPreviewStyle customizedPreviewStyle = new CustomizedPreviewStyle(
+                    ids.get(i), names.get(i),
+                    texts.get(i).replace("__NEWLINE__", "\n"));
+            result.add(customizedPreviewStyle);
+        }
+        return result.isEmpty() ? defaults : result;
+    }
+
+    private void storeCustomizedPreviewStyle(List<CustomizedPreviewStyle> layouts) {
+        if (layouts.isEmpty()) {
+            purgeSeries(PREVIEW_STYLE_CUSTOMIZED_ID, 0);
+            purgeSeries(PREVIEW_STYLE_CUSTOMIZED_NAME, 0);
+            purgeSeries(PREVIEW_STYLE_CUSTOMIZED_TEXT, 0);
+        } else {
+            for (int i = 0; i < layouts.size(); i++) {
+                // On store, we must replace \n with __NEWLINE__ to correctly store text
+                CustomizedPreviewStyle layout = layouts.get(i);
+                put(PREVIEW_STYLE_CUSTOMIZED_ID + i, layout.id());
+                put(PREVIEW_STYLE_CUSTOMIZED_NAME + i, layout.name());
+                put(PREVIEW_STYLE_CUSTOMIZED_TEXT + i, layout.text().replace("\n", "__NEWLINE__"));
+            }
+            purgeSeries(PREVIEW_STYLE_CUSTOMIZED_ID, layouts.size());
+            purgeSeries(PREVIEW_STYLE_CUSTOMIZED_NAME, layouts.size());
+            purgeSeries(PREVIEW_STYLE_CUSTOMIZED_TEXT, layouts.size());
+        }
+    }
+
+    // Intended to migrate the old PREVIEW_STYLE value into CustomizedPreviewStyle list. Then stores the new key immediately so this only runs once
+    private List<CustomizedPreviewStyle> migrateLegacyCustomLayout(List<CustomizedPreviewStyle> defaults) {
+        putBoolean(PREVIEW_STYLE_CUSTOMIZED_MIGRATED, true);    // key is marked so we don't attempt to migrate legacy layout again (i.e. if the list is empty again)
+        if (hasKey(PREVIEW_STYLE)) {
+            String legacyText = get(PREVIEW_STYLE, "").replace("__NEWLINE__", "\n");
+            if (StringUtil.isNotBlank(legacyText)) {
+                // Legacy PREVIEW_CYCLE reference TextBasedPreviewLayout.NAME (reference PreferencesMigrations.upgradeBuiltinPreviewName)
+                // set migrated id to this default value, else cycle inherited from before this change silently drops the customized layout on load
+                CustomizedPreviewStyle migrated = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
+                        TextBasedPreviewLayout.NAME, legacyText);
+                storeCustomizedPreviewStyle(List.of(migrated));
+                return List.of(migrated);
+            }
+        }
+        return defaults;
     }
     // endregion
 

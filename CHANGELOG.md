@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added support for users to create, manage, and persist customized preview styles. UI updated to split "Available" panel into two tabs. [#16075](https://github.com/JabRef/jabref/issues/16075)
 - We added automatic reconnection to shared databases that were still connected when JabRef was closed. [#16801](https://github.com/JabRef/jabref/pull/16801)
 - We added the ability to auto-inject and manually infer the used CSL style in the LibreOffice document. [#16640](https://github.com/JabRef/jabref/issues/16640)
 - We added subset search for CSL styles. [#16693](https://github.com/JabRef/jabref/issues/16693)
