@@ -212,6 +212,7 @@ public class SharedDatabaseUIManager {
         parserResult.setDatabaseContext(bibDatabaseContext);
     }
 
+    // [impl->req~shared-database.loading-indicator~1]
     public BibDatabaseContext createDummyContext(DBMSConnectionProperties connectionProperties) {
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
         DatabaseSynchronizer synchronizer = bibDatabaseContext.getDBMSSynchronizer();

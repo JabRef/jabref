@@ -1312,6 +1312,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     /// Creates a shared-library tab that displays the main table's loading indicator until `connectionTask` has connected.
     /// The dummy context is replaced with the connected context on success; cancellation closes the connected context instead.
+    // [impl->req~shared-database.loading-indicator~1]
     public static LibraryTab createLibraryTab(Callable<BibDatabaseContext> connectionTask,
                                               BibDatabaseContext dummyContext,
                                               DialogService dialogService,
