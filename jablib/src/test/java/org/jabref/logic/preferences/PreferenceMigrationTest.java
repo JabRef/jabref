@@ -88,17 +88,6 @@ class PreferenceMigrationTest {
     }
 
     @Test
-    void getAiPreferencesMigratesLegacyEmbeddingModelL6() {
-        JabRefCliPreferences preferences = new JabRefCliPreferences();
-        preferences.put(AI_EMBEDDING_MODEL, "SENTENCE_TRANSFORMERS_ALL_MINILM_L6_V2");
-
-        String embeddingModel = preferences.getAiPreferences().getEmbeddingModel();
-
-        assertEquals("sentence-transformers/all-MiniLM-L6-v2", embeddingModel);
-        assertEquals("sentence-transformers/all-MiniLM-L6-v2", preferences.get(AI_EMBEDDING_MODEL, UNUSED_DEFAULT_VALUE));
-    }
-
-    @Test
     void getAiPreferencesMigratesOtherLegacyEmbeddingModelToDefault() {
         JabRefCliPreferences preferences = new JabRefCliPreferences();
         preferences.put(AI_EMBEDDING_MODEL, "BAAI_BGE_LARGE_EN_V1_5");

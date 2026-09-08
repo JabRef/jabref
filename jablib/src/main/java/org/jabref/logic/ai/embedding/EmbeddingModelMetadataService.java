@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 @NullMarked
 public class EmbeddingModelMetadataService {
     public static final String DJL_PYTORCH_GROUP_ID = "ai.djl.huggingface.pytorch";
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddingModelMetadataService.class);
 
     private static final Set<String> CONFIG_AND_TOKENIZER_FILES = Set.of(
