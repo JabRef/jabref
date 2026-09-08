@@ -4,6 +4,7 @@ import java.util.List;
 
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.shared.SharedDatabasePlaceholderTab;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NullMarked;
@@ -35,7 +36,10 @@ public interface LibraryTabContainer {
     /// @return true if closing the tabs was successful
     boolean closeTabs(List<LibraryTab> tabs, boolean showWelcomeTab);
 
-    /// Ids of the shared databases whose reconnection failed and that are still shown as an error tab.
+    /// Shows a placeholder for a shared database that is being connected (or failed to)
+    void showSharedDatabasePlaceholder(SharedDatabasePlaceholderTab placeholder, boolean raisePanel);
+
+    /// Ids of the remembered shared databases that are still shown as a placeholder tab.
     /// They have no library tab, but must stay remembered for the next session.
     List<String> getUnconnectedSharedDatabaseIds();
 

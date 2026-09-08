@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class SharedDatabaseErrorTabTest extends ApplicationTest {
+class SharedDatabasePlaceholderTabTest extends ApplicationTest {
 
     private final AtomicInteger retries = new AtomicInteger();
 
-    private SharedDatabaseErrorTab tab;
+    private SharedDatabasePlaceholderTab tab;
 
     @BeforeEach
     void setUp() {
@@ -28,9 +28,8 @@ class SharedDatabaseErrorTabTest extends ApplicationTest {
         when(connectionProperties.getDatabase()).thenReturn("Literature");
 
         interact(() -> {
-            tab = new SharedDatabaseErrorTab("shared-1", connectionProperties);
+            tab = new SharedDatabasePlaceholderTab("shared-1", connectionProperties);
             tab.setRetryAction(retries::incrementAndGet);
-            tab.showError(new SQLException("Connection refused"));
         });
     }
 
@@ -43,14 +42,24 @@ class SharedDatabaseErrorTabTest extends ApplicationTest {
     }
 
     @Test
-    void tabIsNamedAfterTheDatabaseAndShowsTheError() {
+    void startsConnectingWithoutRetry() {
         assertEquals("Literature", tab.getText());
+        assertEquals("Connecting...", message().getText());
+        assertEquals(true, retryButton().isDisabled());
+    }
+
+    @Test
+    void failureShowsTheError() {
+        interact(() -> tab.showError(new SQLException("Connection refused")));
+
         assertEquals("Connection refused", message().getText());
+        assertEquals(false, retryButton().isDisabled());
     }
 
     @Test
     void retryStartsOneAttemptAndBlocksFurtherClicksWhileItRuns() {
         interact(() -> {
+            tab.showError(new SQLException("Connection refused"));
             retryButton().fire();
             retryButton().fire();
         });
@@ -62,6 +71,7 @@ class SharedDatabaseErrorTabTest extends ApplicationTest {
     @Test
     void anotherFailureAllowsRetryingAgain() {
         interact(() -> {
+            tab.showError(new SQLException("Connection refused"));
             retryButton().fire();
             tab.showError(new SQLException("Still refused"));
         });
