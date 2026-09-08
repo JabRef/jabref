@@ -105,6 +105,7 @@
 .padding-4 { -fx-padding: 0.333em; }
 .padding-8 { -fx-padding: 0.667em; }
 .padding-12 { -fx-padding: 1em; }
+.padding-16 { -fx-padding: 1.333em; }
 
 /* Padding: <vertical>-<horizontal>. Added on demand -- only the pairs in use exist. */
 .padding-0-4 { -fx-padding: 0 0.333em; }
@@ -1005,6 +1006,43 @@ We want to have a look that matches our icons in the tool-bar */
 #entryEditor #scitePane Label,
 #entryEditor #scitePane Text {
     -fx-fill: -fx-text-background-color;
+}
+
+#aboutDialog,
+#aboutDialog > .content,
+#aboutDialog > .button-bar > .container {
+    -fx-padding: 0;
+}
+
+#aboutDialog > .button-bar {
+    visibility: hidden;
+    -fx-min-height: 0;
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+}
+
+#aboutDialog .bg-accent .button {
+    -fx-border-color: -color-fg-emphasis;
+}
+
+#aboutDialog #donationButton {
+    -fx-background-color: -color-fg-emphasis;
+    -fx-text-fill: -color-accent-text;
+}
+
+#aboutDialog #donationButton:hover {
+    -fx-background-color: -color-fg-subtle;
+}
+
+#aboutDialog .bg-accent .button:focused {
+    -fx-border-color: -color-fg-emphasis;
+    -fx-border-width: 0.125em;
+}
+
+#aboutDialog .bg-accent .button.btn-transparent,
+#aboutDialog .bg-accent .button.btn-transparent:focused {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
 }
 
 /* ErrorConsole */

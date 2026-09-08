@@ -2,11 +2,12 @@ package org.jabref.gui.help;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javafx.collections.ListChangeListener;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.DialogPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -32,6 +33,7 @@ import org.testfx.util.WaitForAsyncUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -42,6 +44,8 @@ import static org.testfx.matcher.base.NodeMatchers.isVisible;
 class AboutDialogViewTest extends ApplicationTest {
 
     private static final String FONT_SIZE_CLASS = "font-size-12";
+    private static final String COPY_VERSION_BUTTON = "#copyVersionButton";
+    private static final String CLOSE_BUTTON = "#closeButton";
 
     private AboutDialogView aboutDialogView;
     private ClipBoardManager clipBoardManager;
@@ -102,18 +106,18 @@ class AboutDialogViewTest extends ApplicationTest {
 
     @Test
     void copyVersionButton() {
-        verifyThat("Copy Version", isVisible());
+        verifyThat(button(COPY_VERSION_BUTTON), isVisible());
 
-        interact(() -> buttonOf("Copy Version").fire());
+        interact(() -> button(COPY_VERSION_BUTTON).fire());
 
         verify(clipBoardManager).setContent(anyString());
     }
 
     @Test
     void closeButton() {
-        verifyThat("Close", isVisible());
+        verifyThat(button(CLOSE_BUTTON), isVisible());
 
-        interact(() -> buttonOf("Close").fire());
+        interact(() -> button(CLOSE_BUTTON).fire());
 
         assertFalse(aboutDialogView.isShowing());
     }
@@ -121,20 +125,21 @@ class AboutDialogViewTest extends ApplicationTest {
     @Test
     void buttonCaptionsAreNotTruncatedAtARaisedFontSize() {
         WaitForAsyncUtils.waitForFxEvents();
-        DialogPane pane = aboutDialogView.getDialogPane();
 
-        assertEquals(List.of("Copy Version", "Close"),
-                DialogButtonAssertions.buttonsOf(pane).stream().map(Button::getText).toList());
-        DialogButtonAssertions.assertCaptionsAreNotTruncated(pane);
+        assertEquals(List.of("Copy Version", "Close"), buttons().stream().map(Button::getText).toList());
+        DialogButtonAssertions.assertCaptionsAreNotTruncated(buttons());
+    }
+
+    private List<Button> buttons() {
+        return Stream.of(COPY_VERSION_BUTTON, CLOSE_BUTTON).map(this::button).toList();
     }
 
     /// The buttons are fired rather than clicked: a robot click needs the window manager to let the
     /// application move the pointer, which is not the case on every desktop the tests run on.
-    private Button buttonOf(String caption) {
-        return DialogButtonAssertions.buttonsOf(aboutDialogView.getDialogPane()).stream()
-                                     .filter(button -> caption.equals(button.getText()))
-                                     .findFirst()
-                                     .orElseThrow(() -> new AssertionError("No button '%s' on the dialog".formatted(caption)));
+    private Button button(String id) {
+        Node button = aboutDialogView.getDialogPane().lookup(id);
+        assertNotNull(button, "No button '%s' on the dialog".formatted(id));
+        return (Button) button;
     }
 
     private static String stylesheet(String path) {
