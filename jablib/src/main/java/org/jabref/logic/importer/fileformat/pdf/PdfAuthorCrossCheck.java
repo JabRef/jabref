@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -97,7 +98,7 @@ class PdfAuthorCrossCheck {
                                                      .map(source -> source.getCitationKey().isPresent()
                                                              || !BibEntry.DEFAULT_TYPE.equals(source.getType()))
                                                      .orElse(true);
-        if (!sourceLooksBibliographic && (AuthorList.parse(mergedAuthor).getNumberOfAuthors() == 1)) {
+        if (!sourceLooksBibliographic && (namedAuthors(mergedAuthor).count() == 1)) {
             entry.clearField(StandardField.AUTHOR);
         }
     }
@@ -133,12 +134,19 @@ class PdfAuthorCrossCheck {
     }
 
     private static int countFamilyNamesInText(String authorField, String normalizedText) {
-        return (int) AuthorList.parse(authorField).getAuthors().stream()
-                               .map(Author::getFamilyName)
-                               .flatMap(Optional::stream)
-                               .map(PdfAuthorCrossCheck::normalizeForComparison)
-                               .filter(familyName -> !familyName.isBlank() && containsWord(normalizedText, familyName))
-                               .count();
+        return (int) namedAuthors(authorField)
+                .map(Author::getFamilyName)
+                .flatMap(Optional::stream)
+                .map(PdfAuthorCrossCheck::normalizeForComparison)
+                .filter(familyName -> !familyName.isBlank() && containsWord(normalizedText, familyName))
+                .count();
+    }
+
+    /// A trailing "et al." parses to [Author#OTHERS]. It is neither a person that could be confirmed (its family
+    /// name "others" is an ordinary word of prose) nor one that makes a creator-only author list look multi-person.
+    private static Stream<Author> namedAuthors(String authorField) {
+        return AuthorList.parse(authorField).getAuthors().stream()
+                         .filter(author -> !Author.OTHERS.equals(author));
     }
 
     /// Whole-word check: the occurrence must not be preceded or followed by another letter

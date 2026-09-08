@@ -53,6 +53,7 @@ class PdfMergeMetadataImporterOfflineTest {
             Test, Carol                 | Alice Doe, Bob Smith, Example University Testing Lab |
             Void, Eve and Null, Mallory | Alice Doe, Bob Smith, Example University Testing Lab | Void, Eve and Null, Mallory
             Void, Eve                   |                                                     | Void, Eve
+            Void, Eve et al.            | Alice Doe and others, Example University            |
             """)
     void singleCreatorCandidateAuthorIsCrossCheckedAgainstText(String author, String leadingPagesText, String expectedAuthor) {
         BibEntry candidate = new BibEntry().withField(StandardField.AUTHOR, author);
