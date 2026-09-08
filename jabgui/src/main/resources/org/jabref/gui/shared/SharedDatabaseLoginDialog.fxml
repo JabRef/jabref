@@ -17,7 +17,7 @@
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.shared.SharedDatabaseLoginDialogView">
     <content>
         <VBox spacing="10.0">
-            <GridPane fx:id="savedConnectionsPane" hgap="10.0" vgap="8.0">
+            <GridPane fx:id="savedConnectionsPane" hgap="8.0" vgap="8.0">
                 <columnConstraints>
                     <ColumnConstraints hgrow="NEVER" minWidth="-Infinity"/>
                     <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="260.0"/>
@@ -28,7 +28,7 @@
                 <Button fx:id="removeSavedConnection" mnemonicParsing="false" onAction="#removeSavedConnection"
                         text="%Remove" maxWidth="Infinity" GridPane.columnIndex="2"/>
             </GridPane>
-            <GridPane hgap="10.0" vgap="8.0">
+            <GridPane hgap="8.0" vgap="8.0">
                 <columnConstraints>
                     <ColumnConstraints hgrow="NEVER" minWidth="-Infinity"/>
                     <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="260.0"/>
@@ -54,7 +54,7 @@
                 </SplitPane>
             </GridPane>
             <TitledPane fx:id="advancedPane" text="%Advanced" animated="false" expanded="false">
-                <GridPane hgap="10.0" vgap="8.0">
+                <GridPane hgap="8.0" vgap="8.0">
                     <columnConstraints>
                         <ColumnConstraints hgrow="NEVER" minWidth="-Infinity"/>
                         <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="260.0"/>
@@ -67,7 +67,7 @@
                     <TextField fx:id="jdbcUrl" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2"/>
                 </GridPane>
             </TitledPane>
-            <GridPane hgap="10.0" vgap="8.0">
+            <GridPane hgap="8.0" vgap="8.0">
                 <columnConstraints>
                     <ColumnConstraints hgrow="ALWAYS" minWidth="10.0"/>
                     <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="80.0"/>
