@@ -160,10 +160,10 @@ class ThemeTokenContractTest {
         return StyleSheet.class.getResourceAsStream(css);
     }
 
-    /// JabRef's own themes must declare the complete token contract; community themes are layered on
-    /// top of the JabRef theme and may declare a subset.
+    /// Themes without a parent must declare the complete token contract; the others are layered on
+    /// top of their parent and may declare a subset.
     static List<ThemePreset> builtInThemes() {
-        return List.of(ThemePreset.JABREF, ThemePreset.PRIMER);
+        return Arrays.stream(ThemePreset.values()).filter(theme -> theme.getParent().isEmpty()).toList();
     }
 
     static List<ThemePreset> allThemes() {
@@ -171,7 +171,7 @@ class ThemeTokenContractTest {
     }
 
     static List<ThemePreset> communityThemes() {
-        return Arrays.stream(ThemePreset.values()).filter(theme -> !builtInThemes().contains(theme)).toList();
+        return Arrays.stream(ThemePreset.values()).filter(theme -> theme.getParent().isPresent()).toList();
     }
 
     /// A community theme setting a token nobody reads is a typo or a stale port; it would silently
@@ -182,7 +182,7 @@ class ThemeTokenContractTest {
         String themeCss = theme.getStyleSheet().getName();
 
         Set<String> read = new TreeSet<>(tokens(BASE_CSS, Kind.USE));
-        read.addAll(tokens(ThemePreset.JABREF.getStyleSheet().getName(), Kind.USE));
+        theme.getParent().ifPresent(parent -> read.addAll(tokens(parent.getStyleSheet().getName(), Kind.USE)));
         read.addAll(tokens(themeCss, Kind.USE));
 
         Set<String> unread = new TreeSet<>(tokens(themeCss, Kind.DECLARATION));
@@ -217,17 +217,15 @@ class ThemeTokenContractTest {
     }
 
     /// A theme may introduce tokens of its own (Primer scopes a good number of them to single controls),
-    /// but it must not read one it never declares. A community theme sits on top of the JabRef theme,
-    /// so that theme's declarations count for it as well.
+    /// but it must not read one it never declares. A theme with a parent sits on top of that parent,
+    /// so the parent's declarations count for it as well.
     @ParameterizedTest
     @MethodSource("allThemes")
     void themeDeclaresEveryTokenItUsesItself(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
         Set<String> declared = new TreeSet<>(tokens(themeCss, Kind.DECLARATION));
-        if (!builtInThemes().contains(theme)) {
-            declared.addAll(tokens(ThemePreset.JABREF.getStyleSheet().getName(), Kind.DECLARATION));
-        }
+        theme.getParent().ifPresent(parent -> declared.addAll(tokens(parent.getStyleSheet().getName(), Kind.DECLARATION)));
 
         Set<String> undeclared = new TreeSet<>(tokens(themeCss, Kind.USE));
         undeclared.removeAll(declared);
