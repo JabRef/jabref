@@ -1652,7 +1652,7 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.warn("Unable to read citedrive token", ex);
         }
 
-        return parseCiteDriveToken(get(CITE_DRIVE_TOKEN));
+        return parseCiteDriveToken(get(CITE_DRIVE_TOKEN, null));
     }
 
     private void setCiteDriveToken(@Nullable RefreshToken refreshToken) {
