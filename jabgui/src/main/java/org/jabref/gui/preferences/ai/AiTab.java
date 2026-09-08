@@ -8,7 +8,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -63,11 +62,15 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     }
 
     private void buildView() {
-        Label embeddingModelSizeLabel = new Label();
-        embeddingModelSizeLabel.textProperty().bind(viewModel.selectedEmbeddingModelSizeProperty());
+        TextField embeddingModelSizeField = new TextField();
+        embeddingModelSizeField.setEditable(false);
+        embeddingModelSizeField.setFocusTraversable(false);
+        embeddingModelSizeField.textProperty().bind(viewModel.selectedEmbeddingModelSizeProperty());
 
-        Label embeddingModelMaxChunkSizeLabel = new Label();
-        embeddingModelMaxChunkSizeLabel.textProperty().bind(viewModel.selectedEmbeddingModelMaxChunkSizeProperty().asString());
+        TextField embeddingModelMaxChunkSizeField = new TextField();
+        embeddingModelMaxChunkSizeField.setEditable(false);
+        embeddingModelMaxChunkSizeField.setFocusTraversable(false);
+        embeddingModelMaxChunkSizeField.textProperty().bind(viewModel.selectedEmbeddingModelMaxChunkSizeProperty().asString());
 
         setContent(form()
 
@@ -108,8 +111,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                         viewModel.selectedEmbeddingModelProperty(),
                                                         model -> model != null ? model : "",
                                                         embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
-                                                .field(Localization.lang("Embedding model size"), embeddingModelSizeLabel)
-                                                .field(Localization.lang("Embedding model maximum chunk size"), embeddingModelMaxChunkSizeLabel)
+                                                .field(Localization.lang("Embedding model size"), embeddingModelSizeField)
+                                                .field(Localization.lang("Embedding model maximum chunk size"), embeddingModelMaxChunkSizeField)
                                                 // The six numeric expert settings, as two columns of caption-above-field cells.
                                                 // [impl->feat~ai.expert-settings.chat-inference-global~1]
                                                 // [impl->feat~ai.expert-settings.rag-global~1]

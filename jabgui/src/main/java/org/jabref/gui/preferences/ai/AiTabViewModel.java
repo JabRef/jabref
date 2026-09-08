@@ -194,6 +194,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.selectedEmbeddingModel.addListener((_, _, newValue) -> updateSelectedEmbeddingModelMetadata(newValue));
 
         this.selectedAiProvider.addListener((_, oldValue, newValue) -> {
+            if (newValue == null) {
+                return;
+            }
+
             List<String> models = PredefinedChatModelUtil.getAvailableModels(newValue);
 
             disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
@@ -269,7 +273,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 return;
             }
 
-            switch (selectedAiProvider.get()) {
+            AiProvider aiProvider = selectedAiProvider.get();
+            if (aiProvider == null) {
+                return;
+            }
+
+            switch (aiProvider) {
                 case OPEN_AI ->
                         openAiChatModel.set(newValue);
                 case MISTRAL_AI ->
@@ -280,11 +289,16 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         huggingFaceChatModel.set(newValue);
             }
 
-            contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(selectedAiProvider.get(), newValue));
+            contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(aiProvider, newValue));
         });
 
         this.currentApiKey.addListener((_, _, newValue) -> {
-            switch (selectedAiProvider.get()) {
+            AiProvider aiProvider = selectedAiProvider.get();
+            if (aiProvider == null) {
+                return;
+            }
+
+            switch (aiProvider) {
                 case OPEN_AI ->
                         openAiApiKey.set(newValue);
                 case MISTRAL_AI ->
@@ -297,7 +311,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         });
 
         this.currentApiBaseUrl.addListener((_, _, newValue) -> {
-            switch (selectedAiProvider.get()) {
+            AiProvider aiProvider = selectedAiProvider.get();
+            if (aiProvider == null) {
+                return;
+            }
+
+            switch (aiProvider) {
                 case OPEN_AI ->
                         openAiApiBaseUrl.set(newValue);
                 case MISTRAL_AI ->
