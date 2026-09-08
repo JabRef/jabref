@@ -111,6 +111,7 @@ jvmDependencyConflicts.patch {
     module("dev.langchain4j:langchain4j-core") {
         addRuntimeOnlyDependency("com.knuddels:jtokkit")
     }
+
     module("org.jabref:afterburner.fx") {
         // POM pins javafx-* to 20; strip and re-add without version so :versions platform resolves them to current
         removeDependency("org.openjfx:javafx-controls")
@@ -235,6 +236,7 @@ extraJavaModuleInfo {
         // requires("jackson.annotations")
     }
     module("dev.langchain4j:langchain4j", "langchain4j")
+    module("dev.langchain4j:langchain4j-jackson3", "langchain4j.jackson3")
     module("dev.langchain4j:langchain4j-core", "langchain4j.core") {
         // workaround for https://github.com/langchain4j/langchain4j/issues/3668
         patchRealModule()
@@ -246,6 +248,7 @@ extraJavaModuleInfo {
         mergeJar("dev.langchain4j:langchain4j-google-ai-gemini")
         requires("java.net.http")
         uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
+        uses("dev.langchain4j.spi.json.ProviderJsonCodecFactory")
         exportAllPackages()
         requireAllDefinedDependencies()
     }
@@ -255,6 +258,11 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-hugging-face", "langchain4j.hugging.face")
     module("dev.langchain4j:langchain4j-mistral-ai", "langchain4j.mistral.ai")
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
+
+    module("io.smallrye.reactive:mutiny-zero", "io.smallrye.mutiny.zero") {
+        preserveExisting()
+    }
+
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
