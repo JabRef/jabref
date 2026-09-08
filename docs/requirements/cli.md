@@ -37,6 +37,19 @@ See [ADR 65](../decisions/0065-download-url-input-files.md) for more details.
 
 Needs: impl
 
+## Input file argument accepts a shared database URL
+`req~jabkit.cli.input-shared-db~1`
+
+The positional `FILE` argument and its `--input` alias additionally accept a PostgreSQL connection
+URL (for example `postgresql://user:secret@host:5432/library`) pointing at a JabRef shared library.
+The library is exported to a local temporary file before use; the access is read-only, nothing is
+written back to the database.
+A database that is not a JabRef shared library, and any connection failure, is reported as a regular
+CLI error (exit code `SOFTWARE`).
+See [ADR 73](../decisions/0073-shared-database-url-as-jabkit-input.md) for more details.
+
+Needs: impl
+
 ## Banner shown only at `--help`
 `req~jabkit.cli.banner-shown~1`
 

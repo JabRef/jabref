@@ -51,7 +51,7 @@ class Pseudonymize implements Callable<Integer> {
 
     @Override
     public Integer call() throws ImportServiceException, ExportServiceException {
-        Path inputPath = inputOption.getInputFile();
+        Path inputPath = inputOption.getInputFile(argumentProcessor.cliPreferences);
         String fileName = FileUtil.getBaseName(inputPath);
         Path pseudoBibPath = resolveOutputPath(outputFile, inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
         Path pseudoKeyPath = resolveOutputPath(keyFile, inputPath, fileName + PSEUDO_SUFFIX + CSV_EXTENSION);
