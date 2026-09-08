@@ -13,9 +13,11 @@ import org.jabref.model.metadata.MetaData;
 
 public class AddGroupImportEntriesAction implements GUIPostOpenAction {
 
-    public void addImportedEntriesGroupIfNeeded(BibDatabaseContext databaseContext, CliPreferences preferences) {
+    /// @return whether the group was added, so that the caller can mark the library — this runs
+    ///         before the tab is attached to the library, and nothing else reports the write
+    public boolean addImportedEntriesGroupIfNeeded(BibDatabaseContext databaseContext, CliPreferences preferences) {
         if (!preferences.getLibraryPreferences().shouldAddImportedEntries()) {
-            return;
+            return false;
         }
 
         String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
@@ -27,7 +29,7 @@ public class AddGroupImportEntriesAction implements GUIPostOpenAction {
                                        .orElse(true);
 
         if (!groupMissing) {
-            return;
+            return false;
         }
 
         char keywordSeparator = metaData.getKeywordSeparator().orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
@@ -40,6 +42,7 @@ public class AddGroupImportEntriesAction implements GUIPostOpenAction {
         AbstractGroup importEntriesGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, keywordSeparator);
         GroupTreeNode newSubgroup = root.addSubgroup(importEntriesGroup);
         newSubgroup.moveTo(root, 0);
+        return true;
     }
 
     @Override
@@ -51,6 +54,11 @@ public class AddGroupImportEntriesAction implements GUIPostOpenAction {
     /// Selection is omitted to prevent focus theft when switching tabs.
     @Override
     public void performAction(ParserResult pr, DialogService dialogService, CliPreferences preferences) {
-        addImportedEntriesGroupIfNeeded(pr.getDatabaseContext(), preferences);
+        if (addImportedEntriesGroupIfNeeded(pr.getDatabaseContext(), preferences)) {
+            // The library on disk has no such group, so it needs saving. Said here rather than
+            // left to a listener: post-open actions run before the tab is attached to the
+            // library, so nothing is listening yet.
+            pr.setChangedOnMigration(true);
+        }
     }
 }
