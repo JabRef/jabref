@@ -31,7 +31,6 @@ import org.jabref.model.metadata.MetaData;
 
 public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
-
     private final DialogService dialogService;
 
     // The map from each field to its predefined strings ("keywords") that can be selected
