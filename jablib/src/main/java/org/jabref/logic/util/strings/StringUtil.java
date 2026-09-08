@@ -810,11 +810,7 @@ public class StringUtil {
         }
 
         String parent = fullPath.substring(0, lastSeparator);
-        String shortenedParent = abbreviateMiddle(parent, ELLIPSIS, availableLengthForParent);
+        String shortenedParent = StringUtils.abbreviateMiddle(parent, ELLIPSIS, availableLengthForParent);
         return shortenedParent + separator + fileName;
-    }
-
-    public static String abbreviateMiddle(String str, String middle, int length) {
-        return StringUtils.abbreviateMiddle(str, middle, length);
     }
 }
