@@ -36,7 +36,7 @@
                 <Label text="%Description"/>
                 <TextField fx:id="descriptionField"/>
             </VBox>
-            <HBox spacing="10.0">
+            <HBox spacing="8.0">
                 <VBox HBox.hgrow="ALWAYS">
                     <Label text="%Icon"/>
                     <HBox>
@@ -65,7 +65,7 @@
             </HBox>
             <Label text="%Collect by" styleClass="h4"/>
             <HBox>
-                <VBox HBox.hgrow="ALWAYS" spacing="10.0">
+                <VBox HBox.hgrow="ALWAYS" spacing="8.0">
                     <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
                                  text="%Explicit selection">
                         <tooltip>
