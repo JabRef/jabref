@@ -253,7 +253,7 @@
 /* JavaFX Button */
 .button {
     -fx-border-color: -color-button-border;
-    -fx-border-width: 0.062em;
+    -fx-border-width: 0.0625em;
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
 
