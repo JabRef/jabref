@@ -6,7 +6,7 @@
 * never declare a color of their own -- that is what makes a theme swappable.
 *
 * A theme is therefore a single file that assigns a value to every token listed below.
-* See primer-theme.css for a second implementation of the same contract.
+* See the Primer theme on https://themes.jabref.org/ for a second implementation of the same contract.
 */
 
 @media (prefers-color-scheme: light) {
@@ -311,7 +311,7 @@
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-text-fill: -fx-text-base-color;
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-fg-muted;
     -fx-border-width: 0.125em;
     -fx-border-radius: 0.062em;
     -fx-padding: 0.1em 0.1em 0.2em 0.2em;
@@ -368,6 +368,10 @@
 .dialog-pane {
     -fx-font-size: 1em;
     -fx-background-color: -color-bg-overlay;
+}
+
+.preferences-dialog .preferences-tab-content {
+    -fx-padding: 0.333em 0.333em 0.333em 0.667em;
 }
 
 /* JavaFX TextFlow / HyperLink */

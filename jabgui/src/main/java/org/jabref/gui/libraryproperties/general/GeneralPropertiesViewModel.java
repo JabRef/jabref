@@ -29,7 +29,7 @@ import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.undo.UndoableKeywordSeparatorChange;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -57,14 +57,12 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final UndoManager undoManager;
 
     private final BibDatabaseContext databaseContext;
-    private final MetaData metaData;
 
     GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences, UndoManager undoManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.undoManager = undoManager;
         this.databaseContext = databaseContext;
-        this.metaData = databaseContext.getMetaData();
 
         librarySpecificFileDirectoryValidator = new FunctionBasedValidator<>(
                 librarySpecificDirectoryProperty,
@@ -83,7 +81,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void setValues() {
+    public void setValues(MetaData metaData) {
         boolean isShared = databaseContext.getLocation() == DatabaseLocation.SHARED;
         encodingDisableProperty.setValue(isShared); // the encoding of shared database is always UTF-8
 
@@ -96,7 +94,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void storeSettings() {
+    public void storeSettings(MetaData metaData) {
         metaData.setEncoding(selectedEncodingProperty.getValue());
         metaData.setMode(selectedDatabaseModeProperty.getValue());
 
@@ -124,6 +122,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         storeKeywordSeparator(metaData);
     }
 
+    /// The separator and the group definitions the migration rewrites are both metadata, so the
+    /// snapshot the dialog records covers them; only the entries it rewrites are recorded here,
+    /// and they join the dialog's step.
     private void storeKeywordSeparator(MetaData metaData) {
         Optional<Character> previousSeparator = metaData.getKeywordSeparator();
         Optional<Character> newSeparator = Optional.of(keywordSeparatorProperty.getValue().trim())
@@ -135,15 +136,13 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         Character previousEffectiveSeparator = previousSeparator.orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
         Character newEffectiveSeparator = newSeparator.orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
-        undoManager.addEdit(Localization.lang("Change keyword separator"), edit -> {
-            edit.applyEdit(new UndoableKeywordSeparatorChange(metaData, previousSeparator, newSeparator));
-            if (!previousEffectiveSeparator.equals(newEffectiveSeparator)) {
-                KeywordSeparatorMigration.migrateEntryFields(databaseContext, previousEffectiveSeparator, newEffectiveSeparator)
-                                         .forEach(fieldChange -> edit.addEdit(fieldChange));
-                KeywordSeparatorMigration.migrateGroupSeparators(databaseContext, newEffectiveSeparator)
-                                         .forEach(groupChange -> edit.addEdit(groupChange));
-            }
-        });
+        newSeparator.ifPresentOrElse(metaData::setKeywordSeparator, metaData::clearKeywordSeparator);
+        if (previousEffectiveSeparator.equals(newEffectiveSeparator)) {
+            return;
+        }
+        KeywordSeparatorMigration.migrateEntryFields(databaseContext, previousEffectiveSeparator, newEffectiveSeparator)
+                                 .forEach(fieldChange -> undoManager.addEdit(new UndoableFieldChange(fieldChange)));
+        KeywordSeparatorMigration.migrateGroupSeparators(metaData, newEffectiveSeparator);
     }
 
     ValidationStatus librarySpecificFileDirectoryStatus() {
