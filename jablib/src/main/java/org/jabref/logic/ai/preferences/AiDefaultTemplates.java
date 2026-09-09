@@ -64,7 +64,7 @@ public final class AiDefaultTemplates {
 
             #if( $multiPaper )
             Citation is REQUIRED: append the citationkey(s) at the end of every paragraph that uses snippet content, as specified in the system instructions.
-            Citation is Optional: If in-text citations are used, they have to be formated as specified in the system instructions.
+            Citation is Optional: If in-text citations are used, they have to be formatted as specified in the system instructions.
             #else
             Citation is NOT required: all snippets come from a single paper. Do not append any citationkey.
             #end
