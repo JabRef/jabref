@@ -4,9 +4,11 @@ import java.util.List;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.testutils.JavaFxExtension;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@NullMarked
 @ExtendWith(JavaFxExtension.class)
 class PreferencesSearchHandlerTest {
 
@@ -56,6 +59,22 @@ class PreferencesSearchHandlerTest {
         handler.filterTabs("");
 
         assertTrue(handler.firstMatch(generalTab).isEmpty());
+    }
+
+    @Test
+    void firstMatchSkipsAMatchInAHiddenRegion() {
+        Label hiddenMatch = new Label();
+        Label visibleMatch = new Label();
+        VBox hiddenRegion = new VBox(hiddenMatch);
+        hiddenRegion.setVisible(false);
+        new VBox(hiddenRegion, visibleMatch);
+        PreferencesTab aiTab = tab("AI", new SearchableElement("Reset expert settings to default", hiddenMatch),
+                new SearchableElement("Default response engine", visibleMatch));
+
+        PreferencesSearchHandler aiHandler = new PreferencesSearchHandler(List.of(aiTab));
+        aiHandler.filterTabs("default");
+
+        assertEquals(visibleMatch, aiHandler.firstMatch(aiTab).orElseThrow());
     }
 
     private static PreferencesTab tab(String title, SearchableElement... elements) {

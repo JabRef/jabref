@@ -62,9 +62,21 @@ class PreferencesSearchHandler {
                                                             .filter(element -> element.text().toLowerCase(Locale.ROOT).contains(query))
                                                             .toList();
         matches.forEach(element -> element.node().pseudoClassStateChanged(SEARCH_HIGHLIGHT, true));
-        matches.stream().findFirst().ifPresent(element -> firstMatches.put(tab, element.node()));
+        matches.stream().map(SearchableElement::node).filter(PreferencesSearchHandler::isShown).findFirst()
+               .ifPresent(node -> firstMatches.put(tab, node));
 
         return keywordMatches || !matches.isEmpty();
+    }
+
+    /// A node in a region hidden by `visibleWhen` (e.g. the AI tab's expert settings) is not laid
+    /// out and thus useless as a scroll target - the first *visible* match is what to scroll to.
+    private static boolean isShown(Node node) {
+        for (Node current = node; current != null; current = current.getParent()) {
+            if (!current.isVisible()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void clearHighlights() {
