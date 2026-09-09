@@ -8,6 +8,7 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -24,8 +25,10 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,8 +52,23 @@ class InMemoryLuceneSearchBackendTest {
         Optional.ofNullable(searchBackend).ifPresent(InMemoryLuceneSearchBackend::close);
     }
 
-    @Test
-    void searchesLinkedFileContentsWithoutPostgres() throws IOException, URISyntaxException {
+    static Stream<Arguments> searchesLinkedFileContentsWithoutPostgres() {
+        return Stream.of(
+                Arguments.of(Set.of("minimal-sentence-case", "minimal-all-upper-case", "minimal-mixed-case"), "comma"),
+
+                // case-sensitive search - https://github.com/JabRef/jabref/issues/13048
+                // [utest->req~jabgui.search.fulltext.case-sensitive~1]
+                Arguments.of(Set.of("minimal-sentence-case", "minimal-mixed-case"), "any =! comma"),
+                Arguments.of(Set.of("minimal-all-upper-case"), "any =! COMMA"),
+                Arguments.of(Set.of("minimal-note-sentence-case"), "any ==! Hello"),
+                Arguments.of(Set.of("minimal-note-all-upper-case"), "any ==! HELLO"),
+                Arguments.of(Set.of(), "any =! Comma")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void searchesLinkedFileContentsWithoutPostgres(Set<String> expectedCitationKeys, String query) throws IOException, URISyntaxException {
         BibDatabaseContext databaseContext = initializeDatabaseContext("test-library-with-attached-files.bib");
         searchBackend = new InMemoryLuceneSearchBackend(
                 databaseContext,
@@ -58,7 +76,7 @@ class InMemoryLuceneSearchBackendTest {
                 FilePreferences.getDefault(),
                 TASK_EXECUTOR);
 
-        SearchQuery searchQuery = new SearchQuery("comma", EnumSet.of(SearchFlags.FULLTEXT));
+        SearchQuery searchQuery = new SearchQuery(query, EnumSet.of(SearchFlags.FULLTEXT));
 
         Set<String> matchedCitationKeys = searchBackend.search(searchQuery)
                                                        .getMatchedEntries()
@@ -67,7 +85,7 @@ class InMemoryLuceneSearchBackendTest {
                                                        .map(entry -> entry.getCitationKey().orElseThrow())
                                                        .collect(Collectors.toUnmodifiableSet());
 
-        assertEquals(Set.of("minimal-sentence-case", "minimal-all-upper-case", "minimal-mixed-case"), matchedCitationKeys);
+        assertEquals(expectedCitationKeys, matchedCitationKeys);
     }
 
     private BibDatabaseContext initializeDatabaseContext(String testFile) throws URISyntaxException, IOException {
