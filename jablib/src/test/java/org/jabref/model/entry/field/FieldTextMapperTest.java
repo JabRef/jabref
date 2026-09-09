@@ -14,7 +14,7 @@ class FieldTextMapperTest {
     @ParameterizedTest
     @MethodSource("provideFieldsAndExpectedNames")
     void getDisplayNameResolvesExpectedLabels(Field field, String expectedDisplayName) {
-      assertEquals(expectedDisplayName, FieldTextMapper.getDisplayName(field));
+        assertEquals(expectedDisplayName, FieldTextMapper.getDisplayName(field));
     }
 
     private static Stream<Arguments> provideFieldsAndExpectedNames() {

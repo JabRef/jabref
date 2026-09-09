@@ -40,7 +40,8 @@ public class FieldTextMapper {
             return switch (internalField) {
                 case KEY_FIELD ->
                         "Citation Key";
-                case TYPE_HEADER, OBSOLETE_TYPE_HEADER ->
+                case TYPE_HEADER,
+                     OBSOLETE_TYPE_HEADER ->
                         "Entry Type";
                 case INTERNAL_ALL_FIELD ->
                         "All";
@@ -51,18 +52,18 @@ public class FieldTextMapper {
             };
         } else if (field instanceof SpecialField specialField) {
             return switch (specialField) {
-              case PRINTED ->
-                      "Printed";
-              case PRIORITY ->
-                      "Priority";
-              case QUALITY ->
-                      "Quality";
-              case RANKING ->
-                      "Ranking";
-              case READ_STATUS ->
-                      "Read status";
-              case RELEVANCE ->
-                      "Relevance";
+                case PRINTED ->
+                        "Printed";
+                case PRIORITY ->
+                        "Priority";
+                case QUALITY ->
+                        "Quality";
+                case RANKING ->
+                        "Ranking";
+                case READ_STATUS ->
+                        "Read status";
+                case RELEVANCE ->
+                        "Relevance";
             };
         }
 
