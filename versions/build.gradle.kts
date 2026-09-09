@@ -27,7 +27,7 @@ val jbang = "0.141.0"
 extra["jbangVersion"] = jbang
 
 dependencies {
-    api(platform("ai.djl:bom:0.36.0"))
+    api(platform("ai.djl:bom:0.37.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.20.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
