@@ -19,15 +19,11 @@ public class DocumentViewerView extends BaseDialog<Void> {
     private final DocumentViewerViewModel viewModel;
 
     public DocumentViewerView() {
-        this(new DocumentViewerViewModel());
+        this(null);
     }
 
     public DocumentViewerView(@Nullable Path document) {
-        this(new DocumentViewerViewModel(document));
-    }
-
-    public DocumentViewerView(DocumentViewerViewModel viewModel) {
-        this.viewModel = viewModel;
+        this.viewModel = new DocumentViewerViewModel(document);
 
         this.initModality(Modality.NONE);
         this.titleProperty().bind(viewModel.titleProperty());

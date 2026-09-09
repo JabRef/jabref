@@ -38,14 +38,9 @@ public class LiveDocumentViewerView extends BaseDialog<Void> {
     @Inject private CliPreferences preferences;
 
     private final PdfDocumentViewer viewer = new PdfDocumentViewer();
-    private @Nullable LiveDocumentViewerViewModel viewModel;
+    private LiveDocumentViewerViewModel viewModel;
 
     public LiveDocumentViewerView() {
-        this(null);
-    }
-
-    public LiveDocumentViewerView(@Nullable LiveDocumentViewerViewModel viewModel) {
-        this.viewModel = viewModel;
         this.setTitle(Localization.lang("Document viewer"));
         this.initModality(Modality.NONE);
 
@@ -60,19 +55,17 @@ public class LiveDocumentViewerView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        if (viewModel == null) {
-            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            viewModel = new LiveDocumentViewerViewModel(stateManager, preferences, dialogService);
-        }
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        viewModel = new LiveDocumentViewerViewModel(stateManager, preferences, dialogService);
 
         this.titleProperty().bind(viewModel.titleProperty());
 
-        setupViewer(viewModel);
-        setupFileChoice(viewModel);
-        setupModeButtons(viewModel);
+        setupViewer();
+        setupFileChoice();
+        setupModeButtons();
     }
 
-    private void setupModeButtons(LiveDocumentViewerViewModel viewModel) {
+    private void setupModeButtons() {
         // make sure that always one toggle is selected
         toggleGroupMode.selectedToggleProperty().addListener((_, oldToggle, newToggle) -> {
             if (newToggle == null) {
@@ -93,7 +86,7 @@ public class LiveDocumentViewerView extends BaseDialog<Void> {
         });
     }
 
-    private void setupFileChoice(LiveDocumentViewerViewModel viewModel) {
+    private void setupFileChoice() {
         ViewModelListCellFactory<LinkedFile> cellFactory = new ViewModelListCellFactory<LinkedFile>()
                 .withText(LinkedFile::getLink);
         fileChoice.setButtonCell(cellFactory.call(null));
@@ -115,7 +108,7 @@ public class LiveDocumentViewerView extends BaseDialog<Void> {
         fileChoice.itemsProperty().bind(viewModel.filesProperty());
     }
 
-    private void setupViewer(LiveDocumentViewerViewModel viewModel) {
+    private void setupViewer() {
         viewModel.currentDocumentProperty().addListener((_, _, newDocument) -> {
             viewer.show(newDocument);
         });
@@ -128,29 +121,24 @@ public class LiveDocumentViewerView extends BaseDialog<Void> {
         modeLock.setSelected(true);
     }
 
-    public void switchToFile(LinkedFile file) {
+    public void switchToFile(@Nullable LinkedFile file) {
+        if (file == null) {
+            return;
+        }
         fileChoice.getItems().stream()
                   .filter(f -> Objects.equals(f.getLink(), file.getLink()))
                   .findFirst()
                   .ifPresentOrElse(
                           f -> fileChoice.getSelectionModel().select(f),
-                          () -> {
-                              if (viewModel != null) {
-                                  viewModel.switchToFile(file);
-                              }
-                          }
+                          () -> viewModel.switchToFile(file)
                   );
     }
 
     public void gotoPage(int pageNumber) {
-        if (viewModel != null) {
-            viewModel.showPage(pageNumber);
-        }
+        viewModel.showPage(pageNumber);
     }
 
     public void highlightText(String text) {
-        if (viewModel != null) {
-            viewModel.highlightText(text);
-        }
+        viewModel.highlightText(text);
     }
 }
