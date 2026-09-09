@@ -23,7 +23,7 @@ public final class LocalizedNumbersUtils {
             NumberFormat format = NumberFormat.getInstance(locale);
             Number parsedNumber = format.parse(value);
             return Optional.of(parsedNumber.doubleValue());
-        } catch (ParseException e) {
+        } catch (ParseException _) {
             return Optional.empty();
         }
     }
