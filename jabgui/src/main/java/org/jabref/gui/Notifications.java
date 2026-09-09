@@ -8,7 +8,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.util.Duration;
 
@@ -50,15 +49,12 @@ public class Notifications {
         }
     }
 
-    /// GemsFX has no per-action styling hook, so the button of the last action is tagged for `jabref-base.css`.
     @NullMarked
     public static class DonationNotificationView extends NotificationView<Object, DonationNotification> {
         public DonationNotificationView(DonationNotification notification) {
             super(notification);
+            getStyleClass().add("donation-notification");
             setGraphic(IconTheme.JabRefIcons.DONATE.getGraphicNode());
-            if (lookup(".actions-box") instanceof Pane actionsBox && !actionsBox.getChildren().isEmpty()) {
-                actionsBox.getChildren().getLast().getStyleClass().add("notification-action-primary");
-            }
         }
     }
 
