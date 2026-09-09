@@ -98,6 +98,19 @@ class MainTableScrollerTest {
         });
     }
 
+    @Test
+    void shortTableKeepsAllRowsVisible() {
+        interact(() -> {
+            table.setItems(FXCollections.observableArrayList(
+                    IntStream.range(0, 5).boxed().toList()));
+
+            VisibleRange visibleRange = centerSelectedRow(4, 0);
+
+            assertEquals(0, visibleRange.firstIndex());
+            assertEquals(4, visibleRange.lastIndex());
+        });
+    }
+
     private VisibleRange centerSelectedRow(int selectedIndex, int initialScrollIndex) {
         table.getSelectionModel().select(selectedIndex);
         table.scrollTo(initialScrollIndex);
