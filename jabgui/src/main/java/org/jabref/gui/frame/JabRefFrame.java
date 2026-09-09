@@ -759,11 +759,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
-    @Deprecated
-    public Stage getMainStage() {
-        return mainStage;
-    }
-
     @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
         Platform.runLater(() -> {

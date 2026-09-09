@@ -241,7 +241,8 @@ public class ImportFormatReader {
             }
             try {
                 if (!isRecognizedFormat.apply(importer) || importer instanceof ReferImporter) {
-                    // Refer/BibIX should be explicitly chosen by user // TODO: Why - introduced at PR #13118
+                    // Refer/BibIX is recognized by a `%0 ` line, which real EndNote files carry as well, so auto detection
+                    // would route them here instead of to the EndNote importer. Refer/BibIX therefore has to be picked by the user.
                     continue;
                 }
                 ParserResult parserResult = importDatabase.apply(importer);
