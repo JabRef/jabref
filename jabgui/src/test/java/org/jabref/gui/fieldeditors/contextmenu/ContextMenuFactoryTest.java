@@ -17,11 +17,13 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,7 +37,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,7 +46,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class ContextMenuFactoryTest {
 
     private FilePreferences filePreferences;
@@ -117,6 +118,18 @@ class ContextMenuFactoryTest {
 
         assertNotNull(contextMenu);
         assertFalse(contextMenu.getItems().isEmpty(), "Single-selection menu should not be empty");
+    }
+
+    @Test
+    void autoFoundFileOffersLinkInsteadOfRemoveLink() {
+        LinkedFileViewModel autoFoundFileViewModel = mockOfflineExistingFileViewModel(bibDatabaseContext, filePreferences, "");
+        when(autoFoundFileViewModel.isAutomaticallyFound()).thenReturn(true);
+
+        ContextMenu contextMenu = factory.createMenuForSelection(FXCollections.observableArrayList(autoFoundFileViewModel));
+
+        List<String> texts = contextMenu.getItems().stream().map(MenuItem::getText).toList();
+        assertTrue(texts.contains(Localization.lang("Link file")));
+        assertFalse(texts.contains(Localization.lang("Remove link")));
     }
 
     @Test

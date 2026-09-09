@@ -336,6 +336,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // region last files opened
     private static final String LAST_EDITED = "lastEdited";
     private static final String LAST_FOCUSED = "lastFocused";
+    private static final String LAST_SHARED_DATABASES = "lastSharedDatabases";
     private static final String RECENT_DATABASES = "recentDatabases";
     // endregion
 
@@ -1016,25 +1017,27 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Object getObject(Observable observable) {
-        if (observable instanceof BooleanProperty booleanProperty) {
-            return booleanProperty.get();
-        } else if (observable instanceof IntegerProperty integerProperty) {
-            return integerProperty.get();
-        } else if (observable instanceof DoubleProperty doubleProperty) {
-            return doubleProperty.get();
-        } else if (observable instanceof StringProperty stringProperty) {
-            return stringProperty.get();
-        } else if (observable instanceof ObservableList<?> observableList) {
-            return observableList;
-        } else if (observable instanceof ObservableSet<?> observableSet) {
-            return observableSet;
-        } else if (observable instanceof ObservableMap<?, ?> observableMap) {
-            return observableMap;
-        } else if (observable instanceof ObjectProperty<?> objectProperty) {
-            return objectProperty.get();
-        }
-
-        return null;
+        return switch (observable) {
+            case BooleanProperty booleanProperty ->
+                    booleanProperty.get();
+            case IntegerProperty integerProperty ->
+                    integerProperty.get();
+            case DoubleProperty doubleProperty ->
+                    doubleProperty.get();
+            case StringProperty stringProperty ->
+                    stringProperty.get();
+            case ObservableList<?> observableList ->
+                    observableList;
+            case ObservableSet<?> observableSet ->
+                    observableSet;
+            case ObservableMap<?, ?> observableMap ->
+                    observableMap;
+            case ObjectProperty<?> objectProperty ->
+                    objectProperty.get();
+            case null,
+                 default ->
+                    null;
+        };
     }
 
     @Override
@@ -2157,11 +2160,14 @@ public class JabRefCliPreferences implements CliPreferences {
         lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
                 getStringList(LAST_EDITED).stream().map(Path::of).toList(),
                 getPath(LAST_FOCUSED, defaultValues.getLastFocusedFile()),
+                getStringList(LAST_SHARED_DATABASES),
                 FileHistory.of(getStringList(RECENT_DATABASES).stream().map(Path::of).toList()));
 
         bindPathList(lastFilesOpenedPreferences.getLastFilesOpened(), LAST_EDITED, defaultValues.getLastFilesOpened());
         bindPathList(lastFilesOpenedPreferences.getFileHistory(), RECENT_DATABASES, defaultValues.getFileHistory());
         bindPath(lastFilesOpenedPreferences.lastFocusedFileProperty(), LAST_FOCUSED, defaultValues.getLastFocusedFile());
+        bindCustomList(lastFilesOpenedPreferences.getLastSharedDatabasesOpened(), LAST_SHARED_DATABASES, defaultValues.getLastSharedDatabasesOpened(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
 
         return lastFilesOpenedPreferences;
     }
