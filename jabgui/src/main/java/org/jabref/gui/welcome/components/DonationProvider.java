@@ -38,7 +38,6 @@ public class DonationProvider {
 
     public void showIfNeeded() {
         if (preferences.getDonationPreferences().getNextNotificationEpochDay() < 0) {
-            // First launch: do not ask right away, but a week later
             scheduleNextNotification(LocalDate.now().plusDays(FIRST_NOTIFICATION_DELAY_DAYS));
         }
         scheduleAfterDays(calculateDaysUntilNextNotification(
