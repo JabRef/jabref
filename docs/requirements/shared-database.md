@@ -52,6 +52,13 @@ After a connection loss, JabRef reconnects by itself with increasing intervals f
 
 Needs: impl
 
+## A shared database's loading state is indicated
+`req~shared-database.loading-indicator~1`
+
+While JabRef opens or reconnects a shared database, its library tab displays a loading indicator until the connection completes or fails.
+
+Needs: impl
+
 ## Existing databases are migrated
 `req~shared-database.migration~1`
 
