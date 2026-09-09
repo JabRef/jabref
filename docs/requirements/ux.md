@@ -153,6 +153,13 @@ This behavior streamlines the process of creating new entries by allowing users 
 
 Needs: impl
 
+## Community themes are selectable out of the box
+`req~ux.themes.bundled-community-themes~1`
+
+The themes from <https://themes.jabref.org/> that cover both color schemes are bundled with JabRef and appear in the theme selection next to the built-in themes, without the user having to download a CSS file.
+
+Needs: impl
+
 ### Restore the working position on startup
 `req~ux.startup.restore-position~1`
 

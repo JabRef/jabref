@@ -240,11 +240,10 @@ jobs:
           # The labels reflect the complete picture only once every producer of bot comments is done.
           # Whatever is still pending re-triggers this workflow when it finishes (workflow_run for the
           # workflows below, "PR Review Activity" for Qodo), so skipping here loses nothing.
-          PENDING=$(gh pr checks --repo $REPO $PR_NUMBER --json state,workflow \
-            --jq '[.[] | select(.state == "IN_PROGRESS" or .state == "QUEUED" or .state == "PENDING")
-                        | select(.workflow == "Source Code Tests" or .workflow == "On PR opened/updated" or .workflow == "Check PR Format"
-                                 or .workflow == "Link PR to Issue" or .workflow == "Check PR Modifications" or .workflow == "Check PR CHANGELOG.md")
-                        | .workflow] | unique | join(", ")')
+          CHECKS=$(gh pr checks --repo $REPO $PR_NUMBER --json state,workflow \
+            --jq '[.[] | select(.workflow == "Source Code Tests" or .workflow == "On PR opened/updated" or .workflow == "Check PR Format"
+                                 or .workflow == "Link PR to Issue" or .workflow == "Check PR Modifications" or .workflow == "Check PR CHANGELOG.md")]')
+          PENDING=$(jq -r '[.[] | select(.state == "IN_PROGRESS" or .state == "QUEUED" or .state == "PENDING") | .workflow] | unique | join(", ")' <<< "$CHECKS")
           if gh api repos/$REPO/issues/$PR_NUMBER/comments --paginate \
                --jq '.[] | select(.user.login == "qodo-free-for-open-source-projects[bot]") | .body' \
              | grep -q "Qodo is busy working"; then
@@ -287,8 +286,12 @@ jobs:
                   | select([.[1:][] | select(. == $pr.author.login)] == [])
                 ] | length')
 
-          if [[ -n "$COMMENTS" || "$QODO_THREADS" -gt 0 ]]; then
-            echo "Bot comments - adding label changes-required"
+          # Same-repo PRs get no ghprcomment bot comment (see above), so a failed check would leave
+          # no trace here - count the failures themselves, for forks as well.
+          FAILED=$(jq -r '[.[] | select(.state == "FAILURE") | .workflow] | unique | join(", ")' <<< "$CHECKS")
+
+          if [[ -n "$COMMENTS" || "$QODO_THREADS" -gt 0 || -n "$FAILED" ]]; then
+            echo "Bot comments or failed checks ($FAILED) - adding label changes-required"
             gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: stale" --add-label "status: changes-required"
             echo "Bot comments - added label changes-required" >> $GITHUB_STEP_SUMMARY
           else

@@ -1007,25 +1007,27 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Object getObject(Observable observable) {
-        if (observable instanceof BooleanProperty booleanProperty) {
-            return booleanProperty.get();
-        } else if (observable instanceof IntegerProperty integerProperty) {
-            return integerProperty.get();
-        } else if (observable instanceof DoubleProperty doubleProperty) {
-            return doubleProperty.get();
-        } else if (observable instanceof StringProperty stringProperty) {
-            return stringProperty.get();
-        } else if (observable instanceof ObservableList<?> observableList) {
-            return observableList;
-        } else if (observable instanceof ObservableSet<?> observableSet) {
-            return observableSet;
-        } else if (observable instanceof ObservableMap<?, ?> observableMap) {
-            return observableMap;
-        } else if (observable instanceof ObjectProperty<?> objectProperty) {
-            return objectProperty.get();
-        }
-
-        return null;
+        return switch (observable) {
+            case BooleanProperty booleanProperty ->
+                    booleanProperty.get();
+            case IntegerProperty integerProperty ->
+                    integerProperty.get();
+            case DoubleProperty doubleProperty ->
+                    doubleProperty.get();
+            case StringProperty stringProperty ->
+                    stringProperty.get();
+            case ObservableList<?> observableList ->
+                    observableList;
+            case ObservableSet<?> observableSet ->
+                    observableSet;
+            case ObservableMap<?, ?> observableMap ->
+                    observableMap;
+            case ObjectProperty<?> objectProperty ->
+                    objectProperty.get();
+            case null,
+                 default ->
+                    null;
+        };
     }
 
     @Override
