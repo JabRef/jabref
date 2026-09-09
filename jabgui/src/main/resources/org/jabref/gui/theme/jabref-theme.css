@@ -31,6 +31,8 @@
         /* Borders */
         -color-border-default: #B6B6B6;
         -color-border-muted: #DFDFDF;
+        /* The check box square only: see the .check-box > .box rule for why it does not share -color-border-default. */
+        -color-checkbox-border: #B6B6B6;
 
         /* Accent -- the JabRef brand color and its tint */
         -color-accent: #50618F;
@@ -119,6 +121,8 @@
         /* Borders */
         -color-border-default: #3C4050;
         -color-border-muted: #333744;
+        /* The check box square only: see the .check-box > .box rule for why it does not share -color-border-default. */
+        -color-checkbox-border: #3C4050;
 
         /* Accent -- the JabRef brand color and its tint */
         -color-accent: #2C9490;
@@ -320,7 +324,10 @@
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-text-fill: -fx-text-base-color;
-    -fx-border-color: -color-border-default;
+    /* Not -color-border-default: that token outlines surfaces and text fields, whereas this 2px frame *is* the
+       control -- an unchecked box consists of nothing else. Buttons frame a label, tabs need no frame at all
+       (see .tab below). Each purpose gets its own token, at the price of one more line per theme. */
+    -fx-border-color: -color-checkbox-border;
     -fx-border-width: 0.125em;
     -fx-border-radius: 0.062em;
     -fx-padding: 0.1em 0.1em 0.2em 0.2em;
@@ -553,10 +560,15 @@ TextFlow > Text {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-background-color: -color-bg-primary;
-    -fx-border-color: -color-border-default;
-    -fx-border-width: 0.5 0.5 0.5 0.5;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
     -fx-pref-height: 3em;
+}
+
+/* No frame around a tab: the accent line and the background tell the selected tab apart, hovering tints the
+   others -- the same way Firefox and IntelliJ do it, so a tab's edge is never drawn. Declared before :selected,
+   which therefore wins on the selected tab. */
+.tab-pane > .tab-header-area > .headers-region > .tab:hover {
+    -fx-background-color: -color-bg-primary, -color-button-hover;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
