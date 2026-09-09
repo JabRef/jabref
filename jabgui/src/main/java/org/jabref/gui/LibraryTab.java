@@ -601,7 +601,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         });
     }
 
-    private static IconTheme.JabRefIcons tabIcon(DatabaseLocation location, BibDatabaseMode mode) {
+    // [impl->req~ux.tabs.library-kind-icon~1]
+    static IconTheme.JabRefIcons tabIcon(DatabaseLocation location, BibDatabaseMode mode) {
         if (location == DatabaseLocation.SHARED) {
             return IconTheme.JabRefIcons.SHARED_DATABASE_LIBRARY;
         }
