@@ -5,11 +5,13 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
@@ -50,7 +52,6 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -61,7 +62,11 @@ import org.slf4j.LoggerFactory;
 
 public class WelcomeTab extends Tab {
     private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);
-    private static final int MAX_RECENT_FILE_PATH_LENGTH = 35;
+
+    /// Share of the window width kept free on each side. A share instead of a fixed padding, so that
+    /// the content keeps growing with the window until it reaches the maximum width of
+    /// `.welcome-main-container`.
+    private static final double HORIZONTAL_PADDING_RATIO = 0.05;
 
     private final VBox recentLibrariesBox;
     private final LibraryTabContainer tabContainer;
@@ -125,6 +130,10 @@ public class WelcomeTab extends Tab {
         container.setAlignment(Pos.CENTER);
 
         StackPane rootPane = new StackPane(container);
+        container.paddingProperty().bind(rootPane.widthProperty().map(width -> {
+            double padding = width.doubleValue() * HORIZONTAL_PADDING_RATIO;
+            return new Insets(0, padding, 0, padding);
+        }));
         setContent(rootPane);
 
         donationProvider = new DonationProvider(rootPane, preferences, dialogService);
@@ -144,8 +153,8 @@ public class WelcomeTab extends Tab {
     }
 
     private void initializeColumns() {
-        GridPane grid = new GridPane(4, 4);
-        grid.getStyleClass().add("align-top-center");
+        GridPane grid = new GridPane();
+        grid.getStyleClass().addAll("align-top-center", "gap-24");
 
         VBox leftColumn = createLeftColumn();
         GridPane.setHgrow(leftColumn, Priority.ALWAYS);
@@ -312,10 +321,11 @@ public class WelcomeTab extends Tab {
         fileHistoryMenu.disableProperty().unbind();
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
-            String truncatedText = StringUtil.abbreviatePath(item.getText(), MAX_RECENT_FILE_PATH_LENGTH);
-            Hyperlink recentLibraryLink = new Hyperlink(truncatedText);
+            Hyperlink recentLibraryLink = new Hyperlink(item.getText());
+            // Shortened to whatever the column offers, so that the file name stays visible as long as possible.
+            recentLibraryLink.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
             recentLibraryLink.setTooltip(new Tooltip(item.getText()));
-            recentLibraryLink.getStyleClass().add("welcome-hyperlink");
+            recentLibraryLink.getStyleClass().addAll("welcome-hyperlink", "h4");
             recentLibraryLink.setOnAction(item.getOnAction());
             recentLibrariesBox.getChildren().add(recentLibraryLink);
         }
