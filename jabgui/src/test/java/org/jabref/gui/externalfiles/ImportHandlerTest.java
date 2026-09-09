@@ -22,7 +22,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabase;
@@ -89,7 +89,7 @@ class ImportHandlerTest {
                 bibDatabaseContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
-                mock(UndoManager.class),
+                new JabRefUndoManager(),
                 mock(StateManager.class),
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor());
@@ -115,7 +115,7 @@ class ImportHandlerTest {
                 mock(BibDatabaseContext.class),
                 preferences,
                 new DummyFileUpdateMonitor(),
-                mock(UndoManager.class),
+                new JabRefUndoManager(),
                 mock(StateManager.class),
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor());
@@ -186,7 +186,7 @@ class ImportHandlerTest {
                 realContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
-                mock(UndoManager.class),
+                new JabRefUndoManager(),
                 stateManager,
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor());
@@ -225,7 +225,7 @@ class ImportHandlerTest {
                 bibDatabaseContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
-                mock(UndoManager.class),
+                new JabRefUndoManager(),
                 mock(StateManager.class),
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
@@ -256,7 +256,7 @@ class ImportHandlerTest {
                 bibDatabaseContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
-                mock(UndoManager.class),
+                new JabRefUndoManager(),
                 mock(StateManager.class),
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
@@ -290,7 +290,7 @@ class ImportHandlerTest {
                 bibDatabaseContext,
                 preferences,
                 new DummyFileUpdateMonitor(),
-                mock(UndoManager.class),
+                new JabRefUndoManager(),
                 mock(StateManager.class),
                 mock(DialogService.class),
                 new CurrentThreadTaskExecutor()));
@@ -336,5 +336,36 @@ class ImportHandlerTest {
     @Test
     void canImportAsBibEntryReturnsFalseForUnknownFile() {
         assertFalse(importHandler.canImportAsBibEntry(Path.of("test.unknown")));
+    }
+
+    /// Entering a DOI in the New Entry dialog ends here, through
+    /// `importEntryWithDuplicateCheck`. The insert has to be a step of its own: undoing it takes
+    /// the entry out again, and until then the library says it needs saving.
+    @Test
+    void importingAnEntryIsOneUndoStep() {
+        BibDatabase database = new BibDatabase();
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        JabRefUndoManager journal = new JabRefUndoManager();
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
+        ImportHandler handler = new ImportHandler(
+                databaseContext,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                journal,
+                stateManager,
+                mock(DialogService.class),
+                new CurrentThreadTaskExecutor());
+
+        handler.importCleanedEntries(null, List.of(testEntry));
+
+        assertEquals(List.of(testEntry), database.getEntries());
+        assertTrue(journal.hasChanged(), "the library was not reported as needing a save");
+        assertTrue(journal.canUndo(), "the import was not recorded");
+
+        journal.undo();
+
+        assertEquals(List.of(), database.getEntries());
+        assertFalse(journal.canUndo(), "the import left more than one step behind");
     }
 }

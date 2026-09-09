@@ -108,7 +108,6 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -1039,12 +1038,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        // One step, opened around the insert so that the automatic assignment it sets off is
-        // recorded inside it rather than as a second step the user has to undo separately.
-        getUndoManager().addEdit(Localization.lang("Import entries"), edit -> {
-            importHandler.importCleanedEntries(null, entries);
-            edit.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-        });
+        // One step, opened by importCleanedEntries around the insert, so that the automatic
+        // assignment it sets off is recorded inside it rather than as a second step.
+        importHandler.importCleanedEntries(null, entries);
         stateManager.setSelectedEntries(entries);
 
         // Only show/select individual entry for single-entry imports.

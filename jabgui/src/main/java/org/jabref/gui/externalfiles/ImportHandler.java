@@ -64,7 +64,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
@@ -167,16 +166,15 @@ public class ImportHandler {
                 // which happens after this method returns - and by the catch below if anything
                 // fails before that runnable is dispatched.
                 UndoSuspension suspended = undoManager.suspendUndo(name);
-                CompoundEdit compoundEdit = new CompoundEdit(name);
                 try {
-                    return importFiles(files, transferMode, compoundEdit, suspended);
+                    return importFiles(files, transferMode, suspended);
                 } catch (RuntimeException | Error e) {
                     suspended.close();
                     throw e;
                 }
             }
 
-            private List<ImportFilesResultItemViewModel> importFiles(List<Path> files, TransferMode transferMode, CompoundEdit compoundEdit, UndoSuspension suspended) {
+            private List<ImportFilesResultItemViewModel> importFiles(List<Path> files, TransferMode transferMode, UndoSuspension suspended) {
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
@@ -267,14 +265,12 @@ public class ImportHandler {
                     }
                     allEntriesToAdd.addAll(entriesToAdd);
 
-                    compoundEdit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entriesToAdd));
-
                     counter++;
                 }
 
                 // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                 // That method does a clone() on each entry
-                UiTaskExecutor.runInJavaFXThread(() -> insertImported(allEntriesToAdd, compoundEdit, suspended));
+                UiTaskExecutor.runInJavaFXThread(() -> insertImported(allEntriesToAdd, suspended));
                 return results;
             }
 
@@ -285,17 +281,14 @@ public class ImportHandler {
         };
     }
 
-    /// Inserts the imported entries as one undo step and releases the library the import held.
+    /// Inserts the imported entries and releases the library the import held.
     ///
-    /// The step is opened around the insert so that what the insert sets off — group assignment,
-    /// and the tab's automatic assignment to the selected groups — is recorded inside it rather
-    /// than after it.
-    private void insertImported(List<BibEntry> entriesToAdd, CompoundEdit compoundEdit, UndoSuspension suspended) {
+    /// [#importCleanedEntries] records the insert as one step, so the files imported together are
+    /// one Ctrl+Z, and what the insert sets off — group assignment, and the tab's automatic
+    /// assignment to the selected groups — is recorded inside that step rather than after it.
+    private void insertImported(List<BibEntry> entriesToAdd, UndoSuspension suspended) {
         try {
-            undoManager.addEdit(Localization.lang("Import entries"), edit -> {
-                edit.addEdit(compoundEdit.toChangeSet());
-                importEntries(entriesToAdd);
-            });
+            importEntries(entriesToAdd);
         } finally {
             suspended.close();
         }
@@ -350,12 +343,21 @@ public class ImportHandler {
         importCleanedEntries(null, entries);
     }
 
+    /// Adds already cleaned entries to the library, as one undo step.
+    ///
+    /// The step is opened here rather than left to the caller, because this is where the entries
+    /// reach the library: a caller that forgot would insert entries the journal knows nothing
+    /// about, which is a library that says it needs no saving. The group assignment this sets off
+    /// joins the same step, so taking the import back takes the assignments with it.
     public void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries) {
-        targetBibDatabaseContext.getDatabase().insertEntries(entries);
-        generateKeys(entries);
-        setAutomaticFields(entries);
-        addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
-        addToImportEntriesGroup(entries);
+        undoManager.addEdit(Localization.lang("Import entries"), edit -> {
+            targetBibDatabaseContext.getDatabase().insertEntries(entries);
+            edit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entries));
+            generateKeys(entries);
+            setAutomaticFields(entries);
+            addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
+            addToImportEntriesGroup(entries);
+        });
 
         // TODO: Should only be done if NOT copied from other library
         entries.forEach(this::downloadLinkedFiles);
