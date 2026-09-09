@@ -1695,18 +1695,18 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-button-default, -color-button-pressed;
 }
 
-/* Primary action of a notification, e.g. "Donate" */
-.info-center-view .notification-view > .content > .text-container > .actions-box .button.notification-action-primary {
+/* "Donate" - the last action of the donation notification is its primary one */
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child {
     -fx-background: -color-accent;
     -fx-background-color: -color-accent;
     -fx-text-fill: -color-fg-emphasis;
 }
 
-.info-center-view .notification-view > .content > .text-container > .actions-box .button.notification-action-primary:hover {
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child:hover {
     -fx-background-color: -color-accent, -color-button-hover;
 }
 
-.info-center-view .notification-view > .content > .text-container > .actions-box .button.notification-action-primary:armed {
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child:armed {
     -fx-background-color: -color-accent, -color-button-pressed;
 }
 
