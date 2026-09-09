@@ -129,26 +129,46 @@ jobs:
           ISSUE_URL=$(jq --raw-output .issue.html_url "$GITHUB_EVENT_PATH")
           gh project item-add 9 --owner JabRef --url $ISSUE_URL
   wisdom:
-    name: "dev: wisdom"
-    if: "${{ github.event.label.name == 'dev: wisdom' && github.repository_owner == 'JabRef' }}"
+    name: "dev: wisdom-*"
+    if: "${{ startsWith(github.event.label.name, 'dev: wisdom-') && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-slim
     permissions:
       issues: write
       contents: read
+    env:
+      LABEL: ${{ github.event.label.name }}
     steps:
-      - name: Comment PR
-        uses: thollander/actions-comment-pull-request@e4a76dd2b0a3c2027c3fd84147a67c22ee4c90fa # v3
+      - name: Determine message
+        id: wisdom
+        run: |
+          case "$LABEL" in
+            "dev: wisdom-assignment")
+              MESSAGE="👋 Hey, looks like you’re eager to work on this issue—great! 🎉 It also looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us. Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀"
+              ;;
+            "dev: wisdom-ping")
+              MESSAGE="👋 Thanks for your interest in this issue. Please refrain from pinging maintainers shortly after a comment: everyone here works on JabRef in their spare time, and GitHub does notify us about every comment. A reminder after a few days adds noise without speeding anything up. Our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) describes how we work and where to ask if you are stuck."
+              ;;
+            "dev: wisdom-read-issue")
+              MESSAGE="👋 Thanks for your interest in this issue. Please read the complete issue description and the discussion below it before assigning yourself: this issue states a prerequisite (for example, another pull request that has to be merged first), so it cannot be worked on yet. The issue is updated as soon as it is ready to be picked up. See our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) for details."
+              ;;
+            *)
+              echo "Unknown label: $LABEL" >&2
+              exit 1
+              ;;
+          esac
+          {
+            echo "message<<EOF"
+            echo "$MESSAGE"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+      - name: Comment on issue
+        uses: thollander/actions-comment-pull-request@65f9e5c9a1f2cd378bd74b2e057c9736982a8e74 # v3
         with:
-          message: >
-            👋 Hey, looks like you’re eager to work on this issue—great! 🎉
-            It also looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us.
-            Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀
-          comment-tag:
-            wisdom
+          message: ${{ steps.wisdom.outputs.message }}
+          comment-tag: ${{ env.LABEL }}
           mode: recreate
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Remove label
         run: |
-          gh issue edit ${{ github.event.issue.number }} --remove-label "dev: wisdom"
+          gh issue edit ${{ github.event.issue.number }} --repo ${{ github.repository }} --remove-label "$LABEL"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
