@@ -16,3 +16,7 @@
 [submodule "jablib/src/main/resources/ltwa"]
   path = jablib/src/main/resources/ltwa
   url = https://github.com/JabRef/ltwa.git
+[submodule "jabgui/src/main/themes.jabref.org"]
+  path = jabgui/src/main/themes.jabref.org
+  url = https://github.com/JabRef/themes.jabref.org.git
+  shallow = true

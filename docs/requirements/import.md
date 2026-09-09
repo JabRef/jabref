@@ -14,4 +14,11 @@ Delimiter characters that are part of a keyword remain part of that keyword and 
 
 Needs: impl, utest
 
+## Imported entries stay locatable in the library
+`req~import.entries.sorted-by-id~1`
+
+Entries are kept in the library in the order of their internal ids, regardless of the order in which a batch of imported entries arrives (e.g. after per-entry background duplicate checks). Looking up an entry's position in the library therefore succeeds for every imported entry, so the main table can select and update it.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

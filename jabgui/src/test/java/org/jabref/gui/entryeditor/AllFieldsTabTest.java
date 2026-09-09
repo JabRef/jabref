@@ -8,11 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -28,6 +25,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -55,7 +53,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -67,7 +64,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // [utest->req~entry-editor.main-tab.autolink-suggestions~1]
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class AllFieldsTabTest {
 
     /// Runs probes synchronously, but can hold them back so a test can change entry state
@@ -109,11 +106,9 @@ class AllFieldsTabTest {
         when(preferences.getEntryEditorPreferences().autoLinkFilesEnabled()).thenReturn(true);
         when(preferences.getCitationKeyPatternPreferences().getUnwantedCharacters()).thenReturn("");
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
-        when(externalApplicationsPreferences.getExternalFileTypes())
-                .thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
-        when(preferences.getAutoLinkPreferences()).thenReturn(
-                new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
+        when(preferences.getAutoLinkPreferences()).thenReturn(new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
 
         BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of(fileDirectory));
@@ -137,67 +132,51 @@ class AllFieldsTabTest {
         Injector.setModelOrService(JournalAbbreviationRepository.class, mock(JournalAbbreviationRepository.class));
         Injector.setModelOrService(FileUpdateMonitor.class, new DummyFileUpdateMonitor());
 
-        tab = new AllFieldsTab(
-                mock(UndoAction.class),
-                mock(RedoAction.class),
-                preferences,
-                new BibEntryTypesManager(),
-                mock(JournalAbbreviationRepository.class),
-                stateManager,
-                mock(PreviewPanel.class));
-    }
-
-    private void runOnFxThreadAndWait(Runnable action) throws InterruptedException {
-        CountDownLatch done = new CountDownLatch(1);
-        Platform.runLater(() -> {
-            action.run();
-            done.countDown();
-        });
-        assertTrue(done.await(30, TimeUnit.SECONDS));
+        tab = new AllFieldsTab(mock(UndoAction.class), mock(RedoAction.class), preferences, new BibEntryTypesManager(), mock(JournalAbbreviationRepository.class), stateManager, mock(PreviewPanel.class));
     }
 
     @Test
-    void fileEditorAppearsWhenAutolinkFindsUnlinkedFile() throws IOException, InterruptedException {
+    void fileEditorAppearsWhenAutolinkFindsUnlinkedFile() throws IOException {
         Files.createFile(fileDirectory.resolve("CiteKey2021.pdf"));
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertTrue(tab.editors.containsKey(StandardField.FILE));
     }
 
     @Test
-    void abstractEditorAlwaysShown() throws InterruptedException {
+    void abstractEditorAlwaysShown() {
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertTrue(tab.editors.containsKey(StandardField.ABSTRACT));
     }
 
     @Test
-    void abstractEditorHasNoRemoveButtonUnlikeOptionalFields() throws InterruptedException {
+    void abstractEditorHasNoRemoveButtonUnlikeOptionalFields() {
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021")
                                                              .withField(StandardField.NOTE, "A note");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertNull(tab.editors.get(StandardField.ABSTRACT).getNode().lookup(".field-remove-button"));
         assertNotNull(tab.editors.get(StandardField.NOTE).getNode().lookup(".field-remove-button"));
     }
 
     @Test
-    void abstractEditorIsOneRowWhenEmpty() throws InterruptedException {
+    void abstractEditorIsOneRowWhenEmpty() {
         assertEquals(0, abstractEditorExtraRows(""), 0.1);
     }
 
     @Test
-    void abstractEditorGrowsWithWrappedContentUpToFiveRowsUntilFocused() throws InterruptedException {
+    void abstractEditorGrowsWithWrappedContentUpToFiveRowsUntilFocused() {
         assertEquals(4, abstractEditorExtraRows("word ".repeat(300)), 0.1);
     }
 
     @Test
-    void abstractEditorCountsEveryParagraph() throws InterruptedException {
+    void abstractEditorCountsEveryParagraph() {
         assertEquals(3, abstractEditorExtraRows("one\ntwo\nthree\nfour"), 0.1);
     }
 
@@ -205,9 +184,9 @@ class AllFieldsTabTest {
     /// its text is wrapped, then returns how many rows beyond the first the area got: its height
     /// minus the empty area's height, in units of the font's line height. The layout snaps heights
     /// to whole pixels, so the rows are only reliable as a rounded quotient, never as raw pixels.
-    private double abstractEditorExtraRows(String abstractText) throws InterruptedException {
+    private double abstractEditorExtraRows(String abstractText) {
         double[] result = new double[1];
-        runOnFxThreadAndWait(() -> {
+        JavaFxExtension.invokeAndWait(() -> {
             TextArea filled = layoutAbstractEditor(abstractText);
             TextArea empty = layoutAbstractEditor("");
             Text row = new Text("X");
@@ -233,35 +212,35 @@ class AllFieldsTabTest {
     }
 
     @Test
-    void fileEditorStaysHiddenWithoutMatchingFile() throws InterruptedException {
+    void fileEditorStaysHiddenWithoutMatchingFile() {
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertFalse(tab.editors.containsKey(StandardField.FILE));
     }
 
     @Test
-    void fileEditorStaysHiddenWhenAutolinkIsDisabled() throws IOException, InterruptedException {
+    void fileEditorStaysHiddenWhenAutolinkIsDisabled() throws IOException {
         when(preferences.getEntryEditorPreferences().autoLinkFilesEnabled()).thenReturn(false);
         Files.createFile(fileDirectory.resolve("CiteKey2021.pdf"));
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertFalse(tab.editors.containsKey(StandardField.FILE));
     }
 
     @Test
-    void staleProbeResultDoesNotAddFileEditor() throws IOException, InterruptedException {
+    void staleProbeResultDoesNotAddFileEditor() throws IOException {
         Files.createFile(fileDirectory.resolve("CiteKey2021.pdf"));
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("OtherKey");
 
         taskExecutor.deferUpcomingTasks();
-        runOnFxThreadAndWait(() -> tab.bindToEntry(entry));
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
         // The probe for "OtherKey" is still pending; by the time it runs, the key has changed
         // and its (now matching) result must be discarded.
-        runOnFxThreadAndWait(() -> {
+        JavaFxExtension.invokeAndWait(() -> {
             entry.setCitationKey("CiteKey2021");
             taskExecutor.runNextDeferredTask();
         });

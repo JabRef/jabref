@@ -478,6 +478,7 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 - Plain `git pull` is acceptable for updating the branch as long as your local config does not set `pull.rebase=true` (the enforcement hook blocks the explicit rebase variants regardless).
 - Resolve conflicts inside the merge commit. Do not squash or reorder existing commits.
+- Before committing the merge, make sure no conflict marker is left: with `merge.conflictStyle=diff3` (the default here) a hunk has **four** markers — `<<<<<<<`, `|||||||` (the common-ancestor block), `=======`, `>>>>>>>` — and a resolution that only removes the outer ones leaves the ancestor block in the file. `git diff --cached --check` reports every leftover marker; run it after staging the resolved files.
 
 ### Commits
 

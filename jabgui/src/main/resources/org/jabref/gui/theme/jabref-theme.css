@@ -6,7 +6,7 @@
 * never declare a color of their own -- that is what makes a theme swappable.
 *
 * A theme is therefore a single file that assigns a value to every token listed below.
-* See primer-theme.css for a second implementation of the same contract.
+* See the Primer theme on https://themes.jabref.org/ for a second implementation of the same contract.
 */
 
 @media (prefers-color-scheme: light) {
@@ -237,7 +237,7 @@
     -fx-background-color: -color-bg-primary;
 }
 
-/* JavaFX Button-like */
+/* JavaFX Button-like. */
 .button,
 .toggle-button,
 .menu-button,
@@ -248,12 +248,13 @@
     -fx-background-color: -fx-background;
     -fx-background-insets: 0;
     -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
 /* JavaFX Button */
 .button {
     -fx-border-color: -color-button-border;
-    -fx-border-width: 0.062em;
+    -fx-border-width: 0.0625em;
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
 
@@ -261,22 +262,36 @@
     -fx-background: -color-button-hover;
 }
 
-.button:focused,
-.button:pressed {
+.button:armed {
     -fx-background: -color-button-pressed;
 }
 
-.button:default,
-.button:default:hover,
-.button:default:focused,
-.button:default:pressed {
+.button:focused {
+    -fx-border-color: -color-accent;
+}
+
+.button:default {
     -fx-background: -color-button-default;
+    -fx-background-color: -fx-background;
+}
+
+.button:default:hover {
+    -fx-background-color: -color-button-default, -color-button-hover;
+}
+
+.button:default:armed {
+    -fx-background-color: -color-button-default, -color-button-pressed;
 }
 
 /* JavaFX ToggleButton */
 .toggle-button:hover,
 .toggle-button:selected:hover {
     -fx-background-color: -color-overlay-hover;
+}
+
+.toggle-button:armed,
+.toggle-button:selected:armed {
+    -fx-background-color: -color-overlay-armed;
 }
 
 .toggle-button:selected {
@@ -416,7 +431,7 @@ TextFlow > .tooltip-text-monospaced {
 .color-picker:focused,
 .color-picker {
     -fx-background-color: transparent;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
     -fx-background-insets: 0;
     -fx-effect: null;
 }
@@ -464,9 +479,8 @@ TextFlow > .tooltip-text-monospaced {
 .menu-bar .menu-button {
     -fx-border-color: transparent;
     -fx-border-width: 0;
-    -fx-border-radius: 0;
+    -fx-border-radius: 0.25em;
 }
-
 
 .menu-bar > .container {
     -fx-border-width: 0;
@@ -587,7 +601,7 @@ TextFlow > .tooltip-text-monospaced {
 .combo-box-base {
     -fx-background-color: -color-border-default, -color-bg-secondary;
     -fx-background-insets: 0, 1;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .combo-box > .list-cell {
@@ -626,7 +640,7 @@ TextFlow > .tooltip-text-monospaced {
 .date-picker > .text-field {
     -fx-background-color: -color-border-default, -color-bg-secondary;
     -fx-background-insets: 0, 1;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .combo-box-base:editable:focused > .text-field,
@@ -634,7 +648,7 @@ TextFlow > .tooltip-text-monospaced {
 .date-picker > .text-field:focused {
     -fx-background-color: -color-accent-subtle, -color-bg-secondary;
     -fx-background-insets: 0, 2;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .date-picker:focused > .text-field {
@@ -928,9 +942,4 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0 1em 0 1em;
     -fx-alignment: center-left;
     -fx-text-fill: -fx-text-inner-color;
-}
-
-/* JavaFX WebView */
-.web-view {
-    -fx-page-fill: -color-fg-emphasis;
 }
