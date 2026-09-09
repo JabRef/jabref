@@ -9,21 +9,21 @@ import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.Nullable;
 
-/// A theme the user can select: JabRef's own, or one of the themes from <https://themes.jabref.org/>
-/// that the build bundles from the `jabgui/src/main/themes.jabref.org` submodule (see
-/// `processResources` in `jabgui/build.gradle.kts`). The Primer theme lives there as well; it is the
-/// one bundled theme that declares the token contract in full and therefore has no parent.
+/// A theme the user can select. Every theme, JabRef's own included, is maintained on
+/// <https://themes.jabref.org/> and bundled by the build from the `jabgui/src/main/themes.jabref.org`
+/// submodule (see `processResources` in `jabgui/build.gradle.kts`); the JabRef repository holds no
+/// theme of its own, only the base stylesheet that reads the tokens.
 ///
-/// The community constants are a hand-maintained mirror of that submodule -- `ThemePresetTest`
-/// fails when the two drift apart -- so that the set of themes is fixed at compile time and no
-/// classpath scanning happens at startup. The two JabRef themes declare the complete `-color-*`
-/// token contract; community themes only override what differs from their [#getParent()], the
+/// The constants are a hand-maintained mirror of that submodule -- `ThemePresetTest` fails when the
+/// two drift apart -- so that the set of themes is fixed at compile time and no classpath scanning
+/// happens at startup. The JabRef and Primer themes declare the complete `-color-*` token contract
+/// and have no parent; the other themes only override what differs from their [#getParent()], the
 /// JabRef theme, which [ThemeManager] installs beneath them.
 ///
 /// [impl->req~ux.themes.bundled-community-themes~1]
 @AllowedToUseClassGetResource("The previews are bundled next to the themes.")
 public enum ThemePreset {
-    JABREF(Localization.lang("JabRef theme"), "jabref-theme.css", null),
+    JABREF(Localization.lang("JabRef theme"), "community/jabref-theme.css", null),
     EVERFOREST("Everforest", "community/everforest.css", JABREF),
     NORD("Nord", "community/nord.css", JABREF),
     PAPERS("Papers", "community/papers.css", JABREF),

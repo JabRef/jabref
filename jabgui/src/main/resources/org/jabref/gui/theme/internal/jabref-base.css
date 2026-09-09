@@ -8,7 +8,7 @@
 *   component styles never declare the same property, so their order is free.
 * ==========
 * This file declares NO colors. Every color it uses comes from a `-color-*` token that the
-* active theme declares per color scheme (see jabref-theme.css for the full token contract).
+* active theme declares per color scheme (see the JabRef theme on https://themes.jabref.org/ for the full token contract).
 * Because this stylesheet is installed last, any color it declared itself would silently
 * override the theme and make the theme unswappable -- so keep it token-only.
 *
