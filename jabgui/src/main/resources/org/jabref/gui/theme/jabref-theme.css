@@ -31,8 +31,9 @@
         /* Borders */
         -color-border-default: #B6B6B6;
         -color-border-muted: #DFDFDF;
-        /* The check box square only: see the .check-box > .box rule for why it does not share -color-border-default. */
-        -color-checkbox-border: #B6B6B6;
+        /* The check box square only; see the .check-box > .box rule. Defaults to the border color, so a theme that
+           only retunes -color-border-default keeps its check boxes in step, and can still set this one on its own. */
+        -color-checkbox-border: -color-border-default;
 
         /* Accent -- the JabRef brand color and its tint */
         -color-accent: #50618F;
@@ -121,8 +122,9 @@
         /* Borders */
         -color-border-default: #3C4050;
         -color-border-muted: #333744;
-        /* The check box square only: see the .check-box > .box rule for why it does not share -color-border-default. */
-        -color-checkbox-border: #3C4050;
+        /* The check box square only; see the .check-box > .box rule. Defaults to the border color, so a theme that
+           only retunes -color-border-default keeps its check boxes in step, and can still set this one on its own. */
+        -color-checkbox-border: -color-border-default;
 
         /* Accent -- the JabRef brand color and its tint */
         -color-accent: #2C9490;
