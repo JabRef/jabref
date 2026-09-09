@@ -252,7 +252,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         tabContainer.addTab(newTab, true);
     }
 
-    private ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
+    @VisibleForTesting
+    ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
         Path fileToLoad = file.toAbsolutePath();
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
@@ -282,6 +283,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         if (parserResult.isInvalid()) {
             // The file could not be read at all. LibraryTab closes the tab again after this.
+            // [impl->req~import.library.unreadable-reported~1]
             String content = Localization.lang("Error opening file '%0'", fileToLoad.toString())
                     + "\n\n" + parserResult.getErrorMessage();
             UiTaskExecutor.runInJavaFXThread(() ->

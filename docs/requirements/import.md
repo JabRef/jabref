@@ -30,4 +30,15 @@ The `=======` and `|||||||` lines of a conflict are not looked for on their own:
 
 Needs: impl, utest
 
+## A library that cannot be read is reported and leaves no tab behind
+`req~import.library.unreadable-reported~1`
+
+When a library file cannot be read or parsed at all, JabRef names the file and the reason it failed, instead of failing silently or only logging it.
+
+No library tab is left behind for such a file. The tab that was opened to hold the loading library would otherwise stay as an empty, untitled library, which the user could save over the file that had just failed to load.
+
+A file that parses with warnings is not affected: it still opens, and its warnings are reported separately.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

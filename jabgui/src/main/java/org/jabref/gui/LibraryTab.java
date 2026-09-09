@@ -420,6 +420,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             // Nothing could be read from the file - the caller has already reported the reason to the user.
             // Keeping the tab would leave an empty, untitled library behind, which the user could accidentally
             // save over the file that failed to load.
+            // [impl->req~import.library.unreadable-reported~1]
             loading.set(false);
             dataLoadingTask = null;
             tabContainer.closeTab(this);
