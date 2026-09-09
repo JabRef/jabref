@@ -60,7 +60,6 @@ public class DonationProvider {
             return OnClickBehaviour.HIDE_AND_REMOVE;
         }));
 
-        // The last action is the highlighted one, see Notifications.DonationNotificationView
         notification.getActions().add(new NotificationAction<>(Localization.lang("Donate"), _ -> {
             new OpenBrowserAction(URLs.DONATE_URL, dialogService, preferences.getExternalApplicationsPreferences()).execute();
             return OnClickBehaviour.HIDE_AND_REMOVE;

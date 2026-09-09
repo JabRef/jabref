@@ -1661,7 +1661,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-button-default;
 }
 
-/* Primary action of a notification, e.g. "Donate" - highlighted to stand out from the other actions. */
+/* Primary action of a notification, e.g. "Donate" */
 .info-center-view .notification-view > .content > .text-container > .actions-box .button.notification-action-primary {
     -fx-background: -color-accent;
     -fx-background-color: -color-accent;

@@ -41,8 +41,6 @@ public class Notifications {
         }
     }
 
-    /// Notification asking for a donation. Its last action is rendered as the highlighted (accent colored) button,
-    /// see [DonationNotificationView].
     public static class DonationNotification extends Notification<Object> {
         public DonationNotification(String title, String description) {
             super(title, description);
@@ -50,11 +48,7 @@ public class Notifications {
         }
     }
 
-    /// Renders a [DonationNotification] with the JabRef donation icon and highlights the primary action.
-    ///
-    /// GemsFX creates one plain button per notification action, in the order of [Notification#getActions()].
-    /// There is no per-action styling hook, so the button of the last action is tagged here and colored by
-    /// `jabref-base.css`.
+    /// GemsFX has no per-action styling hook, so the button of the last action is tagged for `jabref-base.css`.
     public static class DonationNotificationView extends NotificationView<Object, DonationNotification> {
         public DonationNotificationView(DonationNotification notification) {
             super(notification);
