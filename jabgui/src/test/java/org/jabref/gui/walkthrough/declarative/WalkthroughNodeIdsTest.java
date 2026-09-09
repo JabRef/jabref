@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// Keeps [WalkthroughNodeIds] honest: a constant whose node lost its id resolves to nothing, and
 /// the walkthrough step then spots on nothing instead of failing.
+@NullMarked
 class WalkthroughNodeIdsTest {
 
     private static final Path MAIN = Path.of("src", "main");
@@ -52,7 +55,7 @@ class WalkthroughNodeIdsTest {
     /// searched for the form it can take.
     @ParameterizedTest
     @MethodSource("declarations")
-    void idIsDeclaredOnANode(String constantName, String id, String declaringFile) throws IOException {
+    void idIsDeclaredOnANode(String constantName, String id, @Nullable String declaringFile) throws IOException {
         assertNotNull(declaringFile, constantName + " names no declaring file in DECLARING_FILES");
 
         Path file = MAIN.resolve(declaringFile);
@@ -65,7 +68,7 @@ class WalkthroughNodeIdsTest {
 
     @ParameterizedTest
     @MethodSource("declarations")
-    void noStylesheetSelectsById(String constantName, String id, String declaringFile) throws IOException {
+    void noStylesheetSelectsById(String constantName, String id, @Nullable String declaringFile) throws IOException {
         try (Stream<Path> underMain = Files.walk(MAIN)) {
             Iterable<Path> stylesheets = underMain.filter(path -> path.toString().endsWith(".css"))::iterator;
             for (Path stylesheet : stylesheets) {
