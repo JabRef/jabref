@@ -16,6 +16,16 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class WalkthroughNodeIds {
 
+    /// The main entry table, set in `MainTable`.
+    public static final String MAIN_TABLE = "main-table";
+
+    /// The groups panel, set in `GroupsSidePaneComponent`.
+    public static final String GROUPS_SIDE_PANE = "groups-side-pane";
+
+    /// Search field of the global search bar, set in `GlobalSearchBar`. The bar's own id, not the
+    /// one `SearchTextField` gives every field it builds — the web search pane carries that too.
+    public static final String GLOBAL_SEARCH_FIELD = "global-search-field";
+
     /// Column table of the "Entry table" preferences tab, set in `TableTab`.
     public static final String COLUMNS_LIST = "columns-list";
 

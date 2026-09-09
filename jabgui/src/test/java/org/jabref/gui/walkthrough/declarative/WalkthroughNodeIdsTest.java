@@ -24,16 +24,19 @@ class WalkthroughNodeIdsTest {
     private static final Path MAIN = Path.of("src", "main");
 
     /// The file that declares each constant's id on a node, by constant name.
-    private static final Map<String, String> DECLARING_FILES = Map.of(
-            "COLUMNS_LIST", "java/org/jabref/gui/preferences/table/TableTab.java",
-            "MAIN_FILE_DIRECTORY_RADIO", "java/org/jabref/gui/preferences/linkedfiles/LinkedFilesTab.java",
-            "LINKED_FILE_BROWSE", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
-            "LINKED_FILE_DESCRIPTION", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
-            "LINKED_FILE_TYPE", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
-            "LINKED_FILE_SOURCE_URL", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml",
-            "GROUP_NAME", "resources/org/jabref/gui/groups/GroupDialog.fxml",
-            "GROUP_DESCRIPTION", "resources/org/jabref/gui/groups/GroupDialog.fxml",
-            "GROUP_EXPLICIT_RADIO", "resources/org/jabref/gui/groups/GroupDialog.fxml");
+    private static final Map<String, String> DECLARING_FILES = Map.ofEntries(
+            Map.entry("MAIN_TABLE", "java/org/jabref/gui/maintable/MainTable.java"),
+            Map.entry("GROUPS_SIDE_PANE", "java/org/jabref/gui/sidepane/GroupsSidePaneComponent.java"),
+            Map.entry("GLOBAL_SEARCH_FIELD", "java/org/jabref/gui/search/GlobalSearchBar.java"),
+            Map.entry("COLUMNS_LIST", "java/org/jabref/gui/preferences/table/TableTab.java"),
+            Map.entry("MAIN_FILE_DIRECTORY_RADIO", "java/org/jabref/gui/preferences/linkedfiles/LinkedFilesTab.java"),
+            Map.entry("LINKED_FILE_BROWSE", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml"),
+            Map.entry("LINKED_FILE_DESCRIPTION", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml"),
+            Map.entry("LINKED_FILE_TYPE", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml"),
+            Map.entry("LINKED_FILE_SOURCE_URL", "resources/org/jabref/gui/linkedfile/LinkedFileEditDialog.fxml"),
+            Map.entry("GROUP_NAME", "resources/org/jabref/gui/groups/GroupDialog.fxml"),
+            Map.entry("GROUP_DESCRIPTION", "resources/org/jabref/gui/groups/GroupDialog.fxml"),
+            Map.entry("GROUP_EXPLICIT_RADIO", "resources/org/jabref/gui/groups/GroupDialog.fxml"));
 
     /// Driven by the constants themselves, so a constant added without a declaring file shows up as
     /// a case rather than as a silently missing one.
@@ -63,8 +66,8 @@ class WalkthroughNodeIdsTest {
     @ParameterizedTest
     @MethodSource("declarations")
     void noStylesheetSelectsById(String constantName, String id, String declaringFile) throws IOException {
-        try (Stream<Path> resources = Files.walk(MAIN.resolve("resources"))) {
-            Iterable<Path> stylesheets = resources.filter(path -> path.toString().endsWith(".css"))::iterator;
+        try (Stream<Path> underMain = Files.walk(MAIN)) {
+            Iterable<Path> stylesheets = underMain.filter(path -> path.toString().endsWith(".css"))::iterator;
             for (Path stylesheet : stylesheets) {
                 assertFalse(Files.readString(stylesheet).contains("#" + id),
                         stylesheet + " selects by the node id \"" + id + "\", which the walkthrough resolves on");
