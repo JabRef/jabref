@@ -138,7 +138,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.stateManager = stateManager;
         setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
-        setId("citationRelationsTab");
+        setId("citation-relations-tab");
 
         this.entryTypesManager = bibEntryTypesManager;
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
@@ -180,7 +180,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         column.setHalignment(HPos.CENTER);
 
         sciteResultsPane.getColumnConstraints().setAll(column);
-        sciteResultsPane.setId("scitePane");
+        sciteResultsPane.setId("scite-pane");
+        sciteResultsPane.getStyleClass().add("scite-pane");
         setContent(sciteResultsPane);
 
         EasyBind.subscribe(citationsRelationsTabViewModel.statusProperty(), status -> {
