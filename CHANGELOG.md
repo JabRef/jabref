@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the community themes from [themes.jabref.org](https://themes.jabref.org/) (Everforest, Nord, Papers, Chocolate Honey, and Dino Girl's collection) as selectable themes. [#15915](https://github.com/JabRef/jabref/issues/15915)
+- We added a preview image to the theme selection in the preferences. [#15915](https://github.com/JabRef/jabref/issues/15915)
 - We added automatic reconnection to shared databases that were still connected when JabRef was closed. [#16801](https://github.com/JabRef/jabref/pull/16801)
 - We added the ability to auto-inject and manually infer the used CSL style in the LibreOffice document. [#16640](https://github.com/JabRef/jabref/issues/16640)
 - We added subset search for CSL styles. [#16693](https://github.com/JabRef/jabref/issues/16693)
@@ -78,6 +80,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We redesigned the "About JabRef" dialog. [#16950](https://github.com/JabRef/jabref/pull/16950)
 - We removed the keystore fields, the server timezone, and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We changed remembered shared database passwords to use the operating system credential store. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We changed undo and redo to name the step they take back instead of only saying "Undo". [#16936](https://github.com/JabRef/jabref/pull/16936)
@@ -125,9 +128,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We moved the Git settings into their own preferences tab. [#12630](https://github.com/JabRef/jabref/issues/12630)
 - "Get fulltext", groups "Attach file", "Attach file from URL", "Open folder(s)" and "Open file" commands in right click menu have been moved into a "More file operations..." submenu. [#16829](https://github.com/JabRef/jabref/pull/16829)
 - We changed the logging during full-text search indexing to identify which linked files cause errors. [#15680](https://github.com/JabRef/jabref/issues/15680)
+- We unified the Button style. All Buttons have rounded corners, a hover, pressed and focused color. [#16980](https://github.com/JabRef/jabref/pull/16980)
 
 ### Fixed
 
+- We fixed an issue where an author list ending with "et al." was parsed as a person named "et al." instead of "and others". [#16937](https://github.com/JabRef/jabref/pull/16937)
+- We fixed an issue where dialog buttons cut off their text at a larger font size. [#16787](https://github.com/JabRef/jabref/issues/16787)
 - We fixed an issue where main table columns could not be resized while "Fit table horizontally on screen" was enabled. Resizing a column now adjusts only the columns to its right, and column widths keep their proportions when the window is resized. [#10516](https://github.com/JabRef/jabref/issues/10516)
 - We fixed an issue where entries imported in the background could not be selected or updated in the main table. [#16893](https://github.com/JabRef/jabref/pull/16893)
 - We fixed an issue where editing a library's string constants could not be undone. [#16936](https://github.com/JabRef/jabref/pull/16936)
@@ -248,6 +254,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where entry added by "add entry using" was not selected. [#16035](https://github.com/JabRef/jabref/issues/16035)
 - We fixed an issue where the "Connect to shared database" dialog froze while connecting. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We fixed an issue where the "entrytype" column header was shown in lower case; it now reads "Entry Type". [#16894](https://github.com/JabRef/jabref/pull/16894)
+- We fixed an issue where some buttons were not aligned in entry editor. [#16485](https://github.com/JabRef/jabref/issues/16485)
+- We fixed an issue where long recent library paths overflowed and were cut off in the Welcome tab. [#16808](https://github.com/JabRef/jabref/issues/16808)
 
 ### Removed
 

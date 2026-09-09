@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -49,6 +50,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -59,6 +61,7 @@ import org.slf4j.LoggerFactory;
 
 public class WelcomeTab extends Tab {
     private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);
+    private static final int MAX_RECENT_FILE_PATH_LENGTH = 35;
 
     private final VBox recentLibrariesBox;
     private final LibraryTabContainer tabContainer;
@@ -309,8 +312,10 @@ public class WelcomeTab extends Tab {
         fileHistoryMenu.disableProperty().unbind();
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
-            Hyperlink recentLibraryLink = new Hyperlink(item.getText());
-            recentLibraryLink.getStyleClass().addAll("welcome-hyperlink", "h4");
+            String truncatedText = StringUtil.abbreviatePath(item.getText(), MAX_RECENT_FILE_PATH_LENGTH);
+            Hyperlink recentLibraryLink = new Hyperlink(truncatedText);
+            recentLibraryLink.setTooltip(new Tooltip(item.getText()));
+            recentLibraryLink.getStyleClass().add("welcome-hyperlink");
             recentLibraryLink.setOnAction(item.getOnAction());
             recentLibrariesBox.getChildren().add(recentLibraryLink);
         }
