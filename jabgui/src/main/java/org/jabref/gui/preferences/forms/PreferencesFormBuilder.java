@@ -217,11 +217,11 @@ public class PreferencesFormBuilder {
         }));
     }
 
-    public PreferencesFormBuilder stringField(@Nullable String label, StringProperty value) {
+    public PreferencesFormBuilder stringField(String label, StringProperty value) {
         return stringField(label, value, noConfig());
     }
 
-    public PreferencesFormBuilder stringField(@Nullable String label, StringProperty value, Consumer<InputElement<TextField>> config) {
+    public PreferencesFormBuilder stringField(String label, StringProperty value, Consumer<InputElement<TextField>> config) {
         TextField field = new TextField();
         field.setMaxWidth(Double.MAX_VALUE);
         field.textProperty().bindBidirectional(value);
@@ -378,16 +378,14 @@ public class PreferencesFormBuilder {
         return this;
     }
 
-    private void addField(@Nullable String label, Node control) {
+    private void addField(String label, Node control) {
         GridPane grid = ensureGrid();
         int row = grid.getRowCount();
         HBox controlRow = row(control);
         HBox.setHgrow(control, Priority.ALWAYS);
         GridPane.setHgrow(controlRow, Priority.ALWAYS);
 
-        if (label != null) {
-            searchable(label, control);
-        }
+        searchable(label, control);
         grid.add(new Label(label), 0, row);
         grid.add(controlRow, 1, row);
     }
