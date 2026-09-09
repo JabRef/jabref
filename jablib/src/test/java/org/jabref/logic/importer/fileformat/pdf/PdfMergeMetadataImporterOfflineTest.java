@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 /// Tests for [PdfMergeMetadataImporter] that work without network access, complementing
 /// [PdfMergeMetadataImporterTest] (which is tagged as fetcher test and thus not run by default).
 ///
-/// The cross-check logic under test lives in [PdfContentImporter], but is exercised here through the
+/// The cross-check logic under test lives in [PdfAuthorCrossCheck], but is exercised here through the
 /// merge importer, which is where it takes effect.
 class PdfMergeMetadataImporterOfflineTest {
 

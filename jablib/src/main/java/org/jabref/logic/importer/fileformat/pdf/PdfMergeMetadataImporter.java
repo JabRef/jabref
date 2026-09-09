@@ -178,7 +178,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     ///
     /// Beyond the plain field merge this also: replaces a filename-like title with the first candidate title
     /// that does not look like a filename; cross-checks the merged author against the PDF text (see
-    /// [PdfContentImporter]); and keeps only online (URL) file links.
+    /// [PdfAuthorCrossCheck]); and keeps only online (URL) file links.
     ///
     /// @param candidates       candidate entries ordered by descending priority
     /// @param leadingPagesText plain text of the PDF's leading pages (as produced by [PdfAuthorCrossCheck]), used only to validate the merged author; `null` or empty when the text could not be extracted, in which case the author is left untouched

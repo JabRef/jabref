@@ -5,12 +5,12 @@ import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -68,8 +68,12 @@ class PdfAuthorCrossCheck {
     /// that metadata previously written by JabRef survives re-import even when the PDF text does not
     /// contain the author (e.g. slides or reports).
     static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, @Nullable String leadingPagesText) {
-        String normalizedText = normalizeForComparison(Objects.requireNonNullElse(leadingPagesText, ""));
+        if (StringUtil.isBlank(leadingPagesText)) {
+            return;
+        }
+        String normalizedText = normalizeForComparison(leadingPagesText);
         if (normalizedText.isBlank()) {
+            // Normalization strips everything but letters, so a text of digits or punctuation confirms nothing
             return;
         }
         entry.getField(StandardField.AUTHOR).ifPresent(mergedAuthor -> {
