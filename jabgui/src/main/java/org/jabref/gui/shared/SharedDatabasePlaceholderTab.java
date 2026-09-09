@@ -33,6 +33,9 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class SharedDatabasePlaceholderTab extends Tab {
 
+    /// Identifies the label carrying the connection error, for lookups in tests.
+    static final String MESSAGE_ID = "shared-database-error-message";
+
     private final @Nullable String sharedDatabaseId;
     private final DBMSConnectionProperties connectionProperties;
     private final Label header = new Label();
@@ -50,6 +53,7 @@ public class SharedDatabasePlaceholderTab extends Tab {
 
         header.setWrapText(true);
         header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
+        message.setId(MESSAGE_ID);
         message.setWrapText(true);
         message.setMaxWidth(600);
         message.setTextAlignment(TextAlignment.CENTER);

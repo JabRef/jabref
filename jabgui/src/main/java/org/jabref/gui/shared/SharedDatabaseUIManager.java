@@ -179,6 +179,8 @@ public class SharedDatabaseUIManager {
                           if (placeholder.isAbandoned()) {
                               return;
                           }
+                          // The placeholder alone is easy to miss among the libraries that did open, so the failure is announced as well.
+                          dialogService.notify(Localization.lang("Could not reconnect to shared database %0.", connectionProperties.getDatabase()));
                           placeholder.setRetryAction(() -> connectInBackground(placeholder, connectionProperties, onOpened));
                           placeholder.showError(exception);
                           if (exception instanceof DatabaseNotSupportedException) {
