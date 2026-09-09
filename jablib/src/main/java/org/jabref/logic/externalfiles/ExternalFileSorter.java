@@ -16,7 +16,7 @@ public enum ExternalFileSorter {
     public static ExternalFileSorter parse(String name) {
         try {
             return ExternalFileSorter.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return DEFAULT;
         }
     }

@@ -65,7 +65,7 @@ public abstract sealed class StyleSheet permits StyleSheetDataUrl, StyleSheetFil
         if (styleSheetUrl.isEmpty()) {
             try {
                 return Optional.of(new StyleSheetDataUrl(name, new URI(DATA_URL_PREFIX).toURL()));
-            } catch (URISyntaxException | MalformedURLException e) {
+            } catch (URISyntaxException | MalformedURLException _) {
                 return Optional.empty();
             }
         } else if ("file".equals(styleSheetUrl.get().getProtocol())) {
