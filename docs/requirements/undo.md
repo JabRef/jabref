@@ -59,4 +59,21 @@ The marker is derived from that rather than set by each command, so no undo path
 
 Needs: impl, utest
 
+## Library settings are one undo step
+`req~logic.undo.library-settings-recorded~1`
+
+Accepting the Library properties dialog goes on the undo stack as a single step covering every tab, and undoing it restores the settings the library had before the dialog was opened.
+The settings are written straight to the library's metadata by seven tabs at once, so recording them as one snapshot pair is what makes the dialog undoable at all — and what keeps the modified marker honest for a change no command would otherwise report.
+
+Needs: impl, utest
+
+## Typing a word is one undo step
+`req~logic.undo.typing-is-one-step~2`
+
+A run of keystrokes in one field of one entry goes on the undo stack as a single step, so undoing takes back the word that was typed rather than the last character.
+The run ends at the end of a word, when the editor moves to something else, when the library is saved at that point, or when a command records a step of its own; a run that ends where it started leaves no step behind.
+Breaking at a word is what every other editor does, and it bounds what a single Ctrl+Z can take back: without it, one keystroke of undo takes back a whole abstract.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

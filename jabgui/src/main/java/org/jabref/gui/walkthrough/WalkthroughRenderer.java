@@ -29,11 +29,9 @@ public class WalkthroughRenderer {
     /// @param beforeNavigate Runnable to execute before any navigation action
     /// @return The rendered tooltip content node
     public Node render(TooltipStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
-        VBox tooltip = new VBox(12);
-        tooltip.getStyleClass().addAll("root", "padding-12");
+        VBox tooltip = makePanel();
 
         StackPane titleContainer = new StackPane();
-        titleContainer.getStyleClass().add("walkthrough-title-container");
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
         titleFlow.getStyleClass().add("walkthrough-tooltip-title");
         titleFlow.setMarkdown(step.title());
@@ -62,7 +60,6 @@ public class WalkthroughRenderer {
         configurePanelSize(panel, step);
 
         StackPane titleContainer = new StackPane();
-        titleContainer.getStyleClass().add("walkthrough-title-container");
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
         titleFlow.getStyleClass().add("walkthrough-title");
         titleFlow.setMarkdown(step.title());
@@ -98,10 +95,9 @@ public class WalkthroughRenderer {
 
     private Node render(TextBlock textBlock) {
         StackPane container = new StackPane();
-        container.getStyleClass().add("walkthrough-text-container");
 
         MarkdownTextFlow textFlow = new MarkdownTextFlow(container);
-        textFlow.getStyleClass().addAll("walkthrough-text-content", "h4");
+        textFlow.getStyleClass().addAll("h4");
         textFlow.setMarkdown(textBlock.text());
 
         container.getChildren().add(textFlow);
@@ -109,8 +105,8 @@ public class WalkthroughRenderer {
     }
 
     private Node render(InfoBlock infoBlock) {
-        HBox infoContainer = new HBox(4);
-        infoContainer.getStyleClass().addAll("walkthrough-info-container", "padding-left-12", "align-top-left");
+        HBox infoContainer = new HBox(8);
+        infoContainer.getStyleClass().addAll("walkthrough-info-container", "align-top-left");
 
         JabRefIconView icon = new JabRefIconView(IconTheme.JabRefIcons.INTEGRITY_INFO);
 
@@ -127,7 +123,7 @@ public class WalkthroughRenderer {
 
     private VBox makePanel() {
         VBox container = new VBox(4);
-        container.getStyleClass().add("walkthrough-panel");
+        container.getStyleClass().addAll("walkthrough-panel", "padding-8");
         return container;
     }
 
@@ -141,7 +137,7 @@ public class WalkthroughRenderer {
         component.backButtonText()
                  .ifPresent(text ->
                          actions.getChildren()
-                                .add(makeButton(text, "walkthrough-back-button", beforeNavigate, walkthrough::previousStep)));
+                                .add(makeButton(text, false, beforeNavigate, walkthrough::previousStep)));
 
         HBox rightActions = new HBox(4);
         rightActions.setAlignment(Pos.CENTER_RIGHT);
@@ -149,11 +145,11 @@ public class WalkthroughRenderer {
         component.skipButtonText()
                  .ifPresent(text ->
                          rightActions.getChildren()
-                                     .add(makeButton(text, "walkthrough-skip-button", beforeNavigate, walkthrough::skip)));
+                                     .add(makeButton(text, false, beforeNavigate, walkthrough::skip)));
         component.continueButtonText()
                  .ifPresent(text ->
                          rightActions.getChildren()
-                                     .add(makeButton(text, "walkthrough-continue-button", beforeNavigate, walkthrough::nextStep)));
+                                     .add(makeButton(text, true, beforeNavigate, walkthrough::nextStep)));
         actions.getChildren().addAll(spacer, rightActions);
         return actions;
     }
@@ -174,9 +170,12 @@ public class WalkthroughRenderer {
     }
 
     /// @param text the already localized button text
-    private Button makeButton(String text, String styleClass, Runnable beforeNavigate, Runnable navigationAction) {
+    private Button makeButton(String text, boolean isDefault, Runnable beforeNavigate, Runnable navigationAction) {
         Button button = new Button(text);
-        button.getStyleClass().addAll(styleClass, "h5", "padding-4");
+        button.getStyleClass().addAll("h5", "padding-4");
+        if (isDefault) {
+            button.setDefaultButton(true);
+        }
         button.setOnAction(_ -> {
             beforeNavigate.run();
             navigationAction.run();

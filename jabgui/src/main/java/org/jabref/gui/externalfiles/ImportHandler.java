@@ -21,6 +21,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.importer.actions.AddGroupImportEntriesAction;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -725,8 +726,13 @@ public class ImportHandler {
     private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().shouldAddImportedEntries()) {
             String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
-            // We cannot add the new group here directly because we don't have access to the group node ViewModel stuff here
-            // We would need to add the groups to the metadata first which is a bit more complicated, thus we decided against it atm
+            // The group is created here rather than when the library is opened: a library the user
+            // only looked at is left as it is on disk, and the write happens inside the import that
+            // asked for it. It is announced, because it is a change to the library the user did not
+            // ask for by itself.
+            if (new AddGroupImportEntriesAction().addImportedEntriesGroupIfNeeded(targetBibDatabaseContext, preferences)) {
+                dialogService.notify(Localization.lang("Created the group %0 for imported entries.", groupName));
+            }
             this.targetBibDatabaseContext.getMetaData()
                                          .getGroups()
                                          .flatMap(grp -> grp.getChildren()
