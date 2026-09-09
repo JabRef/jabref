@@ -179,7 +179,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             if (!doi.isEmpty()) {
                 try {
                     DOI.parse(doi).ifPresent(validDoi -> entry.setField(StandardField.DOI, validDoi.asString()));
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException _) {
                     // If DOI parsing fails, use the original DOI string
                     entry.setField(StandardField.DOI, doi);
                 }

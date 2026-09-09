@@ -382,7 +382,7 @@ public class BibtexParser implements Parser {
         int startColumn = column;
         try {
             buffer = parseBracketedFieldContent(false);
-        } catch (IOException e) {
+        } catch (IOException _) {
             // if we get an IO Exception here, then we have an unbracketed comment,
             // which means that we should just return and the comment will be picked up as arbitrary text
             // by the parser
