@@ -61,7 +61,6 @@ import org.slf4j.LoggerFactory;
 
 public class WelcomeTab extends Tab {
     private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);
-    private static final int MAX_RECENT_FILE_PATH_LENGTH = 35;
 
     private final VBox recentLibrariesBox;
     private final LibraryTabContainer tabContainer;
@@ -312,12 +311,28 @@ public class WelcomeTab extends Tab {
         fileHistoryMenu.disableProperty().unbind();
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
-            String truncatedText = StringUtil.abbreviatePath(item.getText(), MAX_RECENT_FILE_PATH_LENGTH);
-            Hyperlink recentLibraryLink = new Hyperlink(truncatedText);
-            recentLibraryLink.setTooltip(new Tooltip(item.getText()));
+            Hyperlink recentLibraryLink = new Hyperlink(item.getText());
             recentLibraryLink.getStyleClass().add("welcome-hyperlink");
+            recentLibraryLink.setTooltip(new Tooltip(item.getText()));
             recentLibraryLink.setOnAction(item.getOnAction());
             recentLibrariesBox.getChildren().add(recentLibraryLink);
+        }
+        recentLibrariesBox.widthProperty().addListener((obs, oldWidth, newWidth) -> {
+            updateRecentLibraryLinks(newWidth.doubleValue());
+        });
+        updateRecentLibraryLinks(recentLibrariesBox.getWidth());
+    }
+
+    private void updateRecentLibraryLinks(double availableWidth) {
+        for (int i = 0; i < fileHistoryMenu.getItems().size(); i++) {
+            MenuItem item = fileHistoryMenu.getItems().get(i);
+            Hyperlink link = (Hyperlink) recentLibrariesBox.getChildren().get(i);
+            String text = StringUtil.abbreviatePathToFit(
+                    item.getText(),
+                    availableWidth,
+                    link.getFont()
+            );
+            link.setText(text);
         }
     }
 

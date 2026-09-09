@@ -83,6 +83,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We changed recent library paths to dynamically abbreviate based on available space while preserving file name. [#17041](https://github.com/JabRef/jabref/issues/17041)
 - We changed the "Add field" button to match the input and check combo box height for better alignment. [#16994](https://github.com/JabRef/jabref/issues/16994)
 - We redesigned the "About JabRef" dialog. [#16950](https://github.com/JabRef/jabref/pull/16950)
 - We now create the group for imported entries when entries are imported, instead of when a library is opened. [#16988](https://github.com/JabRef/jabref/pull/16988)
