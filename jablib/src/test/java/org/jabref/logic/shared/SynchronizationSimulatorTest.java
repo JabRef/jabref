@@ -354,9 +354,12 @@ class SynchronizationSimulatorTest {
     /// shared side and a conflict for the other user - not with a mix of both or a truncation
     @Test
     void simulateConcurrentTypingIntoSameField() throws Exception {
-        BibEntry bibEntryOfClientA = getBibEntryExample(1);
-        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
+        // Inserted without a notification, so that no pull triggered by it flushes B's buffered typing early
+        DBMSProcessor otherClient = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        otherClient.insertEntry(getBibEntryExample(1));
+        clientContextA.getDBMSSynchronizer().pullChanges();
         clientContextB.getDBMSSynchronizer().pullChanges();
+        BibEntry bibEntryOfClientA = clientContextA.getDatabase().getEntries().getFirst();
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
 
         typeInto(bibEntryOfClientA, StandardField.COMMENT, "comment of asterix");

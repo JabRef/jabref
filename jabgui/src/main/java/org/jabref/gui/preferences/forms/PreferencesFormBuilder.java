@@ -217,11 +217,11 @@ public class PreferencesFormBuilder {
         }));
     }
 
-    public PreferencesFormBuilder stringField(@Nullable String label, StringProperty value) {
+    public PreferencesFormBuilder stringField(String label, StringProperty value) {
         return stringField(label, value, noConfig());
     }
 
-    public PreferencesFormBuilder stringField(@Nullable String label, StringProperty value, Consumer<InputElement<TextField>> config) {
+    public PreferencesFormBuilder stringField(String label, StringProperty value, Consumer<InputElement<TextField>> config) {
         TextField field = new TextField();
         field.setMaxWidth(Double.MAX_VALUE);
         field.textProperty().bindBidirectional(value);
@@ -372,16 +372,20 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, control), config);
     }
 
-    private void addField(@Nullable String label, Node control) {
+    /// A labeled row whose value is not a control, e.g. an image; nothing to validate or focus.
+    public PreferencesFormBuilder field(String label, Node node) {
+        addField(label, node);
+        return this;
+    }
+
+    private void addField(String label, Node control) {
         GridPane grid = ensureGrid();
         int row = grid.getRowCount();
         HBox controlRow = row(control);
         HBox.setHgrow(control, Priority.ALWAYS);
         GridPane.setHgrow(controlRow, Priority.ALWAYS);
 
-        if (label != null) {
-            searchable(label, control);
-        }
+        searchable(label, control);
         grid.add(new Label(label), 0, row);
         grid.add(controlRow, 1, row);
     }
@@ -842,6 +846,11 @@ public class PreferencesFormBuilder {
         ElementBase(PreferencesFormBuilder form, N node) {
             this.form = form;
             this.node = node;
+        }
+
+        /// The control itself, for the rare caller that has to reach past the builder.
+        public N getNode() {
+            return node;
         }
 
         /// Adds `condition` to the combination of things that disable this element; see

@@ -131,7 +131,7 @@ public class WalkthroughScroller {
 
         if (itemHeight > 0) {
             double targetCenterY = targetBounds.getCenterY();
-            return (int) Math.max(0, Math.min(itemCount - 1, targetCenterY / itemHeight));
+            return (int) Math.clamp(targetCenterY / itemHeight, 0, itemCount - 1);
         }
         return -1;
     }
