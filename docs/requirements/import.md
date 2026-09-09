@@ -21,4 +21,14 @@ Entries are kept in the library in the order of their internal ids, regardless o
 
 Needs: impl, utest
 
+## Custom entry types of a library are only offered once
+
+`req~import.entry-types.offered-once~1`
+
+When a library declares entry types that differ from the ones stored in the preferences, JabRef offers to store them. This holds both for entry types JabRef does not know and for customizations of entry types JabRef ships.
+
+The definition the user accepts is the one from the library file, and it replaces the stored one. Opening the same library again therefore offers nothing, whereas entry types the user did not accept are offered again.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
