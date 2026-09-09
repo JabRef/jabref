@@ -6,6 +6,7 @@
 * never declare a color of their own -- that is what makes a theme swappable.
 *
 * A theme is therefore a single file that assigns a value to every token listed below.
+* The reasoning behind the tokens is kept short in https://themes.jabref.org/styleguide
 * See the Primer theme on https://themes.jabref.org/ for a second implementation of the same contract.
 */
 
@@ -29,11 +30,9 @@
         -color-fg-emphasis: #FFFFFF;
 
         /* Borders */
-        -color-border-default: #B6B6B6;
+        -color-border-light: #B6B6B6;
+        -color-border-strong: #808080;
         -color-border-muted: #DFDFDF;
-        /* The check box square only; see the .check-box > .box rule. Defaults to the border color, so a theme that
-           only retunes -color-border-default keeps its check boxes in step, and can still set this one on its own. */
-        -color-checkbox-border: -color-border-default;
 
         /* Accent -- the JabRef brand color and its tint */
         -color-accent: #50618F;
@@ -120,11 +119,9 @@
         -color-fg-emphasis: #E5E7EA;
 
         /* Borders */
-        -color-border-default: #3C4050;
+        -color-border-light: #3C4050;
+        -color-border-strong: #6B7280;
         -color-border-muted: #333744;
-        /* The check box square only; see the .check-box > .box rule. Defaults to the border color, so a theme that
-           only retunes -color-border-default keeps its check boxes in step, and can still set this one on its own. */
-        -color-checkbox-border: -color-border-default;
 
         /* Accent -- the JabRef brand color and its tint */
         -color-accent: #2C9490;
@@ -212,7 +209,7 @@
 
     -fx-box-border: derive(-color-bg-tertiary, -5%);
     -fx-text-box-border: derive(-color-bg-tertiary, 10%);
-    -fx-outer-border: -color-border-default;
+    -fx-outer-border: -color-border-light;
 
     -fx-inner-border: derive(-color-bg-tertiary, 65%);
     -fx-inner-border-horizontal: derive(-color-bg-tertiary, 65%);
@@ -257,7 +254,7 @@
 
 /* JavaFX Button */
 .button {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-width: 0.0625em;
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
@@ -326,10 +323,7 @@
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-text-fill: -fx-text-base-color;
-    /* Not -color-border-default: that token outlines surfaces and text fields, whereas this 2px frame *is* the
-       control -- an unchecked box consists of nothing else. Buttons frame a label, tabs need no frame at all
-       (see .tab below). Each purpose gets its own token, at the price of one more line per theme. */
-    -fx-border-color: -color-checkbox-border;
+    -fx-border-color: -color-border-strong;
     -fx-border-width: 0.125em;
     -fx-border-radius: 0.062em;
     -fx-padding: 0.1em 0.1em 0.2em 0.2em;
@@ -535,7 +529,7 @@ TextFlow > Text {
 
 /* JavaFX ContextMenu */
 .context-menu {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-width: 1;
 }
 
@@ -566,9 +560,7 @@ TextFlow > Text {
     -fx-pref-height: 3em;
 }
 
-/* No frame around a tab: the accent line and the background tell the selected tab apart, hovering tints the
-   others -- the same way Firefox and IntelliJ do it, so a tab's edge is never drawn. Declared before :selected,
-   which therefore wins on the selected tab. */
+/* Declared before :selected, which therefore wins on the selected tab. */
 .tab-pane > .tab-header-area > .headers-region > .tab:hover {
     -fx-background-color: -color-bg-primary, -color-button-hover;
 }
@@ -620,7 +612,7 @@ TextFlow > Text {
 
 /* JavaFX ComboBoxBase / ComboBox / DatePicker */
 .combo-box-base {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-border-light, -color-bg-secondary;
     -fx-background-insets: 0, 1;
     -fx-background-radius: 0.25em;
 }
@@ -640,7 +632,7 @@ TextFlow > Text {
     -fx-background-insets: 0;
     -fx-effect: null;
     -fx-border-width: 1;
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-padding: 0;
 }
 
@@ -663,7 +655,7 @@ TextFlow > Text {
 
 .combo-box-base:editable > .text-field,
 .date-picker > .text-field {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-border-light, -color-bg-secondary;
     -fx-background-insets: 0, 1;
     -fx-background-radius: 0.25em;
 }
@@ -831,7 +823,7 @@ TextFlow > Text {
 /* JavaFX TextInput / TextField / TextArea */
 
 .text-input {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-border-light, -color-bg-secondary;
     -fx-background-insets: 0, 1;
     -fx-background-radius: 0.25em;
     -fx-prompt-text-fill: -color-scrollbar-thumb;
@@ -850,7 +842,7 @@ TextFlow > Text {
 }
 
 .text-area .content {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-border-light, -color-bg-secondary;
     -fx-background-insets: 0, 1;
     -fx-padding: 0.333333em 0.583em 0.333333em 0.583em;
     -fx-background-radius: 0;
@@ -957,7 +949,7 @@ TextFlow > Text {
     -fx-font-weight: bold;
     -fx-size: 3em;
     -fx-border-width: 0 0 1 0;
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
 }
 
 .column-header > .label {
