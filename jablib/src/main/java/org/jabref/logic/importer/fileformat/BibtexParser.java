@@ -98,6 +98,8 @@ public class BibtexParser implements Parser {
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final Pattern EPILOG_PATTERN = Pattern.compile("\\w+\\s*=.*,");
     private static final int INDEX_RELATIVE_PATH_IN_PLIST = 4;
+    /// Git writes conflict markers as seven characters at the start of a line, but a botched merge can produce longer runs (https://github.com/JabRef/jabref/issues/9167).
+    private static final int CONFLICT_MARKER_LENGTH = 7;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
@@ -107,6 +109,8 @@ public class BibtexParser implements Parser {
 
     private int line = 1;
     private int column = 1;
+    private char conflictMarkerCharacter;
+    private int conflictMarkerRun;
     // Stores the last read column of the highest column number encountered on any line so far.
     // The intended data structure is Stack, but it is not used because Java code style checkers complain.
     // In basic JDK data structures, there is no size-limited stack. We did not want to include Apache Commons Collections only for "CircularFifoBuffer"
@@ -175,11 +179,16 @@ public class BibtexParser implements Parser {
         // BibTeX related contents
         initializeParserResult(newLineSeparator);
 
-        parseDatabaseID();
+        try {
+            parseDatabaseID();
 
-        skipWhitespace();
+            skipWhitespace();
 
-        return parseFileContent();
+            return parseFileContent();
+        } catch (ConflictMarkerFoundException exception) {
+            // Parsing on would silently drop one side of the conflict or store the markers in an entry's serialization
+            return ParserResult.fromErrorMessage(exception.getMessage());
+        }
     }
 
     private String determineNewLineSeparator() throws IOException {
@@ -656,6 +665,7 @@ public class BibtexParser implements Parser {
         if (!isEOFCharacter(character)) {
             pureTextFromFile.offerLast((char) character);
         }
+        checkForConflictMarker(character);
         if (character == '\n') {
             line++;
             highestColumns.push(column);
@@ -664,6 +674,23 @@ public class BibtexParser implements Parser {
             column++;
         }
         return character;
+    }
+
+    /// Counts a run of conflict marker characters at the start of a line. `column` still holds the column of the just-read character.
+    ///
+    /// Only `<` and `>` are looked for: a line of `=` or `|` also appears as a decorative rule in comments and field values.
+    private void checkForConflictMarker(int character) throws ConflictMarkerFoundException {
+        if ((column == 1) && ((character == '<') || (character == '>'))) {
+            conflictMarkerCharacter = (char) character;
+            conflictMarkerRun = 1;
+        } else if ((conflictMarkerRun > 0) && (character == conflictMarkerCharacter)) {
+            conflictMarkerRun++;
+            if (conflictMarkerRun == CONFLICT_MARKER_LENGTH) {
+                throw new ConflictMarkerFoundException(line);
+            }
+        } else {
+            conflictMarkerRun = 0;
+        }
     }
 
     private void unread(int character) throws IOException {
@@ -1235,6 +1262,15 @@ public class BibtexParser implements Parser {
         if ((character != firstOption) && (character != secondOption)) {
             throw new IOException("Error in line " + line + ": Expected " + firstOption + " or " + secondOption
                     + " but received " + (char) character);
+        }
+    }
+
+    /// Thrown as soon as an unresolved version control conflict marker is read, which makes the rest of the file meaningless.
+    ///
+    /// [impl->req~import.bibtex.merge-conflict-markers~1]
+    private static class ConflictMarkerFoundException extends IOException {
+        ConflictMarkerFoundException(int line) {
+            super(Localization.lang("Found a merge conflict marker in line %0. Please resolve the conflict in the file before opening it.", String.valueOf(line)));
         }
     }
 }

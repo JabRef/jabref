@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 
@@ -74,6 +75,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
@@ -2446,5 +2448,69 @@ class BibtexParserTest {
                 .withFiles(List.of(new LinkedFile("", "../../../Papers/Asheim2005 The Geography of Innovation Regional Innovation Systems.pdf", "")));
 
         assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
+    }
+
+    // [utest->req~import.bibtex.merge-conflict-markers~1]
+    @ParameterizedTest
+    @MethodSource
+    void mergeConflictMarkersResultInAnErrorMessage(String fileContent) throws IOException {
+        ParserResult result = parser.parse(Reader.of(fileContent));
+
+        assertEquals(List.of("Found a merge conflict marker in line 3. Please resolve the conflict in the file before opening it."), result.warnings());
+        assertTrue(result.isInvalid());
+        assertEquals(List.of(), result.getDatabase().getEntries());
+    }
+
+    static Stream<String> mergeConflictMarkersResultInAnErrorMessage() {
+        return Stream.of(
+                // conflict inside an entry
+                """
+                        @Article{first,
+                          author = {Author},
+                        <<<<<<< HEAD:test.bib
+                          title = {Title},
+                        =======
+                          title = {My title},
+                        >>>>>>> 77976da35a11db4580b80ae27e8d65caf5208086:test.bib
+                        }
+                        """,
+                // conflict spanning whole entries
+                """
+                        @Article{first,
+                        }
+                        <<<<<<< HEAD
+                        @Article{second,
+                        }
+                        =======
+                        @Article{third,
+                        }
+                        >>>>>>> other
+                        """,
+                // botched merge with longer runs, https://github.com/JabRef/jabref/issues/9167
+                """
+                        @Article{first,
+                        }
+                        <<<<<<<<<<< HEAD
+                        @Article{second,
+                        }
+                        >>>>>>>>>>> other
+                        """);
+    }
+
+    @Test
+    void lineOfSevenEqualSignsIsNoConflictMarker() throws IOException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.COMMENT, "line one\n=======\nline two");
+
+        ParserResult result = parser.parse(Reader.of("""
+                @Article{test,
+                  comment = {line one
+                =======
+                line two},
+                }
+                """));
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 }

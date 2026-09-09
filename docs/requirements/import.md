@@ -21,4 +21,12 @@ Entries are kept in the library in the order of their internal ids, regardless o
 
 Needs: impl, utest
 
+## Unresolved merge conflict markers abort the import
+`req~import.bibtex.merge-conflict-markers~1`
+
+A BibTeX file that still contains version control conflict markers is rejected with an error naming the line of the first marker, instead of importing an arbitrary side of the conflict or storing the markers inside an entry.
+A marker is a line starting with at least seven `<` or `>` characters.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
