@@ -8,6 +8,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.bibtex.comparator.GroupDiff;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -16,11 +17,11 @@ import org.jabref.model.metadata.MetaData;
 
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -29,12 +30,13 @@ import static org.mockito.Mockito.when;
 
 @NullMarked
 @ResourceLock("Localization.lang")
-class GroupChangeDetailsViewTest extends ApplicationTest {
+@ExtendWith(JavaFxExtension.class)
+class GroupChangeDetailsViewTest {
 
     @ParameterizedTest
     @EnumSource(DiffHighlighter.BasicDiffMethod.class)
     void highlightsRenamedGroup(DiffHighlighter.BasicDiffMethod diffMethod) {
-        interact(() -> {
+        JavaFxExtension.invokeAndWait(() -> {
             SplitPane comparison = comparison("Old", "New", diffMethod);
             assertEquals("Before", ((Label) ((VBox) comparison.getItems().getFirst()).getChildren().getFirst()).getText());
             assertEquals("After", ((Label) ((VBox) comparison.getItems().getLast()).getChildren().getFirst()).getText());
@@ -53,7 +55,7 @@ class GroupChangeDetailsViewTest extends ApplicationTest {
             "Removed, '', 0, deletion"
     })
     void highlightsAddedOrRemovedTree(String before, String after, int highlightedSide, String style) {
-        interact(() -> {
+        JavaFxExtension.invokeAndWait(() -> {
             SplitPane comparison = comparison(before, after, DiffHighlighter.BasicDiffMethod.CHARS);
             assertEquals(before.isEmpty() ? "" : before + '\n', textArea(comparison, 0).getText());
             assertEquals(after.isEmpty() ? "" : after + '\n', textArea(comparison, 1).getText());

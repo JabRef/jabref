@@ -81,6 +81,15 @@ import org.slf4j.LoggerFactory;
 /// change is recorded in [OfflineChanges] (in memory and on disk) instead of being written, pulls
 /// are skipped, and a background loop reconnects with backoff. Back online, the recorded changes
 /// are written through the same optimistic lock as any other change, then everything is pulled.
+///
+/// Undo: a change pulled from the database is applied to the local model without going on the undo
+/// journal, and that is a decision rather than an omission - see ADR-0072. Undoing one locally
+/// would take back something the shared database still holds, leaving this copy out of step until
+/// the next push, and what happens then is a question about who owns a change. What the local user
+/// meets instead: their own recorded change refuses to apply once a pulled change has moved the
+/// value on, and says so, rather than overwriting the newer value
+/// ([org.jabref.model.undo.BibChange#apply]); and the pulled change marks the library as needing a
+/// save, because it arrives as [org.jabref.model.entry.event.EntriesEventSource#SHARED].
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);
@@ -413,6 +422,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
+    /// Writes a pulled entry over the local one. Nothing is recorded: the change is not this
+    /// user's to take back — see the class javadoc.
+    // [impl->adr~shared-changes-are-not-undoable~1]
     private static void overwriteLocalEntry(BibEntry localEntry, BibEntry sharedEntry) {
         localEntry.setType(sharedEntry.getType(), EntriesEventSource.SHARED);
         localEntry.getSharedBibEntryData().setVersion(sharedEntry.getSharedBibEntryData().getVersion());

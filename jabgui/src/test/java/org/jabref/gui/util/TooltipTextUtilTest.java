@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TooltipTextUtilTest {
 
-    private String testText = "this is a test text";
+    private final String testText = "this is a test text";
 
     @Test
     void retrieveCorrectTextStyleNormal() {
