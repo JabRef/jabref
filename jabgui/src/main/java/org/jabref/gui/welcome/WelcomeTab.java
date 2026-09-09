@@ -314,14 +314,14 @@ public class WelcomeTab extends Tab {
     /// @param maxWidth the maximum allowed width of the text
     /// @param font     the font of the text
     /// @return the abbreviated path, or null if fullPath is null
-    private static @Nullable String abbreviatePathToFit(@Nullable String fullPath, double maxWidth, Font font) {
+    static @Nullable String abbreviatePathToFit(@Nullable String fullPath, double maxWidth, Font font) {
         if (fullPath == null) {
             return null;
         }
         String prefix = "";
         String path = fullPath;
         int prefixEnd = fullPath.indexOf(". ");
-        if (prefixEnd > 0 && fullPath.substring(0, prefixEnd).matches("\\d+")) {
+        if (prefixEnd > 0 && fullPath.substring(0, prefixEnd).chars().allMatch(Character::isDigit)) {
             prefix = fullPath.substring(0, prefixEnd + 2);
             path = fullPath.substring(prefixEnd + 2);
         }
@@ -336,7 +336,7 @@ public class WelcomeTab extends Tab {
         }
         int low = MIN_TRUNCATED_FILENAME_LENGTH;
         int high = path.length();
-        int bestLength = low;
+        int bestLength = 0;
         double pathMaxWidth = maxWidth - prefixWidth;
         while (low <= high) {
             int mid = (low + high) / 2;
@@ -352,7 +352,9 @@ public class WelcomeTab extends Tab {
                 high = mid - 1;
             }
         }
-        return prefix + StringUtil.abbreviatePath(path, bestLength);
+        return prefix + (bestLength > 0
+                         ? StringUtil.abbreviatePath(path, bestLength)
+                         : path);
     }
 
     private void updateWelcomeRecentLibraries() {
