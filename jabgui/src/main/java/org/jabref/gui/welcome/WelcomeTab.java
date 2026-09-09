@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -117,13 +116,10 @@ public class WelcomeTab extends Tab {
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
         main = new VBox(4, createTopTitles(), new VBox(), createCommunityBox());
-        main.getStyleClass().addAll("align-center", "padding-8");
+        main.getStyleClass().addAll("welcome-main-container", "align-center", "padding-12");
         initializeColumns();
 
-        VBox container = new VBox(main);
-        container.setAlignment(Pos.CENTER);
-
-        StackPane rootPane = new StackPane(container);
+        StackPane rootPane = new StackPane(main);
         setContent(rootPane);
 
         donationProvider = new DonationProvider(rootPane, preferences, dialogService);
@@ -138,7 +134,7 @@ public class WelcomeTab extends Tab {
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("h2");
         VBox topTitles = new VBox(4, welcomeLabel, descriptionLabel);
-        topTitles.getStyleClass().addAll("align-top-left", "padding-bottom-4");
+        topTitles.getStyleClass().addAll("align-top-center", "padding-bottom-4");
         return topTitles;
     }
 
@@ -229,6 +225,7 @@ public class WelcomeTab extends Tab {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.getStyleClass().add("bg-transparent");
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
         if (!(main.getChildren().get(1) instanceof ScrollPane)) {
             main.getChildren().set(1, scrollPane);
         }
