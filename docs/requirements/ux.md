@@ -167,4 +167,11 @@ Every library tab carries an icon: one for a BibTeX library, one for a BibLaTeX 
 
 Needs: impl, utest
 
+## Entry editor fields carry no frame at rest
+`req~ux.entry-editor.flat-fields~1`
+
+A field in the entry editor grid is drawn without a frame; the frame appears while the pointer hovers the field or the field holds the keyboard focus. Text fields outside the grid keep their frame.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

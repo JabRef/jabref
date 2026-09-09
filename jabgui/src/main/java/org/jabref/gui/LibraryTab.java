@@ -629,6 +629,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (unrecorded) {
             journal().markChanged();
         }
+        // The mode lives in the metadata, and a change of it while the library is already dirty does
+        // not move changedProperty, so the icon has to be refreshed from here.
+        if (event instanceof MetaDataChangedEvent) {
+            updateTabTitle(changedProperty.get());
+        }
     }
 
     /// Returns a collection of suggestion providers, which are populated from the current library.
