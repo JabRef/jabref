@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DialogEvent;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
@@ -91,6 +92,15 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not().or(viewModel.loadingProperty()));
         btnConnect.textProperty().bind(EasyBind.map(viewModel.loadingProperty(), loading -> loading ? Localization.lang("Connecting...") : Localization.lang("Connect")));
         btnClose.disableProperty().bind(viewModel.loadingProperty());
+        // Reading the clipboard once the dialog is shown would run inside the nested event loop of
+        // showAndWait and leave the dialog in a state that breaks the next one, so it happens up front
+        viewModel.applyClipboardConnectionUrl();
+        // addEventHandler, not setOnShown: BaseDialog already installs a shown handler
+        // runLater: the dialog moves the focus to its default button after the shown event
+        addEventHandler(DialogEvent.DIALOG_SHOWN, event -> Platform.runLater(() -> {
+            connectionUrl.requestFocus();
+            connectionUrl.selectAll();
+        }));
         setOnCloseRequest(event -> {
             if (viewModel.loadingProperty().get()) {
                 event.consume();

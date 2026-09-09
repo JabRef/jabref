@@ -55,6 +55,7 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableGroupTreeChange;
 
@@ -253,7 +254,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void writeGroupChangesToMetaData() {
-        currentDatabase.ifPresent(database -> database.getMetaData().setGroups(rootGroup.get().getGroupNode()));
+        writeGroupChangesToMetaData(MetaDataChangeSource.LOCAL);
+    }
+
+    private void writeGroupChangesToMetaData(MetaDataChangeSource source) {
+        currentDatabase.ifPresent(database -> database.getMetaData().setGroups(rootGroup.get().getGroupNode(), source));
     }
 
     /// Records entry assignments as one undo step. The tree is untouched, so only the entries'
@@ -302,7 +307,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// and a step that took back only the entry assignments would leave the library in a state
     /// nothing describes. The journal hands over a failed block's changes for the same reason.
     private void writeBackAndRecord(MetaData metaData, Optional<GroupTreeNode> before, CompoundEdit edit) {
-        writeGroupChangesToMetaData();
+        // Written back as a journalled change: the step below describes it, so the tab must not
+        // mark the library for it — undoing the step brings the library back, marker included.
+        writeGroupChangesToMetaData(MetaDataChangeSource.JOURNAL);
         // Sorting an already sorted group, or dropping one where it already is, changes nothing:
         // recording that would enable Undo over a step that does nothing.
         if (!before.equals(metaData.getGroups())) {

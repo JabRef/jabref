@@ -1,5 +1,6 @@
 package org.jabref.model.undo;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -110,6 +111,24 @@ class BibChangeTest {
 
         assertEquals(List.of(), live.getGroups().orElseThrow().getChildren(),
                 "undo restored a group tree the recorded state never held");
+    }
+
+    /// The AI chat creates the library id lazily, and the stored chats are keyed by it. A settings
+    /// snapshot taken before the chat was opened must not take the id with it when undone.
+    @Test
+    void undoingAMetaDataChangeKeepsAnAiLibraryIdWrittenLater() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        MetaData live = databaseContext.getMetaData();
+        UndoableMetaDataChange change = new UndoableMetaDataChange(databaseContext, live, metaDataWithMode());
+        change.apply();
+
+        live.setAiLibraryId("chat-id");
+        live.setBlgFilePath("user", Path.of("paper.blg"));
+        change.inverted().apply();
+
+        assertEquals(Optional.empty(), live.getMode());
+        assertEquals(Optional.of("chat-id"), live.getAiLibraryId());
+        assertEquals(Optional.of(Path.of("paper.blg")), live.getBlgFilePath("user"));
     }
 
     @Test
