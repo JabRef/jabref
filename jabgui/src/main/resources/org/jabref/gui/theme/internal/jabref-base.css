@@ -429,6 +429,7 @@
 .sidePaneComponentHeader .ikonli-font-icon {
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
+    -fx-font-size: 1.0em;
     -fx-icon-color: -color-accent;
 }
 
@@ -1211,7 +1212,7 @@ We want to have a look that matches our icons in the tool-bar */
 #groupTree .tree-table-row-cell > .tree-table-cell > .icon {
     -fx-translate-x: -0.4em;
 }
-/*here*/
+
 #groupFilterBar .glyph-icon {
     -fx-font-size: 2em;
 }
@@ -1493,6 +1494,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-max-width: infinity;
 }
 
+/* Font size (h2) is applied via style class in Java code to walkthrough-tooltip-title and walkthrough-title */
 .walkthrough-tooltip-title > *,
 .walkthrough-title > * {
     -fx-text-fill: -color-accent!important;
@@ -1591,6 +1593,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-icon-color: -color-accent;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
+    -fx-font-size: 1.2em;
 }
 
 /* TextFlowLimited */

@@ -99,7 +99,7 @@ public class JabRefSvgIcon extends SvgNode {
 
     public JabRefSvgIcon(String path, double size) {
         super(path, size);
-        getStyleClass().addAll("glyph-icon", "ikonli-font-icon", "h5");
+        getStyleClass().addAll("glyph-icon", "ikonli-font-icon");
     }
 
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {

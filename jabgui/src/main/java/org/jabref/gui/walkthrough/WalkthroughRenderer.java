@@ -33,7 +33,7 @@ public class WalkthroughRenderer {
         tooltip.getStyleClass().addAll("root", "padding-12");
 
         StackPane titleContainer = new StackPane();
-        titleContainer.getStyleClass().addAll("walkthrough-title-container", "h2");
+        titleContainer.getStyleClass().addAll("walkthrough-title-container");
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
         titleFlow.getStyleClass().addAll("walkthrough-tooltip-title", "h2");
         titleFlow.setMarkdown(step.title());
@@ -62,7 +62,7 @@ public class WalkthroughRenderer {
         configurePanelSize(panel, step);
 
         StackPane titleContainer = new StackPane();
-        titleContainer.getStyleClass().addAll("walkthrough-title-container", "h2");
+        titleContainer.getStyleClass().addAll("walkthrough-title-container");
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
         titleFlow.getStyleClass().addAll("walkthrough-title", "h2");
         titleFlow.setMarkdown(step.title());

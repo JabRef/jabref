@@ -149,7 +149,7 @@ public class GroupTreeView extends BorderPane {
         mainColumn.setId("mainColumn");
         mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
-        numberColumn.getStyleClass().addAll("numberColumn", "padding-4", "h6");
+        numberColumn.getStyleClass().addAll("numberColumn", "padding-4");
         numberColumn.setMinWidth(NUMBER_COL_WIDTH);
         numberColumn.setMaxWidth(NUMBER_COL_WIDTH);
         numberColumn.setPrefWidth(NUMBER_COL_WIDTH);
@@ -196,7 +196,6 @@ public class GroupTreeView extends BorderPane {
 
         HBox groupBar = new HBox(addNewGroup);
         groupBar.setId("groupBar");
-        groupBar.getStyleClass().add("h1");
         this.setBottom(groupBar);
     }
 

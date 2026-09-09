@@ -116,7 +116,7 @@ public final class IkonliIcon implements JabRefIcon {
         // An explicit color (via withColor/disabled) has to survive the theme's .glyph-icon rules, which is what
         // JabRefFontIcon takes care of. Without one, those rules are what colors the icon.
         FontIcon fontIcon = color == null ? FontIcon.of(ikon, size) : new JabRefFontIcon(ikon, size, color);
-        fontIcon.getStyleClass().addAll("glyph-icon", "h5");
+        fontIcon.getStyleClass().add("glyph-icon");
         return fontIcon;
     }
 
