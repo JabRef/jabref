@@ -38,9 +38,11 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
-import org.testfx.framework.junit5.ApplicationTest;
+import org.testfx.api.FxRobot;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,8 +53,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(ApplicationExtension.class)
 @NullMarked
-class BackupUIManagerTest extends ApplicationTest {
+class BackupUIManagerTest {
 
     private DialogService dialogService;
     private GuiPreferences preferences;
@@ -73,7 +76,7 @@ class BackupUIManagerTest extends ApplicationTest {
     }
 
     @Test
-    void failedRestoreShowsBackupPathAndCause(@TempDir Path tempDir) throws IOException {
+    void failedRestoreShowsBackupPathAndCause(FxRobot robot, @TempDir Path tempDir) throws IOException {
         Path backupDir = tempDir.resolve("backups");
         when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
         when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
@@ -88,7 +91,7 @@ class BackupUIManagerTest extends ApplicationTest {
         LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
         when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList());
 
-        interact(() -> BackupUIManager.showRestoreBackupDialog(
+        robot.interact(() -> BackupUIManager.showRestoreBackupDialog(
                 dialogService,
                 tabContainer,
                 originalFile,
@@ -103,14 +106,14 @@ class BackupUIManagerTest extends ApplicationTest {
     }
 
     @Test
-    void backupResolverDialogShowsLibraryAndBackupSizes(@TempDir Path tempDir) throws IOException {
+    void backupResolverDialogShowsLibraryAndBackupSizes(FxRobot robot, @TempDir Path tempDir) throws IOException {
         Path originalFile = tempDir.resolve("library.bib");
         Files.write(originalFile, new byte[1024]);
         Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, tempDir.resolve("backups"));
         Files.write(backupFile, new byte[2048]);
 
         AtomicReference<@Nullable String> dialogContent = new AtomicReference<>();
-        interact(() -> {
+        robot.interact(() -> {
             BackupResolverDialog dialog = new BackupResolverDialog(originalFile, backupFile.getParent(), mock(ExternalApplicationsPreferences.class));
             StackPane content = (StackPane) dialog.getDialogPane().getContent();
             HyperlinkLabel hyperlink = (HyperlinkLabel) content.getChildren().getFirst();
@@ -127,7 +130,7 @@ class BackupUIManagerTest extends ApplicationTest {
     }
 
     @Test
-    void showRestoreBackupDialogFocusesAssociatedLibraryTab(@TempDir Path tempDir) {
+    void showRestoreBackupDialogFocusesAssociatedLibraryTab(FxRobot robot, @TempDir Path tempDir) {
         // [utest->req~jabgui.autosaveandbackup.focus-backup-library-tab~1]
         Path backupDir = tempDir.resolve("backups");
         when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
@@ -149,7 +152,7 @@ class BackupUIManagerTest extends ApplicationTest {
         LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
         when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(otherTab, targetTab));
 
-        interact(() -> BackupUIManager.showRestoreBackupDialog(
+        robot.interact(() -> BackupUIManager.showRestoreBackupDialog(
                 dialogService,
                 tabContainer,
                 originalFile,
@@ -161,7 +164,7 @@ class BackupUIManagerTest extends ApplicationTest {
     }
 
     @Test
-    void showReviewBackupDialogResetsChangeMonitorOnlyOnTargetTab(@TempDir Path tempDir) throws IOException {
+    void showReviewBackupDialogResetsChangeMonitorOnlyOnTargetTab(FxRobot robot, @TempDir Path tempDir) throws IOException {
         // [utest->req~jabgui.autosaveandbackup.focus-backup-library-tab~1]
         Path backupDir = tempDir.resolve("backups");
         when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
@@ -207,7 +210,7 @@ class BackupUIManagerTest extends ApplicationTest {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.getUndoManager(any())).thenReturn(mock(GuiUndoManager.class));
 
-        interact(() -> BackupUIManager.showRestoreBackupDialog(
+        robot.interact(() -> BackupUIManager.showRestoreBackupDialog(
                 dialogService,
                 tabContainer,
                 originalFile,
