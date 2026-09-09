@@ -408,7 +408,7 @@
 /* The suggestion background must not mask the list's interaction affordances
    (same colors the themes use for cell hover and selection). */
 .linked-files-list .list-cell:auto-found:filled:hover {
-    -fx-background-color: -color-border-default;
+    -fx-background-color: -color-selection-inactive, -color-overlay-hover;
 }
 
 .linked-files-list .list-cell:auto-found:filled:selected {
@@ -461,7 +461,7 @@
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
     /* `!important` is override library's default font size */
-    -fx-font-size: 1.8em!important;
+    -fx-font-size: 1.8em !important;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
     -fx-icon-color: -color-accent;
@@ -492,7 +492,7 @@
 */
 .search-field-icon {
     -fx-icon-color: -fx-text-base-color;
-    -fx-font-size: 1.7em;
+    -fx-font-size: 1.8em;
 }
 
 /* search modifier buttons */
@@ -567,10 +567,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-stroke: -fx-text-background-color;
 }
 
-.code-area .context-menu {
-    -fx-font-family: sans-serif;
-}
-
 .citationsList {
     -fx-text-fill: -fx-text-base-color;
 }
@@ -600,7 +596,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .tags-field:focused {
-    -fx-border-color: -color-accent-subtle;
+    -fx-border-color: -color-accent;
 }
 
 .tags-field > .flow-pane > .tag-view {
@@ -815,15 +811,18 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-selection;
 }
 
-.main-table .table-row-cell:matching-search-and-groups:selected:hover,
 .main-table .table-row-cell:matching-search-and-groups:hover,
-.main-table .table-row-cell:matching-search-not-groups:selected:hover,
 .main-table .table-row-cell:matching-search-not-groups:hover,
-.main-table .table-row-cell:matching-groups-not-search:selected:hover,
 .main-table .table-row-cell:matching-groups-not-search:hover,
-.main-table .table-row-cell:not-matching-search-and-groups:selected:hover,
 .main-table .table-row-cell:not-matching-search-and-groups:hover {
-    -fx-background-color: -color-border-default;
+    -fx-background-color: -color-overlay-hover;
+}
+
+.main-table .table-row-cell:matching-search-and-groups:selected:hover,
+.main-table .table-row-cell:matching-search-not-groups:selected:hover,
+.main-table .table-row-cell:matching-groups-not-search:selected:hover,
+.main-table .table-row-cell:not-matching-search-and-groups:selected:hover {
+    -fx-background-color: -color-selection, -color-overlay-hover;
 }
 
 .rating > .container {
@@ -852,14 +851,6 @@ We want to have a look that matches our icons in the tool-bar */
 .welcome-hyperlink:visited {
     -fx-text-fill: -color-accent;
 }
-
-/* Welcome Tab Layout Styles */
-/* The font family is declared once here and inherited by everything inside. */
-.welcome-main-container {
-    -fx-font-family: "Arial";
-    -fx-max-width: 64em;
-}
-
 
 /* Welcome Community  */
 .welcome-community-link:hover {
@@ -942,7 +933,6 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .entry-editor .entry-type-label .context-menu {
-    -fx-font-size: 0.9em;
     -fx-font-weight: normal;
 }
 
@@ -1022,7 +1012,7 @@ We want to have a look that matches our icons in the tool-bar */
 .error-console .exception .glyph-icon,
 .error-console .output .glyph-icon,
 .error-console .log .glyph-icon {
-    -fx-font-size: 1.5em;
+    -fx-font-size: 1.8em;
 }
 
 .error-console .exception .glyph-icon {
@@ -1120,12 +1110,11 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .group-tree .numberColumn > .hits {
-    -fx-font-size: 0.75em;
     -fx-background: -color-badge-bg;
     -fx-background-color: -color-badge-bg;
-    -fx-padding: 0.4em 0.4em 0.4em 0.4em;
+    -fx-padding: 0.25em;
     -fx-background-insets: 0;
-    -fx-background-radius: 0.7em;
+    -fx-background-radius: 0.25em;
 }
 
 .group-tree .numberColumn > .hits .text {
@@ -1330,7 +1319,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .three-way-merge .merged-field .styled-text-area:focused {
     -fx-highlight-fill: derive(-color-accent-subtle, 20%);
-    -fx-background-color: -color-accent-subtle, -color-bg-secondary;
+    -fx-background-color: -color-accent, -color-bg-secondary;
     -fx-background-insets: 0, 2;
     -fx-highlight-text-fill: -fx-text-inner-color;
 }
@@ -1668,10 +1657,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .rich-text-area .caret-line {
     -fx-fill: transparent;
-}
-
-.bibtex-code-area {
-    -fx-font-family: 'JetBrains Mono';
 }
 
 .bibtex-code-area .bibtex-keyword {

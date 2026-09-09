@@ -26,13 +26,13 @@ public class TooltipTextUtil {
         Text text = new Text(textString);
         switch (textType) {
             case BOLD:
-                text.getStyleClass().setAll("tooltip-text-bold");
+                text.getStyleClass().setAll("bold");
                 break;
             case ITALIC:
-                text.getStyleClass().setAll("tooltip-text-italic");
+                text.getStyleClass().setAll("italic");
                 break;
             case MONOSPACED:
-                text.getStyleClass().setAll("tooltip-text-monospaced");
+                text.getStyleClass().setAll("font-monospace");
                 break;
             default:
                 break;
@@ -145,13 +145,13 @@ public class TooltipTextUtil {
     public static String textToHtmlString(Text text) {
         String textString = text.getText();
         textString = textString.replace("\n", "<br>");
-        if (text.getStyleClass().toString().contains("tooltip-text-monospaced")) {
+        if (text.getStyleClass().toString().contains("font-monospace")) {
             textString = "<tt>%s</tt>".formatted(textString);
         }
-        if (text.getStyleClass().toString().contains("tooltip-text-bold")) {
+        if (text.getStyleClass().toString().contains("bold")) {
             textString = "<b>%s</b>".formatted(textString);
         }
-        if (text.getStyleClass().toString().contains("tooltip-text-italic")) {
+        if (text.getStyleClass().toString().contains("talic")) {
             textString = "<i>%s</i>".formatted(textString);
         }
         return textString;
