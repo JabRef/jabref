@@ -4,31 +4,68 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Notifications;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.gui.welcome.DonationPreferences;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-class DonationProviderTest {
-    private final DonationProvider donationProvider = new DonationProvider(mock(GuiPreferences.class), mock(DialogService.class));
+class DonationProviderTest extends JavaFxTest {
 
-    @Test
-    public void notificationIsDueWhenLastShownIsLongAgo() {
-        int lastShownEpochDay = (int) LocalDate.now().minusYears(1).toEpochDay();
-        assertEquals(0, donationProvider.calculateDaysUntilNextNotification(lastShownEpochDay));
+    private final DialogService dialogService = mock(DialogService.class);
+    private final GuiPreferences preferences = mock(GuiPreferences.class);
+    private final DonationPreferences donationPreferences = new DonationPreferences(-1);
+    private final DonationProvider donationProvider = new DonationProvider(preferences, dialogService);
+
+    @BeforeEach
+    void setUp() {
+        when(preferences.getDonationPreferences()).thenReturn(donationPreferences);
     }
 
     @Test
-    public void notificationIsSnoozedForSixMonthsAfterBeingShown() {
-        LocalDate today = LocalDate.now();
-        int expectedDays = (int) ChronoUnit.DAYS.between(today, today.plusMonths(6));
-        assertEquals(expectedDays, donationProvider.calculateDaysUntilNextNotification((int) today.toEpochDay()));
+    public void notificationIsDueWhenItWasScheduledForAPastDay() {
+        LocalDate today = LocalDate.of(2026, 9, 9);
+        assertEquals(0, donationProvider.calculateDaysUntilNextNotification((int) today.minusDays(30).toEpochDay(), today));
     }
 
     @Test
-    public void notificationIsShownOneWeekAfterFirstLaunch() {
-        assertEquals(7, donationProvider.calculateDaysUntilNextNotification(-1));
+    public void notificationIsDueOnTheScheduledDay() {
+        LocalDate today = LocalDate.of(2026, 9, 9);
+        assertEquals(0, donationProvider.calculateDaysUntilNextNotification((int) today.toEpochDay(), today));
+    }
+
+    @Test
+    public void daysUntilNextNotificationSpanTheWholeInterval() {
+        LocalDate today = LocalDate.of(2026, 9, 9);
+        LocalDate inSixMonths = today.plusMonths(6);
+        assertEquals(ChronoUnit.DAYS.between(today, inSixMonths),
+                donationProvider.calculateDaysUntilNextNotification((int) inSixMonths.toEpochDay(), today));
+    }
+
+    @Test
+    public void firstLaunchSchedulesTheNotificationOneWeekLater() {
+        interact(donationProvider::showIfNeeded);
+
+        assertEquals((int) LocalDate.now().plusDays(7).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
+        verify(dialogService, never()).notify(any(Notifications.DonationNotification.class));
+    }
+
+    @Test
+    public void dueNotificationIsShownAndSnoozedForSixMonths() {
+        donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
+
+        interact(donationProvider::showIfNeeded);
+
+        verify(dialogService).notify(any(Notifications.DonationNotification.class));
+        assertEquals((int) LocalDate.now().plusMonths(6).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
     }
 }

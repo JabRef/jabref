@@ -22,6 +22,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class DonationProvider {
     private static final int DONATION_INTERVAL_MONTHS = 6;
+    private static final int FIRST_NOTIFICATION_DELAY_DAYS = 7;
 
     private final GuiPreferences preferences;
     private final DialogService dialogService;
@@ -34,16 +35,17 @@ public class DonationProvider {
     }
 
     public void showIfNeeded() {
-        int lastShown = preferences.getDonationPreferences().getLastShownEpochDay();
-        scheduleAfterDays(calculateDaysUntilNextNotification(lastShown));
+        if (preferences.getDonationPreferences().getNextNotificationEpochDay() < 0) {
+            // First launch: do not ask right away, but a week later
+            scheduleNextNotification(LocalDate.now().plusDays(FIRST_NOTIFICATION_DELAY_DAYS));
+        }
+        scheduleAfterDays(calculateDaysUntilNextNotification(
+                preferences.getDonationPreferences().getNextNotificationEpochDay(),
+                LocalDate.now()));
     }
 
-    public int calculateDaysUntilNextNotification(int lastShownEpochDay) {
-        if (lastShownEpochDay < 0) {
-            return 7; // 7 days after first-launch, show the donation notification
-        }
-        LocalDate nextShow = LocalDate.ofEpochDay(lastShownEpochDay).plusMonths(DONATION_INTERVAL_MONTHS);
-        return (int) Math.max(0, ChronoUnit.DAYS.between(LocalDate.now(), nextShow));
+    public int calculateDaysUntilNextNotification(int nextNotificationEpochDay, LocalDate today) {
+        return (int) Math.max(0, ChronoUnit.DAYS.between(today, LocalDate.ofEpochDay(nextNotificationEpochDay)));
     }
 
     private void showNotification() {
@@ -67,7 +69,11 @@ public class DonationProvider {
     }
 
     private void snooze() {
-        preferences.getDonationPreferences().setLastShownEpochDay((int) LocalDate.now().toEpochDay());
+        scheduleNextNotification(LocalDate.now().plusMonths(DONATION_INTERVAL_MONTHS));
+    }
+
+    private void scheduleNextNotification(LocalDate date) {
+        preferences.getDonationPreferences().setNextNotificationEpochDay((int) date.toEpochDay());
     }
 
     /// Schedules the next donation notification after a specified number of days to take care
@@ -78,7 +84,9 @@ public class DonationProvider {
         int delayDays = days;
         if (days <= 0) {
             showNotification();
-            delayDays = calculateDaysUntilNextNotification((int) LocalDate.now().toEpochDay());
+            delayDays = calculateDaysUntilNextNotification(
+                    preferences.getDonationPreferences().getNextNotificationEpochDay(),
+                    LocalDate.now());
         }
         scheduledShow = new DelayedExecution(Duration.hours(delayDays * 24), this::showIfNeeded);
         scheduledShow.start();

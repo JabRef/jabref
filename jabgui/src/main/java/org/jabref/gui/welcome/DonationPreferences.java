@@ -4,30 +4,30 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
 public class DonationPreferences {
-    private final IntegerProperty lastShownEpochDay = new SimpleIntegerProperty();
+    private final IntegerProperty nextNotificationEpochDay = new SimpleIntegerProperty();
 
-    public DonationPreferences(int lastShownEpochDay) {
-        this.lastShownEpochDay.set(lastShownEpochDay);
+    public DonationPreferences(int nextNotificationEpochDay) {
+        this.nextNotificationEpochDay.set(nextNotificationEpochDay);
     }
 
     ///  Creates object with default values
     private DonationPreferences() {
-        this(-1); // Donation last shown epoch day
+        this(-1); // No donation notification scheduled yet
     }
 
     public static DonationPreferences getDefault() {
         return new DonationPreferences();
     }
 
-    public int getLastShownEpochDay() {
-        return lastShownEpochDay.get();
+    public int getNextNotificationEpochDay() {
+        return nextNotificationEpochDay.get();
     }
 
-    public void setLastShownEpochDay(int value) {
-        this.lastShownEpochDay.set(value);
+    public void setNextNotificationEpochDay(int value) {
+        this.nextNotificationEpochDay.set(value);
     }
 
-    public IntegerProperty lastShownEpochDayProperty() {
-        return lastShownEpochDay;
+    public IntegerProperty nextNotificationEpochDayProperty() {
+        return nextNotificationEpochDay;
     }
 }
