@@ -76,7 +76,7 @@
                 </VBox>
             </VBox>
 
-            <VBox spacing="4" styleClass="bg-secondary,padding-12" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <VBox spacing="12" styleClass="bg-secondary,padding-12" GridPane.columnIndex="1" GridPane.rowIndex="0">
                 <VBox spacing="4">
                     <Label styleClass="bold,text-accent" text="%Maintainers"/>
                     <Label text="${controller.viewModel.maintainers}" wrapText="true"/>
@@ -87,8 +87,7 @@
                                text="%JabRef would not have been possible without the help of our contributors."/>
                     <Label text="%Founded by Morten O. Alver and Nizar Batada."/>
                 </VBox>
-                <Region VBox.vgrow="SOMETIMES" minHeight="0"/>
-                <VBox spacing="4">
+                <VBox spacing="4" VBox.vgrow="ALWAYS">
                     <Label styleClass="bold,text-accent" text="%System"/>
                     <TextArea fx:id="textAreaVersions" editable="false" styleClass="font-monospace,bg-accent" VBox.vgrow="ALWAYS"/>
                 </VBox>
