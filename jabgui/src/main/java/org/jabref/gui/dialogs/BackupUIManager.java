@@ -127,6 +127,8 @@ public class BackupUIManager {
                         // [impl->req~jabgui.autosaveandbackup.backup-merge-modified~1]
                         originalParserResult.setChangedOnMigration(true);
                     }
+
+                    // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
                     return Optional.of(originalParserResult);
                 }

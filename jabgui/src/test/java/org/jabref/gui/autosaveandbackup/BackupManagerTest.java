@@ -25,6 +25,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -200,7 +201,7 @@ class BackupManagerTest {
                 mock(CoarseChangeFilter.class),
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
                 preferences);
-        manager.listen(new MetaDataChangedEvent(new MetaData()));
+        manager.listen(new MetaDataChangedEvent(new MetaData(), MetaDataChangeSource.LOCAL));
 
         BackupManager.shutdown(databaseContext, filePreferences.getBackupDirectory(), filePreferences.shouldCreateBackup());
 
@@ -228,7 +229,7 @@ class BackupManagerTest {
                 mock(CoarseChangeFilter.class),
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
                 preferences);
-        manager.listen(new MetaDataChangedEvent(new MetaData()));
+        manager.listen(new MetaDataChangedEvent(new MetaData(), MetaDataChangeSource.LOCAL));
 
         Optional<Path> fullBackupPath = manager.determineBackupPathForNewBackup(backupDir);
         fullBackupPath.ifPresent(manager::performBackup);

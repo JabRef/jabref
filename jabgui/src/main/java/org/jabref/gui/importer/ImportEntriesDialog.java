@@ -209,7 +209,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                     Node entryNode = BibEntryView.getEntryNode(entry);
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox container = new HBox(entryNode, separator, addToggle);
-                    container.getStyleClass().add("padding-6-0");
+                    container.getStyleClass().add("padding-4-0");
                     container.prefWidthProperty().bind(entriesListView.widthProperty().subtract(25));
 
                     BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {
