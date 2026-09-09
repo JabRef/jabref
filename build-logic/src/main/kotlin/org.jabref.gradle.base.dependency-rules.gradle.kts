@@ -102,15 +102,13 @@ jvmDependencyConflicts.patch {
             removeDependency("org.slf4j:jcl-over-slf4j")
         }
     }
-    module("org.testfx:testfx-core") {
-        removeDependency("org.osgi:org.osgi.core")
-    }
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
     module("dev.langchain4j:langchain4j-core") {
         addRuntimeOnlyDependency("com.knuddels:jtokkit")
     }
+
     module("org.jabref:afterburner.fx") {
         // POM pins javafx-* to 20; strip and re-add without version so :versions platform resolves them to current
         removeDependency("org.openjfx:javafx-controls")
@@ -241,6 +239,7 @@ extraJavaModuleInfo {
         // requires("jackson.annotations")
     }
     module("dev.langchain4j:langchain4j", "langchain4j")
+    module("dev.langchain4j:langchain4j-jackson3", "langchain4j.jackson3")
     module("dev.langchain4j:langchain4j-core", "langchain4j.core") {
         // workaround for https://github.com/langchain4j/langchain4j/issues/3668
         patchRealModule()
@@ -252,6 +251,7 @@ extraJavaModuleInfo {
         mergeJar("dev.langchain4j:langchain4j-google-ai-gemini")
         requires("java.net.http")
         uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
+        uses("dev.langchain4j.spi.json.ProviderJsonCodecFactory")
         exportAllPackages()
         requireAllDefinedDependencies()
     }
@@ -261,6 +261,11 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-hugging-face", "langchain4j.hugging.face")
     module("dev.langchain4j:langchain4j-mistral-ai", "langchain4j.mistral.ai")
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
+
+    module("io.smallrye.reactive:mutiny-zero", "io.smallrye.mutiny.zero") {
+        preserveExisting()
+    }
+
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
@@ -347,19 +352,6 @@ extraJavaModuleInfo {
         requiresTransitive("java.xml")
     }
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
-
-    module("org.testfx:testfx-core", "org.testfx") {
-        exportAllPackages()
-        // Content based on https://github.com/TestFX/TestFX/commit/bf4a08aa82c008fdd3c296aaafee1d222f3824cb
-        requires("java.desktop")
-        requiresTransitive("javafx.controls")
-        requiresTransitive("org.hamcrest")
-    }
-    module("org.testfx:testfx-junit5", "org.testfx.junit5") {
-        exportAllPackages()
-        requires("org.junit.jupiter.api")
-        requiresTransitive("org.testfx")
-    }
 
     module("org.xmlunit:xmlunit-core", "org.xmlunit") {
         exportAllPackages()
@@ -524,7 +516,6 @@ extraJavaModuleInfo {
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         preserveExisting()
         exports("com.sun.javafx.scene")
-        opens("com.sun.javafx.application", "org.testfx")
         opens("javafx.scene", "org.controlsfx.controls")
     }
 

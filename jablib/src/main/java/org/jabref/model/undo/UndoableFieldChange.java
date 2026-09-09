@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 public record UndoableFieldChange(BibEntry entry, Field field, @Nullable String before, @Nullable String after) implements BibChange {
 
     public UndoableFieldChange(FieldChange change) {
-        this(change.getEntry(), change.getField(), change.getOldValue(), change.getNewValue());
+        this(change.entry(), change.field(), change.oldValue(), change.newValue());
     }
 
     @Override
@@ -23,12 +23,18 @@ public record UndoableFieldChange(BibEntry entry, Field field, @Nullable String 
     }
 
     @Override
-    public void apply() {
+    // [impl->req~logic.undo.stale-change-refused~1]
+    public ApplyResult apply() {
+        String current = entry.getField(field).orElse(null);
+        if (!Objects.equals(current, before)) {
+            return ApplyResult.of(this, "field %s holds '%s', not the recorded '%s'".formatted(field.getName(), current, before));
+        }
         if (after == null) {
             entry.clearField(field);
         } else {
             entry.setField(field, after);
         }
+        return ApplyResult.SUCCESS;
     }
 
     @Override
