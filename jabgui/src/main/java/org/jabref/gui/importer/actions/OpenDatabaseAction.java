@@ -275,16 +275,22 @@ public class OpenDatabaseAction extends SimpleCommand {
                         preferences.getImportFormatPreferences(),
                         fileUpdateMonitor);
             }
-
-            if (parserResult.hasWarnings()) {
-                String content = Localization.lang("Please check your library file for wrong syntax.")
-                        + "\n\n" + parserResult.getErrorMessage();
-                UiTaskExecutor.runInJavaFXThread(() ->
-                        dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
-            }
         } catch (IOException e) {
             parserResult = ParserResult.fromError(e);
             LOGGER.error("Error opening file '{}'", fileToLoad, e);
+        }
+
+        if (parserResult.isInvalid()) {
+            // The file could not be read at all. LibraryTab closes the tab again after this.
+            String content = Localization.lang("Error opening file '%0'", fileToLoad.toString())
+                    + "\n\n" + parserResult.getErrorMessage();
+            UiTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showErrorDialogAndWait(Localization.lang("Open library error"), content));
+        } else if (parserResult.hasWarnings()) {
+            String content = Localization.lang("Please check your library file for wrong syntax.")
+                    + "\n\n" + parserResult.getErrorMessage();
+            UiTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
         }
 
         if (parserResult.getDatabase().isShared()) {

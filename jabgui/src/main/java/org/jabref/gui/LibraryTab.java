@@ -416,6 +416,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
+        if (result.isInvalid()) {
+            // Nothing could be read from the file - the caller has already reported the reason to the user.
+            // Keeping the tab would leave an empty, untitled library behind, which the user could accidentally
+            // save over the file that failed to load.
+            loading.set(false);
+            dataLoadingTask = null;
+            tabContainer.closeTab(this);
+            return;
+        }
+
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
         setDatabaseContext(result.getDatabaseContext());
         if (result.getChangedOnMigration()) {
