@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -23,6 +24,7 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -596,7 +598,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             textProperty().setValue(tabTitle.toString());
             setTooltip(new Tooltip(toolTipText.toString()));
             if (getGraphic() == null || !icon.matches(getGraphic())) {
-                setGraphic(icon.getGraphicNode());
+                Node graphic = icon.getGraphicNode();
+                graphic.getStyleClass().addAll("library-tab-icon", icon.name().toLowerCase(Locale.ROOT).replace('_', '-'));
+                setGraphic(graphic);
             }
         });
     }

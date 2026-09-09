@@ -160,6 +160,21 @@
     -fx-text-fill: -color-fg-muted;
 }
 
+/* Library tabs tell BibTeX, BibLaTeX and shared database apart by shape *and* color, so the icon
+   is larger than the entry editor's and keeps a color of its own instead of the muted tab tint.
+   The three semantic tokens are borrowed because every theme already declares them. */
+.tab-pane > .tab-header-area > .headers-region > .tab .library-tab-icon {
+    -glyph-size: 1.25em;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab .library-tab-icon.bibtex-library {
+    -fx-icon-color: -color-accent;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab .library-tab-icon.biblatex-library {
+    -fx-icon-color: -color-success;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab .library-tab-icon.shared-database-library {
+    -fx-icon-color: -color-warning;
+}
 .tab-pane > .tab-header-area > .headers-region > .tab.drop {
     -fx-border-color: -color-drag-target;
     -fx-background-color: -color-drag-target-hover;
