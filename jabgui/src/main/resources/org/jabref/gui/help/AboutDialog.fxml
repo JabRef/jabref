@@ -44,9 +44,10 @@
                 <VBox spacing="4">
                     <Label styleClass="h1,bold,text-emphasis" text="JabRef"/>
                     <VBox spacing="4">
-                        <Label styleClass="text-emphasis,font-monospace" text="${controller.viewModel.version}"/>
+                        <Label styleClass="text-emphasis,font-monospace" wrapText="true"
+                               text="${controller.viewModel.version}"/>
                         <Label managed="${controller.viewModel.isDevelopmentVersion}"
-                               styleClass="text-emphasis,font-monospace"
+                               styleClass="text-emphasis,font-monospace" wrapText="true"
                                text="${controller.viewModel.developmentVersion}"
                                visible="${controller.viewModel.isDevelopmentVersion}"/>
                     </VBox>
