@@ -138,7 +138,7 @@
 .text-success { -fx-text-fill: -color-success; -fx-fill: -color-success; }
 
 /* Default border */
-.bordered { -fx-border-width: 1; -fx-border-color: -color-border-default; }
+.bordered { -fx-border-width: 1; -fx-border-color: -color-border-light; }
 /* Default corner-radius */
 .corner-radius { -fx-background-radius: 0.25em; }
 
@@ -160,9 +160,7 @@
     -fx-text-fill: -color-fg-muted;
 }
 
-/* Library tab icon: larger than the entry editor's, and the same size and color whether the tab is
-   selected or not -- the :selected variant is needed because the generic :selected rule above outranks
-   a plain descendant rule. The color follows the tab label. */
+/* The :selected variant is needed because the generic :selected rule above outranks a plain descendant rule. */
 .tab-pane > .tab-header-area > .headers-region > .tab .library-tab-icon,
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .library-tab-icon {
     -glyph-size: 1.25em;
@@ -266,7 +264,7 @@
 }
 
 .merge-header-cell {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-width: 0 0 1 0;
     -fx-background-color: -color-bg-alt;
 }
@@ -588,7 +586,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .citationsList .contextBox {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-insets: 5;
     -fx-border-style: dashed;
     -fx-border-width: 2;
@@ -608,7 +606,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-pref-height: 1.875em;
     -fx-margin: 0;
     -fx-border-style: none;
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-border-light, -color-bg-secondary;
 }
 
 .tags-field:focused {
@@ -916,7 +914,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: transparent;
     -fx-font-weight: bold;
     -fx-padding: 0.5em 0 0.333em 0;
-    -fx-border-color: transparent transparent -color-border-default transparent;
+    -fx-border-color: transparent transparent -color-border-light transparent;
 }
 
 .entry-editor .all-fields-section-pane > *.content {
@@ -1334,7 +1332,7 @@ We want to have a look that matches our icons in the tool-bar */
 /* CitationRelationsTab */
 
 .journalInfo .grid-cell-r {
-    -fx-border-color: transparent -color-border-default transparent transparent;
+    -fx-border-color: transparent -color-border-light transparent transparent;
     -fx-border-width: 0 0.062em 0 0;
 }
 
@@ -1357,7 +1355,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* ThreeWayMergeView */
 .three-way-merge .merged-field .styled-text-area {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-border-light, -color-bg-secondary;
     -fx-background-insets: 0, 1;
     -fx-prompt-text-fill: -color-fg-muted;
 }
@@ -1412,7 +1410,7 @@ We want to have a look that matches our icons in the tool-bar */
 /* Miscellaneous */
 
 .chatHistory {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
 }
 
 .exampleQuestionStyle {
@@ -1420,7 +1418,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 0.25em;
     -fx-border-radius: 0.25em;
     -fx-border-width: 0.062em;
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-font-weight: bold;
     -fx-underline: false !important;
     -fx-text-fill: -fx-text-base-color;
@@ -1452,7 +1450,7 @@ We want to have a look that matches our icons in the tool-bar */
 /* Quick Settings */
 .quick-settings-button {
     -fx-background-color: -color-bg-alt;
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-width: 0.08333em;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;

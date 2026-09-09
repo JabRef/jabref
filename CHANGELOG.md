@@ -134,6 +134,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the logging during full-text search indexing to identify which linked files cause errors. [#15680](https://github.com/JabRef/jabref/issues/15680)
 - We unified the Button style. All Buttons have rounded corners, a hover, pressed and focused color. [#16980](https://github.com/JabRef/jabref/pull/16980)
 - We changed tabs to have no frame: the selected tab is marked by its accent line, hovered tabs are highlighted. [#17071](https://github.com/JabRef/jabref/pull/17071)
+- We changed tabs to always show their close button, so selecting a tab no longer shifts its label. [#17071](https://github.com/JabRef/jabref/pull/17071)
 
 ### Fixed
 
