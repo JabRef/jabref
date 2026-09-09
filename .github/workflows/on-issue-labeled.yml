@@ -146,10 +146,10 @@ jobs:
               MESSAGE="👋 Hey, looks like you’re eager to work on this issue—great! 🎉 It also looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us. Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀"
               ;;
             "dev: wisdom-ping")
-              MESSAGE="👋 Thanks for your interest in this issue. Please refrain from pinging maintainers shortly after a comment: everyone here works on JabRef in their spare time, and GitHub does notify us about every comment. A reminder after a few days adds noise without speeding anything up. Our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) describes how we work and where to ask if you are stuck."
+              MESSAGE="👋 Thanks for your interest in this issue. Please refrain from pinging maintainers shortly after a comment: everyone here works on JabRef in their spare time, and GitHub does notify us about every comment. A reminder after a few days adds noise without speeding anything up. Our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#getting-a-task-assigned) describes how we work and where to ask if you are stuck."
               ;;
             "dev: wisdom-read-issue")
-              MESSAGE="👋 Thanks for your interest in this issue. Please read the complete issue description and the discussion below it before assigning yourself: this issue states a prerequisite (for example, another pull request that has to be merged first), so it cannot be worked on yet. The issue is updated as soon as it is ready to be picked up. See our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) for details."
+              MESSAGE="👋 Thanks for your interest in this issue. Please read the complete issue description and the discussion below it before assigning yourself: this issue states a prerequisite (for example, another pull request that has to be merged first), so it cannot be worked on yet. The issue is updated as soon as it is ready to be picked up. See our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#getting-a-task-assigned) for details."
               ;;
             *)
               echo "Unknown label: $LABEL" >&2
