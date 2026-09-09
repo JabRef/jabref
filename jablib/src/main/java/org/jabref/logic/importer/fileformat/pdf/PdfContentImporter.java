@@ -51,7 +51,9 @@ public class PdfContentImporter extends PdfImporter {
 
     // Lookarounds keep the pattern from matching inside longer digit runs such as postal codes or URL path segments
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("(?<!\\d)\\d{4}(?!\\d)");
-    private static final int MINIMUM_PLAUSIBLE_YEAR = 1500;
+    // The importer targets first pages of Springer/IEEE-style papers, i.e. 20th century or later. A lower bound
+    // would admit ISSN halves ("ISSN 1631-0705") and page ranges ("pp. 1523-1540") printed on the same page.
+    private static final int MINIMUM_PLAUSIBLE_YEAR = 1900;
 
     private static final int ARXIV_PREFIX_LENGTH = "arxiv:".length();
 
