@@ -133,7 +133,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where the "Add enclosing braces" and "Normalize en dashes" cleanups could not be selected. [#17020](https://github.com/JabRef/jabref/pull/17020)
+- We fixed an issue where the "Add enclosing braces" and "Normalize en dashes" cleanups could not be selected. [#17021](https://github.com/JabRef/jabref/pull/17021)
 - We fixed an issue where a regular expression search containing a quotation mark stopped the search instead of returning results. [#9482](https://github.com/JabRef/jabref/issues/9482)
 - We fixed an issue where an author list ending with "et al." was parsed as a person named "et al." instead of "and others". [#16937](https://github.com/JabRef/jabref/pull/16937)
 - We fixed an issue where dialog buttons cut off their text at a larger font size. [#16787](https://github.com/JabRef/jabref/issues/16787)
