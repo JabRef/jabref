@@ -3,6 +3,9 @@ package org.jabref.gui.welcome;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class DonationPreferences {
     private final IntegerProperty nextNotificationEpochDay = new SimpleIntegerProperty();
 
