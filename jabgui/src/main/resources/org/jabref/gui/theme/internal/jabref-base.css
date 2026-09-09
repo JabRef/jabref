@@ -914,23 +914,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.5em 0 0.333em 1.333em;
 }
 
-/* Flat field rows: a field in the editor grid carries its name in the label beside it, so the frame around
-   it says nothing the reader does not already see and turns a tab into a stack of boxes. It is drawn once
-   the pointer or the keyboard focus reaches the field. Only the grid: a text field elsewhere stands on its
-   own, without a label to identify it, and keeps its frame. */
-.editorPane,
-.all-fields-container {
-    -color-input-border: -color-bg-secondary;
-}
-
-/* Restoring the frame anywhere in the editor is enough: outside the two grids above the token still
-   holds the border color, so these rules are a no-op there. */
-.entry-editor .text-input:hover,
-.entry-editor .combo-box-base:hover > .text-field,
-.entry-editor .date-picker:hover > .text-field {
-    -color-input-border: -color-border-default;
-}
-
 .entry-editor .all-fields-add-chip {
     -fx-background-radius: 0.25em;
     -fx-border-radius: 0.25em;
