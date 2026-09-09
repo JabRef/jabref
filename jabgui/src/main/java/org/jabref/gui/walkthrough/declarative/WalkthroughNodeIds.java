@@ -33,25 +33,25 @@ public final class WalkthroughNodeIds {
     public static final String MAIN_FILE_DIRECTORY_RADIO = "main-file-directory";
 
     /// "Browse" button of `LinkedFileEditDialog.fxml`.
-    public static final String LINKED_FILE_BROWSE = "browse";
+    public static final String LINKED_FILE_BROWSE = "linked-file-browse";
 
     /// Description field of `LinkedFileEditDialog.fxml`.
-    public static final String LINKED_FILE_DESCRIPTION = "description";
+    public static final String LINKED_FILE_DESCRIPTION = "linked-file-description";
 
     /// File type combo of `LinkedFileEditDialog.fxml`.
-    public static final String LINKED_FILE_TYPE = "fileType";
+    public static final String LINKED_FILE_TYPE = "linked-file-type";
 
     /// Source URL field of `LinkedFileEditDialog.fxml`.
-    public static final String LINKED_FILE_SOURCE_URL = "sourceUrl";
+    public static final String LINKED_FILE_SOURCE_URL = "linked-file-source-url";
 
     /// Group name field of `GroupDialog.fxml`.
-    public static final String GROUP_NAME = "nameField";
+    public static final String GROUP_NAME = "group-name";
 
     /// Group description field of `GroupDialog.fxml`.
-    public static final String GROUP_DESCRIPTION = "descriptionField";
+    public static final String GROUP_DESCRIPTION = "group-description";
 
     /// "Explicit selection" radio of `GroupDialog.fxml`.
-    public static final String GROUP_EXPLICIT_RADIO = "explicitRadioButton";
+    public static final String GROUP_EXPLICIT_RADIO = "group-explicit-radio";
 
     private WalkthroughNodeIds() {
     }
