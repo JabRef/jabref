@@ -179,9 +179,6 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     }
 
     private void showResults() {
-        if (modifiedEntriesCount > 0 && tabSupplier != null) {
-            tabSupplier.get().markBaseChanged();
-        }
         dialogService.notify(Localization.lang("%0 entry(s) needed a clean up", Integer.toString(modifiedEntriesCount)));
     }
 
