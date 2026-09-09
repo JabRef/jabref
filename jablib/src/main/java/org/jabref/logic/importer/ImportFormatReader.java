@@ -280,7 +280,7 @@ public class ImportFormatReader {
             } else {
                 throw new ImportException(parserResult.getErrorMessage());
             }
-        } catch (IOException ignore) {
+        } catch (IOException _) {
             throw new ImportException(Localization.lang("Could not find a suitable import format."));
         }
     }

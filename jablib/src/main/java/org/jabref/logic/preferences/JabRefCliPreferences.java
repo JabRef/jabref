@@ -956,7 +956,7 @@ public class JabRefCliPreferences implements CliPreferences {
                             keyring.getPassword(slot.service(), slot.account()),
                             getInternalPreferences().getUserHostInfo().getUserHostString())
                             .decrypt());
-                } catch (PasswordAccessException ex) {
+                } catch (PasswordAccessException _) {
                     LOGGER.debug("No secret stored in keyring for {}/{}", slot.service(), slot.account());
                     result.put(slot, "");
                 }
@@ -983,7 +983,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 if (StringUtil.isBlank(entry.getValue())) {
                     try {
                         keyring.deletePassword(slot.service(), slot.account());
-                    } catch (PasswordAccessException ex) {
+                    } catch (PasswordAccessException _) {
                         // already absent, nothing to clear
                     }
                 } else {
@@ -2502,7 +2502,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private PlainCitationParserChoice getDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {
         try {
             return PlainCitationParserChoice.valueOf(get(IMPORTER_DEFAULT_PLAIN_CITATION_PARSER, defaultPlainCitationParser.name()));
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException _) {
             return defaultPlainCitationParser;
         }
     }

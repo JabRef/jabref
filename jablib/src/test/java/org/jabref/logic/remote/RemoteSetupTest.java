@@ -115,7 +115,7 @@ class RemoteSetupTest {
             new Thread(() -> {
                 try (Socket message = socket.accept(); OutputStream os = message.getOutputStream()) {
                     os.write("whatever".getBytes(StandardCharsets.UTF_8));
-                } catch (IOException e) {
+                } catch (IOException _) {
                     // Ignored
                 }
             }).start();
