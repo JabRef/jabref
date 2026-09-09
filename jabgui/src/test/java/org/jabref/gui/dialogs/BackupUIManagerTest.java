@@ -7,11 +7,14 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.scene.layout.StackPane;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackupFileType;
@@ -25,7 +28,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
-import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,7 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @NullMarked
-class BackupUIManagerTest extends ApplicationTest {
+class BackupUIManagerTest extends JavaFxTest {
 
     private DialogService dialogService;
     private GuiPreferences preferences;
@@ -84,8 +86,9 @@ class BackupUIManagerTest extends ApplicationTest {
         AtomicReference<@Nullable String> dialogContent = new AtomicReference<>();
         interact(() -> {
             BackupResolverDialog dialog = new BackupResolverDialog(originalFile, backupFile.getParent(), mock(ExternalApplicationsPreferences.class));
-            HyperlinkLabel content = (HyperlinkLabel) dialog.getDialogPane().getContent();
-            dialogContent.set(content.getText());
+            StackPane content = (StackPane) dialog.getDialogPane().getContent();
+            HyperlinkLabel hyperlink = (HyperlinkLabel) content.getChildren().getFirst();
+            dialogContent.set(hyperlink.getText());
         });
 
         assertEquals("""

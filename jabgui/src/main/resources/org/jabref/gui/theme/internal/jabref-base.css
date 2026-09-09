@@ -54,9 +54,10 @@
  * default root font (9pt = 12px, see ThemeManager). The value itself is
  * written in `em`, so all spacing scales with the user's font size setting:
  *
- *     0 -> 0          12 -> 1em
- *     4 -> 0.333em    16 -> 1.333em
- *     8 -> 0.667em    24 -> 2em
+ * 0 -> 0
+ * 4 -> 0.333em
+ * 8 -> 0.667em
+ * 12 -> 1em
  * ========================================================================== */
 
 /* Type scale */
@@ -96,6 +97,9 @@
 .text-warning { -fx-text-fill: -color-warning; -fx-fill: -color-warning; }
 .text-success { -fx-text-fill: -color-success; -fx-fill: -color-success; }
 
+.bg-accent { -fx-background: -color-accent; -fx-background-color: -color-accent; }
+.bg-secondary { -fx-background: -color-bg-secondary; -fx-background-color: -color-bg-secondary; }
+
 /* Padding: all sides */
 .padding-0 { -fx-padding: 0; }
 .padding-4 { -fx-padding: 0.333em; }
@@ -133,12 +137,18 @@
 .align-baseline-left { -fx-alignment: baseline-left; }
 
 /* Surface */
-.bg-transparent { -fx-background-color: transparent; }
+.bg-transparent { -fx-background: transparent; -fx-background-color: transparent; }
 .bordered { -fx-border-width: 1; -fx-border-color: -color-border-default; }
+.corner-radius { -fx-background-radius: 0.25em; }
 
 .root {
     /* Default JabRef font size. */
     -fx-font-size: 9pt;
+}
+
+.btn-transparent {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
 }
 
 /* JavaFX with custom components */
@@ -300,20 +310,13 @@
     -fx-icon-color: -fx-text-base-color;
 }
 
-.text-button {
-    -fx-border-width: 0;
-}
-
-.contained-button {
-    -fx-background-color: -color-accent-subtle;
-    -fx-border-color: -color-accent-subtle;
-}
-
 .icon-button {
-    -fx-border-width: 0;
     -fx-background: transparent;
     -fx-background-color: transparent;
     -fx-padding: 0.5em;
+    -fx-border-radius: 0.25em;
+    -fx-border-width: 0.0625em;
+    -fx-border-color: transparent;
 }
 
 .icon-button:hover {
@@ -333,6 +336,10 @@
     -fx-fill: -color-fg-emphasis;
 }
 
+.icon-button:focused {
+    -fx-border-color: -color-accent;
+}
+
 .icon-button:disabled {
     -fx-opacity: 0.4;
 }
@@ -342,7 +349,6 @@
     -fx-background-color: transparent;
     -fx-fill: -color-selection;
 }
-
 
 .icon-button.no-space-bottom {
     -fx-padding: 0.5em 0.5em -0.1em 0.5em;
@@ -455,7 +461,7 @@
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
     /* `!important` is override library's default font size */
-    -fx-font-size: 1.7em!important;
+    -fx-font-size: 1.8em!important;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
     -fx-icon-color: -color-accent;
@@ -861,22 +867,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: derive(-color-accent, -20%);
 }
 
-/* AboutDialog */
-#aboutDialog .about-heading:pressed {
-    -fx-text-fill: -color-selection;
-}
-
-/* Pulls the developer list up against its heading -- the spacing scale has no negative steps. */
-#aboutDialog .dev-heading {
-    -fx-padding: -0.833em 0 0 0;
-}
-
-#aboutDialog .logo-pane {
-    -fx-fill: transparent;
-}
-
-#aboutDialog .logo-pane SVGPath {
-    -fx-fill: -color-accent;
+/* The logo is a single SvgNode; its shape is filled with -fx-color, not -fx-fill. */
+.jabref-logo {
+    -fx-color: -color-accent;
 }
 
 /* DocumentViewer */
@@ -917,8 +910,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #entryEditor .all-fields-add-chip {
-    -fx-background-radius: 3;
-    -fx-border-radius: 3;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
 #entryEditor Text {
@@ -1078,7 +1071,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-insets: 0;
     -fx-background-insets: 0;
     -fx-border-image-insets: 0;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
 /* ParseLatexResult */
@@ -1368,7 +1362,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .three-way-merge .field-name .glyph-icon,
 .three-way-merge .field-name .ikonli-font-icon {
-    -fx-icon-size: 17;
+    -fx-icon-size: 18;
     -fx-icon-color: -color-accent;
 }
 
@@ -1380,8 +1374,8 @@ We want to have a look that matches our icons in the tool-bar */
 
 .exampleQuestionStyle {
     -fx-background-color: transparent;
-    -fx-background-radius: 20px;
-    -fx-border-radius: 20px;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
     -fx-border-width: 0.062em;
     -fx-border-color: -color-border-default;
     -fx-font-weight: bold;
@@ -1391,6 +1385,10 @@ We want to have a look that matches our icons in the tool-bar */
 
 .exampleQuestionStyle:hover {
     -fx-background-color: -color-button-hover;
+}
+
+.exampleQuestionStyle:armed {
+    -fx-background-color: -color-button-pressed;
 }
 
 .refresh {
@@ -1404,8 +1402,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .add-certificate {
-    -fx-pref-width: 17em;
-    -fx-min-width: 17em;
+    -fx-pref-width: 18em;
+    -fx-min-width: 18em;
 }
 
 /* Quick Settings */
@@ -1413,8 +1411,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-bg-alt;
     -fx-border-color: -color-border-default;
     -fx-border-width: 0.08333em;
-    -fx-border-radius: 0.333em;
-    -fx-background-radius: 0.333em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
     -fx-graphic-text-gap: 0.667em;
     -fx-text-fill: -fx-text-base-color;
     -fx-cursor: hand;
@@ -1422,6 +1420,10 @@ We want to have a look that matches our icons in the tool-bar */
 
 .quick-settings-button:hover {
     -fx-border-color: -color-accent-subtle;
+}
+
+.quick-settings-button:armed {
+    -fx-background-color: -color-bg-alt, -color-button-pressed;
 }
 
 .quick-settings-button .glyph-icon,
@@ -1535,6 +1537,14 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 0.25em;
 }
 
+.walkthrough-continue-button:hover {
+    -fx-background-color: -color-accent, -color-button-hover;
+}
+
+.walkthrough-continue-button:armed {
+    -fx-background-color: -color-accent, -color-button-pressed;
+}
+
 .walkthrough-skip-button {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
@@ -1544,11 +1554,27 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 0.25em;
 }
 
+.walkthrough-skip-button:hover {
+    -fx-background-color: -color-button-hover;
+}
+
+.walkthrough-skip-button:armed {
+    -fx-background-color: -color-button-pressed;
+}
+
 .walkthrough-back-button {
     -fx-background-color: transparent;
     -fx-text-fill: -color-accent;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
+}
+
+.walkthrough-back-button:hover {
+    -fx-background-color: -color-button-hover;
+}
+
+.walkthrough-back-button:armed {
+    -fx-background-color: -color-button-pressed;
 }
 
 .walkthrough-quit-button {
@@ -1567,7 +1593,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: derive(-color-bg-tertiary, -20%);
 }
 
-.walkthrough-quit-button:pressed {
+.walkthrough-quit-button:armed {
     -fx-background-color: derive(-color-bg-tertiary, 30%);
 }
 
@@ -1661,11 +1687,27 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-button-default;
 }
 
+.info-center-view .notification-view > .content > .text-container > .actions-box .button:hover {
+    -fx-background-color: -color-button-default, -color-button-hover;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button:armed {
+    -fx-background-color: -color-button-default, -color-button-pressed;
+}
+
 /* Primary action of a notification, e.g. "Donate" */
 .info-center-view .notification-view > .content > .text-container > .actions-box .button.notification-action-primary {
     -fx-background: -color-accent;
     -fx-background-color: -color-accent;
     -fx-text-fill: -color-fg-emphasis;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button.notification-action-primary:hover {
+    -fx-background-color: -color-accent, -color-button-hover;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button.notification-action-primary:armed {
+    -fx-background-color: -color-accent, -color-button-pressed;
 }
 
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;

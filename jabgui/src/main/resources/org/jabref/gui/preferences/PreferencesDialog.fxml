@@ -80,7 +80,7 @@
                         <Insets bottom="4.0" left="10.0" right="10.0" top="10.0"/>
                     </padding>
                 </Label>
-                <ScrollPane fx:id="preferencesContainer" VBox.vgrow="ALWAYS"/>
+                <ScrollPane fx:id="preferencesContainer" fitToWidth="true" VBox.vgrow="ALWAYS"/>
             </VBox>
         </SplitPane>
     </content>
