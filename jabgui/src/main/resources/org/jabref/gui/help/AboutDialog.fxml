@@ -78,19 +78,18 @@
 
             <VBox spacing="4" styleClass="bg-secondary,padding-12" GridPane.columnIndex="1" GridPane.rowIndex="0">
                 <VBox spacing="4">
-                    <Label text="%Maintainers" styleClass="bold,text-accent"/>
+                    <Label styleClass="bold,text-accent" text="%Maintainers"/>
                     <Label text="${controller.viewModel.maintainers}" wrapText="true"/>
                 </VBox>
-                <Region VBox.vgrow="SOMETIMES" minHeight="0"/>
                 <VBox spacing="4">
-                    <Label text="%Contributors" styleClass="bold,text-accent"/>
+                    <Label styleClass="bold,text-accent" text="%Contributors"/>
                     <Hyperlink onAction="#openContributors" wrapText="true"
                                text="%JabRef would not have been possible without the help of our contributors."/>
                     <Label text="%Founded by Morten O. Alver and Nizar Batada."/>
                 </VBox>
                 <Region VBox.vgrow="SOMETIMES" minHeight="0"/>
                 <VBox spacing="4">
-                    <Label text="%System" styleClass="bold,text-accent"/>
+                    <Label styleClass="bold,text-accent" text="%System"/>
                     <TextArea fx:id="textAreaVersions" editable="false" styleClass="font-monospace,bg-accent" VBox.vgrow="ALWAYS"/>
                 </VBox>
                 <HBox alignment="CENTER_RIGHT" spacing="4" styleClass="padding-top-4">
