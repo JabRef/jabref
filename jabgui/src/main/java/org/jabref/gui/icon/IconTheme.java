@@ -337,8 +337,11 @@ public class IconTheme {
         RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE),
         SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL),
 
-        // Example SVG-backed icon (a star, 24x24 viewport) sourced via the svgnode for testing purposes.
-        EXAMPLE_SVG_STAR("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
+        // Library tab icons: SVG paths of the Material Design Icons alpha-t-box-outline, alpha-l-box-outline and
+        // database-outline (https://pictogrammers.com/library/mdi/), rendered through svgnode.
+        BIBTEX_LIBRARY("M9,7H15V9H13V17H11V9H9V7M5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3M5,5V19H19V5H5Z"),
+        BIBLATEX_LIBRARY("M9,7H11V15H15V17H9V7M5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3M5,5V19H19V5H5Z"),
+        SHARED_DATABASE_LIBRARY("M12 3C7.58 3 4 4.79 4 7V17C4 19.21 7.59 21 12 21S20 19.21 20 17V7C20 4.79 16.42 3 12 3M18 17C18 17.5 15.87 19 12 19S6 17.5 6 17V14.77C7.61 15.55 9.72 16 12 16S16.39 15.55 18 14.77V17M18 12.45C16.7 13.4 14.42 14 12 14C9.58 14 7.3 13.4 6 12.45V9.64C7.47 10.47 9.61 11 12 11C14.39 11 16.53 10.47 18 9.64V12.45M12 9C8.13 9 6 7.5 6 7S8.13 5 12 5C15.87 5 18 6.5 18 7S15.87 9 12 9Z");
 
         private final JabRefIcon icon;
 

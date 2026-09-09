@@ -48,6 +48,7 @@ import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.git.GitDiffDialogView;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.git.GitPullScheduler;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
@@ -90,6 +91,7 @@ import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
@@ -589,10 +591,21 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
         }
 
+        IconTheme.JabRefIcons icon = tabIcon(databaseLocation, bibDatabaseContext.getMode());
         UiTaskExecutor.runInJavaFXThread(() -> {
             textProperty().setValue(tabTitle.toString());
             setTooltip(new Tooltip(toolTipText.toString()));
+            if (getGraphic() == null || !icon.matches(getGraphic())) {
+                setGraphic(icon.getGraphicNode());
+            }
         });
+    }
+
+    private static IconTheme.JabRefIcons tabIcon(DatabaseLocation location, BibDatabaseMode mode) {
+        if (location == DatabaseLocation.SHARED) {
+            return IconTheme.JabRefIcons.SHARED_DATABASE_LIBRARY;
+        }
+        return mode == BibDatabaseMode.BIBLATEX ? IconTheme.JabRefIcons.BIBLATEX_LIBRARY : IconTheme.JabRefIcons.BIBTEX_LIBRARY;
     }
 
     /// Marks the changes the journal does not know about, so that [#changedProperty] can derive
