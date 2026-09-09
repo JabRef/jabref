@@ -8,6 +8,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -63,6 +65,9 @@ public class MainTableDataModel {
     private final Subscription groupViewModeSubscription;
     private final SearchIndexListener indexUpdatedListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    /// Bumped after each search result has been applied to the table rows, so that listeners see the final match categories.
+    /// Deliberately not bumped by the incremental index updates on entry edits: the table must not move while the user is editing an entry
+    private final IntegerProperty searchResultsVersion = new SimpleIntegerProperty();
     @Nullable private final SearchContext searchContext;
 
     private Optional<MatcherSet> groupsMatcher;
@@ -115,6 +120,7 @@ public class MainTableDataModel {
                                   this::clearSearchMatches
                           );
                           FilteredListProxy.refilterListReflection(entriesFiltered);
+                          searchResultsVersion.set(searchResultsVersion.get() + 1);
                       }).executeWith(taskExecutor);
     }
 
@@ -212,12 +218,18 @@ public class MainTableDataModel {
     }
 
     public void unbind() {
+        // A search still running for this model must not apply its result (and notify the table) after the model is replaced
+        searchUpdateSequence.incrementAndGet();
         searchQuerySubscription.unsubscribe();
         searchDisplayModeSubscription.unsubscribe();
         selectedGroupsSubscription.unsubscribe();
         groupViewModeSubscription.unsubscribe();
 
         bibDatabaseContext.getDatabase().unregisterListener(indexUpdatedListener);
+    }
+
+    public ReadOnlyIntegerProperty searchResultsVersionProperty() {
+        return searchResultsVersion;
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {

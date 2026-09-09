@@ -161,6 +161,51 @@ class MainTableDataModelTest {
     }
 
     @Test
+    void searchResultsVersionBumpsOncePerAppliedQueryAndNotAfterUnbind() throws Exception {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.getDatabase().insertEntries(List.of(new BibEntry().withCitationKey("A").withField(StandardField.AUTHOR, "Alice")));
+
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
+        when(preferences.getSearchPreferences()).thenReturn(
+                new SearchPreferences(SearchDisplayMode.FLOAT, false, false, false, false, false, false, 0, 0, 0));
+        when(preferences.getNameDisplayPreferences()).thenReturn(NameDisplayPreferences.getDefault());
+
+        SearchContext searchContext = new SearchContext(
+                new SimpleBooleanProperty(false),
+                () -> new InMemorySearchBackend(bibDatabaseContext, new BibEntryPreferences(',')),
+                () -> new InMemorySearchBackend(bibDatabaseContext, new BibEntryPreferences(',')));
+
+        // Tasks are collected instead of run, so that a search can be completed after the model was unbound
+        List<BackgroundTask<?>> pendingTasks = new ArrayList<>();
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+        when(taskExecutor.execute(any())).thenAnswer(invocation -> {
+            pendingTasks.add(invocation.getArgument(0));
+            return null;
+        });
+
+        OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
+        MainTableDataModel model = new MainTableDataModel(
+                bibDatabaseContext,
+                preferences,
+                taskExecutor,
+                searchContext,
+                new SimpleListProperty<>(FXCollections.observableArrayList()),
+                searchQueryProperty,
+                new SimpleIntegerProperty());
+        int initialVersion = model.searchResultsVersionProperty().get();
+
+        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
+        executeTask(pendingTasks.removeLast());
+        assertEquals(initialVersion + 1, model.searchResultsVersionProperty().get());
+
+        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Bob")));
+        model.unbind();
+        executeTask(pendingTasks.removeLast());
+        assertEquals(initialVersion + 1, model.searchResultsVersionProperty().get());
+    }
+
+    @Test
     void overlappingSearchCompletionKeepsLatestResults() throws Exception {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
 
