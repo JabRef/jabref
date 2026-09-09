@@ -10,5 +10,5 @@ strategies: [ConfiguredNextVersion, TaggedCommit, TrackReleaseBranches, VersionI
 branches:
   main:
     regex: ^main
-    label: 'alpha' # Update this to the label for the alpha/beta release (e.g., "alpha2") or leave empty
-    pre-release-weight: 34000 # 0 after stable release, 15000 before alpha release, 30000 before beta release, 50000 before stable release
+    label: 'beta' # Update this to the label for the alpha/beta release (e.g., "alpha2") or leave empty
+    pre-release-weight: 50000 # 0 after stable release, 15000 before alpha release, 30000 before beta release, 50000 before stable release
