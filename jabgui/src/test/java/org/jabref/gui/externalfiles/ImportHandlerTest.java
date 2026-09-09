@@ -342,20 +342,12 @@ class ImportHandlerTest {
     /// `importEntryWithDuplicateCheck`. The insert has to be a step of its own: undoing it takes
     /// the entry out again, and until then the library says it needs saving.
     @Test
+    // [utest->req~logic.undo.entry-insert-recorded~1]
     void importingAnEntryIsOneUndoStep() {
         BibDatabase database = new BibDatabase();
         BibDatabaseContext databaseContext = new BibDatabaseContext(database);
         JabRefUndoManager journal = new JabRefUndoManager();
-        StateManager stateManager = mock(StateManager.class);
-        when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
-        ImportHandler handler = new ImportHandler(
-                databaseContext,
-                preferences,
-                new DummyFileUpdateMonitor(),
-                journal,
-                stateManager,
-                mock(DialogService.class),
-                new CurrentThreadTaskExecutor());
+        ImportHandler handler = handlerFor(databaseContext, journal);
 
         handler.importCleanedEntries(null, List.of(testEntry));
 
@@ -367,5 +359,62 @@ class ImportHandlerTest {
 
         assertEquals(List.of(), database.getEntries());
         assertFalse(journal.canUndo(), "the import left more than one step behind");
+    }
+
+    /// An import that collected nothing — cancelled, or every file failed — is not a step, and must
+    /// not report the library as needing a save.
+    @Test
+    void importingNothingIsNotAnUndoStep() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        JabRefUndoManager journal = new JabRefUndoManager();
+        ImportHandler handler = handlerFor(databaseContext, journal);
+
+        handler.importCleanedEntries(null, List.of());
+
+        assertFalse(journal.canUndo(), "an empty import became a step");
+        assertFalse(journal.hasChanged(), "an empty import reported the library as changed");
+    }
+
+    /// Replacing a duplicate removes the entry that was there. Undoing the import must not leave
+    /// the library without either entry, so the removal is recorded too.
+    @Test
+    void replacingADuplicateCanBeUndoneBackToTheOriginal() {
+        BibEntry existing = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Existing2023")
+                .withField(StandardField.AUTHOR, "Existing Author");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(existing);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        JabRefUndoManager journal = new JabRefUndoManager();
+        // The decision is asked of the user on the JavaFX thread; this test supplies it instead.
+        ImportHandler handler = Mockito.spy(handlerFor(databaseContext, journal));
+        Mockito.doReturn(CompletableFuture.completedFuture(
+                       new DuplicateDecisionResult(DuplicateResolverDialog.DuplicateResolverResult.KEEP_RIGHT, null)))
+               .when(handler).getDuplicateDecision(testEntry, existing, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+
+        handler.handleDuplicates(testEntry, existing, DuplicateResolverDialog.DuplicateResolverResult.BREAK)
+               .thenAccept(entryToImport -> handler.importCleanedEntries(null, List.of(entryToImport.orElseThrow())))
+               .join();
+
+        assertEquals(List.of(testEntry), database.getEntries());
+
+        journal.undo();
+        assertEquals(List.of(), database.getEntries(), "the import was not taken back");
+
+        journal.undo();
+        assertEquals(List.of(existing), database.getEntries(), "the replaced entry could not be restored");
+    }
+
+    private ImportHandler handlerFor(BibDatabaseContext databaseContext, JabRefUndoManager journal) {
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
+        return new ImportHandler(
+                databaseContext,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                journal,
+                stateManager,
+                mock(DialogService.class),
+                new CurrentThreadTaskExecutor());
     }
 }

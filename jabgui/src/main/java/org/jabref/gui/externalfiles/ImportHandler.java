@@ -65,6 +65,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -349,7 +350,13 @@ public class ImportHandler {
     /// reach the library: a caller that forgot would insert entries the journal knows nothing
     /// about, which is a library that says it needs no saving. The group assignment this sets off
     /// joins the same step, so taking the import back takes the assignments with it.
+    // [impl->req~logic.undo.entry-insert-recorded~1]
     public void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries) {
+        if (entries.isEmpty()) {
+            // An import that collected nothing - cancelled, or every file failed - is not a step,
+            // and must not report the library as changed.
+            return;
+        }
         undoManager.addEdit(Localization.lang("Import entries"), edit -> {
             targetBibDatabaseContext.getDatabase().insertEntries(entries);
             edit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entries));
@@ -417,14 +424,31 @@ public class ImportHandler {
                           importCleanedEntries(transferInformation, List.of(adjustedEntry));
                           tracker.markImported(adjustedEntry);
                           // Remove source entries only once the whole move has succeeded, so a failure partway through doesn't leave already-removed entries unrecoverable
-                          // TODO: Add undo support for moving entries between libraries.
                           if (transferInformation != null && transferInformation.transferMode() == org.jabref.model.TransferMode.MOVE && tracker.getImportedCount() == transferInformation.sourceEntries().size()) {
-                              BibDatabase sourceDatabase = transferInformation.bibDatabaseContext().getDatabase();
+                              BibDatabaseContext sourceContext = transferInformation.bibDatabaseContext();
+                              BibDatabase sourceDatabase = sourceContext.getDatabase();
                               List<BibEntry> sourceEntries = transferInformation.sourceEntries();
                               sourceDatabase.removeEntries(sourceEntries);
+                              // Recorded in the *source* library's journal, because that is the
+                              // library it happened to: a move is two halves, and each undo stack
+                              // describes its own. Without this the copy in the target could be
+                              // undone while the original stayed gone.
+                              stateManager.getUndoManager(sourceContext)
+                                          .addEdit(new UndoableRemoveEntries(sourceDatabase, sourceEntries));
                           }
                       })
                       .executeWith(taskExecutor);
+    }
+
+    /// Removes the entry that the import replaces or merges into, recording it.
+    ///
+    /// Its own step, because it happens well before the import it makes room for — the decision is
+    /// asked of the user asynchronously. Undoing the import therefore takes the imported entry back
+    /// out, and undoing once more brings the replaced entry back, rather than leaving the library
+    /// without either.
+    private void removeReplacedDuplicate(BibEntry duplicateEntry) {
+        targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+        undoManager.addEdit(new UndoableRemoveEntries(targetBibDatabaseContext.getDatabase(), List.of(duplicateEntry)));
     }
 
     private BibEntry adjustLinkedFilesForTargetIfRequired(@Nullable TransferInformation transferInformation, BibEntry entry) {
@@ -454,12 +478,12 @@ public class ImportHandler {
     private @NonNull Optional<BibEntry> handleDecisionResult(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateDecisionResult decisionResult) {
         switch (decisionResult.decision()) {
             case KEEP_RIGHT:
-                targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                removeReplacedDuplicate(duplicateEntry);
                 break;
             case KEEP_BOTH:
                 break;
             case KEEP_MERGE:
-                targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                removeReplacedDuplicate(duplicateEntry);
                 return Optional.of(decisionResult.mergedEntry());
             case KEEP_LEFT:
             case AUTOREMOVE_EXACT:
