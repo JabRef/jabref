@@ -28,7 +28,10 @@ jobs:
           BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
           echo "Body: $BODY"
 
-          if printf '%s\n' "$BODY" | grep -Eq '^- \[x\] I added \*\*one sentence.*CHANGELOG\.md'; then
+          # Only the template's own checklist counts: the AI walkthrough above it ticks
+          # CHANGELOG.md items of its own. The wording of the item itself is not pinned,
+          # because contributors rephrase it.
+          if printf '%s\n' "$BODY" | sed -n '/^### Checklist/,$p' | grep -Eq '^- \[x\] .*CHANGELOG\.md'; then
             echo "found"
             echo "found=yes" >> $GITHUB_OUTPUT
           else
