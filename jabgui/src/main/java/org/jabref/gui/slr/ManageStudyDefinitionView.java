@@ -230,7 +230,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         setupCellFactories(queriesColumn, queriesActionColumn, StudyQuery::getQuery, viewModel::deleteQuery);
         queryTableView.setItems(viewModel.getQueries());
 
-        // TODO: Keep until PR #7279 is merged
         helpIcon.setTooltip(new Tooltip(new StringJoiner("\n")
                 .add(Localization.lang("Query terms are separated by spaces."))
                 .add(Localization.lang("All query terms are joined using the logical AND, and OR operators") + ".")
