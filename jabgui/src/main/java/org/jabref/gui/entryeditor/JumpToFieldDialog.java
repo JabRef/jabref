@@ -1,14 +1,16 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Locale;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -53,19 +55,25 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
 
         // Prefix matching instead of ControlsFX' default substring matching: the popup always preselects
         // its first suggestion, so "file" would offer (and jump to) "dayfiled" first.
-        AutoCompletionBinding<String> autoCompletion = TextFields.bindAutoCompletion(searchField, request -> {
-            String userText = request.getUserText().toLowerCase(Locale.ROOT);
-            return viewModel.getFieldNames().stream()
-                            .filter(fieldName -> fieldName.toLowerCase(Locale.ROOT).startsWith(userText))
-                            .toList();
-        });
+        AutoCompletionBinding<String> autoCompletion = TextFields.bindAutoCompletion(searchField, request ->
+                viewModel.getMatchingFieldNames(request.getUserText()));
         // The open suggestion popup swallows Enter, so the dialog never sees it: jump on the
         // completion event instead. This also makes clicking a suggestion jump right away.
         autoCompletion.setOnAutoCompleted(_ -> confirm());
 
+        // Only show the hint when the popup cannot offer a matching field at all.
         newFieldHint.managedProperty().bind(newFieldHint.visibleProperty());
         newFieldHint.visibleProperty().bind(Bindings.createBooleanBinding(
                 () -> viewModel.isNewField(searchField.getText()), searchField.textProperty()));
+
+        newFieldHint.visibleProperty().addListener((_, _, _) ->
+                Platform.runLater(() -> Optional.ofNullable(getDialogPane().getScene())
+                                                .map(Scene::getWindow)
+                                                .ifPresent(window -> {
+                                                    if (window instanceof Stage stage) {
+                                                        stage.sizeToScene();
+                                                    }
+                                                })));
 
         searchField.setOnAction(event -> {
             confirm();

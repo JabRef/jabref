@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -39,14 +40,20 @@ public class JumpToFieldViewModel extends AbstractViewModel {
                                      .toList();
     }
 
+    public List<String> getMatchingFieldNames(String userText) {
+        String normalizedFieldName = userText.trim().toLowerCase(Locale.ROOT);
+        return getFieldNames().stream()
+                              .filter(fieldName -> fieldName.toLowerCase(Locale.ROOT).startsWith(normalizedFieldName))
+                              .toList();
+    }
+
     /// `true` when jumping to `fieldName` would add a field the entry editor does not offer,
     /// that is: a custom field that does not exist yet.
     public boolean isNewField(String fieldName) {
         if (StringUtil.isBlank(fieldName)) {
             return false;
         }
-        String normalizedFieldName = fieldName.trim();
-        return getFieldNames().stream().noneMatch(normalizedFieldName::equalsIgnoreCase);
+        return getMatchingFieldNames(fieldName).isEmpty();
     }
 
     private List<Field> suggestedFields(BibEntry entry) {

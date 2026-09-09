@@ -8,8 +8,8 @@
             fx:controller="org.jabref.gui.entryeditor.JumpToFieldDialog">
     <content>
         <VBox spacing="4">
-            <TextField fx:id="searchField" promptText="%Type a field name"/>
             <Label fx:id="newFieldHint" text="%Field will be created"/>
+            <TextField fx:id="searchField" promptText="%Type a field name"/>
         </VBox>
     </content>
 </DialogPane>
