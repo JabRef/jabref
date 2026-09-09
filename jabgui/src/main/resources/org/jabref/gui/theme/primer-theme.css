@@ -6,6 +6,7 @@
 * - TabPane Style fixed (padding)
 * - removed hardcoded font size
 * - removed custom AtlantaFX classes (to make this stylesheet smaller and avoid accidental style match)
+* - added `.button-primary` alongside `.button:default`
 */
 
 @media (prefers-color-scheme: light) {
@@ -532,7 +533,9 @@ Text {
     -fx-text-fill: -color-button-fg-pressed;
 }
 
-.button:default {
+/* `.button-primary` gives the same appearance without claiming the scene's Enter key. */
+.button:default,
+.button-primary {
     -color-button-bg: -color-accent-emphasis;
     -color-button-fg: -color-fg-emphasis;
     -color-button-border: -color-accent-emphasis;

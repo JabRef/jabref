@@ -169,12 +169,16 @@ public class WalkthroughRenderer {
         return contentBox;
     }
 
+    /// Panel walkthroughs live in the host window's scene, so `setDefaultButton(true)` would take the
+    /// Enter key away from that scene's own default action (for example the preferences dialog's Save).
+    /// `button-primary` gives the same look without touching keyboard semantics.
+    ///
     /// @param text the already localized button text
-    private Button makeButton(String text, boolean isDefault, Runnable beforeNavigate, Runnable navigationAction) {
+    private Button makeButton(String text, boolean isPrimary, Runnable beforeNavigate, Runnable navigationAction) {
         Button button = new Button(text);
         button.getStyleClass().addAll("h5", "padding-4");
-        if (isDefault) {
-            button.setDefaultButton(true);
+        if (isPrimary) {
+            button.getStyleClass().add("button-primary");
         }
         button.setOnAction(_ -> {
             beforeNavigate.run();

@@ -270,16 +270,20 @@
     -fx-border-color: -color-accent;
 }
 
-.button:default {
+/* `.button-primary` gives the same appearance without claiming the scene's Enter key. */
+.button:default,
+.button-primary {
     -fx-background: -color-button-default;
     -fx-background-color: -fx-background;
 }
 
-.button:default:hover {
+.button:default:hover,
+.button-primary:hover {
     -fx-background-color: -color-button-default, -color-button-hover;
 }
 
-.button:default:armed {
+.button:default:armed,
+.button-primary:armed {
     -fx-background-color: -color-button-default, -color-button-pressed;
 }
 
