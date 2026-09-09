@@ -145,6 +145,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.remoteListenerServerManager = remoteListenerServerManager;
         this.stateManager = stateManager;
 
+        // Registered once: setValues() runs again on every import or reset of the preferences.
+        selectedThemeColorSchemeProperty.addListener(_ -> refreshThemeNames());
+
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
                 _ -> {
@@ -397,6 +400,13 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<Language> selectedLanguageProperty() {
         return this.selectedLanguageProperty;
+    }
+
+    /// Paired themes are named after the hue of the current color scheme, and the combo box re-reads the
+    /// names of its entries when the item list changes. The selection is left alone: its own cell is
+    /// refreshed by the view, so that the theme never passes through an invalid null in between.
+    private void refreshThemeNames() {
+        themesListProperty.setAll(ThemePreset.values());
     }
 
     public ReadOnlyListProperty<ThemePreset> themesListProperty() {
