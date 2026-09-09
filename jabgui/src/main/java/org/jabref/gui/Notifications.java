@@ -21,6 +21,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import com.dlsc.gemsfx.infocenter.Notification;
 import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationView;
+import org.jspecify.annotations.NullMarked;
 
 public class Notifications {
     private Notifications() {
@@ -41,6 +42,7 @@ public class Notifications {
         }
     }
 
+    @NullMarked
     public static class DonationNotification extends Notification<Object> {
         public DonationNotification(String title, String description) {
             super(title, description);
@@ -49,6 +51,7 @@ public class Notifications {
     }
 
     /// GemsFX has no per-action styling hook, so the button of the last action is tagged for `jabref-base.css`.
+    @NullMarked
     public static class DonationNotificationView extends NotificationView<Object, DonationNotification> {
         public DonationNotificationView(DonationNotification notification) {
             super(notification);

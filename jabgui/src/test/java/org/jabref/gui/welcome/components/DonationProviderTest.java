@@ -9,8 +9,11 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.welcome.DonationPreferences;
 
+import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
+import com.dlsc.gemsfx.infocenter.NotificationAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,5 +70,24 @@ class DonationProviderTest extends JavaFxTest {
 
         verify(dialogService).notify(any(Notifications.DonationNotification.class));
         assertEquals((int) LocalDate.now().plusMonths(6).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
+    }
+
+    @Test
+    public void snoozeActionKeepsTheNotificationSixMonthsAway() {
+        donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
+        interact(donationProvider::showIfNeeded);
+
+        assertEquals(OnClickBehaviour.HIDE_AND_REMOVE, triggerAction(0));
+        assertEquals((int) LocalDate.now().plusMonths(6).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
+    }
+
+    /// GemsFX declares the actions as a raw list, hence the unchecked cast.
+    @SuppressWarnings("unchecked")
+    private OnClickBehaviour triggerAction(int index) {
+        ArgumentCaptor<Notifications.DonationNotification> captor = ArgumentCaptor.forClass(Notifications.DonationNotification.class);
+        verify(dialogService).notify(captor.capture());
+        Notifications.DonationNotification notification = captor.getValue();
+        NotificationAction<Object> action = notification.getActions().get(index);
+        return action.getOnAction().call(notification);
     }
 }
