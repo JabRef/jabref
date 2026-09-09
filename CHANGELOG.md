@@ -81,6 +81,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We changed the default prompts for "AI-Chat" & "Chat with Groups" to better handle etiquette, metadata, citationkeys and context separation. [#16981](https://github.com/JabRef/jabref/pull/16981)
 - We redesigned the "About JabRef" dialog. [#16950](https://github.com/JabRef/jabref/pull/16950)
 - We now create the group for imported entries when entries are imported, instead of when a library is opened. [#16988](https://github.com/JabRef/jabref/pull/16988)
 - We removed the keystore fields, the server timezone, and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
@@ -105,7 +106,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved the reliability of online searches by respecting the request limits of arXiv and other services. [#16300](https://github.com/JabRef/jabref/issues/16300)
 - We improved switching between large libraries so entry previews remain responsive while automatic groups and their counts are refreshed. [#16289](https://github.com/JabRef/jabref/pull/16289)
 - We improved the [MODS](https://www.loc.gov/standards/mods/) importer for mapping entry types. [#16055](https://github.com/JabRef/jabref/issues/16055)
-- We changed the default system and user message for chatting (for "AI-Chat" & "Chat with Groups") to better handle etiquette, metadata, citationkeys and context separation. [#16981](https://github.com/JabRef/jabref/pull/16981)
 - AI summaries now render with regular JavaFX components instead of an embedded browser, matching how AI chat messages are rendered. [#16189](https://github.com/JabRef/jabref/pull/16189)
 - We replaced the [scala-based LaTeX-to-Unicode and Unicode-to-LaTeX conversion engine](https://github.com/tomtung/latex2unicode) with the new [SnuggleTeX](https://github.com/davemckain/snuggletex)-based [latex-conv](https://github.com/JabRef/latex-conv) library. Formulas keep their brackets and spacing, `\text{...}` and `\operatorname{...}` render as their content, bases carrying both a sub- and a superscript convert, and `--`/`---` render as typographic dashes. [#6155](https://github.com/JabRef/jabref/pull/6155)
 - The "Unicode to LaTeX" cleanup emits accent commands with a single brace group (`{\aa}` instead of `{{\aa}}`). [#6155](https://github.com/JabRef/jabref/pull/6155)
