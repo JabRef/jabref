@@ -101,6 +101,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.undo.UndoableInsertEntries;
@@ -506,18 +507,18 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// Marks the changes the journal does not know about, so that [#changedProperty] can derive
     /// the rest from it.
     ///
-    /// Metadata is where the marker cannot be derived: the library properties dialog writes
-    /// settings without recording them, and a metadata change is a metadata change whatever wrote
-    /// it. So all of them mark, which errs on the safe side and costs one wart: undoing a group
-    /// edit or an accepted external change leaves the marker set until the library is saved,
-    /// although the library is back where it was. Journalling what the properties dialog writes
-    /// would remove both the wart and this listener.
+    /// Both kinds of change say where they came from, and the marker follows that: an entry
+    /// pushed in from a shared database and a setting written by something that recorded nothing
+    /// can only be taken back by saving, so they mark. A change the journal is behind is described
+    /// by a step, so undoing it brings the library back to the saved position and the marker
+    /// clears itself.
     ///
-    /// Entries carry a source, so they need no such guess: only the ones pushed in from a shared
-    /// database arrive without anyone recording them.
+    /// Saying nothing counts as unrecorded, which is the safe answer: it costs an asterisk on a
+    /// library that does not need saving, never a library closing without asking.
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        boolean unrecorded = (event instanceof MetaDataChangedEvent)
+        boolean unrecorded = ((event instanceof MetaDataChangedEvent metaDataChangedEvent)
+                && (metaDataChangedEvent.getSource() == MetaDataChangeSource.LOCAL))
                 || ((event instanceof EntriesEvent entriesEvent)
                 && (entriesEvent.getEntriesEventSource() == EntriesEventSource.SHARED));
         if (unrecorded) {
