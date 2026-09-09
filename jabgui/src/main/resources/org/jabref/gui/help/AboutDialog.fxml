@@ -16,8 +16,8 @@
 <?import org.jabref.gui.util.DialogPaneWithoutButtonBar?>
 <?import tools.maran.svgnode.SvgNode?>
 <DialogPaneWithoutButtonBar xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
-                            minWidth="600" minHeight="600" prefWidth="800" prefHeight="700"
                             fx:controller="org.jabref.gui.help.AboutDialogView"
+                            minWidth="600" minHeight="400" prefWidth="800" prefHeight="700"
                             id="aboutDialog">
     <content>
         <GridPane>
@@ -61,7 +61,7 @@
                     <Hyperlink onAction="#openPrivacyPolicy" styleClass="text-emphasis" text="Privacy Policy"/>
                     <Hyperlink onAction="#openExternalLibrariesWebsite" styleClass="text-emphasis" text="%Used libraries"/>
                 </VBox>
-                <Region VBox.vgrow="ALWAYS"/>
+                <Region VBox.vgrow="SOMETIMES"/>
                 <VBox spacing="4">
                     <Button id="donationButton" maxWidth="Infinity" onAction="#openDonation" text="%Make a donation">
                         <cursor>
@@ -89,7 +89,7 @@
                     <Label text="%Founded by Morten O. Alver and Nizar Batada."/>
                 </VBox>
                 <Region VBox.vgrow="SOMETIMES" minHeight="0"/>
-                <VBox spacing="4" VBox.vgrow="ALWAYS">
+                <VBox spacing="4">
                     <Label text="%System" styleClass="bold,text-accent"/>
                     <TextArea fx:id="textAreaVersions" editable="false" styleClass="font-monospace,bg-accent" VBox.vgrow="ALWAYS"/>
                 </VBox>

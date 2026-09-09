@@ -44,7 +44,6 @@ public class AboutDialogView extends BaseDialog<Void> {
         viewModel = new AboutDialogViewModel(dialogService, preferences, clipBoardManager, buildInfo);
 
         textAreaVersions.setText(viewModel.getVersionInfo());
-
         closeButton.setText(ButtonType.CLOSE.getText());
     }
 
