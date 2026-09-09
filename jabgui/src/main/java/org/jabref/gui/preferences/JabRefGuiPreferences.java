@@ -228,7 +228,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String ASK_FOR_INCLUDING_CROSS_REFERENCES = "askForIncludingCrossReferences";
 
     // region Donation preferences
-    private static final String DONATION_NEVER_SHOW = "donationNeverShow";
     private static final String DONATION_LAST_SHOWN_EPOCH_DAY = "donationLastShownEpochDay";
     // endregion
 
@@ -1323,10 +1322,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         DonationPreferences defaultValues = DonationPreferences.getDefault();
 
         donationPreferences = new DonationPreferences(
-                getBoolean(DONATION_NEVER_SHOW, defaultValues.isNeverShowAgain()),
                 getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaultValues.getLastShownEpochDay()));
 
-        bindBoolean(donationPreferences.neverShowAgainProperty(), DONATION_NEVER_SHOW, defaultValues.isNeverShowAgain());
         bindInt(donationPreferences.lastShownEpochDayProperty(), DONATION_LAST_SHOWN_EPOCH_DAY, defaultValues.getLastShownEpochDay());
 
         return donationPreferences;
