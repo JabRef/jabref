@@ -11,6 +11,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.verify;
 /// `manuscript` is unknown to JabRef, whereas `audio` is a customization of a type JabRef ships.
 ///
 /// [utest->req~import.entry-types.offered-once~1]
+@NullMarked
 class ImportCustomEntryTypesDialogViewModelTest {
 
     private static final BibDatabaseMode MODE = BibDatabaseMode.BIBLATEX;

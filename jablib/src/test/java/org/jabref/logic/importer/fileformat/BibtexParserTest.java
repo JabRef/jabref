@@ -1430,6 +1430,19 @@ class BibtexParserTest {
         assertEquals(Optional.of(EnumSet.of(FieldProperty.VERBATIM)), customField.map(Field::getProperties));
     }
 
+    /// A file must not yield two definitions of one entry type: only one of them can be stored, so the other one
+    /// would be offered at every start - see <https://github.com/JabRef/jabref/issues/9930>.
+    @Test
+    void lastOfTwoLegacyDefinitionsOfOneEntryTypeWins() throws IOException {
+        ParserResult result = parser.parse(
+                Reader.of("@comment{jabref-entrytype: Customtype: req[author] opt[url]}" + OS.NEWLINE
+                        + "@comment{jabref-entrytype: Customtype: req[title] opt[doi]}"));
+
+        assertEquals(1, result.getEntryTypes().size());
+        assertEquals(List.of(new OrFields(StandardField.TITLE)),
+                List.copyOf(result.getEntryTypes().iterator().next().getRequiredFields()));
+    }
+
     @Test
     void integrationTestBibEntryTypeV2WithProperties() throws IOException {
         ParserResult result = parser.parse(

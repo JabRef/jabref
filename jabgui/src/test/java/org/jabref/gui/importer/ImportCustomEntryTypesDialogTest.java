@@ -24,6 +24,8 @@ import org.jabref.model.entry.types.UnknownEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.controlsfx.control.CheckListView;
+import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +36,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /// Drives the dialog itself, so that the wiring between the check lists and the view model is covered, too.
+@NullMarked
 class ImportCustomEntryTypesDialogTest extends JavaFxTest {
 
     private static final BibDatabaseMode MODE = BibDatabaseMode.BIBLATEX;
@@ -65,6 +68,11 @@ class ImportCustomEntryTypesDialogTest extends JavaFxTest {
 
         dialog = new ImportCustomEntryTypesDialog(MODE, List.of(AUDIO_FROM_FILE, MANUSCRIPT_FROM_FILE));
         dialog.initOwner(stage);
+    }
+
+    @AfterAll
+    static void tearDown() {
+        Injector.forgetAll();
     }
 
     @Test

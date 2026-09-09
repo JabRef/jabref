@@ -16,6 +16,8 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -28,6 +30,7 @@ import static org.mockito.Mockito.when;
 
 /// The library is a reduced version of the one attached to <https://github.com/JabRef/jabref/issues/9930>:
 /// `audio` and `review` customize entry types JabRef ships, `manuscript` is unknown to JabRef.
+@NullMarked
 class CheckForNewEntryTypesActionTest {
 
     private static final String LIBRARY = """
@@ -62,6 +65,11 @@ class CheckForNewEntryTypesActionTest {
 
         parserResult = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS))
                 .parse(Reader.of(LIBRARY));
+    }
+
+    @AfterAll
+    static void tearDown() {
+        Injector.forgetAll();
     }
 
     @Test
