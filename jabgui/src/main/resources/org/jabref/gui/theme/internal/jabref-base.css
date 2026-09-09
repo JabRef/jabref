@@ -54,9 +54,10 @@
  * default root font (9pt = 12px, see ThemeManager). The value itself is
  * written in `em`, so all spacing scales with the user's font size setting:
  *
- *     0 -> 0          12 -> 1em
- *     4 -> 0.333em    16 -> 1.333em
- *     8 -> 0.667em    24 -> 2em
+ * 0 -> 0
+ * 4 -> 0.333em
+ * 8 -> 0.667em
+ * 12 -> 1em
  * ========================================================================== */
 
 /* Type scale */
@@ -96,6 +97,9 @@
 .text-warning { -fx-text-fill: -color-warning; -fx-fill: -color-warning; }
 .text-success { -fx-text-fill: -color-success; -fx-fill: -color-success; }
 
+.bg-accent { -fx-background: -color-accent; -fx-background-color: -color-accent; }
+.bg-secondary { -fx-background: -color-bg-secondary; -fx-background-color: -color-bg-secondary; }
+
 /* Padding: all sides */
 .padding-0 { -fx-padding: 0; }
 .padding-4 { -fx-padding: 0.333em; }
@@ -133,12 +137,18 @@
 .align-baseline-left { -fx-alignment: baseline-left; }
 
 /* Surface */
-.bg-transparent { -fx-background-color: transparent; }
+.bg-transparent { -fx-background: transparent; -fx-background-color: transparent; }
 .bordered { -fx-border-width: 1; -fx-border-color: -color-border-default; }
+.corner-radius { -fx-background-radius: 0.25em; }
 
 .root {
     /* Default JabRef font size. */
     -fx-font-size: 9pt;
+}
+
+.btn-transparent {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
 }
 
 /* JavaFX with custom components */
@@ -210,7 +220,7 @@
 }
 
 .table-row-cell:drag-over-bottom,
-#groupTree .tree-table-row-cell:drag-over-bottom {
+.group-tree .tree-table-row-cell:drag-over-bottom {
     -fx-border-color: -color-drag-target;
     -fx-border-width: 0 0 2 0;
     -fx-padding: 0 0 -2 0;
@@ -222,7 +232,7 @@
 }
 
 .table-row-cell:drag-over-top,
-#groupTree .tree-table-row-cell:drag-over-top {
+.group-tree .tree-table-row-cell:drag-over-top {
     -fx-border-color: -color-drag-target;
     -fx-border-width: 2 0 0 0;
     -fx-padding: -2 0 0 0;
@@ -300,20 +310,13 @@
     -fx-icon-color: -fx-text-base-color;
 }
 
-.text-button {
-    -fx-border-width: 0;
-}
-
-.contained-button {
-    -fx-background-color: -color-accent-subtle;
-    -fx-border-color: -color-accent-subtle;
-}
-
 .icon-button {
-    -fx-border-width: 0;
     -fx-background: transparent;
     -fx-background-color: transparent;
     -fx-padding: 0.5em;
+    -fx-border-radius: 0.25em;
+    -fx-border-width: 0.0625em;
+    -fx-border-color: transparent;
 }
 
 .icon-button:hover {
@@ -333,6 +336,10 @@
     -fx-fill: -color-fg-emphasis;
 }
 
+.icon-button:focused {
+    -fx-border-color: -color-accent;
+}
+
 .icon-button:disabled {
     -fx-opacity: 0.4;
 }
@@ -342,7 +349,6 @@
     -fx-background-color: transparent;
     -fx-fill: -color-selection;
 }
-
 
 .icon-button.no-space-bottom {
     -fx-padding: 0.5em 0.5em -0.1em 0.5em;
@@ -455,7 +461,7 @@
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
     /* `!important` is override library's default font size */
-    -fx-font-size: 1.7em!important;
+    -fx-font-size: 1.8em!important;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
     -fx-icon-color: -color-accent;
@@ -548,7 +554,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-fg-default;
 }
 
-#bibtexcodearea {
+.source-preview-code-area {
     -fx-background-color: -color-bg-secondary;
 }
 
@@ -686,7 +692,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .main-table .table-row-cell:drag-over-center,
-#groupTree .tree-table-row-cell:drag-over-center {
+.group-tree .tree-table-row-cell:drag-over-center {
     -fx-border-color: -color-drag-target;
     -fx-border-width: 1 1 1 1;
     -fx-padding: -1 -1 -1 -1;
@@ -869,57 +875,13 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-max-height: 4em;
 }
 
-.donation-toast .label {
-    -fx-text-fill: -fx-text-base-color;
-}
-
-.donation-btn-primary,
-.donation-btn-secondary,
-.donation-btn-ghost {
-    -fx-background-radius: 0.5em;
-    -fx-border-radius: 0.5em;
-}
-
-.donation-btn-primary {
-    -fx-background-color: -color-accent;
-}
-
-.donation-btn-secondary {
-    -fx-background-color: derive(-color-bg-secondary, -6%);
-}
-
-.donation-btn-ghost {
-    -fx-background-color: transparent;
-    -fx-text-fill: -color-border-default;
-    -fx-stroke-width: 0;
-    -fx-border-width: 0
-}
-
-.donation-btn-ghost:hover {
-    -fx-background-color: transparent;
-    -fx-text-fill: -color-fg-subtle;
-}
-
-/* AboutDialog */
-#aboutDialog .about-heading:pressed {
-    -fx-text-fill: -color-selection;
-}
-
-/* Pulls the developer list up against its heading -- the spacing scale has no negative steps. */
-#aboutDialog .dev-heading {
-    -fx-padding: -0.833em 0 0 0;
-}
-
-#aboutDialog .logo-pane {
-    -fx-fill: transparent;
-}
-
-#aboutDialog .logo-pane SVGPath {
-    -fx-fill: -color-accent;
+/* The logo is a single SvgNode; its shape is filled with -fx-color, not -fx-fill. */
+.jabref-logo {
+    -fx-color: -color-accent;
 }
 
 /* DocumentViewer */
-#documentViewerDialog .document-viewer .page {
+.document-viewer-dialog .document-viewer .page {
     -fx-padding: 0em 0em 1em 0em;
     -fx-background-insets: 0;
 }
@@ -928,166 +890,166 @@ We want to have a look that matches our icons in the tool-bar */
 /* The tab content area is transparent by default, so the window-canvas color
    (-color-bg-primary) would shine through behind the field grids. Paint it like
    the "Main" tab's container so all tabs read as one content surface. */
-#entryEditor .tab-pane > .tab-content-area {
+.entry-editor .tab-pane > .tab-content-area {
     -fx-background-color: -color-bg-secondary;
 }
 
 /* Single scroll-list field tab "Main" (issue #12711) */
-#entryEditor .all-fields-container {
+.entry-editor .all-fields-container {
     -fx-background-color: -color-bg-secondary;
 }
 
 /* Collapsible sections: flat look instead of the default TitledPane box */
-#entryEditor .all-fields-section-pane {
+.entry-editor .all-fields-section-pane {
     -fx-box-border: transparent;
 }
 
-#entryEditor .all-fields-section-pane > .title {
+.entry-editor .all-fields-section-pane > .title {
     -fx-background-color: transparent;
     -fx-font-weight: bold;
     -fx-border-color: transparent transparent -color-border-default transparent;
 }
 
-#entryEditor .all-fields-section-pane > *.content {
+.entry-editor .all-fields-section-pane > *.content {
     -fx-background-color: transparent;
     -fx-border-width: 0;
 }
 
-#entryEditor .all-fields-add-chip {
-    -fx-background-radius: 3;
-    -fx-border-radius: 3;
+.entry-editor .all-fields-add-chip {
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
-#entryEditor Text {
+.entry-editor Text {
     -fx-text-fill: -fx-text-base-color;
     -fx-fill: -fx-text-base-color;
 }
 
-#entryEditor .combo-box > *.text {
+.entry-editor .combo-box > *.text {
     -fx-text-origin: baseline;
 }
 
-#entryEditor #typeLabel {
+.entry-editor .entry-type-label {
     -fx-font-weight: bold;
     -fx-text-fill: -color-accent;
 }
 
-#entryEditor #typeLabel:hover {
+.entry-editor .entry-type-label:hover {
     -fx-background-color: -color-overlay-hover;
 }
 
-#entryEditor #typeLabel .context-menu {
+.entry-editor .entry-type-label .context-menu {
     -fx-font-size: 0.9em;
     -fx-font-weight: normal;
 }
 
-#entryEditor #typeLabel .tooltip {
+.entry-editor .entry-type-label .tooltip {
     -fx-font-size: 1em;
     -fx-font-weight: normal;
 }
 
-#entryEditor .icon-button.narrow {
+.entry-editor .icon-button.narrow {
     -fx-padding: 0.1em;
 }
 
-#entryEditor .icon-button.no-space-bottom.narrow {
+.entry-editor .icon-button.no-space-bottom.narrow {
     -fx-padding: 0.1em 0.1em -0.2em 0.1em;
 }
 
-#entryEditor .icon-button.no-space-top.narrow {
+.entry-editor .icon-button.no-space-top.narrow {
     -fx-padding: -0.2em 0.1em 0.1em 0.1em;
 }
 
-#entryEditor .tool-bar {
+.entry-editor .tool-bar {
     -fx-background-color: -color-bg-primary;
     -fx-background-insets: 0;
 }
 
-#entryEditor .icon-button .glyph-icon,
-#entryEditor .icon-button .ikonli-font-icon {
+.entry-editor .icon-button .glyph-icon,
+.entry-editor .icon-button .ikonli-font-icon {
     -glyph-size: 1.0em;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
 }
 
-#entryEditor .field-remove-button {
+.entry-editor .field-remove-button {
     -fx-background-color: transparent;
 }
 
-#entryEditor .field-remove-button .glyph-icon,
-#entryEditor .field-remove-button .ikonli-font-icon {
+.entry-editor .field-remove-button .glyph-icon,
+.entry-editor .field-remove-button .ikonli-font-icon {
     -fx-fill: -color-fg-subtle;
     -fx-text-fill: -color-fg-subtle;
 }
 
-#entryEditor #related-articles-tab,
-#entryEditor .ai-tab {
+.entry-editor .related-articles-tab,
+.entry-editor .ai-tab {
     -fx-background-color: -color-bg-secondary;
 }
 
-#entryEditor .gdpr-notice {
+.entry-editor .gdpr-notice {
     -fx-border-color: -color-warning;
     -fx-border-insets: 5;
     -fx-border-style: dashed;
     -fx-border-width: 2;
 }
 
-#entryEditor #citationsPane {
+.entry-editor .citations-pane {
     -fx-background-color: -color-bg-secondary;
 }
 
-#entryEditor #citationsPane *,
-#entryEditor #scitePane Label,
-#entryEditor #scitePane Text {
+.entry-editor .citations-pane *,
+.entry-editor .scite-pane Label,
+.entry-editor .scite-pane Text {
     -fx-fill: -fx-text-background-color;
 }
 
 /* ErrorConsole */
-#errorConsole .button-bar {
+.error-console .button-bar {
     -fx-padding: 1em 0em 0em 0em;
 }
 
-#errorConsole .info-section {
+.error-console .info-section {
     -fx-graphic-text-gap: 0.8em;
     -fx-line-spacing: 0.2em;
     -fx-background-color: -color-info-subtle;
 }
 
-#errorConsole .info-section .glyph-icon,
-#errorConsole .exception .glyph-icon,
-#errorConsole .output .glyph-icon,
-#errorConsole .log .glyph-icon {
+.error-console .info-section .glyph-icon,
+.error-console .exception .glyph-icon,
+.error-console .output .glyph-icon,
+.error-console .log .glyph-icon {
     -fx-font-size: 1.5em;
 }
 
-#errorConsole .exception .glyph-icon {
+.error-console .exception .glyph-icon {
     -fx-icon-color: -color-danger;
 }
 
-#errorConsole .output .glyph-icon {
+.error-console .output .glyph-icon {
     -fx-icon-color: -color-warning;
 }
 
-#errorConsole .log .glyph-icon {
+.error-console .log .glyph-icon {
     -fx-icon-color: -color-success-emphasis;
 }
 
 /* Poor readability on -fx-accent. See: https://webaim.org/resources/contrastchecker/?fcolor=9E4C00&bcolor=A3B7E6 */
-#errorConsole .error-console-cell:selected .exception .glyph-icon {
+.error-console .error-console-cell:selected .exception .glyph-icon {
     -fx-icon-color: derive(-color-danger, -50%);
 }
 
-#errorConsole .error-console-cell:selected .output .glyph-icon {
+.error-console .error-console-cell:selected .output .glyph-icon {
     -fx-icon-color: derive(-color-warning, -50%);
 }
 
-#errorConsole .error-console-cell:selected .log .glyph-icon {
+.error-console .error-console-cell:selected .log .glyph-icon {
     -fx-icon-color: derive(-color-success-emphasis, -50%);
 }
 
-#errorConsole .exception,
-#errorConsole .output,
-#errorConsole .log {
+.error-console .exception,
+.error-console .output,
+.error-console .log {
     -fx-text-fill: -fx-text-base-color;
 }
 
@@ -1095,204 +1057,215 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* MultiMergeEntries */
 
-#multiMergeEntries .text-changed {
+.multi-merge-entries .text-changed {
     -fx-fill: -color-warning;
 }
 
-#multiMergeEntries .text-unchanged {
+.multi-merge-entries .text-unchanged {
     -fx-fill: -color-fg-default;
 }
 
-#multiMergeEntries .text-added {
+.multi-merge-entries .text-added {
     -fx-fill: -color-success;
 }
 
-#multiMergeEntries .text-removed {
+.multi-merge-entries .text-removed {
     -fx-fill: -color-danger-emphasis;
 }
 
-#multiMergeEntries .toggle-button {
+.multi-merge-entries .toggle-button {
     -fx-border-insets: 0;
     -fx-background-insets: 0;
     -fx-border-image-insets: 0;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
 }
 
 /* ParseLatexResult */
 
-#parseLatexResultDialog > .split-pane > .split-pane-divider,
-#preferencesDialog > .split-pane > .split-pane-divider {
+.parse-latex-result-dialog > .split-pane > .split-pane-divider,
+.preferences-dialog > .split-pane > .split-pane-divider {
     -fx-padding: 0 4 0 4;
     -fx-background-color: transparent;
 }
 
-#parseLatexResultDialog .button-bar > .container {
+.parse-latex-result-dialog .button-bar > .container {
     -fx-border-width: 1 0 0 0;
 }
 
-#parseLatexResultDialog .parse-latex-reference-text {
+.parse-latex-result-dialog .parse-latex-reference-text {
     -fx-fill: -color-accent-subtle;
 }
 
 /* GroupTree */
 
-#groupTree {
+.group-tree {
     -fx-background-color: -color-bg-sidepane;
 }
 
-#groupTree > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell {
+.group-tree > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell {
     -fx-background: -color-bg-sidepane;
 }
 
-#groupTree > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell > .tree-table-cell {
+.group-tree > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell > .tree-table-cell {
     -fx-padding: 0.35em 0em 0.25em 0em;
 }
 
-#groupTree .numberColumn {
+.group-tree .numberColumn {
     -fx-alignment: top-right;
 }
 
-#groupTree .numberColumn > .hits {
+.group-tree .numberColumn > .hits {
+    -fx-font-size: 0.75em;
     -fx-background: -color-badge-bg;
     -fx-background-color: -color-badge-bg;
     -fx-background-insets: 0;
     -fx-background-radius: 0.7em;
 }
 
-#groupTree .numberColumn > .hits .text {
+.group-tree .numberColumn > .hits .text {
     -fx-fill: -color-fg-emphasis;
 }
 
-#groupTree .expansionNodeColumn {
+.group-tree .expansionNodeColumn {
     -fx-alignment: top-right;
 }
 
-#groupTree .addSubgroupColumn {
+.group-tree .addSubgroupColumn {
     -fx-padding: 0;
     -fx-alignment: center;
 }
 
-#groupTree .tree-table-row-cell:sub > .tree-table-cell {
+.group-tree .tree-table-row-cell:sub > .tree-table-cell {
     -fx-padding: 0.20em 0em 0.20em 0em;
 }
 
-#groupTree .tree-table-row-cell:root {
+.group-tree .tree-table-row-cell:sub > .numberColumn {
+    -fx-padding: 0.20em 0.2em 0.20em 0em;
+}
+
+.group-tree .tree-table-row-cell:root {
     -fx-border-width: 0 0 1 0;
     -fx-border-color: -color-border-muted;
 }
 
-#groupTree .tree-table-row-cell:root > .tree-table-cell {
+.group-tree .tree-table-row-cell:root > .tree-table-cell {
     -fx-padding: 0.65em 0em 0.65em 1em;
 }
 
-#groupTree .tree-table-row-cell:root > .expansionNodeColumn {
+.group-tree .tree-table-row-cell:root > .numberColumn {
+    -fx-padding: 0.40em 0.2em 0.40em 0em;
+}
+
+.group-tree .tree-table-row-cell:root > .expansionNodeColumn {
     -fx-padding: 0.45em 0.2em 0.45em 0.2em;
 }
 
-#groupTree .tree-table-row-cell:empty {
+.group-tree .tree-table-row-cell:empty {
     -fx-background-color: transparent; /* hide cells which are not bound to a group */
 }
 
-#groupTree .column-header-background {
+.group-tree .column-header-background {
     visibility: hidden; /* hide column header */
     -fx-padding: -0.8em;
 }
 
-#groupTree .tree-table-row-cell > .tree-table-cell > .tree-disclosure-node > .arrow {
+.group-tree .tree-table-row-cell > .tree-table-cell > .tree-disclosure-node > .arrow {
     -fx-background-color: -color-fg-muted;
     -fx-max-height: 0.5em;
     -fx-max-width: 0.5em;
     -fx-shape: "m64,416l96,96l256,-256l-256,-256l-96,96l160,160l-160,160z";
 }
 
-#groupTree .tree-table-row-cell:expanded > .tree-table-cell > .tree-disclosure-node > .arrow {
+.group-tree .tree-table-row-cell:expanded > .tree-table-cell > .tree-disclosure-node > .arrow {
     -fx-rotate: 90;
 }
 
-#groupTree .tree-table-row-cell > .tree-table-cell > .icon {
+.group-tree .tree-table-row-cell > .tree-table-cell > .icon {
     -fx-translate-x: -0.4em;
 }
 
-#groupFilterBar .glyph-icon {
+.group-filter-bar .glyph-icon {
     -fx-font-size: 2em;
 }
 
-#groupTree .numberColumn > .hits:all-selected {
+.group-tree .numberColumn > .hits:all-selected {
     -fx-background-color: -color-success;
 }
 
-#groupTree .numberColumn > .hits > .text:any-selected,
-#groupTree .numberColumn > .hits > .text:all-selected {
+.group-tree .numberColumn > .hits > .text:any-selected,
+.group-tree .numberColumn > .hits > .text:all-selected {
     -fx-fill: -color-badge-selected-fg;
 }
 
 /* PreferencesDialog */
 
-#preferencesDialog #sidepane {
+.preferences-dialog .preferences-sidepane {
     -fx-background-color: -color-bg-sidepane;
 }
 
-#preferencesDialog #preferencesTabList {
+.preferences-dialog .preferences-tab-list {
     -fx-background-color: transparent;
 }
 
-#preferencesTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
+.preferences-tab-list > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-padding: 0.667em;
     -fx-background: transparent;
     -fx-text-fill: -color-fg-default;
 }
 
-#preferencesDialog .button-bar > .container {
+.preferences-dialog .button-bar > .container {
     -fx-border-width: 1 0 0 0;
     -fx-border-color: -color-bg-primary;
 }
-#preferencesDialog *:search-highlight {
+
+.preferences-dialog *:search-highlight {
     -fx-background-color: -color-danger;
 }
 
-#preferencesDialog .code-area {
+.preferences-dialog .code-area {
     -fx-border-width: 1;
     -fx-background-color: transparent;
 }
 
-#preferencesDialog .code-area .text {
+.preferences-dialog .code-area .text {
     -fx-fill: -fx-text-background-color;
 }
 
-#preferencesDialog .code-area .lineno .text {
+.preferences-dialog .code-area .lineno .text {
     -fx-fill: -color-fg-default;
 }
 
-#preferencesDialog .code-area .tagmark {
+.preferences-dialog .code-area .tagmark {
     -fx-fill: -color-syntax-punctuation;
 }
 
-#preferencesDialog .code-area .anytag {
+.preferences-dialog .code-area .anytag {
     -fx-fill: -color-syntax-tag;
 }
 
-#preferencesDialog .code-area .paren {
+.preferences-dialog .code-area .paren {
     -fx-fill: -color-syntax-punctuation;
     -fx-font-weight: bold;
 }
 
-#preferencesDialog .code-area .attribute {
+.preferences-dialog .code-area .attribute {
     -fx-fill: -color-syntax-attribute;
 }
 
-#preferencesDialog .code-area .avalue {
+.preferences-dialog .code-area .avalue {
     -fx-fill: -color-syntax-string;
 }
 
-#preferencesDialog .code-area .comment {
+.preferences-dialog .code-area .comment {
     -fx-fill: -color-syntax-comment;
 }
 
-#preferencesDialog .code-area .highlight-keyword {
+.preferences-dialog .code-area .highlight-keyword {
     -fx-text-fill: -color-syntax-keyword;
 }
 
-#preferencesDialog .code-area .context-menu .menu-item .label {
+.preferences-dialog .code-area .context-menu .menu-item .label {
     -fx-padding: 0.167em;
 }
 
@@ -1306,11 +1279,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-fg-muted;
 }
 
-#testButton.text-success .glyph-icon {
+.api-key-test-button.text-success .glyph-icon {
     -fx-icon-color: -color-success;
 }
 
-#testButton.text-danger .glyph-icon {
+.api-key-test-button.text-danger .glyph-icon {
     -fx-icon-color: -color-danger;
 }
 
@@ -1387,7 +1360,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .three-way-merge .field-name .glyph-icon,
 .three-way-merge .field-name .ikonli-font-icon {
-    -fx-icon-size: 17;
+    -fx-icon-size: 18;
     -fx-icon-color: -color-accent;
 }
 
@@ -1398,8 +1371,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 .exampleQuestionStyle {
     -fx-background-color: transparent;
-    -fx-background-radius: 20px;
-    -fx-border-radius: 20px;
+    -fx-background-radius: 0.25em;
+    -fx-border-radius: 0.25em;
     -fx-border-width: 0.062em;
     -fx-border-color: -color-border-default;
     -fx-font-weight: bold;
@@ -1409,6 +1382,10 @@ We want to have a look that matches our icons in the tool-bar */
 
 .exampleQuestionStyle:hover {
     -fx-background-color: -color-button-hover;
+}
+
+.exampleQuestionStyle:armed {
+    -fx-background-color: -color-button-pressed;
 }
 
 .refresh {
@@ -1422,8 +1399,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .add-certificate {
-    -fx-pref-width: 17em;
-    -fx-min-width: 17em;
+    -fx-pref-width: 18em;
+    -fx-min-width: 18em;
 }
 
 /* Quick Settings */
@@ -1431,8 +1408,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-bg-alt;
     -fx-border-color: -color-border-default;
     -fx-border-width: 0.08333em;
-    -fx-border-radius: 0.333em;
-    -fx-background-radius: 0.333em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
     -fx-graphic-text-gap: 0.667em;
     -fx-text-fill: -fx-text-base-color;
     -fx-cursor: hand;
@@ -1440,6 +1417,10 @@ We want to have a look that matches our icons in the tool-bar */
 
 .quick-settings-button:hover {
     -fx-border-color: -color-accent-subtle;
+}
+
+.quick-settings-button:armed {
+    -fx-background-color: -color-bg-alt, -color-button-pressed;
 }
 
 .quick-settings-button .glyph-icon,
@@ -1490,8 +1471,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* Walkthrough Styles */
-.walkthrough-title-container {
-    -fx-max-width: infinity;
+.walkthrough-panel {
+    -fx-background-color: -color-bg-overlay;
 }
 
 /* Font size (h2) is applied via style class in Java code to walkthrough-tooltip-title and walkthrough-title */
@@ -1515,16 +1496,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-min-height: 18em;
 }
 
-/* Text content containers and flows */
-.walkthrough-text-container {
-    -fx-max-width: infinity;
-}
-
-.walkthrough-text-content {
-    -fx-text-fill: -fx-text-base-color;
-    -fx-line-spacing: 0.5em;
-}
-
 /* Info block styling */
 .walkthrough-info-container {
     -fx-border-color: -color-accent;
@@ -1534,9 +1505,7 @@ We want to have a look that matches our icons in the tool-bar */
 .walkthrough-info-container .ikonli-font-icon {
     -fx-icon-color: -color-accent;
     /* 20px is used, since using em seems to lead infinite icon size growth */
-    -fx-icon-size: 20px;
-    /* Center align icon with the text */
-    -fx-translate-y: -0.05em;
+    -fx-icon-size: 24px;
 }
 
 .walkthrough-info-text {
@@ -1544,59 +1513,13 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-line-spacing: 0.5em;
 }
 
-/* Action buttons */
-.walkthrough-continue-button {
-    -fx-background-color: -color-accent;
-    -fx-text-fill: -color-fg-emphasis;
-    -fx-border-radius: 0.25em;
-    -fx-background-radius: 0.25em;
-}
-
-.walkthrough-skip-button {
-    -fx-background-color: transparent;
-    -fx-text-fill: -color-accent;
-    -fx-border-color: -color-accent;
-    -fx-border-width: 0.08em;
-    -fx-border-radius: 0.25em;
-    -fx-background-radius: 0.25em;
-}
-
-.walkthrough-back-button {
-    -fx-background-color: transparent;
-    -fx-text-fill: -color-accent;
-    -fx-border-radius: 0.25em;
-    -fx-background-radius: 0.25em;
-}
-
-.walkthrough-quit-button {
-    -fx-background-color: -color-bg-tertiary;
-    -fx-border-color: transparent;
-    /* For easy clipping */
-    -fx-min-width: 2em;
-    -fx-min-height: 2em;
-    -fx-pref-width: 2em;
-    -fx-pref-height: 2em;
-    -fx-max-width: 2em;
-    -fx-max-height: 2em;
-}
-
-.walkthrough-quit-button:hover {
-    -fx-background-color: derive(-color-bg-tertiary, -20%);
-}
-
-.walkthrough-quit-button:pressed {
-    -fx-background-color: derive(-color-bg-tertiary, 30%);
-}
-
 .walkthrough-quit-button .glyph-icon,
 .walkthrough-quit-button .ikonli-font-icon {
     -fx-icon-color: -color-accent;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
-    -fx-font-size: 1.2em;
+    -fx-font-size: 2em;
 }
-
-/* TextFlowLimited */
 
 .text-flow-more-link {
     -fx-background-color: -color-fg-emphasis;
@@ -1676,6 +1599,14 @@ We want to have a look that matches our icons in the tool-bar */
 .info-center-view .notification-view > .content > .text-container > .actions-box .button {
     -fx-background: -color-button-default;
     -fx-background-color: -color-button-default;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button:hover {
+    -fx-background-color: -color-button-default, -color-button-hover;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button:armed {
+    -fx-background-color: -color-button-default, -color-button-pressed;
 }
 
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
