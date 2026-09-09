@@ -19,6 +19,8 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// Asks the user for a donation every six months - shown in the notification center.
+///
+/// [impl->req~ux.donation.recurring-prompt~1]
 @NullMarked
 public class DonationProvider {
     private static final int DONATION_INTERVAL_MONTHS = 6;

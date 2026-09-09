@@ -160,4 +160,12 @@ The themes from <https://themes.jabref.org/> that cover both color schemes are b
 
 Needs: impl
 
+## Donation prompt returns every six months
+`req~ux.donation.recurring-prompt~1`
+
+JabRef asks for a donation one week after the first launch and every six months afterwards.
+The prompt can be snoozed for another six months, but it cannot be switched off permanently.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
