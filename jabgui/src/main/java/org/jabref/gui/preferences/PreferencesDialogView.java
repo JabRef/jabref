@@ -16,6 +16,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.ScrollUtils;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 
@@ -90,6 +91,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             Node content = tab.getContent();
             preferencesContainer.setContent(content);
             content.getStyleClass().add("padding-4");
+            preferencesContainer.setVvalue(0);
+            searchHandler.firstMatch(tab).ifPresent(this::scrollToSearchMatch);
         });
 
         if (this.preferencesTabToSelectClass != null) {
@@ -109,6 +112,17 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.getMemoryStickProperty());
 
         viewModel.setValues();
+    }
+
+    /// Brings the first element matching the search query into view. The content has just been
+    /// attached, so its layout bounds have to be computed before they can be used.
+    private void scrollToSearchMatch(Node match) {
+        if (preferencesContainer.getScene() == null) {
+            return;
+        }
+        preferencesContainer.applyCss();
+        preferencesContainer.layout();
+        ScrollUtils.scrollIntoScrollPane(preferencesContainer, match.localToScene(match.getBoundsInLocal()));
     }
 
     @FXML
