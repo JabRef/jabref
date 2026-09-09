@@ -1,5 +1,6 @@
 # Applies "component: *" and "dev: *" labels to pull requests based on the
-# changed files, as configured in .github/labeler.yml.
+# changed files, as configured in .github/labeler.yml, and a "size: *" label
+# based on the number of changed lines.
 #
 # pull_request_target is required so the workflow has label-write permission
 # on PRs from forks; the labeler action does not check out or run PR code.
@@ -11,6 +12,11 @@ on:
 
 permissions: {}
 
+# Rapid pushes start overlapping runs; only the newest one should get to label.
+concurrency:
+  group: pr-labeler-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   labeler:
     name: Label PR by changed files
@@ -18,9 +24,35 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     timeout-minutes: 15
     steps:
       - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7
         with:
           sync-labels: true
+
+  size:
+    name: Label PR by size
+    if: github.repository == 'JabRef/jabref'
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-slim
+    timeout-minutes: 15
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            // Fetched instead of taken from the event payload: an older payload
+            // would classify by outdated line counts and labels.
+            const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: context.payload.pull_request.number});
+            const changes = pr.additions + pr.deletions;
+            const wanted = changes <= 100 ? 'size: small' : changes <= 500 ? 'size: medium' : 'size: big';
+            const present = pr.labels.map(label => label.name);
+            for (const label of ['size: small', 'size: medium', 'size: big']) {
+              if (label !== wanted && present.includes(label)) {
+                await github.rest.issues.removeLabel({...context.repo, issue_number: pr.number, name: label});
+              }
+            }
+            if (!present.includes(wanted)) {
+              await github.rest.issues.addLabels({...context.repo, issue_number: pr.number, labels: [wanted]});
+            }

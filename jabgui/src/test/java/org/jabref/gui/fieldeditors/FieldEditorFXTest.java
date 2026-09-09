@@ -12,13 +12,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Test;
-import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-class FieldEditorFXTest extends ApplicationTest {
+class FieldEditorFXTest extends JavaFxTest {
 
     private TextField textField;
     private UndoAction undoAction;

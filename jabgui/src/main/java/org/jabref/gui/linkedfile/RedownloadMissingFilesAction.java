@@ -84,7 +84,8 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
                             filePreferences,
                             taskExecutor,
                             fileName,
-                            true);
+                            true,
+                            stateManager.getUndoManager(this.databaseContext));
                     downloadAction.execute();
                 }));
     }
