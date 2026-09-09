@@ -34,7 +34,7 @@ class TooltipTextUtilTest {
     @Test
     void retrieveCorrectTextStyleBold() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.BOLD);
-        String textStyle = "tooltip-text-bold";
+        String textStyle = "bold";
 
         assertEquals(textStyle, text.getStyleClass().toString());
     }
