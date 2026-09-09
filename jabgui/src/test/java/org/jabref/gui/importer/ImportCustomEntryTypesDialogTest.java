@@ -80,8 +80,8 @@ class ImportCustomEntryTypesDialogTest extends JavaFxTest {
         interact(() -> {
             assertEquals(List.of(MANUSCRIPT_FROM_FILE), List.copyOf(unknownTypes().getItems()));
             assertEquals(List.of(AUDIO_FROM_FILE), differentCustomizations().getItems().stream()
-                                                                           .map(BibEntryTypePrefsAndFileViewModel::customTypeFromFile)
-                                                                           .toList());
+                                                                            .map(BibEntryTypePrefsAndFileViewModel::customTypeFromFile)
+                                                                            .toList());
             assertTrue(differentCustomizationBox().isVisible());
         });
     }
