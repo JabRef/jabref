@@ -115,8 +115,8 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
     /// across all fields has to name the case-preserving fields explicitly.
     private static String anyFieldExpression(String value) {
         return LinkedFilesConstants.CASE_SENSITIVE_PDF_FIELDS.stream()
-                                   .map(field -> field + ":" + value)
-                                   .collect(Collectors.joining(" OR ", "(", ")"));
+                                                             .map(field -> field + ":" + value)
+                                                             .collect(Collectors.joining(" OR ", "(", ")"));
     }
 
     private static String escapeQuotes(String term) {
