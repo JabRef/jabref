@@ -20,6 +20,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
@@ -56,11 +58,13 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WelcomeTab extends Tab {
     private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);
+    private static final int MIN_TRUNCATED_FILENAME_LENGTH = 3;
 
     private final VBox recentLibrariesBox;
     private final LibraryTabContainer tabContainer;
@@ -269,6 +273,9 @@ public class WelcomeTab extends Tab {
         Label header = new Label(Localization.lang("Recent"));
         header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
 
+        recentLibrariesBox.widthProperty().addListener((obs, oldWidth, newWidth) ->
+                updateRecentLibraryLinks(newWidth.doubleValue()));
+
         updateWelcomeRecentLibraries();
         fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) _ -> updateWelcomeRecentLibraries());
 
@@ -301,6 +308,53 @@ public class WelcomeTab extends Tab {
         }
     }
 
+    /// Abbreviates a file path by replacing middle directories with "..." based on available space.
+    ///
+    /// @param fullPath the full file path to abbreviate
+    /// @param maxWidth the maximum allowed width of the text
+    /// @param font     the font of the text
+    /// @return the abbreviated path, or null if fullPath is null
+    private static @Nullable String abbreviatePathToFit(@Nullable String fullPath, double maxWidth, Font font) {
+        if (fullPath == null) {
+            return null;
+        }
+        String prefix = "";
+        String path = fullPath;
+        int prefixEnd = fullPath.indexOf(". ");
+        if (prefixEnd > 0 && fullPath.substring(0, prefixEnd).matches("\\d+")) {
+            prefix = fullPath.substring(0, prefixEnd + 2);
+            path = fullPath.substring(prefixEnd + 2);
+        }
+        Text text = new Text(path);
+        text.setFont(font);
+        double textWidth = text.getLayoutBounds().getWidth();
+        Text prefixText = new Text(prefix);
+        prefixText.setFont(font);
+        double prefixWidth = prefixText.getLayoutBounds().getWidth();
+        if (maxWidth >= textWidth + prefixWidth) {
+            return fullPath;
+        }
+        int low = MIN_TRUNCATED_FILENAME_LENGTH;
+        int high = path.length();
+        int bestLength = low;
+        double pathMaxWidth = maxWidth - prefixWidth;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            String abbreviated = StringUtil.abbreviatePath(path, mid);
+            Text candidate = new Text(abbreviated);
+            candidate.setFont(font);
+            double candidateWidth = candidate.getLayoutBounds().getWidth();
+
+            if (candidateWidth <= pathMaxWidth) {
+                bestLength = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return prefix + StringUtil.abbreviatePath(path, bestLength);
+    }
+
     private void updateWelcomeRecentLibraries() {
         if (fileHistoryMenu.getItems().isEmpty()) {
             displayNoRecentLibrariesMessage();
@@ -317,9 +371,6 @@ public class WelcomeTab extends Tab {
             recentLibraryLink.setOnAction(item.getOnAction());
             recentLibrariesBox.getChildren().add(recentLibraryLink);
         }
-        recentLibrariesBox.widthProperty().addListener((obs, oldWidth, newWidth) -> {
-            updateRecentLibraryLinks(newWidth.doubleValue());
-        });
         updateRecentLibraryLinks(recentLibrariesBox.getWidth());
     }
 
@@ -327,7 +378,7 @@ public class WelcomeTab extends Tab {
         for (int i = 0; i < fileHistoryMenu.getItems().size(); i++) {
             MenuItem item = fileHistoryMenu.getItems().get(i);
             Hyperlink link = (Hyperlink) recentLibrariesBox.getChildren().get(i);
-            String text = StringUtil.abbreviatePathToFit(
+            String text = abbreviatePathToFit(
                     item.getText(),
                     availableWidth,
                     link.getFont()
