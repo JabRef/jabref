@@ -110,7 +110,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     ///
     /// @param list List of BibEntries of related articles
     /// @return VBox of related article descriptions to be displayed in the Related Articles tab
-    private ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
+    ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
         ScrollPane scrollPane = new ScrollPane();
 
         VBox vBox = new VBox(4);
@@ -129,7 +129,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
             hBox.getStyleClass().add("padding-left-12");
 
             String title = entry.getTitle().orElse("");
-            String journal = entry.getFieldOrAlias(StandardField.JOURNAL).orElse("");
+            String journal = entry.getField(StandardField.JOURNAL).orElse("");
             String authors = entry.getField(StandardField.AUTHOR).orElse("");
 
             Hyperlink titleLink = new Hyperlink(title);
