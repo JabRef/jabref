@@ -12,6 +12,7 @@ import org.jabref.gui.FXDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.gui.theme.ThemePreset;
+import org.jabref.gui.theme.ThemePreviewView;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.HelpButton;
@@ -23,6 +24,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class ThemeDialog extends FXDialog {
     @FXML private ComboBox<ThemePreset> theme;
     @FXML private ComboBox<ThemeColorScheme> themeColorScheme;
+    @FXML private ThemePreviewView themePreview;
     @FXML private HelpButton helpButton;
     @FXML private CheckBox customTheme;
     @FXML private TextField customThemePath;
@@ -50,13 +52,20 @@ public class ThemeDialog extends FXDialog {
         });
     }
 
+    /// Themes that pair a dark and a light hue are named after the hue of the selected color scheme.
+    private String themeName(ThemePreset preset) {
+        return preset.getLocalizedName(viewModel.selectedThemeColorSchemeProperty().get());
+    }
+
     @FXML
     private void initialize() {
         viewModel = new ThemeDialogViewModel(preferences, dialogService);
 
-        new ViewModelListCellFactory<ThemePreset>()
-                .withText(ThemePreset::getLocalizedName)
-                .install(theme);
+        new ViewModelListCellFactory<ThemePreset>().withText(this::themeName).install(theme);
+        // The button cell renders only when its item changes, so a name following the color scheme
+        // needs a fresh cell; the popup entries are re-rendered when the view model refreshes the list.
+        viewModel.selectedThemeColorSchemeProperty().addListener(_ -> theme.setButtonCell(
+                new ViewModelListCellFactory<ThemePreset>().withText(this::themeName).call(null)));
         theme.itemsProperty().bind(viewModel.themesListProperty());
         theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
 
@@ -65,6 +74,7 @@ public class ThemeDialog extends FXDialog {
                 .install(themeColorScheme);
         themeColorScheme.itemsProperty().bind(viewModel.colorSchemeListProperty());
         themeColorScheme.valueProperty().bindBidirectional(viewModel.selectedThemeColorSchemeProperty());
+        themePreview.bind(viewModel.selectedThemeProperty(), viewModel.selectedThemeColorSchemeProperty());
 
         customTheme.selectedProperty().bindBidirectional(viewModel.customThemeEnabledProperty());
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());

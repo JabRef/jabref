@@ -15,15 +15,12 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.chatting.ChatMessage;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -31,8 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // [utest->feat~ai.chat.jump-to-entry-pdf~1]
-@ExtendWith(ApplicationExtension.class)
-class AiChatMessageViewTest {
+class AiChatMessageViewTest extends JavaFxTest {
 
     private DialogService dialogService;
     private StateManager stateManager;
@@ -40,8 +36,8 @@ class AiChatMessageViewTest {
     private ExternalApplicationsPreferences externalApplicationsPreferences;
     private ClipBoardManager clipBoardManager;
 
-    @Start
-    void start(Stage stage) {
+    @Override
+    public void start(Stage stage) {
         dialogService = mock(DialogService.class);
         stateManager = mock(StateManager.class);
         preferences = mock(GuiPreferences.class);
@@ -62,27 +58,27 @@ class AiChatMessageViewTest {
         stage.show();
     }
 
-    private AiChatMessageView createView(FxRobot robot) {
+    private AiChatMessageView createView() {
         AtomicReference<AiChatMessageView> viewRef = new AtomicReference<>();
-        robot.interact(() -> viewRef.set(new AiChatMessageView()));
+        interact(() -> viewRef.set(new AiChatMessageView()));
         return viewRef.get();
     }
 
     @Test
-    void markdownTextFlowHasCustomHyperlinkHandlerConfigured(FxRobot robot) {
-        AiChatMessageView view = createView(robot);
+    void markdownTextFlowHasCustomHyperlinkHandlerConfigured() {
+        AiChatMessageView view = createView();
         assertNotNull(view.getMarkdownTextFlow().getHyperlinkHandler());
     }
 
     @Test
-    void clickingCitationLinkExecutesJumpToEntryPdfAction(FxRobot robot) {
-        AiChatMessageView view = createView(robot);
-        robot.interact(() -> {
+    void clickingCitationLinkExecutesJumpToEntryPdfAction() {
+        AiChatMessageView view = createView();
+        interact(() -> {
             ChatMessage message = ChatMessage.aiMessage("[Smith2024](entries/Smith2024#page=12)", List.of());
             view.setChatMessage(message);
         });
 
-        robot.interact(() -> {
+        interact(() -> {
             Hyperlink hyperlink = (Hyperlink) view.getMarkdownTextFlow().getChildren().getFirst();
             hyperlink.fire();
         });

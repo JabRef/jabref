@@ -217,6 +217,10 @@ public class SharedDatabasePreferences {
         setExpertMode(properties.isUseExpertMode());
         setJdbcUrl(properties.getJdbcUrl());
 
-        setPassword(properties.getPassword());
+        // The login dialog's "Remember password" choice governs every node: a live connection still holds the
+        // password the user typed, which must not reach the keyring when they opted out
+        boolean rememberPassword = new SharedDatabasePreferences().getRememberPassword();
+        setRememberPassword(rememberPassword);
+        setPassword(rememberPassword ? properties.getPassword() : "");
     }
 }

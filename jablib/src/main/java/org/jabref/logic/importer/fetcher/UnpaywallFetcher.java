@@ -84,7 +84,7 @@ public class UnpaywallFetcher implements SearchBasedFetcher, CustomizableKeyFetc
             HttpURLConnection connection = (HttpURLConnection) testUrl.openConnection();
             int statusCode = connection.getResponseCode();
             return (statusCode >= 200) && (statusCode < 300);
-        } catch (IOException | UnirestException e) {
+        } catch (IOException | UnirestException _) {
             return false;
         }
     }

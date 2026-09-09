@@ -8,7 +8,7 @@ parent: Requirements
 
 Changes made by one client — entry modifications, groups, and library settings — appear in all other connected clients without any manual action.
 
-Needs: impl
+Needs: impl, utest
 
 ## Change content travels in the notification
 `req~shared-database.change-content-in-notification~1`
@@ -38,6 +38,27 @@ When a local change is refused because the shared entry has a newer version, the
 
 Needs: impl
 
+## Changes made without connection are not lost
+`req~shared-database.offline-changes~1`
+
+When the connection to the shared database is lost, the user keeps working: every change is kept locally, survives closing and reopening JabRef, and is synchronized on the next connect to the same database. A kept change whose shared entry was changed meanwhile is offered for merging.
+
+Needs: impl
+
+## The connection is re-established automatically
+`req~shared-database.automatic-reconnect~1`
+
+After a connection loss, JabRef reconnects by itself with increasing intervals for as long as the library is open. The user is informed when the connection is lost and when it is back, without being interrupted.
+
+Needs: impl
+
+## A shared database's loading state is indicated
+`req~shared-database.loading-indicator~1`
+
+While JabRef opens or reconnects a shared database, its library tab displays a loading indicator until the connection completes or fails.
+
+Needs: impl
+
 ## Existing databases are migrated
 `req~shared-database.migration~1`
 
@@ -49,6 +70,13 @@ Needs: impl
 `req~shared-database.connection-url~1`
 
 The login dialog accepts a connection URL as handed out by hosting providers (`postgres://user:password@host:port/database?...`) or a JDBC URL and fills in the connection details from it. Parameters JabRef has no dedicated setting for are passed on to the driver unchanged.
+
+Needs: impl
+
+## Connected databases are reopened on startup
+`req~shared-database.reopen-on-startup~1`
+
+A shared database that is still connected when JabRef closes is reconnected on the next start, like the last opened local libraries. This also covers connections that are not backed by a local file.
 
 Needs: impl
 
