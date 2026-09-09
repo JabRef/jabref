@@ -298,13 +298,13 @@ public class ComplexSearchQuery {
             int toYear = 9999;
             try {
                 fromYear = Integer.parseInt(split[0]);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException _) {
                 // default value already set
             }
             if (split.length > 1) {
                 try {
                     toYear = Integer.parseInt(split[1]);
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException _) {
                     // default value already set
                 }
             }
