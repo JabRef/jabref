@@ -412,6 +412,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initBindings() {
+        // Every tab shows its close button, so selecting a tab does not shift its label
+        tabbedPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
         BindingsHelper.bindContentFiltered(tabbedPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed

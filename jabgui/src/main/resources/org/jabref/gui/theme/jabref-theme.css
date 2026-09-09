@@ -586,6 +586,10 @@ TextFlow > Text {
     -fx-text-fill: -color-accent;
 }
 
+.tab-pane > .tab-header-area > .headers-region > .tab .tab-close-button {
+    -fx-background-color: -color-fg-muted;
+}
+
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-close-button {
     -fx-background-color: -color-accent;
 }
