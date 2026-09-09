@@ -2,6 +2,7 @@ package org.jabref.gui.shared;
 
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
@@ -12,12 +13,14 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
@@ -33,6 +36,7 @@ import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -41,8 +45,12 @@ import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SharedDatabaseUIManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SharedDatabaseUIManager.class);
 
     private final LibraryTabContainer tabContainer;
     private DatabaseSynchronizer dbmsSynchronizer;
@@ -150,10 +158,54 @@ public class SharedDatabaseUIManager {
                 String.valueOf(event.bibEntries().size())));
     }
 
-    /// Opens a new shared database tab with the given [DBMSConnectionProperties].
+    /// [impl->req~shared-database.connect-in-background~1]
     ///
-    /// @param dbmsConnectionProperties Connection data
-    /// @return BasePanel which also used by [org.jabref.gui.exporter.SaveDatabaseAction]
+    /// Connects off the JavaFX thread while `placeholder` shows "Connecting...". On success the library tab replaces
+    /// the placeholder (see [LibraryTabContainer#addTab(LibraryTab, boolean)]); on failure the placeholder shows the
+    /// error and offers a retry. A result whose placeholder was closed meanwhile (or JabRef quit) is discarded.
+    ///
+    /// @param onOpened runs on the JavaFX thread with the opened library tab
+    public void connectInBackground(SharedDatabasePlaceholderTab placeholder, DBMSConnectionProperties connectionProperties, Consumer<LibraryTab> onOpened) {
+        BackgroundTask.wrap(() -> connect(connectionProperties))
+                      .onSuccess(bibDatabaseContext -> {
+                          if (placeholder.isAbandoned()) {
+                              bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+                              return;
+                          }
+                          onOpened.accept(openTab(bibDatabaseContext));
+                      })
+                      .onFailure(exception -> {
+                          LOGGER.error("Could not connect to shared database {}", connectionProperties.getDatabase(), exception);
+                          if (placeholder.isAbandoned()) {
+                              return;
+                          }
+                          // The placeholder alone is easy to miss among the libraries that did open, so the failure is announced as well.
+                          dialogService.notify(Localization.lang("Could not reconnect to shared database %0.", connectionProperties.getDatabase()));
+                          placeholder.setRetryAction(() -> connectInBackground(placeholder, connectionProperties, onOpened));
+                          placeholder.showError(exception);
+                          if (exception instanceof DatabaseNotSupportedException) {
+                              offerMigration(placeholder);
+                          }
+                      })
+                      .executeWith(taskExecutor);
+    }
+
+    // [impl->req~shared-database.migration~1]
+    private void offerMigration(SharedDatabasePlaceholderTab placeholder) {
+        ButtonType openHelp = new ButtonType(Localization.lang("Open help"), ButtonBar.ButtonData.OTHER);
+        Optional<ButtonType> result = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
+                Localization.lang("Migration help information"),
+                Localization.lang("Entered database has obsolete structure and is no longer supported.")
+                        + "\n" +
+                        Localization.lang("Click help to learn about the migration of pre-3.6 databases.")
+                        + "\n" +
+                        Localization.lang("However, a new database was created alongside the pre-3.6 one."),
+                ButtonType.OK, openHelp);
+        result.filter(openHelp::equals).ifPresent(_ -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
+        // The new database is connected on retry
+        result.filter(ButtonType.OK::equals).ifPresent(_ -> placeholder.retry());
+    }
+
     /// Connects and loads the shared database. Blocks on the network, so call it off the JavaFX thread and hand the
     /// result to [#openTab(BibDatabaseContext)].
     public BibDatabaseContext connect(DBMSConnectionProperties dbmsConnectionProperties)

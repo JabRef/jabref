@@ -80,4 +80,11 @@ If reconnecting on startup fails, the database is shown as a tab carrying the er
 
 Needs: impl
 
+## Connecting does not block the user interface
+`req~shared-database.connect-in-background~1`
+
+Connecting to a shared database (from the connection dialog as well as on startup) happens in the background. The dialog closes immediately and the library appears as a tab that shows "Connecting..." until the entries are loaded, or the error and a retry button if the connection fails. JabRef stays usable meanwhile.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
