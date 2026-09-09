@@ -17,10 +17,13 @@ import org.jabref.logic.l10n.Localization;
 
 import com.dlsc.pdfviewfx.PDFView;
 import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// A document viewer that wraps the PDFView control for displaying PDF documents.
+@NullMarked
 public class PdfDocumentViewer extends StackPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfDocumentViewer.class);
@@ -54,7 +57,7 @@ public class PdfDocumentViewer extends StackPane {
         return highlightText;
     }
 
-    public void show(Path document) {
+    public void show(@Nullable Path document) {
         if (document != null) {
             pdfView.setVisible(false);
             placeholderLabel.setText(Localization.lang("Loading PDF..."));

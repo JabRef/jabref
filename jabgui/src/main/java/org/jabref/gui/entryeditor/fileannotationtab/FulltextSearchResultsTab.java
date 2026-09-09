@@ -162,14 +162,16 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
         pageLink.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {
-                if (documentViewerView == null) {
-                    documentViewerView = new DocumentViewerView();
-                }
-                documentViewerView.switchToFile(linkedFile);
-                documentViewerView.gotoPage(pageNumber);
-                documentViewerView.highlightText(searchExpression);
-                documentViewerView.disableLiveMode();
-                dialogService.showCustomDialog(documentViewerView);
+                BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
+                linkedFile.findIn(databaseContext, preferences.getFilePreferences()).ifPresentOrElse(path -> {
+                    if (documentViewerView == null) {
+                        documentViewerView = new DocumentViewerView();
+                    }
+                    documentViewerView.showDocument(path);
+                    documentViewerView.gotoPage(pageNumber);
+                    documentViewerView.highlightText(searchExpression);
+                    dialogService.showCustomDialog(documentViewerView);
+                }, () -> dialogService.notify(Localization.lang("File %0 not found.", linkedFile.getLink())));
             }
         });
         return pageLink;
