@@ -114,8 +114,13 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         viewModel.setValues();
     }
 
-    /// Brings the first element matching the search query into view. The content has just been
-    /// attached, so its layout bounds have to be computed before they can be used.
+    /// Brings the first element matching the search query into view.
+    ///
+    /// The content was attached to the scroll pane just above. A tab shown for the first time has a
+    /// content height of 0 until it is laid out, and [ScrollUtils] then reads that as "fits into the
+    /// viewport" and does not scroll - hence the explicit layout pass.
+    /// [javafx.application.Platform#runLater] is no substitute: measured on this dialog, the queued
+    /// task still runs before the pulse's layout and sees the same height of 0.
     private void scrollToSearchMatch(Node match) {
         if (preferencesContainer.getScene() == null) {
             return;
