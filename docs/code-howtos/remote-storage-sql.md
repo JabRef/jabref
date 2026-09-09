@@ -135,6 +135,7 @@ The user only sees two notifications (connection lost / restored); the notificat
 ## Connection keepalive settings at the PostgreSQL server
 
 Using PostgreSQL as a shared database server, there may be issues related to keeping the connection alive depending on the system. This is not an issue that can be controlled by JabRef itself but rather by the system connection settings. One possibility is to adjust the `postgresql.conf` with exemplary values here [1]:
+
 - `tcp_keepalives_idle = 300`
 - `tcp_keepalives_interval = 60`
 - `tcp_keepalives_count = 5`
