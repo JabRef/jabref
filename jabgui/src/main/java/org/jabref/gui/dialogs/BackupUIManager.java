@@ -129,6 +129,14 @@ public class BackupUIManager {
 
                     // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
+                    if (resolvedChanges.stream().anyMatch(DatabaseChange::isAccepted)) {
+                        // The original may have failed to parse at all (e.g. it still contains merge conflict markers),
+                        // which leaves the result marked invalid. Content from the backup was just merged in, so the
+                        // result is usable now: without clearing the flag the caller reports an open error and closes
+                        // the tab, discarding the recovery. If every change was denied there is nothing to keep, and
+                        // the result stays invalid so that an unreadable original is still reported.
+                        originalParserResult.setInvalid(false);
+                    }
                     return Optional.of(originalParserResult);
                 }
 
