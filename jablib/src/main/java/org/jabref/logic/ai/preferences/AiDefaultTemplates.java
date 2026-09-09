@@ -11,33 +11,43 @@ public final class AiDefaultTemplates {
             Relay metadata only, if queried.
 
             ## Citing sources
-            Each snippet is tagged with a citationkey. The user prompt lists the valid citationkeys for this request and states whether citation is required.
+            Each snippet is tagged with a citationkey, and may optionally be tagged with a page. The user prompt lists the valid citationkeys for this request and states whether citation is required.
+
+            Citations are always formatted as a Markdown link of the form:
+            [@citationkey](entries/citationkey)
+            If — and only if — the snippet you are drawing on was supplied with a page, append a page fragment to the link target instead:
+            [@citationkey](entries/citationkey#page=N)
+            Never invent a page number. If no page was supplied for the snippet, use the plain form without #page=N.
 
             When citation is required:
-            A) For each paragraph that draws on one or more snippets, append the citationkey(s) at the very end of the paragraph, after the final period, inside a single pair of square brackets.
-            If a paragraph draws on several snippets, list all of their citationkeys separated by a comma inside the brackets.
-            Example: ...end of the paragraph. [smith2023, jones2021]
-            B) In-text citations similarly are conducted by enclosing the citatonkey with a pair of brackets.
+            A) For each paragraph that draws on one or more snippets, append the citation link(s) at the very end of the paragraph, after the final period.
+            If a paragraph draws on several snippets, list each one as its own Markdown link, separated by commas.
+            Example (no page): ...end of the paragraph. [@smith2023](entries/smith2023)
+            Example (with page): ...end of the paragraph. [@smith2023](entries/smith2023#page=12)
+            Example (multiple sources): ...end of the paragraph. [@smith2023](entries/smith2023#page=12), [@jones2021](entries/jones2021)
+
+            B) In-text citations use the same Markdown link format, inline.
             Examples:
-            ... in text [mustermann2001].
-            In text [mustermann2012] ...
-            [mustermann2009] in text ...
+            ... in text [@mustermann2001](entries/mustermann2001).
+            In text [@mustermann2012](entries/mustermann2012#page=4) ...
+            [@mustermann2009](entries/mustermann2009) in text ...
 
             ## Source separation
             Do not merge information from different snippets or papers into a single paragraph. Keep each source's contribution in its own paragraph, separated by a blank line from the next, so every paragraph is attributable to a single citationkey.
 
             Structure your answer as a sequence of source-specific paragraphs:
             - One paragraph per source (or per snippet), containing only claims drawn from that source's snippet(s).
-            - End each paragraph with its citationkey in square brackets, as specified above.
+            - End each paragraph with its citation link(s) as specified above.
             - Separate paragraphs with a blank line so each section stands on its own and can be cited individually.
 
             If the question asks for commonalities or a comparison across papers, first give the per-source paragraphs, then optionally add a short synthesis paragraph at the end that must cite every key it draws on. Never blend claims from multiple sources inside a per-source paragraph.
 
             Rules:
             - Use only citationkeys from the valid list in the user prompt; never invent or alter a key.
-            - Add a citationkey only to paragraphs that contain text derived from snippets.
-            - If snippets do not contain the requested information, notify the user and add no citationkey.
-            - When citation is not required (single-paper request), never append any citationkey.
+            - Add a citation link only to paragraphs that contain text derived from snippets.
+            - Only include a #page=N fragment when a page was explicitly supplied for that snippet; never guess or infer a page number.
+            - If snippets do not contain the requested information, notify the user and add no citation.
+            - When citation is not required (single-paper request), never append any citation link.
 
             Being factual and using a professional tone should be a matter of course.
             Format responses in Markdown.
@@ -63,10 +73,10 @@ public final class AiDefaultTemplates {
             #end
 
             #if( $multiPaper )
-            Citation is REQUIRED: append the citationkey(s) at the end of every paragraph that uses snippet content, as specified in the system instructions.
-            Citation is Optional: If in-text citations are used, they have to be formated as specified in the system instructions.
+            Citation is REQUIRED: append the citation link(s) at the end of every paragraph that uses snippet content, formatted as [@citationkey](entries/citationkey) — or [@citationkey](entries/citationkey#page=N) if that snippet has a page — as specified in the system instructions.
+            Citation is Optional: If in-text citations are used, they have to be formatted the same way, as specified in the system instructions.
             #else
-            Citation is NOT required: all snippets come from a single paper. Do not append any citationkey.
+            Citation is NOT required: all snippets come from a single paper. Do not append any citation link.
             #end
 
             ### Metadata
@@ -76,16 +86,20 @@ public final class AiDefaultTemplates {
 
             ### Snippets
             #foreach( $excerpt in $excerpts )
+            #if( $excerpt.pageNumber() )
+            <source citationkey="$!{excerpt.source()}" page="$!{excerpt.pageNumber()}">
+            #else
             <source citationkey="$!{excerpt.source()}">
+            #end
             $!{excerpt.text()}
             </source>
             #end
 
             #if( $multiPaper )
             ### Expected output structure
-            Give one paragraph per source, in this order, each followed by its citationkey in square brackets. Separate paragraphs with a blank line. You may add a short synthesis paragraph at the end that cites all keys it draws on.
+            Give one paragraph per source, in this order, each followed by its citation link in square-bracket Markdown form. Separate paragraphs with a blank line. You may add a short synthesis paragraph at the end that cites all keys it draws on.
             #foreach( $k in $keys )
-            [$k]
+            [@$k](entries/$k)
             ...paragraph drawing only on the snippet(s) with citationkey $k...
             #end
             #end""";
@@ -110,22 +124,22 @@ public final class AiDefaultTemplates {
     public static final String CITATION_PARSING_USER_MESSAGE_TEMPLATE = "Please convert this plain text citation to a BibTeX entry:\n$citation\nIn your output, please provide only BibTeX code as your message.";
 
     public static final String MARKDOWN_CHAT_EXPORT_TEMPLATE = """
-            # AI chat
+                        # AI chat
 
-            ## BibTeX
+                        ## BibTeX
 
             ```bibtex
-            $bibtex
+                        $bibtex
             ```
 
-            ## Conversation
+                        ## Conversation
 
-            #foreach( $message in $messages )
-            **$message.role().getDisplayName():**
+                        #foreach( $message in $messages )
+                        **$message.role().getDisplayName():**
 
-            $message.content()
+                        $message.content()
 
-            #end""";
+                        #end""";
 
     public static final String FOLLOW_UP_QUESTIONS_TEMPLATE = """
             Based on this conversation:
