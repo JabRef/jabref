@@ -144,8 +144,11 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         addNewField.setPromptText(Localization.lang("Field..."));
 
         fieldPropertyCheckComboBox.setPrefWidth(180.0);
+        fieldPropertyCheckComboBox.prefHeightProperty().bind(addNewField.heightProperty());
 
         addNewFieldButton.setPrefWidth(100.0);
+        addNewFieldButton.setStyle("-fx-padding: 0.3em 1em 0.3em 1em;");
+        addNewFieldButton.prefHeightProperty().bind(fieldPropertyCheckComboBox.heightProperty());
         addNewFieldButton.setOnAction(_ -> addNewField());
 
         HBox addFieldRow = new HBox(GAP, addNewField, fieldPropertyCheckComboBox, addNewFieldButton);
