@@ -2486,6 +2486,48 @@ class BibtexParserTest {
                         }
                         >>>>>>> other
                         """,
+                // conflict inside a preamble, which the parser otherwise recovers from
+                """
+                        @Preamble{"first
+                        second
+                        <<<<<<< HEAD
+                        third
+                        =======
+                        other
+                        >>>>>>> other
+                        "}
+                        """,
+                // conflict inside an @Comment, which the parser otherwise reads as plain text
+                """
+                        @Comment{first
+                        second
+                        <<<<<<< HEAD
+                        third
+                        }
+                        """,
+                // conflict inside a quoted field value
+                """
+                        @Article{first,
+                          author = "Author
+                        <<<<<<< HEAD
+                        Another",
+                        }
+                        """,
+                // diff3 style conflict, reported at its "<<<<<<<" line
+                """
+                        @Article{first,
+                        }
+                        <<<<<<< HEAD
+                        @Article{second,
+                        }
+                        ||||||| base
+                        @Article{base,
+                        }
+                        =======
+                        @Article{third,
+                        }
+                        >>>>>>> other
+                        """,
                 // botched merge with longer runs, https://github.com/JabRef/jabref/issues/9167
                 """
                         @Article{first,
@@ -2495,6 +2537,42 @@ class BibtexParserTest {
                         }
                         >>>>>>>>>>> other
                         """);
+    }
+
+    /// The parser peeks (reads and unreads) while scanning a quoted value, so a character must not be counted twice.
+    @ParameterizedTest
+    @ValueSource(strings = {"<<<<", "<<<<<", "<<<<<<", ">>>>", ">>>>>", ">>>>>>"})
+    void runShorterThanAConflictMarkerIsKept(String shortRun) throws IOException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.COMMENT, "line one\n" + shortRun + " quoted mail\nline two");
+
+        ParserResult result = parser.parse(Reader.of("""
+                @Article{test,
+                  comment = "line one
+                %s quoted mail
+                line two",
+                }
+                """.formatted(shortRun)));
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void lineOfSevenPipesIsNoConflictMarker() throws IOException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.COMMENT, "line one\n|||||||\nline two");
+
+        ParserResult result = parser.parse(Reader.of("""
+                @Article{test,
+                  comment = {line one
+                |||||||
+                line two},
+                }
+                """));
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test

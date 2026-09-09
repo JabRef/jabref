@@ -109,8 +109,8 @@ public class BibtexParser implements Parser {
 
     private int line = 1;
     private int column = 1;
+    /// `0` while the current line does not start with a run of conflict marker characters
     private char conflictMarkerCharacter;
-    private int conflictMarkerRun;
     // Stores the last read column of the highest column number encountered on any line so far.
     // The intended data structure is Stack, but it is not used because Java code style checkers complain.
     // In basic JDK data structures, there is no size-limited stack. We did not want to include Apache Commons Collections only for "CircularFifoBuffer"
@@ -187,6 +187,7 @@ public class BibtexParser implements Parser {
             return parseFileContent();
         } catch (ConflictMarkerFoundException exception) {
             // Parsing on would silently drop one side of the conflict or store the markers in an entry's serialization
+            LOGGER.debug("Aborted parsing, because the file contains a merge conflict marker", exception);
             return ParserResult.fromErrorMessage(exception.getMessage());
         }
     }
@@ -676,20 +677,21 @@ public class BibtexParser implements Parser {
         return character;
     }
 
-    /// Counts a run of conflict marker characters at the start of a line. `column` still holds the column of the just-read character.
+    /// Detects a run of conflict marker characters at the start of a line. `column` still holds the column of the just-read character.
     ///
-    /// Only `<` and `>` are looked for: a line of `=` or `|` also appears as a decorative rule in comments and field values.
-    private void checkForConflictMarker(int character) throws ConflictMarkerFoundException {
+    /// The state is keyed on `column` (which [#unread(int)] restores) instead of on a counter: lookahead reads a character, unreads it and reads it again, and each physical character must be counted once only.
+    ///
+    /// Only `<` and `>` are looked for. A line of `=` or `|` also appears as a decorative rule in comments and field values, and looking for them buys nothing:
+    /// the `=======` separator and the `||||||| base` line of a diff3 style conflict are always preceded by a `<<<<<<<` line, which is reported first anyway.
+    private void checkForConflictMarker(int character) {
         if ((column == 1) && ((character == '<') || (character == '>'))) {
             conflictMarkerCharacter = (char) character;
-            conflictMarkerRun = 1;
-        } else if ((conflictMarkerRun > 0) && (character == conflictMarkerCharacter)) {
-            conflictMarkerRun++;
-            if (conflictMarkerRun == CONFLICT_MARKER_LENGTH) {
-                throw new ConflictMarkerFoundException(line);
-            }
-        } else {
-            conflictMarkerRun = 0;
+        } else if ((conflictMarkerCharacter == 0) || (character != conflictMarkerCharacter)) {
+            conflictMarkerCharacter = 0;
+            return;
+        }
+        if (column == CONFLICT_MARKER_LENGTH) {
+            throw new ConflictMarkerFoundException(line);
         }
     }
 
@@ -1267,8 +1269,10 @@ public class BibtexParser implements Parser {
 
     /// Thrown as soon as an unresolved version control conflict marker is read, which makes the rest of the file meaningless.
     ///
+    /// Unchecked on purpose: the parser recovers from [IOException] in several places (e.g., [#isClosingBracketNext()]), and a conflict marker must not be recoverable.
+    ///
     /// [impl->req~import.bibtex.merge-conflict-markers~1]
-    private static class ConflictMarkerFoundException extends IOException {
+    private static class ConflictMarkerFoundException extends RuntimeException {
         ConflictMarkerFoundException(int line) {
             super(Localization.lang("Found a merge conflict marker in line %0. Please resolve the conflict in the file before opening it.", String.valueOf(line)));
         }
