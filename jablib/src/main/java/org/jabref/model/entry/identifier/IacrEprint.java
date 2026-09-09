@@ -48,7 +48,7 @@ public class IacrEprint implements Identifier {
         String trimmed = identifier.strip();
         try {
             return Optional.of(new IacrEprint(trimmed));
-        } catch (IllegalArgumentException illegalArgumentException) {
+        } catch (IllegalArgumentException _) {
             return Optional.empty();
         }
     }

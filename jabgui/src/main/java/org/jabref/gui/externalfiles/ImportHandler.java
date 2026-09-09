@@ -628,7 +628,7 @@ public class ImportHandler {
                 } else {
                     failures.add(Localization.lang("String constant \"%0\" was not imported because it is not a valid string constant", stringConstantToAdd.getName()));
                 }
-            } catch (KeyCollisionException ex) {
+            } catch (KeyCollisionException _) {
                 failures.add(Localization.lang("String constant %0 was not imported because it already exists in this library", stringConstantToAdd.getName()));
             }
         }
