@@ -34,6 +34,9 @@
         /* The check box square only; see the .check-box > .box rule. Defaults to the border color, so a theme that
            only retunes -color-border-default keeps its check boxes in step, and can still set this one on its own. */
         -color-checkbox-border: -color-border-default;
+        /* The frame of a text field, text area, combo box and date picker. Same defaulting as above; the entry
+           editor rebinds it to its own surface so a labelled field row shows no frame until it is used. */
+        -color-input-border: -color-border-default;
 
         /* Accent -- the JabRef brand color and its tint */
         -color-accent: #50618F;
@@ -125,6 +128,9 @@
         /* The check box square only; see the .check-box > .box rule. Defaults to the border color, so a theme that
            only retunes -color-border-default keeps its check boxes in step, and can still set this one on its own. */
         -color-checkbox-border: -color-border-default;
+        /* The frame of a text field, text area, combo box and date picker. Same defaulting as above; the entry
+           editor rebinds it to its own surface so a labelled field row shows no frame until it is used. */
+        -color-input-border: -color-border-default;
 
         /* Accent -- the JabRef brand color and its tint */
         -color-accent: #2C9490;
@@ -663,7 +669,7 @@ TextFlow > Text {
 
 .combo-box-base:editable > .text-field,
 .date-picker > .text-field {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-input-border, -color-bg-secondary;
     -fx-background-insets: 0, 1;
     -fx-background-radius: 0.25em;
 }
@@ -831,7 +837,7 @@ TextFlow > Text {
 /* JavaFX TextInput / TextField / TextArea */
 
 .text-input {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-input-border, -color-bg-secondary;
     -fx-background-insets: 0, 1;
     -fx-background-radius: 0.25em;
     -fx-prompt-text-fill: -color-scrollbar-thumb;
@@ -850,7 +856,7 @@ TextFlow > Text {
 }
 
 .text-area .content {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-input-border, -color-bg-secondary;
     -fx-background-insets: 0, 1;
     -fx-padding: 0.333333em 0.583em 0.333333em 0.583em;
     -fx-background-radius: 0;
