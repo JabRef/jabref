@@ -52,7 +52,7 @@ public class BibDatabaseContext {
 
     private final BibDatabase database;
 
-    private MetaData metaData;
+    private final MetaData metaData;
 
     /// Generate a random UID for unique of the concrete context
     /// In contrast to hashCode this stays unique
@@ -131,10 +131,6 @@ public class BibDatabaseContext {
 
     public MetaData getMetaData() {
         return metaData;
-    }
-
-    public void setMetaData(MetaData metaData) {
-        this.metaData = metaData;
     }
 
     public boolean isBiblatexMode() {

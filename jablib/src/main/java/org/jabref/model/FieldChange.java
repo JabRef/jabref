@@ -1,83 +1,28 @@
 package org.jabref.model;
 
-import java.util.Objects;
-
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/// This class is used in the instance of a field being modified, removed or added.
+/// One field of one entry, modified, removed or added: what it held before and what it holds now.
+///
+/// Returned by everything in jablib that edits entries — cleanups, formatters, group assignment —
+/// so that a caller can report or record what happened. [org.jabref.model.undo.UndoableFieldChange]
+/// is the same four values as an undoable change, and is built from one of these.
+///
+/// Two changes are equal when they describe the same modification of equal entries — the entry is
+/// compared as [BibEntry] compares. [org.jabref.model.undo.UndoableFieldChange] deliberately does
+/// not: a step on the undo stack has to describe *that* entry object, so it compares the entry by
+/// identity. That difference is why the two are not one type.
+///
+/// @param entry    the entry whose field changed
+/// @param field    the field that changed
+/// @param oldValue what the field held before, or `null` when it had no value
+/// @param newValue what the field holds now, or `null` when it was removed
 @NullMarked
-public class FieldChange {
-
-    private final BibEntry entry;
-    private final Field field;
-    @Nullable private final String oldValue;
-    @Nullable private final String newValue;
-
-    public FieldChange(BibEntry entry, Field field, @Nullable String oldValue, @Nullable String newValue) {
-        this.entry = entry;
-        this.field = field;
-        this.oldValue = oldValue;
-        this.newValue = newValue;
-    }
-
-    public BibEntry getEntry() {
-        return this.entry;
-    }
-
-    public Field getField() {
-        return this.field;
-    }
-
-    public @Nullable String getOldValue() {
-        return this.oldValue;
-    }
-
-    public @Nullable String getNewValue() {
-        return this.newValue;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(entry, field, newValue, oldValue);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj instanceof FieldChange other) {
-            // Entry never null
-            if (!entry.equals(other.entry)) {
-                return false;
-            }
-
-            // Field never null
-            if (!field.equals(other.field)) {
-                return false;
-            }
-
-            if (newValue == null) {
-                if (other.newValue != null) {
-                    return false;
-                }
-            } else if (!newValue.equals(other.newValue)) {
-                return false;
-            }
-
-            if (oldValue == null) {
-                return other.oldValue == null;
-            } else {
-                return oldValue.equals(other.oldValue);
-            }
-        }
-        return false;
-    }
-
+public record FieldChange(BibEntry entry, Field field, @Nullable String oldValue, @Nullable String newValue) {
     @Override
     public String toString() {
         return "FieldChange [entry=" + entry.getCitationKey().orElse("") + ", field=" + field + ", oldValue="
