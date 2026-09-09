@@ -52,7 +52,7 @@ class ExternalChangesResolverViewModelTest {
     }
 
     @Test
-    // [utest->req~jabgui.autosaveandbackup.backup-merge-modified~1]
+        // [utest->req~jabgui.autosaveandbackup.backup-merge-modified~1]
     void resolvedListenerSeesFinalAcceptedState() {
         BibEntry entry = new BibEntry().withCitationKey("Key");
         DatabaseChange change = new EntryAdd(entry, new BibDatabaseContext(), null);
