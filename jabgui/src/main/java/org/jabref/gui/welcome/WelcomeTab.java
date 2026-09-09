@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
@@ -63,11 +62,6 @@ import org.slf4j.LoggerFactory;
 public class WelcomeTab extends Tab {
     private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);
 
-    /// Share of the window width kept free on each side. A share instead of a fixed padding, so that
-    /// the content keeps growing with the window until it reaches the maximum width of
-    /// `.welcome-main-container`.
-    private static final double HORIZONTAL_PADDING_RATIO = 0.05;
-
     private final VBox recentLibrariesBox;
     private final LibraryTabContainer tabContainer;
     private final GuiPreferences preferences;
@@ -123,17 +117,13 @@ public class WelcomeTab extends Tab {
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
         main = new VBox(4, createTopTitles(), new VBox(), createCommunityBox());
-        main.getStyleClass().addAll("welcome-main-container", "align-center", "padding-4");
+        main.getStyleClass().addAll("align-center", "padding-8");
         initializeColumns();
 
         VBox container = new VBox(main);
         container.setAlignment(Pos.CENTER);
 
         StackPane rootPane = new StackPane(container);
-        container.paddingProperty().bind(rootPane.widthProperty().map(width -> {
-            double padding = width.doubleValue() * HORIZONTAL_PADDING_RATIO;
-            return new Insets(0, padding, 0, padding);
-        }));
         setContent(rootPane);
 
         donationProvider = new DonationProvider(rootPane, preferences, dialogService);
@@ -153,8 +143,8 @@ public class WelcomeTab extends Tab {
     }
 
     private void initializeColumns() {
-        GridPane grid = new GridPane();
-        grid.getStyleClass().addAll("align-top-center", "gap-24");
+        GridPane grid = new GridPane(24, 24);
+        grid.getStyleClass().add("align-top-center");
 
         VBox leftColumn = createLeftColumn();
         GridPane.setHgrow(leftColumn, Priority.ALWAYS);
@@ -322,8 +312,8 @@ public class WelcomeTab extends Tab {
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
             Hyperlink recentLibraryLink = new Hyperlink(item.getText());
-            // Shortened to whatever the column offers, so that the file name stays visible as long as possible.
-            recentLibraryLink.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
+            // Shortened to whatever the column offers; the ellipsis goes in front so that the file name stays visible.
+            recentLibraryLink.setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);
             recentLibraryLink.setTooltip(new Tooltip(item.getText()));
             recentLibraryLink.getStyleClass().addAll("welcome-hyperlink", "h4");
             recentLibraryLink.setOnAction(item.getOnAction());

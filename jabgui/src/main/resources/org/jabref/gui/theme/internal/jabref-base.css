@@ -127,7 +127,6 @@
 .gap-4 { -fx-hgap: 0.333em; -fx-vgap: 0.333em; }
 .gap-8 { -fx-hgap: 0.667em; -fx-vgap: 0.667em; }
 .gap-12 { -fx-hgap: 1em; -fx-vgap: 1em; }
-.gap-24 { -fx-hgap: 2em; -fx-vgap: 2em; }
 
 /* Alignment */
 .align-center { -fx-alignment: center; }
@@ -853,14 +852,6 @@ We want to have a look that matches our icons in the tool-bar */
 .welcome-hyperlink:visited {
     -fx-text-fill: -color-accent;
 }
-
-/* Welcome Tab Layout Styles */
-/* The font family is declared once here and inherited by everything inside. */
-.welcome-main-container {
-    -fx-font-family: "Arial";
-    -fx-max-width: 96em;
-}
-
 
 /* Welcome Community  */
 .welcome-community-link:hover {
