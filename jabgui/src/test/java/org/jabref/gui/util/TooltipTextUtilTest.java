@@ -34,7 +34,7 @@ class TooltipTextUtilTest {
     @Test
     void retrieveCorrectTextStyleBold() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.BOLD);
-        String textStyle = "tooltip-text-bold";
+        String textStyle = "bold";
 
         assertEquals(textStyle, text.getStyleClass().toString());
     }
@@ -49,7 +49,7 @@ class TooltipTextUtilTest {
     @Test
     void retrieveCorrectTextStyleItalic() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.ITALIC);
-        String textStyle = "tooltip-text-italic";
+        String textStyle = "italic";
 
         assertEquals(textStyle, text.getStyleClass().toString());
     }
@@ -64,14 +64,14 @@ class TooltipTextUtilTest {
     @Test
     void createTextMonospaced() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
-        assertEquals("tooltip-text-monospaced", text.getStyleClass().toString());
+        assertEquals("font-monospace", text.getStyleClass().toString());
         assertEquals(testText, text.getText());
     }
 
     @Test
     void retrieveCorrectStyleMonospaced() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
-        String textStyle = "tooltip-text-monospaced";
+        String textStyle = "font-monospace";
 
         assertEquals(textStyle, text.getStyleClass().toString());
     }
@@ -113,7 +113,7 @@ class TooltipTextUtilTest {
     @Test
     void transformTextToHtmlStringMonospacedBold() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
-        text.getStyleClass().add("tooltip-text-bold");
+        text.getStyleClass().add("bold");
         String htmlString = TooltipTextUtil.textToHtmlString(text);
         String expectedString = "<b><tt>" + testText + "</tt></b>";
 
