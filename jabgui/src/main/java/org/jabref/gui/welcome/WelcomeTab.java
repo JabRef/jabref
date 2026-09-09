@@ -312,8 +312,8 @@ public class WelcomeTab extends Tab {
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
             Hyperlink recentLibraryLink = new Hyperlink(item.getText());
-            // Shortened to whatever the column offers; the ellipsis goes in front so that the file name stays visible.
-            recentLibraryLink.setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);
+            // Shortened to whatever the column offers, cutting whole path segments.
+            recentLibraryLink.setTextOverrun(OverrunStyle.CENTER_WORD_ELLIPSIS);
             recentLibraryLink.setTooltip(new Tooltip(item.getText()));
             recentLibraryLink.getStyleClass().addAll("welcome-hyperlink", "h4");
             recentLibraryLink.setOnAction(item.getOnAction());
