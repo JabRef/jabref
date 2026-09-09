@@ -16,7 +16,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferencesDialogView;
 import org.jabref.gui.search.GlobalSearchBar;
@@ -170,7 +169,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .panel(Localization.lang("Welcome to PDF linking walkthrough"))
                         .content(new TextBlock(Localization.lang("This walkthrough will guide you through how to link your PDF files with JabRef. We've opened an example library so you can see how this feature works with actual bibliography entries.")))
-                        .resolver(NodeResolver.predicate(MainTable.class::isInstance))
+                        .resolver(NodeResolver.fxId("main-table"))
                         .continueButton(Localization.lang("Continue"))
                         .highlight(HighlightEffect.SPOT_LIGHT)
                         .position(PanelPosition.BOTTOM))
@@ -335,7 +334,7 @@ public class WalkthroughAction extends SimpleCommand {
                                 new TextBlock(Localization.lang("This walkthrough will guide you through creating and managing groups in JabRef. Groups help you organize your bibliography entries into collections. We've opened an example library so you can practice with real entries.")),
                                 new InfoBlock(Localization.lang("The groups panel on the left side shows all your groups in a tree structure. You can create groups, add entries to them, and organize them hierarchically."))
                         )
-                        .resolver(NodeResolver.predicate(node -> node.getClass().getName().contains("GroupsSidePaneComponent")))
+                        .resolver(NodeResolver.fxId("groups-side-pane"))
                         .continueButton(Localization.lang("Continue"))
                         .position(PanelPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
@@ -442,7 +441,7 @@ public class WalkthroughAction extends SimpleCommand {
                                 new TextBlock(Localization.lang("You've learned how to create groups and add entries to them. Groups are a powerful way to organize your bibliography and can be nested to create hierarchical structures.")),
                                 new InfoBlock(Localization.lang("For more information about groups: [Groups documentation](%0)", URLs.GROUPS_DOC))
                         )
-                        .resolver(NodeResolver.predicate(node -> node.getClass().getName().contains("GroupsSidePaneComponent")))
+                        .resolver(NodeResolver.fxId("groups-side-pane"))
                         .continueButton(Localization.lang("Finish"))
                         .position(PanelPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
@@ -471,7 +470,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .content(
                                 new TextBlock(Localization.lang("This walkthrough will guide you through JabRef's search capabilities. We've loaded a sample library to demonstrate various search techniques."))
                         )
-                        .resolver(NodeResolver.predicate(node -> node.getClass().getName().contains("MainTable")))
+                        .resolver(NodeResolver.fxId("main-table"))
                         .continueButton(Localization.lang("Continue"))
                         .position(PanelPosition.BOTTOM)
                         .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
@@ -499,7 +498,7 @@ public class WalkthroughAction extends SimpleCommand {
                                 new TextBlock(Localization.lang("Notice how entries not containing \"machine learning\" are dimmed.")),
                                 new InfoBlock(Localization.lang("This found entries with at least a field in their metadata (*e.g.,* title, author, abstract, *etc.*) containing \"machine learning\"."))
                         )
-                        .resolver(NodeResolver.predicate(node -> node.getClass().getName().contains("MainTable")))
+                        .resolver(NodeResolver.fxId("main-table"))
                         .continueButton(Localization.lang("Continue"))
                         .position(PanelPosition.RIGHT)
                         .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
