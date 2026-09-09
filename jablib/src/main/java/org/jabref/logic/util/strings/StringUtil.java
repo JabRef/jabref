@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.util.Pair;
 
 import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
@@ -796,7 +798,7 @@ public class StringUtil {
         String fileName = fullPath.substring(lastSeparator + 1);
         char separator = fullPath.charAt(lastSeparator);
 
-        if (fileName.length() >= maxLength) {
+        if (fileName.length() > maxLength) {
             return maxLength > MIN_TRUNCATED_FILENAME_LENGTH
                    ? fileName.substring(0, maxLength - ELLIPSIS.length()) + ELLIPSIS
                    : fileName;
@@ -812,5 +814,52 @@ public class StringUtil {
         String parent = fullPath.substring(0, lastSeparator);
         String shortenedParent = StringUtils.abbreviateMiddle(parent, ELLIPSIS, availableLengthForParent);
         return shortenedParent + separator + fileName;
+    }
+
+    /// Abbreviates a file path by replacing middle directories with "..." based on available space.
+    ///
+    /// @param fullPath the full file path to abbreviate
+    /// @param maxWidth the maximum allowed width of the text
+    /// @param font     the font of the text
+    /// @return the abbreviated path, or null if fullPath is null
+    public static String abbreviatePathToFit(String fullPath, double maxWidth, Font font) {
+        if (fullPath == null) {
+            return null;
+        }
+        String prefix = "";
+        String path = fullPath;
+        int prefixEnd = fullPath.indexOf(". ");
+        if (prefixEnd > 0 && fullPath.substring(0, prefixEnd).matches("\\d+")) {
+            prefix = fullPath.substring(0, prefixEnd + 2);
+            path = fullPath.substring(prefixEnd + 2);
+        }
+        Text text = new Text(path);
+        text.setFont(font);
+        double textWidth = text.getLayoutBounds().getWidth();
+        Text prefixText = new Text(prefix);
+        prefixText.setFont(font);
+        double prefixWidth = prefixText.getLayoutBounds().getWidth();
+        if (maxWidth >= textWidth + prefixWidth) {
+            return fullPath;
+        }
+        int low = MIN_TRUNCATED_FILENAME_LENGTH;
+        int high = path.length();
+        int bestLength = low;
+        double pathMaxWidth = maxWidth - prefixWidth;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            String abbreviated = StringUtil.abbreviatePath(path, mid);
+            Text candidate = new Text(abbreviated);
+            candidate.setFont(font);
+            double candidateWidth = candidate.getLayoutBounds().getWidth();
+
+            if (candidateWidth <= pathMaxWidth) {
+                bestLength = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return prefix + StringUtil.abbreviatePath(path, bestLength);
     }
 }
