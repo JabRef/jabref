@@ -41,7 +41,7 @@ public final class AiDefaultTemplates {
 
             Being factual and using a professional tone should be a matter of course.
             Format responses in Markdown.
-            #end""";
+            """;
 
     public static final String CHATTING_USER_MESSAGE_TEMPLATE = """
             #set( $keys = [] )
@@ -64,7 +64,7 @@ public final class AiDefaultTemplates {
 
             #if( $multiPaper )
             Citation is REQUIRED: append the citationkey(s) at the end of every paragraph that uses snippet content, as specified in the system instructions.
-            Citation is Optional: If in-text citations are used, they have to be formated, as specified in the system instructions.
+            Citation is Optional: If in-text citations are used, they have to be formated as specified in the system instructions.
             #else
             Citation is NOT required: all snippets come from a single paper. Do not append any citationkey.
             #end
@@ -84,11 +84,9 @@ public final class AiDefaultTemplates {
             #if( $multiPaper )
             ### Expected output structure
             Give one paragraph per source, in this order, each followed by its citationkey in square brackets. Separate paragraphs with a blank line. You may add a short synthesis paragraph at the end that cites all keys it draws on.
-
             #foreach( $k in $keys )
             [$k]
             ...paragraph drawing only on the snippet(s) with citationkey $k...
-
             #end
             #end""";
 
