@@ -500,7 +500,19 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 
 1. Read `.github/PULL_REQUEST_TEMPLATE.md`.
 2. Fill every section: \"Related issues and pull requests\", \"PR Description\", \"Steps to test\", \"AI usage\".
-3. The PR Description must explain **intent**, not implementation trivia. Do not list modified classes one by one.
+3. Keep the PR body short. Reviewers read the diff; the body only tells them what to expect and why. Hard limits:
+   - "Summary": the description is **at most 3 sentences, under 80 words**, one paragraph (the policy tag and the "Analogies" paragraph required by the template follow it and do not count). State the problem and the outcome — for end users if the change is visible to them, otherwise for whoever is affected (developers, CI, maintainability). No bug archaeology (how the regression came about), no implementation details (class names, preference keys, serialization formats, libraries used), no list of modified classes, no headings or bullet lists.
+   - "Steps to test": numbered steps a beginner can follow, **one line each**, no explanations of *why* a step works or what the feature "also" does. Screenshots where the change is visible.
+   - Checklist walkthrough: mark items, do not justify them. Add a reason only to `[ ]` (why still open). When a whole group does not apply, say so once above it (for example "No Java changed, section 1 not applicable") instead of repeating the same note on every item.
+   - Do not restate the issue, the CHANGELOG entry, or the commit messages in the body.
+
+   Example of a Summary that is too long:
+
+   > The entry editor rework (#16166) dropped support for custom tabs, which broke existing configurations (#16594). This PR brings them back and reworks the preferences into a two-column editor modeled on ... a field may also be a regular expression ... stored as a JSON map under a single preference key (serialized with Jackson, which jabgui already uses); the pre-rework keys are read as a migration fallback and purged on the next store ...
+
+   The same Summary at the right size:
+
+   > Custom entry editor tabs are configurable again in the "Editor tabs" preferences. Field names in a custom tab may be regular expressions (e.g. `comment-.*`), and tabs configured in older versions are picked up automatically.
 4. \"Steps to test\" is a numbered list of concrete steps ending in what the reviewer should see, plus a screenshot cropped to the relevant UI area for every visible change. Never a video: reviewers relate a failure to a step number (\"at step 3 I could not click X\"), which a video does not allow. A video is acceptable only when the interaction involves another program (drag and drop from a file manager, push to a word processor, ...) and the steps are still listed.
 5. Fill \"AI usage\": disclose every AI tool used **and the exact model ID** (for example `Claude Code (model claude-opus-4-7)`).
 6. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.

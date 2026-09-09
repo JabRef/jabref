@@ -71,6 +71,7 @@ Run in this order — cheapest first. Each must pass.
 ## 4. Pull request
 
 - [ ] PR body built from `.github/PULL_REQUEST_TEMPLATE.md`, every section filled.
+- [ ] Summary description is at most 3 sentences (under 80 words), states problem and outcome (user-facing or internal), and names no classes, preference keys, or libraries; test steps are one line each; checklist items are marked, not justified (see `AGENTS.md`, "Pull requests").
 - [ ] All checklist items kept and marked `[x]`, `[ ]`, or `[/]`.
 - [ ] "Steps to test" is a numbered list with a cropped screenshot of the result for every visible change; no video (only allowed when another program is involved, e.g. drag and drop or push to an external application).
 - [ ] All HTML comments removed from the PR body.
