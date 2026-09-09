@@ -147,7 +147,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         fieldPropertyCheckComboBox.prefHeightProperty().bind(addNewField.heightProperty());
 
         addNewFieldButton.setPrefWidth(100.0);
-        addNewFieldButton.setStyle("-fx-padding: 0.3em 1em 0.3em 1em;");
+        addNewFieldButton.getStyleClass().add("add-new-field-button");
         addNewFieldButton.prefHeightProperty().bind(fieldPropertyCheckComboBox.heightProperty());
         addNewFieldButton.setOnAction(_ -> addNewField());
 

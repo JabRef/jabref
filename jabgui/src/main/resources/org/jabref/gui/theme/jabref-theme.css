@@ -258,6 +258,10 @@
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
 
+.add-new-field-button {
+    -fx-padding: 0.3em 1em 0.3em 1em;
+}
+
 .button:hover {
     -fx-background: -color-button-hover;
 }
