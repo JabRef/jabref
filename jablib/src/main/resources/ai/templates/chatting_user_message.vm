@@ -1,0 +1,49 @@
+#set( $keys = [] )
+#foreach( $excerpt in $excerpts )
+#set( $k = false )
+#set( $k = $excerpt.source() )
+#if( $k && !$keys.contains($k) )
+#set( $added = $keys.add($k) )
+#end
+#end
+#set( $multiPaper = $keys.size() > 1 )
+$message
+
+## Source materials
+
+Valid citationkeys for this request (use only these):
+#foreach( $k in $keys )
+- $k
+#end
+
+#if( $multiPaper )
+Citation is REQUIRED: append the citation link(s) at the end of every paragraph that uses snippet content, formatted as [@citationkey](entries/citationkey) — or [@citationkey](entries/citationkey#page=N) if that snippet has a page — as specified in the system instructions.
+Citation is Optional: If in-text citations are used, they have to be formatted the same way, as specified in the system instructions.
+#else
+Citation is NOT required: all snippets come from a single paper. Do not append any citation link.
+#end
+
+### Metadata
+#foreach( $entry in $entries )
+$!{CanonicalBibEntry.getCanonicalRepresentation($entry)}
+#end
+
+### Snippets
+#foreach( $excerpt in $excerpts )
+#if( $excerpt.pageNumber() )
+<source citationkey="$!{excerpt.source()}" page="$!{excerpt.pageNumber()}">
+#else
+<source citationkey="$!{excerpt.source()}">
+#end
+$!{excerpt.text()}
+</source>
+#end
+
+#if( $multiPaper )
+### Expected output structure
+Give one paragraph per source, in this order, each followed by its citation link in square-bracket Markdown form. Separate paragraphs with a blank line. You may add a short synthesis paragraph at the end that cites all keys it draws on.
+#foreach( $k in $keys )
+[@$k](entries/$k)
+...paragraph drawing only on the snippet(s) with citationkey $k...
+#end
+#end
