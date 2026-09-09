@@ -151,7 +151,7 @@ public class TooltipTextUtil {
         if (text.getStyleClass().toString().contains("bold")) {
             textString = "<b>%s</b>".formatted(textString);
         }
-        if (text.getStyleClass().toString().contains("talic")) {
+        if (text.getStyleClass().toString().contains("italic")) {
             textString = "<i>%s</i>".formatted(textString);
         }
         return textString;
