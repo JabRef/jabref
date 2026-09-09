@@ -75,7 +75,7 @@ public class ThreeWayMergeView extends VBox {
 
         getChildren().addAll(toolbar, headerView, scrollPane);
 
-        getStyleClass().addAll("three-way-merge", "padding-4-0");
+        getStyleClass().add("three-way-merge");
     }
 
     public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, GuiPreferences preferences, StateManager stateManager) {

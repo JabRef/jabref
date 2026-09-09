@@ -511,6 +511,7 @@
 
 /* search text */
 .global-search-bar .label {
+    -fx-padding: 0em 1.8em 0em 0em;
 }
 
 .global-search-bar:illegal-search {
@@ -1356,6 +1357,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .three-way-merge .merge-header-cell .label {
     -fx-font-weight: bold;
+    -fx-padding: 0.167em 0 0.167em 0;
 }
 
 .three-way-merge .field-name .glyph-icon,
