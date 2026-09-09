@@ -71,7 +71,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     /// @return A StackPane with related article information to be displayed in the Related Articles tab.
     private StackPane getRelatedArticlesPane(BibEntry entry) {
         StackPane root = new StackPane();
-        root.setId("relatedArticlesTab");
+        root.setId("related-articles-tab");
         root.getStyleClass().add("related-articles-tab");
         root.getStyleClass().add("padding-4");
         ProgressIndicator progress = new ProgressIndicator();
@@ -178,7 +178,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     /// @return StackPane returned to be placed into Related Articles tab.
     private ScrollPane getPrivacyDialog(BibEntry entry) {
         ScrollPane root = new ScrollPane();
-        root.setId("relatedArticlesPrivacyNotice");
+        root.setId("related-articles-privacy-notice");
         root.getStyleClass().add("related-articles-tab");
         root.getStyleClass().add("padding-4");
         VBox vbox = new VBox(4);

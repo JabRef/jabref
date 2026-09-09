@@ -136,7 +136,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setOnDragOver(this::handleOnDragOverTableView);
         this.setOnDragDropped(this::handleOnDragDroppedTableView);
 
-        this.setId("mainTable");
+        this.setId("main-table");
         this.getStyleClass().add("main-table");
 
         MainTableColumnFactory mainTableColumnFactory = new MainTableColumnFactory(

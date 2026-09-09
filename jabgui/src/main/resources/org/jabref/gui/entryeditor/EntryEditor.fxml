@@ -14,7 +14,7 @@
 <fx:root type="BorderPane"
          xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.entryeditor.EntryEditor" minHeight="50"
-         id="entryEditor" styleClass="entry-editor">
+         id="entry-editor" styleClass="entry-editor">
     <left>
         <ToolBar orientation="VERTICAL">
             <Button styleClass="icon-button,narrow" onAction="#close">

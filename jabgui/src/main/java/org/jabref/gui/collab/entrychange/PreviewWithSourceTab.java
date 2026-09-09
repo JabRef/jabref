@@ -46,7 +46,7 @@ public class PreviewWithSourceTab {
         previewViewer.setEntry(entry);
 
         CodeArea codeArea = new CodeArea();
-        codeArea.setId("bibtexCodeArea");
+        codeArea.setId("bibtex-code-area");
         codeArea.getStyleClass().addAll("source-preview-code-area", "padding-4");
         codeArea.setWrapText(true);
         codeArea.setDisable(true);

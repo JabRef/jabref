@@ -30,7 +30,7 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
                                    GroupsPreferences groupsPreferences,
                                    DialogService dialogService) {
         super(SidePaneType.GROUPS, closeCommand, moveUpCommand, moveDownCommand, contentFactory);
-        setId("groupsSidePane");
+        setId("groups-side-pane");
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
 

@@ -89,7 +89,7 @@ public class GlobalSearchBarTest {
         stateManager.clearSearchHistory();
         String searchQuery = "Smith";
         // Track the node, that the search query will be typed into
-        TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
+        TextInputControl searchField = robot.lookup("#search-field").queryTextInputControl();
 
         // The focus is on searchField node, as we click on the search box
         FxRobotInterface searchFieldRoboto = robot.clickOn(searchField);
@@ -112,7 +112,7 @@ public class GlobalSearchBarTest {
     /// entry editor.
     @Test
     void theContextMenuClaimsNoGlobalShortcut(FxRobot robot) {
-        TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
+        TextInputControl searchField = robot.lookup("#search-field").queryTextInputControl();
 
         List<MenuItem> items = searchField.getContextMenu().getItems();
 
@@ -124,7 +124,7 @@ public class GlobalSearchBarTest {
     void emptyQueryIsNotRecorded(FxRobot robot) {
         stateManager.clearSearchHistory();
         String searchQuery = "";
-        TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
+        TextInputControl searchField = robot.lookup("#search-field").queryTextInputControl();
 
         FxRobotInterface searchFieldRoboto = robot.clickOn(searchField);
         searchFieldRoboto.write(searchQuery);
@@ -137,7 +137,7 @@ public class GlobalSearchBarTest {
 
     @Test
     void blankQueryClearsActiveSearch(FxRobot robot) throws InterruptedException {
-        TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
+        TextInputControl searchField = robot.lookup("#search-field").queryTextInputControl();
 
         FxRobotInterface searchFieldRobot = robot.clickOn(searchField);
         searchFieldRobot.write("abc");
