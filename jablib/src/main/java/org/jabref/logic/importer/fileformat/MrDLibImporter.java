@@ -120,6 +120,9 @@ public class MrDLibImporter extends Importer {
         String authors = isRecommendationFieldPresent(recommendation, "authors") ? recommendation.getString("authors") : "";
         String title = isRecommendationFieldPresent(recommendation, "title") ? recommendation.getString("title") : "";
         String year = isRecommendationFieldPresent(recommendation, "published_year") ? Integer.toString(recommendation.getInt("published_year")) : "";
+        if (year.isEmpty() && isRecommendationFieldPresent(recommendation, "year_published")) {
+            year = Integer.toString(recommendation.getInt("year_published"));
+        }
         String journal = isRecommendationFieldPresent(recommendation, "published_in") ? recommendation.getString("published_in") : "";
         String url = isRecommendationFieldPresent(recommendation, "url") ? recommendation.getString("url") : "";
         Integer rank = isRecommendationFieldPresent(recommendation, "recommendation_id") ? recommendation.getInt("recommendation_id") : 100;

@@ -129,15 +129,14 @@ public class RelatedArticlesTab extends EntryEditorTab {
             hBox.getStyleClass().add("padding-left-12");
 
             String title = entry.getTitle().orElse("");
-            String journal = entry.getField(StandardField.JOURNAL).orElse("");
+            String journal = entry.getFieldOrAlias(StandardField.JOURNAL).orElse("");
             String authors = entry.getField(StandardField.AUTHOR).orElse("");
-            String year = entry.getField(StandardField.YEAR).orElse("");
 
             Hyperlink titleLink = new Hyperlink(title);
             Text journalText = new Text(journal);
             journalText.setFont(Font.font(Font.getDefault().getFamily(), FontPosture.ITALIC, Font.getDefault().getSize()));
             Text authorsText = new Text(authors);
-            Text yearText = new Text("(" + year + ")");
+
             titleLink.setOnAction(event -> {
                 if (entry.getField(StandardField.URL).isPresent()) {
                     try {
@@ -149,7 +148,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 }
             });
 
-            hBox.getChildren().addAll(titleLink, journalText, authorsText, yearText);
+            hBox.getChildren().addAll(titleLink, journalText, authorsText);
+            entry.getFieldOrAlias(StandardField.YEAR)
+                 .filter(year -> !year.isBlank())
+                 .ifPresent(year -> hBox.getChildren().add(new Text("(" + year + ")")));
+
             vBox.getChildren().add(hBox);
         }
         scrollPane.setContent(vBox);
