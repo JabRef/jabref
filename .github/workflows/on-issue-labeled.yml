@@ -130,7 +130,7 @@ jobs:
           gh project item-add 9 --owner JabRef --url $ISSUE_URL
   wisdom:
     name: "dev: wisdom-*"
-    if: "${{ startsWith(github.event.label.name, 'dev: wisdom-') && github.repository_owner == 'JabRef' }}"
+    if: "${{ contains(fromJSON('[\"dev: wisdom-assignment\", \"dev: wisdom-ping\", \"dev: wisdom-read-issue\"]'), github.event.label.name) && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-slim
     permissions:
       issues: write
