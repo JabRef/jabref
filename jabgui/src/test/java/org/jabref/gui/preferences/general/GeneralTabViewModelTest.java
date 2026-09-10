@@ -7,9 +7,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.gui.theme.ThemePreset;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,7 @@ class GeneralTabViewModelTest {
                 mock(HttpServerManager.class),
                 mock(LanguageServerController.class),
                 mock(UiMessageHandler.class),
+                mock(OAuthSessionRegistry.class),
                 mock(RemoteListenerServerManager.class),
                 mock(StateManager.class));
     }
