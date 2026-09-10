@@ -35,7 +35,7 @@ public class FullDocumentResponseEngine implements ResponseEngine {
                                         linkedFile
                                                 .findIn(entryIdentifier.databaseContext(), filePreferences)
                                                 .flatMap(universalContentParser::parseAsString)
-                                                .map(c -> new RelevantInformation(FullBibEntry.findEntryByLink(entryIdentifier, linkedFile.getLink()).flatMap(BibEntry::getCitationKey).orElse(null), c))
+                                                .map(c -> new RelevantInformation(FullBibEntry.findEntryByLink(entryIdentifier, linkedFile.getLink()).flatMap(BibEntry::getCitationKey).orElse(null), null, c))
                                                 .stream()
                                 )
                 )
