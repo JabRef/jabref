@@ -8,7 +8,6 @@ import java.util.Optional;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupResolverDialog;
@@ -25,6 +24,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -118,13 +118,14 @@ public class BackupUIManager {
                 );
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.orElse(false)) {
-                    List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
-                    LibraryTab saveState = stateManager.activeTabProperty().get().get();
-                    stateManager.getUndoManager(originalDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
-                            resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
-                    if (reviewBackupDialog.areAllChangesDenied()) {
-                        // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
-                        saveState.resetChangeMonitor();
+                    // Not recorded in a journal: the tab is built from a fresh context object of this ParserResult,
+                    // so a journal keyed by originalDatabase would never be reachable from the tab
+                    CompoundEdit edit = new CompoundEdit(Localization.lang("Merged external changes"));
+                    reviewBackupDialog.getResolvedChanges().stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit));
+                    if (!reviewBackupDialog.areAllChangesDenied()) {
+                        // Accepted backup content is in memory only (the file on disk is not the backup), so the tab has to open as modified
+                        // [impl->req~jabgui.autosaveandbackup.backup-merge-modified~1]
+                        originalParserResult.setChangedOnMigration(true);
                     }
 
                     // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)

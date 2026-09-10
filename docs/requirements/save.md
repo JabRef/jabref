@@ -28,6 +28,22 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
+## Backup reacts to every library change
+`req~jabgui.autosaveandbackup.backup-listens~1`
+
+While backups are enabled for a library, every change to the library must lead to a backup shortly afterwards, including changes the change filter marks as minor (a single typed character in a field the user is still editing).
+A library must not stay without backup until the user moves on to another field.
+
+Needs: impl, utest
+
+## Accepted backup content is preserved until saved
+`req~jabgui.autosaveandbackup.backup-merge-modified~1`
+
+When the user accepts or merges changes from a backup while opening a library, the resulting library differs from the file on disk.
+The library must open as modified, so that closing it asks the user to save and the accepted content is not lost.
+
+Needs: impl, utest
+
 ## Autosave reacts to library changes
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 

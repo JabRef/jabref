@@ -162,6 +162,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where a library could be closed without asking to save changes made after an undo. [#16680](https://github.com/JabRef/jabref/pull/16680)
 - We fixed the context menu of an automatically found file offering "Remove link" instead of linking the file. [#16898](https://github.com/JabRef/jabref/pull/16898)
 - We fixed an issue where an empty backup could overwrite a library during recovery. [#10853](https://github.com/JabRef/jabref/issues/10853)
+- We fixed an issue where backups skipped typed edits and changes merged from a backup were lost on closing. [#16890](https://github.com/JabRef/jabref/pull/16890)
 - We fixed an issue where the packaged JabRef application produced an exception when trying to use fulltext search and indexing. [#16738](https://github.com/JabRef/jabref/pull/16738)
 - We fixed search highlighting exceptions caused by incomplete or literal regular-expression characters. [#16539](https://github.com/JabRef/jabref/issues/16539)
 - We fixed freezing while scrolling results in the Search for unlinked local files dialog. [#16696](https://github.com/JabRef/jabref/pull/16696)
