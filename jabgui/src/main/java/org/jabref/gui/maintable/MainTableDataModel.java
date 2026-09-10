@@ -96,7 +96,7 @@ public class MainTableDataModel {
         selectedGroupsSubscription = EasyBind.listen(selectedGroupsProperty, (observable, oldValue, newValue) -> updateGroupMatches(newValue));
         groupViewModeSubscription = EasyBind.listen(preferences.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(selectedGroupsProperty.get()));
 
-        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS).get())));
+        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().get() == MatchCategory.MATCHING_SEARCH_AND_GROUPS)));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
@@ -163,17 +163,15 @@ public class MainTableDataModel {
     }
 
     private void updateSearchDisplayMode(SearchDisplayMode mode) {
-        BackgroundTask.wrap(() -> {
-            boolean isFloatingMode = mode == SearchDisplayMode.FLOAT;
-            entriesViewModel.forEach(entry -> setEntrySearchVisibility(entry, entry.isMatchedBySearch().get(), isFloatingMode));
-        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+        boolean isFloatingMode = mode == SearchDisplayMode.FLOAT;
+        entriesViewModel.forEach(entry -> setEntrySearchVisibility(entry, entry.isMatchedBySearch().get(), isFloatingMode));
+        FilteredListProxy.refilterListReflection(entriesFiltered);
     }
 
     private void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
-        BackgroundTask.wrap(() -> {
-            groupsMatcher = createGroupMatcher(groups, groupsPreferences);
-            applyGroupMatchesToAllEntries();
-        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+        groupsMatcher = createGroupMatcher(groups, groupsPreferences);
+        applyGroupMatchesToAllEntries();
+        FilteredListProxy.refilterListReflection(entriesFiltered);
     }
 
     private void applyGroupMatchesToAllEntries() {

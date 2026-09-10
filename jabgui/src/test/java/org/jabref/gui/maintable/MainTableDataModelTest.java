@@ -54,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(JavaFxExtension.class)
@@ -305,7 +306,7 @@ class MainTableDataModelTest {
                 new SearchPreferences(SearchDisplayMode.FILTER, false, false, false, false, false, false, 0, 0, 0));
         when(preferences.getNameDisplayPreferences()).thenReturn(NameDisplayPreferences.getDefault());
 
-        CurrentThreadTaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
 
         SimpleListProperty<GroupTreeNode> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
         OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
@@ -331,6 +332,8 @@ class MainTableDataModelTest {
 
         assertFalse(vmB.isMatchedByGroup().get());
         assertFalse(vmB.isVisibleByGroup().get());
+
+        verifyNoInteractions(taskExecutor);
     }
 
     @Test
