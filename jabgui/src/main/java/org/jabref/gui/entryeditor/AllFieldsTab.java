@@ -80,10 +80,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// The single scroll-list tab ("Main") showing *all* fields of an entry (issue #12711):
-/// the citation key, all required fields (even when unset), every set field, and — always,
-/// as the last main row — the abstract. Multiline editors grow with their text, capped at a
-/// few rows until focused. Replaces the classic category tabs (required /
-/// optional / other / …) and the former "Abstract" tab.
+/// the citation key, all required fields (even when unset), and every set field. Multiline
+/// editors grow with their text, capped at a few rows until focused. Replaces the classic
+/// category tabs (required / optional / other / …) and the former "Abstract" tab.
 ///
 /// Below the main fields sits a chip bar for adding unset optional fields ("Show more"
 /// reveals the secondary-optional ones). The identifiers, files & links, bibliometrics,
@@ -95,10 +94,10 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllFieldsTab.class);
 
-    /// Fields shown even when unset for every entry type, without a remove button. The abstract
-    /// is no optional field of any entry type, so it would otherwise only be reachable through the
-    /// free-form field-name box.
-    private static final Set<Field> ALWAYS_SHOWN_FIELDS = Set.of(StandardField.ABSTRACT);
+    /// Chips offered after the entry type's important optional fields, for every entry type. The
+    /// abstract is no optional field of any type, so it would otherwise only be reachable through
+    /// the free-form field-name box.
+    private static final List<Field> COMMON_CHIP_FIELDS = List.of(StandardField.ABSTRACT);
 
     /// Rows a multiline editor shows before it is focused for the first time (a long abstract
     /// must not push the other fields out of view just by being selected).
@@ -185,7 +184,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Order: citation key, required fields (entry-type order), set optional fields
     /// (important first, then detail; each in entry-type order), then all remaining set
-    /// fields sorted by name, then still-empty user-added fields, then the always-shown fields.
+    /// fields sorted by name, then still-empty user-added fields.
     // [impl->req~entry-editor.main-tab.single-list~1]
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
@@ -217,9 +216,6 @@ public class AllFieldsTab extends FieldsEditorTab {
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
         fields.addAll(userAddedFields);
-        // Re-add so the always-shown fields end up last in the main section even when set.
-        fields.removeAll(ALWAYS_SHOWN_FIELDS);
-        fields.addAll(ALWAYS_SHOWN_FIELDS);
         return fields;
     }
 
@@ -409,7 +405,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     // [impl->req~entry-editor.main-tab.remove-field~1]
     private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Node editorNode = editors.get(field).getNode();
-        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field) || ALWAYS_SHOWN_FIELDS.contains(field)) {
+        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)) {
             return editorNode;
         }
 
@@ -561,8 +557,8 @@ public class AllFieldsTab extends FieldsEditorTab {
     // region add-field controls
 
     /// Chips for the entry type's unset optional fields that belong to the main section
-    /// (identifier/file/comment fields get their chips inside their own section);
-    /// "Show more" reveals the secondary-optional ones.
+    /// (identifier/file/comment fields get their chips inside their own section), followed by
+    /// the [#COMMON_CHIP_FIELDS]; "Show more" reveals the secondary-optional ones.
     private Node createMainChipBar(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         BibDatabaseMode mode = getDatabaseMode();
 
@@ -573,6 +569,8 @@ public class AllFieldsTab extends FieldsEditorTab {
             List<Field> shown = List.copyOf(editors.keySet());
             FieldListSections.subtract(entryType.getImportantOptionalFields(), shown).stream()
                              .filter(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.MAIN)
+                             .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
+            FieldListSections.subtract(COMMON_CHIP_FIELDS, shown)
                              .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
 
             List<Field> secondary = FieldListSections.subtract(

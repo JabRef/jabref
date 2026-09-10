@@ -146,28 +146,12 @@ class AllFieldsTabTest {
     }
 
     @Test
-    void abstractEditorAlwaysShown() {
+    void abstractEditorHiddenUntilSet() {
         BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
 
         JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
-        assertTrue(tab.editors.containsKey(StandardField.ABSTRACT));
-    }
-
-    @Test
-    void abstractEditorHasNoRemoveButtonUnlikeOptionalFields() {
-        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021")
-                                                             .withField(StandardField.NOTE, "A note");
-
-        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
-
-        assertNull(tab.editors.get(StandardField.ABSTRACT).getNode().lookup(".field-remove-button"));
-        assertNotNull(tab.editors.get(StandardField.NOTE).getNode().lookup(".field-remove-button"));
-    }
-
-    @Test
-    void abstractEditorIsOneRowWhenEmpty() {
-        assertEquals(0, abstractEditorExtraRows(""), 0.1);
+        assertFalse(tab.editors.containsKey(StandardField.ABSTRACT));
     }
 
     @Test
@@ -182,16 +166,17 @@ class AllFieldsTabTest {
 
     /// Lays the abstract editor out in a scene of fixed width so the text area's skin exists and
     /// its text is wrapped, then returns how many rows beyond the first the area got: its height
-    /// minus the empty area's height, in units of the font's line height. The layout snaps heights
+    /// minus a one-row area's height, in units of the font's line height. The layout snaps heights
     /// to whole pixels, so the rows are only reliable as a rounded quotient, never as raw pixels.
     private double abstractEditorExtraRows(String abstractText) {
         double[] result = new double[1];
         JavaFxExtension.invokeAndWait(() -> {
             TextArea filled = layoutAbstractEditor(abstractText);
-            TextArea empty = layoutAbstractEditor("");
+            // One-word baseline: an unset abstract has no editor, only a chip.
+            TextArea oneRow = layoutAbstractEditor("x");
             Text row = new Text("X");
             row.setFont(filled.getFont());
-            result[0] = Math.round((filled.getHeight() - empty.getHeight()) / row.getLayoutBounds().getHeight());
+            result[0] = Math.round((filled.getHeight() - oneRow.getHeight()) / row.getLayoutBounds().getHeight());
         });
         return result[0];
     }

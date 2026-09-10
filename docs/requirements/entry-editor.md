@@ -31,7 +31,7 @@ Needs: impl
 ## Main tab shows all fields in one scrollable list
 `req~entry-editor.main-tab.single-list~1`
 
-The "Main" tab shows the citation key, all required fields of the entry type (even when unset), and every set field of the entry in a single vertically scrolling list with natural row heights. Field order: citation key, required fields (entry-type order), set optional fields (important before secondary, each in entry-type order), remaining set fields sorted by name, then fields added by the user that are still empty, then the abstract, which is always shown and cannot be removed. Multiline fields are one row when empty and grow with their content, showing at most five rows (with a scrollbar) until they are focused for the first time; from then on they show the complete text until another entry is opened.
+The "Main" tab shows the citation key, all required fields of the entry type (even when unset), and every set field of the entry in a single vertically scrolling list with natural row heights. Field order: citation key, required fields (entry-type order), set optional fields (important before secondary, each in entry-type order), remaining set fields sorted by name, then fields added by the user that are still empty. Multiline fields are one row when empty and grow with their content, showing at most five rows (with a scrollbar) until they are focused for the first time; from then on they show the complete text until another entry is opened.
 
 Needs: impl
 
@@ -45,7 +45,7 @@ Needs: impl
 ## Unset optional fields are offered as one-click chips
 `req~entry-editor.main-tab.add-chips~1`
 
-The entry type's unset important-optional fields that belong to the main group are offered as one-click "+" chips directly below the main fields; a "Show more" toggle reveals chips for the unset secondary-optional fields ("Show less" hides them again). Clicking a chip shows an empty, focused editor for that field, removes the chip, and keeps the field visible — even while still empty — until another entry is opened.
+The entry type's unset important-optional fields that belong to the main group are offered as one-click "+" chips directly below the main fields, followed by an "Abstract" chip for every entry type (no entry type lists the abstract as an optional field); a "Show more" toggle reveals chips for the unset secondary-optional fields ("Show less" hides them again). Clicking a chip shows an empty, focused editor for that field, removes the chip, and keeps the field visible — even while still empty — until another entry is opened.
 
 Needs: impl
 
