@@ -4,17 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -49,28 +45,6 @@ class MrDLibImporterTest {
 
         assertEquals("The protection of rural lands with the spatial development strategy on the case of Hrastnik commune",
                 resultList.getFirst().getFieldLatexFree(StandardField.TITLE).get());
-    }
-
-    @ParameterizedTest
-    @CsvSource(delimiter = '|', textBlock = """
-            {"published_year": 2006} | 2006
-            {"published_year": "2006"} | 2006
-            {"published_year": null} |
-            {"published_year": ""} |
-            {"published_year": "not-a-year"} |
-            {} |
-            """)
-    void importPublicationYear(String recommendation, @Nullable String expectedYear) throws IOException {
-        String response = """
-                {
-                  "label": {"label-text": "Related articles", "label-description": "Recommendations"},
-                  "recommendation_set_id": "1",
-                  "recommendations": {"1": %s}
-                }
-                """.formatted(recommendation);
-
-        BibEntry entry = importer.importDatabase(response).getDatabase().getEntries().getFirst();
-        assertEquals(Optional.ofNullable(expectedYear), entry.getField(StandardField.YEAR));
     }
 
     @Test

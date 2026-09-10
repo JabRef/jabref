@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.Importer;
@@ -120,7 +119,7 @@ public class MrDLibImporter extends Importer {
         // parse each of the relevant fields into variables
         String authors = isRecommendationFieldPresent(recommendation, "authors") ? recommendation.getString("authors") : "";
         String title = isRecommendationFieldPresent(recommendation, "title") ? recommendation.getString("title") : "";
-        String year = parsePublicationYear(recommendation).orElse("");
+        String year = isRecommendationFieldPresent(recommendation, "published_year") ? Integer.toString(recommendation.getInt("published_year")) : "";
         String journal = isRecommendationFieldPresent(recommendation, "published_in") ? recommendation.getString("published_in") : "";
         String url = isRecommendationFieldPresent(recommendation, "url") ? recommendation.getString("url") : "";
         Integer rank = isRecommendationFieldPresent(recommendation, "recommendation_id") ? recommendation.getInt("recommendation_id") : 100;
@@ -133,18 +132,6 @@ public class MrDLibImporter extends Importer {
         current.setField(StandardField.URL, url);
 
         return new RankedBibEntry(current, rank);
-    }
-
-    private Optional<String> parsePublicationYear(JSONObject recommendation) {
-        if (!isRecommendationFieldPresent(recommendation, "published_year")) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(Integer.toString(recommendation.getInt("published_year")));
-        } catch (JSONException exception) {
-            LOGGER.debug("Could not parse published_year field", exception);
-            return Optional.empty();
-        }
     }
 
     private Boolean isRecommendationFieldPresent(JSONObject recommendation, String
