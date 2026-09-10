@@ -26,20 +26,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ThemePresetTest {
 
     /// Where the build copies the themes to, relative to the theme package; named like the submodule.
-    private static final String COMMUNITY_DIRECTORY = "themes.jabref.org/";
+    private static final String THEMES_DIRECTORY = "themes.jabref.org/";
 
-    /// The community constants of [ThemePreset] are written by hand so that the set of themes is
+    /// The constants of [ThemePreset] are written by hand so that the set of themes is
     /// fixed at compile time; which files of the `themes.jabref.org` submodule get bundled is decided
     /// by the excludes in `jabgui/build.gradle.kts`. This test keeps the two in step: after a
     /// submodule bump that brings a new theme, it fails until the theme is either listed in the enum
     /// or excluded from the build.
     @Test
-    void communityConstantsMatchTheBundledFiles() throws IOException, URISyntaxException {
-        URL communityDirectory = ThemePreset.class.getResource(COMMUNITY_DIRECTORY);
-        assertNotNull(communityDirectory, "No community themes bundled, although processResources refuses to run without them");
+    void constantsMatchTheBundledFiles() throws IOException, URISyntaxException {
+        URL themesDirectory = ThemePreset.class.getResource(THEMES_DIRECTORY);
+        assertNotNull(themesDirectory, "No themes bundled, although processResources refuses to run without them");
 
         Set<String> bundled = new TreeSet<>();
-        try (Stream<Path> files = Files.list(Path.of(communityDirectory.toURI()))) {
+        try (Stream<Path> files = Files.list(Path.of(themesDirectory.toURI()))) {
             files.map(file -> file.getFileName().toString())
                  .filter(name -> name.endsWith(".css"))
                  .forEach(bundled::add);
@@ -48,11 +48,11 @@ class ThemePresetTest {
         Set<String> listed = new TreeSet<>();
         Arrays.stream(ThemePreset.values())
               .map(theme -> theme.getStyleSheet().getName())
-              .filter(css -> css.startsWith(COMMUNITY_DIRECTORY))
-              .map(css -> css.substring(COMMUNITY_DIRECTORY.length()))
+              .filter(css -> css.startsWith(THEMES_DIRECTORY))
+              .map(css -> css.substring(THEMES_DIRECTORY.length()))
               .forEach(listed::add);
 
-        assertEquals(bundled, listed, "ThemePreset does not list exactly the bundled community themes");
+        assertEquals(bundled, listed, "ThemePreset does not list exactly the bundled themes");
     }
 
     /// The stored color scheme can be absent, and the preferences read that as "follow system".
