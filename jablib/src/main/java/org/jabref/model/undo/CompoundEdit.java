@@ -43,9 +43,15 @@ public final class CompoundEdit {
     ///
     /// No lock, unlike the manager's method: a recorder belongs to the thread running its block,
     /// and nothing it collects is reachable from another thread until the block ends.
-    public void applyEdit(BibChange change) {
-        change.apply();
-        addEdit(change);
+    ///
+    /// @return what was applied, and what was not — see [BibChange#apply]
+    public ApplyResult applyEdit(BibChange change) {
+        ApplyResult result = change.apply();
+        // Only what happened: see the same rule in the journal's applyEdit.
+        if (result.complete() || (change instanceof ChangeSet)) {
+            addEdit(change);
+        }
+        return result;
     }
 
     /// Records a field change if one happened. An empty [Optional] means the model rejected
