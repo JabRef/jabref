@@ -83,7 +83,7 @@ public final class SearchResult {
         try (TokenStream contentStream = LinkedFilesConstants.LINKED_FILES_ANALYZER.tokenStream(field, content)) {
             TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
             return Arrays.stream(frags).map(TextFragment::toString).toList();
-        } catch (IOException | InvalidTokenOffsetsException e) {
+        } catch (IOException | InvalidTokenOffsetsException _) {
             return List.of();
         }
     }

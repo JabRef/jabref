@@ -6,7 +6,7 @@
 * never declare a color of their own -- that is what makes a theme swappable.
 *
 * A theme is therefore a single file that assigns a value to every token listed below.
-* See primer-theme.css for a second implementation of the same contract.
+* See the Primer theme on https://themes.jabref.org/ for a second implementation of the same contract.
 */
 
 @media (prefers-color-scheme: light) {
@@ -29,7 +29,7 @@
         -color-fg-emphasis: #FFFFFF;
 
         /* Borders */
-        -color-border-default: #DDDDDD;
+        -color-border-default: #B6B6B6;
         -color-border-muted: #DFDFDF;
 
         /* Accent -- the JabRef brand color and its tint */
@@ -41,7 +41,6 @@
         -color-button: transparent;
         -color-button-hover: rgba(0, 0, 0, 0.12);
         -color-button-pressed: rgba(0, 0, 0, 0.30);
-        -color-button-border: #DDDDDD;
         -color-button-default: #C6D3F0;
 
         /* Selection */
@@ -118,7 +117,7 @@
         -color-fg-emphasis: #E5E7EA;
 
         /* Borders */
-        -color-border-default: #424758;
+        -color-border-default: #3C4050;
         -color-border-muted: #333744;
 
         /* Accent -- the JabRef brand color and its tint */
@@ -130,7 +129,6 @@
         -color-button: transparent;
         -color-button-hover: rgba(255, 255, 255, 0.12);
         -color-button-pressed: rgba(255, 255, 255, 0.24);
-        -color-button-border: #424758;
         -color-button-default: #1B403D;
 
         /* Selection */
@@ -214,8 +212,8 @@
     -fx-inner-border-horizontal: derive(-color-bg-tertiary, 65%);
     -fx-inner-border-bottomup: derive(-color-bg-tertiary, 65%);
 
-    -fx-focus-color: -color-accent-subtle;
-    -fx-faint-focus-color: derive(-color-accent-subtle, 50%);
+    -fx-focus-color: -color-accent;
+    -fx-faint-focus-color: derive(-color-accent, 50%);
 
     -fx-default-button: -color-button-default;
     -fx-hover-base: derive(-color-bg-tertiary, 30%);
@@ -253,7 +251,7 @@
 
 /* JavaFX Button */
 .button {
-    -fx-border-color: -color-button-border;
+    -fx-border-color: -color-border-default;
     -fx-border-width: 0.0625em;
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
@@ -266,8 +264,12 @@
     -fx-background: -color-button-pressed;
 }
 
-.button:focused {
+.button:focused,
+.toggle-button:focused,
+.menu-button:focused,
+.choice-box:focused {
     -fx-border-color: -color-accent;
+    -fx-border-width: 0.0625em;
 }
 
 .button:default {
@@ -304,6 +306,13 @@
 .check-box {
     -fx-label-padding: 0.0em 0.0em 0.0em 0.75em;
     -fx-text-fill: -fx-text-background-color;
+    -fx-border-color: transparent;
+    -fx-border-width: 0.0625em;
+    -fx-border-radius: 0.25em;
+}
+
+.check-box:focused {
+    -fx-border-color: -color-accent;
 }
 
 .check-box > .box {
@@ -334,6 +343,16 @@
 }
 
 /* JavaFX RadioButton */
+.radio-button {
+    -fx-border-color: transparent;
+    -fx-border-width: 0.0625em;
+    -fx-border-radius: 0.25em;
+}
+
+.radio-button:focused {
+    -fx-border-color: -color-accent;
+}
+
 .radio-button > .radio {
     -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
     -fx-padding: 0.35em; /* padding from outside edge to the inner dot */
@@ -366,8 +385,11 @@
 
 /* JavaFX Dialog */
 .dialog-pane {
-    -fx-font-size: 1em;
     -fx-background-color: -color-bg-overlay;
+}
+
+.preferences-dialog .preferences-tab-content {
+    -fx-padding: 0.333em 0.333em 0.333em 0.667em;
 }
 
 /* JavaFX TextFlow / HyperLink */
@@ -375,37 +397,28 @@ TextFlow > Text {
     -fx-fill: -fx-text-background-color;
 }
 
-TextFlow > .hyperlink,
 .hyperlink {
     -fx-padding: 0;
     -fx-underline: false;
-    -fx-border-style: null;
     -fx-border-color: transparent;
+    -fx-border-style: solid;
+    -fx-border-width: 0.0625em;
+    -fx-border-radius: 0.25em;
     -fx-text-fill: -color-accent;
     -fx-fill: -color-accent;
 }
 
-TextFlow > .hyperlink:visited,
+.hyperlink:focused {
+    -fx-border-color: -color-accent;
+}
+
 .hyperlink:visited {
     -fx-text-fill: -color-accent-subtle;
     -fx-fill: -color-accent-subtle;
 }
 
-.TextFlow > .hyperlink:hover,
 .hyperlink:hover {
     -fx-underline: true;
-}
-
-TextFlow > .tooltip-text-bold {
-    -fx-font-weight: bold;
-}
-
-TextFlow > .tooltip-text-italic {
-    -fx-font-style: italic;
-}
-
-TextFlow > .tooltip-text-monospaced {
-    -fx-font-family: monospace;
 }
 
 /* JavaFX Tooltip */
@@ -419,10 +432,6 @@ TextFlow > .tooltip-text-monospaced {
     -fx-text-fill: -color-fg-default;
     -fx-show-delay: 300ms;
     -fx-hide-delay: 300ms;
-}
-
-.tooltip > TextFlow > Text {
-    -fx-font-size: 1em;
 }
 
 /* JavaFX ColorPicker */
@@ -489,8 +498,7 @@ TextFlow > .tooltip-text-monospaced {
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:focused,
 .menu-bar > .container > .menu-button:showing {
-    -fx-background: -color-border-default;
-    -fx-background-color: -fx-background;
+    -fx-background-color: -color-button-hover;
 }
 
 .menu-bar > .container > .menu-button:hover > .label,
@@ -508,8 +516,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .menu-item:focused {
-    -fx-text-fill: -color-border-default;
-    -fx-background: -color-border-default;
+    -fx-background: -color-accent-subtle;
     -fx-background-color: -fx-background;
 }
 
@@ -604,9 +611,13 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-radius: 0.25em;
 }
 
+.combo-box-base:focused {
+    -fx-background-color: -color-accent, -color-bg-secondary;
+}
+
 .combo-box > .list-cell {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
-    -fx-background-insets: 0, 1 0 1 1;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
     -fx-text-fill: -fx-text-base-color;
 }
 
@@ -646,8 +657,8 @@ TextFlow > .tooltip-text-monospaced {
 .combo-box-base:editable:focused > .text-field,
 .combo-box-base:editable > .text-field:focused,
 .date-picker > .text-field:focused {
-    -fx-background-color: -color-accent-subtle, -color-bg-secondary;
-    -fx-background-insets: 0, 2;
+    -fx-background-color: -color-accent, -color-bg-secondary;
+    -fx-background-insets: 0, 1;
     -fx-background-radius: 0.25em;
 }
 
@@ -808,13 +819,15 @@ TextFlow > .tooltip-text-monospaced {
 .text-input {
     -fx-background-color: -color-border-default, -color-bg-secondary;
     -fx-background-insets: 0, 1;
+    -fx-background-radius: 0.25em;
     -fx-prompt-text-fill: -color-scrollbar-thumb;
 }
 
 .text-input:focused {
     -fx-highlight-fill: -color-accent-subtle;
-    -fx-background-color: -color-accent-subtle, -color-bg-secondary;
-    -fx-background-insets: 0, 2;
+    -fx-background-color: -color-accent, -color-bg-secondary;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 0.25em;
     -fx-highlight-text-fill: -fx-text-inner-color;
 }
 
@@ -830,8 +843,8 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .text-area:focused .content {
-    -fx-background-color: -color-accent-subtle, -color-bg-secondary;
-    -fx-background-insets: 0, 2;
+    -fx-background-color: -color-accent, -color-bg-secondary;
+    -fx-background-insets: 0, 1;
     -fx-background-radius: 0;
 }
 
@@ -877,13 +890,8 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .table-row-cell:filled:hover,
-.tree-table-row-cell:filled:hover,
-.table-row-cell:filled:hover,
 .tree-table-row-cell:filled:hover {
-    -fx-background: -color-border-default;
-    -fx-background-color: -fx-background;
-    /*-fx-fill: -color-fg-emphasis;*/
-    /*-fx-text-fill: -color-fg-emphasis;*/
+    -fx-background-color: -color-overlay-hover;
 }
 
 .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:filled:selected,
@@ -924,7 +932,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .column-header-background:hover {
-    -fx-background-color: -color-border-default;
+    -fx-background-color: -color-bg-secondary, -color-overlay-hover;
 }
 
 .column-header,

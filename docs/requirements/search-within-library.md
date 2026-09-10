@@ -59,6 +59,16 @@ When linked-file full-text indexing is enabled, users must be able to search the
 
 Needs: impl, utest
 
+## Full-text search survives a query only Lucene rejects
+`req~jabgui.search.fulltext.lenient-query-parsing~1`
+
+Issue: [#9482](https://github.com/JabRef/jabref/issues/9482)
+
+The search bar validates regular expressions with `java.util.regex`, the full-text index parses them with Lucene's own dialect, where characters such as `"` and `<` are syntax instead of literals.
+A query that only Lucene rejects must leave the metadata results untouched and skip the linked files, instead of aborting the whole search.
+
+Needs: impl, utest
+
 ## Case-sensitive full-text search
 `req~jabgui.search.fulltext.case-sensitive~1`
 
