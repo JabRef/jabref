@@ -11,6 +11,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -25,6 +26,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
     @FXML private Label newFieldHint;
     private final EntryEditor entryEditor;
     private JumpToFieldViewModel viewModel;
+    private boolean resizeScheduled;
 
     public JumpToFieldDialog(EntryEditor entryEditor) {
         this.entryEditor = entryEditor;
@@ -66,14 +68,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
         newFieldHint.visibleProperty().bind(Bindings.createBooleanBinding(
                 () -> viewModel.isNewField(searchField.getText()), searchField.textProperty()));
 
-        newFieldHint.visibleProperty().addListener((_, _, _) ->
-                Platform.runLater(() -> Optional.ofNullable(getDialogPane().getScene())
-                                                .map(Scene::getWindow)
-                                                .ifPresent(window -> {
-                                                    if (window instanceof Stage stage) {
-                                                        stage.sizeToScene();
-                                                    }
-                                                })));
+        newFieldHint.visibleProperty().addListener((_, _, _) -> scheduleDialogResize());
 
         searchField.setOnAction(event -> {
             confirm();
@@ -86,6 +81,24 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
         if (okButton != null) {
             okButton.fire();
         }
+    }
+
+    private void scheduleDialogResize() {
+        if (resizeScheduled) {
+            return;
+        }
+        resizeScheduled = true;
+        Platform.runLater(() -> {
+            resizeScheduled = false;
+            Optional.ofNullable(getDialogPane().getScene())
+                    .map(Scene::getWindow)
+                    .filter(Window::isShowing)
+                    .ifPresent(window -> {
+                        if (window instanceof Stage stage) {
+                            stage.sizeToScene();
+                        }
+                    });
+        });
     }
 
     private void jumpToSelectedField() {
