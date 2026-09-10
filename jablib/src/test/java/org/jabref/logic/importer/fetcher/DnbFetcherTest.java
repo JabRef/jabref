@@ -28,10 +28,11 @@ public class DnbFetcherTest {
 
     DnbFetcher dnbFetcher;
     private BibEntry bibEntryISBN9783755300274;
+
     @BeforeEach
     void setUp() {
         dnbFetcher = new DnbFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
-                bibEntryISBN9783755300274 = new BibEntry(StandardEntryType.Misc)
+        bibEntryISBN9783755300274 = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.ADDRESS, "Königswinter")
                 .withField(StandardField.YEAR, "2050")
                 .withField(StandardField.ISBN, "3755300273")
