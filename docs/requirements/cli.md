@@ -46,7 +46,7 @@ The library is exported to a local temporary file before use; the access is read
 written back to the database.
 A database that is not a JabRef shared library, and any connection failure, is reported as a regular
 CLI error (exit code `SOFTWARE`).
-See [ADR 72](../decisions/0072-shared-database-url-as-jabkit-input.md) for more details.
+See [ADR 74](../decisions/0074-shared-database-url-as-jabkit-input.md) for more details.
 
 Needs: impl
 
