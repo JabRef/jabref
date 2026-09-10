@@ -10,23 +10,20 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.skin.VirtualFlow;
 import javafx.stage.Stage;
 
+import org.jabref.gui.testutils.JavaFxTest;
+
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @NullMarked
-@ExtendWith(ApplicationExtension.class)
-class MainTableScrollerTest {
+class MainTableScrollerTest extends JavaFxTest {
 
     private TableView<Integer> table;
 
-    @Start
-    void start(Stage stage) {
+    @Override
+    public void start(Stage stage) {
         table = new TableView<>(FXCollections.observableArrayList(IntStream.range(0, 100).boxed().toList()));
         table.setFixedCellSize(24);
         table.getColumns().add(new TableColumn<>("Value"));
@@ -35,8 +32,8 @@ class MainTableScrollerTest {
     }
 
     @Test
-    void selectedRowBelowViewportIsCentered(FxRobot robot) {
-        robot.interact(() -> {
+    void selectedRowBelowViewportIsCentered() {
+        interact(() -> {
             VisibleRange visibleRange = centerSelectedRow(50, 0);
 
             assertEquals(50, visibleRange.center(), 1.0);
@@ -44,8 +41,8 @@ class MainTableScrollerTest {
     }
 
     @Test
-    void selectedRowAboveViewportIsCentered(FxRobot robot) {
-        robot.interact(() -> {
+    void selectedRowAboveViewportIsCentered() {
+        interact(() -> {
             VisibleRange visibleRange = centerSelectedRow(50, 99);
 
             assertEquals(50, visibleRange.center(), 1.0);
@@ -53,8 +50,8 @@ class MainTableScrollerTest {
     }
 
     @Test
-    void selectedRowNearStartIsClampedToFirstRow(FxRobot robot) {
-        robot.interact(() -> {
+    void selectedRowNearStartIsClampedToFirstRow() {
+        interact(() -> {
             VisibleRange visibleRange = centerSelectedRow(2, 99);
 
             assertEquals(0, visibleRange.firstIndex());
@@ -62,8 +59,8 @@ class MainTableScrollerTest {
     }
 
     @Test
-    void selectedRowNearEndIsClampedToLastRow(FxRobot robot) {
-        robot.interact(() -> {
+    void selectedRowNearEndIsClampedToLastRow() {
+        interact(() -> {
             VisibleRange visibleRange = centerSelectedRow(98, 0);
 
             assertEquals(99, visibleRange.lastIndex());
@@ -71,8 +68,8 @@ class MainTableScrollerTest {
     }
 
     @Test
-    void noSelectionDoesNotScroll(FxRobot robot) {
-        robot.interact(() -> {
+    void noSelectionDoesNotScroll() {
+        interact(() -> {
             table.getSelectionModel().clearSelection();
             table.scrollTo(40);
             layoutTable();
@@ -86,8 +83,8 @@ class MainTableScrollerTest {
     }
 
     @Test
-    void selectedRowIsMadeVisibleBeforeSkinIsAvailable(FxRobot robot) {
-        robot.interact(() -> {
+    void selectedRowIsMadeVisibleBeforeSkinIsAvailable() {
+        interact(() -> {
             RecordingTableView tableWithoutSkin = new RecordingTableView();
             tableWithoutSkin.getItems().addAll(IntStream.range(0, 100).boxed().toList());
             tableWithoutSkin.getSelectionModel().select(80);
