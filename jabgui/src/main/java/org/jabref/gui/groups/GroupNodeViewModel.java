@@ -529,37 +529,33 @@ public class GroupNodeViewModel {
 
     public boolean canAddEntriesIn() {
         AbstractGroup group = groupNode.getGroup();
-        if (group instanceof AllEntriesGroup) {
-            return false;
-        } else if (group instanceof ExplicitGroup) {
-            return true;
-        } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
-            return groupNode.getParent()
-                            .map(GroupTreeNode::getGroup)
-                            .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
-                            .orElse(false);
-        } else if (group instanceof KeywordGroup) {
-            // also covers WordKeywordGroup
-            return true;
-        } else if (group instanceof SearchGroup) {
-            return false;
-        } else if (group instanceof AutomaticKeywordGroup) {
-            return false;
-        } else if (group instanceof AutomaticPersonsGroup) {
-            return false;
-        } else if (group instanceof TexGroup) {
-            return false;
-        } else if (group instanceof AutomaticDateGroup) {
-            return false;
-        } else if (group instanceof DateGroup) {
-            return false;
-        } else if (group instanceof AutomaticEntryTypeGroup) {
-            return false;
-        } else if (group instanceof EntryTypeGroup) {
-            return false;
-        } else {
-            throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
-        }
+        return switch (group) {
+            case AllEntriesGroup _,
+                 SearchGroup _,
+                 AutomaticKeywordGroup _,
+                 AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
+                 DateGroup _,
+                 AutomaticEntryTypeGroup _,
+                 EntryTypeGroup _,
+                 TexGroup _ ->
+                    false;
+            case ExplicitGroup _ ->
+                    true;
+            case LastNameGroup _,
+                 RegexKeywordGroup _ ->
+                    groupNode.getParent()
+                             .map(GroupTreeNode::getGroup)
+                             .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
+                             .orElse(false);
+            case KeywordGroup _ ->
+                // also covers WordKeywordGroup
+                    true;
+            case null ->
+                    throw new IllegalArgumentException("Group cannot be null");
+            default ->
+                    throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
+        };
     }
 
     public boolean canBeDragged() {
