@@ -79,7 +79,13 @@ public class JumpToEntryPdfAction extends SimpleCommand {
             return;
         }
 
-        List<LinkedFile> files = entryOpt.get().getFiles();
+        BibEntry entry = entryOpt.get();
+        if (stateManager.activeTabProperty() != null && stateManager.activeTabProperty().get() != null) {
+            stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entry));
+        }
+        stateManager.setSelectedEntries(List.of(entry));
+
+        List<LinkedFile> files = entry.getFiles();
         Optional<LinkedFile> pdfFileOpt = link.fileIndex()
                                               .filter(index -> index <= files.size())
                                               .map(index -> files.get(index - 1))
@@ -103,8 +109,9 @@ public class JumpToEntryPdfAction extends SimpleCommand {
 
     private void openInDocumentViewer(LinkedFile pdfFile, int page) {
         DocumentViewerView viewerView = new DocumentViewerView();
-        viewerView.switchToFile(pdfFile);
+        viewerView.disableLiveMode();
         viewerView.gotoPage(page);
+        viewerView.switchToFile(pdfFile);
         dialogService.showCustomDialog(viewerView);
     }
 

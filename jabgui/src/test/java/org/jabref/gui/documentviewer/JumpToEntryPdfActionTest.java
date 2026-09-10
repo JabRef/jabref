@@ -147,4 +147,16 @@ class JumpToEntryPdfActionTest {
 
         verify(dialogService).notify(Localization.lang("No PDF files available"));
     }
+
+    @Test
+    void executeSelectsEntryInStateManager() {
+        BibDatabase database = new BibDatabase();
+        BibEntry entry = new BibEntry().withCitationKey("Key1");
+        database.insertEntry(entry);
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext(database)));
+
+        new JumpToEntryPdfAction("entries/Key1", stateManager, dialogService).execute();
+
+        verify(stateManager).setSelectedEntries(List.of(entry));
+    }
 }
