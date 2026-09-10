@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - main-release
+      - stable
   pull_request:
   merge_group:
   workflow_dispatch:
@@ -405,7 +406,7 @@ jobs:
       - name: Check CHANGELOG.md diff
         run: |
           diff \
-            <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
+            <(git show "origin/${{ github.base_ref }}":CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
 
   javadoc:
@@ -721,7 +722,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           show-progress: 'false'
-      - uses: gradle/actions/wrapper-validation@0723195856401067f7a2779048b490ace7a47d7c # v5
+      - uses: gradle/actions/wrapper-validation@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
   # Guards against a committer (e.g. a dependabot wrapper bump) baking CRLF into
   # the committed gradlew.bat blob. .gitattributes stores it as LF and smudges it
