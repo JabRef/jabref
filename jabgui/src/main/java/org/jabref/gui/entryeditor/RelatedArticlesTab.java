@@ -110,7 +110,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     ///
     /// @param list List of BibEntries of related articles
     /// @return VBox of related article descriptions to be displayed in the Related Articles tab
-    ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
+    private ScrollPane getRelatedArticleInfo(List<BibEntry> list, MrDLibFetcher fetcher) {
         ScrollPane scrollPane = new ScrollPane();
 
         VBox vBox = new VBox(4);

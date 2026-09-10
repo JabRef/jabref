@@ -120,9 +120,7 @@ public class MrDLibImporter extends Importer {
         // parse each of the relevant fields into variables
         String authors = isRecommendationFieldPresent(recommendation, "authors") ? recommendation.getString("authors") : "";
         String title = isRecommendationFieldPresent(recommendation, "title") ? recommendation.getString("title") : "";
-        String year = parsePublicationYear(recommendation, "published_year")
-                .or(() -> parsePublicationYear(recommendation, "year_published"))
-                .orElse("");
+        String year = parsePublicationYear(recommendation).orElse("");
         String journal = isRecommendationFieldPresent(recommendation, "published_in") ? recommendation.getString("published_in") : "";
         String url = isRecommendationFieldPresent(recommendation, "url") ? recommendation.getString("url") : "";
         Integer rank = isRecommendationFieldPresent(recommendation, "recommendation_id") ? recommendation.getInt("recommendation_id") : 100;
@@ -137,14 +135,14 @@ public class MrDLibImporter extends Importer {
         return new RankedBibEntry(current, rank);
     }
 
-    private Optional<String> parsePublicationYear(JSONObject recommendation, String field) {
-        if (!isRecommendationFieldPresent(recommendation, field)) {
+    private Optional<String> parsePublicationYear(JSONObject recommendation) {
+        if (!isRecommendationFieldPresent(recommendation, "published_year")) {
             return Optional.empty();
         }
         try {
-            return Optional.of(Integer.toString(recommendation.getInt(field)));
+            return Optional.of(Integer.toString(recommendation.getInt("published_year")));
         } catch (JSONException exception) {
-            LOGGER.debug("Could not parse {} field", field, exception);
+            LOGGER.debug("Could not parse published_year field", exception);
             return Optional.empty();
         }
     }
