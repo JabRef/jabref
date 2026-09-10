@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We made almost everything in JabRef navigatable by keyboard, including adding visiual indicators. [#17059](https://github.com/JabRef/jabref/pull/17059)
+- We added a fetcher for Software Heritage identifiers (SWHID). [#16809](https://github.com/JabRef/jabref/issues/16809)
 - We added the community themes from [themes.jabref.org](https://themes.jabref.org/) (Everforest, Nord, Papers, Chocolate Honey, and Dino Girl's collection) as selectable themes. [#15915](https://github.com/JabRef/jabref/issues/15915)
 - We added a preview image to the theme selection in the preferences. [#15915](https://github.com/JabRef/jabref/issues/15915)
 - We added automatic reconnection to shared databases that were still connected when JabRef was closed. [#16801](https://github.com/JabRef/jabref/pull/16801)
@@ -94,12 +96,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed spacing, padding and font sizes across the interface for a more consistent look and feel. [#16042](https://github.com/JabRef/jabref/issues/16042)
 - We reduced the amount of special spacing, padding and font sizes across the interface for a more unified interface. [#16887](https://github.com/JabRef/jabref/pull/16887)
 - We changed the delete and rename file dialogs to state that undo does not restore files on disk. [#16680](https://github.com/JabRef/jabref/pull/16680)
+- We changed the donation prompt to appear as a notification in the notification center instead of a separate popup on the Welcome tab. [#16972](https://github.com/JabRef/jabref/pull/16972)
 - We reworked the appearance preferences: you now choose a theme (e.g. "JabRef", "Primer") and a color scheme ("Follow System", "Light", "Dark") separately; the "Use System Preference" checkbox is gone. [#15625](https://github.com/JabRef/jabref/issues/15625)
 - A custom theme (CSS file) is now applied on top of the selected theme instead of replacing it entirely. [#15625](https://github.com/JabRef/jabref/issues/15625)
 - Custom themes now use the `-color-*` variables declared in the theme stylesheet (see `jabref-theme.css`); the previous `-jr-*` color variables (e.g. `-jr-theme`, `-jr-accent`) were removed, so existing custom CSS files that override them need to be adapted. [#15625](https://github.com/JabRef/jabref/issues/15625)
 - The LibreOffice integration's bibliography generation for CSL styles is now more performant for a large number of entries. [#16555](https://github.com/JabRef/jabref/pull/16555)
 - We now identify Crossref requests with a configured email address, allowing them to use Crossref's polite pool. [#16535](https://github.com/JabRef/jabref/pull/16535)
 - We improved user experience by making the welcome tab visible when no libraries are open. [#16451](https://github.com/JabRef/jabref/issues/16451)
+- We changed the Welcome tab to use more of the window width, so recent library paths stay readable. [#17003](https://github.com/JabRef/jabref/pull/17003)
 - We made it possible to reopen the `Share this library to GitHub` dialog for saved local libraries with an existing Git remote, check a personal access token's push access, and pull from remotes with unrelated histories or no branches. [#16367](https://github.com/JabRef/jabref/pull/16367)
 - We hardened the fetchers and importers against [XML Entity Expansion attacks](https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html). [#16359](https://github.com/JabRef/jabref/pull/16359)
 - We improved the reliability of online searches by respecting the request limits of arXiv and other services. [#16300](https://github.com/JabRef/jabref/issues/16300)
@@ -133,6 +137,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where an entry added by DOI or URL could not be undone. [#8770](https://github.com/JabRef/jabref/issues/8770)
 - We fixed an issue where a regular expression search containing a quotation mark stopped the search instead of returning results. [#9482](https://github.com/JabRef/jabref/issues/9482)
 - We fixed an issue where an author list ending with "et al." was parsed as a person named "et al." instead of "and others". [#16937](https://github.com/JabRef/jabref/pull/16937)
 - We fixed an issue where dialog buttons cut off their text at a larger font size. [#16787](https://github.com/JabRef/jabref/issues/16787)
@@ -260,6 +265,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "entrytype" column header was shown in lower case; it now reads "Entry Type". [#16894](https://github.com/JabRef/jabref/pull/16894)
 - We fixed an issue where some buttons were not aligned in entry editor. [#16485](https://github.com/JabRef/jabref/issues/16485)
 - We fixed an issue where long recent library paths overflowed and were cut off in the Welcome tab. [#16808](https://github.com/JabRef/jabref/issues/16808)
+- We fixed an issue where a library file containing merge conflict markers was opened without any warning. [#9167](https://github.com/JabRef/jabref/issues/9167)
 
 ### Removed
 
