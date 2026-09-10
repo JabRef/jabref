@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -47,17 +46,11 @@ public class JumpToEntryPdfAction extends SimpleCommand {
     private final String url;
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final @Nullable FilePreferences filePreferences;
 
-    public JumpToEntryPdfAction(String url, StateManager stateManager, DialogService dialogService, @Nullable FilePreferences filePreferences) {
+    public JumpToEntryPdfAction(String url, StateManager stateManager, DialogService dialogService) {
         this.url = url;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.filePreferences = filePreferences;
-    }
-
-    public JumpToEntryPdfAction(String url, StateManager stateManager, DialogService dialogService) {
-        this(url, stateManager, dialogService, null);
     }
 
     @Override
@@ -96,7 +89,7 @@ public class JumpToEntryPdfAction extends SimpleCommand {
             return;
         }
 
-        openInDocumentViewer(databaseOpt.get(), pdfFileOpt.get(), link.page().orElse(1));
+        openInDocumentViewer(pdfFileOpt.get(), link.page().orElse(1));
     }
 
     private static boolean isPdf(LinkedFile file) {
@@ -108,27 +101,11 @@ public class JumpToEntryPdfAction extends SimpleCommand {
         }
     }
 
-    private void openInDocumentViewer(BibDatabaseContext databaseContext, LinkedFile pdfFile, int page) {
-        Optional<Path> resolvedPath = resolvePath(databaseContext, pdfFile);
-        if (resolvedPath.isEmpty()) {
-            dialogService.notify(Localization.lang("File %0 not found.", pdfFile.getLink()));
-            return;
-        }
-
-        DocumentViewerView viewerView = new DocumentViewerView(resolvedPath.get());
+    private void openInDocumentViewer(LinkedFile pdfFile, int page) {
+        DocumentViewerView viewerView = new DocumentViewerView();
+        viewerView.switchToFile(pdfFile);
         viewerView.gotoPage(page);
         dialogService.showCustomDialog(viewerView);
-    }
-
-    private Optional<Path> resolvePath(BibDatabaseContext databaseContext, LinkedFile pdfFile) {
-        if (filePreferences != null) {
-            return pdfFile.findIn(databaseContext, filePreferences);
-        }
-        List<Path> dirs = databaseContext.getDatabasePath()
-                                         .map(Path::getParent)
-                                         .map(List::of)
-                                         .orElseGet(List::of);
-        return pdfFile.findIn(dirs);
     }
 
     /// @return empty if the url is not an entry link (callers then fall back to opening it in the browser)

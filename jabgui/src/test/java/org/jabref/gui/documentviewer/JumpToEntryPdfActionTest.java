@@ -1,8 +1,5 @@
 package org.jabref.gui.documentviewer;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +8,6 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.documentviewer.JumpToEntryPdfAction.EntryLink;
-import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,19 +17,17 @@ import org.jabref.model.entry.LinkedFile;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // [utest->feat~ai.chat.jump-to-entry-pdf~1]
 @NullMarked
-class JumpToEntryPdfActionTest extends JavaFxTest {
+class JumpToEntryPdfActionTest {
 
     private StateManager stateManager;
     private DialogService dialogService;
@@ -152,30 +146,5 @@ class JumpToEntryPdfActionTest extends JavaFxTest {
         new JumpToEntryPdfAction("entries/Key1/files/5", stateManager, dialogService).execute();
 
         verify(dialogService).notify(Localization.lang("No PDF files available"));
-    }
-
-    @Test
-    void executeWithNonExistentPdfFileNotifiesUser() {
-        BibDatabase database = new BibDatabase();
-        database.insertEntry(new BibEntry().withCitationKey("Key1").withFiles(List.of(new LinkedFile("PDF", "nonexistent.pdf", "PDF"))));
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext(database)));
-
-        new JumpToEntryPdfAction("entries/Key1", stateManager, dialogService).execute();
-
-        verify(dialogService).notify(Localization.lang("File %0 not found.", "nonexistent.pdf"));
-    }
-
-    @Test
-    void executeWithExistingPdfOpensDocumentViewer(@TempDir Path tempDir) throws IOException {
-        Path pdfFile = tempDir.resolve("paper.pdf");
-        Files.createFile(pdfFile);
-
-        BibDatabase database = new BibDatabase();
-        database.insertEntry(new BibEntry().withCitationKey("Key1").withFiles(List.of(new LinkedFile("PDF", pdfFile.toAbsolutePath().toString(), "PDF"))));
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext(database)));
-
-        interact(() -> new JumpToEntryPdfAction("entries/Key1#page=3", stateManager, dialogService).execute());
-
-        verify(dialogService).showCustomDialog(any(DocumentViewerView.class));
     }
 }

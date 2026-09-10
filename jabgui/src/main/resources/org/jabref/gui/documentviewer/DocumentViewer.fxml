@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" depthTest="DISABLE" prefHeight="600.0" prefWidth="750.0"
             xmlns="http://javafx.com/javafx/8.0.112"
-            fx:controller="org.jabref.gui.documentviewer.LiveDocumentViewerView"
+            fx:controller="org.jabref.gui.documentviewer.DocumentViewerView"
             id="document-viewer-dialog" styleClass="document-viewer-dialog">
     <content>
         <BorderPane fx:id="mainPane" styleClass="padding-0">

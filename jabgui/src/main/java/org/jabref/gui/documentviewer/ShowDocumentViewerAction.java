@@ -7,15 +7,12 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
-@NullMarked
 public class ShowDocumentViewerAction extends SimpleCommand {
     private final DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-    private @Nullable LiveDocumentViewerView documentViewerView;
+    private DocumentViewerView documentViewerView;
 
     public ShowDocumentViewerAction(StateManager stateManager, CliPreferences preferences) {
         this.executable.bind(needsEntriesSelected(stateManager).and(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferences)));
@@ -24,8 +21,9 @@ public class ShowDocumentViewerAction extends SimpleCommand {
     @Override
     public void execute() {
         if (documentViewerView == null) {
-            documentViewerView = new LiveDocumentViewerView();
+            documentViewerView = new DocumentViewerView();
         }
         dialogService.showCustomDialog(documentViewerView);
     }
 }
+

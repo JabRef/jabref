@@ -199,7 +199,7 @@ public class AiChatMessageView extends HBox {
     // [impl->feat~ai.chat.jump-to-entry-pdf~1]
     void handleHyperlink(String url) {
         if (JumpToEntryPdfAction.parseUrl(url).isPresent()) {
-            new JumpToEntryPdfAction(url, stateManager, dialogService, preferences.getFilePreferences()).execute();
+            new JumpToEntryPdfAction(url, stateManager, dialogService).execute();
         } else {
             new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute();
         }
