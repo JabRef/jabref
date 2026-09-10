@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringSimilarity;
@@ -18,25 +18,18 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
-import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.ISBN;
-import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// This class contains utility method for duplicate checking of entries.
 public class DuplicateCheck {
     private static final double DUPLICATE_THRESHOLD = 0.75; // The overall threshold to signal a duplicate pair
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DuplicateCheck.class);
     /*
      * Integer values for indicating result of duplicate check (for entries):
      */
@@ -46,32 +39,28 @@ public class DuplicateCheck {
     private static final int EMPTY_IN_TWO = 3;
 
     private static final int EMPTY_IN_BOTH = 4;
-    // Non-required fields are investigated only if the required fields give a value within
-    // the doubt range of the threshold:
-    private static final double DOUBT_RANGE = 0.05;
-
-    private static final double REQUIRED_WEIGHT = 3; // Weighting of all required fields
-
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
+    private static final double CORE_FIELD_WEIGHT = 3;
+    private static final Set<Field> CORE_FIELDS = Set.of(
+            StandardField.AUTHOR, StandardField.EDITOR, StandardField.TITLE,
+            StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.BOOKTITLE,
+            StandardField.PUBLISHER, StandardField.DATE, StandardField.YEAR);
     private static final Map<Field, Double> FIELD_WEIGHTS = new HashMap<>();
     private static final Pattern PAGE_SEPARATOR_PATTERN = Pattern.compile("[\\p{Pd} ]+");
-
-    private static final Set<StandardEntryType> STANDARD_ENTRY_TYPES = Set.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection);
 
     static {
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.AUTHOR, 2.5);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.EDITOR, 2.5);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.TITLE, 3.);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.JOURNAL, 2.);
+        DuplicateCheck.FIELD_WEIGHTS.put(StandardField.JOURNALTITLE, 2.);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.NOTE, 0.1);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.COMMENT, 0.1);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.DOI, 3.);
     }
 
-    private final BibEntryTypesManager entryTypesManager;
-
+    /// The parameter is retained for compatibility; matching does not depend on entry-type definitions.
     public DuplicateCheck(BibEntryTypesManager entryTypesManager) {
-        this.entryTypesManager = entryTypesManager;
     }
 
     private static boolean haveSameIdentifier(final BibEntry one, final BibEntry two) {
@@ -107,43 +96,15 @@ public class DuplicateCheck {
                         (compareSingleField(StandardField.PAGES, one, two) == NOT_EQUAL));
     }
 
-    private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
-        final Set<OrFields> requiredFields = type.getRequiredFields();
-        return requiredFields.isEmpty()
-               ? new double[] {0., 0.}
-               : DuplicateCheck.compareFieldSet(requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()), one, two);
-    }
-
-    private static boolean isFarFromThreshold(double value) {
-        if (value < 0.0) {
-            LOGGER.trace("Value {} is below zero. Should not happen", value);
-        }
-        return value - DuplicateCheck.DUPLICATE_THRESHOLD > DuplicateCheck.DOUBT_RANGE;
-    }
-
-    private static boolean compareOptionalFields(final BibEntryType type,
-                                                 final BibEntry one,
-                                                 final BibEntry two,
-                                                 final double[] req) {
-        final Set<BibField> optionalFields = type.getOptionalFields();
-        if (optionalFields.isEmpty()) {
-            return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
-        }
-        final double[] opt = DuplicateCheck.compareFieldSet(optionalFields.stream().map(BibField::field).collect(Collectors.toSet()), one, two);
-        final double numerator = (DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1]);
-        final double denominator = (req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1];
-        final double totValue = numerator / denominator;
-        return totValue >= DuplicateCheck.DUPLICATE_THRESHOLD;
-    }
-
-    private static double[] compareFieldSet(final Collection<Field> fields, final BibEntry one, final BibEntry two) {
+    private static double compareFieldSet(final Collection<Field> fields, final BibEntry one, final BibEntry two) {
         if (fields.isEmpty()) {
-            return new double[] {0.0, 0.0};
+            return 0.0;
         }
         double equalWeights = 0;
         double totalWeights = 0.;
         for (final Field field : fields) {
-            final double currentWeight = DuplicateCheck.FIELD_WEIGHTS.getOrDefault(field, 1.0);
+            final double currentWeight = DuplicateCheck.FIELD_WEIGHTS.getOrDefault(field, 1.0)
+                    * (CORE_FIELDS.contains(field) ? CORE_FIELD_WEIGHT : 1.0);
             totalWeights += currentWeight;
             int result = DuplicateCheck.compareSingleField(field, one, two);
             if (result == EQUAL) {
@@ -153,10 +114,10 @@ public class DuplicateCheck {
             }
         }
         if (totalWeights > 0) {
-            return new double[] {equalWeights / totalWeights, totalWeights};
+            return equalWeights / totalWeights;
         }
         // all fields are empty in both --> have no difference at all
-        return new double[] {0.0, 0.0};
+        return 0.0;
     }
 
     private static int compareSingleField(final Field field, final BibEntry one, final BibEntry two) {
@@ -282,49 +243,29 @@ public class DuplicateCheck {
         return StringUtil.equalsUnifiedLineBreak(one.getField(field), two.getField(field));
     }
 
-    /// Checks if the two entries represent the same publication.
+    /// Checks if the two entries represent the same publication, independently of their entry types.
+    // [impl->req~duplicates.type-independent-matching~1]
     public boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
-        // Checks DOI and other identifiers
         if (haveSameIdentifier(one, two)) {
             return true;
         }
 
-        // TODO: Work on haveDifferentEntryType - InCollection and InProceedings could point to the same publication
-        if (haveDifferentEntryType(one, two) ||
-                haveDifferentEditions(one, two) ||
-                haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
+        if (haveDifferentEditions(one, two) || haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
             return false;
         }
 
-        // In case an ISBN is present, it is a strong indicator that the entries are equal.
-        // Only in InBook, InCollection, or Article the ISBN may be equal and the publication on different pages (and thus not equal)
-        Optional<ISBN> oneISBN = one.getISBN();
-        Optional<ISBN> twoISBN = two.getISBN();
-        if (oneISBN.isPresent() && twoISBN.isPresent()
-                && Objects.equals(oneISBN, twoISBN)
-                && one.getType() instanceof StandardEntryType standardEntry
-                && !STANDARD_ENTRY_TYPES.contains(standardEntry)) {
-            return true;
+        // A shared author or personal metadata alone does not identify a publication.
+        if (compareSingleField(StandardField.TITLE, one, two) != EQUAL ||
+                Stream.of(StandardField.AUTHOR, StandardField.EDITOR, StandardField.DATE, StandardField.YEAR, StandardField.ISBN)
+                      .noneMatch(field -> compareSingleField(field, one, two) == EQUAL)) {
+            return false;
         }
 
-        final Optional<BibEntryType> type = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
-        if (type.isPresent()) {
-            BibEntryType entryType = type.get();
-            final double[] reqCmpResult = compareRequiredFields(entryType, one, two);
-
-            if (isFarFromThreshold(reqCmpResult[0])) {
-                // Far from the threshold value, so we base our decision on the required fields only
-                return reqCmpResult[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
-            }
-
-            // Close to the threshold value, so we take a look at the optional fields, if any:
-            if (compareOptionalFields(type.get(), one, two, reqCmpResult)) {
-                return true;
-            }
-        }
-        // if type is not present, so simply compare fields without any distinction between optional/required
-        // In case both required and optional fields are equal, we also use this fallback
-        return compareFieldSet(Sets.union(one.getFields(), two.getFields()), one, two)[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
+        Set<Field> fields = Sets.union(one.getFields(), two.getFields()).stream()
+                               .filter(field -> !(field instanceof InternalField))
+                               .filter(field -> field != StandardField.GROUPS && field != StandardField.FILE)
+                               .collect(Collectors.toSet());
+        return compareFieldSet(fields, one, two) >= DUPLICATE_THRESHOLD;
     }
 
     /// Goes through all entries in the given database, and if at least one of

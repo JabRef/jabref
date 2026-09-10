@@ -144,6 +144,30 @@ class RelatedWorkMatcherTest {
         assertSame(existingLibraryEntry, matchResult.matchedLibraryBibEntry().orElseThrow());
     }
 
+    @Test
+    void matchRelatedWorkDoesNotMatchAuthorOnlyReferences() throws IOException {
+        BibEntry parsedReference = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "J. Smith");
+        RelatedWorkReferenceResolver resolver = new RelatedWorkReferenceResolver() {
+            @Override
+            public Map<String, BibEntry> parseReferences(LinkedFile linkedFile,
+                                                         BibDatabaseContext databaseContext,
+                                                         FilePreferences filePreferences) {
+                return Map.of("[1]", parsedReference);
+            }
+        };
+        RelatedWorkMatcher matcher = new RelatedWorkMatcher(
+                new RelatedWorkTextParser(), resolver, new DuplicateCheck(new BibEntryTypesManager()));
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        databaseContext.getDatabase().insertEntry(new BibEntry(parsedReference));
+
+        List<RelatedWorkMatchResult> results = matcher.matchRelatedWork(
+                databaseContext, new BibEntry(StandardEntryType.Article), new LinkedFile("", "main.pdf", "PDF"),
+                "A related work sentence [1].", createFilePreferences());
+
+        assertEquals(1, results.size());
+        assertFalse(results.getFirst().hasMatchedLibraryEntry());
+    }
+
     private FilePreferences createFilePreferences() {
         return mock(FilePreferences.class);
     }

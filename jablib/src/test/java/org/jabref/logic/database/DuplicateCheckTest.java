@@ -29,6 +29,147 @@ public class DuplicateCheckTest {
     private BibEntry simpleInBook;
     private DuplicateCheck duplicateChecker;
 
+    private static BibEntry architecturalDecision(StandardEntryType type) {
+        return new BibEntry(type)
+                .withField(StandardField.AUTHOR, "Zimmermann, Olaf")
+                .withField(StandardField.DATE, "2020")
+                .withField(StandardField.TITLE, "Architectural Decisions --- The Making Of")
+                .withField(StandardField.URL, "https://ozimmer.ch/practices/2020/04/27/ArchitectureDecisionMaking.html");
+    }
+
+    private static Stream<Arguments> entryTypePairs() {
+        return Stream.of(BibDatabaseMode.values()).flatMap(mode -> Stream.of(
+                Arguments.of(StandardEntryType.Article, StandardEntryType.Misc, mode),
+                Arguments.of(StandardEntryType.Misc, StandardEntryType.Article, mode),
+                Arguments.of(StandardEntryType.Article, StandardEntryType.Book, mode),
+                Arguments.of(StandardEntryType.Book, StandardEntryType.Article, mode),
+                Arguments.of(StandardEntryType.InCollection, StandardEntryType.InProceedings, mode),
+                Arguments.of(StandardEntryType.InProceedings, StandardEntryType.InCollection, mode),
+                Arguments.of(StandardEntryType.Article, StandardEntryType.Article, mode)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    // [utest->req~duplicates.type-independent-matching~1]
+    void matchingPublicationsAreDuplicatesRegardlessOfType(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        assertTrue(duplicateChecker.isDuplicate(architecturalDecision(firstType), architecturalDecision(secondType), mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void entriesWithDifferentTitlesAreNotDuplicates(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry second = architecturalDecision(secondType).withField(StandardField.TITLE, "A study of marine biology");
+
+        assertFalse(duplicateChecker.isDuplicate(architecturalDecision(firstType), second, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void entriesWithDifferentAuthorsAreNotDuplicates(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry second = architecturalDecision(secondType).withField(StandardField.AUTHOR, "Joyce, James");
+
+        assertFalse(duplicateChecker.isDuplicate(architecturalDecision(firstType), second, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void entriesWithoutTitlesAreNotDuplicates(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry first = architecturalDecision(firstType).withField(StandardField.TITLE, "");
+        BibEntry second = architecturalDecision(secondType).withField(StandardField.TITLE, "");
+
+        assertFalse(duplicateChecker.isDuplicate(first, second, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void entriesWithOnlyMatchingTitlesAreNotDuplicates(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry first = new BibEntry(firstType).withField(StandardField.TITLE, "Architectural Decisions --- The Making Of");
+        BibEntry second = new BibEntry(secondType).withField(StandardField.TITLE, "Architectural Decisions --- The Making Of");
+
+        assertFalse(duplicateChecker.isDuplicate(first, second, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void entriesWithOnlyMatchingAuthorsAreNotDuplicates(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry first = new BibEntry(firstType).withField(StandardField.AUTHOR, "Zimmermann, Olaf");
+        BibEntry second = new BibEntry(secondType).withField(StandardField.AUTHOR, "Zimmermann, Olaf");
+
+        assertFalse(duplicateChecker.isDuplicate(first, second, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void personalFieldsDoNotAffectDuplicateDetection(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry first = architecturalDecision(firstType).withCitationKey("first")
+                .withField(StandardField.GROUPS, "To read")
+                .withField(StandardField.FILE, ":first.pdf:PDF");
+        BibEntry second = architecturalDecision(secondType).withCitationKey("second")
+                .withField(StandardField.GROUPS, "Read")
+                .withField(StandardField.FILE, ":second.pdf:PDF");
+
+        assertTrue(duplicateChecker.isDuplicate(first, second, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void entriesWithDifferentEditionsAreNotDuplicates(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry first = architecturalDecision(firstType).withField(StandardField.EDITION, "1");
+        BibEntry second = architecturalDecision(secondType).withField(StandardField.EDITION, "2");
+
+        assertFalse(duplicateChecker.isDuplicate(first, second, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void entriesWithDifferentPagesAreNotDuplicates(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry first = architecturalDecision(firstType).withField(StandardField.PAGES, "1--10");
+        BibEntry second = architecturalDecision(secondType).withField(StandardField.PAGES, "11--20");
+
+        assertFalse(duplicateChecker.isDuplicate(first, second, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void entriesWithIncompleteMetadataAndSameIsbnAreNotDuplicates(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry first = architecturalDecision(firstType)
+                .withField(StandardField.DATE, "")
+                .withField(StandardField.YEAR, "2020")
+                .withField(StandardField.JOURNAL, "Journal of Software Architecture")
+                .withField(StandardField.ISBN, "0-123456-47-9");
+        BibEntry second = architecturalDecision(secondType)
+                .withField(StandardField.DATE, "")
+                .withField(StandardField.ISBN, "0-123456-47-9");
+
+        assertFalse(duplicateChecker.isDuplicate(first, second, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void matchingCoreDetailsOutweighDifferentJournalAndVolume(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry first = new BibEntry(firstType)
+                .withField(StandardField.AUTHOR, "Billy Bob")
+                .withField(StandardField.YEAR, "2005")
+                .withField(StandardField.TITLE, "A title")
+                .withField(StandardField.JOURNAL, "A")
+                .withField(StandardField.VOLUME, "21")
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.PAGES, "334--337");
+        BibEntry second = new BibEntry(first).withField(StandardField.JOURNAL, "B").withField(StandardField.VOLUME, "22");
+        second.setType(secondType);
+
+        assertTrue(duplicateChecker.isDuplicate(first, second, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryTypePairs")
+    void matchingTitleAndDateCanIdentifyAnonymousPublications(StandardEntryType firstType, StandardEntryType secondType, BibDatabaseMode mode) {
+        BibEntry first = architecturalDecision(firstType).withField(StandardField.AUTHOR, "");
+        BibEntry second = architecturalDecision(secondType).withField(StandardField.AUTHOR, "");
+
+        assertTrue(duplicateChecker.isDuplicate(first, second, mode));
+    }
+
     private static BibEntry getSimpleArticle() {
         return new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Single Author")
@@ -71,17 +212,17 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    void duplicateDetectionWithSameAuthor() {
+    void sameAuthorAloneDoesNotIdentifyAPublication() {
         BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bob");
         BibEntry two = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bob");
 
-        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
+        assertFalse(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
     @Test
     void duplicateDetectionWithSameAuthorAndUmlauts() {
-        BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bobä");
-        BibEntry two = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Bill{\\\"{a}} Bob{\\\"{a}}");
+        BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "A study of software architecture").withField(StandardField.AUTHOR, "Billy Bobä");
+        BibEntry two = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "A study of software architecture").withField(StandardField.AUTHOR, "Bill{\\\"{a}} Bob{\\\"{a}}");
 
         assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
@@ -557,21 +698,21 @@ public class DuplicateCheckTest {
     void compareOfTwoEntriesWithSameContentAndLfEndingsReportsNoDifferences() {
         BibEntry entryOne = new BibEntry().withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry entryTwo = new BibEntry().withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
-        assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+        assertEquals(1.01, DuplicateCheck.compareEntriesStrictly(entryOne, entryTwo));
     }
 
     @Test
     void compareOfTwoEntriesWithSameContentAndCrLfEndingsReportsNoDifferences() {
         BibEntry entryOne = new BibEntry().withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
         BibEntry entryTwo = new BibEntry().withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
-        assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+        assertEquals(1.01, DuplicateCheck.compareEntriesStrictly(entryOne, entryTwo));
     }
 
     @Test
     void compareOfTwoEntriesWithSameContentAndMixedLineEndingsReportsNoDifferences() {
         BibEntry entryOne = new BibEntry().withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry entryTwo = new BibEntry().withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
-        assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+        assertEquals(1.01, DuplicateCheck.compareEntriesStrictly(entryOne, entryTwo));
     }
 
     /// Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundreds of different articles.

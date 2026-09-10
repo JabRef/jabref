@@ -11,6 +11,7 @@ import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -76,7 +77,12 @@ public class RelatedWorkMatcher {
     private Optional<BibEntry> findDuplicateBibEntry(BibEntry sourceEntry,
                                                      BibEntry parsedReference,
                                                      BibDatabaseContext databaseContext) {
-        return duplicateCheck.containsDuplicate(databaseContext.getDatabase(), parsedReference, databaseContext.getMode())
-                             .filter(duplicateEntry -> !duplicateEntry.getId().equals(sourceEntry.getId()));
+        // Imported references may contain only raw reference text rather than structured publication fields.
+        return databaseContext.getEntries().stream()
+                              .filter(entry -> parsedReference.hasField(StandardField.COMMENT) &&
+                                      DuplicateCheck.compareEntriesStrictly(parsedReference, entry) > 1)
+                              .findFirst()
+                              .or(() -> duplicateCheck.containsDuplicate(databaseContext.getDatabase(), parsedReference, databaseContext.getMode()))
+                              .filter(duplicateEntry -> !duplicateEntry.getId().equals(sourceEntry.getId()));
     }
 }
