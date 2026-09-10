@@ -25,7 +25,6 @@ public class EditorTabViewModel {
     private final String customName;
     private final BooleanProperty visible = new SimpleBooleanProperty(true);
     private final ObservableList<String> fieldPatterns = FXCollections.observableArrayList();
-    /// Patterns marked "Extract field": their fields leave the Main tab. Unchecked by default.
     private final Set<String> extractedPatterns = new HashSet<>();
 
     private EditorTabViewModel(EntryEditorTabModel.@Nullable BuiltIn builtIn, String customName) {
