@@ -280,41 +280,14 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         extractColumn.setSortable(false);
         extractColumn.setReorderable(false);
         extractColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
-        extractColumn.setCellFactory(_ -> new TableCell<>() {
-            private final CheckBox checkBox = new CheckBox();
-            private final Tooltip tooltip = new Tooltip();
-
-            {
-                checkBox.setTooltip(tooltip);
-                checkBox.setOnAction(_ -> {
-                    EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
-                    if (tab != null) {
-                        tab.setExtracted(getItem(), checkBox.isSelected());
-                    }
-                });
-            }
-
-            @Override
-            protected void updateItem(String pattern, boolean empty) {
-                super.updateItem(pattern, empty);
-                if (empty || (pattern == null)) {
-                    setGraphic(null);
-                    setTooltip(null);
-                    return;
-                }
-                EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
-                boolean onMainTab = EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab(pattern);
-                checkBox.setDisable(!onMainTab);
-                checkBox.setSelected(!onMainTab || ((tab != null) && tab.isExtracted(pattern)));
-                tooltip.setText(onMainTab
-                                ? Localization.lang("If checked, the field is not shown in the \"Main\" tab anymore.")
-                                : Localization.lang("Field not contained in the \"Main\" tab."));
-                // A disabled checkbox is mouse-transparent, so its tooltip never shows; the cell's
-                // tooltip covers that case (and the rest of the cell).
-                setTooltip(tooltip);
-                setGraphic(checkBox);
-            }
-        });
+        new ValueTableCellFactory<String, String>()
+                .withGraphic(this::createExtractCheckBox)
+                // The tooltip lives on the cell: a disabled checkbox is mouse-transparent, so a
+                // tooltip on the checkbox itself would never show for always-extracted patterns.
+                .withTooltip(pattern -> EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab(pattern)
+                                        ? Localization.lang("If checked, the field is not shown in the \"Main\" tab anymore.")
+                                        : Localization.lang("Field not contained in the \"Main\" tab."))
+                .install(extractColumn);
 
         TableColumn<String, String> warningColumn = new TableColumn<>();
         warningColumn.setMinWidth(40.0);
@@ -362,6 +335,22 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                 .setOnDragOver((row, pattern, event) -> handleOnDragOver(DragAndDropDataFormats.FIELD, row, event))
                 .setOnDragExited((row, pattern, event) -> ControlHelper.removeDroppingPseudoClasses(row))
                 .install(fieldsTable);
+    }
+
+    // [impl->req~entry-editor.custom-tabs.extract-field~1]
+    private CheckBox createExtractCheckBox(String pattern) {
+        CheckBox checkBox = new CheckBox();
+        boolean onMainTab = EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab(pattern);
+        EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
+        checkBox.setDisable(!onMainTab);
+        checkBox.setSelected(!onMainTab || ((tab != null) && tab.isExtracted(pattern)));
+        checkBox.setOnAction(_ -> {
+            EditorTabViewModel selectedTab = tabsTable.getSelectionModel().getSelectedItem();
+            if (selectedTab != null) {
+                selectedTab.setExtracted(pattern, checkBox.isSelected());
+            }
+        });
+        return checkBox;
     }
 
     private void addField() {
