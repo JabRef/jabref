@@ -67,7 +67,7 @@ class FileIngestorTest {
         List<String> capturedTexts = textCaptor.getAllValues();
 
         assertEquals(List.of("Page 1", "Page 2", "Page 3"), capturedTexts);
-        assertEquals(1, capturedMetadatas.get(0).getInteger(FileIngestor.PAGE_NUMBER_METADATA_KEY));
+        assertEquals(1, capturedMetadatas.getFirst().getInteger(FileIngestor.PAGE_NUMBER_METADATA_KEY));
         assertEquals(2, capturedMetadatas.get(1).getInteger(FileIngestor.PAGE_NUMBER_METADATA_KEY));
         assertEquals(3, capturedMetadatas.get(2).getInteger(FileIngestor.PAGE_NUMBER_METADATA_KEY));
     }
@@ -87,7 +87,7 @@ class FileIngestorTest {
         List<String> capturedTexts = textCaptor.getAllValues();
 
         assertEquals(List.of("Page 1", "Page 3"), capturedTexts);
-        assertEquals(1, capturedMetadatas.get(0).getInteger(FileIngestor.PAGE_NUMBER_METADATA_KEY));
+        assertEquals(1, capturedMetadatas.getFirst().getInteger(FileIngestor.PAGE_NUMBER_METADATA_KEY));
         assertEquals(3, capturedMetadatas.get(1).getInteger(FileIngestor.PAGE_NUMBER_METADATA_KEY));
     }
 

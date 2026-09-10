@@ -61,7 +61,7 @@ class PdfContentParserTest {
 
         List<String> pages = parser.parse(pdfPath);
         assertEquals(2, pages.size());
-        assertTrue(pages.get(0).contains("First page text"));
+        assertTrue(pages.getFirst().contains("First page text"));
         assertTrue(pages.get(1).contains("Second page text"));
 
         Optional<String> parsedAsString = parser.parseAsString(pdfPath);
