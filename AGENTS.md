@@ -512,6 +512,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 
 ## Documentation
 
+- New entry in the CHANGELOG.md must be at the top of the corresponding section, e.g. `Fixed`.
 - Add a CHANGELOG.md entry only if the change is visible to the user.
 - Do not add an entry when fixing something that was itself introduced after the last release (e.g. a bug in a feature that only exists in `## [Unreleased]`) — users of the last release never saw the bug. Instead, update the existing unreleased entry if the fix changes what it should say.
 - The CHANGELOG.md entry should be for end users (and not programmers).
