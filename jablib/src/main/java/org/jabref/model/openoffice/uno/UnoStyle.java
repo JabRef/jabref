@@ -36,7 +36,7 @@ public class UnoStyle {
         try {
             Object style = xFamily.getByName(styleName);
             return UnoCast.cast(XStyle.class, style);
-        } catch (NoSuchElementException ex) {
+        } catch (NoSuchElementException _) {
             return Optional.empty();
         }
     }

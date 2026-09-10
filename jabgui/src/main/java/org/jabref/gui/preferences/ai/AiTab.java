@@ -24,10 +24,10 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -44,11 +44,13 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     private TabPane templatesTabPane;
 
     public AiTab(AiPreferences workingAiPreferences) {
+        AiService aiService = Injector.instantiateModelOrService(AiService.class);
         this.viewModel = new AiTabViewModel(
                 preferences.getAiPreferences(),
                 workingAiPreferences,
-                Injector.instantiateModelOrService(AiService.class).getModelService(),
-                taskExecutor);
+                aiService.getModelService(),
+                taskExecutor,
+                new EmbeddingModelMetadataService(workingAiPreferences));
         this.aiDisabled = viewModel.enableAi().not();
 
         buildView();
@@ -60,6 +62,16 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     }
 
     private void buildView() {
+        TextField embeddingModelSizeField = new TextField();
+        embeddingModelSizeField.setEditable(false);
+        embeddingModelSizeField.setFocusTraversable(false);
+        embeddingModelSizeField.textProperty().bind(viewModel.selectedEmbeddingModelSizeProperty());
+
+        TextField embeddingModelMaxChunkSizeField = new TextField();
+        embeddingModelMaxChunkSizeField.setEditable(false);
+        embeddingModelMaxChunkSizeField.setFocusTraversable(false);
+        embeddingModelMaxChunkSizeField.textProperty().bind(viewModel.selectedEmbeddingModelMaxChunkSizeProperty().asString());
+
         setContent(form()
 
                 .section(Localization.lang("General"), general -> general
@@ -97,9 +109,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                 .searchableCombo(Localization.lang("Embedding model"),
                                                         viewModel.embeddingModelsProperty(),
                                                         viewModel.selectedEmbeddingModelProperty(),
-                                                        PredefinedEmbeddingModel::fullInfo,
+                                                        model -> model != null ? model : "",
                                                         embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
-                                                .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
+                                                .field(Localization.lang("Embedding model size"), embeddingModelSizeField)
+                                                .field(Localization.lang("Embedding model maximum chunk size"), embeddingModelMaxChunkSizeField)
                                                 // The six numeric expert settings, as two columns of caption-above-field cells.
                                                 // [impl->feat~ai.expert-settings.chat-inference-global~1]
                                                 // [impl->feat~ai.expert-settings.rag-global~1]
@@ -191,8 +204,19 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     /// primitive property in both directions, mapping `null` to zero.
     private IntegerInputField integerField(IntegerProperty value) {
         IntegerInputField field = new IntegerInputField();
-        field.valueProperty().addListener((_, _, newValue) -> value.set(newValue == null ? 0 : newValue));
-        value.addListener((_, _, newValue) -> field.valueProperty().set(newValue == null ? 0 : newValue.intValue()));
+        field.setValue(value.getValue());
+        field.valueProperty().addListener((_, _, newValue) -> {
+            int newInt = newValue == null ? 0 : newValue;
+            if (value.get() != newInt) {
+                value.set(newInt);
+            }
+        });
+        value.addListener((_, _, newValue) -> {
+            int newInt = newValue == null ? 0 : newValue.intValue();
+            if (field.getValue() == null || field.getValue() != newInt) {
+                field.setValue(newInt);
+            }
+        });
         return field;
     }
 

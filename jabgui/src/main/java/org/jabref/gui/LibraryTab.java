@@ -6,6 +6,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -74,6 +77,7 @@ import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -104,7 +108,6 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -169,7 +172,93 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
-    private BackgroundTask<ParserResult> dataLoadingTask;
+    private BackgroundTask<?> dataLoadingTask;
+
+    static final class SharedDatabaseLoadingCallbacks {
+        private final LibraryTab tab;
+        private final BiConsumer<LibraryTab, BibDatabaseContext> onSuccess;
+        private final Consumer<Exception> onFailure;
+        private Optional<BibDatabaseContext> connectedContext = Optional.empty();
+        private boolean cancelled;
+
+        SharedDatabaseLoadingCallbacks(LibraryTab tab,
+                                       BiConsumer<LibraryTab, BibDatabaseContext> onSuccess,
+                                       Consumer<Exception> onFailure) {
+            this.tab = tab;
+            this.onSuccess = onSuccess;
+            this.onFailure = onFailure;
+        }
+
+        private void onConnected(BibDatabaseContext bibDatabaseContext) {
+            boolean closeContext;
+            synchronized (this) {
+                closeContext = cancelled;
+                if (!closeContext) {
+                    connectedContext = Optional.of(bibDatabaseContext);
+                }
+            }
+            if (closeContext) {
+                closeSharedDatabase(bibDatabaseContext);
+            }
+        }
+
+        private void onDatabaseLoadingSucceed(BibDatabaseContext loadedContext) {
+            boolean closeContext;
+            synchronized (this) {
+                closeContext = cancelled;
+                connectedContext = Optional.empty();
+            }
+            if (closeContext) {
+                closeSharedDatabase(loadedContext);
+                return;
+            }
+            tab.setDatabaseContext(loadedContext);
+            Optional.ofNullable(tab.autoCompleterChangedListener).ifPresent(Runnable::run);
+            tab.loading.set(false);
+            tab.dataLoadingTask = null;
+            onSuccess.accept(tab, loadedContext);
+        }
+
+        private void onDatabaseLoadingFailed(Exception exception) {
+            tab.loading.set(false);
+            tab.dataLoadingTask = null;
+            tab.tabContainer.closeTab(tab);
+            onFailure.accept(exception);
+        }
+
+        private void cancel() {
+            Optional<BibDatabaseContext> contextToClose;
+            synchronized (this) {
+                cancelled = true;
+                contextToClose = connectedContext;
+                connectedContext = Optional.empty();
+            }
+            contextToClose.ifPresent(LibraryTab::closeSharedDatabase);
+        }
+    }
+
+    static final class SharedDatabaseLoadingTask extends BackgroundTask<BibDatabaseContext> {
+        private final Callable<BibDatabaseContext> connectionTask;
+        private final SharedDatabaseLoadingCallbacks callbacks;
+
+        SharedDatabaseLoadingTask(Callable<BibDatabaseContext> connectionTask, SharedDatabaseLoadingCallbacks callbacks) {
+            this.connectionTask = connectionTask;
+            this.callbacks = callbacks;
+        }
+
+        @Override
+        public BibDatabaseContext call() throws Exception {
+            BibDatabaseContext bibDatabaseContext = connectionTask.call();
+            callbacks.onConnected(bibDatabaseContext);
+            return bibDatabaseContext;
+        }
+
+        @Override
+        public void cancel(boolean mayInterruptIfRunning) {
+            super.cancel(mayInterruptIfRunning);
+            callbacks.cancel();
+        }
+    }
 
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
@@ -312,13 +401,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     private static void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
-        text.append(bibDatabaseContext.getDBMSSynchronizer().getDBName());
+        Optional.ofNullable(bibDatabaseContext.getDBMSSynchronizer())
+                .map(DatabaseSynchronizer::getDBName)
+                .ifPresent(text::append);
         text.append(" [");
         text.append(Localization.lang("shared"));
         text.append("]");
     }
 
-    private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
+    private void setDataLoadingTask(BackgroundTask<?> dataLoadingTask) {
         this.loading.set(true);
         this.dataLoadingTask = dataLoadingTask;
     }
@@ -792,9 +883,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             dataLoadingTask.cancel();
         }
         if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
-            bibDatabaseContext.convertToLocalDatabase();
-            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
-            bibDatabaseContext.clearDBMSSynchronizer();
+            closeSharedDatabase(bibDatabaseContext);
         }
         try {
             changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
@@ -840,6 +929,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
+    }
+
+    private static void closeSharedDatabase(BibDatabaseContext bibDatabaseContext) {
+        bibDatabaseContext.convertToLocalDatabase();
+        bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+        bibDatabaseContext.clearDBMSSynchronizer();
     }
 
     /// Get an array containing the currently selected entries. The array is stable and not changed if the selection changes
@@ -943,12 +1038,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        // One step, opened around the insert so that the automatic assignment it sets off is
-        // recorded inside it rather than as a second step the user has to undo separately.
-        getUndoManager().addEdit(Localization.lang("Import entries"), edit -> {
-            importHandler.importCleanedEntries(null, entries);
-            edit.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-        });
+        // One step, opened by importCleanedEntries around the insert, so that the automatic
+        // assignment it sets off is recorded inside it rather than as a second step.
+        importHandler.importCleanedEntries(null, entries);
         stateManager.setSelectedEntries(entries);
 
         // Only show/select individual entry for single-entry imports.
@@ -1213,6 +1305,52 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        .executeWith(taskExecutor);
 
         return newTab;
+    }
+
+    /// Creates a shared-library tab that displays the main table's loading indicator until `connectionTask` has connected.
+    /// The dummy context is replaced with the connected context on success; cancellation closes the connected context instead.
+    // [impl->req~shared-database.loading-indicator~1]
+    public static LibraryTab createLibraryTab(Callable<BibDatabaseContext> connectionTask,
+                                              BibDatabaseContext dummyContext,
+                                              DialogService dialogService,
+                                              AiService aiService,
+                                              GuiPreferences preferences,
+                                              StateManager stateManager,
+                                              LibraryTabContainer tabContainer,
+                                              FileUpdateMonitor fileUpdateMonitor,
+                                              BibEntryTypesManager entryTypesManager,
+                                              ClipBoardManager clipBoardManager,
+                                              TaskExecutor taskExecutor,
+                                              GitHandlerRegistry gitHandlerRegistry,
+                                              BiConsumer<LibraryTab, BibDatabaseContext> onSuccess,
+                                              Consumer<Exception> onFailure) {
+        LibraryTab newTab = new LibraryTab(
+                dummyContext,
+                tabContainer,
+                dialogService,
+                aiService,
+                preferences,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                clipBoardManager,
+                taskExecutor,
+                gitHandlerRegistry,
+                true);
+
+        SharedDatabaseLoadingCallbacks callbacks = new SharedDatabaseLoadingCallbacks(newTab, onSuccess, onFailure);
+        BackgroundTask<BibDatabaseContext> dataLoadingTask = new SharedDatabaseLoadingTask(connectionTask, callbacks);
+        newTab.setDataLoadingTask(dataLoadingTask);
+        dataLoadingTask.onSuccess(callbacks::onDatabaseLoadingSucceed)
+                       .onFailure(callbacks::onDatabaseLoadingFailed);
+
+        return newTab;
+    }
+
+    /// Starts a loading task after its tab has been added to the tab container.
+    public void startDataLoadingTask() {
+        assert dataLoadingTask != null;
+        dataLoadingTask.executeWith(taskExecutor);
     }
 
     public static LibraryTab createLibraryTab(@NonNull BibDatabaseContext databaseContext,

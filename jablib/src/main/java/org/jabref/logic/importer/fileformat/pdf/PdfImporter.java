@@ -62,7 +62,7 @@ public abstract class PdfImporter extends Importer {
     public ParserResult importDatabase(Path filePath) {
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             return importDatabase(filePath, document);
-        } catch (EncryptedPdfsNotSupportedException e) {
+        } catch (EncryptedPdfsNotSupportedException _) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch (IOException | ParseException exception) {
             return ParserResult.fromError(exception);
