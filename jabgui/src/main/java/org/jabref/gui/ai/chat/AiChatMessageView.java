@@ -24,17 +24,13 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.LocaleUtil;
 import org.jabref.gui.util.component.MarkdownTextFlow;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.chatting.ChatMessage;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AiChatMessageView extends HBox {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiChatMessageView.class);
     private static final PseudoClass USER_PSEUDO_CLASS = PseudoClass.getPseudoClass("user");
     private static final PseudoClass AI_PSEUDO_CLASS = PseudoClass.getPseudoClass("ai");
     private static final PseudoClass ERROR_PSEUDO_CLASS = PseudoClass.getPseudoClass("error");
@@ -204,9 +200,6 @@ public class AiChatMessageView extends HBox {
     void handleHyperlink(String url) {
         if (JumpToEntryPdfAction.parseUrl(url).isPresent()) {
             new JumpToEntryPdfAction(url, stateManager, dialogService).execute();
-        } else if (JumpToEntryPdfAction.isEntryUrl(url)) {
-            LOGGER.warn("Could not parse entry link: {}", url);
-            dialogService.notify(Localization.lang("Invalid URL"));
         } else {
             new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute();
         }
