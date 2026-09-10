@@ -126,6 +126,7 @@
 /* Background */
 .bg-accent { -fx-background: -color-accent; -fx-background-color: -color-accent; }
 .bg-secondary { -fx-background: -color-bg-secondary; -fx-background-color: -color-bg-secondary; }
+.bg-sidepane { -fx-background: -color-bg-sidepane; -fx-background-color: -color-bg-sidepane; }
 .bg-transparent { -fx-background: transparent; -fx-background-color: transparent; }
 
 /* Text color */
@@ -857,19 +858,14 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-accent;
 }
 
+.welcome-main-container {
+    -fx-max-width: 96em;
+}
+
 /* Welcome Community  */
 .welcome-community-link:hover {
     -fx-underline: true;
     -fx-text-fill: derive(-color-accent, -20%);
-}
-
-/* donation toast */
-.donation-toast {
-    -fx-background-radius: 0.8333333333em;
-    -fx-effect: dropshadow(gaussian, -color-shadow-subtle, 20, 0.25, 0, 6);
-    -fx-border-color: derive(-color-bg-tertiary, -10%);
-    -fx-border-radius: 0.8333333333em;
-    -fx-max-height: 4em;
 }
 
 /* The logo is a single SvgNode; its shape is filled with -fx-color, not -fx-fill. */
@@ -1642,6 +1638,21 @@ We want to have a look that matches our icons in the tool-bar */
 
 .info-center-view .notification-view > .content > .text-container > .actions-box .button:armed {
     -fx-background-color: -color-button-default, -color-button-pressed;
+}
+
+/* "Donate" - the last action of the donation notification is its primary one */
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child {
+    -fx-background: -color-accent;
+    -fx-background-color: -color-accent;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child:hover {
+    -fx-background-color: -color-accent, -color-button-hover;
+}
+
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child:armed {
+    -fx-background-color: -color-accent, -color-button-pressed;
 }
 
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
