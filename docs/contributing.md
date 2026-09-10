@@ -7,7 +7,7 @@ Please head to our [contributing guide in the main repository](https://github.co
 
 ## Branching strategy
 
-JabRef has two long-lived branches (see [ADR-0072](decisions/0072-single-stable-branch-with-automatic-ports.md)):
+JabRef has two long-lived branches (see [ADR-0072](decisions/0073-single-stable-branch-with-automatic-ports.md)):
 
 - `main` is the development branch. Every pull request targets `main`, unless the change only makes sense for the released version.
 - `stable` is the last regular release plus the fixes ported to it. Releases are tagged on `stable`. It is a [long-lived release branch](https://martinfowler.com/articles/branching-patterns.html#long-lived-release-branch) in the terms of Martin Fowler's branching patterns; fixes are made on `main` and cherry-picked, as the [hotfix branch](https://martinfowler.com/articles/branching-patterns.html#hotfix-branch) pattern recommends.
