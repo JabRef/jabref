@@ -40,17 +40,14 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
     private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
 
-    // LaTeX inline formatting → HTML, resolved before RemoveLatexCommandsFormatter strips them.
-    // Both the \cmd{text} form (used by IEEEtran: \emph{Journal}) and the {\cmd text} group
-    // form (used by abbrv.bst: {\em Booktitle}) are handled.
+    // LaTeX inline formatting → HTML. Italic and bold survive `LatexToUnicodeFormatter`, while
+    // `\textsc{...}` has to be converted earlier because it would otherwise be reduced to plain text.
     private static final Pattern EMPH_PATTERN = Pattern.compile("\\\\emph\\{([^}]*?)}");
     private static final Pattern TEXTIT_PATTERN = Pattern.compile("\\\\textit\\{([^}]*?)}");
     private static final Pattern TEXTBF_PATTERN = Pattern.compile("\\\\textbf\\{([^}]*?)}");
-    private static final Pattern TEXTSC_PATTERN = Pattern.compile("\\\\textsc\\{([^}]*?)}");
     private static final Pattern GROUP_EM_PATTERN = Pattern.compile("\\{\\\\em\\s+([^}]*?)}");
     private static final Pattern GROUP_IT_PATTERN = Pattern.compile("\\{\\\\it\\s+([^}]*?)}");
     private static final Pattern GROUP_BF_PATTERN = Pattern.compile("\\{\\\\bf\\s+([^}]*?)}");
-    private static final Pattern GROUP_SC_PATTERN = Pattern.compile("\\{\\\\sc\\s+([^}]*?)}");
 
     /// Matches a single LaTeX math command wrapped in the `{{$...$}}` form written by some
     /// exporters, e.g. `{{$\Sigma$}}`. Group 1 is the command without its leading backslash
@@ -155,6 +152,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = LATEX_COMMAND_PATTERN.matcher(result).replaceAll("");
         // Remove some IEEEtran.bst output (resulting from a multiline \\providecommand)
         result = result.replace("#2}}", "");
+        result = convertInlineSmallCapsToHtml(result);
         // Have quotes right - and more
         result = new LatexToUnicodeFormatter().format(result);
         result = result.replace("``", "\"");
@@ -173,6 +171,124 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = new RemoveTilde().format(result);
         result = MULTIPLE_SPACES_PATTERN.matcher(result.trim()).replaceAll(" ");
         return result;
+    }
+
+    private static String convertInlineSmallCapsToHtml(String latex) {
+        String html = replaceCommandWithBalancedArgument(latex, "textsc");
+        return replaceLegacySwitchWithBalancedArgument(html, "sc");
+    }
+
+    private static String replaceCommandWithBalancedArgument(String input, String command) {
+        String commandPrefix = "\\" + command;
+        StringBuilder output = new StringBuilder(input.length());
+        int index = 0;
+        while (index < input.length()) {
+            if (!input.startsWith(commandPrefix, index) || isEscaped(input, index)) {
+                output.append(input.charAt(index));
+                index++;
+                continue;
+            }
+
+            int commandEnd = index + commandPrefix.length();
+            if ((commandEnd < input.length()) && Character.isLetter(input.charAt(commandEnd))) {
+                output.append(input.charAt(index));
+                index++;
+                continue;
+            }
+
+            int openingBrace = skipWhitespace(input, commandEnd);
+            if ((openingBrace >= input.length()) || (input.charAt(openingBrace) != '{')) {
+                output.append(input.charAt(index));
+                index++;
+                continue;
+            }
+
+            int contentStart = openingBrace + 1;
+            int groupEnd = findBalancedGroupEnd(input, contentStart);
+            if (groupEnd < 0) {
+                output.append(input, index, input.length());
+                break;
+            }
+
+            output.append("<span style=\"font-variant: small-caps\">")
+                  .append(input, contentStart, groupEnd)
+                  .append("</span>");
+            index = groupEnd + 1;
+        }
+        return output.toString();
+    }
+
+    private static String replaceLegacySwitchWithBalancedArgument(String input, String command) {
+        String legacyCommandPrefix = "{\\" + command;
+        StringBuilder output = new StringBuilder(input.length());
+        int index = 0;
+        while (index < input.length()) {
+            if (!input.startsWith(legacyCommandPrefix, index)) {
+                output.append(input.charAt(index));
+                index++;
+                continue;
+            }
+
+            int commandEnd = index + legacyCommandPrefix.length();
+            if ((commandEnd < input.length()) && Character.isLetter(input.charAt(commandEnd))) {
+                output.append(input.charAt(index));
+                index++;
+                continue;
+            }
+            if ((commandEnd >= input.length()) || (!Character.isWhitespace(input.charAt(commandEnd)) && (input.charAt(commandEnd) != '}'))) {
+                output.append(input.charAt(index));
+                index++;
+                continue;
+            }
+
+            int contentStart = skipWhitespace(input, commandEnd);
+            int groupEnd = findBalancedGroupEnd(input, contentStart);
+            if (groupEnd < 0) {
+                output.append(input, index, input.length());
+                break;
+            }
+
+            output.append("<span style=\"font-variant: small-caps\">")
+                  .append(input, contentStart, groupEnd)
+                  .append("</span>");
+            index = groupEnd + 1;
+        }
+        return output.toString();
+    }
+
+    private static int skipWhitespace(String input, int startIndex) {
+        int index = startIndex;
+        while ((index < input.length()) && Character.isWhitespace(input.charAt(index))) {
+            index++;
+        }
+        return index;
+    }
+
+    private static int findBalancedGroupEnd(String input, int contentStart) {
+        int depth = 0;
+        for (int index = contentStart; index < input.length(); index++) {
+            char currentCharacter = input.charAt(index);
+            if (isEscaped(input, index)) {
+                continue;
+            }
+            if (currentCharacter == '{') {
+                depth++;
+            } else if (currentCharacter == '}') {
+                if (depth == 0) {
+                    return index;
+                }
+                depth--;
+            }
+        }
+        return -1;
+    }
+
+    private static boolean isEscaped(String input, int index) {
+        int backslashCount = 0;
+        for (int pos = index - 1; pos >= 0 && input.charAt(pos) == '\\'; pos--) {
+            backslashCount++;
+        }
+        return (backslashCount % 2) == 1;
     }
 
     /// Replaces `{{$\Cmd$}}` math expressions in all fields of the given entry by the corresponding

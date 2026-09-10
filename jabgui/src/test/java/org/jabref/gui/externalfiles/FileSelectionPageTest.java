@@ -16,6 +16,8 @@ import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.testutils.JavaFxExtension;
+import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -25,9 +27,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
-import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,13 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(ApplicationExtension.class)
-class FileSelectionPageTest {
+@ExtendWith(JavaFxExtension.class)
+class FileSelectionPageTest extends JavaFxTest {
 
     private FileSelectionPage page;
 
-    @Start
-    void onStart(Stage stage) {
+    @Override
+    public void start(Stage stage) {
         UnlinkedFilesDialogViewModel viewModel = mock(UnlinkedFilesDialogViewModel.class);
         when(viewModel.progressValueProperty()).thenReturn(new SimpleDoubleProperty());
         when(viewModel.progressTextProperty()).thenReturn(new SimpleStringProperty());
@@ -68,38 +67,41 @@ class FileSelectionPageTest {
 
     /// [utest->req~jabgui.externalfiles.unlinked-files.preview.close~1]
     @Test
-    void previewPaneCanBeClosedAndShownAgain(FxRobot robot) {
+    void previewPaneCanBeClosedAndShownAgain() {
         Button closeButton = findButtonWithTooltip(Localization.lang("Close PDF preview"));
 
-        robot.interact(closeButton::fire);
+        interact(closeButton::fire);
 
         assertEquals(0, previewPanes());
-        Button showButton = page.lookupAll(".button").stream()
-                                .map(Button.class::cast)
-                                .filter(button -> button.getText().equals(Localization.lang("Show PDF preview")))
-                                .findFirst()
-                                .orElseThrow();
+        Button showButton = JavaFxExtension.lookup(
+                page,
+                ".button",
+                Button.class,
+                button -> Localization.lang("Show PDF preview").equals(button.getText()));
         assertTrue(showButton.isVisible());
 
-        robot.interact(showButton::fire);
+        interact(showButton::fire);
 
         assertEquals(1, previewPanes());
         assertFalse(showButton.isVisible());
     }
 
     private Button findButtonWithTooltip(String tooltipText) {
-        return page.lookupAll(".button").stream()
-                   .map(Button.class::cast)
-                   .filter(button -> button.getTooltip() != null)
-                   .filter(button -> button.getTooltip().getText().equals(tooltipText))
-                   .findFirst()
-                   .orElseThrow();
+        return JavaFxExtension.lookup(
+                page,
+                ".button",
+                Button.class,
+                button -> Optional.ofNullable(button.getTooltip())
+                                  .map(tooltip -> tooltip.getText())
+                                  .filter(tooltipText::equals)
+                                  .isPresent());
     }
 
     private long previewPanes() {
-        return page.lookupAll(".titled-pane").stream()
-                   .map(TitledPane.class::cast)
-                   .filter(pane -> pane.getText().equals(Localization.lang("PDF preview")))
-                   .count();
+        return JavaFxExtension.lookupAll(
+                page,
+                ".titled-pane",
+                TitledPane.class,
+                pane -> Localization.lang("PDF preview").equals(pane.getText())).size();
     }
 }

@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 
@@ -74,6 +75,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
@@ -557,6 +559,66 @@ class BibtexParserTest {
                 .parse(Reader.of("@article{test,author={author missing bracket}"));
         assertTrue(result.hasWarnings());
         assertEquals(List.of(), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseContinuesAfterEntryWithUnmatchedOpenBracket() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{broken,
+                  title = {accuracy of multilingual models by 3 to 15{{\\%}.
+                }
+                @article{valid,
+                  title = {Valid entry}
+                }
+                """));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("valid")
+                .withField(StandardField.TITLE, "Valid entry");
+
+        assertTrue(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseContinuesAfterUnmatchedOpenBracketWithIndentedEntryAndSeparateDelimiter() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{broken,
+                  title = {accuracy of multilingual models by 3 to 15{{\\%}.
+                }
+                    @article
+                    {valid,
+                      title = {Valid entry}
+                    }
+                """));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("valid")
+                .withField(StandardField.TITLE, "Valid entry");
+
+        assertTrue(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseRetainsLineLeadingBibtexLikeTextInBracedField() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @article{test,
+                  title = {prefix
+                @foo{bar}
+                suffix}
+                }
+                """));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.TITLE, """
+                        prefix
+                        @foo{bar}
+                        suffix""");
+
+        assertFalse(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
     @Test
@@ -1854,6 +1916,30 @@ class BibtexParserTest {
     }
 
     @Test
+    void integrationTestGitAutoPull() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoPull:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoPull());
+    }
+
+    @Test
+    void integrationTestGitAutoCommit() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoCommit:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoCommit());
+    }
+
+    @Test
+    void integrationTestGitAutoPush() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: gitAutoPush:true;}"));
+
+        assertTrue(result.getMetaData().isGitAutoPush());
+    }
+
+    @Test
     void integrationTestContentSelectors() throws IOException {
         ParserResult result = parser.parse(
                 Reader.of("@Comment{jabref-meta: selector_pubstate:approved;captured;received;status;}"));
@@ -2362,5 +2448,147 @@ class BibtexParserTest {
                 .withFiles(List.of(new LinkedFile("", "../../../Papers/Asheim2005 The Geography of Innovation Regional Innovation Systems.pdf", "")));
 
         assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
+    }
+
+    // [utest->req~import.bibtex.merge-conflict-markers~1]
+    @ParameterizedTest
+    @MethodSource
+    void mergeConflictMarkersResultInAnErrorMessage(String fileContent) throws IOException {
+        ParserResult result = parser.parse(Reader.of(fileContent));
+
+        assertEquals(List.of("Found a merge conflict marker in line 3. Please resolve the conflict in the file before opening it."), result.warnings());
+        assertTrue(result.isInvalid());
+        assertEquals(List.of(), result.getDatabase().getEntries());
+    }
+
+    static Stream<String> mergeConflictMarkersResultInAnErrorMessage() {
+        return Stream.of(
+                // conflict inside an entry
+                """
+                        @Article{first,
+                          author = {Author},
+                        <<<<<<< HEAD:test.bib
+                          title = {Title},
+                        =======
+                          title = {My title},
+                        >>>>>>> 77976da35a11db4580b80ae27e8d65caf5208086:test.bib
+                        }
+                        """,
+                // conflict spanning whole entries
+                """
+                        @Article{first,
+                        }
+                        <<<<<<< HEAD
+                        @Article{second,
+                        }
+                        =======
+                        @Article{third,
+                        }
+                        >>>>>>> other
+                        """,
+                // conflict inside a preamble, which the parser otherwise recovers from
+                """
+                        @Preamble{"first
+                        second
+                        <<<<<<< HEAD
+                        third
+                        =======
+                        other
+                        >>>>>>> other
+                        "}
+                        """,
+                // conflict inside an @Comment, which the parser otherwise reads as plain text
+                """
+                        @Comment{first
+                        second
+                        <<<<<<< HEAD
+                        third
+                        }
+                        """,
+                // conflict inside a quoted field value
+                """
+                        @Article{first,
+                          author = "Author
+                        <<<<<<< HEAD
+                        Another",
+                        }
+                        """,
+                // diff3 style conflict, reported at its "<<<<<<<" line
+                """
+                        @Article{first,
+                        }
+                        <<<<<<< HEAD
+                        @Article{second,
+                        }
+                        ||||||| base
+                        @Article{base,
+                        }
+                        =======
+                        @Article{third,
+                        }
+                        >>>>>>> other
+                        """,
+                // botched merge with longer runs, https://github.com/JabRef/jabref/issues/9167
+                """
+                        @Article{first,
+                        }
+                        <<<<<<<<<<< HEAD
+                        @Article{second,
+                        }
+                        >>>>>>>>>>> other
+                        """);
+    }
+
+    /// The parser peeks (reads and unreads) while scanning a quoted value, so a character must not be counted twice.
+    @ParameterizedTest
+    @ValueSource(strings = {"<<<<", "<<<<<", "<<<<<<", ">>>>", ">>>>>", ">>>>>>"})
+    void runShorterThanAConflictMarkerIsKept(String shortRun) throws IOException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.COMMENT, "line one\n" + shortRun + " quoted mail\nline two");
+
+        ParserResult result = parser.parse(Reader.of("""
+                @Article{test,
+                  comment = "line one
+                %s quoted mail
+                line two",
+                }
+                """.formatted(shortRun)));
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void lineOfSevenPipesIsNoConflictMarker() throws IOException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.COMMENT, "line one\n|||||||\nline two");
+
+        ParserResult result = parser.parse(Reader.of("""
+                @Article{test,
+                  comment = {line one
+                |||||||
+                line two},
+                }
+                """));
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void lineOfSevenEqualSignsIsNoConflictMarker() throws IOException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.COMMENT, "line one\n=======\nline two");
+
+        ParserResult result = parser.parse(Reader.of("""
+                @Article{test,
+                  comment = {line one
+                =======
+                line two},
+                }
+                """));
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 }

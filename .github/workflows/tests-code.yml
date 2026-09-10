@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - main-release
+      - stable
   pull_request:
   merge_group:
   workflow_dispatch:
@@ -239,6 +240,18 @@ jobs:
             *.md
             docs/**/*.md
 
+  yaml:
+    name: YAML
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: yamllint
+        run: pipx run yamllint==1.38.0 --strict .
+
   textlint:
     name: Textlint
     runs-on: ubuntu-slim
@@ -393,7 +406,7 @@ jobs:
       - name: Check CHANGELOG.md diff
         run: |
           diff \
-            <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
+            <(git show "origin/${{ github.base_ref }}":CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
 
   javadoc:
@@ -515,17 +528,6 @@ jobs:
     if: github.repository_owner == 'JabRef' && needs.changes.outputs.run-gradle-ci-full == 'true'
     name: Database tests
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:13-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
@@ -539,7 +541,6 @@ jobs:
         run: gradle :jablib:databaseTest --rerun-tasks
         env:
           CI: "true"
-          DBMS: "postgresql"
 
   publish:
     needs: changes
@@ -721,7 +722,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           show-progress: 'false'
-      - uses: gradle/actions/wrapper-validation@0723195856401067f7a2779048b490ace7a47d7c # v5
+      - uses: gradle/actions/wrapper-validation@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
 
   # Guards against a committer (e.g. a dependabot wrapper bump) baking CRLF into
   # the committed gradlew.bat blob. .gitattributes stores it as LF and smudges it

@@ -25,6 +25,7 @@ import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -34,7 +35,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -62,7 +62,6 @@ public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
     private final FieldPreferences fieldPreferences;
-    private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
     private final InvalidationListener entryTypeListener = _ -> updateCodeArea();
     private final InvalidationListener entryFieldsListener = _ -> updateCodeArea();
@@ -80,19 +79,18 @@ public class SourceTab extends EntryEditorTab {
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
-    public SourceTab(UndoManager undoManager,
-                     FieldPreferences fieldPreferences,
-                     ImportFormatPreferences importFormatPreferences,
-                     FileUpdateMonitor fileMonitor,
-                     DialogService dialogService,
-                     BibEntryTypesManager entryTypesManager,
-                     KeyBindingRepository keyBindingRepository,
-                     StateManager stateManager,
-                     BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
+    public SourceTab(
+            FieldPreferences fieldPreferences,
+            ImportFormatPreferences importFormatPreferences,
+            FileUpdateMonitor fileMonitor,
+            DialogService dialogService,
+            BibEntryTypesManager entryTypesManager,
+            KeyBindingRepository keyBindingRepository,
+            StateManager stateManager,
+            BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
         this.stateManager = stateManager;
         this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
-        this.undoManager = undoManager;
         this.fieldPreferences = fieldPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
@@ -108,7 +106,7 @@ public class SourceTab extends EntryEditorTab {
             this.setText(Localization.lang("Source"));
             this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
         }));
-        searchQuerySubscription = EasyBind.subscribe(stateManager.searchQueryProperty(), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
+        searchQuerySubscription = EasyBind.subscribe(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
     }
 
     private void refreshCodeAreaDecorator() {
@@ -142,7 +140,7 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.getModel().replace(null, caretPos, caretPos, committed);
             }
         });
-        codeArea.getStyleClass().add("bibtex-code-area");
+        codeArea.getStyleClass().addAll("bibtex-code-area", "font-monospace");
 
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
@@ -329,7 +327,8 @@ public class SourceTab extends EntryEditorTab {
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
             compound.applyEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
         }
-        undoManager.addEdit(compound.toChangeSet());
+        stateManager.getActiveDatabase().ifPresent(databaseContext ->
+                stateManager.getUndoManager(databaseContext).addEdit(compound.toChangeSet()));
 
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         if (selectedEntries == null || selectedEntries.isEmpty()) {

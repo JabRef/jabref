@@ -38,7 +38,7 @@ public class DBMSConnection implements DatabaseConnection {
             }
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
-            // Therefore a stable error determination is not possible.
+            // Therefore, a stable error determination is not possible.
             LOGGER.error("Could not connect to database: {} - Error code: {}", e.getMessage(), e.getErrorCode(), e);
             throw e;
         }
@@ -47,6 +47,16 @@ public class DBMSConnection implements DatabaseConnection {
     @Override
     public Connection getConnection() {
         return this.connection;
+    }
+
+    @Override
+    public DatabaseConnection openNewConnection() throws SQLException {
+        try {
+            return new DBMSConnection(properties);
+        } catch (InvalidDBMSConnectionPropertiesException e) {
+            // Cannot happen: this connection was already opened from the very same properties
+            throw new SQLException(e);
+        }
     }
 
     @Override
@@ -62,7 +72,7 @@ public class DBMSConnection implements DatabaseConnection {
             try {
                 Class.forName(dbms.getDriverClassPath());
                 dbmsTypes.add(dbms);
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException _) {
                 // In case that the driver is not available do not perform tests for this system.
                 LOGGER.info(Localization.lang("%0 driver not available.", dbms.toString()));
             }

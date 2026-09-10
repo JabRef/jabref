@@ -3,6 +3,7 @@ package org.jabref.gui.util.component;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.StringJoiner;
+import java.util.regex.Pattern;
 
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Hyperlink;
@@ -46,8 +47,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class MarkdownTextFlow extends SelectableTextFlow {
-    private static final String BULLET_LIST_PATTERN = "^\\s*[-*•]\\s+$";
-    private static final String NUMBERED_LIST_PATTERN = "^\\s*\\d+\\.\\s+$";
+    private static final Pattern BULLET_LIST_PATTERN = Pattern.compile("^\\s*[-*•]\\s+$");
+    private static final Pattern NUMBERED_LIST_PATTERN = Pattern.compile("^\\s*\\d+\\.\\s+$");
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
 
@@ -210,45 +211,54 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     private String getMarkdownRepresentation(Node astNode, String renderedText) {
         if ("\n".equals(renderedText) || "\n\n".equals(renderedText)) {
             return renderedText;
-        } else if (astNode instanceof Heading heading) {
-            return "#".repeat(heading.getLevel()) + " " + heading.getText().toString().trim();
-        } else if (astNode instanceof Code) {
-            return "`" + astNode.getChildChars() + "`";
-        } else if (astNode instanceof Emphasis) {
-            return "*" + astNode.getChildChars() + "*";
-        } else if (astNode instanceof StrongEmphasis) {
-            return "**" + astNode.getChildChars() + "**";
-        } else if (astNode instanceof Link link) {
-            String linkText = link.getText().toString();
-            String url = link.getUrl().toString();
-            String title = link.getTitle().toString();
-            if (title.isEmpty()) {
-                return "[" + linkText + "](" + url + ")";
-            } else {
-                return "[" + linkText + "](" + url + " \"" + title + "\")";
-            }
-        } else if (astNode instanceof LinkRef linkRef) {
-            String linkText = linkRef.getText().toString();
-            String reference = linkRef.getReference().toString();
-            return "[" + linkText + "][" + reference + "]";
-        } else if (astNode instanceof FencedCodeBlock fencedCodeBlock) {
-            String info = fencedCodeBlock.getInfo().toString();
-            String openingFence = fencedCodeBlock.getOpeningFence().toString();
-            String closingFence = fencedCodeBlock.getClosingFence().toString();
-            // NOTE: Hack. Flexmark always add \n at beginning, \n\n at end.
-            String content = fencedCodeBlock.getContentChars().toString();
-            return openingFence + info + content.substring(0, content.length() - 1) + closingFence;
-        } else if (astNode instanceof IndentedCodeBlock) {
-            return astNode.getChars().toString();
-        } else if (astNode instanceof BlockQuote) {
-            return renderedText;
-        } else if (renderedText.matches(BULLET_LIST_PATTERN)) {
-            return renderedText.replace(UNICODE_BULLET, "-");
-        } else if (renderedText.matches(NUMBERED_LIST_PATTERN)) {
-            return renderedText;
-        } else {
-            return renderedText;
         }
+        return switch (astNode) {
+            case Heading heading ->
+                    "#".repeat(heading.getLevel()) + " " + heading.getText().toString().trim();
+            case Code code ->
+                    "`" + code.getChildChars() + "`";
+            case Emphasis emphasis ->
+                    "*" + emphasis.getChildChars() + "*";
+            case StrongEmphasis strongEmphasis ->
+                    "**" + strongEmphasis.getChildChars() + "**";
+            case Link link -> {
+                String linkText = link.getText().toString();
+                String url = link.getUrl().toString();
+                String title = link.getTitle().toString();
+                if (title.isEmpty()) {
+                    yield "[" + linkText + "](" + url + ")";
+                } else {
+                    yield "[" + linkText + "](" + url + " \"" + title + "\")";
+                }
+            }
+            case LinkRef linkRef -> {
+                String linkText = linkRef.getText().toString();
+                String reference = linkRef.getReference().toString();
+                yield "[" + linkText + "][" + reference + "]";
+            }
+            case FencedCodeBlock fencedCodeBlock -> {
+                String info = fencedCodeBlock.getInfo().toString();
+                String openingFence = fencedCodeBlock.getOpeningFence().toString();
+                String closingFence = fencedCodeBlock.getClosingFence().toString();
+                // NOTE: Hack. Flexmark always add \n at beginning, \n\n at end.
+                String content = fencedCodeBlock.getContentChars().toString();
+                yield openingFence + info + content.substring(0, content.length() - 1) + closingFence;
+            }
+            case IndentedCodeBlock indentedCodeBlock ->
+                    indentedCodeBlock.getChars().toString();
+            case BlockQuote _ ->
+                    renderedText;
+            case null,
+                 default -> {
+                if (BULLET_LIST_PATTERN.matcher(renderedText).matches()) {
+                    yield renderedText.replace(UNICODE_BULLET, "-");
+                } else if (NUMBERED_LIST_PATTERN.matcher(renderedText).matches()) {
+                    yield renderedText;
+                } else {
+                    yield renderedText;
+                }
+            }
+        };
     }
 
     private class MarkdownRenderer {
@@ -293,7 +303,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         private void visit(Heading heading) {
             addNewlinesBetweenBlocks(heading);
             String text = heading.getText().toString();
-            addTextNode(text, heading, "markdown-h" + heading.getLevel());
+            addTextNode(text, heading, "h" + heading.getLevel(), "bold");
             previousBlock = heading;
         }
 
@@ -320,15 +330,15 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         }
 
         private void visit(Emphasis emphasis) {
-            addTextNode(emphasis.getText().toString(), emphasis, "markdown-italic");
+            addTextNode(emphasis.getText().toString(), emphasis, "italic");
         }
 
         private void visit(StrongEmphasis strong) {
-            addTextNode(strong.getText().toString(), strong, "markdown-bold");
+            addTextNode(strong.getText().toString(), strong, "bold");
         }
 
         private void visit(Code code) {
-            addTextNode(code.getText().toString(), code, "markdown-code");
+            addTextNode(code.getText().toString(), code, "markdown-code", "font-monospace");
         }
 
         private void visit(Link link) {
@@ -351,7 +361,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
                 processedContent = content.substring(1, content.length() - 2);
             }
-            addTextNode(processedContent, codeBlock, "markdown-code-block");
+            addTextNode(processedContent, codeBlock, "markdown-code-block", "font-monospace");
             previousBlock = codeBlock;
         }
 
@@ -363,7 +373,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
                 processedContent = content.substring(1, content.length() - 2);
             }
-            addTextNode(processedContent, codeBlock, "markdown-code-block");
+            addTextNode(processedContent, codeBlock, "markdown-code-block", "font-monospace");
             previousBlock = codeBlock;
         }
 
@@ -442,12 +452,12 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         }
 
         private void visit(HtmlInline html) {
-            addTextNode(html.getChars().toString(), html, "markdown-code");
+            addTextNode(html.getChars().toString(), html, "markdown-code", "font-monospace");
         }
 
         private void visit(HtmlBlock html) {
             addNewlinesBetweenBlocks(html);
-            addTextNode(html.getChars().toString(), html, "markdown-code-block");
+            addTextNode(html.getChars().toString(), html, "markdown-code-block", "font-monospace");
             previousBlock = html;
         }
 
