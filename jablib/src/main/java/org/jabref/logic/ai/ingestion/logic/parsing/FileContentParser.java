@@ -8,6 +8,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public interface FileContentParser {
+    /// Returns a list of strings which represent pages.
     List<String> parse(Path path);
 
     default Optional<String> parseAsString(Path path) {
