@@ -14,6 +14,7 @@ import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.l10n.Localization;
 
 public class GroupsSidePaneComponent extends SidePaneComponent {
@@ -30,7 +31,7 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
                                    GroupsPreferences groupsPreferences,
                                    DialogService dialogService) {
         super(SidePaneType.GROUPS, closeCommand, moveUpCommand, moveDownCommand, contentFactory);
-        setId("groups-side-pane");
+        setId(WalkthroughNodeIds.GROUPS_SIDE_PANE);
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
 

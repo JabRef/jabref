@@ -115,7 +115,7 @@ class PdfExtractReferences implements Callable<Integer> {
         for (String input : inputFiles) {
             Path inputFile;
             try {
-                inputFile = InputOption.resolveInput(input);
+                inputFile = InputOption.resolveInput(input, preferences);
             } catch (ImportServiceException e) {
                 // One unreachable URL or malformed path must not abort the remaining inputs.
                 LOGGER.error("Skipped - could not resolve input {}", displayName(input), e);

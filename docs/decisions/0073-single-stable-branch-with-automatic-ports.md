@@ -1,5 +1,5 @@
 ---
-nav_order: 72
+nav_order: 73
 parent: Decision Records
 date: 2026-09-07
 decision-makers: "@Siedlerchr, @koppor, @calixtus"

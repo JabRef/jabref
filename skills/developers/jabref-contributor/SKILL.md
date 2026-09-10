@@ -38,6 +38,7 @@ Requires JDK 25+ for Gradle (the wrapper downloads a JDK itself):
 - **Terminology:** say "library", not "database" — prefer `Library*` over `Database*` in new identifiers (see the [glossary](https://github.com/JabRef/jabref/tree/main/docs/glossary), in particular [library](https://github.com/JabRef/jabref/blob/main/docs/glossary/library.md)).
 - **Tests:** plain JUnit 5 assertions only (see ADR-0009); do not introduce Hamcrest or AssertJ. Mock `*Preferences` classes and stub only the getters the test needs.
 - **Issue references in code:** full URL (`https://github.com/JabRef/jabref/issues/9738`), never a bare `#9738` — the source reader has no repository context.
+- **Icons:** add a new icon to `IconTheme.JabRefIcons`; take the SVG path from the `MDI*` enums of [svg-materialdesign](https://github.com/Maran23/svg-materialdesign) (e.g. `MDITechnology.BOOK_OUTLINE`), never as a hardcoded path string. Font icons still come from Ikonli.
 - **Minimal diffs:** no reformatting of existing code, no speculative refactoring, no drive-by cleanups.
 - **Dependencies:** do not add new ones without justification.
 - **Architecture decisions:** documented as ADRs in `docs/decisions/`; add a new ADR when making an architecturally significant choice.

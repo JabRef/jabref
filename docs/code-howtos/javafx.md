@@ -161,7 +161,12 @@ private void openJabrefWebsite() {
 
 The view consists a FXML file `MyDialog.fxml` which defines the structure and the layout of the UI. Moreover, the FXML file may be accompanied by a style file that should have the same name as the FXML file but with a `css` ending, e.g., `MyDialog.css`. It is recommended to use a graphical design tools like [SceneBuilder](http://gluonhq.com/labs/scene-builder/) to edit the FXML file. The tool [Scenic View](https://github.com/JonathanGiles/scenic-view) is very helpful in debugging styling issues.
 
-A node `id` belongs to the walkthrough: it is the handle a walkthrough step uses to find the control it highlights, so give every major view, dialog and panel a stable `id` and resolve it with `NodeResolver.fxId(...)` instead of matching on class names or node types. Stylesheets must not select on ids. Style with `styleClass`, so that renaming an id never changes the look and restyling never breaks a walkthrough. Write ids in kebab case (`entry-editor`), the same way style classes are written; the exception is an id JavaFX derives from an `fx:id`, which has to be a Java identifier. The only ids the stylesheets still select on belong to JavaFX's own custom-color dialog, whose nodes we do not build.
+Node ids exist for the walkthrough. A walkthrough step finds the control it highlights by id, so:
+
+* Give every major view, dialog and panel a stable `id`, and resolve walkthrough steps with `NodeResolver.fxId(...)` wherever such a node exists, rather than by class name, node type or visible text. Steps that target a virtualized cell — a row of the entry table, the groups tree or a preferences tab list — have no stable node to name and still match on text.
+* Keep every walkthrough id in `WalkthroughNodeIds` and set it from there. One list makes an id reusable, shows which controls the walkthroughs depend on, and stops one being deleted by accident. `WalkthroughNodeIdsTest` fails when a constant no longer names a node.
+* Style with `styleClass`, not with an id. Styling by id works and is occasionally unavoidable — the ids inside JavaFX's own custom-color dialog are the remaining case — but keeping it rare is the point: renaming an id should never change the look, and restyling should never break a walkthrough.
+* Write ids in kebab case (`entry-editor`), the same way style classes are written. An `fx:id` has to stay a Java identifier because a controller field is named after it, so give such a node an explicit `id` attribute as well — FXML applies that one, and the `fx:id` keeps injecting.
 
 ## FXML
 

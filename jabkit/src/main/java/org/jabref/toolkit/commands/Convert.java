@@ -45,7 +45,7 @@ class Convert implements Callable<Integer> {
 
     @Override
     public Integer call() throws ImportServiceException, ExportServiceException {
-        Path inputFile = inputOption.getInputFile();
+        Path inputFile = inputOption.getInputFile(jabKit.cliPreferences);
         boolean writeToStdOut = outputFile == null;
         ParserResult parserResult = ImportService.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain || writeToStdOut);
 
