@@ -23,6 +23,7 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -49,6 +50,7 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.git.GitDiffDialogView;
 import org.jabref.gui.git.GitPullScheduler;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -90,6 +92,7 @@ import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
@@ -108,7 +111,6 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -590,10 +592,24 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
         }
 
+        IconTheme.JabRefIcons icon = tabIcon(databaseLocation, bibDatabaseContext.getMode());
         UiTaskExecutor.runInJavaFXThread(() -> {
             textProperty().setValue(tabTitle.toString());
             setTooltip(new Tooltip(toolTipText.toString()));
+            if (getGraphic() == null || !icon.matches(getGraphic())) {
+                Node graphic = icon.getGraphicNode();
+                graphic.getStyleClass().add("tab-icon");
+                setGraphic(graphic);
+            }
         });
+    }
+
+    // [impl->req~ux.tabs.library-kind-icon~1]
+    static IconTheme.JabRefIcons tabIcon(DatabaseLocation location, BibDatabaseMode mode) {
+        if (location == DatabaseLocation.SHARED) {
+            return IconTheme.JabRefIcons.SHARED_DATABASE_LIBRARY;
+        }
+        return mode == BibDatabaseMode.BIBLATEX ? IconTheme.JabRefIcons.BIBLATEX_LIBRARY : IconTheme.JabRefIcons.BIBTEX_LIBRARY;
     }
 
     /// Marks the changes the journal does not know about, so that [#changedProperty] can derive
@@ -615,6 +631,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 && (entriesEvent.getEntriesEventSource() == EntriesEventSource.SHARED));
         if (unrecorded) {
             journal().markChanged();
+        }
+        // The mode lives in the metadata, and a change of it while the library is already dirty does
+        // not move changedProperty, so the icon has to be refreshed from here.
+        if (event instanceof MetaDataChangedEvent) {
+            updateTabTitle(changedProperty.get());
         }
     }
 
@@ -1039,12 +1060,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        // One step, opened around the insert so that the automatic assignment it sets off is
-        // recorded inside it rather than as a second step the user has to undo separately.
-        getUndoManager().addEdit(Localization.lang("Import entries"), edit -> {
-            importHandler.importCleanedEntries(null, entries);
-            edit.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-        });
+        // One step, opened by importCleanedEntries around the insert, so that the automatic
+        // assignment it sets off is recorded inside it rather than as a second step.
+        importHandler.importCleanedEntries(null, entries);
         stateManager.setSelectedEntries(entries);
 
         // Only show/select individual entry for single-entry imports.

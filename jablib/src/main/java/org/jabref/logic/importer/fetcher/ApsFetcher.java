@@ -45,7 +45,7 @@ public class ApsFetcher implements FulltextFetcher {
                 LOGGER.info("Fulltext PDF found @ APS.");
                 try {
                     return Optional.of(URLUtil.create(pdfRequestUrl));
-                } catch (MalformedURLException e) {
+                } catch (MalformedURLException _) {
                     LOGGER.warn("APS returned malformed URL, cannot find PDF.");
                 }
             }

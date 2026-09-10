@@ -315,7 +315,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         } else {
             try {
                 return Files.getLastModifiedTime(styleFile).toMillis() == this.styleFileModificationTime;
-            } catch (IOException e) {
+            } catch (IOException _) {
                 return false;
             }
         }

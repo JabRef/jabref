@@ -51,7 +51,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         try {
             return new RuleBasedCollator(
                     ((RuleBasedCollator) Collator.getInstance()).getRules().replace("<'\u005f'", "<' '<'\u005f'"));
-        } catch (ParseException e) {
+        } catch (ParseException _) {
             return Collator.getInstance();
         }
     }
@@ -108,13 +108,13 @@ public class FieldComparator implements Comparator<BibEntry> {
             int f1year;
             try {
                 f1year = StringUtil.intValueOf(f1);
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException _) {
                 f1year = 0;
             }
             int f2year;
             try {
                 f2year = StringUtil.intValueOf(f2);
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException _) {
                 f2year = 0;
             }
             int comparisonResult = Integer.compare(f1year, f2year);
@@ -134,7 +134,7 @@ public class FieldComparator implements Comparator<BibEntry> {
             try {
                 i1 = StringUtil.intValueOf(f1);
                 i1present = true;
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException _) {
                 i1 = 0;
                 i1present = false;
             }
@@ -143,7 +143,7 @@ public class FieldComparator implements Comparator<BibEntry> {
             try {
                 i2 = StringUtil.intValueOf(f2);
                 i2present = true;
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException _) {
                 i2 = 0;
                 i2present = false;
             }

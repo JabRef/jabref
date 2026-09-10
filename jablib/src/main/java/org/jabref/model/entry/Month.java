@@ -93,7 +93,7 @@ public enum Month {
         try {
             int number = Integer.parseInt(value);
             return Month.getMonthByNumber(number);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }

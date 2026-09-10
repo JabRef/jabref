@@ -402,7 +402,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         }
                         break;
                     case CLOSE_DATABASE:
-                        new CloseDatabaseAction(this, stateManager).execute();
+                        if (getCurrentLibraryTab() == null) {
+                            closeSelectedNonLibraryTab(tabbedPane);
+                        } else {
+                            new CloseDatabaseAction(this, stateManager).execute();
+                        }
                         event.consume();
                         break;
                     default:
@@ -412,6 +416,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initBindings() {
+        // Every tab shows its close button, so selecting a tab does not shift its label
+        tabbedPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
         BindingsHelper.bindContentFiltered(tabbedPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
@@ -511,6 +517,23 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                                 .orElse(new SimpleBooleanProperty(false))
                 )
         );
+    }
+
+    /// Closes the selected tab if it is no [LibraryTab] (the welcome tab): [CloseDatabaseAction] only knows library tabs, so the close shortcut would do nothing there.
+    ///
+    /// Mirrors what the tab's close button does in `TabPaneBehavior`: the tab close events are notifications, a [TabPane] never removes a tab in response to one, so the removal has to happen here.
+    static void closeSelectedNonLibraryTab(TabPane tabbedPane) {
+        Tab selectedTab = tabbedPane.getSelectionModel().getSelectedItem();
+        if ((selectedTab == null) || (selectedTab instanceof LibraryTab) || !selectedTab.isClosable()) {
+            return;
+        }
+        Event closeRequest = new Event(selectedTab, selectedTab, Tab.TAB_CLOSE_REQUEST_EVENT);
+        Event.fireEvent(selectedTab, closeRequest);
+        if (closeRequest.isConsumed()) {
+            return;
+        }
+        tabbedPane.getTabs().remove(selectedTab);
+        Event.fireEvent(selectedTab, new Event(selectedTab, selectedTab, Tab.CLOSED_EVENT));
     }
 
     private void updateTabBarVisible() {
@@ -757,11 +780,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
                     Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
         }
-    }
-
-    @Deprecated
-    public Stage getMainStage() {
-        return mainStage;
     }
 
     @Override
