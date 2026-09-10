@@ -164,7 +164,7 @@ Needs: impl
 `req~ux.donation.recurring-prompt~1`
 
 JabRef asks for a donation one week after the first launch and every six months afterwards.
-The prompt can be snoozed for another six months, but it cannot be switched off permanently.
+Dismissing the prompt hides it until the next time, it cannot be switched off permanently.
 
 Needs: impl
 

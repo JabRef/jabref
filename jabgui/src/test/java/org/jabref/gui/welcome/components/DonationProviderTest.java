@@ -63,7 +63,7 @@ class DonationProviderTest extends JavaFxTest {
     }
 
     @Test
-    public void dueNotificationIsShownAndSnoozedForSixMonths() {
+    public void dueNotificationIsShownAndScheduledSixMonthsLater() {
         donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
 
         interact(donationProvider::showIfNeeded);
@@ -73,7 +73,7 @@ class DonationProviderTest extends JavaFxTest {
     }
 
     @Test
-    public void snoozeActionKeepsTheNotificationSixMonthsAway() {
+    public void dismissActionKeepsTheNotificationSixMonthsAway() {
         donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
         interact(donationProvider::showIfNeeded);
 

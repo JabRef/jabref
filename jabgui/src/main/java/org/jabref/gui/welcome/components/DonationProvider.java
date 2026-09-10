@@ -50,14 +50,14 @@ public class DonationProvider {
     }
 
     private void showNotification() {
-        snooze();
+        dismiss();
 
         Notifications.DonationNotification notification = new Notifications.DonationNotification(
                 Localization.lang("Support JabRef"),
                 Localization.lang("Help us improve JabRef by donating."));
 
-        notification.getActions().add(new NotificationAction<>(Localization.lang("Snooze for %0 months", String.valueOf(DONATION_INTERVAL_MONTHS)), _ -> {
-            snooze();
+        notification.getActions().add(new NotificationAction<>(Localization.lang("Dismiss"), _ -> {
+            dismiss();
             return OnClickBehaviour.HIDE_AND_REMOVE;
         }));
 
@@ -69,7 +69,7 @@ public class DonationProvider {
         dialogService.notify(notification);
     }
 
-    private void snooze() {
+    private void dismiss() {
         scheduleNextNotification(LocalDate.now().plusMonths(DONATION_INTERVAL_MONTHS));
     }
 
