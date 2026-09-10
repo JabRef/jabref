@@ -200,7 +200,24 @@ public class AllFieldsTab extends FieldsEditorTab {
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
         fields.addAll(userAddedFields);
+        // [impl->req~entry-editor.main-tab.file-editor-always-shown~1]
+        if (isFilesAndLinksSectionOpen(fields)) {
+            fields.add(StandardField.FILE);
+        }
         return fields;
+    }
+
+    /// An open files-and-links section always shows the file editor: its own buttons
+    /// (add / search / download) are what a "+ File" chip could only reach by popping up a
+    /// file dialog. Decided from the fields the section would show anyway — required ones
+    /// included, so an entry type requiring `url` (BibLaTeX `Online`) counts even while that
+    /// field is unset — which is the same set [#createSectionPane] derives its expanded state
+    /// from, so the two cannot disagree.
+    private boolean isFilesAndLinksSectionOpen(SequencedSet<Field> shownFields) {
+        return sectionExpandOverrides.getOrDefault(
+                FieldListSections.SectionType.FILES_AND_LINKS,
+                shownFields.stream()
+                           .anyMatch(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.FILES_AND_LINKS));
     }
 
     @Override
@@ -229,7 +246,8 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// shows not-yet-linked files as auto-found suggestions
     /// (issue <https://github.com/JabRef/jabref/issues/16737>). Probe for such
     /// files here and, on a hit, show the (empty) file editor; its own bind then re-runs
-    /// the search and renders the suggestion rows.
+    /// the search and renders the suggestion rows. An existing editor already scans on its
+    /// own, so the guard below is what keeps the two searches from running side by side.
     // [impl->req~entry-editor.main-tab.autolink-suggestions~1]
     private void showFileFieldIfAutoLinkFindsFiles(BibEntry entry) {
         if (editors.containsKey(StandardField.FILE)
@@ -339,6 +357,13 @@ public class AllFieldsTab extends FieldsEditorTab {
             buckets.put(type, new LinkedHashSet<>());
         }
         editors.keySet().forEach(field -> buckets.get(FieldListSections.sectionOf(field)).add(field));
+        // Buckets inherit the global field order, in which the file field trails the link fields
+        // an entry type requires (BibLaTeX `Online` requires `url`); its editor heads the section.
+        // [impl->req~entry-editor.main-tab.file-editor-always-shown~1]
+        SequencedSet<Field> filesAndLinks = buckets.get(FieldListSections.SectionType.FILES_AND_LINKS);
+        if (filesAndLinks.contains(StandardField.FILE)) {
+            filesAndLinks.addFirst(StandardField.FILE);
+        }
 
         // Main section rows go into the (already cleared) inherited gridPane.
         // The list variant sits flush in its scroll pane, unlike the padded grid of the other tabs.
@@ -389,7 +414,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     // [impl->req~entry-editor.main-tab.remove-field~1]
     private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Node editorNode = editors.get(field).getNode();
-        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)) {
+        // The file row exists only inside an open files and links section, which re-adds it on every
+        // rebuild — removing it would bring it straight back, so it gets no remove button either.
+        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)
+                || (StandardField.FILE == field)) {
             return editorNode;
         }
 
@@ -487,6 +515,13 @@ public class AllFieldsTab extends FieldsEditorTab {
         pane.setExpanded(sectionExpandOverrides.getOrDefault(type, !shownFields.isEmpty()));
         pane.expandedProperty().addListener((_, _, expanded) -> {
             sectionExpandOverrides.put(type, expanded);
+            // The file editor only exists once determineFieldsToShow has seen the section as
+            // open, so opening it for the first time needs a rebuild rather than mere population.
+            if (expanded && (type == FieldListSections.SectionType.FILES_AND_LINKS)
+                    && !editors.containsKey(StandardField.FILE)) {
+                rebuildPanel(bibDatabaseContext, entry);
+                return;
+            }
             if (expanded && content.getChildren().isEmpty()) {
                 populateContent.run();
             }
@@ -523,7 +558,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// All member fields of a section offered as add-chips; the comments section offers the
     /// general comment plus the current user's personal comment field (if enabled).
-    // [impl->req~entry-editor.main-tab.section-chips~1]
+    // [impl->req~entry-editor.main-tab.section-chips~2]
     private SequencedSet<Field> sectionMemberFields(FieldListSections.SectionType type) {
         if (type == FieldListSections.SectionType.COMMENTS) {
             SequencedSet<Field> commentFields = new LinkedHashSet<>();
@@ -619,33 +654,26 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// field if necessary) and focuses it.
     // [impl->req~entry-editor.main-tab.add-chips~1]
     private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
-        showFieldEditor(bibDatabaseContext, entry, field, true);
-    }
-
-    private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field, boolean openAddFileDialogForFile) {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
         // The outer runLater lets one pulse pass so the editors rebuilt become focusable
         // before the inner runLater requests focus on them.
         Platform.runLater(() -> {
             Platform.runLater(() -> {
+                // The tab may have been rebound to a different entry before this deferred block runs;
+                // the editors map would then belong to that other entry, so focusing here would act on
+                // the wrong entry. Bail out unless we are still showing the entry we started with.
                 if (getCurrentEntry() != entry) {
                     return;
                 }
                 requestFocus(field);
-                // Adding the File field via its "+" chip should immediately open the add-file dialog,
-                // since an empty File editor has no other purpose than to receive a file.
-                // navigation must not pop up a modal dialog as a side effect.
-                if (openAddFileDialogForFile && (StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
-                    linkedFilesEditor.addNewFile();
-                }
             });
         });
     }
 
     public void addFieldAndFocus(Field field) {
         Optional.ofNullable(getCurrentEntry())
-                .ifPresent(entry -> showFieldEditor(activeDatabaseContext(), entry, field, false));
+                .ifPresent(entry -> showFieldEditor(activeDatabaseContext(), entry, field));
     }
 
     private void rebuildPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
