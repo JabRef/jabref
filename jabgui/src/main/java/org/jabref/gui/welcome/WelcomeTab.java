@@ -124,7 +124,7 @@ public class WelcomeTab extends Tab {
         StackPane rootPane = new StackPane(main);
         setContent(rootPane);
 
-        donationProvider = new DonationProvider(rootPane, preferences, dialogService);
+        donationProvider = new DonationProvider(preferences, dialogService);
         donationProvider.showIfNeeded();
 
         setOnClosed(_ -> donationProvider.cleanUp());
