@@ -126,6 +126,7 @@
 /* Background */
 .bg-accent { -fx-background: -color-accent; -fx-background-color: -color-accent; }
 .bg-secondary { -fx-background: -color-bg-secondary; -fx-background-color: -color-bg-secondary; }
+.bg-sidepane { -fx-background: -color-bg-sidepane; -fx-background-color: -color-bg-sidepane; }
 .bg-transparent { -fx-background: transparent; -fx-background-color: transparent; }
 
 /* Text color */
@@ -855,6 +856,10 @@ We want to have a look that matches our icons in the tool-bar */
 /* Undo the theme's dimmed ':visited' hyperlink color; the resting color already comes from '.hyperlink'. */
 .welcome-hyperlink:visited {
     -fx-text-fill: -color-accent;
+}
+
+.welcome-main-container {
+    -fx-max-width: 96em;
 }
 
 /* Welcome Community  */
