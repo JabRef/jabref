@@ -43,6 +43,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.maran.svg.SVG;
+import tools.maran.svg.materialdesign.MDIInterface;
 import tools.maran.svg.materialdesign.MDITechnology;
 
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
@@ -340,6 +341,7 @@ public class IconTheme {
         SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL),
 
         // Library tab icons, rendered through svgnode; see [SvgIcon].
+        WELCOME(MDIInterface.HOME_OUTLINE),
         BIBTEX_LIBRARY(MDITechnology.BOOK_OUTLINE),
         BIBLATEX_LIBRARY(MDITechnology.NOTEBOOK_OUTLINE),
         SHARED_DATABASE_LIBRARY(MDITechnology.DATABASE_OUTLINE);

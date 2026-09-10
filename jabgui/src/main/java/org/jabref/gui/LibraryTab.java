@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -599,7 +598,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             setTooltip(new Tooltip(toolTipText.toString()));
             if (getGraphic() == null || !icon.matches(getGraphic())) {
                 Node graphic = icon.getGraphicNode();
-                graphic.getStyleClass().addAll("library-tab-icon", icon.name().toLowerCase(Locale.ROOT).replace('_', '-'));
+                graphic.getStyleClass().add("tab-icon");
                 setGraphic(graphic);
             }
         });

@@ -100,6 +100,9 @@ public class WelcomeTab extends Tab {
                       WorkspacePreferences workspacePreferences) {
         super(Localization.lang("Welcome"));
         setClosable(true);
+        Node tabIcon = IconTheme.JabRefIcons.WELCOME.getGraphicNode();
+        tabIcon.getStyleClass().add("tab-icon");
+        setGraphic(tabIcon);
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.aiService = aiService;

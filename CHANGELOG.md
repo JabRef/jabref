@@ -15,7 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a fetcher for Software Heritage identifiers (SWHID). [#16809](https://github.com/JabRef/jabref/issues/16809)
 - We added the community themes from [themes.jabref.org](https://themes.jabref.org/) (Everforest, Nord, Papers, Chocolate Honey, and Dino Girl's collection) as selectable themes. [#15915](https://github.com/JabRef/jabref/issues/15915)
 - We added a preview image to the theme selection in the preferences. [#15915](https://github.com/JabRef/jabref/issues/15915)
-- We added an icon to each library tab showing whether it is BibTeX, BibLaTeX, or a shared database. [#17071](https://github.com/JabRef/jabref/pull/17071)
+- We added an icon to each tab: the Welcome tab, and per library whether it is BibTeX, BibLaTeX, or a shared database. [#17071](https://github.com/JabRef/jabref/pull/17071)
 - We added automatic reconnection to shared databases that were still connected when JabRef was closed. [#16801](https://github.com/JabRef/jabref/pull/16801)
 - We added a loading spinner while shared libraries connect to their database. [#16935](https://github.com/JabRef/jabref/pull/16935)
 - We added the ability to auto-inject and manually infer the used CSL style in the LibreOffice document. [#16640](https://github.com/JabRef/jabref/issues/16640)
