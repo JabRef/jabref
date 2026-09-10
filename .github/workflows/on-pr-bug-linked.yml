@@ -1,0 +1,63 @@
+name: Label bug fixes for stable
+
+# [impl->req~ci.port-to-other-branch.label-driven-ports~1]
+# [impl->adr~single-stable-branch-with-automatic-ports~1]
+# Adds "dev: into-stable" when a PR into main links an issue of type "bug" for the
+# first time: at creation, or when an edit of the body adds a new issue link. A push never
+# triggers this, and a link that was already there never counts again - so a maintainer's
+# decision to remove (or add) the label by hand sticks.
+
+on:
+  pull_request_target:
+    types: [ opened, edited ]
+
+permissions:
+  issues: read
+  pull-requests: write
+
+jobs:
+  label:
+    # "edited" also fires for title changes; only a body change can add an issue link.
+    if: >
+      github.repository == 'JabRef/jabref' &&
+      github.event.pull_request.base.ref == 'main' &&
+      !(github.event.pull_request.head.repo.full_name == 'JabRef/jabref' && startsWith(github.event.pull_request.head.ref, 'port-')) &&
+      (github.event.action == 'opened' || github.event.changes.body)
+    runs-on: ubuntu-slim
+    steps:
+      - name: 'Add "dev: into-stable" for a newly linked bug'
+        env:
+          # PAT: a label added with GITHUB_TOKEN would not trigger the "Would merge into the other branch" check
+          GH_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BODY: ${{ github.event.pull_request.body }}
+          BODY_BEFORE: ${{ github.event.changes.body.from }}
+        run: |
+          set -euo pipefail
+          # The body regex of link-issue.yml (koppor/ticket-check-action) without "refs", which does
+          # not fix an issue; #13109 is the template's example. The action itself cannot be reused:
+          # it only reads the event's PR, and the "before" set has to come from the previous body.
+          # GitHub's own closingIssuesReferences is not used either: it also holds issues linked via
+          # the sidebar, which have no "before" state, so every description edit would re-add the label.
+          linked_issues() {
+            printf '%s\n' "$1" | grep -Eio '(fixes|closes|resolves)\s+<?(https?://github\.com/JabRef/jabref/issues/)?#?[0-9]+' | grep -Eo '[0-9]+$' | grep -Ev '^13109$' | sort -u || true
+          }
+          new_issues=$(comm -23 <(linked_issues "$BODY") <(linked_issues "$BODY_BEFORE"))
+          if [ -z "$new_issues" ]; then
+            echo "No newly linked issue" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          for issue in $new_issues; do
+            type=$(gh api graphql -F number="$issue" -f query='
+              query($number: Int!) {
+                repository(owner: "JabRef", name: "jabref") { issue(number: $number) { issueType { name } } }
+              }' --jq '.data.repository.issue.issueType.name // "none"' || echo "unknown")
+            echo "Newly linked #$issue has type \`$type\`" >> "$GITHUB_STEP_SUMMARY"
+            # GitHub stores the type name in lower case ("bug") while the issue template writes "Bug"
+            if [ "${type,,}" = "bug" ]; then
+              gh pr edit "$PR_NUMBER" --add-label "dev: into-stable"
+              echo "Added \`dev: into-stable\`" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+          done
