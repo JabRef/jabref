@@ -59,7 +59,7 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
             mergedEntriesView.addSource(webFetcher.getName(), () -> {
                 try {
                     return webFetcher.performSearch(originalEntry).stream().findFirst().orElse(null);
-                } catch (FetcherException e) {
+                } catch (FetcherException _) {
                     return null;
                 }
             });

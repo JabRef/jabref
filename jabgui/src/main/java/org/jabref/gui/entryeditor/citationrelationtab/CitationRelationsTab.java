@@ -138,7 +138,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.stateManager = stateManager;
         setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
-        setId("citationRelationsTab");
+        setId("citation-relations-tab");
 
         this.entryTypesManager = bibEntryTypesManager;
         this.duplicateCheck = new DuplicateCheck(entryTypesManager);
@@ -180,7 +180,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         column.setHalignment(HPos.CENTER);
 
         sciteResultsPane.getColumnConstraints().setAll(column);
-        sciteResultsPane.setId("scitePane");
+        sciteResultsPane.setId("scite-pane");
+        sciteResultsPane.getStyleClass().add("scite-pane");
         setContent(sciteResultsPane);
 
         EasyBind.subscribe(citationsRelationsTabViewModel.statusProperty(), status -> {
@@ -227,10 +228,9 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         Label label = new Label(Localization.lang("Looking up DOI..."));
 
-        VBox vBox = new VBox();
+        VBox vBox = new VBox(4);
         vBox.getChildren().add(progressIndicator);
         vBox.getChildren().add(label);
-        vBox.setSpacing(2d);
         vBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(vBox, 0, 0);
@@ -250,10 +250,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
         link.setOnAction(_ -> triggerDoiLookup());
 
-        HBox hBox = new HBox();
+        HBox hBox = new HBox(4);
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
-        hBox.setSpacing(2d);
         hBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(hBox, 0, 0);
@@ -310,8 +309,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         Label titleLabel = new Label(Localization.lang("Error"));
         titleLabel.getStyleClass().addAll("h3", "bold", "text-danger");
         Text errorMessageText = new Text(citationsRelationsTabViewModel.searchErrorProperty().get());
-        VBox errorMessageBox = new VBox(24, titleLabel, errorMessageText);
-        errorMessageBox.getStyleClass().add("padding-24");
+        VBox errorMessageBox = new VBox(4, titleLabel, errorMessageText);
+        errorMessageBox.getStyleClass().add("padding-4");
         return errorMessageBox;
     }
 
@@ -607,7 +606,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                             }
                             try {
                                 NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
-                            } catch (IOException ex) {
+                            } catch (IOException _) {
                                 dialogService.notify(Localization.lang("Unable to open link."));
                             }
                         });
@@ -833,7 +832,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         hideNodes(citationComponents.abortButton(), citationComponents.progress());
         showNodes(citationComponents.refreshButton());
 
-        HBox hBox = new HBox();
+        HBox hBox = new HBox(4);
         Label label = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
         Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
 
@@ -841,7 +840,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
-        hBox.setSpacing(2d);
         hBox.getStyleClass().add("align-center");
         hBox.setFillHeight(true);
 

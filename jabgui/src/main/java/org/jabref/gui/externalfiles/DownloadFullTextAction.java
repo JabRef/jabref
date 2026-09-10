@@ -160,7 +160,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     preferences);
             // The URL is not linked on the entry, so there is no link to keep: a downloaded HTML page (paywall or
             // consent interstitial instead of the PDF) has to be deleted rather than left orphaned in the file directory.
-            onlineFile.download(false, result.headers());
+            onlineFile.download(false, result.headers(), stateManager.getUndoManager(databaseContext));
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
                     entry.getCitationKey().orElse(Localization.lang("undefined"))));

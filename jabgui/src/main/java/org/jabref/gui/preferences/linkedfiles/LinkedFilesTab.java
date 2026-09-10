@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.linkedfiles;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
@@ -27,10 +28,12 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
                 .section(Localization.lang("File directory"), fileDirectory -> fileDirectory
                         .radioGroup(directory -> directory
                                 .radio(Localization.lang("Main file directory"), viewModel.useMainFileDirectoryProperty(),
-                                        mainDir -> mainDir.attachField(viewModel.mainFileDirectoryProperty(),
-                                                path -> path.browse(viewModel::mainFileDirBrowse)
-                                                            .disableWhen(viewModel.useBibLocationAsPrimaryProperty())
-                                                            .validate(viewModel.mainFileDirValidationStatus())))
+                                        mainDir -> mainDir
+                                                .configure(radio -> radio.setId(WalkthroughNodeIds.MAIN_FILE_DIRECTORY_RADIO))
+                                                .attachField(viewModel.mainFileDirectoryProperty(),
+                                                        path -> path.browse(viewModel::mainFileDirBrowse)
+                                                                    .disableWhen(viewModel.useBibLocationAsPrimaryProperty())
+                                                                    .validate(viewModel.mainFileDirValidationStatus())))
                                 .radio(Localization.lang("Search and store files relative to library file location"),
                                         viewModel.useBibLocationAsPrimaryProperty(),
                                         relative -> relative.tooltip(Localization.lang("When downloading files, or moving linked files to the file directory, use the bib file location.")))))

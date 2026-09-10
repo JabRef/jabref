@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.JabRefSvgIcon;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.logic.util.BackgroundTask;
@@ -51,6 +52,7 @@ class GroupNodeViewModelTest {
     @BeforeEach
     void setUp() {
         stateManager = mock(StateManager.class);
+        when(stateManager.getUndoManager(any())).thenReturn(new HeadlessGuiUndoManager());
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         databaseContext = new BibDatabaseContext();
         taskExecutor = new CurrentThreadTaskExecutor();
@@ -191,12 +193,12 @@ class GroupNodeViewModelTest {
     @Test
     void getIconPrefersJabRefSvgIcon() {
         ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
-        group.setIconName("example_svg_star");
+        group.setIconName("bibtex_library");
 
         GroupNodeViewModel model = getViewModelForGroup(group);
         Node graphicNode = model.getIcon().getGraphicNode();
 
-        assertEquals("EXAMPLE_SVG_STAR", model.getIcon().name());
+        assertEquals("BIBTEX_LIBRARY", model.getIcon().name());
         assertEquals(JabRefSvgIcon.class, graphicNode.getClass());
     }
 

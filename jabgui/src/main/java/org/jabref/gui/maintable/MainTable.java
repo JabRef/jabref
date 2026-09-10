@@ -61,6 +61,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
@@ -136,6 +137,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setOnDragOver(this::handleOnDragOverTableView);
         this.setOnDragDropped(this::handleOnDragDroppedTableView);
 
+        this.setId(WalkthroughNodeIds.MAIN_TABLE);
         this.getStyleClass().add("main-table");
 
         MainTableColumnFactory mainTableColumnFactory = new MainTableColumnFactory(
@@ -187,7 +189,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         });
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
-            this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
+            this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         }
 
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -208,10 +210,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         Label noContentLabel = new Label(Localization.lang("No content in table"));
         noContentLabel.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
 
-        HBox buttonBox = new HBox(20, addExampleButton, importPdfsButton);
+        HBox buttonBox = new HBox(12, addExampleButton, importPdfsButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        VBox placeholderBox = new VBox(15, noContentLabel, buttonBox);
+        VBox placeholderBox = new VBox(12, noContentLabel, buttonBox);
         placeholderBox.setAlignment(Pos.CENTER);
 
         VBox loadingPlaceholder = new VBox(new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS));

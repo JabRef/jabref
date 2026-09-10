@@ -9,13 +9,14 @@
 <?import org.jabref.gui.fieldeditors.EditorTextField?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
+         spacing="4.0"
          alignment="CENTER_LEFT"
          fx:controller="org.jabref.gui.fieldeditors.identifier.IdentifierEditor">
     <EditorTextField fx:id="textField" HBox.hgrow="ALWAYS"/>
 
     <Button fx:id="shortenDOIButton"
             onAction="#shortenID"
-            styleClass="icon-button"
+            styleClass="icon-button, entry-editor-field-button"
             disable="${controller.viewModel.isInvalidIdentifier}"
             managed="${controller.viewModel.canShortenIdentifier}"
             visible="${controller.viewModel.canShortenIdentifier}">
@@ -26,7 +27,7 @@
 
     <Button disable="${controller.viewModel.isInvalidIdentifier}"
             onAction="#openExternalLink"
-            styleClass="icon-button">
+            styleClass="icon-button, entry-editor-field-button">
         <graphic>
             <JabRefIconView glyph="OPEN_LINK"/>
         </graphic>
@@ -37,7 +38,7 @@
 
     <Button fx:id="lookupIdentifierButton"
             onAction="#lookupIdentifier"
-            styleClass="icon-button"
+            styleClass="icon-button, entry-editor-field-button"
             visible="${controller.viewModel.canLookupIdentifier}"
             managed="${controller.viewModel.canLookupIdentifier}">
         <graphic>
@@ -52,7 +53,7 @@
 
     <Button fx:id="fetchInformationByIdentifierButton"
             onAction="#fetchInformationByIdentifier"
-            styleClass="icon-button"
+            styleClass="icon-button, entry-editor-field-button"
             disable="${controller.viewModel.isInvalidIdentifier}"
             managed="${controller.viewModel.canFetchBibliographyInformationById}"
             visible="${controller.viewModel.canFetchBibliographyInformationById}">

@@ -40,6 +40,15 @@ This provides immediate keyboard interaction capabilities (such as Ctrl+V for pa
 
 Needs: impl
 
+## Main table column headers are user-friendly
+`req~maintable.column-headers.user-friendly~1`
+
+Column headers of the main table show readable names, not raw BibTeX field names.
+JabRef-internal fields such as the entry type and the citation key are shown as "Entry Type" and "Citation Key".
+Headers use Title Case, as an exception to the sentence-case rule for UI text, so they read like the other headers ("Author/Editor").
+
+Needs: impl
+
 ## Critical startup failures show an error dialog
 `req~ux.startup.critical-error-dialog~1`
 
@@ -143,5 +152,19 @@ When the "New Entry" dialog is opened:
 This behavior streamlines the process of creating new entries by allowing users to copy an identifier and open the dialog, without needing to manually select the input field, switch tabs, or choose a fetcher manually.
 
 Needs: impl
+
+## Community themes are selectable out of the box
+`req~ux.themes.bundled-community-themes~1`
+
+The themes from <https://themes.jabref.org/> that cover both color schemes are bundled with JabRef and appear in the theme selection next to the built-in themes, without the user having to download a CSS file.
+
+Needs: impl
+
+## Library tabs show what kind of library they hold
+`req~ux.tabs.library-kind-icon~1`
+
+Every library tab carries an icon: one for a BibTeX library, one for a BibLaTeX library, and one for a shared database. A shared database shows the database icon regardless of its mode.
+
+Needs: impl, utest
 
 <!-- markdownlint-disable-file MD022 -->
