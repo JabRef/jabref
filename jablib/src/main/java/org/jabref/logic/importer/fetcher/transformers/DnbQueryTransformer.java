@@ -2,12 +2,14 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Transforms a JabRef search query into DNB's SRU/CQL query syntax.
 ///
-/// @see <a href="https://www.dnb.de/EN/Professionell/Metadatendienste/Datenbezug/SRU/sru_node.html#doc250692bodyText8">DNB SRU documentation</a> for the CQL operators and index syntax
+/// @see [DNB SRU documentation](https://www.dnb.de/EN/Professionell/Metadatendienste/Datenbezug/SRU/sru_node.html#doc250692bodyText8)
+@NullMarked
 public class DnbQueryTransformer extends AbstractQueryTransformer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DnbQueryTransformer.class);
@@ -39,8 +41,13 @@ public class DnbQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleJournal(String journalTitle) {
-        LOGGER.warn("DnbQueryTransformer does not support journal-title search in the DNB bibliographic catalogue");
+        LOGGER.debug("DnbQueryTransformer does not support journal-title search in the DNB bibliographic catalogue");
         return "";
+    }
+
+    @Override
+    protected String handleDoi(String doi) {
+        return "num=\"" + doi + "\"";
     }
 
     @Override
