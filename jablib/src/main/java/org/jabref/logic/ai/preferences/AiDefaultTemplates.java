@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.preferences;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
@@ -11,9 +12,6 @@ import org.slf4j.LoggerFactory;
 /// This collection is made into a separate class (instead of putting into defaults at [org.jabref.logic.preferences.JabRefCliPreferences]),
 /// because they are too big. Templates are stored in src/main/resources/ai/templates/ and loaded at startup.
 public final class AiDefaultTemplates {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiDefaultTemplates.class);
-    private static final String TEMPLATE_BASE_PATH = "/ai/templates/";
-
     public static final String CHATTING_SYSTEM_MESSAGE_TEMPLATE;
     public static final String CHATTING_USER_MESSAGE_TEMPLATE;
     public static final String SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE;
@@ -23,6 +21,9 @@ public final class AiDefaultTemplates {
     public static final String CITATION_PARSING_USER_MESSAGE_TEMPLATE;
     public static final String MARKDOWN_CHAT_EXPORT_TEMPLATE;
     public static final String FOLLOW_UP_QUESTIONS_TEMPLATE;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiDefaultTemplates.class);
+    private static final String TEMPLATE_BASE_PATH = "/ai/templates/";
 
     static {
         CHATTING_SYSTEM_MESSAGE_TEMPLATE = loadTemplate("chatting_system_message");
@@ -46,7 +47,7 @@ public final class AiDefaultTemplates {
     /// @throws IllegalStateException if the template cannot be loaded
     private static String loadTemplate(String templateName) {
         String resourcePath = TEMPLATE_BASE_PATH + templateName + ".vm";
-        try (var inputStream = AiDefaultTemplates.class.getResourceAsStream(resourcePath)) {
+        try (InputStream inputStream = AiDefaultTemplates.class.getResourceAsStream(resourcePath)) {
             if (inputStream == null) {
                 throw new IllegalStateException("Template resource not found: " + resourcePath);
             }
