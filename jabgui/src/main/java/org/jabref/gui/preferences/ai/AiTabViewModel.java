@@ -173,14 +173,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.aiModelService = aiModelService;
         this.taskExecutor = taskExecutor;
         this.embeddingModelMetadataService = embeddingModelMetadataService;
-        // Discovering the models spins up the DJL model zoo, which costs seconds; on the JavaFX
-        // thread that is the whole preferences dialog waiting for the AI tab nobody has opened yet.
+        // Discovering the models queries an external service, which must not block the JavaFX thread.
         BackgroundTask.wrap(embeddingModelMetadataService::getAvailableModels)
                       .onSuccess(models -> {
                           String selected = selectedEmbeddingModel.get();
                           embeddingModelsList.setAll(models);
-                          // Filling the combo's items can clear its value, and with it the selection
-                          // setValues() made while the list was still empty.
+                          // Filling the items can clear the combo's value.
                           selectedEmbeddingModel.set(selected);
                       })
                       .onFailure(e -> LOGGER.warn("Could not retrieve the available embedding models", e))
