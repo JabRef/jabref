@@ -409,15 +409,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         });
     }
 
-    /// ControlsFX's default popup skin always reserves 18px of extra vertical space below the last
-    /// suggestion, which shows up as an empty strip at the bottom of the dropdown
-    /// (https://github.com/JabRef/jabref/issues/16995). We keep the default skin (styling, selection,
-    /// and keyboard handling stay untouched) and only replace its height binding by one that hugs
-    /// the content: one row per suggestion, capped at the visible row count, plus the list's own
-    /// vertical padding. The fixed cell size makes the height computation match the layout exactly,
-    /// so no vertical scrollbar appears for fully visible lists.
-    /// The popup normally creates its default skin lazily on first show; it is created eagerly here
-    /// so that its height binding can be adjusted before the popup ever appears.
+    // ControlsFX adds 18px of extra height to the autocomplete popup; replace that binding with one based on the actual number of suggestions and ListView padding.
     @SuppressWarnings("unchecked")
     private static void tightenSuggestionPopupHeight(AutoCompletionBinding<String> binding) {
         AutoCompletePopup<String> popup = binding.getAutoCompletionPopup();
