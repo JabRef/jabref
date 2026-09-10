@@ -128,7 +128,6 @@ class BackupUIManagerTest extends JavaFxTest {
 
     @Test
     void showRestoreBackupDialogFocusesAssociatedLibraryTab(@TempDir Path tempDir) {
-        // [utest->req~jabgui.autosaveandbackup.focus-backup-library-tab~1]
         Path backupDir = tempDir.resolve("backups");
         when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
         when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
@@ -162,7 +161,6 @@ class BackupUIManagerTest extends JavaFxTest {
 
     @Test
     void showReviewBackupDialogResetsChangeMonitorOnlyOnTargetTab(@TempDir Path tempDir) throws IOException {
-        // [utest->req~jabgui.autosaveandbackup.focus-backup-library-tab~1]
         Path backupDir = tempDir.resolve("backups");
         when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
 

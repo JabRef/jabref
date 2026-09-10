@@ -44,7 +44,6 @@ public class BackupUIManager {
     private BackupUIManager() {
     }
 
-    // [impl->req~jabgui.autosaveandbackup.focus-backup-library-tab~1]
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
                                                                  LibraryTabContainer tabContainer,
                                                                  Path originalPath,
