@@ -141,7 +141,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     }
 
     public void showPage(int pageNumber) {
-        currentPage.set(pageNumber - 1);
+        currentPage.set(Math.max(0, pageNumber - 1));
     }
 
     public void setLiveMode(boolean value) {
