@@ -89,7 +89,7 @@ public class JumpToEntryPdfAction extends SimpleCommand {
         Optional<LinkedFile> pdfFileOpt = link.fileIndex()
                                               .filter(index -> index <= files.size())
                                               .map(index -> files.get(index - 1))
-                                              .or(() -> files.stream().filter(JumpToEntryPdfAction::isPdf).findFirst());
+                                              .or(() -> files.stream().filter(JumpToEntryPdfAction::isPDF).findFirst());
         if (pdfFileOpt.isEmpty()) {
             dialogService.notify(Localization.lang("No PDF files available"));
             return;
@@ -98,7 +98,7 @@ public class JumpToEntryPdfAction extends SimpleCommand {
         openInDocumentViewer(pdfFileOpt.get(), link.page().orElse(1));
     }
 
-    private static boolean isPdf(LinkedFile file) {
+    private static boolean isPDF(LinkedFile file) {
         try {
             return FileUtil.isPDFFile(Path.of(file.getLink()));
         } catch (InvalidPathException e) {
