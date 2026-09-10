@@ -462,6 +462,7 @@
 /*
  * -fx-icon-size is intentionally omitted to prevent a rendering loop. The library sets font size
  * based on the computed icon size, which is itself relative to the font size.
+ * SvgNodes honor -fx-icon-color, -fx-color, and context -fx-font-size.
  */
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
@@ -470,6 +471,13 @@
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
     -fx-icon-color: -color-accent;
+}
+
+.mainToolbar .icon-button:hover .glyph-icon {
+    -fx-icon-color: derive(-color-accent, 20%);
+}
+.mainToolbar .icon-button:disabled .glyph-icon {
+    -fx-opacity: 0.4;
 }
 
 .mainToolbar .progress-indicator {
