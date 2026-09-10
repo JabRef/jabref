@@ -295,6 +295,11 @@
       ]
     },
     {
+      "type": "pt.davidafsilva.apple.OSXKeychainException",
+      "jniAccessible": true,
+      "allDeclaredConstructors": true
+    },
+    {
       "type": "sun.text.resources.cldr.FormatData"
     },
     {
