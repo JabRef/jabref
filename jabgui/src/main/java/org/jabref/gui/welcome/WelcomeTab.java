@@ -309,8 +309,10 @@ public class WelcomeTab extends Tab {
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
             Hyperlink recentLibraryLink = new Hyperlink(item.getText());
-            // Shortened to whatever the column offers, cutting whole path segments.
-            recentLibraryLink.setTextOverrun(OverrunStyle.CENTER_WORD_ELLIPSIS);
+            // Shortened to whatever the column offers. Character-wise, not word-wise: a path has
+            // hardly any word boundaries, so the word variant drops whole segments and leaves half
+            // of the column empty.
+            recentLibraryLink.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
             recentLibraryLink.setTooltip(new Tooltip(item.getText()));
             recentLibraryLink.getStyleClass().addAll("welcome-hyperlink", "h4");
             recentLibraryLink.setOnAction(item.getOnAction());
