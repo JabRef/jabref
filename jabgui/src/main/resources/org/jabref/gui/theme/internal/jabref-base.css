@@ -163,7 +163,7 @@
 /* The :selected variant is needed because the generic :selected rule above outranks a plain descendant rule. */
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-icon,
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-icon {
-    -glyph-size: 1.25em;
+    -glyph-size: 1em;
     -fx-icon-color: -color-fg-muted;
 }
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-icon {
