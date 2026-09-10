@@ -41,10 +41,6 @@ public final class AiDefaultTemplates {
         throw new UnsupportedOperationException("cannot instantiate a utility class");
     }
 
-    /// Loads a template from resources.
-    /// @param templateName the name of the template (without extension), e.g., "chatting_system_message"
-    /// @return the template content as a string
-    /// @throws IllegalStateException if the template cannot be loaded
     private static String loadTemplate(String templateName) {
         String resourcePath = TEMPLATE_BASE_PATH + templateName + ".vm";
         try (InputStream inputStream = AiDefaultTemplates.class.getResourceAsStream(resourcePath)) {
