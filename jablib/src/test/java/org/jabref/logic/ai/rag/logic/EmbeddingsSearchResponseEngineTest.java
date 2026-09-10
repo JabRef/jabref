@@ -39,7 +39,7 @@ class EmbeddingsSearchResponseEngineTest {
         embeddingModel = mock(EmbeddingModel.class);
         embeddingStore = (EmbeddingStore<TextSegment>) mock(EmbeddingStore.class);
 
-        when(embeddingModel.embed(any(String.class))).thenReturn(Response.from(new Embedding(new float[]{0.1f, 0.2f})));
+        when(embeddingModel.embed(any(String.class))).thenReturn(Response.from(new Embedding(new float[] {0.1f, 0.2f})));
 
         responseEngine = new EmbeddingsSearchResponseEngine(
                 filePreferences,
@@ -56,7 +56,7 @@ class EmbeddingsSearchResponseEngineTest {
         metadata.put(FileIngestor.PAGE_NUMBER_METADATA_KEY, 7);
 
         TextSegment textSegment = new TextSegment("Sample excerpt text", metadata);
-        EmbeddingMatch<TextSegment> match = new EmbeddingMatch<>(0.85, "match-1", new Embedding(new float[]{0.1f, 0.2f}), textSegment);
+        EmbeddingMatch<TextSegment> match = new EmbeddingMatch<>(0.85, "match-1", new Embedding(new float[] {0.1f, 0.2f}), textSegment);
         EmbeddingSearchResult<TextSegment> searchResult = new EmbeddingSearchResult<>(List.of(match));
 
         when(embeddingStore.search(any(EmbeddingSearchRequest.class))).thenReturn(searchResult);
@@ -74,7 +74,7 @@ class EmbeddingsSearchResponseEngineTest {
         Metadata metadata = new Metadata();
 
         TextSegment textSegment = new TextSegment("Text without page number", metadata);
-        EmbeddingMatch<TextSegment> match = new EmbeddingMatch<>(0.85, "match-2", new Embedding(new float[]{0.1f, 0.2f}), textSegment);
+        EmbeddingMatch<TextSegment> match = new EmbeddingMatch<>(0.85, "match-2", new Embedding(new float[] {0.1f, 0.2f}), textSegment);
         EmbeddingSearchResult<TextSegment> searchResult = new EmbeddingSearchResult<>(List.of(match));
 
         when(embeddingStore.search(any(EmbeddingSearchRequest.class))).thenReturn(searchResult);
