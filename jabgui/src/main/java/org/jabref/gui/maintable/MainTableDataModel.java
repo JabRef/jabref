@@ -191,8 +191,8 @@ public class MainTableDataModel {
     }
 
     private static GroupMatchResult calculateGroupMatches(List<GroupTreeNode> selectedGroups,
-                                                           EnumSet<GroupViewMode> groupViewMode,
-                                                           List<BibEntryTableViewModel> entries) {
+                                                          EnumSet<GroupViewMode> groupViewMode,
+                                                          List<BibEntryTableViewModel> entries) {
         Optional<MatcherSet> matcher = createGroupMatcher(selectedGroups, groupViewMode);
         boolean isInvertMode = groupViewMode.contains(GroupViewMode.INVERT);
         boolean isFloatingMode = !groupViewMode.contains(GroupViewMode.FILTER);
