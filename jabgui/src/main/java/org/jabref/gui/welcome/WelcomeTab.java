@@ -5,13 +5,14 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -114,14 +115,13 @@ public class WelcomeTab extends Tab {
         this.recentLibrariesBox = new VBox(8);
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
-        main = new VBox(4, createTopTitles(), new VBox(), createCommunityBox());
-        main.getStyleClass().addAll("welcome-main-container", "align-center", "padding-4");
+        main = new VBox(12, createTopTitles(), new VBox(), createCommunityBox());
+        // No padding: the community band is full-bleed, it runs from window edge to window edge.
+        // The width cap ("welcome-main-container") sits on the content inside it instead.
+        main.getStyleClass().add("align-center");
         initializeColumns();
 
-        VBox container = new VBox(main);
-        container.setAlignment(Pos.CENTER);
-
-        StackPane rootPane = new StackPane(container);
+        StackPane rootPane = new StackPane(main);
         setContent(rootPane);
 
         donationProvider = new DonationProvider(rootPane, preferences, dialogService);
@@ -132,17 +132,28 @@ public class WelcomeTab extends Tab {
 
     private VBox createTopTitles() {
         Label welcomeLabel = new Label(Localization.lang("Welcome to JabRef"));
-        welcomeLabel.getStyleClass().addAll("h1", "text-accent");
+        welcomeLabel.getStyleClass().addAll("h1", "text-emphasis");
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("h2");
-        VBox topTitles = new VBox(4, welcomeLabel, descriptionLabel);
-        topTitles.getStyleClass().addAll("align-top-left", "padding-bottom-4");
+        // Two full-bleed bands, stacked without a gap and getting lighter downwards: accent,
+        // then the community footer's surface, then the page itself. A VBox stretches to the
+        // window width, a Label would not (it never grows past its preferred width).
+        VBox welcomeBand = new VBox(welcomeLabel);
+        welcomeBand.getStyleClass().addAll("align-center", "bg-accent", "padding-12");
+
+        VBox subtitleBand = new VBox(descriptionLabel);
+        subtitleBand.getStyleClass().addAll("align-center", "bg-sidepane", "padding-12");
+
+        VBox topTitles = new VBox(welcomeBand, subtitleBand);
+        topTitles.getStyleClass().add("align-top-center");
         return topTitles;
     }
 
     private void initializeColumns() {
-        GridPane grid = new GridPane(4, 4);
-        grid.getStyleClass().add("align-top-center");
+        GridPane grid = new GridPane(24, 24);
+        // "welcome-main-container" caps the width: centered content keeps whitespace left and
+        // right, instead of two columns pushed against the window borders on a wide screen.
+        grid.getStyleClass().addAll("align-top-center", "welcome-main-container", "padding-0-12");
 
         VBox leftColumn = createLeftColumn();
         GridPane.setHgrow(leftColumn, Priority.ALWAYS);
@@ -227,6 +238,7 @@ public class WelcomeTab extends Tab {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.getStyleClass().add("bg-transparent");
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
         if (!(main.getChildren().get(1) instanceof ScrollPane)) {
             main.getChildren().set(1, scrollPane);
         }
@@ -310,6 +322,11 @@ public class WelcomeTab extends Tab {
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
             Hyperlink recentLibraryLink = new Hyperlink(item.getText());
+            // Shortened to whatever the column offers. Character-wise, not word-wise: a path has
+            // hardly any word boundaries, so the word variant drops whole segments and leaves half
+            // of the column empty.
+            recentLibraryLink.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
+            recentLibraryLink.setTooltip(new Tooltip(item.getText()));
             recentLibraryLink.getStyleClass().addAll("welcome-hyperlink", "h4");
             recentLibraryLink.setOnAction(item.getOnAction());
             recentLibrariesBox.getChildren().add(recentLibraryLink);
@@ -334,7 +351,14 @@ public class WelcomeTab extends Tab {
         VBox container = new VBox(12);
         container.getStyleClass().add("align-top-left");
         container.getChildren().addAll(iconLinksContainer, textLinksContainer, versionContainer);
-        return createVBoxContainer(header, container);
+
+        VBox content = createVBoxContainer(header, container);
+        content.getStyleClass().addAll("welcome-main-container", "padding-12");
+        // Band around the capped content, so the background runs to both window edges and, as the
+        // last child of "main", down to the bottom one.
+        VBox band = new VBox(content);
+        band.getStyleClass().addAll("bg-sidepane", "align-center");
+        return band;
     }
 
     private FlowPane createIconLinksContainer() {

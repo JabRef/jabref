@@ -48,7 +48,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
                 if (StringUtil.isNotBlank(string)) {
                     try {
                         return dateFormatter.parse(string);
-                    } catch (DateTimeParseException exception) {
+                    } catch (DateTimeParseException _) {
                         // We accept all kinds of dates (not just in the format specified)
                         return Date.parse(string).map(Date::toTemporalAccessor).orElse(null);
                     }

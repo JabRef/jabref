@@ -37,8 +37,9 @@ public record UndoableRemoveEntries(BibDatabase database, List<BibEntry> entries
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         database.removeEntries(entries);
+        return ApplyResult.SUCCESS;
     }
 
     @Override

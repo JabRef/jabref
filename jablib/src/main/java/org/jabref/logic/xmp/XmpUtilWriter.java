@@ -116,7 +116,7 @@ public class XmpUtilWriter {
                 // In case, that the pdf file has no namespace definition for xmp,
                 // but metadata in a different format, the parser throws an exception
                 // Creating an empty xmp metadata element solves this problem
-            } catch (IOException e) {
+            } catch (IOException _) {
                 meta = XMPMetadata.createXMPMetadata();
             }
         }
