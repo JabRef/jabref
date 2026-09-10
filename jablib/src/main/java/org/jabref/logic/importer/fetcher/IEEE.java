@@ -271,7 +271,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
             URLDownload urlDownload = new URLDownload(testUrl);
             int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
             return (statusCode >= 200) && (statusCode < 300);
-        } catch (IOException | UnirestException | URISyntaxException e) {
+        } catch (IOException | UnirestException | URISyntaxException _) {
             return false;
         }
     }

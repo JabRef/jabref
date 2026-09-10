@@ -10,6 +10,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
@@ -130,5 +131,48 @@ class MetaDataTest {
         int afterOverwrite = events.size();
         metaData.setEncoding(StandardCharsets.ISO_8859_1);
         assertTrue(events.size() > afterOverwrite, "a later edit no longer reaches the listener");
+    }
+
+    /// A setting written by anyone at all reports [MetaDataChangeSource#LOCAL]: saying nothing has
+    /// to mean "nobody recorded this", so that a writer that knows nothing about the journal still
+    /// makes the library ask to be saved.
+    @Test
+    void anOrdinarySettingReportsThatNobodyRecordedIt() {
+        List<MetaDataChangedEvent> events = collectMetaDataEvents();
+
+        metaData.setEncoding(StandardCharsets.ISO_8859_1);
+
+        assertEquals(List.of(MetaDataChangeSource.LOCAL), events.stream().map(MetaDataChangedEvent::getSource).toList());
+    }
+
+    /// The two doors a recorded change goes through say so, which is what lets the modified marker
+    /// derive itself instead of being stamped for a change the journal can take back.
+    @Test
+    void theDoorsARecordedChangeGoesThroughReportTheJournal() {
+        List<MetaDataChangedEvent> events = collectMetaDataEvents();
+
+        metaData.setGroups(GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ',')),
+                MetaDataChangeSource.JOURNAL);
+        MetaData other = new MetaData();
+        other.setMode(BibDatabaseMode.BIBLATEX);
+        metaData.overwriteWith(other, MetaDataChangeSource.JOURNAL);
+        metaData.clearGroups(MetaDataChangeSource.JOURNAL);
+
+        assertEquals(List.of(), events.stream()
+                                      .map(MetaDataChangedEvent::getSource)
+                                      .filter(source -> source != MetaDataChangeSource.JOURNAL)
+                                      .toList());
+        assertFalse(events.isEmpty(), "the doors were silent");
+    }
+
+    private List<MetaDataChangedEvent> collectMetaDataEvents() {
+        List<MetaDataChangedEvent> events = new ArrayList<>();
+        metaData.registerListener(new Object() {
+            @Subscribe
+            public void listen(MetaDataChangedEvent event) {
+                events.add(event);
+            }
+        });
+        return events;
     }
 }

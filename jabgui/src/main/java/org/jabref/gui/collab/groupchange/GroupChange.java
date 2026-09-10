@@ -9,6 +9,7 @@ import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableGroupTreeChange;
 
@@ -32,7 +33,7 @@ public final class GroupChange extends DatabaseChange {
 
         GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
             GroupTreeNode groupTreeNode = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
-            databaseContext.getMetaData().setGroups(groupTreeNode);
+            databaseContext.getMetaData().setGroups(groupTreeNode, MetaDataChangeSource.JOURNAL);
             return groupTreeNode;
         });
 
