@@ -58,7 +58,7 @@ class EntryEditorTabModelTest {
     }
 
     @Test
-    void fieldsOnCustomTabsUnitesExtractedPatternsAndIgnoresBuiltInTabs() {
+    void extractedFieldsOnCustomTabsUnitesExtractedPatternsAndIgnoresBuiltInTabs() {
         List<EntryEditorTabModel> tabModels = List.of(
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.ALL_FIELDS, true),
                 new EntryEditorTabModel.CustomizedFieldsTab("One", List.of("author", "url"), Set.of("author", "url")),
@@ -66,7 +66,7 @@ class EntryEditorTabModelTest {
         assertEquals(
                 Set.of(StandardField.AUTHOR, StandardField.URL,
                         new UserSpecificCommentField("alice"), new UserSpecificCommentField("bob")),
-                EntryEditorTabModel.fieldsOnCustomTabs(tabModels, entry));
+                EntryEditorTabModel.extractedFieldsOnCustomTabs(tabModels, entry));
     }
 
     // [utest->req~entry-editor.custom-tabs.extract-field~1]
@@ -75,7 +75,7 @@ class EntryEditorTabModelTest {
         List<EntryEditorTabModel> tabModels = List.of(
                 new EntryEditorTabModel.CustomizedFieldsTab("One", List.of("author", "title")),
                 new EntryEditorTabModel.CustomizedFieldsTab("Two", List.of("url", "comment"), Set.of("comment")));
-        assertEquals(Set.of(StandardField.COMMENT), EntryEditorTabModel.fieldsOnCustomTabs(tabModels, entry));
+        assertEquals(Set.of(StandardField.COMMENT), EntryEditorTabModel.extractedFieldsOnCustomTabs(tabModels, entry));
     }
 
     // [utest->req~entry-editor.custom-tabs.extract-field~1]
@@ -87,7 +87,7 @@ class EntryEditorTabModelTest {
         // field name are extracted regardless of the (empty) extracted set.
         assertEquals(
                 Set.of(new UserSpecificCommentField("alice"), new UserSpecificCommentField("bob"), new UnknownField("myfield")),
-                EntryEditorTabModel.fieldsOnCustomTabs(tabModels, entry));
+                EntryEditorTabModel.extractedFieldsOnCustomTabs(tabModels, entry));
     }
 
     // [utest->req~entry-editor.custom-tabs.extract-field~1]
@@ -103,10 +103,10 @@ class EntryEditorTabModelTest {
         List<EntryEditorTabModel> tabModels = List.of(
                 new EntryEditorTabModel.CustomizedFieldsTab("Notes", List.of("note.*"), Set.of("note.*")));
         BibEntry withoutNote = new BibEntry(StandardEntryType.Article);
-        assertEquals(Set.of(), EntryEditorTabModel.fieldsOnCustomTabs(tabModels, withoutNote));
+        assertEquals(Set.of(), EntryEditorTabModel.extractedFieldsOnCustomTabs(tabModels, withoutNote));
         // First typed character sets the field; from then on it belongs to the custom tab
         // (and the Main tab must drop it, even when it was chip-added there).
         BibEntry withNote = new BibEntry(StandardEntryType.Article).withField(StandardField.NOTE, "x");
-        assertEquals(Set.of(StandardField.NOTE), EntryEditorTabModel.fieldsOnCustomTabs(tabModels, withNote));
+        assertEquals(Set.of(StandardField.NOTE), EntryEditorTabModel.extractedFieldsOnCustomTabs(tabModels, withNote));
     }
 }

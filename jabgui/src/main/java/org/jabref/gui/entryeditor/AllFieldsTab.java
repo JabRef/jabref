@@ -208,7 +208,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         // Fields a custom tab extracts are moved there, not displayed twice. Also dropped from
         // userAddedFields: a chip-added field whose value starts matching an extracted custom-tab
         // regex must not linger on the Main tab (its editor moves to the custom tab on that rebuild).
-        extractedCustomTabFields = EntryEditorTabModel.fieldsOnCustomTabs(
+        extractedCustomTabFields = EntryEditorTabModel.extractedFieldsOnCustomTabs(
                 guiPreferences.getEntryEditorPreferences().getTabModels(), entry);
         fields.removeAll(extractedCustomTabFields);
         userAddedFields.removeAll(extractedCustomTabFields);

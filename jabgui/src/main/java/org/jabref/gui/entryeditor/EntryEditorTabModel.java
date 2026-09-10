@@ -40,7 +40,7 @@ public sealed interface EntryEditorTabModel
     /// tab list. An extracted field is *moved* to its custom tab: the Main tab uses this to exclude
     /// it from its field list and add-chips, so no field is displayed twice. Non-extracted patterns
     /// (the default) leave the Main tab untouched.
-    static Set<Field> fieldsOnCustomTabs(List<EntryEditorTabModel> tabModels, BibEntry entry) {
+    static Set<Field> extractedFieldsOnCustomTabs(List<EntryEditorTabModel> tabModels, BibEntry entry) {
         Set<Field> result = new LinkedHashSet<>();
         for (EntryEditorTabModel model : tabModels) {
             if (model instanceof CustomizedFieldsTab customTab) {
