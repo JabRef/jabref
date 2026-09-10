@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -12,6 +13,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -51,12 +53,23 @@ import org.jabref.model.entry.types.EntryType;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
+import impl.org.controlsfx.skin.AutoCompletePopup;
+import impl.org.controlsfx.skin.AutoCompletePopupSkin;
 import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
 import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesTabViewModel> {
+
+    /// Height of a single suggestion row in the "add field" popup. Matches the default cell size of
+    /// JavaFX cells, which neither Modena nor ControlsFX's `autocompletion.css` override.
+    private static final double SUGGESTION_CELL_HEIGHT = 24;
+
+    /// Vertical padding of the suggestion list view (1px at the top and bottom, from Modena's
+    /// `.list-view` rule).
+    private static final double SUGGESTION_LIST_VERTICAL_PADDING = 2;
 
     private final TableView<EntryTypeViewModel> entryTypesTable = new TableView<>();
     private final TextField addNewEntryType = new TextField();
@@ -372,12 +385,13 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 .setOnDragExited(this::handleOnDragExited)
                 .install(fields);
 
-        TextFields.bindAutoCompletion(
+        AutoCompletionBinding<String> addFieldAutoCompletion = TextFields.bindAutoCompletion(
                 addNewField,
                 viewModel.fieldsForAdding().stream()
                          .map(Field::getName)
                          .collect(Collectors.toList())
         );
+        tightenSuggestionPopupHeight(addFieldAutoCompletion);
 
         // selected field will show in addNewField box with its properties
         fields.getSelectionModel().selectedItemProperty().addListener((_, _, newSelection) -> {
@@ -393,6 +407,30 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 }
             }
         });
+    }
+
+    /// ControlsFX's default popup skin always reserves 18px of extra vertical space below the last
+    /// suggestion, which shows up as an empty strip at the bottom of the dropdown
+    /// (https://github.com/JabRef/jabref/issues/16995). We keep the default skin (styling, selection,
+    /// and keyboard handling stay untouched) and only replace its height binding by one that hugs
+    /// the content: one row per suggestion, capped at the visible row count, plus the list's own
+    /// vertical padding. The fixed cell size makes the height computation match the layout exactly,
+    /// so no vertical scrollbar appears for fully visible lists.
+    /// The popup normally creates its default skin lazily on first show; it is created eagerly here
+    /// so that its height binding can be adjusted before the popup ever appears.
+    @SuppressWarnings("unchecked")
+    private static void tightenSuggestionPopupHeight(AutoCompletionBinding<String> binding) {
+        AutoCompletePopup<String> popup = binding.getAutoCompletionPopup();
+        AutoCompletePopupSkin<String> skin = new AutoCompletePopupSkin<>(popup);
+        popup.setSkin(skin);
+
+        ListView<String> suggestionList = (ListView<String>) skin.getNode();
+        suggestionList.setFixedCellSize(SUGGESTION_CELL_HEIGHT);
+        suggestionList.prefHeightProperty().unbind();
+        suggestionList.prefHeightProperty().bind(
+                Bindings.min(popup.visibleRowCountProperty(), Bindings.size(suggestionList.getItems()))
+                         .multiply(suggestionList.fixedCellSizeProperty())
+                         .add(SUGGESTION_LIST_VERTICAL_PADDING));
     }
 
     private void makeRotatedColumnHeader(TableColumn<?, ?> column, String text) {

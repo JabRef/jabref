@@ -157,6 +157,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where generated citation keys could not be undone and no notification appeared. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where pressing Escape while a dropdown is open closed the entire dialog instead of just the dropdown. [#16596](https://github.com/JabRef/jabref/issues/16596)
 - We fixed invisible filter text in the keyboard shortcuts preferences when using the light JabRef theme. [#16731](https://github.com/JabRef/jabref/issues/16731)
+- We fixed unwanted empty space at the bottom of the field suggestion dropdown in the entry types preferences. [#16995](https://github.com/JabRef/jabref/issues/16995)
 - We fixed an issue where a full-text PDF link found by DOI lookup was attached in lowercase and failed. [#16762](https://github.com/JabRef/jabref/pull/16762)
 - "Git commit" now saves a modified library first if autosave is enabled, and otherwise lets you choose between saving first and committing only the state on disk, so unsaved changes are no longer silently left out of the commit. [#16718](https://github.com/JabRef/jabref/pull/16718)
 - We fixed an issue where a library could be closed without asking to save changes made after an undo. [#16680](https://github.com/JabRef/jabref/pull/16680)
