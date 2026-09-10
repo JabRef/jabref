@@ -20,6 +20,11 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
@@ -125,6 +130,74 @@ class SynchronizationSimulatorTest {
         Optional<BibDatabaseMode> expected = Optional.of(BibDatabaseMode.BIBLATEX);
         waitUntil(() -> expected.equals(clientContextB.getMetaData().getMode()));
         assertEquals(expected, clientContextB.getMetaData().getMode());
+    }
+
+    /// [Issue 9452](https://github.com/JabRef/jabref/issues/9452): groups created by one client have to
+    /// show up at the other client without reconnecting
+    // [utest->req~shared-database.live-propagation~1]
+    @Test
+    void simulateLiveGroupCreationPropagation() throws Exception {
+        // client A creates the group tree; the group panel writes it back via MetaData.setGroups
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+    }
+
+    // [utest->req~shared-database.live-propagation~1]
+    @Test
+    void simulateLiveSubgroupAdditionPropagation() throws Exception {
+        // A root without children is not serialized at all, so the initial tree needs one group
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+
+        // client A adds a subgroup to the existing tree; the group panel writes the (same) root back
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group B", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().map(root -> root.getNumberOfChildren() == 2).orElse(false));
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+    }
+
+    // [utest->req~shared-database.live-propagation~1]
+    @Test
+    void simulateLiveGroupEditPropagation() throws Exception {
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        GroupTreeNode groupNodeOfClientA = rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+
+        // client A edits name, icon, color and hierarchy of the group; the edit dialog replaces the
+        // node's group and the group panel writes the (same) root back
+        ExplicitGroup editedGroup = new ExplicitGroup("Renamed group", GroupHierarchyType.INCLUDING, ',');
+        editedGroup.setIconName("star");
+        editedGroup.setColor("#ff0000");
+        groupNodeOfClientA.setGroup(editedGroup);
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> Optional.of(editedGroup).equals(groupOfClientB()));
+        assertEquals(Optional.of(editedGroup), groupOfClientB());
+
+        // client A changes the group type
+        WordKeywordGroup keywordGroup = new WordKeywordGroup("Keyword group", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "fpga", false, ',', false);
+        groupNodeOfClientA.setGroup(keywordGroup);
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> Optional.of(keywordGroup).equals(groupOfClientB()));
+        assertEquals(Optional.of(keywordGroup), groupOfClientB());
+    }
+
+    /// The group of the first (and only) child of client B's group tree
+    private Optional<AbstractGroup> groupOfClientB() {
+        return clientContextB.getMetaData().getGroups()
+                             .filter(root -> root.getNumberOfChildren() == 1)
+                             .map(root -> root.getChildAt(0).orElseThrow().getGroup());
     }
 
     @Test
@@ -354,9 +427,12 @@ class SynchronizationSimulatorTest {
     /// shared side and a conflict for the other user - not with a mix of both or a truncation
     @Test
     void simulateConcurrentTypingIntoSameField() throws Exception {
-        BibEntry bibEntryOfClientA = getBibEntryExample(1);
-        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
+        // Inserted without a notification, so that no pull triggered by it flushes B's buffered typing early
+        DBMSProcessor otherClient = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        otherClient.insertEntry(getBibEntryExample(1));
+        clientContextA.getDBMSSynchronizer().pullChanges();
         clientContextB.getDBMSSynchronizer().pullChanges();
+        BibEntry bibEntryOfClientA = clientContextA.getDatabase().getEntries().getFirst();
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
 
         typeInto(bibEntryOfClientA, StandardField.COMMENT, "comment of asterix");

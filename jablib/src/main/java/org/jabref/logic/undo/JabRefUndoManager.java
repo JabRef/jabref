@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,6 +15,7 @@ import org.jabref.model.undo.ApplyResult;
 import org.jabref.model.undo.BibChange;
 import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -120,11 +122,31 @@ public class JabRefUndoManager implements UndoManager {
     /// [#redo]. See [#isApplying] for what it is for and why a thread-local is sound here.
     private final ThreadLocal<Boolean> applying = ThreadLocal.withInitial(() -> false);
 
+    /// Whether the step on top of the stack is finished, so that the next change starts a new one
+    /// rather than continuing it. Guarded by this object's monitor.
+    ///
+    /// Set by anything that ends a user action — a recorded block, an undo, a redo, a caller
+    /// saying so through [#endStep] — and cleared by a single change, which the next one may
+    /// still continue.
+    private boolean stepFinished = true;
+
+    /// The rule for when a change continues the step on top of the stack.
+    private final CoalescingPolicy coalescingPolicy;
+
     /// Set exactly while a [#addEdit] block is in progress *on this thread*. Per-thread because
     /// there is one manager for the application and long commands record from background tasks:
     /// a shared field would fold edits the user makes meanwhile into the background command's
     /// step, and would have two threads appending to one recorder's list.
     private final ThreadLocal<@Nullable CompoundEdit> active = new ThreadLocal<>();
+
+    public JabRefUndoManager() {
+        this(CoalescingPolicy.CONSECUTIVE_FIELD_EDITS);
+    }
+
+    /// For tests that want every change to be its own step, or a rule of their own.
+    public JabRefUndoManager(CoalescingPolicy coalescingPolicy) {
+        this.coalescingPolicy = coalescingPolicy;
+    }
 
     /// Records a single change as its own undo step, or as part of the enclosing step when
     /// called inside [#addEdit].
@@ -142,7 +164,7 @@ public class JabRefUndoManager implements UndoManager {
             return;
         }
         synchronized (this) {
-            push(change);
+            record(change, EditSource.COMMAND);
         }
         notifyListeners();
     }
@@ -169,7 +191,7 @@ public class JabRefUndoManager implements UndoManager {
     /// @return what was applied, and what was not — see [BibChange#apply]
     @Override
     // [impl->req~logic.undo.apply-and-record-atomically~1]
-    public ApplyResult applyEdit(BibChange change) {
+    public ApplyResult applyEdit(BibChange change, EditSource source) {
         CompoundEdit compound = active.get();
         if (compound != null) {
             return compound.applyEdit(change);
@@ -184,7 +206,7 @@ public class JabRefUndoManager implements UndoManager {
             // recording it would spend the next Ctrl+Z and clear the redo stack for no reason. A
             // set that applied in part is different - what it did apply has to stay undoable.
             if (result.complete() || (change instanceof ChangeSet)) {
-                push(change);
+                record(change, source);
             }
         }
         notifyListeners();
@@ -198,6 +220,66 @@ public class JabRefUndoManager implements UndoManager {
     /// nothing either, so both entry points skip it for the same reason.
     private static boolean isEmptyStep(BibChange change) {
         return (change instanceof ChangeSet changeSet) && changeSet.isEmpty();
+    }
+
+    /// Records `change`, either as a step of its own or as the continuation of the step on top of
+    /// the stack — see [CoalescingPolicy].
+    ///
+    /// A merged step takes a **new** position id, because the library is somewhere it has not been
+    /// before: keeping the old id would let a save taken mid-run report the library as unchanged
+    /// after the rest of the run was typed. For the same reason a step is never merged into while
+    /// it *is* the saved position: the user would lose the saved state from the stack, and undoing
+    /// once would take back more than they typed since saving.
+    ///
+    /// A run that ends where it started leaves nothing to undo — typing a word and deleting it
+    /// again — so the step goes rather than sitting on the stack doing nothing.
+    ///
+    /// Callers hold this object's monitor.
+    // [impl->req~logic.undo.typing-is-one-step~2]
+    private void record(BibChange change, EditSource source) {
+        assert Thread.holdsLock(this);
+
+        if ((source == EditSource.COMMAND) || (change instanceof ChangeSet)) {
+            // A command is a whole user action, and so is a block: neither continues the step
+            // below it, nor invites the next change to continue it. Only typing does, which is
+            // why a command writing the field the user was typing in gets a step of its own.
+            push(change);
+            stepFinished = true;
+            return;
+        }
+        if (!stepFinished && !undoStack.isEmpty() && (undoStack.getFirst().id() != savedId)) {
+            Optional<BibChange> merged = coalescingPolicy.merge(undoStack.getFirst().change(), change);
+            if (merged.isPresent()) {
+                undoStack.pop();
+                if (!isNoOp(merged.get())) {
+                    push(merged.get());
+                } else {
+                    // The redo stack is already empty: the first keystroke of the run pushed.
+                    stepFinished = true;
+                }
+                return;
+            }
+        }
+        push(change);
+        stepFinished = false;
+    }
+
+    /// Whether a merged run ended where it started.
+    private static boolean isNoOp(BibChange change) {
+        return (change instanceof UndoableFieldChange fieldChange)
+                && Objects.equals(fieldChange.before(), fieldChange.after());
+    }
+
+    /// Ends the step being collected, so that the next change starts one of its own.
+    ///
+    /// The journal cannot see where one user action ends and the next begins — a field editor
+    /// records one change per keystroke either way — so the caller that knows says so. Ending a
+    /// step nobody is continuing does nothing.
+    @Override
+    public void endStep() {
+        synchronized (this) {
+            stepFinished = true;
+        }
     }
 
     /// Puts `change` on the undo stack as a new position and discards the redo stack, which the
@@ -365,6 +447,7 @@ public class JabRefUndoManager implements UndoManager {
             // Moved with its id, so redoing returns to the position it came from rather than to
             // a new one that only looks the same.
             redoStack.push(journalEntry);
+            stepFinished = true;
         }
         notifyListeners();
         return Optional.of(step);
@@ -384,6 +467,7 @@ public class JabRefUndoManager implements UndoManager {
                     applying(journalEntry.change()::apply).complete());
             redoStack.pop();
             undoStack.push(journalEntry);
+            stepFinished = true;
         }
         notifyListeners();
         return Optional.of(step);
@@ -476,6 +560,7 @@ public class JabRefUndoManager implements UndoManager {
             // position keeps a cleared manager reporting an unchanged library, as before.
             emptyStackId = nextId++;
             savedId = emptyStackId;
+            stepFinished = true;
         }
         notifyListeners();
     }
