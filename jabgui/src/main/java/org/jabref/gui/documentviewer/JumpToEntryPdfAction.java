@@ -41,7 +41,7 @@ public class JumpToEntryPdfAction extends SimpleCommand {
     public static final String SCHEME = "jabref";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JumpToEntryPdfAction.class);
-    private static final Pattern PAGE_FRAGMENT = Pattern.compile("(?:^|&)page=(\\d+)(?:&|$)");
+    private static final Pattern PAGE_FRAGMENT = Pattern.compile("(?:^|&)(?:page=|p=)?(\\d+)(?:&|$)");
 
     private final String url;
     private final StateManager stateManager;
@@ -155,18 +155,54 @@ public class JumpToEntryPdfAction extends SimpleCommand {
         String citationKey = segments.get(1);
 
         Optional<Integer> fileIndex = Optional.empty();
-        if (segments.size() == 4 && "files".equals(segments.get(2))) {
+        Optional<Integer> pathPage = Optional.empty();
+
+        if (segments.size() == 2) {
+            // entries/{citationKey}
+        } else if (segments.size() == 3) {
+            // entries/{citationKey}/{page} e.g. entries/Queiroz2026/5
+            pathPage = parsePositiveInt(segments.get(2));
+            if (pathPage.isEmpty()) {
+                return Optional.empty();
+            }
+        } else if (segments.size() == 4 && "files".equals(segments.get(2))) {
+            // entries/{citationKey}/files/{fileIndex}
             fileIndex = parsePositiveInt(segments.get(3));
-        } else if (segments.size() != 2) {
+        } else if (segments.size() == 4 && "page".equalsIgnoreCase(segments.get(2))) {
+            // entries/{citationKey}/page/{page}
+            pathPage = parsePositiveInt(segments.get(3));
+            if (pathPage.isEmpty()) {
+                return Optional.empty();
+            }
+        } else if (segments.size() == 5 && "files".equals(segments.get(2))) {
+            // entries/{citationKey}/files/{fileIndex}/{page}
+            fileIndex = parsePositiveInt(segments.get(3));
+            pathPage = parsePositiveInt(segments.get(4));
+            if (pathPage.isEmpty()) {
+                return Optional.empty();
+            }
+        } else {
             return Optional.empty();
         }
 
-        Optional<Integer> page = Optional.ofNullable(uri.getFragment())
-                                         .map(PAGE_FRAGMENT::matcher)
-                                         .filter(Matcher::find)
-                                         .flatMap(matcher -> parsePositiveInt(matcher.group(1)));
+        Optional<Integer> fragmentPage = Optional.ofNullable(uri.getFragment())
+                                                 .map(PAGE_FRAGMENT::matcher)
+                                                 .filter(Matcher::find)
+                                                 .flatMap(matcher -> parsePositiveInt(matcher.group(1)));
+        Optional<Integer> page = fragmentPage.or(() -> pathPage);
 
         return Optional.of(new EntryLink(libraryId, citationKey, fileIndex, page));
+    }
+
+    public static boolean isEntryUrl(@Nullable String rawUrl) {
+        if (rawUrl == null || rawUrl.isBlank()) {
+            return false;
+        }
+        String trimmed = rawUrl.trim();
+        return trimmed.startsWith("entries/")
+                || trimmed.startsWith("/entries/")
+                || trimmed.startsWith(SCHEME + "://")
+                || trimmed.startsWith("entry://");
     }
 
     private static Optional<Integer> parsePositiveInt(String value) {

@@ -21,6 +21,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,6 +45,40 @@ class JumpToEntryPdfActionTest {
     void parseRelativeLinkWithPage() {
         assertEquals(Optional.of(new EntryLink(Optional.empty(), "Smith2024", Optional.empty(), Optional.of(12))),
                 JumpToEntryPdfAction.parseUrl("entries/Smith2024#page=12"));
+    }
+
+    @Test
+    void parseRelativeLinkWithPathPage() {
+        assertEquals(Optional.of(new EntryLink(Optional.empty(), "Queiroz2026", Optional.empty(), Optional.of(5))),
+                JumpToEntryPdfAction.parseUrl("entries/Queiroz2026/5"));
+    }
+
+    @Test
+    void parseRelativeLinkWithFilesAndPathPage() {
+        assertEquals(Optional.of(new EntryLink(Optional.empty(), "Queiroz2026", Optional.of(1), Optional.of(5))),
+                JumpToEntryPdfAction.parseUrl("entries/Queiroz2026/files/1/5"));
+    }
+
+    @Test
+    void parseRelativeLinkWithPageKeyword() {
+        assertEquals(Optional.of(new EntryLink(Optional.empty(), "Queiroz2026", Optional.empty(), Optional.of(5))),
+                JumpToEntryPdfAction.parseUrl("entries/Queiroz2026/page/5"));
+    }
+
+    @Test
+    void parseRelativeLinkWithBareNumberFragment() {
+        assertEquals(Optional.of(new EntryLink(Optional.empty(), "Queiroz2026", Optional.empty(), Optional.of(5))),
+                JumpToEntryPdfAction.parseUrl("entries/Queiroz2026#5"));
+    }
+
+    @Test
+    void isEntryUrlRecognizesEntryLinks() {
+        assertTrue(JumpToEntryPdfAction.isEntryUrl("entries/Queiroz2026/5"));
+        assertTrue(JumpToEntryPdfAction.isEntryUrl("/entries/Queiroz2026"));
+        assertTrue(JumpToEntryPdfAction.isEntryUrl("jabref://libraries/lib/entries/Key"));
+        assertFalse(JumpToEntryPdfAction.isEntryUrl("https://example.com"));
+        assertFalse(JumpToEntryPdfAction.isEntryUrl(""));
+        assertFalse(JumpToEntryPdfAction.isEntryUrl(null));
     }
 
     @Test
