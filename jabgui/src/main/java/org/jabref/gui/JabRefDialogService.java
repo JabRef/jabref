@@ -371,8 +371,7 @@ public class JabRefDialogService implements DialogService {
 
         CustomPasswordField passwordField = new CustomPasswordField();
 
-        HBox box = new HBox();
-        box.setSpacing(10);
+        HBox box = new HBox(8);
         box.getChildren().addAll(new Label(content), passwordField);
         dialog.setTitle(title);
         dialog.getDialogPane().setContent(box);

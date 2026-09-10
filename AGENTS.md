@@ -139,6 +139,7 @@ Agents **must not**:
 
 - Do not add trivial comments just restating the code line in plain English.
 - When commenting, focus on the "why" and general idea.
+- Reference issues and pull requests by full URL (`https://github.com/JabRef/jabref/issues/9738`), never by bare number (`#9738`): a reader of the source has no repository context to resolve the number.
 
 Example for trivial comments (to be avoided):
 
@@ -241,6 +242,7 @@ Both comments must not be added.
   - `findMissingLocalizationKeys` failing → its output lists ready-to-paste `key=value` lines to **add** to `jablib/src/main/resources/l10n/JabRef_en.properties`. Place each near semantically related keys; reuse an existing similar key when one exists.
   - `findObsoleteLocalizationKeys` failing → its output lists keys to **remove** from `JabRef_en.properties` (after confirming each is truly unused).
   - Only edit `JabRef_en.properties`. Translated `JabRef_<lang>.properties` files are maintained by translators via Crowdin — never hand-edit them.
+- Deleting or renaming code orphans its keys, so run the test after such a change — and do not trust a green run you did not force. `LocalizationParser` walks `src/main/java` of every module (`jablib`, `jabkit`, `jabsrv`, `jabgui`, `jabls`) at test runtime, so those sources are not declared inputs of `:jablib:test`. The task is cacheable, and a `FROM-CACHE` or `UP-TO-DATE` result can hide a key that a deletion in another module just orphaned. Force it: `./gradlew :jablib:test --tests "*LocalizationConsistencyTest*" --rerun-tasks`
 - JabRef is a multilingual program, When you write any user-facing text, it should be localized.
 
    To do this in Java code, call `Localization.lang` method, like this:

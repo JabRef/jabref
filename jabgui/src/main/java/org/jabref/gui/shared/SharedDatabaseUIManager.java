@@ -134,6 +134,10 @@ public class SharedDatabaseUIManager {
                 mergedBibEntry.getSharedBibEntryData().setVersion(sharedBibEntry.getSharedBibEntryData().getVersion());
 
                 DatabaseSynchronizer synchronizer = updateRefusedEvent.bibDatabaseContext().getDBMSSynchronizer();
+                // The library may have closed while the event waited for the JavaFX thread.
+                if (synchronizer == null) {
+                    return;
+                }
                 synchronizer.synchronizeSharedEntry(mergedBibEntry);
                 synchronizer.synchronizeLocalDatabase();
             });
@@ -166,6 +170,7 @@ public class SharedDatabaseUIManager {
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        assert dbmsSynchronizer != null;
         // Before opening: replaying changes recorded by an earlier session may already ask for a merge
         dbmsSynchronizer.registerListener(this);
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
@@ -185,6 +190,7 @@ public class SharedDatabaseUIManager {
     /// If the database is meanwhile open in another tab (e.g. two remembered connections to the same database),
     /// the new connection is dropped and that tab is shown instead.
     public LibraryTab openTab(BibDatabaseContext bibDatabaseContext) {
+        assert dbmsSynchronizer != null;
         return findOpenTab(dbmsSynchronizer.getConnectionProperties())
                 .map(alreadyOpen -> {
                     LOGGER.info("Shared database {} is already open in another tab, dropping the second connection", dbmsSynchronizer.getConnectionProperties().getDatabase());
@@ -236,11 +242,21 @@ public class SharedDatabaseUIManager {
         bibDatabaseContext.setDatabasePath(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        assert dbmsSynchronizer != null;
         dbmsSynchronizer.registerListener(this);
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
 
         parserResult.setDatabaseContext(bibDatabaseContext);
+    }
+
+    // [impl->req~shared-database.loading-indicator~1]
+    public BibDatabaseContext createDummyContext(DBMSConnectionProperties connectionProperties) {
+        BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
+        DatabaseSynchronizer synchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        assert synchronizer != null;
+        synchronizer.setDBName(connectionProperties.getDatabase());
+        return bibDatabaseContext;
     }
 
     private BibDatabaseContext getBibDatabaseContextForSharedDatabase() {
