@@ -3,6 +3,7 @@ package org.jabref.gui.theme;
 import java.util.List;
 
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -21,9 +22,11 @@ public class ThemePreviewView extends HBox {
 
     private static final double PREVIEW_WIDTH = 256;
 
-    /// The screenshots are roughly 16:10; a frame slightly taller than that leaves a little air
+    /// The screenshots are roughly 16:10; a box slightly taller than that leaves a little air
     /// around the ones that differ by a few pixels instead of cropping them.
-    private static final double PREVIEW_HEIGHT = 164;
+    private static final double PREVIEW_HEIGHT = 160;
+
+    private static final double FRAME_PADDING = 4;
 
     public ThemePreviewView() {
         setSpacing(8);
@@ -58,10 +61,13 @@ public class ThemePreviewView extends HBox {
     }
 
     private static StackPane frame(ImageView preview) {
+        double width = PREVIEW_WIDTH + 2 * FRAME_PADDING;
+        double height = PREVIEW_HEIGHT + 2 * FRAME_PADDING;
         StackPane frame = new StackPane(preview);
-        frame.setMinSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-        frame.setPrefSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-        frame.setMaxSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+        frame.setPadding(new Insets(FRAME_PADDING));
+        frame.setMinSize(width, height);
+        frame.setPrefSize(width, height);
+        frame.setMaxSize(width, height);
         frame.getStyleClass().add("bordered");
         return frame;
     }
