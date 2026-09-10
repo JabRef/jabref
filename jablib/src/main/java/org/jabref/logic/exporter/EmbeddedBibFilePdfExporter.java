@@ -135,7 +135,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
                     if (!names.containsKey(EMBEDDED_FILE_NAME)) {
                         try {
                             names.put(EMBEDDED_FILE_NAME, fileSpecification);
-                        } catch (UnsupportedOperationException e) {
+                        } catch (UnsupportedOperationException _) {
                             throw new IOException(Localization.lang("File '%0' is write protected.", path.toString()));
                         }
                     }

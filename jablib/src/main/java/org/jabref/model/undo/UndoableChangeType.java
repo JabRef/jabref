@@ -20,8 +20,12 @@ public record UndoableChangeType(BibEntry entry, EntryType before, EntryType aft
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
+        if (!Objects.equals(entry.getType(), before)) {
+            return ApplyResult.of(this, "entry is a %s, not the recorded %s".formatted(entry.getType().getName(), before.getName()));
+        }
         entry.setType(after);
+        return ApplyResult.SUCCESS;
     }
 
     @Override

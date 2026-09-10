@@ -55,4 +55,11 @@ The search for full text documents runs as a background task shown in the status
 
 Needs: impl
 
+## Fetch entry by Software Heritage identifier (SWHID)
+`feat~fetchers.swhid~1`
+
+The user can look up and import bibliography entries by providing a Software Heritage identifier (SWHID).
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

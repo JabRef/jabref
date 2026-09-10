@@ -20,7 +20,7 @@ public class NumericFieldComparator implements Comparator<String> {
         try {
             i1 = StringUtil.intValueOf(val1);
             i1present = true;
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException _) {
             i1 = 0;
             i1present = false;
         }
@@ -29,7 +29,7 @@ public class NumericFieldComparator implements Comparator<String> {
         try {
             i2 = StringUtil.intValueOf(val2);
             i2present = true;
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException _) {
             i2 = 0;
             i2present = false;
         }

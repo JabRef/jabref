@@ -17,16 +17,16 @@
 <DialogPane prefHeight="700.0" prefWidth="1100.0" minHeight="400" minWidth="600"
             xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.jabref.gui.preferences.PreferencesDialogView"
-            id="preferencesDialog">
+            id="preferences-dialog" styleClass="preferences-dialog">
     <content>
         <SplitPane dividerPositions="0.2">
-            <VBox id="sidepane">
+            <VBox id="preferences-sidepane" styleClass="preferences-sidepane">
                 <CustomTextField fx:id="searchBox" promptText="%Search" VBox.vgrow="NEVER">
                     <VBox.margin>
                         <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
                     </VBox.margin>
                 </CustomTextField>
-                <ListView fx:id="preferencesTabList" VBox.vgrow="ALWAYS"/>
+                <ListView fx:id="preferencesTabList" styleClass="preferences-tab-list" VBox.vgrow="ALWAYS"/>
                 <VBox prefHeight="10.0" VBox.vgrow="SOMETIMES"/>
                 <HBox alignment="BOTTOM_LEFT" spacing="3.0">
                     <padding>
@@ -75,12 +75,12 @@
                 </HBox>
             </VBox>
             <VBox>
-                <Label fx:id="tabTitle" styleClass="h3,padding-bottom-6">
+                <Label fx:id="tabTitle" styleClass="h3,padding-bottom-4">
                     <padding>
                         <Insets bottom="4.0" left="10.0" right="10.0" top="10.0"/>
                     </padding>
                 </Label>
-                <ScrollPane fx:id="preferencesContainer" VBox.vgrow="ALWAYS"/>
+                <ScrollPane fx:id="preferencesContainer" fitToWidth="true" VBox.vgrow="ALWAYS"/>
             </VBox>
         </SplitPane>
     </content>

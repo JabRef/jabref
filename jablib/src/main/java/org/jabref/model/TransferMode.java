@@ -5,4 +5,3 @@ public enum TransferMode {
     MOVE,
     NONE
 }
-
