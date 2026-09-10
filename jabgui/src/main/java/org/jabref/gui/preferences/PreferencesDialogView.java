@@ -90,7 +90,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             tabTitle.setText(tab.getTitle());
             Node content = tab.getContent();
             preferencesContainer.setContent(content);
-            content.getStyleClass().add("padding-4");
+            content.getStyleClass().addAll("padding-4", "preferences-tab-content");
             preferencesContainer.setVvalue(0);
             searchHandler.firstMatch(tab).ifPresent(this::scrollToSearchMatch);
         });

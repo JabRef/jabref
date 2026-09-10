@@ -97,7 +97,7 @@ public class GroupNameFilterVisitor extends SearchBaseVisitor<Boolean> {
         try {
             SearchParser.StartContext ctx = SearchQuery.getStartContext(query);
             return new GroupNameFilterVisitor(groupName).visit(ctx);
-        } catch (ParseCancellationException e) {
+        } catch (ParseCancellationException _) {
             return StringUtil.containsIgnoreCase(groupName, query);
         }
     }

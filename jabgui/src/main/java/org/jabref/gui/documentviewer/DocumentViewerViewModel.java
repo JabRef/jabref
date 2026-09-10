@@ -119,7 +119,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         try {
             Path filePath = Path.of(file.getLink());
             return FileUtil.isPDFFile(filePath);
-        } catch (InvalidPathException | SecurityException e) {
+        } catch (InvalidPathException | SecurityException _) {
             return false;
         }
     }
