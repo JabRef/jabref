@@ -42,6 +42,8 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignV;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.maran.svg.SVG;
+import tools.maran.svg.materialdesign.MDITechnology;
 
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 @NullMarked
@@ -337,11 +339,10 @@ public class IconTheme {
         RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE),
         SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL),
 
-        // Library tab icons: SVG paths of the Material Design Icons book-outline, notebook-outline and
-        // database-outline (https://pictogrammers.com/library/mdi/), rendered through svgnode.
-        BIBTEX_LIBRARY("M18,2A2,2 0 0,1 20,4V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H18M18,4H13V12L10.5,9.75L8,12V4H6V20H18V4Z"),
-        BIBLATEX_LIBRARY("M17,4V10L15,8L13,10V4H9V20H19V4H17M3,7V5H5V4C5,2.89 5.9,2 7,2H19C20.05,2 21,2.95 21,4V20C21,21.05 20.05,22 19,22H7C5.95,22 5,21.05 5,20V19H3V17H5V13H3V11H5V7H3M5,5V7H7V5H5M5,19H7V17H5V19M5,13H7V11H5V13Z"),
-        SHARED_DATABASE_LIBRARY("M12 3C7.58 3 4 4.79 4 7V17C4 19.21 7.59 21 12 21S20 19.21 20 17V7C20 4.79 16.42 3 12 3M18 17C18 17.5 15.87 19 12 19S6 17.5 6 17V14.77C7.61 15.55 9.72 16 12 16S16.39 15.55 18 14.77V17M18 12.45C16.7 13.4 14.42 14 12 14C9.58 14 7.3 13.4 6 12.45V9.64C7.47 10.47 9.61 11 12 11C14.39 11 16.53 10.47 18 9.64V12.45M12 9C8.13 9 6 7.5 6 7S8.13 5 12 5C15.87 5 18 6.5 18 7S15.87 9 12 9Z");
+        // Library tab icons, rendered through svgnode; see [SvgIcon].
+        BIBTEX_LIBRARY(MDITechnology.BOOK_OUTLINE),
+        BIBLATEX_LIBRARY(MDITechnology.NOTEBOOK_OUTLINE),
+        SHARED_DATABASE_LIBRARY(MDITechnology.DATABASE_OUTLINE);
 
         private final JabRefIcon icon;
 
@@ -353,8 +354,8 @@ public class IconTheme {
             icon = new IkonliIcon(color, icons);
         }
 
-        JabRefIcons(String svgPath) {
-            icon = new SvgIcon(name(), svgPath);
+        JabRefIcons(SVG svg) {
+            icon = new SvgIcon(name(), svg.path());
         }
 
         @Override
