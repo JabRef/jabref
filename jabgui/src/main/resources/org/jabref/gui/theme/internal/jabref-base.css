@@ -857,9 +857,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-accent;
 }
 
-/* Welcome Tab Layout Styles */
-/* The content is centered and stops growing at some point: on a wide screen, two columns pushed
-   against the window borders are hard to read, and the free space left and right frames the tab. */
 .welcome-main-container {
     -fx-max-width: 96em;
 }

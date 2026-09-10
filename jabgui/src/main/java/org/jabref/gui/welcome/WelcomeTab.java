@@ -116,6 +116,8 @@ public class WelcomeTab extends Tab {
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
         main = new VBox(4, createTopTitles(), new VBox(), createCommunityBox());
+        // "welcome-main-container" caps the width: centered content keeps whitespace left and
+        // right, instead of two columns pushed against the window borders on a wide screen.
         main.getStyleClass().addAll("welcome-main-container", "align-center", "padding-12");
         initializeColumns();
 
