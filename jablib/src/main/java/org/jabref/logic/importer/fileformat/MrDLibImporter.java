@@ -39,7 +39,7 @@ public class MrDLibImporter extends Importer {
             if (!jsonObject.has("recommendations")) {
                 return false;
             }
-        } catch (JSONException ex) {
+        } catch (JSONException _) {
             return false;
         }
         return true;
