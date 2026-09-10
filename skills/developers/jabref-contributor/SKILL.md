@@ -37,10 +37,18 @@ Requires JDK 25+ for Gradle (the wrapper downloads a JDK itself):
 
 - **Terminology:** say "library", not "database" — prefer `Library*` over `Database*` in new identifiers (see the [glossary](https://github.com/JabRef/jabref/tree/main/docs/glossary), in particular [library](https://github.com/JabRef/jabref/blob/main/docs/glossary/library.md)).
 - **Tests:** plain JUnit 5 assertions only (see ADR-0009); do not introduce Hamcrest or AssertJ. Mock `*Preferences` classes and stub only the getters the test needs.
+- **Issue references in code:** full URL (`https://github.com/JabRef/jabref/issues/9738`), never a bare `#9738` — the source reader has no repository context.
 - **Minimal diffs:** no reformatting of existing code, no speculative refactoring, no drive-by cleanups.
 - **Dependencies:** do not add new ones without justification.
 - **Architecture decisions:** documented as ADRs in `docs/decisions/`; add a new ADR when making an architecturally significant choice.
 - **Localization:** user-visible strings go through `Localization.lang(...)`; add keys to `jablib/src/main/resources/l10n/JabRef_en.properties` only — other languages are translated via Crowdin.
+
+## Branches
+
+- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes and only receives pull requests for changes that make no sense on `main`.
+- CI labels a pull request into `main` with `dev: into-stable` when it links an issue of type "bug"; after the merge, CI ports it to `stable` in a separate port pull request. Maintainers add or remove the label by hand; never add it to a port pull request (`port-<number>-to-<branch>`).
+- Add the `CHANGELOG.md` entry once, in the branch the pull request targets; the port carries it over.
+- Details: <https://devdocs.jabref.org/contributing.html#branching-strategy>.
 
 ## Stacked pull requests
 

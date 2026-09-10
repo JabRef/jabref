@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We made almost everything in JabRef navigatable by keyboard, including adding visiual indicators. [#17059](https://github.com/JabRef/jabref/pull/17059)
+- We added a fetcher for Software Heritage identifiers (SWHID). [#16809](https://github.com/JabRef/jabref/issues/16809)
 - We added the community themes from [themes.jabref.org](https://themes.jabref.org/) (Everforest, Nord, Papers, Chocolate Honey, and Dino Girl's collection) as selectable themes. [#15915](https://github.com/JabRef/jabref/issues/15915)
 - We added a preview image to the theme selection in the preferences. [#15915](https://github.com/JabRef/jabref/issues/15915)
 - We added automatic reconnection to shared databases that were still connected when JabRef was closed. [#16801](https://github.com/JabRef/jabref/pull/16801)
@@ -134,6 +136,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where an entry added by DOI or URL could not be undone. [#8770](https://github.com/JabRef/jabref/issues/8770)
 - We fixed an issue where a regular expression search containing a quotation mark stopped the search instead of returning results. [#9482](https://github.com/JabRef/jabref/issues/9482)
 - We fixed an issue where an author list ending with "et al." was parsed as a person named "et al." instead of "and others". [#16937](https://github.com/JabRef/jabref/pull/16937)
 - We fixed an issue where dialog buttons cut off their text at a larger font size. [#16787](https://github.com/JabRef/jabref/issues/16787)
@@ -261,6 +264,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the "entrytype" column header was shown in lower case; it now reads "Entry Type". [#16894](https://github.com/JabRef/jabref/pull/16894)
 - We fixed an issue where some buttons were not aligned in entry editor. [#16485](https://github.com/JabRef/jabref/issues/16485)
 - We fixed an issue where long recent library paths overflowed and were cut off in the Welcome tab. [#16808](https://github.com/JabRef/jabref/issues/16808)
+- We fixed an issue where a library file containing merge conflict markers was opened without any warning. [#9167](https://github.com/JabRef/jabref/issues/9167)
 
 ### Removed
 

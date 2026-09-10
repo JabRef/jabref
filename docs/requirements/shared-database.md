@@ -8,7 +8,7 @@ parent: Requirements
 
 Changes made by one client — entry modifications, groups, and library settings — appear in all other connected clients without any manual action.
 
-Needs: impl
+Needs: impl, utest
 
 ## Change content travels in the notification
 `req~shared-database.change-content-in-notification~1`
