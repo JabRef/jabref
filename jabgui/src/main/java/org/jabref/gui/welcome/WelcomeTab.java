@@ -285,7 +285,9 @@ public class WelcomeTab extends Tab {
 
         updateWelcomeRecentLibraries();
         fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) _ -> updateWelcomeRecentLibraries());
-
+        recentLibrariesBox.widthProperty().addListener(
+                (_, _, newWidth) -> updateRecentLibraryLinks(newWidth.doubleValue())
+        );
         return createVBoxContainer(header, recentLibrariesBox);
     }
 
