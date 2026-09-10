@@ -17,11 +17,6 @@ public class CommandLineParser {
     private CommandLineParser() {
     }
 
-    /// Splits a command line into single arguments and replaces the directory placeholder in each of them.
-    ///
-    /// @param commandLine the command line as entered in the preferences.
-    /// @param directory   the directory the command should be started at.
-    /// @return the arguments to pass to ProcessBuilder.
     public static List<String> toArguments(String commandLine, String directory) {
         String replacement = Matcher.quoteReplacement(directory);
         return splitCommandLine(commandLine).stream()
@@ -29,10 +24,6 @@ public class CommandLineParser {
                                             .toList();
     }
 
-    /// Splits a command line string into separate arguments, respecting single and double quotes.
-    ///
-    /// @param commandLine the command line to format.
-    /// @return list of found tokens.
     private static List<String> splitCommandLine(String commandLine) {
         List<String> tokens = new ArrayList<>();
         if (StringUtil.isBlank(commandLine)) {
