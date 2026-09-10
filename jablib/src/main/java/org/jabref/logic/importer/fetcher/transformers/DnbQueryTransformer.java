@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 /// Transforms a JabRef search query into DNB's SRU/CQL query syntax.
 ///
-/// @see [DNB SRU documentation](https://www.dnb.de/EN/Professionell/Metadatendienste/Datenbezug/SRU/sru_node.html#doc250692bodyText8)
+/// @see <a href="https://www.dnb.de/EN/Professionell/Metadatendienste/Datenbezug/SRU/sru_node.html#doc250692bodyText8">DNB SRU documentation</a>
 @NullMarked
 public class DnbQueryTransformer extends AbstractQueryTransformer {
 
