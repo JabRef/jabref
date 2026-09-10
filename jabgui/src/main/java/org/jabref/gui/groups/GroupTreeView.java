@@ -156,7 +156,7 @@ public class GroupTreeView extends BorderPane {
         numberColumn.setPrefWidth(NUMBER_COL_WIDTH);
         numberColumn.setResizable(false);
         expansionNodeColumn = new TreeTableColumn<>();
-        expansionNodeColumn.getStyleClass().addAll("expansionNodeColumn", "padding-6-0");
+        expansionNodeColumn.getStyleClass().addAll("expansionNodeColumn");
         expansionNodeColumn.setMaxWidth(EXPANSION_COL_WIDTH);
         expansionNodeColumn.setMinWidth(EXPANSION_COL_WIDTH);
         expansionNodeColumn.setPrefWidth(EXPANSION_COL_WIDTH);
@@ -360,7 +360,7 @@ public class GroupTreeView extends BorderPane {
 
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
-        node.getStyleClass().addAll("hits", "padding-4", "h6");
+        node.getStyleClass().addAll("hits", "h6");
         Text text = new Text();
         if (!group.isRoot()) {
             // The text carries the pseudo-classes as well: JavaFX does not re-style a descendant when a

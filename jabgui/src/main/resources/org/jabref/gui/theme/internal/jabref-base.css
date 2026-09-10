@@ -1453,6 +1453,7 @@ We want to have a look that matches our icons in the tool-bar */
 .quick-settings-button .ikonli-font-icon {
     -fx-icon-color: -color-accent;
     -fx-fill: -color-accent;
+    -fx-font-size: 1.1em;
 }
 
 .quick-settings-dialog-container {
@@ -1501,7 +1502,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-bg-overlay;
 }
 
-/* Font size (h2) is applied via style class in Java code to walkthrough-tooltip-title and walkthrough-title */
+/* Font size is controlled via Java style classes on these elements, not here */
 .walkthrough-tooltip-title > *,
 .walkthrough-title > * {
     -fx-text-fill: -color-accent!important;
