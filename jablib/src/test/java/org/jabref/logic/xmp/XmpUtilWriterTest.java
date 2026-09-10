@@ -206,7 +206,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-        // [utest->req~logic.xmp.atomic-pdf-write~1]
+    // [utest->req~logic.xmp.atomic-pdf-write~1]
     void writeAndRemoveLeaveLoadablePdfAndNoTempFiles(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_atomic.pdf", tempDir);
 
@@ -226,7 +226,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-        // [utest->req~logic.xmp.atomic-pdf-write~1]
+    // [utest->req~logic.xmp.atomic-pdf-write~1]
     void failedWriteLeavesOriginalUntouchedAndNoTempFiles(@TempDir Path tempDir) throws IOException, URISyntaxException {
         Path pdfFile = tempDir.resolve("encrypted.pdf");
         Files.copy(Path.of(XmpUtilWriterTest.class.getResource("/pdfs/encrypted.pdf").toURI()), pdfFile);
