@@ -1,11 +1,10 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 
+import javafx.scene.Parent;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
@@ -20,47 +19,39 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.jspecify.annotations.NullMarked;
-import org.junit.jupiter.api.Test;
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @NullMarked
+@ResourceLock("Localization.lang")
 class RelatedArticlesTabTest extends JavaFxTest {
 
-    @Test
-    void getRelatedArticleInfoDoesNotAddPublicationYearWhenYearIsAbsent() {
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            , ,
+            '', ,
+            ' ', ,
+            2024, , (2024)
+            , 2024-05-17, (2024)
+            2023, 2024-05-17, (2023)
+            """)
+    void displaysPublicationYearOnlyWhenPresent(@Nullable String year, @Nullable String date, @Nullable String expectedYear) {
         BibEntry entry = new BibEntry()
-                .withField(StandardField.TITLE, "Related article")
+                .withField(StandardField.TITLE, "Related article (2020)")
+                .withField(StandardField.JOURNAL, "Example journal")
                 .withField(StandardField.AUTHOR, "Ada Lovelace");
+        Optional.ofNullable(year).ifPresent(value -> entry.withField(StandardField.YEAR, value));
+        Optional.ofNullable(date).ifPresent(value -> entry.withField(StandardField.DATE, value));
 
-        assertEquals(List.of(), publicationYearTextsFor(entry));
-    }
+        List<String> expectedYearTexts = Optional.ofNullable(expectedYear).stream().toList();
 
-    @Test
-    void getRelatedArticleInfoDoesNotAddPublicationYearWhenYearIsBlank() {
-        BibEntry entry = new BibEntry()
-                .withField(StandardField.TITLE, "Related article")
-                .withField(StandardField.AUTHOR, "Ada Lovelace")
-                .withField(StandardField.YEAR, " ");
-
-        assertEquals(List.of(), publicationYearTextsFor(entry));
-    }
-
-    @Test
-    void getRelatedArticleInfoAddsPublicationYearWhenYearIsPresent() {
-        BibEntry entry = new BibEntry()
-                .withField(StandardField.TITLE, "Related article")
-                .withField(StandardField.AUTHOR, "Ada Lovelace")
-                .withField(StandardField.YEAR, "2024");
-
-        assertEquals(List.of("(2024)"), publicationYearTextsFor(entry));
-    }
-
-    private List<String> publicationYearTextsFor(BibEntry entry) {
-        AtomicReference<List<String>> publicationYearTexts = new AtomicReference<>(List.of());
-        JavaFxExtension.invokeAndWait(() -> {
+        interact(() -> {
             RelatedArticlesTab tab = new RelatedArticlesTab(
                     mock(BuildInfo.class),
                     mock(GuiPreferences.class),
@@ -72,15 +63,13 @@ class RelatedArticlesTabTest extends JavaFxTest {
             when(fetcher.getDescription()).thenReturn("Recommendations");
 
             ScrollPane scrollPane = tab.getRelatedArticleInfo(List.of(entry), fetcher);
+            Parent content = (Parent) scrollPane.getContent();
+            List<String> actualYearTexts = JavaFxExtension.lookupAll(content, "Text", Text.class).stream()
+                                                          .map(Text::getText)
+                                                          .filter(text -> text.startsWith("(") && text.endsWith(")"))
+                                                          .toList();
 
-            HBox relatedArticleRow = (HBox) ((VBox) scrollPane.getContent()).getChildren().get(2);
-            publicationYearTexts.set(relatedArticleRow.getChildren().stream()
-                                                      .filter(Text.class::isInstance)
-                                                      .map(Text.class::cast)
-                                                      .map(Text::getText)
-                                                      .filter(text -> text.startsWith("(") && text.endsWith(")"))
-                                                      .toList());
+            assertEquals(expectedYearTexts, actualYearTexts);
         });
-        return publicationYearTexts.get();
     }
 }

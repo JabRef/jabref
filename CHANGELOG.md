@@ -135,6 +135,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed missing publication years and empty parentheses in the related articles tab. [#16998](https://github.com/JabRef/jabref/issues/16998)
 - We fixed an issue where an entry added by DOI or URL could not be undone. [#8770](https://github.com/JabRef/jabref/issues/8770)
 - We fixed an issue where a regular expression search containing a quotation mark stopped the search instead of returning results. [#9482](https://github.com/JabRef/jabref/issues/9482)
 - We fixed an issue where an author list ending with "et al." was parsed as a person named "et al." instead of "and others". [#16937](https://github.com/JabRef/jabref/pull/16937)
@@ -151,7 +152,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where search results were out of view when the entry table had been scrolled down. [#16897](https://github.com/JabRef/jabref/pull/16897)
 - We fixed an issue where saving a library or PDF dropped its group, DOS flags, ACL and extended attributes. [JabRef/jabref-koppor#750](https://github.com/JabRef/jabref-koppor/issues/750)
 - We fixed Citations tab layout, loading indicators, DOI synchronization, and stale fetcher errors. [#16548](https://github.com/JabRef/jabref/issues/16548)
-- We fixed missing publication years and empty parentheses in the related articles tab. [#16998](https://github.com/JabRef/jabref/issues/16998)
 - We fixed an issue where undoing while a background operation was still writing to the library corrupted the library. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where a step that could only be undone in part reported success. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where library settings changed after accepting an external change were not saved or backed up. [#16936](https://github.com/JabRef/jabref/pull/16936)

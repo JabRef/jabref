@@ -61,6 +61,10 @@ class MrDLibImporterTest {
             {"published_year": 2006, "year_published": 2007} | 2006
             {"published_year": null} |
             {"year_published": null} |
+            {"published_year": ""} |
+            {"published_year": "not-a-year"} |
+            {"year_published": ""} |
+            {"year_published": "not-a-year"} |
             {} |
             """)
     void importPublicationYear(String recommendation, @Nullable String expectedYear) throws IOException {
