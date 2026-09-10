@@ -30,10 +30,8 @@ public final class SvgIcon implements JabRefIcon {
     @Override
     public Node getGraphicNode() {
         JabRefSvgIcon node = new JabRefSvgIcon(svgPath, size);
-        // Explicit color (via withColor/disabled) is a user-origin value, so it wins over theme CSS. When absent,
-        // the node's `glyph-icon`/`ikonli-font-icon` classes let theme `-fx-icon-color` rules drive the color.
         if (color != null) {
-            node.setIconColor(color);
+            node.setColor(color);
         }
         return node;
     }

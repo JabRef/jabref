@@ -17,8 +17,6 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.groups.GroupTreeNode;
 
-import com.airhacks.afterburner.injection.Injector;
-
 public class GroupsEditor extends TagsEditor {
 
     private final GroupsEditorViewModel viewModel;
@@ -28,9 +26,10 @@ public class GroupsEditor extends TagsEditor {
                         SuggestionProvider<?> suggestionProvider,
                         FieldCheckers fieldCheckers,
                         BibEntryPreferences bibEntryPreferences,
-                        BibDatabaseContext databaseContext) {
+                        BibDatabaseContext databaseContext,
+                        UndoManager undoManager) {
 
-        super(field, suggestionProvider, fieldCheckers, Injector.instantiateModelOrService(UndoManager.class));
+        super(field, suggestionProvider, fieldCheckers, undoManager);
 
         this.viewModel = new GroupsEditorViewModel(
                 field,

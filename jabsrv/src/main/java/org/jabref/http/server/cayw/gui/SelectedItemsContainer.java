@@ -59,8 +59,8 @@ public class SelectedItemsContainer extends FlowPane {
             this.entry = entry;
 
             this.setAlignment(Pos.CENTER_LEFT);
-            this.setSpacing(5);
-            this.setPadding(new Insets(5, 10, 5, 10));
+            this.setSpacing(4);
+            this.setPadding(new Insets(4, 8, 4, 8));
 
             this.getStyleClass().add("chip-style");
 

@@ -11,7 +11,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Region;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -90,10 +89,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             tabTitle.setText(tab.getTitle());
             Node content = tab.getContent();
             preferencesContainer.setContent(content);
-            if (content instanceof Region region) {
-                region.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
-            }
-            content.getStyleClass().add("preferencesTab");
+            content.getStyleClass().addAll("padding-4", "preferences-tab-content");
         });
 
         if (this.preferencesTabToSelectClass != null) {

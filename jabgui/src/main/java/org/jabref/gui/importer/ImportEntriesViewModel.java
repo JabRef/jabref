@@ -176,7 +176,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         try {
             // Force reformatting so the displayed BibTeX is consistently formatted
             new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode(), true);
-        } catch (IOException ioException) {
+        } catch (IOException _) {
             // In case of error, fall back to the original parsed serialization if available
             return entry.getParsedSerialization();
         }
@@ -203,15 +203,16 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 parserResult.getMetaData(),
                 parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                 parserResult.getDatabase().getEntries());
+        BibDatabaseContext selectedDatabaseContext = selectedDb.getValue();
         ImportHandler importHandler = new ImportHandler(
-                selectedDb.getValue(),
+                selectedDatabaseContext,
                 preferences,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
                 dialogService,
                 taskExecutor);
-        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entriesToImport.size());
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, selectedDatabaseContext, entriesToImport.size());
         if (StringUtil.isNotBlank(targetGroup)) {
             // Assign the group to the actually imported BibEntry instances (the copies inserted into the
             // database), not to the originals. The import runs asynchronously, so this must happen in the

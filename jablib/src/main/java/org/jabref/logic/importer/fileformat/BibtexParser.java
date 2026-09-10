@@ -98,6 +98,8 @@ public class BibtexParser implements Parser {
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final Pattern EPILOG_PATTERN = Pattern.compile("\\w+\\s*=.*,");
     private static final int INDEX_RELATIVE_PATH_IN_PLIST = 4;
+    /// Git writes conflict markers as seven characters at the start of a line, but a botched merge can produce longer runs (https://github.com/JabRef/jabref/issues/9167).
+    private static final int CONFLICT_MARKER_LENGTH = 7;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
@@ -107,6 +109,8 @@ public class BibtexParser implements Parser {
 
     private int line = 1;
     private int column = 1;
+    /// `0` while the current line does not start with a run of conflict marker characters
+    private char conflictMarkerCharacter;
     // Stores the last read column of the highest column number encountered on any line so far.
     // The intended data structure is Stack, but it is not used because Java code style checkers complain.
     // In basic JDK data structures, there is no size-limited stack. We did not want to include Apache Commons Collections only for "CircularFifoBuffer"
@@ -175,11 +179,17 @@ public class BibtexParser implements Parser {
         // BibTeX related contents
         initializeParserResult(newLineSeparator);
 
-        parseDatabaseID();
+        try {
+            parseDatabaseID();
 
-        skipWhitespace();
+            skipWhitespace();
 
-        return parseFileContent();
+            return parseFileContent();
+        } catch (ConflictMarkerFoundException exception) {
+            // Parsing on would silently drop one side of the conflict or store the markers in an entry's serialization
+            LOGGER.debug("Aborted parsing, because the file contains a merge conflict marker", exception);
+            return ParserResult.fromErrorMessage(exception.getMessage());
+        }
     }
 
     private String determineNewLineSeparator() throws IOException {
@@ -362,6 +372,7 @@ public class BibtexParser implements Parser {
             String errorMessage = Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
+            dumpTextReadSoFarToString();
         }
     }
 
@@ -370,8 +381,8 @@ public class BibtexParser implements Parser {
         int startLine = line;
         int startColumn = column;
         try {
-            buffer = parseBracketedFieldContent();
-        } catch (IOException e) {
+            buffer = parseBracketedFieldContent(false);
+        } catch (IOException _) {
             // if we get an IO Exception here, then we have an unbracketed comment,
             // which means that we should just return and the comment will be picked up as arbitrary text
             // by the parser
@@ -655,6 +666,7 @@ public class BibtexParser implements Parser {
         if (!isEOFCharacter(character)) {
             pureTextFromFile.offerLast((char) character);
         }
+        checkForConflictMarker(character);
         if (character == '\n') {
             line++;
             highestColumns.push(column);
@@ -663,6 +675,24 @@ public class BibtexParser implements Parser {
             column++;
         }
         return character;
+    }
+
+    /// Detects a run of conflict marker characters at the start of a line. `column` still holds the column of the just-read character.
+    ///
+    /// The state is keyed on `column` (which [#unread(int)] restores) instead of on a counter: lookahead reads a character, unreads it and reads it again, and each physical character must be counted once only.
+    ///
+    /// Only `<` and `>` are looked for. A line of `=` or `|` also appears as a decorative rule in comments and field values, and looking for them buys nothing:
+    /// the `=======` separator and the `||||||| base` line of a diff3 style conflict are always preceded by a `<<<<<<<` line, which is reported first anyway.
+    private void checkForConflictMarker(int character) {
+        if ((column == 1) && ((character == '<') || (character == '>'))) {
+            conflictMarkerCharacter = (char) character;
+        } else if ((conflictMarkerCharacter == 0) || (character != conflictMarkerCharacter)) {
+            conflictMarkerCharacter = 0;
+            return;
+        }
+        if (column == CONFLICT_MARKER_LENGTH) {
+            throw new ConflictMarkerFoundException(line);
+        }
     }
 
     private void unread(int character) throws IOException {
@@ -833,7 +863,7 @@ public class BibtexParser implements Parser {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside a field, so we need to count the
                 // brackets to know when the string is finished.
-                StringBuilder text = parseBracketedFieldContent();
+                StringBuilder text = parseBracketedFieldContent(true);
                 value.append(text.toString());
             } else if (Character.isDigit((char) character)) { // value is a number
                 String number = parseTextToken();
@@ -1073,7 +1103,7 @@ public class BibtexParser implements Parser {
 
     /// This is called if a field in the form of `field = {content}` is parsed.
     /// The global variable `character` contains `{`.
-    private StringBuilder parseBracketedFieldContent() throws IOException {
+    private StringBuilder parseBracketedFieldContent(boolean recoverAtEntryStart) throws IOException {
         StringBuilder value = new StringBuilder();
 
         consume('{');
@@ -1081,9 +1111,16 @@ public class BibtexParser implements Parser {
         int brackets = 0;
         char character;
         char lastCharacter = '\0';
+        boolean potentialEntryEnd = false;
+        boolean lineContainsOnlyWhitespace = false;
 
         while (true) {
             character = (char) read();
+
+            if (recoverAtEntryStart && potentialEntryEnd && lineContainsOnlyWhitespace && (character == '@') && isEntryStart()) {
+                unread(character);
+                throw new IOException("Error in line " + line + ": Unmatched opening bracket in field content");
+            }
 
             boolean isClosingBracket = false;
             if (character == '}') {
@@ -1119,12 +1156,38 @@ public class BibtexParser implements Parser {
                 brackets++;
             } else if (isClosingBracket) {
                 brackets--;
+                potentialEntryEnd = (brackets == 0) && lineContainsOnlyWhitespace;
+            } else if (!Character.isWhitespace(character)) {
+                potentialEntryEnd = false;
             }
 
             value.append(character);
 
+            if ((character == '\r') || (character == '\n')) {
+                lineContainsOnlyWhitespace = true;
+            } else if (!Character.isWhitespace(character)) {
+                lineContainsOnlyWhitespace = false;
+            }
             lastCharacter = character;
         }
+    }
+
+    private boolean isEntryStart() throws IOException {
+        StringBuilder entryStart = new StringBuilder(parseTextToken());
+        int character;
+        // @formatter:off
+        do {
+            character = read();
+            if (isEOFCharacter(character)) {
+                unreadBuffer(entryStart);
+                return false;
+            }
+            entryStart.append((char) character);
+        } while (Character.isWhitespace((char) character));
+        // @formatter:on
+        boolean isEntryStart = (entryStart.length() > 1) && ((character == '{') || (character == '('));
+        unreadBuffer(entryStart);
+        return isEntryStart;
     }
 
     private boolean isEscapeSymbol(char character) {
@@ -1201,6 +1264,17 @@ public class BibtexParser implements Parser {
         if ((character != firstOption) && (character != secondOption)) {
             throw new IOException("Error in line " + line + ": Expected " + firstOption + " or " + secondOption
                     + " but received " + (char) character);
+        }
+    }
+
+    /// Thrown as soon as an unresolved version control conflict marker is read, which makes the rest of the file meaningless.
+    ///
+    /// Unchecked on purpose: the parser recovers from [IOException] in several places (e.g., [#isClosingBracketNext()]), and a conflict marker must not be recoverable.
+    ///
+    /// [impl->req~import.bibtex.merge-conflict-markers~1]
+    private static class ConflictMarkerFoundException extends RuntimeException {
+        ConflictMarkerFoundException(int line) {
+            super(Localization.lang("Found a merge conflict marker in line %0. Please resolve the conflict in the file before opening it.", String.valueOf(line)));
         }
     }
 }

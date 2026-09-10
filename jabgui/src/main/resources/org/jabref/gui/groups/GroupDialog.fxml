@@ -30,11 +30,11 @@
             </padding>
             <VBox>
                 <Label text="%Name"/>
-                <TextField fx:id="nameField"/>
+                <TextField fx:id="nameField" id="group-name"/>
             </VBox>
             <VBox>
                 <Label text="%Description"/>
-                <TextField fx:id="descriptionField"/>
+                <TextField fx:id="descriptionField" id="group-description"/>
             </VBox>
             <HBox spacing="10.0">
                 <VBox HBox.hgrow="SOMETIMES">
@@ -66,10 +66,10 @@
                     </VBox>
                 </VBox>
             </HBox>
-            <Label text="%Collect by" styleClass="sectionHeader"/>
+            <Label text="%Collect by" styleClass="h4,padding-top-12"/>
             <HBox>
                 <VBox spacing="10.0">
-                    <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
+                    <RadioButton fx:id="explicitRadioButton" id="group-explicit-radio" toggleGroup="$type" wrapText="true"
                                  text="%Explicit selection">
                         <tooltip>
                             <Tooltip text="%Statically group entries by manual assignment"/>

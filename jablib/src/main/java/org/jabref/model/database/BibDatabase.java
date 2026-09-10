@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -52,14 +53,15 @@ public class BibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+    private static final Comparator<BibEntry> ENTRY_ID_COMPARATOR = Comparator.comparing(BibEntry::getId);
     private static final int BATCH_REPLACEMENT_THRESHOLD = 10;
 
     /// State attributes
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
 
     // BibEntryId to BibEntry
-    private final Map<String, BibEntry> entriesId = new HashMap<>();
-    private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
+    private final Map<String, BibEntry> entryIdToBibEntry = new HashMap<>();
+    private Map<String, BibtexString> stringToBibtexString = new ConcurrentHashMap<>();
 
     // Not included in equals, because it is not relevant for the content of the database
     private final EventBus eventBus = new EventBus();
@@ -87,7 +89,7 @@ public class BibDatabase {
     }
 
     public BibDatabase() {
-        this.registerListener(new KeyChangeListener(this));
+        this.registerListener(new CitationKeyListener(this));
     }
 
     /// Returns the number of entries.
@@ -185,12 +187,86 @@ public class BibDatabase {
             entry.registerListener(this);
         }
         eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
-        entries.addAll(newEntries);
+        // The list is kept sorted by id so that indexOf can use binary search. A batch may arrive in a different
+        // order than its entries were created (e.g. after per-entry background duplicate checks), so appending
+        // is only correct when every new id is higher than the last one in the list.
+        // [impl->req~import.entries.sorted-by-id~1]
+        List<BibEntry> sortedNewEntries = sortEntriesById(newEntries);
+        if (entries.isEmpty() || entries.getLast().getId().compareTo(sortedNewEntries.getFirst().getId()) < 0) {
+            entries.addAll(sortedNewEntries);
+        } else if (sortedNewEntries.size() <= BATCH_REPLACEMENT_THRESHOLD) {
+            insertSmallBatch(sortedNewEntries);
+        } else {
+            // One bulk replacement instead of per-entry inserts: this runs on the JavaFX thread for large imports.
+            entries.setAll(mergeSortedEntries(sortedNewEntries));
+        }
         newEntries.forEach(entry -> {
-                    entriesId.put(entry.getId(), entry);
+                    entryIdToBibEntry.put(entry.getId(), entry);
                     indexEntry(entry);
                 }
         );
+    }
+
+    private List<BibEntry> sortEntriesById(List<BibEntry> newEntries) {
+        if (isSortedById(newEntries)) {
+            return newEntries;
+        }
+
+        List<BibEntry> sortedEntries = new ArrayList<>(newEntries);
+        sortedEntries.sort(ENTRY_ID_COMPARATOR);
+        return sortedEntries;
+    }
+
+    private boolean isSortedById(List<BibEntry> entries) {
+        Iterator<BibEntry> iterator = entries.iterator();
+        if (!iterator.hasNext()) {
+            return true;
+        }
+
+        BibEntry previousEntry = iterator.next();
+        while (iterator.hasNext()) {
+            BibEntry currentEntry = iterator.next();
+            if (ENTRY_ID_COMPARATOR.compare(previousEntry, currentEntry) > 0) {
+                return false;
+            }
+            previousEntry = currentEntry;
+        }
+        return true;
+    }
+
+    private void insertSmallBatch(List<BibEntry> sortedNewEntries) {
+        for (BibEntry entry : sortedNewEntries) {
+            int position = Collections.binarySearch(entries, entry, ENTRY_ID_COMPARATOR);
+            entries.add(position < 0 ? -position - 1 : position, entry);
+        }
+    }
+
+    private List<BibEntry> mergeSortedEntries(List<BibEntry> sortedNewEntries) {
+        List<BibEntry> mergedEntries = new ArrayList<>(entries.size() + sortedNewEntries.size());
+        Iterator<BibEntry> existingEntries = entries.iterator();
+        Iterator<BibEntry> newEntries = sortedNewEntries.iterator();
+
+        BibEntry existingEntry = existingEntries.next();
+        BibEntry newEntry = newEntries.next();
+        while (true) {
+            if (ENTRY_ID_COMPARATOR.compare(existingEntry, newEntry) <= 0) {
+                mergedEntries.add(existingEntry);
+                if (!existingEntries.hasNext()) {
+                    mergedEntries.add(newEntry);
+                    newEntries.forEachRemaining(mergedEntries::add);
+                    return mergedEntries;
+                }
+                existingEntry = existingEntries.next();
+            } else {
+                mergedEntries.add(newEntry);
+                if (!newEntries.hasNext()) {
+                    mergedEntries.add(existingEntry);
+                    existingEntries.forEachRemaining(mergedEntries::add);
+                    return mergedEntries;
+                }
+                newEntry = newEntries.next();
+            }
+        }
     }
 
     public synchronized void removeEntry(BibEntry bibEntry) {
@@ -229,7 +305,7 @@ public class BibDatabase {
         }
 
         toBeDeleted.forEach(entry -> {
-            entriesId.remove(entry.getId());
+            entryIdToBibEntry.remove(entry.getId());
             removeEntryFromIndex(entry);
         });
 
@@ -313,11 +389,11 @@ public class BibDatabase {
             throw new KeyCollisionException("A string with that label already exists", id);
         }
 
-        if (bibtexStrings.containsKey(id)) {
+        if (stringToBibtexString.containsKey(id)) {
             throw new KeyCollisionException("Duplicate BibTeX string id.", id);
         }
 
-        bibtexStrings.put(id, string);
+        stringToBibtexString.put(id, string);
     }
 
     /// Replaces the existing lists of BibTexString with the given one
@@ -325,30 +401,30 @@ public class BibDatabase {
     ///
     /// @param stringsToAdd The collection of strings to set
     public void setStrings(List<BibtexString> stringsToAdd) {
-        bibtexStrings = new ConcurrentHashMap<>();
+        stringToBibtexString = new ConcurrentHashMap<>();
         stringsToAdd.forEach(this::addString);
     }
 
     /// Removes the string with the given id.
     public void removeString(String id) {
-        bibtexStrings.remove(id);
+        stringToBibtexString.remove(id);
     }
 
     /// Returns a Set of keys to all BibtexString objects in the database.
     /// These are in no sorted order.
     public Set<String> getStringKeySet() {
-        return bibtexStrings.keySet();
+        return stringToBibtexString.keySet();
     }
 
     /// Returns a Collection of all BibtexString objects in the database.
     /// These are in no particular order.
     public Collection<BibtexString> getStringValues() {
-        return bibtexStrings.values();
+        return stringToBibtexString.values();
     }
 
     /// Returns the string with the given id.
     public Optional<BibtexString> getString(String id) {
-        return Optional.ofNullable(bibtexStrings.get(id));
+        return Optional.ofNullable(stringToBibtexString.get(id));
     }
 
     /// Returns the string with the given name/label
@@ -358,12 +434,12 @@ public class BibDatabase {
 
     /// Returns the number of strings.
     public int getStringCount() {
-        return bibtexStrings.size();
+        return stringToBibtexString.size();
     }
 
     /// Check if there are strings.
     public boolean hasNoStrings() {
-        return bibtexStrings.isEmpty();
+        return stringToBibtexString.isEmpty();
     }
 
     /// Copies the preamble of another BibDatabase.
@@ -375,7 +451,7 @@ public class BibDatabase {
 
     /// Returns true if a string with the given label already exists.
     public synchronized boolean hasStringByName(String label) {
-        return bibtexStrings.values().stream().anyMatch(value -> value.getName().equals(label));
+        return stringToBibtexString.values().stream().anyMatch(value -> value.getName().equals(label));
     }
 
     /// Resolves any references to strings contained in this field content,
@@ -400,7 +476,7 @@ public class BibDatabase {
             }
         }
 
-        return allUsedIds.stream().map(bibtexStrings::get).toList();
+        return allUsedIds.stream().map(stringToBibtexString::get).toList();
     }
 
     /// Take the given collection of BibEntry and resolve any string
@@ -445,7 +521,7 @@ public class BibDatabase {
     /// If the string is undefined, returns null.
     @NonNull
     private Optional<String> resolveString(@NonNull String label, @NonNull Set<String> usedIds, @NonNull Set<String> allUsedIds) {
-        for (BibtexString string : bibtexStrings.values()) {
+        for (BibtexString string : stringToBibtexString.values()) {
             if (string.getName().equalsIgnoreCase(label)) {
                 // First, check if this string label has been resolved
                 // earlier in this recursion. If so, we have a
@@ -568,8 +644,9 @@ public class BibDatabase {
 
         if (isLinkedField) {
             BibEntry entry = event.getBibEntry();
-            String oldValue = event.getOldValue();
-            String newValue = event.getNewValue();
+            // An absent value is no key: treated like the empty string, it links nothing.
+            String oldValue = Objects.toString(event.getOldValue(), "");
+            String newValue = Objects.toString(event.getNewValue(), "");
 
             // split the old multiple key string into individual keys and remove the entry from all old keys
             if (!StringUtil.isBlank(oldValue)) {
@@ -659,14 +736,11 @@ public class BibDatabase {
     }
 
     /// @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
-    /// @implNote New entries are always added to the end of the list and always get a higher ID.
-    /// See [BibEntry][org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType)],
-    /// [IdGenerator][org.jabref.model.entry.IdGenerator],
-    /// [insertEntries][BibDatabase#insertEntries(List, EntriesEventSource)].
-    /// Therefore, using binary search to find the index.
+    /// @implNote [insertEntries][BibDatabase#insertEntries(List, EntriesEventSource)] keeps the list sorted by the
+    /// ids handed out by [IdGenerator][org.jabref.model.entry.IdGenerator], so binary search finds the index.
     /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
     public int indexOf(@NonNull BibEntry bibEntry) {
-        int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
+        int index = Collections.binarySearch(entries, bibEntry, ENTRY_ID_COMPARATOR);
         if (index >= 0) {
             return index;
         }
@@ -675,7 +749,7 @@ public class BibDatabase {
     }
 
     public Optional<BibEntry> getEntryById(String id) {
-        return Optional.ofNullable(entriesId.get(id));
+        return Optional.ofNullable(entryIdToBibEntry.get(id));
     }
 
     @Override
@@ -687,7 +761,7 @@ public class BibDatabase {
             return false;
         }
         return Objects.equals(entries, that.entries)
-                && Objects.equals(bibtexStrings, that.bibtexStrings)
+                && Objects.equals(stringToBibtexString, that.stringToBibtexString)
                 && Objects.equals(preamble, that.preamble)
                 && Objects.equals(epilog, that.epilog)
                 && Objects.equals(sharedDatabaseID, that.sharedDatabaseID)
@@ -696,6 +770,6 @@ public class BibDatabase {
 
     @Override
     public int hashCode() {
-        return Objects.hash(entries, bibtexStrings, preamble, epilog, sharedDatabaseID, newLineSeparator);
+        return Objects.hash(entries, stringToBibtexString, preamble, epilog, sharedDatabaseID, newLineSeparator);
     }
 }

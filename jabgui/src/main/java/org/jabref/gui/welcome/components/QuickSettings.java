@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.welcome.quicksettings.EntryTableConfigurationDialog;
 import org.jabref.gui.welcome.quicksettings.LargeLibraryOptimizationDialog;
 import org.jabref.gui.welcome.quicksettings.MainFileDirectoryDialog;
@@ -34,10 +35,11 @@ public class QuickSettings extends VBox {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        getStyleClass().add("welcome-section");
+        setSpacing(12);
+        getStyleClass().add("align-top-left");
 
         header = new Label(Localization.lang("Quick settings"));
-        header.getStyleClass().add("welcome-header-label");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
         enableScroll();
     }
 
@@ -100,7 +102,7 @@ public class QuickSettings extends VBox {
                 IconTheme.JabRefIcons.TOGGLE_GROUPS,
                 this::showEntryTableConfigurationDialog);
 
-        VBox newContent = new VBox(
+        VBox newContent = new VBox(4,
                 httpServerToggle,
                 coverImagesDownloadToggle,
                 mainFileDirButton,
@@ -109,7 +111,7 @@ public class QuickSettings extends VBox {
                 entryTableButton,
                 pushApplicationButton,
                 onlineServicesButton);
-        newContent.getStyleClass().add("quick-settings-container");
+        newContent.getStyleClass().add("align-top-left");
         return newContent;
     }
 
@@ -127,7 +129,7 @@ public class QuickSettings extends VBox {
     private Button createButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
         Button button = new Button(text);
         button.setGraphic(icon.getGraphicNode());
-        button.getStyleClass().add("quick-settings-button");
+        button.getStyleClass().addAll("quick-settings-button", "padding-12", "align-center-left");
         button.setMaxWidth(Double.MAX_VALUE);
         button.setOnAction(event -> action.run());
         return button;

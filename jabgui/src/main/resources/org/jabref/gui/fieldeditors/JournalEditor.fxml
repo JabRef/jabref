@@ -6,12 +6,14 @@
 <?import org.jabref.gui.fieldeditors.EditorTextField?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
+         spacing="4.0"
+         alignment="CENTER_LEFT"
          fx:controller="org.jabref.gui.fieldeditors.JournalEditor">
     <EditorTextField fx:id="textField"/>
     <HBox>
         <Button fx:id="journalInfoButton"
                 onAction="#showJournalInfo"
-                styleClass="icon-button">
+                styleClass="icon-button, entry-editor-field-button">
             <graphic>
                 <JabRefIconView glyph="VIEW_JOURNAL_INFO"/>
             </graphic>
@@ -20,7 +22,7 @@
             </tooltip>
         </Button>
         <Button onAction="#toggleAbbreviation"
-                styleClass="icon-button">
+                styleClass="icon-button, entry-editor-field-button">
             <graphic>
                 <JabRefIconView glyph="TOGGLE_ABBREVIATION"/>
             </graphic>
