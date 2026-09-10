@@ -23,19 +23,19 @@ import org.jspecify.annotations.Nullable;
 /// [impl->req~ux.themes.bundled-community-themes~1]
 @AllowedToUseClassGetResource("The previews are bundled next to the themes.")
 public enum ThemePreset {
-    JABREF(Localization.lang("JabRef theme"), "community/jabref-theme.css", null),
-    EVERFOREST("Everforest", "community/everforest.css", JABREF),
-    NORD("Nord", "community/nord.css", JABREF),
-    PAPERS("Papers", "community/papers.css", JABREF),
-    PRIMER("Primer", "community/primer.css", null),
-    CHOCOLATE_HONEY("Chocolate Honey", "community/chocolate-honey.css", JABREF),
-    DINOGIRLS_CHOCOLATEBROWN("Dino Girl's", "Chocolate Brown", "Dark Salmon", "community/chocolatebrown-darksalmon-contrasttext.css", JABREF),
-    DINOGIRLS_FUCHSIAPURPLE("Dino Girl's", "Fuchsia Purple", "Japanese Sakura", "community/fuchsiapurple-japanesesakura-contrasttext.css", JABREF),
-    DINOGIRLS_LIGHTBLUE("Dino Girl's", "Light Blue", "Ice Age", "community/lightblue-iceage-contrasttext.css", JABREF),
-    DINOGIRLS_LIGHTSEAGREEN("Dino Girl's", "Light Sea Green", "Lime Green", "community/lightseagreen-limegreen-contrasttext.css", JABREF),
-    DINOGIRLS_PREHISTORICAMBER("Dino Girl's", "Prehistoric Amber", "Peach Orange", "community/prehistoricamber-peachorange-contrasttext.css", JABREF),
-    DINOGIRLS_TWILIGHTLAVENDER("Dino Girl's", "Twilight Lavender", "Neon", "community/twilightlavender-neon-contrasttext.css", JABREF),
-    DINOGIRLS_WINERED("Dino Girl's", "Wine Red", "Iced Strawberry", "community/winered-icedstrawberry-contrasttext.css", JABREF);
+    JABREF(Localization.lang("JabRef theme"), "themes.jabref.org/jabref-theme.css", null),
+    EVERFOREST("Everforest", "themes.jabref.org/everforest.css", JABREF),
+    NORD("Nord", "themes.jabref.org/nord.css", JABREF),
+    PAPERS("Papers", "themes.jabref.org/papers.css", JABREF),
+    PRIMER("Primer", "themes.jabref.org/primer.css", null),
+    CHOCOLATE_HONEY("Chocolate Honey", "themes.jabref.org/chocolate-honey.css", JABREF),
+    DINOGIRLS_CHOCOLATEBROWN("Dino Girl's", "Chocolate Brown", "Dark Salmon", "themes.jabref.org/chocolatebrown-darksalmon-contrasttext.css", JABREF),
+    DINOGIRLS_FUCHSIAPURPLE("Dino Girl's", "Fuchsia Purple", "Japanese Sakura", "themes.jabref.org/fuchsiapurple-japanesesakura-contrasttext.css", JABREF),
+    DINOGIRLS_LIGHTBLUE("Dino Girl's", "Light Blue", "Ice Age", "themes.jabref.org/lightblue-iceage-contrasttext.css", JABREF),
+    DINOGIRLS_LIGHTSEAGREEN("Dino Girl's", "Light Sea Green", "Lime Green", "themes.jabref.org/lightseagreen-limegreen-contrasttext.css", JABREF),
+    DINOGIRLS_PREHISTORICAMBER("Dino Girl's", "Prehistoric Amber", "Peach Orange", "themes.jabref.org/prehistoricamber-peachorange-contrasttext.css", JABREF),
+    DINOGIRLS_TWILIGHTLAVENDER("Dino Girl's", "Twilight Lavender", "Neon", "themes.jabref.org/twilightlavender-neon-contrasttext.css", JABREF),
+    DINOGIRLS_WINERED("Dino Girl's", "Wine Red", "Iced Strawberry", "themes.jabref.org/winered-icedstrawberry-contrasttext.css", JABREF);
 
     private final String darkName;
     private final String lightName;

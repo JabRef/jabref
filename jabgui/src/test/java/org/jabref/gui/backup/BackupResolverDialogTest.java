@@ -46,7 +46,7 @@ class BackupResolverDialogTest extends JavaFxTest {
 
         Scene mainWindowScene = new Scene(new StackPane(), 1024, 768);
         mainWindowScene.getStylesheets().addAll(
-                stylesheet("/org/jabref/gui/theme/community/jabref-theme.css"),
+                stylesheet("/org/jabref/gui/theme/themes.jabref.org/jabref-theme.css"),
                 stylesheet("/org/jabref/gui/theme/internal/jabref-base.css"));
         stage.setScene(mainWindowScene);
 

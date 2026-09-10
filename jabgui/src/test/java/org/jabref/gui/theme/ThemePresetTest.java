@@ -25,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AllowedToUseClassGetResource("Lists the bundled theme files next to the theme package.")
 class ThemePresetTest {
 
-    /// Where the build copies the community themes to, relative to the theme package.
-    private static final String COMMUNITY_DIRECTORY = "community/";
+    /// Where the build copies the themes to, relative to the theme package; named like the submodule.
+    private static final String COMMUNITY_DIRECTORY = "themes.jabref.org/";
 
     /// The community constants of [ThemePreset] are written by hand so that the set of themes is
     /// fixed at compile time; which files of the `themes.jabref.org` submodule get bundled is decided

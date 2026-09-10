@@ -323,7 +323,7 @@ tasks.test {
 
 // region community themes
 // themes.jabref.org is a submodule and holds every theme, JabRef's own included. Its two-scheme themes
-// (directly below themes/<Name>/) are bundled flat under org/jabref/gui/theme/community/; ThemePreset
+// (directly below themes/<Name>/) are bundled flat under org/jabref/gui/theme/themes.jabref.org/; ThemePreset
 // lists every bundled file and ThemePresetTest fails when the two differ, so a submodule bump that
 // brings a new theme ends up either as a new constant or as an exclude below. DarkTheme/ and
 // LightTheme/ hold single-scheme themes, which cannot follow the color scheme.
@@ -345,7 +345,7 @@ tasks.processResources {
         exclude("DarkTheme/**", "LightTheme/**")
         exclude(themesLeftOut)
         // `path` is relative to the task's destination, so the target directory is part of it.
-        eachFile { path = "org/jabref/gui/theme/community/$name" }
+        eachFile { path = "org/jabref/gui/theme/themes.jabref.org/$name" }
         includeEmptyDirs = false
     }
 }
