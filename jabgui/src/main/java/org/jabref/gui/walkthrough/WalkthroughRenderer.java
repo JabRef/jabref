@@ -29,22 +29,18 @@ public class WalkthroughRenderer {
     /// @param beforeNavigate Runnable to execute before any navigation action
     /// @return The rendered tooltip content node
     public Node render(TooltipStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
-        VBox tooltip = new VBox();
-        tooltip.getStyleClass().addAll("root", "padding-12", "spacing-12");
+        VBox tooltip = makePanel();
 
         StackPane titleContainer = new StackPane();
-        titleContainer.getStyleClass().add("walkthrough-title-container");
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
         titleFlow.getStyleClass().add("walkthrough-tooltip-title");
         titleFlow.setMarkdown(step.title());
         titleContainer.getChildren().add(titleFlow);
 
         VBox contentContainer = createContent(step, walkthrough, beforeNavigate);
-        contentContainer.getStyleClass().add("spacing-16");
         VBox.setVgrow(contentContainer, Priority.ALWAYS);
 
         HBox actionsContainer = createActions(step, walkthrough, beforeNavigate);
-        actionsContainer.getStyleClass().add("spacing-0");
 
         step.maxHeight().ifPresent(tooltip::setMaxHeight);
         step.maxWidth().ifPresent(tooltip::setMaxWidth);
@@ -64,7 +60,6 @@ public class WalkthroughRenderer {
         configurePanelSize(panel, step);
 
         StackPane titleContainer = new StackPane();
-        titleContainer.getStyleClass().add("walkthrough-title-container");
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
         titleFlow.getStyleClass().add("walkthrough-title");
         titleFlow.setMarkdown(step.title());
@@ -82,12 +77,12 @@ public class WalkthroughRenderer {
         boolean isVertical = step.position() == PanelPosition.LEFT || step.position() == PanelPosition.RIGHT;
 
         if (isVertical) {
-            panel.getStyleClass().addAll("walkthrough-side-panel-vertical", "padding-24", "spacing-12");
+            panel.getStyleClass().addAll("walkthrough-side-panel-vertical", "padding-4");
             VBox.setVgrow(panel, Priority.ALWAYS);
             panel.setMaxHeight(Double.MAX_VALUE);
             step.maxWidth().ifPresent(panel::setMaxWidth);
         } else if (step.position() == PanelPosition.TOP || step.position() == PanelPosition.BOTTOM) {
-            panel.getStyleClass().addAll("walkthrough-side-panel-horizontal", "padding-24", "spacing-12");
+            panel.getStyleClass().addAll("walkthrough-side-panel-horizontal", "padding-4");
             HBox.setHgrow(panel, Priority.ALWAYS);
             panel.setMaxWidth(Double.MAX_VALUE);
             step.maxHeight().ifPresent(panel::setMaxHeight);
@@ -100,10 +95,9 @@ public class WalkthroughRenderer {
 
     private Node render(TextBlock textBlock) {
         StackPane container = new StackPane();
-        container.getStyleClass().add("walkthrough-text-container");
 
         MarkdownTextFlow textFlow = new MarkdownTextFlow(container);
-        textFlow.getStyleClass().addAll("walkthrough-text-content", "h4");
+        textFlow.getStyleClass().addAll("h4");
         textFlow.setMarkdown(textBlock.text());
 
         container.getChildren().add(textFlow);
@@ -111,8 +105,8 @@ public class WalkthroughRenderer {
     }
 
     private Node render(InfoBlock infoBlock) {
-        HBox infoContainer = new HBox();
-        infoContainer.getStyleClass().addAll("walkthrough-info-container", "padding-left-10", "spacing-6", "align-top-left");
+        HBox infoContainer = new HBox(8);
+        infoContainer.getStyleClass().addAll("walkthrough-info-container", "align-top-left");
 
         JabRefIconView icon = new JabRefIconView(IconTheme.JabRefIcons.INTEGRITY_INFO);
 
@@ -128,15 +122,14 @@ public class WalkthroughRenderer {
     }
 
     private VBox makePanel() {
-        VBox container = new VBox();
-        container.getStyleClass().add("walkthrough-panel");
+        VBox container = new VBox(4);
+        container.getStyleClass().addAll("walkthrough-panel", "padding-8");
         return container;
     }
 
     private HBox createActions(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
-        HBox actions = new HBox();
+        HBox actions = new HBox(0);
         actions.setAlignment(Pos.CENTER_LEFT);
-        actions.getStyleClass().add("spacing-0");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -144,27 +137,25 @@ public class WalkthroughRenderer {
         component.backButtonText()
                  .ifPresent(text ->
                          actions.getChildren()
-                                .add(makeButton(text, "walkthrough-back-button", beforeNavigate, walkthrough::previousStep)));
+                                .add(makeButton(text, false, beforeNavigate, walkthrough::previousStep)));
 
-        HBox rightActions = new HBox();
+        HBox rightActions = new HBox(4);
         rightActions.setAlignment(Pos.CENTER_RIGHT);
-        rightActions.getStyleClass().add("spacing-6");
 
         component.skipButtonText()
                  .ifPresent(text ->
                          rightActions.getChildren()
-                                     .add(makeButton(text, "walkthrough-skip-button", beforeNavigate, walkthrough::skip)));
+                                     .add(makeButton(text, false, beforeNavigate, walkthrough::skip)));
         component.continueButtonText()
                  .ifPresent(text ->
                          rightActions.getChildren()
-                                     .add(makeButton(text, "walkthrough-continue-button", beforeNavigate, walkthrough::nextStep)));
+                                     .add(makeButton(text, true, beforeNavigate, walkthrough::nextStep)));
         actions.getChildren().addAll(spacer, rightActions);
         return actions;
     }
 
     private VBox createContent(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
-        VBox contentBox = new VBox();
-        contentBox.getStyleClass().add("spacing-16");
+        VBox contentBox = new VBox(4);
         contentBox.getChildren().addAll(component.content().stream().map(block ->
                 switch (block) {
                     case TextBlock textBlock ->
@@ -179,9 +170,12 @@ public class WalkthroughRenderer {
     }
 
     /// @param text the already localized button text
-    private Button makeButton(String text, String styleClass, Runnable beforeNavigate, Runnable navigationAction) {
+    private Button makeButton(String text, boolean isDefault, Runnable beforeNavigate, Runnable navigationAction) {
         Button button = new Button(text);
-        button.getStyleClass().addAll(styleClass, "h5", "padding-4-6");
+        button.getStyleClass().addAll("h5", "padding-4");
+        if (isDefault) {
+            button.setDefaultButton(true);
+        }
         button.setOnAction(_ -> {
             beforeNavigate.run();
             navigationAction.run();

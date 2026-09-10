@@ -16,12 +16,10 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.PaintConverter;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
-import org.jabref.gui.util.ColorUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NullMarked;
@@ -35,20 +33,20 @@ import org.jspecify.annotations.NullMarked;
 /// Theme coloring is handled by the hosted child itself (a `FontIcon` or [JabRefSvgIcon], both of
 /// which carry the icon style classes), so this view stays unclassed to avoid double-theming. The styleable
 /// `-fx-icon-color` here is an explicit override knob — e.g. an inline `style="-fx-icon-color: ..."`
-/// in FXML — and, when set, is forwarded to an SVG child as a user-origin color (overriding theme CSS).
+/// in FXML — and, when set, is forwarded to an SVG child as a color (overriding theme CSS).
 @NullMarked
 public class JabRefIconView extends Group {
 
-    private static final CssMetaData<JabRefIconView, Paint> ICON_COLOR =
+    private static final CssMetaData<JabRefIconView, Paint> COLOR =
             new CssMetaData<>("-fx-icon-color", PaintConverter.getInstance()) {
                 @Override
                 public boolean isSettable(JabRefIconView node) {
-                    return !node.iconColor.isBound();
+                    return !node.color.isBound();
                 }
 
                 @Override
                 public StyleableProperty<Paint> getStyleableProperty(JabRefIconView node) {
-                    return node.iconColor;
+                    return node.color;
                 }
             };
 
@@ -56,14 +54,14 @@ public class JabRefIconView extends Group {
 
     static {
         List<CssMetaData<? extends Styleable, ?>> metaData = new ArrayList<>(Group.getClassCssMetaData());
-        metaData.add(ICON_COLOR);
+        metaData.add(COLOR);
         CSS_META_DATA = Collections.unmodifiableList(metaData);
     }
 
     /// CSS-styleable color, fed by `-fx-icon-color` rules (e.g. an inline `style="-fx-icon-color: ..."`).
-    /// Forwarded to an SVG child as a user-origin color.
-    private final StyleableObjectProperty<Paint> iconColor =
-            new SimpleStyleableObjectProperty<>(ICON_COLOR, this, "iconColor");
+    /// Forwarded to an SVG child as a fixed color.
+    private final StyleableObjectProperty<Paint> color =
+            new SimpleStyleableObjectProperty<>(COLOR, this, "iconColor");
 
     /// This property is only needed to get proper IDE support in FXML files
     /// (e.g. validation that parameter passed to "icon" is indeed of type [IconTheme.JabRefIcons]).
@@ -90,7 +88,7 @@ public class JabRefIconView extends Group {
     private void initialize() {
         EasyBind.subscribe(glyph, _ -> updateGraphic());
         EasyBind.subscribe(glyphSize, _ -> updateGraphic());
-        EasyBind.subscribe(iconColor, _ -> applyColor());
+        EasyBind.subscribe(color, _ -> applyColor());
     }
 
     /// Rebuilds the hosted node from the current glyph, sized to the current glyph size. The icon applies the size
@@ -101,15 +99,16 @@ public class JabRefIconView extends Group {
         applyColor();
     }
 
-    /// Forwards an explicit [#iconColor] override to an SVG child. Applied as an inline style (INLINE origin)
-    /// rather than a programmatic set, so it beats the author `.glyph-icon { -fx-icon-color }` theme rule the child
-    /// also matches. When unset (the common case) the child colors itself from theme CSS, so it is left untouched.
+    /// Forwards an explicit [#color] override to an SVG child. [JabRefSvgIcon#setColor(Paint)] fixes the
+    /// color there, so it beats the author `.ikonli-font-icon { -fx-icon-color }` theme rule the child also matches.
+    /// When unset (the common case) the child colors itself from theme CSS, so it is left untouched.
     private void applyColor() {
-        Paint color = iconColor.get();
-        if ((color instanceof Color iconColorValue) && !getChildren().isEmpty()
+        Paint colorValue = color.get();
+        // Without an override the child colors itself from theme CSS. Pushing the null through would both paint
+        // nothing and pin the color to a code-set value, locking the theme out for good.
+        if ((colorValue != null) && !getChildren().isEmpty()
                 && (getChildren().getFirst() instanceof JabRefSvgIcon svgIcon)) {
-            // FIXME: Inline style should be removed eventually.
-            svgIcon.setStyle("-fx-icon-color: %s;".formatted(ColorUtil.toRGBCode(iconColorValue)));
+            svgIcon.setColor(colorValue);
         }
     }
 
