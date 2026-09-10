@@ -164,5 +164,7 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.13.0")
     api("org.yaml:snakeyaml:2.7")
     api("tech.units:indriya:2.2.4")
+    api("tools.maran:svg:1.0.0")
+    api("tools.maran:svg-materialdesign:1.0.0")
     api("tools.maran:svgnode:2.0.0")
 }
