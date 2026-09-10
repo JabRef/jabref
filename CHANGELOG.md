@@ -262,6 +262,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening an online link with a query string could open a truncated URL. [#16774](https://github.com/JabRef/jabref/pull/16774)
 - We fixed an issue where the main table showed a tooltip with the entry's full title even when the title was already fully visible; the tooltip now appears only when the title is truncated. [#16607](https://github.com/JabRef/jabref/issues/16607)
 - We fixed the `Journal Abbreviation` search box invisible text with `JabRef - Light theme`. [#15721](https://github.com/JabRef/jabref/issues/15721).
+- We fixed an issue where file synchronization tools could pick up a half-written PDF while JabRef wrote metadata. [#16782](https://github.com/JabRef/jabref/pull/16782)
 - We fixed an issue where undo in one library could revert a change made in another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where saving one library cleared the modified marker of another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where entry added by "add entry using" was not selected. [#16035](https://github.com/JabRef/jabref/issues/16035)
