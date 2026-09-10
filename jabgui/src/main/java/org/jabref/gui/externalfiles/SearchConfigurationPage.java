@@ -255,9 +255,9 @@ public class SearchConfigurationPage extends WizardPane {
         if (headerGraphicHidden || getScene() == null) {
             return;
         }
-        javafx.scene.Node headerPanel = getScene().lookup(".header-panel");
-        if (headerPanel instanceof javafx.scene.layout.GridPane grid && grid.getChildren().size() > 1) {
-            javafx.scene.Node graphicContainer = grid.getChildren().get(1);
+        Node headerPanel = getScene().lookup(".header-panel");
+        if (headerPanel instanceof GridPane grid && grid.getChildren().size() > 1) {
+            Node graphicContainer = grid.getChildren().get(1);
             graphicContainer.setVisible(false);
             graphicContainer.setManaged(false);
             headerGraphicHidden = true;

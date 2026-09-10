@@ -2,7 +2,9 @@ package org.jabref.gui.externalfiles;
 
 import java.util.Optional;
 
+import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -44,7 +46,7 @@ public class UnlinkedFilesWizard {
 
         cssInstalled = false;
 
-        javafx.scene.Scene dialogScene = wizard.getDialog().getDialogPane().getScene();
+        Scene dialogScene = wizard.getDialog().getDialogPane().getScene();
 
         if (dialogScene != null) {
             applyThemeAndStageSettings(dialogScene);
@@ -113,8 +115,8 @@ public class UnlinkedFilesWizard {
         }
     }
 
-    private void applyThemeAndStageSettings(javafx.scene.Scene scene) {
-        if (cssInstalled || !(scene.getWindow() instanceof javafx.stage.Stage stage)) {
+    private void applyThemeAndStageSettings(Scene scene) {
+        if (cssInstalled || !(scene.getWindow() instanceof Stage stage)) {
             return;
         }
         cssInstalled = true;
