@@ -16,12 +16,8 @@ Valid citationkeys for this request (use only these):
 - $k
 #end
 
-#if( $multiPaper )
 Citation is REQUIRED: append the citation link(s) at the end of every paragraph that uses snippet content, formatted as [@citationkey](entries/citationkey) — or [@citationkey](entries/citationkey#page=N) if that snippet has a page — as specified in the system instructions.
 Citation is Optional: If in-text citations are used, they have to be formatted the same way, as specified in the system instructions.
-#else
-Citation is NOT required: all snippets come from a single paper. Do not append any citation link.
-#end
 
 ### Metadata
 #foreach( $entry in $entries )
