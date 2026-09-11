@@ -63,7 +63,6 @@ import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesTabViewModel> {
 
-
     private static final double SUGGESTION_CELL_HEIGHT = 24;
     private static final double SUGGESTION_LIST_VERTICAL_PADDING = 2;
     private final TableView<EntryTypeViewModel> entryTypesTable = new TableView<>();
@@ -176,7 +175,6 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     private void setupFieldPropertyCheckComboBox() {
         fieldPropertyCheckComboBox.getItems().addAll(
                 Arrays.stream(FieldProperty.values())
-                      // MULTILINE_TEXT property should be controlled by "multiline" box
                       .filter(fieldProperty -> fieldProperty != FieldProperty.MULTILINE_TEXT)
                       .toList()
         );
@@ -252,7 +250,6 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         entryTypesTable.getColumns().add(entryTypColumn);
         entryTypesTable.getColumns().add(entryTypeActionsColumn);
 
-        // Table View must be editable, otherwise the change of the Radiobuttons does not propagate the commit event
         fields.setEditable(true);
         entryTypesTable.setItems(viewModel.entryTypes());
         entryTypesTable.getSelectionModel().selectFirst();
@@ -339,7 +336,6 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
             FieldViewModel fieldViewModel = event.getRowValue();
             String currentDisplayName = fieldViewModel.displayNameProperty().getValue();
-            // The first predicate will check if the user input the original field name or doesn't edit anything after double click
             boolean fieldExists = !newDisplayName.equals(currentDisplayName) && viewModel.displayNameExists(newDisplayName);
             if (fieldExists) {
                 dialogService.notify(Localization.lang("Unable to change field name. \"%0\" already in use.", newDisplayName));
