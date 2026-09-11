@@ -482,6 +482,10 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 - Resolve conflicts inside the merge commit. Do not squash or reorder existing commits.
 - Before committing the merge, make sure no conflict marker is left: with `merge.conflictStyle=diff3` (the default here) a hunk has **four** markers — `<<<<<<<`, `|||||||` (the common-ancestor block), `=======`, `>>>>>>>` — and a resolution that only removes the outer ones leaves the ancestor block in the file. `git diff --cached --check` reports every leftover marker; run it after staging the resolved files.
 
+### Branches
+
+- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes; CI labels a PR `dev: into-stable` when it links a bug issue (maintainers may add or remove the label by hand) and ports it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
+
 ### Commits
 
 - One logical change per commit
