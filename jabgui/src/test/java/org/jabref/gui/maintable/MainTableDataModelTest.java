@@ -334,6 +334,51 @@ class MainTableDataModelTest {
     }
 
     @Test
+    void latestGroupSelectionWinsWhenGroupMatchTasksCompleteOutOfOrder() throws Exception {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        BibEntry bibEntryA = new BibEntry().withCitationKey("A").withField(StandardField.AUTHOR, "Alice");
+        BibEntry bibEntryB = new BibEntry().withCitationKey("B").withField(StandardField.AUTHOR, "Bob");
+        bibDatabaseContext.getDatabase().insertEntries(List.of(bibEntryA, bibEntryB));
+
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
+        when(preferences.getSearchPreferences()).thenReturn(
+                new SearchPreferences(SearchDisplayMode.FILTER, false, false, false, false, false, false, 0, 0, 0));
+        when(preferences.getNameDisplayPreferences()).thenReturn(NameDisplayPreferences.getDefault());
+
+        List<BackgroundTask<?>> groupMatchTasks = new ArrayList<>();
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+        when(taskExecutor.execute(any())).thenAnswer(invocation -> {
+            groupMatchTasks.add(invocation.getArgument(0));
+            return CompletableFuture.completedFuture(null);
+        });
+
+        SimpleListProperty<GroupTreeNode> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
+        MainTableDataModel model = new MainTableDataModel(
+                bibDatabaseContext,
+                preferences,
+                taskExecutor,
+                null,
+                selectedGroups,
+                OptionalObjectProperty.empty(),
+                new SimpleIntegerProperty());
+
+        BibEntryTableViewModel vmA = model.getViewModelByCitationKey("A").orElseThrow();
+        BibEntryTableViewModel vmB = model.getViewModelByCitationKey("B").orElseThrow();
+
+        selectedGroups.set(FXCollections.observableArrayList(getKeywordGroup(StandardField.AUTHOR, "Alice")));
+        selectedGroups.set(FXCollections.observableArrayList(getKeywordGroup(StandardField.AUTHOR, "Bob")));
+
+        assertEquals(2, groupMatchTasks.size());
+
+        executeTask(groupMatchTasks.getLast());
+        executeTask(groupMatchTasks.getFirst());
+
+        assertFalse(vmA.isMatchedByGroup().get());
+        assertTrue(vmB.isMatchedByGroup().get());
+    }
+
+    @Test
     void deletingEntryKeepsSelectedGroupFilter() {
         List<BibEntry> visibleEntries = new ArrayList<>();
 
