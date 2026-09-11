@@ -41,6 +41,7 @@ Needs: impl, utest
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 
 While autosave is enabled for a library, every change to the library must lead to the library being saved shortly afterwards without user interaction.
+Entry mutations made by save actions must run on the JavaFX event thread, while formatting and file writing remain in the background.
 
 When the autosave manager is shut down, its periodic task must stop and pending callbacks must not post further autosave events.
 

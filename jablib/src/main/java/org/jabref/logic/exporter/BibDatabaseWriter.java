@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,6 +78,7 @@ public class BibDatabaseWriter {
 
     @Nullable private JournalAbbreviationRepository journalAbbreviationRepository;
     private boolean useFJournalField;
+    private Consumer<Runnable> mutationScheduler = Runnable::run;
 
     public BibDatabaseWriter(@NonNull BibWriter bibWriter,
                              SelfContainedSaveConfiguration saveConfiguration,
@@ -106,14 +108,17 @@ public class BibDatabaseWriter {
                 preferences.getCustomEntryTypesRepository());
     }
 
-    private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData, FieldPreferences fieldPreferences) {
+    private static List<FieldChange> applySaveActions(List<BibEntry> toChange,
+                                                       MetaData metaData,
+                                                       FieldPreferences fieldPreferences,
+                                                       Consumer<Runnable> mutationScheduler) {
         List<FieldChange> changes = new ArrayList<>();
 
         Optional<FieldFormatterCleanupActions> saveActions = metaData.getSaveActions();
         saveActions.ifPresent(actions -> {
             // save actions defined -> apply for every entry
             for (BibEntry entry : toChange) {
-                changes.addAll(actions.applySaveActions(entry, metaData.getKeywordSeparator().orElse(null)));
+                changes.addAll(actions.applySaveActions(entry, metaData.getKeywordSeparator().orElse(null), mutationScheduler));
             }
         });
 
@@ -123,8 +128,8 @@ public class BibDatabaseWriter {
         for (BibEntry entry : toChange) {
             // Only apply the trimming if the entry itself has other changes (e.g., by the user or by save actions)
             if (entry.hasChanged()) {
-                changes.addAll(trimWhiteSpaces.cleanup(entry));
-                changes.addAll(normalizeWhitespacesCleanup.cleanup(entry));
+                changes.addAll(trimWhiteSpaces.cleanup(entry, mutationScheduler));
+                changes.addAll(normalizeWhitespacesCleanup.cleanup(entry, mutationScheduler));
             }
         }
 
@@ -132,7 +137,7 @@ public class BibDatabaseWriter {
     }
 
     public static List<FieldChange> applySaveActions(BibEntry entry, MetaData metaData, FieldPreferences fieldPreferences) {
-        return applySaveActions(List.of(entry), metaData, fieldPreferences);
+        return applySaveActions(List.of(entry), metaData, fieldPreferences, Runnable::run);
     }
 
     private static List<Comparator<BibEntry>> getSaveComparators(SaveOrder saveOrder) {
@@ -180,6 +185,13 @@ public class BibDatabaseWriter {
         return this;
     }
 
+    /// Routes [BibEntry] field mutations performed while saving to the correct thread.
+    /// The scheduler must execute each mutation synchronously so the written file contains it.
+    public BibDatabaseWriter withMutationScheduler(Consumer<Runnable> mutationScheduler) {
+        this.mutationScheduler = mutationScheduler;
+        return this;
+    }
+
     /// Saves the complete database.
     public void writeDatabase(@NonNull BibDatabaseContext bibDatabaseContext) throws IOException {
         List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntries()
@@ -215,7 +227,7 @@ public class BibDatabaseWriter {
 
         // FIXME: "Clean" architecture violation: We modify the entries here, which should not happen during a write
         //        The cleanup should be done before the write operation
-        List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData(), fieldPreferences);
+        List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData(), fieldPreferences, mutationScheduler);
         saveActionsFieldChanges.addAll(saveActionChanges);
 
         if (journalAbbreviationRepository != null && saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
@@ -223,13 +235,13 @@ public class BibDatabaseWriter {
                 AbbreviateJournalCleanup cleanup = new AbbreviateJournalCleanup(
                         bibDatabaseContext.getDatabase(), journalAbbreviationRepository, abbreviationType, useFJournalField);
                 for (BibEntry entry : sortedEntries) {
-                    saveActionsFieldChanges.addAll(cleanup.cleanup(entry));
+                    saveActionsFieldChanges.addAll(cleanup.cleanup(entry, mutationScheduler));
                 }
             });
         }
 
         if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
-            List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);
+            List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries, mutationScheduler);
             saveActionsFieldChanges.addAll(keyChanges);
         }
 
@@ -427,14 +439,15 @@ public class BibDatabaseWriter {
     }
 
     /// Generate keys for all entries that are lacking keys.
-    protected List<FieldChange> generateCitationKeys(BibDatabaseContext databaseContext, List<BibEntry> entries) {
+    protected List<FieldChange> generateCitationKeys(BibDatabaseContext databaseContext,
+                                                      List<BibEntry> entries,
+                                                      Consumer<Runnable> mutationScheduler) {
         List<FieldChange> changes = new ArrayList<>();
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, keyPatternPreferences);
         for (BibEntry bes : entries) {
             Optional<String> oldKey = bes.getCitationKey();
             if (StringUtil.isBlank(oldKey)) {
-                Optional<FieldChange> change = keyGenerator.generateAndSetKey(bes);
-                change.ifPresent(changes::add);
+                mutationScheduler.accept(() -> keyGenerator.generateAndSetKey(bes).ifPresent(changes::add));
             }
         }
         return changes;

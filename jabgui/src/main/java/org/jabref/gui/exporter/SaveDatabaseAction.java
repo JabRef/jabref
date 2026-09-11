@@ -29,6 +29,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -354,7 +355,8 @@ public class SaveDatabaseAction {
                         entryTypesManager)
                         .withJournalAbbreviationRepository(
                                 journalAbbreviationRepository,
-                                preferences.getAbbreviationPreferences().shouldUseFJournalField());
+                                preferences.getAbbreviationPreferences().shouldUseFJournalField())
+                        .withMutationScheduler(UiTaskExecutor::runAndWaitInJavaFXThread);
 
                 if (selectedOnly) {
                     databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
