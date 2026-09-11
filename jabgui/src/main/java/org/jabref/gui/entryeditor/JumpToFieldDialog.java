@@ -24,6 +24,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jspecify.annotations.Nullable;
 
 public class JumpToFieldDialog extends BaseDialog<Void> {
     private HoverSelectingAutoCompletionBinding<String> autoCompletion;
@@ -32,7 +33,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
     private final EntryEditor entryEditor;
     private JumpToFieldViewModel viewModel;
     private boolean resizeScheduled;
-    private final ObjectProperty<String> highlightedSuggestion = new SimpleObjectProperty<>();
+    private final ObjectProperty<@Nullable String> highlightedSuggestion = new SimpleObjectProperty<>();
     private boolean confirming;
     private int popupGeneration;
 
