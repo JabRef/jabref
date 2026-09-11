@@ -141,7 +141,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an uncaught error when importing an INSPEC file containing an empty-valued or truncated field (for example an empty abstract), which previously aborted the whole import.
+- We fixed an uncaught error when importing an INSPEC file containing an empty-valued or truncated field (for example an empty abstract), which previously aborted the whole import. [#17094](https://github.com/JabRef/jabref/pull/17094)
 - We fixed missing publication years and empty parentheses in the related articles tab. [#16998](https://github.com/JabRef/jabref/issues/16998)
 - We fixed an issue where <kbd>Ctrl</kbd> + <kbd>W</kbd> did not close the welcome tab. [#16895](https://github.com/JabRef/jabref/pull/16895)
 - We fixed an issue where an entry added by DOI or URL could not be undone. [#8770](https://github.com/JabRef/jabref/issues/8770)
