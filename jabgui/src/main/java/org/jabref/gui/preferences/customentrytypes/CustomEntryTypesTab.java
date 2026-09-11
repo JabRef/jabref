@@ -63,14 +63,9 @@ import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesTabViewModel> {
 
-    /// Height of a single suggestion row in the "add field" popup. Matches the default cell size of
-    /// JavaFX cells, which neither Modena nor ControlsFX's `autocompletion.css` override.
+
     private static final double SUGGESTION_CELL_HEIGHT = 24;
-
-    /// Vertical padding of the suggestion list view (1px at the top and bottom, from Modena's
-    /// `.list-view` rule).
     private static final double SUGGESTION_LIST_VERTICAL_PADDING = 2;
-
     private final TableView<EntryTypeViewModel> entryTypesTable = new TableView<>();
     private final TextField addNewEntryType = new TextField();
     private final TableView<FieldViewModel> fields = new TableView<>();
@@ -78,7 +73,6 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     private final Button addNewEntryTypeButton = new Button();
     private final Button addNewFieldButton = new Button(Localization.lang("Add"));
     private final CheckComboBox<FieldProperty> fieldPropertyCheckComboBox = new CheckComboBox<>();
-
     private final CustomLocalDragboard localDragboard;
 
     public CustomEntryTypesTab() {
