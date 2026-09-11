@@ -32,7 +32,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
     private final EntryEditor entryEditor;
     private JumpToFieldViewModel viewModel;
     private boolean resizeScheduled;
-    private final ObjectProperty<String> hoveredSuggestion = new SimpleObjectProperty<>();
+    private final ObjectProperty<String> highlightedSuggestion = new SimpleObjectProperty<>();
     private boolean confirming;
 
     public JumpToFieldDialog(EntryEditor entryEditor) {
@@ -72,7 +72,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
 
         newFieldHint.managedProperty().bind(newFieldHint.visibleProperty());
         newFieldHint.visibleProperty().bind(Bindings.createBooleanBinding(
-                () -> viewModel.isNewField(fieldToUse()), hoveredSuggestion, searchField.textProperty()));
+                () -> viewModel.isNewField(fieldToUse()), highlightedSuggestion, searchField.textProperty()));
 
         newFieldHint.visibleProperty().addListener((_, _, _) -> scheduleDialogResize());
 
@@ -82,7 +82,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
 
         showingProperty().addListener((_, _, showing) -> {
             if (showing) {
-                hoveredSuggestion.set(null);
+                highlightedSuggestion.set(null);
             }
         });
 
@@ -94,25 +94,25 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
 
     private void trackHighlightedSuggestion() {
         autoCompletion.highlightedSuggestionProperty().addListener((_, _, highlighted) ->
-                hoveredSuggestion.set(highlighted));
+                highlightedSuggestion.set(highlighted));
 
         autoCompletion.popupShowingProperty().addListener((_, _, showing) -> {
             if (!showing && !confirming) {
-                hoveredSuggestion.set(null);
+                highlightedSuggestion.set(null);
             }
         });
 
         // New input and focusing the field again start a fresh context: no suggestion applies.
-        searchField.textProperty().addListener((_, _, _) -> hoveredSuggestion.set(null));
+        searchField.textProperty().addListener((_, _, _) -> highlightedSuggestion.set(null));
         searchField.focusedProperty().addListener((_, _, focused) -> {
             if (focused) {
-                hoveredSuggestion.set(null);
+                highlightedSuggestion.set(null);
             }
         });
     }
 
     private String fieldToUse() {
-        String highlighted = hoveredSuggestion.get();
+        String highlighted = highlightedSuggestion.get();
         return highlighted == null ? searchField.getText() : highlighted;
     }
 
