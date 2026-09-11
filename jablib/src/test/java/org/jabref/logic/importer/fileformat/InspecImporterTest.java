@@ -104,6 +104,27 @@ class InspecImporterTest {
     }
 
     @Test
+    void importDoesNotCrashOnEmptyValuedField() throws IOException {
+        // Regression: an empty-valued field line such as "AB ~" (shorter than the
+        // "XX ~ value" prefix) used to raise StringIndexOutOfBoundsException from
+        // substring(5), aborting the whole import.
+        String testInput = "Record.*INSPEC.*\n" +
+                "\n" +
+                "TI ~ The SIS project\n" +
+                "AU ~ Prechelt, Lutz\n" +
+                "AB ~\n" +
+                "RT ~ Journal-Paper";
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
+        expectedEntry.setField(StandardField.TITLE, "The SIS project");
+        expectedEntry.setField(StandardField.AUTHOR, "Prechelt, Lutz");
+
+        try (BufferedReader reader = new BufferedReader(Reader.of(testInput))) {
+            List<BibEntry> entries = importer.importDatabase(reader).getDatabase().getEntries();
+            assertEquals(List.of(expectedEntry), entries);
+        }
+    }
+
+    @Test
     void getFormatName() {
         assertEquals("INSPEC", importer.getName());
     }

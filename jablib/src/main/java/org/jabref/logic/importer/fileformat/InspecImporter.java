@@ -87,6 +87,13 @@ public class InspecImporter extends Importer {
 
             String[] fields = entry.split("__NEWFIELD__");
             for (String s : fields) {
+                if (s.length() < 5) {
+                    // Skip the record marker and any empty-valued or truncated field line.
+                    // INSPEC fields have the shape "XX ~ value" with content starting at
+                    // index 5, so anything shorter has no value to read (and slicing it
+                    // would throw StringIndexOutOfBoundsException).
+                    continue;
+                }
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
                 switch (f3) {
