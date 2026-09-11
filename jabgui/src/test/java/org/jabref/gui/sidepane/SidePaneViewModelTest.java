@@ -3,6 +3,7 @@ package org.jabref.gui.sidepane;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -105,6 +106,19 @@ class SidePaneViewModelTest {
         sidePaneViewModel.moveDown(SidePaneType.OPEN_OFFICE);
 
         assertEquals(SidePaneType.OPEN_OFFICE, sidePaneComponents.get(2));
+    }
+
+    /// A pane which is closed while the other panes are reordered has to reappear at its old place.
+    /// <a href="https://github.com/JabRef/jabref/issues/16886">Issue 16886</a>
+    @Test
+    void hiddenPaneReappearsAtItsPreferredPosition() {
+        // Initial order: GROUPS, WEB_SEARCH, OPEN_OFFICE
+        sidePaneComponents.remove(SidePaneType.WEB_SEARCH);
+        sidePaneViewModel.moveDown(SidePaneType.GROUPS);
+        sidePaneComponents.add(SidePaneType.WEB_SEARCH);
+        sidePaneComponents.sort(new SidePaneViewModel.PreferredIndexSort(sidePanePreferences));
+
+        assertEquals(List.of(SidePaneType.OPEN_OFFICE, SidePaneType.WEB_SEARCH, SidePaneType.GROUPS), sidePaneComponents);
     }
 
     @Test

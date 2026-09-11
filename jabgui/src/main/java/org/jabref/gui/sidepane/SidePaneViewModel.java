@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -103,13 +102,15 @@ public class SidePaneViewModel extends AbstractViewModel {
         return sidePaneComponent;
     }
 
-    /// Stores the current configuration of visible panes in the preferences, so that we show panes at the preferred
-    /// position next time.
-    private void updatePreferredPositions() {
-        Map<SidePaneType, Integer> preferredPositions = new HashMap<>(preferences.getSidePanePreferences()
-                                                                                 .getPreferredPositions());
-        IntStream.range(0, getPanes().size()).forEach(i -> preferredPositions.put(getPanes().get(i), i));
-        preferences.getSidePanePreferences().setPreferredPositions(preferredPositions);
+    /// Exchanges the preferred positions of the two given panes, so that the new order is restored the next time a
+    /// pane is shown. Only these two panes are touched, thus currently hidden panes keep their preferred position
+    /// and reappear at the same place.
+    private void swapPreferredPositions(SidePaneType pane, SidePaneType otherPane) {
+        Map<SidePaneType, Integer> preferredPositions = preferences.getSidePanePreferences().getPreferredPositions();
+        int position = preferredPositions.getOrDefault(pane, getPanes().indexOf(pane));
+        int otherPosition = preferredPositions.getOrDefault(otherPane, getPanes().indexOf(otherPane));
+        preferredPositions.put(pane, otherPosition);
+        preferredPositions.put(otherPane, position);
     }
 
     public void moveUp(SidePaneType pane) {
@@ -117,8 +118,8 @@ public class SidePaneViewModel extends AbstractViewModel {
             int currentPosition = getPanes().indexOf(pane);
             if (currentPosition > 0) {
                 int newPosition = currentPosition - 1;
+                swapPreferredPositions(pane, getPanes().get(newPosition));
                 swap(getPanes(), currentPosition, newPosition);
-                updatePreferredPositions();
             } else {
                 LOGGER.debug("SidePaneComponent is already at the bottom");
             }
@@ -132,8 +133,8 @@ public class SidePaneViewModel extends AbstractViewModel {
             int currentPosition = getPanes().indexOf(pane);
             if (currentPosition < (getPanes().size() - 1)) {
                 int newPosition = currentPosition + 1;
+                swapPreferredPositions(pane, getPanes().get(newPosition));
                 swap(getPanes(), currentPosition, newPosition);
-                updatePreferredPositions();
             } else {
                 LOGGER.debug("SidePaneComponent {} is already at the top", pane.getTitle());
             }

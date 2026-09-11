@@ -3,6 +3,7 @@ package org.jabref.gui.preferences;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -800,7 +801,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return defaults.getPreferredPositions();
         }
 
-        Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
+        // Start from the defaults, so that panes which have never been moved still have a preferred position
+        Map<SidePaneType, Integer> preferredPositions = new EnumMap<>(defaults.getPreferredPositions());
 
         List<String> componentNames = getStringList(SIDE_PANE_COMPONENT_NAMES);
         List<String> componentPositions = getStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
