@@ -346,8 +346,13 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         checkBox.setSelected(!onMainTab || ((tab != null) && tab.isExtracted(pattern)));
         checkBox.setOnAction(_ -> {
             EditorTabViewModel selectedTab = tabsTable.getSelectionModel().getSelectedItem();
-            if (selectedTab != null) {
-                selectedTab.setExtracted(pattern, checkBox.isSelected());
+            if (selectedTab == null) {
+                return;
+            }
+            if (checkBox.isSelected()) {
+                selectedTab.extractFromMainTab(pattern);
+            } else {
+                selectedTab.keepOnMainTab(pattern);
             }
         });
         return checkBox;

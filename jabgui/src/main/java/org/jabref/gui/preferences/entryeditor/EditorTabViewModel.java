@@ -88,11 +88,13 @@ public class EditorTabViewModel {
         return extractedPatterns.contains(fieldPattern);
     }
 
-    public void setExtracted(String fieldPattern, boolean extracted) {
-        if (extracted) {
-            extractedPatterns.add(fieldPattern);
-        } else {
-            extractedPatterns.remove(fieldPattern);
-        }
+    /// Marks the pattern's fields for extraction: they leave the Main tab.
+    public void extractFromMainTab(String fieldPattern) {
+        extractedPatterns.add(fieldPattern);
+    }
+
+    /// Reverts [#extractFromMainTab]: the pattern's fields are shown on the Main tab again.
+    public void keepOnMainTab(String fieldPattern) {
+        extractedPatterns.remove(fieldPattern);
     }
 }

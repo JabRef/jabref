@@ -94,6 +94,11 @@ class EntryEditorTabModelTest {
     @Test
     void extractChoiceOnlyAppliesToKnownPlainFieldNames() {
         assertTrue(EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab("author"));
+        // Type-scoped fields (BibLaTeX software / APA) parse as unknown without an entry type
+        // but are known fields, so the extraction choice stays enabled for them.
+        assertTrue(EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab("license"));
+        assertTrue(EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab("repository"));
+        assertTrue(EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab("article"));
         assertFalse(EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab("comment-.*"));
         assertFalse(EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab("myfield"));
     }

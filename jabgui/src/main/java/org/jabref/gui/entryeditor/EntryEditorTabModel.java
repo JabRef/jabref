@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedSet;
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -134,6 +136,11 @@ public sealed interface EntryEditorTabModel
         /// See [#compiledRegex]; empty marks an invalid regex.
         private static final Map<String, Optional<Pattern>> COMPILED_REGEXES = new ConcurrentHashMap<>();
 
+        /// Lower-cased names of every registered field (see [#appearsOnMainTab]).
+        private static final Set<String> KNOWN_FIELD_NAMES = FieldFactory.getAllFieldsWithOutInternal().stream()
+                                                                         .map(field -> field.getName().toLowerCase(Locale.ROOT))
+                                                                         .collect(Collectors.toUnmodifiableSet());
+
         public CustomizedFieldsTab {
             fieldPatterns = List.copyOf(fieldPatterns);
             extractedFieldPatterns = Set.copyOf(extractedFieldPatterns);
@@ -173,9 +180,14 @@ public sealed interface EntryEditorTabModel
         /// field is a field the Main tab shows on its own. A regex pattern or an unknown field name
         /// is always extracted — the custom tab is the only place curating such fields — so the
         /// preferences UI shows its checkbox checked and disabled.
+        ///
+        /// Checked against the catalog of all registered fields, not via a type-less
+        /// [FieldFactory#parseField(String)]: type-scoped BibLaTeX software/APA fields (`license`,
+        /// `article`, …) parse as unknown without an entry type but are known fields nonetheless.
         public static boolean appearsOnMainTab(String fieldPattern) {
             return PLAIN_FIELD_NAME.matcher(fieldPattern).matches()
-                    && !(FieldFactory.parseField(fieldPattern) instanceof UnknownField);
+                    && (KNOWN_FIELD_NAMES.contains(fieldPattern.toLowerCase(Locale.ROOT))
+                    || !(FieldFactory.parseField(fieldPattern) instanceof UnknownField));
         }
 
         private SequencedSet<Field> resolve(List<String> patterns, BibEntry entry) {
