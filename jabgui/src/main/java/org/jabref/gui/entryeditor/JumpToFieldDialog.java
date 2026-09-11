@@ -26,7 +26,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class JumpToFieldDialog extends BaseDialog<Void> {
-    HoverSelectingAutoCompletionBinding<String> autoCompletion;
+    private HoverSelectingAutoCompletionBinding<String> autoCompletion;
     @FXML private TextField searchField;
     @FXML private Label newFieldHint;
     private final EntryEditor entryEditor;

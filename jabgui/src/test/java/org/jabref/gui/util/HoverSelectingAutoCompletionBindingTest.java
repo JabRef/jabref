@@ -11,9 +11,11 @@ import org.jabref.gui.testutils.JavaFxTest;
 
 import impl.org.controlsfx.skin.AutoCompletePopup;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @NullMarked
 class HoverSelectingAutoCompletionBindingTest extends JavaFxTest {
@@ -22,7 +24,7 @@ class HoverSelectingAutoCompletionBindingTest extends JavaFxTest {
     /// skin node must be the suggestion [ListView] the binding casts to in its constructor. A ControlsFX
     /// upgrade that changes `AutoCompletePopupSkin`'s shape silently breaks the dialog's
     /// hover-to-highlight feature, so bumping the ControlsFX version requires this test to stay green.
-    private HoverSelectingAutoCompletionBinding<String> binding;
+    @Nullable private HoverSelectingAutoCompletionBinding<String> binding;
 
     @Override
     public void start(Stage stage) {
@@ -41,6 +43,7 @@ class HoverSelectingAutoCompletionBindingTest extends JavaFxTest {
     }
 
     private AutoCompletePopup<String> popup() {
+        assertNotNull(binding);
         return binding.getAutoCompletionPopup();
     }
 }
