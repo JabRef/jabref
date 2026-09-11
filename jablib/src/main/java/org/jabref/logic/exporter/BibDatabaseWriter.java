@@ -109,9 +109,9 @@ public class BibDatabaseWriter {
     }
 
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange,
-                                                       MetaData metaData,
-                                                       FieldPreferences fieldPreferences,
-                                                       Consumer<Runnable> mutationScheduler) {
+                                                      MetaData metaData,
+                                                      FieldPreferences fieldPreferences,
+                                                      Consumer<Runnable> mutationScheduler) {
         List<FieldChange> changes = new ArrayList<>();
 
         Optional<FieldFormatterCleanupActions> saveActions = metaData.getSaveActions();
@@ -440,8 +440,8 @@ public class BibDatabaseWriter {
 
     /// Generate keys for all entries that are lacking keys.
     protected List<FieldChange> generateCitationKeys(BibDatabaseContext databaseContext,
-                                                      List<BibEntry> entries,
-                                                      Consumer<Runnable> mutationScheduler) {
+                                                     List<BibEntry> entries,
+                                                     Consumer<Runnable> mutationScheduler) {
         List<FieldChange> changes = new ArrayList<>();
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, keyPatternPreferences);
         for (BibEntry bes : entries) {
