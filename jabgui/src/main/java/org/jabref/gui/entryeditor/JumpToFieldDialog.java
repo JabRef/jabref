@@ -1,9 +1,14 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -14,19 +19,21 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.HoverSelectingAutoCompletionBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
 
 public class JumpToFieldDialog extends BaseDialog<Void> {
+    HoverSelectingAutoCompletionBinding<String> autoCompletion;
     @FXML private TextField searchField;
     @FXML private Label newFieldHint;
     private final EntryEditor entryEditor;
     private JumpToFieldViewModel viewModel;
     private boolean resizeScheduled;
+    private final ObjectProperty<String> hoveredSuggestion = new SimpleObjectProperty<>();
+    private boolean confirming;
 
     public JumpToFieldDialog(EntryEditor entryEditor) {
         this.entryEditor = entryEditor;
@@ -40,6 +47,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
 
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
+                confirming = true;
                 // Closing the dialog restores focus to whatever had it before, which would undo the
                 // focus the jump puts on the field. Therefore jump only once the dialog is gone.
                 Platform.runLater(this::jumpToSelectedField);
@@ -55,25 +63,77 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
         viewModel = new JumpToFieldViewModel(this.entryEditor);
         searchField.textProperty().bindBidirectional(viewModel.searchTextProperty());
 
-        // Prefix matching instead of ControlsFX' default substring matching: the popup always preselects
-        // its first suggestion, so "file" would offer (and jump to) "dayfiled" first.
-        AutoCompletionBinding<String> autoCompletion = TextFields.bindAutoCompletion(searchField, request ->
-                viewModel.getMatchingFieldNames(request.getUserText()));
+        // The typed text is offered as the first suggestion, so the popup preselects what the search
+        // field holds unless the user highlights another entry.
+        autoCompletion = new HoverSelectingAutoCompletionBinding<>(searchField,
+                request -> getSuggestions(request.getUserText()));
+
+        trackHighlightedSuggestion();
+
+        newFieldHint.managedProperty().bind(newFieldHint.visibleProperty());
+        newFieldHint.visibleProperty().bind(Bindings.createBooleanBinding(
+                () -> viewModel.isNewField(fieldToUse()), hoveredSuggestion, searchField.textProperty()));
+
+        newFieldHint.visibleProperty().addListener((_, _, _) -> scheduleDialogResize());
+
         // The open suggestion popup swallows Enter, so the dialog never sees it: jump on the
         // completion event instead. This also makes clicking a suggestion jump right away.
         autoCompletion.setOnAutoCompleted(_ -> confirm());
 
-        // Only show the hint when the popup cannot offer a matching field at all.
-        newFieldHint.managedProperty().bind(newFieldHint.visibleProperty());
-        newFieldHint.visibleProperty().bind(Bindings.createBooleanBinding(
-                () -> viewModel.isNewField(searchField.getText()), searchField.textProperty()));
-
-        newFieldHint.visibleProperty().addListener((_, _, _) -> scheduleDialogResize());
+        // EntryEditor keeps one dialog instance: confirmations and reopening must start from the typed
+        // text, so drop any suggestion state whenever the dialog is shown again.
+        showingProperty().addListener((_, _, showing) -> {
+            if (showing) {
+                hoveredSuggestion.set(null);
+            }
+        });
 
         searchField.setOnAction(event -> {
             confirm();
             event.consume();
         });
+    }
+
+    private void trackHighlightedSuggestion() {
+        autoCompletion.highlightedSuggestionProperty().addListener((_, _, highlighted) ->
+                hoveredSuggestion.set(highlighted));
+
+        // The popup hides when the OK button takes focus, i.e. before the dialog confirms, but also
+        // when the user dismisses it (Escape or clicking elsewhere, which leaves the field focused).
+        autoCompletion.popupShowingProperty().addListener((_, _, showing) -> {
+            if (!showing && searchField.isFocused() && !confirming) {
+                hoveredSuggestion.set(null);
+            }
+        });
+
+        // New input and focusing the field again start a fresh context: no suggestion applies.
+        searchField.textProperty().addListener((_, _, _) -> hoveredSuggestion.set(null));
+        searchField.focusedProperty().addListener((_, _, focused) -> {
+            if (focused) {
+                hoveredSuggestion.set(null);
+            }
+        });
+    }
+
+    private String fieldToUse() {
+        String highlighted = hoveredSuggestion.get();
+        return highlighted == null ? searchField.getText() : highlighted;
+    }
+
+    private List<String> getSuggestions(String userText) {
+        String normalizedUserText = userText.toLowerCase(Locale.ROOT);
+        List<String> matchingFields = viewModel.getFieldNames().stream()
+                                               .filter(fieldName -> fieldName.toLowerCase(Locale.ROOT).startsWith(normalizedUserText))
+                                               .toList();
+        if (userText.isEmpty()) {
+            return matchingFields;
+        }
+        List<String> suggestions = new ArrayList<>(matchingFields.size() + 1);
+        suggestions.add(userText);
+        matchingFields.stream()
+                      .filter(fieldName -> !fieldName.equalsIgnoreCase(userText))
+                      .forEach(suggestions::add);
+        return suggestions;
     }
 
     private void confirm() {
@@ -102,8 +162,8 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
     }
 
     private void jumpToSelectedField() {
-        String selectedField = searchField.getText();
-
+        confirming = false;
+        String selectedField = fieldToUse();
         if (StringUtil.isNotBlank(selectedField)) {
             String fieldToJumpTo = selectedField.toLowerCase().strip();
             entryEditor.selectField(fieldToJumpTo);
