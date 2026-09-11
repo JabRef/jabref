@@ -98,7 +98,11 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
 
         autoCompletion.popupShowingProperty().addListener((_, _, showing) -> {
             if (!showing && !confirming) {
-                highlightedSuggestion.set(null);
+                Platform.runLater(() -> {
+                    if (!confirming) {
+                        highlightedSuggestion.set(null);
+                    }
+                });
             }
         });
 
