@@ -8,7 +8,7 @@
 *   component styles never declare the same property, so their order is free.
 * ==========
 * This file declares NO colors. Every color it uses comes from a `-color-*` token that the
-* active theme declares per color scheme (see jabref-theme.css for the full token contract).
+* active theme declares per color scheme (see the JabRef theme on https://themes.jabref.org/ for the full token contract).
 * Because this stylesheet is installed last, any color it declared itself would silently
 * override the theme and make the theme unswappable -- so keep it token-only.
 *
@@ -139,7 +139,7 @@
 .text-success { -fx-text-fill: -color-success; -fx-fill: -color-success; }
 
 /* Default border */
-.bordered { -fx-border-width: 1; -fx-border-color: -color-border-default; }
+.bordered { -fx-border-width: 1; -fx-border-color: -color-border-light; }
 /* Default corner-radius */
 .corner-radius { -fx-background-radius: 0.25em; }
 
@@ -220,6 +220,8 @@
     -fx-text-fill: -color-accent;
 }
 
+/* JavaFX with custom components */
+
 .tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon,
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
     -fx-font-size: 0.875em;
@@ -227,7 +229,15 @@
     -fx-text-fill: -color-fg-muted;
 }
 
-/* JavaFX with custom components */
+/* The :selected variant is needed because the generic :selected rule above outranks a plain descendant rule. */
+.tab-pane > .tab-header-area > .headers-region > .tab .tab-icon,
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-icon {
+    -glyph-size: 1em;
+    -fx-icon-color: -color-fg-muted;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-icon {
+    -fx-icon-color: -color-accent;
+}
 
 .tab-pane > .tab-header-area > .headers-region > .tab.drop {
     -fx-border-color: -color-drag-target;
@@ -329,7 +339,7 @@
 }
 
 .merge-header-cell {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-width: 0 0 1 0;
     -fx-background-color: -color-bg-alt;
 }
@@ -602,7 +612,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .citationsList .contextBox {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-insets: 5;
     -fx-border-style: dashed;
     -fx-border-width: 2;
@@ -622,7 +632,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-pref-height: 1.875em;
     -fx-margin: 0;
     -fx-border-style: none;
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-border-light, -color-bg-secondary;
 }
 
 .tags-field:focused {
@@ -892,15 +902,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: derive(-color-accent, -20%);
 }
 
-/* donation toast */
-.donation-toast {
-    -fx-background-radius: 0.8333333333em;
-    -fx-effect: dropshadow(gaussian, -color-shadow-subtle, 20, 0.25, 0, 6);
-    -fx-border-color: derive(-color-bg-tertiary, -10%);
-    -fx-border-radius: 0.8333333333em;
-    -fx-max-height: 4em;
-}
-
 /* The logo is a single SvgNode; its shape is filled with -fx-color, not -fx-fill. */
 .jabref-logo {
     -fx-color: -color-accent;
@@ -934,7 +935,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: transparent;
     -fx-font-weight: bold;
     -fx-padding: 0.5em 0 0.333em 0;
-    -fx-border-color: transparent transparent -color-border-default transparent;
+    -fx-border-color: transparent transparent -color-border-light transparent;
 }
 
 .entry-editor .all-fields-section-pane > *.content {
@@ -1290,7 +1291,7 @@ We want to have a look that matches our icons in the tool-bar */
 /* CitationRelationsTab */
 
 .journalInfo .grid-cell-r {
-    -fx-border-color: transparent -color-border-default transparent transparent;
+    -fx-border-color: transparent -color-border-light transparent transparent;
     -fx-border-width: 0 0.062em 0 0;
 }
 
@@ -1313,7 +1314,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* ThreeWayMergeView */
 .three-way-merge .merged-field .styled-text-area {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-border-light, -color-bg-secondary;
     -fx-background-insets: 0, 1;
     -fx-prompt-text-fill: -color-fg-muted;
 }
@@ -1362,7 +1363,7 @@ We want to have a look that matches our icons in the tool-bar */
 /* Miscellaneous */
 
 .chatHistory {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
 }
 
 .exampleQuestionStyle {
@@ -1370,7 +1371,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 0.25em;
     -fx-border-radius: 0.25em;
     -fx-border-width: 0.062em;
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-font-weight: bold;
     -fx-underline: false !important;
     -fx-text-fill: -fx-text-base-color;
@@ -1402,7 +1403,7 @@ We want to have a look that matches our icons in the tool-bar */
 /* Quick Settings */
 .quick-settings-button {
     -fx-background-color: -color-bg-alt;
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-width: 0.08333em;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
@@ -1580,6 +1581,21 @@ We want to have a look that matches our icons in the tool-bar */
 
 .info-center-view .notification-view > .content > .text-container > .actions-box .button:armed {
     -fx-background-color: -color-button-default, -color-button-pressed;
+}
+
+/* "Donate" - the last action of the donation notification is its primary one */
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child {
+    -fx-background: -color-accent;
+    -fx-background-color: -color-accent;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child:hover {
+    -fx-background-color: -color-accent, -color-button-hover;
+}
+
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child:armed {
+    -fx-background-color: -color-accent, -color-button-pressed;
 }
 
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;

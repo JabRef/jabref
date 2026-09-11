@@ -1,0 +1,16 @@
+# AI chat
+
+## BibTeX
+
+```bibtex
+$bibtex
+```
+
+## Conversation
+
+#foreach( $message in $messages )
+**$message.role().getDisplayName():**
+
+$message.content()
+
+#end
