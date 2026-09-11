@@ -126,7 +126,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
     }
 
     private List<String> getSuggestions(String userText) {
-        String normalizedUserText = userText.toLowerCase(Locale.ROOT);
+        String normalizedUserText = userText.toLowerCase(Locale.ROOT).trim();
         List<String> matchingFields = viewModel.getFieldNames().stream()
                                                .filter(fieldName -> fieldName.toLowerCase(Locale.ROOT).startsWith(normalizedUserText))
                                                .toList();
@@ -134,7 +134,9 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
             return matchingFields;
         }
         List<String> suggestions = new ArrayList<>(matchingFields.size() + 1);
-        suggestions.add(userText);
+        if (StringUtil.isNotBlank(userText)) {
+            suggestions.add(userText);
+        }
         matchingFields.stream()
                       .filter(fieldName -> !fieldName.equalsIgnoreCase(userText))
                       .forEach(suggestions::add);
