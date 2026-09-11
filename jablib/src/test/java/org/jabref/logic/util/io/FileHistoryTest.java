@@ -4,6 +4,9 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javafx.collections.ListChangeListener;
 
 import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 
@@ -25,6 +28,18 @@ class FileHistoryTest {
     void setUp() {
         history = FileHistory.of(List.of());
         baseDir = JabRefBaseDirectoryLocator.getBaseDirectoryPath();
+    }
+
+    @Test
+    void movingAnItemToTheTopNotifiesListenersOnce() {
+        history.newFile(Path.of("aa"));
+        history.newFile(Path.of("bb"));
+        AtomicInteger notifications = new AtomicInteger();
+        history.addListener((ListChangeListener<Path>) _ -> notifications.incrementAndGet());
+
+        history.newFile(Path.of("aa"));
+
+        assertEquals(1, notifications.get());
     }
 
     @Test

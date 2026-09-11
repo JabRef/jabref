@@ -733,6 +733,18 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         List<Path> lastFiles = preferences.getLastFilesOpenedPreferences().getLastFilesOpened();
         if (!lastFiles.isEmpty()) {
             getOpenDatabaseAction().openFiles(lastFiles);
+
+            // [impl->req~ux.startup.restore-position~1]
+            // Each opened library raises its tab, so without this the last library in the list would end up in front.
+            // The tabs exist already; only their content is still loading in the background.
+            Optional.ofNullable(preferences.getLastFilesOpenedPreferences().getLastFocusedFile())
+                    .map(Path::toAbsolutePath)
+                    .flatMap(lastFocusedFile -> getLibraryTabs().stream()
+                                                                .filter(tab -> tab.getBibDatabaseContext().getDatabasePath()
+                                                                                  .filter(path -> path.toAbsolutePath().equals(lastFocusedFile))
+                                                                                  .isPresent())
+                                                                .findFirst())
+                    .ifPresent(this::showLibraryTab);
         }
 
         // [impl->req~shared-database.reopen-on-startup~1]

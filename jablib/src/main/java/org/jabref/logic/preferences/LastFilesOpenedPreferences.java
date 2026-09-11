@@ -2,6 +2,7 @@ package org.jabref.logic.preferences;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -19,6 +20,10 @@ public class LastFilesOpenedPreferences {
 
     private final ObjectProperty<Path> lastFocusedFile;
 
+    /// Citation keys of the entries that were selected in the libraries of [#lastFilesOpened], by the same index.
+    /// An empty string means "nothing to restore" (no selection, or an entry without a citation key).
+    private final ObservableList<String> lastSelectedEntries;
+
     // shared databases (by their id in SharedDatabasePreferences) that were connected without a local file when jabref closed
     private final ObservableList<String> lastSharedDatabasesOpened;
 
@@ -28,6 +33,7 @@ public class LastFilesOpenedPreferences {
     private LastFilesOpenedPreferences() {
         this(
                 List.of(),                // No last files opened on startup
+                List.of(),                // No last selected entries
                 null,                     // No last focused file
                 List.of(),                // No shared databases connected
                 FileHistory.of(List.of()) // Empty file history
@@ -37,14 +43,30 @@ public class LastFilesOpenedPreferences {
     public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
                                       @Nullable Path lastFocusedFile,
                                       FileHistory fileHistory) {
-        this(lastFilesOpened, lastFocusedFile, List.of(), fileHistory);
+        this(lastFilesOpened, List.of(), lastFocusedFile, List.of(), fileHistory);
+    }
+
+    public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
+                                      List<String> lastSelectedEntries,
+                                      @Nullable Path lastFocusedFile,
+                                      FileHistory fileHistory) {
+        this(lastFilesOpened, lastSelectedEntries, lastFocusedFile, List.of(), fileHistory);
     }
 
     public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
                                       @Nullable Path lastFocusedFile,
                                       List<String> lastSharedDatabasesOpened,
                                       FileHistory fileHistory) {
+        this(lastFilesOpened, List.of(), lastFocusedFile, lastSharedDatabasesOpened, fileHistory);
+    }
+
+    public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
+                                      List<String> lastSelectedEntries,
+                                      @Nullable Path lastFocusedFile,
+                                      List<String> lastSharedDatabasesOpened,
+                                      FileHistory fileHistory) {
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
+        this.lastSelectedEntries = FXCollections.observableArrayList(lastSelectedEntries);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.lastSharedDatabasesOpened = FXCollections.observableArrayList(lastSharedDatabasesOpened);
         this.fileHistory = fileHistory;
@@ -60,6 +82,23 @@ public class LastFilesOpenedPreferences {
 
     public void setLastFilesOpened(List<Path> files) {
         lastFilesOpened.setAll(files);
+    }
+
+    public ObservableList<String> getLastSelectedEntries() {
+        return lastSelectedEntries;
+    }
+
+    public void setLastSelectedEntries(List<String> citationKeys) {
+        lastSelectedEntries.setAll(citationKeys);
+    }
+
+    /// @return the citation key that was selected in the given library when JabRef was last closed
+    public Optional<String> getLastSelectedEntry(Path file) {
+        int index = lastFilesOpened.indexOf(file);
+        if ((index < 0) || (index >= lastSelectedEntries.size())) {
+            return Optional.empty();
+        }
+        return Optional.of(lastSelectedEntries.get(index)).filter(key -> !key.isEmpty());
     }
 
     public Path getLastFocusedFile() {
