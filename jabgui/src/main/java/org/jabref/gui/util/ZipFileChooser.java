@@ -44,7 +44,7 @@ public class ZipFileChooser extends BaseDialog<Path> {
                         ZonedDateTime.ofInstant(Files.getLastModifiedTime(data.getValue()).toInstant(),
                                              ZoneId.systemDefault())
                                      .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
-            } catch (IOException e) {
+            } catch (IOException _) {
                 // Ignore
                 return new ReadOnlyStringWrapper("");
             }
@@ -52,7 +52,7 @@ public class ZipFileChooser extends BaseDialog<Path> {
         sizeColumn.setCellValueFactory(data -> {
             try {
                 return new ReadOnlyLongWrapper(Files.size(data.getValue()));
-            } catch (IOException e) {
+            } catch (IOException _) {
                 // Ignore
                 return new ReadOnlyLongWrapper(0);
             }

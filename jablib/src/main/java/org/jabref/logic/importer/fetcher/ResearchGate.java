@@ -137,7 +137,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
             if (link.contains("?")) {
                 link = link.substring(0, link.indexOf("?"));
             }
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             return Optional.empty();
         }
         LOGGER.trace("URL for page: {}", link);
@@ -161,7 +161,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
             link = Objects.requireNonNull(html.getElementById("search"))
                           .select("a").attr("href");
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             return Optional.empty();
         }
         LOGGER.trace("URL for page: {}", link);

@@ -8,7 +8,7 @@
 *   component styles never declare the same property, so their order is free.
 * ==========
 * This file declares NO colors. Every color it uses comes from a `-color-*` token that the
-* active theme declares per color scheme (see jabref-theme.css for the full token contract).
+* active theme declares per color scheme (see the JabRef theme on https://themes.jabref.org/ for the full token contract).
 * Because this stylesheet is installed last, any color it declared itself would silently
 * override the theme and make the theme unswappable -- so keep it token-only.
 *
@@ -68,11 +68,6 @@
 .h5 { -fx-font-size: 1.1em; }
 .h6 { -fx-font-size: 1em; }
 
-/* Font style */
-.bold { -fx-font-weight: bold; }
-.italic { -fx-font-style: italic; }
-.font-monospace { -fx-font-family: monospace; }
-
 .font-size-8 > * { -fx-font-size: 8pt; }
 .font-size-9 > * { -fx-font-size: 9pt; }
 .font-size-10 > * { -fx-font-size: 10pt; }
@@ -86,19 +81,6 @@
 .font-size-18 > * { -fx-font-size: 18pt; }
 .font-size-19 > * { -fx-font-size: 19pt; }
 .font-size-20 > * { -fx-font-size: 20pt; }
-
-/* Text color. Both properties are set so the same class works on a Label
-   (-fx-text-fill), on a Text node inside a TextFlow and on an icon (-fx-fill). */
-.text-accent { -fx-text-fill: -color-accent; -fx-fill: -color-accent; }
-.text-muted { -fx-text-fill: -color-fg-muted; -fx-fill: -color-fg-muted; }
-.text-subtle { -fx-text-fill: -color-fg-subtle; -fx-fill: -color-fg-subtle; }
-.text-emphasis { -fx-text-fill: -color-fg-emphasis; -fx-fill: -color-fg-emphasis; }
-.text-danger { -fx-text-fill: -color-danger; -fx-fill: -color-danger; }
-.text-warning { -fx-text-fill: -color-warning; -fx-fill: -color-warning; }
-.text-success { -fx-text-fill: -color-success; -fx-fill: -color-success; }
-
-.bg-accent { -fx-background: -color-accent; -fx-background-color: -color-accent; }
-.bg-secondary { -fx-background: -color-bg-secondary; -fx-background-color: -color-bg-secondary; }
 
 /* Padding: all sides */
 .padding-0 { -fx-padding: 0; }
@@ -136,9 +118,29 @@
 .align-top-center { -fx-alignment: top-center; }
 .align-baseline-left { -fx-alignment: baseline-left; }
 
-/* Surface */
+/* Font style */
+.bold { -fx-font-weight: bold; }
+.italic { -fx-font-style: italic; }
+.font-monospace { -fx-font-family: monospace; }
+
+/* Background */
+.bg-accent { -fx-background: -color-accent; -fx-background-color: -color-accent; }
+.bg-secondary { -fx-background: -color-bg-secondary; -fx-background-color: -color-bg-secondary; }
+.bg-sidepane { -fx-background: -color-bg-sidepane; -fx-background-color: -color-bg-sidepane; }
 .bg-transparent { -fx-background: transparent; -fx-background-color: transparent; }
-.bordered { -fx-border-width: 1; -fx-border-color: -color-border-default; }
+
+/* Text color */
+.text-accent { -fx-text-fill: -color-accent; -fx-fill: -color-accent; }
+.text-muted { -fx-text-fill: -color-fg-muted; -fx-fill: -color-fg-muted; }
+.text-subtle { -fx-text-fill: -color-fg-subtle; -fx-fill: -color-fg-subtle; }
+.text-emphasis { -fx-text-fill: -color-fg-emphasis; -fx-fill: -color-fg-emphasis; }
+.text-danger { -fx-text-fill: -color-danger; -fx-fill: -color-danger; }
+.text-warning { -fx-text-fill: -color-warning; -fx-fill: -color-warning; }
+.text-success { -fx-text-fill: -color-success; -fx-fill: -color-success; }
+
+/* Default border */
+.bordered { -fx-border-width: 1; -fx-border-color: -color-border-light; }
+/* Default corner-radius */
 .corner-radius { -fx-background-radius: 0.25em; }
 
 .root {
@@ -159,6 +161,15 @@
     -fx-text-fill: -color-fg-muted;
 }
 
+/* The :selected variant is needed because the generic :selected rule above outranks a plain descendant rule. */
+.tab-pane > .tab-header-area > .headers-region > .tab .tab-icon,
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-icon {
+    -glyph-size: 1em;
+    -fx-icon-color: -color-fg-muted;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-icon {
+    -fx-icon-color: -color-accent;
+}
 .tab-pane > .tab-header-area > .headers-region > .tab.drop {
     -fx-border-color: -color-drag-target;
     -fx-background-color: -color-drag-target-hover;
@@ -254,7 +265,7 @@
 }
 
 .merge-header-cell {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-width: 0 0 1 0;
     -fx-background-color: -color-bg-alt;
 }
@@ -344,6 +355,10 @@
     -fx-opacity: 0.4;
 }
 
+.entry-editor-field-button {
+    -fx-padding: 0.333em 0.5em;
+}
+
 /* Selected state is signalled by the icon color alone (set in code), not by a background. */
 .addEntryButton:selected {
     -fx-background-color: transparent;
@@ -408,7 +423,7 @@
 /* The suggestion background must not mask the list's interaction affordances
    (same colors the themes use for cell hover and selection). */
 .linked-files-list .list-cell:auto-found:filled:hover {
-    -fx-background-color: -color-border-default;
+    -fx-background-color: -color-selection-inactive, -color-overlay-hover;
 }
 
 .linked-files-list .list-cell:auto-found:filled:selected {
@@ -461,7 +476,7 @@
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
     /* `!important` is override library's default font size */
-    -fx-font-size: 1.8em!important;
+    -fx-font-size: 1.8em !important;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
     -fx-icon-color: -color-accent;
@@ -492,7 +507,7 @@
 */
 .search-field-icon {
     -fx-icon-color: -fx-text-base-color;
-    -fx-font-size: 1.7em;
+    -fx-font-size: 1.8em;
 }
 
 /* search modifier buttons */
@@ -567,16 +582,12 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-stroke: -fx-text-background-color;
 }
 
-.code-area .context-menu {
-    -fx-font-family: sans-serif;
-}
-
 .citationsList {
     -fx-text-fill: -fx-text-base-color;
 }
 
 .citationsList .contextBox {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-insets: 5;
     -fx-border-style: dashed;
     -fx-border-width: 2;
@@ -596,11 +607,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-pref-height: 1.875em;
     -fx-margin: 0;
     -fx-border-style: none;
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-border-light, -color-bg-secondary;
 }
 
 .tags-field:focused {
-    -fx-border-color: -color-accent-subtle;
+    -fx-border-color: -color-accent;
 }
 
 .tags-field > .flow-pane > .tag-view {
@@ -815,15 +826,18 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-selection;
 }
 
-.main-table .table-row-cell:matching-search-and-groups:selected:hover,
 .main-table .table-row-cell:matching-search-and-groups:hover,
-.main-table .table-row-cell:matching-search-not-groups:selected:hover,
 .main-table .table-row-cell:matching-search-not-groups:hover,
-.main-table .table-row-cell:matching-groups-not-search:selected:hover,
 .main-table .table-row-cell:matching-groups-not-search:hover,
-.main-table .table-row-cell:not-matching-search-and-groups:selected:hover,
 .main-table .table-row-cell:not-matching-search-and-groups:hover {
-    -fx-background-color: -color-border-default;
+    -fx-background-color: -color-overlay-hover;
+}
+
+.main-table .table-row-cell:matching-search-and-groups:selected:hover,
+.main-table .table-row-cell:matching-search-not-groups:selected:hover,
+.main-table .table-row-cell:matching-groups-not-search:selected:hover,
+.main-table .table-row-cell:not-matching-search-and-groups:selected:hover {
+    -fx-background-color: -color-selection, -color-overlay-hover;
 }
 
 .rating > .container {
@@ -853,27 +867,14 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-accent;
 }
 
-/* Welcome Tab Layout Styles */
-/* The font family is declared once here and inherited by everything inside. */
 .welcome-main-container {
-    -fx-font-family: "Arial";
-    -fx-max-width: 64em;
+    -fx-max-width: 96em;
 }
-
 
 /* Welcome Community  */
 .welcome-community-link:hover {
     -fx-underline: true;
     -fx-text-fill: derive(-color-accent, -20%);
-}
-
-/* donation toast */
-.donation-toast {
-    -fx-background-radius: 0.8333333333em;
-    -fx-effect: dropshadow(gaussian, -color-shadow-subtle, 20, 0.25, 0, 6);
-    -fx-border-color: derive(-color-bg-tertiary, -10%);
-    -fx-border-radius: 0.8333333333em;
-    -fx-max-height: 4em;
 }
 
 /* The logo is a single SvgNode; its shape is filled with -fx-color, not -fx-fill. */
@@ -909,7 +910,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: transparent;
     -fx-font-weight: bold;
     -fx-padding: 0.5em 0 0.333em 0;
-    -fx-border-color: transparent transparent -color-border-default transparent;
+    -fx-border-color: transparent transparent -color-border-light transparent;
 }
 
 .entry-editor .all-fields-section-pane > *.content {
@@ -942,7 +943,6 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .entry-editor .entry-type-label .context-menu {
-    -fx-font-size: 0.9em;
     -fx-font-weight: normal;
 }
 
@@ -1007,6 +1007,35 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -fx-text-background-color;
 }
 
+#aboutDialog,
+#aboutDialog > .content {
+    -fx-padding: 0;
+}
+
+#aboutDialog .bg-accent .button {
+    -fx-border-color: -color-fg-emphasis;
+}
+
+#aboutDialog #donationButton {
+    -fx-background-color: -color-fg-emphasis;
+    -fx-text-fill: -color-accent;
+}
+
+#aboutDialog #donationButton:hover {
+    -fx-background-color: -color-fg-subtle;
+}
+
+#aboutDialog .bg-accent .button:focused {
+    -fx-border-color: -color-fg-emphasis;
+    -fx-border-width: 0.125em;
+}
+
+#aboutDialog .bg-accent .button.btn-transparent,
+#aboutDialog .bg-accent .button.btn-transparent:focused {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
 /* ErrorConsole */
 .error-console .button-bar {
     -fx-padding: 1em 0em 0em 0em;
@@ -1022,7 +1051,7 @@ We want to have a look that matches our icons in the tool-bar */
 .error-console .exception .glyph-icon,
 .error-console .output .glyph-icon,
 .error-console .log .glyph-icon {
-    -fx-font-size: 1.5em;
+    -fx-font-size: 1.8em;
 }
 
 .error-console .exception .glyph-icon {
@@ -1120,12 +1149,11 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .group-tree .numberColumn > .hits {
-    -fx-font-size: 0.75em;
     -fx-background: -color-badge-bg;
     -fx-background-color: -color-badge-bg;
-    -fx-padding: 0.4em 0.4em 0.4em 0.4em;
+    -fx-padding: 0.25em;
     -fx-background-insets: 0;
-    -fx-background-radius: 0.7em;
+    -fx-background-radius: 0.25em;
 }
 
 .group-tree .numberColumn > .hits .text {
@@ -1300,7 +1328,7 @@ We want to have a look that matches our icons in the tool-bar */
 /* CitationRelationsTab */
 
 .journalInfo .grid-cell-r {
-    -fx-border-color: transparent -color-border-default transparent transparent;
+    -fx-border-color: transparent -color-border-light transparent transparent;
     -fx-border-width: 0 0.062em 0 0;
 }
 
@@ -1323,14 +1351,14 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* ThreeWayMergeView */
 .three-way-merge .merged-field .styled-text-area {
-    -fx-background-color: -color-border-default, -color-bg-secondary;
+    -fx-background-color: -color-border-light, -color-bg-secondary;
     -fx-background-insets: 0, 1;
     -fx-prompt-text-fill: -color-fg-muted;
 }
 
 .three-way-merge .merged-field .styled-text-area:focused {
     -fx-highlight-fill: derive(-color-accent-subtle, 20%);
-    -fx-background-color: -color-accent-subtle, -color-bg-secondary;
+    -fx-background-color: -color-accent, -color-bg-secondary;
     -fx-background-insets: 0, 2;
     -fx-highlight-text-fill: -fx-text-inner-color;
 }
@@ -1378,7 +1406,7 @@ We want to have a look that matches our icons in the tool-bar */
 /* Miscellaneous */
 
 .chatHistory {
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
 }
 
 .exampleQuestionStyle {
@@ -1386,7 +1414,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 0.25em;
     -fx-border-radius: 0.25em;
     -fx-border-width: 0.062em;
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-font-weight: bold;
     -fx-underline: false !important;
     -fx-text-fill: -fx-text-base-color;
@@ -1418,7 +1446,7 @@ We want to have a look that matches our icons in the tool-bar */
 /* Quick Settings */
 .quick-settings-button {
     -fx-background-color: -color-bg-alt;
-    -fx-border-color: -color-border-default;
+    -fx-border-color: -color-border-light;
     -fx-border-width: 0.08333em;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
@@ -1621,6 +1649,21 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-button-default, -color-button-pressed;
 }
 
+/* "Donate" - the last action of the donation notification is its primary one */
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child {
+    -fx-background: -color-accent;
+    -fx-background-color: -color-accent;
+    -fx-text-fill: -color-fg-emphasis;
+}
+
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child:hover {
+    -fx-background-color: -color-accent, -color-button-hover;
+}
+
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:last-child:armed {
+    -fx-background-color: -color-accent, -color-button-pressed;
+}
+
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
    LinkedFilesEditor binds the ListView pref/max height to this fixed cell size. */
 .linked-files-list {
@@ -1668,10 +1711,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .rich-text-area .caret-line {
     -fx-fill: transparent;
-}
-
-.bibtex-code-area {
-    -fx-font-family: 'JetBrains Mono';
 }
 
 .bibtex-code-area .bibtex-keyword {
