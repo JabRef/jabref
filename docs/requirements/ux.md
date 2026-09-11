@@ -160,6 +160,13 @@ The themes from <https://themes.jabref.org/> that cover both color schemes are b
 
 Needs: impl
 
+## Library tabs show what kind of library they hold
+`req~ux.tabs.library-kind-icon~1`
+
+Every library tab carries an icon: one for a BibTeX library, one for a BibLaTeX library, and one for a shared database. A shared database shows the database icon regardless of its mode.
+
+Needs: impl, utest
+
 ## Donation prompt returns every six months
 `req~ux.donation.recurring-prompt~1`
 

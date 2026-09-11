@@ -80,7 +80,7 @@ public class OS {
         } catch (PasswordAccessException ex) {
             LoggerFactory.getLogger(OS.class).warn("Password storage in credential store failed.");
             return false;
-        } catch (Exception ex) {
+        } catch (Exception _) {
             LoggerFactory.getLogger(OS.class).warn("Connection to credential store failed");
             return false;
         }

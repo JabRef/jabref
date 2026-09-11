@@ -319,7 +319,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         try {
             // Attempt the rename operation
             linkedFileHandler.renameToName(targetFileName, overwriteFile);
-        } catch (IOException e) {
+        } catch (IOException _) {
             // Display an error dialog if file is locked or inaccessible
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Rename failed"),
@@ -439,7 +439,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
                 return Files.isSameFile(fileA, fileB);
-            } catch (IOException e) {
+            } catch (IOException _) {
                 return false;
             }
         };

@@ -680,13 +680,18 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// natural-height list that blows up the rows' preferred heights, so reset text fields to
     /// their computed size and cap text areas at a few visible rows.
     private static void normalizeInputHeights(Node node) {
-        if (node instanceof TextArea textArea) {
-            textArea.setPrefRowCount(MULTILINE_ROWS);
-            textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
-        } else if (node instanceof TextField textField) {
-            textField.setPrefHeight(Region.USE_COMPUTED_SIZE);
-        } else if (node instanceof Parent parent) {
-            parent.getChildrenUnmodifiable().forEach(AllFieldsTab::normalizeInputHeights);
+        switch (node) {
+            case TextArea textArea -> {
+                textArea.setPrefRowCount(MULTILINE_ROWS);
+                textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
+            }
+            case TextField textField ->
+                    textField.setPrefHeight(Region.USE_COMPUTED_SIZE);
+            case Parent parent ->
+                    parent.getChildrenUnmodifiable().forEach(AllFieldsTab::normalizeInputHeights);
+            case null,
+                 default -> {
+            }
         }
     }
 }

@@ -30,10 +30,29 @@ public interface UndoManager {
     /// @return whether anything was recorded, for callers that report the outcome to the user
     boolean addEdit(String name, Consumer<CompoundEdit> mutations);
 
-    /// Performs `change` and records it in one go.
+    /// Performs `change` and records it in one go, as one user action.
     ///
     /// @return what was applied, and what was not — see [BibChange#apply]
-    ApplyResult applyEdit(BibChange change);
+    default ApplyResult applyEdit(BibChange change) {
+        return applyEdit(change, EditSource.COMMAND);
+    }
+
+    /// Performs `change` and records it in one go, saying who is recording it.
+    ///
+    /// Only [EditSource#TYPING] may continue the step on top of the stack; everything else is a
+    /// step of its own, so a command that writes the field the user was just typing in does not
+    /// join what they typed.
+    ///
+    /// @return what was applied, and what was not — see [BibChange#apply]
+    ApplyResult applyEdit(BibChange change, EditSource source);
+
+    /// Ends the step being collected, so that the next change starts one of its own.
+    ///
+    /// A field editor records one change per keystroke, and the journal groups a run of them into
+    /// one step so that Ctrl+Z takes back a word rather than a letter. It cannot see where the run
+    /// ends, though — that is the editor's knowledge — so an editor that stops editing one thing
+    /// and starts another says so here. Ending a step nobody is continuing does nothing.
+    void endStep();
 
     /// Marks the library as changed by something this journal cannot take back — a migration on
     /// load, an external change the user denied, a setting written without being recorded.

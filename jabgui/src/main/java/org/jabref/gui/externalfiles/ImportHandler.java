@@ -21,6 +21,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.importer.actions.AddGroupImportEntriesAction;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -63,8 +64,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -166,16 +167,15 @@ public class ImportHandler {
                 // which happens after this method returns - and by the catch below if anything
                 // fails before that runnable is dispatched.
                 UndoSuspension suspended = undoManager.suspendUndo(name);
-                CompoundEdit compoundEdit = new CompoundEdit(name);
                 try {
-                    return importFiles(files, transferMode, compoundEdit, suspended);
+                    return importFiles(files, transferMode, suspended);
                 } catch (RuntimeException | Error e) {
                     suspended.close();
                     throw e;
                 }
             }
 
-            private List<ImportFilesResultItemViewModel> importFiles(List<Path> files, TransferMode transferMode, CompoundEdit compoundEdit, UndoSuspension suspended) {
+            private List<ImportFilesResultItemViewModel> importFiles(List<Path> files, TransferMode transferMode, UndoSuspension suspended) {
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
@@ -266,14 +266,12 @@ public class ImportHandler {
                     }
                     allEntriesToAdd.addAll(entriesToAdd);
 
-                    compoundEdit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entriesToAdd));
-
                     counter++;
                 }
 
                 // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                 // That method does a clone() on each entry
-                UiTaskExecutor.runInJavaFXThread(() -> insertImported(allEntriesToAdd, compoundEdit, suspended));
+                UiTaskExecutor.runInJavaFXThread(() -> insertImported(allEntriesToAdd, suspended));
                 return results;
             }
 
@@ -284,17 +282,14 @@ public class ImportHandler {
         };
     }
 
-    /// Inserts the imported entries as one undo step and releases the library the import held.
+    /// Inserts the imported entries and releases the library the import held.
     ///
-    /// The step is opened around the insert so that what the insert sets off — group assignment,
-    /// and the tab's automatic assignment to the selected groups — is recorded inside it rather
-    /// than after it.
-    private void insertImported(List<BibEntry> entriesToAdd, CompoundEdit compoundEdit, UndoSuspension suspended) {
+    /// [#importCleanedEntries] records the insert as one step, so the files imported together are
+    /// one Ctrl+Z, and what the insert sets off — group assignment, and the tab's automatic
+    /// assignment to the selected groups — is recorded inside that step rather than after it.
+    private void insertImported(List<BibEntry> entriesToAdd, UndoSuspension suspended) {
         try {
-            undoManager.addEdit(Localization.lang("Import entries"), edit -> {
-                edit.addEdit(compoundEdit.toChangeSet());
-                importEntries(entriesToAdd);
-            });
+            importEntries(entriesToAdd);
         } finally {
             suspended.close();
         }
@@ -349,12 +344,27 @@ public class ImportHandler {
         importCleanedEntries(null, entries);
     }
 
+    /// Adds already cleaned entries to the library, as one undo step.
+    ///
+    /// The step is opened here rather than left to the caller, because this is where the entries
+    /// reach the library: a caller that forgot would insert entries the journal knows nothing
+    /// about, which is a library that says it needs no saving. The group assignment this sets off
+    /// joins the same step, so taking the import back takes the assignments with it.
+    // [impl->req~logic.undo.entry-insert-recorded~1]
     public void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries) {
-        targetBibDatabaseContext.getDatabase().insertEntries(entries);
-        generateKeys(entries);
-        setAutomaticFields(entries);
-        addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
-        addToImportEntriesGroup(entries);
+        if (entries.isEmpty()) {
+            // An import that collected nothing - cancelled, or every file failed - is not a step,
+            // and must not report the library as changed.
+            return;
+        }
+        undoManager.addEdit(Localization.lang("Import entries"), edit -> {
+            targetBibDatabaseContext.getDatabase().insertEntries(entries);
+            edit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entries));
+            generateKeys(entries);
+            setAutomaticFields(entries);
+            addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
+            addToImportEntriesGroup(entries);
+        });
 
         // TODO: Should only be done if NOT copied from other library
         entries.forEach(this::downloadLinkedFiles);
@@ -414,14 +424,31 @@ public class ImportHandler {
                           importCleanedEntries(transferInformation, List.of(adjustedEntry));
                           tracker.markImported(adjustedEntry);
                           // Remove source entries only once the whole move has succeeded, so a failure partway through doesn't leave already-removed entries unrecoverable
-                          // TODO: Add undo support for moving entries between libraries.
                           if (transferInformation != null && transferInformation.transferMode() == org.jabref.model.TransferMode.MOVE && tracker.getImportedCount() == transferInformation.sourceEntries().size()) {
-                              BibDatabase sourceDatabase = transferInformation.bibDatabaseContext().getDatabase();
+                              BibDatabaseContext sourceContext = transferInformation.bibDatabaseContext();
+                              BibDatabase sourceDatabase = sourceContext.getDatabase();
                               List<BibEntry> sourceEntries = transferInformation.sourceEntries();
                               sourceDatabase.removeEntries(sourceEntries);
+                              // Recorded in the *source* library's journal, because that is the
+                              // library it happened to: a move is two halves, and each undo stack
+                              // describes its own. Without this the copy in the target could be
+                              // undone while the original stayed gone.
+                              stateManager.getUndoManager(sourceContext)
+                                          .addEdit(new UndoableRemoveEntries(sourceDatabase, sourceEntries));
                           }
                       })
                       .executeWith(taskExecutor);
+    }
+
+    /// Removes the entry that the import replaces or merges into, recording it.
+    ///
+    /// Its own step, because it happens well before the import it makes room for — the decision is
+    /// asked of the user asynchronously. Undoing the import therefore takes the imported entry back
+    /// out, and undoing once more brings the replaced entry back, rather than leaving the library
+    /// without either.
+    private void removeReplacedDuplicate(BibEntry duplicateEntry) {
+        targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+        undoManager.addEdit(new UndoableRemoveEntries(targetBibDatabaseContext.getDatabase(), List.of(duplicateEntry)));
     }
 
     private BibEntry adjustLinkedFilesForTargetIfRequired(@Nullable TransferInformation transferInformation, BibEntry entry) {
@@ -451,12 +478,12 @@ public class ImportHandler {
     private @NonNull Optional<BibEntry> handleDecisionResult(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateDecisionResult decisionResult) {
         switch (decisionResult.decision()) {
             case KEEP_RIGHT:
-                targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                removeReplacedDuplicate(duplicateEntry);
                 break;
             case KEEP_BOTH:
                 break;
             case KEEP_MERGE:
-                targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                removeReplacedDuplicate(duplicateEntry);
                 return Optional.of(decisionResult.mergedEntry());
             case KEEP_LEFT:
             case AUTOREMOVE_EXACT:
@@ -601,7 +628,7 @@ public class ImportHandler {
                 } else {
                     failures.add(Localization.lang("String constant \"%0\" was not imported because it is not a valid string constant", stringConstantToAdd.getName()));
                 }
-            } catch (KeyCollisionException ex) {
+            } catch (KeyCollisionException _) {
                 failures.add(Localization.lang("String constant %0 was not imported because it already exists in this library", stringConstantToAdd.getName()));
             }
         }
@@ -725,8 +752,13 @@ public class ImportHandler {
     private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().shouldAddImportedEntries()) {
             String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
-            // We cannot add the new group here directly because we don't have access to the group node ViewModel stuff here
-            // We would need to add the groups to the metadata first which is a bit more complicated, thus we decided against it atm
+            // The group is created here rather than when the library is opened: a library the user
+            // only looked at is left as it is on disk, and the write happens inside the import that
+            // asked for it. It is announced, because it is a change to the library the user did not
+            // ask for by itself.
+            if (new AddGroupImportEntriesAction().addImportedEntriesGroupIfNeeded(targetBibDatabaseContext, preferences)) {
+                dialogService.notify(Localization.lang("Created the group %0 for imported entries.", groupName));
+            }
             this.targetBibDatabaseContext.getMetaData()
                                          .getGroups()
                                          .flatMap(grp -> grp.getChildren()
