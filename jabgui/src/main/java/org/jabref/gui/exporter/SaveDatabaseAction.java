@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.ButtonBar;
@@ -356,12 +358,17 @@ public class SaveDatabaseAction {
                         .withJournalAbbreviationRepository(
                                 journalAbbreviationRepository,
                                 preferences.getAbbreviationPreferences().shouldUseFJournalField())
-                        .withMutationScheduler(UiTaskExecutor::runAndWaitInJavaFXThread);
+                        .withMutationScheduler(SaveDatabaseAction::runSaveMutation);
 
-                if (selectedOnly) {
-                    databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
-                } else {
-                    databaseWriter.writeDatabase(bibDatabaseContext);
+                try {
+                    if (selectedOnly) {
+                        databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
+                    } else {
+                        databaseWriter.writeDatabase(bibDatabaseContext);
+                    }
+                } catch (CompletionException exception) {
+                    fileWriter.abort();
+                    throw exception;
                 }
 
                 libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
@@ -369,6 +376,8 @@ public class SaveDatabaseAction {
                 encodingProblems = fileWriter.getEncodingProblems();
             } catch (UnsupportedCharsetException ex) {
                 throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
+            } catch (CompletionException ex) {
+                throw new SaveException("Problems applying save actions", ex.getCause());
             } catch (IOException ex) {
                 throw new SaveException("Problems saving: " + ex, ex);
             }
@@ -382,6 +391,14 @@ public class SaveDatabaseAction {
                 }
             }
             return committedState;
+        }
+    }
+
+    private static void runSaveMutation(Runnable mutation) {
+        try {
+            UiTaskExecutor.runAndWaitInJavaFXThreadWithFailurePropagation(mutation);
+        } catch (ExecutionException exception) {
+            throw new CompletionException(exception.getCause());
         }
     }
 
