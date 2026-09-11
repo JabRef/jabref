@@ -80,8 +80,6 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
         // completion event instead. This also makes clicking a suggestion jump right away.
         autoCompletion.setOnAutoCompleted(_ -> confirm());
 
-        // EntryEditor keeps one dialog instance: confirmations and reopening must start from the typed
-        // text, so drop any suggestion state whenever the dialog is shown again.
         showingProperty().addListener((_, _, showing) -> {
             if (showing) {
                 hoveredSuggestion.set(null);
@@ -98,10 +96,8 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
         autoCompletion.highlightedSuggestionProperty().addListener((_, _, highlighted) ->
                 hoveredSuggestion.set(highlighted));
 
-        // The popup hides when the OK button takes focus, i.e. before the dialog confirms, but also
-        // when the user dismisses it (Escape or clicking elsewhere, which leaves the field focused).
         autoCompletion.popupShowingProperty().addListener((_, _, showing) -> {
-            if (!showing && searchField.isFocused() && !confirming) {
+            if (!showing && !confirming) {
                 hoveredSuggestion.set(null);
             }
         });

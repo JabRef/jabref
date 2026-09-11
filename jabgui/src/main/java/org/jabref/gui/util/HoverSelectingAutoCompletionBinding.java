@@ -16,6 +16,7 @@ import impl.org.controlsfx.skin.AutoCompletePopup;
 import impl.org.controlsfx.skin.AutoCompletePopupSkin;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// An auto-completion binding whose popup highlights the suggestion under the mouse cursor, on top
 /// of the usual keyboard selection, and exposes that highlight so consumers do not need to reach
@@ -30,12 +31,12 @@ import org.jspecify.annotations.NullMarked;
 public class HoverSelectingAutoCompletionBinding<T> extends AutoCompletionBinding<T> {
 
     private final TextField textField;
-    private final ObjectProperty<T> highlightedSuggestion = new SimpleObjectProperty<>();
+    private final ObjectProperty<@Nullable T> highlightedSuggestion = new SimpleObjectProperty<>();
 
     private final ChangeListener<String> textChangeListener;
     private final ChangeListener<Boolean> focusChangedListener;
     private final ListView<T> suggestionList;
-    private final ChangeListener<T> suggestionSelectionListener;
+    private final ChangeListener<@Nullable T> suggestionSelectionListener;
 
     // Guards against completeUserInput's setText call re-triggering a suggestion fetch, which would
     // pop the popup back open immediately after the user picks an item.
@@ -73,7 +74,7 @@ public class HoverSelectingAutoCompletionBinding<T> extends AutoCompletionBindin
 
     /// The suggestion currently highlighted in the popup, either by keyboard selection or by
     /// pointing at it with the mouse.
-    public ObjectProperty<T> highlightedSuggestionProperty() {
+    public ObjectProperty<@Nullable T> highlightedSuggestionProperty() {
         return highlightedSuggestion;
     }
 
