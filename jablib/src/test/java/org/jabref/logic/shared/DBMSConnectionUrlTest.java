@@ -23,6 +23,17 @@ class DBMSConnectionUrlTest {
         assertEquals("jdbc:postgresql://pg-123.h.aivencloud.com:27372/defaultdb", url.toJdbcUrl());
     }
 
+    /// PostgreSQL matches the parameter keywords case-insensitively. A credential that survived into
+    /// [DBMSConnectionUrl#query] would be handed on in every JDBC URL, and thus in error messages.
+    @Test
+    void keepsCaseVariantCredentialsOutOfTheQuery() {
+        DBMSConnectionUrl url = DBMSConnectionUrl.parse("postgres://db.example.org/lib?USER=me&PassWord=secret").orElseThrow();
+
+        assertEquals(new DBMSConnectionUrl(DBMSType.POSTGRESQL, "db.example.org", 5432, "lib",
+                Optional.of("me"), Optional.of("secret"), false, ""), url);
+        assertEquals("jdbc:postgresql://db.example.org:5432/lib", url.toJdbcUrl());
+    }
+
     @Test
     void parsesPsqlCommandLine() {
         DBMSConnectionUrl url = DBMSConnectionUrl.parse("psql 'postgres://avnadmin:secret@pg-123.h.aivencloud.com:27372/defaultdb?sslmode=require'").orElseThrow();
