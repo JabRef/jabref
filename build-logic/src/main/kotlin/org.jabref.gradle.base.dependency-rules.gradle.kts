@@ -475,6 +475,7 @@ extraJavaModuleInfo {
         requires("java.management")
         requires("java.naming")
         requires("java.sql")
+        requires("java.security.jgss")
     }
     module("org.apache.pdfbox:pdfbox", "org.apache.pdfbox") {
         exportAllPackages()

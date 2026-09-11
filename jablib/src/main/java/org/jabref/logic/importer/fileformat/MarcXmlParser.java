@@ -273,7 +273,7 @@ public class MarcXmlParser implements Parser {
                 String strippedDate = StringUtil.stripBrackets(date);
                 try {
                     Date.parse(strippedDate).ifPresent(bibEntry::setDate);
-                } catch (DateTimeException exception) {
+                } catch (DateTimeException _) {
                     // cannot read date value, just copy it in plain text
                     LOGGER.info("Cannot parse date '{}'", strippedDate);
                     bibEntry.setField(StandardField.DATE, StringUtil.stripBrackets(strippedDate));
@@ -410,7 +410,7 @@ public class MarcXmlParser implements Parser {
             try {
                 LinkedFile linkedFile = new LinkedFile("", URLUtil.create(resource), StandardFileType.PDF.getName());
                 bibEntry.setFiles(List.of(linkedFile));
-            } catch (MalformedURLException | IllegalArgumentException e) {
+            } catch (MalformedURLException | IllegalArgumentException _) {
                 LOGGER.info("Malformed URL: {}", resource);
             }
         } else {
