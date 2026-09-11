@@ -53,10 +53,10 @@ public class XmpUtilShared {
         try {
             List<XMPMetadata> metadata = new XmpUtilReader().readRawXmp(path);
             return !metadata.isEmpty();
-        } catch (EncryptedPdfsNotSupportedException ex) {
+        } catch (EncryptedPdfsNotSupportedException _) {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;
-        } catch (IOException e) {
+        } catch (IOException _) {
             XmpUtilShared.LOGGER.debug("No metadata was found. Path: {}", path.toString());
             return false;
         }

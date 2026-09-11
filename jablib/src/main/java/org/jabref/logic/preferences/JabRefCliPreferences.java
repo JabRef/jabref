@@ -102,7 +102,6 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
@@ -957,7 +956,7 @@ public class JabRefCliPreferences implements CliPreferences {
                             keyring.getPassword(slot.service(), slot.account()),
                             getInternalPreferences().getUserHostInfo().getUserHostString())
                             .decrypt());
-                } catch (PasswordAccessException ex) {
+                } catch (PasswordAccessException _) {
                     LOGGER.debug("No secret stored in keyring for {}/{}", slot.service(), slot.account());
                     result.put(slot, "");
                 }
@@ -984,7 +983,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 if (StringUtil.isBlank(entry.getValue())) {
                     try {
                         keyring.deletePassword(slot.service(), slot.account());
-                    } catch (PasswordAccessException ex) {
+                    } catch (PasswordAccessException _) {
                         // already absent, nothing to clear
                     }
                 } else {
@@ -2092,6 +2091,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         AiPreferences defaultValues = AiPreferences.getDefault();
         migrateLegacyAiResponseEngineKind(defaultValues);
+        migrateEmbeddingModelName(defaultValues);
 
         aiPreferences = new AiPreferences(
                 getBoolean(AI_ENABLED, defaultValues.getAiFeaturesEnabled()),
@@ -2109,7 +2109,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(AI_HUGGING_FACE_API_BASE_URL, defaultValues.getHuggingFaceApiBaseUrl()),
                 SummarizatorKind.safeValueOf(get(AI_SUMMARIZATOR_KIND, defaultValues.getSummarizatorKind().name())),
                 TokenEstimatorKind.safeValueOf(get(AI_TOKEN_ESTIMATOR_KIND, defaultValues.getTokenEstimatorKind().name())),
-                PredefinedEmbeddingModel.safeValueOf(get(AI_EMBEDDING_MODEL, defaultValues.embeddingModelProperty().get().name())),
+                get(AI_EMBEDDING_MODEL, defaultValues.embeddingModelProperty().get()),
                 getDouble(AI_TEMPERATURE, defaultValues.temperatureProperty().get()),
                 getInt(AI_CONTEXT_WINDOW_SIZE, defaultValues.contextWindowSizeProperty().get()),
                 DocumentSplitterKind.safeValueOf(get(AI_DOCUMENT_SPLITTER_KIND, defaultValues.getDocumentSplitterKind().name())),
@@ -2149,7 +2149,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         bindObject(aiPreferences.summarizatorKindProperty(), AI_SUMMARIZATOR_KIND, defaultValues.getSummarizatorKind(), SummarizatorKind::name, SummarizatorKind::safeValueOf);
         bindObject(aiPreferences.tokenEstimatorKindProperty(), AI_TOKEN_ESTIMATOR_KIND, defaultValues.getTokenEstimatorKind(), TokenEstimatorKind::name, TokenEstimatorKind::safeValueOf);
-        bindObject(aiPreferences.embeddingModelProperty(), AI_EMBEDDING_MODEL, defaultValues.embeddingModelProperty().get(), PredefinedEmbeddingModel::name, PredefinedEmbeddingModel::safeValueOf);
+        bindString(aiPreferences.embeddingModelProperty(), AI_EMBEDDING_MODEL, defaultValues.embeddingModelProperty().get());
         bindDouble(aiPreferences.temperatureProperty(), AI_TEMPERATURE, defaultValues.temperatureProperty().get());
         bindInt(aiPreferences.contextWindowSizeProperty(), AI_CONTEXT_WINDOW_SIZE, defaultValues.contextWindowSizeProperty().get());
 
@@ -2179,6 +2179,17 @@ public class JabRefCliPreferences implements CliPreferences {
     private void migrateLegacyAiResponseEngineKind(AiPreferences defaultValues) {
         if (!hasKey(AI_RESPONSE_ENGINE_KIND) && hasKey(AI_ANSWER_ENGINE_KIND)) {
             put(AI_RESPONSE_ENGINE_KIND, get(AI_ANSWER_ENGINE_KIND, defaultValues.getResponseEngineKind().name()));
+        }
+    }
+
+    private void migrateEmbeddingModelName(AiPreferences defaultValues) {
+        String currentModel = get(AI_EMBEDDING_MODEL, "");
+        if ("SENTENCE_TRANSFORMERS_ALL_MINILM_L12_V2".equalsIgnoreCase(currentModel)) {
+            put(AI_EMBEDDING_MODEL, "sentence-transformers/all-MiniLM-L12-v2");
+        } else if ("SENTENCE_TRANSFORMERS_ALL_MINILM_L6_V2".equalsIgnoreCase(currentModel)) {
+            put(AI_EMBEDDING_MODEL, "sentence-transformers/all-MiniLM-L6-v2");
+        } else if (StringUtil.isNotBlank(currentModel) && !currentModel.contains("/")) {
+            put(AI_EMBEDDING_MODEL, defaultValues.getEmbeddingModel());
         }
     }
     // endregion
@@ -2511,7 +2522,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private PlainCitationParserChoice getDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {
         try {
             return PlainCitationParserChoice.valueOf(get(IMPORTER_DEFAULT_PLAIN_CITATION_PARSER, defaultPlainCitationParser.name()));
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException _) {
             return defaultPlainCitationParser;
         }
     }
