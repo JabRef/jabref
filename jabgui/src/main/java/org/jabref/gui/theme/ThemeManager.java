@@ -12,6 +12,7 @@ import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Window;
 
@@ -47,6 +48,8 @@ public class ThemeManager {
             Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
     );
     public static final StyleSheet JABREF_BASE_STYLE_SHEET = StyleSheet.create("internal/jabref-base.css").orElseThrow();
+
+    private static final String FONT_SIZE_STYLE_CLASS_PREFIX = "font-size-";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
@@ -111,11 +114,15 @@ public class ThemeManager {
     }
 
     private void updateFontStyleForScene(@NonNull Scene scene) {
-        scene.getRoot().getStyleClass().removeIf(str -> str.startsWith("font-size-"));
+        removeFontSizeStyleClass(scene.getRoot());
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
-            scene.getRoot().getStyleClass().add("font-size-" + workspacePreferences.getMainFontSize());
+            scene.getRoot().getStyleClass().add(FONT_SIZE_STYLE_CLASS_PREFIX + workspacePreferences.getMainFontSize());
         }
+    }
+
+    private static void removeFontSizeStyleClass(@NonNull Parent parent) {
+        parent.getStyleClass().removeIf(styleClass -> styleClass.startsWith(FONT_SIZE_STYLE_CLASS_PREFIX));
     }
 
     private void initializeWindowThemeUpdater() {
@@ -127,14 +134,12 @@ public class ThemeManager {
                 for (Window window : change.getAddedSubList()) {
                     window.sceneProperty().addListener((_, _, newScene) -> {
                         if (newScene != null) {
-                            updateColorSchemeOnScene(newScene);
-                            updateFontOnScene(newScene);
+                            registerScene(newScene);
                         }
                     });
                     Scene scene = window.getScene();
                     if (scene != null) {
-                        updateColorSchemeOnScene(scene);
-                        updateFontOnScene(scene);
+                        registerScene(scene);
                     }
                 }
             }
@@ -142,6 +147,21 @@ public class ThemeManager {
         Window.getWindows().addListener(windowsListener);
 
         LOGGER.debug("Window theme monitoring initialized");
+    }
+
+    private void registerScene(@NonNull Scene scene) {
+        updateColorSchemeOnScene(scene);
+        updateFontOnScene(scene);
+        scene.rootProperty().addListener((_, oldRoot, _) -> {
+            // The font size is carried by a style class on the scene root, so it has to follow the root
+            // whenever a third party replaces it -- ControlsFX injects its DecorationPane as the root on
+            // the first validation decoration. Without moving the class, the old root keeps a stale
+            // font-size-<n> and the new root gets none.
+            if (oldRoot != null) {
+                removeFontSizeStyleClass(oldRoot);
+            }
+            updateFontOnScene(scene);
+        });
     }
 
     private void updateColorSchemeOnScene(Scene scene) {
