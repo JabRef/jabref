@@ -34,6 +34,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
     private boolean resizeScheduled;
     private final ObjectProperty<String> highlightedSuggestion = new SimpleObjectProperty<>();
     private boolean confirming;
+    private int popupGeneration;
 
     public JumpToFieldDialog(EntryEditor entryEditor) {
         this.entryEditor = entryEditor;
@@ -97,13 +98,16 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
                 highlightedSuggestion.set(highlighted));
 
         autoCompletion.popupShowingProperty().addListener((_, _, showing) -> {
-            if (!showing && !confirming) {
-                Platform.runLater(() -> {
-                    if (!confirming) {
-                        highlightedSuggestion.set(null);
-                    }
-                });
+            if (showing) {
+                popupGeneration++;
+                return;
             }
+            int generationAtClose = popupGeneration;
+            Platform.runLater(() -> {
+                if (!confirming && generationAtClose == popupGeneration && !autoCompletion.popupShowingProperty().get()) {
+                    highlightedSuggestion.set(null);
+                }
+            });
         });
 
         // New input and focusing the field again start a fresh context: no suggestion applies.
