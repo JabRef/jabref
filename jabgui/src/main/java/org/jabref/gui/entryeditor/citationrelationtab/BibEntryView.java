@@ -34,7 +34,7 @@ public class BibEntryView {
         authors.getStyleClass().add("h6");
         String titleText = entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse("");
         Node title = createLabel(titleText);
-        title.getStyleClass().addAll("h5", "bold");
+        title.getStyleClass().addAll("h5", "bold", "padding-4");
         Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
         year.getStyleClass().addAll("h6", "bold");
         String journalText = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse("");

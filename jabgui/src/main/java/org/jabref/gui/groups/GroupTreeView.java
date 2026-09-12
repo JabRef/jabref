@@ -150,20 +150,20 @@ public class GroupTreeView extends BorderPane {
         mainColumn.setId("main-column");
         mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
-        numberColumn.getStyleClass().add("numberColumn");
+        numberColumn.getStyleClass().addAll("numberColumn", "padding-4");
         numberColumn.setMinWidth(NUMBER_COL_WIDTH);
         numberColumn.setMaxWidth(NUMBER_COL_WIDTH);
         numberColumn.setPrefWidth(NUMBER_COL_WIDTH);
         numberColumn.setResizable(false);
         expansionNodeColumn = new TreeTableColumn<>();
-        expansionNodeColumn.getStyleClass().add("expansionNodeColumn");
+        expansionNodeColumn.getStyleClass().addAll("expansionNodeColumn");
         expansionNodeColumn.setMaxWidth(EXPANSION_COL_WIDTH);
         expansionNodeColumn.setMinWidth(EXPANSION_COL_WIDTH);
         expansionNodeColumn.setPrefWidth(EXPANSION_COL_WIDTH);
         expansionNodeColumn.setResizable(false);
 
         addSubgroupColumn = new TreeTableColumn<>();
-        addSubgroupColumn.getStyleClass().add("addSubgroupColumn");
+        addSubgroupColumn.getStyleClass().addAll("addSubgroupColumn", "padding-0");
         addSubgroupColumn.setMinWidth(ADD_SUBGROUP_COL_WIDTH);
         addSubgroupColumn.setMaxWidth(ADD_SUBGROUP_COL_WIDTH);
         addSubgroupColumn.setPrefWidth(ADD_SUBGROUP_COL_WIDTH);
@@ -353,14 +353,14 @@ public class GroupTreeView extends BorderPane {
         disclosureNode.getStyleClass().setAll("tree-disclosure-node");
 
         final StackPane disclosureNodeArrow = new StackPane();
-        disclosureNodeArrow.getStyleClass().setAll("arrow");
+        disclosureNodeArrow.getStyleClass().setAll("arrow", "padding-4");
         disclosureNode.getChildren().add(disclosureNodeArrow);
         return disclosureNode;
     }
 
     private StackPane createNumberCell(GroupNodeViewModel group) {
         final StackPane node = new StackPane();
-        node.getStyleClass().add("hits");
+        node.getStyleClass().addAll("hits", "h6");
         Text text = new Text();
         if (!group.isRoot()) {
             // The text carries the pseudo-classes as well: JavaFX does not re-style a descendant when a

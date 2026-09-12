@@ -98,7 +98,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the default macOS shortcuts for "Search document identifier online" and "Focus group list" to not insert special characters. [#16528](https://github.com/JabRef/jabref/issues/16528)
 - We changed the extension of backup files from `.bak` to `.bib`, so that they can be opened in JabRef. [#11454](https://github.com/JabRef/jabref/issues/11454)
 - We changed spacing, padding and font sizes across the interface for a more consistent look and feel. [#16042](https://github.com/JabRef/jabref/issues/16042)
-- We reduced the amount of special spacing, padding and font sizes across the interface for a more unified interface. [#16887](https://github.com/JabRef/jabref/pull/16887)
+- We reduced the amount of special spacing, padding and font sizes across the interface for a more unified interface. [#16887](https://github.com/JabRef/jabref/pull/16887). [#16921](https://github.com/JabRef/jabref/pull/16921)
 - We changed the delete and rename file dialogs to state that undo does not restore files on disk. [#16680](https://github.com/JabRef/jabref/pull/16680)
 - We changed the donation prompt to appear as a notification in the notification center instead of a separate popup on the Welcome tab. [#16972](https://github.com/JabRef/jabref/pull/16972)
 - We reworked the appearance preferences: you now choose a theme (e.g. "JabRef", "Primer") and a color scheme ("Follow System", "Light", "Dark") separately; the "Use System Preference" checkbox is gone. [#15625](https://github.com/JabRef/jabref/issues/15625)
@@ -324,10 +324,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
 - We replaced the various notifications for file changes, tasks and popup toasts with a new info center. [#14762](https://github.com/JabRef/jabref/issues/14762)
 - We upgraded to Lucene 10.4 for the fulltext search.
-    Thus, the now created search index cannot be read from older versions of JabRef anylonger.
-    ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
-    Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
-    [#15220](https://github.com/JabRef/jabref/pull/15220)
+  Thus, the now created search index cannot be read from older versions of JabRef anylonger.
+  ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
+  Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
+  [#15220](https://github.com/JabRef/jabref/pull/15220)
 - We enabled drag and drop of Windows shortcut (`.lnk`) files to open libraries. [#15036](https://github.com/JabRef/jabref/issues/15036)
 - We refined the "Select files to import" page in "Search for unlinked local files" dialog to give the users the choice of linking the file to a related entry or import it to a new entry. [#13689](https://github.com/JabRef/jabref/issues/13689)
 - The "Make/Sync bibliography" button in OO/LO panel now refreshes citations before generating bibliographies. [#14387](https://github.com/JabRef/jabref/issues/14387)
