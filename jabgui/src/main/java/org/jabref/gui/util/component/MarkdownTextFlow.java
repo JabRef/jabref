@@ -3,8 +3,11 @@ package org.jabref.gui.util.component;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.Pane;
@@ -54,6 +57,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
+    private final ObjectProperty<Consumer<String>> hyperlinkHandler =
+            new SimpleObjectProperty<>(this, "hyperlinkHandler", MarkdownTextFlow::defaultHyperlinkHandler);
 
     /// Whether the current content was set via `setPlainText` rather than `setMarkdown`.
     /// Governs whether copying reproduces Markdown markup or the displayed text verbatim.
@@ -94,6 +99,26 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         getChildren().add(new Text(text));
     }
 
+    public ObjectProperty<Consumer<String>> hyperlinkHandlerProperty() {
+        return hyperlinkHandler;
+    }
+
+    public Consumer<String> getHyperlinkHandler() {
+        return hyperlinkHandler.get();
+    }
+
+    public void setHyperlinkHandler(Consumer<String> hyperlinkHandler) {
+        this.hyperlinkHandler.set(hyperlinkHandler);
+    }
+
+    public static void defaultHyperlinkHandler(String url) {
+        new OpenBrowserAction(
+                url,
+                Injector.instantiateModelOrService(DialogService.class),
+                Injector.instantiateModelOrService(GuiPreferences.class)
+                        .getExternalApplicationsPreferences()).execute();
+    }
+
     private void addTextNode(@Nullable String content, Node astNode, String... styleClasses) {
         if (content == null || content.isEmpty()) {
             return;
@@ -116,12 +141,12 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         }
 
         MarkdownAwareHyperlink hyperlink = new MarkdownAwareHyperlink(text, astNode);
-        hyperlink.setOnAction(_ -> new OpenBrowserAction(
-                url,
-                Injector.instantiateModelOrService(DialogService.class),
-                Injector.instantiateModelOrService(GuiPreferences.class)
-                        .getExternalApplicationsPreferences()).execute()
-        );
+        hyperlink.setOnAction(_ -> {
+            Consumer<String> handler = getHyperlinkHandler();
+            if (handler != null) {
+                handler.accept(url);
+            }
+        });
 
         if (styleClasses != null) {
             for (String styleClass : styleClasses) {
