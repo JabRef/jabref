@@ -223,7 +223,7 @@ public class RisImporter extends Importer {
                                 dateTag = tag;
                                 dateValue = value;
                                 datePriority = tagPriority;
-                            } catch (DateTimeParseException ex) {
+                            } catch (DateTimeParseException _) {
                                 // We cannot parse the year, we store as is
                                 year = readYear;
                             }
@@ -297,7 +297,7 @@ public class RisImporter extends Importer {
                     try {
                         int monthNumber = Integer.parseInt(parts[1]);
                         month = Month.getMonthByNumber(monthNumber);
-                    } catch (NumberFormatException ex) {
+                    } catch (NumberFormatException _) {
                         // The month part is unparseable, so we ignore it.
                     }
                 }

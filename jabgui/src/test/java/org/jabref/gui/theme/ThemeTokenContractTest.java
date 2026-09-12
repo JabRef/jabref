@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -23,7 +24,7 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -159,6 +160,39 @@ class ThemeTokenContractTest {
         return StyleSheet.class.getResourceAsStream(css);
     }
 
+    /// A theme without a parent stands on its own and must declare the complete token contract; a
+    /// layered one takes what it does not declare from its parent.
+    static List<ThemePreset> unlayeredThemes() {
+        return Arrays.stream(ThemePreset.values()).filter(theme -> theme.getParent().isEmpty()).toList();
+    }
+
+    static List<ThemePreset> allThemes() {
+        return List.of(ThemePreset.values());
+    }
+
+    static List<ThemePreset> layeredThemes() {
+        return Arrays.stream(ThemePreset.values()).filter(theme -> theme.getParent().isPresent()).toList();
+    }
+
+    /// A layered theme setting a token nobody reads is a typo or a stale port; the control would
+    /// silently keep the parent's color. Unlike [#themeDeclaresNoTokenNobodyReads] this looks at every
+    /// declaration, not only at those inside the color scheme blocks.
+    @ParameterizedTest
+    @MethodSource("layeredThemes")
+    void layeredThemeDeclaresOnlyTokensSomeoneReads(ThemePreset theme) {
+        String themeCss = theme.getStyleSheet().getName();
+
+        Set<String> read = new TreeSet<>(tokens(BASE_CSS, Kind.USE));
+        theme.getParent().ifPresent(parent -> read.addAll(tokens(parent.getStyleSheet().getName(), Kind.USE)));
+        read.addAll(tokens(themeCss, Kind.USE));
+
+        Set<String> unread = new TreeSet<>(tokens(themeCss, Kind.DECLARATION));
+        unread.removeAll(read);
+        unread.removeIf(token -> PALETTE_RAMP.matcher(token).matches());
+
+        assertEquals(Set.of(), unread, "%s declares -color- tokens that no stylesheet reads".formatted(themeCss));
+    }
+
     private static URL resource(String css) {
         return StyleSheet.class.getResource(css);
     }
@@ -167,7 +201,7 @@ class ThemeTokenContractTest {
     /// *both* color schemes. Declaring it only in the light block leaves the control unstyled in dark
     /// mode, which is the failure mode this whole token set exists to prevent.
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("unlayeredThemes")
     void themeDeclaresEveryTokenTheBaseStylesheetUses(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -184,14 +218,18 @@ class ThemeTokenContractTest {
     }
 
     /// A theme may introduce tokens of its own (Primer scopes a good number of them to single controls),
-    /// but it must not read one it never declares.
+    /// but it must not read one it never declares. A theme with a parent sits on top of that parent,
+    /// so the parent's declarations count for it as well.
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("allThemes")
     void themeDeclaresEveryTokenItUsesItself(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
+        Set<String> declared = new TreeSet<>(tokens(themeCss, Kind.DECLARATION));
+        theme.getParent().ifPresent(parent -> declared.addAll(tokens(parent.getStyleSheet().getName(), Kind.DECLARATION)));
+
         Set<String> undeclared = new TreeSet<>(tokens(themeCss, Kind.USE));
-        undeclared.removeAll(tokens(themeCss, Kind.DECLARATION));
+        undeclared.removeAll(declared);
 
         assertEquals(Set.of(), undeclared, "%s reads -color- tokens it never declares".formatted(themeCss));
     }
@@ -200,7 +238,7 @@ class ThemeTokenContractTest {
     /// tokens something already uses, so a token every theme declares but nobody reads is invisible to
     /// it.
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("unlayeredThemes")
     void themeDeclaresNoTokenNobodyReads(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -289,7 +327,7 @@ class ThemeTokenContractTest {
     }
 
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("allThemes")
     void themeLeavesTheLadderColorsToModena(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -316,7 +354,7 @@ class ThemeTokenContractTest {
     }
 
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("allThemes")
     void themeStylesheetParses(ThemePreset theme) {
         ObservableList<CssParser.ParseError> errors = CssParser.errorsProperty();
 

@@ -33,7 +33,7 @@ class ConstantsPropertiesViewModelTest {
         List<String> expected = List.of(string2.getName(), string1.getName()); // ICSE before TSE
 
         ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences, new HeadlessGuiUndoManager());
-        model.setValues();
+        model.setValues(context.getMetaData());
 
         List<String> actual = model.stringsListProperty().stream()
                                    .map(ConstantsItemModel::labelProperty)
@@ -75,7 +75,7 @@ class ConstantsPropertiesViewModelTest {
         ListProperty<ConstantsItemModel> stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("KTH", "Royal Institute of Technology"));
 
-        model.storeSettings();
+        model.storeSettings(context.getMetaData());
 
         List<BibtexString> actual = context.getDatabase().getStringValues().stream().toList();
         assertEquals(List.of(new BibtexString("KTH", "Royal Institute of Technology")), actual);
