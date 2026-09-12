@@ -1,6 +1,7 @@
 package org.jabref.gui.groups;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -105,6 +106,7 @@ public class GroupNodeViewModel {
     private final SearchIndexListener searchIndexListener = new SearchIndexListener();
     @SuppressWarnings("FieldCanBeLocal")
     private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
+    private final List<Future<?>> searchIndexFutures = Collections.synchronizedList(new ArrayList<>());
     private @Nullable BackgroundTask<List<BibEntry>> currentUpdateTask;
     private @Nullable Future<?> currentUpdateFuture;
     private boolean matchedEntriesInitialized;
@@ -311,6 +313,12 @@ public class GroupNodeViewModel {
             currentUpdateFuture.cancel(true);
             currentUpdateFuture = null;
         }
+        synchronized (searchIndexFutures) {
+            for (Future<?> future : searchIndexFutures) {
+                future.cancel(true);
+            }
+            searchIndexFutures.clear();
+        }
         entriesList.removeListener(databaseChangeListener);
         databaseContext.getDatabase().unregisterListener(searchIndexListener);
         children.forEach(GroupNodeViewModel::dispose);
@@ -514,11 +522,29 @@ public class GroupNodeViewModel {
     }
 
     public Optional<GroupNodeViewModel> findGroupNodeViewModel(GroupTreeNode targetNode) {
+        return findGroupNodeViewModelByIdentity(targetNode)
+                .or(() -> findGroupNodeViewModelByEquality(targetNode));
+    }
+
+    private Optional<GroupNodeViewModel> findGroupNodeViewModelByIdentity(GroupTreeNode targetNode) {
+        if (groupNode == targetNode) {
+            return Optional.of(this);
+        }
+        for (GroupNodeViewModel child : children) {
+            Optional<GroupNodeViewModel> found = child.findGroupNodeViewModelByIdentity(targetNode);
+            if (found.isPresent()) {
+                return found;
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<GroupNodeViewModel> findGroupNodeViewModelByEquality(GroupTreeNode targetNode) {
         if (groupNode.equals(targetNode)) {
             return Optional.of(this);
         }
         for (GroupNodeViewModel child : children) {
-            Optional<GroupNodeViewModel> found = child.findGroupNodeViewModel(targetNode);
+            Optional<GroupNodeViewModel> found = child.findGroupNodeViewModelByEquality(targetNode);
             if (found.isPresent()) {
                 return found;
             }
@@ -770,22 +796,36 @@ public class GroupNodeViewModel {
     /// REFINING: match this group and all ancestor groups.
     private boolean isMatchEffective(GroupNodeViewModel vm, BibEntry entry) {
         GroupTreeNode node = vm.groupNode;
-        if (!(node.getGroup() instanceof AutomaticGroup)) {
-            return node.matches(entry);
-        }
-
         return switch (node.getGroup().getHierarchicalContext()) {
-            case INDEPENDENT,
-                 REFINING ->
+            case INDEPENDENT ->
                     node.matches(entry);
 
             case INCLUDING -> {
-                if (node.matches(entry)) {
+                if (node.getGroup().contains(entry)) {
                     yield true;
                 }
-                // Automatic-group children are generated only in the view model and therefore
-                // are not reachable through GroupTreeNode.matches().
-                yield vm.children.stream().anyMatch(childVm -> isMatchEffective(childVm, entry));
+                boolean matched = false;
+                for (GroupNodeViewModel childVm : vm.children) {
+                    if (isMatchEffective(childVm, entry)) {
+                        matched = true;
+                        break;
+                    }
+                }
+                yield matched;
+            }
+
+            case REFINING -> {
+                if (!node.matches(entry)) {
+                    yield false;
+                }
+                Optional<GroupTreeNode> parent = node.getParent();
+                while (parent.isPresent()) {
+                    if (!parent.get().matches(entry)) {
+                        yield false;
+                    }
+                    parent = parent.get().getParent();
+                }
+                yield true;
             }
         };
     }
@@ -793,6 +833,9 @@ public class GroupNodeViewModel {
     class SearchIndexListener {
         @Subscribe
         public void listen(IndexStartedEvent event) {
+            if (disposed) {
+                return;
+            }
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
                 SearchContext searchContext = stateManager.getSearchContext(databaseContext);
                 searchGroup.setMatchedEntries(searchContext.search(searchGroup.getSearchQuery()).getMatchedEntries());
@@ -803,13 +846,27 @@ public class GroupNodeViewModel {
 
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent event) {
+            if (disposed) {
+                return;
+            }
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
                 SearchContext searchContext = stateManager.getSearchContext(databaseContext);
-                BackgroundTask.wrap(() -> {
+                BackgroundTask<Void> indexTask = BackgroundTask.wrap(() -> {
+                    if (disposed || Thread.currentThread().isInterrupted()) {
+                        return null;
+                    }
                     for (BibEntry entry : event.entries()) {
+                        if (disposed || Thread.currentThread().isInterrupted()) {
+                            return null;
+                        }
                         searchGroup.updateMatches(entry, searchContext.isEntryMatched(entry, searchGroup.getSearchQuery()));
                     }
-                }).onFinished(() -> {
+                    return null;
+                });
+                indexTask.onFinished(() -> {
+                    if (disposed) {
+                        return;
+                    }
                     for (BibEntry entry : event.entries()) {
                         if (GroupNodeViewModel.this.isMatchEffective(GroupNodeViewModel.this, entry)) {
                             addMatchedEntry(entry.getId());
@@ -818,12 +875,24 @@ public class GroupNodeViewModel {
                         }
                     }
                     databaseContext.getMetaData().groupsBinding().invalidate();
-                }).executeWith(taskExecutor);
+                });
+                Future<?> future = indexTask.executeWith(taskExecutor);
+                if (future != null) {
+                    if (disposed) {
+                        future.cancel(true);
+                    } else {
+                        searchIndexFutures.add(future);
+                        indexTask.onFinished(() -> searchIndexFutures.remove(future));
+                    }
+                }
             }
         }
 
         @Subscribe
         public void listen(IndexRemovedEvent event) {
+            if (disposed) {
+                return;
+            }
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
                 for (BibEntry entry : event.entries()) {
                     searchGroup.updateMatches(entry, false);

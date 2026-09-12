@@ -46,7 +46,10 @@ public class SearchResultsTableDataModel {
         this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
 
         populateEntriesViewModel();
-        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> populateEntriesViewModel());
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
+            populateEntriesViewModel();
+            updateSearchMatches(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).getValue());
+        });
         entriesFiltered = new FilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
 
         // We need to wrap the list since otherwise sorting in the table does not work
