@@ -69,4 +69,14 @@ A query that only Lucene rejects must leave the metadata results untouched and s
 
 Needs: impl, utest
 
+## Case-sensitive full-text search
+`req~jabgui.search.fulltext.case-sensitive~1`
+
+Issue: [#13048](https://github.com/JabRef/jabref/issues/13048)
+
+The case-sensitive operators of the search syntax (`=!`, `==!`, `=~!`) must also apply to the contents and annotations of linked files.
+Searching for `any ==! SEE` must not match a file that only contains `See`.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

@@ -149,7 +149,13 @@ class SqlBasedLibrarySearcherWithBibFilesTest {
 
                 Arguments.of(List.of(), "test-library-with-attached-files.bib", "NotExisting", true),
                 Arguments.of(List.of(MINIMAL_NOTE_SENTENCE_CASE, MINIMAL_NOTE_ALL_UPPER_CASE, MINIMAL_NOTE_MIXED_CASE), "test-library-with-attached-files.bib", "world", true),
-                Arguments.of(List.of(MINIMAL_NOTE_SENTENCE_CASE, MINIMAL_NOTE_ALL_UPPER_CASE, MINIMAL_NOTE_MIXED_CASE), "test-library-with-attached-files.bib", "\"Hello World\"", true)
+                Arguments.of(List.of(MINIMAL_NOTE_SENTENCE_CASE, MINIMAL_NOTE_ALL_UPPER_CASE, MINIMAL_NOTE_MIXED_CASE), "test-library-with-attached-files.bib", "\"Hello World\"", true),
+
+                // case-sensitive fulltext search - https://github.com/JabRef/jabref/issues/13048
+                Arguments.of(List.of(MINIMAL_ALL_UPPER_CASE), "test-library-with-attached-files.bib", "any =! COMMA", true),
+                Arguments.of(List.of(MINIMAL_SENTENCE_CASE, MINIMAL_MIXED_CASE), "test-library-with-attached-files.bib", "any =! comma", true),
+                Arguments.of(List.of(MINIMAL_NOTE_ALL_UPPER_CASE), "test-library-with-attached-files.bib", "any ==! HELLO", true),
+                Arguments.of(List.of(MINIMAL_NOTE_SENTENCE_CASE), "test-library-with-attached-files.bib", "any ==! Hello", true)
         );
     }
 

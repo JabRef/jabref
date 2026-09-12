@@ -8,6 +8,7 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -27,6 +28,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
@@ -52,11 +55,24 @@ class InMemoryLuceneSearchBackendTest {
         Optional.ofNullable(searchBackend).ifPresent(InMemoryLuceneSearchBackend::close);
     }
 
-    @Test
-    void searchesLinkedFileContentsWithoutPostgres() throws IOException, URISyntaxException {
-        assertEquals(
-                Set.of("minimal-sentence-case", "minimal-all-upper-case", "minimal-mixed-case"),
-                search("comma", EnumSet.of(SearchFlags.FULLTEXT)));
+    static Stream<Arguments> searchesLinkedFileContentsWithoutPostgres() {
+        return Stream.of(
+                Arguments.of(Set.of("minimal-sentence-case", "minimal-all-upper-case", "minimal-mixed-case"), "comma"),
+
+                // case-sensitive search - https://github.com/JabRef/jabref/issues/13048
+                // [utest->req~jabgui.search.fulltext.case-sensitive~1]
+                Arguments.of(Set.of("minimal-sentence-case", "minimal-mixed-case"), "any =! comma"),
+                Arguments.of(Set.of("minimal-all-upper-case"), "any =! COMMA"),
+                Arguments.of(Set.of("minimal-note-sentence-case"), "any ==! Hello"),
+                Arguments.of(Set.of("minimal-note-all-upper-case"), "any ==! HELLO"),
+                Arguments.of(Set.of(), "any =! Comma")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void searchesLinkedFileContentsWithoutPostgres(Set<String> expectedCitationKeys, String query) throws IOException, URISyntaxException {
+        assertEquals(expectedCitationKeys, search(query, EnumSet.of(SearchFlags.FULLTEXT)));
     }
 
     /// [Issue 9482](https://github.com/JabRef/jabref/issues/9482): a quotation mark used to make the search throw.

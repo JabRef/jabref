@@ -71,7 +71,16 @@ public final class SearchResult {
     }
 
     private static List<String> getHighlighterFragments(Highlighter highlighter, LinkedFilesConstants field, String content) {
-        try (TokenStream contentStream = LinkedFilesConstants.LINKED_FILES_ANALYZER.tokenStream(field.toString(), content)) {
+        List<String> fragments = getHighlighterFragments(highlighter, field.toString(), content);
+        if (!fragments.isEmpty()) {
+            return fragments;
+        }
+        // A case-sensitive query matches the case-preserving field, whose terms the analyzer of `field` does not produce.
+        return getHighlighterFragments(highlighter, LinkedFilesConstants.caseSensitiveFieldOf(field.toString()), content);
+    }
+
+    private static List<String> getHighlighterFragments(Highlighter highlighter, String field, String content) {
+        try (TokenStream contentStream = LinkedFilesConstants.LINKED_FILES_ANALYZER.tokenStream(field, content)) {
             TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
             return Arrays.stream(frags).map(TextFragment::toString).toList();
         } catch (IOException | InvalidTokenOffsetsException _) {
