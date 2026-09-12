@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,9 +46,14 @@ import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 /// please see [RuleBasedBibliographyPdfImporter].
 ///
 /// If several PDF importers should be tried, use [PdfMergeMetadataImporter].
+@NullMarked
 public class PdfContentImporter extends PdfImporter {
 
-    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
+    // Lookarounds keep the pattern from matching inside longer digit runs such as postal codes or URL path segments
+    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("(?<!\\d)\\d{4}(?!\\d)");
+    // The importer targets first pages of Springer/IEEE-style papers, i.e. 20th century or later. A lower bound
+    // would admit ISSN halves ("ISSN 1631-0705") and page ranges ("pp. 1523-1540") printed on the same page.
+    private static final int MINIMUM_PLAUSIBLE_YEAR = 1900;
 
     private static final int ARXIV_PREFIX_LENGTH = "arxiv:".length();
 
@@ -660,8 +666,13 @@ public class PdfContentImporter extends PdfImporter {
         }
 
         Matcher m = YEAR_EXTRACT_PATTERN.matcher(curString);
-        if (m.find()) {
-            year = curString.substring(m.start(), m.end());
+        while (m.find()) {
+            int extractedYear = Integer.parseInt(m.group());
+            // The upper bound tolerates in-press works dated slightly ahead of the current year
+            if ((extractedYear >= MINIMUM_PLAUSIBLE_YEAR) && (extractedYear <= Year.now().getValue() + 2)) {
+                year = m.group();
+                return;
+            }
         }
     }
 
