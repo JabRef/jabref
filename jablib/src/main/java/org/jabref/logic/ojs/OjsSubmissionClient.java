@@ -91,15 +91,20 @@ public class OjsSubmissionClient {
     }
 
     private URL buildSubmissionsUrl(String journalUrl, int offset) throws FetcherException {
-        String trimmedJournalUrl = journalUrl.endsWith("/")
-                                   ? journalUrl.substring(0, journalUrl.length() - 1)
-                                   : journalUrl;
         try {
-            URIBuilder uriBuilder = new URIBuilder(trimmedJournalUrl + "/" + SUBMISSIONS_PATH);
+            URIBuilder uriBuilder = new URIBuilder(journalUrl);
+            String basePath = uriBuilder.getPath();
+            String trimmedBasePath = basePath == null
+                                     ? ""
+                                     : basePath.endsWith("/") ? basePath.substring(0, basePath.length() - 1) : basePath;
+            uriBuilder.setPath(trimmedBasePath + "/" + SUBMISSIONS_PATH);
+            // The submissions endpoint has its own query params; drop whatever was on the
+            // configured journal URL rather than mixing it in.
+            uriBuilder.clearParameters();
             uriBuilder.addParameter("count", String.valueOf(PAGE_SIZE));
             uriBuilder.addParameter("offset", String.valueOf(offset));
             return uriBuilder.build().toURL();
-        } catch (URISyntaxException | MalformedURLException e) {
+        } catch (URISyntaxException | MalformedURLException | IllegalArgumentException e) {
             LOGGER.warn("Could not build OJS submissions URL for {}", journalUrl, e);
             throw new FetcherException("Malformed OJS journal URL: " + journalUrl, e);
         }
@@ -108,7 +113,7 @@ public class OjsSubmissionClient {
     /// Derives a display name for the journal from its URL path segment, e.g.
     /// `https://example.org/index.php/myjournal` -> `myjournal`.
     /// This is a placeholder until the journal's real display name is stored alongside
-    /// the URL in Preferences (see the follow-up PR for OJS journal credential storage)
+    /// the URL in Preferences.
     private String extractJournalName(String journalUrl) {
         String trimmedJournalUrl = journalUrl.endsWith("/")
                                    ? journalUrl.substring(0, journalUrl.length() - 1)

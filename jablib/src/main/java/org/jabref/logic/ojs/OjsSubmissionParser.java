@@ -30,7 +30,7 @@ public final class OjsSubmissionParser {
         int id = jsonObject.optInt("id", -1);
         int stageId = jsonObject.optInt("stageId", -1);
 
-        JSONObject currentPublication = extractCurrentPublication(jsonObject);
+        @Nullable JSONObject currentPublication = extractCurrentPublication(jsonObject);
 
         String title = extractLocalizedString(currentPublication, "title")
                 .or(() -> extractLocalizedString(currentPublication, "fullTitle"))
