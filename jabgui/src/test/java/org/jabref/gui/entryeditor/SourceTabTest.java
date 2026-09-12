@@ -30,6 +30,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.DisabledOnCIServer;
 
@@ -256,5 +257,76 @@ class SourceTabTest {
             assertTrue(sourceArea.getText().contains("author = {Author}"));
             assertTrue(sourceArea.getText().contains("title  = {Same title}"));
         });
+    }
+
+    /// Editing the source and leaving the code area must write every kind of change back to the entry,
+    /// so the field editors and the entry table show the edited data.
+    /// See https://github.com/JabRef/jabref/issues/9219
+    @Test
+    void editedSourceIsWrittenBackToEntryOnFocusLoss() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("old")
+                .withField(StandardField.TITLE, "Old title")
+                .withField(StandardField.AUTHOR, "Old author")
+                .withField(StandardField.YEAR, "2000");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(entry);
+            sourceTab.notifyAboutFocus(entry);
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            sourceArea.requestFocus();
+            assertTrue(sourceArea.isFocused());
+            sourceArea.clear();
+            sourceArea.appendText("""
+                    @Book{new,
+                      author  = {Old author},
+                      title   = {New title},
+                      journal = {New journal},
+                    }
+                    """);
+            // Focus loss stores the visible source
+            pane.requestFocus();
+            assertFalse(sourceArea.isFocused());
+        });
+        JavaFxExtension.awaitEvents();
+
+        assertEquals(StandardEntryType.Book, entry.getType());
+        assertEquals(Optional.of("new"), entry.getCitationKey());
+        assertEquals(Optional.of("New title"), entry.getField(StandardField.TITLE));
+        assertEquals(Optional.of("New journal"), entry.getField(StandardField.JOURNAL));
+        assertEquals(Optional.of("Old author"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
+    }
+
+    @Test
+    void editedSourceIsWrittenBackWhenSwitchingToAnotherEntry() {
+        BibEntry firstEntry = new BibEntry().withField(StandardField.TITLE, "First entry");
+        BibEntry secondEntry = new BibEntry().withField(StandardField.TITLE, "Second entry");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(firstEntry);
+            sourceTab.notifyAboutFocus(firstEntry);
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            String editedSource = sourceArea.getText().replace("First entry", "Edited first entry");
+            sourceArea.clear();
+            sourceArea.appendText(editedSource);
+
+            sourceTab.currentEntryProperty().set(secondEntry);
+            sourceTab.notifyAboutFocus(secondEntry);
+        });
+        JavaFxExtension.awaitEvents();
+
+        assertEquals(Optional.of("Edited first entry"), firstEntry.getField(StandardField.TITLE));
+        assertEquals(Optional.of("Second entry"), secondEntry.getField(StandardField.TITLE));
     }
 }

@@ -132,6 +132,20 @@ Until written, replayed entries are protected from that pull like refused ones.
 
 The user only sees two notifications (connection lost / restored); the notification listener reconnects independently on its own connection.
 
+## Connection keepalive settings at the PostgreSQL server
+
+Using PostgreSQL as a shared database server, there may be issues related to keeping the connection alive depending on the system. This is not an issue that can be controlled by JabRef itself but rather by the system connection settings. One possibility is to adjust the `postgresql.conf` with exemplary values here [1]:
+
+* `tcp_keepalives_idle = 300`
+* `tcp_keepalives_interval = 60`
+* `tcp_keepalives_count = 5`
+
+With these values, the connection to the shared database is still alive after hours of idle. If they are set to zero (default configuration of PostgreSQL), the default values from the OS will be used (see [2]), which are much longer time intervals. Consequently, system events (e.g. firewall) may interrupt the shared database connection.
+
+[1] [PostgreSQL settings](https://www.postgresql.org/docs/18/runtime-config-connection.html#RUNTIME-CONFIG-TCP-SETTINGS)
+
+[2] [background](https://www.cybertec-postgresql.com/en/tcp-keepalive-for-a-better-postgresql-experience)
+
 ## Tests
 
 Tests are executed using [Zonky Embedded Postgres](https://github.com/zonkyio/embedded-postgres).

@@ -154,7 +154,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                     int fontSize;
                     try {
                         fontSize = Integer.parseInt(fontSizeProperty().get());
-                    } catch (NumberFormatException ex) {
+                    } catch (NumberFormatException _) {
                         return false;
                     }
                     return fontSize >= 8 && fontSize <= 20;

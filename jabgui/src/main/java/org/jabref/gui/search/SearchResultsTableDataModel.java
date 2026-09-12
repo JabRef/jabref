@@ -78,7 +78,7 @@ public class SearchResultsTableDataModel {
                     entry.isVisibleBySearch().set(true);
                 }
             }
-        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+        }).onSuccess(_ -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {

@@ -63,7 +63,7 @@ public class PreviewWithSourceTab {
 
         try {
             codeArea.appendText(getSourceString(entry, bibDatabaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager));
-        } catch (IOException e) {
+        } catch (IOException _) {
             LOGGER.error("Error getting Bibtex: {}", entry);
         }
         codeArea.setEditable(false);
