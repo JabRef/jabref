@@ -16,18 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 // [utest->req~whats-new.checkout-news~1]
 class WhatsNewTest {
 
-    private static final String ME_SHA = "1111111111111111111111111111111111111111";
-    private static final String OTHER_SHA = "2222222222222222222222222222222222222222";
-    private static final String UNCOMMITTED_SHA = "0000000000000000000000000000000000000000";
-
-    private static List<String> porcelain(String sha, String author, String mail, String text) {
-        return List.of(
-                sha + " 1 1 1",
-                "author " + author,
-                "author-mail <" + mail + ">",
-                "\t" + text);
-    }
-
     private static List<String> changelog(String... entries) {
         return List.of(
                 "## [Unreleased]",
@@ -45,19 +33,6 @@ class WhatsNewTest {
                 "### Fixed",
                 "",
                 "- " + entries[2]);
-    }
-
-    @Test
-    void parseAttributesLinesToMeByMailAndUncommitted() {
-        List<String> porcelain = new ArrayList<>();
-        porcelain.addAll(porcelain(ME_SHA, "Me Myself", "me@example.org", "- mine"));
-        porcelain.addAll(porcelain(OTHER_SHA, "Other Author", "other@example.org", "- theirs"));
-        porcelain.addAll(porcelain(UNCOMMITTED_SHA, "Not Committed Yet", "not.committed.yet", "- local edit"));
-
-        WhatsNew.Source source = WhatsNew.parse(porcelain, "ME@example.org", WhatsNew.ME);
-
-        assertEquals(List.of("- mine", "- theirs", "- local edit"), source.lines());
-        assertEquals(List.of(WhatsNew.ME, "Other Author", WhatsNew.ME), source.by());
     }
 
     @Test

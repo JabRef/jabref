@@ -1,109 +1,141 @@
 package org.jabref.gui.whatsnew;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.util.GitHandlerRegistry;
+
+import org.eclipse.jgit.api.BlameCommand;
+import org.eclipse.jgit.api.FetchCommand;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.blame.BlameResult;
+import org.eclipse.jgit.lib.BranchConfig;
+import org.eclipse.jgit.lib.BranchTrackingStatus;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.PersonIdent;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// The git checkout JabRef runs out of during development, asked through the `git` on the `PATH`.
-/// Every failure (no git, no upstream, no network) is an empty answer: the news is an offer, never an error.
+/// The git checkout JabRef runs out of during development, read through JabRef's own [GitHandler] (JGit).
+/// Every failure (no upstream, no network, no changelog at the revision) is an empty answer: the news is an
+/// offer, never an error.
 // [impl->req~whats-new.checkout-news~1]
 @NullMarked
 public class CheckoutGit {
 
-    /// `git fetch` talks to the network; nothing waits on it.
-    private static final Duration TIMEOUT = Duration.ofMinutes(1);
+    /// The upstream of the checked-out branch, as `git` spells it; JGit's `resolve` does not know it.
+    public static final String UPSTREAM = "@{u}";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckoutGit.class);
+    private static final String CHANGELOG = "CHANGELOG.md";
+    private static final DateTimeFormatter COMMIT_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    private final Path repo;
+    private final GitHandler handler;
 
-    private CheckoutGit(Path repo) {
-        this.repo = repo;
+    private CheckoutGit(GitHandler handler) {
+        this.handler = handler;
     }
 
-    /// The checkout holding `start`: the nearest ancestor with a `.git` (a directory in a clone, a file in a worktree).
-    /// Empty for a packaged JabRef, which has nothing to update from.
-    public static Optional<CheckoutGit> around(Path start) {
-        for (Path dir = start.toAbsolutePath(); dir != null; dir = dir.getParent()) {
-            if (Files.exists(dir.resolve(".git"))) {
-                return Optional.of(new CheckoutGit(dir));
-            }
-        }
-        return Optional.empty();
+    /// The checkout holding `start`, or empty for a packaged JabRef, which has nothing to update from.
+    public static Optional<CheckoutGit> around(Path start, GitHandlerRegistry registry) {
+        return registry.fromAnyPath(start).map(CheckoutGit::new);
     }
 
     /// The checkout's private git directory (per worktree), where this feature keeps its state files.
     public Optional<Path> gitDir() {
-        return run("rev-parse", "--absolute-git-dir").flatMap(lines -> lines.stream().findFirst()).map(Path::of);
+        try (Git git = handler.open()) {
+            return Optional.of(git.getRepository().getDirectory().toPath());
+        } catch (IOException e) {
+            LOGGER.debug("Cannot open the checkout", e);
+            return Optional.empty();
+        }
     }
 
     /// How many commits the checkout is behind its upstream branch, after a fetch; 0 on any failure.
+    /// The fetch is anonymous unless JabRef has git credentials configured — a public clone needs none.
     public int commitsBehind() {
-        if (run("fetch", "--quiet").isEmpty()) {
+        try (Git git = handler.open()) {
+            FetchCommand fetch = git.fetch();
+            handler.getCredentialsProvider().ifPresent(fetch::setCredentialsProvider);
+            fetch.call();
+            Repository repository = git.getRepository();
+            @Nullable BranchTrackingStatus status = BranchTrackingStatus.of(repository, repository.getBranch());
+            return status == null ? 0 : status.getBehindCount();
+        } catch (IOException | GitAPIException e) {
+            LOGGER.debug("Cannot check how far the checkout is behind upstream", e);
             return 0;
         }
-        return run("rev-list", "--count", "HEAD..@{u}")
-                .flatMap(lines -> lines.stream().findFirst())
-                .map(String::strip)
-                .map(count -> {
-                    try {
-                        return Integer.parseInt(count);
-                    } catch (NumberFormatException e) {
-                        LOGGER.warn("Cannot read the commit count behind upstream: {}", count);
-                        return 0;
-                    }
-                })
-                .orElse(0);
     }
 
-    /// `commit` as `<short sha> (<committer date and time>)`.
-    public Optional<String> describe(String commit) {
-        return run("show", "--no-patch", "--date=format:%Y-%m-%d %H:%M", "--format=%h (%cd)", commit)
-                .flatMap(lines -> lines.stream().findFirst())
-                .map(String::strip)
-                .filter(text -> !text.isEmpty());
+    /// `rev` — `HEAD`, [#UPSTREAM] or anything `git rev-parse` takes — as an object id.
+    private static @Nullable ObjectId resolve(Repository repository, String rev) throws IOException {
+        if (!UPSTREAM.equals(rev)) {
+            return repository.resolve(rev);
+        }
+        @Nullable String tracking = new BranchConfig(repository.getConfig(), repository.getBranch()).getTrackingBranch();
+        return tracking == null ? null : repository.resolve(tracking);
     }
 
-    /// `CHANGELOG.md` blamed at `rev` (the working tree for an empty `rev`), every line of `user.email`
-    /// or not committed yet marked as written by `me`.
-    public Optional<WhatsNew.Source> blame(String rev, String me) {
-        Optional<List<String>> porcelain = rev.isEmpty()
-                                           ? run("blame", "--line-porcelain", "--", "CHANGELOG.md")
-                                           : run("blame", "--line-porcelain", rev, "--", "CHANGELOG.md");
-        String mail = run("config", "user.email").flatMap(lines -> lines.stream().findFirst()).map(String::strip).orElse("");
-        return porcelain.map(lines -> WhatsNew.parse(lines, mail, me));
-    }
-
-    private Optional<List<String>> run(String... args) {
-        List<String> command = new ArrayList<>(List.of("git", "-C", repo.toString()));
-        command.addAll(List.of(args));
-        try {
-            Process process = new ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD).start();
-            List<String> output = process.inputReader().lines().toList();
-            if (!process.waitFor(TIMEOUT.toSeconds(), TimeUnit.SECONDS)) {
-                process.destroyForcibly();
-                LOGGER.debug("git {} timed out", String.join(" ", args));
+    /// `rev` (`HEAD`, [#UPSTREAM], …) as `<short sha> (<committer date and time>)`.
+    public Optional<String> describe(String rev) {
+        try (Git git = handler.open();
+             RevWalk walk = new RevWalk(git.getRepository())) {
+            @Nullable ObjectId id = resolve(git.getRepository(), rev);
+            if (id == null) {
                 return Optional.empty();
             }
-            if (process.exitValue() != 0) {
-                LOGGER.debug("git {} exited with {}", String.join(" ", args), process.exitValue());
-                return Optional.empty();
-            }
-            return Optional.of(output);
+            RevCommit commit = walk.parseCommit(id);
+            PersonIdent committer = commit.getCommitterIdent();
+            String time = COMMIT_TIME.format(committer.getWhenAsInstant().atZone(ZoneId.systemDefault()));
+            return Optional.of(id.abbreviate(7).name() + " (" + time + ")");
         } catch (IOException e) {
-            LOGGER.debug("Cannot run git {}", String.join(" ", args), e);
+            LOGGER.debug("Cannot describe {}", rev, e);
             return Optional.empty();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        }
+    }
+
+    /// `CHANGELOG.md` blamed at `rev` (the working tree for an empty `rev`): its lines and, per line, who
+    /// wrote it — `me` for a line of `user.email` or one not committed yet, the author's name otherwise.
+    public Optional<WhatsNew.Source> blame(String rev, String me) {
+        try (Git git = handler.open()) {
+            Repository repository = git.getRepository();
+            BlameCommand blame = git.blame().setFilePath(CHANGELOG);
+            if (!rev.isEmpty()) {
+                @Nullable ObjectId id = resolve(repository, rev);
+                if (id == null) {
+                    return Optional.empty();
+                }
+                blame.setStartCommit(id);
+            }
+            @Nullable BlameResult result = blame.call();
+            if (result == null) {
+                return Optional.empty();
+            }
+            String mail = Optional.ofNullable(repository.getConfig().getString("user", null, "email")).orElse("");
+            List<String> lines = new ArrayList<>();
+            List<String> by = new ArrayList<>();
+            for (int i = 0; i < result.getResultContents().size(); i++) {
+                lines.add(result.getResultContents().getString(i));
+                @Nullable RevCommit source = result.getSourceCommit(i);
+                @Nullable PersonIdent author = result.getSourceAuthor(i);
+                boolean mine = source == null || author == null || author.getEmailAddress().equalsIgnoreCase(mail);
+                by.add(mine ? me : author.getName());
+            }
+            return Optional.of(new WhatsNew.Source(lines, by));
+        } catch (IOException | GitAPIException e) {
+            LOGGER.debug("Cannot blame {} at {}", CHANGELOG, rev, e);
             return Optional.empty();
         }
     }

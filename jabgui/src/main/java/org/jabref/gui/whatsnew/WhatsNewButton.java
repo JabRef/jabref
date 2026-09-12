@@ -20,6 +20,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -87,8 +88,9 @@ public class WhatsNewButton {
                                           TaskExecutor taskExecutor,
                                           DialogService dialogService,
                                           ExternalApplicationsPreferences externalApplicationsPreferences,
+                                          GitHandlerRegistry gitHandlerRegistry,
                                           Runnable quit) {
-        return CheckoutGit.around(Path.of(""))
+        return CheckoutGit.around(Path.of(""), gitHandlerRegistry)
                           .flatMap(git -> git.gitDir().map(gitDir -> new WhatsNewButton(git, gitDir, factory, taskExecutor, dialogService, externalApplicationsPreferences, quit)))
                           .map(whatsNew -> whatsNew.button);
     }
@@ -103,7 +105,7 @@ public class WhatsNewButton {
     private void check() {
         int count = git.commitsBehind();
         if (count > 0) {
-            refreshNews(false, git.blame("@{u}", WhatsNew.ME_REMOTELY));
+            refreshNews(false, git.blame(CheckoutGit.UPSTREAM, WhatsNew.ME_REMOTELY));
         } else {
             refreshNews(true, git.blame("", WhatsNew.ME));
         }
@@ -148,7 +150,7 @@ public class WhatsNewButton {
     /// `since <running commit> — now at <upstream commit>`, or empty when both are the same commit or git cannot say.
     private Optional<String> newsRange() {
         Optional<String> head = git.describe("HEAD");
-        Optional<String> upstream = git.describe("@{u}");
+        Optional<String> upstream = git.describe(CheckoutGit.UPSTREAM);
         if (head.isEmpty() || upstream.isEmpty() || head.equals(upstream)) {
             return Optional.empty();
         }

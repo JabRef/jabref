@@ -164,7 +164,7 @@ public class MainToolBar extends ToolBar {
                         factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferences.getExternalApplicationsPreferences()))));
 
         // Only while JabRef runs out of a git checkout: a packaged JabRef has nothing to update from.
-        WhatsNewButton.create(factory, taskExecutor, dialogService, preferences.getExternalApplicationsPreferences(), quit)
+        WhatsNewButton.create(factory, taskExecutor, dialogService, preferences.getExternalApplicationsPreferences(), gitHandlerRegistry, quit)
                       .ifPresent(button -> ((HBox) getItems().getLast()).getChildren().addFirst(button));
 
         leftSpacer.setPrefWidth(50);

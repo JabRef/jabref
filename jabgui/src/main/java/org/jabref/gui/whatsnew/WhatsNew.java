@@ -48,7 +48,6 @@ public class WhatsNew {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WhatsNew.class);
 
-    private static final Pattern BLAME_HEADER = Pattern.compile("[0-9a-f]{40} \\d+ \\d+.*");
     private static final Pattern SECTION_LABEL = Pattern.compile("^\\[(.*?)\\](?: - (.*))?$");
     private static final Pattern INLINE = Pattern.compile(
             "\\*\\*(.+?)\\*\\*|`([^`]+)`|\\[([^\\]]+)\\]\\((https?://[^)]+)\\)|(https?://\\S+?)(?=[\\s)\\]]|$)");
@@ -61,36 +60,11 @@ public class WhatsNew {
         }
     }
 
-    /// A changelog as `git blame` sees it: its lines and, per line, who wrote it.
+    /// A changelog as `git blame` sees it: its lines and, per line, who wrote it (a name, [#ME] or [#ME_REMOTELY]).
     public record Source(List<String> lines, List<String> by) {
     }
 
     private WhatsNew() {
-    }
-
-    /// `git blame --line-porcelain` output as a [Source]: a header starts a line, `author`/`author-mail` say who,
-    /// the tab-prefixed line is the text. A line of `mail` or not committed yet (the all-zero commit) is `me`.
-    static Source parse(List<String> porcelain, String mail, String me) {
-        List<String> lines = new ArrayList<>();
-        List<String> by = new ArrayList<>();
-        String commit = "";
-        String name = "";
-        String who = "";
-        for (String line : porcelain) {
-            if (line.startsWith("\t")) {
-                lines.add(line.substring(1));
-                by.add(who);
-            } else if (BLAME_HEADER.matcher(line).matches()) {
-                commit = line.substring(0, 40);
-            } else if (line.startsWith("author ")) {
-                name = line.substring("author ".length());
-            } else if (line.startsWith("author-mail ")) {
-                String lineMail = line.substring("author-mail <".length(), line.length() - 1);
-                boolean uncommitted = commit.chars().allMatch(c -> c == '0');
-                who = lineMail.equalsIgnoreCase(mail) || uncommitted ? me : name;
-            }
-        }
-        return new Source(lines, by);
     }
 
     /// Every entry of `changelog` for which `byAt` (given the index of the entry's line) names an author;
