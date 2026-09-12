@@ -12,7 +12,7 @@ import org.jspecify.annotations.NullMarked;
 /// user acts in, as the name of the enclosing [ChangeSet].
 @NullMarked
 public sealed interface BibChange permits
-        UndoableCommentsChange, ChangeSet,
+        UndoableCommentsChange, UndoableChangedFlag, ChangeSet,
         UndoableInsertEntries,
         UndoableRemoveEntries,
         UndoableChangeType,

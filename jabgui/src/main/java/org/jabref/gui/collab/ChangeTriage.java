@@ -78,7 +78,8 @@ public final class ChangeTriage {
                 case BibTexStringChange stringChange ->
                         baseline.sideOfString(stringChange.getOldString().getName(), stringChange.getOldString().getContent(), stringChange.getNewString().getContent());
                 case BibTexStringRename stringRename ->
-                        baseline.sideOfStringRename(stringRename.getOldString().getName(), stringRename.getOldString().getContent(), stringRename.getNewString().getName());
+                        baseline.sideOfStringRename(stringRename.getOldString().getName(), stringRename.getOldString().getContent(), stringRename.getNewString().getName(),
+                                name -> local.getDatabase().getStringByName(name).isPresent());
             };
             switch (side) {
                 case DISK -> {
@@ -152,10 +153,15 @@ public final class ChangeTriage {
         Set<EntryDelete> pairedDeletes = new HashSet<>();
         for (DatabaseChange change : changes) {
             if (change instanceof EntryAdd entryAdd) {
-                lookup.baseIdOf(entryAdd.getAddedEntry()).map(deletesByBaseId::remove).ifPresent(entryDelete -> {
-                    pairedDeletes.add(entryDelete);
-                    replacements.put(entryAdd, new EntryChange(entryDelete.getDeletedEntry(), entryAdd.getAddedEntry(), local, resolverFactory));
-                });
+                // By identity first; an entry whose key and a field changed on disk matches neither, so among the
+                // entries deleted on disk the one closest in content is taken, if that is unambiguous
+                lookup.baseIdOf(entryAdd.getAddedEntry())
+                      .or(() -> baseline.closestOf(deletesByBaseId.keySet(), entryAdd.getAddedEntry()))
+                      .map(deletesByBaseId::remove)
+                      .ifPresent(entryDelete -> {
+                          pairedDeletes.add(entryDelete);
+                          replacements.put(entryAdd, new EntryChange(entryDelete.getDeletedEntry(), entryAdd.getAddedEntry(), local, resolverFactory));
+                      });
             }
         }
         List<DatabaseChange> paired = new ArrayList<>(changes.size());

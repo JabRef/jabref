@@ -2,11 +2,14 @@ package org.jabref.logic.sync;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
@@ -187,14 +190,17 @@ public final class LibraryBaseline {
         // Without a common ancestor (entry new on both sides), an empty entry of the in-memory type makes every field
         // an addition, so only fields set differently on both sides count as conflicts and the in-memory type is kept
         BibEntry ancestor = base == null ? new BibEntry(local.getType()) : base.toEntry();
-        if (ConflictRules.hasConflictingFields(ancestor, local, remote)) {
+        boolean commentsChangedLocally = !ancestor.getUserComments().equals(local.getUserComments());
+        boolean commentsChangedRemotely = !ancestor.getUserComments().equals(remote.getUserComments());
+        boolean commentsConflict = commentsChangedLocally && commentsChangedRemotely && !local.getUserComments().equals(remote.getUserComments());
+        if (commentsConflict || ConflictRules.hasConflictingFields(ancestor, local, remote)) {
             return Optional.empty();
         }
         BibEntry merged = new BibEntry(local);
         if (!ancestor.getType().equals(remote.getType())) {
             merged.setType(remote.getType());
         }
-        if (ancestor.getUserComments().equals(local.getUserComments())) {
+        if (!commentsChangedLocally) {
             merged.setCommentsBeforeEntry(remote.getUserComments());
         }
         FieldPatchComputer.compute(ancestor, local, remote).forEach((field, value) -> {
@@ -230,15 +236,40 @@ public final class LibraryBaseline {
         if (strings.containsKey(name)) {
             return sideOf(strings.get(name), null, content);
         }
-        boolean renamedFromDeleted = strings.entrySet().stream()
-                                            .anyMatch(base -> base.getValue().equals(content) && !existsInMemory.test(base.getKey()));
-        return renamedFromDeleted ? Side.BOTH : Side.DISK;
+        // Only an unambiguous source counts: with several equal-valued strings gone from memory, nothing says which one was renamed
+        long deletedWithSameContent = strings.entrySet().stream()
+                                             .filter(base -> base.getValue().equals(content) && !existsInMemory.test(base.getKey()))
+                                             .count();
+        return deletedWithSameContent == 1 ? Side.BOTH : Side.DISK;
     }
 
     /// A string renamed on disk is taken over only if memory neither touched the old string nor already uses the new name.
-    public Side sideOfStringRename(String oldName, String oldContent, String newName) {
+    ///
+    /// @param existsInMemory whether memory has a string of the given name
+    public Side sideOfStringRename(String oldName, String oldContent, String newName, Predicate<String> existsInMemory) {
         boolean oldUntouchedInMemory = Objects.equals(strings.get(oldName), oldContent);
-        return oldUntouchedInMemory && !strings.containsKey(newName) ? Side.DISK : Side.BOTH;
+        return oldUntouchedInMemory && !existsInMemory.test(newName) ? Side.DISK : Side.BOTH;
+    }
+
+    /// Among the given baseline entries, the one a disk entry most likely was taken from when neither key nor exact
+    /// content match anymore: same type and at most one field besides the citation key differing, and only when
+    /// exactly one candidate is that close.
+    public Optional<String> closestOf(Collection<String> candidateIds, BibEntry remote) {
+        EntrySnapshot snapshot = EntrySnapshot.view(remote).withoutKey();
+        List<String> close = candidateIds.stream()
+                                         .filter(id -> entriesById.containsKey(id))
+                                         .filter(id -> differingFields(entriesById.get(id).withoutKey(), snapshot) <= 1)
+                                         .toList();
+        return close.size() == 1 ? Optional.of(close.getFirst()) : Optional.empty();
+    }
+
+    private static int differingFields(EntrySnapshot one, EntrySnapshot other) {
+        if (!one.type().equals(other.type())) {
+            return Integer.MAX_VALUE;
+        }
+        Set<Field> fields = new HashSet<>(one.fields().keySet());
+        fields.addAll(other.fields().keySet());
+        return (int) fields.stream().filter(field -> !Objects.equals(one.fields().get(field), other.fields().get(field))).count();
     }
 
     /// `null` stands for "absent" on that side.

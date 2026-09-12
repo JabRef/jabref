@@ -256,17 +256,14 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         if (scannedBaseline != null && isSynchronizing()) {
             // [impl->req~ux.external-library-changes.synchronize~1]
             BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
-                          .onSuccess(changes -> onScannedForSynchronization(generation, scanner, scannedBaseline, changes))
+                          .onSuccess(changes -> changes.ifPresent(scanned -> onScannedForSynchronization(generation, scanner, scannedBaseline, scanned)))
                           .onFailure(e -> LOGGER.error("Error while synchronizing with the library file", e))
                           .executeWith(taskExecutor);
             return;
         }
         BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
-                      .onSuccess(changes -> {
-                          if (!changes.isEmpty()) {
-                              listeners.forEach(listener -> listener.databaseChanged(changes));
-                          }
-                      })
+                      .onSuccess(changes -> changes.filter(scanned -> !scanned.isEmpty())
+                                                   .ifPresent(scanned -> listeners.forEach(listener -> listener.databaseChanged(scanned))))
                       .onFailure(e -> LOGGER.error("Error while watching for changes", e))
                       .executeWith(taskExecutor);
     }
@@ -289,10 +286,12 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// size and modification time have stopped changing for a while. The state seen becomes the known disk state, so
     /// that the events of the write just waited for do not trigger another scan; only for the current scan, since a
     /// scan already overtaken will not apply what it sees, and recording it would make the next event look handled.
-    private void awaitStableLibraryFile(int generation) {
+    ///
+    /// @return `false` when the wait was interrupted; the file may still be incomplete, so the scan must not go on
+    private boolean awaitStableLibraryFile(int generation) {
         Path path = monitoredPath.orElse(null);
         if (path == null) {
-            return;
+            return true;
         }
         FileSnapshot last = FileSnapshot.read(path);
         int unchanged = 0;
@@ -302,7 +301,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             } catch (InterruptedException e) {
                 LOGGER.debug("Interrupted while waiting for {} to stop changing; the scan is abandoned", path, e);
                 Thread.currentThread().interrupt();
-                return;
+                return false;
             }
             FileSnapshot current = FileSnapshot.read(path);
             unchanged = Objects.equals(current, last) ? unchanged + 1 : 0;
@@ -313,6 +312,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 knownDiskState = last;
             }
         }
+        return true;
     }
 
     /// Applies what changed on disk only, and offers the review for what changed on both sides.
