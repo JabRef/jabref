@@ -25,6 +25,7 @@ public class HeadlessGuiUndoManager extends JabRefUndoManager implements GuiUndo
 
     private final ReadOnlyBooleanWrapper undoable = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper redoable = new ReadOnlyBooleanWrapper(false);
+    private final ReadOnlyBooleanWrapper changed = new ReadOnlyBooleanWrapper(false);
 
     public HeadlessGuiUndoManager() {
         // Straight from the notification, with no hop: a JavaFX property needs no toolkit, only
@@ -32,7 +33,13 @@ public class HeadlessGuiUndoManager extends JabRefUndoManager implements GuiUndo
         addListener(() -> {
             undoable.set(canUndo());
             redoable.set(canRedo());
+            changed.set(hasChanged());
         });
+    }
+
+    @Override
+    public ReadOnlyBooleanProperty hasChangedProperty() {
+        return changed.getReadOnlyProperty();
     }
 
     @Override

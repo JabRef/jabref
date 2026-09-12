@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.support.DisabledOnCIServer;
-import org.jabref.testutils.category.ExternalServicesTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.Test;
 

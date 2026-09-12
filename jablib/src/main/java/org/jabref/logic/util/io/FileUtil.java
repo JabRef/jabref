@@ -129,7 +129,7 @@ public class FileUtil {
         Path path;
         try {
             path = Path.of(fileName.trim());
-        } catch (InvalidPathException e) {
+        } catch (InvalidPathException _) {
             return FilenameUtils.getBaseName(FilenameUtils.getName(fileName.trim()));
         }
         String realFileName = path.getFileName().toString();

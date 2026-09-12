@@ -5,11 +5,16 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javafx.collections.ObservableList;
 import javafx.css.CssParser;
@@ -19,7 +24,7 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,6 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 /// 2. Every theme must declare every token that is used, otherwise JavaFX falls back to a default
 ///    and the control silently loses its color.
 /// 3. Every token a theme declares must be read by someone.
+///
+/// The fourth one is not about the stylesheets at all: nothing may set an inline style, because an inline
+/// style outranks every stylesheet and would put the color out of the theme's reach for good.
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 class ThemeTokenContractTest {
 
@@ -74,6 +82,16 @@ class ThemeTokenContractTest {
 
     /// Primer's raw color ramps -- `-color-base-0` - `-color-base-9`.
     private static final Pattern PALETTE_RAMP = Pattern.compile("-color-(?:base|accent|success|warning|danger)-[0-9]|-color-(?:dark|light)");
+
+    /// All modules holding Java sources and FXML files that may build a scene graph.
+    private static final List<String> MODULES = List.of("jablib", "jabkit", "jabsrv", "jabgui", "jabls");
+
+    /// JavaFX's three entry points to a node's inline style.
+    private static final Pattern INLINE_STYLE_API = Pattern.compile(
+            "\\.(?:setStyle\\s*\\(|getStyle\\s*\\(\\s*\\)|styleProperty\\s*\\(\\s*\\))");
+
+    /// FXML's inline style, the same thing spelled declaratively.
+    private static final Pattern INLINE_STYLE_ATTRIBUTE = Pattern.compile("\\sstyle\\s*=\\s*\"");
 
     @BeforeEach
     void beforeEach() {
@@ -142,6 +160,39 @@ class ThemeTokenContractTest {
         return StyleSheet.class.getResourceAsStream(css);
     }
 
+    /// A theme without a parent stands on its own and must declare the complete token contract; a
+    /// layered one takes what it does not declare from its parent.
+    static List<ThemePreset> unlayeredThemes() {
+        return Arrays.stream(ThemePreset.values()).filter(theme -> theme.getParent().isEmpty()).toList();
+    }
+
+    static List<ThemePreset> allThemes() {
+        return List.of(ThemePreset.values());
+    }
+
+    static List<ThemePreset> layeredThemes() {
+        return Arrays.stream(ThemePreset.values()).filter(theme -> theme.getParent().isPresent()).toList();
+    }
+
+    /// A layered theme setting a token nobody reads is a typo or a stale port; the control would
+    /// silently keep the parent's color. Unlike [#themeDeclaresNoTokenNobodyReads] this looks at every
+    /// declaration, not only at those inside the color scheme blocks.
+    @ParameterizedTest
+    @MethodSource("layeredThemes")
+    void layeredThemeDeclaresOnlyTokensSomeoneReads(ThemePreset theme) {
+        String themeCss = theme.getStyleSheet().getName();
+
+        Set<String> read = new TreeSet<>(tokens(BASE_CSS, Kind.USE));
+        theme.getParent().ifPresent(parent -> read.addAll(tokens(parent.getStyleSheet().getName(), Kind.USE)));
+        read.addAll(tokens(themeCss, Kind.USE));
+
+        Set<String> unread = new TreeSet<>(tokens(themeCss, Kind.DECLARATION));
+        unread.removeAll(read);
+        unread.removeIf(token -> PALETTE_RAMP.matcher(token).matches());
+
+        assertEquals(Set.of(), unread, "%s declares -color- tokens that no stylesheet reads".formatted(themeCss));
+    }
+
     private static URL resource(String css) {
         return StyleSheet.class.getResource(css);
     }
@@ -150,7 +201,7 @@ class ThemeTokenContractTest {
     /// *both* color schemes. Declaring it only in the light block leaves the control unstyled in dark
     /// mode, which is the failure mode this whole token set exists to prevent.
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("unlayeredThemes")
     void themeDeclaresEveryTokenTheBaseStylesheetUses(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -167,14 +218,18 @@ class ThemeTokenContractTest {
     }
 
     /// A theme may introduce tokens of its own (Primer scopes a good number of them to single controls),
-    /// but it must not read one it never declares.
+    /// but it must not read one it never declares. A theme with a parent sits on top of that parent,
+    /// so the parent's declarations count for it as well.
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("allThemes")
     void themeDeclaresEveryTokenItUsesItself(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
+        Set<String> declared = new TreeSet<>(tokens(themeCss, Kind.DECLARATION));
+        theme.getParent().ifPresent(parent -> declared.addAll(tokens(parent.getStyleSheet().getName(), Kind.DECLARATION)));
+
         Set<String> undeclared = new TreeSet<>(tokens(themeCss, Kind.USE));
-        undeclared.removeAll(tokens(themeCss, Kind.DECLARATION));
+        undeclared.removeAll(declared);
 
         assertEquals(Set.of(), undeclared, "%s reads -color- tokens it never declares".formatted(themeCss));
     }
@@ -183,7 +238,7 @@ class ThemeTokenContractTest {
     /// tokens something already uses, so a token every theme declares but nobody reads is invisible to
     /// it.
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("unlayeredThemes")
     void themeDeclaresNoTokenNobodyReads(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -200,6 +255,50 @@ class ThemeTokenContractTest {
                     "%s declares -color- tokens for 'prefers-color-scheme: %s' that no stylesheet reads"
                             .formatted(themeCss, colorScheme));
         }
+    }
+
+    /// Walks `src/main/<sourceSet>` of every module and reports every line matching `forbidden`.
+    ///
+    /// @return `<module>/<path>:<line>: <line content>` for each hit, in file order
+    private static List<String> matchesInSources(String sourceSet, String extension, Pattern forbidden) throws IOException {
+        List<String> matches = new ArrayList<>();
+        for (String module : MODULES) {
+            Path root = Path.of("..", module, "src", "main", sourceSet).normalize();
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            // Files.walk holds a directory handle, thus the stream needs to be closed
+            try (Stream<Path> paths = Files.walk(root)) {
+                for (Path path : paths.filter(candidate -> candidate.toString().endsWith(extension)).toList()) {
+                    List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+                    for (int line = 0; line < lines.size(); line++) {
+                        if (forbidden.matcher(lines.get(line)).find()) {
+                            matches.add("%s:%d: %s".formatted(path, line + 1, lines.get(line).strip()));
+                        }
+                    }
+                }
+            }
+        }
+        return matches;
+    }
+
+    /// An inline style is applied with INLINE origin, which outranks the author stylesheets a theme is made of.
+    /// A control styled that way therefore keeps its hardcoded color in every theme and in both color schemes --
+    /// the failure this whole token set exists to prevent. Style classes and `-color-*` tokens are the way in.
+    ///
+    /// There is no exception: even the user's main font size goes through a `font-size-<n>` class.
+    @Test
+    void noSourceFileUsesTheInlineStyleApi() throws IOException {
+        assertEquals(List.of(), matchesInSources("java", ".java", INLINE_STYLE_API),
+                "an inline style cannot be themed: give the node a style class and let the stylesheets color it");
+    }
+
+    /// The declarative half of [#noSourceFileUsesTheInlineStyleApi]: `style="..."` in FXML is the same INLINE
+    /// origin, just written in the layout instead of in code.
+    @Test
+    void noFxmlFileUsesTheInlineStyleAttribute() throws IOException {
+        assertEquals(List.of(), matchesInSources("resources", ".fxml", INLINE_STYLE_ATTRIBUTE),
+                "an inline style cannot be themed: use styleClass and let the stylesheets color it");
     }
 
     @Test
@@ -228,7 +327,7 @@ class ThemeTokenContractTest {
     }
 
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("allThemes")
     void themeLeavesTheLadderColorsToModena(ThemePreset theme) {
         String themeCss = theme.getStyleSheet().getName();
 
@@ -255,7 +354,7 @@ class ThemeTokenContractTest {
     }
 
     @ParameterizedTest
-    @EnumSource(ThemePreset.class)
+    @MethodSource("allThemes")
     void themeStylesheetParses(ThemePreset theme) {
         ObservableList<CssParser.ParseError> errors = CssParser.errorsProperty();
 
