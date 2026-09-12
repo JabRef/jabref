@@ -32,8 +32,19 @@ public class FieldTextMapper {
                 default ->
                         StringUtil.capitalizeFirst(field.getName());
             };
-        } else if (field == InternalField.KEY_FIELD) {
-            return "Citationkey";
+        } else if (field instanceof InternalField internalField) {
+            // Display names are never parsed back into a field (persistence uses getName()), so they may contain spaces.
+            // Title Case on purpose: column headers are read like "Author/Editor", not like sentences.
+            // [impl->req~maintable.column-headers.user-friendly~1]
+            // Other internal fields keep their exact name, e.g. the "JabRef" brand casing in INTERNAL_ID_FIELD.
+            return switch (internalField) {
+                case KEY_FIELD ->
+                        "Citation Key";
+                case TYPE_HEADER ->
+                        "Entry Type";
+                default ->
+                        field.getName();
+            };
         }
 
         return field.getName();

@@ -23,7 +23,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
                                      String leftLabelText,
                                      String rightLabelText,
                                      DiffHighlighter.BasicDiffMethod diffMethod) {
-        VBox container = new VBox(15);
+        VBox container = new VBox(12);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
         header.getStyleClass().addAll(StyleClasses.SECTION_HEADER);

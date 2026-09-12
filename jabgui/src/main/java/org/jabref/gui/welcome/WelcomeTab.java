@@ -5,18 +5,20 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -97,6 +99,9 @@ public class WelcomeTab extends Tab {
                       WorkspacePreferences workspacePreferences) {
         super(Localization.lang("Welcome"));
         setClosable(true);
+        Node tabIcon = IconTheme.JabRefIcons.WELCOME.getGraphicNode();
+        tabIcon.getStyleClass().add("tab-icon");
+        setGraphic(tabIcon);
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.aiService = aiService;
@@ -115,16 +120,15 @@ public class WelcomeTab extends Tab {
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
         main = new VBox(24, createTopTitles(), new VBox(), createCommunityBox());
-        main.getStyleClass().addAll("welcome-main-container", "align-center", "padding-24");
+        main.getStyleClass().addAll("welcome-main-container", "align-center");
+        // Sized to its content, so the StackPane centers it: whitespace above and below on a tall window.
+        main.setMaxHeight(Region.USE_PREF_SIZE);
         initializeColumns();
 
-        VBox container = new VBox(main);
-        container.setAlignment(Pos.CENTER);
-
-        StackPane rootPane = new StackPane(container);
+        StackPane rootPane = new StackPane(main);
         setContent(rootPane);
 
-        donationProvider = new DonationProvider(rootPane, preferences, dialogService);
+        donationProvider = new DonationProvider(preferences, dialogService);
         donationProvider.showIfNeeded();
 
         setOnClosed(_ -> donationProvider.cleanUp());
@@ -136,13 +140,13 @@ public class WelcomeTab extends Tab {
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("h2");
         VBox topTitles = new VBox(12, welcomeLabel, descriptionLabel);
-        topTitles.getStyleClass().addAll("align-top-left", "padding-bottom-24");
+        topTitles.getStyleClass().add("align-top-left");
         return topTitles;
     }
 
     private void initializeColumns() {
-        GridPane grid = new GridPane();
-        grid.getStyleClass().addAll("gap-16", "align-top-center");
+        GridPane grid = new GridPane(24, 24);
+        grid.getStyleClass().add("align-top-center");
 
         VBox leftColumn = createLeftColumn();
         GridPane.setHgrow(leftColumn, Priority.ALWAYS);
@@ -227,6 +231,7 @@ public class WelcomeTab extends Tab {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.getStyleClass().add("bg-transparent");
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
         if (!(main.getChildren().get(1) instanceof ScrollPane)) {
             main.getChildren().set(1, scrollPane);
         }
@@ -310,6 +315,11 @@ public class WelcomeTab extends Tab {
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
             Hyperlink recentLibraryLink = new Hyperlink(item.getText());
+            // Shortened to whatever the column offers. Character-wise, not word-wise: a path has
+            // hardly any word boundaries, so the word variant drops whole segments and leaves half
+            // of the column empty.
+            recentLibraryLink.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
+            recentLibraryLink.setTooltip(new Tooltip(item.getText()));
             recentLibraryLink.getStyleClass().addAll("welcome-hyperlink", "h4");
             recentLibraryLink.setOnAction(item.getOnAction());
             recentLibrariesBox.getChildren().add(recentLibraryLink);
@@ -353,7 +363,7 @@ public class WelcomeTab extends Tab {
     }
 
     private HBox createTextLinksContainer() {
-        HBox container = new HBox(16);
+        HBox container = new HBox(12);
         container.getStyleClass().addAll("align-center-left");
 
         Hyperlink devVersionLink = createFooterLink(Localization.lang("Download development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);

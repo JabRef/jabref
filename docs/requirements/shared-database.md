@@ -8,7 +8,7 @@ parent: Requirements
 
 Changes made by one client — entry modifications, groups, and library settings — appear in all other connected clients without any manual action.
 
-Needs: impl
+Needs: impl, utest
 
 ## Change content travels in the notification
 `req~shared-database.change-content-in-notification~1`
@@ -35,6 +35,27 @@ Needs: impl
 `req~shared-database.conflict-merge-dialog~1`
 
 When a local change is refused because the shared entry has a newer version, the user is told which versions collide and is offered the merge entries dialog showing the local and the shared entry side by side. The merged entry replaces the shared one and becomes the local one. Until the user has decided, the local entry keeps its unsynchronized state; cancelling leaves it unsynchronized.
+
+Needs: impl
+
+## Changes made without connection are not lost
+`req~shared-database.offline-changes~1`
+
+When the connection to the shared database is lost, the user keeps working: every change is kept locally, survives closing and reopening JabRef, and is synchronized on the next connect to the same database. A kept change whose shared entry was changed meanwhile is offered for merging.
+
+Needs: impl
+
+## The connection is re-established automatically
+`req~shared-database.automatic-reconnect~1`
+
+After a connection loss, JabRef reconnects by itself with increasing intervals for as long as the library is open. The user is informed when the connection is lost and when it is back, without being interrupted.
+
+Needs: impl
+
+## A shared database's loading state is indicated
+`req~shared-database.loading-indicator~1`
+
+While JabRef opens or reconnects a shared database, its library tab displays a loading indicator until the connection completes or fails.
 
 Needs: impl
 

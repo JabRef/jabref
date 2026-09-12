@@ -42,8 +42,8 @@ public class BibEntryView {
         journal.getStyleClass().add("h6");
 
         VBox entryContainer = new VBox(
-                new HBox(10, entryType, title),
-                new HBox(5, year, journal),
+                new HBox(4, entryType, title),
+                new HBox(4, year, journal),
                 authors
         );
 

@@ -158,7 +158,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox bottomRow = new HBox(GAP, new VBox(5.0, addFieldRow), spacer, resetButton);
+        HBox bottomRow = new HBox(GAP, new VBox(4, addFieldRow), spacer, resetButton);
         bottomRow.setAlignment(Pos.BASELINE_LEFT);
 
         VBox column = new VBox(GAP, header, fields, bottomRow);
