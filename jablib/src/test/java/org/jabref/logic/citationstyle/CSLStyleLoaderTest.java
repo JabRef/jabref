@@ -37,7 +37,7 @@ public class CSLStyleLoaderTest {
     }
 
     @Test
-    // [utest->req~ux.citation-styles.lazy-source-loading~1]
+        // [utest->req~ux.citation-styles.lazy-source-loading~1]
     void loadsCitationStyleSourceOnDemand() {
         AtomicInteger sourceLoadCount = new AtomicInteger();
         CitationStyle style = new CitationStyle(
