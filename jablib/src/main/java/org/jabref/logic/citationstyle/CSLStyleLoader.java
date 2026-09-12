@@ -121,11 +121,11 @@ public record CSLStyleLoader(
 
     private static String loadInternalStyleSource(String path) {
         try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
-            if (styleStream == null) {
-                LOGGER.error("Could not find style file: {}", path);
-                return "";
+            if (styleStream instanceof InputStream inputStream) {
+                return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             }
-            return new String(styleStream.readAllBytes(), StandardCharsets.UTF_8);
+            LOGGER.error("Could not find style file: {}", path);
+            return "";
         } catch (IOException e) {
             LOGGER.error("Error loading style file: {}", path, e);
             return "";
