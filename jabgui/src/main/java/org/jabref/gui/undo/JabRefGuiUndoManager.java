@@ -58,9 +58,11 @@ public class JabRefGuiUndoManager extends JabRefUndoManager implements GuiUndoMa
     /// records a change and then reads the property in the same event does not see the previous
     /// value. Deferring unconditionally would leave the menu stale for a pulse.
     ///
-    /// A burst of edits therefore queues one update per edit, and they are not coalesced: each
-    /// reads the current state, so every update after the first sets the value already there,
-    /// which a JavaFX property ignores without notifying anything.
+    /// A burst of edits off the JavaFX thread therefore queues one update per edit, uncoalesced.
+    /// That costs queue pressure and nothing else: each update reads the current state, so every
+    /// one after the first sets the value already there, which a JavaFX property ignores without
+    /// notifying anything. The burst worth worrying about was one push per keystroke, and typing
+    /// is one step now; a command pushes once, however long it ran.
     private void refresh() {
         UiTaskExecutor.runNowOrInJavaFXThread(() -> {
             undoable.set(canUndo());

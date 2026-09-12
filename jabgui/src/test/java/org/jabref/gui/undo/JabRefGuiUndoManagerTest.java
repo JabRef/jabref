@@ -36,6 +36,12 @@ class JabRefGuiUndoManagerTest {
         entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Einstein");
     }
 
+    private UndoableFieldChange setField(StandardField field, String value) {
+        String before = entry.getField(field).orElse(null);
+        entry.setField(field, value);
+        return new UndoableFieldChange(entry, field, before, value);
+    }
+
     private UndoableFieldChange setAuthor(String value) {
         String before = entry.getField(StandardField.AUTHOR).orElse(null);
         entry.setField(StandardField.AUTHOR, value);
@@ -132,5 +138,30 @@ class JabRefGuiUndoManagerTest {
 
         assertFalse(undoManager.undoableProperty().get());
         assertEquals(List.of(), undoableValues);
+    }
+
+    /// A burst of edits off the JavaFX thread leaves the properties at the state the journal ends
+    /// in, however many updates that took. The updates are not coalesced, and this is what says
+    /// that they need not be.
+    @Test
+    void aBurstOfEditsLeavesThePropertiesAtTheLastState() throws InterruptedException {
+        CountDownLatch release = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                release.await(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        // While the JavaFX thread is blocked, so every update these produce is still queued.
+        for (int i = 0; i < 20; i++) {
+            undoManager.addEdit(setField(StandardField.YEAR, String.valueOf(1900 + i)));
+        }
+        release.countDown();
+        JavaFxExtension.awaitEvents();
+
+        assertTrue(undoManager.undoableProperty().get());
+        assertTrue(undoManager.hasChangedProperty().get());
     }
 }

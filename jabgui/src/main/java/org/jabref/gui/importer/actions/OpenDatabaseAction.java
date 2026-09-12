@@ -57,8 +57,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),
             // Migrate search groups fielded terms to use the new operators (RegEx, case sensitive)
-            new SearchGroupsMigrationAction(),
-            new AddGroupImportEntriesAction()
+            new SearchGroupsMigrationAction()
     );
 
     private final LibraryTabContainer tabContainer;
@@ -115,7 +114,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         try {
             FileDialogConfiguration initialDirectoryConfig = getFileDialogConfiguration(getInitialDirectory());
             filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(initialDirectoryConfig);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             // See https://github.com/JabRef/jabref/issues/10548 for details
             // Rebuild a new config with the home directory
             FileDialogConfiguration homeDirectoryConfig = getFileDialogConfiguration(Directories.getUserDirectory());

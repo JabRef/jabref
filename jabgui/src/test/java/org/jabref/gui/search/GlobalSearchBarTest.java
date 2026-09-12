@@ -22,6 +22,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.search.SearchDisplayMode;
@@ -89,7 +90,7 @@ class GlobalSearchBarTest {
         stateManager.clearSearchHistory();
         String searchQuery = "Smith";
         // Track the node, that the search query will be typed into
-        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#searchField", TextInputControl.class);
+        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#" + WalkthroughNodeIds.GLOBAL_SEARCH_FIELD, TextInputControl.class);
 
         // The focus is on searchField node, as we click on the search box
         invokeAndWait(searchField::requestFocus);
@@ -112,7 +113,7 @@ class GlobalSearchBarTest {
     /// entry editor.
     @Test
     void theContextMenuClaimsNoGlobalShortcut() {
-        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#searchField", TextInputControl.class);
+        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#" + WalkthroughNodeIds.GLOBAL_SEARCH_FIELD, TextInputControl.class);
         AtomicReference<List<Boolean>> accelerators = new AtomicReference<>();
 
         invokeAndWait(() -> accelerators.set(searchField.getContextMenu().getItems().stream()
@@ -127,7 +128,7 @@ class GlobalSearchBarTest {
     void emptyQueryIsNotRecorded() {
         stateManager.clearSearchHistory();
         String searchQuery = "";
-        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#searchField", TextInputControl.class);
+        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#" + WalkthroughNodeIds.GLOBAL_SEARCH_FIELD, TextInputControl.class);
 
         invokeAndWait(searchField::requestFocus);
         invokeAndWait(() -> searchField.appendText(searchQuery));
@@ -140,7 +141,7 @@ class GlobalSearchBarTest {
 
     @Test
     void blankQueryClearsActiveSearch() throws InterruptedException {
-        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#searchField", TextInputControl.class);
+        TextInputControl searchField = JavaFxExtension.lookup(hBox, "#" + WalkthroughNodeIds.GLOBAL_SEARCH_FIELD, TextInputControl.class);
 
         invokeAndWait(searchField::requestFocus);
         invokeAndWait(() -> searchField.appendText("abc"));
