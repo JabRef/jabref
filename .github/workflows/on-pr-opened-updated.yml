@@ -48,7 +48,9 @@ jobs:
           # including "automerge", which the newer push's own run removes.
           # The second between this read and the edit below needs no closing: a verdict for a head
           # pushed within it cannot exist yet, as "Comment on PR" defers while checks are pending.
-          if [ "$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)" != "$HEAD_SHA" ]; then
+          # Separate query from test so a failed API call fails the step instead of reading as "moved on".
+          live_head=$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)
+          if [ "$live_head" != "$HEAD_SHA" ]; then
             echo "⊘ PR moved on since this push - labels left untouched" >> $GITHUB_STEP_SUMMARY
             exit 0
           fi
