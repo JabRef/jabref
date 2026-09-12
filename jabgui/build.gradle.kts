@@ -33,6 +33,9 @@ testModuleInfo {
     requires("org.junit.jupiter.params")
     requires("org.mockito")
 
+    // Reachability assertions (JMemoryBuddy) - comes in transitively with TestFX
+    requires("de.sandec.jmemorybuddy")
+
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
 
