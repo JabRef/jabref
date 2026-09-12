@@ -131,6 +131,7 @@ open module org.jabref.jablib {
     exports org.jabref.model.sciteTallies;
     exports org.jabref.logic.bibtex.comparator.plausibility;
     exports org.jabref.logic.ocr;
+    exports org.jabref.model.ojs;
 
     // region: AI
     exports org.jabref.logic.ai;
