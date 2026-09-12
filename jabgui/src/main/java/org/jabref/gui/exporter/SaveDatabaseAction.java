@@ -196,7 +196,11 @@ public class SaveDatabaseAction {
         // Set new location
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
-            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
+            // An ID the database already has is kept: generating a new one here would orphan the settings
+            // stored under the old ID and leave them behind as a second saved connection.
+            String sharedDatabaseId = context.getDatabase().getSharedDatabaseID()
+                                             .orElseGet(() -> context.getDatabase().generateSharedDatabaseID());
+            new SharedDatabasePreferences(sharedDatabaseId)
                     .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
         }
 
