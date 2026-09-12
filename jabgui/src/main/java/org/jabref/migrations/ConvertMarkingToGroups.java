@@ -73,7 +73,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
             }
 
             Matcher matcher = MARKING_PATTERN.matcher(marking.get());
-            if (matcher.find()) {
+            if (matcher.matches()) {
                 String owner = matcher.group(1);
                 String number = matcher.group(2);
                 markings.put(owner + ":" + number, entry);

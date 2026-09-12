@@ -44,4 +44,19 @@ class ConvertMarkingToGroupsTest {
 
         assertEquals(Optional.of("A; B; Nicolas:6"), entry.getField(StandardField.GROUPS));
     }
+
+    @Test
+    void performMigrationKeepsTextAroundMarkingInGroupName() {
+        BibEntry entry = new BibEntry()
+                .withField(InternalField.MARKED_INTERNAL, "note [Nicolas:6] more");
+        ParserResult parserResult = new ParserResult(Set.of(entry));
+
+        new ConvertMarkingToGroups(',').performMigration(parserResult);
+
+        GroupTreeNode rootExpected = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+        GroupTreeNode markings = rootExpected.addSubgroup(new ExplicitGroup("Markings", GroupHierarchyType.INCLUDING, ','));
+        markings.addSubgroup(new ExplicitGroup("note [Nicolas:6] more", GroupHierarchyType.INCLUDING, ','));
+
+        assertEquals(Optional.of(rootExpected), parserResult.getMetaData().getGroups());
+    }
 }
