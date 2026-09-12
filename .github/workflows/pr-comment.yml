@@ -41,9 +41,11 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       actions: read
+      checks: read
       contents: read
       issues: write
       pull-requests: write
+      statuses: read
     timeout-minutes: 10
     steps:
       - name: Show GitHub context
