@@ -41,8 +41,9 @@ public record UndoableInsertEntries(BibDatabase database, List<BibEntry> entries
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
         database.insertEntries(entries, source);
+        return ApplyResult.SUCCESS;
     }
 
     @Override

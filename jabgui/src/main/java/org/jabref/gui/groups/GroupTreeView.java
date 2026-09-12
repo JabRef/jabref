@@ -142,11 +142,12 @@ public class GroupTreeView extends BorderPane {
     private void createNodes() {
         searchField = SearchTextField.create(keyBindingRepository, IconTheme.JabRefIcons.FILTER);
         searchField.setPromptText(Localization.lang("Filter groups..."));
-        searchField.setId("groupFilterBar");
+        searchField.setId("group-filter-bar");
+        searchField.getStyleClass().add("group-filter-bar");
         this.setTop(searchField);
 
         mainColumn = new TreeTableColumn<>();
-        mainColumn.setId("mainColumn");
+        mainColumn.setId("main-column");
         mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
         numberColumn.getStyleClass().add("numberColumn");
@@ -169,7 +170,8 @@ public class GroupTreeView extends BorderPane {
         addSubgroupColumn.setResizable(false);
 
         groupTree = new TreeTableView<>();
-        groupTree.setId("groupTree");
+        groupTree.setId("group-tree");
+        groupTree.getStyleClass().add("group-tree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, addSubgroupColumn, expansionNodeColumn));
         groupTree.setOnKeyPressed(event -> {
@@ -195,7 +197,8 @@ public class GroupTreeView extends BorderPane {
         addNewGroup.setOnAction(event -> addNewGroup());
 
         HBox groupBar = new HBox(addNewGroup);
-        groupBar.setId("groupBar");
+        groupBar.setId("group-bar");
+        groupBar.getStyleClass().add("group-bar");
         this.setBottom(groupBar);
     }
 
@@ -424,26 +427,28 @@ public class GroupTreeView extends BorderPane {
         if (dragboard.hasContent(DragAndDropDataFormats.GROUP) && row.getItem().canAddGroupsIn()) {
             List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
             List<GroupNodeViewModel> changedGroups = new LinkedList<>();
-            for (String pathToSource : pathToSources) {
-                Optional<GroupNodeViewModel> source = viewModel
-                        .rootGroupProperty().get()
-                        .getChildByPath(pathToSource);
-                if (source.isPresent() && source.get().canBeDragged()) {
-                    source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
-                    changedGroups.add(source.get());
-                    success = true;
+            // One drag is one undo step, however many groups it moved.
+            viewModel.recordTreeChange(Localization.lang("Move group"), () -> {
+                for (String pathToSource : pathToSources) {
+                    Optional<GroupNodeViewModel> source = viewModel
+                            .rootGroupProperty().get()
+                            .getChildByPath(pathToSource);
+                    if (source.isPresent() && source.get().canBeDragged()) {
+                        source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
+                        changedGroups.add(source.get());
+                    }
                 }
-            }
+            });
+            success = !changedGroups.isEmpty();
             groupTree.getSelectionModel().clearSelection();
             changedGroups.forEach(value -> selectNode(value, true));
-            if (success) {
-                viewModel.writeGroupChangesToMetaData();
-            }
         }
 
         if (localDragboard.hasBibEntries()) {
             List<BibEntry> entries = localDragboard.getBibEntries();
-            row.getItem().addEntriesToGroup(entries);
+            stateManager.getActiveDatabase().ifPresent(database ->
+                    stateManager.getUndoManager(database).addEdit(Localization.lang("Assign entries to group"),
+                            edit -> edit.addAll(row.getItem().addEntriesToGroup(entries))));
             success = true;
         }
 

@@ -1,6 +1,7 @@
 package org.jabref.gui.edit.automaticfieldeditor;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.util.strings.StringUtil;
@@ -37,10 +38,12 @@ public class MoveFieldValueAction extends SimpleCommand {
         affectedEntriesCount = 0;
         for (BibEntry entry : entries) {
             String fromFieldValue = entry.getField(fromField).orElse("");
-            String toFieldValue = entry.getField(toField).orElse("");
+            Optional<String> toFieldValue = entry.getField(toField);
             if (StringUtil.isNotBlank(fromFieldValue)) {
-                if (overwriteToFieldContent || toFieldValue.isEmpty()) {
-                    edits.applyEdit(new UndoableFieldChange(entry, toField, toFieldValue, fromFieldValue));
+                if (overwriteToFieldContent || toFieldValue.orElse("").isEmpty()) {
+                    // The prior value is recorded as absent rather than as "", so that undoing this
+                    // removes the field again instead of leaving an empty one behind.
+                    edits.applyEdit(new UndoableFieldChange(entry, toField, toFieldValue.orElse(null), fromFieldValue));
                     edits.applyEdit(new UndoableFieldChange(entry, fromField, fromFieldValue, null));
                     affectedEntriesCount++;
                 }
