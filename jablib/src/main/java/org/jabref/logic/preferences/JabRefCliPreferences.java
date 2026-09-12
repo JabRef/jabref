@@ -124,7 +124,6 @@ import org.jabref.model.search.SearchFlags;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
 import org.jspecify.annotations.NonNull;
@@ -567,7 +566,26 @@ public class JabRefCliPreferences implements CliPreferences {
             return new ArrayList<>();
         }
 
-        return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
+        // Inverse of [#convertListToString]: a backslash escapes the next character, so delimiters and backslashes
+        // inside an element survive the round trip.
+        List<String> result = new ArrayList<>();
+        StringBuilder element = new StringBuilder();
+        boolean escaped = false;
+        for (char c : toConvert.toCharArray()) {
+            if (escaped) {
+                element.append(c);
+                escaped = false;
+            } else if (c == '\\') {
+                escaped = true;
+            } else if (c == STRINGLIST_DELIMITER) {
+                result.add(element.toString());
+                element.setLength(0);
+            } else {
+                element.append(c);
+            }
+        }
+        result.add(element.toString());
+        return result;
     }
     // endregion
 

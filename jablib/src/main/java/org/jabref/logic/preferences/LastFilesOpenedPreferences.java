@@ -11,14 +11,16 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.util.io.FileHistory;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class LastFilesOpenedPreferences {
 
     // the last libraries that were open when jabref closes and should be reopened on startup
     private final ObservableList<Path> lastFilesOpened;
 
-    private final ObjectProperty<Path> lastFocusedFile;
+    private final ObjectProperty<@Nullable Path> lastFocusedFile;
 
     /// Citation keys of the entries that were selected in the libraries of [#lastFilesOpened], by the same index.
     /// An empty string means "nothing to restore" (no selection, or an entry without a citation key).
@@ -101,15 +103,15 @@ public class LastFilesOpenedPreferences {
         return Optional.of(lastSelectedEntries.get(index)).filter(key -> !key.isEmpty());
     }
 
-    public Path getLastFocusedFile() {
+    public @Nullable Path getLastFocusedFile() {
         return lastFocusedFile.get();
     }
 
-    public ObjectProperty<Path> lastFocusedFileProperty() {
+    public ObjectProperty<@Nullable Path> lastFocusedFileProperty() {
         return lastFocusedFile;
     }
 
-    public void setLastFocusedFile(Path lastFocusedFile) {
+    public void setLastFocusedFile(@Nullable Path lastFocusedFile) {
         this.lastFocusedFile.set(lastFocusedFile);
     }
 

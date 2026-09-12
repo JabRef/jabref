@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.SequencedMap;
@@ -150,16 +151,17 @@ public class JabRefFrameViewModel {
         }
 
         // Read the opened and focused databases before closing them
-        List<LibraryTab> savedTabs = tabContainer.getLibraryTabs().stream()
-                                                 .filter(tab -> tab.getBibDatabaseContext().getDatabasePath().isPresent())
-                                                 .toList();
+        List<Map.Entry<Path, LibraryTab>> savedTabs = tabContainer.getLibraryTabs().stream()
+                                                                  .flatMap(tab -> tab.getBibDatabaseContext().getDatabasePath().stream()
+                                                                                     .map(path -> Map.entry(path.toAbsolutePath(), tab)))
+                                                                  .toList();
         List<Path> openedLibraries = savedTabs.stream()
-                                              .map(tab -> tab.getBibDatabaseContext().getDatabasePath().orElseThrow().toAbsolutePath())
+                                              .map(Map.Entry::getKey)
                                               .toList();
         List<String> selectedEntries = savedTabs.stream()
-                                                .map(tab -> tab.getSelectedEntries().stream().findFirst()
-                                                               .flatMap(BibEntry::getCitationKey)
-                                                               .orElse(""))
+                                                .map(saved -> saved.getValue().getSelectedEntries().stream().findFirst()
+                                                                   .flatMap(BibEntry::getCitationKey)
+                                                                   .orElse(""))
                                                 .toList();
         Path focusedLibraries = Optional.ofNullable(tabContainer.getCurrentLibraryTab())
                                         .map(LibraryTab::getBibDatabaseContext)
