@@ -20,6 +20,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
@@ -50,7 +51,6 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -61,7 +61,7 @@ import static org.mockito.Mockito.when;
 /// Profiles group-tree creation after synchronizing the generated large library through a shared database.
 ///
 /// Run explicitly with `-PsharedDatabaseProfile`.
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 @EnabledIfSystemProperty(named = "sharedDatabaseProfile", matches = "true")
 class GroupTreeSharedDatabaseProfileTest {
 
@@ -108,7 +108,7 @@ class GroupTreeSharedDatabaseProfileTest {
                         Duration.ofNanos(parseDuration).toMillis(),
                         Duration.ofNanos(synchronizationDuration).toMillis(),
                         Duration.ofNanos(treeCreationDuration).toMillis());
-                assertTrue(groupTree.rootGroupProperty().get() != null);
+                assertNotNull(groupTree.rootGroupProperty().get());
             } finally {
                 targetSynchronizer.closeSharedDatabase();
             }

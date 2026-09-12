@@ -1,6 +1,9 @@
 package org.jabref.gui.maintable;
 
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -39,6 +42,7 @@ import org.jabref.model.search.query.SearchResults;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +61,7 @@ public class MainTableDataModel {
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
     private final AtomicLong searchUpdateSequence = new AtomicLong();
+    private final AtomicLong groupUpdateSequence = new AtomicLong();
     private final Subscription searchQuerySubscription;
     private final Subscription searchDisplayModeSubscription;
     private final Subscription selectedGroupsSubscription;
@@ -82,7 +87,7 @@ public class MainTableDataModel {
         this.bibDatabaseContext = context;
         this.searchQueryProperty = searchQueryProperty;
         this.indexUpdatedListener = new SearchIndexListener();
-        this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
+        this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences.getGroupViewMode());
 
         this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);
         resetFieldFormatter();
@@ -96,16 +101,19 @@ public class MainTableDataModel {
         selectedGroupsSubscription = EasyBind.listen(selectedGroupsProperty, (observable, oldValue, newValue) -> updateGroupMatches(newValue));
         groupViewModeSubscription = EasyBind.listen(preferences.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(selectedGroupsProperty.get()));
 
-        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS).get())));
+        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().get() == MatchCategory.MATCHING_SEARCH_AND_GROUPS)));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
     private void updateSearchMatches(Optional<SearchQuery> query) {
         long updateSequence = searchUpdateSequence.incrementAndGet();
+        Optional<SearchQuery> querySnapshot = query.map(searchQuery -> new SearchQuery(
+                searchQuery.getSearchExpression(),
+                EnumSet.copyOf(searchQuery.getSearchFlags())));
 
         BackgroundTask.wrap(() ->
-                              query.map(searchQuery -> searchContext.search(searchQuery)))
+                              querySnapshot.map(searchQuery -> searchContext.search(searchQuery)))
                       .onSuccess(results -> {
                           if (updateSequence != searchUpdateSequence.get()) {
                               return;
@@ -134,7 +142,7 @@ public class MainTableDataModel {
     private void setSearchMatches(SearchResults results) {
         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
         entriesViewModel.forEach(entry -> {
-            entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));
+            entry.setHasFullTextResults(results.hasFulltextResults(entry.getEntry()));
             updateEntrySearchMatch(entry, results.isMatched(entry.getEntry()), isFloatingMode);
         });
     }
@@ -142,66 +150,90 @@ public class MainTableDataModel {
     private void clearSearchMatches() {
         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
         entriesViewModel.forEach(entry -> {
-            entry.isMatchedBySearch().set(true);
-            entry.hasFullTextResultsProperty().set(false);
+            entry.setMatchedBySearch(true);
+            entry.setHasFullTextResults(false);
             updateEntrySearchMatch(entry, true, isFloatingMode);
         });
     }
 
     private static void updateEntrySearchMatch(BibEntryTableViewModel entry, boolean isMatched, boolean isFloatingMode) {
-        entry.isMatchedBySearch().set(isMatched);
+        entry.setMatchedBySearch(isMatched);
         entry.updateMatchCategory();
         setEntrySearchVisibility(entry, isMatched, isFloatingMode);
     }
 
     private static void setEntrySearchVisibility(BibEntryTableViewModel entry, boolean isMatched, boolean isFloatingMode) {
         if (isMatched) {
-            entry.isVisibleBySearch().set(true);
+            entry.setVisibleBySearch(true);
         } else {
-            entry.isVisibleBySearch().set(isFloatingMode);
+            entry.setVisibleBySearch(isFloatingMode);
         }
     }
 
     private void updateSearchDisplayMode(SearchDisplayMode mode) {
-        BackgroundTask.wrap(() -> {
-            boolean isFloatingMode = mode == SearchDisplayMode.FLOAT;
-            entriesViewModel.forEach(entry -> setEntrySearchVisibility(entry, entry.isMatchedBySearch().get(), isFloatingMode));
-        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+        boolean isFloatingMode = mode == SearchDisplayMode.FLOAT;
+        entriesViewModel.forEach(entry -> setEntrySearchVisibility(entry, entry.isMatchedBySearch(), isFloatingMode));
+        FilteredListProxy.refilterListReflection(entriesFiltered);
     }
 
     private void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
-        BackgroundTask.wrap(() -> {
-            groupsMatcher = createGroupMatcher(groups, groupsPreferences);
-            applyGroupMatchesToAllEntries();
-        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+        long updateSequence = groupUpdateSequence.incrementAndGet();
+        List<GroupTreeNode> selectedGroups = groups == null ? List.of() : List.copyOf(groups);
+        List<BibEntryTableViewModel> entries = List.copyOf(entriesViewModel);
+        EnumSet<GroupViewMode> groupViewMode = groupsPreferences.getGroupViewMode();
+
+        BackgroundTask.wrap(() -> calculateGroupMatches(selectedGroups, groupViewMode, entries))
+                      .onSuccess(groupMatches -> {
+                          if (updateSequence != groupUpdateSequence.get()) {
+                              return;
+                          }
+                          groupsMatcher = groupMatches.matcher();
+                          applyGroupMatches(groupMatches);
+                          FilteredListProxy.refilterListReflection(entriesFiltered);
+                      }).executeWith(taskExecutor);
     }
 
-    private void applyGroupMatchesToAllEntries() {
-        boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
-        boolean isFloatingMode = !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);
-        entriesViewModel.forEach(entry -> updateEntryGroupMatch(entry, groupsMatcher, isInvertMode, isFloatingMode));
+    private static GroupMatchResult calculateGroupMatches(List<GroupTreeNode> selectedGroups,
+                                                          EnumSet<GroupViewMode> groupViewMode,
+                                                          List<BibEntryTableViewModel> entries) {
+        Optional<MatcherSet> matcher = createGroupMatcher(selectedGroups, groupViewMode);
+        boolean isInvertMode = groupViewMode.contains(GroupViewMode.INVERT);
+        boolean isFloatingMode = !groupViewMode.contains(GroupViewMode.FILTER);
+        Map<BibEntryTableViewModel, Boolean> matches = new HashMap<>(entries.size());
+        entries.forEach(entry -> matches.put(
+                entry,
+                matcher.map(currentMatcher -> currentMatcher.isMatch(entry.getEntry()) ^ isInvertMode).orElse(true)));
+        return new GroupMatchResult(matcher, Map.copyOf(matches), isFloatingMode);
+    }
+
+    private void applyGroupMatches(GroupMatchResult groupMatches) {
+        groupMatches.matches().forEach((entry, isMatched) -> updateEntryGroupMatch(entry, isMatched, groupMatches.isFloatingMode()));
     }
 
     private void updateEntryGroupMatch(BibEntryTableViewModel entry, Optional<MatcherSet> groupsMatcher, boolean isInvertMode, boolean isFloatingMode) {
         boolean isMatched = groupsMatcher.map(matcher -> matcher.isMatch(entry.getEntry()) ^ isInvertMode)
                                          .orElse(true);
-        entry.isMatchedByGroup().set(isMatched);
+        updateEntryGroupMatch(entry, isMatched, isFloatingMode);
+    }
+
+    private static void updateEntryGroupMatch(BibEntryTableViewModel entry, boolean isMatched, boolean isFloatingMode) {
+        entry.setMatchedByGroup(isMatched);
         entry.updateMatchCategory();
         if (isMatched) {
-            entry.isVisibleByGroup().set(true);
+            entry.setVisibleByGroup(true);
         } else {
-            entry.isVisibleByGroup().set(isFloatingMode);
+            entry.setVisibleByGroup(isFloatingMode);
         }
     }
 
-    private static Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups, GroupsPreferences groupsPreferences) {
+    private static Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups, EnumSet<GroupViewMode> groupViewMode) {
         if ((selectedGroups == null) || selectedGroups.isEmpty()) {
             // No selected group, show all entries
             return Optional.empty();
         }
 
         final MatcherSet searchRules = MatcherSets.build(
-                groupsPreferences.getGroupViewMode().contains(GroupViewMode.INTERSECTION)
+                groupViewMode.contains(GroupViewMode.INTERSECTION)
                 ? MatcherSets.MatcherType.AND
                 : MatcherSets.MatcherType.OR);
 
@@ -209,6 +241,12 @@ public class MainTableDataModel {
             searchRules.addRule(node.getSearchMatcher());
         }
         return Optional.of(searchRules);
+    }
+
+    @NullMarked
+    private record GroupMatchResult(Optional<MatcherSet> matcher,
+                                    Map<BibEntryTableViewModel, Boolean> matches,
+                                    boolean isFloatingMode) {
     }
 
     public void unbind() {
@@ -245,39 +283,73 @@ public class MainTableDataModel {
     class SearchIndexListener {
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
-            indexAddedOrUpdatedEvent.entries().forEach(entry -> BackgroundTask.wrap(() -> {
-                int index = bibDatabaseContext.getDatabase().indexOf(entry);
-                if (index >= 0) {
-                    BibEntryTableViewModel viewModel = entriesViewModel.get(index);
-                    boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
-                    boolean isMatched;
-                    if (searchQueryProperty.get().isPresent()) {
-                        SearchQuery searchQuery = searchQueryProperty.get().get();
-                        String newSearchExpression = "(" + ENTRY_ID + "= " + entry.getId() + ") AND (" + searchQuery.getSearchExpression() + ")";
-                        SearchQuery entryQuery = new SearchQuery(newSearchExpression, searchQuery.getSearchFlags());
-                        SearchResults results = searchContext.search(entryQuery);
-
-                        isMatched = results.isMatched(entry);
-                        viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));
-                    } else {
-                        isMatched = true;
-                        viewModel.hasFullTextResultsProperty().set(false);
-                    }
-
-                    updateEntrySearchMatch(viewModel, isMatched, isFloatingMode);
-                    updateEntryGroupMatch(viewModel, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
-                }
-                return index;
-            }).onSuccess(index -> {
-                if (index >= 0) {
-                    FilteredListProxy.refilterListReflection(entriesFiltered, index, index + 1);
-                }
-            }).executeWith(taskExecutor));
+            long updateSequence = searchUpdateSequence.get();
+            Optional<SearchQuery> query = searchQueryProperty.get()
+                                                             .map(searchQuery -> new SearchQuery(
+                                                                     searchQuery.getSearchExpression(),
+                                                                     EnumSet.copyOf(searchQuery.getSearchFlags())));
+            indexAddedOrUpdatedEvent.entries().forEach(entry -> BackgroundTask
+                    .wrap(() -> calculateIndexedEntrySearchMatch(entry, query, updateSequence))
+                    .onSuccess(MainTableDataModel.this::applyIndexedEntrySearchMatch)
+                    .executeWith(taskExecutor));
         }
 
         @Subscribe
         public void listen(IndexStartedEvent indexStartedEvent) {
             updateSearchMatches(searchQueryProperty.get());
         }
+    }
+
+    private IndexedEntrySearchMatch calculateIndexedEntrySearchMatch(BibEntry entry,
+                                                                     Optional<SearchQuery> query,
+                                                                     long updateSequence) {
+        if (query.isEmpty()) {
+            return new IndexedEntrySearchMatch(entry, updateSequence, true, false);
+        }
+
+        SearchQuery searchQuery = query.get();
+        String expression = "(" + ENTRY_ID + "= " + entry.getId() + ") AND (" + searchQuery.getSearchExpression() + ")";
+        SearchQuery entryQuery = new SearchQuery(expression, searchQuery.getSearchFlags());
+        SearchResults results = searchContext.search(entryQuery);
+        return new IndexedEntrySearchMatch(
+                entry,
+                updateSequence,
+                results.isMatched(entry),
+                results.hasFulltextResults(entry));
+    }
+
+    private void applyIndexedEntrySearchMatch(IndexedEntrySearchMatch result) {
+        if (result.updateSequence() != searchUpdateSequence.get()) {
+            return;
+        }
+
+        int index = bibDatabaseContext.getDatabase().indexOf(result.entry());
+        if (index < 0 || index >= entriesViewModel.size()) {
+            return;
+        }
+
+        BibEntryTableViewModel viewModel = entriesViewModel.get(index);
+        if (viewModel.getEntry() != result.entry()) {
+            return;
+        }
+
+        viewModel.setHasFullTextResults(result.hasFullTextResults());
+        boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
+        updateEntrySearchMatch(viewModel, result.isMatchedBySearch(), isFloatingMode);
+
+        EnumSet<GroupViewMode> groupViewMode = groupsPreferences.getGroupViewMode();
+        updateEntryGroupMatch(
+                viewModel,
+                groupsMatcher,
+                groupViewMode.contains(GroupViewMode.INVERT),
+                !groupViewMode.contains(GroupViewMode.FILTER));
+        FilteredListProxy.refilterListReflection(entriesFiltered, index, index + 1);
+    }
+
+    @NullMarked
+    private record IndexedEntrySearchMatch(BibEntry entry,
+                                           long updateSequence,
+                                           boolean isMatchedBySearch,
+                                           boolean hasFullTextResults) {
     }
 }

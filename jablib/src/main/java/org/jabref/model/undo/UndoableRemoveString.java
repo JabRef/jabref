@@ -17,8 +17,14 @@ public record UndoableRemoveString(BibDatabase database, BibtexString string) im
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
+        // By identity, not by name: a different string under the same name means the one this
+        // change recorded is gone, and removing by its id would quietly do nothing at all.
+        if (database.getStringByName(string.getName()).filter(present -> present == string).isEmpty()) {
+            return ApplyResult.of(this, "the string '%s' this change recorded is no longer in the library".formatted(string.getName()));
+        }
         database.removeString(string.getId());
+        return ApplyResult.SUCCESS;
     }
 
     @Override

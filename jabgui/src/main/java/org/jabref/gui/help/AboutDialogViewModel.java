@@ -29,7 +29,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final String versionInfo;
     private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
     private final Logger logger = LoggerFactory.getLogger(AboutDialogViewModel.class);
-    private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
+    private final ReadOnlyStringWrapper version = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper maintainers = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
     private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
@@ -45,14 +45,14 @@ public class AboutDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.clipBoardManager = clipBoardManager;
-        String[] version = buildInfo.version.getFullVersion().split("--");
-        heading.set("JabRef " + version[0]);
+        String[] versionParts = buildInfo.version.getFullVersion().split("--");
+        version.set(Localization.lang("Version") + " " + versionParts[0]);
 
-        if (version.length == 1) {
+        if (versionParts.length == 1) {
             isDevelopmentVersion.set(false);
         } else {
             isDevelopmentVersion.set(true);
-            String dev = new ArrayList<>(Arrays.asList(version)).stream().filter(string -> !string.equals(version[0])).collect(
+            String dev = new ArrayList<>(Arrays.asList(versionParts)).stream().filter(string -> !string.equals(versionParts[0])).collect(
                     Collectors.joining("--"));
             developmentVersion.set(dev);
         }
@@ -94,12 +94,12 @@ public class AboutDialogViewModel extends AbstractViewModel {
         return maintainers.get();
     }
 
-    public ReadOnlyStringProperty headingProperty() {
-        return heading.getReadOnlyProperty();
+    public ReadOnlyStringProperty versionProperty() {
+        return version.getReadOnlyProperty();
     }
 
-    public String getHeading() {
-        return heading.get();
+    public String getVersion() {
+        return version.get();
     }
 
     public ReadOnlyStringProperty licenseProperty() {
