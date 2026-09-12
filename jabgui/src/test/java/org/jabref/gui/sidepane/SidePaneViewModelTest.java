@@ -83,6 +83,9 @@ class SidePaneViewModelTest {
 
         assertEquals(SidePaneType.WEB_SEARCH, sidePaneComponents.getFirst());
         assertEquals(SidePaneType.GROUPS, sidePaneComponents.get(1));
+
+        assertEquals(0, sidePanePreferences.getPreferredPositions().get(SidePaneType.WEB_SEARCH));
+        assertEquals(1, sidePanePreferences.getPreferredPositions().get(SidePaneType.GROUPS));
     }
 
     @Test
@@ -98,6 +101,9 @@ class SidePaneViewModelTest {
 
         assertEquals(SidePaneType.OPEN_OFFICE, sidePaneComponents.get(1));
         assertEquals(SidePaneType.WEB_SEARCH, sidePaneComponents.get(2));
+
+        assertEquals(1, sidePanePreferences.getPreferredPositions().get(SidePaneType.OPEN_OFFICE));
+        assertEquals(2, sidePanePreferences.getPreferredPositions().get(SidePaneType.WEB_SEARCH));
     }
 
     @Test
@@ -115,5 +121,13 @@ class SidePaneViewModelTest {
         sidePaneComponents.sort(new SidePaneViewModel.PreferredIndexSort(sidePanePreferences));
 
         assertTrue(sidePaneComponents.getFirst() == SidePaneType.OPEN_OFFICE && sidePaneComponents.get(2) == SidePaneType.GROUPS);
+    }
+
+    @Test
+    void reorderingPreservesHiddenPanePosition() {
+        sidePaneComponents.remove(SidePaneType.WEB_SEARCH);
+        sidePaneViewModel.moveDown(SidePaneType.GROUPS);
+
+        assertEquals(1, sidePanePreferences.getPreferredPositions().get(SidePaneType.WEB_SEARCH));
     }
 }

@@ -31,7 +31,11 @@ public class SidePanePreferences {
     private SidePanePreferences() {
         this(
                 EnumSet.of(SidePaneType.WEB_SEARCH, SidePaneType.GROUPS), // Default visible panes (OPEN_OFFICE omitted)
-                Map.of(),                                                 // Default preferred positions
+                Map.of(
+                        SidePaneType.WEB_SEARCH, 0,
+                        SidePaneType.GROUPS, 1,
+                        SidePaneType.OPEN_OFFICE, 2
+                ),                                                        // Default preferred positions
                 0                                                         // Default web search fetcher index
         );
     }
