@@ -34,9 +34,7 @@ class SharedDatabasePreferencesTest {
     @AfterEach
     void tearDown() throws BackingStoreException {
         for (String sharedDatabaseId : List.of(ID, OTHER_ID)) {
-            if (SharedDatabasePreferences.listSavedIds().contains(sharedDatabaseId)) {
-                new SharedDatabasePreferences(sharedDatabaseId).remove();
-            }
+            new SharedDatabasePreferences(sharedDatabaseId).remove();
         }
     }
 
@@ -64,6 +62,23 @@ class SharedDatabasePreferencesTest {
         new SharedDatabasePreferences().setHost("localhost");
 
         assertEquals(List.of(ID), savedTestIds());
+    }
+
+    @Test
+    void nodeWithoutConnectionIsNotListed() {
+        new SharedDatabasePreferences(OTHER_ID).getHost();
+
+        assertEquals(List.of(ID), savedTestIds());
+    }
+
+    @Test
+    void expertModeConnectionIsListed() {
+        SharedDatabasePreferences expertPreferences = new SharedDatabasePreferences(OTHER_ID);
+        expertPreferences.setUser("alice");
+        expertPreferences.setExpertMode(true);
+        expertPreferences.setJdbcUrl("jdbc:postgresql://localhost:5432/jabref");
+
+        assertEquals(List.of(ID, OTHER_ID), savedTestIds().stream().sorted().toList());
     }
 
     @Test

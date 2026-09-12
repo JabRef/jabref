@@ -386,6 +386,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     public void applySavedConnection(SavedConnection savedConnection) {
+        // A half-typed URL would keep failing validation and disable "Connect" although the fields are complete
+        connectionUrl.set("");
         applyPreferences(new SharedDatabasePreferences(savedConnection.id()));
     }
 

@@ -213,6 +213,15 @@ public class SharedDatabasePreferences {
         return passwordCleared;
     }
 
+    private boolean hasConnection() {
+        if (getUser().isEmpty()) {
+            return false;
+        }
+        return isUseExpertMode()
+               ? getJdbcUrl().filter(url -> !url.isEmpty()).isPresent()
+               : getHost().isPresent() && getName().isPresent();
+    }
+
     /// Whether this stored connection addresses the same database as `properties`. The password is not part of
     /// the comparison, and neither are driver settings that do not identify the database (such as SSL).
     public boolean addresses(DatabaseConnectionProperties properties) {
@@ -240,11 +249,15 @@ public class SharedDatabasePreferences {
                              .findFirst();
     }
 
+    /// Nodes without a usable connection are skipped: reading the settings of an unknown identifier (a stale
+    /// reconnect entry, a library file from another computer) creates an empty node.
+    ///
     /// @return the identifiers of all stored connections, without the "last used" default node
     public static List<String> listSavedIds() {
         try {
             return Arrays.stream(Preferences.userRoot().node(PREFERENCES_PATH_NAME).childrenNames())
                          .filter(id -> !DEFAULT_NODE.equals(id))
+                         .filter(id -> new SharedDatabasePreferences(id).hasConnection())
                          .toList();
         } catch (BackingStoreException e) {
             LOGGER.warn("Could not read the stored shared database connections", e);
