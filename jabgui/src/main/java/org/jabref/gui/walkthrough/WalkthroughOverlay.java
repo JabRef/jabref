@@ -137,12 +137,20 @@ public class WalkthroughOverlay {
             this.scroller = new WalkthroughScroller(resolvedNode);
         }
 
+        Optional<WalkthroughPane> pane = WalkthroughPane.ensureFor(resolvedWindow);
+        if (pane.isEmpty()) {
+            LOGGER.error("Window '{}' cannot host a walkthrough pane, so step '{}' cannot be shown. Reverting.",
+                    resolvedWindow.getClass().getSimpleName(), component.title());
+            reverter.findAndUndo();
+            return;
+        }
+
         highlighter.applyHighlight(
                 component.highlight().orElse(null),
                 resolvedWindow.getScene(),
                 resolvedNode);
         WindowOverlay overlay = overlays.computeIfAbsent(resolvedWindow,
-                w -> new WindowOverlay(w, WalkthroughPane.getInstance(w), walkthrough));
+                w -> new WindowOverlay(w, pane.get(), walkthrough));
 
         switch (component) {
             case TooltipStep tooltip ->

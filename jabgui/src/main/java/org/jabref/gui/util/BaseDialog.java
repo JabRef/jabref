@@ -21,6 +21,7 @@ import javafx.stage.WindowEvent;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.walkthrough.WalkthroughPane;
 
 import com.airhacks.afterburner.injection.Injector;
 
@@ -30,9 +31,11 @@ public class BaseDialog<T> extends Dialog<T> {
         dialogPaneProperty().addListener((_, _, newPane) -> {
             if (newPane != null) {
                 setupKeyBindings(newPane);
+                installWalkthroughPane();
             }
         });
         setupKeyBindings(getDialogPane());
+        installWalkthroughPane();
 
         setDialogIcon(IconTheme.getJabRefIcon());
 
@@ -52,6 +55,13 @@ public class BaseDialog<T> extends Dialog<T> {
         }
 
         return false;
+    }
+
+    /// Gives the dialog the pane a walkthrough draws into. It belongs to the dialog pane rather than to
+    /// the scene, because JavaFX reassigns the scene root of a dialog on every show and swaps in a
+    /// placeholder on close. Runs again for every new dialog pane.
+    private void installWalkthroughPane() {
+        WalkthroughPane.installIn(getDialogPane());
     }
 
     private Stage getDialogWindow() {
