@@ -56,6 +56,10 @@ public class ThemeManager {
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
 
+    /// Marks a scene whose root this manager already follows for the font size. A window re-enters
+    /// [Window#getWindows()] every time it is shown again, and the scene it brings is the same one.
+    private final Object fontSizeFollowsRootKey = new Object();
+
     private final FileUpdateListener baseCssLiveUpdate = () -> cssLiveUpdate(JABREF_BASE_STYLE_SHEET);
     private @Nullable FileUpdateListener themeCssLiveUpdate;
     private @Nullable FileUpdateListener parentCssLiveUpdate;
@@ -139,6 +143,9 @@ public class ThemeManager {
     private void registerScene(Scene scene) {
         updateColorSchemeOnScene(scene);
         updateFontStyleForScene(scene);
+        if (scene.getProperties().putIfAbsent(fontSizeFollowsRootKey, Boolean.TRUE) != null) {
+            return;
+        }
         scene.rootProperty().addListener((_, oldRoot, _) -> {
             // The font size is carried by a style class on the scene root, so it has to follow the root
             // whenever a third party replaces it.
