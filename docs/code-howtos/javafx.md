@@ -168,6 +168,18 @@ Node ids exist for the walkthrough. A walkthrough step finds the control it high
 * Style with `styleClass`, not with an id. Styling by id works and is occasionally unavoidable — the ids inside JavaFX's own custom-color dialog are the remaining case — but keeping it rare is the point: renaming an id should never change the look, and restyling should never break a walkthrough.
 * Write ids in kebab case (`entry-editor`), the same way style classes are written. An `fx:id` has to stay a Java identifier because a controller field is named after it, so give such a node an explicit `id` attribute as well — FXML applies that one, and the `fx:id` keeps injecting.
 
+## Styling
+
+The look of JabRef comes from style classes in `jabgui/src/main/resources/org/jabref/gui/theme/internal/jabref-base.css`; the colors come from the `-color-*` tokens a theme defines.
+The drivers behind that file, from <https://github.com/JabRef/jabref/issues/16042>, <https://github.com/JabRef/jabref/issues/16787> and <https://github.com/JabRef/jabref/issues/15721>:
+
+* As few style classes as possible, but the UI has to stay nice. Every class is a lookup for the next reader, and a class used by one view is usually a padding or a font size that a utility class already offers. When the utilities cannot express what a view needs, one class named after the view (`welcome-main-container`) is the right trade-off; a second step on the spacing scale is not.
+* Utility classes for padding, gaps, alignment, font size and color: `padding-12`, `gap-8`, `align-center-left`, `h3`, `text-accent`. They form one fixed scale in `em`, so all views share the same few distances and grow with the user's font size. The scale stays small on purpose; do not add `padding-10` because one dialog looked better with it.
+* The spacing between the children of a `VBox`, `HBox` or `GridPane` goes into the constructor: `new VBox(12)`, `new GridPane(24, 24)`.
+* No inline styles: no `setStyle(..)`, no `styleProperty()` binding, no `-fx-*` string in Java. An inline style beats every stylesheet, so a theme could not change it.
+* Colors only through the `-color-*` tokens, never as literals, so every theme keeps working.
+* Style with `styleClass`, not with an `id`; see the node id rules above.
+
 ## FXML
 
 The following expressions can be used in FXML attributes, according to the [official documentation](https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#attributes)
