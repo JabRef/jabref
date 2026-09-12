@@ -3,14 +3,18 @@ package org.jabref.logic.preferences;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -301,6 +305,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
+
+    private static final String DECLINED_CUSTOM_ENTRY_TYPES = "declinedCustomEntryTypes";
 
     // region (Linked)FilePreferences
     private static final String FILES_MAIN_DIRECTORY = "fileDirectory";
@@ -1082,6 +1088,7 @@ public class JabRefCliPreferences implements CliPreferences {
     @Override
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
+        PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
         clearCitationKeyPatterns();
         clearTruststoreFromCustomCertificates();
         clearCustomFetcherKeys();
@@ -1322,6 +1329,35 @@ public class JabRefCliPreferences implements CliPreferences {
             prefsNodev2.flush();
         } catch (BackingStoreException e) {
             LOGGER.info("Updating stored custom entry types failed.", e);
+        }
+    }
+
+    @Override
+    public Set<String> getDeclinedCustomEntryTypes() {
+        Preferences node = PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES);
+        try {
+            return Arrays.stream(node.keys())
+                         .map(key -> node.get(key, null))
+                         .filter(Objects::nonNull)
+                         .collect(Collectors.toSet());
+        } catch (BackingStoreException e) {
+            LOGGER.info("Reading declined custom entry types failed.", e);
+            return Set.of();
+        }
+    }
+
+    /// Stores each decision under its hash: a preference key is limited to 80 characters, an entry type definition is not.
+    @Override
+    public void addDeclinedCustomEntryTypes(Collection<String> declinedEntryTypes) {
+        Preferences node = PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES);
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            declinedEntryTypes.forEach(declined -> node.put(
+                    HexFormat.of().formatHex(digest.digest(declined.getBytes(StandardCharsets.UTF_8))),
+                    declined));
+            node.flush();
+        } catch (NoSuchAlgorithmException | BackingStoreException e) {
+            LOGGER.info("Storing declined custom entry types failed.", e);
         }
     }
 

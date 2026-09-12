@@ -1,7 +1,9 @@
 package org.jabref.gui.importer;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.preferences.CliPreferences;
@@ -18,9 +20,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /// Tests for the dialog offering to store the custom entry types of a just opened library.
 ///
@@ -40,6 +45,7 @@ class ImportCustomEntryTypesDialogViewModelTest {
 
     private BibEntryTypesManager entryTypesManager;
     private CliPreferences preferences;
+    private Set<String> declinedDecisions;
 
     private static BibEntryType parse(String comment) {
         return MetaDataParser.parseCustomEntryType(comment).orElseThrow();
@@ -49,6 +55,10 @@ class ImportCustomEntryTypesDialogViewModelTest {
     void setUp() {
         entryTypesManager = new BibEntryTypesManager();
         preferences = mock(CliPreferences.class);
+        declinedDecisions = new HashSet<>();
+        when(preferences.getDeclinedCustomEntryTypes()).thenAnswer(_ -> Set.copyOf(declinedDecisions));
+        doAnswer(invocation -> declinedDecisions.addAll(invocation.getArgument(0)))
+                .when(preferences).addDeclinedCustomEntryTypes(any());
     }
 
     private ImportCustomEntryTypesDialogViewModel viewModelFor(List<BibEntryType> typesInFile) {
@@ -122,7 +132,7 @@ class ImportCustomEntryTypesDialogViewModelTest {
     }
 
     @Test
-    void unselectedTypesAreStillOfferedAtTheNextStart() {
+    void uncheckedTypesAreNotOfferedAgainAfterOk() {
         List<BibEntryType> typesInFile = List.of(AUDIO_FROM_FILE, MANUSCRIPT_FROM_FILE);
 
         ImportCustomEntryTypesDialogViewModel firstStart = viewModelFor(typesInFile);
@@ -131,18 +141,42 @@ class ImportCustomEntryTypesDialogViewModelTest {
         ImportCustomEntryTypesDialogViewModel secondStart = viewModelFor(typesInFile);
 
         assertEquals(List.of(), List.copyOf(secondStart.newTypes()));
-        assertEquals(List.of(AUDIO_FROM_FILE), secondStart.differentCustomizations().stream()
-                                                          .map(BibEntryTypePrefsAndFileViewModel::customTypeFromFile)
-                                                          .toList());
+        assertEquals(List.of(), List.copyOf(secondStart.differentCustomizations()));
+        assertEquals(Optional.of(MANUSCRIPT_FROM_FILE), entryTypesManager.enrich(new UnknownEntryType("manuscript"), MODE));
+        assertTrue(entryTypesManager.getAllCustomizedTypes(MODE).stream().noneMatch(type -> type.getType() == BiblatexNonStandardEntryType.Audio));
     }
 
     @Test
-    void nothingIsStoredWhenNothingIsChecked() {
+    void okWithoutSelectionDeclinesEverythingWithoutStoringTypes() {
         ImportCustomEntryTypesDialogViewModel viewModel = viewModelFor(List.of(AUDIO_FROM_FILE, MANUSCRIPT_FROM_FILE));
 
         viewModel.importBibEntryTypes(List.of(), List.of());
 
         assertTrue(entryTypesManager.getAllCustomizedTypes(MODE).isEmpty());
         verify(preferences, never()).storeCustomEntryTypesRepository(entryTypesManager);
+        assertEquals(List.of(), List.copyOf(viewModelFor(List.of(AUDIO_FROM_FILE, MANUSCRIPT_FROM_FILE)).newTypes()));
+        assertEquals(List.of(), List.copyOf(viewModelFor(List.of(AUDIO_FROM_FILE, MANUSCRIPT_FROM_FILE)).differentCustomizations()));
+    }
+
+    @Test
+    void declinedTypeIsOfferedAgainWhenTheLibraryChangesItsDefinition() {
+        viewModelFor(List.of(MANUSCRIPT_FROM_FILE)).importBibEntryTypes(List.of(), List.of());
+        BibEntryType changedManuscript = parse("jabref-entrytype: manuscript: req[library;shelfmark] opt[origin]");
+
+        ImportCustomEntryTypesDialogViewModel viewModel = viewModelFor(List.of(changedManuscript));
+
+        assertEquals(List.of(changedManuscript), List.copyOf(viewModel.newTypes()));
+    }
+
+    @Test
+    void declinedTypeIsOfferedAgainWhenTheStoredDefinitionChanges() {
+        viewModelFor(List.of(AUDIO_FROM_FILE)).importBibEntryTypes(List.of(), List.of());
+        entryTypesManager.addCustomOrModifiedType(parse("jabref-entrytype: audio: req[title] opt[url]"), MODE);
+
+        ImportCustomEntryTypesDialogViewModel viewModel = viewModelFor(List.of(AUDIO_FROM_FILE));
+
+        assertEquals(List.of(AUDIO_FROM_FILE), viewModel.differentCustomizations().stream()
+                                                        .map(BibEntryTypePrefsAndFileViewModel::customTypeFromFile)
+                                                        .toList());
     }
 }

@@ -1,11 +1,11 @@
 package org.jabref.gui.importer.actions;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
-import org.jabref.logic.LibraryPreferences;
+import org.jabref.gui.importer.ImportCustomEntryTypesDialogViewModel;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
@@ -20,27 +20,28 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
-        return !getListOfUnknownAndUnequalCustomizations(parserResult, preferences.getLibraryPreferences()).isEmpty();
+        return !getListOfUnknownAndUnequalCustomizations(parserResult, preferences).isEmpty();
     }
 
     @Override
-    public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferencesService) {
-        LibraryPreferences preferences = preferencesService.getLibraryPreferences();
+    public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult, preferences);
         dialogService.showCustomDialogAndWait(new ImportCustomEntryTypesDialog(mode, getListOfUnknownAndUnequalCustomizations(parserResult, preferences)));
     }
 
-    private List<BibEntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult, LibraryPreferences preferences) {
+    private List<BibEntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult, CliPreferences preferences) {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult, preferences);
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
+        Set<String> declinedDecisions = preferences.getDeclinedCustomEntryTypes();
 
         return parserResult.getEntryTypes()
                            .stream()
                            .filter(type -> entryTypesManager.isDifferentCustomOrModifiedType(type, mode))
-                           .collect(Collectors.toList());
+                           .filter(type -> !declinedDecisions.contains(ImportCustomEntryTypesDialogViewModel.decision(type, entryTypesManager.enrich(type.getType(), mode), mode)))
+                           .toList();
     }
 
-    private BibDatabaseMode getBibDatabaseModeFromParserResult(ParserResult parserResult, LibraryPreferences preferences) {
-        return parserResult.getMetaData().getMode().orElse(preferences.getDefaultBibDatabaseMode());
+    private BibDatabaseMode getBibDatabaseModeFromParserResult(ParserResult parserResult, CliPreferences preferences) {
+        return parserResult.getMetaData().getMode().orElse(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());
     }
 }

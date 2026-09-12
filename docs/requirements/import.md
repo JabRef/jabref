@@ -35,7 +35,7 @@ Needs: impl, utest
 
 When a library declares entry types that differ from the ones stored in the preferences, JabRef offers to store them. This holds both for entry types JabRef does not know and for customizations of entry types JabRef ships.
 
-The definition the user accepts is the one from the library file, and it replaces the stored one. Opening the same library again therefore offers nothing, whereas entry types the user did not accept are offered again.
+The definition the user accepts is the one from the library file, and it replaces the stored one. Entry types the user leaves unchecked when confirming the dialog are remembered as declined. Opening the same library again therefore offers nothing, unless the definition in the library or the stored one has changed since. Cancelling the dialog decides nothing, so the entry types are offered again.
 
 Needs: impl, utest
 

@@ -2,6 +2,8 @@ package org.jabref.gui.importer.actions;
 
 import java.io.Reader;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.BibEntryTypePrefsAndFileViewModel;
@@ -83,6 +85,17 @@ class CheckForNewEntryTypesActionTest {
     @Test
     void dialogIsNotOfferedAgainAfterTheUserAcceptedEverything() {
         importAllOfferedEntryTypes();
+
+        assertFalse(action.isActionNecessary(parserResult, dialogService, preferences));
+    }
+
+    @Test
+    void dialogIsNotOfferedForDeclinedTypes() {
+        Set<String> declined = parserResult.getEntryTypes().stream()
+                                           .map(type -> ImportCustomEntryTypesDialogViewModel.decision(
+                                                   type, entryTypesManager.enrich(type.getType(), BibDatabaseMode.BIBLATEX), BibDatabaseMode.BIBLATEX))
+                                           .collect(Collectors.toSet());
+        when(preferences.getDeclinedCustomEntryTypes()).thenReturn(declined);
 
         assertFalse(action.isActionNecessary(parserResult, dialogService, preferences));
     }

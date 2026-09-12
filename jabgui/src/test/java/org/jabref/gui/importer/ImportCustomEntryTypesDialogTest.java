@@ -1,6 +1,7 @@
 package org.jabref.gui.importer;
 
 import java.util.List;
+import java.util.Optional;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -112,6 +114,8 @@ class ImportCustomEntryTypesDialogTest extends JavaFxTest {
 
         assertEquals(List.of(AUDIO_FROM_FILE), List.copyOf(entryTypesManager.getAllCustomizedTypes(MODE)));
         assertTrue(entryTypesManager.enrich(new UnknownEntryType("manuscript"), MODE).isEmpty());
+        verify(preferences).addDeclinedCustomEntryTypes(List.of(
+                ImportCustomEntryTypesDialogViewModel.decision(MANUSCRIPT_FROM_FILE, Optional.empty(), MODE)));
     }
 
     @Test
@@ -125,6 +129,7 @@ class ImportCustomEntryTypesDialogTest extends JavaFxTest {
         assertTrue(entryTypesManager.getAllCustomizedTypes(MODE).isEmpty());
         assertTrue(entryTypesManager.enrich(BiblatexNonStandardEntryType.Audio, MODE).isPresent());
         verify(preferences, never()).storeCustomEntryTypesRepository(entryTypesManager);
+        verify(preferences, never()).addDeclinedCustomEntryTypes(any());
     }
 
     @SuppressWarnings("unchecked")
