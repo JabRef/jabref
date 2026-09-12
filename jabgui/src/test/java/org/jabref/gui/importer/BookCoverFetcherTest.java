@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Tag("ExternalServicesTest")
 class BookCoverFetcherTest {
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final BookCoverFetcher bookCoverFetcher = new BookCoverFetcher(externalApplicationsPreferences);
@@ -75,6 +74,7 @@ class BookCoverFetcherTest {
     /// "toFile". This should then cause the expected file to
     /// be created.
     @Test
+    @Tag("ExternalServicesTest")
     void createNotAvailableFileAfterFailedDownload() throws Exception {
         bookCoverFetcher.downloadCoversForEntry(badEntry);
 
@@ -128,6 +128,7 @@ class BookCoverFetcherTest {
     /// We create a new .not-available file in the cover directory with a modification time more than 24 hours ago
     /// When we try to download the book and fail to do so, the modification time should be set to now.
     @Test
+    @Tag("ExternalServicesTest")
     void modificationTimeChangesWhenMoreThan24Hours() throws IOException, FetcherException {
         Instant now = Instant.now();
         Files.createFile(badNotAvailablePath);
@@ -166,6 +167,7 @@ class BookCoverFetcherTest {
     /// We create a new .not-available file in the cover directory with a modification time more than 24 hours ago
     /// When we try to download the book and succeed, the file should be deleted.
     @Test
+    @Tag("ExternalServicesTest")
     void notAvailableFileIsDeletedAfterSuccessfulDownload() throws IOException, FetcherException {
         Files.createFile(notAvailablePath);
         Files.setLastModifiedTime(notAvailablePath, FileTime.from(Instant.now().minus(25, ChronoUnit.HOURS)));

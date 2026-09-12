@@ -14,6 +14,7 @@ on:
       - '.github/workflows/tests-code-fetchers.yml'
       - '.github/actions/setup-gradle/action.yml'
       - 'jablib/build.gradle.kts'
+      - 'jabgui/src/main/java/org/jabref/gui/importer/**'
       - 'jabgui/src/test/java/org/jabref/gui/importer/**'
       - 'jabgui/build.gradle.kts'
   pull_request:
@@ -27,6 +28,7 @@ on:
       - '.github/actions/setup-gradle/action.yml'
       - '.github/workflows/tests-code-fetchers.yml'
       - 'jablib/build.gradle.kts'
+      - 'jabgui/src/main/java/org/jabref/gui/importer/**'
       - 'jabgui/src/test/java/org/jabref/gui/importer/**'
       - 'jabgui/build.gradle.kts'
   schedule:
@@ -65,6 +67,6 @@ jobs:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       - name: Run external services tests
-        run: gradle externalServicesTest jabgui:externalServicesTest
+        run: gradle externalServicesTest
         env:
           CI: "true"
