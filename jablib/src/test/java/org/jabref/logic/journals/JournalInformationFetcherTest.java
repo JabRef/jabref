@@ -2,7 +2,7 @@ package org.jabref.logic.journals;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.JournalInformationFetcher;
-import org.jabref.testutils.category.ExternalServicesTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.Test;
 
