@@ -3,10 +3,6 @@ package org.jabref.gui.walkthrough;
 import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
-import javafx.collections.ObservableList;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -99,35 +95,21 @@ public final class WalkthroughPane extends StackPane {
     /// menu a walkthrough steps into -- is not JabRef's to build, so it is given one here, the first time
     /// a walkthrough draws on it. Empty for any other window built outside JabRef.
     public static Optional<WalkthroughPane> of(Window window) {
-        Optional<WalkthroughPane> existing = Optional.ofNullable(window.getScene())
-                                                     .map(scene -> scene.getProperties().get(SCENE_PROPERTY_KEY))
-                                                     .map(WalkthroughPane.class::cast);
+        Optional<Scene> scene = Optional.ofNullable(window.getScene());
+        Optional<WalkthroughPane> existing = scene.map(it -> it.getProperties().get(SCENE_PROPERTY_KEY))
+                                                  .map(WalkthroughPane.class::cast);
         if (existing.isPresent() || !(window instanceof PopupWindow)) {
             return existing;
         }
-
-        return Optional.ofNullable(window.getScene())
-                       .map(Scene::getRoot)
-                       .flatMap(WalkthroughPane::childrenOf)
-                       .map(children -> {
-                           WalkthroughPane pane = new WalkthroughPane(Extent.NONE);
-                           children.add(pane);
-                           return pane;
-                       });
-    }
-
-    /// The two parents that take arbitrary children -- the same pair [PopupWindow] itself accepts as a
-    /// popup's root. Its own content list is not public beyond [javafx.stage.Popup], and a context menu is
-    /// a [javafx.scene.control.PopupControl].
-    private static Optional<ObservableList<Node>> childrenOf(Parent parent) {
-        return switch (parent) {
-            case Group group ->
-                    Optional.of(group.getChildren());
-            case Pane pane ->
-                    Optional.of(pane.getChildren());
-            default ->
-                    Optional.empty();
-        };
+        // A popup's root is the Pane that PopupWindow builds around its content.
+        return scene.map(Scene::getRoot)
+                    .filter(Pane.class::isInstance)
+                    .map(Pane.class::cast)
+                    .map(root -> {
+                        WalkthroughPane pane = new WalkthroughPane(Extent.NONE);
+                        root.getChildren().add(pane);
+                        return pane;
+                    });
     }
 
     private void fitToScene() {

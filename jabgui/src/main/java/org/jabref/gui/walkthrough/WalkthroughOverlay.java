@@ -150,7 +150,7 @@ public class WalkthroughOverlay {
                 resolvedWindow.getScene(),
                 resolvedNode);
         WindowOverlay overlay = overlays.computeIfAbsent(resolvedWindow,
-                w -> new WindowOverlay(w, pane.get(), walkthrough));
+                w -> new WindowOverlay(w, pane.orElseThrow(), walkthrough));
 
         switch (component) {
             case TooltipStep tooltip ->
