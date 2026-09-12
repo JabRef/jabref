@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@NullMarked
 class SharedDatabaseErrorTabTest extends JavaFxTest {
 
     private final AtomicInteger retries = new AtomicInteger();
