@@ -272,9 +272,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private void updateSidePane() {
         if (sidePane.getChildren().isEmpty()) {
-            if (horizontalDividerSubscription != null) {
-                horizontalDividerSubscription.unsubscribe();
-            }
+            unsubscribeHorizontalDivider();
             horizontalSplit.getItems().remove(sidePane);
         } else {
             if (!horizontalSplit.getItems().contains(sidePane)) {
@@ -303,13 +301,33 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public void updateHorizontalDividerPosition() {
-        if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
-            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
-                                                    .mapObservable(SplitPane.Divider::positionProperty)
-                                                    .listenToValues((_, newValue) ->
-                                                            preferences.getGuiPreferences()
-                                                                       .setHorizontalDividerPosition(newValue.doubleValue()));
+        // Toggling a side panel quickly queues several Platform.runLater callbacks, and this method is
+        // additionally called once the stage is shown. Without dropping the previous subscription first,
+        // each call would add another listener that keeps writing the preference while the side pane is
+        // being added, removed or laid out.
+        unsubscribeHorizontalDivider();
+        if (!mainStage.isShowing() || sidePane.getChildren().isEmpty()) {
+            return;
+        }
+        horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
+        horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
+                                                .mapObservable(SplitPane.Divider::positionProperty)
+                                                .listenToValues((_, newValue) -> storeHorizontalDividerPosition(newValue.doubleValue()));
+    }
+
+    private void unsubscribeHorizontalDivider() {
+        if (horizontalDividerSubscription != null) {
+            horizontalDividerSubscription.unsubscribe();
+            horizontalDividerSubscription = null;
+        }
+    }
+
+    /// Only a divider of a laid out side pane describes a width the user chose. While the pane is added or
+    /// removed the position collapses to 0 or 1, and restoring such a value would move the side bar to the
+    /// very left or the very right.
+    private void storeHorizontalDividerPosition(double position) {
+        if (position > 0 && position < 1) {
+            preferences.getGuiPreferences().setHorizontalDividerPosition(position);
         }
     }
 
