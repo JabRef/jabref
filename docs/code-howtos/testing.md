@@ -153,7 +153,7 @@ When executing tests in the sub project, the tests of the other sub projects are
 When executing tests in the main project, all tests of the sub projects are executed.
 
 The exceptions are the (SQL) database and fetcher tests.
-They are marked with `@org.jabref.testutils.category.DatabaseTest`.
+They are marked with `@org.jabref.support.DatabaseTest`.
 
 ### Database tests
 
@@ -171,7 +171,7 @@ docker run -d -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRE
 
 Set the environment variable `DBMS` to `postgres` (or leave it unset)
 
-Then, all DBMS Tests (annotated with `@org.jabref.testutils.category.DatabaseTest`) run properly.
+Then, all DBMS Tests (annotated with `@org.jabref.support.DatabaseTest`) run properly.
 
 ### Fetchers in tests
 
@@ -179,7 +179,7 @@ Then, all DBMS Tests (annotated with `@org.jabref.testutils.category.DatabaseTes
 Since API keys are required and some providers block requests from unknown IP addresses, these tests are not executed by default.
 Detailed information is available at [JabRef's fetcher documentation](fetchers.md).
 
-Each fetcher test is marked by `@org.jabref.testutils.category.ExternalServicesTest`.
+Each fetcher test is marked by `@org.jabref.support.ExternalServicesTest`.
 Some of them are also marked with `@org.jabref.support.DisabledOnCIServer`, to indicate that they are not executed on the CI server.
 These test are not executed on the CI, because the rate limits of the API providers are too often reached during the build process.
 

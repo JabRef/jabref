@@ -9,7 +9,7 @@ import org.jabref.model.entry.field.BiblatexSoftwareField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryType;
-import org.jabref.testutils.category.ExternalServicesTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeAll;
