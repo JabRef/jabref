@@ -39,7 +39,7 @@ child of a parent the window already has, installed while the window is built an
 lifetime:
 
 * the main window adds one to its `PowerPane` (`JabRefGUI`),
-* every dialog adds one to its `DialogPane` (`BaseDialog`),
+* every dialog adds one to its `DialogPane` (`BaseDialog`, and the input dialogs of `JabRefDialogService`),
 * popups -- context menus a walkthrough steps into -- are not JabRef's to build, so they are given one on
   the first lookup.
 
