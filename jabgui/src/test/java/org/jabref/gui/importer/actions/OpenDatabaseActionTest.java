@@ -1,7 +1,9 @@
 package org.jabref.gui.importer.actions;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
@@ -15,14 +17,19 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -92,5 +99,37 @@ public class OpenDatabaseActionTest {
         assertThrows(IllegalArgumentException.class, () -> dialogService.showFileOpenDialogAndGetMultipleFiles(badConfig));
         assertDoesNotThrow(() -> dialogService.showFileOpenDialog(goodConfig));
         assertEquals(List.of(), openDatabaseAction.getFilesToOpen());
+    }
+
+    /// Legacy group memberships are stored inside the group tree instead of the entries' `groups` field.
+    /// [org.jabref.migrations.ConvertLegacyExplicitGroups] converts them, and this test pins that it runs on open
+    /// (it stopped running when jabgui and jablib were split, https://github.com/JabRef/jabref/pull/12990).
+    // [utest->req~import.bibtex.legacy-migrations~1]
+    @Test
+    void loadDatabaseMigratesLegacyExplicitGroups(@TempDir Path tempDir) throws Exception {
+        Path library = tempDir.resolve("legacy-groups.bib");
+        Files.writeString(library, """
+                @Article{Entry1,
+                  author = {Koppor Test},
+                  title  = {Legacy groups migration test},
+                }
+
+                @Comment{jabref-meta: groupsversion:3;}
+
+                @Comment{jabref-meta: groupstree:
+                0 AllEntriesGroup:;
+                1 ExplicitGroup:TestGroup\\;0\\;Entry1\\;;
+                }
+                """);
+
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(filePreferences.getBackupDirectory()).thenReturn(tempDir.resolve("backups"));
+        when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
+        when(guiPreferences.getImportFormatPreferences()).thenReturn(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+
+        ParserResult parserResult = openDatabaseAction.loadDatabase(library);
+
+        BibEntry entry = parserResult.getDatabase().getEntries().getFirst();
+        assertEquals(Optional.of("TestGroup"), entry.getField(StandardField.GROUPS));
     }
 }

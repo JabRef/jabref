@@ -30,4 +30,12 @@ The `=======` and `|||||||` lines of a conflict are not looked for on their own:
 
 Needs: impl, utest
 
+## Legacy libraries are migrated when opened
+`req~import.bibtex.legacy-migrations~1`
+
+Opening a library written by JabRef 2.x/3.x converts its legacy content to the current representation: explicit group memberships stored inside the group tree move to the entries' `groups` field, `__markedentry` markings become groups, and special field values stored in `keywords` move to their own fields.
+The keyword separator used for splitting is the library's own, falling back to the configured one.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
