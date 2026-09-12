@@ -98,7 +98,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the default macOS shortcuts for "Search document identifier online" and "Focus group list" to not insert special characters. [#16528](https://github.com/JabRef/jabref/issues/16528)
 - We changed the extension of backup files from `.bak` to `.bib`, so that they can be opened in JabRef. [#11454](https://github.com/JabRef/jabref/issues/11454)
 - We changed spacing, padding and font sizes across the interface for a more consistent look and feel. [#16042](https://github.com/JabRef/jabref/issues/16042)
-- We reduced the amount of special spacing, padding and font sizes across the interface for a more unified interface. [#16887](https://github.com/JabRef/jabref/pull/16887), [#16921](https://github.com/JabRef/jabref/pull/16921)
+- We reduced the amount of special spacing, padding and font sizes across the interface for a more unified interface. [#16887](https://github.com/JabRef/jabref/pull/16887). [#16921](https://github.com/JabRef/jabref/pull/16921)
 - We changed the delete and rename file dialogs to state that undo does not restore files on disk. [#16680](https://github.com/JabRef/jabref/pull/16680)
 - We changed the donation prompt to appear as a notification in the notification center instead of a separate popup on the Welcome tab. [#16972](https://github.com/JabRef/jabref/pull/16972)
 - We reworked the appearance preferences: you now choose a theme (e.g. "JabRef", "Primer") and a color scheme ("Follow System", "Light", "Dark") separately; the "Use System Preference" checkbox is gone. [#15625](https://github.com/JabRef/jabref/issues/15625)
