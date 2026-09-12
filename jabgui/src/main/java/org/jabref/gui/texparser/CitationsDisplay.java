@@ -72,7 +72,7 @@ public class CitationsDisplay extends ListView<Citation> {
 
         // Citation text (highlighted).
         Text citation = new Text(line.substring(start, end));
-        citation.getStyleClass().setAll("tooltip-text-bold");
+        citation.getStyleClass().setAll("bold");
         texts.add(citation);
 
         // Text after the citation.

@@ -31,7 +31,7 @@ public class Walkthroughs extends VBox {
         this.preferences = preferences;
 
         setSpacing(12);
-        getStyleClass().add("align-top-left");
+        getStyleClass().addAll("align-top-left", "padding-top-12");
 
         header = new Label(Localization.lang("Walkthroughs"));
         header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);

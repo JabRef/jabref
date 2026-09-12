@@ -323,6 +323,12 @@
       "glob": "protectedterms/months_weekdays.terms"
     },
     {
+      "condition": {
+        "typeReached": "org.jabref.logic.ai.preferences.AiDefaultTemplates"
+      },
+      "glob": "ai/templates/*.vm"
+    },
+    {
       "glob": "build.properties"
     },
     {

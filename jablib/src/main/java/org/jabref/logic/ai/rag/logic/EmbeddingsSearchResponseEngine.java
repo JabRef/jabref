@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.ingestion.logic.EmbeddingsCleaner;
+import org.jabref.logic.ai.ingestion.logic.ingestion.FileIngestor;
 import org.jabref.logic.ai.ingestion.util.FileHasher;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.ai.pipeline.RelevantInformation;
@@ -101,7 +102,8 @@ public class EmbeddingsSearchResponseEngine implements ResponseEngine {
                                          : findEntryByFileHash(entriesFilter, fileHash)
                                            .flatMap(BibEntry::getCitationKey)
                                            .orElse(null);
-                    return new RelevantInformation(citationKey, textSegment.text());
+                    Integer pageNumber = textSegment.metadata().getInteger(FileIngestor.PAGE_NUMBER_METADATA_KEY);
+                    return new RelevantInformation(citationKey, pageNumber, textSegment.text());
                 })
                 .toList();
 
@@ -116,24 +118,26 @@ public class EmbeddingsSearchResponseEngine implements ResponseEngine {
     /// @param fileHash the SHA-256 hash of the file
     /// @return the entry if found
     private Optional<BibEntry> findEntryByFileHash(List<FullBibEntry> entries, String fileHash) {
-        return entries
-                .stream()
-                .flatMap(fullEntry ->
-                        fullEntry.databaseContext()
-                                 .getEntries()
-                                 .stream()
-                                 .filter(entry ->
-                                         entry.getFiles()
-                                              .stream()
-                                              .anyMatch(linkedFile ->
-                                                      linkedFile.findIn(fullEntry.databaseContext(), filePreferences)
-                                                                .flatMap(FileHasher::computeHash)
-                                                                .filter(hash -> hash.equals(fileHash))
-                                                                .isPresent()
-                                              )
-                                 )
-                )
-                .findFirst();
+        // It's easier to use the old-style cycle here. And it's easier to debug.
+        for (FullBibEntry fullEntry : entries) {
+            for (LinkedFile linkedFile : fullEntry.entry().getFiles()) {
+                Optional<Path> path = linkedFile.findIn(fullEntry.databaseContext(), filePreferences);
+                if (path.isEmpty()) {
+                    continue;
+                }
+
+                Optional<String> hash = FileHasher.computeHash(path.get());
+                if (hash.isEmpty()) {
+                    continue;
+                }
+
+                if (hash.get().equals(fileHash)) {
+                    return Optional.of(fullEntry.entry());
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     @Override

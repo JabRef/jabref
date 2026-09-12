@@ -56,7 +56,8 @@ import org.controlsfx.control.textfield.CustomTextField;
 
 public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
-    private static final String PANDOC_WARNING_LABEL_STYLE = "-fx-text-fill: #c9a227;";
+    /// Turns [#bstPandocWarning] into a warning; without it the label reads as a plain hint.
+    private static final String WARNING_STYLE_CLASS = "text-warning";
 
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
@@ -334,13 +335,13 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         if (StringUtil.isBlank(pandocPath)) {
             bstPandocWarning.setText(
                     Localization.lang("Pandoc path is required to be set. Please set it in your preferences."));
-            // FIXME: Inline style should be removed eventually.
-            bstPandocWarning.setStyle(PANDOC_WARNING_LABEL_STYLE);
+            if (!bstPandocWarning.getStyleClass().contains(WARNING_STYLE_CLASS)) {
+                bstPandocWarning.getStyleClass().add(WARNING_STYLE_CLASS);
+            }
         } else {
             bstPandocWarning.setText(
                     Localization.lang("Pandoc path: %0", pandocPath));
-            // FIXME: Inline style should be removed eventually.
-            bstPandocWarning.setStyle("");
+            bstPandocWarning.getStyleClass().remove(WARNING_STYLE_CLASS);
         }
 
         bstNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
