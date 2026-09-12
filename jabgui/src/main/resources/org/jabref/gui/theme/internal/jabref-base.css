@@ -126,7 +126,6 @@
 /* Background */
 .bg-accent { -fx-background: -color-accent; -fx-background-color: -color-accent; }
 .bg-secondary { -fx-background: -color-bg-secondary; -fx-background-color: -color-bg-secondary; }
-.bg-sidepane { -fx-background: -color-bg-sidepane; -fx-background-color: -color-bg-sidepane; }
 .bg-transparent { -fx-background: transparent; -fx-background-color: transparent; }
 
 /* Text color */
@@ -869,6 +868,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .welcome-main-container {
     -fx-max-width: 96em;
+    -fx-padding: 2em;
 }
 
 /* Welcome Community  */
