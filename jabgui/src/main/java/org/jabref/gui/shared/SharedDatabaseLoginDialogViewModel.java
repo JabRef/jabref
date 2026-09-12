@@ -14,7 +14,6 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
@@ -306,14 +305,17 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         autosave.set(sharedDatabaseAutosave);
     }
 
+    /// A database still being connected (or whose connection failed) counts as present too: a second attempt with
+    /// the same details would open and load the same remote library twice.
     private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
-        List<LibraryTab> libraryTabs = tabContainer.getLibraryTabs();
-        return libraryTabs.parallelStream().anyMatch(panel -> {
+        boolean open = tabContainer.getLibraryTabs().stream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
-
             return (context.getLocation() == DatabaseLocation.SHARED) &&
                     connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties());
         });
+        boolean pending = tabContainer.getSharedDatabasePlaceholders().stream()
+                                      .anyMatch(placeholder -> connectionProperties.equals(placeholder.getConnectionProperties()));
+        return open || pending;
     }
 
     public void showSaveDbToFileDialog() {

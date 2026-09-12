@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.ObservableList;
 
@@ -39,9 +40,17 @@ public interface LibraryTabContainer {
     /// Shows a placeholder for a shared database that is being connected (or failed to)
     void showSharedDatabasePlaceholder(SharedDatabasePlaceholderTab placeholder, boolean raisePanel);
 
+    /// Shared databases that are being connected or failed to, i.e. shown as a placeholder instead of a library tab
+    List<SharedDatabasePlaceholderTab> getSharedDatabasePlaceholders();
+
     /// Ids of the remembered shared databases that are still shown as a placeholder tab.
     /// They have no library tab, but must stay remembered for the next session.
-    List<String> getUnconnectedSharedDatabaseIds();
+    default List<String> getUnconnectedSharedDatabaseIds() {
+        return getSharedDatabasePlaceholders().stream()
+                                              .map(SharedDatabasePlaceholderTab::getSharedDatabaseId)
+                                              .flatMap(Optional::stream)
+                                              .toList();
+    }
 
     /// Refreshes the ui after changes to the preferences
     void refresh();

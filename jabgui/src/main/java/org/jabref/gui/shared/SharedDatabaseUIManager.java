@@ -181,7 +181,11 @@ public class SharedDatabaseUIManager {
                           }
                           placeholder.setRetryAction(() -> connectInBackground(placeholder, connectionProperties, onOpened));
                           placeholder.showError(exception);
-                          if (exception instanceof DatabaseNotSupportedException) {
+                          if (placeholder.getSharedDatabaseId().isPresent()) {
+                              // A remembered database reconnects on startup: no modal dialog then, but the tab alone is easy
+                              // to miss among the libraries that did open, so the failure is announced as well.
+                              dialogService.notify(Localization.lang("Could not connect to shared database %0", connectionProperties.getDatabase()));
+                          } else if (exception instanceof DatabaseNotSupportedException) {
                               offerMigration(placeholder);
                           }
                       })
@@ -200,7 +204,7 @@ public class SharedDatabaseUIManager {
                         Localization.lang("However, a new database was created alongside the pre-3.6 one."),
                 ButtonType.OK, openHelp);
         result.filter(openHelp::equals).ifPresent(_ -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
-        // The new database is connected on retry
+        // The failed attempt already created the new database alongside the pre-3.6 one, so retrying connects to it
         result.filter(ButtonType.OK::equals).ifPresent(_ -> placeholder.retry());
     }
 

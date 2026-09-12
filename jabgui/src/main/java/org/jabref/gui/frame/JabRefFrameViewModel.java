@@ -170,7 +170,9 @@ public class JabRefFrameViewModel {
         new SharedDatabaseSessionService().persistConnections(sharedDatabases);
         // Shared databases that failed to reconnect have no tab, but their connection settings are still stored and
         // must stay in the list so that the next start tries them again.
-        List<String> sharedDatabaseIds = Stream.concat(sharedDatabases.keySet().stream(), unconnectedSharedDatabaseIds.stream()).toList();
+        List<String> sharedDatabaseIds = Stream.concat(sharedDatabases.keySet().stream(), unconnectedSharedDatabaseIds.stream())
+                                               .distinct()
+                                               .toList();
         storeLastOpenedFiles(openedLibraries, focusedLibraries, sharedDatabaseIds); // store only if successfully having closed the libraries
 
         ProcessingLibraryDialog processingLibraryDialog = new ProcessingLibraryDialog(dialogService);

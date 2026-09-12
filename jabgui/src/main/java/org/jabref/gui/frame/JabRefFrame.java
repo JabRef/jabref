@@ -60,8 +60,7 @@ import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.shared.DatabaseConnectionProperties;
-import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.SharedDatabaseSessionService;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -602,16 +601,16 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
     }
 
-    /// Drops the placeholder of a shared database once it is open, no matter whether that happened through the
-    /// placeholder's retry or through the connection dialog. Leaving it behind would remember the same database
-    /// twice at quit and reconnect it twice on the next start.
+    /// Drops the placeholder of a shared database once it is open, no matter whether that
+    /// happened through the placeholder's retry or through the connection dialog. Leaving it behind would remember
+    /// the same database twice at quit and reconnect it twice on the next start.
     private void removeSharedDatabasePlaceholderFor(BibDatabaseContext databaseContext) {
-        if (databaseContext.getLocation() != DatabaseLocation.SHARED) {
-            return;
-        }
-        DatabaseConnectionProperties connectionProperties = databaseContext.getDBMSSynchronizer().getConnectionProperties();
-        tabbedPane.getTabs().removeIf(tab -> (tab instanceof SharedDatabasePlaceholderTab placeholder)
-                && placeholder.getConnectionProperties().equals(connectionProperties));
+        // Only a shared database carries a synchronizer, so its absence already rules out a matching placeholder.
+        Optional.ofNullable(databaseContext.getDBMSSynchronizer())
+                .map(DatabaseSynchronizer::getConnectionProperties)
+                .ifPresent(connectionProperties -> tabbedPane.getTabs().removeIf(
+                        tab -> (tab instanceof SharedDatabasePlaceholderTab placeholder)
+                                && placeholder.getConnectionProperties().equals(connectionProperties)));
     }
 
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
@@ -746,10 +745,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     @Override
-    public List<String> getUnconnectedSharedDatabaseIds() {
+    public List<SharedDatabasePlaceholderTab> getSharedDatabasePlaceholders() {
         return tabbedPane.getTabs().stream()
                          .filter(SharedDatabasePlaceholderTab.class::isInstance)
-                         .flatMap(tab -> ((SharedDatabasePlaceholderTab) tab).getSharedDatabaseId().stream())
+                         .map(SharedDatabasePlaceholderTab.class::cast)
                          .toList();
     }
 

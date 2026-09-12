@@ -930,7 +930,13 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.dbmsProcessor = new DBMSProcessor(connection);
         this.notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
         this.offlineChanges = OfflineChanges.load(offlineChangesDirectory, connection.getProperties());
-        initializeDatabases();
+        try {
+            initializeDatabases();
+        } catch (DatabaseNotSupportedException | SQLException e) {
+            // The connection is already assigned; a retry by the caller creates a new one, so this one must not leak
+            closeQuietly(currentConnection);
+            throw e;
+        }
     }
 
     @Override
