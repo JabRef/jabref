@@ -33,6 +33,7 @@ import org.jspecify.annotations.Nullable;
 
 import static java.util.Comparator.comparingDouble;
 import static org.jabref.logic.ai.ingestion.logic.EmbeddingsCleaner.FILE_HASH_METADATA_KEY;
+import static org.jabref.logic.ai.ingestion.logic.ingestion.FileIngestor.PAGE_NUMBER_METADATA_KEY;
 
 /// A custom implementation of langchain4j's [EmbeddingStore] that uses an MVStore as an embedded database.
 ///
@@ -44,10 +45,12 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
     private static final String FILE_HASH_MAP_NAME = "file-hashes";
     private static final String CONTENT_MAP_NAME = "contents";
     private static final String EMBEDDING_VECTOR_MAP_NAME = "embeddings";
+    private static final String PAGE_NUMBER_MAP_NAME = "page-numbers";
 
     private final Map<String, String> fileHashMap;
     private final Map<String, String> contentMap;
     private final Map<String, float[]> embeddingVectorMap;
+    private final Map<String, Integer> pageNumberMap;
 
     public MVStoreEmbeddingStore(Path path, NotificationService dialogService) {
         super(path, dialogService);
@@ -55,6 +58,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         this.fileHashMap = this.mvStore.openMap(FILE_HASH_MAP_NAME);
         this.contentMap = this.mvStore.openMap(CONTENT_MAP_NAME);
         this.embeddingVectorMap = this.mvStore.openMap(EMBEDDING_VECTOR_MAP_NAME);
+        this.pageNumberMap = this.mvStore.openMap(PAGE_NUMBER_MAP_NAME);
     }
 
     @Override
@@ -79,15 +83,22 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         fileHashMap.put(id, null);
         contentMap.put(id, "");
         embeddingVectorMap.put(id, embedding.vector());
+        pageNumberMap.remove(id);
     }
 
     @Override
     public String add(Embedding embedding, TextSegment textSegment) {
         String id = String.valueOf(UUID.randomUUID());
         String fileHash = textSegment.metadata().getString(FILE_HASH_METADATA_KEY);
+        Integer pageNumber = textSegment.metadata().getInteger(PAGE_NUMBER_METADATA_KEY);
         fileHashMap.put(id, fileHash);
         contentMap.put(id, textSegment.text());
         embeddingVectorMap.put(id, embedding.vector());
+        if (pageNumber != null) {
+            pageNumberMap.put(id, pageNumber);
+        } else {
+            pageNumberMap.remove(id);
+        }
         return id;
     }
 
@@ -101,6 +112,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         fileHashMap.remove(id);
         contentMap.remove(id);
         embeddingVectorMap.remove(id);
+        pageNumberMap.remove(id);
     }
 
     @Override
@@ -114,6 +126,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         fileHashMap.clear();
         contentMap.clear();
         embeddingVectorMap.clear();
+        pageNumberMap.clear();
     }
 
     /// The main function of finding most relevant text segments.
@@ -135,20 +148,25 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
             float[] embeddingVector = embeddingVectorMap.getOrDefault(id, new float[0]);
             String content = contentMap.getOrDefault(id, "");
             String fileHash = fileHashMap.get(id);
+            Integer pageNumber = pageNumberMap.get(id);
 
             double cosineSimilarity = CosineSimilarity.between(Embedding.from(embeddingVector), request.queryEmbedding());
             double score = RelevanceScore.fromCosineSimilarity(cosineSimilarity);
 
             if (score >= request.minScore()) {
+                Metadata metadata = new Metadata();
+                if (fileHash != null) {
+                    metadata.put(FILE_HASH_METADATA_KEY, fileHash);
+                }
+                if (pageNumber != null) {
+                    metadata.put(PAGE_NUMBER_METADATA_KEY, pageNumber);
+                }
                 matches.add(
                         new EmbeddingMatch<>(
                                 score,
                                 id,
                                 Embedding.from(embeddingVector),
-                                new TextSegment(
-                                        content,
-                                        new Metadata(
-                                                fileHash == null ? Map.of() : Map.of(FILE_HASH_METADATA_KEY, fileHash)))));
+                                new TextSegment(content, metadata)));
 
                 if (matches.size() > request.maxResults()) {
                     matches.poll();
@@ -168,6 +186,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
             fileHashMap.remove(id);
             contentMap.remove(id);
             embeddingVectorMap.remove(id);
+            pageNumberMap.remove(id);
         });
     }
 

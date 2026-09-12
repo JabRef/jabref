@@ -51,6 +51,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15929](https://github.com/JabRef/jabref/pull/15929)
 - The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts any open library id, switching JabRef to that library before importing, instead of only the currently active one. [#15929](https://github.com/JabRef/jabref/pull/15929)
 - We added support for selecting response engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
+- We added the ability to jump to cited entries and page locations in the PDF viewer from AI chat citations. [#16981](https://github.com/JabRef/jabref/pull/16981)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 - We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
@@ -82,8 +83,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a Git section to the library properties for automatic commit, pull and push. [#12630](https://github.com/JabRef/jabref/issues/12630)
 - We added connection URL pasting to the shared database login dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We added a Dnb Fetcher that uses SRU interface and wired to ISBN Fetcher [#17070](https://github.com/JabRef/jabref/pull/17070)
+- We added read-only access to shared SQL libraries in `jabkit`: every input file argument accepts a PostgreSQL URL. [#12948](https://github.com/JabRef/jabref/issues/12948)
+
 ### Changed
 
+- We changed the default prompts for "AI-Chat" & "Chat with Groups" to better handle etiquette, metadata, citationkeys and context separation. [#16981](https://github.com/JabRef/jabref/pull/16981)
 - We redesigned the "About JabRef" dialog. [#16950](https://github.com/JabRef/jabref/pull/16950)
 - We now create the group for imported entries when entries are imported, instead of when a library is opened. [#16988](https://github.com/JabRef/jabref/pull/16988)
 - We removed the keystore fields, the server timezone, and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
@@ -140,6 +144,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed missing publication years and empty parentheses in the related articles tab. [#16998](https://github.com/JabRef/jabref/issues/16998)
+- We fixed an issue where <kbd>Ctrl</kbd> + <kbd>W</kbd> did not close the welcome tab. [#16895](https://github.com/JabRef/jabref/pull/16895)
 - We fixed an issue where an entry added by DOI or URL could not be undone. [#8770](https://github.com/JabRef/jabref/issues/8770)
 - We fixed an issue where a regular expression search containing a quotation mark stopped the search instead of returning results. [#9482](https://github.com/JabRef/jabref/issues/9482)
 - We fixed an issue where an author list ending with "et al." was parsed as a person named "et al." instead of "and others". [#16937](https://github.com/JabRef/jabref/pull/16937)
@@ -149,6 +155,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where editing a library's string constants could not be undone. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where changes made in the library properties could not be undone. [#16988](https://github.com/JabRef/jabref/pull/16988)
 - We fixed an issue where the modified marker stayed set after undoing a change to groups or library properties. [#16988](https://github.com/JabRef/jabref/pull/16988)
+- We fixed an exception when switching to a group in a shared library. [#17089](https://github.com/JabRef/jabref/issues/17089)
 - We fixed an issue where undoing could overwrite a newer value when a background operation had changed the same field. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where adding, removing, moving, sorting or editing groups could not be undone. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where Ctrl+Z and Ctrl+Y only worked while the entry editor had focus. [#16936](https://github.com/JabRef/jabref/pull/16936)
@@ -261,6 +268,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening an online link with a query string could open a truncated URL. [#16774](https://github.com/JabRef/jabref/pull/16774)
 - We fixed an issue where the main table showed a tooltip with the entry's full title even when the title was already fully visible; the tooltip now appears only when the title is truncated. [#16607](https://github.com/JabRef/jabref/issues/16607)
 - We fixed the `Journal Abbreviation` search box invisible text with `JabRef - Light theme`. [#15721](https://github.com/JabRef/jabref/issues/15721).
+- We fixed an issue where file synchronization tools could pick up a half-written PDF while JabRef wrote metadata. [#16782](https://github.com/JabRef/jabref/pull/16782)
 - We fixed an issue where undo in one library could revert a change made in another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where saving one library cleared the modified marker of another library. [#16857](https://github.com/JabRef/jabref/pull/16857)
 - We fixed an issue where entry added by "add entry using" was not selected. [#16035](https://github.com/JabRef/jabref/issues/16035)
