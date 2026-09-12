@@ -26,6 +26,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -134,7 +135,7 @@ public class ExtractReferencesAction extends SimpleCommand {
             // subsequent files are just appended to result
             Iterator<Path> fileListIterator = fileList.iterator();
             fileListIterator.next(); // skip first file
-            extractReferences(fileListIterator, result, currentEntry);
+            extractReferences(databaseContext, fileListIterator, result, currentEntry);
 
             // handle subsequent entries
             Iterator<BibEntry> selectedEntriesIterator = selectedEntries.iterator();
@@ -143,22 +144,24 @@ public class ExtractReferencesAction extends SimpleCommand {
                 currentEntry = selectedEntriesIterator.next();
                 fileList = FileUtil.getListOfLinkedFiles(List.of(currentEntry), databaseContext.getFileDirectories(preferences.getFilePreferences()));
                 fileListIterator = fileList.iterator();
-                extractReferences(fileListIterator, result, currentEntry);
+                extractReferences(databaseContext, fileListIterator, result, currentEntry);
             }
 
             return result;
         };
     }
 
-    private void extractReferences(Iterator<Path> fileListIterator, ParserResult result, BibEntry currentEntry) {
+    private void extractReferences(BibDatabaseContext databaseContext, Iterator<Path> fileListIterator, ParserResult result, BibEntry currentEntry) {
         while (fileListIterator.hasNext()) {
             result.getDatabase().insertEntries(ruleBasedBibliographyPdfImporter.importDatabase(fileListIterator.next()).getDatabase().getEntries());
         }
 
         String cites = getCites(result.getDatabase().getEntries(), currentEntry);
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            currentEntry.setField(StandardField.CITES, cites);
-        });
+        // The library the entry belongs to, not whichever is active when this finishes.
+        UiTaskExecutor.runInJavaFXThread(() ->
+                stateManager.getUndoManager(databaseContext)
+                            .applyEdit(new UndoableFieldChange(currentEntry, StandardField.CITES,
+                                    currentEntry.getField(StandardField.CITES).orElse(null), cites)));
     }
 
     /// Creates the field content for the "cites" field. The field contains the citation keys of the imported entries.

@@ -18,7 +18,6 @@ import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.journals.AbbreviationType;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -53,21 +52,20 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     // Journal abbreviation on save
     private final ObjectProperty<AbbreviationType> journalAbbreviationOnSaveProperty = new SimpleObjectProperty<>();
 
-    private final BibDatabaseContext databaseContext;
-    private final MetaData initialMetaData;
-    private final SaveOrder saveOrder;
     private final FieldFormatterCleanupActions defaultSaveActions;
 
-    public SavingPropertiesViewModel(BibDatabaseContext databaseContext, FieldFormatterCleanupActions defaultSaveActions) {
-        this.databaseContext = databaseContext;
-        this.initialMetaData = databaseContext.getMetaData();
-        this.saveOrder = initialMetaData.getSaveOrder().orElse(UI_DEFAULT_SAVE_ORDER);
+    /// The order the dialog was opened with, which [#storeSettings] compares against so that
+    /// leaving the controls alone writes nothing.
+    private SaveOrder saveOrder = UI_DEFAULT_SAVE_ORDER;
+
+    public SavingPropertiesViewModel(FieldFormatterCleanupActions defaultSaveActions) {
         this.defaultSaveActions = defaultSaveActions;
     }
 
     @Override
-    public void setValues() {
-        libraryProtectedProperty.setValue(initialMetaData.isProtected());
+    public void setValues(MetaData metaData) {
+        saveOrder = metaData.getSaveOrder().orElse(UI_DEFAULT_SAVE_ORDER);
+        libraryProtectedProperty.setValue(metaData.isProtected());
 
         // SaveOrderConfigPanel, included via <?import ...> in FXML
 
@@ -96,7 +94,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
         // FieldFormatterCleanupsPanel, included via <?import ...> in FXML
 
-        Optional<FieldFormatterCleanupActions> saveActions = initialMetaData.getSaveActions();
+        Optional<FieldFormatterCleanupActions> saveActions = metaData.getSaveActions();
         saveActions.ifPresentOrElse(value -> {
             cleanupsDisableProperty.setValue(!value.isEnabled());
             cleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
@@ -105,17 +103,15 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             cleanupsProperty.setValue(FXCollections.observableArrayList(defaultSaveActions.getConfiguredActions()));
         });
 
-        journalAbbreviationOnSaveProperty.setValue(initialMetaData.getLibraryAbbreviationType().orElse(null));
+        journalAbbreviationOnSaveProperty.setValue(metaData.getLibraryAbbreviationType().orElse(null));
     }
 
     @Override
-    public void storeSettings() {
-        MetaData newMetaData = databaseContext.getMetaData();
-
+    public void storeSettings(MetaData metaData) {
         if (libraryProtectedProperty.getValue()) {
-            newMetaData.markAsProtected();
+            metaData.markAsProtected();
         } else {
-            newMetaData.markAsNotProtected();
+            metaData.markAsNotProtected();
         }
 
         FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(
@@ -123,13 +119,13 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
                 cleanupsProperty());
 
         if (FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanupActions.getConfiguredActions())) {
-            newMetaData.clearSaveActions();
+            metaData.clearSaveActions();
         } else {
             // if all actions have been removed, remove the save actions from the MetaData
             if (fieldFormatterCleanupActions.getConfiguredActions().isEmpty()) {
-                newMetaData.clearSaveActions();
+                metaData.clearSaveActions();
             } else {
-                newMetaData.setSaveActions(fieldFormatterCleanupActions);
+                metaData.setSaveActions(fieldFormatterCleanupActions);
             }
         }
 
@@ -139,20 +135,18 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
         if (!newSaveOrder.equals(saveOrder)) {
             if (newSaveOrder.equals(SaveOrder.getDefaultSaveOrder())) {
-                newMetaData.clearSaveOrder();
+                metaData.clearSaveOrder();
             } else {
-                newMetaData.setSaveOrder(newSaveOrder);
+                metaData.setSaveOrder(newSaveOrder);
             }
         }
 
         AbbreviationType abbreviationType = journalAbbreviationOnSaveProperty.getValue();
         if (abbreviationType != null) {
-            newMetaData.setLibraryAbbreviationType(abbreviationType);
+            metaData.setLibraryAbbreviationType(abbreviationType);
         } else {
-            newMetaData.clearLibraryAbbreviationType();
+            metaData.clearLibraryAbbreviationType();
         }
-
-        databaseContext.setMetaData(newMetaData);
     }
 
     public BooleanProperty protectDisableProperty() {

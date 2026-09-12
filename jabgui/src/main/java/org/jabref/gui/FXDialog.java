@@ -1,10 +1,12 @@
 package org.jabref.gui;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
@@ -42,22 +44,32 @@ public class FXDialog extends Alert {
     public FXDialog(AlertType type, boolean isModal) {
         super(type);
 
+        dialogPaneProperty().addListener((_, _, newPane) -> {
+            if (newPane != null) {
+                setupKeyBindings(newPane);
+            }
+        });
+        setupKeyBindings(getDialogPane());
+
         setDialogIcon(IconTheme.getJabRefIcon());
 
         Stage dialogWindow = getDialogWindow();
-        dialogWindow.setOnCloseRequest(evt -> this.close());
+        dialogWindow.addEventHandler(WindowEvent.WINDOW_SHOWN, _ -> BaseDialog.fitWindowToContent(this.getDialogPane()));
+        dialogWindow.setOnCloseRequest(_ -> this.close());
+
         if (isModal) {
             initModality(Modality.APPLICATION_MODAL);
         } else {
             initModality(Modality.NONE);
         }
-
-        getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event -> BaseDialog.closeOnKeyBindingMatch(event, this));
-        setOnShown(_ -> BaseDialog.applyButtonFix(this.getDialogPane()));
     }
 
     public FXDialog(AlertType type) {
         this(type, true);
+    }
+
+    private void setupKeyBindings(DialogPane newPane) {
+        newPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> BaseDialog.closeOnKeyBindingMatch(event, this));
     }
 
     private void setDialogIcon(Image image) {

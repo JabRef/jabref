@@ -16,7 +16,7 @@
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="680.0"
             prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171"
             fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView"
-            id="styleSelectDialog">
+            id="style-select-dialog">
     <content>
         <VBox spacing="10.0">
             <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">

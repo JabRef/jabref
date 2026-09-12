@@ -2,9 +2,11 @@ package org.jabref.gui.util;
 
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
@@ -14,6 +16,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -31,9 +34,11 @@ public class BaseDialog<T> extends Dialog<T> {
         });
         setupKeyBindings(getDialogPane());
 
-        setOnShown(_ -> applyButtonFix(this.getDialogPane()));
-
         setDialogIcon(IconTheme.getJabRefIcon());
+
+        Stage dialogWindow = getDialogWindow();
+        dialogWindow.addEventHandler(WindowEvent.WINDOW_SHOWN, _ -> fitWindowToContent(this.getDialogPane()));
+
         setResizable(true);
     }
 
@@ -49,27 +54,33 @@ public class BaseDialog<T> extends Dialog<T> {
         return false;
     }
 
-    private void setupKeyBindings(DialogPane dialogPane) {
-        dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            boolean closed = closeOnKeyBindingMatch(event, this);
-            if (closed) {
-                return;
-            }
+    private Stage getDialogWindow() {
+        return (Stage) getDialogPane().getScene().getWindow();
+    }
 
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
-                getDefaultButton().ifPresent(Button::fire);
+    private void setupKeyBindings(DialogPane dialogPane) {
+        dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyEvent);
+    }
+
+    private void handleKeyEvent(KeyEvent event) {
+        boolean closed = closeOnKeyBindingMatch(event, this);
+        if (closed) {
+            return;
+        }
+
+        KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+        if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {
+            getDefaultButton().ifPresent(Button::fire);
+            event.consume();
+        }
+
+        // all buttons in base dialogs react on enter
+        if (event.getCode() == KeyCode.ENTER) {
+            if (event.getTarget() instanceof Button button) {
+                button.fire();
                 event.consume();
             }
-
-            // all buttons in base dialogs react on enter
-            if (event.getCode() == KeyCode.ENTER) {
-                if (event.getTarget() instanceof Button button) {
-                    button.fire();
-                    event.consume();
-                }
-            }
-        });
+        }
     }
 
     private Optional<Button> getDefaultButton() {
@@ -88,34 +99,46 @@ public class BaseDialog<T> extends Dialog<T> {
         dialogWindow.getIcons().add(image);
     }
 
-    /// Applies a fix to prevent truncating ButtonBar buttons with larger font sizes
-    public static void applyButtonFix(DialogPane pane) {
-        // Force the window to fit the new font content bounds
-        if (pane.getScene() != null && pane.getScene().getWindow() != null) {
-            pane.getScene().getWindow().sizeToScene();
-        }
-
+    /// Fits the dialog window around its content.
+    public static void fitWindowToContent(DialogPane pane) {
         for (ButtonType type : pane.getButtonTypes()) {
-            Node node = pane.lookupButton(type);
-            if (node instanceof Button button) {
-                // Disabling uniform size prevents the ButtonBar from squeezing
-                // buttons into a width that is slightly too small for 10pt or larger text.
-
-                ButtonBar.setButtonUniformSize(button, false);
-                button.setMinWidth(Region.USE_PREF_SIZE);
-                button.setMaxWidth(Double.MAX_VALUE);
-
-                // Re-trigger CSS to ensure prefWidth is calculated using the new font metrics
-                button.applyCss();
+            if (pane.lookupButton(type) instanceof Button button) {
+                // The button bar squeezes buttons into a width that is too small for a raised font size.
+                button.setPrefWidth(Region.USE_COMPUTED_SIZE);
             }
         }
 
-        pane.requestLayout();
+        // The new sizes are only known after the pane has been laid out again.
+        Platform.runLater(() -> sizeDialog(pane));
+    }
+
+    /// Reapplies CSS and relayout the dialog again.
+    private static void sizeDialog(DialogPane pane) {
+        Scene scene = pane.getScene();
+        if (scene == null || !(scene.getWindow() instanceof Stage stage)) {
+            return;
+        }
+        clearSizeCache(pane);
+
+        pane.applyCss();
+        pane.layout();
+
+        // Now that the sizes are the ones of the font the dialog is rendered in, the window can be
+        // fitted around its content again.
+        stage.sizeToScene();
+    }
+
+    private static void clearSizeCache(Parent parent) {
+        parent.requestLayout();
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof Parent childParent) {
+                clearSizeCache(childParent);
+            }
+        }
     }
 
     public static void bringToFront(Dialog<?> dialog) {
         // Using answers from: <https://stackoverflow.com/a/43007782> and <https://stackoverflow.com/a/48798192>.
-
         Window window = dialog.getDialogPane().getScene().getWindow();
         if (window instanceof Stage stage) {
             stage.setAlwaysOnTop(true);
