@@ -28,7 +28,6 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private Function<T, String> toText;
     private BiFunction<S, T, Node> toGraphic;
     private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
-    private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseEnterEvent;
     private Function<T, BooleanExpression> toDisableExpression;
     private Function<T, BooleanExpression> toVisibleExpression;
     private BiFunction<S, T, String> toTooltip;

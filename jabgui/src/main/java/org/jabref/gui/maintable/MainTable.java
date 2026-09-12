@@ -129,6 +129,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
         this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), journalAbbreviationRepository);
+        fixedCellSizeProperty().bind(preferences.getWorkspacePreferences().virtualizedCellSizeProperty());
 
         MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
