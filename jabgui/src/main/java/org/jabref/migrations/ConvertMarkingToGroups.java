@@ -27,6 +27,13 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
 
     private static final Pattern MARKING_PATTERN = Pattern.compile("\\[([^\\[\\]]*):(\\d+)\\]");
 
+    // The groups field of an entry is split with the library's keyword separator, so the created groups must use it too
+    private final Character keywordSeparator;
+
+    public ConvertMarkingToGroups(Character keywordSeparator) {
+        this.keywordSeparator = keywordSeparator;
+    }
+
     @Override
     public boolean isMigrationNecessary(ParserResult parserResult) {
         return parserResult.getDatabase().getEntries().stream().anyMatch(entry -> entry.hasField(InternalField.MARKED_INTERNAL));
@@ -52,13 +59,13 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
             // Group names are unique per library, so an existing "Markings" tree (e.g., from a partial earlier run) is extended
             GroupTreeNode markingRoot = childNamed(root, Localization.lang("Markings"))
                     .orElseGet(() -> {
-                        GroupTreeNode node = GroupTreeNode.fromGroup(new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, ','));
+                        GroupTreeNode node = GroupTreeNode.fromGroup(new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, keywordSeparator));
                         root.addChild(node, 0);
                         return node;
                     });
             for (Map.Entry<String, Collection<BibEntry>> marking : markings.asMap().entrySet()) {
                 GroupTreeNode markingGroup = childNamed(markingRoot, marking.getKey())
-                        .orElseGet(() -> markingRoot.addSubgroup(new ExplicitGroup(marking.getKey(), GroupHierarchyType.INCLUDING, ',')));
+                        .orElseGet(() -> markingRoot.addSubgroup(new ExplicitGroup(marking.getKey(), GroupHierarchyType.INCLUDING, keywordSeparator)));
                 markingGroup.addEntriesToGroup(marking.getValue());
             }
             parserResult.getMetaData().setGroups(root);

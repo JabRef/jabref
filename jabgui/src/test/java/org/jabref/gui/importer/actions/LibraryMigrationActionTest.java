@@ -13,6 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /// [utest->req~import.legacy-library-migration~1]
+@NullMarked
 class LibraryMigrationActionTest {
 
     private final CliPreferences preferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);

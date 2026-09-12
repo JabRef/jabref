@@ -30,7 +30,7 @@ class ConvertMarkingToGroupsTest {
             .addSubgroup(new ExplicitGroup("Nicolas:6", GroupHierarchyType.INCLUDING, ','));
         parserResult.getMetaData().setGroups(root);
 
-        new ConvertMarkingToGroups().performMigration(parserResult);
+        new ConvertMarkingToGroups(',').performMigration(parserResult);
 
         GroupTreeNode rootExpected = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
         GroupTreeNode markings = rootExpected.addSubgroup(new ExplicitGroup("Markings", GroupHierarchyType.INCLUDING, ','));
@@ -44,7 +44,7 @@ class ConvertMarkingToGroupsTest {
         BibEntry entry = new BibEntry()
                 .withField(InternalField.MARKED_INTERNAL, " ");
         ParserResult parserResult = new ParserResult(Set.of(entry));
-        ConvertMarkingToGroups migration = new ConvertMarkingToGroups();
+        ConvertMarkingToGroups migration = new ConvertMarkingToGroups(',');
         assertTrue(migration.isMigrationNecessary(parserResult));
 
         migration.performMigration(parserResult);
@@ -60,7 +60,7 @@ class ConvertMarkingToGroupsTest {
                 .withField(InternalField.MARKED_INTERNAL, "note [Alice:1][Bob:2]");
         ParserResult parserResult = new ParserResult(Set.of(entry));
 
-        new ConvertMarkingToGroups().performMigration(parserResult);
+        new ConvertMarkingToGroups(',').performMigration(parserResult);
 
         GroupTreeNode rootExpected = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
         GroupTreeNode markings = rootExpected.addSubgroup(new ExplicitGroup("Markings", GroupHierarchyType.INCLUDING, ','));
@@ -76,7 +76,7 @@ class ConvertMarkingToGroupsTest {
                 .withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
         ParserResult parserResult = new ParserResult(Set.of(entry));
 
-        ConvertMarkingToGroups migration = new ConvertMarkingToGroups();
+        ConvertMarkingToGroups migration = new ConvertMarkingToGroups(',');
         assertTrue(migration.isMigrationNecessary(parserResult));
 
         migration.performMigration(parserResult);

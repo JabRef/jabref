@@ -87,7 +87,7 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
         List<String> skippedMigrations = parserResult.getMetaData().getSkippedMigrations();
         return Stream.of(
                              new ConvertLegacyExplicitGroups(),
-                             new ConvertMarkingToGroups(),
+                             new ConvertMarkingToGroups(keywordSeparator),
                              new SpecialFieldsToSeparateFields(keywordSeparator))
                      // A stored skip never silences a mandatory conversion: without it, saving would lose data
                      .filter(migration -> !migration.isOptional() || !skippedMigrations.contains(migration.getId()))
