@@ -15,6 +15,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -27,15 +29,17 @@ import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.Nullable;
 
 public class JumpToFieldDialog extends BaseDialog<Void> {
-    private HoverSelectingAutoCompletionBinding<String> autoCompletion;
-    @FXML private TextField searchField;
+    HoverSelectingAutoCompletionBinding<String> autoCompletion;
+    @FXML TextField searchField;
     @FXML private Label newFieldHint;
     private final EntryEditor entryEditor;
     private JumpToFieldViewModel viewModel;
     private boolean resizeScheduled;
+    private double lastResizedPrefHeight = Double.NaN;
     private final ObjectProperty<@Nullable String> highlightedSuggestion = new SimpleObjectProperty<>();
     private boolean confirming;
     private int popupGeneration;
+    private @Nullable String pendingSelection;
 
     public JumpToFieldDialog(EntryEditor entryEditor) {
         this.entryEditor = entryEditor;
@@ -46,6 +50,14 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         this.getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        if (getDialogPane().lookupButton(ButtonType.OK) instanceof Button okButton) {
+            okButton.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    pendingSelection = fieldToUse();
+                }
+            });
+        }
 
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
@@ -85,6 +97,7 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
         showingProperty().addListener((_, _, showing) -> {
             if (showing) {
                 highlightedSuggestion.set(null);
+                lastResizedPrefHeight = getDialogPane().prefHeight(-1);
             }
         });
 
@@ -112,10 +125,14 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
         });
 
         // New input and focusing the field again start a fresh context: no suggestion applies.
-        searchField.textProperty().addListener((_, _, _) -> highlightedSuggestion.set(null));
+        searchField.textProperty().addListener((_, _, _) -> {
+            highlightedSuggestion.set(null);
+            pendingSelection = null;
+        });
         searchField.focusedProperty().addListener((_, _, focused) -> {
             if (focused) {
                 highlightedSuggestion.set(null);
+                pendingSelection = null;
             }
         });
     }
@@ -162,7 +179,15 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
                     .filter(Window::isShowing)
                     .ifPresent(window -> {
                         if (window instanceof Stage stage) {
-                            stage.sizeToScene();
+                            double currentPrefHeight = getDialogPane().prefHeight(-1);
+                            if (Double.isNaN(lastResizedPrefHeight)) {
+                                lastResizedPrefHeight = currentPrefHeight;
+                            }
+                            double heightDelta = currentPrefHeight - lastResizedPrefHeight;
+                            lastResizedPrefHeight = currentPrefHeight;
+                            if (Math.abs(heightDelta) > 0.01) {
+                                stage.setHeight(stage.getHeight() + heightDelta);
+                            }
                         }
                     });
         });
@@ -170,7 +195,8 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
 
     private void jumpToSelectedField() {
         confirming = false;
-        String selectedField = fieldToUse();
+        String selectedField = pendingSelection != null ? pendingSelection : fieldToUse();
+        pendingSelection = null;
         if (StringUtil.isNotBlank(selectedField)) {
             String fieldToJumpTo = selectedField.toLowerCase().strip();
             entryEditor.selectField(fieldToJumpTo);
