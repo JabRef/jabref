@@ -160,3 +160,6 @@ just whats-new --stdout   # plain text instead
 ```
 
 The first run only records the current commit (in the checkout's `.git` directory) and shows nothing.
+
+While JabRef runs from a checkout, the same news lives in a "What's new" toolbar button next to the GitHub one: every five minutes it fetches, turns blue once the checkout is behind, lists the pending entries in its tooltip and, clicked, opens the window with a *Restart to update* button.
+`just run-loop` makes that restart work: it pulls, rebuilds and starts JabRef again.

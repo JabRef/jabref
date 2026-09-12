@@ -28,6 +28,7 @@ import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.whatsnew.WhatsNewButton;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -56,6 +57,7 @@ public class MainToolBar extends ToolBar {
     private SimpleCommand forwardCommand;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final GitHandlerRegistry gitHandlerRegistry;
+    private final Runnable quit;
 
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
@@ -73,7 +75,8 @@ public class MainToolBar extends ToolBar {
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
                        JournalAbbreviationRepository journalAbbreviationRepository,
-                       GitHandlerRegistry gitHandlerRegistry) {
+                       GitHandlerRegistry gitHandlerRegistry,
+                       Runnable quit) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
@@ -87,6 +90,7 @@ public class MainToolBar extends ToolBar {
         this.clipBoardManager = clipBoardManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.gitHandlerRegistry = gitHandlerRegistry;
+        this.quit = quit;
 
         createToolBar();
     }
@@ -158,6 +162,10 @@ public class MainToolBar extends ToolBar {
 
                 new HBox(
                         factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferences.getExternalApplicationsPreferences()))));
+
+        // Only while JabRef runs out of a git checkout: a packaged JabRef has nothing to update from.
+        WhatsNewButton.create(factory, taskExecutor, dialogService, preferences.getExternalApplicationsPreferences(), quit)
+                      .ifPresent(button -> ((HBox) getItems().getLast()).getChildren().addFirst(button));
 
         leftSpacer.setPrefWidth(50);
         leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
