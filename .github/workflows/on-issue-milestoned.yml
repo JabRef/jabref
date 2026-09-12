@@ -9,6 +9,7 @@ on:
     types: [ milestoned ]
 
 permissions:
+  issues: read
   pull-requests: write
 
 jobs:
