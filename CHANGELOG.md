@@ -132,6 +132,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - We improved JabRef's startup performance by loading MSC codes only when activated. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
+- We renamed the sort dropdown option in "Search for unlinked local files" from "Default" to "Grouped by directory". [#16158](https://github.com/JabRef/jabref/issues/16158)
 - We now keep changes made while the [remote SQL database](https://docs.jabref.org/collaborative-work/sqldatabase) connection is down and synchronize them once it is back. [#11211](https://github.com/JabRef/jabref/issues/11211)
 - We changed the full text document search to run as a cancelable background task instead of blocking JabRef with a modal dialog. [#16831](https://github.com/JabRef/jabref/pull/16831)
 - We changed [remote SQL database](https://docs.jabref.org/collaborative-work/sqldatabase) synchronization to PostgreSQL-only with live updates; existing database tables are migrated. [#11232](https://github.com/JabRef/jabref/issues/11232)
@@ -266,6 +267,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where `LinkedFile.isOnlineLink()` did not recognize `ftp://` links as online links. [#16400](https://github.com/JabRef/jabref/issues/16400)
 - We fixed an issue where the "Jump to field" dialog only searched fields already shown in the entry editor. It now searches all known fields, adds the selected field if it is not yet visible, and creates the field if it does not exist yet. [#16593](https://github.com/JabRef/jabref/issues/16593)
 - We fixed an issue where deleting an entry removed the group filter and defaulted to the home view. [#16036](https://github.com/JabRef/jabref/issues/16036)
+- We fixed the "Search for unlinked local files" that was not applying JabRef's theme. [#16158](https://github.com/JabRef/jabref/issues/16158)
+- We fixed the question-mark icon appearing in the "Search for unlinked local files" wizard pages. [#16158](https://github.com/JabRef/jabref/issues/16158)
+- We fixed the "select files to import" header, it no longer shows during the file scan. [#16158](https://github.com/JabRef/jabref/issues/16158)
+- We fixed the space key not toggling the file checkboxes after we scan the document in "Search for unlinked local files". [#16158](https://github.com/JabRef/jabref/issues/16158)
 - We fixed an issue where opening an online link with a query string could open a truncated URL. [#16774](https://github.com/JabRef/jabref/pull/16774)
 - We fixed an issue where the main table showed a tooltip with the entry's full title even when the title was already fully visible; the tooltip now appears only when the title is truncated. [#16607](https://github.com/JabRef/jabref/issues/16607)
 - We fixed the `Journal Abbreviation` search box invisible text with `JabRef - Light theme`. [#15721](https://github.com/JabRef/jabref/issues/15721).

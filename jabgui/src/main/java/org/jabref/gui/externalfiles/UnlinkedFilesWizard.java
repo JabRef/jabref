@@ -2,13 +2,15 @@ package org.jabref.gui.externalfiles;
 
 import java.util.Optional;
 
-import javafx.application.Platform;
+import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -23,6 +25,7 @@ public class UnlinkedFilesWizard {
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private ThemeManager themeManager;
 
     private UnlinkedFilesDialogViewModel viewModel;
     private BibDatabaseContext bibDatabaseContext;
@@ -31,6 +34,7 @@ public class UnlinkedFilesWizard {
     private SearchConfigurationPage page1;
     private FileSelectionPage page2;
     private ImportResultsPage page3;
+    private boolean cssInstalled = false;
 
     public UnlinkedFilesWizard() {
     }
@@ -40,14 +44,19 @@ public class UnlinkedFilesWizard {
             return;
         }
 
-        Platform.runLater(() -> {
-            if (page1.getScene() != null && page1.getScene().getWindow() instanceof javafx.stage.Stage stage) {
-                stage.setResizable(true);
-                stage.setWidth(650);
-                stage.setHeight(550);
-                stage.getIcons().addAll(IconTheme.getLogoSet());
-            }
-        });
+        cssInstalled = false;
+
+        Scene dialogScene = wizard.getDialog().getDialogPane().getScene();
+
+        if (dialogScene != null) {
+            applyThemeAndStageSettings(dialogScene);
+        } else {
+            wizard.getDialog().getDialogPane().sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (!cssInstalled && newScene != null) {
+                    applyThemeAndStageSettings(newScene);
+                }
+            });
+        }
 
         Optional<ButtonType> result = dialogService.showCustomDialogAndWait(wizard.getDialog());
         page2.shutdown();
@@ -104,5 +113,17 @@ public class UnlinkedFilesWizard {
         if (viewModel.selectedSortProperty().get() != null) {
             preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(viewModel.selectedSortProperty().get());
         }
+    }
+
+    private void applyThemeAndStageSettings(Scene scene) {
+        if (cssInstalled || !(scene.getWindow() instanceof Stage stage)) {
+            return;
+        }
+        cssInstalled = true;
+        stage.setResizable(true);
+        stage.setWidth(650);
+        stage.setHeight(550);
+        stage.getIcons().addAll(IconTheme.getLogoSet());
+        themeManager.updateCssOnScene(scene);
     }
 }
