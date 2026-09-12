@@ -1,0 +1,38 @@
+name: On issue milestoned
+
+# Gives open PRs that close the issue the issue's milestone, so that reviewers can filter PRs by
+# milestone. A PR that already has a milestone keeps it. The other direction (PR links an issue
+# that is already milestoned) is on-pr-bug-linked.yml.
+
+on:
+  issues:
+    types: [ milestoned ]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  milestone-linked-prs:
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-slim
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          MILESTONE: ${{ github.event.milestone.number }}
+        run: |
+          set -euo pipefail
+          prs=$(gh api graphql -F number="$ISSUE_NUMBER" -f query='
+            query($number: Int!) {
+              repository(owner: "JabRef", name: "jabref") { issue(number: $number) {
+                closedByPullRequestsReferences(first: 20, includeClosedPrs: false) { nodes { number milestone { number } } }
+              } }
+            }' --jq '.data.repository.issue.closedByPullRequestsReferences.nodes[] | select(.milestone == null) | .number')
+          if [ -z "$prs" ]; then
+            echo "No open PR without milestone closes #$ISSUE_NUMBER" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          for pr in $prs; do
+            gh api -X PATCH "repos/JabRef/jabref/issues/$pr" -F milestone="$MILESTONE"
+            echo "Set milestone of #$pr" >> "$GITHUB_STEP_SUMMARY"
+          done
