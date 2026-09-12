@@ -1,86 +1,121 @@
 package org.jabref.gui.walkthrough;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
-import javafx.scene.Parent;
+import javafx.beans.InvalidationListener;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.PopupWindow;
 import javafx.stage.Window;
 
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NullMarked;
 
-/// A specialized StackPane that manages walkthrough overlays for a specific window.
-/// Each window can have at most one WalkthroughPane instance.
+/// The layer a walkthrough draws into: an initially empty pane covering a whole window, on top of that
+/// window's regular content. Panels, tooltips and highlight effects are added here and removed again.
 ///
-/// @implNote This pane is created since [impl.org.controlsfx.skin.DecorationPane] from
-/// ControlsFX also modifies the scene root, which can lead to issues with overlapping,
-/// never-removed Walkthrough effects. To prevent this, we use a dedicated pane that can
-/// be identified as part of the walkthrough system.
-public class WalkthroughPane extends StackPane {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughPane.class);
-    /// Mutable map of all the instances created. Not thread-safe because the entire
-    /// life-cycle of this class is used in JavaFX-thread.
-    private static final Map<Window, WalkthroughPane> INSTANCES = new HashMap<>();
+/// A window adds its pane where it is built and keeps it for its lifetime. The pane is a child of a
+/// parent the window already has, never a replacement for the scene root -- three parties already
+/// claim that root (JavaFX's [javafx.scene.control.Dialog] reassigns it on every show, ControlsFX injects
+/// its decoration pane on the first validation decoration, and the walkthrough used to wrap it), and any
+/// two of them colliding drops the third's contribution. Replacing the root of a visible window also
+/// invalidates the CSS of the entire scene graph and makes Scenic View re-attach from scratch, losing the
+/// developer's selection.
+///
+/// @implNote The pane is unmanaged. In the main window and in dialogs it sizes itself to the scene rather
+/// than to its parent, so that one rule covers a pane that fills the window and a dialog pane that is the
+/// scene root alike; [javafx.scene.Parent#layout()] descends into unmanaged children, so the pane still
+/// lays out its own. A popup's pane takes no size, see [Extent#NONE].
+@NullMarked
+public final class WalkthroughPane extends StackPane {
 
-    private final Window window;
-    private @Nullable Parent root;
-    private boolean isAttached = false;
+    /// Keyed into the scene's property map, so [#of(Window)] is a lookup instead of a scene-graph search
+    /// and nothing outlives the scene that holds the pane. A window has at most one pane.
+    private static final Object SCENE_PROPERTY_KEY = new Object();
 
-    private WalkthroughPane(@NonNull Window window) {
-        this.window = window;
+    /// A lower view order renders a child in front of its siblings, whatever its position in the list.
+    /// A [javafx.scene.control.DialogPane] appends its header, content and button bar as they are first
+    /// needed, so position in the list is not something the pane can hold on to.
+    private static final double IN_FRONT_OF_SIBLINGS = -1;
+
+    /// How much of its window the pane takes up.
+    private enum Extent {
+        /// The whole scene: the main window and dialogs are sized independently of the pane.
+        SCENE,
+        /// None of its own. A popup window is sized from the bounds of its content, and a context menu's drop
+        /// shadow offsets that content from the scene's origin, so a pane sized to the popup's scene would
+        /// enlarge the very window it measures itself against -- until the bounds computation overflows the
+        /// stack and the menu stops rendering. On popups the walkthrough only draws effects that position
+        /// themselves, such as the ping.
+        NONE
+    }
+
+    public WalkthroughPane() {
+        this(Extent.SCENE);
+    }
+
+    private WalkthroughPane(Extent extent) {
+        getStyleClass().add("walkthrough-pane");
         setMinSize(0, 0);
-    }
+        setManaged(false);
+        setViewOrder(IN_FRONT_OF_SIBLINGS);
+        // A Region picks on its bounds by default, and this one covers the whole window in front of its
+        // content: clicks a walkthrough step waits for -- through a spotlight's hole, next to a panel --
+        // must reach that content, so only the overlay nodes themselves take input.
+        setPickOnBounds(false);
 
-    /// Returns the WalkthroughPane instance for the specified window, creating and
-    /// attach it if necessary.
-    public static @NonNull WalkthroughPane getInstance(@NonNull Window window) {
-        return INSTANCES.computeIfAbsent(window, key -> {
-            WalkthroughPane newPane = new WalkthroughPane(key);
-            newPane.attach();
-            return newPane;
+        sceneProperty().addListener((_, oldScene, newScene) -> {
+            if (oldScene != null) {
+                oldScene.getProperties().remove(SCENE_PROPERTY_KEY);
+            }
+            if (newScene != null) {
+                newScene.getProperties().put(SCENE_PROPERTY_KEY, this);
+            }
         });
+
+        if (extent == Extent.SCENE) {
+            InvalidationListener fitToScene = _ -> fitToScene();
+            sceneProperty().addListener((_, oldScene, newScene) -> {
+                if (oldScene != null) {
+                    oldScene.widthProperty().removeListener(fitToScene);
+                    oldScene.heightProperty().removeListener(fitToScene);
+                }
+                if (newScene != null) {
+                    newScene.widthProperty().addListener(fitToScene);
+                    newScene.heightProperty().addListener(fitToScene);
+                }
+                fitToScene();
+            });
+        }
     }
 
-    private void attach() {
-        if (isAttached) {
-            LOGGER.error("WalkthroughPane already attached to window: {}", window.getClass().getSimpleName());
-            throw new IllegalStateException("WalkthroughPane already attached to window: " + window.getClass().getSimpleName());
+    /// Returns the pane of the given window.
+    ///
+    /// The main window and every JabRef dialog are given theirs where they are built. A popup -- a context
+    /// menu a walkthrough steps into -- is not JabRef's to build, so it is given one here, the first time
+    /// a walkthrough draws on it. Empty for any other window built outside JabRef.
+    public static Optional<WalkthroughPane> of(Window window) {
+        Optional<Scene> scene = Optional.ofNullable(window.getScene());
+        Optional<WalkthroughPane> existing = scene.map(it -> it.getProperties().get(SCENE_PROPERTY_KEY))
+                                                  .map(WalkthroughPane.class::cast);
+        if (existing.isPresent() || !(window instanceof PopupWindow)) {
+            return existing;
         }
-        Scene scene = window.getScene();
-        if (scene == null) {
-            throw new IllegalStateException("Cannot attach WalkthroughPane: scene is null for window: " + window.getClass().getSimpleName());
-        }
-
-        root = scene.getRoot();
-        if (root == null) {
-            throw new IllegalStateException("Cannot attach WalkthroughPane: original root is null for window: " + window.getClass().getSimpleName());
-        }
-        getChildren().add(root);
-        scene.setRoot(this);
-        LOGGER.debug("WalkthroughPane attached to window: {}", window.getClass().getSimpleName());
-        isAttached = true;
+        // A popup's root is the Pane that PopupWindow builds around its content.
+        return scene.map(Scene::getRoot)
+                    .filter(Pane.class::isInstance)
+                    .map(Pane.class::cast)
+                    .map(root -> {
+                        WalkthroughPane pane = new WalkthroughPane(Extent.NONE);
+                        root.getChildren().add(pane);
+                        return pane;
+                    });
     }
 
-    /// Ensure the WalkthroughPane is detached from the window.
-    public void detach() {
-        if (!isAttached) {
-            LOGGER.error("WalkthroughPane not attached to window: {}", window.getClass().getSimpleName());
-            throw new IllegalStateException("WalkthroughPane not attached to window: " + window.getClass().getSimpleName());
+    private void fitToScene() {
+        Scene scene = getScene();
+        if (scene != null) {
+            resizeRelocate(0, 0, scene.getWidth(), scene.getHeight());
         }
-        Scene scene = window.getScene();
-        if (scene == null || root == null) {
-            throw new IllegalStateException("Cannot detach WalkthroughPane: scene or root is null for window: " + window.getClass().getSimpleName());
-        }
-
-        getChildren().remove(root);
-        scene.setRoot(root);
-        root = null;
-        INSTANCES.remove(window);
-        LOGGER.debug("WalkthroughPane detached from window: {}", window.getClass().getSimpleName());
-        isAttached = false;
     }
 }

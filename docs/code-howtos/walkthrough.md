@@ -32,6 +32,29 @@ The following step types are supported:
 2. `PanelStep`: Shows a panel with rich text and info boxes on the top, left, bottom, or right of the screen.
    ![A information panel displayed at the top of the screen.](../images/panel-step.png)
 
+## Where overlays are rendered
+
+Every walkthrough overlay is drawn into the `WalkthroughPane` of the window it belongs to. That pane is a
+child of a parent the window already has, installed while the window is built and kept for the window's
+lifetime:
+
+* the main window adds one to its `PowerPane` (`JabRefGUI`),
+* every dialog adds one to its `DialogPane` (`BaseDialog`, and the input dialogs of `JabRefDialogService`),
+* popups -- context menus a walkthrough steps into -- are not JabRef's to build, so they are given one on
+  the first lookup.
+
+`WalkthroughPane.of(Window)` is how the walkthrough gets at the pane of the window it is working on.
+
+Do not host an overlay by replacing the scene root. Three parties already claim that root: JavaFX's
+`Dialog` reassigns it on every show and swaps in a placeholder on close, ControlsFX injects its
+`DecorationPane` on the first validation decoration, and an overlay wrapping it would be the third. Any two
+of them colliding drop the third's contribution. Replacing the root of a visible window also invalidates
+the CSS of the whole scene graph and makes Scenic View re-attach from scratch, losing the selection of
+whoever is debugging.
+
+Tooltips are the exception: a `TooltipStep` renders into a ControlsFX `PopOver`, which brings its own
+window and scene. The pane still carries that step's quit button.
+
 ## Side Effects
 
 1. `OpenLibrarySideEffect`: Opens a specified example library.

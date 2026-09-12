@@ -33,6 +33,11 @@ public class RecursiveChildrenListener {
     /// the scene's root changes, the listener will automatically detach from the old
     /// root and attach to the new one.
     ///
+    /// Following the root is still required even though [org.jabref.gui.walkthrough.WalkthroughPane]
+    /// no longer replaces it: a [javafx.scene.control.Dialog] reassigns its scene root on every show
+    /// and swaps in a placeholder on close, and ControlsFX injects its decoration pane as the root on
+    /// the first validation decoration.
+    ///
     /// @param scene the scene to attach to
     public void attachToScene(@NonNull Scene scene) {
         detach();

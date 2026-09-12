@@ -21,18 +21,19 @@ import javafx.stage.WindowEvent;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.walkthrough.WalkthroughPane;
 
 import com.airhacks.afterburner.injection.Injector;
 
 public class BaseDialog<T> extends Dialog<T> {
 
     protected BaseDialog() {
+        setUpDialogPane(getDialogPane());
         dialogPaneProperty().addListener((_, _, newPane) -> {
             if (newPane != null) {
-                setupKeyBindings(newPane);
+                setUpDialogPane(newPane);
             }
         });
-        setupKeyBindings(getDialogPane());
 
         setDialogIcon(IconTheme.getJabRefIcon());
 
@@ -52,6 +53,15 @@ public class BaseDialog<T> extends Dialog<T> {
         }
 
         return false;
+    }
+
+    /// Key bindings and the pane a walkthrough draws into both belong to the dialog pane, so a dialog that
+    /// swaps in a new one gets them again. The pane goes here rather than into the scene because a [Dialog]
+    /// reassigns its scene root when the dialog pane is set, again on every show, and swaps in a
+    /// placeholder on close.
+    private void setUpDialogPane(DialogPane dialogPane) {
+        setupKeyBindings(dialogPane);
+        dialogPane.getChildren().add(new WalkthroughPane());
     }
 
     private Stage getDialogWindow() {
