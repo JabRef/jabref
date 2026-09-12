@@ -44,6 +44,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -111,6 +112,26 @@ class DBMSSynchronizerTest {
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
         assertEquals(List.of(expectedEntry), actualEntries);
+    }
+
+    @Test
+    void canCloseBeforeOpeningSharedDatabase() {
+        BibDatabaseContext context = new BibDatabaseContext();
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(
+                context,
+                ',',
+                fieldPreferences,
+                pattern,
+                new DummyFileUpdateMonitor(),
+                "UserAndHost",
+                new VirtualThreadTaskExecutor());
+
+        synchronizer.setDBName("shared-library");
+
+        assertEquals("shared-library", synchronizer.getDBName());
+        assertDoesNotThrow(synchronizer::closeSharedDatabase);
     }
 
     @Test

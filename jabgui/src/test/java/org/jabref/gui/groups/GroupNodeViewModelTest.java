@@ -193,12 +193,12 @@ class GroupNodeViewModelTest {
     @Test
     void getIconPrefersJabRefSvgIcon() {
         ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
-        group.setIconName("example_svg_star");
+        group.setIconName("bibtex_library");
 
         GroupNodeViewModel model = getViewModelForGroup(group);
         Node graphicNode = model.getIcon().getGraphicNode();
 
-        assertEquals("EXAMPLE_SVG_STAR", model.getIcon().name());
+        assertEquals("BIBTEX_LIBRARY", model.getIcon().name());
         assertEquals(JabRefSvgIcon.class, graphicNode.getClass());
     }
 

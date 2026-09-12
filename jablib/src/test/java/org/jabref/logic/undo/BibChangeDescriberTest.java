@@ -19,10 +19,9 @@ import org.jabref.model.undo.BibChange;
 import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.UndoableChangeType;
 import org.jabref.model.undo.UndoableFieldChange;
-import org.jabref.model.undo.UndoableGroupChange;
+import org.jabref.model.undo.UndoableGroupTreeChange;
 import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableInsertString;
-import org.jabref.model.undo.UndoableKeywordSeparatorChange;
 import org.jabref.model.undo.UndoableMetaDataChange;
 import org.jabref.model.undo.UndoablePreambleChange;
 import org.jabref.model.undo.UndoableRemoveEntries;
@@ -55,11 +54,10 @@ class BibChangeDescriberTest {
                 Arguments.of("Insert entries", new UndoableInsertEntries(database, List.of(entry, entry()), EntriesEventSource.LOCAL)),
                 Arguments.of("Remove entry", new UndoableRemoveEntries(database, List.of(entry), EntriesEventSource.LOCAL)),
                 Arguments.of("Remove entries", new UndoableRemoveEntries(database, List.of(entry, entry()), EntriesEventSource.LOCAL)),
-                Arguments.of("Edit group Books", new UndoableGroupChange(
-                        GroupTreeNode.fromGroup(new ExplicitGroup("Articles", GroupHierarchyType.INDEPENDENT, ',')),
-                        new ExplicitGroup("Articles", GroupHierarchyType.INDEPENDENT, ','),
-                        new ExplicitGroup("Books", GroupHierarchyType.INDEPENDENT, ','))),
-                Arguments.of("Change keyword separator", new UndoableKeywordSeparatorChange(new MetaData(), Optional.of(','), Optional.of(';'))),
+                Arguments.of("Edit groups", new UndoableGroupTreeChange(
+                        new MetaData(),
+                        Optional.empty(),
+                        Optional.of(GroupTreeNode.fromGroup(new ExplicitGroup("Books", GroupHierarchyType.INDEPENDENT, ','))))),
                 Arguments.of("Change library settings", new UndoableMetaDataChange(new BibDatabaseContext(), new MetaData(), new MetaData())),
                 Arguments.of("Change preamble", new UndoablePreambleChange(database, null, "preamble")),
                 Arguments.of("Change string name", new UndoableStringChange(string, UndoableStringChange.Part.CONTENT, "content", "other")),

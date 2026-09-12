@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -85,6 +86,46 @@ class ThemeManagerTest {
         assertEquals(List.of(
                 ThemePreset.JABREF.getStyleSheet().getSceneStylesheetLocation(),
                 ThemeManager.JABREF_BASE_STYLE_SHEET.getSceneStylesheetLocation()), scene.getStylesheets());
+    }
+
+    @Test
+    void communityThemeIsInstalledOnTopOfItsParent() {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        workspacePreferences.setTheme(ThemePreset.NORD);
+
+        ThemeManager themeManager = createThemeManager(workspacePreferences);
+
+        Scene scene = mock(Scene.class);
+        when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
+
+        themeManager.updateCssOnScene(scene);
+
+        assertEquals(List.of(
+                ThemePreset.JABREF.getStyleSheet().getSceneStylesheetLocation(),
+                ThemePreset.NORD.getStyleSheet().getSceneStylesheetLocation(),
+                ThemeManager.JABREF_BASE_STYLE_SHEET.getSceneStylesheetLocation()), scene.getStylesheets());
+    }
+
+    /// An edit in the parent changes a community theme's look, so both files have to be watched.
+    @Test
+    void communityThemeWatchesItsParentForLiveUpdates() throws IOException {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        workspacePreferences.setTheme(ThemePreset.NORD);
+        FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
+
+        createThemeManager(workspacePreferences, fileUpdateMonitor);
+
+        Path parentPath = assertNotNullWatchPath(ThemePreset.JABREF);
+        Path themePath = assertNotNullWatchPath(ThemePreset.NORD);
+        verify(fileUpdateMonitor).addListenerForFile(eq(themePath), any());
+        // The manager starts on the JabRef theme and switches, so its file is registered again as the parent.
+        verify(fileUpdateMonitor, atLeastOnce()).addListenerForFile(eq(parentPath), any());
+    }
+
+    private static Path assertNotNullWatchPath(ThemePreset theme) {
+        Path watchPath = theme.getStyleSheet().getWatchPath();
+        assertNotNull(watchPath, theme + " is not a file, so live updates cannot be tested");
+        return watchPath;
     }
 
     @Test
