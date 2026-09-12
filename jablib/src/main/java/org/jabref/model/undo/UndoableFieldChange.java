@@ -14,7 +14,7 @@ import org.jspecify.annotations.Nullable;
 public record UndoableFieldChange(BibEntry entry, Field field, @Nullable String before, @Nullable String after) implements BibChange {
 
     public UndoableFieldChange(FieldChange change) {
-        this(change.getEntry(), change.getField(), change.getOldValue(), change.getNewValue());
+        this(change.entry(), change.field(), change.oldValue(), change.newValue());
     }
 
     @Override

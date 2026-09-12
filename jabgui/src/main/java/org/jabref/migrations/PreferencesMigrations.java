@@ -490,7 +490,7 @@ public class PreferencesMigrations {
                                                .map(string -> {
                                                    try {
                                                        return Double.parseDouble(string);
-                                                   } catch (NumberFormatException e) {
+                                                   } catch (NumberFormatException _) {
                                                        return ColumnPreferences.DEFAULT_COLUMN_WIDTH;
                                                    }
                                                }).toList();
@@ -608,7 +608,7 @@ public class PreferencesMigrations {
 
             int fontSizeAsInt = (int) Math.round(Double.parseDouble(fontSizeAsString));
             preferences.putInt(V5_0_MAIN_FONT_SIZE, fontSizeAsInt);
-        } catch (ClassCastException e) {
+        } catch (ClassCastException _) {
             // already an integer
         }
     }

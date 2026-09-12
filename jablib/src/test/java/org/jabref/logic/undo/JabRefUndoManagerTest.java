@@ -36,7 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JabRefUndoManagerTest {
 
-    private final JabRefUndoManager undoRedoManager = new JabRefUndoManager();
+    /// Without coalescing, so that each test here means what it says: this class is about the
+    /// journal's mechanics, and whether two changes are one step is [CoalescingPolicy]'s business,
+    /// covered by [KeystrokeCoalescingTest].
+    private final JabRefUndoManager undoRedoManager = new JabRefUndoManager(CoalescingPolicy.NONE);
     private BibEntry entry;
 
     @BeforeEach

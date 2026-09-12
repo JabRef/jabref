@@ -38,7 +38,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     }
 
     public void initialize() {
-        this.viewModel = new SavingPropertiesViewModel(databaseContext, CleanupPreferences.getDefault().getFieldFormatterCleanups());
+        this.viewModel = new SavingPropertiesViewModel(CleanupPreferences.getDefault().getFieldFormatterCleanups());
 
         protect.disableProperty().bind(viewModel.protectDisableProperty());
         protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());
