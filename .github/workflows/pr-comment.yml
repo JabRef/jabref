@@ -41,9 +41,11 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       actions: read
+      checks: read
       contents: read
       issues: write
       pull-requests: write
+      statuses: read
     timeout-minutes: 10
     steps:
       - name: Show GitHub context
@@ -314,9 +316,12 @@ jobs:
             fi
           fi
         env:
-          # Labels set by the PAT do emit "labeled" events, which is harmless here: the only
+          # The default token keeps the timeline consistent: every status label is moved by
+          # github-actions[bot], not by jabref-machine. This workflow only runs on workflow_run
+          # (and workflow_dispatch), where that token has pull-requests: write even for fork PRs.
+          # Its downside - labels it sets emit no "labeled" event - costs nothing here: the only
           # listener acting on a status label ("Adapt PR status") marks drafts ready for review,
           # and this step never puts "status: ready-for-review" on a draft.
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ steps.set-vars.outputs.pr_number }}
           HEAD_SHA: ${{ github.event.inputs.head_sha }}
