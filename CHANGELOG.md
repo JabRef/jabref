@@ -7,7 +7,7 @@ In case there is no issue present, the pull request implementing the feature is 
 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
-## [6.0-beta.1] - 2026-09-09
+## [Unreleased]
 
 ### Added
 
@@ -2290,7 +2290,7 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[6.0-beta.1]: https://github.com/JabRef/jabref/compare/v6.0-alpha.6...v6.0-beta.1
+[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-alpha.6...HEAD
 [6.0-alpha.6]: https://github.com/JabRef/jabref/compare/v6.0-alpha.5...v6.0-alpha.6
 [6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...v6.0-alpha.5
 [6.0-alpha.4]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...v6.0-alpha.4
