@@ -16,7 +16,7 @@ import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.testutils.category.ExternalServicesTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
