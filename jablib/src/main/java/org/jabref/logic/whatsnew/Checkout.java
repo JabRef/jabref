@@ -24,7 +24,6 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,6 @@ import org.slf4j.LoggerFactory;
 /// Every question is answered with an empty result on failure (no upstream, no network, no changelog at the
 /// revision) and the cause is logged: the news is an offer to the developer, never an error to show.
 // [impl->req~whats-new.checkout-news~1]
-@NullMarked
 public final class Checkout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Checkout.class);

@@ -2,10 +2,7 @@ package org.jabref.logic.whatsnew;
 
 import java.util.List;
 
-import org.jspecify.annotations.NullMarked;
-
 /// A `CHANGELOG.md` as `git blame` sees it: every line with the contributor who wrote it.
-@NullMarked
 public record BlamedChangelog(List<Line> lines) {
     /// One line and who wrote it.
     public record Line(String text, Contributor by) {

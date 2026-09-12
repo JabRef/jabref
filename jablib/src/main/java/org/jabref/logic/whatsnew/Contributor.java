@@ -2,13 +2,10 @@ package org.jabref.logic.whatsnew;
 
 import java.util.Comparator;
 
-import org.jspecify.annotations.NullMarked;
-
 /// Who wrote a changelog entry, seen from the developer running JabRef: somebody else by name, or me.
 ///
 /// A sealed type instead of a name with two reserved values: a `switch` over it is checked for completeness by
 /// the compiler, and no real contributor can collide with a marker string.
-@NullMarked
 public sealed interface Contributor {
 
     /// The order of the news: every other contributor as they first appear, then my entries pushed from another

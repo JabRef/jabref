@@ -8,13 +8,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jspecify.annotations.NullMarked;
-
 /// The changelog entries announced to the developer so far, kept in a file: one entry per line, its section,
 /// heading and text separated by tabs. A changelog line never contains a tab, so no escaping is needed.
 ///
 /// The file lives in the checkout's git directory, so it follows the worktree and survives JabRef being closed.
-@NullMarked
 public final class AnnouncedEntries {
 
     private static final String FIELD_SEPARATOR = "\t";

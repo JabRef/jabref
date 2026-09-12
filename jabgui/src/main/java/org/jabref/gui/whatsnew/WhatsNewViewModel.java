@@ -34,7 +34,6 @@ import org.jabref.logic.whatsnew.ChangelogEntry;
 import org.jabref.logic.whatsnew.Checkout;
 import org.jabref.logic.whatsnew.News;
 
-import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +43,6 @@ import org.slf4j.LoggerFactory;
 /// A look at the checkout runs in the background and lands here on the FX thread; every property is read and
 /// written on the FX thread only.
 // [impl->req~whats-new.checkout-news~1]
-@NullMarked
 public class WhatsNewViewModel extends AbstractViewModel {
 
     /// The file `just run-loop` looks for after JabRef quits: present, it pulls, rebuilds and starts JabRef again.

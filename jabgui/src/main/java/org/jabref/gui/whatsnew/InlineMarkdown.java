@@ -11,15 +11,12 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import org.jspecify.annotations.NullMarked;
-
 /// Renders the inline Markdown a changelog entry uses — `**bold**`, `` `code` ``, `[label](url)` and bare URLs —
 /// into a [TextFlow], styled through the base stylesheet's `bold` and `font-monospace` classes.
 ///
 /// Not [org.jabref.gui.util.component.MarkdownTextFlow]: this class is also compiled into the jbang script
 /// `.jbang/WhatsNewLauncher.java`, which runs before jabgui is built and can only take along classes that depend
 /// on nothing but JavaFX and jablib.
-@NullMarked
 final class InlineMarkdown {
 
     private static final String BOLD = "\\*\\*(?<bold>.+?)\\*\\*";

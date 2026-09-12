@@ -16,7 +16,6 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.whatsnew.Checkout;
 
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// The toolbar's "What's new" button, present only while JabRef runs out of a git checkout: its glyph turns
@@ -24,7 +23,6 @@ import org.jspecify.annotations.Nullable;
 /// [WhatsNewDialog] on a fresh fetch. Binds the button to the [WhatsNewViewModel]; holds no state of its own
 /// beyond the window that is open.
 // [impl->req~whats-new.checkout-news~1]
-@NullMarked
 public final class WhatsNewButton {
 
     private final WhatsNewViewModel viewModel;

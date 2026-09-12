@@ -9,14 +9,11 @@ import java.util.Set;
 
 import org.jabref.logic.l10n.Localization;
 
-import org.jspecify.annotations.NullMarked;
-
 /// The changelog entries a developer has not seen yet, grouped for display by who wrote them.
 ///
 /// Which entries are news is decided against the set of entries announced before, not against a commit range:
 /// so nothing is shown twice, nothing is missed while JabRef is closed, and a reworded entry counts as new.
 // [impl->req~whats-new.checkout-news~1]
-@NullMarked
 public record News(List<AttributedEntry> items) {
     public static final News NONE = new News(List.of());
 

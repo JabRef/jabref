@@ -16,14 +16,11 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.whatsnew.News;
 
-import org.jspecify.annotations.NullMarked;
-
 /// The non-modal "What's new" window: the news, *Later* and *Restart to update*.
 ///
 /// It opens on a fetch — "Checking remote…" with a bar, the restart disabled — and [#checked] brings the answer,
 /// so nobody restarts into a version that is already stale.
 // [impl->req~whats-new.checkout-news~1]
-@NullMarked
 public class WhatsNewDialog extends BaseDialog<Boolean> {
 
     private static final double WIDTH = 900;

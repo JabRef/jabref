@@ -6,11 +6,8 @@ import java.util.SequencedMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jspecify.annotations.NullMarked;
-
 /// Reads the entries out of the lines of a `CHANGELOG.md` in the [keep a changelog](https://keepachangelog.com)
 /// layout: `## [release] - date` sections holding `### Added/Changed/Fixed` headings holding `- ` entries.
-@NullMarked
 public final class ChangelogParser {
 
     private static final String SECTION_PREFIX = "## ";
