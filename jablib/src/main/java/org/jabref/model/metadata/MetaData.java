@@ -486,6 +486,8 @@ public class MetaData {
         gitAutoPull = other.gitAutoPull;
         gitAutoCommit = other.gitAutoCommit;
         gitAutoPush = other.gitAutoPush;
+        groupsInLegacyFormat = other.groupsInLegacyFormat;
+        skippedMigrations = other.skippedMigrations;
 
         other.getGroups()
              .map(GroupTreeNode::copySubtree)
