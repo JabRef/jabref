@@ -161,7 +161,25 @@ private void openJabrefWebsite() {
 
 The view consists a FXML file `MyDialog.fxml` which defines the structure and the layout of the UI. Moreover, the FXML file may be accompanied by a style file that should have the same name as the FXML file but with a `css` ending, e.g., `MyDialog.css`. It is recommended to use a graphical design tools like [SceneBuilder](http://gluonhq.com/labs/scene-builder/) to edit the FXML file. The tool [Scenic View](https://github.com/JonathanGiles/scenic-view) is very helpful in debugging styling issues.
 
-A node `id` belongs to the walkthrough: it is the handle a walkthrough step uses to find the control it highlights, so give every major view, dialog and panel a stable `id` and resolve it with `NodeResolver.fxId(...)` instead of matching on class names or node types. Stylesheets must not select on ids. Style with `styleClass`, so that renaming an id never changes the look and restyling never breaks a walkthrough. Write ids in kebab case (`entry-editor`), the same way style classes are written; the exception is an id JavaFX derives from an `fx:id`, which has to be a Java identifier. The only ids the stylesheets still select on belong to JavaFX's own custom-color dialog, whose nodes we do not build.
+Node ids exist for the walkthrough. A walkthrough step finds the control it highlights by id, so:
+
+* Give every major view, dialog and panel a stable `id`, and resolve walkthrough steps with `NodeResolver.fxId(...)` wherever such a node exists, rather than by class name, node type or visible text. Steps that target a virtualized cell — a row of the entry table, the groups tree or a preferences tab list — have no stable node to name and still match on text.
+* Keep every walkthrough id in `WalkthroughNodeIds` and set it from there. One list makes an id reusable, shows which controls the walkthroughs depend on, and stops one being deleted by accident. `WalkthroughNodeIdsTest` fails when a constant no longer names a node.
+* Style with `styleClass`, not with an id. Styling by id works and is occasionally unavoidable — the ids inside JavaFX's own custom-color dialog are the remaining case — but keeping it rare is the point: renaming an id should never change the look, and restyling should never break a walkthrough.
+* Write ids in kebab case (`entry-editor`), the same way style classes are written. An `fx:id` has to stay a Java identifier because a controller field is named after it, so give such a node an explicit `id` attribute as well — FXML applies that one, and the `fx:id` keeps injecting.
+
+## CSS style classes and themes
+
+The appearance of JabRef is the job of a theme. Themes live at <https://themes.jabref.org/> (checked out as the submodule `jabgui/src/main/themes.jabref.org`, so JabRef bundles every theme that covers both color schemes); a theme sets the `-color-*` tokens and the rules of its [style guide](https://github.com/JabRef/themes.jabref.org/blob/main/styleguide.md). A new look is a new theme there, not new CSS in JabRef.
+
+What remains in JabRef is `jabgui/src/main/resources/org/jabref/gui/theme/internal/jabref-base.css`, loaded with every theme. It holds the utility classes for padding, gaps, alignment, font size and color (`padding-12`, `gap-8`, `align-center-left`, `h3`, `text-accent`) and the structure of the shared controls and views: borders, radii, paddings and layout of buttons, tabs, the entry editor, the main table and so on, all expressed in `-color-*` tokens so that a theme only has to pick colors. The drivers, from <https://github.com/JabRef/jabref/issues/16042>, <https://github.com/JabRef/jabref/issues/16787> and <https://github.com/JabRef/jabref/issues/15721>:
+
+* Do not introduce a CSS class. Every class is a lookup for the next reader, and one used by a single view is usually a padding or a font size a utility class already offers. When the utilities cannot express what a view needs, one class named after the view (`welcome-main-container`) is the trade-off between few classes and a UI that still looks right; a second step on the spacing scale is not.
+* The utility classes form one fixed scale in `em`, so all views share the same few distances and grow with the user's font size. Do not add `padding-10` because one dialog looked better with it.
+* The spacing between the children of a `VBox`, `HBox` or `GridPane` goes into the constructor: `new VBox(12)`, `new GridPane(24, 24)`.
+* No inline styles: no `setStyle(..)`, no `styleProperty()` binding, no `-fx-*` string in Java. An inline style beats every stylesheet, so a theme could not change it.
+* Colors only through the `-color-*` tokens, never as literals, so every theme keeps working.
+* Style with `styleClass`, not with an `id`; see the node id rules above.
 
 ## FXML
 
