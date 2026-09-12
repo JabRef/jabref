@@ -192,7 +192,7 @@ public class GitHandler {
                 return Optional.empty();
             }
             return Optional.of(url);
-        } catch (IOException e) {
+        } catch (IOException _) {
             return Optional.empty();
         }
     }
@@ -205,7 +205,7 @@ public class GitHandler {
                 return false;
             }
             return "https".equalsIgnoreCase(scheme);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             return false;
         }
     }
@@ -392,7 +392,7 @@ public class GitHandler {
             PullCommand pullCommand = git.pull();
             credsOpt.ifPresent(pullCommand::setCredentialsProvider);
             pullCommand.call();
-        } catch (GitAPIException e) {
+        } catch (GitAPIException _) {
             LOGGER.info("Failed to pull.");
         }
     }

@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.util.Duration;
 
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DelayedExecution;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -19,6 +20,7 @@ import org.jabref.logic.util.strings.StringUtil;
 import com.dlsc.gemsfx.infocenter.Notification;
 import com.dlsc.gemsfx.infocenter.NotificationAction;
 import com.dlsc.gemsfx.infocenter.NotificationView;
+import org.jspecify.annotations.NullMarked;
 
 public class Notifications {
     private Notifications() {
@@ -36,6 +38,23 @@ public class Notifications {
         public FileNotification(String title, String description) {
             super(title, description);
             setOnClick(_ -> OnClickBehaviour.NONE);
+        }
+    }
+
+    @NullMarked
+    public static class DonationNotification extends Notification<Object> {
+        public DonationNotification(String title, String description) {
+            super(title, description);
+            setOnClick(_ -> OnClickBehaviour.NONE);
+        }
+    }
+
+    @NullMarked
+    public static class DonationNotificationView extends NotificationView<Object, DonationNotification> {
+        public DonationNotificationView(DonationNotification notification) {
+            super(notification);
+            getStyleClass().add("donation-notification");
+            setGraphic(IconTheme.JabRefIcons.DONATE.getGraphicNode());
         }
     }
 

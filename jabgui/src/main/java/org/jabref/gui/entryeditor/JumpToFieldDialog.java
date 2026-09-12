@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -82,8 +83,8 @@ public class JumpToFieldDialog extends BaseDialog<Void> {
     private void jumpToSelectedField() {
         String selectedField = searchField.getText();
 
-        if (selectedField != null && !selectedField.isEmpty()) {
-            String fieldToJumpTo = selectedField.toLowerCase();
+        if (StringUtil.isNotBlank(selectedField)) {
+            String fieldToJumpTo = selectedField.toLowerCase().strip();
             entryEditor.selectField(fieldToJumpTo);
         }
     }

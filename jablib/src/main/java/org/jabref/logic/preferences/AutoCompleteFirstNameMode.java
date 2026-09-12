@@ -13,7 +13,7 @@ public enum AutoCompleteFirstNameMode {
     public static AutoCompleteFirstNameMode parse(String input) {
         try {
             return AutoCompleteFirstNameMode.valueOf(input);
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException _) {
             // Should only occur when preferences are set directly via preferences.put and not via setFirstnameMode
             return AutoCompleteFirstNameMode.BOTH;
         }

@@ -6,6 +6,7 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -14,12 +15,11 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
-import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-class MultiMergeEntriesViewTest extends ApplicationTest {
+class MultiMergeEntriesViewTest extends JavaFxTest {
 
     private MultiMergeEntriesView dialog;
 
