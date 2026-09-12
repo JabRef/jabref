@@ -82,10 +82,12 @@ Git calls the driver with the base (`%O`), current (`%A`), and other (`%B`) vers
 The driver writes `current + (other - base)` into `%A`.
 Exit code 0 means a clean merge, exit code 1 marks the file as conflicted; conflicting entries keep the current side's version and their citation keys are printed to stderr.
 
-The merge plan is keyed by citation key and covers entries only.
-Therefore the driver refuses the merge (exit code 1, `CURRENT` untouched) when an input file contains duplicate citation keys, when the parser reported a warning for it (the file cannot be written back without loss then), and when content outside of entries with a citation key (entries without one, `@String` definitions, custom entry types, preamble, epilogue, metadata, shared database ID, encoding) differs between `OTHER` and both other versions.
-The entry type and the comment written above an entry are merged by the driver itself, because the plan carries field values only: a value changed in `OTHER` alone is applied to `CURRENT`, any other divergence is reported as a conflict.
-A comment in front of an `@Comment` block is refused as well, because JabRef's parser drops it (as it does on every other save), and so is a custom entry type that no entry uses, because the writer emits a definition only for types in use.
+The command class `GitMergeDriver` (jabkit) only translates between that contract and `BibFileMerger` (jablib, package `org.jabref.logic.git.merge`), which returns a `MergeOutcome`: either `Refused` with the reasons, or `Merged` with the remaining conflicts.
+`BibFileMerger` composes the existing `SemanticMergeAnalyzer` with `EntryPropertyMerge`, which applies the same three-way rules to the entry type and the comment above an entry, because the merge plan carries field values only.
+
+`MergePreconditions` refuses the merge (exit code 1, `CURRENT` untouched) when writing the result would lose content; `Refusal.Reason` documents each case.
+The merge plan is keyed by citation key and covers entries only, so duplicate citation keys are refused, and so is content outside of entries with a citation key (entries without one, `@String` definitions, custom entry types, preamble, epilogue, metadata, shared database ID, encoding) that `OTHER` changed - it is taken from `CURRENT` as is.
+Content that JabRef's parser or writer drops is refused as well: a file with parser warnings, an entry without fields, a custom entry type that no entry uses, and a comment in front of `@Comment` or `@Preamble`.
 
 ## Related Test Cases
 

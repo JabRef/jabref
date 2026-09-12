@@ -1,37 +1,28 @@
 package org.jabref.toolkit.commands;
 
-import java.util.concurrent.Callable;
-
-import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.ImportFormatPreferences;
 
 import org.jspecify.annotations.NullMarked;
-import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.ParentCommand;
-import static picocli.CommandLine.Spec;
 
+/// Groups the Git subcommands. Not executable itself: picocli reports a missing subcommand.
 @Command(name = "git", description = "Git integration for .bib files.",
         subcommands = {
                 GitMergeDriver.class
         })
 @NullMarked
-class Git implements Callable<Integer> {
+class Git {
 
     @ParentCommand
-    protected JabKit jabKit;
+    private JabKit jabKit;
 
     @Mixin
     private JabKit.SharedOptions sharedOptions;
 
-    @Spec
-    private CommandLine.Model.CommandSpec spec;
-
-    @Override
-    public Integer call() {
-        System.err.println(Localization.lang("Specify a subcommand (merge-driver)."));
-        spec.commandLine().usage(System.err);
-        return CommandLine.ExitCode.USAGE;
+    ImportFormatPreferences importFormatPreferences() {
+        return jabKit.cliPreferences.getImportFormatPreferences();
     }
 }
