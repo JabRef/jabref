@@ -1,6 +1,7 @@
 package org.jabref.gui.welcome.components;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
@@ -15,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -27,7 +26,7 @@ class DonationProviderTest extends JavaFxTest {
 
     private final DialogService dialogService = mock(DialogService.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
-    private final DonationPreferences donationPreferences = new DonationPreferences(false, -1);
+    private final DonationPreferences donationPreferences = new DonationPreferences(-1);
     private final DonationProvider donationProvider = new DonationProvider(preferences, dialogService);
 
     @BeforeEach
@@ -36,42 +35,50 @@ class DonationProviderTest extends JavaFxTest {
     }
 
     @Test
-    public void calculateDaysUntilNextPopup() {
-        int lastShownEpochDay = (int) LocalDate.now().minusDays(400).toEpochDay();
-        assertEquals(0, donationProvider.calculateDaysUntilNextPopup(lastShownEpochDay));
-
-        lastShownEpochDay = (int) LocalDate.now().toEpochDay();
-        assertEquals(365, donationProvider.calculateDaysUntilNextPopup(lastShownEpochDay));
+    public void notificationIsDueWhenItWasScheduledForAPastDay() {
+        LocalDate today = LocalDate.of(2026, 9, 9);
+        assertEquals(0, donationProvider.calculateDaysUntilNextNotification((int) today.minusDays(30).toEpochDay(), today));
     }
 
     @Test
-    public void notificationIsShownWhenTheLastOneIsAYearOld() {
-        donationPreferences.setLastShownEpochDay((int) LocalDate.now().minusDays(400).toEpochDay());
-
-        interact(donationProvider::showIfNeeded);
-
-        verify(dialogService).notify(any(Notifications.DonationNotification.class));
-        assertEquals((int) LocalDate.now().toEpochDay(), donationPreferences.getLastShownEpochDay());
+    public void notificationIsDueOnTheScheduledDay() {
+        LocalDate today = LocalDate.of(2026, 9, 9);
+        assertEquals(0, donationProvider.calculateDaysUntilNextNotification((int) today.toEpochDay(), today));
     }
 
     @Test
-    public void noNotificationIsShownWhenTheUserOptedOut() {
-        donationPreferences.setNeverShowAgain(true);
-        donationPreferences.setLastShownEpochDay((int) LocalDate.now().minusDays(400).toEpochDay());
+    public void daysUntilNextNotificationSpanTheWholeInterval() {
+        LocalDate today = LocalDate.of(2026, 9, 9);
+        LocalDate inSixMonths = today.plusMonths(6);
+        assertEquals(ChronoUnit.DAYS.between(today, inSixMonths),
+                donationProvider.calculateDaysUntilNextNotification((int) inSixMonths.toEpochDay(), today));
+    }
 
+    @Test
+    public void firstLaunchSchedulesTheNotificationOneWeekLater() {
         interact(donationProvider::showIfNeeded);
 
+        assertEquals((int) LocalDate.now().plusDays(7).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
         verify(dialogService, never()).notify(any(Notifications.DonationNotification.class));
     }
 
     @Test
-    public void neverShowAgainActionOptsTheUserOut() {
-        donationPreferences.setLastShownEpochDay((int) LocalDate.now().minusDays(400).toEpochDay());
+    public void dueNotificationIsShownAndScheduledSixMonthsLater() {
+        donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
+
         interact(donationProvider::showIfNeeded);
 
-        assertFalse(donationPreferences.isNeverShowAgain());
+        verify(dialogService).notify(any(Notifications.DonationNotification.class));
+        assertEquals((int) LocalDate.now().plusMonths(6).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
+    }
+
+    @Test
+    public void dismissActionKeepsTheNotificationSixMonthsAway() {
+        donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
+        interact(donationProvider::showIfNeeded);
+
         assertEquals(OnClickBehaviour.HIDE_AND_REMOVE, triggerAction(0));
-        assertTrue(donationPreferences.isNeverShowAgain());
+        assertEquals((int) LocalDate.now().plusMonths(6).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
     }
 
     /// GemsFX declares the actions as a raw list, hence the unchecked cast.

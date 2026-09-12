@@ -167,4 +167,12 @@ Every library tab carries an icon: one for a BibTeX library, one for a BibLaTeX 
 
 Needs: impl, utest
 
+## Donation prompt returns every six months
+`req~ux.donation.recurring-prompt~1`
+
+JabRef asks for a donation one week after the first launch and every six months afterwards.
+Dismissing the prompt hides it until the next time, it cannot be switched off permanently.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
