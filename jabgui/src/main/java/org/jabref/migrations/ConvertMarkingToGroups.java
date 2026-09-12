@@ -28,20 +28,26 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
 
     private static final Pattern MARKING_PATTERN = Pattern.compile("\\[(.*):(\\d+)\\]");
 
+    private final Character keywordSeparator;
+
+    public ConvertMarkingToGroups(Character keywordSeparator) {
+        this.keywordSeparator = keywordSeparator;
+    }
+
     @Override
     public void performMigration(@NonNull ParserResult parserResult) {
         ObservableList<BibEntry> entries = parserResult.getDatabase().getEntries();
         Multimap<String, BibEntry> markings = getMarkingWithEntries(entries);
         if (!markings.isEmpty()) {
             GroupTreeNode markingRoot = GroupTreeNode.fromGroup(
-                    new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, ','));
+                    new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, keywordSeparator));
 
             for (Map.Entry<String, Collection<BibEntry>> marking : markings.asMap().entrySet()) {
                 String markingName = marking.getKey();
                 Collection<BibEntry> markingMatchedEntries = marking.getValue();
 
                 GroupTreeNode markingGroup = markingRoot.addSubgroup(
-                        new ExplicitGroup(markingName, GroupHierarchyType.INCLUDING, ','));
+                        new ExplicitGroup(markingName, GroupHierarchyType.INCLUDING, keywordSeparator));
                 markingGroup.addEntriesToGroup(markingMatchedEntries);
             }
 

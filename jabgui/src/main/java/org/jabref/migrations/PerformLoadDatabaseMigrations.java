@@ -11,7 +11,7 @@ public class PerformLoadDatabaseMigrations {
                                                      Character keywordDelimited) {
         List<PostOpenMigration> postOpenMigrations = Arrays.asList(
                 new ConvertLegacyExplicitGroups(),
-                new ConvertMarkingToGroups(),
+                new ConvertMarkingToGroups(keywordDelimited),
                 new SpecialFieldsToSeparateFields(keywordDelimited)
         );
 
