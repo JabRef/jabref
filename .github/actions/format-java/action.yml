@@ -11,3 +11,6 @@ runs:
     - name: Undo JBang changes # IntelliJ issue: https://youtrack.jetbrains.com/issue/IDEA-https://youtrack.jetbrains.com/issue/IDEA-384956/Skip-formatting-of-shebang-headers/Skip-formatting-of-shebang-headers
       shell: bash
       run: git checkout HEAD -- jablib-examples/jbang/*.java
+    - name: Undo changes in submodules # vendored content is formatted in the repository it comes from
+      shell: bash
+      run: git submodule foreach --quiet 'git checkout -- .'

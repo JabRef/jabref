@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -90,17 +89,10 @@ public class MergeLibraryAction extends SimpleCommand {
         if (areAllChangesResolved.orElse(false)) {
             List<DatabaseChange> resolvedChanges = databaseChangesResolverDialog.getResolvedChanges();
 
-            boolean anyChange = stateManager.getUndoManager(activeDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
+            stateManager.getUndoManager(activeDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
                     resolvedChanges.stream()
                                    .filter(DatabaseChange::isAccepted)
                                    .forEach(change -> change.applyChange(edit)));
-
-            if (anyChange) {
-                libraryTabContainer.getLibraryTabs().stream()
-                                   .filter(tab -> tab.getBibDatabaseContext().equals(activeDatabase))
-                                   .findFirst()
-                                   .ifPresent(LibraryTab::markBaseChanged);
-            }
         }
     }
 }

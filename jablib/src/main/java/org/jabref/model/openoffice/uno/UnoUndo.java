@@ -29,7 +29,7 @@ public class UnoUndo {
         if (undoManager.isPresent()) {
             try {
                 undoManager.get().leaveUndoContext();
-            } catch (InvalidStateException ex) {
+            } catch (InvalidStateException _) {
                 throw new IllegalStateException("leaveUndoContext reported InvalidStateException");
             }
         }

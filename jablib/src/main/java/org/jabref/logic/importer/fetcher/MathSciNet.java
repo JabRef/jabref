@@ -179,7 +179,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             if (!doi.isEmpty()) {
                 try {
                     DOI.parse(doi).ifPresent(validDoi -> entry.setField(StandardField.DOI, validDoi.asString()));
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException _) {
                     // If DOI parsing fails, use the original DOI string
                     entry.setField(StandardField.DOI, doi);
                 }
@@ -231,13 +231,15 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             }
         }
 
-        if (value instanceof String stringValue) {
-            return Optional.of(fixStringEncoding(stringValue));
-        } else if (value instanceof Integer intValue) {
-            return Optional.of(intValue.toString());
-        }
-
-        return Optional.empty();
+        return switch (value) {
+            case String stringValue ->
+                    Optional.of(fixStringEncoding(stringValue));
+            case Integer intValue ->
+                    Optional.of(intValue.toString());
+            case null,
+                 default ->
+                    Optional.empty();
+        };
     }
 
     /// Method to change character set, to fix output string encoding
