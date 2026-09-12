@@ -1,7 +1,5 @@
 package org.jabref.gui.whatsnew;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import javafx.geometry.Insets;
@@ -16,61 +14,66 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.whatsnew.News;
 
 import org.jspecify.annotations.NullMarked;
 
-/// The non-modal "What's new" window: the pending changelog entries, *Later* and *Restart to update*.
-/// It opens on a fetch — "Checking remote …" with a bar, the restart disabled — and [#checked] brings the answer,
+/// The non-modal "What's new" window: the news, *Later* and *Restart to update*.
+///
+/// It opens on a fetch — "Checking remote…" with a bar, the restart disabled — and [#checked] brings the answer,
 /// so nobody restarts into a version that is already stale.
 // [impl->req~whats-new.checkout-news~1]
 @NullMarked
 public class WhatsNewDialog extends BaseDialog<Boolean> {
 
+    private static final double WIDTH = 900;
+    private static final double HEIGHT = 650;
+
     private final BorderPane root = new BorderPane();
-    private final HBox checking;
-    private final ButtonType restart;
+    private final ButtonType restart = new ButtonType(Localization.lang("Restart to update"), ButtonBar.ButtonData.APPLY);
     private final Consumer<String> openUrl;
 
-    public WhatsNewDialog(String title, List<WhatsNew.Item> items, Consumer<String> openUrl) {
+    public WhatsNewDialog(News news, Consumer<String> openUrl) {
         this.openUrl = openUrl;
-        setTitle(title);
         ButtonType later = new ButtonType(Localization.lang("Later"), ButtonBar.ButtonData.CANCEL_CLOSE);
-        restart = new ButtonType(Localization.lang("Restart to update"), ButtonBar.ButtonData.APPLY);
         getDialogPane().getButtonTypes().addAll(later, restart);
-        setResultConverter(button -> button == restart);
+        setResultConverter(restart::equals);
 
-        ProgressBar bar = new ProgressBar();
-        bar.setPrefWidth(120);
-        checking = new HBox(8, bar, new Label(Localization.lang("Checking remote...")));
-        checking.setAlignment(Pos.CENTER_LEFT);
-        checking.setPadding(new Insets(0, 16, 8, 16));
-        root.setCenter(body(items));
-        root.setBottom(checking);
-        root.setPrefSize(900, 650);
+        root.setCenter(body(news));
+        root.setBottom(checkingRow());
+        root.setPrefSize(WIDTH, HEIGHT);
         getDialogPane().setContent(root);
         getDialogPane().lookupButton(restart).setDisable(true);
     }
 
-    /// The fetch has answered: the freshly projected entries replace the body and *Restart to update* goes live.
-    public void checked(String title, List<WhatsNew.Item> items) {
-        setTitle(title);
-        root.setCenter(body(items));
+    /// The fetch has answered: `news` replaces the body and *Restart to update* goes live.
+    public void checked(News news) {
+        root.setCenter(body(news));
         root.setBottom(null);
         getDialogPane().lookupButton(restart).setDisable(false);
     }
 
-    /// The projected entries, or a line saying that there are none — a blank sheet reads as a rendering failure.
-    private Node body(List<WhatsNew.Item> items) {
-        if (items.isEmpty()) {
-            Label empty = new Label(Localization.lang("Nothing new since the running version."));
-            empty.setPadding(new Insets(16));
-            return empty;
-        }
-        return WhatsNew.view(items, openUrl);
+    /// Whether the user chose *Restart to update*; `false` before the window closes.
+    public boolean restartChosen() {
+        return Boolean.TRUE.equals(getResult());
     }
 
-    /// Whether the user chose *Restart to update*.
-    public boolean restartChosen() {
-        return Optional.ofNullable(getResult()).orElse(false);
+    private static Node checkingRow() {
+        ProgressBar bar = new ProgressBar();
+        bar.setPrefWidth(120);
+        HBox row = new HBox(8, bar, new Label(Localization.lang("Checking remote...")));
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(0, 16, 8, 16));
+        return row;
+    }
+
+    /// The news, or a line saying that there are none — a blank sheet reads as a rendering failure.
+    private Node body(News news) {
+        if (news.isEmpty()) {
+            Label nothing = new Label(Localization.lang("Nothing new since the running version."));
+            nothing.setPadding(new Insets(16));
+            return nothing;
+        }
+        return new WhatsNewView(news, openUrl);
     }
 }

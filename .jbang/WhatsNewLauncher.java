@@ -4,7 +4,14 @@
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 //DEPS org.openjfx:javafx-controls:26.0.2
 //DEPS io.github.mkpaz:atlantafx-base:2.1.0
-//SOURCES ../jabgui/src/main/java/org/jabref/gui/whatsnew/WhatsNew.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/AttributedEntry.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/BlamedChangelog.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/ChangelogEntry.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/ChangelogParser.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/Contributor.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/News.java
+//SOURCES ../jabgui/src/main/java/org/jabref/gui/whatsnew/InlineMarkdown.java
+//SOURCES ../jabgui/src/main/java/org/jabref/gui/whatsnew/WhatsNewView.java
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -12,8 +19,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.Preferences;
@@ -31,9 +40,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import org.jabref.gui.whatsnew.WhatsNew;
+import org.jabref.gui.whatsnew.WhatsNewView;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.whatsnew.AttributedEntry;
+import org.jabref.logic.whatsnew.ChangelogParser;
+import org.jabref.logic.whatsnew.Contributor;
+import org.jabref.logic.whatsnew.News;
 
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
@@ -41,176 +54,189 @@ import atlantafx.base.theme.Styles;
 
 /// "What's new since you last ran JabRef from this checkout", personalized.
 ///
-/// Compares the commit of the previous run (stored in the checkout's git directory) with `HEAD`
-/// and shows the `CHANGELOG.md` entries that landed in between, grouped by who wrote them —
-/// the window and the grouping are JabRef's own `org.jabref.gui.whatsnew.WhatsNew`, the class
-/// behind the toolbar button of a running JabRef.
+/// Compares the commit of the previous run (kept in the checkout's git directory) with `HEAD` and shows the
+/// `CHANGELOG.md` entries that landed in between, grouped by who wrote them. The entry model, the grouping
+/// and the window are JabRef's own classes, compiled in through the `//SOURCES` lines above: the script runs
+/// before jablib is built, so it calls the `git` binary instead of JGit and takes the sources along.
 ///
-/// An entry is attributed to the commit that first added it, not to the last one that touched it:
-/// `git log -S` finds where the current wording appeared, and when that commit reworded an older
-/// entry (a removed line in the same hunk shares most of its words), the search follows the older
-/// wording back. A reworded entry that predates the previous run is therefore not news.
-///
-/// "Run" (or closing the window) exits 0 and the `just` recipe starts JabRef; "Cancel run" exits 1
-/// and stops it. `--stdout` prints instead of opening a window. The first run only records the commit.
+/// "Run" (or closing the window) exits 0 and the `just` recipe starts JabRef; "Cancel run" exits 1 and stops
+/// it. `--stdout` prints instead of opening a window. The first run only records the commit.
 public class WhatsNewLauncher {
 
-    private static final Pattern BLAME_HEADER = Pattern.compile("^([0-9a-f]{40}) \\d+ (\\d+).*");
-    private static final Pattern SECTION_LABEL = Pattern.compile("^\\[(.*?)\\](?: - (.*))?$");
-    private static final Pattern WORD = Pattern.compile("\\w+");
-    private static final int MAX_REWORD_HOPS = 8;
-
-    /// The classes `WhatsNew.view` takes from JabRef's base stylesheet, for a scene without it.
-    private static final String CSS = """
-            .h3 { -fx-font-size: 1.5em; }
-            .h4 { -fx-font-size: 1.25em; }
-            .bold { -fx-font-weight: bold; }
-            .text-muted { -fx-opacity: 0.7; }
-            .font-monospace { -fx-font-family: monospace; }
-            """;
-
-    /// The commit that first added an entry, and who wrote it.
-    record Origin(String commit, String email, String name) {
-    }
-
-    private static final List<WhatsNew.Item> ITEMS = new ArrayList<>();
-    private static String since = "";
-    private static String now = "";
+    private static final String CHANGELOG = "CHANGELOG.md";
+    private static final String LAST_RUN_FILE = "whats-new-last-commit";
+    private static final String STDOUT_FLAG = "--stdout";
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Localization.setLanguage(Language.ENGLISH);
-        Path state = Path.of(git("rev-parse", "--absolute-git-dir").getFirst(), "whats-new-last-commit");
+        Path lastRunFile = Path.of(git("rev-parse", "--absolute-git-dir").getFirst(), LAST_RUN_FILE);
         String head = git("rev-parse", "HEAD").getFirst();
-        String last = Files.exists(state) ? Files.readString(state).strip() : "";
-        // Record the new position first: a failure below must not replay the same news forever.
-        Files.writeString(state, head + "\n");
-        if (last.isEmpty() || last.equals(head)) {
+        Optional<String> lastRun = Files.exists(lastRunFile) ? Optional.of(Files.readString(lastRunFile).strip()) : Optional.empty();
+        // Recorded first: a failure below must not replay the same news forever.
+        Files.writeString(lastRunFile, head + "\n");
+        if (lastRun.isEmpty() || lastRun.get().equals(head)) {
             return;
         }
-        Set<String> fresh = new HashSet<>(git("rev-list", last + ".." + head));
-        if (fresh.isEmpty()) {
+        Set<String> newCommits = new HashSet<>(git("rev-list", lastRun.get() + ".." + head));
+        String myEmail = git("config", "user.email").stream().findFirst().orElse("");
+        News news = new EntryOrigins(newCommits, myEmail).newsIn(Files.readAllLines(Path.of(CHANGELOG)), head);
+        if (news.isEmpty()) {
             return;
         }
-        since = describe(last);
-        now = describe(head);
-        String me = git("config", "user.email").stream().findFirst().orElse("");
-
-        List<String> lines = Files.readAllLines(Path.of("CHANGELOG.md"));
-        // Blame is the cheap pre-filter: an entry whose current line predates the previous run is old for sure.
-        String[] blamed = new String[lines.size()];
-        for (String l : git("blame", "--line-porcelain", head, "--", "CHANGELOG.md")) {
-            Matcher m = BLAME_HEADER.matcher(l);
-            if (m.matches()) {
-                blamed[Integer.parseInt(m.group(2)) - 1] = m.group(1);
-            }
-        }
-
-        String section = "";
-        String heading = "";
-        for (int n = 0; n < lines.size(); n++) {
-            String l = lines.get(n);
-            if (l.startsWith("## ")) {
-                Matcher m = SECTION_LABEL.matcher(l.substring(3).strip());
-                section = m.matches() ? m.group(1) + (m.group(2) == null ? "" : " (" + m.group(2) + ")") : l.substring(3);
-            } else if (l.startsWith("### ")) {
-                heading = l.substring(4);
-            } else if (l.startsWith("- ") && blamed[n] != null && fresh.contains(blamed[n])) {
-                String text = l.substring(2).strip();
-                Optional<Origin> origin = origin(text, 0);
-                if (origin.isPresent() && fresh.contains(origin.get().commit())) {
-                    String by = me.equalsIgnoreCase(origin.get().email()) ? WhatsNew.ME : origin.get().name();
-                    ITEMS.add(new WhatsNew.Item(by, section, heading, text));
-                }
-            }
-        }
-        if (ITEMS.isEmpty()) {
+        if (List.of(args).contains(STDOUT_FLAG) || java.awt.GraphicsEnvironment.isHeadless()) {
+            System.out.println(news.asPlainText());
             return;
         }
-        if ((args.length > 0 && "--stdout".equals(args[0])) || java.awt.GraphicsEnvironment.isHeadless()) {
-            System.out.println(WhatsNew.plainText(ITEMS));
-            return;
-        }
-        Application.launch(Window.class);
+        Window.show(news, "What's new since " + describe(lastRun.get()) + " — now at " + describe(head));
     }
 
-    /// The commit that first added the entry now reading `text`, following rewordings back.
-    static Optional<Origin> origin(String text, int hops) throws IOException, InterruptedException {
-        List<String> found = git("log", "--reverse", "--format=%H%x09%ae%x09%an", "-S" + text, "--", "CHANGELOG.md");
-        if (found.isEmpty()) {
-            return Optional.empty();
+    /// Which commit first added a changelog entry, and so whether the entry is news and who wrote it.
+    ///
+    /// `git log -S` finds the commit where the entry's current wording appeared. When that commit reworded an
+    /// older entry (a removed line in the same hunk shares at least half of its words), the search follows the
+    /// older wording back: a link fix or a rewording by someone else keeps the original author, and a reworded
+    /// entry that predates the previous run is not news.
+    static final class EntryOrigins {
+
+        /// A `git blame --line-porcelain` header: the commit and the line number in the blamed file.
+        private static final Pattern BLAME_HEADER = Pattern.compile("^(?<commit>[0-9a-f]{40}) \\d+ (?<line>\\d+).*");
+        private static final Pattern WORD = Pattern.compile("\\w+");
+        private static final double REWORDING_SHARED_WORDS = 0.5;
+        private static final int MAX_REWORDING_HOPS = 8;
+
+        /// The commit that first added an entry, and who wrote it.
+        record Origin(String commit, String email, String name) {
         }
-        String[] parts = found.getFirst().split("\t", 3);
-        Origin origin = new Origin(parts[0], parts.length > 1 ? parts[1] : "", parts.length > 2 ? parts[2] : "");
-        if (hops >= MAX_REWORD_HOPS) {
+
+        private final Set<String> newCommits;
+        private final String myEmail;
+
+        /// @param newCommits the commits since the previous run
+        /// @param myEmail    the checkout's `user.email`; entries first added under it are mine
+        EntryOrigins(Set<String> newCommits, String myEmail) {
+            this.newCommits = Set.copyOf(newCommits);
+            this.myEmail = myEmail;
+        }
+
+        /// The entries of `changelog` (as of `head`) first added by one of the new commits.
+        News newsIn(List<String> changelog, String head) throws IOException, InterruptedException {
+            Map<Integer, String> blamedCommits = blamedCommits(head);
+            List<AttributedEntry> items = new ArrayList<>();
+            for (var entry : ChangelogParser.entries(changelog).entrySet()) {
+                // Blame is the cheap pre-filter: an entry whose current line predates the previous run is old for sure.
+                if (!newCommits.contains(blamedCommits.get(entry.getKey()))) {
+                    continue;
+                }
+                Optional<Origin> origin = origin(entry.getValue().text(), 0);
+                if (origin.isPresent() && newCommits.contains(origin.get().commit())) {
+                    items.add(new AttributedEntry(contributor(origin.get()), entry.getValue()));
+                }
+            }
+            return new News(items);
+        }
+
+        /// The commit that last touched each line of the changelog at `head`, by line index.
+        private static Map<Integer, String> blamedCommits(String head) throws IOException, InterruptedException {
+            Map<Integer, String> commits = new HashMap<>();
+            for (String line : git("blame", "--line-porcelain", head, "--", CHANGELOG)) {
+                Matcher header = BLAME_HEADER.matcher(line);
+                if (header.matches()) {
+                    commits.put(Integer.parseInt(header.group("line")) - 1, header.group("commit"));
+                }
+            }
+            return commits;
+        }
+
+        private Contributor contributor(Origin origin) {
+            return myEmail.equalsIgnoreCase(origin.email()) ? Contributor.Me.LOCAL : new Contributor.Other(origin.name());
+        }
+
+        /// The commit that first added the entry now reading `text`, following up to [#MAX_REWORDING_HOPS] rewordings back.
+        private static Optional<Origin> origin(String text, int hops) throws IOException, InterruptedException {
+            List<String> found = git("log", "--reverse", "--format=%H%x09%ae%x09%an", "-S" + text, "--", CHANGELOG);
+            if (found.isEmpty()) {
+                return Optional.empty();
+            }
+            String[] fields = found.getFirst().split("\t", 3);
+            Origin origin = new Origin(fields[0], fields.length > 1 ? fields[1] : "", fields.length > 2 ? fields[2] : "");
+            if (hops >= MAX_REWORDING_HOPS) {
+                return Optional.of(origin);
+            }
+            Optional<String> olderWording = rewordedFrom(origin.commit(), text);
+            if (olderWording.isPresent()) {
+                return origin(olderWording.get(), hops + 1);
+            }
             return Optional.of(origin);
         }
-        Optional<String> older = rewordedFrom(origin.commit(), text);
-        if (older.isPresent()) {
-            return origin(older.get(), hops + 1);
-        }
-        return Optional.of(origin);
-    }
 
-    /// The entry `commit` replaced by `text`, if the hunk adding `text` also removed an entry
-    /// that shares at least half its words with it; empty for a plain addition.
-    static Optional<String> rewordedFrom(String commit, String text) throws IOException, InterruptedException {
-        List<String> removed = new ArrayList<>();
-        boolean hunkAddsText = false;
-        Set<String> words = words(text);
-        for (String l : git("show", "--format=", "-U0", commit, "--", "CHANGELOG.md")) {
-            if (l.startsWith("@@")) {
-                if (hunkAddsText) {
-                    break;
+        /// The entry `commit` replaced by `text`: the removed line of the hunk adding `text` that shares the most
+        /// words with it, at least [#REWORDING_SHARED_WORDS] of them; empty for a plain addition.
+        private static Optional<String> rewordedFrom(String commit, String text) throws IOException, InterruptedException {
+            List<String> removed = new ArrayList<>();
+            boolean hunkAddsText = false;
+            for (String line : git("show", "--format=", "-U0", commit, "--", CHANGELOG)) {
+                if (line.startsWith("@@")) {
+                    if (hunkAddsText) {
+                        break;
+                    }
+                    removed.clear();
+                } else if (line.startsWith("-- ")) {
+                    removed.add(line.substring(3).strip());
+                } else if (line.startsWith("+- ") && line.contains(text)) {
+                    hunkAddsText = true;
                 }
-                removed.clear();
-            } else if (l.startsWith("-- ")) {
-                removed.add(l.substring(3).strip());
-            } else if (l.startsWith("+- ") && l.contains(text)) {
-                hunkAddsText = true;
             }
-        }
-        if (!hunkAddsText) {
-            return Optional.empty();
-        }
-        String best = "";
-        double bestShare = 0.5;
-        for (String candidate : removed) {
-            Set<String> common = new HashSet<>(words(candidate));
-            common.retainAll(words);
-            double share = words.isEmpty() ? 0 : (double) common.size() / words.size();
-            if (share >= bestShare && !candidate.equals(text)) {
-                best = candidate;
-                bestShare = share;
+            if (!hunkAddsText) {
+                return Optional.empty();
             }
+            Set<String> words = words(text);
+            Optional<String> best = Optional.empty();
+            double bestShare = REWORDING_SHARED_WORDS;
+            for (String candidate : removed) {
+                Set<String> common = words(candidate);
+                common.retainAll(words);
+                double share = words.isEmpty() ? 0 : (double) common.size() / words.size();
+                if (share >= bestShare && !candidate.equals(text)) {
+                    best = Optional.of(candidate);
+                    bestShare = share;
+                }
+            }
+            return best;
         }
-        return best.isEmpty() ? Optional.empty() : Optional.of(best);
-    }
 
-    static Set<String> words(String text) {
-        Set<String> result = new HashSet<>();
-        Matcher m = WORD.matcher(text.toLowerCase());
-        while (m.find()) {
-            result.add(m.group());
+        private static Set<String> words(String text) {
+            Set<String> words = new HashSet<>();
+            Matcher matcher = WORD.matcher(text.toLowerCase());
+            while (matcher.find()) {
+                words.add(matcher.group());
+            }
+            return words;
         }
-        return result;
     }
 
-    /// `<short sha> (<date> <time>)`.
-    static String describe(String commit) throws IOException, InterruptedException {
-        return git("show", "--no-patch", "--date=format:%Y-%m-%d %H:%M", "--format=%h (%cd)", commit).getFirst();
-    }
-
-    /// Dark if JabRef's color scheme preference says so, or says "follow system" and the system is dark.
-    static boolean dark() {
-        String scheme = Preferences.userRoot().node("/org/jabref").get("themeColorScheme", "FOLLOW_SYSTEM");
-        return switch (scheme) {
-            case "DARK" -> true;
-            case "LIGHT" -> false;
-            default -> Platform.getPreferences().getColorScheme() == ColorScheme.DARK;
-        };
-    }
-
+    /// The window: the news, "Cancel run" and "Run", in JabRef's light or dark colour scheme.
     public static class Window extends Application {
+
+        /// The classes [WhatsNewView] takes from JabRef's base stylesheet, which this scene does not load.
+        private static final String CSS = """
+                .h3 { -fx-font-size: 1.5em; }
+                .h4 { -fx-font-size: 1.25em; }
+                .bold { -fx-font-weight: bold; }
+                .text-muted { -fx-opacity: 0.7; }
+                .font-monospace { -fx-font-family: monospace; }
+                """;
+        private static final String PREFERENCES_NODE = "/org/jabref";
+        private static final String COLOR_SCHEME_PREFERENCE = "themeColorScheme";
+
+        // Application.launch instantiates the class by reflection: the news reach the window through these fields.
+        private static News news = News.NONE;
+        private static String title = "";
+
+        static void show(News news, String title) {
+            Window.news = news;
+            Window.title = title;
+            Application.launch(Window.class);
+        }
 
         @Override
         public void start(Stage stage) {
@@ -226,24 +252,40 @@ public class WhatsNewLauncher {
             HBox buttons = new HBox(8, cancel, run);
             buttons.setAlignment(Pos.CENTER_RIGHT);
             buttons.setPadding(new Insets(8, 16, 12, 16));
-            BorderPane root = new BorderPane(WhatsNew.view(ITEMS, url -> getHostServices().showDocument(url)));
+            BorderPane root = new BorderPane(new WhatsNewView(news, url -> getHostServices().showDocument(url)));
             root.setBottom(buttons);
             Scene scene = new Scene(root, 900, 650);
             scene.getStylesheets().add("data:text/css;base64," + Base64.getEncoder().encodeToString(CSS.getBytes(StandardCharsets.UTF_8)));
-            stage.setTitle("What's new since " + since + " — now at " + now);
+            stage.setTitle(title);
             stage.setScene(scene);
             stage.show();
         }
+
+        /// Dark if JabRef's colour scheme preference says so, or says "follow system" and the system is dark.
+        private static boolean dark() {
+            String scheme = Preferences.userRoot().node(PREFERENCES_NODE).get(COLOR_SCHEME_PREFERENCE, "FOLLOW_SYSTEM");
+            return switch (scheme) {
+                case "DARK" -> true;
+                case "LIGHT" -> false;
+                default -> Platform.getPreferences().getColorScheme() == ColorScheme.DARK;
+            };
+        }
     }
 
+    /// `<abbreviated id> (<commit date and time>)`.
+    static String describe(String commit) throws IOException, InterruptedException {
+        return git("show", "--no-patch", "--date=format:%Y-%m-%d %H:%M", "--format=%h (%cd)", commit).getFirst();
+    }
+
+    /// The output lines of `git args...`; a non-zero exit is an [IOException].
     static List<String> git(String... args) throws IOException, InterruptedException {
-        List<String> cmd = new ArrayList<>(List.of("git"));
-        cmd.addAll(List.of(args));
-        Process p = new ProcessBuilder(cmd).redirectError(ProcessBuilder.Redirect.INHERIT).start();
-        List<String> out = p.inputReader().lines().toList();
-        if (p.waitFor() != 0) {
+        List<String> command = new ArrayList<>(List.of("git"));
+        command.addAll(List.of(args));
+        Process process = new ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.INHERIT).start();
+        List<String> output = process.inputReader().lines().toList();
+        if (process.waitFor() != 0) {
             throw new IOException("git " + String.join(" ", args) + " failed");
         }
-        return out;
+        return output;
     }
 }

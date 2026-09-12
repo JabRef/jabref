@@ -1,0 +1,94 @@
+package org.jabref.logic.whatsnew;
+
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.SequencedMap;
+import java.util.SequencedSet;
+import java.util.Set;
+
+import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NullMarked;
+
+/// The changelog entries a developer has not seen yet, grouped for display by who wrote them.
+///
+/// Which entries are news is decided against the set of entries announced before, not against a commit range:
+/// so nothing is shown twice, nothing is missed while JabRef is closed, and a reworded entry counts as new.
+// [impl->req~whats-new.checkout-news~1]
+@NullMarked
+public record News(List<AttributedEntry> items) {
+    public static final News NONE = new News(List.of());
+
+    public News {
+        items = List.copyOf(items);
+    }
+
+    /// The entries of `changelogs` that `announced` does not hold. An entry appearing in several changelogs
+    /// counts once, attributed as the first changelog has it: so the working tree goes first, and an entry
+    /// pulled already is not "pushed from another machine".
+    public static News pending(Set<ChangelogEntry> announced, List<BlamedChangelog> changelogs) {
+        SequencedMap<ChangelogEntry, AttributedEntry> fresh = new LinkedHashMap<>();
+        for (BlamedChangelog changelog : changelogs) {
+            for (AttributedEntry item : changelog.entries()) {
+                if (!announced.contains(item.entry())) {
+                    fresh.putIfAbsent(item.entry(), item);
+                }
+            }
+        }
+        return new News(List.copyOf(fresh.values()));
+    }
+
+    /// Every entry of `changelogs`, once: what [#pending] does not report after they are announced.
+    public static SequencedSet<ChangelogEntry> allEntries(List<BlamedChangelog> changelogs) {
+        SequencedSet<ChangelogEntry> entries = new LinkedHashSet<>();
+        for (BlamedChangelog changelog : changelogs) {
+            changelog.entries().forEach(item -> entries.add(item.entry()));
+        }
+        return entries;
+    }
+
+    public boolean isEmpty() {
+        return items.isEmpty();
+    }
+
+    public int size() {
+        return items.size();
+    }
+
+    /// The items by contributor, in [Contributor#DISPLAY_ORDER]; within a group in changelog order.
+    public SequencedMap<Contributor, List<AttributedEntry>> grouped() {
+        SequencedMap<Contributor, List<AttributedEntry>> groups = new LinkedHashMap<>();
+        items.stream()
+             .map(AttributedEntry::by)
+             .distinct()
+             .sorted(Contributor.DISPLAY_ORDER)
+             .forEach(by -> groups.put(by, items.stream().filter(item -> item.by().equals(by)).toList()));
+        return groups;
+    }
+
+    /// The title of a group, localized.
+    public static String groupTitle(Contributor contributor) {
+        return switch (contributor) {
+            case Contributor.Other(String name) ->
+                    Localization.lang("Changes by %0", name);
+            case Contributor.Me.REMOTE ->
+                    Localization.lang("Changes by me (pushed from another machine)");
+            case Contributor.Me.LOCAL ->
+                    Localization.lang("Changes by me");
+        };
+    }
+
+    /// The groups as text, one bullet per entry with the Markdown emphasis dropped — a tooltip or a terminal.
+    public String asPlainText() {
+        StringBuilder text = new StringBuilder();
+        grouped().forEach((contributor, entries) -> {
+            if (!text.isEmpty()) {
+                text.append('\n');
+            }
+            text.append(groupTitle(contributor)).append('\n');
+            entries.forEach(item -> text.append("• ").append(item.entry().text().replace("**", "")).append('\n'));
+        });
+        return text.toString().strip();
+    }
+}

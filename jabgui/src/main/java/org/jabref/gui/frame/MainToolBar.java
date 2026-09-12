@@ -160,12 +160,7 @@ public class MainToolBar extends ToolBar {
 
                 new Separator(Orientation.VERTICAL),
 
-                new HBox(
-                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferences.getExternalApplicationsPreferences()))));
-
-        // Only while JabRef runs out of a git checkout: a packaged JabRef has nothing to update from.
-        WhatsNewButton.create(factory, taskExecutor, dialogService, preferences.getExternalApplicationsPreferences(), gitHandlerRegistry, quit)
-                      .ifPresent(button -> ((HBox) getItems().getLast()).getChildren().addFirst(button));
+                projectLinks(factory));
 
         leftSpacer.setPrefWidth(50);
         leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
@@ -174,6 +169,15 @@ public class MainToolBar extends ToolBar {
         HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
 
         getStyleClass().add("mainToolbar");
+    }
+
+    /// The GitHub link and, only while JabRef runs out of a git checkout, the "What's new" button before it.
+    private HBox projectLinks(ActionFactory factory) {
+        HBox links = new HBox(
+                factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferences.getExternalApplicationsPreferences())));
+        WhatsNewButton.create(factory, taskExecutor, dialogService, preferences.getExternalApplicationsPreferences(), gitHandlerRegistry, quit)
+                      .ifPresent(links.getChildren()::addFirst);
+        return links;
     }
 
     private void initNavigationCommands() {
