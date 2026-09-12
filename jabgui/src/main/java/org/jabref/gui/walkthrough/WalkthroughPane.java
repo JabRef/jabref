@@ -11,16 +11,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.PopupWindow;
 import javafx.stage.Window;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 
 /// The layer a walkthrough draws into: an initially empty pane covering a whole window, on top of that
 /// window's regular content. Panels, tooltips and highlight effects are added here and removed again.
 ///
-/// A window installs its pane while it is being built and keeps it for its lifetime. The pane is a child
-/// of a parent the window already has, never a replacement for the scene root -- three parties already
+/// A window adds its pane where it is built and keeps it for its lifetime. The pane is a child of a
+/// parent the window already has, never a replacement for the scene root -- three parties already
 /// claim that root (JavaFX's [javafx.scene.control.Dialog] reassigns it on every show, ControlsFX injects
 /// its decoration pane on the first validation decoration, and the walkthrough used to wrap it), and any
 /// two of them colliding drops the third's contribution. Replacing the root of a visible window also
@@ -28,14 +28,14 @@ import org.jspecify.annotations.NullMarked;
 /// developer's selection.
 ///
 /// @implNote The pane is unmanaged and sizes itself to the scene rather than to its parent, so that one
-/// rule covers every host: a [Pane] that is the scene root, a pane that fills it, and the root of a popup
-/// window alike. This assumes the host's origin coincides with the scene's, which holds for all three.
+/// rule covers every host: a [Pane] that is the scene root, a pane that fills it, and the content of a
+/// popup alike. This assumes the host's origin coincides with the scene's, which holds for all three.
 /// [javafx.scene.Parent#layout()] descends into unmanaged children, so the pane still lays out its own.
 @NullMarked
 public final class WalkthroughPane extends StackPane {
 
     /// Keyed into the scene's property map, so [#of(Window)] is a lookup instead of a scene-graph search
-    /// and nothing outlives the scene that holds the pane.
+    /// and nothing outlives the scene that holds the pane. A window has at most one pane.
     private static final Object SCENE_PROPERTY_KEY = new Object();
 
     /// A lower view order renders a child in front of its siblings, whatever its position in the list.
@@ -43,7 +43,7 @@ public final class WalkthroughPane extends StackPane {
     /// needed, so position in the list is not something the pane can hold on to.
     private static final double IN_FRONT_OF_SIBLINGS = -1;
 
-    private WalkthroughPane() {
+    public WalkthroughPane() {
         getStyleClass().add("walkthrough-pane");
         setMinSize(0, 0);
         setManaged(false);
@@ -67,49 +67,32 @@ public final class WalkthroughPane extends StackPane {
         });
     }
 
-    /// Installs the walkthrough pane of a window as a child of the given parent, or returns the one that
-    /// parent already holds. Call it while the window is being built.
-    public static WalkthroughPane installIn(@NonNull Pane parent) {
-        return installIn(parent.getChildren());
-    }
-
-    /// Returns the walkthrough pane of the given window, if it has one.
-    public static Optional<WalkthroughPane> of(@NonNull Window window) {
-        return Optional.ofNullable(window.getScene())
-                       .map(scene -> scene.getProperties().get(SCENE_PROPERTY_KEY))
-                       .map(WalkthroughPane.class::cast);
-    }
-
-    /// Returns the walkthrough pane of the given window, installing one into the window's scene root if
-    /// the window does not have one yet. Windows JabRef does not build itself -- context menus and other
-    /// popups -- get their pane this way, the first time a walkthrough needs to draw on them.
+    /// Returns the pane of the given window.
     ///
-    /// Empty for a window whose root accepts no children, which no walkthrough currently targets.
-    public static Optional<WalkthroughPane> ensureFor(@NonNull Window window) {
-        Optional<WalkthroughPane> installed = of(window);
-        if (installed.isPresent()) {
-            return installed;
+    /// The main window and every JabRef dialog are given theirs where they are built. A popup -- a context
+    /// menu a walkthrough steps into -- is not JabRef's to build, so it is given one here, the first time
+    /// a walkthrough draws on it. Empty for any other window built outside JabRef.
+    public static Optional<WalkthroughPane> of(Window window) {
+        Optional<WalkthroughPane> existing = Optional.ofNullable(window.getScene())
+                                                     .map(scene -> scene.getProperties().get(SCENE_PROPERTY_KEY))
+                                                     .map(WalkthroughPane.class::cast);
+        if (existing.isPresent() || !(window instanceof PopupWindow)) {
+            return existing;
         }
+
         return Optional.ofNullable(window.getScene())
                        .map(Scene::getRoot)
                        .flatMap(WalkthroughPane::childrenOf)
-                       .map(WalkthroughPane::installIn);
+                       .map(children -> {
+                           WalkthroughPane pane = new WalkthroughPane();
+                           children.add(pane);
+                           return pane;
+                       });
     }
 
-    private static WalkthroughPane installIn(ObservableList<Node> siblings) {
-        for (Node sibling : siblings) {
-            if (sibling instanceof WalkthroughPane installed) {
-                return installed;
-            }
-        }
-
-        WalkthroughPane pane = new WalkthroughPane();
-        siblings.add(pane);
-        return pane;
-    }
-
-    /// The two parents that take arbitrary children -- the same pair [javafx.stage.PopupWindow] itself
-    /// accepts as a popup's root.
+    /// The two parents that take arbitrary children -- the same pair [PopupWindow] itself accepts as a
+    /// popup's root. Its own content list is not public beyond [javafx.stage.Popup], and a context menu is
+    /// a [javafx.scene.control.PopupControl].
     private static Optional<ObservableList<Node>> childrenOf(Parent parent) {
         return switch (parent) {
             case Group group ->

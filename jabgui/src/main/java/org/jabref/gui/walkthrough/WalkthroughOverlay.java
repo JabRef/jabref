@@ -137,7 +137,7 @@ public class WalkthroughOverlay {
             this.scroller = new WalkthroughScroller(resolvedNode);
         }
 
-        Optional<WalkthroughPane> pane = WalkthroughPane.ensureFor(resolvedWindow);
+        Optional<WalkthroughPane> pane = WalkthroughPane.of(resolvedWindow);
         if (pane.isEmpty()) {
             LOGGER.error("Window '{}' cannot host a walkthrough pane, so step '{}' cannot be shown. Reverting.",
                     resolvedWindow.getClass().getSimpleName(), component.title());

@@ -191,7 +191,7 @@ public class WalkthroughHighlighter {
     }
 
     private void applyBackdropHighlight(@NonNull Window window, @NonNull Node targetNode) {
-        WalkthroughPane.ensureFor(window).ifPresentOrElse(pane -> {
+        WalkthroughPane.of(window).ifPresentOrElse(pane -> {
             Spotlight backdrop = getOrCreateBackdropHighlight(window, pane);
             backdrop.setOnClick(onBackgroundClickHandler);
             backdrop.attach(targetNode);
@@ -199,13 +199,13 @@ public class WalkthroughHighlighter {
     }
 
     private void applyPulseAnimation(@NonNull Window window, @NonNull Node targetNode) {
-        WalkthroughPane.ensureFor(window).ifPresentOrElse(
+        WalkthroughPane.of(window).ifPresentOrElse(
                 pane -> getOrCreatePulseIndicator(window, pane).attach(targetNode),
                 () -> logMissingPane(window));
     }
 
     private void applyFullScreenDarken(@NonNull Window window) {
-        WalkthroughPane.ensureFor(window).ifPresentOrElse(pane -> {
+        WalkthroughPane.of(window).ifPresentOrElse(pane -> {
             FullScreenDarken fullDarken = getOrCreateFullScreenDarken(window, pane);
             fullDarken.setOnClick(onBackgroundClickHandler);
             fullDarken.attach();

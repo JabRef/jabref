@@ -374,7 +374,7 @@ public class JabRefGUI extends Application {
         powerpane.getInfoCenterPane().autoHideProperty().bind(Bindings.isEmpty(dialogService.getPersistentNotifications()));
         // PowerPane is a StackPane, so the walkthrough draws into a sibling of the info center pane
         // rather than into a wrapper around the scene root.
-        WalkthroughPane.installIn(powerpane);
+        powerpane.getChildren().add(new WalkthroughPane());
 
         Scene scene = new Scene(powerpane);
         installControlsFxDecorationPane(powerpane);

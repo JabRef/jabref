@@ -27,53 +27,36 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class WalkthroughPaneTest {
 
     @Test
-    void paneInstalledInAParentIsFoundByItsWindow() {
-        StackPane content = new StackPane();
-        AtomicReference<WalkthroughPane> pane = new AtomicReference<>();
-        JavaFxExtension.invokeAndWait(() -> pane.set(WalkthroughPane.installIn(content)));
+    void paneAddedToAWindowIsFoundByThatWindow() {
+        WalkthroughPane pane = new WalkthroughPane();
+        StackPane content = new StackPane(pane);
 
         Stage stage = showStage(new Scene(content));
 
-        assertEquals(Optional.of(pane.get()), WalkthroughPane.of(stage));
-    }
-
-    @Test
-    void installingInTheSameParentTwiceKeepsTheFirstPane() {
-        StackPane content = new StackPane();
-
-        AtomicReference<WalkthroughPane> first = new AtomicReference<>();
-        AtomicReference<WalkthroughPane> second = new AtomicReference<>();
-        JavaFxExtension.invokeAndWait(() -> {
-            first.set(WalkthroughPane.installIn(content));
-            second.set(WalkthroughPane.installIn(content));
-        });
-
-        assertSame(first.get(), second.get());
-        assertEquals(1, content.getChildren().stream().filter(WalkthroughPane.class::isInstance).count());
+        assertEquals(Optional.of(pane), WalkthroughPane.of(stage));
     }
 
     /// The pane covers the window, so its size comes from the scene rather than from whichever parent
     /// happens to hold it.
     @Test
     void paneCoversTheWholeScene() {
-        StackPane content = new StackPane();
-        AtomicReference<WalkthroughPane> pane = new AtomicReference<>();
-        JavaFxExtension.invokeAndWait(() -> pane.set(WalkthroughPane.installIn(content)));
+        WalkthroughPane pane = new WalkthroughPane();
+        StackPane content = new StackPane(pane);
 
         showStage(new Scene(content, 640, 480));
 
-        assertEquals(640, pane.get().getWidth());
-        assertEquals(480, pane.get().getHeight());
+        assertEquals(640, pane.getWidth());
+        assertEquals(480, pane.getHeight());
     }
 
     @Test
-    void obtainingThePaneNeverReplacesTheSceneRoot() {
+    void lookingUpAPaneNeverReplacesTheSceneRoot() {
         StackPane content = new StackPane();
         Scene scene = new Scene(content);
         Stage stage = showStage(scene);
         Parent rootBefore = scene.getRoot();
 
-        JavaFxExtension.invokeAndWait(() -> WalkthroughPane.ensureFor(stage));
+        JavaFxExtension.invokeAndWait(() -> WalkthroughPane.of(stage));
 
         assertSame(rootBefore, scene.getRoot());
     }
@@ -87,7 +70,8 @@ class WalkthroughPaneTest {
         JavaFxExtension.invokeAndWait(() -> {
             Dialog<Void> newDialog = new Dialog<>();
             newDialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-            pane.set(WalkthroughPane.installIn(newDialog.getDialogPane()));
+            pane.set(new WalkthroughPane());
+            newDialog.getDialogPane().getChildren().add(pane.get());
             newDialog.show();
             newDialog.close();
             newDialog.show();
@@ -104,7 +88,7 @@ class WalkthroughPaneTest {
     /// Windows JabRef does not build itself -- context menus and other popups -- get their pane the first
     /// time a walkthrough needs one.
     @Test
-    void popupWindowGetsAPaneOnDemand() {
+    void popupGetsItsPaneOnFirstLookup() {
         Stage owner = showStage(new Scene(new StackPane()));
         Popup popup = new Popup();
 
@@ -112,7 +96,7 @@ class WalkthroughPaneTest {
         JavaFxExtension.invokeAndWait(() -> {
             popup.getContent().add(new Region());
             popup.show(owner);
-            pane.set(WalkthroughPane.ensureFor(popup));
+            pane.set(WalkthroughPane.of(popup));
         });
 
         assertTrue(pane.get().isPresent());
@@ -123,15 +107,13 @@ class WalkthroughPaneTest {
 
     @Test
     void emptyPaneDoesNotSwallowInput() {
-        StackPane content = new StackPane();
-        AtomicReference<WalkthroughPane> pane = new AtomicReference<>();
-        JavaFxExtension.invokeAndWait(() -> pane.set(WalkthroughPane.installIn(content)));
+        WalkthroughPane pane = new WalkthroughPane();
 
-        assertTrue(pane.get().isMouseTransparent());
+        assertTrue(pane.isMouseTransparent());
 
-        JavaFxExtension.invokeAndWait(() -> pane.get().getChildren().add(new Region()));
+        JavaFxExtension.invokeAndWait(() -> pane.getChildren().add(new Region()));
 
-        assertFalse(pane.get().isMouseTransparent());
+        assertFalse(pane.isMouseTransparent());
     }
 
     private static Stage showStage(Scene scene) {

@@ -31,11 +31,11 @@ public class BaseDialog<T> extends Dialog<T> {
         dialogPaneProperty().addListener((_, _, newPane) -> {
             if (newPane != null) {
                 setupKeyBindings(newPane);
-                installWalkthroughPane();
+                addWalkthroughPane();
             }
         });
         setupKeyBindings(getDialogPane());
-        installWalkthroughPane();
+        addWalkthroughPane();
 
         setDialogIcon(IconTheme.getJabRefIcon());
 
@@ -57,11 +57,11 @@ public class BaseDialog<T> extends Dialog<T> {
         return false;
     }
 
-    /// Gives the dialog the pane a walkthrough draws into. It belongs to the dialog pane rather than to
-    /// the scene, because JavaFX reassigns the scene root of a dialog on every show and swaps in a
-    /// placeholder on close. Runs again for every new dialog pane.
-    private void installWalkthroughPane() {
-        WalkthroughPane.installIn(getDialogPane());
+    /// Adds the pane a walkthrough draws into. It goes into the dialog pane rather than into the scene,
+    /// because a [Dialog] reassigns its scene root when the dialog pane is set, again on every show, and
+    /// swaps in a placeholder on close. Runs again for every new dialog pane.
+    private void addWalkthroughPane() {
+        getDialogPane().getChildren().add(new WalkthroughPane());
     }
 
     private Stage getDialogWindow() {
