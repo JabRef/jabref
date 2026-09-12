@@ -268,14 +268,14 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 clipBoardManager,
                 taskExecutor,
                 gitHandlerRegistry,
-                (tab, loadedContext) -> handleSharedDatabaseConnectionSuccess(tab, loadedContext, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath),
+                (tab, bibDatabaseContext) -> handleSharedDatabaseConnectionSuccess(tab, bibDatabaseContext, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath),
                 exception -> showConnectionFailure(exception, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
         tabContainer.addTab(libraryTab, true);
         libraryTab.startDataLoadingTask();
     }
 
     private void handleSharedDatabaseConnectionSuccess(LibraryTab libraryTab,
-                                                       BibDatabaseContext loadedContext,
+                                                       BibDatabaseContext bibDatabaseContext,
                                                        DBMSConnectionProperties connectionProperties,
                                                        boolean shouldRememberPassword,
                                                        boolean shouldAutosave,
@@ -285,10 +285,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         // Store the connection right away, so it is remembered even if JabRef never reaches a clean quit.
         // A database already stored keeps its identifier, otherwise the list would grow an
         // indistinguishable second entry on every reconnect. Quit and "Save as" reuse it too.
-        String sharedDatabaseId = loadedContext.getDatabase().getSharedDatabaseID()
-                                               .or(() -> SharedDatabasePreferences.findSavedId(connectionProperties))
-                                               .orElseGet(() -> loadedContext.getDatabase().generateSharedDatabaseID());
-        loadedContext.getDatabase().setSharedDatabaseID(sharedDatabaseId);
+        String sharedDatabaseId = bibDatabaseContext.getDatabase().getSharedDatabaseID()
+                                                    .or(() -> SharedDatabasePreferences.findSavedId(connectionProperties))
+                                                    .orElseGet(() -> bibDatabaseContext.getDatabase().generateSharedDatabaseID());
+        bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseId);
         setPreferences(new SharedDatabasePreferences(sharedDatabaseId), connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
         if (!autosavePath.isEmpty() && shouldAutosave) {
             try {
