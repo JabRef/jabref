@@ -152,7 +152,7 @@ class ImportCustomEntryTypesDialogViewModelTest {
 
         viewModel.importBibEntryTypes(List.of(), List.of());
 
-        assertTrue(entryTypesManager.getAllCustomizedTypes(MODE).isEmpty());
+        assertEquals(List.of(), List.copyOf(entryTypesManager.getAllCustomizedTypes(MODE)));
         verify(preferences, never()).storeCustomEntryTypesRepository(entryTypesManager);
         assertEquals(List.of(), List.copyOf(viewModelFor(List.of(AUDIO_FROM_FILE, MANUSCRIPT_FROM_FILE)).newTypes()));
         assertEquals(List.of(), List.copyOf(viewModelFor(List.of(AUDIO_FROM_FILE, MANUSCRIPT_FROM_FILE)).differentCustomizations()));

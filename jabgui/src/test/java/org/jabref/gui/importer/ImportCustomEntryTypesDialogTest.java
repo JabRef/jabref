@@ -113,7 +113,7 @@ class ImportCustomEntryTypesDialogTest extends JavaFxTest {
         });
 
         assertEquals(List.of(AUDIO_FROM_FILE), List.copyOf(entryTypesManager.getAllCustomizedTypes(MODE)));
-        assertTrue(entryTypesManager.enrich(new UnknownEntryType("manuscript"), MODE).isEmpty());
+        assertEquals(Optional.empty(), entryTypesManager.enrich(new UnknownEntryType("manuscript"), MODE));
         verify(preferences).addDeclinedCustomEntryTypes(List.of(
                 ImportCustomEntryTypesDialogViewModel.decision(MANUSCRIPT_FROM_FILE, Optional.empty(), MODE)));
     }
@@ -126,7 +126,7 @@ class ImportCustomEntryTypesDialogTest extends JavaFxTest {
             buttonOf(ButtonType.CANCEL).fire();
         });
 
-        assertTrue(entryTypesManager.getAllCustomizedTypes(MODE).isEmpty());
+        assertEquals(List.of(), List.copyOf(entryTypesManager.getAllCustomizedTypes(MODE)));
         assertTrue(entryTypesManager.enrich(BiblatexNonStandardEntryType.Audio, MODE).isPresent());
         verify(preferences, never()).storeCustomEntryTypesRepository(entryTypesManager);
         verify(preferences, never()).addDeclinedCustomEntryTypes(any());
