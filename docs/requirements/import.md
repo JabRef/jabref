@@ -21,21 +21,21 @@ Entries are kept in the library in the order of their internal ids, regardless o
 
 Needs: impl, utest
 
-## Custom entry types of a library are only offered once
-`req~import.entry-types.offered-once~1`
-
-When a library declares entry types that differ from the ones stored in the preferences, JabRef offers to store them. This holds both for entry types JabRef does not know and for customizations of entry types JabRef ships.
-
-The definition the user accepts is the one from the library file, and it replaces the stored one. Opening the same library again therefore offers nothing, whereas entry types the user did not accept are offered again.
-
-Needs: impl, utest
-
 ## Unresolved merge conflict markers abort the import
 `req~import.bibtex.merge-conflict-markers~1`
 
 A BibTeX file that still contains version control conflict markers is rejected with an error naming the line of the first marker, instead of importing an arbitrary side of the conflict or storing the markers inside an entry.
 A marker is a line starting with at least seven `<` or `>` characters.
 The `=======` and `|||||||` lines of a conflict are not looked for on their own: they always follow a `<<<<<<<` line, and such lines also occur as decorative rules in field values.
+
+Needs: impl, utest
+
+## Custom entry types of a library are only offered once
+`req~import.entry-types.offered-once~1`
+
+When a library declares entry types that differ from the ones stored in the preferences, JabRef offers to store them. This holds both for entry types JabRef does not know and for customizations of entry types JabRef ships.
+
+The definition the user accepts is the one from the library file, and it replaces the stored one. Opening the same library again therefore offers nothing, whereas entry types the user did not accept are offered again.
 
 Needs: impl, utest
 
