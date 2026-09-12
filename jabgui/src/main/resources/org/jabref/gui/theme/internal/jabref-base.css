@@ -1733,3 +1733,25 @@ We want to have a look that matches our icons in the tool-bar */
 .flashing-danger {
     -fx-background-color: -color-danger;
 }
+
+/* The "What's new" window of a development checkout */
+.whats-new-group {
+    -fx-font-size: 1.4em;
+    -fx-font-weight: bold;
+}
+
+.whats-new-section {
+    -fx-font-size: 1.1em;
+}
+
+.whats-new-heading {
+    -fx-text-fill: -jr-gray-2;
+}
+
+.whats-new-bold {
+    -fx-font-weight: bold;
+}
+
+.whats-new-code {
+    -fx-font-family: monospace;
+}

@@ -231,7 +231,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryTypesManager,
                 clipBoardManager,
                 journalAbbreviationRepository,
-                gitHandlerRegistry);
+                gitHandlerRegistry,
+                () -> new CloseAction(this).execute());
 
         MainMenu mainMenu = new MainMenu(
                 this,
