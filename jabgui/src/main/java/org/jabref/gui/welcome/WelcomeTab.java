@@ -18,6 +18,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -120,6 +121,8 @@ public class WelcomeTab extends Tab {
 
         main = new VBox(24, createTopTitles(), new VBox(), createCommunityBox());
         main.getStyleClass().addAll("welcome-main-container", "align-center");
+        // Sized to its content, so the StackPane centers it: whitespace above and below on a tall window.
+        main.setMaxHeight(Region.USE_PREF_SIZE);
         initializeColumns();
 
         StackPane rootPane = new StackPane(main);
