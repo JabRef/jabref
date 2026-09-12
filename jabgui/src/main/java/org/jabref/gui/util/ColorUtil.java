@@ -7,6 +7,9 @@ import javafx.scene.paint.Color;
 
 public class ColorUtil {
 
+    private ColorUtil() {
+    }
+
     public static String toRGBCode(Color color) {
         return "#%02X%02X%02X".formatted(
                 (int) (color.getRed() * 255),

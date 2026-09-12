@@ -57,7 +57,7 @@ jobs:
           show-progress: 'false'
 
       - name: Generate Gource video
-        uses: nbprojekt/gource-action@d2fdf85904db416b69445dae5551282528e052ae # v1
+        uses: nbprojekt/gource-action@57256d303c5a9a5e72ed92ba13e3e83c5ec8b257 # v1
         with:
           gource_title: ${{ matrix.title }}
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'

@@ -172,7 +172,7 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
         if (LinkedFile.isOnlineLink(link.getValue())) {
             try {
                 return new LinkedFile(description.getValue(), URLUtil.create(link.getValue()), fileType, sourceUrl.getValue());
-            } catch (MalformedURLException e) {
+            } catch (MalformedURLException _) {
                 return new LinkedFile(description.getValue(), link.getValue(), fileType, sourceUrl.getValue());
             }
         }
