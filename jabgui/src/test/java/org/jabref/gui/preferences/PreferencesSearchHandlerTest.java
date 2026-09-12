@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PreferencesSearchHandlerTest {
 
     private Node autosaveNode;
+    private Node columnNamesNode;
     private PreferencesTab generalTab;
     private PreferencesTab tableTab;
     private PreferencesSearchHandler handler;
@@ -31,7 +32,8 @@ class PreferencesSearchHandlerTest {
         generalTab = tab("General", new SearchableElement("Show welcome tab", new Label()),
                 new SearchableElement("Autosave local libraries", autosaveNode),
                 new SearchableElement("Autosave interval", new Label()));
-        tableTab = tab("Table", new SearchableElement("Show column names", new Label()));
+        columnNamesNode = new Label();
+        tableTab = tab("Table", new SearchableElement("Show column names", columnNamesNode));
         handler = new PreferencesSearchHandler(List.of(generalTab, tableTab));
     }
 
@@ -50,7 +52,7 @@ class PreferencesSearchHandlerTest {
         handler.filterTabs("column");
 
         assertTrue(handler.firstMatch(generalTab).isEmpty());
-        assertTrue(handler.firstMatch(tableTab).isPresent());
+        assertEquals(columnNamesNode, handler.firstMatch(tableTab).orElseThrow());
     }
 
     @Test
