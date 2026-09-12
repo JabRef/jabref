@@ -110,7 +110,7 @@ public class StudyRepository {
             gitHandler.createCommitOnCurrentBranch("Save changes before searching.", false);
             gitHandler.checkoutBranch(WORK_BRANCH);
             updateWorkAndSearchBranch();
-        } catch (GitAPIException e) {
+        } catch (GitAPIException _) {
             LOGGER.error("Could not checkout work branch");
         }
         if (Files.notExists(studyDefinitionFile)) {
@@ -132,12 +132,12 @@ public class StudyRepository {
             }
             setUpRepositoryStructureForQueriesAndFetchers();
             gitHandler.createCommitOnCurrentBranch(updateRepositoryStructureMessage, false);
-        } catch (GitAPIException e) {
+        } catch (GitAPIException _) {
             LOGGER.error("Could not checkout search branch.");
         }
         try {
             gitHandler.checkoutBranch(WORK_BRANCH);
-        } catch (GitAPIException e) {
+        } catch (GitAPIException _) {
             LOGGER.error("Could not checkout work branch");
         }
     }

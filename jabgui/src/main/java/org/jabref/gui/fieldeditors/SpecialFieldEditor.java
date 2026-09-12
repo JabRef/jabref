@@ -61,7 +61,7 @@ public class SpecialFieldEditor extends HBox implements FieldEditorFX {
         this.viewModel = new SpecialFieldViewModel(specialField, preferences, undoManager);
 
         setAlignment(Pos.CENTER_LEFT);
-        setSpacing(2);
+        setSpacing(4);
 
         if (specialField == SpecialField.RANKING) {
             Rating rating = createRatingControl();

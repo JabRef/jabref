@@ -31,6 +31,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -212,7 +213,38 @@ class DatabaseChangeMonitorTest {
         assertEquals(1, database.getEntryCount());
         assertEquals("Merged title", database.getEntryByCitationKey("Key").orElseThrow().getField(StandardField.TITLE).orElseThrow());
         assertTrue(undoManager.hasChanged());
-        verify(libraryTab).markBaseChanged();
+        verify(libraryTab, never()).resetChangedProperties();
+    }
+
+    /// Denying an external change records nothing, but the file on disk still holds what the user
+    /// rejected: the library has to say it needs saving, or closing it asks nothing and the denial
+    /// is lost.
+    @Test
+    void applyResolvedChangesMarksTheLibraryWhenAChangeWasDenied() {
+        BibEntry oldEntry = new BibEntry().withCitationKey("Key").withField(StandardField.TITLE, "Old title");
+        BibDatabase database = new BibDatabase(List.of(oldEntry));
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        BibEntry diskEntry = new BibEntry(oldEntry).withField(StandardField.TITLE, "Disk title");
+        EntryChange deniedChange = new EntryChange(oldEntry, diskEntry, databaseContext);
+
+        JabRefUndoManager undoManager = new JabRefUndoManager();
+        undoManager.markUnchanged();
+        LibraryTab libraryTab = mock(LibraryTab.class);
+        DatabaseChangeMonitor monitor = new DatabaseChangeMonitor(
+                databaseContext,
+                mock(FileUpdateMonitor.class),
+                mock(TaskExecutor.class),
+                mock(DialogService.class),
+                mock(GuiPreferences.class),
+                undoManager,
+                mock(StateManager.class),
+                libraryTab);
+
+        monitor.applyResolvedChanges(List.of(deniedChange), false);
+
+        assertEquals("Old title", database.getEntryByCitationKey("Key").orElseThrow().getField(StandardField.TITLE).orElseThrow());
+        assertFalse(undoManager.canUndo(), "denying a change recorded a step");
+        assertTrue(undoManager.hasChanged(), "the library looks saved although the file holds the denied change");
         verify(libraryTab, never()).resetChangedProperties();
     }
 
@@ -245,7 +277,6 @@ class DatabaseChangeMonitorTest {
         assertEquals("Disk title", database.getEntryByCitationKey("Key").orElseThrow().getField(StandardField.TITLE).orElseThrow());
         assertTrue(undoManager.hasChanged());
         verify(libraryTab).resetChangedProperties();
-        verify(libraryTab, never()).markBaseChanged();
     }
 
     @Test

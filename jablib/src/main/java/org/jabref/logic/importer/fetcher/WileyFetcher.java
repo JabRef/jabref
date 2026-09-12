@@ -57,7 +57,7 @@ public class WileyFetcher implements FulltextFetcher, CustomizableKeyFetcher {
         try {
             UUID.fromString(apiKey.strip());
             return true;
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return false;
         }
     }

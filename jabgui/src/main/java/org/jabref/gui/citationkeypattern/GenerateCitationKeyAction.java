@@ -3,7 +3,6 @@ package org.jabref.gui.citationkeypattern;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
@@ -17,6 +16,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
@@ -108,15 +108,27 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     }
 
     private BackgroundTask<Void> generateKeysInBackground(BibDatabaseContext databaseContext) {
-        // Taken here, while the library is certainly open: asking for a journal once it has closed
-        // would create one nothing can reach.
         UndoManager undoManager = stateManager.getUndoManager(databaseContext);
+        CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
+        // The keys are written entry by entry in call(), which is also where they are handed over
+        // and the library released: cancelling the task reaches neither the success nor the failure
+        // handler, and the keys written before it still have to be undoable.
+        UndoSuspension suspended = undoManager.suspendUndo(StandardActions.GENERATE_CITE_KEYS.getText());
 
-        return new BackgroundTask<>() {
-            private final CompoundEdit compound = new CompoundEdit(StandardActions.GENERATE_CITE_KEYS.getText());
-
+        BackgroundTask<Void> backgroundTask = new BackgroundTask<>() {
             @Override
             public Void call() {
+                try {
+                    return generateKeys();
+                } finally {
+                    if (compound.hasEdits()) {
+                        undoManager.addEdit(compound.toChangeSet());
+                    }
+                    suspended.close();
+                }
+            }
+
+            private Void generateKeys() {
                 if (isCanceled) {
                     return null;
                 }
@@ -144,19 +156,10 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                 }
                 return null;
             }
-
-            @Override
-            public BackgroundTask<Void> onSuccess(Consumer<Void> onSuccess) {
-                // register the undo event only if new citation keys were generated
-                if (compound.hasEdits()) {
-                    undoManager.addEdit(compound.toChangeSet());
-                }
-
-                tabSupplier.get().markBaseChanged();
-                dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
-                return super.onSuccess(onSuccess);
-            }
         };
+
+        return backgroundTask.onSuccess(_ ->
+                dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size())));
     }
 
     private String formatOutputMessage(String start, int count) {
