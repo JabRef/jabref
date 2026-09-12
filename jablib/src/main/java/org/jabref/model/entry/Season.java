@@ -74,7 +74,7 @@ public enum Season {
         try {
             int number = Integer.parseInt(value);
             return Season.getSeasonByNumber(number);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }

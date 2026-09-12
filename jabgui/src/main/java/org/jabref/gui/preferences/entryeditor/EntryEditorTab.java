@@ -28,6 +28,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.theme.StyleClasses;
@@ -271,6 +272,23 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         patternColumn.setReorderable(false);
         patternColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
 
+        // [impl->req~entry-editor.custom-tabs.extract-field~1]
+        TableColumn<String, String> extractColumn = new TableColumn<>(Localization.lang("Extract field"));
+        extractColumn.setMinWidth(130.0);
+        extractColumn.setMaxWidth(130.0);
+        extractColumn.setResizable(false);
+        extractColumn.setSortable(false);
+        extractColumn.setReorderable(false);
+        extractColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue()));
+        new ValueTableCellFactory<String, String>()
+                .withGraphic(this::createExtractCheckBox)
+                // The tooltip lives on the cell: a disabled checkbox is mouse-transparent, so a
+                // tooltip on the checkbox itself would never show for always-extracted patterns.
+                .withTooltip(pattern -> EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab(pattern)
+                                        ? Localization.lang("If checked, the field is not shown in the \"Main\" tab anymore.")
+                                        : Localization.lang("Field not contained in the \"Main\" tab."))
+                .install(extractColumn);
+
         TableColumn<String, String> warningColumn = new TableColumn<>();
         warningColumn.setMinWidth(40.0);
         warningColumn.setMaxWidth(40.0);
@@ -307,6 +325,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                 .install(actionsColumn);
 
         fieldsTable.getColumns().add(patternColumn);
+        fieldsTable.getColumns().add(extractColumn);
         fieldsTable.getColumns().add(warningColumn);
         fieldsTable.getColumns().add(actionsColumn);
 
@@ -316,6 +335,27 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                 .setOnDragOver((row, pattern, event) -> handleOnDragOver(DragAndDropDataFormats.FIELD, row, event))
                 .setOnDragExited((row, pattern, event) -> ControlHelper.removeDroppingPseudoClasses(row))
                 .install(fieldsTable);
+    }
+
+    // [impl->req~entry-editor.custom-tabs.extract-field~1]
+    private CheckBox createExtractCheckBox(String pattern) {
+        CheckBox checkBox = new CheckBox();
+        boolean onMainTab = EntryEditorTabModel.CustomizedFieldsTab.appearsOnMainTab(pattern);
+        EditorTabViewModel tab = tabsTable.getSelectionModel().getSelectedItem();
+        checkBox.setDisable(!onMainTab);
+        checkBox.setSelected(!onMainTab || ((tab != null) && tab.isExtracted(pattern)));
+        checkBox.setOnAction(_ -> {
+            EditorTabViewModel selectedTab = tabsTable.getSelectionModel().getSelectedItem();
+            if (selectedTab == null) {
+                return;
+            }
+            if (checkBox.isSelected()) {
+                selectedTab.extractFromMainTab(pattern);
+            } else {
+                selectedTab.keepOnMainTab(pattern);
+            }
+        });
+        return checkBox;
     }
 
     private void addField() {

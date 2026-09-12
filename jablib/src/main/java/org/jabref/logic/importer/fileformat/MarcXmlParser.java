@@ -72,22 +72,28 @@ public class MarcXmlParser implements Parser {
 
     private List<BibEntry> parseEntries(Document content) {
         List<BibEntry> result = new LinkedList<>();
-
-        Element root = (Element) content.getElementsByTagName("zs:searchRetrieveResponse").item(0);
-        Element srwrecords = getChild("zs:records", root);
+        Element root = content.getDocumentElement();
+        Element srwrecords = getChild("records", root);
         if (srwrecords == null) {
             // no records found, so return the empty list
             return result;
         }
-        List<Element> records = getChildren("zs:record", srwrecords);
+        List<Element> records = getChildren("record", srwrecords);
         for (Element element : records) {
-            Element e = getChild("zs:recordData", element);
-            if (e != null) {
-                e = getChild("record", e);
-                if (e != null) {
-                    result.add(parseEntry(e));
-                }
+            Element recordDataElement = getChild("recordData", element);
+            if (recordDataElement == null) {
+                continue;
             }
+
+            Element marcRecord = getChild("record", recordDataElement);
+            if (marcRecord == null) {
+                Element recordSchemaElement = getChild("recordSchema", element);
+                String actualSchema = recordSchemaElement != null ? recordSchemaElement.getTextContent() : "unknown";
+                LOGGER.warn("Skipping record with unsupported recordSchema '{}' (expected MARC21-xml)", actualSchema);
+                continue;
+            }
+
+            result.add(parseEntry(marcRecord));
         }
         return result;
     }
@@ -273,7 +279,7 @@ public class MarcXmlParser implements Parser {
                 String strippedDate = StringUtil.stripBrackets(date);
                 try {
                     Date.parse(strippedDate).ifPresent(bibEntry::setDate);
-                } catch (DateTimeException exception) {
+                } catch (DateTimeException _) {
                     // cannot read date value, just copy it in plain text
                     LOGGER.info("Cannot parse date '{}'", strippedDate);
                     bibEntry.setField(StandardField.DATE, StringUtil.stripBrackets(strippedDate));
@@ -410,7 +416,7 @@ public class MarcXmlParser implements Parser {
             try {
                 LinkedFile linkedFile = new LinkedFile("", URLUtil.create(resource), StandardFileType.PDF.getName());
                 bibEntry.setFiles(List.of(linkedFile));
-            } catch (MalformedURLException | IllegalArgumentException e) {
+            } catch (MalformedURLException | IllegalArgumentException _) {
                 LOGGER.info("Malformed URL: {}", resource);
             }
         } else {
@@ -463,6 +469,11 @@ public class MarcXmlParser implements Parser {
         return subfields.stream().filter(field -> field.getAttribute("code").equals(a)).map(Node::getTextContent).toList();
     }
 
+    private static String localName(String tagName) {
+        int colonIndex = tagName.indexOf(':');
+        return colonIndex == -1 ? tagName : tagName.substring(colonIndex + 1);
+    }
+
     private Element getChild(String name, Element e) {
         if (e == null) {
             return null;
@@ -474,7 +485,7 @@ public class MarcXmlParser implements Parser {
             Node test = children.item(i);
             if (test.getNodeType() == Node.ELEMENT_NODE) {
                 Element entry = (Element) test;
-                if (entry.getTagName().equals(name)) {
+                if (localName(entry.getTagName()).equals(name)) {
                     return entry;
                 }
             }
@@ -491,7 +502,7 @@ public class MarcXmlParser implements Parser {
             Node test = children.item(i);
             if (test.getNodeType() == Node.ELEMENT_NODE) {
                 Element entry = (Element) test;
-                if (entry.getTagName().equals(name)) {
+                if (localName(entry.getTagName()).equals(name)) {
                     result.add(entry);
                 }
             }

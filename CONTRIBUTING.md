@@ -84,6 +84,14 @@ One can also add [callouts](https://just-the-docs.github.io/just-the-docs-tests/
 Comment on the issue you want to work at with `/assign-me`.
 GitHub will then automatically assign you.
 
+Before you do so, read the complete issue and its discussion.
+Some issues state a prerequisite - typically another pull request that has to be merged first.
+As long as that prerequisite is open, the issue cannot be worked on; it is updated as soon as it is ready to be picked up.
+
+Please do not ping maintainers for a status update shortly after a comment.
+JabRef is developed by volunteers in their free time, and GitHub notifies them about every comment.
+If a question is unanswered for more than a week, a friendly reminder is fine.
+
 <!-- markdownlint-disable-next-line MD026 -->
 ## Give JabRef a Star!
 

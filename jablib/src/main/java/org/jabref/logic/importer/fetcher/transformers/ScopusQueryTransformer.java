@@ -53,7 +53,7 @@ public class ScopusQueryTransformer extends YearRangeByFilteringQueryTransformer
             int yearInt = Integer.parseInt(year);
             startYear = Math.min(startYear, yearInt);
             endYear = Math.max(endYear, yearInt);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             // Ignore invalid year
         }
         return "PUBYEAR = " + year;

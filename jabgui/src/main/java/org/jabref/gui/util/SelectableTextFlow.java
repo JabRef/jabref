@@ -3,6 +3,7 @@ package org.jabref.gui.util;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -126,7 +127,11 @@ public class SelectableTextFlow extends TextFlow {
     }
 
     private void onMousePressed(MouseEvent event) {
-        event.consume();
+        if (isInHyperlink(event)) {
+            clearSelection();
+            return;
+        }
+
         requestFocus();
 
         startHit = hitTest(new Point2D(event.getX(), event.getY()));
@@ -141,7 +146,6 @@ public class SelectableTextFlow extends TextFlow {
         if (startHit == null) {
             return;
         }
-        event.consume();
         isDragging = true;
         endHit = hitTest(new Point2D(event.getX(), event.getY()));
         updateSelectionHighlight();
@@ -162,8 +166,28 @@ public class SelectableTextFlow extends TextFlow {
             return;
         }
 
-        event.consume();
+        if (isInHyperlink(event)) {
+            clearSelection();
+            return;
+        }
+
         removeHighlight();
+    }
+
+    private boolean isInHyperlink(MouseEvent event) {
+        if (!(event.getTarget() instanceof Node eventTarget)) {
+            return false;
+        }
+
+        Node currentNode = eventTarget;
+        while (currentNode != null && currentNode != this) {
+            if (currentNode instanceof Hyperlink) {
+                return true;
+            }
+            currentNode = currentNode.getParent();
+        }
+
+        return false;
     }
 
     private void removeHighlight() {
