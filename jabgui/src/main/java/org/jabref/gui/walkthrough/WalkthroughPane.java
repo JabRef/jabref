@@ -3,7 +3,6 @@ package org.jabref.gui.walkthrough;
 import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -48,8 +47,10 @@ public final class WalkthroughPane extends StackPane {
         setMinSize(0, 0);
         setManaged(false);
         setViewOrder(IN_FRONT_OF_SIBLINGS);
-        // While the pane holds nothing, it covers the window without any reason to receive input.
-        mouseTransparentProperty().bind(Bindings.isEmpty(getChildren()));
+        // A Region picks on its bounds by default, and this one covers the whole window in front of its
+        // content: clicks a walkthrough step waits for -- through a spotlight's hole, next to a panel --
+        // must reach that content, so only the overlay nodes themselves take input.
+        setPickOnBounds(false);
 
         InvalidationListener fitToScene = _ -> fitToScene();
         sceneProperty().addListener((_, oldScene, newScene) -> {

@@ -1,28 +1,36 @@
 package org.jabref.gui.walkthrough;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.robot.Robot;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import org.jabref.gui.testutils.JavaFxExtension;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@NullMarked
 @ExtendWith(JavaFxExtension.class)
 class WalkthroughPaneTest {
 
@@ -105,15 +113,56 @@ class WalkthroughPaneTest {
         JavaFxExtension.invokeAndWait(popup::hide);
     }
 
+    /// The pane covers the window in front of its content, so a click next to an overlay node -- through a
+    /// spotlight's hole, beside a panel -- has to reach the control a walkthrough step is waiting for.
     @Test
-    void emptyPaneDoesNotSwallowInput() {
+    void clickNextToAnOverlayNodeReachesTheWindowContent() {
+        AtomicBoolean contentClicked = new AtomicBoolean();
+        Button content = new Button("Content");
+        content.setOnAction(_ -> contentClicked.set(true));
         WalkthroughPane pane = new WalkthroughPane();
+        showStage(new Scene(new StackPane(content, pane), 300, 200));
 
-        assertTrue(pane.isMouseTransparent());
+        JavaFxExtension.invokeAndWait(() -> {
+            Region overlayNode = new Region();
+            overlayNode.setMaxSize(20, 20);
+            StackPane.setAlignment(overlayNode, Pos.TOP_LEFT);
+            pane.getChildren().add(overlayNode);
+        });
+        click(content);
 
-        JavaFxExtension.invokeAndWait(() -> pane.getChildren().add(new Region()));
+        assertTrue(contentClicked.get());
+    }
 
-        assertFalse(pane.isMouseTransparent());
+    @Test
+    void overlayNodeReceivesClicks() {
+        AtomicBoolean overlayClicked = new AtomicBoolean();
+        Button overlayButton = new Button("Quit");
+        overlayButton.setOnAction(_ -> overlayClicked.set(true));
+        WalkthroughPane pane = new WalkthroughPane();
+        showStage(new Scene(new StackPane(new Button("Content"), pane), 300, 200));
+
+        JavaFxExtension.invokeAndWait(() -> {
+            StackPane.setAlignment(overlayButton, Pos.TOP_LEFT);
+            pane.getChildren().add(overlayButton);
+        });
+        click(overlayButton);
+
+        assertTrue(overlayClicked.get());
+    }
+
+    private static void click(Node node) {
+        JavaFxExtension.invokeAndWait(() -> {
+            // Overlay nodes are added to a live window; lay them out now instead of waiting for the next pulse.
+            Parent root = node.getScene().getRoot();
+            root.applyCss();
+            root.layout();
+            Robot robot = new Robot();
+            Bounds bounds = node.localToScreen(node.getBoundsInLocal());
+            robot.mouseMove(bounds.getCenterX(), bounds.getCenterY());
+            robot.mouseClick(MouseButton.PRIMARY);
+        });
+        JavaFxExtension.awaitEvents();
     }
 
     private static Stage showStage(Scene scene) {
