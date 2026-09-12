@@ -6,17 +6,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class SharedDatabaseErrorTabTest extends ApplicationTest {
+class SharedDatabaseErrorTabTest extends JavaFxTest {
 
     private final AtomicInteger retries = new AtomicInteger();
 

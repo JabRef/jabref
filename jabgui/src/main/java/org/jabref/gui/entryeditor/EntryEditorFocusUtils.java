@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.application.Platform;
@@ -13,9 +14,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.NotificationService;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import org.jspecify.annotations.Nullable;
 
@@ -27,12 +32,14 @@ class EntryEditorFocusUtils {
 
     private final TabPane tabPane;
     private final Node sceneSource;
+    private final NotificationService notificationService;
 
     private @Nullable Field lastFocusedField;
 
-    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource) {
+    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource, NotificationService notificationService) {
         this.tabPane = tabPane;
         this.sceneSource = sceneSource;
+        this.notificationService = notificationService;
     }
 
     // region — field focus capture / restore
@@ -68,13 +75,32 @@ class EntryEditorFocusUtils {
     // region — jump to field
 
     void setFocusToField(Field field) {
+        focusField(field, () -> {
+        });
+    }
+
+    void focusOrAddField(Field field) {
+        focusField(field, () -> addFieldViaAllFieldsTab(field));
+    }
+
+    private void focusField(Field field, Runnable onNotFound) {
         UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
                 tab -> selectTabAndField(tab, field),
                 () -> {
                     Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
-                    getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
+                    getTabContainingField(aliasField).ifPresentOrElse(
+                            tab -> selectTabAndField(tab, aliasField),
+                            onNotFound
+                    );
                 }
         ));
+    }
+
+    private Field canonicalFieldForActiveMode(Field field, BibDatabaseMode mode) {
+        Map<Field, Field> aliasesToCanonical = mode == BibDatabaseMode.BIBTEX
+                                               ? EntryConverter.FIELD_ALIASES_BIBLATEX_TO_BIBTEX
+                                               : EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX;
+        return aliasesToCanonical.getOrDefault(field, field);
     }
 
     private Optional<FieldsEditorTab> getTabContainingField(Field field) {
@@ -83,6 +109,24 @@ class EntryEditorFocusUtils {
                       .map(FieldsEditorTab.class::cast)
                       .filter(tab -> tab.getShownFields().contains(field))
                       .findFirst();
+    }
+
+    private void addFieldViaAllFieldsTab(Field field) {
+        tabPane.getTabs().stream()
+               .filter(AllFieldsTab.class::isInstance)
+               .map(AllFieldsTab.class::cast)
+               .findFirst()
+               .ifPresentOrElse(allFieldsTab -> {
+                           BibDatabaseMode mode = allFieldsTab.getDatabaseMode();
+                           // Custom field names are added as they are typed, like the tab's free-form add row does.
+                           Field canonicalField = canonicalFieldForActiveMode(field, mode);
+                           tabPane.getSelectionModel().select(allFieldsTab);
+                           allFieldsTab.addFieldAndFocus(canonicalField);
+                       },
+                       // No other tab can show a field it was not configured for, so say why nothing happens
+                       // instead of swallowing the jump.
+                       () -> notificationService.notify(Localization.lang("Cannot show \"%0\" because the \"%1\" tab is hidden",
+                               FieldTextMapper.getDisplayName(field), EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName())));
     }
 
     private void selectTabAndField(FieldsEditorTab tab, Field field) {

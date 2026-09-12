@@ -176,7 +176,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         try {
             // Force reformatting so the displayed BibTeX is consistently formatted
             new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode(), true);
-        } catch (IOException ioException) {
+        } catch (IOException _) {
             // In case of error, fall back to the original parsed serialization if available
             return entry.getParsedSerialization();
         }

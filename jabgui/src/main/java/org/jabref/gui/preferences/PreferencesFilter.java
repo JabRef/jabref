@@ -61,21 +61,23 @@ public class PreferencesFilter {
         }
 
         private PreferenceType getType(Object value) {
-            if (value instanceof Boolean) {
-                return PreferenceType.BOOLEAN;
-            } else if (value instanceof Integer) {
-                return PreferenceType.INTEGER;
-            } else if (value instanceof Double) {
-                return PreferenceType.DOUBLE;
-            } else if (value instanceof Map) {
-                return PreferenceType.MAP;
-            } else if (value instanceof Set) {
-                return PreferenceType.SET;
-            } else if (value instanceof List) {
-                return PreferenceType.LIST;
-            } else {
-                return PreferenceType.STRING;
-            }
+            return switch (value) {
+                case Boolean _ ->
+                        PreferenceType.BOOLEAN;
+                case Integer _ ->
+                        PreferenceType.INTEGER;
+                case Double _ ->
+                        PreferenceType.DOUBLE;
+                case Map<?, ?> _ ->
+                        PreferenceType.MAP;
+                case Set<?> _ ->
+                        PreferenceType.SET;
+                case List<?> _ ->
+                        PreferenceType.LIST;
+                case null,
+                     default ->
+                        PreferenceType.STRING;
+            };
         }
 
         public boolean isUnchanged() {

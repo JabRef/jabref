@@ -18,6 +18,7 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
@@ -103,6 +104,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
     }
 
     private void setupColumnsList() {
+        columnsList.setId(WalkthroughNodeIds.COLUMNS_LIST);
         columnsList.setPrefHeight(300.0);
         columnsList.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 

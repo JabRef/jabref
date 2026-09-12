@@ -35,6 +35,11 @@ public interface LibraryTabContainer {
     /// @return true if closing the tabs was successful
     boolean closeTabs(List<LibraryTab> tabs, boolean showWelcomeTab);
 
+    /// Drops the placeholder of a failed reconnection once the same shared database is connected, whichever way that
+    /// happened. Leaving it behind would remember the database twice at quit and reconnect it twice on the next start.
+    /// Call only with a connected context: a loading tab's synchronizer has no connection properties yet.
+    void removeSharedDatabaseErrorTabFor(BibDatabaseContext connectedContext);
+
     /// Ids of the shared databases whose reconnection failed and that are still shown as an error tab.
     /// They have no library tab, but must stay remembered for the next session.
     List<String> getUnconnectedSharedDatabaseIds();

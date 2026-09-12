@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 <DialogPane prefWidth="300" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.jabref.gui.entryeditor.JumpToFieldDialog">
     <content>
-        <VBox>
+        <VBox spacing="4">
             <TextField fx:id="searchField" promptText="%Type a field name"/>
+            <Label fx:id="newFieldHint" text="%Field will be created"/>
         </VBox>
     </content>
 </DialogPane>
