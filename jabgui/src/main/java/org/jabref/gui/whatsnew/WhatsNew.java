@@ -163,9 +163,12 @@ public class WhatsNew {
 
     static String groupTitle(String group) {
         return switch (group) {
-            case ME -> Localization.lang("Changes by me");
-            case ME_REMOTELY -> Localization.lang("Changes by me (pushed from another machine)");
-            default -> Localization.lang("Changes by %0", group);
+            case ME ->
+                    Localization.lang("Changes by me");
+            case ME_REMOTELY ->
+                    Localization.lang("Changes by me (pushed from another machine)");
+            default ->
+                    Localization.lang("Changes by %0", group);
         };
     }
 

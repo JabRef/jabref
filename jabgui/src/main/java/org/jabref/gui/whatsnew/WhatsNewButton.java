@@ -157,8 +157,8 @@ public class WhatsNewButton {
 
     private String title() {
         String count = pending.isEmpty()
-                ? Localization.lang("What's new")
-                : Localization.lang("What's new - %0 pending change(s)", String.valueOf(pending.size()));
+                       ? Localization.lang("What's new")
+                       : Localization.lang("What's new - %0 pending change(s)", String.valueOf(pending.size()));
         return range.map(r -> count + " " + r).orElse(count);
     }
 
@@ -174,8 +174,8 @@ public class WhatsNewButton {
         // The button's tooltip is bound to the action's description plus the command's status message.
         command.setNews(parts.isEmpty() ? "" : "\n\n" + String.join("\n\n", parts));
         button.setGraphic(behind > 0
-                ? IconTheme.JabRefIcons.WHATS_NEW.withColor(IconTheme.SELECTED_COLOR).getGraphicNode()
-                : IconTheme.JabRefIcons.WHATS_NEW.getGraphicNode());
+                          ? IconTheme.JabRefIcons.WHATS_NEW.withColor(IconTheme.SELECTED_COLOR).getGraphicNode()
+                          : IconTheme.JabRefIcons.WHATS_NEW.getGraphicNode());
     }
 
     /// The click: opens the window on a fetch and hands it what the fetch found; a second click brings the open

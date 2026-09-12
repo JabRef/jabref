@@ -77,8 +77,8 @@ public class CheckoutGit {
     /// or not committed yet marked as written by `me`.
     public Optional<WhatsNew.Source> blame(String rev, String me) {
         Optional<List<String>> porcelain = rev.isEmpty()
-                ? run("blame", "--line-porcelain", "--", "CHANGELOG.md")
-                : run("blame", "--line-porcelain", rev, "--", "CHANGELOG.md");
+                                           ? run("blame", "--line-porcelain", "--", "CHANGELOG.md")
+                                           : run("blame", "--line-porcelain", rev, "--", "CHANGELOG.md");
         String mail = run("config", "user.email").flatMap(lines -> lines.stream().findFirst()).map(String::strip).orElse("");
         return porcelain.map(lines -> WhatsNew.parse(lines, mail, me));
     }
