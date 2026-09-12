@@ -21,6 +21,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -48,6 +49,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
+import de.sandec.jmemorybuddy.JMemoryBuddy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -212,6 +214,36 @@ class AllFieldsTabTest {
         JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertFalse(tab.editors.containsKey(StandardField.FILE));
+    }
+
+    /// Every entry switch drops the whole editor set and builds a new one, so a discarded editor
+    /// must not stay reachable from the entry - otherwise arrow-keying through a library would pile
+    /// up editor generations. Guards the reasoning documented in `FieldsEditorTab#setupPanel`.
+    @Test
+    void discardedEditorsAreNotRetainedAfterRebuild() throws InterruptedException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Key2021")
+                .withField(StandardField.TITLE, "start")
+                .withField(StandardField.AUTHOR, "Smith, John")
+                .withField(StandardField.JOURNAL, "Journal")
+                .withField(StandardField.YEAR, "2021");
+
+        List<FieldEditorFX> everCreated = new ArrayList<>();
+        for (int rebuild = 0; rebuild < 10; rebuild++) {
+            runOnFxThreadAndWait(() -> {
+                tab.bindToEntry(entry);
+                everCreated.addAll(tab.editors.values());
+            });
+        }
+
+        JMemoryBuddy.memoryTest(checker -> {
+            everCreated.stream()
+                       .filter(editor -> !tab.editors.containsValue(editor))
+                       .forEach(checker::assertCollectable);
+            tab.editors.values().forEach(checker::setAsReferenced);
+            // The list itself must not keep the discarded editors alive
+            everCreated.clear();
+        });
     }
 
     @Test
