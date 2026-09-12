@@ -30,4 +30,20 @@ The `=======` and `|||||||` lines of a conflict are not looked for on their own:
 
 Needs: impl, utest
 
+## PDF import keeps only authors the document prints
+`req~import.pdf.author-confirmed-by-text~1`
+
+When importing a PDF, an author taken from the PDF's document properties is kept only if the text of the leading pages confirms it; otherwise an author list extracted from the document text replaces it.
+If no candidate is confirmed, a single unconfirmed person from the document properties is dropped, because office suites store the account name of whoever exported the file there.
+Metadata previously written by JabRef (an entry with citation key or explicit type) is kept even when the text does not confirm it.
+
+Needs: impl, utest
+
+## PDF import extracts only plausible years
+`req~import.pdf.plausible-year~1`
+
+When extracting the year from the text of a PDF's first page, JabRef takes only a standalone four-digit number between 1900 and two years after the current year, so postal codes, ISSNs, and page ranges are not imported as the year.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

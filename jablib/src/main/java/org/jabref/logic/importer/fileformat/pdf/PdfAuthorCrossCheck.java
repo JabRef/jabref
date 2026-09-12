@@ -67,24 +67,26 @@ class PdfAuthorCrossCheck {
     /// wrong author is worse than none. Entries with a citation key or explicit type are left untouched so
     /// that metadata previously written by JabRef survives re-import even when the PDF text does not
     /// contain the author (e.g. slides or reports).
+    ///
+    /// [impl->req~import.pdf.author-confirmed-by-text~1]
     static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, @Nullable String leadingPagesText) {
         if (StringUtil.isBlank(leadingPagesText)) {
             return;
         }
-        String normalizedText = normalizeForComparison(leadingPagesText);
-        if (normalizedText.isBlank()) {
-            // Normalization strips everything but letters, so a text of digits or punctuation confirms nothing
+        String documentWords = toWordSequence(leadingPagesText);
+        if (documentWords.isBlank()) {
+            // A text of digits or punctuation confirms nothing
             return;
         }
         entry.getField(StandardField.AUTHOR).ifPresent(mergedAuthor -> {
-            if (isAuthorConfirmedByText(mergedAuthor, normalizedText)) {
+            if (isAuthorConfirmedByText(mergedAuthor, documentWords)) {
                 return;
             }
 
             candidates.stream()
                       .flatMap(candidate -> candidate.getField(StandardField.AUTHOR).stream())
                       .filter(PdfAuthorCrossCheck::looksLikeAuthorList)
-                      .map(author -> new ScoredAuthor(author, countFamilyNamesInText(author, normalizedText)))
+                      .map(author -> new ScoredAuthor(author, countFamilyNamesInText(author, documentWords)))
                       .filter(scored -> scored.confirmedNames() > 0)
                       // keeps the earlier (= higher-priority) candidate unless a later one is strictly better
                       .reduce((first, second) -> second.confirmedNames() > first.confirmedNames() ? second : first)
@@ -125,24 +127,26 @@ class PdfAuthorCrossCheck {
         return true;
     }
 
-    private static boolean isAuthorConfirmedByText(String authorField, String normalizedText) {
-        if (countFamilyNamesInText(authorField, normalizedText) > 0) {
+    private static boolean isAuthorConfirmedByText(String authorField, String documentWords) {
+        if (countFamilyNamesInText(authorField, documentWords) > 0) {
             return true;
         }
         // Fallback for author values AuthorList cannot split into proper persons (e.g. exotic separator
-        // characters from broken XMP decoding): any word of the raw value found in the text confirms it.
-        return Arrays.stream(NON_LETTERS.split(authorField))
-                     .filter(word -> word.length() >= 2)
-                     .map(PdfAuthorCrossCheck::normalizeForComparison)
-                     .anyMatch(word -> !word.isBlank() && containsWord(normalizedText, word));
+        // characters from broken XMP decoding). A single common word such as a given name also occurs in
+        // unrelated text, so at least two distinct words of the raw value must occur.
+        long confirmedWords = Arrays.stream(NON_LETTERS.split(normalizeForComparison(authorField)))
+                                    .filter(word -> word.length() >= 2 && !NAME_LIST_LOWERCASE_WORDS.contains(word))
+                                    .distinct()
+                                    .filter(word -> containsPhrase(documentWords, word))
+                                    .count();
+        return confirmedWords >= 2;
     }
 
-    private static int countFamilyNamesInText(String authorField, String normalizedText) {
+    private static int countFamilyNamesInText(String authorField, String documentWords) {
         return (int) namedAuthors(authorField)
                 .map(Author::getFamilyName)
                 .flatMap(Optional::stream)
-                .map(PdfAuthorCrossCheck::normalizeForComparison)
-                .filter(familyName -> !familyName.isBlank() && containsWord(normalizedText, familyName))
+                .filter(familyName -> containsPhrase(documentWords, familyName))
                 .count();
     }
 
@@ -153,18 +157,16 @@ class PdfAuthorCrossCheck {
                          .filter(author -> !Author.OTHERS.equals(author));
     }
 
-    /// Whole-word check: the occurrence must not be preceded or followed by another letter
-    private static boolean containsWord(String normalizedText, String word) {
-        int index = normalizedText.indexOf(word);
-        while (index >= 0) {
-            int end = index + word.length();
-            if ((index == 0 || !Character.isLetter(normalizedText.codePointBefore(index)))
-                    && (end >= normalizedText.length() || !Character.isLetter(normalizedText.codePointAt(end)))) {
-                return true;
-            }
-            index = normalizedText.indexOf(word, index + 1);
-        }
-        return false;
+    /// Whole-word match, also for multi-word names such as "van der Berg"
+    private static boolean containsPhrase(String documentWords, String phrase) {
+        String phraseWords = toWordSequence(phrase).strip();
+        return !phraseWords.isEmpty() && documentWords.contains(" " + phraseWords + " ");
+    }
+
+    /// Normalized words separated and enclosed by single spaces, so that a whole-word match is a plain substring search
+    private static String toWordSequence(String text) {
+        String words = String.join(" ", NON_LETTERS.split(normalizeForComparison(text))).strip();
+        return " " + words + " ";
     }
 
     /// Case-, diacritic- and hyphen-insensitive comparison form. Hyphens are removed on both sides because

@@ -46,6 +46,7 @@ class PdfMergeMetadataImporterOfflineTest {
     /// citation key. Its author survives only when confirmed by the document text; an empty expected value
     /// means it is dropped. Columns: author | leadingPagesText | expectedAuthor (an empty leadingPagesText
     /// column arrives as `null`, modelling a PDF whose text could not be extracted).
+    // [utest->req~import.pdf.author-confirmed-by-text~1]
     @ParameterizedTest
     @CsvSource(delimiter = '|', textBlock = """
             Doe, Alice                  | Alice Doe, Bob Smith, Example University Testing Lab | Doe, Alice
@@ -54,6 +55,8 @@ class PdfMergeMetadataImporterOfflineTest {
             Void, Eve and Null, Mallory | Alice Doe, Bob Smith, Example University Testing Lab | Void, Eve and Null, Mallory
             Void, Eve                   |                                                     | Void, Eve
             Void, Eve et al.            | Alice Doe and others, Example University            |
+            Void, Eve                   | Eve Adams and Bob Smith, Example University          |
+            van der Berg, Anna          | Anna van der Berg, Example University               | van der Berg, Anna
             """)
     void singleCreatorCandidateAuthorIsCrossCheckedAgainstText(String author, String leadingPagesText, String expectedAuthor) {
         BibEntry candidate = new BibEntry().withField(StandardField.AUTHOR, author);

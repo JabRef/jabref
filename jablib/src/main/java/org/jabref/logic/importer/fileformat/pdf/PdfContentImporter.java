@@ -65,7 +65,7 @@ public class PdfContentImporter extends PdfImporter {
 
     private String curString;
 
-    private String year;
+    private @Nullable String year;
 
     /// Removes all non-letter characters at the end
     ///
@@ -642,7 +642,7 @@ public class PdfContentImporter extends PdfImporter {
         return DOI.findInText(curString).map(DOI::asString).orElse(null);
     }
 
-    private String getArXivId(String arXivId) {
+    private @Nullable String getArXivId(@Nullable String arXivId) {
         if (arXivId != null) {
             return arXivId;
         }
@@ -660,6 +660,8 @@ public class PdfContentImporter extends PdfImporter {
     }
 
     /// Extract the year out of curString (if it is not yet defined)
+    ///
+    /// [impl->req~import.pdf.plausible-year~1]
     private void extractYear() {
         if (year != null) {
             return;

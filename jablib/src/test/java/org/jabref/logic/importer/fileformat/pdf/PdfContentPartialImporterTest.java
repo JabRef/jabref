@@ -102,6 +102,7 @@ class PdfContentPartialImporterTest {
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
     }
 
+    // [utest->req~import.pdf.plausible-year~1]
     @Test
     void yearNotExtractedFromLongerDigitRun() {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
@@ -118,6 +119,7 @@ class PdfContentPartialImporterTest {
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
     }
 
+    // [utest->req~import.pdf.plausible-year~1]
     @Test
     void implausibleFourDigitNumberSkippedInFavorOfActualYear() {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
