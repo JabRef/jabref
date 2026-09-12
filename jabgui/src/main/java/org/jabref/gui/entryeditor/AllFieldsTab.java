@@ -2,6 +2,8 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -25,7 +27,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
@@ -41,6 +42,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
+import org.jabref.gui.fieldeditors.EditorTextArea;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.fieldeditors.TagsEditor;
@@ -78,8 +80,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// The single scroll-list tab ("Main") showing *all* fields of an entry (issue #12711):
-/// the citation key, all required fields (even when unset), and every set field.
-/// Replaces the classic category tabs (required / optional / other / …).
+/// the citation key, all required fields (even when unset), and every set field. Multiline
+/// editors grow with their text, capped at a few rows until focused. Replaces the classic
+/// category tabs (required / optional / other / …) and the former "Abstract" tab.
 ///
 /// Below the main fields sits a chip bar for adding unset optional fields ("Show more"
 /// reveals the secondary-optional ones). The identifiers, files & links, bibliometrics,
@@ -91,9 +94,14 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllFieldsTab.class);
 
-    /// Preferred number of visible text rows for multiline editors in the scroll list
-    /// (instead of the JavaFX TextArea default of 10).
-    private static final int MULTILINE_ROWS = 4;
+    /// Chips offered after the entry type's important optional fields, for every entry type. The
+    /// abstract is no optional field of any type, so it would otherwise only be reachable through
+    /// the free-form field-name box.
+    private static final List<Field> COMMON_CHIP_FIELDS = List.of(StandardField.ABSTRACT);
+
+    /// Rows a multiline editor shows before it is focused for the first time (a long abstract
+    /// must not push the other fields out of view just by being selected).
+    private static final int COLLAPSED_MULTILINE_ROWS = 5;
 
     /// Pixels of preferred height granted per weight unit for editors with weight > 1
     /// (e.g. the linked-files list), since percent-height rows do not exist in the scroll list.
@@ -112,6 +120,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// of [BibEntry#getFields()] yet, but must stay visible while this entry is edited.
     private final Set<Field> userAddedFields = new LinkedHashSet<>();
     private @Nullable BibEntry entryOfUserAddedFields;
+
+    /// Multiline fields the user has focused (and thereby expanded) while editing the current
+    /// entry; editors are rebuilt for the same entry, so the expansion must outlive them.
+    private final Set<Field> expandedFields = new HashSet<>();
 
     /// Required fields of the current entry's type, refreshed on every [#determineFieldsToShow];
     /// used to keep the remove-field button (see [#wrapWithRemoveButton]) off required rows.
@@ -136,6 +148,9 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// — which every rebuild runs first — and reused by the chip-building paths, so the custom-tab
     /// regexes are evaluated once per rebuild instead of once per chip bar.
     private Set<Field> extractedCustomTabFields = Set.of();
+
+    /// Last laid-out width of each field's growing text area (see [#normalizeInputHeights]).
+    private final Map<Field, Double> textAreaWidths = new HashMap<>();
 
     /// The entry whose event bus this tab is currently subscribed to (for live refresh
     /// when fields are set/unset from outside, e.g. Source tab, fetchers, undo).
@@ -181,6 +196,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         if (entry != entryOfUserAddedFields) {
             userAddedFields.clear();
+            expandedFields.clear();
             sectionExpandOverrides.clear();
             entryOfUserAddedFields = entry;
         }
@@ -368,7 +384,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
         listContainer.getChildren().add(createFreeFormAddRow(bibDatabaseContext, entry));
 
-        editors.values().forEach(AllFieldsTab::applyNaturalHeight);
+        editors.forEach(this::applyNaturalHeight);
     }
 
     /// Label/editor rows with natural heights, label column as narrow as its content.
@@ -556,8 +572,8 @@ public class AllFieldsTab extends FieldsEditorTab {
     // region add-field controls
 
     /// Chips for the entry type's unset optional fields that belong to the main section
-    /// (identifier/file/comment fields get their chips inside their own section);
-    /// "Show more" reveals the secondary-optional ones.
+    /// (identifier/file/comment fields get their chips inside their own section), followed by
+    /// the [#COMMON_CHIP_FIELDS]; "Show more" reveals the secondary-optional ones.
     private Node createMainChipBar(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         BibDatabaseMode mode = getDatabaseMode();
 
@@ -571,6 +587,8 @@ public class AllFieldsTab extends FieldsEditorTab {
             shown.addAll(extractedCustomTabFields);
             FieldListSections.subtract(entryType.getImportantOptionalFields(), shown).stream()
                              .filter(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.MAIN)
+                             .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
+            FieldListSections.subtract(COMMON_CHIP_FIELDS, shown)
                              .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
 
             List<Field> secondary = FieldListSections.subtract(
@@ -682,8 +700,8 @@ public class AllFieldsTab extends FieldsEditorTab {
         return stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
     }
 
-    private static void applyNaturalHeight(FieldEditorFX editor) {
-        normalizeInputHeights(editor.getNode());
+    private void applyNaturalHeight(Field field, FieldEditorFX editor) {
+        normalizeInputHeights(field, editor.getNode());
         if (editor instanceof LinkedFilesEditor || editor instanceof TagsEditor) {
             // Sizes itself to the file rows plus the trailing button row; a fixed weight-based height would override that.
             return;
@@ -696,17 +714,32 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// The classic stretch layout lets text inputs fill their percent-height rows by setting
     /// an infinite pref height ([org.jabref.gui.fieldeditors.EditorTextField]); in the
     /// natural-height list that blows up the rows' preferred heights, so reset text fields to
-    /// their computed size and cap text areas at a few visible rows.
-    private static void normalizeInputHeights(Node node) {
+    /// their computed size and let text areas grow with their content.
+    private void normalizeInputHeights(Field field, Node node) {
         switch (node) {
-            case TextArea textArea -> {
-                textArea.setPrefRowCount(MULTILINE_ROWS);
+            case EditorTextArea textArea -> {
                 textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
+                // Editors are rebuilt on every entry switch; the width the field had for the previous
+                // entry lets the new area wrap correctly before its own first layout.
+                textArea.setGrowWithContent(textAreaWidths.getOrDefault(field, -1.0), COLLAPSED_MULTILINE_ROWS);
+                if (expandedFields.contains(field)) {
+                    textArea.expand();
+                }
+                textArea.focusedProperty().addListener((_, _, focused) -> {
+                    if (focused) {
+                        expandedFields.add(field);
+                    }
+                });
+                textArea.widthProperty().addListener((_, _, width) -> {
+                    if (width.doubleValue() > 0) {
+                        textAreaWidths.put(field, width.doubleValue());
+                    }
+                });
             }
             case TextField textField ->
                     textField.setPrefHeight(Region.USE_COMPUTED_SIZE);
             case Parent parent ->
-                    parent.getChildrenUnmodifiable().forEach(AllFieldsTab::normalizeInputHeights);
+                    parent.getChildrenUnmodifiable().forEach(child -> normalizeInputHeights(field, child));
             case null,
                  default -> {
             }
