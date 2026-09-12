@@ -160,16 +160,16 @@ public class WhatsNew {
                     continue;
                 }
                 if (first) {
-                    box.getChildren().add(title(groupTitle(group), "whats-new-group", 12));
+                    box.getChildren().add(title(groupTitle(group), List.of("h3", "bold"), 12));
                     first = false;
                 }
                 if (!item.section().equals(lastSection)) {
-                    box.getChildren().add(title(item.section(), "whats-new-section", 10));
+                    box.getChildren().add(title(item.section(), List.of("h4"), 10));
                     lastSection = item.section();
                     lastHeading = "";
                 }
                 if (!item.heading().equals(lastHeading)) {
-                    box.getChildren().add(title(item.heading(), "whats-new-heading", 4));
+                    box.getChildren().add(title(item.heading(), List.of("text-muted"), 4));
                     lastHeading = item.heading();
                 }
                 TextFlow flow = inline(item.text(), openUrl);
@@ -182,9 +182,9 @@ public class WhatsNew {
         return scroll;
     }
 
-    private static Label title(String text, String styleClass, double topGap) {
+    private static Label title(String text, List<String> styleClasses, double topGap) {
         Label label = new Label(text);
-        label.getStyleClass().add(styleClass);
+        label.getStyleClass().addAll(styleClasses);
         label.setPadding(new Insets(topGap, 0, 0, 0));
         return label;
     }
@@ -197,12 +197,12 @@ public class WhatsNew {
             flow.getChildren().add(new Text(line.substring(pos, m.start())));
             if (m.group(1) != null) {
                 for (Node child : List.copyOf(inline(m.group(1), openUrl).getChildren())) {
-                    child.getStyleClass().add("whats-new-bold");
+                    child.getStyleClass().add("bold");
                     flow.getChildren().add(child);
                 }
             } else if (m.group(2) != null) {
                 Text code = new Text(m.group(2));
-                code.getStyleClass().add("whats-new-code");
+                code.getStyleClass().add("font-monospace");
                 flow.getChildren().add(code);
             } else if (m.group(3) != null) {
                 flow.getChildren().add(link(m.group(3), m.group(4), openUrl));

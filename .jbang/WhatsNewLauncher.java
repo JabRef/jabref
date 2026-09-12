@@ -60,13 +60,13 @@ public class WhatsNewLauncher {
     private static final Pattern WORD = Pattern.compile("\\w+");
     private static final int MAX_REWORD_HOPS = 8;
 
-    /// The styles `WhatsNew.view` expects from JabRef's base stylesheet, for a scene without it.
+    /// The classes `WhatsNew.view` takes from JabRef's base stylesheet, for a scene without it.
     private static final String CSS = """
-            .whats-new-group { -fx-font-size: 1.4em; -fx-font-weight: bold; }
-            .whats-new-section { -fx-font-size: 1.1em; }
-            .whats-new-heading { -fx-opacity: 0.7; }
-            .whats-new-bold { -fx-font-weight: bold; }
-            .whats-new-code { -fx-font-family: monospace; }
+            .h3 { -fx-font-size: 1.5em; }
+            .h4 { -fx-font-size: 1.25em; }
+            .bold { -fx-font-weight: bold; }
+            .text-muted { -fx-opacity: 0.7; }
+            .font-monospace { -fx-font-family: monospace; }
             """;
 
     /// The commit that first added an entry, and who wrote it.
