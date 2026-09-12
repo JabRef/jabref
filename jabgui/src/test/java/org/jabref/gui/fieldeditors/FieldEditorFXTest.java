@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
@@ -112,7 +113,7 @@ class FieldEditorFXTest extends JavaFxTest {
     void undoShortcutTriggersLibraryUndoInsteadOfTextControlUndo() {
         interact(() -> {
             textField.setText("hello");
-            textField.fireEvent(shortcutPressed(KeyCode.Z));
+            pressShortcutOnFocusedField(KeyCode.Z);
         });
 
         verify(undoAction).execute();
@@ -125,7 +126,7 @@ class FieldEditorFXTest extends JavaFxTest {
     // [utest->req~logic.undo.text-field-shortcut~1]
     @Test
     void redoShortcutTriggersLibraryRedo() {
-        interact(() -> textField.fireEvent(shortcutPressed(KeyCode.Y)));
+        interact(() -> pressShortcutOnFocusedField(KeyCode.Y));
 
         verify(redoAction).execute();
         verify(undoAction, never()).execute();
@@ -136,8 +137,12 @@ class FieldEditorFXTest extends JavaFxTest {
         return event.getCode() == code && event.isShortcutDown();
     }
 
-    private KeyEvent shortcutPressed(KeyCode code) {
-        return new KeyEvent(textField, textField, KeyEvent.KEY_PRESSED, "", code.getName(), code,
-                false, !OS.OS_X, false, OS.OS_X);
+    /// Delivers the key press the way the scene does for a real keystroke: to its focus owner
+    private void pressShortcutOnFocusedField(KeyCode code) {
+        textField.requestFocus();
+        Node focusOwner = textField.getScene().getFocusOwner();
+        assertEquals(textField, focusOwner);
+        focusOwner.fireEvent(new KeyEvent(focusOwner, focusOwner, KeyEvent.KEY_PRESSED, "", code.getName(), code,
+                false, !OS.OS_X, false, OS.OS_X));
     }
 }
