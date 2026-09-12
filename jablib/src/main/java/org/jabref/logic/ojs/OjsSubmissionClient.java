@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 ///
 /// See <https://docs.pkp.sfu.ca/dev/api/ojs/3.4#tag/Submissions> for the endpoint
 /// documentation (the response shape has drifted slightly across OJS 3.x versions;
-/// [OjsSubmission#fromJSONObject] parses defensively).
+/// [OjsSubmissionParser#parse] parses defensively).
 ///
 /// Requests are authenticated with the Bearer token configured per-journal in Preferences.
 @NullMarked
@@ -74,7 +74,7 @@ public class OjsSubmissionClient {
                     continue;
                 }
                 try {
-                    submissions.add(OjsSubmission.fromJSONObject(item, journalName));
+                    submissions.add(OjsSubmissionParser.parse(item, journalName));
                 } catch (JSONException e) {
                     LOGGER.warn("Skipping unparsable OJS submission from {}", journalUrl, e);
                 }
@@ -119,5 +119,3 @@ public class OjsSubmissionClient {
                : trimmedJournalUrl;
     }
 }
-
-

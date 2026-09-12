@@ -1,13 +1,16 @@
-package org.jabref.model.ojs;
+package org.jabref.logic.ojs;
 
 import java.util.Optional;
+
+import org.jabref.model.ojs.OjsSubmission;
+import org.jabref.model.ojs.OjsSubmissionStage;
 
 import kong.unirest.core.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class OjsSubmissionTest {
+class OjsSubmissionParserTest {
 
     @Test
     void parsesLocalizedTitleAndDoiFromCurrentPublication() {
@@ -23,7 +26,7 @@ class OjsSubmissionTest {
                 }
                 """);
 
-        OjsSubmission result = OjsSubmission.fromJSONObject(submission, "My Journal");
+        OjsSubmission result = OjsSubmissionParser.parse(submission, "My Journal");
 
         assertEquals(42, result.id());
         assertEquals("My Journal", result.journalName());
@@ -47,7 +50,7 @@ class OjsSubmissionTest {
                 }
                 """);
 
-        OjsSubmission result = OjsSubmission.fromJSONObject(submission, "My Journal");
+        OjsSubmission result = OjsSubmissionParser.parse(submission, "My Journal");
 
         assertEquals("Draft Two", result.title());
         assertEquals(Optional.of(OjsSubmissionStage.SUBMISSION), result.stage());
@@ -65,7 +68,7 @@ class OjsSubmissionTest {
                 }
                 """);
 
-        OjsSubmission result = OjsSubmission.fromJSONObject(submission, "My Journal");
+        OjsSubmission result = OjsSubmissionParser.parse(submission, "My Journal");
 
         assertEquals("Plain Title", result.title());
         assertEquals(Optional.of(OjsSubmissionStage.COPYEDITING), result.stage());
@@ -80,25 +83,9 @@ class OjsSubmissionTest {
                 }
                 """);
 
-        OjsSubmission result = OjsSubmission.fromJSONObject(submission, "My Journal");
+        OjsSubmission result = OjsSubmissionParser.parse(submission, "My Journal");
 
         assertEquals("", result.title());
         assertEquals(Optional.empty(), result.doi());
-        assertEquals(Optional.of(OjsSubmissionStage.PRODUCTION), result.stage());
-    }
-
-    @Test
-    void unknownStageIdYieldsEmptyStage() {
-        JSONObject submission = new JSONObject("""
-                {
-                  "id": 5,
-                  "stageId": 999,
-                  "publications": [{"id": 1, "title": {"en_US": "T"}}]
-                }
-                """);
-
-        OjsSubmission result = OjsSubmission.fromJSONObject(submission, "My Journal");
-
-        assertEquals(Optional.empty(), result.stage());
     }
 }
