@@ -115,7 +115,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         try {
             FileDialogConfiguration initialDirectoryConfig = getFileDialogConfiguration(getInitialDirectory());
             filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(initialDirectoryConfig);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             // See https://github.com/JabRef/jabref/issues/10548 for details
             // Rebuild a new config with the home directory
             FileDialogConfiguration homeDirectoryConfig = getFileDialogConfiguration(Directories.getUserDirectory());

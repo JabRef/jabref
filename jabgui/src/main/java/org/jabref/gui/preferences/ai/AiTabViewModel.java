@@ -3,8 +3,10 @@ package org.jabref.gui.preferences.ai;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
@@ -21,28 +23,39 @@ import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.models.AiModelService;
 import org.jabref.logic.ai.models.FetchAiModelsBackgroundTask;
 import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.logic.ai.preferences.AiDefaultTemplates;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.LocalizedNumbersUtils;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.apache.commons.io.FileUtils;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
+    public static final int DEFAULT_MAX_CHUNK_SIZE = 512;
+
     protected static SpinnerValueFactory<Integer> followUpQuestionsCountValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 3);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiTabViewModel.class);
 
     private final Locale oldLocale;
 
@@ -75,9 +88,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
 
-    private final ListProperty<PredefinedEmbeddingModel> embeddingModelsList =
-            new SimpleListProperty<>(FXCollections.observableArrayList(PredefinedEmbeddingModel.values()));
-    private final ObjectProperty<PredefinedEmbeddingModel> selectedEmbeddingModel = new SimpleObjectProperty<>();
+    private final ListProperty<String> embeddingModelsList =
+            new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final StringProperty selectedEmbeddingModel = new SimpleStringProperty();
+    private final StringProperty selectedEmbeddingModelSize = new SimpleStringProperty("");
+    private final IntegerProperty selectedEmbeddingModelMaxChunkSize = new SimpleIntegerProperty(DEFAULT_MAX_CHUNK_SIZE);
 
     private final StringProperty currentApiBaseUrl = new SimpleStringProperty();
     private final BooleanProperty disableApiBaseUrl = new SimpleBooleanProperty(true); // HuggingFaceChatModel and GoogleAiGeminiChatModel don't support setting an API base URL
@@ -127,6 +142,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final AiPreferences workingAiPreferences;
     private final AiModelService aiModelService;
     private final TaskExecutor taskExecutor;
+    private final EmbeddingModelMetadataService embeddingModelMetadataService;
 
     private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
@@ -147,7 +163,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             AiPreferences aiPreferences,
             AiPreferences workingAiPreferences,
             AiModelService aiModelService,
-            TaskExecutor taskExecutor
+            TaskExecutor taskExecutor,
+            EmbeddingModelMetadataService embeddingModelMetadataService
     ) {
         this.oldLocale = Locale.getDefault();
 
@@ -155,6 +172,17 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.workingAiPreferences = workingAiPreferences;
         this.aiModelService = aiModelService;
         this.taskExecutor = taskExecutor;
+        this.embeddingModelMetadataService = embeddingModelMetadataService;
+        // Discovering the models queries an external service, which must not block the JavaFX thread.
+        BackgroundTask.wrap(embeddingModelMetadataService::getAvailableModels)
+                      .onSuccess(models -> {
+                          String selected = selectedEmbeddingModel.get();
+                          embeddingModelsList.setAll(models);
+                          // Filling the items can clear the combo's value.
+                          selectedEmbeddingModel.set(selected);
+                      })
+                      .onFailure(e -> LOGGER.warn("Could not retrieve the available embedding models", e))
+                      .executeWith(taskExecutor);
 
         // The master switch needs no validation, and other tabs (web search) depend on it, so it
         // is mirrored into the working copy while the dialog is open. All validated fields are
@@ -172,7 +200,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 disableExpertSettings.set(!newValue || !enableAi.get())
         );
 
+        this.selectedEmbeddingModel.addListener((_, _, newValue) -> updateSelectedEmbeddingModelMetadata(newValue));
+
         this.selectedAiProvider.addListener((_, oldValue, newValue) -> {
+            if (newValue == null) {
+                return;
+            }
+
             List<String> models = PredefinedChatModelUtil.getAvailableModels(newValue);
 
             disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
@@ -248,7 +282,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 return;
             }
 
-            switch (selectedAiProvider.get()) {
+            AiProvider aiProvider = selectedAiProvider.get();
+            if (aiProvider == null) {
+                return;
+            }
+
+            switch (aiProvider) {
                 case OPEN_AI ->
                         openAiChatModel.set(newValue);
                 case MISTRAL_AI ->
@@ -259,11 +298,16 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         huggingFaceChatModel.set(newValue);
             }
 
-            contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(selectedAiProvider.get(), newValue));
+            contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(aiProvider, newValue));
         });
 
         this.currentApiKey.addListener((_, _, newValue) -> {
-            switch (selectedAiProvider.get()) {
+            AiProvider aiProvider = selectedAiProvider.get();
+            if (aiProvider == null) {
+                return;
+            }
+
+            switch (aiProvider) {
                 case OPEN_AI ->
                         openAiApiKey.set(newValue);
                 case MISTRAL_AI ->
@@ -276,7 +320,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         });
 
         this.currentApiBaseUrl.addListener((_, _, newValue) -> {
-            switch (selectedAiProvider.get()) {
+            AiProvider aiProvider = selectedAiProvider.get();
+            if (aiProvider == null) {
+                return;
+            }
+
+            switch (aiProvider) {
                 case OPEN_AI ->
                         openAiApiBaseUrl.set(newValue);
                 case MISTRAL_AI ->
@@ -305,7 +354,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.embeddingModelValidator = new FunctionBasedValidator<>(
                 selectedEmbeddingModel,
-                Objects::nonNull,
+                model -> !StringUtil.isBlank(model),
                 ValidationMessage.error(Localization.lang("Embedding model has to be provided")));
 
         this.temperatureTypeValidator = new FunctionBasedValidator<>(
@@ -324,15 +373,33 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 size -> size.intValue() > 0,
                 ValidationMessage.error(Localization.lang("Context window size must be greater than 0")));
 
-        this.documentSplitterChunkSizeValidator = new FunctionBasedValidator<>(
-                documentSplitterChunkSize,
-                size -> size.intValue() > 0,
-                ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0")));
+        this.documentSplitterChunkSizeValidator = new ObservableRuleBasedValidator(
+                Bindings.createObjectBinding(
+                        () -> {
+                            int size = documentSplitterChunkSize.get();
+                            if (size <= 0) {
+                                return ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0"));
+                            }
+                            int maxChunkSize = selectedEmbeddingModelMaxChunkSize.get();
+                            if (size > maxChunkSize) {
+                                return ValidationMessage.error(Localization.lang("Document splitter chunk size must not exceed %0", maxChunkSize));
+                            }
+                            return null;
+                        },
+                        documentSplitterChunkSize,
+                        selectedEmbeddingModelMaxChunkSize));
 
         this.documentSplitterOverlapSizeValidator = new FunctionBasedValidator<>(
-                documentSplitterOverlapSize,
-                size -> size.intValue() > 0 && size.intValue() < documentSplitterChunkSize.get(),
-                ValidationMessage.error(Localization.lang("Document splitter overlap size must be greater than 0 and less than chunk size")));
+                Bindings.createObjectBinding(
+                        () -> documentSplitterOverlapSize.getValue(),
+                        documentSplitterOverlapSize,
+                        documentSplitterChunkSize),
+                size -> {
+                    if (size == null || size.intValue() <= 0 || size.intValue() >= documentSplitterChunkSize.get()) {
+                        return ValidationMessage.error(Localization.lang("Document splitter overlap size must be greater than 0 and less than chunk size"));
+                    }
+                    return null;
+                });
 
         this.ragMaxResultsCountValidator = new FunctionBasedValidator<>(
                 ragMaxResultsCount,
@@ -474,6 +541,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         summarizationAlgorithmProperty.set(AiDefaultExpertSettings.SUMMARIZATOR_KIND);
         tokenEstimationAlgorithmProperty.set(AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND);
+        selectedEmbeddingModel.set(AiDefaultExpertSettings.EMBEDDING_MODEL);
         temperature.set(LocalizedNumbersUtils.doubleToString(AiDefaultExpertSettings.TEMPERATURE));
         documentSplitterChunkSize.set(AiDefaultExpertSettings.DOCUMENT_SPLITTER_CHUNK_SIZE);
         documentSplitterOverlapSize.set(AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE);
@@ -616,11 +684,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return customizeExpertSettings;
     }
 
-    public ReadOnlyListProperty<PredefinedEmbeddingModel> embeddingModelsProperty() {
+    public ReadOnlyListProperty<String> embeddingModelsProperty() {
         return embeddingModelsList;
     }
 
-    public ObjectProperty<PredefinedEmbeddingModel> selectedEmbeddingModelProperty() {
+    public StringProperty selectedEmbeddingModelProperty() {
         return selectedEmbeddingModel;
     }
 
@@ -770,5 +838,51 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty followUpQuestionsTemplateProperty() {
         return followUpQuestionsTemplate;
+    }
+
+    public StringProperty selectedEmbeddingModelSizeProperty() {
+        return selectedEmbeddingModelSize;
+    }
+
+    public IntegerProperty selectedEmbeddingModelMaxChunkSizeProperty() {
+        return selectedEmbeddingModelMaxChunkSize;
+    }
+
+    private void updateSelectedEmbeddingModelMetadata(@Nullable String modelName) {
+        if (StringUtil.isBlank(modelName)) {
+            selectedEmbeddingModelSize.set("");
+            selectedEmbeddingModelMaxChunkSize.set(DEFAULT_MAX_CHUNK_SIZE);
+            return;
+        }
+
+        selectedEmbeddingModelSize.set(Localization.lang("Loading..."));
+        selectedEmbeddingModelMaxChunkSize.set(DEFAULT_MAX_CHUNK_SIZE);
+        BackgroundTask.wrap(() -> embeddingModelMetadataService.getMetadata(modelName))
+                      .onSuccess(metadataOpt -> {
+                          if (modelName.equals(selectedEmbeddingModel.get())) {
+                              String sizeText = metadataOpt
+                                      .map(EmbeddingModelMetadata::downloadSizeBytes)
+                                      .filter(OptionalLong::isPresent)
+                                      .map(OptionalLong::getAsLong)
+                                      .map(FileUtils::byteCountToDisplaySize)
+                                      .orElse(Localization.lang("Unknown"));
+                              selectedEmbeddingModelSize.set(sizeText);
+
+                              int maxTokens = metadataOpt
+                                      .map(EmbeddingModelMetadata::maxSnippetTokens)
+                                      .filter(OptionalInt::isPresent)
+                                      .map(OptionalInt::orElseThrow)
+                                      .orElse(DEFAULT_MAX_CHUNK_SIZE);
+                              selectedEmbeddingModelMaxChunkSize.set(maxTokens);
+                          }
+                      })
+                      .onFailure(e -> {
+                          LOGGER.warn("Failed to fetch embedding model metadata for {}", modelName, e);
+                          if (modelName.equals(selectedEmbeddingModel.get())) {
+                              selectedEmbeddingModelSize.set(Localization.lang("Unknown"));
+                              selectedEmbeddingModelMaxChunkSize.set(DEFAULT_MAX_CHUNK_SIZE);
+                          }
+                      })
+                      .executeWith(taskExecutor);
     }
 }
