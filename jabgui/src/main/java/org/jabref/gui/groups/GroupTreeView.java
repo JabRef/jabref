@@ -353,7 +353,7 @@ public class GroupTreeView extends BorderPane {
         disclosureNode.getStyleClass().setAll("tree-disclosure-node");
 
         final StackPane disclosureNodeArrow = new StackPane();
-        disclosureNodeArrow.getStyleClass().setAll("arrow", "padding-4-0");
+        disclosureNodeArrow.getStyleClass().setAll("arrow", "padding-4");
         disclosureNode.getChildren().add(disclosureNodeArrow);
         return disclosureNode;
     }

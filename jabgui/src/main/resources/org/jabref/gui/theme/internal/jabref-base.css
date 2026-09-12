@@ -909,7 +909,7 @@ We want to have a look that matches our icons in the tool-bar */
 .entry-editor .all-fields-section-pane > .title {
     -fx-background-color: transparent;
     -fx-font-weight: bold;
-    -fx-border-color: transparent transparent -color-border-default transparent;
+    -fx-border-color: transparent transparent -color-border-light transparent;
 }
 
 .entry-editor .all-fields-section-pane > *.content {
@@ -1400,6 +1400,7 @@ We want to have a look that matches our icons in the tool-bar */
 .chatHistory {
     -fx-border-color: -color-border-light;
 }
+
 .exampleQuestionStyle {
     -fx-background-color: transparent;
     -fx-background-radius: 0.25em;
