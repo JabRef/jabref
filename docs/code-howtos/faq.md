@@ -64,6 +64,11 @@ Check the directory `jablib/src/main/resources/csl-locales`.
 If it is missing or empty, run `git submodule update`.
 If still not fixed, run `git reset --hard` **inside that directory**.
 
+### `jabgui/src/main/themes.jabref.org/themes is empty. Run: git submodule update --init`
+
+The themes JabRef bundles come from the submodule `jabgui/src/main/themes.jabref.org`.
+Run `git submodule update --init` and check that `jabgui/src/main/themes.jabref.org/themes` contains the theme directories.
+
 ### `org.jabref.support.CommonArchitectureTest restrictStandardStreams` <span style="color:red">FAILED</span>
 
 Check if you've used `System.out.println(...)` (the standard output stream) to log anything into the console.
@@ -110,7 +115,7 @@ You probably chose the wrong gradle task:
 
 ### The problem
 
-Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org`, `csl-styles` or `csl-locales` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
+Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org`, `csl-styles`, `csl-locales`, `ltwa` or `themes.jabref.org` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
 
 ![Changed submodules](../images/submodules.png)
 
@@ -121,7 +126,7 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
   
 ### Fix
 
-For `abbrev.jabref.org`, `csl-styles`, `csl-locales`, and `ltwa`:
+For `abbrev.jabref.org`, `csl-styles`, `csl-locales`, `ltwa`, and `themes.jabref.org`:
 
 ```bash
 git fetch upstream --prune
@@ -130,6 +135,7 @@ git checkout upstream/main -- jablib/src/main/abbrv.jabref.org
 git checkout upstream/main -- jablib/src/main/resources/csl-styles
 git checkout upstream/main -- jablib/src/main/resources/csl-locales
 git checkout upstream/main -- jablib/src/main/resources/ltwa
+git checkout upstream/main -- jabgui/src/main/themes.jabref.org
 git commit -m "Fix submodules"
 git push
 ```
