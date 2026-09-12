@@ -270,7 +270,8 @@ Find more information in the [JabRef developer docs](https://devdocs.jabref.org/
 In Markdown files (e.g., `CHANGELOG.md`), sometimes keyboard shortcuts need to be added.
 Example: `<kbd>Ctrl</kbd> + <kbd>Enter</kbd>`
 
-In case you add keys to the changelog, please follow these rules:
+This also applies to pull request descriptions as well as issue and review comments.
+In case you add keys, please follow these rules:
 
 * `<kbd>` tag for each key
 * First letter of key capitalized
