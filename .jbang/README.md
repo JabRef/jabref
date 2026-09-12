@@ -9,7 +9,7 @@ Five use cases:
 - Runing `JabLs` - JabRef's LSP Server.
 - Runing `JabSrv` - JabRef's HTTP server.
 - Try out any pull request with minimal installation. See [our blog entry](https://blog.jabref.org/2025/05/31/run-pr/) for details.
-- See what changed since you last ran JabRef from your checkout (`WhatsNew.java`).
+- See what changed since you last ran JabRef from your checkout (`WhatsNewLauncher.java`).
 
 ## Running `JabKit`
 

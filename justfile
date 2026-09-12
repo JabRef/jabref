@@ -19,7 +19,7 @@ run-branch branch: ensure-gg-cmd
 # Show the CHANGELOG.md entries that landed since the previous run, by others and by me. "Cancel run" stops the recipe.
 [unix]
 whats-new *FLAGS: ensure-gg-cmd
-    sh ./gg.cmd jbang .jbang/WhatsNew.java {{FLAGS}}
+    sh ./gg.cmd jbang .jbang/WhatsNewLauncher.java {{FLAGS}}
 
 # Run JabRef from the checkout until it is really quit: "Restart to update" in its "What's new" window pulls, rebuilds and starts it again.
 [unix]
@@ -64,7 +64,7 @@ run-branch branch: ensure-gg-cmd
 
 [windows]
 whats-new *FLAGS: ensure-gg-cmd
-    .\gg.cmd jbang .jbang\WhatsNew.java {{FLAGS}}
+    .\gg.cmd jbang .jbang\WhatsNewLauncher.java {{FLAGS}}
 
 [windows]
 run-loop: ensure-gg-cmd
