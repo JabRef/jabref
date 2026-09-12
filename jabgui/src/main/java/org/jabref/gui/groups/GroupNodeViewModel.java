@@ -1,9 +1,11 @@
 package org.jabref.gui.groups;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -64,6 +66,7 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +105,8 @@ public class GroupNodeViewModel {
     private final SearchIndexListener searchIndexListener = new SearchIndexListener();
     @SuppressWarnings("FieldCanBeLocal")
     private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
+    private @Nullable BackgroundTask<List<BibEntry>> currentUpdateTask;
+    private @Nullable Future<?> currentUpdateFuture;
     private boolean matchedEntriesInitialized;
     private boolean matchedEntriesUpdateInProgress;
     private boolean matchedEntriesUpdatePending;
@@ -156,6 +161,10 @@ public class GroupNodeViewModel {
         allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
 
         this.databaseContext.getDatabase().registerListener(searchIndexListener);
+
+        if (isAllEntriesGroup()) {
+            updateAllEntriesCount();
+        }
     }
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, GuiPreferences preferences) {
@@ -294,6 +303,14 @@ public class GroupNodeViewModel {
         }
 
         disposed = true;
+        if (currentUpdateTask != null) {
+            currentUpdateTask.cancel(true);
+            currentUpdateTask = null;
+        }
+        if (currentUpdateFuture != null) {
+            currentUpdateFuture.cancel(true);
+            currentUpdateFuture = null;
+        }
         entriesList.removeListener(databaseChangeListener);
         databaseContext.getDatabase().unregisterListener(searchIndexListener);
         children.forEach(GroupNodeViewModel::dispose);
@@ -385,9 +402,22 @@ public class GroupNodeViewModel {
 
         matchedEntriesUpdateInProgress = true;
         BackgroundTask<List<BibEntry>> updateTask = BackgroundTask
-                .wrap(() -> databaseContext.getDatabase().getEntriesSnapshot().stream()
-                                           .filter(e -> isMatchEffective(this, e))
-                                           .toList())
+                .wrap(() -> {
+                    if (disposed || Thread.currentThread().isInterrupted()) {
+                        return List.<BibEntry>of();
+                    }
+                    List<BibEntry> entriesSnapshot = databaseContext.getDatabase().getEntriesSnapshot();
+                    List<BibEntry> matched = new ArrayList<>();
+                    for (BibEntry entry : entriesSnapshot) {
+                        if (disposed || Thread.currentThread().isInterrupted()) {
+                            return List.<BibEntry>of();
+                        }
+                        if (isMatchEffective(this, entry)) {
+                            matched.add(entry);
+                        }
+                    }
+                    return matched;
+                })
                 .onSuccess(entries -> {
                     if (disposed) {
                         return;
@@ -400,13 +430,16 @@ public class GroupNodeViewModel {
                     LOGGER.warn("Could not update matched entries for group {}", groupNode.getName(), e);
                     completeMatchedEntriesUpdate();
                 });
+        currentUpdateTask = updateTask;
         // schedule() routes to the executor's separate scheduled pool, keeping the main worker pool
         // free for preview rendering — do not "simplify" to executeWith()
-        taskExecutor.schedule(updateTask, 0, TimeUnit.MILLISECONDS);
+        currentUpdateFuture = taskExecutor.schedule(updateTask, 0, TimeUnit.MILLISECONDS);
     }
 
     private void completeMatchedEntriesUpdate() {
         matchedEntriesUpdateInProgress = false;
+        currentUpdateTask = null;
+        currentUpdateFuture = null;
         if (matchedEntriesUpdatePending) {
             matchedEntriesUpdatePending = false;
             updateMatchedEntries();
@@ -478,6 +511,19 @@ public class GroupNodeViewModel {
 
     public Optional<GroupNodeViewModel> getChildByPath(String pathToSource) {
         return groupNode.getChildByPath(pathToSource).map(this::toViewModel);
+    }
+
+    public Optional<GroupNodeViewModel> findGroupNodeViewModel(GroupTreeNode targetNode) {
+        if (groupNode.equals(targetNode)) {
+            return Optional.of(this);
+        }
+        for (GroupNodeViewModel child : children) {
+            Optional<GroupNodeViewModel> found = child.findGroupNodeViewModel(targetNode);
+            if (found.isPresent()) {
+                return found;
+            }
+        }
+        return Optional.empty();
     }
 
     /// Decides if the content stored in the given [Dragboard] can be dropped on the given target row. Currently, the following sources are allowed:
@@ -789,7 +835,7 @@ public class GroupNodeViewModel {
 
         @Subscribe
         public void listen(IndexClosedEvent event) {
-            if (groupNode.getGroup() instanceof SearchGroup group) {
+            if (groupNode.getGroup() instanceof SearchGroup _) {
                 databaseContext.getDatabase().unregisterListener(this);
             }
         }

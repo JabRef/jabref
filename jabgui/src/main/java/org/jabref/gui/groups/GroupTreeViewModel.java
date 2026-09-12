@@ -230,7 +230,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
         selectedGroups.setAll(
                 stateManager.getSelectedGroups(newDatabase.get()).stream()
-                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
+                            .map(selectedGroup -> newRoot.findGroupNodeViewModel(selectedGroup)
+                                                         .orElseGet(() -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences)))
                             .toList());
     }
 
@@ -254,7 +255,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
             newGroup.ifPresent(group -> recordTreeChange(Localization.lang("Add group"), _ -> {
                 GroupTreeNode newSubgroup = parent.addSubgroup(group);
                 // [impl->req~ux.groups.create-explicit-from-selection~1]
-                selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
+                GroupNodeViewModel newViewModel = parent.findGroupNodeViewModel(newSubgroup)
+                                                        .orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
+                selectedGroups.setAll(newViewModel);
 
                 // TODO: expand the parent so the new group is visible
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
@@ -355,7 +358,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             selectedGroups.setAll(newSuggestedSubgroups
                     .stream()
-                    .map(newSubGroup -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                    .map(newSubGroup -> rootGroup.get() != null
+                            ? rootGroup.get().findGroupNodeViewModel(newSubGroup).orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                            : new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
                     .toList());
 
             writeGroupChangesToMetaData();
