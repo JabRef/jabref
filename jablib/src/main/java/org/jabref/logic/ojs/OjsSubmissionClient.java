@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher;
+package org.jabref.logic.ojs;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
 ///
 /// Requests are authenticated with the Bearer token configured per-journal in Preferences.
 @NullMarked
-public class OjsSubmissionFetcher {
+public class OjsSubmissionClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OjsSubmissionFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OjsSubmissionClient.class);
     private static final String SUBMISSIONS_PATH = "api/v1/submissions";
     private static final int PAGE_SIZE = 100;
     // Hard ceiling on pages fetched per call, independent of what the server reports as
@@ -119,4 +119,5 @@ public class OjsSubmissionFetcher {
                : trimmedJournalUrl;
     }
 }
+
 
