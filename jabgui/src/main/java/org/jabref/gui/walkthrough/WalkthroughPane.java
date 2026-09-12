@@ -26,10 +26,10 @@ import org.jspecify.annotations.NullMarked;
 /// invalidates the CSS of the entire scene graph and makes Scenic View re-attach from scratch, losing the
 /// developer's selection.
 ///
-/// @implNote The pane is unmanaged and sizes itself to the scene rather than to its parent, so that one
-/// rule covers every host: a [Pane] that is the scene root, a pane that fills it, and the content of a
-/// popup alike. This assumes the host's origin coincides with the scene's, which holds for all three.
-/// [javafx.scene.Parent#layout()] descends into unmanaged children, so the pane still lays out its own.
+/// @implNote The pane is unmanaged. In the main window and in dialogs it sizes itself to the scene rather
+/// than to its parent, so that one rule covers a pane that fills the window and a dialog pane that is the
+/// scene root alike; [javafx.scene.Parent#layout()] descends into unmanaged children, so the pane still
+/// lays out its own. A popup's pane takes no size, see [Extent#NONE].
 @NullMarked
 public final class WalkthroughPane extends StackPane {
 
@@ -42,7 +42,23 @@ public final class WalkthroughPane extends StackPane {
     /// needed, so position in the list is not something the pane can hold on to.
     private static final double IN_FRONT_OF_SIBLINGS = -1;
 
+    /// How much of its window the pane takes up.
+    private enum Extent {
+        /// The whole scene: the main window and dialogs are sized independently of the pane.
+        SCENE,
+        /// None of its own. A popup window is sized from the bounds of its content, and a context menu's drop
+        /// shadow offsets that content from the scene's origin, so a pane sized to the popup's scene would
+        /// enlarge the very window it measures itself against -- until the bounds computation overflows the
+        /// stack and the menu stops rendering. On popups the walkthrough only draws effects that position
+        /// themselves, such as the ping.
+        NONE
+    }
+
     public WalkthroughPane() {
+        this(Extent.SCENE);
+    }
+
+    private WalkthroughPane(Extent extent) {
         getStyleClass().add("walkthrough-pane");
         setMinSize(0, 0);
         setManaged(false);
@@ -52,20 +68,29 @@ public final class WalkthroughPane extends StackPane {
         // must reach that content, so only the overlay nodes themselves take input.
         setPickOnBounds(false);
 
-        InvalidationListener fitToScene = _ -> fitToScene();
         sceneProperty().addListener((_, oldScene, newScene) -> {
             if (oldScene != null) {
                 oldScene.getProperties().remove(SCENE_PROPERTY_KEY);
-                oldScene.widthProperty().removeListener(fitToScene);
-                oldScene.heightProperty().removeListener(fitToScene);
             }
             if (newScene != null) {
                 newScene.getProperties().put(SCENE_PROPERTY_KEY, this);
-                newScene.widthProperty().addListener(fitToScene);
-                newScene.heightProperty().addListener(fitToScene);
             }
-            fitToScene();
         });
+
+        if (extent == Extent.SCENE) {
+            InvalidationListener fitToScene = _ -> fitToScene();
+            sceneProperty().addListener((_, oldScene, newScene) -> {
+                if (oldScene != null) {
+                    oldScene.widthProperty().removeListener(fitToScene);
+                    oldScene.heightProperty().removeListener(fitToScene);
+                }
+                if (newScene != null) {
+                    newScene.widthProperty().addListener(fitToScene);
+                    newScene.heightProperty().addListener(fitToScene);
+                }
+                fitToScene();
+            });
+        }
     }
 
     /// Returns the pane of the given window.
@@ -85,7 +110,7 @@ public final class WalkthroughPane extends StackPane {
                        .map(Scene::getRoot)
                        .flatMap(WalkthroughPane::childrenOf)
                        .map(children -> {
-                           WalkthroughPane pane = new WalkthroughPane();
+                           WalkthroughPane pane = new WalkthroughPane(Extent.NONE);
                            children.add(pane);
                            return pane;
                        });

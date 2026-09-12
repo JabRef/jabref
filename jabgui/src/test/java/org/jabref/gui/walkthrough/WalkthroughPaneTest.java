@@ -11,11 +11,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.MenuItem;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -111,6 +115,35 @@ class WalkthroughPaneTest {
         assertEquals(pane.get(), WalkthroughPane.of(popup));
 
         JavaFxExtension.invokeAndWait(popup::hide);
+    }
+
+    /// A popup window is sized from its content, and a context menu's drop shadow offsets that content. A pane
+    /// sized to the popup's scene would enlarge the very window it measures itself against, until the bounds
+    /// computation overflows the stack and the menu no longer renders.
+    @Test
+    void contextMenuKeepsItsSizeOnceItHasAPane() {
+        Stage owner = showStage(new Scene(new StackPane(), 400, 300));
+        ContextMenu menu = new ContextMenu(new MenuItem("Open library"), new MenuItem("Preferences"));
+        JavaFxExtension.invokeAndWait(() -> {
+            menu.show(owner, owner.getX() + 20, owner.getY() + 20);
+            menu.getScene().getRoot().lookup(".context-menu").setEffect(new DropShadow(12, Color.BLACK));
+        });
+        JavaFxExtension.awaitEvents();
+        double width = menu.getWidth();
+        double height = menu.getHeight();
+
+        JavaFxExtension.invokeAndWait(() -> WalkthroughPane.of(menu));
+        JavaFxExtension.awaitEvents();
+        JavaFxExtension.invokeAndWait(() -> {
+            menu.hide();
+            menu.show(owner, owner.getX() + 20, owner.getY() + 20);
+        });
+        JavaFxExtension.awaitEvents();
+
+        assertEquals(width, menu.getWidth());
+        assertEquals(height, menu.getHeight());
+
+        JavaFxExtension.invokeAndWait(menu::hide);
     }
 
     /// The pane covers the window in front of its content, so a click next to an overlay node -- through a
