@@ -24,6 +24,7 @@ import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.DOABFetcher;
 import org.jabref.logic.importer.fetcher.DOAJFetcher;
 import org.jabref.logic.importer.fetcher.DiVA;
+import org.jabref.logic.importer.fetcher.DnbFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.EuropePmcFetcher;
@@ -162,6 +163,7 @@ public class WebFetchers {
         searchBasedFetchers.add(new ISIDOREFetcher());
         searchBasedFetchers.add(new INSPIREFetcher(importFormatPreferences));
         searchBasedFetchers.add(new GvkFetcher(importFormatPreferences));
+        searchBasedFetchers.add(new DnbFetcher(importFormatPreferences));
         searchBasedFetchers.add(new BvbFetcher());
         searchBasedFetchers.add(new MedlineFetcher(importerPreferences));
         searchBasedFetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));

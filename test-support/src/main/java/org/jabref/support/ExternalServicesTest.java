@@ -1,4 +1,4 @@
-package org.jabref.testutils.category;
+package org.jabref.support;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Tag;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-@Tag("DatabaseTest")
-public @interface DatabaseTest {
+@Tag("ExternalServicesTest")
+public @interface ExternalServicesTest {
+    String value() default "";
 }
