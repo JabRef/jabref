@@ -176,6 +176,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// Verified by [org.jabref.gui.LibraryTabRetentionTest].
     private final List<Subscription> stateManagerSubscriptions = new ArrayList<>();
 
+    /// Set by [#onClosed], so listener registrations still queued behind it are skipped instead of
+    /// registering after the cleanup already ran.
+    private boolean closed;
+
     private ListProperty<GroupTreeNode> selectedGroupsProperty;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
     private final IntegerProperty resultSize = new SimpleIntegerProperty(0);
@@ -372,6 +376,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
         Platform.runLater(() -> {
+            if (closed) {
+                return;
+            }
             // [impl->req~logic.undo.modified-marker-derived~1]
             changedProperty.bind(journal().hasChangedProperty());
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -912,6 +919,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     /// Perform necessary cleanup when this Library is closed.
     private void onClosed(Event event) {
+        closed = true;
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
         }
@@ -923,13 +931,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         } catch (RuntimeException e) {
             LOGGER.error("Problem when closing change monitor", e);
         }
+        // Dropped before closing, so a failing backend shutdown cannot skip it: the registration keeps
+        // the context reachable from the StateManager, and its backend factories capture this tab.
+        stateManager.removeSearchContext(bibDatabaseContext);
         try {
             if (searchContext != null) {
                 searchContext.close();
-                // Closing only shuts the backend down; the registration itself has to go too, or the
-                // context stays reachable from the StateManager and its backend factories, which
-                // capture this tab, keep the closed library alive.
-                stateManager.removeSearchContext(bibDatabaseContext);
             }
         } catch (RuntimeException e) {
             LOGGER.error("Problem when closing search context", e);

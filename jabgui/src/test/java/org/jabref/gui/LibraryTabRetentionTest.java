@@ -1,7 +1,6 @@
 package org.jabref.gui;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -11,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.scene.control.Tab;
@@ -20,9 +18,10 @@ import javafx.scene.control.TabPane;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.gui.groups.GroupViewMode;
+import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
@@ -45,12 +44,14 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
 import de.sandec.jmemorybuddy.JMemoryBuddy;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mockito;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -61,7 +62,8 @@ import static org.mockito.Mockito.when;
 /// The [StateManager] outlives every library, so whatever it still points at after a close stays for
 /// the rest of the session - the tab, its table model, its [BibDatabaseContext] and all its entries.
 /// [LibraryTab#onClosed] is what has to prevent that.
-@ExtendWith(ApplicationExtension.class)
+@NullMarked
+@ExtendWith(JavaFxExtension.class)
 class LibraryTabRetentionTest {
 
     private GuiPreferences preferences;
@@ -90,7 +92,7 @@ class LibraryTabRetentionTest {
         // listener it was handed, and Mockito's bookkeeping would then root everything that listener
         // captures - the very objects this test asserts are gone.
         when(preferences.getSearchPreferences().searchDisplayModeProperty()).thenReturn(new SimpleObjectProperty<>(SearchDisplayMode.FILTER));
-        when(preferences.getGroupsPreferences().groupViewModeProperty()).thenReturn(new SimpleSetProperty<>(FXCollections.observableSet(EnumSet.noneOf(GroupViewMode.class))));
+        when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
         when(preferences.getFilePreferences().fulltextIndexLinkedFilesProperty()).thenReturn(new SimpleBooleanProperty(false));
 
         stateManager = new JabRefGuiStateManager();
@@ -109,9 +111,14 @@ class LibraryTabRetentionTest {
         Injector.setModelOrService(FileUpdateMonitor.class, new DummyFileUpdateMonitor());
     }
 
+    @AfterEach
+    void tearDown() {
+        Injector.forgetAll();
+    }
+
     private static void runOnFxThreadAndWait(Runnable action) throws InterruptedException {
         CountDownLatch done = new CountDownLatch(1);
-        Throwable[] failure = new Throwable[1];
+        @Nullable Throwable[] failure = new Throwable[1];
         Platform.runLater(() -> {
             try {
                 action.run();
@@ -148,6 +155,12 @@ class LibraryTabRetentionTest {
     }
 
     private LibraryTab openTab() throws InterruptedException {
+        return openTab(false);
+    }
+
+    /// @param closeImmediately closes the tab in the same JavaFX pulse that created it, before the
+     ///                         listener registrations it queued with `Platform.runLater` have run
+    private LibraryTab openTab(boolean closeImmediately) throws InterruptedException {
         LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
         when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList());
 
@@ -160,7 +173,7 @@ class LibraryTabRetentionTest {
                         .withField(StandardField.TITLE, "Title")));
         BibDatabaseContext context = new BibDatabaseContext(database);
 
-        LibraryTab[] created = new LibraryTab[1];
+        @Nullable LibraryTab[] created = new LibraryTab[1];
         runOnFxThreadAndWait(() -> {
             LibraryTab tab = LibraryTab.createLibraryTab(
                     context,
@@ -176,6 +189,10 @@ class LibraryTabRetentionTest {
                     mock(GitHandlerRegistry.class));
             tabPane.getTabs().add(tab);
             tabPane.getSelectionModel().select(tab);
+            if (closeImmediately) {
+                tabPane.getTabs().remove(tab);
+                Event.fireEvent(tab, new Event(tabPane, tab, Tab.CLOSED_EVENT));
+            }
             created[0] = tab;
         });
         // Part of the tab's listeners are registered from a Platform.runLater, so let that run
@@ -210,8 +227,21 @@ class LibraryTabRetentionTest {
 
         // Held in a slot the assertion can empty: a local variable, or a lambda capturing one, would
         // keep the tab alive by itself.
-        LibraryTab[] tab = {openTab()};
+        @Nullable LibraryTab[] tab = {openTab()};
         closeTab(tab[0]);
+        releaseMocks();
+
+        JMemoryBuddy.memoryTest(checker -> {
+            checker.assertCollectable(tab[0]);
+            tab[0] = null;
+        });
+    }
+
+    @Test
+    void tabClosedBeforeItsDeferredSetupRanIsReleased() throws InterruptedException {
+        setUpTabPane();
+
+        @Nullable LibraryTab[] tab = {openTab(true)};
         releaseMocks();
 
         JMemoryBuddy.memoryTest(checker -> {
@@ -225,7 +255,7 @@ class LibraryTabRetentionTest {
         setUpTabPane();
 
         LibraryTab stays = openTab();
-        LibraryTab[] goes = {openTab()};
+        @Nullable LibraryTab[] goes = {openTab()};
         closeTab(goes[0]);
         releaseMocks();
 
