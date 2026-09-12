@@ -132,7 +132,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                 case "oapen.pages" -> {
                     try {
                         entry.setField(StandardField.PAGES, String.valueOf(dataObject.getInt("value")));
-                    } catch (JSONException e) {
+                    } catch (JSONException _) {
                         entry.setField(StandardField.PAGES, dataObject.getString("value"));
                     }
                 }

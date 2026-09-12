@@ -29,7 +29,7 @@ public class URLUtil {
             if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
                 strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
             }
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException _) {
             // Don't report this error, since this getting the suffix is a non-critical
             // operation, and this error will be triggered and reported elsewhere.
         }

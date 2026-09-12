@@ -237,7 +237,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
             URLDownload urlDownload = new URLDownload(getTestUrl(apiKey));
             int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
             return (statusCode >= 200) && (statusCode < 300);
-        } catch (IOException | UnirestException e) {
+        } catch (IOException | UnirestException _) {
             return false;
         }
     }

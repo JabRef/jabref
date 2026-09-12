@@ -8,6 +8,8 @@ public interface DatabaseSynchronizer {
 
     String getDBName();
 
+    void setDBName(String dbName);
+
     void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException, SQLException;
 
     void closeSharedDatabase();

@@ -296,7 +296,7 @@ public class GroupsParser {
             ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
             addGroupDetails(token, newGroup);
             return newGroup;
-        } catch (NumberFormatException exception) {
+        } catch (NumberFormatException _) {
             throw new ParseException("Could not parse context in " + input);
         }
     }
@@ -313,7 +313,7 @@ public class GroupsParser {
             ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
             GroupsParser.addLegacyEntryKeys(token, newGroup);
             return newGroup;
-        } catch (NumberFormatException exception) {
+        } catch (NumberFormatException _) {
             throw new ParseException("Could not parse context in " + input);
         }
     }
