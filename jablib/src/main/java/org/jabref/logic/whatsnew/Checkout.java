@@ -172,8 +172,13 @@ public final class Checkout {
             Contributor by = author == null || author.getEmailAddress().equalsIgnoreCase(myEmail)
                              ? mine
                              : new Contributor.Other(author.getName());
-            lines.add(new BlamedChangelog.Line(result.getResultContents().getString(i), by));
+            lines.add(new BlamedChangelog.Line(withoutCarriageReturn(result.getResultContents().getString(i)), by));
         }
         return Optional.of(new BlamedChangelog(lines));
+    }
+
+    /// JGit ends a line at `\n` only, so a `\r\n` file (a Windows checkout) leaves the `\r` on every line.
+    private static String withoutCarriageReturn(String line) {
+        return line.endsWith("\r") ? line.substring(0, line.length() - 1) : line;
     }
 }

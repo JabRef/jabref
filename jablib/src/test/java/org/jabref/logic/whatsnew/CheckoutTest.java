@@ -96,6 +96,15 @@ class CheckoutTest {
     }
 
     @Test
+    void aChangelogWithWindowsLineEndingsIsBlamedWithoutThem() throws IOException {
+        Files.writeString(cloneDirectory.resolve(CHANGELOG), String.join("\r\n", "## [Unreleased]", "### Added", "- An entry I am writing."));
+
+        BlamedChangelog blamed = checkout.blameWorkingTree().orElseThrow();
+
+        assertEquals(List.of("## [Unreleased]", "### Added", "- An entry I am writing."), blamed.lines().stream().map(BlamedChangelog.Line::text).toList());
+    }
+
+    @Test
     void aFreshCloneIsNotBehind() {
         checkout.fetch();
 
