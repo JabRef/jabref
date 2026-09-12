@@ -67,17 +67,15 @@ public class SearchConfigurationPage extends WizardPane {
     private void setupUI(BibDatabaseContext bibDatabaseContext, GuiPreferences preferences) {
         VBox wrapper = new VBox();
         wrapper.setFillWidth(true);
-        wrapper.setPadding(new Insets(10));
+        wrapper.setPadding(new Insets(8));
         wrapper.setMaxWidth(Double.MAX_VALUE);
         wrapper.setMaxHeight(Double.MAX_VALUE);
 
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
+        GridPane grid = new GridPane(8, 8);
         grid.setMaxWidth(Double.MAX_VALUE);
         VBox.setVgrow(grid, Priority.ALWAYS);
 
-        /// Column Constraints for proper alignment and resizing
+        // Column Constraints for proper alignment and resizing
         ColumnConstraints labelColumn = new ColumnConstraints();
         labelColumn.setHgrow(Priority.NEVER);
         labelColumn.setMinWidth(100);
@@ -92,11 +90,11 @@ public class SearchConfigurationPage extends WizardPane {
 
         int row = 0;
 
-        ///Directory selection
+        // Directory selection
         Label dirLabel = new Label(Localization.lang("Directory"));
         grid.add(dirLabel, 0, row);
 
-        HBox directoryBox = new HBox(5);
+        HBox directoryBox = new HBox(4);
         directoryBox.setAlignment(Pos.CENTER_LEFT);
         directoryBox.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(directoryBox, Priority.ALWAYS);

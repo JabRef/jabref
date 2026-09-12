@@ -546,6 +546,59 @@ class BibDatabaseTest {
         assertEquals(-1, database.indexOf(entryA));
     }
 
+    // [utest->req~import.entries.sorted-by-id~1]
+    @Test
+    void entriesInsertedOutOfCreationOrderAreFoundByIndexOf() {
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        BibEntry entryB = new BibEntry(StandardEntryType.Article);
+        BibEntry entryC = new BibEntry(StandardEntryType.Article);
+        BibEntry entryD = new BibEntry(StandardEntryType.Article);
+
+        database.insertEntries(entryB, entryD);
+        database.insertEntries(entryC, entryA);
+
+        assertEquals(List.of(entryA, entryB, entryC, entryD), database.getEntries());
+        assertEquals(0, database.indexOf(entryA));
+        assertEquals(1, database.indexOf(entryB));
+        assertEquals(2, database.indexOf(entryC));
+        assertEquals(3, database.indexOf(entryD));
+    }
+
+    // [utest->req~import.entries.sorted-by-id~1]
+    @Test
+    void smallOutOfOrderBatchDoesNotReplaceEntriesList() {
+        BibEntry firstEntry = new BibEntry(StandardEntryType.Article);
+        BibEntry secondEntry = new BibEntry(StandardEntryType.Article);
+        database.insertEntry(secondEntry);
+
+        List<Boolean> replacementChanges = new ArrayList<>();
+        database.getEntries().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                replacementChanges.add(change.wasReplaced());
+            }
+        });
+
+        database.insertEntry(firstEntry);
+
+        assertEquals(List.of(false), replacementChanges);
+        assertEquals(List.of(firstEntry, secondEntry), database.getEntries());
+    }
+
+    // [utest->req~import.entries.sorted-by-id~1]
+    @Test
+    void largeBatchInsertedInReverseOrderIsSortedById() {
+        List<BibEntry> created = new ArrayList<>();
+        for (int i = 0; i < 2000; i++) {
+            created.add(new BibEntry(StandardEntryType.Article));
+        }
+        database.insertEntries(created.subList(1000, 2000));
+        database.insertEntries(created.subList(0, 1000).reversed());
+
+        assertEquals(created, database.getEntries());
+        assertEquals(1500, database.indexOf(created.get(1500)));
+        assertEquals(7, database.indexOf(created.get(7)));
+    }
+
     @Test
     void crossrefChangeUpdatesCitationIndex() {
         BibDatabase database = new BibDatabase();

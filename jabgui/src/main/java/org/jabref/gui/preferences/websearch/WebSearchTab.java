@@ -86,7 +86,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                                         .checkbox(Localization.lang("Warn about duplicates on import"), viewModel.warnAboutDuplicatesOnImportProperty())
                                         .checkbox(Localization.lang("Download referenced files (PDFs, ...)"), viewModel.shouldDownloadLinkedOnlineFiles())
                                         .checkbox(Localization.lang("Store url for downloaded file"), viewModel.shouldKeepDownloadUrl()),
-                                toggleRow -> toggleRow.styleClass("gap-16"))
+                                toggleRow -> toggleRow.styleClass("gap-4"))
                         .checkWithField(Localization.lang("Add imported entries to group"), viewModel.getAddImportedEntries(), viewModel.getAddImportedEntriesGroupName(),
                                 PreferencesFormBuilder.InputElement::grow)
                         .combo(Localization.lang("Default plain citation parser"), viewModel.plainCitationParsers(), viewModel.defaultPlainCitationParserProperty(), PlainCitationParserChoice::getLocalizedName)

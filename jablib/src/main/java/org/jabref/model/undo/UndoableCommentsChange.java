@@ -15,8 +15,14 @@ public record UndoableCommentsChange(BibEntry entry, String before, String after
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
+        if (!entry.getUserComments().equals(before)) {
+            return ApplyResult.of(this, "entry comments are not the recorded ones");
+        }
         entry.setCommentsBeforeEntry(after);
+        // The setter is the parser's and leaves the flag alone; here the comment differs from what was parsed
+        entry.setChanged(true);
+        return ApplyResult.SUCCESS;
     }
 
     @Override

@@ -3,6 +3,8 @@ package org.jabref.gui.collab;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -37,22 +39,24 @@ public class ChangeScanner {
     }
 
     public List<DatabaseChange> scanForChanges() {
-        return scanForChanges(() -> {
-        });
+        return scanForChanges(() -> true).orElse(List.of());
     }
 
-    /// @param beforeParsing run right before the file is parsed, e.g. to wait until a sync client has finished writing it
-    public List<DatabaseChange> scanForChanges(Runnable beforeParsing) {
+    /// @param readyToParse consulted right before the file is parsed, e.g. to wait until a sync client has finished writing it; `false` abandons the scan
+    /// @return the changes, or empty when the scan was abandoned
+    public Optional<List<DatabaseChange>> scanForChanges(BooleanSupplier readyToParse) {
         if (database.getDatabasePath().isEmpty()) {
-            return List.of();
+            return Optional.of(List.of());
         }
-        beforeParsing.run();
+        if (!readyToParse.getAsBoolean()) {
+            return Optional.empty();
+        }
 
         try {
-            return getDatabaseChanges(database.getDatabasePath().get());
+            return Optional.of(getDatabaseChanges(database.getDatabasePath().get()));
         } catch (IOException e) {
             LOGGER.warn("Error while parsing changed file.", e);
-            return List.of();
+            return Optional.of(List.of());
         }
     }
 

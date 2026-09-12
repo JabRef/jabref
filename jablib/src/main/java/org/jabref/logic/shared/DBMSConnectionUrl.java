@@ -161,7 +161,9 @@ public record DBMSConnectionUrl(DBMSType type,
         boolean useSSL = false;
         List<String> remaining = new ArrayList<>();
         for (Map.Entry<String, String> parameter : parameters) {
-            String key = parameter.getKey();
+            // PostgreSQL treats the parameter keywords case-insensitively, so "PASSWORD" must not slip
+            // through into the query part - it would end up in every JDBC URL built from this record
+            String key = parameter.getKey().toLowerCase(Locale.ROOT);
             String value = parameter.getValue();
             if ("user".equals(key)) {
                 user = Optional.of(user.orElse(value));

@@ -51,6 +51,15 @@ public class Directories {
                                              OS.APP_DIR_APP_AUTHOR));
     }
 
+    /// Changes made while a shared database was unreachable, one file per database
+    /// (see `org.jabref.logic.shared.OfflineChanges`)
+    public static Path getSharedDatabaseDirectory() {
+        return Path.of(AppDirsFactory.getInstance()
+                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
+                                             "shared-database",
+                                             OS.APP_DIR_APP_AUTHOR));
+    }
+
     public static Path getSslDirectory() {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(OS.APP_DIR_APP_NAME,

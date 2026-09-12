@@ -16,7 +16,7 @@
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="680.0"
             prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171"
             fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView"
-            id="styleSelectDialog">
+            id="style-select-dialog">
     <content>
         <VBox spacing="10.0">
             <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
@@ -96,7 +96,7 @@
                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                             </columnResizePolicy>
                         </TableView>
-                        <HBox alignment="CENTER_LEFT" spacing="16.0">
+                        <HBox alignment="CENTER_LEFT" spacing="12">
                             <Label text="%Citation format"/>
                             <RadioButton fx:id="numericFormatButton" text="%Numeric [1]"/>
                             <RadioButton fx:id="authorYearFormatButton" text="%Author-year"/>

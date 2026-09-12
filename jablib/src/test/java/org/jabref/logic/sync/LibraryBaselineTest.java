@@ -164,4 +164,52 @@ class LibraryBaselineTest {
         assertEquals(Side.BOTH, baseline.sideOfAddedString("january", "January", _ -> false));
         assertEquals(Side.DISK, baseline.sideOfAddedString("feb", "February", _ -> false));
     }
+
+    @Test
+    void commentsChangedDifferentlyOnBothSidesAreAConflict() {
+        local.setCommentsBeforeEntry("% memory");
+        remote.setCommentsBeforeEntry("% disk");
+
+        assertEquals(Optional.empty(), baseline.mergeEntry(local, remote));
+    }
+
+    @Test
+    void stringRenamedOnDiskToANameTakenInMemoryIsAConflict() {
+        BibDatabase database = new BibDatabase(List.of(local));
+        database.addString(new BibtexString("jan", "January"));
+        baseline = LibraryBaseline.of(new BibDatabaseContext(database), PATTERNS);
+
+        assertEquals(Side.DISK, baseline.sideOfStringRename("jan", "January", "january", _ -> false));
+        assertEquals(Side.BOTH, baseline.sideOfStringRename("jan", "January", "january", "january"::equals));
+    }
+
+    @Test
+    void ambiguousRenameSourceIsNotAConflict() {
+        BibDatabase database = new BibDatabase(List.of(local));
+        database.addString(new BibtexString("jan", "January"));
+        database.addString(new BibtexString("januar", "January"));
+        baseline = LibraryBaseline.of(new BibDatabaseContext(database), PATTERNS);
+
+        // both equal-valued strings are gone from memory: nothing says which one the disk string was renamed from
+        assertEquals(Side.DISK, baseline.sideOfAddedString("january", "January", _ -> false));
+    }
+
+    @Test
+    void closestEntryIsFoundWhenKeyAndOneFieldChanged() {
+        BibEntry other = new BibEntry(StandardEntryType.Book).withCitationKey("Other").withField(StandardField.TITLE, "Other");
+        baseline = LibraryBaseline.of(new BibDatabaseContext(new BibDatabase(List.of(local, other))), PATTERNS);
+        remote.setCitationKey("Renamed");
+        remote.setField(StandardField.YEAR, "2021");
+
+        assertEquals(Optional.of(local.getId()), baseline.closestOf(List.of(local.getId(), other.getId()), remote));
+    }
+
+    @Test
+    void closestEntryIsNotGuessedWhenTwoFieldsChanged() {
+        remote.setCitationKey("Renamed");
+        remote.setField(StandardField.YEAR, "2021");
+        remote.setField(StandardField.TITLE, "Another title");
+
+        assertEquals(Optional.empty(), baseline.closestOf(List.of(local.getId()), remote));
+    }
 }

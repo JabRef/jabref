@@ -2,6 +2,7 @@ package org.jabref.gui.collab;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -164,8 +166,27 @@ class ChangeTriageTest {
         ChangeTriage.Triage triage = triage();
 
         EntryChange change = assertInstanceOf(EntryChange.class, triage.diskOnly().getFirst());
+        local.setChanged(false);
         change.applyChange(new CompoundEdit("test"));
         assertEquals("% from disk", local.getUserComments());
+        // otherwise a save would write the parsed serialization with the old comment
+        assertTrue(local.hasChanged());
+    }
+
+    @Test
+    void undoOfAppliedChangeRestoresTheParsedState() {
+        disk.setField(StandardField.TITLE, "Disk title");
+        ChangeTriage.Triage triage = triage();
+        EntryChange change = assertInstanceOf(EntryChange.class, triage.diskOnly().getFirst());
+        local.setChanged(false);
+        CompoundEdit edit = new CompoundEdit("test");
+
+        change.applyChange(edit);
+        assertTrue(local.hasChanged());
+        edit.toChangeSet().inverted().apply();
+
+        assertEquals(Optional.of("Title"), local.getField(StandardField.TITLE));
+        assertFalse(local.hasChanged());
     }
 
     @Test

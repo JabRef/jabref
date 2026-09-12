@@ -12,7 +12,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -126,8 +125,8 @@ public class FileSelectionPage extends WizardPane {
     private void setupUI() {
         BorderPane mainLayout = new BorderPane();
 
-        progressPane = new VBox(10);
-        progressPane.getStyleClass().addAll("align-center", "padding-24");
+        progressPane = new VBox(4);
+        progressPane.getStyleClass().addAll("align-center", "padding-4");
 
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.progressProperty().bind(viewModel.progressValueProperty());
@@ -137,7 +136,7 @@ public class FileSelectionPage extends WizardPane {
 
         progressPane.getChildren().addAll(progressIndicator, progressLabel);
 
-        contentPane = new VBox(10);
+        contentPane = new VBox(4);
 
         fileCountLabel = new Label();
         fileCountLabel.getStyleClass().add("bold");
@@ -170,11 +169,11 @@ public class FileSelectionPage extends WizardPane {
         closePreviewButton.setTooltip(new Tooltip(Localization.lang("Close PDF preview")));
         closePreviewButton.setOnAction(_ -> hidePreviewPane());
 
-        HBox previewControls = new HBox(8, enablePreviewCheckBox, closePreviewButton);
+        HBox previewControls = new HBox(4, enablePreviewCheckBox, closePreviewButton);
         HBox.setHgrow(enablePreviewCheckBox, Priority.ALWAYS);
 
-        VBox previewContent = new VBox(8, previewControls, pdfPreview, metadataLabel, metadataPreview);
-        previewContent.setPadding(new Insets(8));
+        VBox previewContent = new VBox(4, previewControls, pdfPreview, metadataLabel, metadataPreview);
+        previewContent.getStyleClass().add("padding-4");
         previewPane = new TitledPane(Localization.lang("PDF preview"), previewContent);
         previewPane.setExpanded(true);
         previewPane.setCollapsible(false);
@@ -183,7 +182,7 @@ public class FileSelectionPage extends WizardPane {
         splitPane.setDividerPositions(0.58);
         VBox.setVgrow(splitPane, Priority.ALWAYS);
 
-        HBox buttonBar = new HBox(5);
+        HBox buttonBar = new HBox(4);
         selectAllButton = new Button(Localization.lang("Select all"));
         selectAllButton.setOnAction(e -> unlinkedFilesList.getCheckModel().checkAll());
 

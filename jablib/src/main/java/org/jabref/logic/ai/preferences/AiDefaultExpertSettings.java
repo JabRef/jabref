@@ -1,6 +1,5 @@
 package org.jabref.logic.ai.preferences;
 
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
@@ -13,7 +12,7 @@ import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 public class AiDefaultExpertSettings {
     public static final SummarizatorKind SUMMARIZATOR_KIND = SummarizatorKind.CHUNKED;
     public static final TokenEstimatorKind TOKEN_ESTIMATOR_KIND = TokenEstimatorKind.MAX;
-    public static final PredefinedEmbeddingModel EMBEDDING_MODEL = PredefinedEmbeddingModel.SENTENCE_TRANSFORMERS_ALL_MINILM_L12_V2;
+    public static final String EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L12-v2";
     public static final float TEMPERATURE = 0.7F;
 
     public static final DocumentSplitterKind DOCUMENT_SPLITTER_KIND = DocumentSplitterKind.SLIDING_WINDOW;

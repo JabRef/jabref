@@ -272,17 +272,14 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         if (scannedBaseline != null && isSynchronizing()) {
             // [impl->req~ux.external-library-changes.synchronize~1]
             BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
-                          .onSuccess(changes -> onScannedForSynchronization(generation, scanner, scannedBaseline, changes))
+                          .onSuccess(changes -> changes.ifPresent(scanned -> onScannedForSynchronization(generation, scanner, scannedBaseline, scanned)))
                           .onFailure(e -> LOGGER.error("Error while synchronizing with the library file", e))
                           .executeWith(taskExecutor);
             return;
         }
         BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
-                      .onSuccess(changes -> {
-                          if (!changes.isEmpty()) {
-                              listeners.forEach(listener -> listener.databaseChanged(changes));
-                          }
-                      })
+                      .onSuccess(changes -> changes.filter(scanned -> !scanned.isEmpty())
+                                                   .ifPresent(scanned -> listeners.forEach(listener -> listener.databaseChanged(scanned))))
                       .onFailure(e -> LOGGER.error("Error while watching for changes", e))
                       .executeWith(taskExecutor);
     }
@@ -305,17 +302,12 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// size and modification time have stopped changing for a while.
     ///
     /// @return the last state seen
-    private static @Nullable FileSnapshot awaitStableFile(Path path) {
+    /// @throws InterruptedException when the wait was interrupted; the file may still be incomplete, so the caller must not parse it
+    private static @Nullable FileSnapshot awaitStableFile(Path path) throws InterruptedException {
         FileSnapshot last = FileSnapshot.read(path);
         int unchanged = 0;
         for (int attempt = 0; attempt < STABLE_FILE_ATTEMPTS && unchanged < STABLE_FILE_CONFIRMATIONS; attempt++) {
-            try {
-                Thread.sleep(STABLE_FILE_INTERVAL_MILLIS);
-            } catch (InterruptedException e) {
-                LOGGER.debug("Interrupted while waiting for {} to stop changing; the scan is abandoned", path, e);
-                Thread.currentThread().interrupt();
-                return last;
-            }
+            Thread.sleep(STABLE_FILE_INTERVAL_MILLIS);
             FileSnapshot current = FileSnapshot.read(path);
             unchanged = Objects.equals(current, last) ? unchanged + 1 : 0;
             last = current;
@@ -326,15 +318,26 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// The state seen becomes the known disk state, so that the events of the write just waited for do not trigger
     /// another scan; only for the current scan, since a scan already overtaken will not apply what it sees, and
     /// recording it would make the next event look handled.
-    private void awaitStableLibraryFile(int generation) {
-        monitoredPath.ifPresent(path -> {
+    ///
+    /// @return `false` when the wait was interrupted and the scan must not go on
+    private boolean awaitStableLibraryFile(int generation) {
+        Path path = monitoredPath.orElse(null);
+        if (path == null) {
+            return true;
+        }
+        try {
             FileSnapshot state = awaitStableFile(path);
             synchronized (database) {
                 if (generation == scanGeneration) {
                     knownDiskState = state;
                 }
             }
-        });
+            return true;
+        } catch (InterruptedException e) {
+            LOGGER.debug("Interrupted while waiting for {} to stop changing; the scan is abandoned", path, e);
+            Thread.currentThread().interrupt();
+            return false;
+        }
     }
 
     /// Applies what changed on disk only, and offers the review for what changed on both sides.
@@ -404,16 +407,22 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         // No new generation: merging a copy must not cancel the library scan it may run alongside
         int generation = scanGeneration;
         BackgroundTask.wrap(() -> {
-                          awaitStableFile(copy);
-                          return scanner.scanFile(copy);
+                          try {
+                              awaitStableFile(copy);
+                          } catch (InterruptedException e) {
+                              LOGGER.debug("Interrupted while waiting for {} to stop changing; the merge is abandoned", copy, e);
+                              Thread.currentThread().interrupt();
+                              return Optional.<List<DatabaseChange>>empty();
+                          }
+                          return Optional.of(scanner.scanFile(copy));
                       })
-                      .onSuccess(changes -> {
+                      .onSuccess(scanned -> {
                           synchronized (database) {
-                              if (generation != scanGeneration) {
+                              if (scanned.isEmpty() || generation != scanGeneration) {
                                   mergedConflictedCopies.remove(copy);
                                   return;
                               }
-                              ChangeTriage.Triage triage = scanner.triage(scannedBaseline, changes);
+                              ChangeTriage.Triage triage = scanner.triage(scannedBaseline, scanned.get());
                               synchronize(scannedBaseline, triage,
                                       Localization.lang("Merged %0 change(s) from the conflicted copy '%1'", String.valueOf(triage.diskOnly().size()), copy.getFileName().toString()),
                                       copy);
@@ -478,7 +487,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         if (resolvedChangesMatchDisk) {
             libraryTab.resetChangedProperties();
         } else {
-            libraryTab.markBaseChanged();
+            // Nothing on the stack describes a denied change - denying one records nothing - but the
+            // file no longer matches what the user chose to keep, so the library still needs saving.
+            undoManager.markChanged();
         }
     }
 

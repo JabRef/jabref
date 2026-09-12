@@ -10,12 +10,12 @@
 <?import javafx.scene.text.Text?>
 <fx:root
         type="ScrollPane"
-        styleClass="ai-tab,padding-24"
+        styleClass="ai-tab,padding-4"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="org.jabref.gui.ai.AiPrivacyNoticeView">
-    <VBox spacing="20.0"
-          styleClass="gdpr-notice,h4,padding-12"
+    <VBox spacing="4.0"
+          styleClass="gdpr-notice,h4,padding-4"
           fx:id="text">
         <Label wrapText="true"
                text="%Privacy notice"
@@ -35,7 +35,7 @@
                 styleClass="embeddedHyperlink"
                 text="%You can find information about DJL privacy policy here."/>
 
-        <HBox spacing="10.0">
+        <HBox spacing="4.0">
             <Button onAction="#onPrivacyAgree"
                     text="%I agree"/>
             <Button onAction="#onPrivacyDisagree"

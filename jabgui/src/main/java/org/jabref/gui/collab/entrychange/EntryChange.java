@@ -12,6 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableChangeType;
+import org.jabref.model.undo.UndoableChangedFlag;
 import org.jabref.model.undo.UndoableCommentsChange;
 import org.jabref.model.undo.UndoableFieldChange;
 
@@ -47,6 +48,8 @@ public final class EntryChange extends DatabaseChange {
     @Override
     public void applyChange(CompoundEdit undoEdit) {
         CompoundEdit entryEdit = new CompoundEdit(getName());
+        // First in the compound, so that undo restores it after the field edits have marked the entry changed again
+        entryEdit.applyEdit(new UndoableChangedFlag(oldEntry, oldEntry.hasChanged(), true));
         if (!Objects.equals(oldEntry.getType(), newEntry.getType())) {
             entryEdit.applyEdit(new UndoableChangeType(oldEntry, oldEntry.getType(), newEntry.getType()));
         }
