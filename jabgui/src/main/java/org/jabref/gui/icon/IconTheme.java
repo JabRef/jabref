@@ -42,6 +42,9 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignV;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.maran.svg.SVG;
+import tools.maran.svg.materialdesign.MDIInterface;
+import tools.maran.svg.materialdesign.MDITechnology;
 
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 @NullMarked
@@ -337,8 +340,11 @@ public class IconTheme {
         RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE),
         SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL),
 
-        // Example SVG-backed icon (a star, 24x24 viewport) sourced via the svgnode for testing purposes.
-        EXAMPLE_SVG_STAR("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
+        // Library tab icons, rendered through svgnode; see [SvgIcon].
+        WELCOME(MDIInterface.HOME_OUTLINE),
+        BIBTEX_LIBRARY(MDITechnology.BOOK_OUTLINE),
+        BIBLATEX_LIBRARY(MDITechnology.NOTEBOOK_OUTLINE),
+        SHARED_DATABASE_LIBRARY(MDITechnology.DATABASE_OUTLINE);
 
         private final JabRefIcon icon;
 
@@ -350,8 +356,8 @@ public class IconTheme {
             icon = new IkonliIcon(color, icons);
         }
 
-        JabRefIcons(String svgPath) {
-            icon = new SvgIcon(name(), svgPath);
+        JabRefIcons(SVG svg) {
+            icon = new SvgIcon(name(), svg.path());
         }
 
         @Override

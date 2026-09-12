@@ -50,7 +50,7 @@ class Search implements Callable<Integer> {
 
     @Override
     public Integer call() throws ImportServiceException, ExportServiceException {
-        Path inputFile = inputOption.getInputFile();
+        Path inputFile = inputOption.getInputFile(argumentProcessor.cliPreferences);
 
         ParserResult parserResult = ImportService.importBibTexFile(inputFile, argumentProcessor.cliPreferences, sharedOptions.porcelain);
 
