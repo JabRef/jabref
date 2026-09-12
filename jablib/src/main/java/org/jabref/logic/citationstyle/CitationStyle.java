@@ -2,10 +2,12 @@ package org.jabref.logic.citationstyle;
 
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.jabref.logic.openoffice.style.OOStyle;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Representation of a CitationStyle. Stores its name, the file path and the style itself.
 /// This is a pure model class. For loading/parsing functionality, see  [CSLStyleUtils] and [CSLStyleLoader].
@@ -23,7 +25,8 @@ public class CitationStyle implements OOStyle {
     private final boolean hasBibliography;
     private final boolean hasBibliographySortOrder;
     private final boolean usesHangingIndent;
-    private final String source;
+    private final Supplier<String> sourceLoader;
+    @Nullable private volatile String source;
     private final boolean isInternalStyle;
 
     public CitationStyle(@NonNull String filePath,
@@ -37,6 +40,57 @@ public class CitationStyle implements OOStyle {
                          boolean usesHangingIndent,
                          @NonNull String source,
                          boolean isInternalStyle) {
+        this(filePath,
+                styleId,
+                styleClass,
+                title,
+                shortTitle,
+                isNumericStyle,
+                hasBibliography,
+                hasBibliographySortOrder,
+                usesHangingIndent,
+                () -> source,
+                source,
+                isInternalStyle);
+    }
+
+    CitationStyle(@NonNull String filePath,
+                  @NonNull String styleId,
+                  @NonNull String styleClass,
+                  @NonNull String title,
+                  @NonNull String shortTitle,
+                  boolean isNumericStyle,
+                  boolean hasBibliography,
+                  boolean hasBibliographySortOrder,
+                  boolean usesHangingIndent,
+                  @NonNull Supplier<String> sourceLoader,
+                  boolean isInternalStyle) {
+        this(filePath,
+                styleId,
+                styleClass,
+                title,
+                shortTitle,
+                isNumericStyle,
+                hasBibliography,
+                hasBibliographySortOrder,
+                usesHangingIndent,
+                sourceLoader,
+                null,
+                isInternalStyle);
+    }
+
+    private CitationStyle(@NonNull String filePath,
+                          @NonNull String styleId,
+                          @NonNull String styleClass,
+                          @NonNull String title,
+                          @NonNull String shortTitle,
+                          boolean isNumericStyle,
+                          boolean hasBibliography,
+                          boolean hasBibliographySortOrder,
+                          boolean usesHangingIndent,
+                          @NonNull Supplier<String> sourceLoader,
+                          @Nullable String source,
+                          boolean isInternalStyle) {
         this.filePath = Path.of(filePath).toString(); // wrapping with Path.of takes care of extra slashes in path due to subsequent storage and retrieval (observed on Windows)
         this.styleId = styleId;
         this.styleClass = styleClass;
@@ -47,6 +101,7 @@ public class CitationStyle implements OOStyle {
         this.hasBibliographySortOrder = hasBibliography && hasBibliographySortOrder;
         this.usesHangingIndent = hasBibliography && usesHangingIndent;
         this.source = source;
+        this.sourceLoader = sourceLoader;
         this.isInternalStyle = isInternalStyle;
     }
 
@@ -90,7 +145,17 @@ public class CitationStyle implements OOStyle {
     }
 
     public String getSource() {
-        return source;
+        @Nullable String currentSource = source;
+        if (currentSource == null) {
+            synchronized (this) {
+                currentSource = source;
+                if (currentSource == null) {
+                    currentSource = sourceLoader.get();
+                    source = currentSource;
+                }
+            }
+        }
+        return currentSource;
     }
 
     public String getFilePath() {
@@ -112,12 +177,13 @@ public class CitationStyle implements OOStyle {
         }
 
         CitationStyle other = (CitationStyle) o;
-        return Objects.equals(source, other.source);
+        return isInternalStyle == other.isInternalStyle
+                && Objects.equals(filePath, other.filePath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(source);
+        return Objects.hash(filePath, isInternalStyle);
     }
 
     @Override
