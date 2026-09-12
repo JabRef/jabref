@@ -41,9 +41,9 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         OpenLibraryIsbnFetcher openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
         this.gvkIsbnFetcher = new GvkFetcher(importFormatPreferences);
         this.retryIsbnFetcher = new ArrayList<>();
+        this.addRetryFetcher(new DnbFetcher(importFormatPreferences));
         this.addRetryFetcher(lobidIsbnFetcher);
         this.addRetryFetcher(openLibraryIsbnFetcher);
-        this.addRetryFetcher(new DnbFetcher(importFormatPreferences));
     }
 
     @Override
