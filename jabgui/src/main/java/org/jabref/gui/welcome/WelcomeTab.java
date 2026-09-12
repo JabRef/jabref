@@ -18,6 +18,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -118,10 +119,10 @@ public class WelcomeTab extends Tab {
         this.recentLibrariesBox = new VBox(8);
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
-        main = new VBox(12, createTopTitles(), new VBox(), createCommunityBox());
-        // No padding: the community band is full-bleed, it runs from window edge to window edge.
-        // The width cap ("welcome-main-container") sits on the content inside it instead.
-        main.getStyleClass().add("align-center");
+        main = new VBox(24, createTopTitles(), new VBox(), createCommunityBox());
+        main.getStyleClass().addAll("welcome-main-container", "align-center");
+        // Sized to its content, so the StackPane centers it: whitespace above and below on a tall window.
+        main.setMaxHeight(Region.USE_PREF_SIZE);
         initializeColumns();
 
         StackPane rootPane = new StackPane(main);
@@ -135,28 +136,17 @@ public class WelcomeTab extends Tab {
 
     private VBox createTopTitles() {
         Label welcomeLabel = new Label(Localization.lang("Welcome to JabRef"));
-        welcomeLabel.getStyleClass().addAll("h1", "text-emphasis");
+        welcomeLabel.getStyleClass().addAll("h1", "text-accent");
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("h2");
-        // Two full-bleed bands, stacked without a gap and getting lighter downwards: accent,
-        // then the community footer's surface, then the page itself. A VBox stretches to the
-        // window width, a Label would not (it never grows past its preferred width).
-        VBox welcomeBand = new VBox(welcomeLabel);
-        welcomeBand.getStyleClass().addAll("align-center", "bg-accent", "padding-12");
-
-        VBox subtitleBand = new VBox(descriptionLabel);
-        subtitleBand.getStyleClass().addAll("align-center", "bg-sidepane", "padding-12");
-
-        VBox topTitles = new VBox(welcomeBand, subtitleBand);
-        topTitles.getStyleClass().add("align-top-center");
+        VBox topTitles = new VBox(12, welcomeLabel, descriptionLabel);
+        topTitles.getStyleClass().add("align-top-left");
         return topTitles;
     }
 
     private void initializeColumns() {
         GridPane grid = new GridPane(24, 24);
-        // "welcome-main-container" caps the width: centered content keeps whitespace left and
-        // right, instead of two columns pushed against the window borders on a wide screen.
-        grid.getStyleClass().addAll("align-top-center", "welcome-main-container", "padding-0-12");
+        grid.getStyleClass().add("align-top-center");
 
         VBox leftColumn = createLeftColumn();
         GridPane.setHgrow(leftColumn, Priority.ALWAYS);
@@ -185,7 +175,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createLeftColumn() {
-        VBox leftColumn = new VBox(12,
+        VBox leftColumn = new VBox(24,
                 createWelcomeStartBox(),
                 createWelcomeRecentBox()
         );
@@ -196,7 +186,7 @@ public class WelcomeTab extends Tab {
     private VBox createRightColumn() {
         this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);
         this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
-        VBox rightColumn = new VBox(12, quickSettings, walkthroughs);
+        VBox rightColumn = new VBox(24, quickSettings, walkthroughs);
         rightColumn.getStyleClass().addAll("align-top-left");
         return rightColumn;
     }
@@ -354,14 +344,7 @@ public class WelcomeTab extends Tab {
         VBox container = new VBox(12);
         container.getStyleClass().add("align-top-left");
         container.getChildren().addAll(iconLinksContainer, textLinksContainer, versionContainer);
-
-        VBox content = createVBoxContainer(header, container);
-        content.getStyleClass().addAll("welcome-main-container", "padding-12");
-        // Band around the capped content, so the background runs to both window edges and, as the
-        // last child of "main", down to the bottom one.
-        VBox band = new VBox(content);
-        band.getStyleClass().addAll("bg-sidepane", "align-center");
-        return band;
+        return createVBoxContainer(header, container);
     }
 
     private FlowPane createIconLinksContainer() {
