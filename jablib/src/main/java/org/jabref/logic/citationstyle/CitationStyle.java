@@ -2,6 +2,7 @@ package org.jabref.logic.citationstyle;
 
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -145,17 +146,15 @@ public class CitationStyle implements OOStyle {
     }
 
     public String getSource() {
-        @Nullable String currentSource = source;
-        if (currentSource == null) {
-            synchronized (this) {
-                currentSource = source;
-                if (currentSource == null) {
-                    currentSource = sourceLoader.get();
-                    source = currentSource;
-                }
-            }
-        }
-        return currentSource;
+        return Optional.ofNullable(source).orElseGet(this::loadSource);
+    }
+
+    private synchronized String loadSource() {
+        return Optional.ofNullable(source).orElseGet(() -> {
+            String loadedSource = sourceLoader.get();
+            source = loadedSource;
+            return loadedSource;
+        });
     }
 
     public String getFilePath() {
