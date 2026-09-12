@@ -71,14 +71,23 @@ public class FieldFormatterCleanup implements CleanupJob {
 
         // Only the actual field mutation is dispatched via the scheduler:
         String appliedValue;
+        String expectedOldValue = oldValue.get();
         if (newValue.isEmpty()) {
-            mutationScheduler.accept(() -> entry.clearField(fieldKey));
+            mutationScheduler.accept(() -> {
+                if (entry.getField(fieldKey).filter(current -> current.equals(expectedOldValue)).isPresent()) {
+                    entry.clearField(fieldKey);
+                }
+            });
             appliedValue = null;
         } else {
-            mutationScheduler.accept(() -> entry.setField(fieldKey, newValue, EntriesEventSource.SAVE_ACTION));
+            mutationScheduler.accept(() -> {
+                if (entry.getField(fieldKey).filter(current -> current.equals(expectedOldValue)).isPresent()) {
+                    entry.setField(fieldKey, newValue, EntriesEventSource.SAVE_ACTION);
+                }
+            });
             appliedValue = newValue;
         }
-        return List.of(new FieldChange(entry, fieldKey, oldValue.get(), appliedValue));
+        return List.of(new FieldChange(entry, fieldKey, expectedOldValue, appliedValue));
     }
 
     private List<FieldChange> cleanupAllFields(BibEntry entry, Consumer<Runnable> mutationScheduler) {
