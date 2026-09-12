@@ -24,6 +24,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -36,8 +37,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -273,6 +277,27 @@ class GroupNodeViewModelTest {
     }
 
     @Test
+    void hierarchicalCountEvaluatesEachGroupOncePerEntry() {
+        BibEntry entry = new BibEntry();
+        databaseContext.getDatabase().insertEntry(entry);
+        AbstractGroup parentGroup = mock(AbstractGroup.class);
+        when(parentGroup.getName()).thenReturn("Parent");
+        when(parentGroup.getHierarchicalContext()).thenReturn(GroupHierarchyType.INCLUDING);
+        AbstractGroup childGroup = mock(AbstractGroup.class);
+        when(childGroup.getName()).thenReturn("Child");
+        when(childGroup.getHierarchicalContext()).thenReturn(GroupHierarchyType.INDEPENDENT);
+
+        GroupTreeNode root = new GroupTreeNode(parentGroup);
+        root.addChild(new GroupTreeNode(childGroup));
+        GroupNodeViewModel vm = getViewModelForGroup(root);
+
+        vm.ensureMatchedEntriesLoaded();
+
+        verify(parentGroup, times(1)).contains(entry);
+        verify(childGroup, times(1)).contains(entry);
+    }
+
+    @Test
     void hitsIndependentAutomaticGroupIgnoresVmChildren() {
         databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.KEYWORDS, "A > B"));
         databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.KEYWORDS, "A > C"));
@@ -309,6 +334,28 @@ class GroupNodeViewModelTest {
         preferences.getGroupsPreferences().setDisplayGroupCount(true);
         vm.ensureMatchedEntriesLoaded();
         assertEquals(1, vm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void allEntriesCountUsesDatabaseEntryCountWithoutSchedulingFullLibraryMatching() {
+        TaskExecutor recordingTaskExecutor = mock(TaskExecutor.class);
+        GroupNodeViewModel allEntriesViewModel = new GroupNodeViewModel(
+                databaseContext,
+                stateManager,
+                recordingTaskExecutor,
+                new AllEntriesGroup("All entries"),
+                new CustomLocalDragboard(),
+                preferences);
+
+        databaseContext.getDatabase().insertEntries(List.of(new BibEntry(), new BibEntry()));
+        allEntriesViewModel.ensureMatchedEntriesLoaded();
+
+        assertEquals(2, allEntriesViewModel.getHits().getValue().intValue());
+        verify(recordingTaskExecutor, never()).schedule(any(BackgroundTask.class), anyLong(), any(TimeUnit.class));
+
+        databaseContext.getDatabase().insertEntry(new BibEntry());
+
+        assertEquals(3, allEntriesViewModel.getHits().getValue().intValue());
     }
 
     @Test

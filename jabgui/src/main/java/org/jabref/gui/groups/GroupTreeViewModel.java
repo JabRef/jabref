@@ -201,6 +201,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Gets invoked if the user changes the active database.
     /// We need to get the new group tree and update the view
     private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
+        disposeDisplayedGroups();
         currentDatabase = newDatabase;
         MetaData newMetaData = newDatabase.map(BibDatabaseContext::getMetaData).orElse(null);
         if (newMetaData != observedMetaData) {
@@ -231,6 +232,14 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 stateManager.getSelectedGroups(newDatabase.get()).stream()
                             .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
                             .toList());
+    }
+
+    private void disposeDisplayedGroups() {
+        GroupNodeViewModel root = rootGroup.get();
+        if (root != null) {
+            root.dispose();
+        }
+        selectedGroups.forEach(GroupNodeViewModel::dispose);
     }
 
     /// Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group

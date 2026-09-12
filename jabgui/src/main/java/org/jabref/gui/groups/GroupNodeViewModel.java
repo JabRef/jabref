@@ -98,11 +98,14 @@ public class GroupNodeViewModel {
     private final GuiPreferences preferences;
     @SuppressWarnings("FieldCanBeLocal")
     private final ObservableList<BibEntry> entriesList;
+    private final ListChangeListener<BibEntry> databaseChangeListener = this::onDatabaseChanged;
+    private final SearchIndexListener searchIndexListener = new SearchIndexListener();
     @SuppressWarnings("FieldCanBeLocal")
     private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
     private boolean matchedEntriesInitialized;
     private boolean matchedEntriesUpdateInProgress;
     private boolean matchedEntriesUpdatePending;
+    private boolean disposed;
 
     public GroupNodeViewModel(@NonNull BibDatabaseContext databaseContext,
                               @NonNull StateManager stateManager,
@@ -145,14 +148,14 @@ public class GroupNodeViewModel {
         // Register listener
         // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
         entriesList = databaseContext.getDatabase().getEntries();
-        entriesList.addListener(this::onDatabaseChanged);
+        entriesList.addListener(databaseChangeListener);
 
         EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
         anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
         // 'all' returns 'true' for empty streams, so this has to be checked explicitly
         allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
 
-        this.databaseContext.getDatabase().registerListener(new SearchIndexListener());
+        this.databaseContext.getDatabase().registerListener(searchIndexListener);
     }
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, GuiPreferences preferences) {
@@ -222,7 +225,7 @@ public class GroupNodeViewModel {
     void ensureMatchedEntriesLoaded() {
         // Also guard on "in progress": this method only needs the initial load, and cells re-render
         // frequently — queueing a pending re-run here would rescan the whole database once per burst.
-        if (!matchedEntriesInitialized && !matchedEntriesUpdateInProgress) {
+        if (!disposed && !matchedEntriesInitialized && !matchedEntriesUpdateInProgress) {
             updateMatchedEntries();
         }
     }
@@ -285,6 +288,17 @@ public class GroupNodeViewModel {
         return children;
     }
 
+    void dispose() {
+        if (disposed) {
+            return;
+        }
+
+        disposed = true;
+        entriesList.removeListener(databaseChangeListener);
+        databaseContext.getDatabase().unregisterListener(searchIndexListener);
+        children.forEach(GroupNodeViewModel::dispose);
+    }
+
     public GroupTreeNode getGroupNode() {
         return groupNode;
     }
@@ -293,6 +307,11 @@ public class GroupNodeViewModel {
     ///
     /// @implNote Search groups are updated in [SearchIndexListener].
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
+        if (isAllEntriesGroup()) {
+            updateMatchedEntries();
+            return;
+        }
+
         if (groupNode.getGroup() instanceof SearchGroup) {
             return;
         }
@@ -341,12 +360,21 @@ public class GroupNodeViewModel {
     }
 
     void updateMatchedEntries() {
+        if (disposed) {
+            return;
+        }
+
         // [impl->req~ux.active-library.preview-responsiveness~1]
         if (!preferences.getGroupsPreferences().shouldDisplayGroupCount()) {
             // A skipped recompute leaves the cache stale: force a reload when counts are re-enabled,
             // and clear now so rebinding never briefly shows the outdated number
             matchedEntriesInitialized = false;
             clearMatchedEntries();
+            return;
+        }
+
+        if (isAllEntriesGroup()) {
+            updateAllEntriesCount();
             return;
         }
 
@@ -361,6 +389,9 @@ public class GroupNodeViewModel {
                                            .filter(e -> isMatchEffective(this, e))
                                            .toList())
                 .onSuccess(entries -> {
+                    if (disposed) {
+                        return;
+                    }
                     replaceMatchedEntries(entries);
                     matchedEntriesInitialized = true;
                     completeMatchedEntriesUpdate();
@@ -400,11 +431,19 @@ public class GroupNodeViewModel {
 
     private void clearMatchedEntries() {
         synchronized (matchedEntriesLock) {
-            if (!matchedEntries.isEmpty()) {
+            if (!matchedEntries.isEmpty() || matchedEntriesCount.get() != 0) {
                 matchedEntries.clear();
                 matchedEntriesCount.set(0);
             }
         }
+    }
+
+    private void updateAllEntriesCount() {
+        synchronized (matchedEntriesLock) {
+            matchedEntries.clear();
+            matchedEntriesCount.set(databaseContext.getDatabase().getEntryCount());
+        }
+        matchedEntriesInitialized = true;
     }
 
     private void replaceMatchedEntries(List<BibEntry> entries) {
@@ -685,30 +724,22 @@ public class GroupNodeViewModel {
     /// REFINING: match this group and all ancestor groups.
     private boolean isMatchEffective(GroupNodeViewModel vm, BibEntry entry) {
         GroupTreeNode node = vm.groupNode;
+        if (!(node.getGroup() instanceof AutomaticGroup)) {
+            return node.matches(entry);
+        }
+
         return switch (node.getGroup().getHierarchicalContext()) {
-            case INDEPENDENT ->
+            case INDEPENDENT,
+                 REFINING ->
                     node.matches(entry);
 
             case INCLUDING -> {
                 if (node.matches(entry)) {
                     yield true;
                 }
-                // recursively check VM-children (including auto-groups)
+                // Automatic-group children are generated only in the view model and therefore
+                // are not reachable through GroupTreeNode.matches().
                 yield vm.children.stream().anyMatch(childVm -> isMatchEffective(childVm, entry));
-            }
-
-            case REFINING -> {
-                if (!node.matches(entry)) {
-                    yield false;
-                }
-                Optional<GroupTreeNode> parent = node.getParent();
-                while (parent.isPresent()) {
-                    if (!parent.get().matches(entry)) {
-                        yield false;
-                    }
-                    parent = parent.get().getParent();
-                }
-                yield true;
             }
         };
     }
