@@ -490,6 +490,7 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 - One logical change per commit
 - Clear, technical commit messages
+- Wrap annotations and other `@`-words in backticks in commit messages and PR texts (`` `@Nullable` ``); GitHub turns a plain `@Nullable` into a mention of that user
 - Do not reference issues in commits
 - Avoid force-pushes
 - No generated artifacts unless required
