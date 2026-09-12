@@ -1,5 +1,6 @@
 package org.jabref.gui.importer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,7 +13,6 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,15 +22,19 @@ public class ImportCustomEntryTypesDialogViewModel {
 
     private final BibDatabaseMode mode;
     private final CliPreferences preferences;
+    private final BibEntryTypesManager entryTypesManager;
 
     private final ObservableList<BibEntryType> newTypes = FXCollections.observableArrayList();
     private final ObservableList<BibEntryTypePrefsAndFileViewModel> differentCustomizationTypes = FXCollections.observableArrayList();
 
-    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode, List<BibEntryType> entryTypes, CliPreferences preferences) {
+    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode,
+                                                 List<BibEntryType> entryTypes,
+                                                 CliPreferences preferences,
+                                                 BibEntryTypesManager entryTypesManager) {
         this.mode = mode;
         this.preferences = preferences;
+        this.entryTypesManager = entryTypesManager;
 
-        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         for (BibEntryType customType : entryTypes) {
             Optional<BibEntryType> currentlyStoredType = entryTypesManager.enrich(customType.getType(), mode);
             if (currentlyStoredType.isEmpty()) {
@@ -53,15 +57,20 @@ public class ImportCustomEntryTypesDialogViewModel {
         return this.differentCustomizationTypes;
     }
 
+    /// Stores the entry types the user selected in the entry types manager and in the preferences.
+    ///
+    /// Both lists hold the definition **from the file**: for the different customizations, the stored
+    /// customization is overwritten - otherwise the dialog would be shown again at the next start.
+    /// See <https://github.com/JabRef/jabref/issues/9930>.
+    ///
+    /// [impl->req~import.entry-types.offered-once~1]
     public void importBibEntryTypes(List<BibEntryType> checkedUnknownEntryTypes, List<BibEntryType> checkedDifferentEntryTypes) {
-        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-        if (!checkedUnknownEntryTypes.isEmpty()) {
-            checkedUnknownEntryTypes.forEach(type -> entryTypesManager.addCustomOrModifiedType(type, mode));
-            preferences.storeCustomEntryTypesRepository(entryTypesManager);
+        List<BibEntryType> typesToImport = new ArrayList<>(checkedUnknownEntryTypes);
+        typesToImport.addAll(checkedDifferentEntryTypes);
+        if (typesToImport.isEmpty()) {
+            return;
         }
-        if (!checkedDifferentEntryTypes.isEmpty()) {
-            checkedUnknownEntryTypes.forEach(type -> entryTypesManager.addCustomOrModifiedType(type, mode));
-            preferences.storeCustomEntryTypesRepository(entryTypesManager);
-        }
+        typesToImport.forEach(type -> entryTypesManager.addCustomOrModifiedType(type, mode));
+        preferences.storeCustomEntryTypesRepository(entryTypesManager);
     }
 }
