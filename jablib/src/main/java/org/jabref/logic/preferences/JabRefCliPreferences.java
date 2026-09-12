@@ -3,18 +3,14 @@ package org.jabref.logic.preferences;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1148,6 +1144,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
         LOGGER.debug("Importing preferences {}", path.toAbsolutePath());
+        try {
+            // Importing merges into the current preferences; declined decisions must come from the imported file only
+            PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
+        } catch (BackingStoreException e) {
+            LOGGER.info("Clearing declined custom entry types failed.", e);
+        }
         try (InputStream is = Files.newInputStream(path)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
@@ -1334,29 +1336,22 @@ public class JabRefCliPreferences implements CliPreferences {
 
     @Override
     public Set<String> getDeclinedCustomEntryTypes() {
-        Preferences node = PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES);
         try {
-            return Arrays.stream(node.keys())
-                         .map(key -> node.get(key, null))
-                         .filter(Objects::nonNull)
-                         .collect(Collectors.toSet());
+            return Set.of(PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).keys());
         } catch (BackingStoreException e) {
             LOGGER.info("Reading declined custom entry types failed.", e);
             return Set.of();
         }
     }
 
-    /// Stores each decision under its hash: a preference key is limited to 80 characters, an entry type definition is not.
+    /// Stores each fingerprint as a key without a value: a key is limited to 80 characters, a value to 8192.
     @Override
     public void addDeclinedCustomEntryTypes(Collection<String> declinedEntryTypes) {
         Preferences node = PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES);
+        declinedEntryTypes.forEach(declined -> node.put(declined, ""));
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            declinedEntryTypes.forEach(declined -> node.put(
-                    HexFormat.of().formatHex(digest.digest(declined.getBytes(StandardCharsets.UTF_8))),
-                    declined));
             node.flush();
-        } catch (NoSuchAlgorithmException | BackingStoreException e) {
+        } catch (BackingStoreException e) {
             LOGGER.info("Storing declined custom entry types failed.", e);
         }
     }

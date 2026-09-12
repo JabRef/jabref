@@ -1,5 +1,6 @@
 package org.jabref.gui.importer;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +16,10 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
+import com.google.common.hash.Hashing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,9 +68,18 @@ public class ImportCustomEntryTypesDialogViewModel {
 
     /// Identifies what the user is asked: storing the definition from the file, replacing the one stored at that time.
     /// A declined decision is not offered again - unless the definition in the file or the stored one changes.
+    ///
+    /// Returns a fixed-length fingerprint, because a definition can be longer than a preference value may be.
     public static String decision(BibEntryType typeFromFile, Optional<BibEntryType> storedType, BibDatabaseMode mode) {
-        return mode.getAsString() + ": " + MetaDataSerializer.serializeCustomEntryTypesV2(typeFromFile)
-                + storedType.map(stored -> " replacing " + MetaDataSerializer.serializeCustomEntryTypesV2(stored)).orElse("");
+        String decision = mode.getAsString() + ": " + signature(typeFromFile)
+                + storedType.map(stored -> " replacing " + signature(stored)).orElse("");
+        return Hashing.sha256().hashString(decision, StandardCharsets.UTF_8).toString();
+    }
+
+    /// Everything [EntryTypeFactory#nameAndFieldsAreEqual(BibEntryType, BibEntryType)] compares, including which optional fields are detail fields
+    private static String signature(BibEntryType entryType) {
+        return MetaDataSerializer.serializeCustomEntryTypesV2(entryType)
+                + " detail[" + FieldFactory.serializeFieldsListV2(entryType.getDetailOptionalFields()) + "]";
     }
 
     public ObservableList<BibEntryType> newTypes() {

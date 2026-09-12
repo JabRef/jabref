@@ -4,12 +4,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.BiblatexNonStandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
@@ -178,5 +182,36 @@ class ImportCustomEntryTypesDialogViewModelTest {
         assertEquals(List.of(AUDIO_FROM_FILE), viewModel.differentCustomizations().stream()
                                                         .map(BibEntryTypePrefsAndFileViewModel::customTypeFromFile)
                                                         .toList());
+    }
+
+    @Test
+    void declinedTypeIsOfferedAgainWhenOnlyStoredFieldPrioritiesChange() {
+        entryTypesManager.addCustomOrModifiedType(new BibEntryTypeBuilder()
+                .withType(BiblatexNonStandardEntryType.Audio)
+                .withRequiredFields(StandardField.AUTHOR)
+                .withImportantFields(StandardField.URL)
+                .withDetailFields(StandardField.URLDATE)
+                .build(), MODE);
+        viewModelFor(List.of(AUDIO_FROM_FILE)).importBibEntryTypes(List.of(), List.of());
+        entryTypesManager.addCustomOrModifiedType(new BibEntryTypeBuilder()
+                .withType(BiblatexNonStandardEntryType.Audio)
+                .withRequiredFields(StandardField.AUTHOR)
+                .withImportantFields(StandardField.URL, StandardField.URLDATE)
+                .build(), MODE);
+
+        ImportCustomEntryTypesDialogViewModel viewModel = viewModelFor(List.of(AUDIO_FROM_FILE));
+
+        assertEquals(List.of(AUDIO_FROM_FILE), viewModel.differentCustomizations().stream()
+                                                        .map(BibEntryTypePrefsAndFileViewModel::customTypeFromFile)
+                                                        .toList());
+    }
+
+    /// A preference key holds at most 80 characters, a value at most 8192 - a definition can be longer than both
+    @Test
+    void decisionOfALongDefinitionFitsIntoAPreferenceKey() {
+        String manyFields = IntStream.range(0, 2000).mapToObj(i -> "field" + i).collect(Collectors.joining(";"));
+        BibEntryType longType = parse("jabref-entrytype: longtype: req[title] opt[" + manyFields + "]");
+
+        assertEquals(64, ImportCustomEntryTypesDialogViewModel.decision(longType, Optional.of(longType), MODE).length());
     }
 }
