@@ -305,11 +305,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     public void updateHorizontalDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
             horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
-            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
-                                                    .mapObservable(SplitPane.Divider::positionProperty)
-                                                    .listenToValues((_, newValue) ->
-                                                            preferences.getGuiPreferences()
-                                                                       .setHorizontalDividerPosition(newValue.doubleValue()));
+            // sidePane is not resizable with its parent (see the setResizableWithParent call above), so its width
+            // stays fixed while the divider's fractional position drifts with every layout pass. Track sidePane's
+            // own width instead of the divider position to avoid that drift accumulating on repeated show/hide.
+            horizontalDividerSubscription = EasyBind.listen(sidePane.widthProperty(), (_, _, newValue) ->
+                    preferences.getGuiPreferences()
+                               .setHorizontalDividerPosition(newValue.doubleValue() / horizontalSplit.getWidth()));
         }
     }
 
