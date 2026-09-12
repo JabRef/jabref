@@ -223,22 +223,74 @@ public class BibtexParser implements Parser {
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
+    // [impl->req~import.bibtex.percent-comments~1]
     private void parseDatabaseID() throws IOException {
+        boolean escaped = false;
+
         while (!eof) {
-            skipWhitespace();
+            if (!escaped) {
+                skipWhitespace();
+            }
+
             char c = (char) read();
 
             if (c == '%') {
-                skipWhitespace();
+                skipWhitespaceOnLine();
                 String label = parseTextToken().trim();
 
                 if (BibDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {
-                    skipWhitespace();
+                    skipWhitespaceOnLine();
                     database.setSharedDatabaseID(parseTextToken().trim());
+                    skipUntilEndOfLine();
+                } else if (SaveConfiguration.ENCODING_PREFIX.trim().equals(label)) {
+                    skipWhitespaceOnLine();
+                    parseTextToken();
+
+                    if (peek() != '@') {
+                        skipUntilEndOfLine();
+                    }
+                } else if (!escaped) {
+                    skipUntilEndOfLine();
                 }
             } else if (c == '@') {
                 unread(c);
                 break;
+            }
+
+            if (c == '\\') {
+                escaped = !escaped;
+            } else {
+                escaped = false;
+            }
+        }
+    }
+
+    private void skipWhitespaceOnLine() throws IOException {
+        while (!eof) {
+            int character = read();
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return;
+            }
+
+            if (!Character.isWhitespace((char) character) || (character == '\n') || (character == '\r')) {
+                unread(character);
+                return;
+            }
+        }
+    }
+
+    private void skipUntilEndOfLine() throws IOException {
+        while (!eof) {
+            int character = read();
+
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return;
+            }
+
+            if ((character == '\n') || (character == '\r')) {
+                return;
             }
         }
     }
@@ -1240,20 +1292,36 @@ public class BibtexParser implements Parser {
         }
     }
 
+    // [impl->req~import.bibtex.percent-comments~1]
     private boolean consumeUncritically(char expected) throws IOException {
-        int character;
-        // @formatter:off
-        do {
-            // @formatter:on
-            character = read();
-        } while ((character != expected) && (character != -1) && (character != 65535));
+        boolean escaped = false;
 
-        if (isEOFCharacter(character)) {
-            eof = true;
+        while (!eof) {
+            int character = read();
+
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return false;
+            }
+
+            if (character == expected) {
+                return true;
+            }
+
+            if ((character == '%') && !escaped) {
+                skipUntilEndOfLine();
+                escaped = false;
+                continue;
+            }
+
+            if (character == '\\') {
+                escaped = !escaped;
+            } else {
+                escaped = false;
+            }
         }
 
-        // Return true if we actually found the character we were looking for:
-        return character == expected;
+        return false;
     }
 
     private void consume(char firstOption, char secondOption) throws IOException {
