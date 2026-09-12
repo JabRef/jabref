@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences;
 
 import java.util.List;
+import java.util.Set;
 
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 
@@ -46,5 +47,17 @@ class JabRefGuiPreferencesTest {
 
         // The stored-order entry consumes the first duplicate; the second survives at the end.
         assertEquals(List.of(PREVIEW, first, MAIN, second), ordered);
+    }
+
+    // [utest->req~entry-editor.custom-tabs.extract-field~1]
+    @Test
+    void parseCustomTabsReadsPlainStringsAndExtractObjects() {
+        assertEquals(
+                List.of(new EntryEditorTabModel.CustomizedFieldsTab(
+                        "My tab", List.of("author", "doi"), Set.of("doi"))),
+                JabRefGuiPreferences.parseCustomTabs(
+                        """
+                                {"My tab":["author",{"pattern":"doi","extract":true}]}
+                                """));
     }
 }
