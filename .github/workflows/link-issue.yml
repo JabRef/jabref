@@ -50,7 +50,7 @@ jobs:
           bodyRegexFlags: 'i'
           outputOnly: true
       - run: echo "${{ steps.get_issue_number.outputs.ticketNumber }}"
-      - name: Allow missing issue link for maintainers using `Closes NA`
+      - name: Allow missing issue link for maintainers using `Closes NA` or `Closes N/A`
         id: allow_missing_issue_link
         env:
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
@@ -66,7 +66,7 @@ jobs:
             exit 0
           fi
 
-          if printf '%s\n' "$PR_BODY" | grep -Eiq '^[[:space:]]*closes[[:space:]]+na[[:space:]]*$'; then
+          if printf '%s\n' "$PR_BODY" | grep -Eiq '^[[:space:]]*closes[[:space:]]+n/?a[[:space:]]*$'; then
             case "$PR_AUTHOR_ASSOCIATION" in
               OWNER|MEMBER|COLLABORATOR)
                 echo "Maintainer '$PR_AUTHOR' used 'Closes NA'; allowing missing issue link."
