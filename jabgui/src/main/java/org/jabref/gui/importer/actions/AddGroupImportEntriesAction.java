@@ -1,8 +1,6 @@
 package org.jabref.gui.importer.actions;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.groups.GroupsFactory;
-import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
@@ -11,11 +9,17 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 
-public class AddGroupImportEntriesAction implements GUIPostOpenAction {
+/// Creates the group that imported entries are collected in, at position 0 under the root.
+///
+/// This runs when entries are imported, not when a library is opened: a library the user only
+/// looked at is not written to, and the write that does happen belongs to an import the user
+/// asked for.
+public class AddGroupImportEntriesAction {
 
-    public void addImportedEntriesGroupIfNeeded(BibDatabaseContext databaseContext, CliPreferences preferences) {
+    /// @return whether the group was added
+    public boolean addImportedEntriesGroupIfNeeded(BibDatabaseContext databaseContext, CliPreferences preferences) {
         if (!preferences.getLibraryPreferences().shouldAddImportedEntries()) {
-            return;
+            return false;
         }
 
         String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
@@ -27,7 +31,7 @@ public class AddGroupImportEntriesAction implements GUIPostOpenAction {
                                        .orElse(true);
 
         if (!groupMissing) {
-            return;
+            return false;
         }
 
         char keywordSeparator = metaData.getKeywordSeparator().orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
@@ -40,17 +44,9 @@ public class AddGroupImportEntriesAction implements GUIPostOpenAction {
         AbstractGroup importEntriesGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, keywordSeparator);
         GroupTreeNode newSubgroup = root.addSubgroup(importEntriesGroup);
         newSubgroup.moveTo(root, 0);
-    }
-
-    @Override
-    public boolean isActionNecessary(ParserResult pr, DialogService dialogService, CliPreferences preferences) {
-        return preferences.getLibraryPreferences().shouldAddImportedEntries();
-    }
-
-    /// Creates the "Imported entries" group at position 0 under the root.
-    /// Selection is omitted to prevent focus theft when switching tabs.
-    @Override
-    public void performAction(ParserResult pr, DialogService dialogService, CliPreferences preferences) {
-        addImportedEntriesGroupIfNeeded(pr.getDatabaseContext(), preferences);
+        // The tree was edited in place, so the root is written back to report the write: that is
+        // what marks the library and what the group panel refreshes on.
+        metaData.setGroups(root);
+        return true;
     }
 }

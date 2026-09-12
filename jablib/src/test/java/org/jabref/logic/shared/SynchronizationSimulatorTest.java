@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.util.VirtualThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -19,6 +20,11 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
@@ -75,12 +81,12 @@ class SynchronizationSimulatorTest {
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
 
         clientContextA = new BibDatabaseContext();
-        DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost");
+        DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", new VirtualThreadTaskExecutor());
         clientContextA.convertToSharedDatabase(synchronizerA);
         clientContextA.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
 
         clientContextB = new BibDatabaseContext();
-        DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost");
+        DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost", new VirtualThreadTaskExecutor());
         clientContextB.convertToSharedDatabase(synchronizerB);
         // use a second connection, because this is another client (typically on another machine)
         clientContextB.getDBMSSynchronizer().openSharedDatabase(connectorTest.getTestDBMSConnection());
@@ -124,6 +130,74 @@ class SynchronizationSimulatorTest {
         Optional<BibDatabaseMode> expected = Optional.of(BibDatabaseMode.BIBLATEX);
         waitUntil(() -> expected.equals(clientContextB.getMetaData().getMode()));
         assertEquals(expected, clientContextB.getMetaData().getMode());
+    }
+
+    /// [Issue 9452](https://github.com/JabRef/jabref/issues/9452): groups created by one client have to
+    /// show up at the other client without reconnecting
+    // [utest->req~shared-database.live-propagation~1]
+    @Test
+    void simulateLiveGroupCreationPropagation() throws Exception {
+        // client A creates the group tree; the group panel writes it back via MetaData.setGroups
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+    }
+
+    // [utest->req~shared-database.live-propagation~1]
+    @Test
+    void simulateLiveSubgroupAdditionPropagation() throws Exception {
+        // A root without children is not serialized at all, so the initial tree needs one group
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+
+        // client A adds a subgroup to the existing tree; the group panel writes the (same) root back
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group B", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().map(root -> root.getNumberOfChildren() == 2).orElse(false));
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+    }
+
+    // [utest->req~shared-database.live-propagation~1]
+    @Test
+    void simulateLiveGroupEditPropagation() throws Exception {
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        GroupTreeNode groupNodeOfClientA = rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+
+        // client A edits name, icon, color and hierarchy of the group; the edit dialog replaces the
+        // node's group and the group panel writes the (same) root back
+        ExplicitGroup editedGroup = new ExplicitGroup("Renamed group", GroupHierarchyType.INCLUDING, ',');
+        editedGroup.setIconName("star");
+        editedGroup.setColor("#ff0000");
+        groupNodeOfClientA.setGroup(editedGroup);
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> Optional.of(editedGroup).equals(groupOfClientB()));
+        assertEquals(Optional.of(editedGroup), groupOfClientB());
+
+        // client A changes the group type
+        WordKeywordGroup keywordGroup = new WordKeywordGroup("Keyword group", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "fpga", false, ',', false);
+        groupNodeOfClientA.setGroup(keywordGroup);
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> Optional.of(keywordGroup).equals(groupOfClientB()));
+        assertEquals(Optional.of(keywordGroup), groupOfClientB());
+    }
+
+    /// The group of the first (and only) child of client B's group tree
+    private Optional<AbstractGroup> groupOfClientB() {
+        return clientContextB.getMetaData().getGroups()
+                             .filter(root -> root.getNumberOfChildren() == 1)
+                             .map(root -> root.getChildAt(0).orElseThrow().getGroup());
     }
 
     @Test
@@ -307,5 +381,77 @@ class SynchronizationSimulatorTest {
         assertNotNull(eventListenerB.getUpdateRefusedEvent());
         assertEquals(Optional.of("2030"), bibEntryOfClientB.getField(StandardField.YEAR));
         assertEquals(Optional.of("2001"), eventListenerB.getUpdateRefusedEvent().sharedBibEntry().getField(StandardField.YEAR));
+    }
+
+    /// Types the text into the field character by character, as a user does: every keystroke is
+    /// a one-character change, which [org.jabref.logic.util.CoarseChangeFilter] marks as filtered
+    private static void typeInto(BibEntry bibEntry, StandardField field, String text) {
+        StringBuilder typed = new StringBuilder();
+        for (char character : text.toCharArray()) {
+            typed.append(character);
+            bibEntry.setField(field, typed.toString());
+        }
+    }
+
+    /// https://github.com/JabRef/jabref/issues/9738: text typed character by character arrived truncated on the shared side
+    @Test
+    void simulateTypedTextReachesSharedSideCompletely() throws Exception {
+        BibEntry bibEntryOfClientA = getBibEntryExample(1);
+        clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
+        clientContextB.getDBMSSynchronizer().pullChanges();
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
+
+        String comment = "je ne sais pas quoi en dire en ce moment";
+        typeInto(bibEntryOfClientA, StandardField.COMMENT, comment);
+        // Nothing is written while typing; the user then moves on to another field
+        bibEntryOfClientA.setField(StandardField.TITLE, "my very short title");
+
+        Optional<String> expectedComment = Optional.of(comment);
+        waitUntil(() -> expectedComment.equals(bibEntryOfClientB.getField(StandardField.COMMENT)));
+        assertEquals(expectedComment, bibEntryOfClientB.getField(StandardField.COMMENT));
+        assertEquals(Optional.of("my very short title"), bibEntryOfClientB.getField(StandardField.TITLE));
+        assertEquals(bibEntryOfClientA.getSharedBibEntryData().getVersion(), bibEntryOfClientB.getSharedBibEntryData().getVersion());
+
+        // Typing is the last thing the user does before closing JabRef
+        typeInto(bibEntryOfClientA, StandardField.ABSTRACT, "my comment on this issue");
+        clientContextA.getDBMSSynchronizer().closeSharedDatabase();
+
+        DBMSProcessor reader = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        BibEntry sharedEntry = reader.getSharedEntry(bibEntryOfClientA.getSharedBibEntryData().getSharedIdAsInt()).orElseThrow();
+        assertEquals(expectedComment, sharedEntry.getField(StandardField.COMMENT));
+        assertEquals(Optional.of("my comment on this issue"), sharedEntry.getField(StandardField.ABSTRACT));
+        assertEquals(bibEntryOfClientA.getSharedBibEntryData().getVersion(), sharedEntry.getSharedBibEntryData().getVersion());
+    }
+
+    /// https://github.com/JabRef/jabref/issues/9738: two users typing into the same field must end with one complete text on the
+    /// shared side and a conflict for the other user - not with a mix of both or a truncation
+    @Test
+    void simulateConcurrentTypingIntoSameField() throws Exception {
+        // Inserted without a notification, so that no pull triggered by it flushes B's buffered typing early
+        DBMSProcessor otherClient = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        otherClient.insertEntry(getBibEntryExample(1));
+        clientContextA.getDBMSSynchronizer().pullChanges();
+        clientContextB.getDBMSSynchronizer().pullChanges();
+        BibEntry bibEntryOfClientA = clientContextA.getDatabase().getEntries().getFirst();
+        BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().getFirst();
+
+        typeInto(bibEntryOfClientA, StandardField.COMMENT, "comment of asterix");
+        typeInto(bibEntryOfClientB, StandardField.COMMENT, "comment of obelix");
+
+        // A leaves the field first: A's text is written; B's typing is still buffered
+        bibEntryOfClientA.setField(StandardField.TITLE, "title of asterix");
+        Optional<String> expectedTitle = Optional.of("title of asterix");
+        waitUntil(() -> eventListenerB.getUpdateRefusedEvent() != null);
+
+        // A's write asked B to pull; the pull flushes B's buffered typing first, which is refused
+        assertNotNull(eventListenerB.getUpdateRefusedEvent());
+        assertEquals(Optional.of("comment of asterix"), eventListenerB.getUpdateRefusedEvent().sharedBibEntry().getField(StandardField.COMMENT));
+        assertEquals(expectedTitle, eventListenerB.getUpdateRefusedEvent().sharedBibEntry().getField(StandardField.TITLE));
+        // B keeps the local text for the merge dialog; the shared side is untouched by B
+        assertEquals(Optional.of("comment of obelix"), bibEntryOfClientB.getField(StandardField.COMMENT));
+        DBMSProcessor reader = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        BibEntry sharedEntry = reader.getSharedEntry(bibEntryOfClientA.getSharedBibEntryData().getSharedIdAsInt()).orElseThrow();
+        assertEquals(Optional.of("comment of asterix"), sharedEntry.getField(StandardField.COMMENT));
+        assertEquals(expectedTitle, sharedEntry.getField(StandardField.TITLE));
     }
 }

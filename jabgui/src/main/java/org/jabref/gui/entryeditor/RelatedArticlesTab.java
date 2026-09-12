@@ -72,6 +72,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private StackPane getRelatedArticlesPane(BibEntry entry) {
         StackPane root = new StackPane();
         root.setId("related-articles-tab");
+        root.getStyleClass().add("related-articles-tab");
         root.getStyleClass().add("padding-4");
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
@@ -130,13 +131,12 @@ public class RelatedArticlesTab extends EntryEditorTab {
             String title = entry.getTitle().orElse("");
             String journal = entry.getField(StandardField.JOURNAL).orElse("");
             String authors = entry.getField(StandardField.AUTHOR).orElse("");
-            String year = entry.getField(StandardField.YEAR).orElse("");
 
             Hyperlink titleLink = new Hyperlink(title);
             Text journalText = new Text(journal);
             journalText.setFont(Font.font(Font.getDefault().getFamily(), FontPosture.ITALIC, Font.getDefault().getSize()));
             Text authorsText = new Text(authors);
-            Text yearText = new Text("(" + year + ")");
+
             titleLink.setOnAction(event -> {
                 if (entry.getField(StandardField.URL).isPresent()) {
                     try {
@@ -148,7 +148,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 }
             });
 
-            hBox.getChildren().addAll(titleLink, journalText, authorsText, yearText);
+            hBox.getChildren().addAll(titleLink, journalText, authorsText);
+            entry.getFieldOrAlias(StandardField.YEAR)
+                 .filter(year -> !year.isBlank())
+                 .ifPresent(year -> hBox.getChildren().add(new Text("(" + year + ")")));
+
             vBox.getChildren().add(hBox);
         }
         scrollPane.setContent(vBox);
@@ -177,7 +181,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
     /// @return StackPane returned to be placed into Related Articles tab.
     private ScrollPane getPrivacyDialog(BibEntry entry) {
         ScrollPane root = new ScrollPane();
-        root.setId("related-articles-tab");
+        root.setId("related-articles-privacy-notice");
+        root.getStyleClass().add("related-articles-tab");
         root.getStyleClass().add("padding-4");
         VBox vbox = new VBox(4);
         vbox.getStyleClass().addAll("gdpr-notice", "h4", "padding-4");

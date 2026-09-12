@@ -46,7 +46,7 @@ public class RemoteListenerServer implements Runnable {
                 try (Socket socket = serverSocket.accept()) {
                     socket.setSoTimeout(TIMEOUT);
                     handleConnection(socket);
-                } catch (SocketException ex) {
+                } catch (SocketException _) {
                     return;
                 } catch (IOException e) {
                     LOGGER.warn("RemoteListenerServer crashed", e);

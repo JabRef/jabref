@@ -52,7 +52,7 @@ public class UTF8Checker implements EntryChecker {
         CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
         try {
             decoder.decode(ByteBuffer.wrap(data));
-        } catch (CharacterCodingException ex) {
+        } catch (CharacterCodingException _) {
             return false;
         }
         return true;

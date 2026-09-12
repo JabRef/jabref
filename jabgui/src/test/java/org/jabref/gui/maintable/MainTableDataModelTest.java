@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
@@ -23,6 +24,7 @@ import javafx.collections.transformation.SortedList;
 
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.search.SearchPreferences;
@@ -46,8 +48,6 @@ import org.jabref.model.search.query.SearchResults;
 import com.tobiasdiez.easybind.EasyBind;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.util.WaitForAsyncUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -56,7 +56,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class MainTableDataModelTest {
 
     @Test
@@ -334,10 +334,55 @@ class MainTableDataModelTest {
     }
 
     @Test
+    void latestGroupSelectionWinsWhenGroupMatchTasksCompleteOutOfOrder() throws Exception {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        BibEntry bibEntryA = new BibEntry().withCitationKey("A").withField(StandardField.AUTHOR, "Alice");
+        BibEntry bibEntryB = new BibEntry().withCitationKey("B").withField(StandardField.AUTHOR, "Bob");
+        bibDatabaseContext.getDatabase().insertEntries(List.of(bibEntryA, bibEntryB));
+
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
+        when(preferences.getSearchPreferences()).thenReturn(
+                new SearchPreferences(SearchDisplayMode.FILTER, false, false, false, false, false, false, 0, 0, 0));
+        when(preferences.getNameDisplayPreferences()).thenReturn(NameDisplayPreferences.getDefault());
+
+        List<BackgroundTask<?>> groupMatchTasks = new ArrayList<>();
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+        when(taskExecutor.execute(any())).thenAnswer(invocation -> {
+            groupMatchTasks.add(invocation.getArgument(0));
+            return CompletableFuture.completedFuture(null);
+        });
+
+        SimpleListProperty<GroupTreeNode> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
+        MainTableDataModel model = new MainTableDataModel(
+                bibDatabaseContext,
+                preferences,
+                taskExecutor,
+                null,
+                selectedGroups,
+                OptionalObjectProperty.empty(),
+                new SimpleIntegerProperty());
+
+        BibEntryTableViewModel vmA = model.getViewModelByCitationKey("A").orElseThrow();
+        BibEntryTableViewModel vmB = model.getViewModelByCitationKey("B").orElseThrow();
+
+        selectedGroups.set(FXCollections.observableArrayList(getKeywordGroup(StandardField.AUTHOR, "Alice")));
+        selectedGroups.set(FXCollections.observableArrayList(getKeywordGroup(StandardField.AUTHOR, "Bob")));
+
+        assertEquals(2, groupMatchTasks.size());
+
+        executeTask(groupMatchTasks.getLast());
+        executeTask(groupMatchTasks.getFirst());
+
+        assertFalse(vmA.isMatchedByGroup().get());
+        assertTrue(vmB.isMatchedByGroup().get());
+    }
+
+    @Test
     void deletingEntryKeepsSelectedGroupFilter() {
         List<BibEntry> visibleEntries = new ArrayList<>();
 
-        WaitForAsyncUtils.asyncFx(() -> {
+        Platform.runLater(() -> {
             BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
 
             BibEntry matchingEntry = new BibEntry()
@@ -371,7 +416,7 @@ class MainTableDataModelTest {
                                        .map(BibEntryTableViewModel::getEntry)
                                        .toList());
         });
-        WaitForAsyncUtils.waitForFxEvents();
+        JavaFxExtension.awaitEvents();
 
         assertEquals(List.of(), visibleEntries);
     }
