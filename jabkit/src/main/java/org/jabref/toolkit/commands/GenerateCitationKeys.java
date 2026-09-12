@@ -81,7 +81,7 @@ class GenerateCitationKeys implements Callable<Integer> {
 
     @Override
     public Integer call() throws ImportServiceException, ExportServiceException {
-        Path inputFile = inputOption.getInputFile();
+        Path inputFile = inputOption.getInputFile(parentCommand.getParent().cliPreferences);
         ParserResult parserResult = ImportService.importBibTexFile(
                 inputFile,
                 parentCommand.getParent().cliPreferences,

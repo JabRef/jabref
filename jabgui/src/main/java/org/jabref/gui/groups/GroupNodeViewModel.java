@@ -167,13 +167,13 @@ public class GroupNodeViewModel {
         return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child, localDragBoard, preferences);
     }
 
+    /// @return what the assignment changed, for the caller to record — this does not touch the
+    ///         journal itself, because whether the assignment is a step of its own or part of a
+    ///         larger one is the caller's to know
+    ///
+    /// TODO: warn before assigning to a group whose membership is written to a field other than
+    ///  `keywords`, since that edits the entries in a way the user may not expect.
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
-        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
-        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
-        // {
-        //    return; // user aborted operation
-        // }
-
         List<FieldChange> changes = groupNode.addEntriesToGroup(entries);
 
         // Update appearance of group
@@ -181,9 +181,6 @@ public class GroupNodeViewModel {
         allSelectedEntriesMatched.invalidate();
 
         return changes;
-        // TODO: Store undo
-        // if (!undo.isEmpty()) {
-        // groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo), target.getNode(), assignedEntries);
     }
 
     public SimpleBooleanProperty expandedProperty() {
@@ -457,15 +454,10 @@ public class GroupNodeViewModel {
         return canDropOtherGroup || canDropEntries || canDropFiles;
     }
 
+    /// Moves this group, without recording: a drag can move several groups at once, so the step is
+    /// opened by whoever handles the gesture — see [GroupTreeViewModel#recordTreeChange].
     public void moveTo(GroupNodeViewModel target) {
-        // TODO: Add undo and display message
-        // MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
-        //        source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
-
         getGroupNode().moveTo(target.getGroupNode());
-        // panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange).toChangeSet());
-        // panel.markBaseChanged();
-        // frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
     }
 
     public void moveTo(GroupTreeNode target, int targetIndex) {
@@ -537,37 +529,33 @@ public class GroupNodeViewModel {
 
     public boolean canAddEntriesIn() {
         AbstractGroup group = groupNode.getGroup();
-        if (group instanceof AllEntriesGroup) {
-            return false;
-        } else if (group instanceof ExplicitGroup) {
-            return true;
-        } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
-            return groupNode.getParent()
-                            .map(GroupTreeNode::getGroup)
-                            .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
-                            .orElse(false);
-        } else if (group instanceof KeywordGroup) {
-            // also covers WordKeywordGroup
-            return true;
-        } else if (group instanceof SearchGroup) {
-            return false;
-        } else if (group instanceof AutomaticKeywordGroup) {
-            return false;
-        } else if (group instanceof AutomaticPersonsGroup) {
-            return false;
-        } else if (group instanceof TexGroup) {
-            return false;
-        } else if (group instanceof AutomaticDateGroup) {
-            return false;
-        } else if (group instanceof DateGroup) {
-            return false;
-        } else if (group instanceof AutomaticEntryTypeGroup) {
-            return false;
-        } else if (group instanceof EntryTypeGroup) {
-            return false;
-        } else {
-            throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
-        }
+        return switch (group) {
+            case AllEntriesGroup _,
+                 SearchGroup _,
+                 AutomaticKeywordGroup _,
+                 AutomaticPersonsGroup _,
+                 AutomaticDateGroup _,
+                 DateGroup _,
+                 AutomaticEntryTypeGroup _,
+                 EntryTypeGroup _,
+                 TexGroup _ ->
+                    false;
+            case ExplicitGroup _ ->
+                    true;
+            case LastNameGroup _,
+                 RegexKeywordGroup _ ->
+                    groupNode.getParent()
+                             .map(GroupTreeNode::getGroup)
+                             .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
+                             .orElse(false);
+            case KeywordGroup _ ->
+                // also covers WordKeywordGroup
+                    true;
+            case null ->
+                    throw new IllegalArgumentException("Group cannot be null");
+            default ->
+                    throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
+        };
     }
 
     public boolean canBeDragged() {

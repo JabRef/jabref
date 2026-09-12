@@ -165,7 +165,7 @@ public class FileFieldParser {
         if (LinkedFile.isOnlineLink(entry.get(1))) {
             try {
                 field = new LinkedFile(entry.getFirst(), URLUtil.create(entry.get(1)), entry.get(2));
-            } catch (MalformedURLException e) {
+            } catch (MalformedURLException _) {
                 // in case the URL is malformed, store it nevertheless
                 field = new LinkedFile(entry.getFirst(), entry.get(1), entry.get(2));
             }

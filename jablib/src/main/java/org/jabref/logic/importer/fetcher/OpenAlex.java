@@ -133,7 +133,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
             String id = segments[segments.length - 1];
 
             return id.isBlank() ? Optional.empty() : Optional.of(id);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException _) {
             return Optional.empty();
         }
     }
@@ -163,7 +163,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
                         .or(() -> entry.getField(StandardField.URL)
                                        .flatMap(this::extractOpenAlexId)
                                        .map(Unchecked.function(id -> getUrl("/" + id, fieldsToSelect))));
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException _) {
             LOGGER.debug("Invalid OpenAlex URL");
             return Optional.empty();
         }

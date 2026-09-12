@@ -15,6 +15,7 @@ module org.jabref.jabkit {
 
     requires org.jspecify;
     requires java.prefs;
+    requires java.sql;
 
     requires javafx.base;
     requires afterburner.fx;
