@@ -75,8 +75,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
-    private final BibEntryTypesManager entryTypesManager;
-    private final FieldPreferences fieldPreferences;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
@@ -106,9 +104,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                               @NonNull TaskExecutor taskExecutor
     ) {
         this.stateManager = stateManager;
-        this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.fieldPreferences = preferences.getFieldPreferences();
         this.dialogService = dialogService;
         this.aiService = aiService;
         this.localDragboard = localDragboard;
@@ -359,8 +355,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
             selectedGroups.setAll(newSuggestedSubgroups
                     .stream()
                     .map(newSubGroup -> rootGroup.get() != null
-                            ? rootGroup.get().findGroupNodeViewModel(newSubGroup).orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
-                            : new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                                        ? rootGroup.get().findGroupNodeViewModel(newSubGroup).orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                                        : new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
                     .toList());
 
             writeGroupChangesToMetaData();

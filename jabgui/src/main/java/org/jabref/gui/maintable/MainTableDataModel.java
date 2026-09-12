@@ -285,9 +285,9 @@ public class MainTableDataModel {
         public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
             long updateSequence = searchUpdateSequence.get();
             Optional<SearchQuery> query = searchQueryProperty.get()
-                                                              .map(searchQuery -> new SearchQuery(
-                                                                      searchQuery.getSearchExpression(),
-                                                                      EnumSet.copyOf(searchQuery.getSearchFlags())));
+                                                             .map(searchQuery -> new SearchQuery(
+                                                                     searchQuery.getSearchExpression(),
+                                                                     EnumSet.copyOf(searchQuery.getSearchFlags())));
             indexAddedOrUpdatedEvent.entries().forEach(entry -> BackgroundTask
                     .wrap(() -> calculateIndexedEntrySearchMatch(entry, query, updateSequence))
                     .onSuccess(MainTableDataModel.this::applyIndexedEntrySearchMatch)
@@ -301,8 +301,8 @@ public class MainTableDataModel {
     }
 
     private IndexedEntrySearchMatch calculateIndexedEntrySearchMatch(BibEntry entry,
-                                                                      Optional<SearchQuery> query,
-                                                                      long updateSequence) {
+                                                                     Optional<SearchQuery> query,
+                                                                     long updateSequence) {
         if (query.isEmpty()) {
             return new IndexedEntrySearchMatch(entry, updateSequence, true, false);
         }
