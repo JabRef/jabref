@@ -51,7 +51,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         public static DuplicateResolverResult parse(String name) {
             try {
                 return DuplicateResolverResult.valueOf(name);
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _) {
                 return BREAK; // default
             }
         }

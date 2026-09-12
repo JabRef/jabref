@@ -63,9 +63,29 @@ git fetch --all
 ```
 
 {: .important }
-> `--recurse-submodules` is necessary to have the required files available to JabRef. (Background: It concerns the files from [citation-style-language/styles](https://github.com/citation-style-language/styles) and more).
+> `--recurse-submodules` is necessary to have the required files available to JabRef. (Background: It concerns the files from [citation-style-language/styles](https://github.com/citation-style-language/styles), the journal abbreviations from [abbrv.jabref.org](https://github.com/JabRef/abbrv.jabref.org), the themes from [themes.jabref.org](https://github.com/JabRef/themes.jabref.org) and more).
 >
 > Note that putting the JabRef repository directly on `C:\` or any other drive letter on Windows causes compile errors (**negative example**: `C:\jabref`).
+
+#### Exclude the workspace from Windows Defender
+
+Windows Defender's real-time protection scans every file the build touches.
+JabRef's resources contain more than 10,000 citation style files, and `:jablib:processResources` copies about 3,000 of them - each copy triggers a scan.
+
+Measured on a developer machine, excluding the workspace and the Gradle caches cut `:jablib:processResources` from **3 minutes 21 seconds to 51 seconds**.
+
+Open "Windows PowerShell" **as administrator** and run (adjust the paths to your setup):
+
+```powershell
+Add-MpPreference -ExclusionPath 'C:\git-repositories\jabref', "$env:USERPROFILE\.gradle"
+```
+
+Check the result with `(Get-MpPreference).ExclusionPath`.
+
+{: .warning }
+> Files below these paths are no longer scanned in real time.
+> This includes everything Gradle downloads into `~/.gradle`.
+> Exclude the directory you actually work in - an exclusion for an old checkout path silently does nothing.
 
 ### Background
 

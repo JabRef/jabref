@@ -14,6 +14,9 @@ on:
       - '.github/workflows/tests-code-fetchers.yml'
       - '.github/actions/setup-gradle/action.yml'
       - 'jablib/build.gradle.kts'
+      - 'jabgui/src/main/java/org/jabref/gui/importer/**'
+      - 'jabgui/src/test/java/org/jabref/gui/importer/**'
+      - 'jabgui/build.gradle.kts'
   pull_request:
     paths:
       - 'jablib/src/main/java/org/jabref/logic/importer/fetcher/**'
@@ -25,6 +28,9 @@ on:
       - '.github/actions/setup-gradle/action.yml'
       - '.github/workflows/tests-code-fetchers.yml'
       - 'jablib/build.gradle.kts'
+      - 'jabgui/src/main/java/org/jabref/gui/importer/**'
+      - 'jabgui/src/test/java/org/jabref/gui/importer/**'
+      - 'jabgui/build.gradle.kts'
   schedule:
     # run on each Monday
     - cron: '2 3 * * 1'

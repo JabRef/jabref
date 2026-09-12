@@ -89,11 +89,16 @@ public final class LinkedFilesSearcher {
         return new SearchResults();
     }
 
+    // [impl->req~jabgui.search.fulltext.lenient-query-parsing~1]
     private Optional<Query> getLuceneQuery(SearchQuery searchQuery) {
         String query = SearchQueryConversion.searchToLucene(searchQuery);
         try {
             return Optional.of(parser.parse(query));
-        } catch (ParseException e) {
+        } catch (ParseException | IllegalArgumentException e) {
+            // Lucene's regular expression dialect is not the one of java.util.regex, which SearchQuery validates against.
+            // Characters such as " or < are literals there, but syntax here, and Lucene reports that as IllegalArgumentException.
+            // Such a query is still valid for the metadata search, so only the linked files part is skipped.
+            // https://github.com/JabRef/jabref/issues/9482
             LOGGER.error("Error during query parsing with query {}", searchQuery, e);
             return Optional.empty();
         }

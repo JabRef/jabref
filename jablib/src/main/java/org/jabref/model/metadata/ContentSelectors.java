@@ -2,6 +2,7 @@ package org.jabref.model.metadata;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,11 @@ public class ContentSelectors {
 
     public void addContentSelector(@NonNull ContentSelector contentSelector) {
         this.contentSelectors.add(contentSelector);
+    }
+
+    public void setAll(@NonNull Collection<ContentSelector> selectors) {
+        this.contentSelectors.clear();
+        this.contentSelectors.addAll(selectors);
     }
 
     public static ContentSelector parse(@NonNull Field key, @NonNull String values) {
