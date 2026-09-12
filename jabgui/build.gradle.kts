@@ -307,6 +307,10 @@ tasks.test {
     systemProperty("glass.platform", "Headless")
     systemProperty("prism.order", "sw")
 
+    useJUnitPlatform {
+        excludeTags("ExternalServicesTest")
+    }
+
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
 
@@ -318,6 +322,26 @@ tasks.test {
         // "--add-reads", "org.jabref=wiremock"
     ) + useLibericaJdkFullJvmArgs
 
+    maxParallelForks = 1
+}
+
+val testSourceSet = sourceSets.test.get()
+
+tasks.register<Test>("externalServicesTest") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
+    useJUnitPlatform {
+        includeTags("ExternalServicesTest")
+    }
+    systemProperty("glass.platform", "Headless")
+    systemProperty("prism.order", "sw")
+    jvmArgs = listOf(
+        "-javaagent:${configurations.mockitoAgent.get().asPath}",
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        "--enable-native-access=javafx.graphics,com.sun.jna"
+    ) + useLibericaJdkFullJvmArgs
     maxParallelForks = 1
 }
 
