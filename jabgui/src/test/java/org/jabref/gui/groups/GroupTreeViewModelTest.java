@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +34,11 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.undo.CompoundEdit;
 
+import com.google.common.eventbus.Subscribe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,6 +58,7 @@ class GroupTreeViewModelTest {
     private StateManager stateManager;
     private GroupTreeViewModel groupTree;
     private BibDatabaseContext databaseContext;
+    private OptionalObjectProperty<BibDatabaseContext> activeDatabase;
     private TaskExecutor taskExecutor;
     private GuiPreferences preferences;
     private DialogService dialogService;
@@ -64,9 +69,9 @@ class GroupTreeViewModelTest {
         databaseContext = new BibDatabaseContext();
 
         stateManager = mock(JabRefGuiStateManager.class);
-        OptionalObjectProperty<BibDatabaseContext> activeDb = OptionalObjectProperty.empty();
-        activeDb.setValue(Optional.of(databaseContext));
-        when(stateManager.activeDatabaseProperty()).thenReturn(activeDb);
+        activeDatabase = OptionalObjectProperty.empty();
+        activeDatabase.setValue(Optional.of(databaseContext));
+        when(stateManager.activeDatabaseProperty()).thenReturn(activeDatabase);
         when(stateManager.getSearchContext(databaseContext)).thenReturn(new SearchContext(
                 new SimpleBooleanProperty(false),
                 NoOpSearchBackend::new,
@@ -106,6 +111,22 @@ class GroupTreeViewModelTest {
         assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
     }
 
+    @Test
+    void switchingLibraryDetachesThePreviousGroupTreeFromEntryChanges() {
+        GroupNodeViewModel previousRoot = groupTree.rootGroupProperty().getValue();
+        previousRoot.ensureMatchedEntriesLoaded();
+        assertEquals(0, previousRoot.getHits().getValue().intValue());
+
+        BibDatabaseContext newDatabaseContext = new BibDatabaseContext();
+        when(stateManager.getSelectedGroups(newDatabaseContext)).thenReturn(FXCollections.emptyObservableList());
+        activeDatabase.setValue(Optional.empty());
+        activeDatabase.setValue(Optional.of(newDatabaseContext));
+
+        databaseContext.getDatabase().insertEntry(new BibEntry());
+
+        assertEquals(0, previousRoot.getHits().getValue().intValue());
+    }
+
     /// Group operations reach the model by editing the tree in place and writing the root back, so
     /// they are recorded as the tree they produced - one step, undone by installing the tree that
     /// was there before.
@@ -120,11 +141,14 @@ class GroupTreeViewModelTest {
         // changes only through Platform.runLater - so it is rebuilt here rather than waited on.
         groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
 
-        groupTree.sortAlphabeticallyRecursive(databaseContext.getMetaData().getGroups().orElseThrow());
+        // Both operations edit the tree the queued refresh reads. Run them on the JavaFX thread, so
+        // that the refresh either has finished or has not started - it must not walk a list of
+        // children while this thread is reordering it.
+        JavaFxExtension.invokeAndWait(() -> groupTree.sortAlphabeticallyRecursive(databaseContext.getMetaData().getGroups().orElseThrow()));
         assertEquals(List.of("A", "B"), childNames());
 
         assertTrue(journal.canUndo(), "the sort was not recorded");
-        journal.undo();
+        JavaFxExtension.invokeAndWait(journal::undo);
         assertEquals(List.of("B", "A"), childNames());
     }
 
@@ -161,6 +185,30 @@ class GroupTreeViewModelTest {
         groupTree.sortAlphabeticallyRecursive(databaseContext.getMetaData().getGroups().orElseThrow());
 
         assertFalse(journal.canUndo(), "sorting an already sorted group became an undo step");
+    }
+
+    /// A group operation writes its tree back and records a step for it, so the library is told
+    /// the journal is behind the write. Were it told nothing, the tab would mark the library and
+    /// undoing the operation would leave the marker set.
+    @Test
+    void aRecordedGroupOperationSaysTheJournalIsBehindIt() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        databaseContext.getMetaData().setGroups(root);
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        List<MetaDataChangedEvent> events = new ArrayList<>();
+        databaseContext.getMetaData().registerListener(new Object() {
+            @Subscribe
+            public void listen(MetaDataChangedEvent event) {
+                events.add(event);
+            }
+        });
+
+        groupTree.sortAlphabeticallyRecursive(databaseContext.getMetaData().getGroups().orElseThrow());
+
+        assertEquals(List.of(MetaDataChangeSource.JOURNAL),
+                events.stream().map(MetaDataChangedEvent::getSource).distinct().toList());
     }
 
     private List<String> childNames() {

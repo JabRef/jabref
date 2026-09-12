@@ -30,9 +30,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.highlight.Highlighter;
-import org.apache.lucene.search.highlight.QueryScorer;
-import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,11 +86,16 @@ public final class LinkedFilesSearcher {
         return new SearchResults();
     }
 
+    // [impl->req~jabgui.search.fulltext.lenient-query-parsing~1]
     private Optional<Query> getLuceneQuery(SearchQuery searchQuery) {
         String query = SearchQueryConversion.searchToLucene(searchQuery);
         try {
             return Optional.of(parser.parse(query));
-        } catch (ParseException e) {
+        } catch (ParseException | IllegalArgumentException e) {
+            // Lucene's regular expression dialect is not the one of java.util.regex, which SearchQuery validates against.
+            // Characters such as " or < are literals there, but syntax here, and Lucene reports that as IllegalArgumentException.
+            // Such a query is still valid for the metadata search, so only the linked files part is skipped.
+            // https://github.com/JabRef/jabref/issues/9482
             LOGGER.error("Error during query parsing with query {}", searchQuery, e);
             return Optional.empty();
         }
@@ -111,7 +113,6 @@ public final class LinkedFilesSearcher {
         long startTime = System.currentTimeMillis();
 
         Map<String, List<String>> linkedFilesMap = getLinkedFilesMap();
-        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(searchQuery));
 
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
             Document document = storedFields.document(scoreDoc.doc);
@@ -125,7 +126,7 @@ public final class LinkedFilesSearcher {
                             getFieldContents(document, LinkedFilesConstants.CONTENT),
                             getFieldContents(document, LinkedFilesConstants.ANNOTATIONS),
                             Integer.parseInt(getFieldContents(document, LinkedFilesConstants.PAGE_NUMBER)),
-                            highlighter);
+                            searchQuery);
                     searchResults.addSearchResult(entriesWithFile, searchResult);
                 }
             }
