@@ -1747,3 +1747,11 @@ We want to have a look that matches our icons in the tool-bar */
 .whats-new-heading {
     -fx-text-fill: -jr-gray-2;
 }
+
+.whats-new-bold {
+    -fx-font-weight: bold;
+}
+
+.whats-new-code {
+    -fx-font-family: monospace;
+}

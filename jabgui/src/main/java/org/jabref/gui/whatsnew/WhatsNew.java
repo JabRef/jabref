@@ -223,12 +223,12 @@ public class WhatsNew {
             flow.getChildren().add(new Text(line.substring(pos, m.start())));
             if (m.group(1) != null) {
                 for (Node child : List.copyOf(inline(m.group(1), openUrl).getChildren())) {
-                    child.setStyle("-fx-font-weight: bold;");
+                    child.getStyleClass().add("whats-new-bold");
                     flow.getChildren().add(child);
                 }
             } else if (m.group(2) != null) {
                 Text code = new Text(m.group(2));
-                code.setStyle("-fx-font-family: monospace;");
+                code.getStyleClass().add("whats-new-code");
                 flow.getChildren().add(code);
             } else if (m.group(3) != null) {
                 flow.getChildren().add(link(m.group(3), m.group(4), openUrl));
