@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -170,6 +170,6 @@ public class OpenDatabaseActionTest {
         assertFalse(result.isInvalid());
         assertEquals(1, result.getDatabase().getEntryCount());
         JavaFxExtension.awaitEvents();
-        verify(dialogService, never()).showErrorDialogAndWait(any(String.class), any(String.class));
+        verify(dialogService, never()).showErrorDialogAndWait(anyString(), anyString());
     }
 }
