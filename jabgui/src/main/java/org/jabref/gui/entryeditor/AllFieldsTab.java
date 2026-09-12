@@ -696,10 +696,10 @@ public class AllFieldsTab extends FieldsEditorTab {
         // before the inner runLater requests focus on them.
         Platform.runLater(() -> {
             Platform.runLater(() -> {
-                // The tab may have been rebound to a different entry before this deferred block runs;
-                // the editors map would then belong to that other entry, so focusing here would act on
-                // the wrong entry. Bail out unless we are still showing the entry we started with.
-                if (getCurrentEntry() != entry) {
+                // The tab may have been rebound to a different entry, or disposed, before this deferred
+                // block runs. getCurrentEntry() survives disposal, so subscribedEntry (cleared by dispose())
+                // must match too: focusing can expand a section, and expanding rebuilds the panel.
+                if ((getCurrentEntry() != entry) || subscribedEntry.filter(current -> current == entry).isEmpty()) {
                     return;
                 }
                 requestFocus(field);

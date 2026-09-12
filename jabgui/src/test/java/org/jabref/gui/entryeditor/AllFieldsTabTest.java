@@ -307,6 +307,30 @@ class AllFieldsTabTest {
         assertSame(tab.editors.get(StandardField.FILE).getNode(), fileRow);
     }
 
+    /// Focusing a field in a collapsed files and links section expands it, which rebuilds the panel;
+    /// a tab disposed before that deferred focus runs must not rebuild.
+    @Test
+    void disposedTabDoesNotRebuildOnDeferredFocus() {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("CiteKey2021")
+                .withField(StandardField.URL, "https://example.org");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            tab.currentEntryProperty().set(entry);
+            tab.bindToEntry(entry);
+            filesAndLinksPane().setExpanded(false);
+            tab.addFieldAndFocus(StandardField.URI);
+            tab.dispose();
+        });
+        // Two passes: the focus callback is nested in a second runLater.
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+
+        assertFalse(tab.editors.containsKey(StandardField.FILE));
+    }
+
     // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
     @Test
     void fileEditorAppearsWhenFilesAndLinksSectionIsOpen() {
