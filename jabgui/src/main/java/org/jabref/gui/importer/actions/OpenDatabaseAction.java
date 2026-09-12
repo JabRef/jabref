@@ -252,7 +252,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         tabContainer.addTab(newTab, true);
     }
 
-    private ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
+    @VisibleForTesting
+    ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
         Path fileToLoad = file.toAbsolutePath();
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
@@ -275,16 +276,23 @@ public class OpenDatabaseAction extends SimpleCommand {
                         preferences.getImportFormatPreferences(),
                         fileUpdateMonitor);
             }
-
-            if (parserResult.hasWarnings()) {
-                String content = Localization.lang("Please check your library file for wrong syntax.")
-                        + "\n\n" + parserResult.getErrorMessage();
-                UiTaskExecutor.runInJavaFXThread(() ->
-                        dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
-            }
         } catch (IOException e) {
             parserResult = ParserResult.fromError(e);
             LOGGER.error("Error opening file '{}'", fileToLoad, e);
+        }
+
+        if (parserResult.isInvalid()) {
+            // The file could not be read at all. LibraryTab closes the tab again after this.
+            // [impl->req~import.library.unreadable-reported~1]
+            String content = Localization.lang("Error opening file '%0'", fileToLoad.toString())
+                    + "\n\n" + parserResult.getErrorMessage();
+            UiTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showErrorDialogAndWait(Localization.lang("Open library error"), content));
+        } else if (parserResult.hasWarnings()) {
+            String content = Localization.lang("Please check your library file for wrong syntax.")
+                    + "\n\n" + parserResult.getErrorMessage();
+            UiTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
         }
 
         if (parserResult.getDatabase().isShared()) {
