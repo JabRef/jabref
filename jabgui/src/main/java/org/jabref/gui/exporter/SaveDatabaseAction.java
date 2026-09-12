@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.ButtonBar;
@@ -29,6 +31,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -354,12 +357,18 @@ public class SaveDatabaseAction {
                         entryTypesManager)
                         .withJournalAbbreviationRepository(
                                 journalAbbreviationRepository,
-                                preferences.getAbbreviationPreferences().shouldUseFJournalField());
+                                preferences.getAbbreviationPreferences().shouldUseFJournalField())
+                        .withMutationScheduler(SaveDatabaseAction::runSaveMutation);
 
-                if (selectedOnly) {
-                    databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
-                } else {
-                    databaseWriter.writeDatabase(bibDatabaseContext);
+                try {
+                    if (selectedOnly) {
+                        databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
+                    } else {
+                        databaseWriter.writeDatabase(bibDatabaseContext);
+                    }
+                } catch (CompletionException exception) {
+                    fileWriter.abort();
+                    throw exception;
                 }
 
                 libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
@@ -367,6 +376,8 @@ public class SaveDatabaseAction {
                 encodingProblems = fileWriter.getEncodingProblems();
             } catch (UnsupportedCharsetException ex) {
                 throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
+            } catch (CompletionException ex) {
+                throw new SaveException("Problems applying save actions", ex.getCause());
             } catch (IOException ex) {
                 throw new SaveException("Problems saving: " + ex, ex);
             }
@@ -380,6 +391,14 @@ public class SaveDatabaseAction {
                 }
             }
             return committedState;
+        }
+    }
+
+    private static void runSaveMutation(Runnable mutation) {
+        try {
+            UiTaskExecutor.runAndWaitInJavaFXThreadWithFailurePropagation(mutation);
+        } catch (ExecutionException exception) {
+            throw new CompletionException(exception.getCause());
         }
     }
 
