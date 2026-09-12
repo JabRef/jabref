@@ -51,7 +51,7 @@ class Pseudonymize implements Callable<Integer> {
 
     @Override
     public Integer call() throws ImportServiceException, ExportServiceException {
-        Path inputPath = inputOption.getInputFile();
+        Path inputPath = inputOption.getInputFile(argumentProcessor.cliPreferences);
         String fileName = FileUtil.getBaseName(inputPath);
         Path pseudoBibPath = resolveOutputPath(outputFile, inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
         Path pseudoKeyPath = resolveOutputPath(keyFile, inputPath, fileName + PSEUDO_SUFFIX + CSV_EXTENSION);
@@ -87,7 +87,16 @@ class Pseudonymize implements Callable<Integer> {
     }
 
     private Path resolveOutputPath(Path customPath, Path inputPath, String defaultFileName) {
-        return customPath != null ? customPath : inputPath.toAbsolutePath().getParent().resolve(defaultFileName);
+        if (customPath != null) {
+            return customPath;
+        }
+        Path directory = inputPath.toAbsolutePath().getParent();
+        if (directory.equals(Path.of(System.getProperty("java.io.tmpdir")).toAbsolutePath())) {
+            // A URL or a shared database was resolved to a temporary file; the results belong where
+            // the user can find them, not next to a file named jabref-shared-4711.bib in /tmp
+            directory = Path.of("").toAbsolutePath();
+        }
+        return directory.resolve(defaultFileName);
     }
 
     private boolean fileOverwriteCheck(Path filePath) {
