@@ -3,12 +3,13 @@
 This directory contains JBang scripts for JabRef.
 [JBang](https://www.jbang.dev/) allows for running Java applications without having a JDK installed (before).
 
-Four use cases:
+Five use cases:
 
 - Runing `JabKit` - JabRef's CLI tool.
 - Runing `JabLs` - JabRef's LSP Server.
 - Runing `JabSrv` - JabRef's HTTP server.
 - Try out any pull request with minimal installation. See [our blog entry](https://blog.jabref.org/2025/05/31/run-pr/) for details.
+- See what changed since you last ran JabRef from your checkout (`WhatsNew.java`).
 
 ## Running `JabKit`
 
@@ -146,3 +147,16 @@ JBang installed: <https://www.jbang.dev/download/>
 ## Try out any pull request
 
 See <https://blog.jabref.org/2025/05/31/run-pr/> for a howto.
+
+## What's new since my last run
+
+`just run-main` pulls the latest `main` and, before starting JabRef, opens a window with the `CHANGELOG.md` entries that landed since the previous run, split into *changes by others* and *changes by me* (the `git config user.email` of the checkout).
+Each entry is attributed to the commit that first added it, so a link fix or a rewording by someone else keeps the original author.
+"Run" starts JabRef, "Cancel run" stops the recipe.
+
+```bash
+just whats-new            # the window on its own
+just whats-new --stdout   # plain text instead
+```
+
+The first run only records the current commit (in the checkout's `.git` directory) and shows nothing.

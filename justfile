@@ -9,11 +9,17 @@ checkout-pr pr-id: ensure-gg-cmd
     if command -v gh >/dev/null 2>&1; then gh pr checkout {{pr-id}}; else sh ./gg.cmd jbang https://github.com/JabRef/jabref/blob/main/.jbang/CheckoutPR.java {{pr-id}}; fi
 
 [unix]
-run-brach branch: ensure-gg-cmd
+run-branch branch: ensure-gg-cmd
     sh ./gg.cmd jbang git@jbangdev checkout {{branch}}
     sh ./gg.cmd jbang git@jbangdev fetch origin
     sh ./gg.cmd jbang git@jbangdev merge origin/main
+    just whats-new
     just run
+
+# Show the CHANGELOG.md entries that landed since the previous run, by others and by me. "Cancel run" stops the recipe.
+[unix]
+whats-new *FLAGS: ensure-gg-cmd
+    sh ./gg.cmd jbang .jbang/WhatsNew.java {{FLAGS}}
 
 [unix]
 run: ensure-gg-cmd
@@ -40,7 +46,12 @@ run-branch branch: ensure-gg-cmd
     .\gg.cmd jbang git@jbangdev checkout {{branch}}
     .\gg.cmd jbang git@jbangdev fetch origin
     .\gg.cmd jbang git@jbangdev merge origin/main
+    just whats-new
     just run
+
+[windows]
+whats-new *FLAGS: ensure-gg-cmd
+    .\gg.cmd jbang .jbang\WhatsNew.java {{FLAGS}}
 
 [windows]
 run: ensure-gg-cmd
