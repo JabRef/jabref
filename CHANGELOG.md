@@ -81,7 +81,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a fetcher for the Bielefeld Academic Search Engine (BASE). [#15016](https://github.com/JabRef/jabref/issues/15016)
 - We added a Git section to the library properties for automatic commit, pull and push. [#12630](https://github.com/JabRef/jabref/issues/12630)
 - We added connection URL pasting to the shared database login dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
-
+- We added a Dnb Fetcher that uses SRU interface and wired to ISBN Fetcher [#17070](https://github.com/JabRef/jabref/pull/17070)
 ### Changed
 
 - We redesigned the "About JabRef" dialog. [#16950](https://github.com/JabRef/jabref/pull/16950)
