@@ -11,6 +11,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.undo.RedoAction;
@@ -22,9 +23,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class FieldEditorFXTest extends JavaFxTest {
 
@@ -52,7 +56,12 @@ class FieldEditorFXTest extends JavaFxTest {
 
         undoAction = mock(UndoAction.class);
         redoAction = mock(RedoAction.class);
-        editor.establishBinding(textField, textProperty, new KeyBindingRepository(), undoAction, redoAction);
+        // Stubbed: the real repository matches the event against every binding, and matching a
+        // KeyCharacterCombination throws UnsupportedOperationException on the headless toolkit
+        KeyBindingRepository keyBindingRepository = mock(KeyBindingRepository.class);
+        when(keyBindingRepository.matches(any(), eq(KeyBinding.UNDO))).thenAnswer(invocation -> isShortcut(invocation.getArgument(0), KeyCode.Z));
+        when(keyBindingRepository.matches(any(), eq(KeyBinding.REDO))).thenAnswer(invocation -> isShortcut(invocation.getArgument(0), KeyCode.Y));
+        editor.establishBinding(textField, textProperty, keyBindingRepository, undoAction, redoAction);
         textField.addEventHandler(KeyEvent.KEY_PRESSED, _ -> keyPressReachedControl.set(true));
 
         stage.setScene(new Scene(textField, 400, 100));
@@ -121,6 +130,10 @@ class FieldEditorFXTest extends JavaFxTest {
         verify(redoAction).execute();
         verify(undoAction, never()).execute();
         assertFalse(keyPressReachedControl.get());
+    }
+
+    private static boolean isShortcut(KeyEvent event, KeyCode code) {
+        return event.getCode() == code && event.isShortcutDown();
     }
 
     private KeyEvent shortcutPressed(KeyCode code) {
