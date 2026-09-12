@@ -184,7 +184,7 @@ public class SharedDatabaseUIManager {
                           if (placeholder.getSharedDatabaseId().isPresent()) {
                               // A remembered database reconnects on startup: no modal dialog then, but the tab alone is easy
                               // to miss among the libraries that did open, so the failure is announced as well.
-                              dialogService.notify(Localization.lang("Could not connect to shared database %0", connectionProperties.getDatabase()));
+                              dialogService.notify(Localization.lang("Could not reconnect to shared database %0.", connectionProperties.getDatabase()));
                           } else if (exception instanceof DatabaseNotSupportedException) {
                               offerMigration(placeholder);
                           }
