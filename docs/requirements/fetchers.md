@@ -62,4 +62,21 @@ The user can look up and import bibliography entries by providing a Software Her
 
 Needs: impl
 
+## Search the German National Library (DNB)
+`req~fetchers.dnb-search~1`
+
+The user can search the German National Library (DNB) catalog as a search-based
+fetcher, retrieving matching bibliographic entries by title, author, or other
+search terms.
+
+Needs: impl
+
+## Look up entries in the German National Library by ISBN
+`req~fetchers.dnb-isbn-lookup~1`
+
+The user can retrieve a bibliographic entry from the German National Library
+(DNB) by providing an ISBN.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

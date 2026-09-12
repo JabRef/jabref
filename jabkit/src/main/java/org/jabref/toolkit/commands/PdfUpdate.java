@@ -67,7 +67,7 @@ class PdfUpdate implements Callable<Integer> {
             return 2;
         }
 
-        Path inputFile = inputOption.getInputFile();
+        Path inputFile = inputOption.getInputFile(pdf.argumentProcessor.cliPreferences);
         ParserResult parserResult = ImportService.importFile(
                 inputFile,
                 inputFormat,
