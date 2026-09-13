@@ -392,7 +392,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    // [utest->req~shared-database.atomic-metadata-snapshots~1]
+        // [utest->req~shared-database.atomic-metadata-snapshots~1]
     void setSharedMetaDataIsAtomicAcrossConnections() throws Exception {
         SequencedMap<String, String> metadata = new LinkedHashMap<>();
         metadata.put("firstMetadataKey", "first metadata value");
