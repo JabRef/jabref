@@ -4,10 +4,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.sshd.SshdSessionFactory;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 class GitSshTest {
 
     @Test
