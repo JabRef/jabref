@@ -68,19 +68,19 @@
 .h5 { -fx-font-size: 1.1em; }
 .h6 { -fx-font-size: 1em; }
 
-.font-size-8 > * { -fx-font-size: 8pt; }
-.font-size-9 > * { -fx-font-size: 9pt; }
-.font-size-10 > * { -fx-font-size: 10pt; }
-.font-size-11 > * { -fx-font-size: 11pt; }
-.font-size-12 > * { -fx-font-size: 12pt; }
-.font-size-13 > * { -fx-font-size: 13pt; }
-.font-size-14 > * { -fx-font-size: 14pt; }
-.font-size-15 > * { -fx-font-size: 15pt; }
-.font-size-16 > * { -fx-font-size: 16pt; }
-.font-size-17 > * { -fx-font-size: 17pt; }
-.font-size-18 > * { -fx-font-size: 18pt; }
-.font-size-19 > * { -fx-font-size: 19pt; }
-.font-size-20 > * { -fx-font-size: 20pt; }
+.font-size-8.root { -fx-font-size: 8pt; }
+.font-size-9.root { -fx-font-size: 9pt; }
+.font-size-10.root { -fx-font-size: 10pt; }
+.font-size-11.root { -fx-font-size: 11pt; }
+.font-size-12.root { -fx-font-size: 12pt; }
+.font-size-13.root { -fx-font-size: 13pt; }
+.font-size-14.root { -fx-font-size: 14pt; }
+.font-size-15.root { -fx-font-size: 15pt; }
+.font-size-16.root { -fx-font-size: 16pt; }
+.font-size-17.root { -fx-font-size: 17pt; }
+.font-size-18.root { -fx-font-size: 18pt; }
+.font-size-19.root { -fx-font-size: 19pt; }
+.font-size-20.root { -fx-font-size: 20pt; }
 
 /* Padding: all sides */
 .padding-0 { -fx-padding: 0; }
@@ -147,15 +147,83 @@
     -fx-font-size: 9pt;
 }
 
-.btn-transparent {
-    -fx-background: transparent;
-    -fx-background-color: transparent;
+/* Icon sizing with the font. */
+
+/* Here we set ikonli as well, as it is used GemsFX, but we have our own wrapper. */
+.ikonli-font-icon,
+.glyph-icon {
+    -fx-font-size: 1.25em !important;
+    -fx-bounds-type: logical_vertical_center;
+    -fx-fill: -fx-text-base-color;
+    -fx-icon-color: -fx-text-base-color;
+}
+
+.quick-settings-button .glyph-icon,
+.quick-settings-button .glyph-icon {
+    -fx-font-size: 1.25em !important;
+    -fx-icon-color: -color-accent;
+    -fx-fill: -color-accent;
+}
+
+.search-field-icon {
+    -fx-font-size: 1.75em !important;
+    -fx-icon-color: -fx-text-base-color;
+}
+
+.mainToolbar .glyph-icon {
+    -fx-font-size: 1.75em !important;
+    -fx-fill: -color-accent;
+    -fx-text-fill: -color-accent;
+    -fx-icon-color: -color-accent;
+}
+
+.sidePaneComponentHeader .glyph-icon {
+    -fx-font-size: 1.0em !important;
+    -fx-fill: -color-accent;
+    -fx-text-fill: -color-accent;
+    -fx-icon-color: -color-accent;
+}
+
+.error-console .info-section .glyph-icon,
+.error-console .exception .glyph-icon,
+.error-console .output .glyph-icon,
+.error-console .log .glyph-icon {
+    -fx-font-size: 1.75em !important;
+}
+
+.walkthrough-quit-button .glyph-icon {
+    -fx-font-size: 2em !important;
+    -fx-fill: -color-accent;
+    -fx-text-fill: -color-accent;
+    -fx-icon-color: -color-accent;
+}
+
+.walkthrough-info-container .glyph-icon {
+    -fx-font-size: 2em !important;;
+    -fx-icon-color: -color-accent;
+}
+
+.three-way-merge .field-name .glyph-icon {
+    -fx-font-size: 1.75em;
+    -fx-icon-color: -color-accent;
+}
+
+.merge-field-value .action-icon {
+    -fx-font-size: 1.25em;
+    -fx-icon-color: -fx-text-background-color;
+}
+
+.entry-editor .icon-button .glyph-icon {
+    -fx-font-size: 1.0em;
+    -fx-fill: -color-accent;
+    -fx-text-fill: -color-accent;
 }
 
 /* JavaFX with custom components */
+
 .tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon,
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
-    -glyph-size: 0.812em;
+    -fx-font-size: 0.875em;
     -fx-fill: -color-fg-muted;
     -fx-text-fill: -color-fg-muted;
 }
@@ -169,6 +237,7 @@
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-icon {
     -fx-icon-color: -color-accent;
 }
+
 .tab-pane > .tab-header-area > .headers-region > .tab.drop {
     -fx-border-color: -color-drag-target;
     -fx-background-color: -color-drag-target-hover;
@@ -250,6 +319,11 @@
 
 /* Custom styles */
 
+.btn-transparent {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
 .unchanged,
 .text-unchanged {
     -fx-fill: -color-fg-emphasis;
@@ -306,20 +380,6 @@
     -rtfx-background-color: -color-info;
 }
 
-.glyph-icon {
-    /* This adjusts text alignment within the bounds of text nodes so that
-       the text is always vertically centered within the bounds. Based on
-       the cap height of the text. */
-    -fx-bounds-type: logical_vertical_center;
-
-    /* The base color of icons should always be the same as the text. */
-    -fx-fill: -fx-text-base-color;
-}
-
-.ikonli-font-icon {
-    -fx-icon-color: -fx-text-base-color;
-}
-
 .icon-button {
     -fx-background: transparent;
     -fx-background-color: transparent;
@@ -374,11 +434,6 @@
 
 .numberColumn > .hits:any-selected {
     -fx-background-color: derive(-color-success, 70%);
-}
-
-.merge-field-value .action-icon {
-    -fx-icon-size: 14;
-    -fx-icon-color: -fx-text-background-color;
 }
 
 .merge-field-value:disabled .action-icon {
@@ -445,14 +500,6 @@
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
 }
 
-.sidePaneComponentHeader .glyph-icon,
-.sidePaneComponentHeader .ikonli-font-icon {
-    -fx-fill: -color-accent;
-    -fx-text-fill: -color-accent;
-    -fx-font-size: 1.0em;
-    -fx-icon-color: -color-accent;
-}
-
 .mainMenu {
     -fx-background-color: -color-bg-tertiary;
     -fx-background-insets: 0;
@@ -466,19 +513,6 @@
     -fx-background-color: -color-bg-tertiary;
     -fx-border-color: derive(-color-bg-tertiary, 50%);
     -fx-border-width: 0;
-}
-
-/*
- * -fx-icon-size is intentionally omitted to prevent a rendering loop. The library sets font size
- * based on the computed icon size, which is itself relative to the font size.
- */
-.mainToolbar .glyph-icon,
-.mainToolbar .ikonli-font-icon {
-    /* `!important` is override library's default font size */
-    -fx-font-size: 1.8em !important;
-    -fx-fill: -color-accent;
-    -fx-text-fill: -color-accent;
-    -fx-icon-color: -color-accent;
 }
 
 .mainToolbar .progress-indicator {
@@ -498,15 +532,6 @@
     -fx-fill: -fx-text-base-color;
     -fx-text-fill: -fx-text-base-color;
     -fx-icon-color: -fx-text-base-color;
-}
-
-/*
- * The magnifying glass icon left of the search text field.
- * Currently, hits "Web search" and "Groups" only (not the searchbar on the top).
-*/
-.search-field-icon {
-    -fx-icon-color: -fx-text-base-color;
-    -fx-font-size: 1.8em;
 }
 
 /* search modifier buttons */
@@ -720,7 +745,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .main-table .table-row-cell:matching-search-and-groups > .table-cell,
-.main-table .table-row-cell:matching-search-and-groups > .table-cell > .ikonli-font-icon {
+.main-table .table-row-cell:matching-search-and-groups > .table-cell > .glyph-icon {
     -fx-text-fill: -color-match-1-text-color;
 }
 
@@ -730,9 +755,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: derive(-color-match-1-text-color, 10%);
 }
 
-.main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon,
-.main-table .table-row-cell:matching-search-and-groups:hover > .table-cell > .ikonli-font-icon,
-.main-table .table-row-cell:matching-search-and-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
+.main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell > .glyph-icon,
+.main-table .table-row-cell:matching-search-and-groups:hover > .table-cell > .glyph-icon,
+.main-table .table-row-cell:matching-search-and-groups:selected:focused:hover > .table-cell > .glyph-icon {
     -fx-icon-color: derive(-color-match-1-text-color, 10%);
 }
 
@@ -747,7 +772,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .main-table .table-row-cell:matching-search-not-groups > .table-cell,
-.main-table .table-row-cell:matching-search-not-groups > .table-cell > .ikonli-font-icon {
+.main-table .table-row-cell:matching-search-not-groups > .table-cell > .glyph-icon {
     -fx-text-fill: -color-match-2-text-color;
 }
 
@@ -757,9 +782,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: derive(-color-match-2-text-color, 10%);
 }
 
-.main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell > .ikonli-font-icon,
-.main-table .table-row-cell:matching-search-not-groups:hover > .table-cell > .ikonli-font-icon,
-.main-table .table-row-cell:matching-search-not-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
+.main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell > .glyph-icon,
+.main-table .table-row-cell:matching-search-not-groups:hover > .table-cell > .glyph-icon,
+.main-table .table-row-cell:matching-search-not-groups:selected:focused:hover > .table-cell > .glyph-icon {
     -fx-icon-color: derive(-color-match-2-text-color, 10%);
 }
 
@@ -774,7 +799,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .main-table .table-row-cell:matching-groups-not-search > .table-cell,
-.main-table .table-row-cell:matching-groups-not-search > .table-cell > .ikonli-font-icon {
+.main-table .table-row-cell:matching-groups-not-search > .table-cell > .glyph-icon {
     -fx-text-fill: -color-match-3-text-color;
 }
 
@@ -784,9 +809,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: derive(-color-match-3-text-color, 10%);
 }
 
-.main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell > .ikonli-font-icon,
-.main-table .table-row-cell:matching-groups-not-search:hover > .table-cell > .ikonli-font-icon,
-.main-table .table-row-cell:matching-groups-not-search:selected:focused:hover > .table-cell > .ikonli-font-icon {
+.main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell > .glyph-icon,
+.main-table .table-row-cell:matching-groups-not-search:hover > .table-cell > .glyph-icon,
+.main-table .table-row-cell:matching-groups-not-search:selected:focused:hover > .table-cell > .glyph-icon {
     -fx-icon-color: derive(-color-match-3-text-color, 10%);
 }
 
@@ -801,7 +826,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .main-table .table-row-cell:not-matching-search-and-groups > .table-cell,
-.main-table .table-row-cell:not-matching-search-and-groups > .table-cell > .ikonli-font-icon {
+.main-table .table-row-cell:not-matching-search-and-groups > .table-cell > .glyph-icon {
     -fx-text-fill: -color-match-4-text-color;
 }
 
@@ -811,9 +836,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: derive(-color-match-4-text-color, 10%);
 }
 
-.main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon,
-.main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell > .ikonli-font-icon,
-.main-table .table-row-cell:not-matching-search-and-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
+.main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell > .glyph-icon,
+.main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell > .glyph-icon,
+.main-table .table-row-cell:not-matching-search-and-groups:selected:focused:hover > .table-cell > .glyph-icon {
     -fx-icon-color: derive(-color-match-4-text-color, 10%);
 }
 
@@ -946,11 +971,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-weight: normal;
 }
 
-.entry-editor .entry-type-label .tooltip {
-    -fx-font-size: 1em;
-    -fx-font-weight: normal;
-}
-
 .entry-editor .icon-button.narrow {
     -fx-padding: 0.1em;
 }
@@ -968,19 +988,12 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0;
 }
 
-.entry-editor .icon-button .glyph-icon,
-.entry-editor .icon-button .ikonli-font-icon {
-    -glyph-size: 1.0em;
-    -fx-fill: -color-accent;
-    -fx-text-fill: -color-accent;
-}
-
 .entry-editor .field-remove-button {
     -fx-background-color: transparent;
 }
 
 .entry-editor .field-remove-button .glyph-icon,
-.entry-editor .field-remove-button .ikonli-font-icon {
+.entry-editor .field-remove-button .glyph-icon {
     -fx-fill: -color-fg-subtle;
     -fx-text-fill: -color-fg-subtle;
 }
@@ -1045,13 +1058,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-graphic-text-gap: 0.8em;
     -fx-line-spacing: 0.2em;
     -fx-background-color: -color-info-subtle;
-}
-
-.error-console .info-section .glyph-icon,
-.error-console .exception .glyph-icon,
-.error-console .output .glyph-icon,
-.error-console .log .glyph-icon {
-    -fx-font-size: 1.8em;
 }
 
 .error-console .exception .glyph-icon {
@@ -1139,19 +1145,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background: -color-bg-sidepane;
 }
 
-.group-tree > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell > .tree-table-cell {
-    -fx-padding: 0.35em 0em 0.25em 0em;
-}
-
-.group-tree .numberColumn {
-    -fx-alignment: top-right;
-    -fx-padding: 0.35em 0.2em 0.25em 0em;
-}
-
 .group-tree .numberColumn > .hits {
     -fx-background: -color-badge-bg;
     -fx-background-color: -color-badge-bg;
-    -fx-padding: 0.25em;
     -fx-background-insets: 0;
     -fx-background-radius: 0.25em;
 }
@@ -1169,29 +1165,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-alignment: center;
 }
 
-.group-tree .tree-table-row-cell:sub > .tree-table-cell {
-    -fx-padding: 0.20em 0em 0.20em 0em;
-}
-
-.group-tree .tree-table-row-cell:sub > .numberColumn {
-    -fx-padding: 0.20em 0.2em 0.20em 0em;
-}
-
 .group-tree .tree-table-row-cell:root {
     -fx-border-width: 0 0 1 0;
     -fx-border-color: -color-border-muted;
-}
-
-.group-tree .tree-table-row-cell:root > .tree-table-cell {
-    -fx-padding: 0.65em 0em 0.65em 1em;
-}
-
-.group-tree .tree-table-row-cell:root > .numberColumn {
-    -fx-padding: 0.40em 0.2em 0.40em 0em;
-}
-
-.group-tree .tree-table-row-cell:root > .expansionNodeColumn {
-    -fx-padding: 0.45em 0.2em 0.45em 0.2em;
 }
 
 .group-tree .tree-table-row-cell:empty {
@@ -1207,24 +1183,12 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-fg-muted;
     -fx-max-height: 0.5em;
     -fx-max-width: 0.5em;
-    -fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
+    -fx-padding: 0.333333em; /* 4 */
     -fx-shape: "m64,416l96,96l256,-256l-256,-256l-96,96l160,160l-160,160z";
 }
 
 .group-tree .tree-table-row-cell:expanded > .tree-table-cell > .tree-disclosure-node > .arrow {
     -fx-rotate: 90;
-}
-
-.group-tree .tree-table-row-cell > .tree-table-cell > .icon {
-    -fx-translate-x: -0.4em;
-}
-
-.group-filter-bar .glyph-icon {
-    -fx-font-size: 2em;
-}
-
-.group-bar .glyph-icon {
-    -fx-font-size: 2em;
 }
 
 .group-tree .numberColumn > .hits:all-selected {
@@ -1247,7 +1211,6 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .preferences-tab-list > .virtual-flow > .clipped-container > .sheet > .list-cell {
-    -fx-padding: 0.667em;
     -fx-background: transparent;
     -fx-text-fill: -color-fg-default;
 }
@@ -1397,12 +1360,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.167em 0 0.167em 0;
 }
 
-.three-way-merge .field-name .glyph-icon,
-.three-way-merge .field-name .ikonli-font-icon {
-    -fx-icon-size: 18;
-    -fx-icon-color: -color-accent;
-}
-
 /* Miscellaneous */
 
 .chatHistory {
@@ -1463,13 +1420,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-bg-alt, -color-button-pressed;
 }
 
-.quick-settings-button .glyph-icon,
-.quick-settings-button .ikonli-font-icon {
-    -fx-icon-color: -color-accent;
-    -fx-fill: -color-accent;
-    -fx-font-size: 1.1em;
-}
-
 .quick-settings-dialog-container {
     -fx-pref-width: 42.667em;
 }
@@ -1506,7 +1456,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .detected-application .glyph-icon,
-.detected-application .ikonli-font-icon {
+.detected-application .glyph-icon {
     -fx-icon-color: -color-accent;
     -fx-fill: -color-accent;
 }
@@ -1514,14 +1464,6 @@ We want to have a look that matches our icons in the tool-bar */
 /* Walkthrough Styles */
 .walkthrough-panel {
     -fx-background-color: -color-bg-overlay;
-}
-
-.walkthrough-tooltip-title > *,
-.walkthrough-title > * {
-    -fx-text-fill: -color-accent!important;
-    -fx-fill: -color-accent!important;
-    -fx-font-weight: bold;
-    -fx-font-size: 1.75em;
 }
 
 .walkthrough-side-panel-vertical {
@@ -1542,23 +1484,15 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-width: 0 0 0 0.15em;
 }
 
-.walkthrough-info-container .ikonli-font-icon {
-    -fx-icon-color: -color-accent;
-    /* 20px is used, since using em seems to lead infinite icon size growth */
-    -fx-icon-size: 24px;
+.walkthrough-tooltip-title > *,
+.walkthrough-title > * {
+    -fx-text-fill: -color-accent!important;
+    -fx-fill: -color-accent!important;
 }
 
 .walkthrough-info-text {
     -fx-text-fill: -color-accent;
     -fx-line-spacing: 0.5em;
-}
-
-.walkthrough-quit-button .glyph-icon,
-.walkthrough-quit-button .ikonli-font-icon {
-    -fx-icon-color: -color-accent;
-    -fx-fill: -color-accent;
-    -fx-text-fill: -color-accent;
-    -fx-font-size: 2em;
 }
 
 .text-flow-more-link {

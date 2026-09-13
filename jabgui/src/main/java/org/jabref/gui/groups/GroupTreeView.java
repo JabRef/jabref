@@ -21,7 +21,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollBar;
@@ -170,6 +169,8 @@ public class GroupTreeView extends BorderPane {
         addSubgroupColumn.setResizable(false);
 
         groupTree = new TreeTableView<>();
+        groupTree.fixedCellSizeProperty().bind(preferences.getWorkspacePreferences().virtualizedCellSizeProperty());
+
         groupTree.setId("group-tree");
         groupTree.getStyleClass().add("group-tree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
@@ -390,7 +391,7 @@ public class GroupTreeView extends BorderPane {
         text.getStyleClass().setAll("text");
 
         node.getChildren().add(text);
-        node.setMaxWidth(Control.USE_PREF_SIZE);
+        node.maxWidthProperty().bind(preferences.getWorkspacePreferences().virtualizedCellSizeProperty());
         return node;
     }
 

@@ -61,6 +61,7 @@ public class ThemeManager {
     private ThemePreset theme = ThemePreset.JABREF;
     private ThemeColorScheme colorScheme = ThemeColorScheme.FOLLOW_SYSTEM;
     private @Nullable StyleSheet customTheme;
+    private @Nullable String fontSize;
 
     public ThemeManager(@NonNull WorkspacePreferences workspacePreferences,
                         @NonNull FileUpdateMonitor fileUpdateMonitor) {
@@ -111,10 +112,15 @@ public class ThemeManager {
     }
 
     private void updateFontStyleForScene(@NonNull Scene scene) {
-        scene.getRoot().getStyleClass().removeIf(str -> str.startsWith("font-size-"));
+        if (fontSize != null) {
+            scene.getRoot().getStyleClass().remove(fontSize);
+            fontSize = null;
+        }
+
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
-            scene.getRoot().getStyleClass().add("font-size-" + workspacePreferences.getMainFontSize());
+            fontSize = "font-size-" + workspacePreferences.getMainFontSize();
+            scene.getRoot().getStyleClass().add(fontSize);
         }
     }
 
