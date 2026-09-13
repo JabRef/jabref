@@ -35,6 +35,9 @@ public final class WhatsNewButton {
     /// The source checkout JabRef was started from; set by `jabgui/build.gradle.kts` for the `run` task only.
     static final String CHECKOUT_PROPERTY = "jabref.checkout";
 
+    /// Whether `just run-loop` waits to pull, rebuild and start JabRef again; only then is a restart offered.
+    static final String RESTART_LOOP_PROPERTY = "jabref.restart.loop";
+
     private final WhatsNewViewModel viewModel;
     private final DialogService dialogService;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
@@ -85,7 +88,8 @@ public final class WhatsNewButton {
             openDialog.getDialogPane().getScene().getWindow().requestFocus();
             return;
         }
-        WhatsNewDialog dialog = new WhatsNewDialog(viewModel.getPending(), viewModel.updateAvailableProperty(),
+        WhatsNewDialog dialog = new WhatsNewDialog(viewModel.getPending(),
+                Boolean.getBoolean(RESTART_LOOP_PROPERTY) ? Optional.of(viewModel.updateAvailableProperty()) : Optional.empty(),
                 url -> NativeDesktop.openBrowserShowPopup(url, dialogService, externalApplicationsPreferences));
         dialog.titleProperty().bind(viewModel.titleProperty());
         openDialog = dialog;
@@ -95,8 +99,13 @@ public final class WhatsNewButton {
             // A window closed before the answer: the news in it stay unseen, and the window is not touched again.
             presentation.cancel();
             openDialog = null;
-            if (dialog.restartChosen() && viewModel.requestRestart() == WhatsNewViewModel.RestartRequest.MARKER_NOT_WRITTEN) {
-                dialogService.notify(Localization.lang("Cannot request the restart (see the log) - JabRef keeps running."));
+            if (dialog.restartChosen()) {
+                WhatsNewViewModel.RestartRequest request = viewModel.requestRestart();
+                if (request == WhatsNewViewModel.RestartRequest.MARKER_NOT_WRITTEN) {
+                    dialogService.notify(Localization.lang("Cannot request the restart (see the log) - JabRef keeps running."));
+                } else if (request == WhatsNewViewModel.RestartRequest.MARKER_NOT_WITHDRAWN) {
+                    dialogService.notify(Localization.lang("Cannot withdraw the restart request (see the log) - the next quit restarts JabRef."));
+                }
             }
         });
     }

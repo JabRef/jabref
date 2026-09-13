@@ -70,8 +70,8 @@ class WhatsNewViewModelTest {
             due.forEach(super::execute);
         }
 
+        /// Runs what was held; tasks submitted meanwhile are held again.
         void runHeld() {
-            holding = false;
             List<BackgroundTask<?>> due = List.copyOf(held);
             held.clear();
             due.forEach(super::execute);
@@ -159,6 +159,24 @@ class WhatsNewViewModelTest {
         AtomicReference<News> presented = new AtomicReference<>();
 
         viewModel.present(presented::set, _ -> fail("the look must not fail"));
+
+        assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE))), presented.get());
+        assertEquals(News.NONE, viewModel.getPending());
+        assertEquals(Optional.of(Set.of(OLD, MINE)), announced().read());
+    }
+
+    @Test
+    void aLookOverlappingAPresentationDoesNotBringShownNewsBack() throws IOException {
+        announced().write(Set.of(OLD));
+        when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
+        viewModel.startWatching();
+        taskExecutor.holding = true;
+        AtomicReference<News> presented = new AtomicReference<>();
+        viewModel.present(presented::set, _ -> fail("the look must not fail"));
+        taskExecutor.runHeld();
+        // The periodic look reads the announced entries before the presentation's write got to them.
+        taskExecutor.runScheduled();
+        taskExecutor.runHeld();
 
         assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE))), presented.get());
         assertEquals(News.NONE, viewModel.getPending());

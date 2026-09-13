@@ -106,6 +106,16 @@ class CheckoutNewsTest {
     }
 
     @Test
+    void aLookWithoutAChangelogAnnouncesNothingEvenWhenAsked() throws IOException {
+        announced.write(Set.of(OLD));
+        when(checkout.blameWorkingTree()).thenReturn(Optional.empty());
+
+        news.announce(news.look(CheckoutNews.Mode.WITH_FETCH));
+
+        assertEquals(Optional.of(Set.of(OLD)), announced.read());
+    }
+
+    @Test
     void aLookAnnouncesNothingUntilAsked() throws IOException {
         announced.write(Set.of(OLD));
 

@@ -49,6 +49,12 @@ public record News(List<AttributedEntry> items) {
         return entries;
     }
 
+    /// The items whose entry is not among `announced` (by text, like [#pending]).
+    public News without(Set<ChangelogEntry> announced) {
+        Set<String> announcedTexts = announced.stream().map(ChangelogEntry::text).collect(Collectors.toSet());
+        return new News(items.stream().filter(item -> !announcedTexts.contains(item.entry().text())).toList());
+    }
+
     public boolean isEmpty() {
         return items.isEmpty();
     }

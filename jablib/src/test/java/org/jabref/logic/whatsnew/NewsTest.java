@@ -57,6 +57,13 @@ class NewsTest {
     }
 
     @Test
+    void withoutDropsTheAnnouncedEntriesByText() {
+        News news = new News(List.of(new AttributedEntry(ALICE, ADDED), new AttributedEntry(BOB, BRAND_NEW)));
+
+        assertEquals(new News(List.of(new AttributedEntry(BOB, BRAND_NEW))), news.without(Set.of(new ChangelogEntry("6.0", "Added", ADDED.text()))));
+    }
+
+    @Test
     void allEntriesSpanEveryChangelogOnce() {
         List<BlamedChangelog> changelogs = List.of(changelog(ALICE, ADDED, FIXED), changelog(Contributor.Me.REMOTE, FIXED, BRAND_NEW));
 

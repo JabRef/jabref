@@ -129,8 +129,12 @@ application {
 }
 
 tasks.named<JavaExec>("run") {
-    // Tells the running JabRef which source checkout started it, for the "What's new" button; a packaged JabRef has none.
+    // For the "What's new" button: the source checkout JabRef runs from (a packaged JabRef has none), and whether
+    // `just run-loop` (which passes -PrestartLoop) waits to pull, rebuild and start JabRef again.
     systemProperty("jabref.checkout", rootDir.absolutePath)
+    if (project.hasProperty("restartLoop")) {
+        systemProperty("jabref.restart.loop", "true")
+    }
     // "assert" statements in the code should activated when running using gradle
     enableAssertions = true
     jvmArgs(application.applicationDefaultJvmArgs)

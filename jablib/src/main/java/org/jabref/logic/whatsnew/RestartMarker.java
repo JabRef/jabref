@@ -36,12 +36,15 @@ public final class RestartMarker {
         }
     }
 
-    /// Takes the marker back, so the next quit is an ordinary one.
-    public void withdraw() {
+    /// Takes the marker back, so the next quit is an ordinary one; `false` when it cannot be removed, which is
+    /// logged.
+    public boolean withdraw() {
         try {
             Files.deleteIfExists(file);
+            return true;
         } catch (IOException e) {
             LOGGER.warn("Cannot remove {}", file, e);
+            return false;
         }
     }
 }

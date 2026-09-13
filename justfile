@@ -30,7 +30,7 @@ run-loop: ensure-gg-cmd
         just whats-new || exit $?
         marker="$(git rev-parse --absolute-git-dir)/restart-requested"
         rm -f "$marker"
-        sh ./gg.cmd gradle :jabgui:run || { status=$?; rm -f "$marker"; exit $status; }
+        sh ./gg.cmd gradle :jabgui:run -PrestartLoop || { status=$?; rm -f "$marker"; exit $status; }
         [ -f "$marker" ] || break
         rm -f "$marker"
     done
@@ -69,7 +69,7 @@ whats-new *FLAGS: ensure-gg-cmd
 
 [windows]
 run-loop: ensure-gg-cmd
-    while ($true) { git pull --no-rebase; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; just whats-new; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $marker = "$(git rev-parse --absolute-git-dir)/restart-requested"; Remove-Item -ErrorAction Ignore $marker; .\gg.cmd gradle :jabgui:run; if ($LASTEXITCODE -ne 0) { Remove-Item -ErrorAction Ignore $marker; exit $LASTEXITCODE }; if (-not (Test-Path $marker)) { break }; Remove-Item $marker }
+    while ($true) { git pull --no-rebase; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; just whats-new; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $marker = "$(git rev-parse --absolute-git-dir)/restart-requested"; Remove-Item -ErrorAction Ignore $marker; .\gg.cmd gradle :jabgui:run -PrestartLoop; if ($LASTEXITCODE -ne 0) { Remove-Item -ErrorAction Ignore $marker; exit $LASTEXITCODE }; if (-not (Test-Path $marker)) { break }; Remove-Item $marker }
 
 [windows]
 run: ensure-gg-cmd

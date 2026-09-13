@@ -50,6 +50,8 @@ public class WhatsNewViewModel extends AbstractViewModel {
         REQUESTED,
         /// The user kept JabRef open (a library to save first); the marker is withdrawn.
         DECLINED_BY_USER,
+        /// The user kept JabRef open, but the marker could not be withdrawn: the next quit restarts JabRef.
+        MARKER_NOT_WITHDRAWN,
         /// The marker could not be written; JabRef keeps running.
         MARKER_NOT_WRITTEN
     }
@@ -112,7 +114,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
             show(look);
             if (look.fetched()) {
                 onChecked.accept(look.news());
-                pending.set(News.NONE);
+                pending.set(pending.get().without(look.seen()));
                 announce(look);
             } else {
                 onFailed.accept(look.news());
@@ -135,8 +137,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
         if (quit.getAsBoolean()) {
             return RestartRequest.REQUESTED;
         }
-        restartMarker.withdraw();
-        return RestartRequest.DECLINED_BY_USER;
+        return restartMarker.withdraw() ? RestartRequest.DECLINED_BY_USER : RestartRequest.MARKER_NOT_WITHDRAWN;
     }
 
     /// The next periodic look; none once the executor is shut down, i.e. while JabRef quits.
@@ -157,12 +158,14 @@ public class WhatsNewViewModel extends AbstractViewModel {
                              .onFailure(e -> LOGGER.warn("Cannot look at the checkout", e));
     }
 
-    /// Makes the news of `look` old, in the background. FX thread.
+    /// Makes the news of `look` old, in the background. A look that ran meanwhile has read the old announced
+    /// entries and shown them again, so the pending news drop them once more when the write is done. FX thread.
     private void announce(Look look) {
         BackgroundTask.wrap(() -> {
                           news.announce(look);
                           return look;
                       })
+                      .onSuccess(announced -> pending.set(pending.get().without(announced.seen())))
                       .onFailure(e -> LOGGER.warn("Cannot remember the announced entries", e))
                       .executeWith(taskExecutor);
     }

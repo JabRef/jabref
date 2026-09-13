@@ -70,8 +70,12 @@ public final class CheckoutNews {
     }
 
     /// Makes everything `look` saw old: called once its news were shown, so a window closed before its answer
-    /// leaves the news pending. Blocking: not for the UI thread.
+    /// leaves the news pending. A look that saw no entry (no changelog could be read) announces nothing, or
+    /// everything announced before would be news again once the changelog is back. Blocking: not for the UI thread.
     public synchronized void announce(Look look) throws IOException {
+        if (look.seen().isEmpty()) {
+            return;
+        }
         announced.write(look.seen());
     }
 }

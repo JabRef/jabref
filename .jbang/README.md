@@ -161,6 +161,6 @@ just whats-new --stdout   # plain text instead
 
 The first run only records the current changelog (in the checkout's `.git` directory) and shows nothing.
 
-While JabRef runs from a checkout (started by `just run`, i.e. Gradle's `run` task), the same news lives in a "What's new" toolbar button next to the GitHub one: every five minutes it fetches, turns blue once the checkout is behind, lists the pending entries in its tooltip and, clicked, opens the window with a *Restart to update* button.
-`just run-loop` makes that restart work: it pulls, rebuilds and starts JabRef again.
+While JabRef runs from a checkout (started by `just run`, i.e. Gradle's `run` task), the same news lives in a "What's new" toolbar button next to the GitHub one: every five minutes it fetches, turns blue once the checkout is behind, lists the pending entries in its tooltip and, clicked, opens the window.
+Under `just run-loop` the window also offers *Restart to update*: the loop pulls, rebuilds and starts JabRef again.
 The window before the start and the button share what was shown, so nothing is shown twice.

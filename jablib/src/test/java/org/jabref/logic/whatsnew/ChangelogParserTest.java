@@ -47,6 +47,23 @@ class ChangelogParserTest {
     }
 
     @Test
+    void indentedLinesContinueAnEntry() {
+        List<String> changelog = List.of(
+                "## [Unreleased]",
+                "### Changed",
+                "- We upgraded the search library.",
+                "  Existing indexes are rebuilt on the first start.",
+                "  [#1](https://github.com/JabRef/jabref/pull/1)",
+                "- Another entry.",
+                "",
+                "  Not a continuation: a blank line ended the entry.");
+
+        assertEquals(Map.of(
+                2, new ChangelogEntry("Unreleased", "Changed", "We upgraded the search library. Existing indexes are rebuilt on the first start. [#1](https://github.com/JabRef/jabref/pull/1)"),
+                5, new ChangelogEntry("Unreleased", "Changed", "Another entry.")), ChangelogParser.entries(changelog));
+    }
+
+    @Test
     void textOutsideEntriesIsIgnored() {
         List<String> changelog = List.of(
                 "# Changelog",
@@ -54,7 +71,6 @@ class ChangelogParserTest {
                 "## [Unreleased]",
                 "### Added",
                 "- An entry.",
-                "  continued on the next line.",
                 "[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0...HEAD");
 
         assertEquals(Map.of(4, new ChangelogEntry("Unreleased", "Added", "An entry.")), ChangelogParser.entries(changelog));
