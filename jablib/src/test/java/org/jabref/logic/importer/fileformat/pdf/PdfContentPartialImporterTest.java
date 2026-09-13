@@ -157,6 +157,22 @@ class PdfContentPartialImporterTest {
 
     // [utest->req~import.pdf.plausible-year~1]
     @Test
+    void implausibleYearInSpringerFooterNotImported() {
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                A. Persson and J. Stirna (Eds.): PoEM, LNBIP 39, pp. 161-175, 7056.""";
+
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("161-175"), entry.flatMap(parsed -> parsed.getField(StandardField.PAGES)));
+        assertEquals(Optional.empty(), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
     void implausibleFourDigitNumberSkippedInFavorOfActualYear() {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Alice Sample")
