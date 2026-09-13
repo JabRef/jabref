@@ -5,9 +5,11 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.ai.llm.AiProvider;
+import org.jabref.model.http.SimpleHttpResponse;
 
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.json.JSONArray;
@@ -49,6 +51,9 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
             models = parseModelsFromResponse(new JsonNode(response));
 
             LOGGER.debug("Successfully fetched {} models from {}", models.size(), aiProvider.name());
+        } catch (FetcherClientException e) {
+            // Invalid API key or wrong base URL: URLDownload already logged the response, a stack trace adds nothing
+            LOGGER.warn("Could not fetch models from {}: {}", aiProvider.name(), e.getHttpResponse().map(SimpleHttpResponse::statusCode).orElse(-1));
         } catch (FetcherException | MalformedURLException | JSONException e) {
             LOGGER.error("Failed to fetch models from {}", aiProvider.name(), e);
         }
