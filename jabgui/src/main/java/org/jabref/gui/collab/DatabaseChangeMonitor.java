@@ -26,10 +26,12 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.ConflictedCopies;
 import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.dlsc.gemsfx.infocenter.NotificationAction;
+import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -71,7 +73,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// instead of applying stale content.
     private volatile int scanGeneration;
 
-    private final ChangeListener<Boolean> synchronizingListener = (_, _, enabled) -> onSynchronizingChanged(enabled);
+    private final ChangeListener<Boolean> synchronizingListener = (_, _, _) -> onSynchronizingChanged(isSynchronizing());
+    private final ChangeListener<Boolean> mergingCopiesListener = (_, _, _) -> mergeConflictedCopies(baseline);
 
     /// Conflicted copies already merged, with the state they had at that time; a copy is written once by the sync
     /// client, so the same file is not merged again on every scan.
@@ -108,7 +111,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             // Registered once per monitor; a tab replacing its monitor calls unregister() on the old one first, which
             // removes this listener again, so the preference never accumulates listeners
             if (database.getLocation() == DatabaseLocation.LOCAL) {
-                preferences.getLibraryPreferences().autoSaveProperty().addListener(synchronizingListener);
+                preferences.getLibraryPreferences().synchronizeWithFileProperty().addListener(synchronizingListener);
+                preferences.getLibraryPreferences().mergeConflictedCopiesProperty().addListener(mergingCopiesListener);
+                database.getMetaData().registerListener(this);
             }
         });
 
@@ -214,10 +219,23 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         }
     }
 
-    /// Synchronizing (silently merging external changes) is tied to the autosave preference: both together keep a
-    /// local library and its file the same in both directions.
+    /// Synchronizing (silently merging external changes) is decided by the library itself, or, if it does not, by the
+    /// global preference.
     private boolean isSynchronizing() {
-        return database.getLocation() == DatabaseLocation.LOCAL && preferences.getLibraryPreferences().shouldAutoSave();
+        return database.getLocation() == DatabaseLocation.LOCAL
+                && database.getMetaData().getSynchronizeWithFile().orElseGet(() -> preferences.getLibraryPreferences().shouldSynchronizeWithFile());
+    }
+
+    /// Merging conflicted copies is decided the same way, and only while synchronizing at all.
+    private boolean isMergingConflictedCopies() {
+        return isSynchronizing()
+                && database.getMetaData().getMergeConflictedCopies().orElseGet(() -> preferences.getLibraryPreferences().shouldMergeConflictedCopies());
+    }
+
+    /// The library's own setting is part of its metadata, which the library properties dialog changes.
+    @Subscribe
+    public void listen(MetaDataChangedEvent event) {
+        onSynchronizingChanged(isSynchronizing());
     }
 
     /// Synchronization switched on for an open library needs a baseline right away: as long as the library is
@@ -226,8 +244,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         boolean captured = false;
         synchronized (database) {
             if (!enabled) {
-                baseline = null;
-                scanGeneration++;
+                if (baseline != null) {
+                    baseline = null;
+                    scanGeneration++;
+                }
             } else if (baseline == null && !libraryTab.isModified()) {
                 baseline = captureBaseline();
                 captured = baseline != null;
@@ -389,7 +409,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// [impl->req~ux.external-library-changes.conflicted-copies~1]
     private void mergeConflictedCopies(@Nullable LibraryBaseline scannedBaseline) {
         Path path = monitoredPath.orElse(null);
-        if (path == null || scannedBaseline == null || !isSynchronizing()) {
+        if (path == null || scannedBaseline == null || !isMergingConflictedCopies()) {
             return;
         }
         Optional<Path> next = ConflictedCopies.find(path).stream()
@@ -503,7 +523,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             fileMonitor.removeListener(path, this);
             // Unconditionally: the library may have been converted to a shared one since the listener was added,
             // and removing a listener that was never added is a no-op
-            preferences.getLibraryPreferences().autoSaveProperty().removeListener(synchronizingListener);
+            preferences.getLibraryPreferences().synchronizeWithFileProperty().removeListener(synchronizingListener);
+            preferences.getLibraryPreferences().mergeConflictedCopiesProperty().removeListener(mergingCopiesListener);
+            database.getMetaData().unregisterListener(this);
         });
     }
 }

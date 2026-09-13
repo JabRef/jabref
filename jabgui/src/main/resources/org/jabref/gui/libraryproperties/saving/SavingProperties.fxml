@@ -21,6 +21,16 @@
     <Label styleClass="h4,padding-top-12" text="%Save actions"/>
     <FieldFormatterCleanupsPanel fx:id="fieldFormatterCleanupsPanel" />
 
+    <Label styleClass="h4,padding-top-12" text="%Synchronization with the library file"/>
+    <HBox spacing="8.0" alignment="CENTER_LEFT">
+        <Label text="%Merge external changes of the file into the library without asking"/>
+        <ComboBox fx:id="synchronizeWithFile"/>
+    </HBox>
+    <HBox spacing="8.0" alignment="CENTER_LEFT">
+        <Label text="%Merge conflicted copies left by sync clients"/>
+        <ComboBox fx:id="mergeConflictedCopies"/>
+    </HBox>
+
     <Label styleClass="h4,padding-top-12" text="%Journal abbreviation on save"/>
     <HBox spacing="8.0" alignment="CENTER_LEFT">
         <Label text="%Abbreviation style"/>

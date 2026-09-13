@@ -15,17 +15,23 @@ public class LibraryPreferences {
     private final ObjectProperty<BibDatabaseMode> defaultBibDatabaseMode;
     private final BooleanProperty alwaysReformatOnSave;
     private final BooleanProperty autoSave;
+    private final BooleanProperty synchronizeWithFile;
+    private final BooleanProperty mergeConflictedCopies;
     private final BooleanProperty addImportedEntries;
     private final StringProperty addImportedEntriesGroupName;
 
     public LibraryPreferences(BibDatabaseMode defaultBibDatabaseMode,
                               boolean alwaysReformatOnSave,
                               boolean autoSave,
+                              boolean synchronizeWithFile,
+                              boolean mergeConflictedCopies,
                               boolean addImportedEntries,
                               String addImportedEntriesGroupName) {
         this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.autoSave = new SimpleBooleanProperty(autoSave);
+        this.synchronizeWithFile = new SimpleBooleanProperty(synchronizeWithFile);
+        this.mergeConflictedCopies = new SimpleBooleanProperty(mergeConflictedCopies);
         this.addImportedEntries = new SimpleBooleanProperty(addImportedEntries);
         this.addImportedEntriesGroupName = new SimpleStringProperty(addImportedEntriesGroupName);
     }
@@ -35,6 +41,8 @@ public class LibraryPreferences {
                 BibDatabaseMode.BIBTEX,
                 false,                                // alwaysReformatOnSave
                 false,                                // autoSave
+                false,                                // synchronizeWithFile
+                false,                                // mergeConflictedCopies
                 false,                                // addImportedEntries
                 Localization.lang("Imported entries") // addImportedEntriesGroupName
         );
@@ -78,6 +86,32 @@ public class LibraryPreferences {
 
     public void setAutoSave(boolean shouldAutoSave) {
         this.autoSave.set(shouldAutoSave);
+    }
+
+    /// The default for libraries that do not decide it themselves (see `MetaData.getSynchronizeWithFile`)
+    public boolean shouldSynchronizeWithFile() {
+        return synchronizeWithFile.get();
+    }
+
+    public BooleanProperty synchronizeWithFileProperty() {
+        return synchronizeWithFile;
+    }
+
+    public void setSynchronizeWithFile(boolean synchronizeWithFile) {
+        this.synchronizeWithFile.set(synchronizeWithFile);
+    }
+
+    /// The default for libraries that do not decide it themselves (see `MetaData.getMergeConflictedCopies`)
+    public boolean shouldMergeConflictedCopies() {
+        return mergeConflictedCopies.get();
+    }
+
+    public BooleanProperty mergeConflictedCopiesProperty() {
+        return mergeConflictedCopies;
+    }
+
+    public void setMergeConflictedCopies(boolean mergeConflictedCopies) {
+        this.mergeConflictedCopies.set(mergeConflictedCopies);
     }
 
     public boolean shouldAddImportedEntries() {

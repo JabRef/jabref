@@ -24,6 +24,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -54,6 +55,7 @@ class DatabaseChangeMonitorTest {
 
         BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(originalPath), Optional.of(newPath));
+        when(databaseContext.getMetaData()).thenReturn(new MetaData());
 
         FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
 
@@ -321,7 +323,8 @@ class DatabaseChangeMonitorTest {
     /// A monitor with synchronization on, whose background work runs immediately on the calling thread
     private DatabaseChangeMonitor createSynchronizingMonitor(BibDatabaseContext databaseContext, DialogService dialogService) {
         GuiPreferences preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferences.getLibraryPreferences().shouldAutoSave()).thenReturn(true);
+        when(preferences.getLibraryPreferences().shouldSynchronizeWithFile()).thenReturn(true);
+        when(preferences.getLibraryPreferences().shouldMergeConflictedCopies()).thenReturn(true);
         when(preferences.getCitationKeyPatternPreferences().getKeyPatterns()).thenReturn(GlobalCitationKeyPatterns.fromPattern("[auth][year]"));
         when(preferences.getImportFormatPreferences().bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         return new DatabaseChangeMonitor(
@@ -348,6 +351,21 @@ class DatabaseChangeMonitorTest {
         createSynchronizingMonitor(databaseContext, mock(DialogService.class));
 
         assertEquals(List.of("a", "b", "c"), database.getEntries().stream().map(entry -> entry.getCitationKey().orElseThrow()).sorted().toList());
+    }
+
+    @Test
+    void conflictedCopiesAreLeftAloneWhenTheLibraryOptsOut(@TempDir Path tempDir) throws Exception {
+        Path library = tempDir.resolve("library.bib");
+        Files.writeString(library, "@Article{a, title = {A}}");
+        Files.writeString(tempDir.resolve("library (conflicted copy 2026-09-03).bib"), "@Article{a, title = {A}}\n@Article{b, title = {B}}");
+        BibDatabase database = new BibDatabase(List.of(new BibEntry().withCitationKey("a").withField(StandardField.TITLE, "A")));
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        databaseContext.setDatabasePath(library);
+        databaseContext.getMetaData().setMergeConflictedCopies(false);
+
+        createSynchronizingMonitor(databaseContext, mock(DialogService.class));
+
+        assertEquals(1, database.getEntryCount());
     }
 
     @Test

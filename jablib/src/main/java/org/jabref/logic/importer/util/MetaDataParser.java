@@ -155,6 +155,10 @@ public class MetaDataParser {
                 } else {
                     metaData.markAsNotProtected();
                 }
+            } else if (MetaData.SYNCHRONIZE_WITH_FILE.equals(entry.getKey())) {
+                metaData.setSynchronizeWithFile(Boolean.parseBoolean(getSingleItem(values)));
+            } else if (MetaData.MERGE_CONFLICTED_COPIES.equals(entry.getKey())) {
+                metaData.setMergeConflictedCopies(Boolean.parseBoolean(getSingleItem(values)));
             } else if (MetaData.GIT_AUTO_PULL.equals(entry.getKey())) {
                 metaData.setGitAutoPull(Boolean.parseBoolean(getSingleItem(values)));
             } else if (MetaData.GIT_AUTO_COMMIT.equals(entry.getKey())) {

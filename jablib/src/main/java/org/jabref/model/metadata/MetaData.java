@@ -65,6 +65,8 @@ public class MetaData {
     public static final String BLG_FILE_PATH = "blgFilePath";
     public static final String AI_LIBRARY_ID = "aiLibraryId";
 
+    public static final String SYNCHRONIZE_WITH_FILE = "synchronizeWithFile";
+    public static final String MERGE_CONFLICTED_COPIES = "mergeConflictedCopies";
     public static final String GIT_AUTO_PULL = "gitAutoPull";
     public static final String GIT_AUTO_COMMIT = "gitAutoCommit";
     public static final String GIT_AUTO_PUSH = "gitAutoPush";
@@ -85,6 +87,10 @@ public class MetaData {
     @Nullable private FieldFormatterCleanupActions saveActions;
     @Nullable private BibDatabaseMode mode;
     @Nullable private AbbreviationType libraryAbbreviationType;
+    /// Absent when the library follows the global preference
+    @Nullable private Boolean synchronizeWithFile;
+    /// Absent when the library follows the global preference
+    @Nullable private Boolean mergeConflictedCopies;
     @Nullable private Character keywordSeparator;
     private boolean isProtected;
     @Nullable private String librarySpecificFileDirectory;
@@ -288,6 +294,50 @@ public class MetaData {
         postChange();
     }
 
+    /// Whether external changes of the library file are merged into the library without asking; absent if the
+    /// library does not decide this itself (then the global preference applies)
+    public Optional<Boolean> getSynchronizeWithFile() {
+        return Optional.ofNullable(synchronizeWithFile);
+    }
+
+    public void setSynchronizeWithFile(boolean synchronizeWithFile) {
+        if (Objects.equals(this.synchronizeWithFile, synchronizeWithFile)) {
+            return;
+        }
+        this.synchronizeWithFile = synchronizeWithFile;
+        postChange();
+    }
+
+    public void clearSynchronizeWithFile() {
+        if (this.synchronizeWithFile == null) {
+            return;
+        }
+        this.synchronizeWithFile = null;
+        postChange();
+    }
+
+    /// Whether conflicted copies left by a sync client next to the library file are merged into the library; absent
+    /// if the library does not decide this itself (then the global preference applies)
+    public Optional<Boolean> getMergeConflictedCopies() {
+        return Optional.ofNullable(mergeConflictedCopies);
+    }
+
+    public void setMergeConflictedCopies(boolean mergeConflictedCopies) {
+        if (Objects.equals(this.mergeConflictedCopies, mergeConflictedCopies)) {
+            return;
+        }
+        this.mergeConflictedCopies = mergeConflictedCopies;
+        postChange();
+    }
+
+    public void clearMergeConflictedCopies() {
+        if (this.mergeConflictedCopies == null) {
+            return;
+        }
+        this.mergeConflictedCopies = null;
+        postChange();
+    }
+
     /// The separator used in this library's keyword fields; absent if the library does not declare one (then the global preference applies)
     public Optional<Character> getKeywordSeparator() {
         return Optional.ofNullable(keywordSeparator);
@@ -454,6 +504,8 @@ public class MetaData {
         saveActions = other.saveActions;
         mode = other.mode;
         libraryAbbreviationType = other.libraryAbbreviationType;
+        synchronizeWithFile = other.synchronizeWithFile;
+        mergeConflictedCopies = other.mergeConflictedCopies;
         keywordSeparator = other.keywordSeparator;
         isProtected = other.isProtected;
         librarySpecificFileDirectory = other.librarySpecificFileDirectory;
@@ -572,6 +624,8 @@ public class MetaData {
                 && Objects.equals(saveActions, that.saveActions)
                 && (mode == that.mode)
                 && (libraryAbbreviationType == that.libraryAbbreviationType)
+                && Objects.equals(synchronizeWithFile, that.synchronizeWithFile)
+                && Objects.equals(mergeConflictedCopies, that.mergeConflictedCopies)
                 && Objects.equals(keywordSeparator, that.keywordSeparator)
                 && Objects.equals(librarySpecificFileDirectory, that.librarySpecificFileDirectory)
                 && Objects.equals(contentSelectors, that.contentSelectors)
