@@ -81,7 +81,12 @@ public final class WhatsNewButton {
         });
         openDialog = dialog;
         dialogService.showCustomDialog(dialog);
-        viewModel.present(dialog::checked);
+        // A window closed while the fetch runs is not touched again.
+        viewModel.present(news -> {
+            if (openDialog == dialog) {
+                dialog.checked(news);
+            }
+        });
     }
 
     /// The click; the status message becomes the tooltip's second part.

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import javafx.beans.binding.Bindings;
@@ -64,6 +65,10 @@ public class WhatsNewViewModel extends AbstractViewModel {
     private final BooleanBinding updateAvailable = commitsBehind.greaterThan(0);
     private final StringBinding tooltip = Bindings.createStringBinding(this::tooltipText, pending, commitsBehind, title);
 
+    /// Counts the looks that started running; a look whose answer arrives after a later look started is dropped,
+    /// so a slow scheduled look never replaces what a click just found. FX thread.
+    private long looksStarted;
+
     /// What one look at the checkout found; `seen` holds every entry the look passed by, news or not.
     private record Look(int commitsBehind, String title, News news, Set<ChangelogEntry> seen) {
     }
@@ -99,26 +104,24 @@ public class WhatsNewViewModel extends AbstractViewModel {
 
     /// One look now without fetching (`just run-loop` has just pulled), then a fetch every five minutes.
     public void startWatching() {
-        BackgroundTask.wrap(() -> look(false))
-                      .onSuccess(this::show)
-                      .onFinished(this::scheduleNextLook)
-                      .executeWith(taskExecutor);
+        startLook(false, this::show)
+                .onFinished(this::scheduleNextLook)
+                .executeWith(taskExecutor);
     }
 
     /// A look on demand: fetches, hands the news found to `present` and makes them old — the tooltip drops
     /// them and the announced entries take them. Should the look fail, `present` gets the news known so far.
     public void present(Consumer<News> present) {
-        BackgroundTask.wrap(() -> look(true))
-                      .onSuccess(look -> {
-                          show(look);
-                          present.accept(look.news());
-                          announce(look.seen());
-                      })
-                      .onFailure(e -> {
-                          LOGGER.warn("Cannot look at the checkout", e);
-                          present.accept(pending.get());
-                      })
-                      .executeWith(taskExecutor);
+        startLook(true, look -> {
+            show(look);
+            present.accept(look.news());
+            announce(look.seen());
+        })
+                .onFailure(e -> {
+                    LOGGER.warn("Cannot look at the checkout", e);
+                    present.accept(pending.get());
+                })
+                .executeWith(taskExecutor);
     }
 
     /// Leaves the marker for `just run-loop` and quits.
@@ -132,10 +135,23 @@ public class WhatsNewViewModel extends AbstractViewModel {
     }
 
     private void scheduleNextLook() {
-        BackgroundTask.wrap(() -> look(true))
-                      .onSuccess(this::show)
-                      .onFinished(this::scheduleNextLook)
-                      .scheduleWith(taskExecutor, CHECK_INTERVAL.toMinutes(), TimeUnit.MINUTES);
+        startLook(true, this::show)
+                .onFinished(this::scheduleNextLook)
+                .scheduleWith(taskExecutor, CHECK_INTERVAL.toMinutes(), TimeUnit.MINUTES);
+    }
+
+    /// The task for one look, not started yet. Its answer reaches `onSuccess` only while it is the latest look
+    /// that started running; a failure is logged. FX thread.
+    private BackgroundTask<Look> startLook(boolean fetch, Consumer<Look> onSuccess) {
+        AtomicLong thisLook = new AtomicLong();
+        return BackgroundTask.wrap(() -> look(fetch))
+                             .onRunning(() -> thisLook.set(++looksStarted))
+                             .onSuccess(look -> {
+                                 if (thisLook.get() == looksStarted) {
+                                     onSuccess.accept(look);
+                                 }
+                             })
+                             .onFailure(e -> LOGGER.warn("Cannot look at the checkout", e));
     }
 
     /// Reads the checkout: the working tree's changelog, plus the upstream's once the checkout is behind, so an
