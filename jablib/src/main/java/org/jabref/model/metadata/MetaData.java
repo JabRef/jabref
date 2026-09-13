@@ -27,6 +27,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.EventBus;
@@ -126,6 +127,14 @@ public class MetaData {
 
     /// Sets a new group root node. **WARNING **: This invalidates everything returned by getGroups() so far!!!
     public void setGroups(@NonNull GroupTreeNode root) {
+        setGroups(root, MetaDataChangeSource.LOCAL);
+    }
+
+    /// Sets a new group root node, reporting who is behind the change.
+    ///
+    /// The group panel writes its tree back through here after every operation it records, and so
+    /// does undoing one, which is why this door can say [MetaDataChangeSource#JOURNAL].
+    public void setGroups(@NonNull GroupTreeNode root, MetaDataChangeSource source) {
         // Subscribed once per node. The group panel writes its tree back after every operation, and
         // most of those hand back the node already installed: subscribing again each time would
         // multiply the listeners on it, so one edit would then post as many events as operations
@@ -136,15 +145,21 @@ public class MetaData {
             root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
         }
         eventBus.post(new GroupUpdatedEvent(this));
-        postChange();
+        postChange(source);
     }
 
     /// Removes the group tree, so that the library has no groups at all — the state it is in before
     /// the first group is created.
     public void clearGroups() {
+        clearGroups(MetaDataChangeSource.LOCAL);
+    }
+
+    /// Removes the group tree, reporting who is behind the change — see
+    /// [#setGroups(GroupTreeNode,MetaDataChangeSource)].
+    public void clearGroups(MetaDataChangeSource source) {
         groupsRoot.setValue(null);
         eventBus.post(new GroupUpdatedEvent(this));
-        postChange();
+        postChange(source);
     }
 
     public void setGroupSearchSyntaxVersion(Version version) {
@@ -411,6 +426,13 @@ public class MetaData {
     /// with it everything registered on its [EventBus] — installing `other` in the library instead
     /// would orphan every listener of the instance it replaced.
     public void overwriteWith(@NonNull MetaData other) {
+        overwriteWith(other, MetaDataChangeSource.LOCAL);
+    }
+
+    /// Overwrites this instance's contents with those of `other`, reporting who is behind the
+    /// change. The door an [org.jabref.model.undo.UndoableMetaDataChange] goes through, which is
+    /// why it can say [MetaDataChangeSource#JOURNAL].
+    public void overwriteWith(@NonNull MetaData other, MetaDataChangeSource source) {
         citeKeyPatterns.clear();
         citeKeyPatterns.putAll(other.citeKeyPatterns);
         userFileDirectory.clear();
@@ -444,15 +466,22 @@ public class MetaData {
 
         other.getGroups()
              .map(GroupTreeNode::copySubtree)
-             .ifPresentOrElse(this::setGroups, this::clearGroups);
+             .ifPresentOrElse(root -> setGroups(root, source), () -> clearGroups(source));
 
-        postChange();
+        postChange(source);
     }
 
     /// Posts a new [MetaDataChangedEvent] on the [EventBus].
     private void postChange() {
+        postChange(MetaDataChangeSource.LOCAL);
+    }
+
+    /// Every setter reports [MetaDataChangeSource#LOCAL]; the two doors a recorded change goes
+    /// through — [#setGroups(GroupTreeNode,MetaDataChangeSource)] and
+    /// [#overwriteWith(MetaData,MetaDataChangeSource)] — say so instead.
+    private void postChange(MetaDataChangeSource source) {
         if (isEventPropagationEnabled) {
-            eventBus.post(new MetaDataChangedEvent(this));
+            eventBus.post(new MetaDataChangedEvent(this, source));
         }
     }
 
@@ -494,7 +523,7 @@ public class MetaData {
     public void unregisterListener(Object listener) {
         try {
             this.eventBus.unregister(listener);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             // occurs if the event source has not been registered, should not prevent shutdown
         }
     }

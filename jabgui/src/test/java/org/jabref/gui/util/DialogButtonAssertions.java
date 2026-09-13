@@ -16,16 +16,21 @@ public class DialogButtonAssertions {
     private DialogButtonAssertions() {
     }
 
-    public static List<Button> buttonsOf(DialogPane pane) {
+    private static List<Button> buttonsOf(DialogPane pane) {
         return pane.getButtonTypes().stream()
                    .map(pane::lookupButton)
                    .map(Button.class::cast)
                    .toList();
     }
 
-    /// Asserts that every button of the pane shows its whole caption.
+    /// Asserts that every button of the pane's button bar shows its whole caption.
     public static void assertCaptionsAreNotTruncated(DialogPane pane) {
-        for (Button button : buttonsOf(pane)) {
+        assertCaptionsAreNotTruncated(buttonsOf(pane));
+    }
+
+    /// Asserts that every one of the buttons shows its whole caption.
+    public static void assertCaptionsAreNotTruncated(List<Button> buttons) {
+        for (Button button : buttons) {
             // A caption that does not fit is rendered with an ellipsis instead of the caption itself.
             assertEquals(button.getText(), ((Text) button.lookup(".text")).getText(),
                     "Caption of button '%s' is truncated".formatted(button.getText()));

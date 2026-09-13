@@ -34,7 +34,6 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddingsforseveral.GenerateEmbeddingsForSeveralTaskRequest;
 import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTaskRequest;
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.query.GroupNameFilterVisitor;
@@ -55,6 +54,7 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.undo.CompoundEdit;
 import org.jabref.model.undo.UndoableGroupTreeChange;
 
@@ -74,8 +74,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
-    private final BibEntryTypesManager entryTypesManager;
-    private final FieldPreferences fieldPreferences;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
@@ -105,9 +103,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                               @NonNull TaskExecutor taskExecutor
     ) {
         this.stateManager = stateManager;
-        this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.fieldPreferences = preferences.getFieldPreferences();
         this.dialogService = dialogService;
         this.aiService = aiService;
         this.localDragboard = localDragboard;
@@ -200,6 +196,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Gets invoked if the user changes the active database.
     /// We need to get the new group tree and update the view
     private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
+        disposeDisplayedGroups();
         currentDatabase = newDatabase;
         MetaData newMetaData = newDatabase.map(BibDatabaseContext::getMetaData).orElse(null);
         if (newMetaData != observedMetaData) {
@@ -228,8 +225,17 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
         selectedGroups.setAll(
                 stateManager.getSelectedGroups(newDatabase.get()).stream()
-                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
+                            .map(selectedGroup -> newRoot.findGroupNodeViewModel(selectedGroup)
+                                                         .orElseGet(() -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences)))
                             .toList());
+    }
+
+    private void disposeDisplayedGroups() {
+        GroupNodeViewModel root = rootGroup.get();
+        if (root != null) {
+            root.dispose();
+        }
+        selectedGroups.forEach(GroupNodeViewModel::dispose);
     }
 
     /// Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
@@ -244,7 +250,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
             newGroup.ifPresent(group -> recordTreeChange(Localization.lang("Add group"), _ -> {
                 GroupTreeNode newSubgroup = parent.addSubgroup(group);
                 // [impl->req~ux.groups.create-explicit-from-selection~1]
-                selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
+                GroupNodeViewModel newViewModel = parent.findGroupNodeViewModel(newSubgroup)
+                                                        .orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
+                selectedGroups.setAll(newViewModel);
 
                 // TODO: expand the parent so the new group is visible
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
@@ -253,7 +261,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void writeGroupChangesToMetaData() {
-        currentDatabase.ifPresent(database -> database.getMetaData().setGroups(rootGroup.get().getGroupNode()));
+        writeGroupChangesToMetaData(MetaDataChangeSource.LOCAL);
+    }
+
+    private void writeGroupChangesToMetaData(MetaDataChangeSource source) {
+        currentDatabase.ifPresent(database -> database.getMetaData().setGroups(rootGroup.get().getGroupNode(), source));
     }
 
     /// Records entry assignments as one undo step. The tree is untouched, so only the entries'
@@ -302,7 +314,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// and a step that took back only the entry assignments would leave the library in a state
     /// nothing describes. The journal hands over a failed block's changes for the same reason.
     private void writeBackAndRecord(MetaData metaData, Optional<GroupTreeNode> before, CompoundEdit edit) {
-        writeGroupChangesToMetaData();
+        // Written back as a journalled change: the step below describes it, so the tab must not
+        // mark the library for it — undoing the step brings the library back, marker included.
+        writeGroupChangesToMetaData(MetaDataChangeSource.JOURNAL);
         // Sorting an already sorted group, or dropping one where it already is, changes nothing:
         // recording that would enable Undo over a step that does nothing.
         if (!before.equals(metaData.getGroups())) {
@@ -339,7 +353,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             selectedGroups.setAll(newSuggestedSubgroups
                     .stream()
-                    .map(newSubGroup -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                    .map(newSubGroup -> rootGroup.get() != null
+                                        ? rootGroup.get().findGroupNodeViewModel(newSubGroup).orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                                        : new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
                     .toList());
 
             writeGroupChangesToMetaData();

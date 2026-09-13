@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.util;
 
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.testutils.category.ExternalServicesTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -38,7 +39,8 @@ public record UndoableGroupTreeChange(MetaData metaData, Optional<GroupTreeNode>
     @Override
     public ApplyResult apply() {
         after.map(GroupTreeNode::copySubtree)
-             .ifPresentOrElse(metaData::setGroups, metaData::clearGroups);
+             .ifPresentOrElse(root -> metaData.setGroups(root, MetaDataChangeSource.JOURNAL),
+                     () -> metaData.clearGroups(MetaDataChangeSource.JOURNAL));
         return ApplyResult.SUCCESS;
     }
 }

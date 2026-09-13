@@ -11,6 +11,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import javafx.collections.FXCollections;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -49,6 +54,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -135,6 +141,57 @@ class AllFieldsTabTest {
         JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertTrue(tab.editors.containsKey(StandardField.FILE));
+    }
+
+    @Test
+    void abstractEditorHiddenUntilSet() {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
+
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
+
+        assertFalse(tab.editors.containsKey(StandardField.ABSTRACT));
+    }
+
+    @Test
+    void abstractEditorGrowsWithWrappedContentUpToFiveRowsUntilFocused() {
+        assertEquals(4, abstractEditorExtraRows("word ".repeat(300)), 0.1);
+    }
+
+    @Test
+    void abstractEditorCountsEveryParagraph() {
+        assertEquals(3, abstractEditorExtraRows("one\ntwo\nthree\nfour"), 0.1);
+    }
+
+    /// Lays the abstract editor out in a scene of fixed width so the text area's skin exists and
+    /// its text is wrapped, then returns how many rows beyond the first the area got: its height
+    /// minus a one-row area's height, in units of the font's line height. The layout snaps heights
+    /// to whole pixels, so the rows are only reliable as a rounded quotient, never as raw pixels.
+    private double abstractEditorExtraRows(String abstractText) {
+        double[] result = new double[1];
+        JavaFxExtension.invokeAndWait(() -> {
+            TextArea filled = layoutAbstractEditor(abstractText);
+            // One-word baseline: an unset abstract has no editor, only a chip.
+            TextArea oneRow = layoutAbstractEditor("x");
+            Text row = new Text("X");
+            row.setFont(filled.getFont());
+            result[0] = Math.round((filled.getHeight() - oneRow.getHeight()) / row.getLayoutBounds().getHeight());
+        });
+        return result[0];
+    }
+
+    private TextArea layoutAbstractEditor(String abstractText) {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021")
+                                                             .withField(StandardField.ABSTRACT, abstractText);
+        tab.bindToEntry(entry);
+        Node editor = tab.editors.get(StandardField.ABSTRACT).getNode();
+        // VBox (not StackPane): a StackPane would stretch the editor to the scene height.
+        VBox root = new VBox(editor);
+        new Scene(root, 400, 600);
+        root.applyCss();
+        // Two passes: the first gives the area its width, the second wraps the text at it.
+        root.layout();
+        root.layout();
+        return (TextArea) editor.lookup(".text-area");
     }
 
     @Test

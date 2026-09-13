@@ -12,34 +12,6 @@ on:
         required: true
 
 jobs:
-  # "status: changes-required" describes the state before this push and is therefore stale:
-  # whether the new head still requires changes is only known once CI and Qodo have run on it.
-  # No label at all is the honest state for that window; "Comment on PR" sets the verdict.
-  # Own job, sharing the concurrency group of "Comment on PR": an evaluation still running for the
-  # previous head must finish before this removal, otherwise its stale verdict lands after it and
-  # the label survives the push. The group key mirrors the one there, which reads head repository
-  # and branch of the run that triggered it - the same PR head this event carries.
-  # Not in the job below: that one re-adds "automerge" after pushing a conflict resolution, which a
-  # removal queued behind an unrelated status evaluation could undo.
-  clear_changes_required:
-    if: github.repository == 'JabRef/jabref' && github.event.action == 'synchronize' && github.event.sender.login != 'jabref-machine'
-    name: 'Clear "status: changes-required"'
-    runs-on: ubuntu-slim
-    concurrency:
-      group: pr-status-${{ github.event.pull_request.head.repo.full_name }}-${{ github.event.pull_request.head.ref }}
-      cancel-in-progress: false
-    permissions:
-      issues: write
-      pull-requests: write
-    steps:
-      - name: Remove label
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: >-
-          gh pr edit "$PR_NUMBER" --remove-label "status: changes-required"
-
   conflicts_with_target:
     if: github.repository == 'JabRef/jabref'
     name: Conflicts with target branch
@@ -55,13 +27,34 @@ jobs:
           show-progress: 'false'
       # A human push invalidates the bot's earlier approval; "automerge" must be granted again explicitly.
       # The merge commit pushed by this workflow (as jabref-machine) is exempt, as it does not change the PR's content.
-      - name: Remove automerge label on push
+      # Both status labels describe the state before the push and are therefore stale: whether the new
+      # head requires changes or is ready for review is only known once CI and Qodo have run on it.
+      # No label at all is the honest state for that window; "Comment on PR" sets the verdict.
+      # Deliberately not in the concurrency group of "Comment on PR", although that would order the
+      # removal before a still-running evaluation of the previous head: a group holds only one
+      # pending run, and that workflow queues one per completed check, so the removal was cancelled
+      # before it ran on about half of all pushes.
+      - name: Remove stale labels on push
         if: github.event.action == 'synchronize' && github.event.sender.login != 'jabref-machine'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: gh pr edit "$PR_NUMBER" --remove-label automerge
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Without the group above, a run held in the runner queue can reach this point after a
+          # newer push has already been evaluated. Its verdict is the current one and nothing would
+          # recompute it before the next push, so a stale run must leave every label alone -
+          # including "automerge", which the newer push's own run removes.
+          # The second between this read and the edit below needs no closing: a verdict for a head
+          # pushed within it cannot exist yet, as "Comment on PR" defers while checks are pending.
+          # Separate query from test so a failed API call fails the step instead of reading as "moved on".
+          live_head=$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)
+          if [ "$live_head" != "$HEAD_SHA" ]; then
+            echo "⊘ PR moved on since this push - labels left untouched" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          gh pr edit "$PR_NUMBER" --remove-label "automerge,status: changes-required,status: ready-for-review"
       - name: Get PR info
         id: pr_info
         env:
