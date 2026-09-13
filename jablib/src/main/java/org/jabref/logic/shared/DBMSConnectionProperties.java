@@ -1,5 +1,6 @@
 package org.jabref.logic.shared;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -151,7 +152,8 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
             return false;
         }
         return Objects.equals(type, properties.getType())
-                && this.host.equalsIgnoreCase(properties.getHost())
+                // Remembered preferences may lack the host; equality must not throw on them
+                && ((host == null) ? (properties.getHost() == null) : host.equalsIgnoreCase(properties.getHost()))
                 && Objects.equals(port, properties.getPort())
                 && Objects.equals(database, properties.getDatabase())
                 && Objects.equals(user, properties.getUser())
@@ -163,7 +165,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, host, port, database, user, useSSL, allowPublicKeyRetrieval, jdbcUrl, expertMode);
+        return Objects.hash(type, (host == null) ? null : host.toLowerCase(Locale.ROOT), port, database, user, useSSL, allowPublicKeyRetrieval, jdbcUrl, expertMode);
     }
 
     @Override
