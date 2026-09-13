@@ -4,19 +4,19 @@ import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.FileHistoryMenu;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.util.io.FileHistory;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class FileHistoryMenuTest {
     private static final String BIBTEX_LIBRARY_PATH = "src/test/resources/org/jabref/";
 

@@ -53,6 +53,7 @@
                         fx:id="chatHistoryScrollPane"
                         fitToWidth="true"
                         fitToHeight="true"
+                        focusTraversable="false"
                         spacing="10"
                         styleClass="bordered">
                     <contentPadding>

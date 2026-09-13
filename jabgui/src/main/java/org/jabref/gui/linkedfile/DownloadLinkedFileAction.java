@@ -26,11 +26,13 @@ import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProgressInputStream;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileNameUniqueness;
@@ -38,6 +40,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import com.tobiasdiez.easybind.EasyBind;
 import kong.unirest.core.UnirestException;
@@ -59,6 +63,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     private final boolean keepHtmlLink;
 
     private final BibDatabaseContext databaseContext;
+    private final UndoManager undoManager;
 
     private final DoubleProperty downloadProgress = new SimpleDoubleProperty();
     private final LinkedFileHandler linkedFileHandler;
@@ -73,7 +78,8 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                                     FilePreferences filePreferences,
                                     TaskExecutor taskExecutor,
                                     String suggestedName,
-                                    boolean keepHtmlLink) {
+                                    boolean keepHtmlLink,
+                                    UndoManager undoManager) {
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.linkedFile = linkedFile;
@@ -84,6 +90,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
         this.keepHtmlLink = keepHtmlLink;
+        this.undoManager = undoManager;
 
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
     }
@@ -96,7 +103,8 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                                     DialogService dialogService,
                                     ExternalApplicationsPreferences externalApplicationsPreferences,
                                     FilePreferences filePreferences,
-                                    TaskExecutor taskExecutor) {
+                                    TaskExecutor taskExecutor,
+                                    UndoManager undoManager) {
         this(databaseContext,
                 entry,
                 linkedFile,
@@ -106,7 +114,8 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                 filePreferences,
                 taskExecutor,
                 "",
-                true);
+                true,
+                undoManager);
     }
 
     public void setDownloadHeaders(Map<String, String> headers) {
@@ -197,7 +206,11 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                 dialogService.notify(Localization.lang("Download '%0' was a HTML file. Removed.", downloadUrl));
                 List<LinkedFile> newFiles = new ArrayList<>(entry.getFiles());
                 newFiles.remove(linkedFile);
-                entry.setFiles(newFiles);
+                // Recorded: the modified marker derives from the journal, so removing the link
+                // without saying so would leave the library looking saved.
+                undoManager.applyEdit(new UndoableFieldChange(entry, StandardField.FILE,
+                        entry.getField(StandardField.FILE).orElse(null),
+                        FileFieldWriter.getStringRepresentation(newFiles)));
                 try {
                     Files.delete(downloadedFile);
                 } catch (IOException e) {

@@ -31,7 +31,7 @@ Needs: impl
 ## Main tab shows all fields in one scrollable list
 `req~entry-editor.main-tab.single-list~1`
 
-The "Main" tab shows the citation key, all required fields of the entry type (even when unset), and every set field of the entry in a single vertically scrolling list with natural row heights. Field order: citation key, required fields (entry-type order), set optional fields (important before secondary, each in entry-type order), remaining set fields sorted by name, then fields added by the user that are still empty.
+The "Main" tab shows the citation key, all required fields of the entry type (even when unset), and every set field of the entry in a single vertically scrolling list with natural row heights. Field order: citation key, required fields (entry-type order), set optional fields (important before secondary, each in entry-type order), remaining set fields sorted by name, then fields added by the user that are still empty. Multiline fields are one row when empty and grow with their content, showing at most five rows (with a scrollbar) until they are focused for the first time; from then on they show the complete text until another entry is opened.
 
 Needs: impl
 
@@ -45,7 +45,7 @@ Needs: impl
 ## Unset optional fields are offered as one-click chips
 `req~entry-editor.main-tab.add-chips~1`
 
-The entry type's unset important-optional fields that belong to the main group are offered as one-click "+" chips directly below the main fields; a "Show more" toggle reveals chips for the unset secondary-optional fields ("Show less" hides them again). Clicking a chip shows an empty, focused editor for that field, removes the chip, and keeps the field visible — even while still empty — until another entry is opened.
+The entry type's unset important-optional fields that belong to the main group are offered as one-click "+" chips directly below the main fields, followed by an "Abstract" chip for every entry type (no entry type lists the abstract as an optional field); a "Show more" toggle reveals chips for the unset secondary-optional fields ("Show less" hides them again). Clicking a chip shows an empty, focused editor for that field, removes the chip, and keeps the field visible — even while still empty — until another entry is opened.
 
 Needs: impl
 
@@ -90,6 +90,13 @@ Needs: impl, utest
 Users can define custom entry editor tabs in the preferences ("Entry editor" → "Editor tabs"): a "Tabs" column lists all tabs (built-in tabs with a visibility checkbox, custom tabs with a delete action) and supports adding custom tabs and reordering all tabs via drag and drop; a "Fields" column edits the selected custom tab's ordered field list, also reorderable via drag and drop. A field entry is either a plain field name (always shown on the tab, even while unset) or a regular expression (e.g. `comment-.*`), which shows every set field of the entry whose name matches. A field listed on more than one tab is marked with a warning sign. Custom tabs configured in JabRef versions before the "Main" tab rework are picked up again on upgrade — except stored tabs that are exactly one of the former default tabs "General", "Abstract", "Comments", or "Review" (localized name paired with the field set shipped in JabRef ≤ 5.x or a 6.0 alpha), which are dropped, since the "Main" tab already shows all their fields.
 
 Needs: impl
+
+## Extracted custom-tab fields leave the Main tab
+`req~entry-editor.custom-tabs.extract-field~1`
+
+The "Fields" column offers an "Extract field" checkbox per field pattern, unchecked by default; its tooltip explains that a checked field is not shown in the "Main" tab anymore. The fields resolved by a checked pattern are moved to the custom tab: the "Main" tab shows neither an editor nor an add-chip for them. Unchecked patterns only mirror their fields on the custom tab, leaving the "Main" tab unchanged. The choice exists only for plain names of known fields — fields the "Main" tab shows on its own. A regular expression or an unknown field name is always extracted; its checkbox is shown checked and disabled, with a tooltip stating that the field is not contained in the "Main" tab.
+
+Needs: impl, utest
 
 ## Special fields are edited with the same icon controls as the main table
 `req~entry-editor.special-field-editors~1`
