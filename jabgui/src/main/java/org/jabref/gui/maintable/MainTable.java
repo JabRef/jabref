@@ -63,6 +63,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
@@ -138,6 +139,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setOnDragOver(this::handleOnDragOverTableView);
         this.setOnDragDropped(this::handleOnDragDroppedTableView);
 
+        this.setId(WalkthroughNodeIds.MAIN_TABLE);
         this.getStyleClass().add("main-table");
 
         MainTableColumnFactory mainTableColumnFactory = new MainTableColumnFactory(
@@ -196,7 +198,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         });
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
-            this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
+            this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         }
 
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -696,6 +698,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private BibEntry addExampleEntry() {
         BibEntry exampleEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("JabRef2023")
                 .withField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker")
                 .withField(StandardField.TITLE, "JabRef: BibTeX-based literature management software")
                 .withField(StandardField.JOURNAL, "TUGboat")

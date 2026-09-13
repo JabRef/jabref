@@ -50,9 +50,9 @@ public class DBMSConnection implements DatabaseConnection {
     }
 
     @Override
-    public Connection openNewConnection() throws SQLException {
+    public DatabaseConnection openNewConnection() throws SQLException {
         try {
-            return new DBMSConnection(properties).getConnection();
+            return new DBMSConnection(properties);
         } catch (InvalidDBMSConnectionPropertiesException e) {
             // Cannot happen: this connection was already opened from the very same properties
             throw new SQLException(e);
@@ -72,7 +72,7 @@ public class DBMSConnection implements DatabaseConnection {
             try {
                 Class.forName(dbms.getDriverClassPath());
                 dbmsTypes.add(dbms);
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException _) {
                 // In case that the driver is not available do not perform tests for this system.
                 LOGGER.info(Localization.lang("%0 driver not available.", dbms.toString()));
             }
