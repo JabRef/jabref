@@ -6,6 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntry;
@@ -32,6 +33,10 @@ class NewEntryActionTest {
     @BeforeEach
     void setUp() {
         when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
+        // Keeps the test off the entry editor, which only exists in a running GUI
+        EntryEditorPreferences entryEditorPreferences = mock(EntryEditorPreferences.class);
+        when(entryEditorPreferences.shouldOpenOnNewEntry()).thenReturn(false);
+        when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
         newEntryAction = new NewEntryAction(false, () -> libraryTab, dialogService, preferences, stateManager);
     }
 
