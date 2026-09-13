@@ -541,25 +541,29 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             // A single node, because copying maps each node to the Markdown source of its AST node
             StringJoiner lines = new StringJoiner("\n");
             for (int r = 0; r < rows.size(); r++) {
-                if (r == headerRowCount && r > 0) {
+                StringJoiner line = new StringJoiner(" │ ");
+                for (int i = 0; i < columnCount; i++) {
+                    String cell = i < rows.get(r).size() ? rows.get(r).get(i) : "";
+                    int padding = widths[i] - cell.length();
+                    int leftPadding = switch (alignments.get(i)) {
+                        case RIGHT ->
+                                padding;
+                        case CENTER ->
+                                padding / 2;
+                        case null,
+                             default ->
+                                0;
+                    };
+                    line.add(" ".repeat(leftPadding) + cell + " ".repeat(padding - leftPadding));
+                }
+                lines.add(line.toString().stripTrailing());
+                if (r == headerRowCount - 1) {
                     StringJoiner separator = new StringJoiner("─┼─");
                     for (int width : widths) {
                         separator.add("─".repeat(width));
                     }
                     lines.add(separator.toString());
                 }
-                StringJoiner line = new StringJoiner(" │ ");
-                for (int i = 0; i < columnCount; i++) {
-                    String cell = i < rows.get(r).size() ? rows.get(r).get(i) : "";
-                    int padding = widths[i] - cell.length();
-                    int leftPadding = switch (alignments.get(i)) {
-                        case RIGHT -> padding;
-                        case CENTER -> padding / 2;
-                        case null, default -> 0;
-                    };
-                    line.add(" ".repeat(leftPadding) + cell + " ".repeat(padding - leftPadding));
-                }
-                lines.add(line.toString().stripTrailing());
             }
 
             addTextNode(lines.toString(), table, "markdown-code-block", "font-monospace");

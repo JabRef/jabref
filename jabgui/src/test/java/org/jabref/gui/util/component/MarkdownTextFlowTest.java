@@ -23,6 +23,7 @@ import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -230,7 +231,23 @@ class MarkdownTextFlowTest extends JavaFxTest {
                 | a | b | c |
                 """));
 
-        assertTrue(renderedText(textFlow).endsWith("a    │   b    │     c"));
+        assertEquals("""
+                left │ center │ right
+                ─────┼────────┼──────
+                a    │   b    │     c""", renderedText(textFlow));
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = ';', textBlock = """
+            '| a | b |\n|---|---|';                  'a │ b\n──┼──'
+            '| a |\n|---|\n| 1 | 2 |';               'a │\n──┼──\n1 │ 2'
+            """)
+    void setMarkdownRendersHeaderOnlyAndIrregularTables(String markdown, String expected) {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> textFlow.setMarkdown(markdown.translateEscapes()));
+
+        assertEquals(expected.translateEscapes(), renderedText(textFlow));
     }
 
     @Test
@@ -243,7 +260,10 @@ class MarkdownTextFlowTest extends JavaFxTest {
                 > | 1 | 2 |
                 """));
 
-        assertTrue(renderedText(textFlow).startsWith("> a │ b"));
+        assertEquals("""
+                > a │ b
+                ──┼──
+                1 │ 2""", renderedText(textFlow));
     }
 
     @Test
