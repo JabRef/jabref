@@ -98,6 +98,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                                                 .field(),
                                 key -> key.disableWhen(viewModel.disableBasicSettingsProperty())
                                           .validate(viewModel.getApiTokenValidationStatus()))
+                        // [impl->req~ai.llms.test-connection~1]
                         .button(Localization.lang("Test connection"), this::testConnection,
                                 test -> test.disableWhen(viewModel.disableBasicSettingsProperty())))
 

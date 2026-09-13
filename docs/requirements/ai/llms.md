@@ -66,4 +66,11 @@ User needs to point the client to their specific local server address (e.g., `lo
 
 Needs: impl
 
+### User can test the connection to the AI provider
+`req~ai.llms.test-connection~1`
+
+User can check provider, chat model, API key, and API base URL entered in the preferences with a minimal chat request before saving them.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
