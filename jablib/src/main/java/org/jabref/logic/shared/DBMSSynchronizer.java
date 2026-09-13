@@ -121,6 +121,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     // Buffered micro-edits; set from EventBus dispatch threads, taken by the database worker
     private final AtomicReference<BibEntry> entryWithPendingChanges = new AtomicReference<>();
     private final ReentrantLock pullLock = new ReentrantLock();
+    // Metadata notifications arrive once per changed key. Keep one worker scheduled while retaining
+    // the fact that another notification arrived during its current read.
+    private final AtomicBoolean metadataPullScheduled = new AtomicBoolean();
+    private final AtomicBoolean metadataPullRequested = new AtomicBoolean();
     // Cleared when the connection is found dead; set again by the reconnect loop
     private final AtomicBoolean connected = new AtomicBoolean(true);
     private volatile boolean closed;
@@ -319,7 +323,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Schedules a metadata update received from another shared-database client.
     public void handleRemoteMetaDataChange() {
-        pullMetaData();
+        pullMetaDataFromNotification();
     }
 
     /// Brings the local entries up to date with the shared database: fetches on the database
@@ -346,20 +350,56 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     private void pullMetaData() {
-        syncExecutor.execute(() -> {
-            if (!connected.get()) {
-                return;
-            }
-            Map<String, String> sharedMetaData;
-            try {
-                sharedMetaData = dbmsProcessor.getSharedMetaData();
-            } catch (SQLException e) {
-                LOGGER.error("Could not fetch metadata from the shared database", e);
-                checkCurrentConnection();
-                return;
-            }
-            remoteUpdateExecutor.execute(() -> withPullLock(() -> applyRemoteMetaData(sharedMetaData)));
-        });
+        syncExecutor.execute(this::pullMetaDataFromDatabase);
+    }
+
+    private void pullMetaDataFromNotification() {
+        metadataPullRequested.set(true);
+        scheduleMetadataPull();
+    }
+
+    private void scheduleMetadataPull() {
+        if (!metadataPullScheduled.compareAndSet(false, true)) {
+            return;
+        }
+        try {
+            syncExecutor.execute(() -> {
+                metadataPullRequested.set(false);
+                try {
+                    pullMetaDataFromDatabase();
+                } finally {
+                    metadataPullScheduled.set(false);
+                    // A notification may have arrived while this read was active. Schedule its
+                    // follow-up separately so metadata pulls do not monopolize the database worker.
+                    if (metadataPullRequested.get()) {
+                        scheduleMetadataPull();
+                    }
+                }
+            });
+        } catch (RuntimeException e) {
+            metadataPullScheduled.set(false);
+            throw e;
+        }
+    }
+
+    @VisibleForTesting
+    Map<String, String> readSharedMetaData() throws SQLException {
+        return dbmsProcessor.getSharedMetaData();
+    }
+
+    private void pullMetaDataFromDatabase() {
+        if (!connected.get()) {
+            return;
+        }
+        Map<String, String> sharedMetaData;
+        try {
+            sharedMetaData = readSharedMetaData();
+        } catch (SQLException e) {
+            LOGGER.error("Could not fetch metadata from the shared database", e);
+            checkCurrentConnection();
+            return;
+        }
+        remoteUpdateExecutor.execute(() -> withPullLock(() -> applyRemoteMetaData(sharedMetaData)));
     }
 
     /// Database worker. Transfers only what differs: the id/version mapping plus the entries

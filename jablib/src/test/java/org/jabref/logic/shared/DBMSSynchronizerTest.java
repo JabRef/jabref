@@ -10,6 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
 import javafx.collections.FXCollections;
@@ -207,6 +215,112 @@ class DBMSSynchronizerTest {
             assertEquals("Updated title", localEntry.getField(StandardField.TITLE).orElseThrow());
         } finally {
             remoteSynchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
+    void metadataNotificationsAreCoalesced() throws Exception {
+        List<Runnable> pendingDatabaseTasks = new ArrayList<>();
+        BibDatabase remoteDatabase = new BibDatabase();
+        BibDatabaseContext remoteContext = new BibDatabaseContext(remoteDatabase);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        DBMSSynchronizer remoteSynchronizer = new DBMSSynchronizer(
+                remoteContext,
+                ',',
+                fieldPreferences,
+                pattern,
+                new DummyFileUpdateMonitor(),
+                "UserAndHost",
+                new VirtualThreadTaskExecutor(),
+                Runnable::run,
+                pendingDatabaseTasks::add,
+                offlineChangesDirectory);
+        remoteDatabase.registerListener(remoteSynchronizer);
+        remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+
+        try {
+            remoteSynchronizer.handleRemoteMetaDataChange();
+            remoteSynchronizer.handleRemoteMetaDataChange();
+
+            assertEquals(1, pendingDatabaseTasks.size());
+
+            pendingDatabaseTasks.getFirst().run();
+            remoteSynchronizer.handleRemoteMetaDataChange();
+
+            assertEquals(2, pendingDatabaseTasks.size());
+        } finally {
+            remoteSynchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
+    void metadataNotificationDuringReadSchedulesFollowUp() throws Exception {
+        CountDownLatch firstMetadataReadFinished = new CountDownLatch(1);
+        CountDownLatch allowFirstMetadataReadToReturn = new CountDownLatch(1);
+        CountDownLatch secondMetadataReadFinished = new CountDownLatch(1);
+        AtomicInteger metadataReadCount = new AtomicInteger();
+        BlockingQueue<Runnable> pendingDatabaseTasks = new LinkedBlockingQueue<>();
+        BibDatabase remoteDatabase = new BibDatabase();
+        BibDatabaseContext remoteContext = new BibDatabaseContext(remoteDatabase);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+
+        try (ExecutorService taskExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
+            DBMSSynchronizer remoteSynchronizer = new DBMSSynchronizer(
+                    remoteContext,
+                    ',',
+                    fieldPreferences,
+                    pattern,
+                    new DummyFileUpdateMonitor(),
+                    "UserAndHost",
+                    new VirtualThreadTaskExecutor(),
+                    Runnable::run,
+                    pendingDatabaseTasks::add,
+                    offlineChangesDirectory) {
+                @Override
+                Map<String, String> readSharedMetaData() throws SQLException {
+                    Map<String, String> sharedMetaData = super.readSharedMetaData();
+                    if (metadataReadCount.incrementAndGet() == 1) {
+                        firstMetadataReadFinished.countDown();
+                        try {
+                            if (!allowFirstMetadataReadToReturn.await(5, TimeUnit.SECONDS)) {
+                                throw new SQLException("Timed out waiting to resume the first metadata read");
+                            }
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            throw new SQLException("Interrupted while holding the first metadata read", e);
+                        }
+                    } else {
+                        secondMetadataReadFinished.countDown();
+                    }
+                    return sharedMetaData;
+                }
+            };
+            remoteDatabase.registerListener(remoteSynchronizer);
+            remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+
+            try {
+                remoteSynchronizer.handleRemoteMetaDataChange();
+                Runnable firstDatabaseTask = pendingDatabaseTasks.poll(5, TimeUnit.SECONDS);
+                assertNotNull(firstDatabaseTask);
+                Future<?> firstRead = taskExecutor.submit(firstDatabaseTask);
+                assertTrue(firstMetadataReadFinished.await(5, TimeUnit.SECONDS));
+
+                remoteSynchronizer.handleRemoteMetaDataChange();
+                allowFirstMetadataReadToReturn.countDown();
+
+                firstRead.get(5, TimeUnit.SECONDS);
+                assertEquals(1, pendingDatabaseTasks.size());
+                Runnable secondDatabaseTask = pendingDatabaseTasks.poll(5, TimeUnit.SECONDS);
+                assertNotNull(secondDatabaseTask);
+                taskExecutor.submit(secondDatabaseTask).get(5, TimeUnit.SECONDS);
+                assertTrue(secondMetadataReadFinished.await(5, TimeUnit.SECONDS));
+                assertEquals(2, metadataReadCount.get());
+            } finally {
+                allowFirstMetadataReadToReturn.countDown();
+                remoteSynchronizer.closeSharedDatabase();
+            }
         }
     }
 
