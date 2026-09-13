@@ -22,6 +22,14 @@ public final class CheckoutNews {
     public record Look(boolean fetched, int commitsBehind, Optional<String> head, Optional<String> upstream, News news) {
     }
 
+    /// Whether a look fetches the upstream first.
+    public enum Mode {
+        /// Right after `just run-loop` pulled: the upstream is as fresh as it gets.
+        WITHOUT_FETCH,
+        /// The periodic check.
+        WITH_FETCH
+    }
+
     private final Checkout checkout;
     private final AnnouncedEntries announced;
 
@@ -30,16 +38,26 @@ public final class CheckoutNews {
         this.announced = announced;
     }
 
+    /// A look that shows what is pending without making it old. Blocking: not for the UI thread.
+    public Look look(Mode mode) throws IOException {
+        return look(mode == Mode.WITH_FETCH, false, () -> false);
+    }
+
+    /// The look behind the window: fetches, and makes everything seen old once the upstream was reached and the
+    /// look is not `cancelled` (the window closed before the answer). Blocking: not for the UI thread.
+    public Look present(BooleanSupplier cancelled) throws IOException {
+        return look(true, true, cancelled);
+    }
+
     /// Reads the checkout: the working tree's changelog, plus the upstream's once the checkout is behind, so an
     /// entry arriving upstream while a local edit is pending hides nothing. Without announced entries yet (the
     /// first look in a checkout) everything seen is announced now and nothing is news: a fresh checkout is not
     /// greeted with the whole changelog — but only once a changelog could be read, or a failed first look would
-    /// announce nothing and the next one everything. With `announce`, everything seen is announced once the
-    /// upstream was fetched and the look is not `cancelled`.
+    /// announce nothing and the next one everything.
     ///
-    /// Looks run one after the other, so the announced entries are never written by an older look after a newer
-    /// one. Blocking: not for the UI thread.
-    public synchronized Look look(boolean fetch, boolean announce, BooleanSupplier cancelled) throws IOException {
+    /// Looks run one after the other and so answer in the order they started: an older look never overwrites
+    /// a newer one, on disk or on screen.
+    private synchronized Look look(boolean fetch, boolean announce, BooleanSupplier cancelled) throws IOException {
         boolean fetched = fetch && checkout.fetch();
         int behind = checkout.commitsBehind();
         List<BlamedChangelog> changelogs = new ArrayList<>();

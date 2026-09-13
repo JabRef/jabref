@@ -152,7 +152,7 @@ See <https://blog.jabref.org/2025/05/31/run-pr/> for a howto.
 
 `just run-main` pulls the latest `main` and, before starting JabRef, opens a window with the `CHANGELOG.md` entries not shown yet, split into *changes by others* and *changes by me* (the `git config user.email` of the checkout).
 Each entry is attributed to the commit that first added it, so a link fix or a rewording by someone else keeps the original author.
-"Run" starts JabRef, "Cancel run" stops the recipe.
+"Start" starts JabRef, "Cancel" stops the recipe.
 
 ```bash
 just whats-new            # the window on its own

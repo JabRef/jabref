@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
@@ -28,6 +28,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.whatsnew.CheckoutNews;
 import org.jabref.logic.whatsnew.CheckoutNews.Look;
+import org.jabref.logic.whatsnew.CheckoutNews.Mode;
 import org.jabref.logic.whatsnew.News;
 import org.jabref.logic.whatsnew.RestartMarker;
 
@@ -39,7 +40,8 @@ import org.slf4j.LoggerFactory;
 /// projects what they find into properties.
 ///
 /// A look runs in the background and lands here on the FX thread; every property is read and written on the
-/// FX thread only.
+/// FX thread only. [CheckoutNews] runs looks one after the other, so their answers arrive in the order they
+/// started and an older answer never replaces a newer one.
 // [impl->req~whats-new.checkout-news~1]
 public class WhatsNewViewModel extends AbstractViewModel {
 
@@ -67,9 +69,10 @@ public class WhatsNewViewModel extends AbstractViewModel {
     private final BooleanBinding updateAvailable = commitsBehind.greaterThan(0);
     private final StringBinding tooltip = Bindings.createStringBinding(this::tooltipText, pending, commitsBehind, title);
 
-    /// Counts the looks that started running; a look whose answer arrives after a later look started is dropped,
-    /// so a slow scheduled look never replaces what a click just found. FX thread.
-    private long looksStarted;
+    /// One look, as [CheckoutNews] offers it, given whether the look was cancelled meanwhile.
+    private interface LookCall {
+        Look look(BooleanSupplier cancelled) throws IOException;
+    }
 
     /// @param quit closes JabRef the ordinary way, so unsaved libraries are asked about; `false` when the user
     ///             keeps JabRef open
@@ -101,7 +104,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
 
     /// One look now without fetching (`just run-loop` has just pulled), then a fetch every five minutes.
     public void startWatching() {
-        startLook(false, false, this::show)
+        lookTask(_ -> news.look(Mode.WITHOUT_FETCH), this::show)
                 .onFinished(this::scheduleNextLook)
                 .executeWith(taskExecutor);
     }
@@ -111,7 +114,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// `onFailed` gets the news known so far instead, and nothing is made old. Cancelling the returned task
     /// (the window closed before the answer) makes nothing old either and calls neither consumer.
     public BackgroundTask<?> present(Consumer<News> onChecked, Consumer<News> onFailed) {
-        BackgroundTask<Look> presentation = startLook(true, true, look -> {
+        BackgroundTask<Look> presentation = lookTask(news::present, look -> {
             show(look);
             if (look.fetched()) {
                 onChecked.accept(look.news());
@@ -141,28 +144,26 @@ public class WhatsNewViewModel extends AbstractViewModel {
         return RestartRequest.DECLINED_BY_USER;
     }
 
+    /// The next periodic look; none once the executor is shut down, i.e. while JabRef quits.
     private void scheduleNextLook() {
-        startLook(true, false, this::show)
-                .onFinished(this::scheduleNextLook)
-                .scheduleWith(taskExecutor, CHECK_INTERVAL.toMinutes(), TimeUnit.MINUTES);
+        try {
+            lookTask(_ -> news.look(Mode.WITH_FETCH), this::show)
+                    .onFinished(this::scheduleNextLook)
+                    .scheduleWith(taskExecutor, CHECK_INTERVAL.toMinutes(), TimeUnit.MINUTES);
+        } catch (RejectedExecutionException e) {
+            LOGGER.debug("No further look: the task executor is shut down", e);
+        }
     }
 
-    /// The task for one look, not started yet. Its answer reaches `onSuccess` only while it is the latest look
-    /// that started running; a failure is logged. FX thread.
-    private BackgroundTask<Look> startLook(boolean fetch, boolean announce, Consumer<Look> onSuccess) {
-        AtomicLong thisLook = new AtomicLong();
+    /// The task for one look, not started yet; a failure is logged. FX thread.
+    private BackgroundTask<Look> lookTask(LookCall call, Consumer<Look> onSuccess) {
         BackgroundTask<Look> task = new BackgroundTask<>() {
             @Override
             public Look call() throws IOException {
-                return news.look(fetch, announce, this::isCancelled);
+                return call.look(this::isCancelled);
             }
         };
-        return task.onRunning(() -> thisLook.set(++looksStarted))
-                   .onSuccess(look -> {
-                       if (thisLook.get() == looksStarted) {
-                           onSuccess.accept(look);
-                       }
-                   })
+        return task.onSuccess(onSuccess)
                    .onFailure(e -> LOGGER.warn("Cannot look at the checkout", e));
     }
 

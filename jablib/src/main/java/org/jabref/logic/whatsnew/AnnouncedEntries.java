@@ -1,12 +1,16 @@
 package org.jabref.logic.whatsnew;
 
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.jabref.logic.exporter.AtomicFileWriter;
 
 /// The changelog entries announced to the developer so far, kept in a file: one entry per line, its section,
 /// heading and text separated by tabs. A changelog line never contains a tab, so no escaping is needed.
@@ -40,10 +44,16 @@ public final class AnnouncedEntries {
                                 .collect(Collectors.toUnmodifiableSet()));
     }
 
-    /// Replaces the announced entries: from now on, only entries outside `entries` are news.
+    /// Replaces the announced entries: from now on, only entries outside `entries` are news. The file is
+    /// replaced in one step, so an interrupted write leaves the entries announced before, never a partial file.
     public void write(Collection<ChangelogEntry> entries) throws IOException {
         Files.createDirectories(file.getParent());
-        Files.write(file, entries.stream().map(AnnouncedEntries::toLine).toList());
+        try (Writer writer = new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
+            for (ChangelogEntry entry : entries) {
+                writer.write(toLine(entry));
+                writer.write(System.lineSeparator());
+            }
+        }
     }
 
     private static String toLine(ChangelogEntry entry) {

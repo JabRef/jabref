@@ -49,7 +49,7 @@ class CheckoutNewsTest {
 
     @Test
     void theFirstLookAnnouncesEverythingSilently() throws IOException {
-        CheckoutNews.Look look = news.look(false, false, () -> false);
+        CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITHOUT_FETCH);
 
         assertEquals(News.NONE, look.news());
         assertEquals(Optional.of(Set.of(OLD, MINE)), announced.read());
@@ -59,7 +59,7 @@ class CheckoutNewsTest {
     void aFirstLookWithoutAChangelogAnnouncesNothing() throws IOException {
         when(checkout.blameWorkingTree()).thenReturn(Optional.empty());
 
-        CheckoutNews.Look look = news.look(false, false, () -> false);
+        CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITHOUT_FETCH);
 
         assertEquals(News.NONE, look.news());
         assertEquals(Optional.empty(), announced.read());
@@ -69,7 +69,7 @@ class CheckoutNewsTest {
     void aLaterLookFindsWhatWasNotAnnounced() throws IOException {
         announced.write(Set.of(OLD));
 
-        CheckoutNews.Look look = news.look(false, false, () -> false);
+        CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITHOUT_FETCH);
 
         assertEquals(new CheckoutNews.Look(false, 0, Optional.empty(), Optional.empty(), new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE)))), look);
         assertEquals(Optional.of(Set.of(OLD)), announced.read());
@@ -83,7 +83,7 @@ class CheckoutNewsTest {
         when(checkout.describeHead()).thenReturn(Optional.of("1111111 (2026-09-13 10:00)"));
         when(checkout.describeUpstream()).thenReturn(Optional.of("2222222 (2026-09-13 11:00)"));
 
-        CheckoutNews.Look look = news.look(true, false, () -> false);
+        CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITH_FETCH);
 
         assertEquals(new CheckoutNews.Look(true, 2, Optional.of("1111111 (2026-09-13 10:00)"), Optional.of("2222222 (2026-09-13 11:00)"),
                 new News(List.of(new AttributedEntry(Contributor.Me.REMOTE, PUSHED)))), look);
@@ -94,7 +94,7 @@ class CheckoutNewsTest {
         announced.write(Set.of(OLD));
         when(checkout.fetch()).thenReturn(false);
 
-        CheckoutNews.Look look = news.look(true, true, () -> false);
+        CheckoutNews.Look look = news.present(() -> false);
 
         assertEquals(false, look.fetched());
         assertEquals(Optional.of(Set.of(OLD)), announced.read());
@@ -104,7 +104,7 @@ class CheckoutNewsTest {
     void announcingHappensOnceFetched() throws IOException {
         announced.write(Set.of(OLD));
 
-        news.look(true, true, () -> false);
+        news.present(() -> false);
 
         assertEquals(Optional.of(Set.of(OLD, MINE)), announced.read());
     }
@@ -113,7 +113,7 @@ class CheckoutNewsTest {
     void aCancelledLookAnnouncesNothing() throws IOException {
         announced.write(Set.of(OLD));
 
-        news.look(true, true, () -> true);
+        news.present(() -> true);
 
         assertEquals(Optional.of(Set.of(OLD)), announced.read());
     }

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,7 +64,7 @@ import org.jspecify.annotations.NullMarked;
 /// the grouping and the window are JabRef's own classes, compiled in through the `//SOURCES` lines above: the
 /// script runs before jablib is built, so it calls the `git` binary instead of JGit and takes the sources along.
 ///
-/// "Run" (or closing the window) exits 0 and the `just` recipe starts JabRef; "Cancel run" exits 1 and stops
+/// "Start" (or closing the window) exits 0 and the `just` recipe starts JabRef; "Cancel" exits 1 and stops
 /// it. `--stdout` prints instead of opening a window. The first run only records the changelog. A git failure
 /// (no `CHANGELOG.md` at `HEAD`) is reported and exits 0: the news never block the start.
 @NullMarked
@@ -71,6 +72,11 @@ public class WhatsNewLauncher {
 
     private static final String CHANGELOG = "CHANGELOG.md";
     private static final String STDOUT_FLAG = "--stdout";
+
+    /// JabRef's preferences, read directly: the language and the colour scheme the developer chose.
+    private static final Preferences JABREF_PREFERENCES = Preferences.userRoot().node("/org/jabref");
+    private static final String LANGUAGE_PREFERENCE = "language";
+    private static final String COLOR_SCHEME_PREFERENCE = "themeColorScheme";
 
     public static void main(String[] args) throws InterruptedException {
         try {
@@ -82,7 +88,7 @@ public class WhatsNewLauncher {
     }
 
     private static void run(String[] args) throws IOException, InterruptedException {
-        Localization.setLanguage(Language.ENGLISH);
+        Localization.setLanguage(Language.getLanguageFor(JABREF_PREFERENCES.get(LANGUAGE_PREFERENCE, Locale.getDefault().getLanguage())));
         AnnouncedEntries announced = AnnouncedEntries.inGitDir(Path.of(git("rev-parse", "--absolute-git-dir").getFirst()));
         String head = git("rev-parse", "HEAD").getFirst();
         List<ChangelogEntry> entries = List.copyOf(ChangelogParser.entries(git("show", head + ":" + CHANGELOG)).values());
@@ -109,7 +115,7 @@ public class WhatsNewLauncher {
             System.out.println(news.asPlainText());
             return;
         }
-        Window.show(news, "What's new — now at " + describe(head));
+        Window.show(news, Localization.lang("What's new") + " — " + describe(head));
     }
 
     /// Who first added a changelog entry.
@@ -207,7 +213,7 @@ public class WhatsNewLauncher {
         }
     }
 
-    /// The window: the news, "Cancel run" and "Run", in JabRef's light or dark colour scheme.
+    /// The window: the news, "Cancel" and "Start", in JabRef's light or dark colour scheme.
     public static class Window extends Application {
 
         /// The classes [WhatsNewView] takes from JabRef's base stylesheet, which this scene does not load.
@@ -218,9 +224,6 @@ public class WhatsNewLauncher {
                 .text-muted { -fx-opacity: 0.7; }
                 .font-monospace { -fx-font-family: monospace; }
                 """;
-        private static final String PREFERENCES_NODE = "/org/jabref";
-        private static final String COLOR_SCHEME_PREFERENCE = "themeColorScheme";
-
         // Application.launch instantiates the class by reflection: the news reach the window through these fields.
         private static News news = News.NONE;
         private static String title = "";
@@ -234,11 +237,11 @@ public class WhatsNewLauncher {
         @Override
         public void start(Stage stage) {
             Application.setUserAgentStylesheet(dark() ? new PrimerDark().getUserAgentStylesheet() : new PrimerLight().getUserAgentStylesheet());
-            Button run = new Button("Run");
+            Button run = new Button(Localization.lang("Start"));
             run.getStyleClass().addAll(Styles.SMALL, Styles.ACCENT);
             run.setDefaultButton(true);
             run.setOnAction(_ -> stage.close());
-            Button cancel = new Button("Cancel run");
+            Button cancel = new Button(Localization.lang("Cancel"));
             cancel.getStyleClass().add(Styles.SMALL);
             cancel.setCancelButton(true);
             cancel.setOnAction(_ -> System.exit(1));
@@ -256,7 +259,7 @@ public class WhatsNewLauncher {
 
         /// Dark if JabRef's colour scheme preference says so, or says "follow system" and the system is dark.
         private static boolean dark() {
-            String scheme = Preferences.userRoot().node(PREFERENCES_NODE).get(COLOR_SCHEME_PREFERENCE, "FOLLOW_SYSTEM");
+            String scheme = JABREF_PREFERENCES.get(COLOR_SCHEME_PREFERENCE, "FOLLOW_SYSTEM");
             return switch (scheme) {
                 case "DARK" -> true;
                 case "LIGHT" -> false;
