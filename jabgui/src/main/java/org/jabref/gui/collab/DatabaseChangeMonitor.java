@@ -22,10 +22,12 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.dlsc.gemsfx.infocenter.NotificationAction;
+import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +68,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// instead of applying stale content.
     private volatile int scanGeneration;
 
-    private final ChangeListener<Boolean> synchronizingListener = (_, _, enabled) -> onSynchronizingChanged(enabled);
+    private final ChangeListener<Boolean> synchronizingListener = (_, _, _) -> onSynchronizingChanged(isSynchronizing());
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
@@ -99,7 +101,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             // Registered once per monitor; a tab replacing its monitor calls unregister() on the old one first, which
             // removes this listener again, so the preference never accumulates listeners
             if (database.getLocation() == DatabaseLocation.LOCAL) {
-                preferences.getLibraryPreferences().autoSaveProperty().addListener(synchronizingListener);
+                preferences.getLibraryPreferences().synchronizeWithFileProperty().addListener(synchronizingListener);
+                database.getMetaData().registerListener(this);
             }
         });
 
@@ -199,10 +202,17 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         }
     }
 
-    /// Synchronizing (silently merging external changes) is tied to the autosave preference: both together keep a
-    /// local library and its file the same in both directions.
+    /// Synchronizing (silently merging external changes) is decided by the library itself, or, if it does not, by the
+    /// global preference.
     private boolean isSynchronizing() {
-        return database.getLocation() == DatabaseLocation.LOCAL && preferences.getLibraryPreferences().shouldAutoSave();
+        return database.getLocation() == DatabaseLocation.LOCAL
+                && database.getMetaData().getSynchronizeWithFile().orElseGet(() -> preferences.getLibraryPreferences().shouldSynchronizeWithFile());
+    }
+
+    /// The library's own setting is part of its metadata, which the library properties dialog changes.
+    @Subscribe
+    public void listen(MetaDataChangedEvent event) {
+        onSynchronizingChanged(isSynchronizing());
     }
 
     /// Synchronization switched on for an open library needs a baseline right away: as long as the library is
@@ -211,8 +221,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         boolean captured = false;
         synchronized (database) {
             if (!enabled) {
-                baseline = null;
-                scanGeneration++;
+                if (baseline != null) {
+                    baseline = null;
+                    scanGeneration++;
+                }
             } else if (baseline == null && !libraryTab.isModified()) {
                 baseline = captureBaseline();
                 captured = baseline != null;
@@ -377,7 +389,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             fileMonitor.removeListener(path, this);
             // Unconditionally: the library may have been converted to a shared one since the listener was added,
             // and removing a listener that was never added is a no-op
-            preferences.getLibraryPreferences().autoSaveProperty().removeListener(synchronizingListener);
+            preferences.getLibraryPreferences().synchronizeWithFileProperty().removeListener(synchronizingListener);
+            database.getMetaData().unregisterListener(this);
         });
     }
 }

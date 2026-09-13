@@ -51,6 +51,8 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     // Journal abbreviation on save
     private final ObjectProperty<AbbreviationType> journalAbbreviationOnSaveProperty = new SimpleObjectProperty<>();
+    /// `null` = follow the global preference
+    private final ObjectProperty<Boolean> synchronizeWithFileProperty = new SimpleObjectProperty<>();
 
     private final FieldFormatterCleanupActions defaultSaveActions;
 
@@ -104,6 +106,7 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         });
 
         journalAbbreviationOnSaveProperty.setValue(metaData.getLibraryAbbreviationType().orElse(null));
+        synchronizeWithFileProperty.setValue(metaData.getSynchronizeWithFile().orElse(null));
     }
 
     @Override
@@ -139,6 +142,13 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             } else {
                 metaData.setSaveOrder(newSaveOrder);
             }
+        }
+
+        Boolean synchronize = synchronizeWithFileProperty.getValue();
+        if (synchronize == null) {
+            metaData.clearSynchronizeWithFile();
+        } else {
+            metaData.setSynchronizeWithFile(synchronize);
         }
 
         AbbreviationType abbreviationType = journalAbbreviationOnSaveProperty.getValue();
@@ -191,5 +201,9 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     public ObjectProperty<AbbreviationType> journalAbbreviationOnSaveProperty() {
         return journalAbbreviationOnSaveProperty;
+    }
+
+    public ObjectProperty<Boolean> synchronizeWithFileProperty() {
+        return synchronizeWithFileProperty;
     }
 }

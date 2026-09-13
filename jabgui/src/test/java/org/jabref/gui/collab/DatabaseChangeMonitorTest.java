@@ -22,6 +22,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -52,6 +53,7 @@ class DatabaseChangeMonitorTest {
 
         BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(originalPath), Optional.of(newPath));
+        when(databaseContext.getMetaData()).thenReturn(new MetaData());
 
         FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
 

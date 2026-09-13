@@ -10,12 +10,14 @@ import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class SavingPropertiesView extends AbstractPropertiesTabView<SavingPropertiesViewModel> implements PropertiesTab {
 
@@ -23,6 +25,9 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
     @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
     @FXML private ComboBox<AbbreviationType> journalAbbreviationOnSave;
+    @FXML private ComboBox<Boolean> synchronizeWithFile;
+
+    @Inject private GuiPreferences preferences;
 
     public SavingPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -79,5 +84,26 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
             }
         });
         journalAbbreviationOnSave.valueProperty().bindBidirectional(viewModel.journalAbbreviationOnSaveProperty());
+
+        synchronizeWithFile.setItems(FXCollections.observableArrayList(null, Boolean.TRUE, Boolean.FALSE));
+        synchronizeWithFile.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Boolean synchronize) {
+                if (synchronize == null) {
+                    return Localization.lang("Use global setting (%0)", onOrOff(preferences.getLibraryPreferences().shouldSynchronizeWithFile()));
+                }
+                return onOrOff(synchronize);
+            }
+
+            @Override
+            public Boolean fromString(String string) {
+                return null;
+            }
+        });
+        synchronizeWithFile.valueProperty().bindBidirectional(viewModel.synchronizeWithFileProperty());
+    }
+
+    private static String onOrOff(boolean on) {
+        return on ? Localization.lang("On") : Localization.lang("Off");
     }
 }

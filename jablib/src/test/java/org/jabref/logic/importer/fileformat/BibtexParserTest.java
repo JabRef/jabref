@@ -397,7 +397,7 @@ class BibtexParserTest {
         ParserResult result = parser.parse(Reader.of("""
                 This file was created with JabRef 2.1 beta 2.
                 Encoding: Cp1252
-
+                
                 @INPROCEEDINGS{CroAnnHow05,
                   author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
                   title = {Effective work practices for floss development: A model and propositions},
@@ -1040,7 +1040,7 @@ class BibtexParserTest {
         ParserResult result = parser
                 .parse(Reader.of("""
                         @article{test,a = {a
-
+                        
                         b},b = {a
                         \s
                         b},c = {a\s
@@ -1281,7 +1281,7 @@ class BibtexParserTest {
                           DOI                      = {10.1109/CICC.2011.6055279},
                           ISSN                     = {0886-5930}
                         }
-
+                        
                         @comment{jabref-meta: saveActions:enabled;title[lower_case]}"""));
 
         FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
@@ -1305,7 +1305,7 @@ class BibtexParserTest {
                           DOI                      = {10.1109/CICC.2011.6055279},
                           ISSN                     = {0886-5930}
                         }
-
+                        
                         @Comment{jabref-meta: saveActions:enabled;
                         month[normalize_month]
                         pages[normalize_page_numbers]
@@ -1537,7 +1537,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
-
+                
                 @article{Heyl:2023aa,
                     author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
                     date-added = {2023-09-14 20:09:08 +0200},
@@ -1549,7 +1549,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
-
+                
                 @comment{BibDesk Static Groups{
                 <?xml version="1.0" encoding="UTF-8"?>
                 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -1597,7 +1597,7 @@ class BibtexParserTest {
                 @article{test,
                     keywords = {first; second},
                     groups = {existing}}
-
+                
                 @comment{BibDesk Static Groups{
                 <plist><array><dict>
                     <key>group name</key><string>static</string>
@@ -1620,7 +1620,7 @@ class BibtexParserTest {
                 @article{test,
                     keywords = {first; second},
                     groups = {existing}}
-
+                
                 @comment{BibDesk Static Groups{
                 <plist><array><dict>
                     <key>group name</key><string>static</string>
@@ -1669,7 +1669,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06485.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06485}}
-
+                
                 @article{Swain:2023aa,
                     author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
                     date-added = {2023-09-14 20:09:08 +0200},
@@ -1681,7 +1681,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
-
+                
                 @article{Heyl:2023aa,
                     author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
                     date-added = {2023-09-14 20:09:08 +0200},
@@ -1693,7 +1693,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
-
+                
                 @comment{BibDesk Smart Groups{
                 <?xml version="1.0" encoding="UTF-8"?>
                 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -1786,7 +1786,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06485.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06485}}
-
+                
                 @article{Swain:2023aa,
                     author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
                     date-added = {2023-09-14 20:09:08 +0200},
@@ -1798,7 +1798,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06758.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06758}}
-
+                
                 @article{Heyl:2023aa,
                     author = {Johannes Heyl and Joshua Butterworth and Serena Viti},
                     date-added = {2023-09-14 20:09:08 +0200},
@@ -1810,7 +1810,7 @@ class BibtexParserTest {
                     year = {2023},
                     bdsk-url-1 = {https://arxiv.org/pdf/2309.06784.pdf},
                     bdsk-url-2 = {https://arxiv.org/abs/2309.06784}}
-
+                
                 @comment{BibDesk Static Groups{
                 <?xml version="1.0" encoding="UTF-8"?>
                 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -1825,7 +1825,7 @@ class BibtexParserTest {
                 </array>
                 </plist>
                 }}
-
+                
                 @comment{BibDesk Smart Groups{
                 <?xml version="1.0" encoding="UTF-8"?>
                 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -1913,6 +1913,14 @@ class BibtexParserTest {
                 .parse(Reader.of("@comment{jabref-meta: protectedFlag:true;}"));
 
         assertTrue(result.getMetaData().isProtected());
+    }
+
+    @Test
+    void integrationTestSynchronizeWithFile() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: synchronizeWithFile:false;}"));
+
+        assertEquals(Optional.of(false), result.getMetaData().getSynchronizeWithFile());
     }
 
     @Test
@@ -2383,7 +2391,7 @@ class BibtexParserTest {
                 @Article{Test2017,
                   keywords = {bbb},
                 }
-
+                
                 @Article{,
                   keywords = {asdf,asdf,asdf},
                 },
@@ -2434,7 +2442,7 @@ class BibtexParserTest {
                 @Article{Test2017,
                     bdsk-file-1 = {////=},
                 }
-
+                
                 @Article{Test2,
                    bdsk-file-1 = {YnBsaXN0MDDUAQIDBAUGJCVYJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoKgHCBMUFRYaIVUkbnVsbNMJCgsMDxJXTlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6INDoACgAOiEBGABIAFgAdccmVsYXRpdmVQYXRoWWFsaWFzRGF0YV8QVi4uLy4uLy4uL1BhcGVycy9Bc2hlaW0yMDA1IFRoZSBHZW9ncmFwaHkgb2YgSW5ub3ZhdGlvbiBSZWdpb25hbCBJbm5vdmF0aW9uIFN5c3RlbXMucGRm0hcLGBlXTlMuZGF0YU8RAkoAAAAAAkoAAgAADE1hY2ludG9zaCBIRAAAAAAAAAAAAAAAAAAAAM6T/wtIKwAAACI+9B9Bc2hlaW0yMDA1IFRoZSBHZW9nciMyMjQ4QzkucGRmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIkjJw6jvRAAAAAAAAAAAAAMAAgAACSAAAAAAAAAAAAAAAAAAAAAGUGFwZXJzABAACAAAzpPw+wAAABEACAAAw6jhNAAAAAEAEAAiPvQAIjTXACHV2wAHw2AAAgBQTWFjaW50b3NoIEhEOlVzZXJzOgBpbGlwcGVydDoARG9jdW1lbnRzOgBQYXBlcnM6AEFzaGVpbTIwMDUgVGhlIEdlb2dyIzIyNDhDOS5wZGYADgCOAEYAQQBzAGgAZQBpAG0AMgAwADAANQAgAFQAaABlACAARwBlAG8AZwByAGEAcABoAHkAIABvAGYAIABJAG4AbgBvAHYAYQB0AGkAbwBuACAAUgBlAGcAaQBvAG4AYQBsACAASQBuAG4AbwB2AGEAdABpAG8AbgAgAFMAeQBzAHQAZQBtAHMALgBwAGQAZgAPABoADABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAASAGZVc2Vycy9pbGlwcGVydC9Eb2N1bWVudHMvUGFwZXJzL0FzaGVpbTIwMDUgVGhlIEdlb2dyYXBoeSBvZiBJbm5vdmF0aW9uIFJlZ2lvbmFsIElubm92YXRpb24gU3lzdGVtcy5wZGYAEwABLwAAFQACAA///wAAgAbSGxwdHlokY2xhc3NuYW1lWCRjbGFzc2VzXU5TTXV0YWJsZURhdGGjHR8gVk5TRGF0YVhOU09iamVjdNIbHCIjXE5TRGljdGlvbmFyeaIiIF8QD05TS2V5ZWRBcmNoaXZlctEmJ1Ryb290gAEACAARABoAIwAtADIANwBAAEYATQBVAGAAZwBqAGwAbgBxAHMAdQB3AIQAjgDnAOwA9ANCA0QDSQNUA10DawNvA3YDfwOEA5EDlAOmA6kDrgAAAAAAAAIBAAAAAAAAACgAAAAAAAAAAAAAAAAAAAOw},
                 },
