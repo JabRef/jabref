@@ -61,6 +61,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.SharedDatabaseSessionService;
 import org.jabref.logic.util.BuildInfo;
@@ -637,9 +638,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Only a shared database carries a synchronizer, so its absence already rules out a matching placeholder.
         Optional.ofNullable(databaseContext.getDBMSSynchronizer())
                 .map(DatabaseSynchronizer::getConnectionProperties)
-                .ifPresent(connectionProperties -> tabbedPane.getTabs().removeIf(
-                        tab -> (tab instanceof SharedDatabaseErrorTab errorTab)
-                                && errorTab.getConnectionProperties().equals(connectionProperties)));
+                .ifPresent(this::removeSharedDatabaseErrorTabsFor);
+    }
+
+    private void removeSharedDatabaseErrorTabsFor(DatabaseConnectionProperties connectionProperties) {
+        tabbedPane.getTabs().removeIf(tab -> (tab instanceof SharedDatabaseErrorTab errorTab)
+                && errorTab.getConnectionProperties().equals(connectionProperties));
     }
 
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
@@ -809,6 +813,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     @Override
     public void showSharedDatabaseErrorTab(SharedDatabaseErrorTab errorTab) {
+        // A repeated attempt for the same connection replaces its earlier error tab instead of piling up retries
+        removeSharedDatabaseErrorTabsFor(errorTab.getConnectionProperties());
         tabbedPane.getTabs().add(errorTab);
         tabbedPane.getSelectionModel().select(errorTab);
     }

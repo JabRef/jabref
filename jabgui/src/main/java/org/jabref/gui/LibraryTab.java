@@ -224,8 +224,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         private void onDatabaseLoadingFailed(Exception exception) {
+            boolean dismissed;
+            synchronized (this) {
+                dismissed = cancelled;
+            }
             tab.loading.set(false);
             tab.dataLoadingTask = null;
+            if (dismissed) {
+                // The user closed the loading tab meanwhile: the attempt is over, no error tab may bring it back
+                return;
+            }
             tab.tabContainer.closeTab(tab);
             onFailure.accept(exception);
         }
