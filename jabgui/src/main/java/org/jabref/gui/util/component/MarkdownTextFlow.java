@@ -501,7 +501,10 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         /// Renders the table as monospaced text with aligned columns, as the selection only works on [Text] nodes.
         private void visit(TableBlock table) {
             // [impl->req~ai.chat.markdown-tables~1]
-            addNewlinesBetweenBlocks(table);
+            // Inside a block quote or list, the enclosing marker is already emitted
+            if (table.getParent() instanceof Document) {
+                addNewlinesBetweenBlocks(table);
+            }
 
             List<List<String>> rows = new ArrayList<>();
             int headerRowCount = 0;

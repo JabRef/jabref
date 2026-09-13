@@ -221,6 +221,19 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void setMarkdownKeepsQuotedTableNextToQuoteMarker() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> textFlow.setMarkdown("""
+                > | a | b |
+                > |---|---|
+                > | 1 | 2 |
+                """));
+
+        assertTrue(renderedText(textFlow).startsWith("> a │ b"));
+    }
+
+    @Test
     void copySelectedTableUsesMarkdownAndHtmlTable() {
         MarkdownTextFlow textFlow = markdownTextFlow();
         String table = """
