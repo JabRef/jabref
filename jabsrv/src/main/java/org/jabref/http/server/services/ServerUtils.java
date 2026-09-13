@@ -38,7 +38,7 @@ public class ServerUtils {
     /// everything. Empty for unsaved libraries.
     /// [impl->req~directory-library.rest-api~1]
     public static Optional<String> libraryId(BibDatabaseContext context) {
-        return context.getPathOnDisk().map(ServerUtils::libraryId);
+        return context.getLibraryId();
     }
 
     private static String libraryId(Path path) {

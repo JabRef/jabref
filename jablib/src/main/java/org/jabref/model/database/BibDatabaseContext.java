@@ -134,9 +134,10 @@ public class BibDatabaseContext {
 
     /// The id used to address this library from the outside: the REST API (`/libraries/{id}/...`),
     /// cite-as-you-write (`libraryid=`), JabMap and in-app links (`jabref://libraries/{id}/entries/{key}`).
+    /// A directory library is identified by its root directory.
     /// Empty for libraries that have not been saved to disk yet.
     public Optional<String> getLibraryId() {
-        return getDatabasePath().map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path));
+        return getPathOnDisk().map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path));
     }
 
     public BibDatabase getDatabase() {
