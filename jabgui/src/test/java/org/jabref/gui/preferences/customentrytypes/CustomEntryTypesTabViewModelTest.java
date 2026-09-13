@@ -109,6 +109,17 @@ class CustomEntryTypesTabViewModelTest {
     }
 
     @Test
+    void unchangedSaveWithFieldOutsideEntryTypesHasNoRestartWarning() {
+        when(preferences.getFieldPreferences()).thenReturn(new FieldPreferences(true, List.of(), List.of(StandardField.PDF, StandardField.PS, StandardField.URL)));
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.storeSettings();
+
+        assertEquals(List.of(), model.getRestartWarnings());
+    }
+
+    @Test
     void changedTypeHasRestartWarningUntilNextUnchangedSave() {
         CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
         model.setValues();

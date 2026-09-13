@@ -151,16 +151,18 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         storedDefinitions = newDefinitions;
     }
 
-    /// Serialized form includes field properties, which `BibEntryType.equals` ignores
+    /// Serialized form includes field properties, which `BibEntryType.equals` ignores.
+    /// Multiline state is compared only for fields of the entry types, because saving drops all other non-wrappable fields.
     private List<String> currentDefinitions() {
-        List<String> definitions = new ArrayList<>(entryTypesManager.getAllTypes(bibDatabaseMode).stream()
-                                                                    .map(MetaDataSerializer::serializeCustomEntryTypesV2)
-                                                                    .toList());
-        preferences.getFieldPreferences().getNonWrappableFields().stream()
-                   .map(Field::getName)
-                   .sorted()
-                   .forEach(definitions::add);
-        return definitions;
+        List<Field> nonWrappableFields = preferences.getFieldPreferences().getNonWrappableFields();
+        return entryTypesManager.getAllTypes(bibDatabaseMode).stream()
+                                .map(type -> MetaDataSerializer.serializeCustomEntryTypesV2(type)
+                                        + type.getAllFields().stream()
+                                              .filter(field -> nonWrappableFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT))
+                                              .map(Field::getName)
+                                              .sorted()
+                                              .toList())
+                                .toList();
     }
 
     @Override
