@@ -7,6 +7,8 @@ import java.util.Properties;
 
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 
+import org.jspecify.annotations.Nullable;
+
 /// Keeps all essential data for establishing a new connection to a DBMS using [DBMSConnection].
 public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
@@ -152,8 +154,7 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
             return false;
         }
         return Objects.equals(type, properties.getType())
-                // Remembered preferences may lack the host; equality must not throw on them
-                && ((host == null) ? (properties.getHost() == null) : host.equalsIgnoreCase(properties.getHost()))
+                && Objects.equals(canonicalHost(host), canonicalHost(properties.getHost()))
                 && Objects.equals(port, properties.getPort())
                 && Objects.equals(database, properties.getDatabase())
                 && Objects.equals(user, properties.getUser())
@@ -165,7 +166,13 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, (host == null) ? null : host.toLowerCase(Locale.ROOT), port, database, user, useSSL, allowPublicKeyRetrieval, jdbcUrl, expertMode);
+        return Objects.hash(type, canonicalHost(host), port, database, user, useSSL, allowPublicKeyRetrieval, jdbcUrl, expertMode);
+    }
+
+    /// Host names are case-insensitive; one canonical form serves `equals` and `hashCode` alike. Remembered preferences
+    /// may lack the host, which must not make the comparison throw.
+    private static @Nullable String canonicalHost(@Nullable String host) {
+        return (host == null) ? null : host.toLowerCase(Locale.ROOT);
     }
 
     @Override
