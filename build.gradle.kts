@@ -36,11 +36,12 @@ rewrite {
 }
 
 // OpenRewrite parses with the JDK running Gradle, not with the toolchain. An older JDK's parser
-// mangles Java 25 syntax (e.g., `catch (Throwable _)` becomes `catch (Throwable_ _)`).
+// mangles Java 25 syntax (e.g., `catch (Throwable _)` becomes `catch (Throwable_ _)`), and a newer
+// one fails to parse dozens of files (https://github.com/openrewrite/rewrite/issues/7554).
 tasks.matching { it.name.startsWith("rewrite") }.configureEach {
     doFirst {
-        require(JavaVersion.current() >= JavaVersion.VERSION_25) {
-            "OpenRewrite must run on JDK 25 or newer (Gradle runs on ${JavaVersion.current()}). Set JAVA_HOME accordingly."
+        require(JavaVersion.current() == JavaVersion.VERSION_25) {
+            "OpenRewrite must run on JDK 25 (Gradle runs on ${JavaVersion.current()}). Set JAVA_HOME accordingly."
         }
     }
 }
