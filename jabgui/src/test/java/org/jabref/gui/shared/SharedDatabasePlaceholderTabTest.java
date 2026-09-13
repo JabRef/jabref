@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +47,7 @@ class SharedDatabasePlaceholderTabTest extends ApplicationTest {
     void startsConnectingWithoutRetry() {
         assertEquals("Literature", tab.getText());
         assertEquals("Connecting...", message().getText());
-        assertEquals(true, retryButton().isDisabled());
+        assertTrue(retryButton().isDisabled());
     }
 
     @Test
@@ -53,7 +55,7 @@ class SharedDatabasePlaceholderTabTest extends ApplicationTest {
         interact(() -> tab.showError(new SQLException("Connection refused")));
 
         assertEquals("Connection refused", message().getText());
-        assertEquals(false, retryButton().isDisabled());
+        assertFalse(retryButton().isDisabled());
     }
 
     @Test
@@ -65,7 +67,7 @@ class SharedDatabasePlaceholderTabTest extends ApplicationTest {
         });
 
         assertEquals(1, retries.get());
-        assertEquals(true, retryButton().isDisabled());
+        assertTrue(retryButton().isDisabled());
     }
 
     @Test
