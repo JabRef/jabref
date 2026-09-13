@@ -7,15 +7,20 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupTreeNode;
+
+import org.jspecify.annotations.NullMarked;
 
 /// Warns about static groups that still list their entries inside the group (format of old JabRef versions).
 /// Library migrations are not run anymore, so these memberships are not shown and are lost on save.
+@NullMarked
 public class LegacyGroupMembershipWarningAction implements GUIPostOpenAction {
 
+    // [impl->req~import.library.legacy-group-memberships-warned~1]
     @Override
     public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
         return parserResult.getMetaData().getGroups().stream()
-                           .flatMap(root -> root.iterateOverTree())
+                           .flatMap(GroupTreeNode::iterateOverTree)
                            .anyMatch(node -> node.getGroup() instanceof ExplicitGroup group && !group.getLegacyEntryKeys().isEmpty());
     }
 

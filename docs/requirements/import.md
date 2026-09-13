@@ -21,6 +21,15 @@ Entries are kept in the library in the order of their internal ids, regardless o
 
 Needs: impl, utest
 
+## Static group memberships in the pre-3.4 format are warned about
+`req~import.library.legacy-group-memberships-warned~1`
+
+Libraries written by JabRef before 3.4 list the members of a static group inside the group instead of in the entries.
+JabRef does not convert this format anymore, so these groups show up empty and saving the library removes the memberships.
+When such a library is opened, JabRef warns about the loss and recommends a backup and opening and saving the library once with JabRef 5.15.
+
+Needs: impl, utest
+
 ## Unresolved merge conflict markers abort the import
 `req~import.bibtex.merge-conflict-markers~1`
 

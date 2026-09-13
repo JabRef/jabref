@@ -31,6 +31,7 @@ class LegacyGroupMembershipWarningActionTest {
         assertFalse(action.isActionNecessary(parserResult, null, null));
     }
 
+    // [utest->req~import.library.legacy-group-memberships-warned~1]
     @Test
     void warningForNestedGroupListingItsEntries() {
         group.addLegacyEntryKey("Smith2001");
