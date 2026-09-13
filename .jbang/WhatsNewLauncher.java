@@ -301,7 +301,8 @@ public class WhatsNewLauncher {
         List<String> command = new ArrayList<>(List.of("git"));
         command.addAll(List.of(args));
         Process process = new ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.INHERIT).start();
-        List<String> output = process.inputReader().lines().toList();
+        // Git writes the changelog and the names as UTF-8, whatever the platform's own encoding.
+        List<String> output = process.inputReader(StandardCharsets.UTF_8).lines().toList();
         if (process.waitFor() != 0) {
             throw new IOException("git " + String.join(" ", args) + " failed");
         }
