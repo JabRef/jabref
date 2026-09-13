@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TabPane;
 
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.shared.DBMSConnectionProperties;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,7 +60,18 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
         });
 
         assertEquals(1, retries.get());
-        assertEquals(true, retryButton().isDisabled());
+        assertTrue(retryButton().isDisabled());
+    }
+
+    @Test
+    void retryRemovesTheTabFromItsPane() {
+        TabPane tabPane = new TabPane();
+        interact(() -> {
+            tabPane.getTabs().add(tab);
+            retryButton().fire();
+        });
+
+        assertTrue(tabPane.getTabs().isEmpty());
     }
 
     @Test

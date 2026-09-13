@@ -93,6 +93,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We now create the group for imported entries when entries are imported, instead of when a library is opened. [#16988](https://github.com/JabRef/jabref/pull/16988)
 - We removed the keystore fields, the server timezone, and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We changed remembered shared database passwords to use the operating system credential store. [#16800](https://github.com/JabRef/jabref/pull/16800)
+- We changed a failed connection from the "Connect to shared database" dialog to show as a tab with a "Retry" button instead of an error dialog. [#16968](https://github.com/JabRef/jabref/pull/16968)
 - We changed undo and redo to name the step they take back instead of only saying "Undo". [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We changed undo in the entry editor to take back the last typed word instead of one character. [#16988](https://github.com/JabRef/jabref/pull/16988)
 - We moved zotero-related settings from openoffice panel to openoffice/libreoffice preference tab. [#16352](https://github.com/JabRef/jabref/issues/16352)

@@ -802,21 +802,22 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // The tab alone is easy to miss among the libraries that did open, so the failure is announced as well.
         dialogService.notify(Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()));
         SharedDatabaseErrorTab errorTab = new SharedDatabaseErrorTab(reconnection.sharedDatabaseId(), reconnection.connectionProperties());
-        // A retry swaps the placeholder for a fresh loading tab: closing that tab cancels the attempt, exactly as at
-        // startup, so a pending attempt can never resurrect a placeholder the user already dismissed.
-        errorTab.setRetryAction(() -> {
-            tabbedPane.getTabs().remove(errorTab);
-            reconnectSharedDatabase(sessionService, reconnection);
-        });
+        errorTab.setRetryAction(() -> reconnectSharedDatabase(sessionService, reconnection));
         errorTab.showError(exception);
         tabbedPane.getTabs().add(errorTab);
+    }
+
+    @Override
+    public void showSharedDatabaseErrorTab(SharedDatabaseErrorTab errorTab) {
+        tabbedPane.getTabs().add(errorTab);
+        tabbedPane.getSelectionModel().select(errorTab);
     }
 
     @Override
     public List<String> getUnconnectedSharedDatabaseIds() {
         return tabbedPane.getTabs().stream()
                          .filter(SharedDatabaseErrorTab.class::isInstance)
-                         .map(tab -> ((SharedDatabaseErrorTab) tab).getSharedDatabaseId())
+                         .flatMap(tab -> ((SharedDatabaseErrorTab) tab).getSharedDatabaseId().stream())
                          .toList();
     }
 

@@ -37,6 +37,7 @@ import org.jabref.logic.shared.DBMSConnectionUrl;
 import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
+import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -308,21 +309,14 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             result.filter(ButtonType.OK::equals).ifPresent(btn -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
             return;
         }
+        // [impl->req~shared-database.reconnect-retry~1]
+        // The failed loading tab has already closed itself; an error tab with a retry takes its place instead of a dialog.
+        // The database is not remembered yet (no id), so closing the tab simply forgets the attempt.
+        SharedDatabaseErrorTab errorTab = new SharedDatabaseErrorTab(null, connectionProperties);
+        errorTab.setRetryAction(() -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
         // The driver's own message is generic ("The connection attempt failed."); the reason is at the end of the cause chain
-        String reason = Optional.ofNullable(Throwables.getRootCause(exception).getLocalizedMessage()).orElse(exception.toString());
-        dialogService.showErrorDialogAndWait(
-                Localization.lang("Connection error"),
-                Localization.lang("Could not connect to %0.\n\n%1", connectionEndpoint(connectionProperties), reason),
-                exception);
-    }
-
-    private String connectionEndpoint(DBMSConnectionProperties connectionProperties) {
-        if (!connectionProperties.isUseExpertMode()) {
-            return connectionProperties.getHost() + ":" + connectionProperties.getPort();
-        }
-        return DBMSConnectionUrl.parse(connectionProperties.getJdbcUrl())
-                                .map(url -> url.host() + ":" + url.port())
-                                .orElse(connectionProperties.getJdbcUrl());
+        errorTab.showError(Throwables.getRootCause(exception));
+        tabContainer.showSharedDatabaseErrorTab(errorTab);
     }
 
     private void setPreferences(DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath) {
@@ -374,13 +368,20 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         autosave.set(sharedDatabaseAutosave);
     }
 
+    /// A database still loading counts as present too: a second attempt would open and load the same remote library
+    /// twice. Its synchronizer has no connection properties yet, only the database name.
     private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
         List<LibraryTab> libraryTabs = tabContainer.getLibraryTabs();
-        return libraryTabs.parallelStream().anyMatch(panel -> {
+        return libraryTabs.stream().anyMatch(panel -> {
             BibDatabaseContext context = panel.getBibDatabaseContext();
-
-            return (context.getLocation() == DatabaseLocation.SHARED) &&
-                    connectionProperties.equals(context.getDBMSSynchronizer().getConnectionProperties());
+            if (context.getLocation() != DatabaseLocation.SHARED) {
+                return false;
+            }
+            DatabaseSynchronizer synchronizer = context.getDBMSSynchronizer();
+            if (panel.isLoading()) {
+                return connectionProperties.getDatabase().equals(synchronizer.getDBName());
+            }
+            return connectionProperties.equals(synchronizer.getConnectionProperties());
         });
     }
 

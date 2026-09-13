@@ -413,6 +413,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         text.append("]");
     }
 
+    public boolean isLoading() {
+        return loading.get();
+    }
+
     private void setDataLoadingTask(BackgroundTask<?> dataLoadingTask) {
         this.loading.set(true);
         this.dataLoadingTask = dataLoadingTask;
