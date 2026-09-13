@@ -35,9 +35,11 @@ rewrite {
     failOnDryRunResults = true
 }
 
-// OpenRewrite parses with the JDK running Gradle, not with the toolchain. An older JDK's parser
-// mangles Java 25 syntax (e.g., `catch (Throwable _)` becomes `catch (Throwable_ _)`), and a newer
-// one fails to parse dozens of files (https://github.com/openrewrite/rewrite/issues/7554).
+// OpenRewrite parses with the JDK running Gradle, not with the toolchain.
+// An older JDK's parser mangles Java 25 syntax, e.g., `catch (Throwable _)` becomes `catch (Throwable_ _)`:
+// https://github.com/openrewrite/rewrite-migrate-java/issues/1239
+// A newer JDK fails to parse dozens of files:
+// https://github.com/openrewrite/rewrite/issues/7554
 tasks.matching { it.name.startsWith("rewrite") }.configureEach {
     doFirst {
         require(JavaVersion.current() == JavaVersion.VERSION_25) {
