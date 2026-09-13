@@ -48,6 +48,18 @@ public final class CSLFormatUtils {
     private static final String DEFAULT_HANGING_INDENT_BIBLIOGRAPHY_BODY_FORMAT = "Hanging indent";
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
+    private static final Pattern MARGIN_PATTERN = Pattern.compile(
+            "<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>");
+    private static final Pattern DIV_OPEN_TAG = Pattern.compile("<div[^>]*>");
+    private static final Pattern A_OPEN_TAG = Pattern.compile("<a[^>]*>");
+    private static final Pattern BOLD_SPAN = Pattern.compile("<span style=\"font-weight: ?bold;?\">(.*?)</span>");
+    private static final Pattern ITALIC_SPAN = Pattern.compile("<span style=\"font-style: ?italic;?\">(.*?)</span>");
+    private static final Pattern UNDERLINE_SPAN = Pattern.compile("<span style=\"text-decoration: ?underline;?\">(.*?)</span>");
+    private static final Pattern SMALL_CAPS_SPAN = Pattern.compile("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>");
+    private static final Pattern REMAINING_SPAN_TAGS = Pattern.compile("</?span[^>]*>");
+    private static final Pattern LINE_BREAKS = Pattern.compile("[\n\r]+");
+    private static final Pattern LEADING_EMPTY_PARAGRAPH_MARKER = Pattern.compile("^\\s*<p>\\s*</p>");
+    private static final Pattern TRAILING_EMPTY_PARAGRAPH_MARKERS = Pattern.compile("(?:<p>\\s*</p>\\s*){2,}$");
 
     private CSLFormatUtils() {
         // prevent instantiation
@@ -72,43 +84,41 @@ public final class CSLFormatUtils {
         html = StringEscapeUtils.unescapeHtml4(html);
 
         // Handle margins (spaces between citation number and text)
-        html = html.replaceAll("<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>", "$1 $2");
+        html = MARGIN_PATTERN.matcher(html).replaceAll("$1 $2");
 
         // Remove unsupported tags
-        html = html.replaceAll("<div[^>]*>", "");
+        html = DIV_OPEN_TAG.matcher(html).replaceAll("");
         html = html.replace("</div>", "");
 
         // Remove unsupported links
-        html = html.replaceAll("<a[^>]*>", "");
+        html = A_OPEN_TAG.matcher(html).replaceAll("");
         html = html.replace("</a>", "");
 
         // Replace span tags with inline styles for bold
-        html = html.replaceAll("<span style=\"font-weight: ?bold;?\">(.*?)</span>", "<b>$1</b>");
+        html = BOLD_SPAN.matcher(html).replaceAll("<b>$1</b>");
 
         // Replace span tags with inline styles for italic
-        html = html.replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
+        html = ITALIC_SPAN.matcher(html).replaceAll("<i>$1</i>");
 
         // Replace span tags with inline styles for underline
-        html = html.replaceAll("<span style=\"text-decoration: ?underline;?\">(.*?)</span>", "<u>$1</u>");
+        html = UNDERLINE_SPAN.matcher(html).replaceAll("<u>$1</u>");
 
-        html = html.replaceAll("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>", "<smallcaps>$1</smallcaps>");
+        html = SMALL_CAPS_SPAN.matcher(html).replaceAll("<smallcaps>$1</smallcaps>");
 
         // Clean up any remaining span tags
-        html = html.replaceAll("</?span[^>]*>", "");
+        html = REMAINING_SPAN_TAGS.matcher(html).replaceAll("");
 
         // Convert line breaks to paragraph breaks
-        html = html.replaceAll("[\n\r]+", "<p></p>");
+        html = LINE_BREAKS.matcher(html).replaceAll("<p></p>");
 
         // Remove leading paragraph tags (preserving any whitespaces after them for indentation)
-        html = html.replaceAll("^\\s*<p>\\s*</p>", "");
+        html = LEADING_EMPTY_PARAGRAPH_MARKER.matcher(html).replaceAll("");
 
         // Remove extra trailing paragraph tags when there are multiple (keeping one)
-        html = html.replaceAll("(?:<p>\\s*</p>\\s*){2,}$", "<p></p>");
+        html = TRAILING_EMPTY_PARAGRAPH_MARKERS.matcher(html).replaceAll("<p></p>");
 
         // In bibliography entries, citeproc-java adds 4 leading spaces for numeric styles, and 2 for non-numeric
-        html = html.trim();
-
-        return html;
+        return html.trim();
     }
 
     /// Alphanumeric citations are not natively supported by citeproc-java (see [generateCitation][org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, org.jabref.logic.citationstyle.CitationStyleOutputFormat, BibDatabaseContext, org.jabref.model.entry.BibEntryTypesManager)]).
