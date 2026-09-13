@@ -29,6 +29,9 @@ import org.slf4j.LoggerFactory;
 /// Guesses which of several author candidates is the real author list of a PDF by checking the candidates
 /// against the text of the document's leading pages. Used by [PdfMergeMetadataImporter] after merging
 /// the candidates of the individual [PdfImporter]s.
+///
+/// Family names are split out with [AuthorList] (backed by [org.jabref.logic.importer.AuthorListParser]); the
+/// check against the page text is what that parser cannot provide, as it turns any string into names.
 @NullMarked
 class PdfAuthorCrossCheck {
 
