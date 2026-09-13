@@ -35,10 +35,14 @@ import org.jabref.model.ai.llm.AiProvider;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.unitfx.IntegerInputField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiTab.class);
 
     private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
 
@@ -194,6 +198,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                  .onSuccess(response -> dialogService.showInformationDialogAndWait(Localization.lang("Test connection"),
                          Localization.lang("Connection successful. Response: %0", response)))
                  .onFailure(exception -> {
+                     LOGGER.debug("AI connection test failed", exception);
                      // A model missing on the server cannot be downloaded through the OpenAI-compatible API, so the user is pointed to the Ollama command.
                      if (AiModelService.isModelNotFound(exception)) {
                          dialogService.showErrorDialogAndWait(Localization.lang("Connection failed"),

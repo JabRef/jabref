@@ -54,6 +54,19 @@ class AiTabViewModelTest {
     }
 
     @Test
+    void basicSettingsEnabledWhenAiAlreadyEnabled() {
+        AiPreferences aiPreferences = AiPreferences.getDefault();
+        aiPreferences.setAiFeaturesEnabledCurrently(true);
+        AiPreferences workingAiPreferences = AiPreferences.getDefault();
+        workingAiPreferences.setAiFeaturesEnabledCurrently(true);
+
+        AiTabViewModel enabledViewModel = new AiTabViewModel(aiPreferences, workingAiPreferences, aiModelService, new CurrentThreadTaskExecutor(), embeddingModelMetadataService);
+        enabledViewModel.setValues();
+
+        assertFalse(enabledViewModel.disableBasicSettingsProperty().get());
+    }
+
+    @Test
     void connectionUsesEnteredValues() throws Exception {
         viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
         viewModel.selectedChatModelProperty().set("granite4.2:8b");

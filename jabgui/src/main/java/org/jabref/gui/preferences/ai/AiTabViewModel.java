@@ -199,6 +199,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.customizeExpertSettings.addListener((_, _, newValue) ->
                 disableExpertSettings.set(!newValue || !enableAi.get())
         );
+        // enableAi was seeded before the listeners were added, and setValues() assigns the same value again without a change event.
+        disableBasicSettings.set(!enableAi.get());
+        disableExpertSettings.set(!enableAi.get() || !customizeExpertSettings.get());
 
         this.selectedEmbeddingModel.addListener((_, _, newValue) -> updateSelectedEmbeddingModelMetadata(newValue));
 
