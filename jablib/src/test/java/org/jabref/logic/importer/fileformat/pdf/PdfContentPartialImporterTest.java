@@ -23,6 +23,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -120,8 +121,9 @@ class PdfContentPartialImporterTest {
     }
 
     // [utest->req~import.pdf.plausible-year~1]
-    @Test
-    void pageRangeSkippedInFavorOfActualYear() {
+    @ParameterizedTest
+    @ValueSource(strings = {"1999-2005", "1999–2005", "1999—2005", "1999  -  2005", "1999 \t— 2005"})
+    void pageRangeSkippedInFavorOfActualYear(String pageRange) {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Alice Sample")
                 .withField(StandardField.TITLE, "Some Title of a Paper")
@@ -132,7 +134,7 @@ class PdfContentPartialImporterTest {
 
                 Alice Sample
 
-                Proceedings, pp. 1999-2005, 2018""";
+                Proceedings, pp. %s, 2018""".formatted(pageRange);
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
     }

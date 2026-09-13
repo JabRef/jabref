@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -90,7 +92,9 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     /// 2. Run [PdfImporter]s, and store extracted candidates in the list.
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
-        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document);
+        // BibEntry equality is by content, but provenance belongs to the instance
+        Set<BibEntry> citedWorks = Collections.newSetFromMap(new IdentityHashMap<>());
+        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document, citedWorks);
         if (extractedCandidates.isEmpty()) {
             return new ParserResult();
         }
@@ -99,7 +103,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
         List<BibEntry> allCandidates = new ArrayList<>(fetchedCandidates);
         allCandidates.addAll(extractedCandidates);
-        BibEntry entry = mergeCandidates(allCandidates, PdfAuthorCrossCheck.extractLeadingPagesText(document));
+        BibEntry entry = mergeCandidates(allCandidates, citedWorks, PdfAuthorCrossCheck.extractLeadingPagesText(document));
 
         // We use the absolute path here as we do not know the context where this import will be used.
         // The caller is responsible for making the path relative if necessary.
@@ -107,7 +111,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return new ParserResult(List.of(entry));
     }
 
-    private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document) {
+    private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document, Set<BibEntry> citedWorks) {
         List<BibEntry> candidates = new ArrayList<>();
 
         for (PdfImporter metadataImporter : metadataImporters) {
@@ -115,6 +119,9 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                 List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, document).getDatabase().getEntries();
                 LOGGER.debug("Importer {} extracted {}", metadataImporter.getName(), extractedEntries);
                 candidates.addAll(extractedEntries);
+                if (metadataImporter instanceof BibliographyFromPdfImporter) {
+                    citedWorks.addAll(extractedEntries);
+                }
             } catch (ParseException | IOException e) {
                 LOGGER.error("Got an exception while importing PDF file", e);
             }
@@ -184,6 +191,12 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     /// @param leadingPagesText plain text of the PDF's leading pages (as produced by [PdfAuthorCrossCheck]), used only to validate the merged author; `null` or empty when the text could not be extracted, in which case the author is left untouched
     @VisibleForTesting
     static BibEntry mergeCandidates(List<BibEntry> candidates, @Nullable String leadingPagesText) {
+        return mergeCandidates(candidates, Set.of(), leadingPagesText);
+    }
+
+    /// @param citedWorks candidates taken from the PDF's reference list, compared by identity
+    @VisibleForTesting
+    static BibEntry mergeCandidates(List<BibEntry> candidates, Set<BibEntry> citedWorks, @Nullable String leadingPagesText) {
         final BibEntry entry = new BibEntry();
         candidates.forEach(entry::mergeWith);
 
@@ -197,7 +210,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                       .ifPresent(betterTitle -> entry.setField(StandardField.TITLE, betterTitle));
         }
 
-        PdfAuthorCrossCheck.crossCheckAuthor(entry, candidates, leadingPagesText);
+        PdfAuthorCrossCheck.crossCheckAuthor(entry, candidates, citedWorks, leadingPagesText);
 
         // Retain online links only
         List<LinkedFile> onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();

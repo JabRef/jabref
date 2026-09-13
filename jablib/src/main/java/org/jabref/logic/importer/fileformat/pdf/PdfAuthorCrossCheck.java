@@ -17,6 +17,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -73,7 +74,7 @@ class PdfAuthorCrossCheck {
     /// worse than none.
     ///
     /// [impl->req~import.pdf.author-confirmed-by-text~1]
-    static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, @Nullable String leadingPagesText) {
+    static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, Set<BibEntry> citedWorks, @Nullable String leadingPagesText) {
         if (StringUtil.isBlank(leadingPagesText)) {
             return;
         }
@@ -83,7 +84,7 @@ class PdfAuthorCrossCheck {
             return;
         }
         entry.getField(StandardField.AUTHOR).ifPresent(mergedAuthor -> {
-            if (authorSourceLooksBibliographic(candidates) || isAuthorConfirmedByText(mergedAuthor, documentWords)) {
+            if (authorSourceLooksBibliographic(candidates, citedWorks) || isAuthorConfirmedByText(mergedAuthor, documentWords)) {
                 return;
             }
 
@@ -104,12 +105,14 @@ class PdfAuthorCrossCheck {
         });
     }
 
-    private static boolean authorSourceLooksBibliographic(List<BibEntry> candidates) {
+    /// @param citedWorks candidates describing works the PDF cites (e.g. from its reference list), compared by identity;
+    ///                   their type says nothing about the imported document
+    private static boolean authorSourceLooksBibliographic(List<BibEntry> candidates, Set<BibEntry> citedWorks) {
         // The merge is first-wins, thus the merged value stems from the first candidate carrying an author
         return candidates.stream()
                          .filter(candidate -> candidate.hasField(StandardField.AUTHOR))
                          .findFirst()
-                         .map(source -> source.getCitationKey().isPresent() || isKnownNonDefaultType(source.getType()))
+                         .map(source -> !citedWorks.contains(source) && (source.getCitationKey().isPresent() || isKnownNonDefaultType(source.getType())))
                          .orElse(true);
     }
 
@@ -146,7 +149,7 @@ class PdfAuthorCrossCheck {
         // Fallback for author values AuthorList cannot split into proper persons (e.g. exotic separator
         // characters from broken XMP decoding). A single common word such as a given name also occurs in
         // unrelated text, so at least two distinct words of the raw value must occur.
-        long confirmedWords = Arrays.stream(NON_LETTERS.split(normalizeForComparison(authorField)))
+        long confirmedWords = Arrays.stream(NON_LETTERS.split(normalizeForComparison(LatexToUnicodeAdapter.format(authorField))))
                                     .filter(word -> word.length() >= 2 && !NAME_LIST_LOWERCASE_WORDS.contains(word.toLowerCase(Locale.ROOT)))
                                     .distinct()
                                     .filter(documentWords::containsName)
@@ -182,14 +185,15 @@ class PdfAuthorCrossCheck {
         }
 
         boolean containsWords(String phrase) {
-            String words = toWordSequence(normalizeForComparison(phrase).toLowerCase(Locale.ROOT)).strip();
+            String words = toWordSequence(normalizeForComparison(LatexToUnicodeAdapter.format(phrase)).toLowerCase(Locale.ROOT)).strip();
             return !words.isEmpty() && lowerCase.contains(" " + words + " ");
         }
 
         /// A capitalized name must occur capitalized or in capitals, so that a family name such as "May" or
         /// "Young" is not confirmed by the ordinary word in prose.
         boolean containsName(String name) {
-            String words = toWordSequence(normalizeForComparison(name)).strip();
+            // Metadata may encode accents as LaTeX ("B{\\\"o}hm"), the PDF text prints them ("Böhm")
+            String words = toWordSequence(normalizeForComparison(LatexToUnicodeAdapter.format(name))).strip();
             if (words.isEmpty() || !Character.isUpperCase(words.codePointAt(0))) {
                 return containsWords(name);
             }

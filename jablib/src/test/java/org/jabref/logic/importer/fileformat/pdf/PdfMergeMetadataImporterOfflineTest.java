@@ -2,8 +2,11 @@ package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javafx.collections.FXCollections;
 
@@ -171,6 +174,30 @@ class PdfMergeMetadataImporterOfflineTest {
                 "Link to record in the Repository. A placeholder study.");
 
         assertEquals(Optional.empty(), merged.getField(StandardField.AUTHOR));
+    }
+
+    @Test
+    void citedWorkAuthorIsReplacedByConfirmedByline() {
+        BibEntry citedWork = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Void, Eve");
+        BibEntry content = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Doe, Alice and Smith, Bob");
+        Set<BibEntry> citedWorks = Collections.newSetFromMap(new IdentityHashMap<>());
+        citedWorks.add(citedWork);
+
+        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(citedWork, content), citedWorks, DOCUMENT_TEXT);
+
+        assertEquals(Optional.of("Doe, Alice and Smith, Bob"), merged.getField(StandardField.AUTHOR));
+    }
+
+    @Test
+    void latexEncodedAuthorConfirmedByUnicodeText() {
+        BibEntry documentInformation = new BibEntry()
+                .withField(StandardField.AUTHOR, "B{\\\"o}hm, Corrado");
+
+        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation), "A calculus by Corrado Böhm, Example University");
+
+        assertEquals(Optional.of("B{\\\"o}hm, Corrado"), merged.getField(StandardField.AUTHOR));
     }
 
     @Test
