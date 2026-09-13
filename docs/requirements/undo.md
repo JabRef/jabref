@@ -27,6 +27,14 @@ No other thread can observe the library holding a change the journal does not ye
 
 Needs: impl, utest
 
+## Undo shortcuts in text fields drive the library's undo history
+`req~logic.undo.text-field-shortcut~1`
+
+Pressing the undo or redo shortcut while a field editor's text control has focus performs the library's undo or redo, the same as the toolbar buttons.
+JavaFX's built-in per-control text undo is bypassed: it would only revert the keystrokes of that one control, and it throws when its history is empty.
+
+Needs: impl, utest
+
 ## A command's writes are reserved against undo
 `req~logic.undo.writes-reserved-against-undo~1`
 
