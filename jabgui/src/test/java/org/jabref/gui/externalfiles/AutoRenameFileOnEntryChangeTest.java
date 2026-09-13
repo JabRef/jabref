@@ -138,6 +138,19 @@ class AutoRenameFileOnEntryChangeTest {
     }
 
     @Test
+    void directoryLibrariesLeaveRenamesToTheSidecarWriteBack() throws IOException {
+        Files.createFile(tempDir.resolve("oldKey2081.pdf"));
+        entry.setFiles(List.of(new LinkedFile("", "oldKey2081.pdf", "PDF")));
+        when(filePreferences.shouldAutoRenameFilesOnChange()).thenReturn(true);
+        bibDatabaseContext.convertToDirectoryLibrary(tempDir);
+
+        entry.setField(StandardField.AUTHOR, "newKey");
+
+        assertEquals("oldKey2081.pdf", entry.getFiles().getFirst().getLink());
+        assertFileExists(tempDir.resolve("oldKey2081.pdf"));
+    }
+
+    @Test
     void singleFileRenameOnEntryChange() throws IOException {
         Files.createFile(tempDir.resolve("oldKey2081.pdf"));
         entry.setFiles(List.of(new LinkedFile("", "oldKey2081.pdf", "PDF")));

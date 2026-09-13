@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -34,7 +35,8 @@ public class AutoRenameFileOnEntryChange {
 
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        if (!isEnabled(bibDatabaseContext, filePreferences)) {
+        // A directory library renames its sidecar/PDF pairs in the write-back (see SidecarWriteBack)
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.DIRECTORY || !isEnabled(bibDatabaseContext, filePreferences)) {
             return;
         }
 
