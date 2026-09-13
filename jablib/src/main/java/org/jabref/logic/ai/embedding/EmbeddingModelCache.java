@@ -47,7 +47,7 @@ public class EmbeddingModelCache implements AutoCloseable {
     ///
     /// @param modelName the requested embedding model name
     /// @return a (possibly still-loading) [AsyncEmbeddingModel] for `modelName`
-    public AsyncEmbeddingModel getOrCreate(String modelName) {
+    public synchronized AsyncEmbeddingModel getOrCreate(String modelName) {
         // Only the effective model is in use; release superseded ones instead of keeping every selected model loaded
         cache.entrySet().removeIf(entry -> {
             if (entry.getKey().equals(modelName)) {
@@ -64,7 +64,7 @@ public class EmbeddingModelCache implements AutoCloseable {
     ///
     /// Should be called once the AI subsystem is shut down (i.e. from `AiService.close()`).
     @Override
-    public void close() {
+    public synchronized void close() {
         cache.values().forEach(AsyncEmbeddingModel::close);
         cache.clear();
     }

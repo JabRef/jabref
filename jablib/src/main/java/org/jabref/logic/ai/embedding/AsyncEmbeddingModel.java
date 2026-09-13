@@ -43,6 +43,8 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     // Empty if there is no error.
     private String errorWhileBuildingModel = "";
 
+    private boolean closed;
+
     public AsyncEmbeddingModel(
             String modelName,
             AiPreferences aiPreferences,
@@ -65,8 +67,15 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
 
         new UpdateEmbeddingModelTask(modelName, metadataService)
                 .onSuccess(model -> {
-                    predictorProperty.set(Optional.of(model));
-                    errorWhileBuildingModel = "";
+                    synchronized (this) {
+                        if (closed) {
+                            // Evicted while loading: nobody owns the model anymore
+                            model.close();
+                            return;
+                        }
+                        predictorProperty.set(Optional.of(model));
+                        errorWhileBuildingModel = "";
+                    }
                 })
                 .onFailure(e -> {
                     LOGGER.error("An error occurred while downloading the embedding model", e);
@@ -118,7 +127,8 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
+        closed = true;
         if (predictorProperty.get().isPresent()) {
             predictorProperty.get().get().close();
         }
