@@ -14,12 +14,14 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.git.GitHandler;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.function.Predicate.not;
 
+@NullMarked
 public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GitIgnoreFileFilter.class);
