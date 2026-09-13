@@ -78,17 +78,35 @@ public class FieldTextMapper {
         }
 
         return switch (displayName.trim().toLowerCase(Locale.ROOT)) {
-            case "citation key", "citationkey", "bibtexkey" -> Optional.of(InternalField.KEY_FIELD);
-            case "entry type", "entrytype", "bibtextype" -> Optional.of(InternalField.TYPE_HEADER);
-            case "all" -> Optional.of(InternalField.INTERNAL_ALL_FIELD);
-            case "all text fields", "all-text-fields" -> Optional.of(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
-            case "printed" -> Optional.of(SpecialField.PRINTED);
-            case "priority" -> Optional.of(SpecialField.PRIORITY);
-            case "quality", "qualityassured" -> Optional.of(SpecialField.QUALITY);
-            case "ranking" -> Optional.of(SpecialField.RANKING);
-            case "read status", "readstatus" -> Optional.of(SpecialField.READ_STATUS);
-            case "relevance" -> Optional.of(SpecialField.RELEVANCE);
-            default -> Optional.empty();
+            case "citation key",
+                 "citationkey",
+                 "bibtexkey" ->
+                    Optional.of(InternalField.KEY_FIELD);
+            case "entry type",
+                 "entrytype",
+                 "bibtextype" ->
+                    Optional.of(InternalField.TYPE_HEADER);
+            case "all" ->
+                    Optional.of(InternalField.INTERNAL_ALL_FIELD);
+            case "all text fields",
+                 "all-text-fields" ->
+                    Optional.of(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
+            case "printed" ->
+                    Optional.of(SpecialField.PRINTED);
+            case "priority" ->
+                    Optional.of(SpecialField.PRIORITY);
+            case "quality",
+                 "qualityassured" ->
+                    Optional.of(SpecialField.QUALITY);
+            case "ranking" ->
+                    Optional.of(SpecialField.RANKING);
+            case "read status",
+                 "readstatus" ->
+                    Optional.of(SpecialField.READ_STATUS);
+            case "relevance" ->
+                    Optional.of(SpecialField.RELEVANCE);
+            default ->
+                    Optional.empty();
         };
     }
 
