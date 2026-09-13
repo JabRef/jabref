@@ -120,7 +120,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                         // [impl->req~ai.llms.test-connection~1]
                         .button(Localization.lang("Test connection"), this::testConnection,
                                 test -> test.disableWhen(Bindings.or(viewModel.disableBasicSettingsProperty(), testingConnection))
-                                    .configure(button -> testConnectionButton = button))
+                                            .configure(button -> testConnectionButton = button))
                         .info("", details -> details.configure(label -> {
                                                         label.textProperty().bind(testConnectionDetails);
                                                         label.setWrapText(true);
