@@ -67,8 +67,8 @@ public record News(List<AttributedEntry> items) {
     /// The title of a group, localized.
     public static String groupTitle(Contributor contributor) {
         return switch (contributor) {
-            case Contributor.Other(String name) ->
-                    Localization.lang("Changes by %0", name);
+            case Contributor.Other other ->
+                    Localization.lang("Changes by %0", other.name());
             case Contributor.Me.REMOTE ->
                     Localization.lang("Changes by me (pushed from another machine)");
             case Contributor.Me.LOCAL ->
