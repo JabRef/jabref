@@ -35,4 +35,11 @@ User needs to force a re-ingestion of documents if parsing logic changes or to f
 
 Needs: impl
 
+## Embeddings of another model are regenerated
+`req~ai.ingestion.model-change-invalidation~1`
+
+Embeddings of different models are not comparable. When the effective embedding model differs from the one the stored embeddings were generated with (e.g., after an update changed the default model, or after toggling expert settings), the stored embeddings are removed so that files are ingested again.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

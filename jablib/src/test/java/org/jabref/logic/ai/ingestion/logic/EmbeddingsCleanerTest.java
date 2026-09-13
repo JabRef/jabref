@@ -71,6 +71,7 @@ class EmbeddingsCleanerTest {
         assertTrue(ingestedDocumentsRepository.isDocumentIngested("hash-1"));
     }
 
+    // [utest->req~ai.ingestion.model-change-invalidation~1]
     @Test
     void startupClearsEmbeddingsOfOtherModel() {
         embeddingStore.add(Embedding.from(new float[] {1.0f, 0.0f}), segmentWithHash("doc", "hash-1"));
@@ -84,6 +85,7 @@ class EmbeddingsCleanerTest {
         assertEquals(Optional.of("model-b"), embeddingStore.getEmbeddingModel());
     }
 
+    // [utest->req~ai.ingestion.model-change-invalidation~1]
     @Test
     void startupClearsEmbeddingsWithoutRecordedModel() {
         MVStoreEmbeddingStore legacyStore = new MVStoreEmbeddingStore(tempDir.resolve("legacy.mv"), _ -> {
@@ -99,6 +101,7 @@ class EmbeddingsCleanerTest {
                                                                          .build()).matches());
     }
 
+    // [utest->req~ai.ingestion.model-change-invalidation~1]
     @Test
     void togglingExpertSettingsClearsEmbeddingsOfPreviousModel() {
         AiPreferences preferences = AiPreferences.getDefault();

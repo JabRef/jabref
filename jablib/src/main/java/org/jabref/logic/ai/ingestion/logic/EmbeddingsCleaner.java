@@ -37,6 +37,7 @@ public class EmbeddingsCleaner {
 
     /// Embeddings of different models are not comparable. This catches model changes made while JabRef was not running,
     /// e.g., a new default model in a JabRef update.
+    // [impl->req~ai.ingestion.model-change-invalidation~1]
     private void removeAllIfGeneratedWithOtherModel() {
         if (!embeddingStore.getEmbeddingModel().equals(Optional.of(aiPreferences.getEmbeddingModel()))) {
             removeAll();
