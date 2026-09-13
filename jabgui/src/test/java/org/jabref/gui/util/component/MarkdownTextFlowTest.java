@@ -204,6 +204,45 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void setMarkdownRendersTableWithAlignedColumns() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> textFlow.setMarkdown("""
+                | Name | Year |
+                |------|------|
+                | **JabRef** | 2003 |
+                """));
+
+        assertEquals("""
+                Name   │ Year
+                ───────┼─────
+                JabRef │ 2003""", renderedText(textFlow));
+    }
+
+    @Test
+    void copySelectedTableUsesMarkdownAndHtmlTable() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+        String table = """
+                | a | b |
+                |---|---|
+                | 1 | 2 |""";
+
+        interact(() -> {
+            textFlow.setMarkdown(table);
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+        });
+
+        assertEquals(table, clipBoardManager.stringContent.get());
+        assertTrue(clipBoardManager.htmlContent.get().contains("<table>"));
+    }
+
+    @Test
     void hyperlinkHandlerDefaultsToNonNull() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
