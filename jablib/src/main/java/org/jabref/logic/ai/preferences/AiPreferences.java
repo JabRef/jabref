@@ -677,6 +677,7 @@ public class AiPreferences {
 
     public List<Property<?>> getEmbeddingsProperties() {
         return List.of(
+                customizeExpertSettings,
                 embeddingModel,
                 documentSplitterKind,
                 documentSplitterChunkSize,

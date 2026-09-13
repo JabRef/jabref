@@ -93,10 +93,23 @@ class EmbeddingsCleanerTest {
         new EmbeddingsCleaner(aiPreferences, legacyStore, ingestedDocumentsRepository);
 
         assertEquals(Optional.of("model-a"), legacyStore.getEmbeddingModel());
-        assertTrue(legacyStore.search(EmbeddingSearchRequest.builder()
-                                                            .queryEmbedding(Embedding.from(new float[] {1.0f, 0.0f}))
-                                                            .minScore(0.0)
-                                                            .build()).matches().isEmpty());
+        assertEquals(List.of(), legacyStore.search(EmbeddingSearchRequest.builder()
+                                                                         .queryEmbedding(Embedding.from(new float[] {1.0f, 0.0f}))
+                                                                         .minScore(0.0)
+                                                                         .build()).matches());
+    }
+
+    @Test
+    void togglingExpertSettingsClearsEmbeddingsOfPreviousModel() {
+        AiPreferences preferences = AiPreferences.getDefault();
+        preferences.setEmbeddingModel("custom-model");
+        new EmbeddingsCleaner(preferences, embeddingStore, ingestedDocumentsRepository);
+        embeddingStore.add(Embedding.from(new float[] {1.0f, 0.0f}), segmentWithHash("doc", "hash-1"));
+
+        preferences.setCustomizeExpertSettings(true);
+
+        assertFalse(hasAnyEmbedding());
+        assertEquals(Optional.of("custom-model"), embeddingStore.getEmbeddingModel());
     }
 
     @Test
