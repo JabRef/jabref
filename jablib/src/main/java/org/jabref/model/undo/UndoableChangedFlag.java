@@ -17,6 +17,9 @@ public record UndoableChangedFlag(BibEntry entry, boolean before, boolean after)
 
     @Override
     public ApplyResult apply() {
+        if (entry.hasChanged() != before) {
+            return ApplyResult.of(this, "entry is " + (entry.hasChanged() ? "" : "not ") + "marked changed, unlike recorded");
+        }
         entry.setChanged(after);
         return ApplyResult.SUCCESS;
     }

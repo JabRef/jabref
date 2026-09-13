@@ -18,6 +18,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
+import org.jspecify.annotations.Nullable;
 
 public class SavingPropertiesView extends AbstractPropertiesTabView<SavingPropertiesViewModel> implements PropertiesTab {
 
@@ -25,7 +26,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
     @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
     @FXML private ComboBox<AbbreviationType> journalAbbreviationOnSave;
-    @FXML private ComboBox<Boolean> synchronizeWithFile;
+    @FXML private ComboBox<@Nullable Boolean> synchronizeWithFile;
 
     @Inject private GuiPreferences preferences;
 
@@ -88,7 +89,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
         synchronizeWithFile.setItems(FXCollections.observableArrayList(null, Boolean.TRUE, Boolean.FALSE));
         synchronizeWithFile.setConverter(new StringConverter<>() {
             @Override
-            public String toString(Boolean synchronize) {
+            public String toString(@Nullable Boolean synchronize) {
                 if (synchronize == null) {
                     return Localization.lang("Use global setting (%0)", onOrOff(preferences.getLibraryPreferences().shouldSynchronizeWithFile()));
                 }
@@ -96,7 +97,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
             }
 
             @Override
-            public Boolean fromString(String string) {
+            public @Nullable Boolean fromString(String string) {
                 return null;
             }
         });

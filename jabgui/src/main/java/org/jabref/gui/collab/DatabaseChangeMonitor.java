@@ -225,7 +225,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                     baseline = null;
                     scanGeneration++;
                 }
-            } else if (baseline == null && !libraryTab.isModified()) {
+            } else if (baseline == null && (!libraryTab.isModified() || !undoManager.canUndo())) {
+                // A modified tab without an undoable step was only dirtied by a setting, such as the one just
+                // switched on; its entries still match the file
                 baseline = captureBaseline();
                 captured = baseline != null;
             }
@@ -275,9 +277,20 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         }
         BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
                       .onSuccess(changes -> changes.filter(scanned -> !scanned.isEmpty())
-                                                   .ifPresent(scanned -> listeners.forEach(listener -> listener.databaseChanged(scanned))))
+                                                   .ifPresent(scanned -> offerReview(generation, scanned)))
                       .onFailure(e -> LOGGER.error("Error while watching for changes", e))
                       .executeWith(taskExecutor);
+    }
+
+    /// A scan overtaken by a newer file change, a save, or the tab closing must not replace the current review either.
+    private void offerReview(int generation, List<DatabaseChange> changes) {
+        synchronized (database) {
+            if (generation != scanGeneration) {
+                LOGGER.debug("Discarding review of a scan overtaken by a newer file change");
+                return;
+            }
+            listeners.forEach(listener -> listener.databaseChanged(changes));
+        }
     }
 
     /// Sorting the changes on the FX thread right before applying them leaves no window for a user edit to slip in
@@ -299,7 +312,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// that the events of the write just waited for do not trigger another scan; only for the current scan, since a
     /// scan already overtaken will not apply what it sees, and recording it would make the next event look handled.
     ///
-    /// @return `false` when the wait was interrupted; the file may still be incomplete, so the scan must not go on
+    /// @return `false` when the wait was interrupted or the file did not settle; it may still be incomplete, so the scan must not go on
     private boolean awaitStableLibraryFile(int generation) {
         Path path = monitoredPath.orElse(null);
         if (path == null) {
@@ -318,6 +331,11 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             FileSnapshot current = FileSnapshot.read(path);
             unchanged = Objects.equals(current, last) ? unchanged + 1 : 0;
             last = current;
+        }
+        if (unchanged < STABLE_FILE_CONFIRMATIONS) {
+            // Still being written when the budget ran out: the writer's next events start a fresh scan
+            LOGGER.debug("{} kept changing; the scan is abandoned", path);
+            return false;
         }
         synchronized (database) {
             if (generation == scanGeneration) {

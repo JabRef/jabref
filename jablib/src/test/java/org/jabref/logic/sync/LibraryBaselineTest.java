@@ -89,12 +89,12 @@ class LibraryBaselineTest {
     void addedEntryUnknownToBaselineIsNewOnDisk() {
         BibEntry added = new BibEntry(StandardEntryType.Misc).withCitationKey("New");
 
-        assertEquals(Side.DISK, baseline.lookup().sideOfAddedEntry(added));
+        assertEquals(Side.DISK, baseline.lookup().sideOfAddedEntry(added, _ -> true));
     }
 
     @Test
     void addedEntryEqualToBaselineWasDeletedInMemory() {
-        assertEquals(Side.MEMORY, baseline.lookup().sideOfAddedEntry(remote));
+        assertEquals(Side.MEMORY, baseline.lookup().sideOfAddedEntry(remote, _ -> false));
     }
 
     @Test
@@ -211,5 +211,37 @@ class LibraryBaselineTest {
         remote.setField(StandardField.TITLE, "Another title");
 
         assertEquals(Optional.empty(), baseline.closestOf(List.of(local.getId()), remote));
+    }
+
+    @Test
+    void duplicateAddedOnDiskWhileTheOriginalStaysInMemoryIsAnAddition() {
+        assertEquals(Side.DISK, baseline.lookup().sideOfAddedEntry(remote, _ -> true));
+    }
+
+    @Test
+    void entryWithoutAncestorKeepsTheLocalType() {
+        BibEntry newLocal = new BibEntry(StandardEntryType.Article).withCitationKey("New").withField(StandardField.TITLE, "New");
+        BibEntry newRemote = new BibEntry(StandardEntryType.Misc).withCitationKey("New").withField(StandardField.TITLE, "New").withField(StandardField.YEAR, "2022");
+
+        Optional<BibEntry> merged = baseline.mergeEntry(newLocal, newRemote);
+
+        assertEquals(Optional.of(StandardEntryType.Article), merged.map(BibEntry::getType));
+        assertEquals(Optional.of("2022"), merged.flatMap(entry -> entry.getField(StandardField.YEAR)));
+    }
+
+    @Test
+    void typeChangedOnDiskOnlyIsTakenOver() {
+        local.setField(StandardField.TITLE, "Memory title");
+        remote.setType(StandardEntryType.Book);
+
+        assertEquals(Optional.of(StandardEntryType.Book), baseline.mergeEntry(local, remote).map(BibEntry::getType));
+    }
+
+    @Test
+    void typeChangedDifferentlyOnBothSidesIsAConflict() {
+        local.setType(StandardEntryType.Misc);
+        remote.setType(StandardEntryType.Book);
+
+        assertEquals(Optional.empty(), baseline.mergeEntry(local, remote));
     }
 }

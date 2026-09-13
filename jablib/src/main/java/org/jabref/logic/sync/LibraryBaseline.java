@@ -138,9 +138,13 @@ public final class LibraryBaseline {
         }
 
         /// A disk entry without in-memory counterpart is either new on disk, or was deleted in memory (and possibly
-        /// modified on disk as well).
-        public Side sideOfAddedEntry(BibEntry remote) {
-            return find(remote).map(base -> base.getValue().equals(EntrySnapshot.view(remote)) ? Side.MEMORY : Side.BOTH)
+        /// modified on disk as well). Only an entry whose baseline counterpart is gone from memory counts as deleted
+        /// there; a duplicate of an entry still in memory is an addition.
+        ///
+        /// @param existsInMemory whether the in-memory entry with the given id still exists
+        public Side sideOfAddedEntry(BibEntry remote, Predicate<String> existsInMemory) {
+            return find(remote).filter(base -> !existsInMemory.test(base.getKey()))
+                               .map(base -> base.getValue().equals(EntrySnapshot.view(remote)) ? Side.MEMORY : Side.BOTH)
                                .orElse(Side.DISK);
         }
 
@@ -188,7 +192,7 @@ public final class LibraryBaseline {
     public Optional<BibEntry> mergeEntry(BibEntry local, BibEntry remote) {
         EntrySnapshot base = entriesById.get(local.getId());
         // Without a common ancestor (entry new on both sides), an empty entry of the in-memory type makes every field
-        // an addition, so only fields set differently on both sides count as conflicts and the in-memory type is kept
+        // an addition, so only fields set differently on both sides count as conflicts; the in-memory type is kept
         BibEntry ancestor = base == null ? new BibEntry(local.getType()) : base.toEntry();
         boolean commentsChangedLocally = !ancestor.getUserComments().equals(local.getUserComments());
         boolean commentsChangedRemotely = !ancestor.getUserComments().equals(remote.getUserComments());
@@ -197,7 +201,10 @@ public final class LibraryBaseline {
             return Optional.empty();
         }
         BibEntry merged = new BibEntry(local);
-        if (!ancestor.getType().equals(remote.getType())) {
+        if (base != null && !ancestor.getType().equals(remote.getType())) {
+            if (!ancestor.getType().equals(local.getType()) && !local.getType().equals(remote.getType())) {
+                return Optional.empty();
+            }
             merged.setType(remote.getType());
         }
         if (!commentsChangedLocally) {
@@ -322,6 +329,9 @@ public final class LibraryBaseline {
     private static Map<String, String> serialize(MetaData metaData, GlobalCitationKeyPatterns citationKeyPatterns) {
         Map<String, String> serialized = new HashMap<>(MetaDataSerializer.getSerializedStringMap(metaData, citationKeyPatterns));
         serialized.put(ENCODING_KEY, metaData.getEncoding().map(Charset::name).orElse(""));
+        // The synchronization setting itself is never synchronized: switching it on in memory must not be undone by
+        // the older value in the file, nor must the file switch it off under a running synchronization
+        serialized.remove(MetaData.SYNCHRONIZE_WITH_FILE);
         return serialized;
     }
 }
