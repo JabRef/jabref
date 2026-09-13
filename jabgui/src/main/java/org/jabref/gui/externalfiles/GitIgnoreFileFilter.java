@@ -23,9 +23,20 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
     private final Path baseDir;
 
     public GitIgnoreFileFilter(Path path) {
-        Path currentPath = path;
-        while ((currentPath != null) && !Files.exists(currentPath.resolve(".gitignore"))) {
-            currentPath = currentPath.getParent();
+        // A .gitignore only applies inside a git repository, so never look above the repository root
+        Path repositoryRoot = path;
+        while ((repositoryRoot != null) && !Files.exists(repositoryRoot.resolve(".git"))) {
+            repositoryRoot = repositoryRoot.getParent();
+        }
+        Path currentPath = null;
+        if (repositoryRoot != null) {
+            currentPath = path;
+            while (!Files.exists(currentPath.resolve(".gitignore")) && !currentPath.equals(repositoryRoot)) {
+                currentPath = currentPath.getParent();
+            }
+            if (!Files.exists(currentPath.resolve(".gitignore"))) {
+                currentPath = null;
+            }
         }
         if (currentPath == null) {
             // we did not find any gitignore, set baseDir to provided path and use default ignores
