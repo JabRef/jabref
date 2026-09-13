@@ -167,4 +167,14 @@ class AiTabViewModelTest {
         assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
         assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().getHighestMessage().isEmpty());
     }
+
+    @Test
+    void documentSplitterOverlapSizeValidWhenChunkSizeSetAfterOverlapSize() {
+        viewModel.documentSplitterChunkSizeProperty().set(0);
+        viewModel.documentSplitterOverlapSizeProperty().set(100);
+        assertFalse(viewModel.getDocumentSplitterOverlapSizeValidationStatus().isValid());
+
+        viewModel.documentSplitterChunkSizeProperty().set(300);
+        assertTrue(viewModel.getDocumentSplitterOverlapSizeValidationStatus().isValid());
+    }
 }
