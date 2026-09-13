@@ -143,24 +143,34 @@ public final class LibraryBaseline {
         ///
         /// @param existsInMemory whether the in-memory entry with the given id still exists
         public Side sideOfAddedEntry(BibEntry remote, Predicate<String> existsInMemory) {
-            return find(remote).filter(base -> !existsInMemory.test(base.getKey()))
-                               .map(base -> base.getValue().equals(EntrySnapshot.view(remote)) ? Side.MEMORY : Side.BOTH)
-                               .orElse(Side.DISK);
+            Optional<Map.Entry<String, EntrySnapshot>> base = find(remote).filter(found -> !existsInMemory.test(found.getKey()));
+            if (base.isPresent()) {
+                return base.get().getValue().equals(EntrySnapshot.view(remote)) ? Side.MEMORY : Side.BOTH;
+            }
+            // Neither key nor content match: an entry deleted in memory may still be the origin, with key and a
+            // field changed on disk; then the deletion and the change need a review
+            List<String> goneFromMemory = entriesById.keySet().stream().filter(id -> !existsInMemory.test(id)).toList();
+            return closestOf(goneFromMemory, remote).isPresent() ? Side.BOTH : Side.DISK;
         }
 
+        /// Identical content under the same key is the entry itself; identical content under another key is the entry
+        /// renamed; only then does a same-key entry with other content count, and each only when unambiguous.
         private Optional<Map.Entry<String, EntrySnapshot>> find(BibEntry remote) {
             EntrySnapshot snapshot = EntrySnapshot.view(remote);
             List<Map.Entry<String, EntrySnapshot>> byKeyCandidates = snapshot.citationKey().map(key -> byKey.getOrDefault(key, List.of())).orElse(List.of());
-            if (!byKeyCandidates.isEmpty()) {
-                return unambiguous(byKeyCandidates, snapshot);
+            List<Map.Entry<String, EntrySnapshot>> identicalWithKey = byKeyCandidates.stream().filter(entry -> entry.getValue().equals(snapshot)).toList();
+            if (!identicalWithKey.isEmpty()) {
+                return single(identicalWithKey);
             }
-            return unambiguous(byContentExceptKey.getOrDefault(snapshot.withoutKey(), List.of()), snapshot);
+            List<Map.Entry<String, EntrySnapshot>> sameContent = byContentExceptKey.getOrDefault(snapshot.withoutKey(), List.of());
+            if (!sameContent.isEmpty()) {
+                return single(sameContent);
+            }
+            return single(byKeyCandidates);
         }
 
-        private static Optional<Map.Entry<String, EntrySnapshot>> unambiguous(List<Map.Entry<String, EntrySnapshot>> candidates, EntrySnapshot snapshot) {
-            List<Map.Entry<String, EntrySnapshot>> identical = candidates.stream().filter(entry -> entry.getValue().equals(snapshot)).toList();
-            List<Map.Entry<String, EntrySnapshot>> chosen = identical.isEmpty() ? candidates : identical;
-            return chosen.size() == 1 ? Optional.of(chosen.getFirst()) : Optional.empty();
+        private static Optional<Map.Entry<String, EntrySnapshot>> single(List<Map.Entry<String, EntrySnapshot>> candidates) {
+            return candidates.size() == 1 ? Optional.of(candidates.getFirst()) : Optional.empty();
         }
     }
 

@@ -2,7 +2,7 @@ package org.jabref.gui.collab.entrychange;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.Set;
+import java.util.SequencedSet;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
@@ -53,7 +53,7 @@ public final class EntryChange extends DatabaseChange {
         if (!Objects.equals(oldEntry.getType(), newEntry.getType())) {
             entryEdit.applyEdit(new UndoableChangeType(oldEntry, oldEntry.getType(), newEntry.getType()));
         }
-        Set<Field> fields = new LinkedHashSet<>(oldEntry.getFields());
+        SequencedSet<Field> fields = new LinkedHashSet<>(oldEntry.getFields());
         fields.addAll(newEntry.getFields());
         for (Field field : fields) {
             String before = oldEntry.getField(field).orElse(null);

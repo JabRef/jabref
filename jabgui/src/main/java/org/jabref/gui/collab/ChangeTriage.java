@@ -1,10 +1,13 @@
 package org.jabref.gui.collab;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,6 +25,7 @@ import org.jabref.logic.sync.LibraryBaseline;
 import org.jabref.logic.sync.LibraryBaseline.Side;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -50,8 +54,12 @@ public final class ChangeTriage {
         Side metaDataSide = Side.BOTH;
         LibraryBaseline.Lookup lookup = baseline.lookup();
         Set<String> idsInMemory = local.getDatabase().getEntries().stream().map(BibEntry::getId).collect(Collectors.toSet());
-        for (DatabaseChange change : pairSplitEntries(baseline, lookup, changes, local, resolverFactory)) {
+        Set<DatabaseChange> pairedBySimilarity = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (DatabaseChange change : pairSplitEntries(baseline, lookup, changes, local, resolverFactory, pairedBySimilarity)) {
             Side side = switch (change) {
+                // A pair that only similarity established is not certain enough to merge fields into: the user decides
+                case EntryChange entryChange when pairedBySimilarity.contains(entryChange) ->
+                        Side.BOTH;
                 case EntryChange entryChange -> {
                     Side entrySide = baseline.sideOfEntry(entryChange.getOldEntry(), entryChange.getNewEntry());
                     if (entrySide == Side.BOTH) {
@@ -66,6 +74,7 @@ public final class ChangeTriage {
                 case EntryDelete entryDelete ->
                         baseline.sideOfDeletedEntry(entryDelete.getDeletedEntry());
                 case MetadataChange metadataChange -> {
+                    keepLocalSettings(local.getMetaData(), metadataChange.getMetaDataDiff().getNewMetaData());
                     metaDataSide = baseline.sideOfMetaData(local.getMetaData(), metadataChange.getMetaDataDiff().getNewMetaData());
                     yield metaDataSide;
                 }
@@ -129,6 +138,13 @@ public final class ChangeTriage {
         }
     }
 
+    /// Applying a metadata change installs the parsed metadata as a whole, so the settings that are never synchronized
+    /// from the file are carried over from memory first.
+    private static void keepLocalSettings(MetaData local, MetaData fromDisk) {
+        local.getSynchronizeWithFile().ifPresentOrElse(fromDisk::setSynchronizeWithFile, fromDisk::clearSynchronizeWithFile);
+        local.getMergeConflictedCopies().ifPresentOrElse(fromDisk::setMergeConflictedCopies, fromDisk::clearMergeConflictedCopies);
+    }
+
     private record BibEntryMerge(Side side, DatabaseChange change) {
     }
 
@@ -142,7 +158,9 @@ public final class ChangeTriage {
     /// changed on the other can fall below the similarity threshold and show up as a deletion plus an addition. The
     /// baseline knows both belong to the same entry. One pass over the changes: a paired addition becomes the change,
     /// its deletion is dropped.
-    private static List<DatabaseChange> pairSplitEntries(LibraryBaseline baseline, LibraryBaseline.Lookup lookup, List<DatabaseChange> changes, BibDatabaseContext local, @Nullable DatabaseChangeResolverFactory resolverFactory) {
+    ///
+    /// @param pairedBySimilarity receives the pairs that were established by closeness rather than by identity
+    private static List<DatabaseChange> pairSplitEntries(LibraryBaseline baseline, LibraryBaseline.Lookup lookup, List<DatabaseChange> changes, BibDatabaseContext local, @Nullable DatabaseChangeResolverFactory resolverFactory, Set<DatabaseChange> pairedBySimilarity) {
         Map<String, EntryDelete> deletesByBaseId = new HashMap<>();
         for (DatabaseChange change : changes) {
             if (change instanceof EntryDelete entryDelete && baseline.hasEntry(entryDelete.getDeletedEntry().getId())) {
@@ -158,13 +176,16 @@ public final class ChangeTriage {
             if (change instanceof EntryAdd entryAdd) {
                 // By identity first; an entry whose key and a field changed on disk matches neither, so among the
                 // entries deleted on disk the one closest in content is taken, if that is unambiguous
-                lookup.baseIdOf(entryAdd.getAddedEntry())
-                      .or(() -> baseline.closestOf(deletesByBaseId.keySet(), entryAdd.getAddedEntry()))
-                      .map(deletesByBaseId::remove)
-                      .ifPresent(entryDelete -> {
-                          pairedDeletes.add(entryDelete);
-                          replacements.put(entryAdd, new EntryChange(entryDelete.getDeletedEntry(), entryAdd.getAddedEntry(), local, resolverFactory));
-                      });
+                Optional<String> byIdentity = lookup.baseIdOf(entryAdd.getAddedEntry());
+                Optional<String> baseId = byIdentity.or(() -> baseline.closestOf(deletesByBaseId.keySet(), entryAdd.getAddedEntry()));
+                baseId.map(deletesByBaseId::remove).ifPresent(entryDelete -> {
+                    pairedDeletes.add(entryDelete);
+                    EntryChange pair = new EntryChange(entryDelete.getDeletedEntry(), entryAdd.getAddedEntry(), local, resolverFactory);
+                    replacements.put(entryAdd, pair);
+                    if (byIdentity.isEmpty()) {
+                        pairedBySimilarity.add(pair);
+                    }
+                });
             }
         }
         List<DatabaseChange> paired = new ArrayList<>(changes.size());
