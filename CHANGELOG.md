@@ -86,7 +86,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added OCR language selection to the OCR preferences, allowing users to configure which Tesseract languages to use. [#16618](https://github.com/JabRef/jabref/issues/16618)
 - We added a fetcher for the Bielefeld Academic Search Engine (BASE). [#15016](https://github.com/JabRef/jabref/issues/15016)
 - We added a Git section to the library properties for automatic commit, pull and push. [#12630](https://github.com/JabRef/jabref/issues/12630)
-- We added a library-specific override of the "Auto rename files if entry changes" preference to the library properties. [#17111](https://github.com/JabRef/jabref/pull/17111)
+- We added a library-specific override of the "Auto rename files if entry changes" preference to the library properties. [#769](https://github.com/JabRef/jabref-koppor/pull/769)
 - We added connection URL pasting to the shared database login dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We added a Dnb Fetcher that uses SRU interface and wired to ISBN Fetcher. [#17070](https://github.com/JabRef/jabref/pull/17070)
 - We added read-only access to shared SQL libraries in `jabkit`: every input file argument accepts a PostgreSQL URL. [#12948](https://github.com/JabRef/jabref/issues/12948)
