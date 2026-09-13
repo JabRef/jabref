@@ -46,10 +46,10 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
         initModality(Modality.NONE);
         ButtonType later = new ButtonType(Localization.lang("Later"), ButtonBar.ButtonData.CANCEL_CLOSE);
         getDialogPane().getButtonTypes().add(later);
-        if (updateAvailable.isPresent()) {
+        updateAvailable.ifPresent(_ -> {
             getDialogPane().getButtonTypes().add(restart);
             getDialogPane().lookupButton(restart).setDisable(true);
-        }
+        });
         setResultConverter(restart::equals);
 
         root.setCenter(body(news));

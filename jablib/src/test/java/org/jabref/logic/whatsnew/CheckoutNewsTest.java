@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -86,7 +88,7 @@ class CheckoutNewsTest {
 
         CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITH_FETCH);
 
-        assertEquals(true, look.fetched());
+        assertTrue(look.fetched());
         assertEquals(2, look.commitsBehind());
         assertEquals(Optional.of("1111111 (2026-09-13 10:00)"), look.head());
         assertEquals(Optional.of("2222222 (2026-09-13 11:00)"), look.upstream());
@@ -101,7 +103,7 @@ class CheckoutNewsTest {
 
         CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITH_FETCH);
 
-        assertEquals(false, look.fetched());
+        assertFalse(look.fetched());
         assertEquals(Optional.of(Set.of(OLD)), announced.read());
     }
 

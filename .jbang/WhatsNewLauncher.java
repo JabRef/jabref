@@ -123,9 +123,17 @@ public class WhatsNewLauncher {
             announced.announce(entries);
             return;
         }
-        // Announced once the news are ready to show: a git failure above keeps them for the next run.
-        announced.announce(entries);
-        Window.show(news, Localization.lang("What's new") + " — " + describe(head));
+        // Announced once the window is on screen: a git or JavaFX failure before that keeps the news for the next run.
+        Window.show(news, Localization.lang("What's new") + " — " + describe(head), () -> remember(announced, entries));
+    }
+
+    private static void remember(AnnouncedEntries announced, List<ChangelogEntry> entries) {
+        try {
+            announced.announce(entries);
+        } catch (IOException e) {
+            System.err.println("What's new cannot remember the announced entries: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /// Who first added a changelog entry.
@@ -238,10 +246,13 @@ public class WhatsNewLauncher {
         // Application.launch instantiates the class by reflection: the news reach the window through these fields.
         private static News news = News.NONE;
         private static String title = "";
+        private static Runnable onShown = () -> { };
 
-        static void show(News news, String title) {
+        /// Shows `news` and runs `onShown` once the window is on screen.
+        static void show(News news, String title, Runnable onShown) {
             Window.news = news;
             Window.title = title;
+            Window.onShown = onShown;
             Application.launch(Window.class);
         }
 
@@ -266,6 +277,7 @@ public class WhatsNewLauncher {
             stage.setTitle(title);
             stage.setScene(scene);
             stage.show();
+            onShown.run();
         }
 
         /// Dark if JabRef's colour scheme preference says so, or says "follow system" and the system is dark.
