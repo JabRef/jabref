@@ -209,13 +209,13 @@ public class DBMSProcessor {
                 BEGIN
                     -- Check if the key already exists and get its current value
                     SELECT VALUE INTO existing_value FROM METADATA WHERE KEY = metadata_key;
-                
+
                     -- Perform the upsert
                     INSERT INTO METADATA (KEY, VALUE)
                     VALUES (metadata_key, metadata_value)
                     ON CONFLICT (KEY)
                     DO UPDATE SET VALUE = EXCLUDED.VALUE;
-                
+
                     -- Notify only if the value has changed
                     IF existing_value IS DISTINCT FROM metadata_value THEN
                         -- Only the key: values (e.g. serialized groups) can exceed the 8000 byte payload limit,
