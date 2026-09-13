@@ -54,7 +54,7 @@ class AiTabViewModelTest {
     }
 
     @Test
-    void testConnectionUsesEnteredValues() throws Exception {
+    void connectionUsesEnteredValues() throws Exception {
         viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
         viewModel.selectedChatModelProperty().set("granite4.2:8b");
         viewModel.apiKeyProperty().set("key");
@@ -67,7 +67,7 @@ class AiTabViewModelTest {
     }
 
     @Test
-    void testConnectionUsesProviderUrlWithoutExpertSettings() throws Exception {
+    void connectionUsesProviderUrlWithoutExpertSettings() throws Exception {
         viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
         viewModel.selectedChatModelProperty().set("gpt-4o");
         viewModel.apiKeyProperty().set("key");
