@@ -78,10 +78,15 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
                     }
                 })
                 .onFailure(e -> {
-                    LOGGER.error("An error occurred while downloading the embedding model", e);
-                    notificationService.notify(Localization.lang("An error occurred while downloading the embedding model"));
-                    predictorProperty.set(Optional.empty());
-                    errorWhileBuildingModel = e.getMessage() == null ? "" : e.getMessage();
+                    synchronized (this) {
+                        if (closed) {
+                            return;
+                        }
+                        LOGGER.error("An error occurred while downloading the embedding model", e);
+                        notificationService.notify(Localization.lang("An error occurred while downloading the embedding model"));
+                        predictorProperty.set(Optional.empty());
+                        errorWhileBuildingModel = e.getMessage() == null ? "" : e.getMessage();
+                    }
                 })
                 .executeWith(taskExecutor);
     }
