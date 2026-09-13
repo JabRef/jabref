@@ -79,6 +79,22 @@ class PreferencesSearchHandlerTest {
         assertEquals(visibleMatch, aiHandler.firstMatch(aiTab).orElseThrow());
     }
 
+    @Test
+    void firstMatchFollowsVisibilityChangesAfterTheSearch() {
+        Label expertMatch = new Label();
+        Label visibleMatch = new Label();
+        VBox expertRegion = new VBox(expertMatch);
+        new VBox(expertRegion, visibleMatch);
+        PreferencesTab aiTab = tab("AI", new SearchableElement("Reset expert settings to default", expertMatch),
+                new SearchableElement("Default response engine", visibleMatch));
+
+        PreferencesSearchHandler aiHandler = new PreferencesSearchHandler(List.of(aiTab));
+        aiHandler.filterTabs("default");
+        expertRegion.setVisible(false);
+
+        assertEquals(visibleMatch, aiHandler.firstMatch(aiTab).orElseThrow());
+    }
+
     private static PreferencesTab tab(String title, SearchableElement... elements) {
         return new PreferencesTab() {
             @Override

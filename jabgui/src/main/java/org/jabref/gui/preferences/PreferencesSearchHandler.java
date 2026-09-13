@@ -27,8 +27,8 @@ class PreferencesSearchHandler {
     private final ListProperty<PreferencesTab> filteredPreferenceTabs;
     private final Map<PreferencesTab, List<SearchableElement>> searchableElements;
 
-    /// The first highlighted node per tab of the last search, so the dialog can scroll to it.
-    private final Map<PreferencesTab, Node> firstMatches = new HashMap<>();
+    /// The highlighted nodes per tab of the last search, in declaration order, so the dialog can scroll to the first one.
+    private final Map<PreferencesTab, List<Node>> matchedNodes = new HashMap<>();
 
     PreferencesSearchHandler(List<PreferencesTab> preferenceTabs) {
         this.preferenceTabs = preferenceTabs;
@@ -39,7 +39,7 @@ class PreferencesSearchHandler {
 
     public void filterTabs(String query) {
         clearHighlights();
-        firstMatches.clear();
+        matchedNodes.clear();
 
         if (query.isBlank()) {
             filteredPreferenceTabs.setAll(preferenceTabs);
@@ -62,14 +62,14 @@ class PreferencesSearchHandler {
                                                             .filter(element -> element.text().toLowerCase(Locale.ROOT).contains(query))
                                                             .toList();
         matches.forEach(element -> element.node().pseudoClassStateChanged(SEARCH_HIGHLIGHT, true));
-        matches.stream().map(SearchableElement::node).filter(PreferencesSearchHandler::isShown).findFirst()
-               .ifPresent(node -> firstMatches.put(tab, node));
+        matchedNodes.put(tab, matches.stream().map(SearchableElement::node).toList());
 
         return keywordMatches || !matches.isEmpty();
     }
 
     /// A node in a region hidden by `visibleWhen` (e.g. the AI tab's expert settings) is not laid
     /// out and thus useless as a scroll target - the first *visible* match is what to scroll to.
+    /// Checked when scrolling, not when searching: the region can be toggled in between.
     private static boolean isShown(Node node) {
         for (Node current = node; current != null; current = current.getParent()) {
             if (!current.isVisible()) {
@@ -85,9 +85,11 @@ class PreferencesSearchHandler {
                           .forEach(element -> element.node().pseudoClassStateChanged(SEARCH_HIGHLIGHT, false));
     }
 
-    /// @return the first element the current query highlighted in the given tab, if any
+    /// @return the first currently visible element the current query highlighted in the given tab, if any
     public Optional<Node> firstMatch(PreferencesTab tab) {
-        return Optional.ofNullable(firstMatches.get(tab));
+        return matchedNodes.getOrDefault(tab, List.of()).stream()
+                           .filter(PreferencesSearchHandler::isShown)
+                           .findFirst();
     }
 
     protected ListProperty<PreferencesTab> filteredPreferenceTabsProperty() {
