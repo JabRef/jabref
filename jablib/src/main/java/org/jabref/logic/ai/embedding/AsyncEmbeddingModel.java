@@ -80,6 +80,7 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
                 .onFailure(e -> {
                     synchronized (this) {
                         if (closed) {
+                            LOGGER.debug("Download of evicted embedding model {} failed", modelName, e);
                             return;
                         }
                         LOGGER.error("An error occurred while downloading the embedding model", e);

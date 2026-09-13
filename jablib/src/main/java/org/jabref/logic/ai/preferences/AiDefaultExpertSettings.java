@@ -12,7 +12,6 @@ import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 public class AiDefaultExpertSettings {
     public static final SummarizatorKind SUMMARIZATOR_KIND = SummarizatorKind.CHUNKED;
     public static final TokenEstimatorKind TOKEN_ESTIMATOR_KIND = TokenEstimatorKind.MAX;
-    // [impl->req~ai.expert-settings.default-embedding-model~1]
     public static final String EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5";
     public static final float TEMPERATURE = 0.7F;
 

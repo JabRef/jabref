@@ -52,12 +52,15 @@ class EmbeddingsCleanerTest {
         return new TextSegment(text, new Metadata(java.util.Map.of(FILE_HASH_METADATA_KEY, hash)));
     }
 
-    private boolean hasAnyEmbedding() {
-        return !embeddingStore.search(EmbeddingSearchRequest.builder()
-                                                            .queryEmbedding(Embedding.from(new float[] {1.0f, 0.0f}))
-                                                            .maxResults(100)
-                                                            .minScore(0.0)
-                                                            .build()).matches().isEmpty();
+    private List<String> embeddedTexts() {
+        return embeddingStore.search(EmbeddingSearchRequest.builder()
+                                                           .queryEmbedding(Embedding.from(new float[] {1.0f, 0.0f}))
+                                                           .maxResults(100)
+                                                           .minScore(0.0)
+                                                           .build())
+                             .matches().stream()
+                             .map(match -> match.embedded().text())
+                             .toList();
     }
 
     @Test
@@ -67,7 +70,7 @@ class EmbeddingsCleanerTest {
 
         new EmbeddingsCleaner(aiPreferences, embeddingStore, ingestedDocumentsRepository);
 
-        assertTrue(hasAnyEmbedding());
+        assertEquals(List.of("doc"), embeddedTexts());
         assertTrue(ingestedDocumentsRepository.isDocumentIngested("hash-1"));
     }
 
@@ -80,25 +83,24 @@ class EmbeddingsCleanerTest {
 
         new EmbeddingsCleaner(aiPreferences, embeddingStore, ingestedDocumentsRepository);
 
-        assertFalse(hasAnyEmbedding());
+        assertEquals(List.of(), embeddedTexts());
         assertFalse(ingestedDocumentsRepository.isDocumentIngested("hash-1"));
-        assertEquals(Optional.of("model-b"), embeddingStore.getEmbeddingModel());
+        assertEquals(Optional.of("model-b"), ingestedDocumentsRepository.getEmbeddingModel());
     }
 
     // [utest->req~ai.ingestion.model-change-invalidation~1]
     @Test
     void startupClearsEmbeddingsWithoutRecordedModel() {
-        MVStoreEmbeddingStore legacyStore = new MVStoreEmbeddingStore(tempDir.resolve("legacy.mv"), _ -> {
-        });
-        legacyStore.add(Embedding.from(new float[] {1.0f, 0.0f}), segmentWithHash("doc", "hash-1"));
+        MVStoreIngestedDocumentsRepository legacyRepository = new MVStoreIngestedDocumentsRepository(_ -> {
+        }, tempDir.resolve("legacy.mv"));
+        legacyRepository.markDocumentAsFullyIngested("hash-1");
+        embeddingStore.add(Embedding.from(new float[] {1.0f, 0.0f}), segmentWithHash("doc", "hash-1"));
 
-        new EmbeddingsCleaner(aiPreferences, legacyStore, ingestedDocumentsRepository);
+        new EmbeddingsCleaner(aiPreferences, embeddingStore, legacyRepository);
 
-        assertEquals(Optional.of("model-a"), legacyStore.getEmbeddingModel());
-        assertEquals(List.of(), legacyStore.search(EmbeddingSearchRequest.builder()
-                                                                         .queryEmbedding(Embedding.from(new float[] {1.0f, 0.0f}))
-                                                                         .minScore(0.0)
-                                                                         .build()).matches());
+        assertEquals(List.of(), embeddedTexts());
+        assertFalse(legacyRepository.isDocumentIngested("hash-1"));
+        assertEquals(Optional.of("model-a"), legacyRepository.getEmbeddingModel());
     }
 
     // [utest->req~ai.ingestion.model-change-invalidation~1]
@@ -111,8 +113,8 @@ class EmbeddingsCleanerTest {
 
         preferences.setCustomizeExpertSettings(true);
 
-        assertFalse(hasAnyEmbedding());
-        assertEquals(Optional.of("custom-model"), embeddingStore.getEmbeddingModel());
+        assertEquals(List.of(), embeddedTexts());
+        assertEquals(Optional.of("custom-model"), ingestedDocumentsRepository.getEmbeddingModel());
     }
 
     @Test
@@ -121,7 +123,7 @@ class EmbeddingsCleanerTest {
 
         cleaner.removeAll();
 
-        assertFalse(hasAnyEmbedding());
+        assertEquals(List.of(), embeddedTexts());
     }
 
     @Test

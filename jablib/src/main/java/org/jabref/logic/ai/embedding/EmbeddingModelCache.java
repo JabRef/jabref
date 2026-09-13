@@ -41,9 +41,8 @@ public class EmbeddingModelCache implements AutoCloseable {
 
     /// Returns the cached [AsyncEmbeddingModel] for `modelName`, creating it on first access.
     ///
-    /// Calling this method multiple times with the same `modelName` always returns the
-    /// *same* instance; no additional background tasks are launched.
-    /// Requesting another model name closes and evicts the cached models of other names.
+    /// Consecutive calls with the same `modelName` return the *same* instance; no additional background tasks are launched.
+    /// Requesting another model name closes and evicts that instance, so a later request for `modelName` creates a new one.
     ///
     /// @param modelName the requested embedding model name
     /// @return a (possibly still-loading) [AsyncEmbeddingModel] for `modelName`
