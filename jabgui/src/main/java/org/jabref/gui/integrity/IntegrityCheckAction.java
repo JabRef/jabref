@@ -72,7 +72,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 return result;
             }
         };
-        task.setOnSucceeded(value -> {
+        task.setOnSucceeded(_ -> {
             List<IntegrityMessage> messages = task.getValue();
             if (messages.isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
@@ -80,7 +80,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, tabSupplier.get(), dialogService));
             }
         });
-        task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));
+        task.setOnFailed(_ -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));
 
         dialogService.showProgressDialog(
                 Localization.lang("Checking integrity..."),

@@ -82,7 +82,7 @@ public class DefaultLatexParser implements LatexParser {
                 matchBibFile(latexFile, line, latexParserResult);
                 matchNestedFile(latexFile, line, latexParserResult);
             }
-        } catch (ClosedChannelException e) {
+        } catch (ClosedChannelException _) {
             // User changed the underlying LaTeX file
             // We ignore this error and just continue with parsing
             LOGGER.info("Parsing has been interrupted");

@@ -176,7 +176,7 @@ public class CitationsResource {
             }
             try {
                 results.add(doLookup(citationText, targetContext, openDatabases, duplicateCheck));
-            } catch (UncheckedFetcherException | BadRequestException e) {
+            } catch (UncheckedFetcherException | BadRequestException _) {
                 // One citation failing — fetcher error (UncheckedFetcherException) or
                 // parser-returned-empty (BadRequestException) — must not fail the batch.
                 // Surface as a "no match" slot so the client paints a gray ring there;

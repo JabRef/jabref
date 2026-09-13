@@ -86,7 +86,7 @@ public class JStyleLoader {
                 } else {
                     LOGGER.error("Style with filename {} is invalid", filename);
                 }
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException _) {
                 // The file couldn't be found... should we tell anyone?
                 LOGGER.info("Cannot find external style file {}", filename);
             } catch (IOException e) {

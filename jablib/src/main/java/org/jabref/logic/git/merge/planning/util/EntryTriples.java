@@ -37,7 +37,7 @@ public final class EntryTriples {
                       .collect(Collectors.toMap(
                               entry -> entry.getCitationKey().get(),
                               Function.identity(),
-                              (existing, replacement) -> replacement,
+                              (_, replacement) -> replacement,
                               LinkedHashMap::new
                       ));
     }

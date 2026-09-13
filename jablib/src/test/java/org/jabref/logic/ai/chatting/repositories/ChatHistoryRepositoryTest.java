@@ -27,7 +27,7 @@ class ChatHistoryRepositoryTest {
 
     static List<ChatHistoryRepository> repositories() {
         return List.of(
-                new MVStoreChatHistoryRepository(tempDir.resolve("chat-test.mv"), notification -> {
+                new MVStoreChatHistoryRepository(tempDir.resolve("chat-test.mv"), _ -> {
                 })
         );
     }

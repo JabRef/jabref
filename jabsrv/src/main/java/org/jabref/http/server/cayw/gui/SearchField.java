@@ -17,7 +17,7 @@ public class SearchField extends TextField {
     public SearchField(FilteredList<CAYWEntry> filteredEntries, Function<String, List<CAYWEntry>> filter) {
         PauseTransition pause = new PauseTransition(Duration.millis(DELAY_IN_MS));
         textProperty().addListener((_, _, newValue) -> {
-            pause.setOnFinished(event -> {
+            pause.setOnFinished(_ -> {
                 Set<CAYWEntry> currentEntries = new HashSet<>(filter.apply(newValue));
                 filteredEntries.setPredicate(currentEntries::contains);
             });

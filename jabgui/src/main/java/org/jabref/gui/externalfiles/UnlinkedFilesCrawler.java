@@ -98,7 +98,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
                             .forEach(associatedPaths::add);
                 }
                 for (Path associatedPath : associatedPaths) {
-                    relatedEntriesByFile.computeIfAbsent(associatedPath, ignored -> new ArrayList<>()).add(entry);
+                    relatedEntriesByFile.computeIfAbsent(associatedPath, _ -> new ArrayList<>()).add(entry);
                 }
             } catch (IOException e) {
                 LOGGER.warn("Error finding related files for entry {}", entry.getCitationKey(), e);

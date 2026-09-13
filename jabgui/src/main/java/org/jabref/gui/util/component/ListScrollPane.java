@@ -54,7 +54,7 @@ public class ListScrollPane<T> extends ScrollPane {
             itemsProperty.get().addListener(listContentListener);
         }
 
-        itemsProperty.addListener((obs, oldList, newList) -> {
+        itemsProperty.addListener((_, oldList, newList) -> {
             if (oldList == newList) {
                 return;
             }

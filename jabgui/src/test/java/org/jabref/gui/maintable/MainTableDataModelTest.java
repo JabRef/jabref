@@ -78,7 +78,7 @@ class MainTableDataModelTest {
 
         final boolean[] changed = {false};
 
-        entriesFilteredAndSorted.addListener((InvalidationListener) observable -> changed[0] = true);
+        entriesFilteredAndSorted.addListener((InvalidationListener) _ -> changed[0] = true);
 
         BibEntry bibEntryAuthorT = new BibEntry().withField(StandardField.AUTHOR, "T");
         entries.add(bibEntryAuthorT);

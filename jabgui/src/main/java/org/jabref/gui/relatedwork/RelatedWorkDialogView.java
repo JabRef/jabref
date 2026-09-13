@@ -57,7 +57,7 @@ public class RelatedWorkDialogView extends BaseDialog<Void> {
 
         ViewLoader.view(this).load().setAsDialogPane(this);
 
-        ControlHelper.setAction(parseButtonType, getDialogPane(), event -> viewModel.matchRelatedWork().ifPresent(this::openResultDialog));
+        ControlHelper.setAction(parseButtonType, getDialogPane(), _ -> viewModel.matchRelatedWork().ifPresent(this::openResultDialog));
 
         Button parseButton = (Button) getDialogPane().lookupButton(parseButtonType);
         parseButton.disableProperty().bind(viewModel.parseDisabledProperty());

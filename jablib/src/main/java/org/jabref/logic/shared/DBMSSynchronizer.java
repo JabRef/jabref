@@ -466,7 +466,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         } catch (OfflineLockException exception) {
             sharedIdsInConflict.add(sharedId);
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
-        } catch (SharedEntryNotPresentException exception) {
+        } catch (SharedEntryNotPresentException _) {
             // Deleted on the shared side: the pull removes it locally and tells the user
             pullEntries();
         } catch (SQLException e) {
@@ -694,7 +694,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // not interleave with them
         try {
             syncExecutor.execute(() -> useConnection(newConnection));
-        } catch (RejectedExecutionException e) {
+        } catch (RejectedExecutionException _) {
             // Closed while connecting
             closeQuietly(newConnection.getConnection());
         }
@@ -973,7 +973,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                     LOGGER.warn("Queued shared database writes did not finish in time - closing anyway");
                     ownedSyncExecutor.shutdownNow();
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException _) {
                 Thread.currentThread().interrupt();
             }
         } else {

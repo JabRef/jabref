@@ -102,7 +102,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         highlightWordsRadioButton.disableProperty().bind(notShowDiffProperty());
         highlightCharactersRadioButtons.disableProperty().bind(notShowDiffProperty());
 
-        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener(observable -> {
+        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener(_ -> {
             if (diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightCharactersRadioButtons)) {
                 diffHighlightingMethod.set(BasicDiffMethod.CHARS);
             } else {
@@ -194,11 +194,11 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     }
 
     public void setOnSelectLeftEntryValuesButtonClicked(Runnable onClick) {
-        selectLeftEntryValuesButton.setOnMouseClicked(e -> onClick.run());
+        selectLeftEntryValuesButton.setOnMouseClicked(_ -> onClick.run());
     }
 
     public void setOnSelectRightEntryValuesButtonClicked(Runnable onClick) {
-        selectRightEntryValuesButton.setOnMouseClicked(e -> onClick.run());
+        selectRightEntryValuesButton.setOnMouseClicked(_ -> onClick.run());
     }
 
     public enum PlainTextOrDiff {

@@ -312,7 +312,7 @@ public class AiPreferences {
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
         try (final Keyring keyring = Keyring.create()) {
             return keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
-        } catch (PasswordAccessException e) {
+        } catch (PasswordAccessException _) {
             LOGGER.debug("No API key stored for provider {}. Returning an empty string", aiProvider.name());
             return "";
         } catch (Exception e) {
@@ -326,7 +326,7 @@ public class AiPreferences {
             if (StringUtil.isNullOrEmpty(newKey)) {
                 try {
                     keyring.deletePassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
-                } catch (PasswordAccessException ex) {
+                } catch (PasswordAccessException _) {
                     LOGGER.debug("API key for provider {} not stored in keyring. JabRef does not store an empty key.", aiProvider.name());
                 }
             } else {

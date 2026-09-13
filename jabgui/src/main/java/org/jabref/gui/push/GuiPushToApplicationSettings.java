@@ -62,7 +62,7 @@ public class GuiPushToApplicationSettings {
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(filePreferences.getWorkingDirectory()).build();
-        browse.setOnAction(e -> dialogService.showFileOpenDialog(fileDialogConfiguration)
+        browse.setOnAction(_ -> dialogService.showFileOpenDialog(fileDialogConfiguration)
                                              .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         settingsPane.add(browse, 2, 0);
 

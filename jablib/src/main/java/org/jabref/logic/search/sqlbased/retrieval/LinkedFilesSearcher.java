@@ -144,7 +144,7 @@ public final class LinkedFilesSearcher {
         Map<String, List<String>> linkedFilesMap = new HashMap<>();
         for (BibEntry bibEntry : databaseContext.getEntries()) {
             for (LinkedFile linkedFile : bibEntry.getFiles()) {
-                linkedFilesMap.computeIfAbsent(linkedFile.getLink(), k -> new ArrayList<>()).add(bibEntry.getId());
+                linkedFilesMap.computeIfAbsent(linkedFile.getLink(), _ -> new ArrayList<>()).add(bibEntry.getId());
             }
         }
         return linkedFilesMap;

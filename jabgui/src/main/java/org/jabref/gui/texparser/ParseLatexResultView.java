@@ -37,7 +37,7 @@ public class ParseLatexResultView extends BaseDialog<Void> {
 
         ViewLoader.view(this).load().setAsDialogPane(this);
 
-        ControlHelper.setAction(importButtonType, getDialogPane(), event -> {
+        ControlHelper.setAction(importButtonType, getDialogPane(), _ -> {
             viewModel.importButtonClicked();
             close();
         });

@@ -746,7 +746,7 @@ public class OOTextIntoOO {
         } catch (UnknownPropertyException
                  | PropertyVetoException
                  | IllegalArgumentException
-                 | WrappedTargetException ex) {
+                 | WrappedTargetException _) {
             return FAIL;
         }
     }

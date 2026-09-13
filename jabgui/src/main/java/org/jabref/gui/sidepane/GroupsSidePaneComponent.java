@@ -39,7 +39,7 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
         setupFilterToggle();
         setupIntersectionUnionToggle();
 
-        groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
+        groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) _ -> {
             GroupModeViewModel modeViewModel = new GroupModeViewModel(groupsPreferences.groupViewModeProperty());
             intersectionUnionToggle.setGraphic(modeViewModel.getUnionIntersectionGraphic());
             intersectionUnionToggle.setTooltip(modeViewModel.getUnionIntersectionTooltip());
@@ -48,21 +48,21 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
 
     private void setupIntersectionUnionToggle() {
         addExtraNodeToHeader(intersectionUnionToggle, 0);
-        intersectionUnionToggle.setOnAction(event -> new ToggleUnionIntersectionAction().execute());
+        intersectionUnionToggle.setOnAction(_ -> new ToggleUnionIntersectionAction().execute());
     }
 
     private void setupFilterToggle() {
         addExtraNodeToHeader(filterToggle, 0);
         filterToggle.setTooltip(new Tooltip(Localization.lang("Filter by groups")));
         filterToggle.setSelected(groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER));
-        filterToggle.selectedProperty().addListener((observable, oldValue, newValue) -> groupsPreferences.setGroupViewMode(GroupViewMode.FILTER, newValue));
+        filterToggle.selectedProperty().addListener((_, _, newValue) -> groupsPreferences.setGroupViewMode(GroupViewMode.FILTER, newValue));
     }
 
     private void setupInvertToggle() {
         addExtraNodeToHeader(invertToggle, 0);
         invertToggle.setTooltip(new Tooltip(Localization.lang("Invert groups")));
         invertToggle.setSelected(groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INVERT));
-        invertToggle.selectedProperty().addListener((observable, oldValue, newValue) -> groupsPreferences.setGroupViewMode(GroupViewMode.INVERT, newValue));
+        invertToggle.selectedProperty().addListener((_, _, newValue) -> groupsPreferences.setGroupViewMode(GroupViewMode.INVERT, newValue));
     }
 
     private class ToggleUnionIntersectionAction extends SimpleCommand {

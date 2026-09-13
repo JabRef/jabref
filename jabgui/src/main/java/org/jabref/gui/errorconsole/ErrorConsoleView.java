@@ -57,9 +57,9 @@ public class ErrorConsoleView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        ControlHelper.setAction(copyLogButton, getDialogPane(), event -> copyLog());
-        ControlHelper.setAction(clearLogButton, getDialogPane(), event -> clearLog());
-        ControlHelper.setAction(createIssueButton, getDialogPane(), event -> createIssue());
+        ControlHelper.setAction(copyLogButton, getDialogPane(), _ -> copyLog());
+        ControlHelper.setAction(clearLogButton, getDialogPane(), _ -> clearLog());
+        ControlHelper.setAction(createIssueButton, getDialogPane(), _ -> createIssue());
     }
 
     @FXML
@@ -69,7 +69,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
         messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
         messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);
         messagesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        viewModel.allMessagesDataProperty().addListener((ListChangeListener<LogEventViewModel>) (change -> {
+        viewModel.allMessagesDataProperty().addListener((ListChangeListener<LogEventViewModel>) (_ -> {
             int size = viewModel.allMessagesDataProperty().size();
             if (size > 0) {
                 messagesListView.scrollTo(size - 1);
@@ -79,7 +79,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
     }
 
     private Callback<ListView<LogEventViewModel>, ListCell<LogEventViewModel>> createCellFactory() {
-        return cell -> new ListCell<>() {
+        return _ -> new ListCell<>() {
             private final HBox graphic;
             private final VBox message;
             private final Label heading;
@@ -124,7 +124,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
             private ContextMenu createContextMenu(LogEventViewModel selectedLogEntry) {
                 ContextMenu contextMenu = new ContextMenu();
                 MenuItem copyItem = new MenuItem("Copy");
-                copyItem.setOnAction(event -> viewModel.copyLogEntry(selectedLogEntry));
+                copyItem.setOnAction(_ -> viewModel.copyLogEntry(selectedLogEntry));
                 contextMenu.getItems().add(copyItem);
                 return contextMenu;
             }

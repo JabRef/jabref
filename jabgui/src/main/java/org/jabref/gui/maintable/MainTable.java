@@ -182,7 +182,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // force match category column to be the first sort order, (match_category column is always the first column)
         this.getSortOrder().addFirst(getColumns().getFirst());
-        this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
+        this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) _ -> {
             if (!this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
                 this.getSortOrder().addFirst(getColumns().getFirst());
             }
@@ -221,9 +221,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         updatePlaceholder(placeholderBox, loadingPlaceholder);
 
-        database.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> updatePlaceholder(placeholderBox, loadingPlaceholder));
+        database.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) _ -> updatePlaceholder(placeholderBox, loadingPlaceholder));
 
-        this.getItems().addListener((ListChangeListener<BibEntryTableViewModel>) change -> updatePlaceholder(placeholderBox, loadingPlaceholder));
+        this.getItems().addListener((ListChangeListener<BibEntryTableViewModel>) _ -> updatePlaceholder(placeholderBox, loadingPlaceholder));
 
         libraryTab.getLoading().addListener((_, _, _) -> updatePlaceholder(placeholderBox, loadingPlaceholder));
 

@@ -71,11 +71,11 @@ public class OpenDatabaseActionTest {
         // Make it so that showFileOpenDialogAndGetMultipleFiles will throw an error when called with the bad path, but
         // not for the good path as in issue #10548
         when(dialogService.showFileOpenDialogAndGetMultipleFiles(badConfig))
-                .thenAnswer(x -> {
+                .thenAnswer(_ -> {
                     throw new IllegalArgumentException();
                 });
         when(dialogService.showFileOpenDialogAndGetMultipleFiles(goodConfig))
-                .thenAnswer(x -> List.of());
+                .thenAnswer(_ -> List.of());
 
         // Simulate a scenario where the initial directory is good
         when(openDatabaseAction.getFileDialogConfiguration(openDatabaseAction.getInitialDirectory()))

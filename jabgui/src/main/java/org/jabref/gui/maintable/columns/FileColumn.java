@@ -164,7 +164,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),
                     linkedFileViewModel.getTypeIcon().getGraphicNode());
-            menuItem.setOnAction(event -> linkedFileViewModel.open());
+            menuItem.setOnAction(_ -> linkedFileViewModel.open());
             contextMenu.getItems().add(menuItem);
         }
 

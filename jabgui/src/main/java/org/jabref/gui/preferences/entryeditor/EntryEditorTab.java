@@ -185,10 +185,10 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         tabsTable.setItems(viewModel.getTabs());
 
         new ViewModelTableRowFactory<EditorTabViewModel>()
-                .setOnDragDetected((row, tab, event) -> handleOnDragDetected(tabsTable, DragAndDropDataFormats.ENTRY_EDITOR_TAB, EditorTabViewModel.class, tab, event))
-                .setOnDragDropped((row, tab, event) -> handleOnDragDropped(tabsTable, EditorTabViewModel.class, row, event))
-                .setOnDragOver((row, tab, event) -> handleOnDragOver(DragAndDropDataFormats.ENTRY_EDITOR_TAB, row, event))
-                .setOnDragExited((row, tab, event) -> ControlHelper.removeDroppingPseudoClasses(row))
+                .setOnDragDetected((_, tab, event) -> handleOnDragDetected(tabsTable, DragAndDropDataFormats.ENTRY_EDITOR_TAB, EditorTabViewModel.class, tab, event))
+                .setOnDragDropped((row, _, event) -> handleOnDragDropped(tabsTable, EditorTabViewModel.class, row, event))
+                .setOnDragOver((row, _, event) -> handleOnDragOver(DragAndDropDataFormats.ENTRY_EDITOR_TAB, row, event))
+                .setOnDragExited((row, _, _) -> ControlHelper.removeDroppingPseudoClasses(row))
                 .install(tabsTable);
 
         EasyBind.subscribe(tabsTable.getSelectionModel().selectedItemProperty(), this::onSelectedTabChanged);
@@ -330,10 +330,10 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         fieldsTable.getColumns().add(actionsColumn);
 
         new ViewModelTableRowFactory<String>()
-                .setOnDragDetected((row, pattern, event) -> handleOnDragDetected(fieldsTable, DragAndDropDataFormats.FIELD, String.class, pattern, event))
-                .setOnDragDropped((row, pattern, event) -> handleOnDragDropped(fieldsTable, String.class, row, event))
-                .setOnDragOver((row, pattern, event) -> handleOnDragOver(DragAndDropDataFormats.FIELD, row, event))
-                .setOnDragExited((row, pattern, event) -> ControlHelper.removeDroppingPseudoClasses(row))
+                .setOnDragDetected((_, pattern, event) -> handleOnDragDetected(fieldsTable, DragAndDropDataFormats.FIELD, String.class, pattern, event))
+                .setOnDragDropped((row, _, event) -> handleOnDragDropped(fieldsTable, String.class, row, event))
+                .setOnDragOver((row, _, event) -> handleOnDragOver(DragAndDropDataFormats.FIELD, row, event))
+                .setOnDragExited((row, _, _) -> ControlHelper.removeDroppingPseudoClasses(row))
                 .install(fieldsTable);
     }
 

@@ -29,7 +29,7 @@ public class HistoryTextArea extends TextArea {
         this.setWrapText(true);
         this.setPrefRowCount(1);
 
-        this.textProperty().addListener((observable, oldValue, newValue) -> {
+        this.textProperty().addListener((_, _, newValue) -> {
             int newLines = 1;
             if (newValue != null) {
                 for (int i = 0; i < newValue.length(); i++) {
@@ -41,7 +41,7 @@ public class HistoryTextArea extends TextArea {
             this.setPrefRowCount(Math.min(newLines, MAX_EXPAND_ROWS));
         });
 
-        history.addListener((obs, oldVal, newVal) -> resetHistoryState());
+        history.addListener((_, _, _) -> resetHistoryState());
         this.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPressed);
     }
 
