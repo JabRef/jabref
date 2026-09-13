@@ -23,7 +23,9 @@ import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.prefs.Preferences;
@@ -91,7 +93,9 @@ public class WhatsNewLauncher {
         Localization.setLanguage(Language.getLanguageFor(JABREF_PREFERENCES.get(LANGUAGE_PREFERENCE, Locale.getDefault().getLanguage())));
         AnnouncedEntries announced = AnnouncedEntries.inGitDir(Path.of(git("rev-parse", "--absolute-git-dir").getFirst()));
         String head = git("rev-parse", "HEAD").getFirst();
-        List<ChangelogEntry> entries = List.copyOf(ChangelogParser.entries(git("show", head + ":" + CHANGELOG)).values());
+        List<String> changelog = git("show", head + ":" + CHANGELOG);
+        SequencedMap<Integer, ChangelogEntry> entriesByLine = ChangelogParser.entries(changelog);
+        List<ChangelogEntry> entries = List.copyOf(entriesByLine.values());
         Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
         if (announcedSoFar.isEmpty()) {
             announced.write(entries);
@@ -101,9 +105,12 @@ public class WhatsNewLauncher {
         // Without `--default`, an unset user.email is a failing command, not an empty answer.
         EntryOrigins origins = new EntryOrigins(git("config", "--default", "", "--get", "user.email").getFirst());
         List<AttributedEntry> items = new ArrayList<>();
-        for (ChangelogEntry entry : entries) {
+        for (Map.Entry<Integer, ChangelogEntry> entryAtLine : entriesByLine.entrySet()) {
+            ChangelogEntry entry = entryAtLine.getValue();
             if (!announcedTexts.contains(entry.text())) {
-                items.add(origins.attribute(entry));
+                // The history is searched for the bullet line as committed: an entry continued on further lines
+                // is joined for display only.
+                items.add(origins.attribute(entry, changelog.get(entryAtLine.getKey()).substring(2).strip()));
             }
         }
         News news = new News(items);
@@ -143,9 +150,10 @@ public class WhatsNewLauncher {
             this.myEmail = myEmail;
         }
 
-        /// `entry` with who first added it; mine when the history does not tell, which a committed line does not do.
-        AttributedEntry attribute(ChangelogEntry entry) throws IOException, InterruptedException {
-            Contributor by = origin(entry.text(), 0).map(this::contributor).orElse(Contributor.Me.LOCAL);
+        /// `entry` with who first added its `bulletLine` (the `- ` line as committed, without the marker); mine
+        /// when the history does not tell, which a committed line does not do.
+        AttributedEntry attribute(ChangelogEntry entry, String bulletLine) throws IOException, InterruptedException {
+            Contributor by = origin(bulletLine, 0).map(this::contributor).orElse(Contributor.Me.LOCAL);
             return new AttributedEntry(by, entry);
         }
 
