@@ -1,7 +1,6 @@
 package org.jabref.logic.whatsnew;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +24,7 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.transport.RefSpec;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +38,6 @@ public final class Checkout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Checkout.class);
     private static final String CHANGELOG = "CHANGELOG.md";
-
-    /// What tells JabRef's own source tree from any other repository JabRef happens to be started in.
-    private static final Path JABGUI_BUILD_FILE = Path.of("jabgui", "build.gradle.kts");
     private static final int ABBREVIATED_ID_LENGTH = 7;
     private static final DateTimeFormatter COMMIT_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -50,12 +47,9 @@ public final class Checkout {
         this.handler = handler;
     }
 
-    /// The JabRef source checkout holding `anyPathInside`; empty for a packaged JabRef, which runs out of no
-    /// checkout, and for a repository that is not JabRef's.
+    /// The checkout holding `anyPathInside`, or empty when it lies in no git repository.
     public static Optional<Checkout> around(Path anyPathInside, GitHandlerRegistry registry) {
-        return registry.fromAnyPath(anyPathInside)
-                       .filter(handler -> Files.exists(handler.getRepositoryPathAsFile().toPath().resolve(JABGUI_BUILD_FILE)))
-                       .map(Checkout::new);
+        return registry.fromAnyPath(anyPathInside).map(Checkout::new);
     }
 
     /// The checkout's private git directory (`.git`, or the worktree's directory under it).
@@ -68,19 +62,23 @@ public final class Checkout {
         }
     }
 
-    /// Fetches from the remote the checked-out branch tracks; `false` when that failed (offline, no remote), in
-    /// which case [#commitsBehind()] answers from the last fetch that succeeded. The fetch is anonymous unless
-    /// JabRef has git credentials configured; a public clone needs none, which is why
-    /// [GitHandler#fetchOnCurrentBranch()], which insists on credentials for every `https` remote, is not used.
+    /// Fetches the branch the checked-out branch tracks, asked for by name so a narrow fetch refspec of the
+    /// remote cannot leave it out; `false` when that failed (offline, no upstream), in which case
+    /// [#commitsBehind()] answers from the last fetch that succeeded. The fetch is anonymous unless JabRef has
+    /// git credentials configured; a public clone needs none, which is why [GitHandler#fetchOnCurrentBranch()],
+    /// which insists on credentials for every `https` remote, is not used.
     public boolean fetch() {
         try (Git git = handler.open()) {
             Repository repository = git.getRepository();
-            @Nullable String remote = new BranchConfig(repository.getConfig(), repository.getBranch()).getRemote();
-            if (remote == null) {
-                LOGGER.debug("The checked-out branch tracks no remote");
+            BranchConfig branch = new BranchConfig(repository.getConfig(), repository.getBranch());
+            @Nullable String remote = branch.getRemote();
+            @Nullable String merge = branch.getMerge();
+            @Nullable String tracking = branch.getRemoteTrackingBranch();
+            if (remote == null || merge == null || tracking == null) {
+                LOGGER.debug("The checked-out branch tracks no upstream");
                 return false;
             }
-            FetchCommand fetch = git.fetch().setRemote(remote);
+            FetchCommand fetch = git.fetch().setRemote(remote).setRefSpecs(new RefSpec(merge + ":" + tracking).setForceUpdate(true));
             handler.getCredentialsProvider().ifPresent(fetch::setCredentialsProvider);
             fetch.call();
             return true;

@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.exporter.AtomicFileWriter;
 
+import org.jspecify.annotations.Nullable;
+
 /// The changelog entries announced to the developer so far, kept in a file: one entry per line, its section,
 /// heading and text separated by tabs. A changelog line never contains a tab, so no escaping is needed.
 ///
@@ -47,7 +49,10 @@ public final class AnnouncedEntries {
     /// Replaces the announced entries: from now on, only entries outside `entries` are news. The file is
     /// replaced in one step, so an interrupted write leaves the entries announced before, never a partial file.
     public void write(Collection<ChangelogEntry> entries) throws IOException {
-        Files.createDirectories(file.getParent());
+        @Nullable Path directory = file.getParent();
+        if (directory != null) {
+            Files.createDirectories(directory);
+        }
         try (Writer writer = new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
             for (ChangelogEntry entry : entries) {
                 writer.write(toLine(entry));

@@ -66,7 +66,7 @@ import org.jspecify.annotations.NullMarked;
 ///
 /// "Start" (or closing the window) exits 0 and the `just` recipe starts JabRef; "Cancel" exits 1 and stops
 /// it. `--stdout` prints instead of opening a window. The first run only records the changelog. A git failure
-/// (no `CHANGELOG.md` at `HEAD`) is reported and exits 0: the news never block the start.
+/// is reported and exits 0, and the news stay unannounced for the next run: they never block the start.
 @NullMarked
 public class WhatsNewLauncher {
 
@@ -93,9 +93,8 @@ public class WhatsNewLauncher {
         String head = git("rev-parse", "HEAD").getFirst();
         List<ChangelogEntry> entries = List.copyOf(ChangelogParser.entries(git("show", head + ":" + CHANGELOG)).values());
         Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
-        // Announced first: a failure below must not replay the same news forever.
-        announced.write(entries);
         if (announcedSoFar.isEmpty()) {
+            announced.write(entries);
             return;
         }
         Set<String> announcedTexts = announcedSoFar.get().stream().map(ChangelogEntry::text).collect(Collectors.toSet());
@@ -109,12 +108,16 @@ public class WhatsNewLauncher {
         }
         News news = new News(items);
         if (news.isEmpty()) {
+            announced.write(entries);
             return;
         }
         if (List.of(args).contains(STDOUT_FLAG) || java.awt.GraphicsEnvironment.isHeadless()) {
             System.out.println(news.asPlainText());
+            announced.write(entries);
             return;
         }
+        // Announced once the news are ready to show: a git failure above keeps them for the next run.
+        announced.write(entries);
         Window.show(news, Localization.lang("What's new") + " — " + describe(head));
     }
 

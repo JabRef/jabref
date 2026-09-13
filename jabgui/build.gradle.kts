@@ -129,6 +129,8 @@ application {
 }
 
 tasks.named<JavaExec>("run") {
+    // Tells the running JabRef which source checkout started it, for the "What's new" button; a packaged JabRef has none.
+    systemProperty("jabref.checkout", rootDir.absolutePath)
     // "assert" statements in the code should activated when running using gradle
     enableAssertions = true
     jvmArgs(application.applicationDefaultJvmArgs)

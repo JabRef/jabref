@@ -24,12 +24,16 @@ import org.jabref.logic.whatsnew.RestartMarker;
 
 import org.jspecify.annotations.Nullable;
 
-/// The toolbar's "What's new" button, present only while JabRef runs out of a git checkout: its glyph turns
+/// The toolbar's "What's new" button, present only while JabRef runs out of a git checkout, i.e. started by the
+/// Gradle `run` task, which names the checkout in [#CHECKOUT_PROPERTY]: its glyph turns
 /// blue once the checkout is behind its upstream, its tooltip lists the news, and a click opens the
 /// [WhatsNewDialog] on a fresh fetch. Binds the button to the [WhatsNewViewModel]; holds no state of its own
 /// beyond the window that is open.
 // [impl->req~whats-new.checkout-news~1]
 public final class WhatsNewButton {
+
+    /// The source checkout JabRef was started from; set by `jabgui/build.gradle.kts` for the `run` task only.
+    static final String CHECKOUT_PROPERTY = "jabref.checkout";
 
     private final WhatsNewViewModel viewModel;
     private final DialogService dialogService;
@@ -49,8 +53,8 @@ public final class WhatsNewButton {
         viewModel.updateAvailableProperty().subscribe(this::showGlyph);
     }
 
-    /// The button for the checkout around the working directory, watching it from now on; empty for a packaged
-    /// JabRef, which has nothing to update from.
+    /// The button for the checkout JabRef was started from, watching it from now on; empty for a packaged JabRef
+    /// or an IDE run, which have nothing `just run-loop` could update.
     ///
     /// @param quit closes JabRef the ordinary way, for *Restart to update*; `false` when the user keeps it open
     public static Optional<Button> create(ActionFactory factory,
@@ -59,7 +63,8 @@ public final class WhatsNewButton {
                                           ExternalApplicationsPreferences externalApplicationsPreferences,
                                           GitHandlerRegistry gitHandlerRegistry,
                                           BooleanSupplier quit) {
-        Optional<WhatsNewViewModel> viewModel = Checkout.around(Path.of(""), gitHandlerRegistry)
+        Optional<WhatsNewViewModel> viewModel = Optional.ofNullable(System.getProperty(CHECKOUT_PROPERTY))
+                                                        .flatMap(checkout -> Checkout.around(Path.of(checkout), gitHandlerRegistry))
                                                         .flatMap(checkout -> checkout.gitDir().map(gitDir -> new WhatsNewViewModel(
                                                                 new CheckoutNews(checkout, AnnouncedEntries.inGitDir(gitDir)),
                                                                 RestartMarker.inGitDir(gitDir),
