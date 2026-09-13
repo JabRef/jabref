@@ -159,7 +159,7 @@ class LibraryTabRetentionTest {
     }
 
     /// @param closeImmediately closes the tab in the same JavaFX pulse that created it, before the
-     ///                         listener registrations it queued with `Platform.runLater` have run
+    ///                         listener registrations it queued with `Platform.runLater` have run
     private LibraryTab openTab(boolean closeImmediately) throws InterruptedException {
         LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
         when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList());
