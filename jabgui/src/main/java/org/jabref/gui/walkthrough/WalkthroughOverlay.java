@@ -123,11 +123,11 @@ public class WalkthroughOverlay {
     }
 
     private void displayWalkthroughStep(WalkthroughResult result) {
-        Optional<Window> window = result.window();
-        if (window.isEmpty()) {
+        Optional<Window> resultWindow = result.window();
+        if (resultWindow.isEmpty()) {
             throw new IllegalStateException("Resolution should not be successful without Window being resolved.");
         }
-        this.resolvedWindow = window.get();
+        this.resolvedWindow = resultWindow.get();
         this.resolvedNode = result.node().orElse(null);
         VisibleComponent component = (VisibleComponent) walkthrough.getCurrentStep();
 
@@ -150,7 +150,7 @@ public class WalkthroughOverlay {
                 resolvedWindow.getScene(),
                 resolvedNode);
         WindowOverlay overlay = overlays.computeIfAbsent(resolvedWindow,
-                w -> new WindowOverlay(w, pane.orElseThrow(), walkthrough));
+                window -> new WindowOverlay(window, pane.orElseThrow(), walkthrough));
 
         switch (component) {
             case TooltipStep tooltip ->

@@ -89,7 +89,7 @@ public final class WalkthroughPane extends StackPane {
     /// a walkthrough draws on it. Empty for any other window built outside JabRef.
     public static Optional<WalkthroughPane> of(Window window) {
         Optional<Scene> scene = Optional.ofNullable(window.getScene());
-        Optional<WalkthroughPane> existing = scene.map(it -> it.getProperties().get(SCENE_PROPERTY_KEY))
+        Optional<WalkthroughPane> existing = scene.map(currentScene -> currentScene.getProperties().get(SCENE_PROPERTY_KEY))
                                                   .map(WalkthroughPane.class::cast);
         if (existing.isPresent() || !(window instanceof PopupWindow)) {
             return existing;
