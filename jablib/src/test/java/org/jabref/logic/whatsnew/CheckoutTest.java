@@ -50,6 +50,10 @@ class CheckoutTest {
     void cloneAnUpstreamWithAChangelog() throws IOException, GitAPIException {
         SystemReader.setInstance(new NoopGitSystemReader());
         try (Git upstream = Git.init().setInitialBranch("main").setDirectory(upstreamDirectory.toFile()).call()) {
+            Path buildFile = upstreamDirectory.resolve("jabgui").resolve("build.gradle.kts");
+            Files.createDirectories(buildFile.getParent());
+            Files.writeString(buildFile, "");
+            upstream.add().addFilepattern("jabgui").call();
             commit(upstream, INITIAL_CHANGELOG, "Somebody Else", "somebody@example.org");
         }
         try (Git clone = Git.cloneRepository().setURI(upstreamDirectory.toUri().toString()).setDirectory(cloneDirectory.toFile()).call()) {
@@ -75,6 +79,13 @@ class CheckoutTest {
     @Test
     void aDirectoryOutsideAnyRepositoryIsNoCheckout(@TempDir Path elsewhere) {
         assertEquals(Optional.empty(), Checkout.around(elsewhere, new GitHandlerRegistry(GitPreferences.getDefault())));
+    }
+
+    @Test
+    void aRepositoryThatIsNotJabRefsIsNoCheckout(@TempDir Path other) throws GitAPIException {
+        try (Git git = Git.init().setDirectory(other.toFile()).call()) {
+            assertEquals(Optional.empty(), Checkout.around(other, new GitHandlerRegistry(GitPreferences.getDefault())));
+        }
     }
 
     @Test
@@ -106,7 +117,7 @@ class CheckoutTest {
 
     @Test
     void aFreshCloneIsNotBehind() {
-        checkout.fetch();
+        assertTrue(checkout.fetch());
 
         assertEquals(0, checkout.commitsBehind());
         assertEquals(checkout.describeHead(), checkout.describeUpstream());

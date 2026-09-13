@@ -13,6 +13,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.whatsnew.Checkout;
 
@@ -75,18 +76,24 @@ public final class WhatsNewButton {
         dialog.titleProperty().bind(viewModel.titleProperty());
         dialog.setOnHidden(_ -> {
             openDialog = null;
-            if (dialog.restartChosen()) {
-                viewModel.requestRestart();
+            if (dialog.restartChosen() && !viewModel.requestRestart()) {
+                dialogService.notify(Localization.lang("Cannot request the restart (see the log) - JabRef keeps running."));
             }
         });
         openDialog = dialog;
         dialogService.showCustomDialog(dialog);
         // A window closed while the fetch runs is not touched again.
-        viewModel.present(news -> {
-            if (openDialog == dialog) {
-                dialog.checked(news);
-            }
-        });
+        viewModel.present(
+                news -> {
+                    if (openDialog == dialog) {
+                        dialog.checked(news);
+                    }
+                },
+                news -> {
+                    if (openDialog == dialog) {
+                        dialog.checkFailed(news);
+                    }
+                });
     }
 
     /// The click; the status message becomes the tooltip's second part.

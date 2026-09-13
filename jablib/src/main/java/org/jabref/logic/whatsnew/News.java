@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.SequencedMap;
 import java.util.SequencedSet;
 import java.util.Set;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
 
@@ -21,15 +23,17 @@ public record News(List<AttributedEntry> items) {
         items = List.copyOf(items);
     }
 
-    /// The entries of `changelogs` that `announced` does not hold. An entry appearing in several changelogs
-    /// counts once, attributed as the first changelog has it: so the working tree goes first, and an entry
-    /// pulled already is not "pushed from another machine".
+    /// The entries of `changelogs` that `announced` does not hold. An entry is known by its text: a release
+    /// moves every entry from *Unreleased* under the release's section, and that must not make it news again.
+    /// An entry appearing in several changelogs counts once, attributed as the first changelog has it: so the
+    /// working tree goes first, and an entry pulled already is not "pushed from another machine".
     public static News pending(Set<ChangelogEntry> announced, List<BlamedChangelog> changelogs) {
-        SequencedMap<ChangelogEntry, AttributedEntry> fresh = new LinkedHashMap<>();
+        Set<String> announcedTexts = announced.stream().map(ChangelogEntry::text).collect(Collectors.toSet());
+        SequencedMap<String, AttributedEntry> fresh = new LinkedHashMap<>();
         for (BlamedChangelog changelog : changelogs) {
             for (AttributedEntry item : changelog.entries()) {
-                if (!announced.contains(item.entry())) {
-                    fresh.putIfAbsent(item.entry(), item);
+                if (!announcedTexts.contains(item.entry().text())) {
+                    fresh.putIfAbsent(item.entry().text(), item);
                 }
             }
         }
@@ -78,14 +82,13 @@ public record News(List<AttributedEntry> items) {
 
     /// The groups as text, one bullet per entry with the Markdown emphasis dropped — a tooltip or a terminal.
     public String asPlainText() {
-        StringBuilder text = new StringBuilder();
+        StringJoiner groups = new StringJoiner("\n\n");
         grouped().forEach((contributor, entries) -> {
-            if (!text.isEmpty()) {
-                text.append('\n');
-            }
-            text.append(groupTitle(contributor)).append('\n');
-            entries.forEach(item -> text.append("• ").append(item.entry().text().replace("**", "")).append('\n'));
+            StringJoiner group = new StringJoiner("\n");
+            group.add(groupTitle(contributor));
+            entries.forEach(item -> group.add("• " + item.entry().text().replace("**", "")));
+            groups.add(group.toString());
         });
-        return text.toString().strip();
+        return groups.toString();
     }
 }

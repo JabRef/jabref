@@ -37,6 +37,15 @@ class NewsTest {
     }
 
     @Test
+    void anEntryMovedIntoAReleaseSectionIsNotNewsAgain() {
+        ChangelogEntry released = new ChangelogEntry("6.0 (2026-10-01)", "Added", ADDED.text());
+
+        News news = News.pending(Set.of(ADDED), List.of(changelog(ALICE, released)));
+
+        assertEquals(News.NONE, news);
+    }
+
+    @Test
     void anEntryInSeveralChangelogsCountsOnceAsTheFirstChangelogHasIt() {
         List<BlamedChangelog> workingTreeThenUpstream = List.of(
                 changelog(Contributor.Me.LOCAL, BRAND_NEW),
@@ -73,12 +82,7 @@ class NewsTest {
                 new AttributedEntry(Contributor.Me.LOCAL, new ChangelogEntry("Unreleased", "Added", "**Bold** start.")),
                 new AttributedEntry(ALICE, ADDED)));
 
-        assertEquals("""
-                Changes by Alice
-                • added
-
-                Changes by me
-                • Bold start.""", news.asPlainText());
+        assertEquals("Changes by Alice\n• added\n\nChanges by me\n• Bold start.", news.asPlainText());
     }
 
     @Test

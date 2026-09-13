@@ -29,6 +29,7 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -77,6 +78,7 @@ class WhatsNewViewModelTest {
 
     @BeforeEach
     void setUp() {
+        when(checkout.fetch()).thenReturn(true);
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(new Contributor.Other("Somebody"), OLD)));
         viewModel = new WhatsNewViewModel(checkout, gitDir, taskExecutor, () -> quitRequested.set(true));
     }
@@ -130,11 +132,26 @@ class WhatsNewViewModelTest {
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         AtomicReference<News> presented = new AtomicReference<>();
 
-        viewModel.present(presented::set);
+        viewModel.present(presented::set, _ -> fail("the look must not fail"));
 
         assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE))), presented.get());
         assertEquals(News.NONE, viewModel.getPending());
         assertEquals(Optional.of(Set.of(OLD, MINE)), announced().read());
+    }
+
+    @Test
+    void anUnreachableUpstreamPresentsTheNewsButKeepsThemPending() throws IOException {
+        announced().write(Set.of(OLD));
+        when(checkout.fetch()).thenReturn(false);
+        when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
+        AtomicReference<News> presented = new AtomicReference<>();
+
+        viewModel.present(_ -> fail("the upstream was not reached"), presented::set);
+
+        News mine = new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE)));
+        assertEquals(mine, presented.get());
+        assertEquals(mine, viewModel.getPending());
+        assertEquals(Optional.of(Set.of(OLD)), announced().read());
     }
 
     @Test
@@ -147,7 +164,7 @@ class WhatsNewViewModelTest {
         Files.createDirectory(gitDir.resolve(WhatsNewViewModel.ANNOUNCED_FILE));
         AtomicReference<News> presented = new AtomicReference<>();
 
-        viewModel.present(presented::set);
+        viewModel.present(_ -> fail("the look must fail"), presented::set);
 
         assertEquals(known, presented.get());
         assertEquals(known, viewModel.getPending());
@@ -155,9 +172,18 @@ class WhatsNewViewModelTest {
 
     @Test
     void aRestartLeavesTheMarkerAndQuits() {
-        viewModel.requestRestart();
+        assertTrue(viewModel.requestRestart());
 
         assertTrue(Files.exists(gitDir.resolve(WhatsNewViewModel.RESTART_MARKER)));
         assertTrue(quitRequested.get());
+    }
+
+    @Test
+    void aRestartWhoseMarkerCannotBeWrittenKeepsJabRefRunning() throws IOException {
+        Files.createDirectory(gitDir.resolve(WhatsNewViewModel.RESTART_MARKER));
+
+        assertFalse(viewModel.requestRestart());
+
+        assertFalse(quitRequested.get());
     }
 }

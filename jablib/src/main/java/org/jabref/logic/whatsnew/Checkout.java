@@ -1,6 +1,7 @@
 package org.jabref.logic.whatsnew;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -37,6 +38,9 @@ public final class Checkout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Checkout.class);
     private static final String CHANGELOG = "CHANGELOG.md";
+
+    /// What tells JabRef's own source tree from any other repository JabRef happens to be started in.
+    private static final Path JABGUI_BUILD_FILE = Path.of("jabgui", "build.gradle.kts");
     private static final int ABBREVIATED_ID_LENGTH = 7;
     private static final DateTimeFormatter COMMIT_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -46,9 +50,12 @@ public final class Checkout {
         this.handler = handler;
     }
 
-    /// The checkout holding `anyPathInside`, or empty for a packaged JabRef, which runs out of no checkout.
+    /// The JabRef source checkout holding `anyPathInside`; empty for a packaged JabRef, which runs out of no
+    /// checkout, and for a repository that is not JabRef's.
     public static Optional<Checkout> around(Path anyPathInside, GitHandlerRegistry registry) {
-        return registry.fromAnyPath(anyPathInside).map(Checkout::new);
+        return registry.fromAnyPath(anyPathInside)
+                       .filter(handler -> Files.exists(handler.getRepositoryPathAsFile().toPath().resolve(JABGUI_BUILD_FILE)))
+                       .map(Checkout::new);
     }
 
     /// The checkout's private git directory (`.git`, or the worktree's directory under it).
@@ -61,16 +68,19 @@ public final class Checkout {
         }
     }
 
-    /// Fetches from the upstream of the checked-out branch. The fetch is anonymous unless JabRef has git
-    /// credentials configured; a public clone needs none, which is why [GitHandler#fetchOnCurrentBranch()],
-    /// which insists on credentials for every `https` remote, is not used.
-    public void fetch() {
+    /// Fetches from the upstream of the checked-out branch; `false` when that failed (offline, no remote), in
+    /// which case [#commitsBehind()] answers from the last fetch that succeeded. The fetch is anonymous unless
+    /// JabRef has git credentials configured; a public clone needs none, which is why
+    /// [GitHandler#fetchOnCurrentBranch()], which insists on credentials for every `https` remote, is not used.
+    public boolean fetch() {
         try (Git git = handler.open()) {
             FetchCommand fetch = git.fetch();
             handler.getCredentialsProvider().ifPresent(fetch::setCredentialsProvider);
             fetch.call();
+            return true;
         } catch (IOException | GitAPIException e) {
             LOGGER.debug("Cannot fetch the checkout's upstream", e);
+            return false;
         }
     }
 

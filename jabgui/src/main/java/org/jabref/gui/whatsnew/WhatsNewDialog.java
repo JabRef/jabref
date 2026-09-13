@@ -19,7 +19,7 @@ import org.jabref.logic.whatsnew.News;
 /// The non-modal "What's new" window: the news, *Later* and *Restart to update*.
 ///
 /// It opens on a fetch — "Checking remote…" with a bar, the restart disabled — and [#checked] brings the answer,
-/// so nobody restarts into a version that is already stale.
+/// so nobody restarts into a version that is already stale; after [#checkFailed] the restart stays disabled.
 // [impl->req~whats-new.checkout-news~1]
 public class WhatsNewDialog extends BaseDialog<Boolean> {
 
@@ -48,6 +48,14 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
         root.setCenter(body(news));
         root.setBottom(null);
         getDialogPane().lookupButton(restart).setDisable(false);
+    }
+
+    /// The upstream could not be reached: `news` is what is known so far, and no restart is offered.
+    public void checkFailed(News news) {
+        root.setCenter(body(news));
+        Label failed = new Label(Localization.lang("Checking remote failed - no restart offered."));
+        failed.setPadding(new Insets(0, 16, 8, 16));
+        root.setBottom(failed);
     }
 
     /// Whether the user chose *Restart to update*; `false` before the window closes.

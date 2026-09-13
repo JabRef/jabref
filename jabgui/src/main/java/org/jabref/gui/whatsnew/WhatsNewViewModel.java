@@ -69,8 +69,8 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// so a slow scheduled look never replaces what a click just found. FX thread.
     private long looksStarted;
 
-    /// What one look at the checkout found; `seen` holds every entry the look passed by, news or not.
-    private record Look(int commitsBehind, String title, News news, Set<ChangelogEntry> seen) {
+    /// What one look at the checkout found; `fetched` is false when the upstream could not be reached.
+    private record Look(boolean fetched, int commitsBehind, String title, News news) {
     }
 
     /// @param gitDir the checkout's git directory, where the announced entries and the restart marker live
@@ -104,47 +104,55 @@ public class WhatsNewViewModel extends AbstractViewModel {
 
     /// One look now without fetching (`just run-loop` has just pulled), then a fetch every five minutes.
     public void startWatching() {
-        startLook(false, this::show)
+        startLook(false, false, this::show)
                 .onFinished(this::scheduleNextLook)
                 .executeWith(taskExecutor);
     }
 
-    /// A look on demand: fetches, hands the news found to `present` and makes them old — the tooltip drops
-    /// them and the announced entries take them. Should the look fail, `present` gets the news known so far.
-    public void present(Consumer<News> present) {
-        startLook(true, look -> {
+    /// A look on demand: fetches, hands the news found to `onChecked` and makes them old — the tooltip drops
+    /// them and the announced entries take them. When the upstream cannot be reached or the look fails,
+    /// `onFailed` gets the news known so far instead, and nothing is made old.
+    public void present(Consumer<News> onChecked, Consumer<News> onFailed) {
+        startLook(true, true, look -> {
             show(look);
-            present.accept(look.news());
-            announce(look.seen());
+            if (look.fetched()) {
+                onChecked.accept(look.news());
+                pending.set(News.NONE);
+            } else {
+                onFailed.accept(look.news());
+            }
         })
                 .onFailure(e -> {
                     LOGGER.warn("Cannot look at the checkout", e);
-                    present.accept(pending.get());
+                    onFailed.accept(pending.get());
                 })
                 .executeWith(taskExecutor);
     }
 
-    /// Leaves the marker for `just run-loop` and quits.
-    public void requestRestart() {
+    /// Leaves the marker for `just run-loop` and quits; `false` when the marker cannot be written, in which
+    /// case JabRef keeps running.
+    public boolean requestRestart() {
         try {
             Files.writeString(restartMarker, "");
         } catch (IOException e) {
             LOGGER.warn("Cannot write {}", restartMarker, e);
+            return false;
         }
         quit.run();
+        return true;
     }
 
     private void scheduleNextLook() {
-        startLook(true, this::show)
+        startLook(true, false, this::show)
                 .onFinished(this::scheduleNextLook)
                 .scheduleWith(taskExecutor, CHECK_INTERVAL.toMinutes(), TimeUnit.MINUTES);
     }
 
     /// The task for one look, not started yet. Its answer reaches `onSuccess` only while it is the latest look
     /// that started running; a failure is logged. FX thread.
-    private BackgroundTask<Look> startLook(boolean fetch, Consumer<Look> onSuccess) {
+    private BackgroundTask<Look> startLook(boolean fetch, boolean announce, Consumer<Look> onSuccess) {
         AtomicLong thisLook = new AtomicLong();
-        return BackgroundTask.wrap(() -> look(fetch))
+        return BackgroundTask.wrap(() -> look(fetch, announce))
                              .onRunning(() -> thisLook.set(++looksStarted))
                              .onSuccess(look -> {
                                  if (thisLook.get() == looksStarted) {
@@ -157,11 +165,10 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// Reads the checkout: the working tree's changelog, plus the upstream's once the checkout is behind, so an
     /// entry arriving upstream while a local edit is pending hides nothing. Without announced entries yet (the
     /// first run in a checkout) everything seen is announced now and nothing is news: a fresh checkout is not
-    /// greeted with the whole changelog. Any thread but FX.
-    private Look look(boolean fetch) throws IOException {
-        if (fetch) {
-            checkout.fetch();
-        }
+    /// greeted with the whole changelog. With `announce`, everything seen is announced once the upstream was
+    /// fetched — in this task, so no other look reads the announced entries in between. Any thread but FX.
+    private Look look(boolean fetch, boolean announce) throws IOException {
+        boolean fetched = fetch && checkout.fetch();
         int behind = checkout.commitsBehind();
         List<BlamedChangelog> changelogs = new ArrayList<>();
         checkout.blameWorkingTree().ifPresent(changelogs::add);
@@ -170,11 +177,11 @@ public class WhatsNewViewModel extends AbstractViewModel {
         }
         Set<ChangelogEntry> seen = News.allEntries(changelogs);
         Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
-        if (announcedSoFar.isEmpty()) {
+        News news = announcedSoFar.map(old -> News.pending(old, changelogs)).orElse(News.NONE);
+        if (announcedSoFar.isEmpty() || (announce && fetched)) {
             announced.write(seen);
         }
-        News news = announcedSoFar.map(old -> News.pending(old, changelogs)).orElse(News.NONE);
-        return new Look(behind, title(behind, news), news, seen);
+        return new Look(fetched, behind, title(behind, news), news);
     }
 
     /// `What's new - 3 pending change(s) since <running commit> - now at <upstream commit>`, the count only with
@@ -199,17 +206,6 @@ public class WhatsNewViewModel extends AbstractViewModel {
         pending.set(look.news());
         commitsBehind.set(look.commitsBehind());
         title.set(look.title());
-    }
-
-    /// FX thread.
-    private void announce(Set<ChangelogEntry> seen) {
-        BackgroundTask.wrap(() -> {
-                          announced.write(seen);
-                          return seen;
-                      })
-                      .onFailure(e -> LOGGER.warn("Cannot remember the announced entries", e))
-                      .executeWith(taskExecutor);
-        pending.set(News.NONE);
     }
 
     private String tooltipText() {

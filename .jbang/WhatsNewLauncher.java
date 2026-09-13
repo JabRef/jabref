@@ -51,6 +51,7 @@ import org.jabref.logic.whatsnew.News;
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 import atlantafx.base.theme.Styles;
+import org.jspecify.annotations.NullMarked;
 
 /// "What's new since you last ran JabRef from this checkout", personalized.
 ///
@@ -61,6 +62,7 @@ import atlantafx.base.theme.Styles;
 ///
 /// "Run" (or closing the window) exits 0 and the `just` recipe starts JabRef; "Cancel run" exits 1 and stops
 /// it. `--stdout` prints instead of opening a window. The first run only records the commit.
+@NullMarked
 public class WhatsNewLauncher {
 
     private static final String CHANGELOG = "CHANGELOG.md";
@@ -78,7 +80,8 @@ public class WhatsNewLauncher {
             return;
         }
         Set<String> newCommits = new HashSet<>(git("rev-list", lastRun.get() + ".." + head));
-        String myEmail = git("config", "user.email").stream().findFirst().orElse("");
+        // Without `--default`, an unset user.email is a failing command, not an empty answer.
+        String myEmail = git("config", "--default", "", "--get", "user.email").getFirst();
         News news = new EntryOrigins(newCommits, myEmail).newsIn(Files.readAllLines(Path.of(CHANGELOG)), head);
         if (news.isEmpty()) {
             return;
@@ -127,10 +130,9 @@ public class WhatsNewLauncher {
                 if (!newCommits.contains(blamedCommits.get(entry.getKey()))) {
                     continue;
                 }
-                Optional<Origin> origin = origin(entry.getValue().text(), 0);
-                if (origin.isPresent() && newCommits.contains(origin.get().commit())) {
-                    items.add(new AttributedEntry(contributor(origin.get()), entry.getValue()));
-                }
+                origin(entry.getValue().text(), 0)
+                        .filter(origin -> newCommits.contains(origin.commit()))
+                        .ifPresent(origin -> items.add(new AttributedEntry(contributor(origin), entry.getValue())));
             }
             return new News(items);
         }
