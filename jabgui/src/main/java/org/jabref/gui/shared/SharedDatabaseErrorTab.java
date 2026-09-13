@@ -14,6 +14,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
+import org.jabref.logic.shared.DBMSConnectionUrl;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -42,10 +43,7 @@ public class SharedDatabaseErrorTab extends Tab {
     public SharedDatabaseErrorTab(@Nullable String sharedDatabaseId, DBMSConnectionProperties connectionProperties) {
         this.sharedDatabaseId = sharedDatabaseId;
         this.connectionProperties = connectionProperties;
-        // In expert mode the database name may be empty: the JDBC URL is all the user entered
-        String databaseName = connectionProperties.getDatabase().isBlank()
-                              ? connectionProperties.getJdbcUrl()
-                              : connectionProperties.getDatabase();
+        String databaseName = displayName(connectionProperties);
 
         setText(databaseName);
         setGraphic(IconTheme.JabRefIcons.ERROR.getGraphicNode());
@@ -67,6 +65,18 @@ public class SharedDatabaseErrorTab extends Tab {
         content.setAlignment(Pos.CENTER);
         content.setPadding(new Insets(20));
         setContent(content);
+    }
+
+    /// In expert mode the database name may be empty: the JDBC URL is all the user entered. The URL itself is never
+    /// shown, it may carry the password; only its database or host is.
+    private static String displayName(DBMSConnectionProperties connectionProperties) {
+        if (!connectionProperties.getDatabase().isBlank()) {
+            return connectionProperties.getDatabase();
+        }
+        return DBMSConnectionUrl.parse(connectionProperties.getJdbcUrl())
+                                .map(url -> url.database().isBlank() ? url.host() : url.database())
+                                .filter(name -> !name.isBlank())
+                                .orElseGet(() -> Localization.lang("Shared database connection"));
     }
 
     public void setRetryAction(Runnable retryAction) {

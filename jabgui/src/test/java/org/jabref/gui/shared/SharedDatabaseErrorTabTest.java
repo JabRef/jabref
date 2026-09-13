@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -67,14 +68,15 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
     }
 
     @Test
-    void expertModeWithoutDatabaseNameIsNamedAfterTheUrl() {
+    void expertModeWithoutDatabaseNameIsNamedAfterTheUrlWithoutCredentials() {
         DBMSConnectionProperties expertProperties = mock(DBMSConnectionProperties.class);
         when(expertProperties.getDatabase()).thenReturn("");
-        when(expertProperties.getJdbcUrl()).thenReturn("jdbc:postgresql://db.example.org/literature");
+        when(expertProperties.getJdbcUrl()).thenReturn("jdbc:postgresql://db.example.org/literature?user=alice&password=secret");
 
         interact(() -> tab = new SharedDatabaseErrorTab(null, expertProperties));
 
-        assertEquals("jdbc:postgresql://db.example.org/literature", tab.getText());
+        assertEquals("literature", tab.getText());
+        assertFalse(((Label) tab.getContent().lookup(".welcome-header-label")).getText().contains("secret"));
     }
 
     @Test
