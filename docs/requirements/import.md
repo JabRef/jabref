@@ -35,7 +35,8 @@ Needs: impl, utest
 
 When importing a PDF, an author taken from the PDF's document properties is kept only if the text of the leading pages confirms it; otherwise an author list extracted from the document text replaces it.
 If no candidate is confirmed, a single unconfirmed person from the document properties is dropped, because office suites store the account name of whoever exported the file there.
-Metadata previously written by JabRef (an entry with citation key or explicit type) is kept even when the text does not confirm it.
+Metadata previously written by JabRef (an entry with citation key or a known entry type) is kept even when the text does not confirm it.
+If no usable text can be extracted from the leading pages, the author is left unchanged.
 
 Needs: impl, utest
 

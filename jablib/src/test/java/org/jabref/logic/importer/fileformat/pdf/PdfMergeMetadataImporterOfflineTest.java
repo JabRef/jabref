@@ -12,6 +12,7 @@ import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -138,6 +139,16 @@ class PdfMergeMetadataImporterOfflineTest {
         BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(jabRefWrittenMetadata), DOCUMENT_TEXT);
 
         assertEquals(Optional.of("Void, Eve"), merged.getField(StandardField.AUTHOR));
+    }
+
+    @Test
+    void unconfirmedAuthorFromEntryWithGenericDublinCoreTypeIsDropped() {
+        BibEntry dublinCoreWithDocumentInformationAuthor = new BibEntry(new UnknownEntryType("Text"))
+                .withField(StandardField.AUTHOR, "Void, Eve");
+
+        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(dublinCoreWithDocumentInformationAuthor), DOCUMENT_TEXT);
+
+        assertEquals(Optional.empty(), merged.getField(StandardField.AUTHOR));
     }
 
     @Test

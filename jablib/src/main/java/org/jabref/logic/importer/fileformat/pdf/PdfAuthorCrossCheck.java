@@ -15,6 +15,8 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -64,7 +66,7 @@ class PdfAuthorCrossCheck {
     /// least one of its family names occurs in the text of those pages. An unconfirmed merged value is
     /// replaced by the best-confirmed candidate value. If no candidate is confirmed, a single person coming
     /// from a non-bibliographic candidate (no citation key, no explicit entry type) is dropped entirely: a
-    /// wrong author is worse than none. Entries with a citation key or explicit type are left untouched so
+    /// wrong author is worse than none. Entries with a citation key or known entry type are left untouched so
     /// that metadata previously written by JabRef survives re-import even when the PDF text does not
     /// contain the author (e.g. slides or reports).
     ///
@@ -102,11 +104,18 @@ class PdfAuthorCrossCheck {
                                                      .filter(candidate -> candidate.hasField(StandardField.AUTHOR))
                                                      .findFirst()
                                                      .map(source -> source.getCitationKey().isPresent()
-                                                             || !BibEntry.DEFAULT_TYPE.equals(source.getType()))
+                                                             || isKnownNonDefaultType(source.getType()))
                                                      .orElse(true);
         if (!sourceLooksBibliographic && (namedAuthors(mergedAuthor).count() == 1)) {
             entry.clearField(StandardField.AUTHOR);
         }
+    }
+
+    /// Dublin Core metadata of other tools may carry a generic type such as "Text", which says nothing about
+    /// who wrote the author field; only a real entry type indicates metadata written by JabRef. The type is
+    /// still only a proxy: exact would be tracking the origin of each field in the XMP reader.
+    private static boolean isKnownNonDefaultType(EntryType type) {
+        return !BibEntry.DEFAULT_TYPE.equals(type) && !(type instanceof UnknownEntryType);
     }
 
     private record ScoredAuthor(String value, int confirmedNames) {
