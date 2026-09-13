@@ -51,7 +51,7 @@
             </tooltip>
 
         </Button>
-        <Button onAction="#browseLibrarySpecificFileDirectory"
+        <Button fx:id="browseLibrarySpecificFileDirectoryButton" onAction="#browseLibrarySpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="3" GridPane.rowIndex="1">
             <graphic>
@@ -81,7 +81,7 @@
                 <Tooltip fx:id ="userSpecificFileDirSwitchTooltip" text="%Switch to absolute path: converts the path to an absolute path."/>
             </tooltip>
         </Button>
-        <Button onAction="#browseUserSpecificFileDirectory"
+        <Button fx:id="browseUserSpecificFileDirectoryButton" onAction="#browseUserSpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="3" GridPane.rowIndex="2">
             <graphic>
