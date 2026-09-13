@@ -74,6 +74,7 @@ class GitIgnoreFileFilterTest {
         Path subDir = Files.createDirectory(dir.resolve("mine"));
         GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(subDir);
         assertTrue(gitIgnoreFileFilter.accept(subDir.resolve("paper.pdf")));
+        assertFalse(gitIgnoreFileFilter.accept(subDir.resolve(".gitignore")));
     }
 
     @Test

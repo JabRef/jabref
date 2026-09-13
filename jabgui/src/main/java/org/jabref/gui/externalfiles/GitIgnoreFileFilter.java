@@ -27,7 +27,7 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
     private final Path baseDir;
 
     public GitIgnoreFileFilter(Path path) {
-        Path absolutePath = path.toAbsolutePath();
+        Path absolutePath = path.toAbsolutePath().normalize();
         // A .gitignore only applies inside a git repository, so never look above the repository root
         @Nullable Path currentPath = GitHandler.findRepositoryRoot(absolutePath)
                                                .flatMap(repositoryRoot -> Stream.iterate(absolutePath, Objects::nonNull, Path::getParent)
@@ -38,7 +38,7 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
         if (currentPath == null) {
             // we did not find any gitignore, set baseDir to provided path and use default ignores
             this.baseDir = absolutePath;
-            gitIgnorePatterns = Set.of(".git", ".DS_Store", "desktop.ini", "Thumbs.db").stream()
+            gitIgnorePatterns = Set.of(".git", ".gitignore", ".DS_Store", "desktop.ini", "Thumbs.db").stream()
                                    // duplicate code as below
                                    .map(line -> "glob:" + line)
                                    .map(matcherString -> FileSystems.getDefault().getPathMatcher(matcherString))
@@ -76,7 +76,7 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
     @Override
     public boolean accept(Path path) throws IOException {
         // Match patterns relative to baseDir because .gitignore patterns are applied relative to their location
-        Path relative = safeRelativize(baseDir, path.toAbsolutePath());
+        Path relative = safeRelativize(baseDir, path.toAbsolutePath().normalize());
         // We assume that git does not stop at a pattern, but tries all. We implement that behavior
         return gitIgnorePatterns.stream().noneMatch(filter ->
                 // for patterns like "*.png" or ".gitignore"
