@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.preferences.CliPreferences;
@@ -23,7 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -147,7 +144,7 @@ class ImportCustomEntryTypesDialogViewModelTest {
         assertEquals(List.of(), List.copyOf(secondStart.newTypes()));
         assertEquals(List.of(), List.copyOf(secondStart.differentCustomizations()));
         assertEquals(Optional.of(MANUSCRIPT_FROM_FILE), entryTypesManager.enrich(new UnknownEntryType("manuscript"), MODE));
-        assertTrue(entryTypesManager.getAllCustomizedTypes(MODE).stream().noneMatch(type -> type.getType() == BiblatexNonStandardEntryType.Audio));
+        assertEquals(List.of(MANUSCRIPT_FROM_FILE), List.copyOf(entryTypesManager.getAllCustomizedTypes(MODE)));
     }
 
     @Test
@@ -204,14 +201,5 @@ class ImportCustomEntryTypesDialogViewModelTest {
         assertEquals(List.of(AUDIO_FROM_FILE), viewModel.differentCustomizations().stream()
                                                         .map(BibEntryTypePrefsAndFileViewModel::customTypeFromFile)
                                                         .toList());
-    }
-
-    /// A preference key holds at most 80 characters, a value at most 8192 - a definition can be longer than both
-    @Test
-    void decisionOfALongDefinitionFitsIntoAPreferenceKey() {
-        String manyFields = IntStream.range(0, 2000).mapToObj(i -> "field" + i).collect(Collectors.joining(";"));
-        BibEntryType longType = parse("jabref-entrytype: longtype: req[title] opt[" + manyFields + "]");
-
-        assertEquals(64, ImportCustomEntryTypesDialogViewModel.decision(longType, Optional.of(longType), MODE).length());
     }
 }

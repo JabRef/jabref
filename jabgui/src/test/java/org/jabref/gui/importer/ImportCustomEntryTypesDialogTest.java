@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.logic.importer.util.CustomEntryTypeDecision;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -115,7 +116,7 @@ class ImportCustomEntryTypesDialogTest extends JavaFxTest {
         assertEquals(List.of(AUDIO_FROM_FILE), List.copyOf(entryTypesManager.getAllCustomizedTypes(MODE)));
         assertEquals(Optional.empty(), entryTypesManager.enrich(new UnknownEntryType("manuscript"), MODE));
         verify(preferences).addDeclinedCustomEntryTypes(List.of(
-                ImportCustomEntryTypesDialogViewModel.decision(MANUSCRIPT_FROM_FILE, Optional.empty(), MODE)));
+                CustomEntryTypeDecision.fingerprint(MANUSCRIPT_FROM_FILE, Optional.empty(), MODE)));
     }
 
     @Test

@@ -12,6 +12,7 @@ import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.util.CustomEntryTypeDecision;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -92,7 +93,7 @@ class CheckForNewEntryTypesActionTest {
     @Test
     void dialogIsNotOfferedForDeclinedTypes() {
         Set<String> declined = parserResult.getEntryTypes().stream()
-                                           .map(type -> ImportCustomEntryTypesDialogViewModel.decision(
+                                           .map(type -> CustomEntryTypeDecision.fingerprint(
                                                    type, entryTypesManager.enrich(type.getType(), BibDatabaseMode.BIBLATEX), BibDatabaseMode.BIBLATEX))
                                            .collect(Collectors.toSet());
         when(preferences.getDeclinedCustomEntryTypes()).thenReturn(declined);

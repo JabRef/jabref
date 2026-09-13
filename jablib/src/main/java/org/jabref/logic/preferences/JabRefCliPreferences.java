@@ -1084,7 +1084,7 @@ public class JabRefCliPreferences implements CliPreferences {
     @Override
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
-        PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
+        removeDeclinedCustomEntryTypes();
         clearCitationKeyPatterns();
         clearTruststoreFromCustomCertificates();
         clearCustomFetcherKeys();
@@ -1142,21 +1142,29 @@ public class JabRefCliPreferences implements CliPreferences {
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences()));
     }
 
-    private static void importPreferencesToBackingStore(Path path) throws JabRefException {
+    private void importPreferencesToBackingStore(Path path) throws JabRefException {
         LOGGER.debug("Importing preferences {}", path.toAbsolutePath());
-        try {
-            // Importing merges into the current preferences; declined decisions must come from the imported file only
-            PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
-        } catch (BackingStoreException e) {
-            LOGGER.info("Clearing declined custom entry types failed.", e);
-        }
+        // Importing merges into the current preferences, but the declined decisions must come from the imported file only.
+        // They are restored if the file cannot be imported.
+        Set<String> declinedBeforeImport = getDeclinedCustomEntryTypes();
+        removeDeclinedCustomEntryTypes();
         try (InputStream is = Files.newInputStream(path)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
+            removeDeclinedCustomEntryTypes();
+            addDeclinedCustomEntryTypes(declinedBeforeImport);
             throw new JabRefException(
                     "Could not import preferences",
                     Localization.lang("Could not import preferences"),
                     ex);
+        }
+    }
+
+    private void removeDeclinedCustomEntryTypes() {
+        try {
+            PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
+        } catch (BackingStoreException e) {
+            LOGGER.info("Clearing declined custom entry types failed.", e);
         }
     }
 

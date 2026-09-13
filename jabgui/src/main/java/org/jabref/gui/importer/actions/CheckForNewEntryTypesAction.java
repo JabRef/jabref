@@ -5,8 +5,8 @@ import java.util.Set;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
-import org.jabref.gui.importer.ImportCustomEntryTypesDialogViewModel;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.util.CustomEntryTypeDecision;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -37,7 +37,7 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
         return parserResult.getEntryTypes()
                            .stream()
                            .filter(type -> entryTypesManager.isDifferentCustomOrModifiedType(type, mode))
-                           .filter(type -> !declinedDecisions.contains(ImportCustomEntryTypesDialogViewModel.decision(type, entryTypesManager.enrich(type.getType(), mode), mode)))
+                           .filter(type -> !declinedDecisions.contains(CustomEntryTypeDecision.fingerprint(type, entryTypesManager.enrich(type.getType(), mode), mode)))
                            .toList();
     }
 

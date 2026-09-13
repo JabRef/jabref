@@ -1,6 +1,5 @@
 package org.jabref.gui.importer;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,15 +10,13 @@ import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.exporter.MetaDataSerializer;
+import org.jabref.logic.importer.util.CustomEntryTypeDecision;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
-import com.google.common.hash.Hashing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +31,7 @@ public class ImportCustomEntryTypesDialogViewModel {
     private final ObservableList<BibEntryType> newTypes = FXCollections.observableArrayList();
     private final ObservableList<BibEntryTypePrefsAndFileViewModel> differentCustomizationTypes = FXCollections.observableArrayList();
 
-    /// The decision each offered type from the file stands for, see [#decision(BibEntryType, Optional, BibDatabaseMode)]
+    /// The decision each offered type from the file stands for, see [CustomEntryTypeDecision]
     private final Map<BibEntryType, String> offeredDecisions = new HashMap<>();
 
     public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode,
@@ -48,7 +45,7 @@ public class ImportCustomEntryTypesDialogViewModel {
         Set<String> declinedDecisions = preferences.getDeclinedCustomEntryTypes();
         for (BibEntryType customType : entryTypes) {
             Optional<BibEntryType> currentlyStoredType = entryTypesManager.enrich(customType.getType(), mode);
-            String decision = decision(customType, currentlyStoredType, mode);
+            String decision = CustomEntryTypeDecision.fingerprint(customType, currentlyStoredType, mode);
             if (declinedDecisions.contains(decision)) {
                 continue;
             }
@@ -64,22 +61,6 @@ public class ImportCustomEntryTypesDialogViewModel {
                 }
             }
         }
-    }
-
-    /// Identifies what the user is asked: storing the definition from the file, replacing the one stored at that time.
-    /// A declined decision is not offered again - unless the definition in the file or the stored one changes.
-    ///
-    /// Returns a fixed-length fingerprint, because a definition can be longer than a preference value may be.
-    public static String decision(BibEntryType typeFromFile, Optional<BibEntryType> storedType, BibDatabaseMode mode) {
-        String decision = mode.getAsString() + ": " + signature(typeFromFile)
-                + storedType.map(stored -> " replacing " + signature(stored)).orElse("");
-        return Hashing.sha256().hashString(decision, StandardCharsets.UTF_8).toString();
-    }
-
-    /// Everything [EntryTypeFactory#nameAndFieldsAreEqual(BibEntryType, BibEntryType)] compares, including which optional fields are detail fields
-    private static String signature(BibEntryType entryType) {
-        return MetaDataSerializer.serializeCustomEntryTypesV2(entryType)
-                + " detail[" + FieldFactory.serializeFieldsListV2(entryType.getDetailOptionalFields()) + "]";
     }
 
     public ObservableList<BibEntryType> newTypes() {
