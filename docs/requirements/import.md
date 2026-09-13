@@ -30,12 +30,23 @@ The `=======` and `|||||||` lines of a conflict are not looked for on their own:
 
 Needs: impl, utest
 
+## A library that cannot be read is reported and leaves no tab behind
+`req~import.library.unreadable-reported~1`
+
+When a library file cannot be read or parsed at all, JabRef names the file and the reason it failed, instead of failing silently or only logging it.
+
+No library tab is left behind for such a file. The tab that was opened to hold the loading library would otherwise stay as an empty, untitled library, which the user could save over the file that had just failed to load.
+
+A file that parses with warnings is not affected: it still opens, and its warnings are reported separately.
+
+Needs: impl, utest
+
 ## PDF import keeps only authors the document prints
 `req~import.pdf.author-confirmed-by-text~1`
 
 When importing a PDF, an author taken from the PDF's document properties is kept only if the text of the leading pages confirms it; otherwise an author list extracted from the document text replaces it.
 If no candidate is confirmed, a single unconfirmed person from the document properties is dropped, because office suites store the account name of whoever exported the file there.
-Metadata previously written by JabRef (an entry with citation key or a known entry type) is kept even when the text does not confirm it.
+An author from bibliographic metadata (an entry with citation key or a known entry type, such as metadata previously written by JabRef or fetched online) is kept even when the text does not confirm it.
 If no usable text can be extracted from the leading pages, the author is left unchanged.
 
 Needs: impl, utest
