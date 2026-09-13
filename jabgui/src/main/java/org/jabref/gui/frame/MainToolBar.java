@@ -1,5 +1,7 @@
 package org.jabref.gui.frame;
 
+import java.util.function.BooleanSupplier;
+
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
@@ -57,7 +59,7 @@ public class MainToolBar extends ToolBar {
     private SimpleCommand forwardCommand;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final GitHandlerRegistry gitHandlerRegistry;
-    private final Runnable quit;
+    private final BooleanSupplier quit;
 
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
@@ -76,7 +78,7 @@ public class MainToolBar extends ToolBar {
                        ClipBoardManager clipBoardManager,
                        JournalAbbreviationRepository journalAbbreviationRepository,
                        GitHandlerRegistry gitHandlerRegistry,
-                       Runnable quit) {
+                       BooleanSupplier quit) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;

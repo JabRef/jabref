@@ -11,15 +11,22 @@ import java.util.stream.Collectors;
 /// The changelog entries announced to the developer so far, kept in a file: one entry per line, its section,
 /// heading and text separated by tabs. A changelog line never contains a tab, so no escaping is needed.
 ///
-/// The file lives in the checkout's git directory, so it follows the worktree and survives JabRef being closed.
+/// The file lives in the checkout's git directory, so it follows the worktree and survives JabRef being closed;
+/// the toolbar button and the jbang launcher share it, so neither shows what the other has announced.
 public final class AnnouncedEntries {
 
+    private static final String FILE_NAME = "whats-new-announced.tsv";
     private static final String FIELD_SEPARATOR = "\t";
 
     private final Path file;
 
     public AnnouncedEntries(Path file) {
         this.file = file;
+    }
+
+    /// The announced entries of the checkout whose git directory is `gitDir`.
+    public static AnnouncedEntries inGitDir(Path gitDir) {
+        return new AnnouncedEntries(gitDir.resolve(FILE_NAME));
     }
 
     /// The announced entries, or empty when nothing has been announced yet — the first run in a checkout.

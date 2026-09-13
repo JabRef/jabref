@@ -4,6 +4,7 @@
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 //DEPS org.openjfx:javafx-controls:26.0.2
 //DEPS io.github.mkpaz:atlantafx-base:2.1.0
+//SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/AnnouncedEntries.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/AttributedEntry.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/BlamedChangelog.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/ChangelogEntry.java
@@ -19,12 +20,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +43,9 @@ import javafx.stage.Stage;
 import org.jabref.gui.whatsnew.WhatsNewView;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.whatsnew.AnnouncedEntries;
 import org.jabref.logic.whatsnew.AttributedEntry;
+import org.jabref.logic.whatsnew.ChangelogEntry;
 import org.jabref.logic.whatsnew.ChangelogParser;
 import org.jabref.logic.whatsnew.Contributor;
 import org.jabref.logic.whatsnew.News;
@@ -55,19 +57,19 @@ import org.jspecify.annotations.NullMarked;
 
 /// "What's new since you last ran JabRef from this checkout", personalized.
 ///
-/// Compares the commit of the previous run (kept in the checkout's git directory) with `HEAD` and shows the
-/// `CHANGELOG.md` entries that landed in between, grouped by who wrote them. The entry model, the grouping
-/// and the window are JabRef's own classes, compiled in through the `//SOURCES` lines above: the script runs
-/// before jablib is built, so it calls the `git` binary instead of JGit and takes the sources along.
+/// Shows the `CHANGELOG.md` entries at `HEAD` that were not announced yet, grouped by who wrote them, and
+/// announces everything at `HEAD`. The announced entries are the same file the "What's new" toolbar button of
+/// a running JabRef keeps, so neither shows what the other has shown. The entry model, the announced entries,
+/// the grouping and the window are JabRef's own classes, compiled in through the `//SOURCES` lines above: the
+/// script runs before jablib is built, so it calls the `git` binary instead of JGit and takes the sources along.
 ///
 /// "Run" (or closing the window) exits 0 and the `just` recipe starts JabRef; "Cancel run" exits 1 and stops
-/// it. `--stdout` prints instead of opening a window. The first run only records the commit. A git failure
-/// (a checkpoint rewritten away, no `CHANGELOG.md`) is reported and exits 0: the news never block the start.
+/// it. `--stdout` prints instead of opening a window. The first run only records the changelog. A git failure
+/// (no `CHANGELOG.md` at `HEAD`) is reported and exits 0: the news never block the start.
 @NullMarked
 public class WhatsNewLauncher {
 
     private static final String CHANGELOG = "CHANGELOG.md";
-    private static final String LAST_RUN_FILE = "whats-new-last-commit";
     private static final String STDOUT_FLAG = "--stdout";
 
     public static void main(String[] args) throws InterruptedException {
@@ -75,24 +77,31 @@ public class WhatsNewLauncher {
             run(args);
         } catch (IOException e) {
             System.err.println("What's new is unavailable: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     private static void run(String[] args) throws IOException, InterruptedException {
         Localization.setLanguage(Language.ENGLISH);
-        Path lastRunFile = Path.of(git("rev-parse", "--absolute-git-dir").getFirst(), LAST_RUN_FILE);
+        AnnouncedEntries announced = AnnouncedEntries.inGitDir(Path.of(git("rev-parse", "--absolute-git-dir").getFirst()));
         String head = git("rev-parse", "HEAD").getFirst();
-        Optional<String> lastRun = Files.exists(lastRunFile) ? Optional.of(Files.readString(lastRunFile).strip()) : Optional.empty();
-        // Recorded first: a failure below must not replay the same news forever.
-        Files.writeString(lastRunFile, head + "\n");
-        if (lastRun.isEmpty() || lastRun.get().equals(head)) {
+        List<ChangelogEntry> entries = List.copyOf(ChangelogParser.entries(git("show", head + ":" + CHANGELOG)).values());
+        Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
+        // Announced first: a failure below must not replay the same news forever.
+        announced.write(entries);
+        if (announcedSoFar.isEmpty()) {
             return;
         }
-        Set<String> newCommits = new HashSet<>(git("rev-list", lastRun.get() + ".." + head));
+        Set<String> announcedTexts = announcedSoFar.get().stream().map(ChangelogEntry::text).collect(Collectors.toSet());
         // Without `--default`, an unset user.email is a failing command, not an empty answer.
-        String myEmail = git("config", "--default", "", "--get", "user.email").getFirst();
-        // The changelog as committed, so its line numbers are the ones the blame below reports.
-        News news = new EntryOrigins(newCommits, myEmail).newsIn(git("show", head + ":" + CHANGELOG), head);
+        EntryOrigins origins = new EntryOrigins(git("config", "--default", "", "--get", "user.email").getFirst());
+        List<AttributedEntry> items = new ArrayList<>();
+        for (ChangelogEntry entry : entries) {
+            if (!announcedTexts.contains(entry.text())) {
+                items.add(origins.attribute(entry));
+            }
+        }
+        News news = new News(items);
         if (news.isEmpty()) {
             return;
         }
@@ -100,19 +109,16 @@ public class WhatsNewLauncher {
             System.out.println(news.asPlainText());
             return;
         }
-        Window.show(news, "What's new since " + describe(lastRun.get()) + " — now at " + describe(head));
+        Window.show(news, "What's new — now at " + describe(head));
     }
 
-    /// Which commit first added a changelog entry, and so whether the entry is news and who wrote it.
+    /// Who first added a changelog entry.
     ///
     /// `git log -S` finds the commit where the entry's current wording appeared. When that commit reworded an
     /// older entry (a removed line in the same hunk shares at least half of its words), the search follows the
-    /// older wording back: a link fix or a rewording by someone else keeps the original author, and a reworded
-    /// entry that predates the previous run is not news.
+    /// older wording back: a link fix or a rewording by someone else keeps the original author.
     static final class EntryOrigins {
 
-        /// A `git blame --line-porcelain` header: the commit and the line number in the blamed file.
-        private static final Pattern BLAME_HEADER = Pattern.compile("^(?<commit>[0-9a-f]{40}) \\d+ (?<line>\\d+).*");
         private static final Pattern WORD = Pattern.compile("\\w+");
         private static final double REWORDING_SHARED_WORDS = 0.5;
         private static final int MAX_REWORDING_HOPS = 8;
@@ -121,42 +127,17 @@ public class WhatsNewLauncher {
         record Origin(String commit, String email, String name) {
         }
 
-        private final Set<String> newCommits;
         private final String myEmail;
 
-        /// @param newCommits the commits since the previous run
-        /// @param myEmail    the checkout's `user.email`; entries first added under it are mine
-        EntryOrigins(Set<String> newCommits, String myEmail) {
-            this.newCommits = Set.copyOf(newCommits);
+        /// @param myEmail the checkout's `user.email`; entries first added under it are mine
+        EntryOrigins(String myEmail) {
             this.myEmail = myEmail;
         }
 
-        /// The entries of `changelog` (as of `head`) first added by one of the new commits.
-        News newsIn(List<String> changelog, String head) throws IOException, InterruptedException {
-            Map<Integer, String> blamedCommits = blamedCommits(head);
-            List<AttributedEntry> items = new ArrayList<>();
-            for (var entry : ChangelogParser.entries(changelog).entrySet()) {
-                // Blame is the cheap pre-filter: an entry whose current line predates the previous run is old for sure.
-                if (!newCommits.contains(blamedCommits.get(entry.getKey()))) {
-                    continue;
-                }
-                origin(entry.getValue().text(), 0)
-                        .filter(origin -> newCommits.contains(origin.commit()))
-                        .ifPresent(origin -> items.add(new AttributedEntry(contributor(origin), entry.getValue())));
-            }
-            return new News(items);
-        }
-
-        /// The commit that last touched each line of the changelog at `head`, by line index.
-        private static Map<Integer, String> blamedCommits(String head) throws IOException, InterruptedException {
-            Map<Integer, String> commits = new HashMap<>();
-            for (String line : git("blame", "--line-porcelain", head, "--", CHANGELOG)) {
-                Matcher header = BLAME_HEADER.matcher(line);
-                if (header.matches()) {
-                    commits.put(Integer.parseInt(header.group("line")) - 1, header.group("commit"));
-                }
-            }
-            return commits;
+        /// `entry` with who first added it; mine when the history does not tell, which a committed line does not do.
+        AttributedEntry attribute(ChangelogEntry entry) throws IOException, InterruptedException {
+            Contributor by = origin(entry.text(), 0).map(this::contributor).orElse(Contributor.Me.LOCAL);
+            return new AttributedEntry(by, entry);
         }
 
         private Contributor contributor(Origin origin) {

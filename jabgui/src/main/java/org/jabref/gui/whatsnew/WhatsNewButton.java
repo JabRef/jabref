@@ -2,6 +2,7 @@ package org.jabref.gui.whatsnew;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import javafx.scene.control.Button;
 
@@ -48,13 +49,13 @@ public final class WhatsNewButton {
     /// The button for the checkout around the working directory, watching it from now on; empty for a packaged
     /// JabRef, which has nothing to update from.
     ///
-    /// @param quit closes JabRef the ordinary way, for *Restart to update*
+    /// @param quit closes JabRef the ordinary way, for *Restart to update*; `false` when the user keeps it open
     public static Optional<Button> create(ActionFactory factory,
                                           TaskExecutor taskExecutor,
                                           DialogService dialogService,
                                           ExternalApplicationsPreferences externalApplicationsPreferences,
                                           GitHandlerRegistry gitHandlerRegistry,
-                                          Runnable quit) {
+                                          BooleanSupplier quit) {
         Optional<WhatsNewViewModel> viewModel = Checkout.around(Path.of(""), gitHandlerRegistry)
                                                         .flatMap(checkout -> checkout.gitDir().map(gitDir -> new WhatsNewViewModel(checkout, gitDir, taskExecutor, quit)));
         viewModel.ifPresent(WhatsNewViewModel::startWatching);
@@ -82,7 +83,7 @@ public final class WhatsNewButton {
             // A window closed before the answer: the news in it stay unseen, and the window is not touched again.
             presentation.cancel();
             openDialog = null;
-            if (dialog.restartChosen() && !viewModel.requestRestart()) {
+            if (dialog.restartChosen() && viewModel.requestRestart() == WhatsNewViewModel.RestartRequest.MARKER_NOT_WRITTEN) {
                 dialogService.notify(Localization.lang("Cannot request the restart (see the log) - JabRef keeps running."));
             }
         });

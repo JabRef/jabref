@@ -49,7 +49,16 @@ public class WhatsNewViewModel extends AbstractViewModel {
 
     /// The file `just run-loop` looks for after JabRef quits: present, it pulls, rebuilds and starts JabRef again.
     static final String RESTART_MARKER = "restart-requested";
-    static final String ANNOUNCED_FILE = "whats-new-announced.tsv";
+
+    /// What [#requestRestart()] achieved.
+    public enum RestartRequest {
+        /// The marker is in place and JabRef is closing.
+        REQUESTED,
+        /// The user kept JabRef open (a library to save first); the marker is withdrawn.
+        DECLINED_BY_USER,
+        /// The marker could not be written; JabRef keeps running.
+        MARKER_NOT_WRITTEN
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WhatsNewViewModel.class);
     private static final Duration CHECK_INTERVAL = Duration.ofMinutes(5);
@@ -58,7 +67,11 @@ public class WhatsNewViewModel extends AbstractViewModel {
     private final AnnouncedEntries announced;
     private final Path restartMarker;
     private final TaskExecutor taskExecutor;
-    private final Runnable quit;
+    private final BooleanSupplier quit;
+
+    /// Looks run one after the other, so the announced entries are never written by an older look after a newer
+    /// one. Background threads only.
+    private final Object lookLock = new Object();
 
     private final ObjectProperty<News> pending = new SimpleObjectProperty<>(News.NONE);
     private final IntegerProperty commitsBehind = new SimpleIntegerProperty();
@@ -75,10 +88,11 @@ public class WhatsNewViewModel extends AbstractViewModel {
     }
 
     /// @param gitDir the checkout's git directory, where the announced entries and the restart marker live
-    /// @param quit   closes JabRef the ordinary way, so unsaved libraries are asked about
-    public WhatsNewViewModel(Checkout checkout, Path gitDir, TaskExecutor taskExecutor, Runnable quit) {
+    /// @param quit   closes JabRef the ordinary way, so unsaved libraries are asked about; `false` when the user
+    ///               keeps JabRef open
+    public WhatsNewViewModel(Checkout checkout, Path gitDir, TaskExecutor taskExecutor, BooleanSupplier quit) {
         this.checkout = checkout;
-        this.announced = new AnnouncedEntries(gitDir.resolve(ANNOUNCED_FILE));
+        this.announced = AnnouncedEntries.inGitDir(gitDir);
         this.restartMarker = gitDir.resolve(RESTART_MARKER);
         this.taskExecutor = taskExecutor;
         this.quit = quit;
@@ -132,17 +146,24 @@ public class WhatsNewViewModel extends AbstractViewModel {
         return presentation;
     }
 
-    /// Leaves the marker for `just run-loop` and quits; `false` when the marker cannot be written, in which
-    /// case JabRef keeps running.
-    public boolean requestRestart() {
+    /// Leaves the marker for `just run-loop` and quits. A user who keeps JabRef open takes the marker back, so
+    /// an ordinary quit later does not restart JabRef.
+    public RestartRequest requestRestart() {
         try {
             Files.writeString(restartMarker, "");
         } catch (IOException e) {
             LOGGER.warn("Cannot write {}", restartMarker, e);
-            return false;
+            return RestartRequest.MARKER_NOT_WRITTEN;
         }
-        quit.run();
-        return true;
+        if (quit.getAsBoolean()) {
+            return RestartRequest.REQUESTED;
+        }
+        try {
+            Files.deleteIfExists(restartMarker);
+        } catch (IOException e) {
+            LOGGER.warn("Cannot remove {}", restartMarker, e);
+        }
+        return RestartRequest.DECLINED_BY_USER;
     }
 
     private void scheduleNextLook() {
@@ -173,24 +194,29 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// Reads the checkout: the working tree's changelog, plus the upstream's once the checkout is behind, so an
     /// entry arriving upstream while a local edit is pending hides nothing. Without announced entries yet (the
     /// first run in a checkout) everything seen is announced now and nothing is news: a fresh checkout is not
-    /// greeted with the whole changelog. With `announce`, everything seen is announced once the upstream was
-    /// fetched and the look is not `cancelled` — in this task, so no other look reads the announced entries in
-    /// between. Any thread but FX.
+    /// greeted with the whole changelog — but only once a changelog could be read, or a failed first look would
+    /// announce nothing and the next one everything. With `announce`, everything seen is announced once the
+    /// upstream was fetched and the look is not `cancelled` — in this task, so no other look reads the announced
+    /// entries in between. Any thread but FX.
     private Look look(boolean fetch, boolean announce, BooleanSupplier cancelled) throws IOException {
-        boolean fetched = fetch && checkout.fetch();
-        int behind = checkout.commitsBehind();
-        List<BlamedChangelog> changelogs = new ArrayList<>();
-        checkout.blameWorkingTree().ifPresent(changelogs::add);
-        if (behind > 0) {
-            checkout.blameUpstream().ifPresent(changelogs::add);
+        synchronized (lookLock) {
+            boolean fetched = fetch && checkout.fetch();
+            int behind = checkout.commitsBehind();
+            List<BlamedChangelog> changelogs = new ArrayList<>();
+            checkout.blameWorkingTree().ifPresent(changelogs::add);
+            if (behind > 0) {
+                checkout.blameUpstream().ifPresent(changelogs::add);
+            }
+            if (changelogs.isEmpty()) {
+                return new Look(fetched, behind, title(behind, News.NONE), News.NONE);
+            }
+            Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
+            News news = announcedSoFar.map(old -> News.pending(old, changelogs)).orElse(News.NONE);
+            if (announcedSoFar.isEmpty() || (announce && fetched && !cancelled.getAsBoolean())) {
+                announced.write(News.allEntries(changelogs));
+            }
+            return new Look(fetched, behind, title(behind, news), news);
         }
-        Set<ChangelogEntry> seen = News.allEntries(changelogs);
-        Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
-        News news = announcedSoFar.map(old -> News.pending(old, changelogs)).orElse(News.NONE);
-        if (announcedSoFar.isEmpty() || (announce && fetched && !cancelled.getAsBoolean())) {
-            announced.write(seen);
-        }
-        return new Look(fetched, behind, title(behind, news), news);
     }
 
     /// `What's new - 3 pending change(s) since <running commit> - now at <upstream commit>`, the count only with

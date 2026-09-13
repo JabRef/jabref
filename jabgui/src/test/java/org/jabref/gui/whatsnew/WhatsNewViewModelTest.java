@@ -64,6 +64,7 @@ class WhatsNewViewModelTest {
     private final Checkout checkout = mock(Checkout.class);
     private final RecordingTaskExecutor taskExecutor = new RecordingTaskExecutor();
     private final AtomicReference<Boolean> quitRequested = new AtomicReference<>(false);
+    private final AtomicReference<Boolean> quitAllowed = new AtomicReference<>(true);
     private WhatsNewViewModel viewModel;
 
     private static BlamedChangelog changelog(Contributor by, ChangelogEntry... entries) {
@@ -80,11 +81,14 @@ class WhatsNewViewModelTest {
     void setUp() {
         when(checkout.fetch()).thenReturn(true);
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(new Contributor.Other("Somebody"), OLD)));
-        viewModel = new WhatsNewViewModel(checkout, gitDir, taskExecutor, () -> quitRequested.set(true));
+        viewModel = new WhatsNewViewModel(checkout, gitDir, taskExecutor, () -> {
+            quitRequested.set(true);
+            return quitAllowed.get();
+        });
     }
 
     private AnnouncedEntries announced() {
-        return new AnnouncedEntries(gitDir.resolve(WhatsNewViewModel.ANNOUNCED_FILE));
+        return AnnouncedEntries.inGitDir(gitDir);
     }
 
     @Test
@@ -105,8 +109,18 @@ class WhatsNewViewModelTest {
 
         assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE))), viewModel.getPending());
         assertEquals("What's new - 1 pending change(s)", viewModel.titleProperty().get());
-        assertTrue(viewModel.tooltipProperty().get().contains("An entry of mine."));
+        assertEquals("\n\nWhat's new - 1 pending change(s):\nChanges by me\n• An entry of mine.", viewModel.tooltipProperty().get());
         assertFalse(viewModel.updateAvailableProperty().get());
+    }
+
+    @Test
+    void aFirstLookWithoutAChangelogAnnouncesNothing() throws IOException {
+        when(checkout.blameWorkingTree()).thenReturn(Optional.empty());
+
+        viewModel.startWatching();
+
+        assertEquals(News.NONE, viewModel.getPending());
+        assertEquals(Optional.empty(), announced().read());
     }
 
     @Test
@@ -123,7 +137,9 @@ class WhatsNewViewModelTest {
         assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.REMOTE, PUSHED))), viewModel.getPending());
         assertEquals("What's new - 1 pending change(s) since 1111111 (2026-09-13 10:00) - now at 2222222 (2026-09-13 11:00)", viewModel.titleProperty().get());
         assertTrue(viewModel.updateAvailableProperty().get());
-        assertTrue(viewModel.tooltipProperty().get().contains("A new version is available (2 commit(s))"));
+        assertEquals("\n\nWhat's new - 1 pending change(s) since 1111111 (2026-09-13 10:00) - now at 2222222 (2026-09-13 11:00):\n"
+                + "Changes by me (pushed from another machine)\n• An entry pushed from elsewhere.\n\n"
+                + "A new version is available (2 commit(s)) - restart to update.", viewModel.tooltipProperty().get());
     }
 
     @Test
@@ -160,8 +176,8 @@ class WhatsNewViewModelTest {
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         viewModel.startWatching();
         News known = viewModel.getPending();
-        Files.delete(gitDir.resolve(WhatsNewViewModel.ANNOUNCED_FILE));
-        Files.createDirectory(gitDir.resolve(WhatsNewViewModel.ANNOUNCED_FILE));
+        Files.delete(gitDir.resolve("whats-new-announced.tsv"));
+        Files.createDirectory(gitDir.resolve("whats-new-announced.tsv"));
         AtomicReference<News> presented = new AtomicReference<>();
 
         viewModel.present(_ -> fail("the look must fail"), presented::set);
@@ -172,17 +188,26 @@ class WhatsNewViewModelTest {
 
     @Test
     void aRestartLeavesTheMarkerAndQuits() {
-        assertTrue(viewModel.requestRestart());
+        assertEquals(WhatsNewViewModel.RestartRequest.REQUESTED, viewModel.requestRestart());
 
         assertTrue(Files.exists(gitDir.resolve(WhatsNewViewModel.RESTART_MARKER)));
         assertTrue(quitRequested.get());
     }
 
     @Test
+    void aRestartTheUserDeclinesTakesTheMarkerBack() {
+        quitAllowed.set(false);
+
+        assertEquals(WhatsNewViewModel.RestartRequest.DECLINED_BY_USER, viewModel.requestRestart());
+
+        assertFalse(Files.exists(gitDir.resolve(WhatsNewViewModel.RESTART_MARKER)));
+    }
+
+    @Test
     void aRestartWhoseMarkerCannotBeWrittenKeepsJabRefRunning() throws IOException {
         Files.createDirectory(gitDir.resolve(WhatsNewViewModel.RESTART_MARKER));
 
-        assertFalse(viewModel.requestRestart());
+        assertEquals(WhatsNewViewModel.RestartRequest.MARKER_NOT_WRITTEN, viewModel.requestRestart());
 
         assertFalse(quitRequested.get());
     }
