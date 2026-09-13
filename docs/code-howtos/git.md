@@ -75,19 +75,12 @@ Therefore, JabRef performs an automatic merge without requiring manual conflict 
 
 ## Using the semantic merge as Git merge driver
 
-`jabkit git merge-driver` exposes the semantic merge as a [Git merge driver](https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver), so that Git merges `.bib` files entry by entry.
-The setup is described in the user documentation, [Share](https://docs.jabref.org/collaborative-work/) → "Merging a Bib(la)TeX Library with Git".
+`jabkit git merge-driver` exposes the semantic merge as a [Git merge driver](https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver).
+The user-visible behavior (setup, what is merged, conflicts, refusals) is described in the user documentation, [Share](https://docs.jabref.org/collaborative-work/) → "Merging a Bib(la)TeX Library with Git".
 
-Git calls the driver with the base (`%O`), current (`%A`), and other (`%B`) version.
-The driver writes `current + (other - base)` into `%A`.
-Exit code 0 means a clean merge, exit code 1 marks the file as conflicted; conflicting entries keep the current side's version and their citation keys are printed to stderr.
-
-The command class `GitMergeDriver` (jabkit) only translates between that contract and `BibFileMerger` (jablib, package `org.jabref.logic.git.merge`), which returns a `MergeOutcome`: either `Refused` with the reasons, or `Merged` with the remaining conflicts.
+The command class `GitMergeDriver` (jabkit) only translates between Git's contract (`%O %A %B`, exit code) and `BibFileMerger` (jablib, package `org.jabref.logic.git.merge`), which returns a `MergeOutcome`: either `Refused` with the reasons, or `Merged` with the remaining conflicts.
 `BibFileMerger` composes the existing `SemanticMergeAnalyzer` with `EntryPropertyMerge`, which applies the same three-way rules to the entry type and the comment above an entry, because the merge plan carries field values only.
-
-`MergePreconditions` refuses the merge (exit code 1, `CURRENT` untouched) when writing the result would lose content; `Refusal.Reason` documents each case.
-The merge plan is keyed by citation key and covers entries only, so duplicate citation keys are refused, and so is content outside of entries with a citation key (entries without one, `@String` definitions, custom entry types, preamble, epilogue, metadata, shared database ID, encoding) that `OTHER` changed - it is taken from `CURRENT` as is.
-Content that JabRef's parser or writer drops is refused as well: a file with parser warnings, an entry without fields, a custom entry type that no entry uses, and a comment in front of `@Comment` or `@Preamble`.
+`MergePreconditions` refuses the merge when writing the result would lose content; `Refusal.Reason` documents each case and the parser or writer behavior behind it.
 
 ## Related Test Cases
 
