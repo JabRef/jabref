@@ -625,6 +625,7 @@ public class DBMSProcessor {
     ///
     /// @param data JabRef meta data as map
     public void setSharedMetaData(Map<String, String> data) throws SQLException {
+        // [impl->req~shared-database.atomic-metadata-snapshots~1]
         // PostgreSQL sends the queued notifications at commit, so receivers only pull a complete metadata snapshot.
         inTransaction(() -> {
             try (PreparedStatement statement = connection.prepareStatement("SELECT upsert_metadata(?, ?)")) {
