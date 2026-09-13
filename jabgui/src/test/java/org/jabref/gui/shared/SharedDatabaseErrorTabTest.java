@@ -17,8 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -68,15 +66,26 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
     }
 
     @Test
-    void expertModeWithoutDatabaseNameIsNamedAfterTheUrlWithoutCredentials() {
+    void expertModeIsNamedAfterTheUrlWithoutCredentials() {
         DBMSConnectionProperties expertProperties = mock(DBMSConnectionProperties.class);
-        when(expertProperties.getDatabase()).thenReturn("");
+        when(expertProperties.isUseExpertMode()).thenReturn(true);
+        when(expertProperties.getDatabase()).thenReturn("stale");
         when(expertProperties.getJdbcUrl()).thenReturn("jdbc:postgresql://db.example.org/literature?user=alice&password=secret");
 
         interact(() -> tab = new SharedDatabaseErrorTab(null, expertProperties));
 
         assertEquals("literature", tab.getText());
-        assertFalse(((Label) tab.getContent().lookup(".welcome-header-label")).getText().contains("secret"));
+        assertEquals("Could not connect to literature", ((Label) tab.getContent().lookup(".welcome-header-label")).getText());
+    }
+
+    @Test
+    void missingDatabaseNameFallsBackToAGenericName() {
+        DBMSConnectionProperties incompleteProperties = mock(DBMSConnectionProperties.class);
+        when(incompleteProperties.getDatabase()).thenReturn(null);
+
+        interact(() -> tab = new SharedDatabaseErrorTab("shared-1", incompleteProperties));
+
+        assertEquals("Shared database connection", tab.getText());
     }
 
     @Test
@@ -87,7 +96,7 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
             tab.close();
         });
 
-        assertTrue(tabPane.getTabs().isEmpty());
+        assertEquals(List.of(), tabPane.getTabs());
     }
 
     @Test

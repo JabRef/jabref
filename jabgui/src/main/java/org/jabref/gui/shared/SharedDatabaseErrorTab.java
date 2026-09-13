@@ -67,16 +67,17 @@ public class SharedDatabaseErrorTab extends Tab {
         setContent(content);
     }
 
-    /// In expert mode the database name may be empty: the JDBC URL is all the user entered. The URL itself is never
-    /// shown, it may carry the password; only its database or host is.
+    /// In expert mode the connection uses the JDBC URL, not the database field (which may hold a stale name or, for
+    /// incomplete remembered preferences, none at all). The URL itself is never shown, it may carry the password;
+    /// only its database or host is.
     private static String displayName(DBMSConnectionProperties connectionProperties) {
-        if (!connectionProperties.getDatabase().isBlank()) {
-            return connectionProperties.getDatabase();
-        }
-        return DBMSConnectionUrl.parse(connectionProperties.getJdbcUrl())
-                                .map(url -> url.database().isBlank() ? url.host() : url.database())
-                                .filter(name -> !name.isBlank())
-                                .orElseGet(() -> Localization.lang("Shared database connection"));
+        Optional<String> fromUrl = connectionProperties.isUseExpertMode()
+                                   ? DBMSConnectionUrl.parse(connectionProperties.getJdbcUrl())
+                                                      .map(url -> url.database().isBlank() ? url.host() : url.database())
+                                   : Optional.empty();
+        return fromUrl.or(() -> Optional.ofNullable(connectionProperties.getDatabase()))
+                      .filter(name -> !name.isBlank())
+                      .orElseGet(() -> Localization.lang("Shared database connection"));
     }
 
     public void setRetryAction(Runnable retryAction) {
