@@ -223,7 +223,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening preferences could break arXiv web search later. [#16059](https://github.com/JabRef/jabref/issues/16059)
 - We fixed arXiv title searches containing accented characters. [#16477](https://github.com/JabRef/jabref/issues/16477)
 - We fixed an issue where generating AI embeddings for an entry with a linked URL logged a misleading error about a missing file. [#16123](https://github.com/JabRef/jabref/issues/16123)
-- We fixed an issue where an AI chat connection error showed only "java.net.ConnectException" instead of the server URL and the reason. [#PRNUM](https://github.com/JabRef/jabref/pull/PRNUM)
+- We fixed an issue where an AI chat connection error showed only "java.net.ConnectException" instead of the server URL and the reason. [#17125](https://github.com/JabRef/jabref/pull/17125)
 - We fixed an issue with the LibreOffice integration where the ordering for numeric CSL styles in footnotes was broken. [#12484](https://github.com/JabRef/jabref/issues/12484)
 - We fixed an issue where `git push` did not report rejected remote updates. [#16367](https://github.com/JabRef/jabref/pull/16367)
 - We fixed formatting issues in entry preview when `.bst` styles were used. [#16314](https://github.com/JabRef/jabref/issues/16314)
