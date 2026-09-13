@@ -76,7 +76,8 @@ public class LatexCitationsTab extends EntryEditorTab {
 
         searchPane.getColumnConstraints().setAll(column);
         searchPane.getRowConstraints().setAll(mainRow, bottomRow);
-        searchPane.setId("citationsPane");
+        searchPane.setId("citations-pane");
+        searchPane.getStyleClass().add("citations-pane");
         searchPane.getStyleClass().add("padding-0");
         setContent(searchPane);
 

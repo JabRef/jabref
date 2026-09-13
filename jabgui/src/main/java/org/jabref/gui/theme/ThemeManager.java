@@ -55,6 +55,7 @@ public class ThemeManager {
 
     private final FileUpdateListener baseCssLiveUpdate = () -> cssLiveUpdate(JABREF_BASE_STYLE_SHEET);
     private @Nullable FileUpdateListener themeCssLiveUpdate;
+    private @Nullable FileUpdateListener parentCssLiveUpdate;
     private @Nullable FileUpdateListener customCssLiveUpdate;
 
     private ThemePreset theme = ThemePreset.JABREF;
@@ -85,10 +86,12 @@ public class ThemeManager {
     ///
     /// The theme stylesheet comes first, the user's custom stylesheet on top of it, and the base
     /// stylesheet last -- the base sheet only maps JabRef's own selectors onto the color tokens the
-    /// theme defines, so it has to win over both.
+    /// theme defines, so it has to win over both. A theme with a parent declares only the tokens it
+    /// changes, so the parent's stylesheet goes beneath it to supply the rest.
     public void updateCssOnScene(Scene scene) {
-        List<String> toAdd = new ArrayList<>(3);
+        List<String> toAdd = new ArrayList<>(4);
 
+        theme.getParent().ifPresent(parent -> toAdd.add(parent.getStyleSheet().getSceneStylesheetLocation()));
         toAdd.add(theme.getStyleSheet().getSceneStylesheetLocation());
         if (customTheme != null) {
             toAdd.add(customTheme.getSceneStylesheetLocation());
@@ -108,13 +111,10 @@ public class ThemeManager {
     }
 
     private void updateFontStyleForScene(@NonNull Scene scene) {
+        scene.getRoot().getStyleClass().removeIf(str -> str.startsWith("font-size-"));
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
-            scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
-        } else {
-            int mainFontSize = WorkspacePreferences.getDefault().getMainFontSize();
-            LOGGER.debug("Using default font size of {}pt", mainFontSize);
-            scene.getRoot().setStyle("-fx-font-size: " + mainFontSize + "pt;");
+            scene.getRoot().getStyleClass().add("font-size-" + workspacePreferences.getMainFontSize());
         }
     }
 
@@ -168,10 +168,7 @@ public class ThemeManager {
 
         boolean cssChanged = false;
         if (theme != newTheme) {
-            if (themeCssLiveUpdate != null) {
-                removeStylesheetFromWatchList(theme.getStyleSheet(), themeCssLiveUpdate);
-            }
-
+            removeThemeStylesheetsFromWatchList(theme);
             addThemeStylesheetToWatchlist(newTheme);
 
             cssChanged = true;
@@ -251,6 +248,25 @@ public class ThemeManager {
         StyleSheet themeStyleSheet = theme.getStyleSheet();
         themeCssLiveUpdate = () -> cssLiveUpdate(themeStyleSheet);
         addStylesheetToWatchlist(themeStyleSheet, themeCssLiveUpdate);
+
+        // The parent supplies every token the theme itself does not declare, so an edit there changes
+        // the look just as much as one in the selected theme.
+        theme.getParent().ifPresent(parent -> {
+            StyleSheet parentStyleSheet = parent.getStyleSheet();
+            parentCssLiveUpdate = () -> cssLiveUpdate(parentStyleSheet);
+            addStylesheetToWatchlist(parentStyleSheet, parentCssLiveUpdate);
+        });
+    }
+
+    private void removeThemeStylesheetsFromWatchList(ThemePreset theme) {
+        if (themeCssLiveUpdate != null) {
+            removeStylesheetFromWatchList(theme.getStyleSheet(), themeCssLiveUpdate);
+            themeCssLiveUpdate = null;
+        }
+        if (parentCssLiveUpdate != null) {
+            theme.getParent().ifPresent(parent -> removeStylesheetFromWatchList(parent.getStyleSheet(), parentCssLiveUpdate));
+            parentCssLiveUpdate = null;
+        }
     }
 
     private void cssLiveUpdate(StyleSheet styleSheet) {

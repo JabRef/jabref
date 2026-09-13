@@ -23,7 +23,7 @@ public class UrlChecker implements ValueChecker {
 
         try {
             new URIBuilder(value);
-        } catch (URISyntaxException ex) {
+        } catch (URISyntaxException _) {
             return Optional.of(Localization.lang("invalid URL format"));
         }
 
