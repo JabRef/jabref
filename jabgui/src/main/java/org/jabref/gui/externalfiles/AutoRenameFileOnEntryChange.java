@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -24,16 +25,16 @@ public class AutoRenameFileOnEntryChange {
         renamePdfCleanup = new RenamePdfCleanup(false, () -> bibDatabaseContext, filePreferences);
     }
 
-    /// The library properties override the global preference when set (`MetaData#getAutoRenameFilesOnChange`).
+    /// The library properties override the global preference when set (`MetaData#getAutoRenameFilesOnChange`);
+    /// without a filename pattern there is nothing to rename to.
     public static boolean isEnabled(BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
-        return bibDatabaseContext.getMetaData().getAutoRenameFilesOnChange().orElseGet(filePreferences::shouldAutoRenameFilesOnChange);
+        return !StringUtil.isBlank(filePreferences.getFileNamePattern())
+                && bibDatabaseContext.getMetaData().getAutoRenameFilesOnChange().orElseGet(filePreferences::shouldAutoRenameFilesOnChange);
     }
 
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        if (!isEnabled(bibDatabaseContext, filePreferences)
-                || filePreferences.getFileNamePattern().isEmpty()
-                || filePreferences.getFileNamePattern() == null) {
+        if (!isEnabled(bibDatabaseContext, filePreferences)) {
             return;
         }
 

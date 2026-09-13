@@ -1,5 +1,7 @@
 package org.jabref.gui.collab.metedatachange;
 
+import java.util.Optional;
+
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
@@ -72,12 +74,21 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         VBox diffContainer = new VBox(12);
 
         // Show both original and new values
-        diffContainer.getChildren().add(new Label(diff.originalObject().toString()));
-        diffContainer.getChildren().add(new Label(diff.newObject().toString()));
+        diffContainer.getChildren().add(new Label(formatValue(diff, diff.originalObject())));
+        diffContainer.getChildren().add(new Label(formatValue(diff, diff.newObject())));
 
         ScrollPane scrollPane = new ScrollPane(diffContainer);
         scrollPane.setFitToWidth(true);
         return scrollPane;
+    }
+
+    private static String formatValue(MetaDataDiff.Difference diff, Object value) {
+        if (diff.differenceType() == MetaDataDiff.DifferenceType.AUTO_RENAME_FILES_ON_CHANGE
+                && value instanceof Optional<?> override) {
+            return override.map(rename -> Boolean.TRUE.equals(rename) ? Localization.lang("Yes") : Localization.lang("No"))
+                           .orElse(Localization.lang("Use global preference"));
+        }
+        return value.toString();
     }
 
     private String getDifferenceString(MetaDataDiff.DifferenceType changeType) {
