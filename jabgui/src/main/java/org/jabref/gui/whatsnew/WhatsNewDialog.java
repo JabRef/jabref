@@ -65,7 +65,7 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
         updateAvailable.ifPresent(available -> getDialogPane().lookupButton(restart).disableProperty().bind(Bindings.not(available)));
     }
 
-    /// The upstream could not be reached: `news` is what is known so far, and no restart is offered.
+    /// The upstream could not be reached: `news` is what the working tree holds, and no restart is offered.
     public void checkFailed(News news) {
         root.setCenter(body(news));
         Label failed = new Label(Localization.lang("Checking remote failed - no restart offered."));

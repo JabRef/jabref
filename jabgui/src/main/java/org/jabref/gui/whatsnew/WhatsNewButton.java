@@ -94,11 +94,11 @@ public final class WhatsNewButton {
         dialog.titleProperty().bind(viewModel.titleProperty());
         openDialog = dialog;
         dialogService.showCustomDialog(dialog);
-        BackgroundTask<?> presentation = viewModel.present(dialog::checked, dialog::checkFailed);
+        BackgroundTask<?> presentation = viewModel.present(() -> openDialog == dialog, dialog::checked, dialog::checkFailed);
         dialog.setOnHidden(_ -> {
             // A window closed before the answer: the news in it stay unseen, and the window is not touched again.
-            presentation.cancel();
             openDialog = null;
+            presentation.cancel();
             if (dialog.restartChosen()) {
                 WhatsNewViewModel.RestartRequest request = viewModel.requestRestart();
                 if (request == WhatsNewViewModel.RestartRequest.MARKER_NOT_WRITTEN) {

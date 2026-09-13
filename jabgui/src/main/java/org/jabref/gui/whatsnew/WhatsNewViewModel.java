@@ -105,24 +105,30 @@ public class WhatsNewViewModel extends AbstractViewModel {
                 .executeWith(taskExecutor);
     }
 
-    /// A look on demand: fetches, hands the news found to `onChecked` and only then makes them old — the tooltip
-    /// drops them and the announced entries take them. When the upstream cannot be reached or the look fails,
-    /// `onFailed` gets the news known so far instead, and nothing is made old. Cancelling the returned task
-    /// (the window closed before the answer) makes nothing old either and calls neither consumer.
-    public BackgroundTask<?> present(Consumer<News> onChecked, Consumer<News> onFailed) {
+    /// A look on demand: fetches, hands the news found to `onChecked` — or to `onFailed` when the upstream could
+    /// not be reached, so no restart is offered — and only then makes them old: the tooltip drops them and the
+    /// announced entries take them. Should the look itself fail, `onFailed` gets the news known so far and
+    /// nothing is made old. Nothing happens once `windowOpen` says the window is gone: cancelling the returned
+    /// task covers a look still running, this covers an answer already on its way.
+    public BackgroundTask<?> present(BooleanSupplier windowOpen, Consumer<News> onChecked, Consumer<News> onFailed) {
         BackgroundTask<Look> presentation = lookTask(Mode.WITH_FETCH, look -> {
+            if (!windowOpen.getAsBoolean()) {
+                return;
+            }
             show(look);
             if (look.fetched()) {
                 onChecked.accept(look.news());
-                pending.set(pending.get().without(look.seen()));
-                announce(look);
             } else {
                 onFailed.accept(look.news());
             }
+            pending.set(pending.get().without(look.seen()));
+            announce(look);
         })
                 .onFailure(e -> {
                     LOGGER.warn("Cannot look at the checkout", e);
-                    onFailed.accept(pending.get());
+                    if (windowOpen.getAsBoolean()) {
+                        onFailed.accept(pending.get());
+                    }
                 });
         presentation.executeWith(taskExecutor);
         return presentation;

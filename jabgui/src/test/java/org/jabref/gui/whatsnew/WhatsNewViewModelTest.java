@@ -158,7 +158,7 @@ class WhatsNewViewModelTest {
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         AtomicReference<News> presented = new AtomicReference<>();
 
-        viewModel.present(presented::set, _ -> fail("the look must not fail"));
+        viewModel.present(() -> true, presented::set, _ -> fail("the look must not fail"));
 
         assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE))), presented.get());
         assertEquals(News.NONE, viewModel.getPending());
@@ -172,7 +172,7 @@ class WhatsNewViewModelTest {
         viewModel.startWatching();
         taskExecutor.holding = true;
         AtomicReference<News> presented = new AtomicReference<>();
-        viewModel.present(presented::set, _ -> fail("the look must not fail"));
+        viewModel.present(() -> true, presented::set, _ -> fail("the look must not fail"));
         taskExecutor.runHeld();
         // The periodic look reads the announced entries before the presentation's write got to them.
         taskExecutor.runScheduled();
@@ -189,7 +189,7 @@ class WhatsNewViewModelTest {
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         taskExecutor.holding = true;
 
-        BackgroundTask<?> presentation = viewModel.present(_ -> fail("the window was closed"), _ -> fail("the window was closed"));
+        BackgroundTask<?> presentation = viewModel.present(() -> true, _ -> fail("the window was closed"), _ -> fail("the window was closed"));
         presentation.cancel();
         taskExecutor.runHeld();
 
@@ -197,17 +197,29 @@ class WhatsNewViewModelTest {
     }
 
     @Test
-    void anUnreachableUpstreamPresentsTheNewsButKeepsThemPending() throws IOException {
+    void anUnreachableUpstreamPresentsTheNewsAsFailedAndStillMakesThemOld() throws IOException {
         announced().announce(Set.of(OLD));
         when(checkout.fetch()).thenReturn(false);
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         AtomicReference<News> presented = new AtomicReference<>();
 
-        viewModel.present(_ -> fail("the upstream was not reached"), presented::set);
+        viewModel.present(() -> true, _ -> fail("the upstream was not reached"), presented::set);
 
-        News mine = new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE)));
-        assertEquals(mine, presented.get());
-        assertEquals(mine, viewModel.getPending());
+        assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE))), presented.get());
+        assertEquals(News.NONE, viewModel.getPending());
+        assertEquals(Optional.of(Set.of(OLD, MINE)), announced().read());
+    }
+
+    @Test
+    void anAnswerForAClosedWindowChangesNothing() throws IOException {
+        announced().announce(Set.of(OLD));
+        when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
+        viewModel.startWatching();
+        News known = viewModel.getPending();
+
+        viewModel.present(() -> false, _ -> fail("the window was closed"), _ -> fail("the window was closed"));
+
+        assertEquals(known, viewModel.getPending());
         assertEquals(Optional.of(Set.of(OLD)), announced().read());
     }
 
@@ -221,7 +233,7 @@ class WhatsNewViewModelTest {
         Files.createDirectory(gitDir.resolve("whats-new-announced.tsv"));
         AtomicReference<News> presented = new AtomicReference<>();
 
-        viewModel.present(_ -> fail("the look must fail"), presented::set);
+        viewModel.present(() -> true, _ -> fail("the look must fail"), presented::set);
 
         assertEquals(known, presented.get());
         assertEquals(known, viewModel.getPending());
