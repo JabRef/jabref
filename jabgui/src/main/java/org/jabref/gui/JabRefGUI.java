@@ -604,6 +604,7 @@ public class JabRefGUI extends Application {
                 try {
                     GitSsh.shutdown();
                 } catch (RuntimeException e) {
+                    // Log only: the submitted task's future is never read (a rethrow would vanish) and the UI is already gone
                     LOGGER.error("Unable to close Git SSH session factory", e);
                 }
                 LOGGER.trace("Git SSH session factory closed");
