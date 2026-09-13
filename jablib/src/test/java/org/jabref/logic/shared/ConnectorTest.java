@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.testutils.category.DatabaseTest;
+import org.jabref.support.DatabaseTest;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 

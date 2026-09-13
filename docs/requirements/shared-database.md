@@ -8,7 +8,7 @@ parent: Requirements
 
 Changes made by one client — entry modifications, groups, and library settings — appear in all other connected clients without any manual action.
 
-Needs: impl
+Needs: impl, utest
 
 ## Change content travels in the notification
 `req~shared-database.change-content-in-notification~1`
@@ -52,6 +52,13 @@ After a connection loss, JabRef reconnects by itself with increasing intervals f
 
 Needs: impl
 
+## A shared database's loading state is indicated
+`req~shared-database.loading-indicator~1`
+
+While JabRef opens or reconnects a shared database, its library tab displays a loading indicator until the connection completes or fails.
+
+Needs: impl
+
 ## Existing databases are migrated
 `req~shared-database.migration~1`
 
@@ -77,13 +84,6 @@ Needs: impl
 `req~shared-database.reconnect-retry~1`
 
 If reconnecting on startup fails, the database is shown as a tab carrying the error and a retry button instead of an error dialog. The database stays remembered when JabRef is closed while that tab is open.
-
-Needs: impl
-
-## Connecting does not block the user interface
-`req~shared-database.connect-in-background~1`
-
-Connecting to a shared database (from the connection dialog as well as on startup) happens in the background. The dialog closes immediately and the library appears as a tab that shows "Connecting..." until the entries are loaded, or the error and a retry button if the connection fails. JabRef stays usable meanwhile.
 
 Needs: impl
 

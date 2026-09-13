@@ -70,7 +70,7 @@ public class UnoReferenceMark {
             }
             try {
                 doc.getText().removeTextContent(mark.get());
-            } catch (NoSuchElementException ex) {
+            } catch (NoSuchElementException _) {
                 // The caller gets what it expects.
             }
         }

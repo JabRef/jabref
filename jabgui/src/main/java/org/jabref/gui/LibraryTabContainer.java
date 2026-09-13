@@ -1,11 +1,9 @@
 package org.jabref.gui;
 
 import java.util.List;
-import java.util.Optional;
 
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.shared.SharedDatabasePlaceholderTab;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NullMarked;
@@ -37,20 +35,14 @@ public interface LibraryTabContainer {
     /// @return true if closing the tabs was successful
     boolean closeTabs(List<LibraryTab> tabs, boolean showWelcomeTab);
 
-    /// Shows a placeholder for a shared database that is being connected (or failed to)
-    void showSharedDatabasePlaceholder(SharedDatabasePlaceholderTab placeholder, boolean raisePanel);
+    /// Drops the placeholder of a failed reconnection once the same shared database is connected, whichever way that
+    /// happened. Leaving it behind would remember the database twice at quit and reconnect it twice on the next start.
+    /// Call only with a connected context: a loading tab's synchronizer has no connection properties yet.
+    void removeSharedDatabaseErrorTabFor(BibDatabaseContext connectedContext);
 
-    /// Shared databases that are being connected or failed to, i.e. shown as a placeholder instead of a library tab
-    List<SharedDatabasePlaceholderTab> getSharedDatabasePlaceholders();
-
-    /// Ids of the remembered shared databases that are still shown as a placeholder tab.
+    /// Ids of the shared databases whose reconnection failed and that are still shown as an error tab.
     /// They have no library tab, but must stay remembered for the next session.
-    default List<String> getUnconnectedSharedDatabaseIds() {
-        return getSharedDatabasePlaceholders().stream()
-                                              .map(SharedDatabasePlaceholderTab::getSharedDatabaseId)
-                                              .flatMap(Optional::stream)
-                                              .toList();
-    }
+    List<String> getUnconnectedSharedDatabaseIds();
 
     /// Refreshes the ui after changes to the preferences
     void refresh();
