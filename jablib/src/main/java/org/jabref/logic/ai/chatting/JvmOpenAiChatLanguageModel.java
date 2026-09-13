@@ -4,6 +4,7 @@ import java.io.UncheckedIOException;
 import java.net.http.HttpClient;
 import java.util.List;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 
 import dev.langchain4j.data.message.AiMessage;
@@ -82,8 +83,9 @@ public class JvmOpenAiChatLanguageModel implements ChatModel {
                 rootCause = rootCause.getCause();
             }
             String reason = rootCause.getMessage() == null ? rootCause.getClass().getSimpleName() : rootCause.getMessage();
-            LOGGER.debug("Could not connect to {}", baseUrl, e);
-            throw new UncheckedIOException(Localization.lang("Could not connect to %0.\n\n%1", baseUrl, reason), e.getCause());
+            String redactedUrl = FetcherException.getRedactedUrl(baseUrl);
+            LOGGER.debug("Could not connect to {}", redactedUrl, e);
+            throw new UncheckedIOException(Localization.lang("Could not connect to %0.\n\n%1", redactedUrl, reason), e.getCause());
         }
         Usage usage = chatCompletion.usage();
         List<ChatCompletion.Choice> choices = chatCompletion.choices();
