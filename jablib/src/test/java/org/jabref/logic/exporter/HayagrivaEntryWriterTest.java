@@ -253,7 +253,7 @@ class HayagrivaEntryWriterTest {
                     title: Some Title
                 """);
         BibEntry entry = HayagrivaMapping.toBibEntry("key", node)
-                .withField(StandardField.GROUPS, "Reading list, Favorites");
+                                         .withField(StandardField.GROUPS, "Reading list, Favorites");
 
         writer.mergeIntoNode(entry, node);
 
