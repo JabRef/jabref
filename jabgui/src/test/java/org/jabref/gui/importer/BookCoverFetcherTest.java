@@ -19,10 +19,10 @@ import org.jabref.logic.util.Directories;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
@@ -74,7 +74,7 @@ class BookCoverFetcherTest {
     /// "toFile". This should then cause the expected file to
     /// be created.
     @Test
-    @Tag("ExternalServicesTest")
+    @ExternalServicesTest
     void createNotAvailableFileAfterFailedDownload() throws Exception {
         bookCoverFetcher.downloadCoversForEntry(badEntry);
 
@@ -128,7 +128,7 @@ class BookCoverFetcherTest {
     /// We create a new .not-available file in the cover directory with a modification time more than 24 hours ago
     /// When we try to download the book and fail to do so, the modification time should be set to now.
     @Test
-    @Tag("ExternalServicesTest")
+    @ExternalServicesTest
     void modificationTimeChangesWhenMoreThan24Hours() throws IOException, FetcherException {
         Instant now = Instant.now();
         Files.createFile(badNotAvailablePath);
@@ -167,7 +167,7 @@ class BookCoverFetcherTest {
     /// We create a new .not-available file in the cover directory with a modification time more than 24 hours ago
     /// When we try to download the book and succeed, the file should be deleted.
     @Test
-    @Tag("ExternalServicesTest")
+    @ExternalServicesTest
     void notAvailableFileIsDeletedAfterSuccessfulDownload() throws IOException, FetcherException {
         Files.createFile(notAvailablePath);
         Files.setLastModifiedTime(notAvailablePath, FileTime.from(Instant.now().minus(25, ChronoUnit.HOURS)));
