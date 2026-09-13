@@ -95,22 +95,24 @@ public class Notifications {
             Optional<EventHandler<WorkerStateEvent>> onSucceeded = Optional.ofNullable(task.getOnSucceeded());
             task.setOnSucceeded(event -> {
                 onSucceeded.ifPresent(handler -> handler.handle(event));
-                finishTask();
+                finishTask(undefinedTask);
             });
+            // A failed task never reaches full progress, so its notification would look like it is still running.
+            // When the caller handles the failure, it reports the error itself and the notification can go.
             Optional<EventHandler<WorkerStateEvent>> onFailed = Optional.ofNullable(task.getOnFailed());
             task.setOnFailed(event -> {
                 onFailed.ifPresent(handler -> handler.handle(event));
-                finishTask();
+                finishTask(undefinedTask || onFailed.isPresent());
             });
             Optional<EventHandler<WorkerStateEvent>> onCancelled = Optional.ofNullable(task.getOnCancelled());
             task.setOnCancelled(event -> {
                 onCancelled.ifPresent(handler -> handler.handle(event));
-                finishTask();
+                finishTask(true);
             });
         }
 
-        private void finishTask() {
-            if (undefinedTask) {
+        private void finishTask(boolean remove) {
+            if (remove) {
                 UiTaskExecutor.runInJavaFXThread(this::remove);
             }
             setOnClick(_ -> OnClickBehaviour.REMOVE);
