@@ -26,7 +26,7 @@ public class AutoRenameFileOnEntryChange {
 
     /// The library properties override the global preference when set (`MetaData#getAutoRenameFilesOnChange`).
     public static boolean isEnabled(BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
-        return bibDatabaseContext.getMetaData().getAutoRenameFilesOnChange().orElse(filePreferences.shouldAutoRenameFilesOnChange());
+        return bibDatabaseContext.getMetaData().getAutoRenameFilesOnChange().orElseGet(filePreferences::shouldAutoRenameFilesOnChange);
     }
 
     @Subscribe

@@ -1023,7 +1023,6 @@ class DirectoryLibrarySynchronizerTest {
         assertEquals(List.of(DirectoryStructureGroup.class, ExplicitGroup.class),
                 children.stream().map(child -> child.getGroup().getClass()).toList());
         assertEquals("My group", children.getLast().getName());
-        // Membership lives in the entry's groups field and must survive the sidecar round trip
         assertEquals(Optional.of("My group"), entries().getFirst().getField(StandardField.GROUPS));
     }
 
