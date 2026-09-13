@@ -3,6 +3,7 @@ package org.jabref.logic.bibtex.comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.ExplicitGroup;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.mock;
 
 @ResourceLock("Localization.lang")
 @Execution(ExecutionMode.SAME_THREAD)
@@ -30,6 +32,17 @@ class MetaDataDiffTest {
         two.addContentSelector(new ContentSelector(StandardField.AUTHOR, "first", "second"));
 
         assertEquals(Optional.empty(), MetaDataDiff.compare(one, two));
+    }
+
+    @Test
+    void autoRenameOverrideIsReported() {
+        MetaData one = new MetaData();
+        MetaData two = new MetaData();
+        two.setAutoRenameFilesOnChange(false);
+
+        List<MetaDataDiff.Difference> differences = MetaDataDiff.compare(one, two).orElseThrow().getDifferences(mock(GlobalCitationKeyPatterns.class));
+
+        assertEquals(List.of(new MetaDataDiff.Difference(MetaDataDiff.DifferenceType.AUTO_RENAME_FILES_ON_CHANGE, Optional.empty(), Optional.of(false))), differences);
     }
 
     @Test

@@ -106,6 +106,8 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
                     Localization.lang("Library-specific file directory");
             case CONTENT_SELECTOR ->
                     Localization.lang("Content selectors");
+            case AUTO_RENAME_FILES_ON_CHANGE ->
+                    Localization.lang("Auto rename files if entry changes");
         };
     }
 }

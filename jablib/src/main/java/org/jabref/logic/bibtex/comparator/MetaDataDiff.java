@@ -16,6 +16,7 @@ import org.jabref.model.metadata.MetaData;
 
 public class MetaDataDiff {
     public enum DifferenceType {
+        AUTO_RENAME_FILES_ON_CHANGE,
         CONTENT_SELECTOR,
         DEFAULT_KEY_PATTERN,
         ENCODING,
@@ -112,6 +113,7 @@ public class MetaDataDiff {
         addToListIfDiff(changes, DifferenceType.MODE, originalMetaData.getMode(), newMetaData.getMode());
         addToListIfDiff(changes, DifferenceType.LIBRARY_SPECIFIC_FILE_DIRECTORY, originalMetaData.getLibrarySpecificFileDirectory(), newMetaData.getLibrarySpecificFileDirectory());
         addToListIfDiff(changes, DifferenceType.CONTENT_SELECTOR, originalMetaData.getContentSelectors(), newMetaData.getContentSelectors());
+        addToListIfDiff(changes, DifferenceType.AUTO_RENAME_FILES_ON_CHANGE, originalMetaData.getAutoRenameFilesOnChange(), newMetaData.getAutoRenameFilesOnChange());
         return changes;
     }
 
