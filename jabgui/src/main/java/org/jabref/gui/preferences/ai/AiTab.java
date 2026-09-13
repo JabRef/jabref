@@ -2,7 +2,9 @@ package org.jabref.gui.preferences.ai;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -25,6 +27,7 @@ import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
+import org.jabref.logic.ai.models.AiModelService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -41,7 +44,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
     private final BooleanBinding aiDisabled;
 
+    private final BooleanProperty testingConnection = new SimpleBooleanProperty();
+
     private TabPane templatesTabPane;
+    private ComboBox<String> chatModelCombo;
 
     public AiTab(AiPreferences workingAiPreferences) {
         AiService aiService = Injector.instantiateModelOrService(AiService.class);
@@ -100,7 +106,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                           .validate(viewModel.getApiTokenValidationStatus()))
                         // [impl->req~ai.llms.test-connection~1]
                         .button(Localization.lang("Test connection"), this::testConnection,
-                                test -> test.disableWhen(viewModel.disableBasicSettingsProperty())))
+                                test -> test.disableWhen(Bindings.or(viewModel.disableBasicSettingsProperty(), testingConnection))))
 
                 .section(Localization.lang("Expert settings"), expertSettings -> expertSettings
                                 .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
@@ -179,15 +185,19 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     }
 
     private void testConnection() {
+        // A typed model name reaches the view model only on commit.
+        chatModelCombo.commitValue();
         String modelName = viewModel.selectedChatModelProperty().get();
         viewModel.testConnectionTask()
+                 .onRunning(() -> testingConnection.set(true))
+                 .onFinished(() -> testingConnection.set(false))
                  .onSuccess(response -> dialogService.showInformationDialogAndWait(Localization.lang("Test connection"),
                          Localization.lang("Connection successful. Response: %0", response)))
                  .onFailure(exception -> {
                      // A model missing on the server cannot be downloaded through the OpenAI-compatible API, so the user is pointed to the Ollama command.
-                     if (String.valueOf(exception.getMessage()).contains("not found")) {
+                     if (AiModelService.isModelNotFound(exception)) {
                          dialogService.showErrorDialogAndWait(Localization.lang("Connection failed"),
-                                 exception.getMessage() + "\n\n" + Localization.lang("If you use Ollama, download the model with: %0", "ollama pull " + modelName));
+                                 Localization.lang("The model %0 was not found on the server. If you use Ollama, download it with: %1", modelName, "ollama pull " + modelName));
                      } else {
                          dialogService.showErrorDialogAndWait(Localization.lang("Connection failed"), exception);
                      }
@@ -198,6 +208,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     /// Editable combo whose prompt switches to a model-name hint once Hugging Face is selected.
     private ComboBox<String> buildChatModelCombo() {
         ComboBox<String> combo = new ComboBox<>();
+        chatModelCombo = combo;
         combo.setEditable(true);
         combo.setMaxWidth(Double.MAX_VALUE);
         combo.itemsProperty().bind(viewModel.chatModelsProperty());
