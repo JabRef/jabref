@@ -601,7 +601,11 @@ public class JabRefGUI extends Application {
 
             executor.submit(() -> {
                 LOGGER.trace("Closing Git SSH session factory");
-                GitSsh.shutdown();
+                try {
+                    GitSsh.shutdown();
+                } catch (RuntimeException e) {
+                    LOGGER.error("Unable to close Git SSH session factory", e);
+                }
                 LOGGER.trace("Git SSH session factory closed");
             });
 
