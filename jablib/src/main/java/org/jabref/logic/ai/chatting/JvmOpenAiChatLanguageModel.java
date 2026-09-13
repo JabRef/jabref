@@ -82,7 +82,8 @@ public class JvmOpenAiChatLanguageModel implements ChatModel {
                 rootCause = rootCause.getCause();
             }
             String reason = rootCause.getMessage() == null ? rootCause.getClass().getSimpleName() : rootCause.getMessage();
-            throw new RuntimeException(Localization.lang("Could not connect to %0.\n\n%1", baseUrl, reason), e);
+            LOGGER.debug("Could not connect to {}", baseUrl, e);
+            throw new UncheckedIOException(Localization.lang("Could not connect to %0.\n\n%1", baseUrl, reason), e.getCause());
         }
         Usage usage = chatCompletion.usage();
         List<ChatCompletion.Choice> choices = chatCompletion.choices();
