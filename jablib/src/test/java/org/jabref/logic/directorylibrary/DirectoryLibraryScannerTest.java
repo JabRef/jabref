@@ -299,14 +299,31 @@ class DirectoryLibraryScannerTest {
     }
 
     @Test
-    void gitignoredPdfIsNotPairedWithSidecar() throws IOException {
+    void gitignoredPdfIsStillPairedWithSidecar() throws IOException {
+        // PDFs are the library's own content, so .gitignore does not hide them
         Files.writeString(root.resolve(".gitignore"), "*.pdf\n");
         Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
         Files.createFile(root.resolve("smith2020.pdf"));
 
         ScanResult result = scan();
 
-        assertEquals(List.of(), singleEntry(result).getFiles());
+        assertEquals(List.of(new LinkedFile("", Path.of("smith2020.pdf"), "PDF")), singleEntry(result).getFiles());
+    }
+
+    @Test
+    void catchAllGitignoreDoesNotHideLibraryContent() throws IOException {
+        // A scratch PDF folder is commonly a `.gitignore` of `*` plus a `.gitkeep`
+        Files.writeString(root.resolve(".gitignore"), "*\n");
+        Files.createFile(root.resolve(".gitkeep"));
+        Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
+        Files.createFile(root.resolve("smith2020.pdf"));
+        Files.createFile(root.resolve("bare.pdf"));
+
+        ScanResult result = scan();
+
+        List<BibEntry> entries = result.databaseContext().getDatabase().getEntries();
+        assertEquals(2, entries.size());
+        assertEquals(List.of(new LinkedFile("", Path.of("smith2020.pdf"), "PDF")), entries.getFirst().getFiles());
     }
 
     @Test

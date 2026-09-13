@@ -30,13 +30,30 @@ jobs:
       # Both status labels describe the state before the push and are therefore stale: whether the new
       # head requires changes or is ready for review is only known once CI and Qodo have run on it.
       # No label at all is the honest state for that window; "Comment on PR" sets the verdict.
+      # Deliberately not in the concurrency group of "Comment on PR", although that would order the
+      # removal before a still-running evaluation of the previous head: a group holds only one
+      # pending run, and that workflow queues one per completed check, so the removal was cancelled
+      # before it ran on about half of all pushes.
       - name: Remove stale labels on push
         if: github.event.action == 'synchronize' && github.event.sender.login != 'jabref-machine'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: >-
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Without the group above, a run held in the runner queue can reach this point after a
+          # newer push has already been evaluated. Its verdict is the current one and nothing would
+          # recompute it before the next push, so a stale run must leave every label alone -
+          # including "automerge", which the newer push's own run removes.
+          # The second between this read and the edit below needs no closing: a verdict for a head
+          # pushed within it cannot exist yet, as "Comment on PR" defers while checks are pending.
+          # Separate query from test so a failed API call fails the step instead of reading as "moved on".
+          live_head=$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)
+          if [ "$live_head" != "$HEAD_SHA" ]; then
+            echo "⊘ PR moved on since this push - labels left untouched" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
           gh pr edit "$PR_NUMBER" --remove-label "automerge,status: changes-required,status: ready-for-review"
       - name: Get PR info
         id: pr_info
