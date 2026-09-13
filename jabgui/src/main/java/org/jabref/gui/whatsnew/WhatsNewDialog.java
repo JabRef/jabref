@@ -2,6 +2,8 @@ package org.jabref.gui.whatsnew;
 
 import java.util.function.Consumer;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -19,7 +21,8 @@ import org.jabref.logic.whatsnew.News;
 /// The non-modal "What's new" window: the news, *Later* and *Restart to update*.
 ///
 /// It opens on a fetch — "Checking remote…" with a bar, the restart disabled — and [#checked] brings the answer,
-/// so nobody restarts into a version that is already stale; after [#checkFailed] the restart stays disabled.
+/// so nobody restarts into a version that is already stale. From then on the restart is offered exactly while
+/// an update is available; after [#checkFailed] it stays disabled.
 // [impl->req~whats-new.checkout-news~1]
 public class WhatsNewDialog extends BaseDialog<Boolean> {
 
@@ -28,9 +31,12 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
 
     private final BorderPane root = new BorderPane();
     private final ButtonType restart = new ButtonType(Localization.lang("Restart to update"), ButtonBar.ButtonData.APPLY);
+    private final ObservableBooleanValue updateAvailable;
     private final Consumer<String> openUrl;
 
-    public WhatsNewDialog(News news, Consumer<String> openUrl) {
+    /// @param updateAvailable whether the checkout is behind its upstream, as of the latest look
+    public WhatsNewDialog(News news, ObservableBooleanValue updateAvailable, Consumer<String> openUrl) {
+        this.updateAvailable = updateAvailable;
         this.openUrl = openUrl;
         ButtonType later = new ButtonType(Localization.lang("Later"), ButtonBar.ButtonData.CANCEL_CLOSE);
         getDialogPane().getButtonTypes().addAll(later, restart);
@@ -43,11 +49,11 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
         getDialogPane().lookupButton(restart).setDisable(true);
     }
 
-    /// The fetch has answered: `news` replaces the body and *Restart to update* goes live.
+    /// The fetch has answered: `news` replaces the body, and *Restart to update* follows the update availability.
     public void checked(News news) {
         root.setCenter(body(news));
         root.setBottom(null);
-        getDialogPane().lookupButton(restart).setDisable(false);
+        getDialogPane().lookupButton(restart).disableProperty().bind(Bindings.not(updateAvailable));
     }
 
     /// The upstream could not be reached: `news` is what is known so far, and no restart is offered.

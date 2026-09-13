@@ -61,7 +61,8 @@ import org.jspecify.annotations.NullMarked;
 /// before jablib is built, so it calls the `git` binary instead of JGit and takes the sources along.
 ///
 /// "Run" (or closing the window) exits 0 and the `just` recipe starts JabRef; "Cancel run" exits 1 and stops
-/// it. `--stdout` prints instead of opening a window. The first run only records the commit.
+/// it. `--stdout` prints instead of opening a window. The first run only records the commit. A git failure
+/// (a checkpoint rewritten away, no `CHANGELOG.md`) is reported and exits 0: the news never block the start.
 @NullMarked
 public class WhatsNewLauncher {
 
@@ -69,7 +70,15 @@ public class WhatsNewLauncher {
     private static final String LAST_RUN_FILE = "whats-new-last-commit";
     private static final String STDOUT_FLAG = "--stdout";
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
+        try {
+            run(args);
+        } catch (IOException e) {
+            System.err.println("What's new is unavailable: " + e.getMessage());
+        }
+    }
+
+    private static void run(String[] args) throws IOException, InterruptedException {
         Localization.setLanguage(Language.ENGLISH);
         Path lastRunFile = Path.of(git("rev-parse", "--absolute-git-dir").getFirst(), LAST_RUN_FILE);
         String head = git("rev-parse", "HEAD").getFirst();
@@ -82,7 +91,8 @@ public class WhatsNewLauncher {
         Set<String> newCommits = new HashSet<>(git("rev-list", lastRun.get() + ".." + head));
         // Without `--default`, an unset user.email is a failing command, not an empty answer.
         String myEmail = git("config", "--default", "", "--get", "user.email").getFirst();
-        News news = new EntryOrigins(newCommits, myEmail).newsIn(Files.readAllLines(Path.of(CHANGELOG)), head);
+        // The changelog as committed, so its line numbers are the ones the blame below reports.
+        News news = new EntryOrigins(newCommits, myEmail).newsIn(git("show", head + ":" + CHANGELOG), head);
         if (news.isEmpty()) {
             return;
         }

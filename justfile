@@ -27,8 +27,8 @@ run-loop: ensure-gg-cmd
     #!/usr/bin/env sh
     while :; do
         git pull --no-rebase || exit 1
-        just whats-new
-        sh ./gg.cmd gradle :jabgui:run
+        just whats-new || exit $?
+        sh ./gg.cmd gradle :jabgui:run || exit $?
         marker="$(git rev-parse --absolute-git-dir)/restart-requested"
         [ -f "$marker" ] || break
         rm -f "$marker"
@@ -68,7 +68,7 @@ whats-new *FLAGS: ensure-gg-cmd
 
 [windows]
 run-loop: ensure-gg-cmd
-    while ($true) { git pull --no-rebase; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; just whats-new; .\gg.cmd gradle :jabgui:run; $marker = "$(git rev-parse --absolute-git-dir)/restart-requested"; if (-not (Test-Path $marker)) { break }; Remove-Item $marker }
+    while ($true) { git pull --no-rebase; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; just whats-new; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; .\gg.cmd gradle :jabgui:run; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $marker = "$(git rev-parse --absolute-git-dir)/restart-requested"; if (-not (Test-Path $marker)) { break }; Remove-Item $marker }
 
 [windows]
 run: ensure-gg-cmd

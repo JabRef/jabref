@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -38,6 +39,7 @@ class CheckoutTest {
     private static final String MY_EMAIL = "me@example.org";
     private static final String CHANGELOG = "CHANGELOG.md";
     private static final List<String> INITIAL_CHANGELOG = List.of("## [Unreleased]", "### Added", "- An entry by somebody else.");
+    private static final Pattern DESCRIPTION = Pattern.compile("[0-9a-f]{7} \\(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}\\)");
 
     @TempDir
     Path upstreamDirectory;
@@ -133,7 +135,7 @@ class CheckoutTest {
 
         assertEquals(1, checkout.commitsBehind());
         assertNotEquals(checkout.describeHead(), checkout.describeUpstream());
-        assertTrue(checkout.describeUpstream().orElseThrow().matches("[0-9a-f]{7} \\(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}\\)"));
+        assertTrue(DESCRIPTION.matcher(checkout.describeUpstream().orElseThrow()).matches());
         assertEquals(new BlamedChangelog.Line("- An entry I pushed from elsewhere.", Contributor.Me.REMOTE),
                 checkout.blameUpstream().orElseThrow().lines().getLast());
     }

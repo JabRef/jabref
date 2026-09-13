@@ -68,13 +68,19 @@ public final class Checkout {
         }
     }
 
-    /// Fetches from the upstream of the checked-out branch; `false` when that failed (offline, no remote), in
+    /// Fetches from the remote the checked-out branch tracks; `false` when that failed (offline, no remote), in
     /// which case [#commitsBehind()] answers from the last fetch that succeeded. The fetch is anonymous unless
     /// JabRef has git credentials configured; a public clone needs none, which is why
     /// [GitHandler#fetchOnCurrentBranch()], which insists on credentials for every `https` remote, is not used.
     public boolean fetch() {
         try (Git git = handler.open()) {
-            FetchCommand fetch = git.fetch();
+            Repository repository = git.getRepository();
+            @Nullable String remote = new BranchConfig(repository.getConfig(), repository.getBranch()).getRemote();
+            if (remote == null) {
+                LOGGER.debug("The checked-out branch tracks no remote");
+                return false;
+            }
+            FetchCommand fetch = git.fetch().setRemote(remote);
             handler.getCredentialsProvider().ifPresent(fetch::setCredentialsProvider);
             fetch.call();
             return true;
