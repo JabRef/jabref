@@ -625,15 +625,17 @@ public class DBMSProcessor {
     ///
     /// @param data JabRef meta data as map
     public void setSharedMetaData(Map<String, String> data) throws SQLException {
-        // The function upserts and notifies other clients about actually changed values (see setUp)
-        try (PreparedStatement statement = connection.prepareStatement("SELECT upsert_metadata(?, ?)")) {
-            for (Map.Entry<String, String> metaEntry : data.entrySet()) {
-                statement.setString(1, metaEntry.getKey());
-                statement.setString(2, metaEntry.getValue());
-                statement.execute();
+        // PostgreSQL sends the queued notifications at commit, so receivers only pull a complete metadata snapshot.
+        inTransaction(() -> {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT upsert_metadata(?, ?)")) {
+                for (Map.Entry<String, String> metaEntry : data.entrySet()) {
+                    statement.setString(1, metaEntry.getKey());
+                    statement.setString(2, metaEntry.getValue());
+                    statement.execute();
+                }
             }
-        }
-        removeObsoleteGroupTreeMetaData(data.keySet());
+            removeObsoleteGroupTreeMetaData(data.keySet());
+        });
     }
 
     /// Removes group tree formats which are no longer present after a group update.
