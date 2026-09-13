@@ -56,7 +56,7 @@ public class SharedDatabaseErrorTab extends Tab {
         retryButton.setOnAction(_ -> retryAction.run());
 
         Label header = new Label(sharedDatabaseId == null
-                                 ? Localization.lang("Could not connect to %0", databaseName)
+                                 ? Localization.lang("Could not connect to %0.", databaseName)
                                  : Localization.lang("Could not reconnect to shared database %0.", databaseName));
         header.setWrapText(true);
         header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);

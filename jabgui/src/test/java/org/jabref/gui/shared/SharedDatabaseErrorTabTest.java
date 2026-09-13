@@ -75,7 +75,7 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
         interact(() -> tab = new SharedDatabaseErrorTab(null, expertProperties));
 
         assertEquals("literature", tab.getText());
-        assertEquals("Could not connect to literature", ((Label) tab.getContent().lookup(".welcome-header-label")).getText());
+        assertEquals("Could not connect to literature.", ((Label) tab.getContent().lookup(".welcome-header-label")).getText());
     }
 
     @Test
