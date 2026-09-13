@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -25,23 +26,30 @@ import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.event.EntriesEventSource;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -263,6 +271,34 @@ class SaveDatabaseActionTest {
         assertEquals("external content", Files.readString(file));
         assertEquals(SaveDatabaseAction.SaveResult.FAILURE, result);
         verify(libraryTab, never()).resetChangedProperties();
+    }
+
+    @Test
+    @ExtendWith(JavaFxExtension.class)
+    void saveReportsFailureAndDoesNotReplaceFileWhenSaveMutationFails() throws IOException {
+        AtomicBoolean failSaveMutation = new AtomicBoolean();
+        BibEntry entry = new BibEntry() {
+            @Override
+            public Optional<FieldChange> setField(Field field, @Nullable String value, EntriesEventSource eventSource) {
+                if (failSaveMutation.get() && eventSource == EntriesEventSource.SAVE_ACTION) {
+                    throw new IllegalArgumentException("expected failure");
+                }
+                return super.setField(field, value, eventSource);
+            }
+        };
+        entry.setField(StandardField.TITLE, "UPPERCASE TITLE");
+        failSaveMutation.set(true);
+        BibDatabase database = new BibDatabase(List.of(entry));
+        saveDatabaseAction = createSaveDatabaseActionForBibDatabase(database);
+        when(metaData.getSaveActions()).thenReturn(Optional.of(new FieldFormatterCleanupActions(
+                true,
+                List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())))));
+
+        SaveDatabaseAction.SaveResult result = saveDatabaseAction.save();
+
+        assertEquals(SaveDatabaseAction.SaveResult.FAILURE, result);
+        assertEquals("", Files.readString(file));
+        verify(libraryTab, never()).registerUndoableChanges(any());
     }
 
     @Test

@@ -1,4 +1,4 @@
-name: Label bug fixes for stable
+name: Inherit label and milestone from linked issue
 
 # [impl->req~ci.port-to-other-branch.label-driven-ports~1]
 # [impl->adr~single-stable-branch-with-automatic-ports~1]
@@ -6,6 +6,9 @@ name: Label bug fixes for stable
 # first time: at creation, or when an edit of the body adds a new issue link. A push never
 # triggers this, and a link that was already there never counts again - so a maintainer's
 # decision to remove (or add) the label by hand sticks.
+# The same newly linked issue also lends its milestone to a PR without one, so that reviewers
+# can filter PRs by milestone. The reverse direction (issue milestoned while the PR is open)
+# is on-issue-milestoned.yml.
 
 on:
   pull_request_target:
@@ -48,16 +51,24 @@ jobs:
             echo "No newly linked issue" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
+          pr_milestone=$(gh pr view "$PR_NUMBER" --json milestone --jq '.milestone.number // ""')
+          labeled=false
           for issue in $new_issues; do
-            type=$(gh api graphql -F number="$issue" -f query='
+            IFS=' ' read -r type milestone < <(gh api graphql -F number="$issue" -f query='
               query($number: Int!) {
-                repository(owner: "JabRef", name: "jabref") { issue(number: $number) { issueType { name } } }
-              }' --jq '.data.repository.issue.issueType.name // "none"' || echo "unknown")
-            echo "Newly linked #$issue has type \`$type\`" >> "$GITHUB_STEP_SUMMARY"
+                repository(owner: "JabRef", name: "jabref") { issue(number: $number) { issueType { name } milestone { number } } }
+              }' --jq '.data.repository.issue | "\(.issueType.name // "none") \(.milestone.number // "")"' || echo "unknown")
+            echo "Newly linked #$issue has type \`$type\` and milestone \`${milestone:-none}\`" >> "$GITHUB_STEP_SUMMARY"
+            # Only a PR without milestone inherits one - a milestone chosen by hand sticks.
+            if [ -z "$pr_milestone" ] && [ -n "$milestone" ]; then
+              gh api -X PATCH "repos/JabRef/jabref/issues/$PR_NUMBER" -F milestone="$milestone"
+              pr_milestone=$milestone
+              echo "Set milestone of #$issue" >> "$GITHUB_STEP_SUMMARY"
+            fi
             # GitHub stores the type name in lower case ("bug") while the issue template writes "Bug"
-            if [ "${type,,}" = "bug" ]; then
+            if [ "$labeled" = false ] && [ "${type,,}" = "bug" ]; then
               gh pr edit "$PR_NUMBER" --add-label "dev: into-stable"
               echo "Added \`dev: into-stable\`" >> "$GITHUB_STEP_SUMMARY"
-              exit 0
+              labeled=true
             fi
           done
