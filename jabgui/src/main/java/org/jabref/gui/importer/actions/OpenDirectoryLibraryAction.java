@@ -160,8 +160,12 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
         libraryTab.updateTabTitle(false);
 
         BibDatabaseContext databaseContext = scanResult.databaseContext();
-        Function<BibEntry, Optional<String>> fileNameGenerator = entry -> FileUtil.createFileNameFromPattern(
-                databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileNamePattern());
+        // Evaluated per write, so a changed preference (global or library) takes effect immediately
+        // [impl->req~directory-library.pattern-rename~2]
+        Function<BibEntry, Optional<String>> fileNameGenerator = entry ->
+                databaseContext.getMetaData().getAutoRenameFilesOnChange().orElse(preferences.getFilePreferences().shouldAutoRenameFilesOnChange())
+                ? FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileNamePattern())
+                : Optional.empty();
         GuiGitConflictResolverStrategy conflictResolver = new GuiGitConflictResolverStrategy(
                 new GitConflictResolverDialog(dialogService, preferences, stateManager));
         DirectoryLibrarySynchronizer synchronizer = new DirectoryLibrarySynchronizer(

@@ -43,7 +43,7 @@ import static java.util.function.Predicate.not;
 /// The debounce, retry, and reporting of pending writes live in [PendingWrites]; this class
 /// only knows how to write one file. Callers hold the synchronizer's monitor.
 // [impl->req~directory-library.write-back~2]
-// [impl->req~directory-library.pattern-rename~1]
+// [impl->req~directory-library.pattern-rename~2]
 @NullMarked
 class SidecarWriteBack {
 

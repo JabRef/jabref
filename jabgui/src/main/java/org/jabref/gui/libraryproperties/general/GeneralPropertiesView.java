@@ -2,9 +2,11 @@ package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -37,6 +39,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private TextField userSpecificFileDirectory;
     @FXML private TextField latexFileDirectory;
     @FXML private TextField keywordSeparator;
+    @FXML private ComboBox<Optional<Boolean>> autoRenameFilesOnChange;
     @FXML private Button libSpecificFileDirSwitchId;
     @FXML private Button userSpecificFileDirSwitchId;
     @FXML private Button laTexSpecificFileDirSwitchId;
@@ -100,6 +103,14 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         UnaryOperator<TextFormatter.Change> singleCharacterFilter =
                 change -> change.getControlNewText().length() <= 1 ? change : null;
         keywordSeparator.setTextFormatter(new TextFormatter<>(singleCharacterFilter));
+
+        boolean globalAutoRename = preferences.getFilePreferences().shouldAutoRenameFilesOnChange();
+        new ViewModelListCellFactory<Optional<Boolean>>()
+                .withText(choice -> choice.map(GeneralPropertiesView::yesOrNo)
+                                          .orElse(Localization.lang("Use global preference (%0)", yesOrNo(globalAutoRename))))
+                .install(autoRenameFilesOnChange);
+        autoRenameFilesOnChange.setItems(FXCollections.observableArrayList(Optional.empty(), Optional.of(true), Optional.of(false)));
+        autoRenameFilesOnChange.valueProperty().bindBidirectional(viewModel.autoRenameFilesOnChangeProperty());
 
         userSpecificFileDirectoryTooltip.setText(Localization.lang("User-specific file directory: %0", preferences.getFilePreferences().getUserAndHost()));
         userSpecificFileDirectory.setTooltip(userSpecificFileDirectoryTooltip);
@@ -178,5 +189,9 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML
     void laTexSpecificFileDirPathSwitch() {
         viewModel.togglePath(viewModel.laTexFileDirectoryProperty());
+    }
+
+    private static String yesOrNo(boolean value) {
+        return value ? Localization.lang("Yes") : Localization.lang("No");
     }
 }

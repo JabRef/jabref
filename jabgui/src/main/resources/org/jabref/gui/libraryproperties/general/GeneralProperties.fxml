@@ -135,6 +135,10 @@
                GridPane.columnIndex="0" GridPane.rowIndex="7"/>
         <TextField fx:id="keywordSeparator" prefWidth="50.0" maxWidth="50.0"
                    GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+        <Label text="%Auto rename files if entry changes"
+               GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+        <ComboBox fx:id="autoRenameFilesOnChange" prefWidth="150.0"
+                  GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="8"/>
 
     </GridPane>
 </fx:root>

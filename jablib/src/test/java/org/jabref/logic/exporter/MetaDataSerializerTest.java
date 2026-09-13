@@ -71,6 +71,13 @@ public class MetaDataSerializerTest {
     }
 
     @Test
+    void serializeAutoRenameFilesOnChangeOverride() {
+        metaData.setAutoRenameFilesOnChange(false);
+
+        assertEquals(Map.of("autoRenameFilesOnChange", "false;"), MetaDataSerializer.getSerializedStringMap(metaData, pattern));
+    }
+
+    @Test
     void serializeSingleSaveAction() {
         FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));

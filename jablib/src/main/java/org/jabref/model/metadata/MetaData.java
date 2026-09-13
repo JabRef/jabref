@@ -68,6 +68,7 @@ public class MetaData {
     public static final String GIT_AUTO_PULL = "gitAutoPull";
     public static final String GIT_AUTO_COMMIT = "gitAutoCommit";
     public static final String GIT_AUTO_PUSH = "gitAutoPush";
+    public static final String AUTO_RENAME_FILES_ON_CHANGE = "autoRenameFilesOnChange";
 
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
@@ -100,6 +101,8 @@ public class MetaData {
     private boolean containsSearchGroups;
 
     private boolean gitAutoPull;
+    /// Library override of the global "auto rename files if entry changes" preference; absent = use the global one
+    @Nullable private Boolean autoRenameFilesOnChange;
     private boolean gitAutoCommit;
     private boolean gitAutoPush;
 
@@ -181,6 +184,20 @@ public class MetaData {
 
     public boolean isGitAutoPull() {
         return gitAutoPull;
+    }
+
+    public Optional<Boolean> getAutoRenameFilesOnChange() {
+        return Optional.ofNullable(autoRenameFilesOnChange);
+    }
+
+    public void setAutoRenameFilesOnChange(boolean autoRenameFilesOnChange) {
+        this.autoRenameFilesOnChange = autoRenameFilesOnChange;
+        postChange();
+    }
+
+    public void clearAutoRenameFilesOnChange() {
+        autoRenameFilesOnChange = null;
+        postChange();
     }
 
     public void setGitAutoPull(boolean gitAutoPull) {
@@ -463,6 +480,7 @@ public class MetaData {
         gitAutoPull = other.gitAutoPull;
         gitAutoCommit = other.gitAutoCommit;
         gitAutoPush = other.gitAutoPush;
+        autoRenameFilesOnChange = other.autoRenameFilesOnChange;
 
         other.getGroups()
              .map(GroupTreeNode::copySubtree)
@@ -579,18 +597,19 @@ public class MetaData {
                 && Objects.equals(aiLibraryId, that.aiLibraryId)
                 && (gitAutoPull == that.gitAutoPull)
                 && (gitAutoCommit == that.gitAutoCommit)
-                && (gitAutoPush == that.gitAutoPush);
+                && (gitAutoPush == that.gitAutoPush)
+                && Objects.equals(autoRenameFilesOnChange, that.autoRenameFilesOnChange);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId, gitAutoPull, gitAutoCommit, gitAutoPush);
+                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId, gitAutoPull, gitAutoCommit, gitAutoPush, autoRenameFilesOnChange);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + ", gitAutoPull=" + gitAutoPull + ", gitAutoCommit=" + gitAutoCommit + ", gitAutoPush=" + gitAutoPush + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + ", gitAutoPull=" + gitAutoPull + ", gitAutoCommit=" + gitAutoCommit + ", gitAutoPush=" + gitAutoPush + ", autoRenameFilesOnChange=" + autoRenameFilesOnChange + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {

@@ -2,6 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jabref.logic.importer.fileformat.HayagrivaMapping;
 import org.jabref.model.entry.BibEntry;
@@ -242,6 +243,27 @@ class HayagrivaEntryWriterTest {
                     comment: shared comment
                     comment-koppor: per-user comment
                 """), node);
+    }
+
+    @Test
+    void mergeWritesGroupMembershipAndReadsItBack() {
+        ObjectNode node = parseEntryNode("""
+                key:
+                    type: article
+                    title: Some Title
+                """);
+        BibEntry entry = HayagrivaMapping.toBibEntry("key", node);
+        entry.setField(StandardField.GROUPS, "Reading list, Favorites");
+
+        writer.mergeIntoNode(entry, node);
+
+        assertEquals(parseEntryNode("""
+                key:
+                    type: article
+                    title: Some Title
+                    groups: Reading list, Favorites
+                """), node);
+        assertEquals(Optional.of("Reading list, Favorites"), HayagrivaMapping.toBibEntry("key", node).getField(StandardField.GROUPS));
     }
 
     @Test

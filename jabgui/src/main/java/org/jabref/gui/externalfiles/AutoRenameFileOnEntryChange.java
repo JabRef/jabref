@@ -14,17 +14,19 @@ import org.slf4j.LoggerFactory;
 public class AutoRenameFileOnEntryChange {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoRenameFileOnEntryChange.class);
 
+    private final BibDatabaseContext bibDatabaseContext;
     private final FilePreferences filePreferences;
     private final RenamePdfCleanup renamePdfCleanup;
 
     public AutoRenameFileOnEntryChange(BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
+        this.bibDatabaseContext = bibDatabaseContext;
         this.filePreferences = filePreferences;
         renamePdfCleanup = new RenamePdfCleanup(false, () -> bibDatabaseContext, filePreferences);
     }
 
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        if (!filePreferences.shouldAutoRenameFilesOnChange()
+        if (!bibDatabaseContext.getMetaData().getAutoRenameFilesOnChange().orElse(filePreferences.shouldAutoRenameFilesOnChange())
                 || filePreferences.getFileNamePattern().isEmpty()
                 || filePreferences.getFileNamePattern() == null) {
             return;

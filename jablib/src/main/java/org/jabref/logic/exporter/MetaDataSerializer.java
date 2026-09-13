@@ -54,6 +54,8 @@ public class MetaDataSerializer {
         if (metaData.isGitAutoPush()) {
             stringyMetaData.put(MetaData.GIT_AUTO_PUSH, List.of("true"));
         }
+        metaData.getAutoRenameFilesOnChange().ifPresent(
+                autoRename -> stringyMetaData.put(MetaData.AUTO_RENAME_FILES_ON_CHANGE, List.of(autoRename.toString())));
         stringyMetaData.putAll(serializeCiteKeyPatterns(metaData, globalCiteKeyPatterns));
         metaData.getMode().ifPresent(
                 mode -> stringyMetaData.put(MetaData.DATABASE_TYPE, List.of(mode.getAsString())));

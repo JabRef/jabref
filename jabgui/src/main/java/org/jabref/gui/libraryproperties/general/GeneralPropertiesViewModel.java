@@ -47,6 +47,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
+    private final ObjectProperty<Optional<Boolean>> autoRenameFilesOnChangeProperty = new SimpleObjectProperty<>(Optional.empty());
 
     private final Validator librarySpecificFileDirectoryValidator;
     private final Validator userSpecificFileDirectoryValidator;
@@ -91,6 +92,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
         keywordSeparatorProperty.setValue(metaData.getKeywordSeparator().map(Object::toString).orElse(""));
+        autoRenameFilesOnChangeProperty.setValue(metaData.getAutoRenameFilesOnChange());
     }
 
     @Override
@@ -120,6 +122,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         }
 
         storeKeywordSeparator(metaData);
+        autoRenameFilesOnChangeProperty.getValue().ifPresentOrElse(metaData::setAutoRenameFilesOnChange, metaData::clearAutoRenameFilesOnChange);
     }
 
     /// The separator and the group definitions the migration rewrites are both metadata, so the
@@ -223,6 +226,10 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     public StringProperty keywordSeparatorProperty() {
         return this.keywordSeparatorProperty;
+    }
+
+    public ObjectProperty<Optional<Boolean>> autoRenameFilesOnChangeProperty() {
+        return this.autoRenameFilesOnChangeProperty;
     }
 
     private Path getBrowseDirectory(String configuredDir) {

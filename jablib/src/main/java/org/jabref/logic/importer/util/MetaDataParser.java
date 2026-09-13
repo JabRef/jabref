@@ -161,6 +161,8 @@ public class MetaDataParser {
                 metaData.setGitAutoCommit(Boolean.parseBoolean(getSingleItem(values)));
             } else if (MetaData.GIT_AUTO_PUSH.equals(entry.getKey())) {
                 metaData.setGitAutoPush(Boolean.parseBoolean(getSingleItem(values)));
+            } else if (MetaData.AUTO_RENAME_FILES_ON_CHANGE.equals(entry.getKey())) {
+                metaData.setAutoRenameFilesOnChange(Boolean.parseBoolean(getSingleItem(values)));
             } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
             } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {

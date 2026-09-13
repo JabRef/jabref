@@ -59,9 +59,10 @@ public final class HayagrivaMapping {
     /// order. `title` and `url` are "formattable strings" (scalar or map with a `value` key) and
     /// are handled separately, as are the person lists and `serial-number`.
     ///
-    /// `comment` (like the per-user `comment-<name>` keys, see [#USER_COMMENT_PREFIX]) is not
-    /// part of the Hayagriva specification but a JabRef extension key: the Hayagriva parser
-    /// silently ignores keys it does not know, so such files stay loadable by Typst.
+    /// `comment` (like the per-user `comment-<name>` keys, see [#USER_COMMENT_PREFIX]) and
+    /// `groups` (explicit group membership) are not part of the Hayagriva specification but
+    /// JabRef extension keys: the Hayagriva parser silently ignores keys it does not know, so
+    /// such files stay loadable by Typst.
     public static final SequencedMap<String, Field> SCALAR_FIELDS;
 
     /// `serial-number` sub-keys with a dedicated BibEntry field. `arxiv` is handled separately
@@ -111,6 +112,7 @@ public final class HayagrivaMapping {
         scalars.put("note", StandardField.NOTE);
         scalars.put("abstract", StandardField.ABSTRACT);
         scalars.put("comment", StandardField.COMMENT);
+        scalars.put("groups", StandardField.GROUPS);
         SCALAR_FIELDS = Collections.unmodifiableSequencedMap(scalars);
 
         SequencedMap<String, Field> serialNumbers = new LinkedHashMap<>();
