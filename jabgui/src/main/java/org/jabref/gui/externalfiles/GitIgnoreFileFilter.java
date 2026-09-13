@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +25,11 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
 
     public GitIgnoreFileFilter(Path path) {
         // A .gitignore only applies inside a git repository, so never look above the repository root
-        Path repositoryRoot = path;
+        @Nullable Path repositoryRoot = path;
         while ((repositoryRoot != null) && !Files.exists(repositoryRoot.resolve(".git"))) {
             repositoryRoot = repositoryRoot.getParent();
         }
-        Path currentPath = null;
+        @Nullable Path currentPath = null;
         if (repositoryRoot != null) {
             currentPath = path;
             while (!Files.exists(currentPath.resolve(".gitignore")) && !currentPath.equals(repositoryRoot)) {

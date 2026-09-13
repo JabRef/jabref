@@ -39,6 +39,7 @@ class UnlinkedFilesCrawlerTest {
     @Test
     void ignoresFilesInNamedSubdirectoryAccordingToGitignore(@TempDir Path testRoot) throws IOException {
         // This mirrors GitIgnoreFileFilterTest::checkDirectoryGitIgnoreSubDir but tests via the crawler
+        Files.createDirectory(testRoot.resolve(".git"));
         Files.writeString(testRoot.resolve(".gitignore"), """
                 ignore/.*
                 ignore/*
@@ -66,6 +67,7 @@ class UnlinkedFilesCrawlerTest {
 
     @Test
     void minimalGitIgnore(@TempDir Path testRoot) throws IOException {
+        Files.createDirectory(testRoot.resolve(".git"));
         Files.writeString(testRoot.resolve(".gitignore"), """
                 *.png
                 """);
