@@ -203,6 +203,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
         assertTrue(clipBoardManager.htmlContent.get().contains("<strong>bold</strong>"));
     }
 
+    // [utest->req~ai.chat.markdown-tables~1]
     @Test
     void setMarkdownRendersTableWithAlignedColumns() {
         MarkdownTextFlow textFlow = markdownTextFlow();
