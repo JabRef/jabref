@@ -221,6 +221,19 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void setMarkdownRendersTableColumnAlignment() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> textFlow.setMarkdown("""
+                | left | center | right |
+                |:-----|:------:|------:|
+                | a | b | c |
+                """));
+
+        assertTrue(renderedText(textFlow).endsWith("a    │   b    │     c"));
+    }
+
+    @Test
     void setMarkdownKeepsQuotedTableNextToQuoteMarker() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 

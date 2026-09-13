@@ -507,6 +507,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             }
 
             List<List<String>> rows = new ArrayList<>();
+            List<TableCell.Alignment> alignments = new ArrayList<>();
             int headerRowCount = 0;
             for (Node section : table.getChildren()) {
                 if (!(section instanceof TableHead) && !(section instanceof TableBody)) {
@@ -515,7 +516,10 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 for (Node row : section.getChildren()) {
                     List<String> cells = new ArrayList<>();
                     for (Node cell : row.getChildren()) {
-                        if (cell instanceof TableCell) {
+                        if (cell instanceof TableCell tableCell) {
+                            if (alignments.size() == cells.size()) {
+                                alignments.add(tableCell.getAlignment());
+                            }
                             cells.add(new TextCollectingVisitor().collectAndGetText(cell).strip());
                         }
                     }
@@ -547,7 +551,13 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 StringJoiner line = new StringJoiner(" │ ");
                 for (int i = 0; i < columnCount; i++) {
                     String cell = i < rows.get(r).size() ? rows.get(r).get(i) : "";
-                    line.add(cell + " ".repeat(widths[i] - cell.length()));
+                    int padding = widths[i] - cell.length();
+                    int leftPadding = switch (alignments.get(i)) {
+                        case RIGHT -> padding;
+                        case CENTER -> padding / 2;
+                        case null, default -> 0;
+                    };
+                    line.add(" ".repeat(leftPadding) + cell + " ".repeat(padding - leftPadding));
                 }
                 lines.add(line.toString().stripTrailing());
             }
