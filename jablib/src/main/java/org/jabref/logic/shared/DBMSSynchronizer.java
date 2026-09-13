@@ -121,8 +121,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     // Buffered micro-edits; set from EventBus dispatch threads, taken by the database worker
     private final AtomicReference<BibEntry> entryWithPendingChanges = new AtomicReference<>();
     private final ReentrantLock pullLock = new ReentrantLock();
-    // Metadata notifications arrive once per changed key; coalesce pending pulls.
-    private final AtomicBoolean metadataPullPending = new AtomicBoolean();
+    // Metadata notifications arrive once per changed key. Keep one worker scheduled while retaining
+    // the fact that another notification arrived during its current read.
+    private final AtomicBoolean metadataPullScheduled = new AtomicBoolean();
+    private final AtomicBoolean metadataPullRequested = new AtomicBoolean();
     // Cleared when the connection is found dead; set again by the reconnect loop
     private final AtomicBoolean connected = new AtomicBoolean(true);
     private volatile boolean closed;
@@ -352,21 +354,39 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     private void pullMetaDataFromNotification() {
-        if (!metadataPullPending.compareAndSet(false, true)) {
+        metadataPullRequested.set(true);
+        scheduleMetadataPull();
+    }
+
+    private void scheduleMetadataPull() {
+        if (!metadataPullScheduled.compareAndSet(false, true)) {
             return;
         }
         try {
             syncExecutor.execute(() -> {
                 try {
-                    pullMetaDataFromDatabase();
+                    do {
+                        metadataPullRequested.set(false);
+                        pullMetaDataFromDatabase();
+                    } while (metadataPullRequested.get());
                 } finally {
-                    metadataPullPending.set(false);
+                    metadataPullScheduled.set(false);
+                    // A notification may have arrived after the last loop check but before the
+                    // scheduled state was cleared. Schedule a new worker rather than dropping it.
+                    if (metadataPullRequested.get()) {
+                        scheduleMetadataPull();
+                    }
                 }
             });
         } catch (RuntimeException e) {
-            metadataPullPending.set(false);
+            metadataPullScheduled.set(false);
             throw e;
         }
+    }
+
+    @VisibleForTesting
+    Map<String, String> readSharedMetaData() throws SQLException {
+        return dbmsProcessor.getSharedMetaData();
     }
 
     private void pullMetaDataFromDatabase() {
@@ -375,7 +395,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
         Map<String, String> sharedMetaData;
         try {
-            sharedMetaData = dbmsProcessor.getSharedMetaData();
+            sharedMetaData = readSharedMetaData();
         } catch (SQLException e) {
             LOGGER.error("Could not fetch metadata from the shared database", e);
             checkCurrentConnection();
