@@ -220,7 +220,7 @@ class AllFieldsTabTest {
     /// must not stay reachable from the entry - otherwise arrow-keying through a library would pile
     /// up editor generations. Guards the reasoning documented in `FieldsEditorTab#setupPanel`.
     @Test
-    void discardedEditorsAreNotRetainedAfterRebuild() throws InterruptedException {
+    void discardedEditorsAreNotRetainedAfterRebuild() {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Key2021")
                 .withField(StandardField.TITLE, "start")
@@ -230,7 +230,7 @@ class AllFieldsTabTest {
 
         List<FieldEditorFX> everCreated = new ArrayList<>();
         for (int rebuild = 0; rebuild < 10; rebuild++) {
-            runOnFxThreadAndWait(() -> {
+            JavaFxExtension.invokeAndWait(() -> {
                 tab.bindToEntry(entry);
                 everCreated.addAll(tab.editors.values());
             });
