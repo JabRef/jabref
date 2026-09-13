@@ -21,6 +21,9 @@ runs:
           echo "Building $f..."
           jbang build --fresh "$f"
         done
+    - name: Changelog cherry-pick merge driver self-test
+      shell: bash
+      run: jbang run --fresh .jbang/ChangelogCherryPickMergeDriver.java --self-test
     - name: JabKit launcher supports --help
       shell: bash
       run: jbang run --fresh .jbang/JabKitLauncher.java --help

@@ -253,8 +253,7 @@ public class MainTableColumnFactory {
                                                                               .stream())
                                                    .toList();
         if (!groupIcons.isEmpty()) {
-            HBox container = new HBox();
-            container.setSpacing(2);
+            HBox container = new HBox(4);
             container.setMinWidth(10);
             container.setAlignment(Pos.CENTER_LEFT);
             container.setPadding(new Insets(0, 2, 0, 2));

@@ -26,8 +26,11 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -51,6 +54,49 @@ class InMemoryLuceneSearchBackendTest {
 
     @Test
     void searchesLinkedFileContentsWithoutPostgres() throws IOException, URISyntaxException {
+        assertEquals(
+                Set.of("minimal-sentence-case", "minimal-all-upper-case", "minimal-mixed-case"),
+                search("comma", EnumSet.of(SearchFlags.FULLTEXT)));
+    }
+
+    /// [Issue 9482](https://github.com/JabRef/jabref/issues/9482): a quotation mark used to make the search throw.
+    @Test
+    void searchesPhraseInLinkedFileContents() throws IOException, URISyntaxException {
+        assertEquals(
+                Set.of("minimal-sentence-case", "minimal-all-upper-case", "minimal-mixed-case"),
+                search("\"short sentence\"", EnumSet.of(SearchFlags.FULLTEXT)));
+    }
+
+    @Test
+    void searchesPhraseWordsSeparatelyOnMissingClosingQuote() throws IOException, URISyntaxException {
+        assertEquals(
+                Set.of("minimal-sentence-case", "minimal-all-upper-case", "minimal-mixed-case"),
+                search("\"short sentence", EnumSet.of(SearchFlags.FULLTEXT)));
+    }
+
+    @Test
+    void findsNothingForPhraseNotContainedInLinkedFileContents() throws IOException, URISyntaxException {
+        assertEquals(Set.of(), search("\"sentence short\"", EnumSet.of(SearchFlags.FULLTEXT)));
+    }
+
+    /// Lucene reads `"` as syntax of its own regular expression dialect, `java.util.regex` does not.
+    /// The metadata results still have to arrive, only the linked files are left out.
+    // [utest->req~jabgui.search.fulltext.lenient-query-parsing~1]
+    @Test
+    void keepsMetadataResultsOnRegularExpressionLuceneCannotParse() throws IOException, URISyntaxException {
+        assertEquals(
+                Set.of("minimal-mixed-case"),
+                search("\"?minimal-mixed-case", EnumSet.of(SearchFlags.FULLTEXT, SearchFlags.REGULAR_EXPRESSION)));
+    }
+
+    // [utest->req~jabgui.search.fulltext.lenient-query-parsing~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"\"", "\"a", "a\"", "a\"b", "<", "a<b"})
+    void doesNotThrowOnRegularExpressionLuceneCannotParse(String searchExpression) {
+        assertDoesNotThrow(() -> search(searchExpression, EnumSet.of(SearchFlags.FULLTEXT, SearchFlags.REGULAR_EXPRESSION)));
+    }
+
+    private Set<String> search(String searchExpression, EnumSet<SearchFlags> searchFlags) throws IOException, URISyntaxException {
         BibDatabaseContext databaseContext = initializeDatabaseContext("test-library-with-attached-files.bib");
         searchBackend = new InMemoryLuceneSearchBackend(
                 databaseContext,
@@ -58,16 +104,12 @@ class InMemoryLuceneSearchBackendTest {
                 FilePreferences.getDefault(),
                 TASK_EXECUTOR);
 
-        SearchQuery searchQuery = new SearchQuery("comma", EnumSet.of(SearchFlags.FULLTEXT));
-
-        Set<String> matchedCitationKeys = searchBackend.search(searchQuery)
-                                                       .getMatchedEntries()
-                                                       .stream()
-                                                       .map(entryId -> databaseContext.getDatabase().getEntryById(entryId).orElseThrow())
-                                                       .map(entry -> entry.getCitationKey().orElseThrow())
-                                                       .collect(Collectors.toUnmodifiableSet());
-
-        assertEquals(Set.of("minimal-sentence-case", "minimal-all-upper-case", "minimal-mixed-case"), matchedCitationKeys);
+        return searchBackend.search(new SearchQuery(searchExpression, searchFlags))
+                            .getMatchedEntries()
+                            .stream()
+                            .map(entryId -> databaseContext.getDatabase().getEntryById(entryId).orElseThrow())
+                            .map(entry -> entry.getCitationKey().orElseThrow())
+                            .collect(Collectors.toUnmodifiableSet());
     }
 
     private BibDatabaseContext initializeDatabaseContext(String testFile) throws URISyntaxException, IOException {
