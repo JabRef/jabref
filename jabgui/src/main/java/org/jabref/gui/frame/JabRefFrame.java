@@ -819,14 +819,19 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     @Override
     public void showSharedDatabaseErrorTab(SharedDatabaseErrorTab errorTab) {
-        // A repeated attempt for the same connection replaces its earlier error tab instead of piling up retries;
-        // a remembered database keeps its id through the replacement
-        tabbedPane.getTabs().stream()
-                  .filter(tab -> (tab instanceof SharedDatabaseErrorTab existing)
-                          && existing.getConnectionProperties().equals(errorTab.getConnectionProperties()))
-                  .findFirst()
-                  .flatMap(tab -> ((SharedDatabaseErrorTab) tab).getSharedDatabaseId())
-                  .ifPresent(errorTab::rememberAs);
+        // A repeated attempt for the same connection does not pile up retries. The tab of a remembered database stays,
+        // its retry keeps the id and so the database stays remembered; it merely shows the newer error.
+        Optional<SharedDatabaseErrorTab> remembered = tabbedPane.getTabs().stream()
+                                                                .filter(SharedDatabaseErrorTab.class::isInstance)
+                                                                .map(SharedDatabaseErrorTab.class::cast)
+                                                                .filter(existing -> existing.getConnectionProperties().equals(errorTab.getConnectionProperties()))
+                                                                .filter(existing -> existing.getSharedDatabaseId().isPresent())
+                                                                .findFirst();
+        if (remembered.isPresent()) {
+            errorTab.getError().ifPresent(remembered.get()::showError);
+            tabbedPane.getSelectionModel().select(remembered.get());
+            return;
+        }
         removeSharedDatabaseErrorTabsFor(errorTab.getConnectionProperties());
         tabbedPane.getTabs().add(errorTab);
         tabbedPane.getSelectionModel().select(errorTab);

@@ -100,11 +100,11 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
     }
 
     @Test
-    void rememberAsKeepsTheIdOfAReplacedTab() {
-        SharedDatabaseErrorTab dialogTab = new SharedDatabaseErrorTab(null, tab.getConnectionProperties());
-        dialogTab.rememberAs("shared-1");
+    void showErrorKeepsTheErrorForAReplacingTab() {
+        SQLException stillRefused = new SQLException("Still refused");
+        interact(() -> tab.showError(stillRefused));
 
-        assertEquals(Optional.of("shared-1"), dialogTab.getSharedDatabaseId());
+        assertEquals(Optional.of(stillRefused), tab.getError());
     }
 
     @Test

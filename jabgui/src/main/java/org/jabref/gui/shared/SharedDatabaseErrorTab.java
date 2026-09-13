@@ -32,13 +32,14 @@ public class SharedDatabaseErrorTab extends Tab {
     /// Identifies the label carrying the connection error, for lookups in tests.
     static final String MESSAGE_ID = "shared-database-error-message";
 
-    private @Nullable String sharedDatabaseId;
+    private final @Nullable String sharedDatabaseId;
     private final DBMSConnectionProperties connectionProperties;
     private final Label message = new Label();
     private final Button retryButton = new Button(Localization.lang("Retry"));
 
     private Runnable retryAction = () -> {
     };
+    private @Nullable Throwable error;
 
     public SharedDatabaseErrorTab(@Nullable String sharedDatabaseId, DBMSConnectionProperties connectionProperties) {
         this.sharedDatabaseId = sharedDatabaseId;
@@ -88,11 +89,6 @@ public class SharedDatabaseErrorTab extends Tab {
         return Optional.ofNullable(sharedDatabaseId);
     }
 
-    /// A dialog attempt for a remembered database that fails again inherits the id, so the database stays remembered
-    public void rememberAs(String sharedDatabaseId) {
-        this.sharedDatabaseId = sharedDatabaseId;
-    }
-
     /// Called once a new attempt for this database has started: the loading tab takes this tab's place. Removing the
     /// tab only then keeps it when the attempt is cancelled before it starts (e.g. a declined overwrite confirmation).
     public void close() {
@@ -104,6 +100,11 @@ public class SharedDatabaseErrorTab extends Tab {
     }
 
     public void showError(Throwable exception) {
+        this.error = exception;
         message.setText(Optional.ofNullable(exception.getMessage()).orElseGet(exception::toString));
+    }
+
+    public Optional<Throwable> getError() {
+        return Optional.ofNullable(error);
     }
 }
