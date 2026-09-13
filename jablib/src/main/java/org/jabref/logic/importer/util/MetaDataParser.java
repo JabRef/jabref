@@ -168,6 +168,7 @@ public class MetaDataParser {
                     metaData.setAutoRenameFilesOnChange(Boolean.parseBoolean(value));
                 } else {
                     LOGGER.warn("Ignoring invalid value '{}' for {}", value, MetaData.AUTO_RENAME_FILES_ON_CHANGE);
+                    metaData.clearAutoRenameFilesOnChange();
                 }
             } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
