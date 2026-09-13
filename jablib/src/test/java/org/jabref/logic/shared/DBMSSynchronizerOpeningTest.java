@@ -16,8 +16,8 @@ import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,6 +58,6 @@ class DBMSSynchronizerOpeningTest {
                 offlineChangesDirectory);
 
         assertThrows(SQLException.class, () -> synchronizer.openSharedDatabase(databaseConnection));
-        assertEquals(true, closed.get());
+        assertTrue(closed.get());
     }
 }
