@@ -176,6 +176,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
     private BackgroundTask<?> dataLoadingTask;
+    private boolean restoreSelectionAfterLoading;
 
     static final class SharedDatabaseLoadingCallbacks {
         private final LibraryTab tab;
@@ -447,6 +448,30 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;
+
+        // Only a load that installed its context counts; a tab closed meanwhile has no table left to select in.
+        if (restoreSelectionAfterLoading && Optional.ofNullable(getTabPane()).isPresent()) {
+            restoreLastSelectedEntry();
+        }
+    }
+
+    /// Selects the entry that was selected at the last close once this library has loaded successfully. Failed,
+    /// invalid, or cancelled loads restore nothing.
+    public void restoreLastSelectedEntryAfterLoading() {
+        restoreSelectionAfterLoading = true;
+    }
+
+    /// [impl->req~ux.startup.restore-position~1]
+    /// Restores the entry that was selected in this library when JabRef was closed the last time. A citation key is
+    /// the only identity an entry keeps across reloads, so a key held by several entries restores nothing rather than
+    /// picking one of them.
+    private void restoreLastSelectedEntry() {
+        bibDatabaseContext.getDatabasePath()
+                          .map(Path::toAbsolutePath)
+                          .flatMap(path -> preferences.getLastFilesOpenedPreferences().getLastSelectedEntry(path))
+                          .map(citationKey -> bibDatabaseContext.getDatabase().getEntriesByCitationKey(citationKey))
+                          .filter(entries -> entries.size() == 1)
+                          .ifPresent(entries -> clearAndSelect(entries.getFirst()));
     }
 
     public void createSearchContext() {
