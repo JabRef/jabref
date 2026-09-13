@@ -64,6 +64,16 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
         }
     }
 
+    /// Adds the files in the given order, so the last one ends up on top, as a single change for listeners.
+    public void newFiles(List<Path> files) {
+        beginChange();
+        try {
+            files.forEach(this::newFile);
+        } finally {
+            endChange();
+        }
+    }
+
     public void removeItem(Path file) {
         this.remove(file);
 

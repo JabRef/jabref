@@ -43,6 +43,17 @@ class FileHistoryTest {
     }
 
     @Test
+    void addingSeveralItemsNotifiesListenersOnce() {
+        AtomicInteger notifications = new AtomicInteger();
+        history.addListener((ListChangeListener<Path>) _ -> notifications.incrementAndGet());
+
+        history.newFiles(List.of(Path.of("aa"), Path.of("bb"), Path.of("aa")));
+
+        assertEquals(List.of(Path.of("aa"), Path.of("bb")), history);
+        assertEquals(1, notifications.get());
+    }
+
+    @Test
     void newItemsAreAddedInRightOrder() {
         history.newFile(Path.of("aa"));
         history.newFile(Path.of("bb"));

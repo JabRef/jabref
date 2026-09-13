@@ -12,6 +12,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -733,6 +734,20 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         List<Path> lastFiles = preferences.getLastFilesOpenedPreferences().getLastFilesOpened();
         if (!lastFiles.isEmpty()) {
             getOpenDatabaseAction().openFiles(lastFiles);
+
+            // Only the libraries reopened here get their selection back; a library opened later in the session starts
+            // without the selection of an earlier session.
+            getLibraryTabs().stream()
+                            .filter(tab -> tab.getLoading().get())
+                            .forEach(tab -> tab.getLoading().addListener(new ChangeListener<>() {
+                                @Override
+                                public void changed(ObservableValue<? extends Boolean> observable, Boolean wasLoading, Boolean isLoading) {
+                                    if (!isLoading) {
+                                        observable.removeListener(this);
+                                        tab.restoreLastSelectedEntry();
+                                    }
+                                }
+                            }));
 
             // [impl->req~ux.startup.restore-position~1]
             // Each opened library raises its tab, so without this the last library in the list would end up in front.
