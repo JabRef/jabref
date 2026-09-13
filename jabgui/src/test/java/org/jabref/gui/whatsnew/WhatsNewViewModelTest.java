@@ -19,8 +19,10 @@ import org.jabref.logic.whatsnew.AttributedEntry;
 import org.jabref.logic.whatsnew.BlamedChangelog;
 import org.jabref.logic.whatsnew.ChangelogEntry;
 import org.jabref.logic.whatsnew.Checkout;
+import org.jabref.logic.whatsnew.CheckoutNews;
 import org.jabref.logic.whatsnew.Contributor;
 import org.jabref.logic.whatsnew.News;
+import org.jabref.logic.whatsnew.RestartMarker;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,7 +83,7 @@ class WhatsNewViewModelTest {
     void setUp() {
         when(checkout.fetch()).thenReturn(true);
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(new Contributor.Other("Somebody"), OLD)));
-        viewModel = new WhatsNewViewModel(checkout, gitDir, taskExecutor, () -> {
+        viewModel = new WhatsNewViewModel(new CheckoutNews(checkout, announced()), RestartMarker.inGitDir(gitDir), taskExecutor, () -> {
             quitRequested.set(true);
             return quitAllowed.get();
         });
@@ -92,11 +94,11 @@ class WhatsNewViewModelTest {
     }
 
     @Test
-    void theFirstLookAnnouncesEverythingSilently() throws IOException {
+    void theFirstLookShowsNothing() throws IOException {
         viewModel.startWatching();
 
         assertEquals(News.NONE, viewModel.getPending());
-        assertEquals(Optional.of(Set.of(OLD)), announced().read());
+        assertEquals("What's new", viewModel.titleProperty().get());
         assertEquals("", viewModel.tooltipProperty().get());
     }
 
@@ -111,16 +113,6 @@ class WhatsNewViewModelTest {
         assertEquals("What's new - 1 pending change(s)", viewModel.titleProperty().get());
         assertEquals("\n\nWhat's new - 1 pending change(s):\nChanges by me\n• An entry of mine.", viewModel.tooltipProperty().get());
         assertFalse(viewModel.updateAvailableProperty().get());
-    }
-
-    @Test
-    void aFirstLookWithoutAChangelogAnnouncesNothing() throws IOException {
-        when(checkout.blameWorkingTree()).thenReturn(Optional.empty());
-
-        viewModel.startWatching();
-
-        assertEquals(News.NONE, viewModel.getPending());
-        assertEquals(Optional.empty(), announced().read());
     }
 
     @Test
@@ -190,7 +182,7 @@ class WhatsNewViewModelTest {
     void aRestartLeavesTheMarkerAndQuits() {
         assertEquals(WhatsNewViewModel.RestartRequest.REQUESTED, viewModel.requestRestart());
 
-        assertTrue(Files.exists(gitDir.resolve(WhatsNewViewModel.RESTART_MARKER)));
+        assertTrue(Files.exists(gitDir.resolve("restart-requested")));
         assertTrue(quitRequested.get());
     }
 
@@ -200,12 +192,12 @@ class WhatsNewViewModelTest {
 
         assertEquals(WhatsNewViewModel.RestartRequest.DECLINED_BY_USER, viewModel.requestRestart());
 
-        assertFalse(Files.exists(gitDir.resolve(WhatsNewViewModel.RESTART_MARKER)));
+        assertFalse(Files.exists(gitDir.resolve("restart-requested")));
     }
 
     @Test
     void aRestartWhoseMarkerCannotBeWrittenKeepsJabRefRunning() throws IOException {
-        Files.createDirectory(gitDir.resolve(WhatsNewViewModel.RESTART_MARKER));
+        Files.createDirectory(gitDir.resolve("restart-requested"));
 
         assertEquals(WhatsNewViewModel.RestartRequest.MARKER_NOT_WRITTEN, viewModel.requestRestart());
 

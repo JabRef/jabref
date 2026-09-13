@@ -80,15 +80,19 @@ public record News(List<AttributedEntry> items) {
         };
     }
 
-    /// The groups as text, one bullet per entry with the Markdown emphasis dropped — a tooltip or a terminal.
+    /// The groups as text, one bullet per entry with the emphasis and key markup dropped — a tooltip or a terminal.
     public String asPlainText() {
         StringJoiner groups = new StringJoiner("\n\n");
         grouped().forEach((contributor, entries) -> {
             StringJoiner group = new StringJoiner("\n");
             group.add(groupTitle(contributor));
-            entries.forEach(item -> group.add("• " + item.entry().text().replace("**", "")));
+            entries.forEach(item -> group.add("• " + plain(item.entry().text())));
             groups.add(group.toString());
         });
         return groups.toString();
+    }
+
+    private static String plain(String text) {
+        return text.replace("**", "").replace("<kbd>", "").replace("</kbd>", "");
     }
 }

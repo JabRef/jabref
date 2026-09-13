@@ -11,8 +11,8 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-/// Renders the inline Markdown a changelog entry uses — `**bold**`, `` `code` ``, `[label](url)` and bare URLs —
-/// into a [TextFlow], styled through the base stylesheet's `bold` and `font-monospace` classes.
+/// Renders the inline markup a changelog entry uses — `**bold**`, `` `code` ``, `<kbd>key</kbd>`, `[label](url)`
+/// and bare URLs — into a [TextFlow], styled through the base stylesheet's `bold` and `font-monospace` classes.
 ///
 /// Not [org.jabref.gui.util.component.MarkdownTextFlow]: this class is also compiled into the jbang script
 /// `.jbang/WhatsNewLauncher.java`, which runs before jabgui is built and can only take along classes that depend
@@ -21,9 +21,10 @@ final class InlineMarkdown {
 
     private static final String BOLD = "\\*\\*(?<bold>.+?)\\*\\*";
     private static final String CODE = "`(?<code>[^`]+)`";
+    private static final String KEY = "<kbd>(?<key>[^<]+)</kbd>";
     private static final String LINK = "\\[(?<label>[^\\]]+)]\\((?<url>https?://[^)]+)\\)";
     private static final String BARE_URL = "(?<bare>https?://\\S+?)(?=[\\s)\\]]|$)";
-    private static final Pattern MARKUP = Pattern.compile(String.join("|", BOLD, CODE, LINK, BARE_URL));
+    private static final Pattern MARKUP = Pattern.compile(String.join("|", BOLD, CODE, KEY, LINK, BARE_URL));
 
     private static final String BOLD_CLASS = "bold";
     private static final String CODE_CLASS = "font-monospace";
@@ -52,8 +53,8 @@ final class InlineMarkdown {
             bold.forEach(node -> node.getStyleClass().add(BOLD_CLASS));
             return bold;
         }
-        if (matcher.group("code") != null) {
-            Text code = new Text(matcher.group("code"));
+        if (matcher.group("code") != null || matcher.group("key") != null) {
+            Text code = new Text(matcher.group("code") != null ? matcher.group("code") : matcher.group("key"));
             code.getStyleClass().add(CODE_CLASS);
             return List.of(code);
         }

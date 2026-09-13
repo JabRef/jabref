@@ -79,10 +79,10 @@ class NewsTest {
     @Test
     void plainTextIsOneBulletPerEntryUnderItsGroupTitle() {
         News news = new News(List.of(
-                new AttributedEntry(Contributor.Me.LOCAL, new ChangelogEntry("Unreleased", "Added", "**Bold** start.")),
+                new AttributedEntry(Contributor.Me.LOCAL, new ChangelogEntry("Unreleased", "Added", "**Bold** start, <kbd>Ctrl</kbd> + <kbd>W</kbd>.")),
                 new AttributedEntry(ALICE, ADDED)));
 
-        assertEquals("Changes by Alice\n• added\n\nChanges by me\n• Bold start.", news.asPlainText());
+        assertEquals("Changes by Alice\n• added\n\nChanges by me\n• Bold start, Ctrl + W.", news.asPlainText());
     }
 
     @Test

@@ -1,13 +1,9 @@
 package org.jabref.gui.whatsnew;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BooleanSupplier;
@@ -30,25 +26,22 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.whatsnew.AnnouncedEntries;
-import org.jabref.logic.whatsnew.BlamedChangelog;
-import org.jabref.logic.whatsnew.ChangelogEntry;
-import org.jabref.logic.whatsnew.Checkout;
+import org.jabref.logic.whatsnew.CheckoutNews;
+import org.jabref.logic.whatsnew.CheckoutNews.Look;
 import org.jabref.logic.whatsnew.News;
+import org.jabref.logic.whatsnew.RestartMarker;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// The state behind the "What's new" button: the news not announced yet, how far the checkout is behind its
-/// upstream, and the title both the button and the window show.
+/// upstream, and the title both the button and the window show. Schedules the looks of [CheckoutNews] and
+/// projects what they find into properties.
 ///
-/// A look at the checkout runs in the background and lands here on the FX thread; every property is read and
-/// written on the FX thread only.
+/// A look runs in the background and lands here on the FX thread; every property is read and written on the
+/// FX thread only.
 // [impl->req~whats-new.checkout-news~1]
 public class WhatsNewViewModel extends AbstractViewModel {
-
-    /// The file `just run-loop` looks for after JabRef quits: present, it pulls, rebuilds and starts JabRef again.
-    static final String RESTART_MARKER = "restart-requested";
 
     /// What [#requestRestart()] achieved.
     public enum RestartRequest {
@@ -63,15 +56,10 @@ public class WhatsNewViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(WhatsNewViewModel.class);
     private static final Duration CHECK_INTERVAL = Duration.ofMinutes(5);
 
-    private final Checkout checkout;
-    private final AnnouncedEntries announced;
-    private final Path restartMarker;
+    private final CheckoutNews news;
+    private final RestartMarker restartMarker;
     private final TaskExecutor taskExecutor;
     private final BooleanSupplier quit;
-
-    /// Looks run one after the other, so the announced entries are never written by an older look after a newer
-    /// one. Background threads only.
-    private final Object lookLock = new Object();
 
     private final ObjectProperty<News> pending = new SimpleObjectProperty<>(News.NONE);
     private final IntegerProperty commitsBehind = new SimpleIntegerProperty();
@@ -83,17 +71,11 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// so a slow scheduled look never replaces what a click just found. FX thread.
     private long looksStarted;
 
-    /// What one look at the checkout found; `fetched` is false when the upstream could not be reached.
-    private record Look(boolean fetched, int commitsBehind, String title, News news) {
-    }
-
-    /// @param gitDir the checkout's git directory, where the announced entries and the restart marker live
-    /// @param quit   closes JabRef the ordinary way, so unsaved libraries are asked about; `false` when the user
-    ///               keeps JabRef open
-    public WhatsNewViewModel(Checkout checkout, Path gitDir, TaskExecutor taskExecutor, BooleanSupplier quit) {
-        this.checkout = checkout;
-        this.announced = AnnouncedEntries.inGitDir(gitDir);
-        this.restartMarker = gitDir.resolve(RESTART_MARKER);
+    /// @param quit closes JabRef the ordinary way, so unsaved libraries are asked about; `false` when the user
+    ///             keeps JabRef open
+    public WhatsNewViewModel(CheckoutNews news, RestartMarker restartMarker, TaskExecutor taskExecutor, BooleanSupplier quit) {
+        this.news = news;
+        this.restartMarker = restartMarker;
         this.taskExecutor = taskExecutor;
         this.quit = quit;
     }
@@ -149,20 +131,13 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// Leaves the marker for `just run-loop` and quits. A user who keeps JabRef open takes the marker back, so
     /// an ordinary quit later does not restart JabRef.
     public RestartRequest requestRestart() {
-        try {
-            Files.writeString(restartMarker, "");
-        } catch (IOException e) {
-            LOGGER.warn("Cannot write {}", restartMarker, e);
+        if (!restartMarker.place()) {
             return RestartRequest.MARKER_NOT_WRITTEN;
         }
         if (quit.getAsBoolean()) {
             return RestartRequest.REQUESTED;
         }
-        try {
-            Files.deleteIfExists(restartMarker);
-        } catch (IOException e) {
-            LOGGER.warn("Cannot remove {}", restartMarker, e);
-        }
+        restartMarker.withdraw();
         return RestartRequest.DECLINED_BY_USER;
     }
 
@@ -179,7 +154,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
         BackgroundTask<Look> task = new BackgroundTask<>() {
             @Override
             public Look call() throws IOException {
-                return look(fetch, announce, this::isCancelled);
+                return news.look(fetch, announce, this::isCancelled);
             }
         };
         return task.onRunning(() -> thisLook.set(++looksStarted))
@@ -191,56 +166,25 @@ public class WhatsNewViewModel extends AbstractViewModel {
                    .onFailure(e -> LOGGER.warn("Cannot look at the checkout", e));
     }
 
-    /// Reads the checkout: the working tree's changelog, plus the upstream's once the checkout is behind, so an
-    /// entry arriving upstream while a local edit is pending hides nothing. Without announced entries yet (the
-    /// first run in a checkout) everything seen is announced now and nothing is news: a fresh checkout is not
-    /// greeted with the whole changelog — but only once a changelog could be read, or a failed first look would
-    /// announce nothing and the next one everything. With `announce`, everything seen is announced once the
-    /// upstream was fetched and the look is not `cancelled` — in this task, so no other look reads the announced
-    /// entries in between. Any thread but FX.
-    private Look look(boolean fetch, boolean announce, BooleanSupplier cancelled) throws IOException {
-        synchronized (lookLock) {
-            boolean fetched = fetch && checkout.fetch();
-            int behind = checkout.commitsBehind();
-            List<BlamedChangelog> changelogs = new ArrayList<>();
-            checkout.blameWorkingTree().ifPresent(changelogs::add);
-            if (behind > 0) {
-                checkout.blameUpstream().ifPresent(changelogs::add);
-            }
-            if (changelogs.isEmpty()) {
-                return new Look(fetched, behind, title(behind, News.NONE), News.NONE);
-            }
-            Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
-            News news = announcedSoFar.map(old -> News.pending(old, changelogs)).orElse(News.NONE);
-            if (announcedSoFar.isEmpty() || (announce && fetched && !cancelled.getAsBoolean())) {
-                announced.write(News.allEntries(changelogs));
-            }
-            return new Look(fetched, behind, title(behind, news), news);
-        }
-    }
-
-    /// `What's new - 3 pending change(s) since <running commit> - now at <upstream commit>`, the count only with
-    /// news, the commits only while behind.
-    private String title(int behind, News news) {
-        String title = news.isEmpty()
-                       ? Localization.lang("What's new")
-                       : Localization.lang("What's new - %0 pending change(s)", String.valueOf(news.size()));
-        if (behind == 0) {
-            return title;
-        }
-        Optional<String> head = checkout.describeHead();
-        Optional<String> upstream = checkout.describeUpstream();
-        if (head.isEmpty() || upstream.isEmpty()) {
-            return title;
-        }
-        return title + " " + Localization.lang("since %0 - now at %1", head.get(), upstream.get());
-    }
-
     /// FX thread.
     private void show(Look look) {
         pending.set(look.news());
         commitsBehind.set(look.commitsBehind());
-        title.set(look.title());
+        title.set(title(look));
+    }
+
+    /// `What's new - 3 pending change(s) since <running commit> - now at <upstream commit>`: the count only with
+    /// news, the commits only while behind — each variant one sentence, so translators may order it.
+    private static String title(Look look) {
+        String count = String.valueOf(look.news().size());
+        if (look.head().isEmpty() || look.upstream().isEmpty()) {
+            return look.news().isEmpty()
+                   ? Localization.lang("What's new")
+                   : Localization.lang("What's new - %0 pending change(s)", count);
+        }
+        return look.news().isEmpty()
+               ? Localization.lang("What's new since %0 - now at %1", look.head().get(), look.upstream().get())
+               : Localization.lang("What's new - %0 pending change(s) since %1 - now at %2", count, look.head().get(), look.upstream().get());
     }
 
     private String tooltipText() {

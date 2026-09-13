@@ -17,7 +17,10 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.whatsnew.AnnouncedEntries;
 import org.jabref.logic.whatsnew.Checkout;
+import org.jabref.logic.whatsnew.CheckoutNews;
+import org.jabref.logic.whatsnew.RestartMarker;
 
 import org.jspecify.annotations.Nullable;
 
@@ -57,7 +60,11 @@ public final class WhatsNewButton {
                                           GitHandlerRegistry gitHandlerRegistry,
                                           BooleanSupplier quit) {
         Optional<WhatsNewViewModel> viewModel = Checkout.around(Path.of(""), gitHandlerRegistry)
-                                                        .flatMap(checkout -> checkout.gitDir().map(gitDir -> new WhatsNewViewModel(checkout, gitDir, taskExecutor, quit)));
+                                                        .flatMap(checkout -> checkout.gitDir().map(gitDir -> new WhatsNewViewModel(
+                                                                new CheckoutNews(checkout, AnnouncedEntries.inGitDir(gitDir)),
+                                                                RestartMarker.inGitDir(gitDir),
+                                                                taskExecutor,
+                                                                quit)));
         viewModel.ifPresent(WhatsNewViewModel::startWatching);
         return viewModel.map(model -> new WhatsNewButton(model, factory, dialogService, externalApplicationsPreferences).button);
     }
