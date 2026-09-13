@@ -67,7 +67,7 @@ class CheckoutNewsTest {
 
     @Test
     void aLaterLookFindsWhatWasNotAnnounced() throws IOException {
-        announced.write(Set.of(OLD));
+        announced.announce(Set.of(OLD));
 
         CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITHOUT_FETCH);
 
@@ -78,7 +78,7 @@ class CheckoutNewsTest {
 
     @Test
     void behindTheUpstreamTheFetchedChangelogCountsToo() throws IOException {
-        announced.write(Set.of(OLD, MINE));
+        announced.announce(Set.of(OLD, MINE));
         when(checkout.commitsBehind()).thenReturn(2);
         when(checkout.blameUpstream()).thenReturn(Optional.of(changelog(Contributor.Me.REMOTE, OLD, PUSHED)));
         when(checkout.describeHead()).thenReturn(Optional.of("1111111 (2026-09-13 10:00)"));
@@ -96,7 +96,7 @@ class CheckoutNewsTest {
 
     @Test
     void anUnreachableUpstreamIsReported() throws IOException {
-        announced.write(Set.of(OLD));
+        announced.announce(Set.of(OLD));
         when(checkout.fetch()).thenReturn(false);
 
         CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITH_FETCH);
@@ -107,7 +107,7 @@ class CheckoutNewsTest {
 
     @Test
     void aLookWithoutAChangelogAnnouncesNothingEvenWhenAsked() throws IOException {
-        announced.write(Set.of(OLD));
+        announced.announce(Set.of(OLD));
         when(checkout.blameWorkingTree()).thenReturn(Optional.empty());
 
         news.announce(news.look(CheckoutNews.Mode.WITH_FETCH));
@@ -117,7 +117,7 @@ class CheckoutNewsTest {
 
     @Test
     void aLookAnnouncesNothingUntilAsked() throws IOException {
-        announced.write(Set.of(OLD));
+        announced.announce(Set.of(OLD));
 
         CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITH_FETCH);
         assertEquals(Optional.of(Set.of(OLD)), announced.read());

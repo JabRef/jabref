@@ -122,7 +122,7 @@ class WhatsNewViewModelTest {
 
     @Test
     void aLaterLookShowsWhatWasNotAnnounced() throws IOException {
-        announced().write(Set.of(OLD));
+        announced().announce(Set.of(OLD));
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
 
         viewModel.startWatching();
@@ -135,7 +135,7 @@ class WhatsNewViewModelTest {
 
     @Test
     void thePeriodicLookFetchesAndReportsTheUpstream() throws IOException {
-        announced().write(Set.of(OLD));
+        announced().announce(Set.of(OLD));
         viewModel.startWatching();
         when(checkout.commitsBehind()).thenReturn(2);
         when(checkout.blameUpstream()).thenReturn(Optional.of(changelog(Contributor.Me.REMOTE, OLD, PUSHED)));
@@ -154,7 +154,7 @@ class WhatsNewViewModelTest {
 
     @Test
     void presentingTheNewsMakesThemOld() throws IOException {
-        announced().write(Set.of(OLD));
+        announced().announce(Set.of(OLD));
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         AtomicReference<News> presented = new AtomicReference<>();
 
@@ -167,7 +167,7 @@ class WhatsNewViewModelTest {
 
     @Test
     void aLookOverlappingAPresentationDoesNotBringShownNewsBack() throws IOException {
-        announced().write(Set.of(OLD));
+        announced().announce(Set.of(OLD));
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         viewModel.startWatching();
         taskExecutor.holding = true;
@@ -185,7 +185,7 @@ class WhatsNewViewModelTest {
 
     @Test
     void aPresentationCancelledBeforeItsAnswerAnnouncesNothing() throws IOException {
-        announced().write(Set.of(OLD));
+        announced().announce(Set.of(OLD));
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         taskExecutor.holding = true;
 
@@ -198,7 +198,7 @@ class WhatsNewViewModelTest {
 
     @Test
     void anUnreachableUpstreamPresentsTheNewsButKeepsThemPending() throws IOException {
-        announced().write(Set.of(OLD));
+        announced().announce(Set.of(OLD));
         when(checkout.fetch()).thenReturn(false);
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         AtomicReference<News> presented = new AtomicReference<>();
@@ -213,7 +213,7 @@ class WhatsNewViewModelTest {
 
     @Test
     void aFailedLookPresentsTheNewsKnownSoFar() throws IOException {
-        announced().write(Set.of(OLD));
+        announced().announce(Set.of(OLD));
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         viewModel.startWatching();
         News known = viewModel.getPending();

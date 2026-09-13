@@ -27,19 +27,19 @@ class AnnouncedEntriesTest {
     void writtenEntriesAreReadBack(@TempDir Path directory) throws IOException {
         AnnouncedEntries announced = new AnnouncedEntries(directory.resolve("state").resolve("announced.tsv"));
 
-        announced.write(List.of(ADDED, FIXED));
+        announced.announce(List.of(ADDED, FIXED));
 
         assertEquals(Optional.of(Set.of(ADDED, FIXED)), announced.read());
     }
 
     @Test
-    void aWriteReplacesTheEntriesAnnouncedBefore(@TempDir Path directory) throws IOException {
+    void announcingAddsToTheEntriesAnnouncedBefore(@TempDir Path directory) throws IOException {
         AnnouncedEntries announced = new AnnouncedEntries(directory.resolve("announced.tsv"));
-        announced.write(List.of(ADDED));
+        announced.announce(List.of(ADDED));
 
-        announced.write(List.of(FIXED));
+        announced.announce(List.of(FIXED));
 
-        assertEquals(Optional.of(Set.of(FIXED)), announced.read());
+        assertEquals(Optional.of(Set.of(ADDED, FIXED)), announced.read());
     }
 
     @Test

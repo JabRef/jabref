@@ -64,7 +64,7 @@ public final class CheckoutNews {
         Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
         News news = announcedSoFar.map(old -> News.pending(old, changelogs)).orElse(News.NONE);
         if (announcedSoFar.isEmpty()) {
-            announced.write(seen);
+            announced.announce(seen);
         }
         return new Look(fetched, behind, head, upstream, news, seen);
     }
@@ -76,6 +76,6 @@ public final class CheckoutNews {
         if (look.seen().isEmpty()) {
             return;
         }
-        announced.write(look.seen());
+        announced.announce(look.seen());
     }
 }

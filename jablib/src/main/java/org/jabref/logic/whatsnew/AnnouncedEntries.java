@@ -6,7 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,7 @@ import org.jspecify.annotations.Nullable;
 
 /// The changelog entries announced to the developer so far, kept in a file: one entry per line, its section,
 /// heading and text separated by tabs. A changelog line never contains a tab, so no escaping is needed.
+/// Announcing adds to the file: an entry shown once stays announced, whichever revision is checked out later.
 ///
 /// The file lives in the checkout's git directory, so it follows the worktree and survives JabRef being closed;
 /// the toolbar button and the jbang launcher share it, so neither shows what the other has announced.
@@ -46,15 +49,17 @@ public final class AnnouncedEntries {
                                 .collect(Collectors.toUnmodifiableSet()));
     }
 
-    /// Replaces the announced entries: from now on, only entries outside `entries` are news. The file is
-    /// replaced in one step, so an interrupted write leaves the entries announced before, never a partial file.
-    public void write(Collection<ChangelogEntry> entries) throws IOException {
+    /// Adds `entries` to the announced ones: from now on, none of them is news. The file is replaced in one
+    /// step, so an interrupted write leaves the entries announced before, never a partial file.
+    public void announce(Collection<ChangelogEntry> entries) throws IOException {
+        SequencedSet<ChangelogEntry> all = new LinkedHashSet<>(read().orElse(Set.of()));
+        all.addAll(entries);
         @Nullable Path directory = file.getParent();
         if (directory != null) {
             Files.createDirectories(directory);
         }
         try (Writer writer = new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
-            for (ChangelogEntry entry : entries) {
+            for (ChangelogEntry entry : all) {
                 writer.write(toLine(entry));
                 writer.write(System.lineSeparator());
             }

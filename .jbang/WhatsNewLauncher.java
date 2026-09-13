@@ -98,7 +98,7 @@ public class WhatsNewLauncher {
         List<ChangelogEntry> entries = List.copyOf(entriesByLine.values());
         Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
         if (announcedSoFar.isEmpty()) {
-            announced.write(entries);
+            announced.announce(entries);
             return;
         }
         Set<String> announcedTexts = announcedSoFar.get().stream().map(ChangelogEntry::text).collect(Collectors.toSet());
@@ -115,16 +115,16 @@ public class WhatsNewLauncher {
         }
         News news = new News(items);
         if (news.isEmpty()) {
-            announced.write(entries);
+            announced.announce(entries);
             return;
         }
         if (List.of(args).contains(STDOUT_FLAG) || java.awt.GraphicsEnvironment.isHeadless()) {
             System.out.println(news.asPlainText());
-            announced.write(entries);
+            announced.announce(entries);
             return;
         }
         // Announced once the news are ready to show: a git failure above keeps them for the next run.
-        announced.write(entries);
+        announced.announce(entries);
         Window.show(news, Localization.lang("What's new") + " — " + describe(head));
     }
 
