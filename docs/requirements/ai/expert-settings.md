@@ -49,4 +49,11 @@ The maximum snippet length in tokens for an embedding model is discovered dynami
 
 Needs: impl
 
+## Default local embedding model covers a whole document piece
+`req~ai.expert-settings.default-embedding-model~1`
+
+The default local embedding model reads at least as many tokens as the default document piece size, so no text of a piece is cut off before embedding. `BAAI/bge-small-en-v1.5` reads 512 tokens, the default piece size is 300.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
