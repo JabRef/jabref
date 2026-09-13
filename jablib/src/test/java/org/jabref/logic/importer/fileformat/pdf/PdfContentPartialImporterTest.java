@@ -139,6 +139,24 @@ class PdfContentPartialImporterTest {
 
     // [utest->req~import.pdf.plausible-year~1]
     @Test
+    void yearAfterIssueNumberAndDashExtracted() {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Alice Sample")
+                .withField(StandardField.TITLE, "Some Title of a Paper")
+                .withField(StandardField.YEAR, "2024");
+
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Journal of Examples, Vol. 1 - 2024""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
     void implausibleFourDigitNumberSkippedInFavorOfActualYear() {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Alice Sample")

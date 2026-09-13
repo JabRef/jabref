@@ -63,12 +63,12 @@ class PdfAuthorCrossCheck {
     /// the document itself.
     ///
     /// Since scholarly works print their authors on the leading pages, an author list is trusted only if at
-    /// least one of its family names occurs in the text of those pages. An unconfirmed merged value is
-    /// replaced by the best-confirmed candidate value. If no candidate is confirmed, a single person coming
-    /// from a non-bibliographic candidate (no citation key, no explicit entry type) is dropped entirely: a
-    /// wrong author is worse than none. Entries with a citation key or known entry type are left untouched so
-    /// that metadata previously written by JabRef survives re-import even when the PDF text does not
-    /// contain the author (e.g. slides or reports).
+    /// least one of its family names occurs in the text of those pages. This applies only when the merged
+    /// author comes from a non-bibliographic candidate (no citation key, no known entry type): fetched
+    /// metadata and metadata previously written by JabRef are kept even when the PDF text does not contain
+    /// the author (e.g. slides or reports). An unconfirmed creator value is replaced by the best-confirmed
+    /// candidate value. If no candidate is confirmed, a single person is dropped entirely: a wrong author is
+    /// worse than none.
     ///
     /// [impl->req~import.pdf.author-confirmed-by-text~1]
     static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, @Nullable String leadingPagesText) {
@@ -81,7 +81,7 @@ class PdfAuthorCrossCheck {
             return;
         }
         entry.getField(StandardField.AUTHOR).ifPresent(mergedAuthor -> {
-            if (isAuthorConfirmedByText(mergedAuthor, documentWords)) {
+            if (authorSourceLooksBibliographic(candidates) || isAuthorConfirmedByText(mergedAuthor, documentWords)) {
                 return;
             }
 
@@ -94,21 +94,21 @@ class PdfAuthorCrossCheck {
                       .reduce((first, second) -> second.confirmedNames() > first.confirmedNames() ? second : first)
                       .ifPresentOrElse(
                               scored -> entry.setField(StandardField.AUTHOR, scored.value()),
-                              () -> dropCreatorOnlyAuthor(entry, candidates, mergedAuthor));
+                              () -> {
+                                  if (namedAuthors(mergedAuthor).count() == 1) {
+                                      entry.clearField(StandardField.AUTHOR);
+                                  }
+                              });
         });
     }
 
-    private static void dropCreatorOnlyAuthor(BibEntry entry, List<BibEntry> candidates, String mergedAuthor) {
+    private static boolean authorSourceLooksBibliographic(List<BibEntry> candidates) {
         // The merge is first-wins, thus the merged value stems from the first candidate carrying an author
-        boolean sourceLooksBibliographic = candidates.stream()
-                                                     .filter(candidate -> candidate.hasField(StandardField.AUTHOR))
-                                                     .findFirst()
-                                                     .map(source -> source.getCitationKey().isPresent()
-                                                             || isKnownNonDefaultType(source.getType()))
-                                                     .orElse(true);
-        if (!sourceLooksBibliographic && (namedAuthors(mergedAuthor).count() == 1)) {
-            entry.clearField(StandardField.AUTHOR);
-        }
+        return candidates.stream()
+                         .filter(candidate -> candidate.hasField(StandardField.AUTHOR))
+                         .findFirst()
+                         .map(source -> source.getCitationKey().isPresent() || isKnownNonDefaultType(source.getType()))
+                         .orElse(true);
     }
 
     /// Dublin Core metadata of other tools may carry a generic type such as "Text", which says nothing about

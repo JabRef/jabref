@@ -142,6 +142,18 @@ class PdfMergeMetadataImporterOfflineTest {
     }
 
     @Test
+    void fetchedAuthorIsNotReplacedByLowerPriorityTextCandidate() {
+        BibEntry fetched = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Void, Eve");
+        BibEntry content = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Doe, Alice and Smith, Bob");
+
+        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(fetched, content), DOCUMENT_TEXT);
+
+        assertEquals(Optional.of("Void, Eve"), merged.getField(StandardField.AUTHOR));
+    }
+
+    @Test
     void unconfirmedAuthorFromEntryWithGenericDublinCoreTypeIsDropped() {
         BibEntry dublinCoreWithDocumentInformationAuthor = new BibEntry(new UnknownEntryType("Text"))
                 .withField(StandardField.AUTHOR, "Void, Eve");
