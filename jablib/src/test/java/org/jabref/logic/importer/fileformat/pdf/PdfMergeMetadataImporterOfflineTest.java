@@ -141,6 +141,35 @@ class PdfMergeMetadataImporterOfflineTest {
         assertEquals(Optional.of("Void, Eve"), merged.getField(StandardField.AUTHOR));
     }
 
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', textBlock = """
+            山田 太郎 and 佐藤 花子       | 山田 太郎, 佐藤 花子, Example University
+            Ahmad bin Hassan            | Ahmad bin Hassan, Example University
+            """)
+    void unconfirmedAuthorIsReplacedByInternationalByline(String byline, String leadingPagesText) {
+        BibEntry documentInformation = new BibEntry()
+                .withField(StandardField.AUTHOR, "Void, Eve");
+        BibEntry content = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, byline);
+
+        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation, content), leadingPagesText);
+
+        assertEquals(Optional.of(byline), merged.getField(StandardField.AUTHOR));
+    }
+
+    @Test
+    void proseMisparsedAsAuthorListDoesNotReplaceUnconfirmedAuthor() {
+        BibEntry documentInformation = new BibEntry()
+                .withField(StandardField.AUTHOR, "Void, Eve");
+        BibEntry content = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Link to record in the Repository");
+
+        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation, content),
+                "Link to record in the Repository. A placeholder study.");
+
+        assertEquals(Optional.empty(), merged.getField(StandardField.AUTHOR));
+    }
+
     @Test
     void fetchedAuthorIsNotReplacedByLowerPriorityTextCandidate() {
         BibEntry fetched = new BibEntry(StandardEntryType.Article)

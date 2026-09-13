@@ -39,7 +39,8 @@ class PdfAuthorCrossCheck {
     private static final Pattern SOFT_LINE_BREAK_HYPHEN = Pattern.compile("-\\r?\\n\\s*");
     private static final Pattern COMBINING_MARKS = Pattern.compile("\\p{M}+");
     private static final Set<String> NAME_LIST_LOWERCASE_WORDS = Set.of(
-            "and", "others", "van", "von", "der", "den", "de", "del", "dos", "da", "di", "la", "le", "ten", "ter", "y", "e");
+            "and", "others", "van", "von", "vom", "zu", "zur", "der", "den", "de", "del", "della", "dei", "des", "du", "dos", "das", "do", "da", "di",
+            "la", "le", "ten", "ter", "af", "av", "y", "e", "bin", "binti", "bint", "ibn", "al", "el");
 
     private PdfAuthorCrossCheck() {
     }
@@ -129,7 +130,8 @@ class PdfAuthorCrossCheck {
         for (String word : WHITESPACE.split(authorField)) {
             String stripped = LEADING_AND_TRAILING_NON_LETTERS.matcher(word).replaceAll("");
             if (stripped.isEmpty()
-                    || (!Character.isUpperCase(stripped.codePointAt(0)) && !NAME_LIST_LOWERCASE_WORDS.contains(stripped))) {
+                    // Scripts without letter case (e.g. CJK, Arabic) cannot signal a name by capitalization
+                    || (Character.isLowerCase(stripped.codePointAt(0)) && !NAME_LIST_LOWERCASE_WORDS.contains(stripped))) {
                 return false;
             }
         }
