@@ -37,8 +37,7 @@ jobs:
     # head repository plus head branch identifies the same pull request just as well, for fork PRs too.
     # Exception: "PR Review Activity" runs triggered by issue_comment run on the default branch, so
     # head_branch is "main" for every PR - one group for all PRs, which cancelled the pending
-    # evaluations of other PRs. Their run title is the PR title instead.
-    # Two open PRs with the same title would share a group, which only serializes their evaluations.
+    # evaluations of other PRs. Their run title carries the PR number instead.
     concurrency:
       group: pr-status-${{ github.event.workflow_run.head_repository.full_name || github.repository }}-${{ (github.event.workflow_run.event == 'issue_comment' && github.event.workflow_run.display_title) || github.event.workflow_run.head_branch || github.event.inputs.pr_number }}
       cancel-in-progress: false
