@@ -10,9 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
@@ -257,12 +260,13 @@ class DBMSSynchronizerTest {
         CountDownLatch allowFirstMetadataReadToReturn = new CountDownLatch(1);
         CountDownLatch secondMetadataReadFinished = new CountDownLatch(1);
         AtomicInteger metadataReadCount = new AtomicInteger();
+        BlockingQueue<Runnable> pendingDatabaseTasks = new LinkedBlockingQueue<>();
         BibDatabase remoteDatabase = new BibDatabase();
         BibDatabaseContext remoteContext = new BibDatabaseContext(remoteDatabase);
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
 
-        try (ExecutorService databaseExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
+        try (ExecutorService taskExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
             DBMSSynchronizer remoteSynchronizer = new DBMSSynchronizer(
                     remoteContext,
                     ',',
@@ -272,7 +276,7 @@ class DBMSSynchronizerTest {
                     "UserAndHost",
                     new VirtualThreadTaskExecutor(),
                     Runnable::run,
-                    databaseExecutor,
+                    pendingDatabaseTasks::add,
                     offlineChangesDirectory) {
                 @Override
                 Map<String, String> readSharedMetaData() throws SQLException {
@@ -298,11 +302,19 @@ class DBMSSynchronizerTest {
 
             try {
                 remoteSynchronizer.handleRemoteMetaDataChange();
+                Runnable firstDatabaseTask = pendingDatabaseTasks.poll(5, TimeUnit.SECONDS);
+                assertNotNull(firstDatabaseTask);
+                Future<?> firstRead = taskExecutor.submit(firstDatabaseTask);
                 assertTrue(firstMetadataReadFinished.await(5, TimeUnit.SECONDS));
 
                 remoteSynchronizer.handleRemoteMetaDataChange();
                 allowFirstMetadataReadToReturn.countDown();
 
+                firstRead.get(5, TimeUnit.SECONDS);
+                assertEquals(1, pendingDatabaseTasks.size());
+                Runnable secondDatabaseTask = pendingDatabaseTasks.poll(5, TimeUnit.SECONDS);
+                assertNotNull(secondDatabaseTask);
+                taskExecutor.submit(secondDatabaseTask).get(5, TimeUnit.SECONDS);
                 assertTrue(secondMetadataReadFinished.await(5, TimeUnit.SECONDS));
                 assertEquals(2, metadataReadCount.get());
             } finally {

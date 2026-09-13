@@ -364,15 +364,13 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
         try {
             syncExecutor.execute(() -> {
+                metadataPullRequested.set(false);
                 try {
-                    do {
-                        metadataPullRequested.set(false);
-                        pullMetaDataFromDatabase();
-                    } while (metadataPullRequested.get());
+                    pullMetaDataFromDatabase();
                 } finally {
                     metadataPullScheduled.set(false);
-                    // A notification may have arrived after the last loop check but before the
-                    // scheduled state was cleared. Schedule a new worker rather than dropping it.
+                    // A notification may have arrived while this read was active. Schedule its
+                    // follow-up separately so metadata pulls do not monopolize the database worker.
                     if (metadataPullRequested.get()) {
                         scheduleMetadataPull();
                     }
