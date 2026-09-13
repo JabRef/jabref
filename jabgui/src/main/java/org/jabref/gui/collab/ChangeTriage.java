@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
@@ -20,6 +21,7 @@ import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.logic.sync.LibraryBaseline;
 import org.jabref.logic.sync.LibraryBaseline.Side;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -47,6 +49,7 @@ public final class ChangeTriage {
         // A group change is always accompanied by the metadata change it is part of, which precedes it in the list
         Side metaDataSide = Side.BOTH;
         LibraryBaseline.Lookup lookup = baseline.lookup();
+        Set<String> idsInMemory = local.getDatabase().getEntries().stream().map(BibEntry::getId).collect(Collectors.toSet());
         for (DatabaseChange change : pairSplitEntries(baseline, lookup, changes, local, resolverFactory)) {
             Side side = switch (change) {
                 case EntryChange entryChange -> {
@@ -59,7 +62,7 @@ public final class ChangeTriage {
                     yield entrySide;
                 }
                 case EntryAdd entryAdd ->
-                        lookup.sideOfAddedEntry(entryAdd.getAddedEntry());
+                        lookup.sideOfAddedEntry(entryAdd.getAddedEntry(), idsInMemory::contains);
                 case EntryDelete entryDelete ->
                         baseline.sideOfDeletedEntry(entryDelete.getDeletedEntry());
                 case MetadataChange metadataChange -> {

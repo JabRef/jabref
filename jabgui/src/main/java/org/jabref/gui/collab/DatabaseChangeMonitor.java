@@ -248,7 +248,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                     baseline = null;
                     scanGeneration++;
                 }
-            } else if (baseline == null && !libraryTab.isModified()) {
+            } else if (baseline == null && (!libraryTab.isModified() || !undoManager.canUndo())) {
+                // A modified tab without an undoable step was only dirtied by a setting, such as the one just
+                // switched on; its entries still match the file
                 baseline = captureBaseline();
                 captured = baseline != null;
             }
@@ -299,9 +301,20 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         }
         BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
                       .onSuccess(changes -> changes.filter(scanned -> !scanned.isEmpty())
-                                                   .ifPresent(scanned -> listeners.forEach(listener -> listener.databaseChanged(scanned))))
+                                                   .ifPresent(scanned -> offerReview(generation, scanned)))
                       .onFailure(e -> LOGGER.error("Error while watching for changes", e))
                       .executeWith(taskExecutor);
+    }
+
+    /// A scan overtaken by a newer file change, a save, or the tab closing must not replace the current review either.
+    private void offerReview(int generation, List<DatabaseChange> changes) {
+        synchronized (database) {
+            if (generation != scanGeneration) {
+                LOGGER.debug("Discarding review of a scan overtaken by a newer file change");
+                return;
+            }
+            listeners.forEach(listener -> listener.databaseChanged(changes));
+        }
     }
 
     /// Sorting the changes on the FX thread right before applying them leaves no window for a user edit to slip in
@@ -321,9 +334,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// half of a library parses fine and would look like every later entry had been deleted. Waits (bounded) until
     /// size and modification time have stopped changing for a while.
     ///
-    /// @return the last state seen
+    /// @return the settled state, or empty when the file kept changing for the whole wait or its attributes could
+    /// not be read; either way it must not be parsed. The writer's next events start a fresh scan.
     /// @throws InterruptedException when the wait was interrupted; the file may still be incomplete, so the caller must not parse it
-    private static @Nullable FileSnapshot awaitStableFile(Path path) throws InterruptedException {
+    private static Optional<FileSnapshot> awaitStableFile(Path path) throws InterruptedException {
         FileSnapshot last = FileSnapshot.read(path);
         int unchanged = 0;
         for (int attempt = 0; attempt < STABLE_FILE_ATTEMPTS && unchanged < STABLE_FILE_CONFIRMATIONS; attempt++) {
@@ -332,24 +346,31 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             unchanged = Objects.equals(current, last) ? unchanged + 1 : 0;
             last = current;
         }
-        return last;
+        if (unchanged < STABLE_FILE_CONFIRMATIONS) {
+            LOGGER.debug("{} kept changing; the scan is abandoned", path);
+            return Optional.empty();
+        }
+        return Optional.ofNullable(last);
     }
 
     /// The state seen becomes the known disk state, so that the events of the write just waited for do not trigger
     /// another scan; only for the current scan, since a scan already overtaken will not apply what it sees, and
     /// recording it would make the next event look handled.
     ///
-    /// @return `false` when the wait was interrupted and the scan must not go on
+    /// @return `false` when the wait was interrupted or the file did not settle; the scan must not go on
     private boolean awaitStableLibraryFile(int generation) {
         Path path = monitoredPath.orElse(null);
         if (path == null) {
             return true;
         }
         try {
-            FileSnapshot state = awaitStableFile(path);
+            Optional<FileSnapshot> state = awaitStableFile(path);
+            if (state.isEmpty()) {
+                return false;
+            }
             synchronized (database) {
                 if (generation == scanGeneration) {
-                    knownDiskState = state;
+                    knownDiskState = state.get();
                 }
             }
             return true;
@@ -428,7 +449,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         int generation = scanGeneration;
         BackgroundTask.wrap(() -> {
                           try {
-                              awaitStableFile(copy);
+                              if (awaitStableFile(copy).isEmpty()) {
+                                  return Optional.<List<DatabaseChange>>empty();
+                              }
                           } catch (InterruptedException e) {
                               LOGGER.debug("Interrupted while waiting for {} to stop changing; the merge is abandoned", copy, e);
                               Thread.currentThread().interrupt();

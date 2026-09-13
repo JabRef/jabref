@@ -25,6 +25,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
 
+import org.jspecify.annotations.Nullable;
+
 public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
     private static final SaveOrder UI_DEFAULT_SAVE_ORDER = new SaveOrder(SaveOrder.OrderType.ORIGINAL, List.of(
@@ -52,8 +54,8 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     // Journal abbreviation on save
     private final ObjectProperty<AbbreviationType> journalAbbreviationOnSaveProperty = new SimpleObjectProperty<>();
     /// `null` = follow the global preference
-    private final ObjectProperty<Boolean> synchronizeWithFileProperty = new SimpleObjectProperty<>();
-    private final ObjectProperty<Boolean> mergeConflictedCopiesProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<@Nullable Boolean> synchronizeWithFileProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<@Nullable Boolean> mergeConflictedCopiesProperty = new SimpleObjectProperty<>();
 
     private final FieldFormatterCleanupActions defaultSaveActions;
 
@@ -211,11 +213,11 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
         return journalAbbreviationOnSaveProperty;
     }
 
-    public ObjectProperty<Boolean> synchronizeWithFileProperty() {
+    public ObjectProperty<@Nullable Boolean> synchronizeWithFileProperty() {
         return synchronizeWithFileProperty;
     }
 
-    public ObjectProperty<Boolean> mergeConflictedCopiesProperty() {
+    public ObjectProperty<@Nullable Boolean> mergeConflictedCopiesProperty() {
         return mergeConflictedCopiesProperty;
     }
 }

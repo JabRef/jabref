@@ -21,6 +21,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
+import org.jspecify.annotations.Nullable;
 
 public class SavingPropertiesView extends AbstractPropertiesTabView<SavingPropertiesViewModel> implements PropertiesTab {
 
@@ -28,8 +29,8 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
     @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
     @FXML private ComboBox<AbbreviationType> journalAbbreviationOnSave;
-    @FXML private ComboBox<Boolean> synchronizeWithFile;
-    @FXML private ComboBox<Boolean> mergeConflictedCopies;
+    @FXML private ComboBox<@Nullable Boolean> synchronizeWithFile;
+    @FXML private ComboBox<@Nullable Boolean> mergeConflictedCopies;
 
     @Inject private GuiPreferences preferences;
 
@@ -94,11 +95,11 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     }
 
     /// A per-library setting that may follow the global one: `null` stands for "use global setting"
-    private static void bindOverride(ComboBox<Boolean> comboBox, ObjectProperty<Boolean> property, BooleanSupplier globalSetting) {
+    private static void bindOverride(ComboBox<@Nullable Boolean> comboBox, ObjectProperty<@Nullable Boolean> property, BooleanSupplier globalSetting) {
         comboBox.setItems(FXCollections.observableArrayList(null, Boolean.TRUE, Boolean.FALSE));
         comboBox.setConverter(new StringConverter<>() {
             @Override
-            public String toString(Boolean enabled) {
+            public String toString(@Nullable Boolean enabled) {
                 if (enabled == null) {
                     return Localization.lang("Use global setting (%0)", onOrOff(globalSetting.getAsBoolean()));
                 }
@@ -106,7 +107,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
             }
 
             @Override
-            public Boolean fromString(String string) {
+            public @Nullable Boolean fromString(String string) {
                 return null;
             }
         });
