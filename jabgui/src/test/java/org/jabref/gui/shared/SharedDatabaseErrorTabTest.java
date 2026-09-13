@@ -1,6 +1,8 @@
 package org.jabref.gui.shared;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.scene.control.Button;
@@ -53,14 +55,15 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
     }
 
     @Test
-    void retryStartsOneAttemptAndBlocksFurtherClicksWhileItRuns() {
+    void retryRunsTheActionAndKeepsTheTab() {
+        TabPane tabPane = new TabPane();
         interact(() -> {
-            retryButton().fire();
+            tabPane.getTabs().add(tab);
             retryButton().fire();
         });
 
         assertEquals(1, retries.get());
-        assertTrue(retryButton().isDisabled());
+        assertEquals(List.of(tab), tabPane.getTabs());
     }
 
     @Test
@@ -75,14 +78,22 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
     }
 
     @Test
-    void retryRemovesTheTabFromItsPane() {
+    void closeRemovesTheTabFromItsPane() {
         TabPane tabPane = new TabPane();
         interact(() -> {
             tabPane.getTabs().add(tab);
-            retryButton().fire();
+            tab.close();
         });
 
         assertTrue(tabPane.getTabs().isEmpty());
+    }
+
+    @Test
+    void rememberAsKeepsTheIdOfAReplacedTab() {
+        SharedDatabaseErrorTab dialogTab = new SharedDatabaseErrorTab(null, tab.getConnectionProperties());
+        dialogTab.rememberAs("shared-1");
+
+        assertEquals(Optional.of("shared-1"), dialogTab.getSharedDatabaseId());
     }
 
     @Test

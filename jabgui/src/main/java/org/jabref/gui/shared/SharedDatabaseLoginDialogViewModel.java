@@ -314,7 +314,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         // The database is not remembered yet (no id), so closing the tab simply forgets the attempt.
         LOGGER.error("Could not connect to shared database {}", connectionProperties.getDatabase(), exception);
         SharedDatabaseErrorTab errorTab = new SharedDatabaseErrorTab(null, connectionProperties);
-        errorTab.setRetryAction(() -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
+        // The tab goes only once the attempt really starts: `openSharedDatabase` can still bail out before that
+        errorTab.setRetryAction(() -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, errorTab::close));
         // The driver's own message is generic ("The connection attempt failed."); the reason is at the end of the cause chain
         errorTab.showError(Throwables.getRootCause(exception));
         tabContainer.showSharedDatabaseErrorTab(errorTab);
