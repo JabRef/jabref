@@ -1,5 +1,6 @@
 package org.jabref.model.entry.field;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -64,5 +65,35 @@ class FieldTextMapperTest {
     @MethodSource
     void displayNames(String expected, Field field) {
         assertEquals(expected, FieldTextMapper.getDisplayName(field));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDisplayNamesAndExpectedFields")
+    void fromDisplayNameResolvesExpectedField(String displayName, Field expectedField) {
+        assertEquals(Optional.of(expectedField), FieldTextMapper.fromDisplayName(displayName));
+    }
+
+    private static Stream<Arguments> provideDisplayNamesAndExpectedFields() {
+        return Stream.of(
+                Arguments.of("Citation Key", InternalField.KEY_FIELD),
+                Arguments.of("citationkey", InternalField.KEY_FIELD),
+                Arguments.of("Entry Type", InternalField.TYPE_HEADER),
+                Arguments.of("entrytype", InternalField.TYPE_HEADER),
+                Arguments.of("All", InternalField.INTERNAL_ALL_FIELD),
+                Arguments.of("All text fields", InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD),
+                Arguments.of("Printed", SpecialField.PRINTED),
+                Arguments.of("Priority", SpecialField.PRIORITY),
+                Arguments.of("Quality", SpecialField.QUALITY),
+                Arguments.of("Ranking", SpecialField.RANKING),
+                Arguments.of("Read status", SpecialField.READ_STATUS),
+                Arguments.of("Relevance", SpecialField.RELEVANCE)
+        );
+    }
+
+    @Test
+    void fromDisplayNameReturnsEmptyForUnknownDisplayName() {
+        assertEquals(Optional.empty(), FieldTextMapper.fromDisplayName("unknown_field_xyz"));
+        assertEquals(Optional.empty(), FieldTextMapper.fromDisplayName(""));
+        assertEquals(Optional.empty(), FieldTextMapper.fromDisplayName("   "));
     }
 }
