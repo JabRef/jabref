@@ -1,5 +1,6 @@
 package org.jabref.logic.preferences;
 
+import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
 
 import org.jspecify.annotations.NullMarked;
@@ -83,7 +84,8 @@ class PreferenceMigrationTest {
 
         String embeddingModel = preferences.getAiPreferences().getEmbeddingModel();
 
-        assertEquals("sentence-transformers/all-MiniLM-L12-v2", embeddingModel);
+        // Without customized expert settings, the default model is used regardless of the stored value
+        assertEquals(AiDefaultExpertSettings.EMBEDDING_MODEL, embeddingModel);
         assertEquals("sentence-transformers/all-MiniLM-L12-v2", preferences.get(AI_EMBEDDING_MODEL, UNUSED_DEFAULT_VALUE));
     }
 
@@ -94,8 +96,8 @@ class PreferenceMigrationTest {
 
         String embeddingModel = preferences.getAiPreferences().getEmbeddingModel();
 
-        assertEquals("sentence-transformers/all-MiniLM-L12-v2", embeddingModel);
-        assertEquals("sentence-transformers/all-MiniLM-L12-v2", preferences.get(AI_EMBEDDING_MODEL, UNUSED_DEFAULT_VALUE));
+        assertEquals(AiDefaultExpertSettings.EMBEDDING_MODEL, embeddingModel);
+        assertEquals(AiDefaultExpertSettings.EMBEDDING_MODEL, preferences.get(AI_EMBEDDING_MODEL, UNUSED_DEFAULT_VALUE));
     }
 
     private void restorePreference(JabRefCliPreferences preferences, String key, boolean hasValue, String value) {

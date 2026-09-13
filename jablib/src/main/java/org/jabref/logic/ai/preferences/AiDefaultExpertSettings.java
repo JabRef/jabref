@@ -12,7 +12,7 @@ import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 public class AiDefaultExpertSettings {
     public static final SummarizatorKind SUMMARIZATOR_KIND = SummarizatorKind.CHUNKED;
     public static final TokenEstimatorKind TOKEN_ESTIMATOR_KIND = TokenEstimatorKind.MAX;
-    public static final String EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L12-v2";
+    public static final String EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5";
     public static final float TEMPERATURE = 0.7F;
 
     public static final DocumentSplitterKind DOCUMENT_SPLITTER_KIND = DocumentSplitterKind.SLIDING_WINDOW;

@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -46,11 +47,14 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
     private static final String CONTENT_MAP_NAME = "contents";
     private static final String EMBEDDING_VECTOR_MAP_NAME = "embeddings";
     private static final String PAGE_NUMBER_MAP_NAME = "page-numbers";
+    private static final String SETTINGS_MAP_NAME = "settings";
+    private static final String EMBEDDING_MODEL_KEY = "embeddingModel";
 
     private final Map<String, String> fileHashMap;
     private final Map<String, String> contentMap;
     private final Map<String, float[]> embeddingVectorMap;
     private final Map<String, Integer> pageNumberMap;
+    private final Map<String, String> settingsMap;
 
     public MVStoreEmbeddingStore(Path path, NotificationService dialogService) {
         super(path, dialogService);
@@ -59,6 +63,16 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         this.contentMap = this.mvStore.openMap(CONTENT_MAP_NAME);
         this.embeddingVectorMap = this.mvStore.openMap(EMBEDDING_VECTOR_MAP_NAME);
         this.pageNumberMap = this.mvStore.openMap(PAGE_NUMBER_MAP_NAME);
+        this.settingsMap = this.mvStore.openMap(SETTINGS_MAP_NAME);
+    }
+
+    /// The embedding model the stored embeddings were generated with. Empty for stores written before this was recorded.
+    public Optional<String> getEmbeddingModel() {
+        return Optional.ofNullable(settingsMap.get(EMBEDDING_MODEL_KEY));
+    }
+
+    public void setEmbeddingModel(String embeddingModel) {
+        settingsMap.put(EMBEDDING_MODEL_KEY, embeddingModel);
     }
 
     @Override
