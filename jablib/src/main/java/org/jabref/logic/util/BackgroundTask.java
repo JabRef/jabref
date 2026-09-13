@@ -201,6 +201,11 @@ public abstract class BackgroundTask<V> {
         return chain(onFinished, onException);
     }
 
+    /// Whether a failure consumer was set with [#onFailure(Consumer)]; an [#onFinished(Runnable)] callback does not count.
+    public boolean hasFailureHandler() {
+        return onException != null;
+    }
+
     /// Sets the [Consumer] that is invoked after the task has failed with an exception.
     /// The consumer always runs on the JavaFX thread.
     public BackgroundTask<V> onFailure(Consumer<Exception> onException) {

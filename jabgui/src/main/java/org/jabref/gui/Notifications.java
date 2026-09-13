@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ProgressBar;
@@ -98,11 +99,16 @@ public class Notifications {
                 finishTask(undefinedTask);
             });
             // A failed task never reaches full progress, so its notification would look like it is still running.
-            // When the caller handles the failure, it reports the error itself and the notification can go.
+            // A caller that reports the error itself makes the notification redundant; otherwise the notification shows the error.
             Optional<EventHandler<WorkerStateEvent>> onFailed = Optional.ofNullable(task.getOnFailed());
+            boolean failureReported = onFailed.filter(UiTaskExecutor.FailureReportingHandler.class::isInstance).isPresent();
             task.setOnFailed(event -> {
                 onFailed.ifPresent(handler -> handler.handle(event));
-                finishTask(undefinedTask || onFailed.isPresent());
+                if (!failureReported) {
+                    setType(Type.ERROR);
+                    Optional.ofNullable(task.getException()).map(Throwable::getMessage).ifPresent(this::setSummary);
+                }
+                finishTask(undefinedTask || failureReported);
             });
             Optional<EventHandler<WorkerStateEvent>> onCancelled = Optional.ofNullable(task.getOnCancelled());
             task.setOnCancelled(event -> {
@@ -126,6 +132,8 @@ public class Notifications {
         public TaskNotificationView(TaskNotification notification) {
             super(notification);
             progressBar.progressProperty().bind(notification.getUserObject().progressProperty());
+            progressBar.visibleProperty().bind(notification.getUserObject().stateProperty().isNotEqualTo(Worker.State.FAILED));
+            progressBar.managedProperty().bind(progressBar.visibleProperty());
             HBox.setHgrow(progressBar, Priority.ALWAYS);
             setContent(progressBar);
             setShowContent(true);
