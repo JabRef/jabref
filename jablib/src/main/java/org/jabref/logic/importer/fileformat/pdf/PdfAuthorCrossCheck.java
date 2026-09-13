@@ -38,6 +38,7 @@ class PdfAuthorCrossCheck {
     private static final Pattern NON_LETTERS = Pattern.compile("\\P{L}+");
     private static final Pattern SOFT_LINE_BREAK_HYPHEN = Pattern.compile("-\\r?\\n\\s*");
     private static final Pattern COMBINING_MARKS = Pattern.compile("\\p{M}+");
+    private static final Pattern APOSTROPHES = Pattern.compile("['\u2019\u02BC]");
     private static final Set<String> NAME_LIST_LOWERCASE_WORDS = Set.of(
             "and", "others", "van", "von", "vom", "zu", "zur", "der", "den", "de", "del", "della", "dei", "des", "du", "dos", "das", "do", "da", "di",
             "la", "le", "ten", "ter", "af", "av", "y", "e", "bin", "binti", "bint", "ibn", "al", "el");
@@ -76,7 +77,7 @@ class PdfAuthorCrossCheck {
         if (StringUtil.isBlank(leadingPagesText)) {
             return;
         }
-        String documentWords = toWordSequence(leadingPagesText);
+        DocumentWords documentWords = DocumentWords.of(leadingPagesText);
         if (documentWords.isBlank()) {
             // A text of digits or punctuation confirms nothing
             return;
@@ -138,7 +139,7 @@ class PdfAuthorCrossCheck {
         return true;
     }
 
-    private static boolean isAuthorConfirmedByText(String authorField, String documentWords) {
+    private static boolean isAuthorConfirmedByText(String authorField, DocumentWords documentWords) {
         if (countFamilyNamesInText(authorField, documentWords) > 0) {
             return true;
         }
@@ -146,18 +147,18 @@ class PdfAuthorCrossCheck {
         // characters from broken XMP decoding). A single common word such as a given name also occurs in
         // unrelated text, so at least two distinct words of the raw value must occur.
         long confirmedWords = Arrays.stream(NON_LETTERS.split(normalizeForComparison(authorField)))
-                                    .filter(word -> word.length() >= 2 && !NAME_LIST_LOWERCASE_WORDS.contains(word))
+                                    .filter(word -> word.length() >= 2 && !NAME_LIST_LOWERCASE_WORDS.contains(word.toLowerCase(Locale.ROOT)))
                                     .distinct()
-                                    .filter(word -> containsPhrase(documentWords, word))
+                                    .filter(documentWords::containsName)
                                     .count();
         return confirmedWords >= 2;
     }
 
-    private static int countFamilyNamesInText(String authorField, String documentWords) {
+    private static int countFamilyNamesInText(String authorField, DocumentWords documentWords) {
         return (int) namedAuthors(authorField)
                 .map(Author::getFamilyName)
                 .flatMap(Optional::stream)
-                .filter(familyName -> containsPhrase(documentWords, familyName))
+                .filter(documentWords::containsName)
                 .count();
     }
 
@@ -168,25 +169,47 @@ class PdfAuthorCrossCheck {
                          .filter(author -> !Author.OTHERS.equals(author));
     }
 
-    /// Whole-word match, also for multi-word names such as "van der Berg"
-    private static boolean containsPhrase(String documentWords, String phrase) {
-        String phraseWords = toWordSequence(phrase).strip();
-        return !phraseWords.isEmpty() && documentWords.contains(" " + phraseWords + " ");
+    /// The leading-page text as normalized words separated and enclosed by single spaces, so that a whole-word
+    /// match is a plain substring search, also for multi-word names such as "van der Berg".
+    private record DocumentWords(String lowerCase, String caseSensitive) {
+        static DocumentWords of(String text) {
+            return new DocumentWords(toWordSequence(normalizeForComparison(text).toLowerCase(Locale.ROOT)),
+                    toWordSequence(normalizeForComparison(text)));
+        }
+
+        boolean isBlank() {
+            return lowerCase.isBlank();
+        }
+
+        boolean containsWords(String phrase) {
+            String words = toWordSequence(normalizeForComparison(phrase).toLowerCase(Locale.ROOT)).strip();
+            return !words.isEmpty() && lowerCase.contains(" " + words + " ");
+        }
+
+        /// A capitalized name must occur capitalized or in capitals, so that a family name such as "May" or
+        /// "Young" is not confirmed by the ordinary word in prose.
+        boolean containsName(String name) {
+            String words = toWordSequence(normalizeForComparison(name)).strip();
+            if (words.isEmpty() || !Character.isUpperCase(words.codePointAt(0))) {
+                return containsWords(name);
+            }
+            int firstLength = Character.charCount(words.codePointAt(0));
+            String capitalized = words.substring(0, firstLength) + words.substring(firstLength).toLowerCase(Locale.ROOT);
+            return Stream.of(words, words.toUpperCase(Locale.ROOT), capitalized)
+                         .anyMatch(variant -> caseSensitive.contains(" " + variant + " "));
+        }
+
+        private static String toWordSequence(String normalizedText) {
+            return " " + String.join(" ", NON_LETTERS.split(normalizedText)).strip() + " ";
+        }
     }
 
-    /// Normalized words separated and enclosed by single spaces, so that a whole-word match is a plain substring search
-    private static String toWordSequence(String text) {
-        String words = String.join(" ", NON_LETTERS.split(normalizeForComparison(text))).strip();
-        return " " + words + " ";
-    }
-
-    /// Case-, diacritic- and hyphen-insensitive comparison form. Hyphens are removed on both sides because
+    /// Diacritic-, hyphen- and apostrophe-insensitive comparison form. Hyphens are removed on both sides because
     /// text extraction may break a name at the end of a justified line ("Breitenbü-\ncher"), where the
     /// hyphen is a soft line-break hyphen for one name but a genuine part of another (e.g. "Kylo-Ren").
+    /// Apostrophes are removed instead of splitting words, so that "Connor" does not match "O'Connor".
     private static String normalizeForComparison(String text) {
-        String dehyphenated = SOFT_LINE_BREAK_HYPHEN.matcher(text).replaceAll("").replace("-", "");
-        return COMBINING_MARKS.matcher(Normalizer.normalize(dehyphenated, Normalizer.Form.NFKD))
-                              .replaceAll("")
-                              .toLowerCase(Locale.ROOT);
+        String joined = APOSTROPHES.matcher(SOFT_LINE_BREAK_HYPHEN.matcher(text).replaceAll("").replace("-", "")).replaceAll("");
+        return COMBINING_MARKS.matcher(Normalizer.normalize(joined, Normalizer.Form.NFKD)).replaceAll("");
     }
 }

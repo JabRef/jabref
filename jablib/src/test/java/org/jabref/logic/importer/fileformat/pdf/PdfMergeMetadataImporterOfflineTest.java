@@ -52,7 +52,7 @@ class PdfMergeMetadataImporterOfflineTest {
     /// column arrives as `null`, modelling a PDF whose text could not be extracted).
     // [utest->req~import.pdf.author-confirmed-by-text~1]
     @ParameterizedTest
-    @CsvSource(delimiter = '|', textBlock = """
+    @CsvSource(delimiter = '|', quoteCharacter = '"', textBlock = """
             Doe, Alice                  | Alice Doe, Bob Smith, Example University Testing Lab | Doe, Alice
             Void, Eve                   | Alice Doe, Bob Smith, Example University Testing Lab |
             Test, Carol                 | Alice Doe, Bob Smith, Example University Testing Lab |
@@ -61,6 +61,9 @@ class PdfMergeMetadataImporterOfflineTest {
             Void, Eve et al.            | Alice Doe and others, Example University            |
             Void, Eve                   | Eve Adams and Bob Smith, Example University          |
             van der Berg, Anna          | Anna van der Berg, Example University               | van der Berg, Anna
+            May, John                   | John Doe wrote what may happen, Example University   |
+            Connor, Eve                 | A study by Sean O'Connor, Example University         |
+            O’Connor, Sean              | A study by SEAN O'CONNOR, Example University         | O’Connor, Sean
             """)
     void singleCreatorCandidateAuthorIsCrossCheckedAgainstText(String author, @Nullable String leadingPagesText, @Nullable String expectedAuthor) {
         BibEntry candidate = new BibEntry().withField(StandardField.AUTHOR, author);

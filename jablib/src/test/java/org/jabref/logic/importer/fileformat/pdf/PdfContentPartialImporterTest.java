@@ -157,6 +157,24 @@ class PdfContentPartialImporterTest {
 
     // [utest->req~import.pdf.plausible-year~1]
     @Test
+    void yearInsideIdentifierSkippedInFavorOfActualYear() {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Alice Sample")
+                .withField(StandardField.TITLE, "Some Title of a Paper")
+                .withField(StandardField.YEAR, "2021");
+
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Proceedings of IPAC2019, published 2021""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
     void implausibleYearInSpringerFooterNotImported() {
         String firstPageContents = """
                 Some Title of a Paper
