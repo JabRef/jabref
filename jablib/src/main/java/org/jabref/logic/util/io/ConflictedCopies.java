@@ -65,7 +65,9 @@ public final class ConflictedCopies {
         String extension = FileUtil.getFileExtension(fileName).map(ext -> "." + ext).orElse("");
         String baseName = Pattern.quote(FileUtil.getBaseName(fileName));
         String quotedExtension = Pattern.quote(extension);
-        String alternatives = baseName + " \\(.*conflicted copy.*\\)" + quotedExtension
+        // Dropbox: "(Alice's conflicted copy 2026-09-03)", possibly numbered "(…2026-09-03 (1))"; Nextcloud and ownCloud:
+        // "(conflicted copy 2026-09-03 143015)". Anything looser would take an ordinary "(… conflicted copy …)" file for one.
+        String alternatives = baseName + " \\((?:.+'s )?conflicted copy \\d{4}-\\d{2}-\\d{2}(?: \\d{6})?(?: \\(\\d+\\))?\\)" + quotedExtension
                 + "|" + baseName + "\\.sync-conflict-\\d{8}-\\d{6}-[A-Z0-9]+" + quotedExtension
                 + computerName.map(name -> "|" + baseName + "-" + Pattern.quote(name) + "(-\\d+)?" + quotedExtension).orElse("");
         return Pattern.compile(alternatives, Pattern.CASE_INSENSITIVE);

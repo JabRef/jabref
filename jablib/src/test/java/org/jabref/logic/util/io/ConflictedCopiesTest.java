@@ -25,6 +25,7 @@ class ConflictedCopiesTest {
             "library (Alice's conflicted copy 2026-09-03).bib",
             "library (conflicted copy 2026-09-03).bib",
             "library (conflicted copy 2026-09-03 143015).bib",
+            "library (Alice's conflicted copy 2026-09-03 (1)).bib",
             "library.sync-conflict-20260903-143015-ABCDEFG.bib"
     })
     void recognizesSyncClientNames(String fileName) {
@@ -37,6 +38,9 @@ class ConflictedCopiesTest {
             "library (1).bib",
             "library-old.bib",
             "other (conflicted copy 2026-09-03).bib",
+            "library (my conflicted copy notes).bib",
+            "library (conflicted copy).bib",
+            "library (conflicted copy 2026-09-03 extra).bib",
             "library (conflicted copy 2026-09-03).bib.bak"
     })
     void ignoresOtherNames(String fileName) {

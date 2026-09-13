@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javafx.beans.value.ChangeListener;
 
@@ -129,7 +130,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private void notifyExternalChanges(List<DatabaseChange> changes, String description) {
         Optional.ofNullable(activeNotification).ifPresent(ExternalLibraryChangeNotification::remove);
 
-        ExternalLibraryChangeNotification notification = new ExternalLibraryChangeNotification(changes, description, true, () -> {
+        ExternalLibraryChangeNotification notification = new ExternalLibraryChangeNotification(changes, description, true, _ -> {
         });
         dialogService.notify(notification);
         activeNotification = notification;
@@ -143,8 +144,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
     private class ExternalLibraryChangeNotification extends Notifications.FileNotification {
         /// @param fromLibraryFile whether the changes come from the library file itself; only then can a fully accepted review leave the library matching its file and therefore clean
-        /// @param afterReview     run once all changes have been reviewed and applied
-        public ExternalLibraryChangeNotification(List<DatabaseChange> changes, String description, boolean fromLibraryFile, Runnable afterReview) {
+        /// @param afterReview     run once all changes have been reviewed and applied, with whether every change was accepted
+        public ExternalLibraryChangeNotification(List<DatabaseChange> changes, String description, boolean fromLibraryFile, Consumer<Boolean> afterReview) {
             super(Localization.lang("External changes detected"), description);
             setOnClick(_ -> OnClickBehaviour.NONE);
 
@@ -160,12 +161,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                         Localization.lang("External Changes Resolver"));
                 Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
                 if (areAllChangesResolved.orElse(false)) {
-                    List<DatabaseChange> resolved = databaseChangesResolverDialog.getResolvedChanges();
-                    applyResolvedChanges(resolved, fromLibraryFile && databaseChangesResolverDialog.resolvedChangesMatchDisk());
-                    rebaseAfterReview(resolved);
-
+                    completeReview(databaseChangesResolverDialog.getResolvedChanges(),
+                            fromLibraryFile && databaseChangesResolverDialog.resolvedChangesMatchDisk(), afterReview);
                     clearActiveNotification(this);
-                    afterReview.run();
                     return OnClickBehaviour.REMOVE;
                 }
 
@@ -412,9 +410,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             dialogService.notify(new ExternalLibraryChangeNotification(triage.bothSides(),
                     Localization.lang("The conflicted copy '%0' contains changes that need review.", conflictedCopy.getFileName().toString()),
                     false,
-                    () -> dialogService.notify(new ConflictedCopyMergedNotification(conflictedCopy))));
+                    everythingAccepted -> dialogService.notify(new ConflictedCopyMergedNotification(conflictedCopy, everythingAccepted))));
         } else {
-            dialogService.notify(new ConflictedCopyMergedNotification(conflictedCopy));
+            dialogService.notify(new ConflictedCopyMergedNotification(conflictedCopy, true));
         }
         mergeConflictedCopies(scannedBaseline);
     }
@@ -447,25 +445,16 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences, stateManager);
         // No new generation: merging a copy must not cancel the library scan it may run alongside
         int generation = scanGeneration;
-        BackgroundTask.wrap(() -> {
-                          try {
-                              if (awaitStableFile(copy).isEmpty()) {
-                                  return Optional.<List<DatabaseChange>>empty();
-                              }
-                          } catch (InterruptedException e) {
-                              LOGGER.debug("Interrupted while waiting for {} to stop changing; the merge is abandoned", copy, e);
-                              Thread.currentThread().interrupt();
-                              return Optional.<List<DatabaseChange>>empty();
-                          }
-                          return Optional.of(scanner.scanFile(copy));
-                      })
+        BackgroundTask.wrap(() -> scanCopy(scanner, copy))
                       .onSuccess(scanned -> {
                           synchronized (database) {
-                              if (scanned.isEmpty() || generation != scanGeneration) {
+                              if (scanned.isEmpty() || generation != scanGeneration || !isMergingConflictedCopies()) {
                                   mergedConflictedCopies.remove(copy);
                                   return;
                               }
-                              ChangeTriage.Triage triage = scanner.triage(scannedBaseline, scanned.get());
+                              // The state that was parsed, so that the copy is neither merged again nor deleted in another state
+                              mergedConflictedCopies.put(copy, scanned.get().state());
+                              ChangeTriage.Triage triage = scanner.triage(scannedBaseline, scanned.get().changes());
                               synchronize(scannedBaseline, triage,
                                       Localization.lang("Merged %0 change(s) from the conflicted copy '%1'", String.valueOf(triage.diskOnly().size()), copy.getFileName().toString()),
                                       copy);
@@ -479,12 +468,40 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                       .executeWith(taskExecutor);
     }
 
-    /// Everything in the copy is in the library now, so the copy only clutters the folder; deleting stays the user's call.
+    private record ScannedCopy(FileSnapshot state, List<DatabaseChange> changes) {
+    }
+
+    /// Parses the copy once it has settled and only if it is still in that state afterwards; empty when it kept
+    /// changing or was interrupted, in which case the sync client's next write starts over.
+    private static Optional<ScannedCopy> scanCopy(ChangeScanner scanner, Path copy) throws IOException {
+        Optional<FileSnapshot> settled;
+        try {
+            settled = awaitStableFile(copy);
+        } catch (InterruptedException e) {
+            LOGGER.debug("Interrupted while waiting for {} to stop changing; the merge is abandoned", copy, e);
+            Thread.currentThread().interrupt();
+            return Optional.empty();
+        }
+        if (settled.isEmpty()) {
+            return Optional.empty();
+        }
+        List<DatabaseChange> changes = scanner.scanFile(copy);
+        if (!settled.get().matches(copy)) {
+            LOGGER.debug("{} changed while being parsed; the merge is abandoned", copy);
+            return Optional.empty();
+        }
+        return Optional.of(new ScannedCopy(settled.get(), changes));
+    }
+
+    /// Nothing of the copy is left to look at, so it only clutters the folder; deleting stays the user's call, and a
+    /// change the user rejected in the review lives on in the copy only.
     @NullMarked
     private class ConflictedCopyMergedNotification extends Notifications.FileNotification {
-        ConflictedCopyMergedNotification(Path copy) {
+        ConflictedCopyMergedNotification(Path copy, boolean everythingApplied) {
             super(Localization.lang("Conflicted copy merged"),
-                    Localization.lang("All changes of '%0' are in the library.", copy.getFileName().toString()));
+                    everythingApplied
+                    ? Localization.lang("All changes of '%0' are in the library.", copy.getFileName().toString())
+                    : Localization.lang("Review of '%0' is complete. The changes you rejected exist only in the copy.", copy.getFileName().toString()));
             setOnClick(_ -> OnClickBehaviour.REMOVE);
             // The sync client may replace the copy while the notification is showing; only the merged state is deleted
             FileSnapshot mergedState = mergedConflictedCopies.get(copy);
@@ -502,6 +519,20 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                 return OnClickBehaviour.REMOVE;
             }));
         }
+    }
+
+    @Nullable LibraryBaseline getBaseline() {
+        return baseline;
+    }
+
+    /// Applies what the review accepted, rebases, and tells the caller whether everything was accepted.
+    ///
+    /// @param resolved    the reviewed changes, accepted or not
+    /// @param matchesDisk whether the library now matches its file, see [#applyResolvedChanges]
+    void completeReview(List<DatabaseChange> resolved, boolean matchesDisk, Consumer<Boolean> afterReview) {
+        applyResolvedChanges(resolved, matchesDisk);
+        rebaseAfterReview(resolved);
+        afterReview.accept(resolved.stream().allMatch(DatabaseChange::isAccepted));
     }
 
     /// After a review, the accepted changes are in memory and must not count as a divergence anymore; the rejected
