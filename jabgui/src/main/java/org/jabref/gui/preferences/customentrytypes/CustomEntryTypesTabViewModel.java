@@ -20,6 +20,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
@@ -51,6 +52,8 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
     private final List<String> restartWarnings = new ArrayList<>();
+    /// State at dialog open, so that resets (stored immediately) also count as changes
+    private List<String> storedDefinitions;
 
     private final CliPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
@@ -73,6 +76,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         this.bibDatabaseMode = mode;
 
         this.multiLineFields.addAll(preferences.getFieldPreferences().getNonWrappableFields());
+        this.storedDefinitions = currentDefinitions();
 
         entryTypeValidator = new FunctionBasedValidator<>(
                 entryTypeToAdd,
@@ -106,9 +110,6 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        List<BibEntryType> typesBefore = List.copyOf(entryTypesManager.getAllTypes(bibDatabaseMode));
-        Set<Field> multilineFieldsBefore = Set.copyOf(preferences.getFieldPreferences().getNonWrappableFields());
-
         Set<Field> multilineFields = new HashSet<>();
         for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
             List<FieldViewModel> allFields = typeViewModel.fields();
@@ -143,10 +144,23 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         preferences.storeCustomEntryTypesRepository(entryTypesManager);
 
         restartWarnings.clear();
-        if (!typesBefore.equals(List.copyOf(entryTypesManager.getAllTypes(bibDatabaseMode)))
-                || !multilineFieldsBefore.equals(multilineFields)) {
+        List<String> newDefinitions = currentDefinitions();
+        if (!storedDefinitions.equals(newDefinitions)) {
             restartWarnings.add(Localization.lang("Entry types changed."));
         }
+        storedDefinitions = newDefinitions;
+    }
+
+    /// Serialized form includes field properties, which `BibEntryType.equals` ignores
+    private List<String> currentDefinitions() {
+        List<String> definitions = new ArrayList<>(entryTypesManager.getAllTypes(bibDatabaseMode).stream()
+                                                                    .map(MetaDataSerializer::serializeCustomEntryTypesV2)
+                                                                    .toList());
+        preferences.getFieldPreferences().getNonWrappableFields().stream()
+                   .map(Field::getName)
+                   .sorted()
+                   .forEach(definitions::add);
+        return definitions;
     }
 
     @Override

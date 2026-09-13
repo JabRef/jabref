@@ -14,8 +14,10 @@ import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,6 +96,63 @@ class CustomEntryTypesTabViewModelTest {
 
         TreeSet<BibEntryType> expected = new TreeSet<>(List.of(modified));
         assertEquals(expected, entryTypesManager.getAllCustomizedTypes(BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    void unchangedSaveHasNoRestartWarning() {
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.storeSettings();
+
+        assertEquals(List.of(), model.getRestartWarnings());
+    }
+
+    @Test
+    void changedTypeHasRestartWarningUntilNextUnchangedSave() {
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+        BibEntryType modified = new BibEntryTypeBuilder()
+                .withType(StandardEntryType.Online)
+                .withRequiredFields(StandardField.TITLE)
+                .build();
+        model.entryTypes().setAll(List.of(new CustomEntryTypeViewModel(modified, x -> false)));
+
+        model.storeSettings();
+        assertEquals(List.of("Entry types changed."), model.getRestartWarnings());
+
+        model.storeSettings();
+        assertEquals(List.of(), model.getRestartWarnings());
+    }
+
+    @Test
+    void changedFieldPropertyHasRestartWarning() {
+        UnknownField field = new UnknownField("custom");
+        entryTypesManager.update(new BibEntryTypeBuilder().withType(new UnknownEntryType("mytype")).withImportantFields(field).build(), BibDatabaseMode.BIBLATEX);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.entryTypes().stream()
+             .filter(type -> "mytype".equals(type.entryType().getValue().getType().getName()))
+             .findFirst().orElseThrow()
+             .fields().getFirst()
+             .getProperties().add(FieldProperty.DATE);
+        model.storeSettings();
+
+        assertEquals(List.of("Entry types changed."), model.getRestartWarnings());
+    }
+
+    @Test
+    void resetBeforeSaveHasRestartWarning() {
+        entryTypesManager.update(new BibEntryTypeBuilder().withType(new UnknownEntryType("mytype")).withRequiredFields(StandardField.TITLE).build(), BibDatabaseMode.BIBLATEX);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.resetAllCustomEntryTypes();
+        model.setValues();
+        model.storeSettings();
+
+        assertEquals(List.of("Entry types changed."), model.getRestartWarnings());
     }
 
     @Test

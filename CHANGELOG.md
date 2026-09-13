@@ -135,7 +135,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - We improved JabRef's startup performance by loading MSC codes only when activated. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
-- JabRef now asks for a restart after custom entry types are changed, so the entry editor shows them. [#17121](https://github.com/JabRef/jabref/pull/17121)
+- We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
 - We now keep changes made while the [remote SQL database](https://docs.jabref.org/collaborative-work/sqldatabase) connection is down and synchronize them once it is back. [#11211](https://github.com/JabRef/jabref/issues/11211)
 - We changed the full text document search to run as a cancelable background task instead of blocking JabRef with a modal dialog. [#16831](https://github.com/JabRef/jabref/pull/16831)
 - We changed [remote SQL database](https://docs.jabref.org/collaborative-work/sqldatabase) synchronization to PostgreSQL-only with live updates; existing database tables are migrated. [#11232](https://github.com/JabRef/jabref/issues/11232)
