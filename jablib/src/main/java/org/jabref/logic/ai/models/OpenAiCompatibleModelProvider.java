@@ -54,6 +54,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
         } catch (FetcherClientException e) {
             // Invalid API key or wrong base URL: URLDownload already logged the response, a stack trace adds nothing
             LOGGER.warn("Could not fetch models from {}: {}", aiProvider.name(), e.getHttpResponse().map(SimpleHttpResponse::statusCode).orElse(-1));
+            LOGGER.debug("Client error while fetching models from {}", aiProvider.name(), e);
         } catch (FetcherException | MalformedURLException | JSONException e) {
             LOGGER.error("Failed to fetch models from {}", aiProvider.name(), e);
         }
