@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - main-release
+      - stable
   pull_request:
   merge_group:
   workflow_dispatch:
@@ -405,7 +406,7 @@ jobs:
       - name: Check CHANGELOG.md diff
         run: |
           diff \
-            <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
+            <(git show "origin/${{ github.base_ref }}":CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
 
   javadoc:

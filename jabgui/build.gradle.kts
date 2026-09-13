@@ -188,6 +188,13 @@ javaModulePackaging {
             // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
 
+            // The two-step packaging (app-image, then deb/rpm/msi from it) does not pass these on.
+            // Without "--name", jpackage silently ignores "--file-associations".
+            // https://github.com/JabRef/jabref/issues/17006
+            "--name", applicationName.get(),
+            "--description", applicationDescription.get(),
+            "--vendor", vendor.get(),
+
             // Generic options, but different for each target
             "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
             "--file-associations", "$projectDir\\buildres\\windows\\bibtexAssociations.properties",
@@ -221,6 +228,13 @@ javaModulePackaging {
         options.addAll(
             // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // The two-step packaging (app-image, then deb/rpm/msi from it) does not pass these on.
+            // Without "--name", jpackage silently ignores "--file-associations".
+            // https://github.com/JabRef/jabref/issues/17006
+            "--name", applicationName.get(),
+            "--description", applicationDescription.get(),
+            "--vendor", vendor.get(),
 
             // Generic options, but different for each target
             "--icon", "$projectDir/buildres/linux/JabRef.png",
@@ -323,6 +337,10 @@ tasks.test {
     systemProperty("glass.platform", "Headless")
     systemProperty("prism.order", "sw")
 
+    useJUnitPlatform {
+        excludeTags("ExternalServicesTest")
+    }
+
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
 
@@ -337,12 +355,32 @@ tasks.test {
     maxParallelForks = 1
 }
 
+val testSourceSet = sourceSets.test.get()
+
+tasks.register<Test>("externalServicesTest") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
+    useJUnitPlatform {
+        includeTags("ExternalServicesTest")
+    }
+    systemProperty("glass.platform", "Headless")
+    systemProperty("prism.order", "sw")
+    jvmArgs = listOf(
+        "-javaagent:${configurations.mockitoAgent.get().asPath}",
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        "--enable-native-access=javafx.graphics,com.sun.jna"
+    ) + useLibericaJdkFullJvmArgs
+    maxParallelForks = 1
+}
+
 // region community themes
-// themes.jabref.org is a submodule. Its two-scheme themes (directly below themes/<Name>/) are bundled
-// flat under org/jabref/gui/theme/community/; ThemePreset lists every bundled file and ThemePresetTest
-// fails when the two differ, so a submodule bump that brings a new theme ends up either as a new
-// constant or as an exclude below. DarkTheme/ and LightTheme/ hold single-scheme themes, which
-// cannot follow the color scheme.
+// themes.jabref.org is a submodule and holds every theme, JabRef's own included. Its two-scheme themes
+// (directly below themes/<Name>/) are bundled flat under org/jabref/gui/theme/themes.jabref.org/; ThemePreset
+// lists every bundled file and ThemePresetTest fails when the two differ, so a submodule bump that
+// brings a new theme ends up either as a new constant or as an exclude below. DarkTheme/ and
+// LightTheme/ hold single-scheme themes, which cannot follow the color scheme.
 val themesJabRefOrgDir = layout.projectDirectory.dir("src/main/themes.jabref.org/themes")
 // Left out on purpose: the grey-text variants of Dino Girl's themes read worse than their
 // contrast-text twins, and the jabrefdark/jabreflight pair is JabRef's own look.
@@ -361,13 +399,13 @@ tasks.processResources {
         exclude("DarkTheme/**", "LightTheme/**")
         exclude(themesLeftOut)
         // `path` is relative to the task's destination, so the target directory is part of it.
-        eachFile { path = "org/jabref/gui/theme/community/$name" }
+        eachFile { path = "org/jabref/gui/theme/themes.jabref.org/$name" }
         includeEmptyDirs = false
     }
 }
 
 // The theme previews shown in the preferences: the screenshots themes.jabref.org keeps next to each
-// theme plus JabRef's own in src/main/theme-previews, scaled down so they add well under 1 MB.
+// theme, scaled down so they add well under 1 MB.
 val generateThemePreviews = tasks.register("generateThemePreviews") {
     group = "JabRef"
     description = "Scales the theme screenshots down to preview size"
@@ -375,7 +413,7 @@ val generateThemePreviews = tasks.register("generateThemePreviews") {
         include("*/*.png")
         exclude("DarkTheme/**", "LightTheme/**")
         exclude(themesLeftOut)
-    } + fileTree(layout.projectDirectory.dir("src/main/theme-previews")) { include("*.png") }
+    }
     val targetRoot = layout.buildDirectory.dir("generated/resources/theme-previews").get().asFile
     val targetDir = targetRoot.resolve("org/jabref/gui/theme/preview")
     val previewWidth = 400

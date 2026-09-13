@@ -38,11 +38,12 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final CliPreferences preferences;
     private final ObjectProperty<Path> currentDocument = new SimpleObjectProperty<>();
-    private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
+    private final ListProperty<LinkedFile> files = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
     private final IntegerProperty currentPage = new SimpleIntegerProperty();
     private final StringProperty highlightText = new SimpleStringProperty();
     private final DialogService dialogService;
+    private final ListChangeListener<BibEntry> selectedEntriesListener;
 
     public DocumentViewerViewModel(@NonNull StateManager stateManager,
                                    @NonNull CliPreferences preferences,
@@ -50,13 +51,14 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
-
-        this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) _ -> {
+        this.selectedEntriesListener = _ -> {
             // Switch to currently selected entry in live mode
             if (liveMode.get()) {
                 setCurrentEntries(this.stateManager.getSelectedEntries());
             }
-        });
+        };
+
+        this.stateManager.getSelectedEntries().addListener(selectedEntriesListener);
 
         this.liveMode.addListener((_, oldValue, newValue) -> {
             // Switch to currently selected entry if mode is changed to live
@@ -100,7 +102,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
                 currentDocument.set(null);
                 dialogService.notify(Localization.lang("No PDF files available"));
             } else {
-                files.setValue(FXCollections.observableArrayList(pdfFiles));
+                files.setAll(pdfFiles);
             }
         }
     }
@@ -126,6 +128,9 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     public void switchToFile(LinkedFile file) {
         if (file != null) {
+            if (!files.contains(file)) {
+                files.add(file);
+            }
             stateManager.getActiveDatabase()
                         .flatMap(database -> file.findIn(database, preferences.getFilePreferences()))
                         .ifPresentOrElse(
@@ -141,7 +146,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     }
 
     public void showPage(int pageNumber) {
-        currentPage.set(pageNumber - 1);
+        currentPage.set(Math.max(0, pageNumber - 1));
     }
 
     public void setLiveMode(boolean value) {
@@ -150,5 +155,9 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     public void highlightText(String text) {
         this.highlightText.set(text);
+    }
+
+    public void dispose() {
+        this.stateManager.getSelectedEntries().removeListener(selectedEntriesListener);
     }
 }
