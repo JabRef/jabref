@@ -13,6 +13,8 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
@@ -276,6 +278,41 @@ class ThemeManagerTest {
 
         assertEquals("data:text/css;charset=utf-8;base64,LyogQW5kIG5vdyBmb3Igc29tZXRoaW5nIHNsaWdodGx5IGRpZmZlcmVudCAqLwouY29kZS1hcmVhIC50ZXh0IHsKICAgIC1meC1mb250LWZhbWlseTogc2VyaWY7Cn0=",
                 styleSheet.orElseThrow().getSceneStylesheetLocation(), "stylesheet embedded in data: url should have reloaded");
+    }
+
+    /// A third party can replace the scene root of a live window at any time -- ControlsFX injects its
+    /// DecorationPane on the first validation decoration. The font size is carried by a style class on the
+    /// root, so it has to move along instead of being stranded on the node that is no longer the root.
+    @Test
+    void fontSizeStyleClassFollowsSceneRootChange() {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        workspacePreferences.setShouldOverrideDefaultFontSize(true);
+        workspacePreferences.setMainFontSize(16);
+        createThemeManager(workspacePreferences);
+
+        Parent initialRoot = new StackPane();
+        AtomicReference<Stage> stage = new AtomicReference<>();
+        JavaFxExtension.invokeAndWait(() -> {
+            Stage newStage = new Stage();
+            newStage.setScene(new Scene(initialRoot));
+            newStage.show();
+            stage.set(newStage);
+        });
+
+        assertEquals(List.of("font-size-16"), fontSizeStyleClasses(initialRoot));
+
+        Parent replacementRoot = new StackPane();
+        JavaFxExtension.invokeAndWait(() -> {
+            stage.get().getScene().setRoot(replacementRoot);
+            stage.get().close();
+        });
+
+        assertEquals(List.of(), fontSizeStyleClasses(initialRoot), "the replaced root should not keep a stale font size");
+        assertEquals(List.of("font-size-16"), fontSizeStyleClasses(replacementRoot));
+    }
+
+    private static List<String> fontSizeStyleClasses(Parent parent) {
+        return parent.getStyleClass().stream().filter(styleClass -> styleClass.startsWith("font-size-")).toList();
     }
 
     private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences) {
