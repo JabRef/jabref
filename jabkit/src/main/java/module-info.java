@@ -13,7 +13,7 @@ module org.jabref.jabkit {
     opens org.jabref.toolkit.converter;
     opens org.jabref.toolkit;
 
-    requires org.jspecify;
+    requires static org.jspecify;
     requires java.prefs;
     requires java.sql;
 
