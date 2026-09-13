@@ -52,7 +52,6 @@ public class SharedDatabaseErrorTab extends Tab {
         retryButton.setDefaultButton(true);
         retryButton.setOnAction(_ -> {
             retryButton.setDisable(true);
-            message.setText(Localization.lang("Connecting..."));
             retryAction.run();
         });
 
