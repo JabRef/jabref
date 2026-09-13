@@ -52,7 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts any open library id, switching JabRef to that library before importing, instead of only the currently active one. [#15929](https://github.com/JabRef/jabref/pull/15929)
 - We added support for selecting response engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - We added the ability to jump to cited entries and page locations in the PDF viewer from AI chat citations. [#16981](https://github.com/JabRef/jabref/pull/16981)
-- We changed the default local embedding model to `BAAI/bge-small-en-v1.5` for better passage retrieval. [#TODO](https://github.com/JabRef/jabref/pull/TODO)
+- We changed the default local embedding model to `BAAI/bge-small-en-v1.5` for better passage retrieval. [#17120](https://github.com/JabRef/jabref/pull/17120)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 - We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
