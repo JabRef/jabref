@@ -1,7 +1,8 @@
 package org.jabref.gui;
 
 import java.sql.SQLException;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.testutils.JavaFxExtension;
@@ -17,7 +18,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,17 +62,17 @@ class LibraryTabTest {
 
     @Test
     void failureAfterCancellationDoesNotReachTheFailureHandler() {
-        AtomicBoolean failureHandled = new AtomicBoolean();
+        List<Exception> handledFailures = new ArrayList<>();
         LibraryTab.SharedDatabaseLoadingCallbacks callbacks = new LibraryTab.SharedDatabaseLoadingCallbacks(
                 mock(LibraryTab.class),
                 (_, _) -> {
                 },
-                _ -> failureHandled.set(true));
+                handledFailures::add);
         LibraryTab.SharedDatabaseLoadingTask task = new LibraryTab.SharedDatabaseLoadingTask(() -> mock(BibDatabaseContext.class), callbacks);
 
         task.cancel();
         callbacks.onDatabaseLoadingFailed(new SQLException("Connection refused"));
 
-        assertFalse(failureHandled.get());
+        assertEquals(List.of(), handledFailures);
     }
 }
