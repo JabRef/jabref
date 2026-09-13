@@ -34,6 +34,8 @@ import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -45,6 +47,30 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class DatabaseChangeMonitorTest {
+
+    @Test
+    void unregisterWithdrawsTheActiveReview(@TempDir Path tempDir) throws Exception {
+        Path library = tempDir.resolve("library.bib");
+        Files.writeString(library, "@Article{a, title = {A}}");
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(library));
+        when(databaseContext.getMetaData()).thenReturn(new MetaData());
+        DatabaseChangeMonitor monitor = new DatabaseChangeMonitor(
+                databaseContext,
+                mock(FileUpdateMonitor.class),
+                mock(TaskExecutor.class),
+                mock(DialogService.class),
+                mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(UndoManager.class),
+                mock(StateManager.class),
+                mock(LibraryTab.class));
+        monitor.notifyExternalChanges(List.of());
+        assertNotNull(monitor.getActiveNotification());
+
+        monitor.unregister();
+
+        assertNull(monitor.getActiveNotification());
+    }
 
     @Test
     void unregisterRemovesListenerFromOriginallyMonitoredPath(@TempDir Path tempDir) throws Exception {

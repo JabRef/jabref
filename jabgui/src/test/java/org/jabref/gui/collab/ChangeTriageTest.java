@@ -190,6 +190,34 @@ class ChangeTriageTest {
     }
 
     @Test
+    void pairEstablishedBySimilarityOnlyGoesToReview() {
+        // memory edits the entry, disk replaces it by a similar one under another key
+        local.setField(StandardField.YEAR, "2021");
+        diskContext.getDatabase().removeEntry(disk);
+        diskContext.getDatabase().insertEntry(new BibEntry(StandardEntryType.Article).withCitationKey("Renamed").withField(StandardField.TITLE, "Alpha title").withField(StandardField.YEAR, "2020"));
+
+        ChangeTriage.Triage triage = triage();
+
+        assertInstanceOf(EntryChange.class, triage.bothSides().getFirst());
+        assertEquals(List.of(), triage.diskOnly());
+    }
+
+    @Test
+    void metadataChangeKeepsTheLocalSynchronizationSetting() {
+        localContext.getMetaData().setSynchronizeWithFile(true);
+        baseline = LibraryBaseline.of(localContext, PATTERNS);
+        diskContext.getMetaData().setSynchronizeWithFile(false);
+        diskContext.getMetaData().setEncoding(StandardCharsets.ISO_8859_1);
+
+        ChangeTriage.Triage triage = triage();
+        MetadataChange change = assertInstanceOf(MetadataChange.class, triage.diskOnly().getFirst());
+        change.applyChange(new CompoundEdit("test"));
+
+        assertEquals(Optional.of(true), localContext.getMetaData().getSynchronizeWithFile());
+        assertEquals(Optional.of(StandardCharsets.ISO_8859_1), localContext.getMetaData().getEncoding());
+    }
+
+    @Test
     void entryAddedOnDiskIsAccepted() {
         diskContext.getDatabase().insertEntry(new BibEntry().withCitationKey("New").withField(StandardField.TITLE, "New on disk"));
 

@@ -110,7 +110,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     void notifyExternalChanges(List<DatabaseChange> changes) {
-        Optional.ofNullable(activeNotification).ifPresent(ExternalLibraryChangeNotification::remove);
+        withdrawActiveNotification();
 
         ExternalLibraryChangeNotification notification = new ExternalLibraryChangeNotification(changes);
         dialogService.notify(notification);
@@ -235,7 +235,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         if (captured) {
             // A review offered while synchronization was off holds changes computed against an older state; from now
             // on the scan decides, so the pending review is withdrawn and the file is looked at again
-            Optional.ofNullable(activeNotification).ifPresent(ExternalLibraryChangeNotification::remove);
+            withdrawActiveNotification();
             activeNotification = null;
             synchronized (database) {
                 scanForChanges();
@@ -271,15 +271,35 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             // [impl->req~ux.external-library-changes.synchronize~1]
             BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
                           .onSuccess(changes -> changes.ifPresent(scanned -> onScannedForSynchronization(generation, scanner, scannedBaseline, scanned)))
-                          .onFailure(e -> LOGGER.error("Error while synchronizing with the library file", e))
+                          .onFailure(e -> forgetDiskState("Error while synchronizing with the library file", e))
                           .executeWith(taskExecutor);
             return;
         }
         BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
                       .onSuccess(changes -> changes.filter(scanned -> !scanned.isEmpty())
                                                    .ifPresent(scanned -> offerReview(generation, scanned)))
-                      .onFailure(e -> LOGGER.error("Error while watching for changes", e))
+                      .onFailure(e -> forgetDiskState("Error while watching for changes", e))
                       .executeWith(taskExecutor);
+    }
+
+    /// A scan that failed to read the file must not leave its state recorded as handled: forgetting it makes the next
+    /// file event scan again.
+    private void forgetDiskState(String message, Exception exception) {
+        LOGGER.error(message, exception);
+        synchronized (database) {
+            knownDiskState = null;
+        }
+    }
+
+    /// A notification that was never shown (no dialog service showed it) has no group to be removed from.
+    private void withdrawActiveNotification() {
+        if (activeNotification != null && activeNotification.getGroup() != null) {
+            activeNotification.remove();
+        }
+    }
+
+    @Nullable ExternalLibraryChangeNotification getActiveNotification() {
+        return activeNotification;
     }
 
     /// A scan overtaken by a newer file change, a save, or the tab closing must not replace the current review either.
@@ -402,7 +422,12 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     public void unregister() {
-        scanGeneration++;
+        synchronized (database) {
+            scanGeneration++;
+        }
+        // A review offered by this monitor must not outlive it: its changes belong to the file it watched
+        withdrawActiveNotification();
+        activeNotification = null;
         monitoredPath.ifPresent(path -> {
             fileMonitor.removeListener(path, this);
             // Unconditionally: the library may have been converted to a shared one since the listener was added,

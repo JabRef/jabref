@@ -244,4 +244,22 @@ class LibraryBaselineTest {
 
         assertEquals(Optional.empty(), baseline.mergeEntry(local, remote));
     }
+
+    @Test
+    void entryDeletedInMemoryAndRenamedWithAChangeOnDiskIsAConflict() {
+        remote.setCitationKey("Renamed");
+        remote.setField(StandardField.YEAR, "2021");
+
+        assertEquals(Side.BOTH, baseline.lookup().sideOfAddedEntry(remote, _ -> false));
+        assertEquals(Side.DISK, baseline.lookup().sideOfAddedEntry(remote, _ -> true));
+    }
+
+    @Test
+    void entryRenamedToAnotherEntrysKeyIsFoundByContent() {
+        BibEntry other = new BibEntry(StandardEntryType.Book).withCitationKey("Other").withField(StandardField.TITLE, "Other");
+        baseline = LibraryBaseline.of(new BibDatabaseContext(new BibDatabase(List.of(local, other))), PATTERNS);
+        remote.setCitationKey("Other");
+
+        assertEquals(Optional.of(local.getId()), baseline.lookup().baseIdOf(remote));
+    }
 }

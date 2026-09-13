@@ -37,25 +37,25 @@ public class ChangeScanner {
     }
 
     public List<DatabaseChange> scanForChanges() {
-        return scanForChanges(() -> true).orElse(List.of());
+        try {
+            return scanForChanges(() -> true).orElse(List.of());
+        } catch (IOException e) {
+            LOGGER.warn("Error while parsing changed file.", e);
+            return List.of();
+        }
     }
 
     /// @param readyToParse consulted right before the file is parsed, e.g. to wait until a sync client has finished writing it; `false` abandons the scan
     /// @return the changes, or empty when the scan was abandoned
-    public Optional<List<DatabaseChange>> scanForChanges(BooleanSupplier readyToParse) {
+    /// @throws IOException when the file could not be read; unlike no changes, a failed read must be retried
+    public Optional<List<DatabaseChange>> scanForChanges(BooleanSupplier readyToParse) throws IOException {
         if (database.getDatabasePath().isEmpty()) {
             return Optional.of(List.of());
         }
         if (!readyToParse.getAsBoolean()) {
             return Optional.empty();
         }
-
-        try {
-            return Optional.of(getDatabaseChanges(database.getDatabasePath().get()));
-        } catch (IOException e) {
-            LOGGER.warn("Error while parsing changed file.", e);
-            return Optional.of(List.of());
-        }
+        return Optional.of(getDatabaseChanges(database.getDatabasePath().get()));
     }
 
     /// @return the given external changes sorted by the side they happened on, see [ChangeTriage#triage]
