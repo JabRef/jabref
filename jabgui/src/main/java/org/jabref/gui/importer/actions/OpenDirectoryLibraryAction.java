@@ -19,6 +19,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
 import org.jabref.gui.git.GitConflictResolverDialog;
 import org.jabref.gui.git.GuiGitConflictResolverStrategy;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -163,7 +164,7 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
         // Evaluated per write, so a changed preference (global or library) takes effect immediately
         // [impl->req~directory-library.pattern-rename~2]
         Function<BibEntry, Optional<String>> fileNameGenerator = entry ->
-                databaseContext.getMetaData().getAutoRenameFilesOnChange().orElse(preferences.getFilePreferences().shouldAutoRenameFilesOnChange())
+                AutoRenameFileOnEntryChange.isEnabled(databaseContext, preferences.getFilePreferences())
                 ? FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileNamePattern())
                 : Optional.empty();
         GuiGitConflictResolverStrategy conflictResolver = new GuiGitConflictResolverStrategy(

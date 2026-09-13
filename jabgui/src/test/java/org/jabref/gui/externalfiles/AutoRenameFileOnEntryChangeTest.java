@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 class AutoRenameFileOnEntryChangeTest {
     private FilePreferences filePreferences;
+    private BibDatabaseContext bibDatabaseContext;
     private BibEntry entry;
     private Path tempDir;
 
@@ -42,7 +43,7 @@ class AutoRenameFileOnEntryChangeTest {
         this.tempDir = tempDir;
         MetaData metaData = new MetaData();
         metaData.setLibrarySpecificFileDirectory(tempDir.toString());
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), metaData);
+        bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), metaData);
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         GuiPreferences guiPreferences = mock(GuiPreferences.class);
         filePreferences = mock(FilePreferences.class);
@@ -104,6 +105,32 @@ class AutoRenameFileOnEntryChangeTest {
         entry.setFiles(List.of(new LinkedFile("", "oldKey2081.pdf", "PDF")));
         when(filePreferences.getFileNamePattern()).thenReturn("");
         when(filePreferences.shouldAutoRenameFilesOnChange()).thenReturn(true);
+        entry.setField(StandardField.AUTHOR, "newKey");
+
+        assertEquals("oldKey2081.pdf", entry.getFiles().getFirst().getLink());
+        assertFileExists(tempDir.resolve("oldKey2081.pdf"));
+    }
+
+    @Test
+    void libraryOverrideEnablesRenameDespiteDisabledGlobalPreference() throws IOException {
+        Files.createFile(tempDir.resolve("oldKey2081.pdf"));
+        entry.setFiles(List.of(new LinkedFile("", "oldKey2081.pdf", "PDF")));
+        when(filePreferences.shouldAutoRenameFilesOnChange()).thenReturn(false);
+        bibDatabaseContext.getMetaData().setAutoRenameFilesOnChange(true);
+
+        entry.setField(StandardField.AUTHOR, "newKey");
+
+        assertEquals("newKey2081.pdf", entry.getFiles().getFirst().getLink());
+        assertFileExists(tempDir.resolve("newKey2081.pdf"));
+    }
+
+    @Test
+    void libraryOverrideDisablesRenameDespiteEnabledGlobalPreference() throws IOException {
+        Files.createFile(tempDir.resolve("oldKey2081.pdf"));
+        entry.setFiles(List.of(new LinkedFile("", "oldKey2081.pdf", "PDF")));
+        when(filePreferences.shouldAutoRenameFilesOnChange()).thenReturn(true);
+        bibDatabaseContext.getMetaData().setAutoRenameFilesOnChange(false);
+
         entry.setField(StandardField.AUTHOR, "newKey");
 
         assertEquals("oldKey2081.pdf", entry.getFiles().getFirst().getLink());

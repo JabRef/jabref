@@ -1024,7 +1024,7 @@ class DirectoryLibrarySynchronizerTest {
                 children.stream().map(child -> child.getGroup().getClass()).toList());
         assertEquals("My group", children.getLast().getName());
         // Membership lives in the entry's groups field and must survive the sidecar round trip
-        assertTrue(children.getLast().getGroup().contains(entries().getFirst()));
+        assertEquals(Optional.of("My group"), entries().getFirst().getField(StandardField.GROUPS));
     }
 
     /// [utest->req~directory-library.convert~1]

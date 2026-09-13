@@ -115,6 +115,14 @@ public class MetaDataParserTest {
     }
 
     @Test
+    void ignoresMalformedAutoRenameFilesOnChangeOverride() throws ParseException {
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(Map.of(MetaData.AUTO_RENAME_FILES_ON_CHANGE, "yes;"), ',', "userAndHost");
+
+        assertEquals(Optional.empty(), parsed.getAutoRenameFilesOnChange());
+    }
+
+    @Test
     void parsesKeywordSeparator() throws ParseException {
         MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
         MetaData parsed = parser.parse(Map.of(MetaData.KEYWORD_SEPARATOR, "\\;;"), ',', "userAndHost");

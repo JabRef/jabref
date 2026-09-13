@@ -24,9 +24,14 @@ public class AutoRenameFileOnEntryChange {
         renamePdfCleanup = new RenamePdfCleanup(false, () -> bibDatabaseContext, filePreferences);
     }
 
+    /// The library properties override the global preference when set (`MetaData#getAutoRenameFilesOnChange`).
+    public static boolean isEnabled(BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
+        return bibDatabaseContext.getMetaData().getAutoRenameFilesOnChange().orElse(filePreferences.shouldAutoRenameFilesOnChange());
+    }
+
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        if (!bibDatabaseContext.getMetaData().getAutoRenameFilesOnChange().orElse(filePreferences.shouldAutoRenameFilesOnChange())
+        if (!isEnabled(bibDatabaseContext, filePreferences)
                 || filePreferences.getFileNamePattern().isEmpty()
                 || filePreferences.getFileNamePattern() == null) {
             return;
