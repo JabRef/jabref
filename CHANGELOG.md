@@ -183,6 +183,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the packaged JabRef application produced an exception when trying to use fulltext search and indexing. [#16738](https://github.com/JabRef/jabref/pull/16738)
 - We fixed search highlighting exceptions caused by incomplete or literal regular-expression characters. [#16539](https://github.com/JabRef/jabref/issues/16539)
 - We fixed freezing while scrolling results in the Search for unlinked local files dialog. [#16696](https://github.com/JabRef/jabref/pull/16696)
+- We fixed an issue where "Search for unlinked local files" found no files because of a `.gitignore` outside a git repository. [#17141](https://github.com/JabRef/jabref/pull/17141)
 - We fixed an issue where "File > Git > Commit" refused to commit when the repository had no remote or the remote could not be reached. [#16720](https://github.com/JabRef/jabref/pull/16720)
 - We fixed Git commit, push, and GitHub share errors for broken local repositories. [#16704](https://github.com/JabRef/jabref/issues/16704)
 - We fixed Git diffs so group tree changes are highlighted. [#16729](https://github.com/JabRef/jabref/issues/16729)
