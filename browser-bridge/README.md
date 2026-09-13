@@ -155,7 +155,7 @@ native-messaging host,
 
 The two are deliberately kept separate: import is stateless and one-shot, while
 this host is a long-lived server owning a loopback port and a discovery file.
-See [ADR 0071](../docs/decisions/0071-separate-native-messaging-hosts-for-import-and-fulltext.md)
+See [ADR 0075](../docs/decisions/0075-separate-native-messaging-hosts-for-import-and-fulltext.md)
 for the trade-offs.
 
 ## Lifecycle

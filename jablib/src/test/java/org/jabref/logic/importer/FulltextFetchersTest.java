@@ -191,7 +191,7 @@ class FulltextFetchersTest {
         FallbackFileFetcher fallback = e -> Optional.of(fileUrl);
 
         // Head start of 200 ms: the fallback must launch and win while the primary is still sleeping,
-        // instead of waiting out the primary's full run (ADR-0072).
+        // instead of waiting out the primary's full run (ADR-0076).
         FulltextFetchers fetchers = new FulltextFetchers(Set.of(slowPrimary, fallback), Duration.ofMillis(200));
 
         long startNanos = System.nanoTime();

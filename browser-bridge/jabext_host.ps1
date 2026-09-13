@@ -155,7 +155,7 @@ function Handle-Context($ctx) {
 
 # Background runspace: blocking native-messaging read loop. Reads frames and
 # delivers fulltext replies (correlated by requestId). Import is served by a
-# separate host (JabRefHost.ps1 / org.jabref.jabref, see ADR 0071), so messages
+# separate host (JabRefHost.ps1 / org.jabref.jabref, see ADR 0075), so messages
 # without a requestId are ignored here.
 $ReaderScript = {
     param($Sync)

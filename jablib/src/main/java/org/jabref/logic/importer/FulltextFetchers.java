@@ -52,7 +52,7 @@ public class FulltextFetchers {
 
     // How long the direct (non-fallback) fetchers run before the fallback fetcher is also
     // launched. Short, so a source only the browser extension can serve (e.g. IEEE) does not
-    // first wait out the slowest direct fetcher's full timeout. See ADR-0072.
+    // first wait out the slowest direct fetcher's full timeout. See ADR-0076.
     private static final Duration DEFAULT_HEAD_START = Duration.ofSeconds(4);
 
     private final Set<FulltextFetcher> fetchers;
@@ -126,7 +126,7 @@ public class FulltextFetchers {
         // Split direct fetchers from fallback fetchers. Direct (HTTP) fetchers are cheap;
         // fallback fetchers (e.g. the browser-extension companion, which opens a browser tab)
         // are consulted only after a head start, so the browser session is reserved for PDFs
-        // JabRef cannot download directly. See ADR-0072.
+        // JabRef cannot download directly. See ADR-0076.
         Set<FulltextFetcher> primaryFetchers = new HashSet<>();
         Set<FulltextFetcher> fallbackFetchers = new HashSet<>();
         for (FulltextFetcher fetcher : fetchers) {

@@ -5,7 +5,7 @@ Implements the provider side of the Browser-Extension Fulltext Protocol
 (req~bxf.*~1). The browser launches it via connectNative; it runs a loopback
 HTTP server for JabRef and forwards each fetch to the extension over native
 messaging. The import direction (browser -> JabRef) is a separate host
-(jabrefHost.py / org.jabref.jabref); see ADR 0071.
+(jabrefHost.py / org.jabref.jabref); see ADR 0075.
 
 Ships as source like jabrefHost.py: no GraalVM, no JBang, no mise, no per-OS
 binary to build/bundle. Stdlib only.
@@ -248,7 +248,7 @@ def write_discovery(port: int, token_file: Path) -> Path:
 def nm_loop() -> None:
     """Main read loop: each extension message is a reply to a pending fulltext
     request, correlated by requestId. Import is served by a separate host
-    (jabrefHost.py / org.jabref.jabref, see ADR 0071), so anything without a
+    (jabrefHost.py / org.jabref.jabref, see ADR 0075), so anything without a
     requestId is ignored here."""
     global DONE
     while True:

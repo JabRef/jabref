@@ -1,5 +1,5 @@
 ---
-nav_order: 72
+nav_order: 76
 parent: Decision Records
 status: proposed
 date: 2026-09-03
@@ -9,7 +9,7 @@ date: 2026-09-03
 
 ## Context and Problem Statement
 
-`FulltextFetchers` runs the direct (HTTP) fetchers first and consults the browser-extension companion fetcher (`BrowserExtensionFulltextFetcher`, a `FallbackFulltextFetcher`) only when the direct fetchers all return nothing — a fallback, per [ADR-0071](0071-separate-native-messaging-hosts-for-import-and-fulltext.md). The direct fetchers run as one batch (`HeadlessExecutorService.executeAll`): the phase ends only when the *slowest* fetcher finishes.
+`FulltextFetchers` runs the direct (HTTP) fetchers first and consults the browser-extension companion fetcher (`BrowserExtensionFulltextFetcher`, a `FallbackFulltextFetcher`) only when the direct fetchers all return nothing — a fallback, per [ADR-0075](0075-separate-native-messaging-hosts-for-import-and-fulltext.md). The direct fetchers run as one batch (`HeadlessExecutorService.executeAll`): the phase ends only when the *slowest* fetcher finishes.
 
 For sources the direct fetchers cannot reach — e.g. IEEE Xplore, which is anti-bot / paywalled and is exactly what the extension exists to handle — the slowest direct fetcher runs to its timeout before the extension even starts. `DoiResolution` alone waits 30 s (`Jsoup … timeout(30_000)`) following the DOI into `ieeexplore.ieee.org`. So the user waits up to ~30 s *before* the extension begins, on top of the extension's own (unavoidable) tab-open-and-download time.
 
@@ -18,14 +18,14 @@ How should the extension fetcher be scheduled so that extension-only sources are
 ## Decision Drivers
 
 * Time-to-PDF for sources only the extension can fetch (IEEE, other paywalled/anti-bot publishers).
-* No browser tab and no wasted extension work for content the direct fetchers already return — the reason the extension is a fallback at all ([ADR-0071](0071-separate-native-messaging-hosts-for-import-and-fulltext.md)).
+* No browser tab and no wasted extension work for content the direct fetchers already return — the reason the extension is a fallback at all ([ADR-0075](0075-separate-native-messaging-hosts-for-import-and-fulltext.md)).
 * Preserve trust-based result selection: a higher-trust direct result must still win over a lower-trust extension result.
 * Simplicity and statelessness — avoid per-user learned state, cold starts, and staleness where a simpler mechanism suffices.
 * Protocol neutrality: the change is JabRef-internal; the wire protocol (`req~bxf.*`) is untouched.
 
 ## Considered Options
 
-* Race the extension as an equal source (the pre-[ADR-0071] behaviour).
+* Race the extension as an equal source (the pre-[ADR-0075] behaviour).
 * Keep the strict fallback (status quo).
 * Learn per-registrant which sources the extension handles best and route eagerly for them.
 * Give the direct fetchers a short head start, then run the extension in parallel.
@@ -78,4 +78,4 @@ Unit tests in `FulltextFetchersTest`: a fast direct-fetcher result is returned w
 
 ## More Information
 
-Supersedes the scheduling half of [ADR-0071](0071-separate-native-messaging-hosts-for-import-and-fulltext.md)'s consequences (the fallback ordering); the two-host separation itself is unchanged. The "learned per-registrant routing" option is recorded as a deliberate future refinement, not a rejection.
+Supersedes the scheduling half of [ADR-0075](0075-separate-native-messaging-hosts-for-import-and-fulltext.md)'s consequences (the fallback ordering); the two-host separation itself is unchanged. The "learned per-registrant routing" option is recorded as a deliberate future refinement, not a rejection.
