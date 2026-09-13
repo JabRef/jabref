@@ -31,7 +31,7 @@ public class SharedDatabaseErrorTab extends Tab {
     /// Identifies the label carrying the connection error, for lookups in tests.
     static final String MESSAGE_ID = "shared-database-error-message";
 
-    private final @Nullable String sharedDatabaseId;
+    private @Nullable String sharedDatabaseId;
     private final DBMSConnectionProperties connectionProperties;
     private final Label message = new Label();
     private final Button retryButton = new Button(Localization.lang("Retry"));
@@ -44,8 +44,8 @@ public class SharedDatabaseErrorTab extends Tab {
         this.connectionProperties = connectionProperties;
         // In expert mode the database name may be empty: the JDBC URL is all the user entered
         String databaseName = connectionProperties.getDatabase().isBlank()
-                ? connectionProperties.getJdbcUrl()
-                : connectionProperties.getDatabase();
+                              ? connectionProperties.getJdbcUrl()
+                              : connectionProperties.getDatabase();
 
         setText(databaseName);
         setGraphic(IconTheme.JabRefIcons.ERROR.getGraphicNode());
@@ -55,13 +55,7 @@ public class SharedDatabaseErrorTab extends Tab {
         message.setMaxWidth(600);
         message.setTextAlignment(TextAlignment.CENTER);
         retryButton.setDefaultButton(true);
-        // A retry swaps this tab for a fresh loading tab: closing that tab cancels the attempt, so a pending attempt
-        // can never resurrect a placeholder the user already dismissed.
-        retryButton.setOnAction(_ -> {
-            retryButton.setDisable(true);
-            Optional.ofNullable(getTabPane()).ifPresent(tabPane -> tabPane.getTabs().remove(this));
-            retryAction.run();
-        });
+        retryButton.setOnAction(_ -> retryAction.run());
 
         Label header = new Label(sharedDatabaseId == null
                                  ? Localization.lang("Could not connect to %0", databaseName)
@@ -83,12 +77,22 @@ public class SharedDatabaseErrorTab extends Tab {
         return Optional.ofNullable(sharedDatabaseId);
     }
 
+    /// A dialog attempt for a remembered database that fails again inherits the id, so the database stays remembered
+    public void rememberAs(String sharedDatabaseId) {
+        this.sharedDatabaseId = sharedDatabaseId;
+    }
+
+    /// Called once a new attempt for this database has started: the loading tab takes this tab's place. Removing the
+    /// tab only then keeps it when the attempt is cancelled before it starts (e.g. a declined overwrite confirmation).
+    public void close() {
+        Optional.ofNullable(getTabPane()).ifPresent(tabPane -> tabPane.getTabs().remove(this));
+    }
+
     public DBMSConnectionProperties getConnectionProperties() {
         return connectionProperties;
     }
 
     public void showError(Throwable exception) {
         message.setText(Optional.ofNullable(exception.getMessage()).orElseGet(exception::toString));
-        retryButton.setDisable(false);
     }
 }
