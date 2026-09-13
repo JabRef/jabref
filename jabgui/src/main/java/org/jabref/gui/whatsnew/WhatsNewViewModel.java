@@ -1,6 +1,5 @@
 package org.jabref.gui.whatsnew;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,11 +68,6 @@ public class WhatsNewViewModel extends AbstractViewModel {
     private final BooleanBinding updateAvailable = commitsBehind.greaterThan(0);
     private final StringBinding tooltip = Bindings.createStringBinding(this::tooltipText, pending, commitsBehind, title);
 
-    /// One look, as [CheckoutNews] offers it, given whether the look was cancelled meanwhile.
-    private interface LookCall {
-        Look look(BooleanSupplier cancelled) throws IOException;
-    }
-
     /// @param quit closes JabRef the ordinary way, so unsaved libraries are asked about; `false` when the user
     ///             keeps JabRef open
     public WhatsNewViewModel(CheckoutNews news, RestartMarker restartMarker, TaskExecutor taskExecutor, BooleanSupplier quit) {
@@ -104,21 +98,22 @@ public class WhatsNewViewModel extends AbstractViewModel {
 
     /// One look now without fetching (`just run-loop` has just pulled), then a fetch every five minutes.
     public void startWatching() {
-        lookTask(_ -> news.look(Mode.WITHOUT_FETCH), this::show)
+        lookTask(Mode.WITHOUT_FETCH, this::show)
                 .onFinished(this::scheduleNextLook)
                 .executeWith(taskExecutor);
     }
 
-    /// A look on demand: fetches, hands the news found to `onChecked` and makes them old — the tooltip drops
-    /// them and the announced entries take them. When the upstream cannot be reached or the look fails,
+    /// A look on demand: fetches, hands the news found to `onChecked` and only then makes them old — the tooltip
+    /// drops them and the announced entries take them. When the upstream cannot be reached or the look fails,
     /// `onFailed` gets the news known so far instead, and nothing is made old. Cancelling the returned task
     /// (the window closed before the answer) makes nothing old either and calls neither consumer.
     public BackgroundTask<?> present(Consumer<News> onChecked, Consumer<News> onFailed) {
-        BackgroundTask<Look> presentation = lookTask(news::present, look -> {
+        BackgroundTask<Look> presentation = lookTask(Mode.WITH_FETCH, look -> {
             show(look);
             if (look.fetched()) {
                 onChecked.accept(look.news());
                 pending.set(News.NONE);
+                announce(look);
             } else {
                 onFailed.accept(look.news());
             }
@@ -147,7 +142,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// The next periodic look; none once the executor is shut down, i.e. while JabRef quits.
     private void scheduleNextLook() {
         try {
-            lookTask(_ -> news.look(Mode.WITH_FETCH), this::show)
+            lookTask(Mode.WITH_FETCH, this::show)
                     .onFinished(this::scheduleNextLook)
                     .scheduleWith(taskExecutor, CHECK_INTERVAL.toMinutes(), TimeUnit.MINUTES);
         } catch (RejectedExecutionException e) {
@@ -156,15 +151,20 @@ public class WhatsNewViewModel extends AbstractViewModel {
     }
 
     /// The task for one look, not started yet; a failure is logged. FX thread.
-    private BackgroundTask<Look> lookTask(LookCall call, Consumer<Look> onSuccess) {
-        BackgroundTask<Look> task = new BackgroundTask<>() {
-            @Override
-            public Look call() throws IOException {
-                return call.look(this::isCancelled);
-            }
-        };
-        return task.onSuccess(onSuccess)
-                   .onFailure(e -> LOGGER.warn("Cannot look at the checkout", e));
+    private BackgroundTask<Look> lookTask(Mode mode, Consumer<Look> onSuccess) {
+        return BackgroundTask.wrap(() -> news.look(mode))
+                             .onSuccess(onSuccess)
+                             .onFailure(e -> LOGGER.warn("Cannot look at the checkout", e));
+    }
+
+    /// Makes the news of `look` old, in the background. FX thread.
+    private void announce(Look look) {
+        BackgroundTask.wrap(() -> {
+                          news.announce(look);
+                          return look;
+                      })
+                      .onFailure(e -> LOGGER.warn("Cannot remember the announced entries", e))
+                      .executeWith(taskExecutor);
     }
 
     /// FX thread.

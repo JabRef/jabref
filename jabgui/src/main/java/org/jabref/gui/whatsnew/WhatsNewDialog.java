@@ -13,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -38,6 +39,8 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
     public WhatsNewDialog(News news, ObservableBooleanValue updateAvailable, Consumer<String> openUrl) {
         this.updateAvailable = updateAvailable;
         this.openUrl = openUrl;
+        // JavaFX dialogs are application-modal unless told otherwise; this one must not block JabRef.
+        initModality(Modality.NONE);
         ButtonType later = new ButtonType(Localization.lang("Later"), ButtonBar.ButtonData.CANCEL_CLOSE);
         getDialogPane().getButtonTypes().addAll(later, restart);
         setResultConverter(restart::equals);

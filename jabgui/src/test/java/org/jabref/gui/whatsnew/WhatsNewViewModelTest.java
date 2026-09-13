@@ -42,10 +42,21 @@ class WhatsNewViewModelTest {
     private static final ChangelogEntry MINE = new ChangelogEntry("Unreleased", "Added", "An entry of mine.");
     private static final ChangelogEntry PUSHED = new ChangelogEntry("Unreleased", "Fixed", "An entry pushed from elsewhere.");
 
-    /// Runs a task at once when executed, but only records it when scheduled: the test decides when the
-    /// next periodic look happens.
+    /// Runs a task at once when executed, but only records it when scheduled, or when told to hold executed
+    /// tasks too: the test decides when the next periodic look happens, and can cancel a task before it runs.
     private static final class RecordingTaskExecutor extends CurrentThreadTaskExecutor {
         private final List<BackgroundTask<?>> scheduled = new ArrayList<>();
+        private final List<BackgroundTask<?>> held = new ArrayList<>();
+        private boolean holding;
+
+        @Override
+        public <V> Future<V> execute(BackgroundTask<V> task) {
+            if (holding) {
+                held.add(task);
+                return CompletableFuture.completedFuture(null);
+            }
+            return super.execute(task);
+        }
 
         @Override
         public <V> Future<?> schedule(BackgroundTask<V> task, long delay, TimeUnit unit) {
@@ -56,7 +67,14 @@ class WhatsNewViewModelTest {
         void runScheduled() {
             List<BackgroundTask<?>> due = List.copyOf(scheduled);
             scheduled.clear();
-            due.forEach(this::execute);
+            due.forEach(super::execute);
+        }
+
+        void runHeld() {
+            holding = false;
+            List<BackgroundTask<?>> due = List.copyOf(held);
+            held.clear();
+            due.forEach(super::execute);
         }
     }
 
@@ -145,6 +163,19 @@ class WhatsNewViewModelTest {
         assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE))), presented.get());
         assertEquals(News.NONE, viewModel.getPending());
         assertEquals(Optional.of(Set.of(OLD, MINE)), announced().read());
+    }
+
+    @Test
+    void aPresentationCancelledBeforeItsAnswerAnnouncesNothing() throws IOException {
+        announced().write(Set.of(OLD));
+        when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
+        taskExecutor.holding = true;
+
+        BackgroundTask<?> presentation = viewModel.present(_ -> fail("the window was closed"), _ -> fail("the window was closed"));
+        presentation.cancel();
+        taskExecutor.runHeld();
+
+        assertEquals(Optional.of(Set.of(OLD)), announced().read());
     }
 
     @Test

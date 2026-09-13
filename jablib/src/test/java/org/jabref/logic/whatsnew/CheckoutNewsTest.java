@@ -71,7 +71,8 @@ class CheckoutNewsTest {
 
         CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITHOUT_FETCH);
 
-        assertEquals(new CheckoutNews.Look(false, 0, Optional.empty(), Optional.empty(), new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE)))), look);
+        assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE))), look.news());
+        assertEquals(List.of(OLD, MINE), List.copyOf(look.seen()));
         assertEquals(Optional.of(Set.of(OLD)), announced.read());
     }
 
@@ -85,36 +86,33 @@ class CheckoutNewsTest {
 
         CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITH_FETCH);
 
-        assertEquals(new CheckoutNews.Look(true, 2, Optional.of("1111111 (2026-09-13 10:00)"), Optional.of("2222222 (2026-09-13 11:00)"),
-                new News(List.of(new AttributedEntry(Contributor.Me.REMOTE, PUSHED)))), look);
+        assertEquals(true, look.fetched());
+        assertEquals(2, look.commitsBehind());
+        assertEquals(Optional.of("1111111 (2026-09-13 10:00)"), look.head());
+        assertEquals(Optional.of("2222222 (2026-09-13 11:00)"), look.upstream());
+        assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.REMOTE, PUSHED))), look.news());
+        assertEquals(List.of(OLD, MINE, PUSHED), List.copyOf(look.seen()));
     }
 
     @Test
-    void announcingNeedsAFetchedUpstream() throws IOException {
+    void anUnreachableUpstreamIsReported() throws IOException {
         announced.write(Set.of(OLD));
         when(checkout.fetch()).thenReturn(false);
 
-        CheckoutNews.Look look = news.present(() -> false);
+        CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITH_FETCH);
 
         assertEquals(false, look.fetched());
         assertEquals(Optional.of(Set.of(OLD)), announced.read());
     }
 
     @Test
-    void announcingHappensOnceFetched() throws IOException {
+    void aLookAnnouncesNothingUntilAsked() throws IOException {
         announced.write(Set.of(OLD));
 
-        news.present(() -> false);
-
-        assertEquals(Optional.of(Set.of(OLD, MINE)), announced.read());
-    }
-
-    @Test
-    void aCancelledLookAnnouncesNothing() throws IOException {
-        announced.write(Set.of(OLD));
-
-        news.present(() -> true);
-
+        CheckoutNews.Look look = news.look(CheckoutNews.Mode.WITH_FETCH);
         assertEquals(Optional.of(Set.of(OLD)), announced.read());
+
+        news.announce(look);
+        assertEquals(Optional.of(Set.of(OLD, MINE)), announced.read());
     }
 }

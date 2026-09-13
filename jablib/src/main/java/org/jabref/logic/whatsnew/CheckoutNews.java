@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
-import java.util.function.BooleanSupplier;
 
-/// The news of a checkout: one look reads the checkout, projects the entries not announced yet and, when asked,
-/// announces them. What a toolbar button, a window or anything else shows comes from here.
+/// The news of a checkout: one look reads the checkout and projects the entries not announced yet; once they
+/// were shown, [#announce] makes them old. What a toolbar button, a window or anything else shows comes from here.
 // [impl->req~whats-new.checkout-news~1]
 public final class CheckoutNews {
 
@@ -19,7 +19,8 @@ public final class CheckoutNews {
     /// @param head          the commit checked out, described, while behind
     /// @param upstream      the upstream commit, described, while behind
     /// @param news          the entries not announced yet
-    public record Look(boolean fetched, int commitsBehind, Optional<String> head, Optional<String> upstream, News news) {
+    /// @param seen          every entry the look passed by, news or not: what [#announce] makes old
+    public record Look(boolean fetched, int commitsBehind, Optional<String> head, Optional<String> upstream, News news, SequencedSet<ChangelogEntry> seen) {
     }
 
     /// Whether a look fetches the upstream first.
@@ -38,27 +39,16 @@ public final class CheckoutNews {
         this.announced = announced;
     }
 
-    /// A look that shows what is pending without making it old. Blocking: not for the UI thread.
-    public Look look(Mode mode) throws IOException {
-        return look(mode == Mode.WITH_FETCH, false, () -> false);
-    }
-
-    /// The look behind the window: fetches, and makes everything seen old once the upstream was reached and the
-    /// look is not `cancelled` (the window closed before the answer). Blocking: not for the UI thread.
-    public Look present(BooleanSupplier cancelled) throws IOException {
-        return look(true, true, cancelled);
-    }
-
     /// Reads the checkout: the working tree's changelog, plus the upstream's once the checkout is behind, so an
     /// entry arriving upstream while a local edit is pending hides nothing. Without announced entries yet (the
     /// first look in a checkout) everything seen is announced now and nothing is news: a fresh checkout is not
     /// greeted with the whole changelog — but only once a changelog could be read, or a failed first look would
     /// announce nothing and the next one everything.
     ///
-    /// Looks run one after the other and so answer in the order they started: an older look never overwrites
-    /// a newer one, on disk or on screen.
-    private synchronized Look look(boolean fetch, boolean announce, BooleanSupplier cancelled) throws IOException {
-        boolean fetched = fetch && checkout.fetch();
+    /// Looks and announcements run one after the other and so answer in the order they started: an older look
+    /// never overwrites a newer one, on disk or on screen. Blocking: not for the UI thread.
+    public synchronized Look look(Mode mode) throws IOException {
+        boolean fetched = mode == Mode.WITH_FETCH && checkout.fetch();
         int behind = checkout.commitsBehind();
         List<BlamedChangelog> changelogs = new ArrayList<>();
         checkout.blameWorkingTree().ifPresent(changelogs::add);
@@ -67,14 +57,21 @@ public final class CheckoutNews {
         }
         Optional<String> head = behind > 0 ? checkout.describeHead() : Optional.empty();
         Optional<String> upstream = behind > 0 ? checkout.describeUpstream() : Optional.empty();
+        SequencedSet<ChangelogEntry> seen = News.allEntries(changelogs);
         if (changelogs.isEmpty()) {
-            return new Look(fetched, behind, head, upstream, News.NONE);
+            return new Look(fetched, behind, head, upstream, News.NONE, seen);
         }
         Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
         News news = announcedSoFar.map(old -> News.pending(old, changelogs)).orElse(News.NONE);
-        if (announcedSoFar.isEmpty() || (announce && fetched && !cancelled.getAsBoolean())) {
-            announced.write(News.allEntries(changelogs));
+        if (announcedSoFar.isEmpty()) {
+            announced.write(seen);
         }
-        return new Look(fetched, behind, head, upstream, news);
+        return new Look(fetched, behind, head, upstream, news, seen);
+    }
+
+    /// Makes everything `look` saw old: called once its news were shown, so a window closed before its answer
+    /// leaves the news pending. Blocking: not for the UI thread.
+    public synchronized void announce(Look look) throws IOException {
+        announced.write(look.seen());
     }
 }
