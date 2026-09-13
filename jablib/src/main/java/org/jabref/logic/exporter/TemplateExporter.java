@@ -193,7 +193,7 @@ public class TemplateExporter extends Exporter {
             try (Reader reader = getReader(lfFileName + BEGIN_INFIX + LAYOUT_EXTENSION)) {
                 LayoutHelper layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);
                 beginLayout = layoutHelper.getLayoutFromText();
-            } catch (IOException ex) {
+            } catch (IOException _) {
                 // If an exception was cast, export filter doesn't have a begin
                 // file.
             }
@@ -241,7 +241,7 @@ public class TemplateExporter extends Exporter {
                         if (layout != null) {
                             missingFormatters.addAll(layout.getMissingFormatters());
                         }
-                    } catch (IOException ex) {
+                    } catch (IOException _) {
                         // The exception indicates that no type-specific layout
                         // exists, so we
                         // go with the default one.
@@ -269,7 +269,7 @@ public class TemplateExporter extends Exporter {
             try (Reader reader = getReader(lfFileName + END_INFIX + LAYOUT_EXTENSION)) {
                 layoutHelper = new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository);
                 endLayout = layoutHelper.getLayoutFromText();
-            } catch (IOException ex) {
+            } catch (IOException _) {
                 // If an exception was thrown, export filter doesn't have an end
                 // file.
             }

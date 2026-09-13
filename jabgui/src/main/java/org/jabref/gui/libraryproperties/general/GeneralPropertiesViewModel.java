@@ -264,7 +264,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
                         Localization.lang("The file directory '%0' for the %1 file path is not found or is inaccessible.", directoryPath, messageKey)
                 );
             }
-        } catch (InvalidPathException ex) {
+        } catch (InvalidPathException _) {
             return ValidationMessage.error(
                     Localization.lang("Invalid path: '%0'.\nCheck \"%1\".", directoryPath, messageKey)
             );

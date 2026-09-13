@@ -27,7 +27,7 @@ val jbang = "0.141.0"
 extra["jbangVersion"] = jbang
 
 dependencies {
-    api(platform("ai.djl:bom:0.36.0"))
+    api(platform("ai.djl:bom:0.38.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.20.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
@@ -88,7 +88,7 @@ dependencies.constraints {
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:4.8.194")
+    api("io.github.classgraph:classgraph:4.8.195")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
@@ -125,9 +125,9 @@ dependencies.constraints {
     api("org.apache.velocity:velocity-engine-core:2.4.1")
     api("org.bouncycastle:bcprov-jdk18on:1.85.2")
     api("org.controlsfx:controlsfx:11.2.5")
-    api("org.eclipse.jgit:org.eclipse.jgit:7.7.1.202607240634-r")
-    api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.7.1.202607240634-r")
-    api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent:7.7.1.202607240634-r")
+    api("org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r")
+    api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.8.0.202609011348-r")
+    api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent:7.8.0.202609011348-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
     api("org.glassfish.hk2:hk2-api:4.0.2")
@@ -164,5 +164,7 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.13.0")
     api("org.yaml:snakeyaml:2.7")
     api("tech.units:indriya:2.2.4")
+    api("tools.maran:svg:1.0.0")
+    api("tools.maran:svg-materialdesign:1.0.0")
     api("tools.maran:svgnode:2.0.0")
 }

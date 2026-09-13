@@ -606,7 +606,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                             }
                             try {
                                 NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
-                            } catch (IOException ex) {
+                            } catch (IOException _) {
                                 dialogService.notify(Localization.lang("Unable to open link."));
                             }
                         });

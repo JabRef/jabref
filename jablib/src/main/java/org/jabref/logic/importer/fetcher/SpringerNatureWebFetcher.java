@@ -130,7 +130,7 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
                     if ("pdf".equalsIgnoreCase(url.optString("format"))) {
                         try {
                             entry.addFile(new LinkedFile(URLUtil.create(url.optString("value")), "PDF"));
-                        } catch (MalformedURLException e) {
+                        } catch (MalformedURLException _) {
                             LOGGER.info("Malformed URL: {}", url.optString("value"));
                         }
                     }
@@ -174,7 +174,7 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
             URLDownload urlDownload = new URLDownload(getTestUrl(apiKey));
             int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
             return (statusCode >= 200) && (statusCode < 300);
-        } catch (IOException | UnirestException e) {
+        } catch (IOException | UnirestException _) {
             return false;
         }
     }

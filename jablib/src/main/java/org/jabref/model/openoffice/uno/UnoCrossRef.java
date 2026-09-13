@@ -52,7 +52,7 @@ public class UnoCrossRef {
             xFieldProps.setPropertyValue("SourceName", referenceMarkName);
         } catch (UnknownPropertyException ex) {
             throw new java.lang.IllegalStateException("The created GetReference does not have property 'SourceName'");
-        } catch (PropertyVetoException ex) {
+        } catch (PropertyVetoException _) {
             throw new java.lang.IllegalStateException("Caught PropertyVetoException on 'SourceName'");
         }
 
@@ -63,7 +63,7 @@ public class UnoCrossRef {
         } catch (UnknownPropertyException ex) {
             throw new java.lang.IllegalStateException("The created GetReference does not have property"
                     + " 'ReferenceFieldSource'");
-        } catch (PropertyVetoException ex) {
+        } catch (PropertyVetoException _) {
             throw new java.lang.IllegalStateException("Caught PropertyVetoException on 'ReferenceFieldSource'");
         }
 
@@ -73,7 +73,7 @@ public class UnoCrossRef {
         } catch (UnknownPropertyException ex) {
             throw new java.lang.IllegalStateException("The created GetReference does not have property"
                     + " 'ReferenceFieldPart'");
-        } catch (PropertyVetoException ex) {
+        } catch (PropertyVetoException _) {
             throw new java.lang.IllegalStateException("Caught PropertyVetoException on 'ReferenceFieldPart'");
         }
 

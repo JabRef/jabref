@@ -76,4 +76,12 @@ Breaking at a word is what every other editor does, and it bounds what a single 
 
 Needs: impl, utest
 
+## An entry added to a library is one undo step
+`req~logic.undo.entry-insert-recorded~1`
+
+An entry that reaches a library goes on the undo stack as a single step, whichever way it was added — typed identifier, URL, dropped file, paste or citation relation — together with the citation key and group assignments the insert produces.
+The library counts as modified from that moment, so it is not closed without being offered a save, and undoing removes the entry again.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
