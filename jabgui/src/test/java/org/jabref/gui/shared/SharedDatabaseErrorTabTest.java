@@ -64,6 +64,17 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
     }
 
     @Test
+    void expertModeWithoutDatabaseNameIsNamedAfterTheUrl() {
+        DBMSConnectionProperties expertProperties = mock(DBMSConnectionProperties.class);
+        when(expertProperties.getDatabase()).thenReturn("");
+        when(expertProperties.getJdbcUrl()).thenReturn("jdbc:postgresql://db.example.org/literature");
+
+        interact(() -> tab = new SharedDatabaseErrorTab(null, expertProperties));
+
+        assertEquals("jdbc:postgresql://db.example.org/literature", tab.getText());
+    }
+
+    @Test
     void retryRemovesTheTabFromItsPane() {
         TabPane tabPane = new TabPane();
         interact(() -> {

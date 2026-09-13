@@ -42,7 +42,10 @@ public class SharedDatabaseErrorTab extends Tab {
     public SharedDatabaseErrorTab(@Nullable String sharedDatabaseId, DBMSConnectionProperties connectionProperties) {
         this.sharedDatabaseId = sharedDatabaseId;
         this.connectionProperties = connectionProperties;
-        String databaseName = connectionProperties.getDatabase();
+        // In expert mode the database name may be empty: the JDBC URL is all the user entered
+        String databaseName = connectionProperties.getDatabase().isBlank()
+                ? connectionProperties.getJdbcUrl()
+                : connectionProperties.getDatabase();
 
         setText(databaseName);
         setGraphic(IconTheme.JabRefIcons.ERROR.getGraphicNode());
