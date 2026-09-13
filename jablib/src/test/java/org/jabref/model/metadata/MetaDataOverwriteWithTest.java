@@ -80,6 +80,7 @@ class MetaDataOverwriteWithTest {
         metaData.setGitAutoPull(true);
         metaData.setGitAutoCommit(true);
         metaData.setGitAutoPush(true);
+        metaData.setAutoRenameFilesOnChange(true);
         metaData.setCiteKeyPattern(new CitationKeyPattern("[auth]", CitationKeyPattern.Category.AUTHOR_RELATED),
                 Map.of(StandardEntryType.Article, new CitationKeyPattern("[auth][year]", CitationKeyPattern.Category.AUTHOR_RELATED)));
         metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of()));
