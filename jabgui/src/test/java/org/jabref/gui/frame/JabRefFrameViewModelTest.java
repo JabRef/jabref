@@ -29,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -140,7 +140,7 @@ class JabRefFrameViewModelTest extends JavaFxTest {
         when(tabContainer.getUnconnectedSharedDatabaseIds()).thenReturn(List.of("shared-1"));
         when(preferences.getWorkspacePreferences().shouldOpenLastEdited()).thenReturn(true);
 
-        interact(() -> assertEquals(true, viewModel.close()));
+        interact(() -> assertTrue(viewModel.close()));
 
         verify(preferences.getLastFilesOpenedPreferences()).setLastSharedDatabasesOpened(List.of("shared-1"));
     }
