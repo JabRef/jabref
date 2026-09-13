@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 /// [BibDatabaseContext] has [org.jabref.logic.shared.DatabaseLocation#DIRECTORY] and no
 /// database path; linked files are stored relative to the root, which is registered as the
 /// library-specific file directory.
-// [impl->req~directory-library.scan~5]
+// [impl->req~directory-library.scan~6]
 @NullMarked
 public class DirectoryLibraryScanner {
 
@@ -140,10 +140,20 @@ public class DirectoryLibraryScanner {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
-                if (isHidden(file) || !gitIgnoreFilter.accept(file)) {
+                if (isHidden(file)) {
                     return FileVisitResult.CONTINUE;
                 }
                 String extension = FileUtil.getFileExtension(file).map(ext -> ext.toLowerCase(Locale.ROOT)).orElse("");
+                boolean isLibraryContent = YAML_EXTENSIONS.contains(extension)
+                        || MarkdownSidecar.MARKDOWN_EXTENSION.equals(extension)
+                        || PDF_EXTENSION.equals(extension);
+                // The library's own content (sidecars and PDFs) is never hidden by .gitignore: a
+                // scratch PDF folder is commonly a `.gitignore` of `*` next to a `.gitkeep`, which
+                // would otherwise leave the whole library empty. .gitignore still governs every
+                // other file and, through preVisitDirectory, whole ignored subtrees.
+                if (!isLibraryContent && !gitIgnoreFilter.accept(file)) {
+                    return FileVisitResult.CONTINUE;
+                }
                 if (YAML_EXTENSIONS.contains(extension) || MarkdownSidecar.MARKDOWN_EXTENSION.equals(extension)) {
                     sidecarFiles.add(file);
                 } else if (PDF_EXTENSION.equals(extension)) {
