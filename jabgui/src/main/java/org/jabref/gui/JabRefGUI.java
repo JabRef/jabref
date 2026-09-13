@@ -41,6 +41,7 @@ import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.git.GitSsh;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -596,6 +597,12 @@ public class JabRefGUI extends Application {
                 LOGGER.trace("Stopping background tasks");
                 Unirest.shutDown();
                 LOGGER.trace("Unirest shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Closing Git SSH session factory");
+                GitSsh.shutdown();
+                LOGGER.trace("Git SSH session factory closed");
             });
 
             // region All threading related shutdowns
