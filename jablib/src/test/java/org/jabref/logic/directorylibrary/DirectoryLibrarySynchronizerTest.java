@@ -1004,11 +1004,15 @@ class DirectoryLibrarySynchronizerTest {
         openLibrary();
         synchronizer.doInitializeMirror();
         synchronizer.flush();
-        context.getMetaData().getGroups().orElseThrow()
-               .addSubgroup(new ExplicitGroup("My group", GroupHierarchyType.INDEPENDENT, ','));
+        ExplicitGroup group = new ExplicitGroup("My group", GroupHierarchyType.INDEPENDENT, ',');
+        context.getMetaData().getGroups().orElseThrow().addSubgroup(group);
         // Delivered by the context's change filter in the application
         synchronizer.listen(new GroupUpdatedEvent(context.getMetaData()));
+        BibEntry entry = entries().getFirst();
+        group.add(entry);
+        synchronizer.handleLocalChange(entry);
         synchronizer.awaitPendingEvents();
+        synchronizer.flush();
         synchronizer.shutdown();
 
         openLibrary();
@@ -1019,6 +1023,8 @@ class DirectoryLibrarySynchronizerTest {
         assertEquals(List.of(DirectoryStructureGroup.class, ExplicitGroup.class),
                 children.stream().map(child -> child.getGroup().getClass()).toList());
         assertEquals("My group", children.getLast().getName());
+        // Membership lives in the entry's groups field and must survive the sidecar round trip
+        assertTrue(children.getLast().getGroup().contains(entries().getFirst()));
     }
 
     /// [utest->req~directory-library.convert~1]
