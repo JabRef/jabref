@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -764,6 +765,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
         // The callbacks check the stage so a connection that completes during shutdown is closed with its loading tab.
         BibDatabaseContext dummyContext = manager.createDummyContext(reconnection.connectionProperties());
+        // The id keeps the database remembered if JabRef quits while this tab is still loading
+        dummyContext.getDatabase().setSharedDatabaseID(reconnection.sharedDatabaseId());
         LibraryTab newTab = LibraryTab.createLibraryTab(
                 () -> manager.connect(reconnection.connectionProperties()),
                 dummyContext,
@@ -821,10 +824,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     @Override
     public List<String> getUnconnectedSharedDatabaseIds() {
-        return tabbedPane.getTabs().stream()
-                         .filter(SharedDatabaseErrorTab.class::isInstance)
-                         .flatMap(tab -> ((SharedDatabaseErrorTab) tab).getSharedDatabaseId().stream())
-                         .toList();
+        Stream<String> failed = tabbedPane.getTabs().stream()
+                                          .filter(SharedDatabaseErrorTab.class::isInstance)
+                                          .flatMap(tab -> ((SharedDatabaseErrorTab) tab).getSharedDatabaseId().stream());
+        // A remembered database still reconnecting has no connection to persist, but must not be forgotten either
+        Stream<String> loading = getLibraryTabs().stream()
+                                                 .filter(LibraryTab::isLoading)
+                                                 .flatMap(tab -> tab.getBibDatabaseContext().getDatabase().getSharedDatabaseID().stream());
+        return Stream.concat(failed, loading).toList();
     }
 
     @Override
