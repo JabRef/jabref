@@ -140,7 +140,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<UnlinkedFilesSearchResu
         // Filters:
         //   1. UnlinkedPDFFileFilter
         //   2. GitIgnoreFilter
-        ChainedFilters filters = new ChainedFilters(List.of(unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory)));
+        ChainedFilters filters = new ChainedFilters(List.of(unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory, this.directory)));
         Map<Boolean, List<Path>> directoryAndFilePartition;
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory, filters);
              Stream<Path> filesStream = StreamSupport.stream(dirStream.spliterator(), false)) {

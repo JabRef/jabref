@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,14 +28,20 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
     private final Path baseDir;
 
     public GitIgnoreFileFilter(Path path) {
+        this(path, path);
+    }
+
+    /// @param searchRoot the directory selected by the user; its `.gitignore` applies even outside a git repository
+    public GitIgnoreFileFilter(Path path, Path searchRoot) {
         Path absolutePath = path.toAbsolutePath().normalize();
-        // A .gitignore only applies inside a git repository, so never look above the repository root
-        @Nullable Path currentPath = GitHandler.findRepositoryRoot(absolutePath)
-                                               .flatMap(repositoryRoot -> Stream.iterate(absolutePath, Objects::nonNull, Path::getParent)
-                                                                                .takeWhile(directory -> directory.startsWith(repositoryRoot))
-                                                                                .filter(directory -> Files.exists(directory.resolve(".gitignore")))
-                                                                                .findFirst())
-                                               .orElse(null);
+        Path absoluteSearchRoot = searchRoot.toAbsolutePath().normalize();
+        Optional<Path> repositoryRoot = GitHandler.findRepositoryRoot(absolutePath);
+        // A .gitignore above the selected directory only applies inside the same git repository
+        @Nullable Path currentPath = Stream.iterate(absolutePath, Objects::nonNull, Path::getParent)
+                                           .takeWhile(directory -> directory.startsWith(absoluteSearchRoot) || repositoryRoot.filter(directory::startsWith).isPresent())
+                                           .filter(directory -> Files.exists(directory.resolve(".gitignore")))
+                                           .findFirst()
+                                           .orElse(null);
         if (currentPath == null) {
             // we did not find any gitignore, set baseDir to provided path and use default ignores
             this.baseDir = absolutePath;
