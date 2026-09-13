@@ -211,6 +211,42 @@ class DBMSSynchronizerTest {
     }
 
     @Test
+    void metadataNotificationsAreCoalesced() throws Exception {
+        List<Runnable> pendingDatabaseTasks = new ArrayList<>();
+        BibDatabase remoteDatabase = new BibDatabase();
+        BibDatabaseContext remoteContext = new BibDatabaseContext(remoteDatabase);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        DBMSSynchronizer remoteSynchronizer = new DBMSSynchronizer(
+                remoteContext,
+                ',',
+                fieldPreferences,
+                pattern,
+                new DummyFileUpdateMonitor(),
+                "UserAndHost",
+                new VirtualThreadTaskExecutor(),
+                Runnable::run,
+                pendingDatabaseTasks::add,
+                offlineChangesDirectory);
+        remoteDatabase.registerListener(remoteSynchronizer);
+        remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+
+        try {
+            remoteSynchronizer.handleRemoteMetaDataChange();
+            remoteSynchronizer.handleRemoteMetaDataChange();
+
+            assertEquals(1, pendingDatabaseTasks.size());
+
+            pendingDatabaseTasks.getFirst().run();
+            remoteSynchronizer.handleRemoteMetaDataChange();
+
+            assertEquals(2, pendingDatabaseTasks.size());
+        } finally {
+            remoteSynchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
     void entriesRemovedEventListener() throws SQLException {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
