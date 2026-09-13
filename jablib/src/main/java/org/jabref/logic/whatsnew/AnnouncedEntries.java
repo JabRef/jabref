@@ -17,7 +17,8 @@ import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jspecify.annotations.Nullable;
 
 /// The changelog entries announced to the developer so far, kept in a file: one entry per line, its section,
-/// heading and text separated by tabs. A changelog line never contains a tab, so no escaping is needed.
+/// heading and text separated by tabs. The text comes last and may itself contain tabs; a section or heading
+/// is a Markdown title and never does.
 /// Announcing adds to the file: an entry shown once stays announced, whichever revision is checked out later.
 ///
 /// The file lives in the checkout's git directory, so it follows the worktree and survives JabRef being closed;
@@ -71,7 +72,7 @@ public final class AnnouncedEntries {
     }
 
     private static Optional<ChangelogEntry> fromLine(String line) {
-        String[] fields = line.split(FIELD_SEPARATOR, -1);
+        String[] fields = line.split(FIELD_SEPARATOR, 3);
         if (fields.length != 3) {
             return Optional.empty();
         }

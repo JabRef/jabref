@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
@@ -39,8 +40,9 @@ import org.slf4j.LoggerFactory;
 /// projects what they find into properties.
 ///
 /// A look runs in the background and lands here on the FX thread; every property is read and written on the
-/// FX thread only. [CheckoutNews] runs looks one after the other, so their answers arrive in the order they
-/// started and an older answer never replaces a newer one.
+/// FX thread only. [CheckoutNews] runs looks one after the other, but not necessarily in the order they were
+/// due: a click right after the start may take the checkout before the first look does. So every look is
+/// numbered by the moment it is due, and an answer older than the one shown last is dropped.
 // [impl->req~whats-new.checkout-news~1]
 public class WhatsNewViewModel extends AbstractViewModel {
 
@@ -69,6 +71,13 @@ public class WhatsNewViewModel extends AbstractViewModel {
     private final StringProperty title = new SimpleStringProperty(Localization.lang("What's new"));
     private final BooleanBinding updateAvailable = commitsBehind.greaterThan(0);
     private final StringBinding tooltip = Bindings.createStringBinding(this::tooltipText, pending, commitsBehind, title);
+
+    /// One look's answer with the number of the look. FX thread.
+    private record Answer(long due, Look look) {
+    }
+
+    private long looksDue;
+    private long lastShown;
 
     /// @param quit closes JabRef the ordinary way, so unsaved libraries are asked about; `false` when the user
     ///             keeps JabRef open
@@ -100,7 +109,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
 
     /// One look now without fetching (`just run-loop` has just pulled), then a fetch every five minutes.
     public void startWatching() {
-        lookTask(Mode.WITHOUT_FETCH, this::show)
+        lookNow(Mode.WITHOUT_FETCH, this::show)
                 .onFinished(this::scheduleNextLook)
                 .executeWith(taskExecutor);
     }
@@ -111,11 +120,12 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// nothing is made old. Nothing happens once `windowOpen` says the window is gone: cancelling the returned
     /// task covers a look still running, this covers an answer already on its way.
     public BackgroundTask<?> present(BooleanSupplier windowOpen, Consumer<News> onChecked, Consumer<News> onFailed) {
-        BackgroundTask<Look> presentation = lookTask(Mode.WITH_FETCH, look -> {
+        BackgroundTask<Answer> presentation = lookNow(Mode.WITH_FETCH, answer -> {
             if (!windowOpen.getAsBoolean()) {
                 return;
             }
-            show(look);
+            show(answer);
+            Look look = answer.look();
             if (look.fetched()) {
                 onChecked.accept(look.news());
             } else {
@@ -149,7 +159,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// The next periodic look; none once the executor is shut down, i.e. while JabRef quits.
     private void scheduleNextLook() {
         try {
-            lookTask(Mode.WITH_FETCH, this::show)
+            lookLater(Mode.WITH_FETCH, this::show)
                     .onFinished(this::scheduleNextLook)
                     .scheduleWith(taskExecutor, CHECK_INTERVAL.toMinutes(), TimeUnit.MINUTES);
         } catch (RejectedExecutionException e) {
@@ -157,9 +167,19 @@ public class WhatsNewViewModel extends AbstractViewModel {
         }
     }
 
-    /// The task for one look, not started yet; a failure is logged. FX thread.
-    private BackgroundTask<Look> lookTask(Mode mode, Consumer<Look> onSuccess) {
-        return BackgroundTask.wrap(() -> news.look(mode))
+    /// The task for a look due now, numbered as such; a failure is logged. FX thread.
+    private BackgroundTask<Answer> lookNow(Mode mode, Consumer<Answer> onSuccess) {
+        long due = ++looksDue;
+        return BackgroundTask.wrap(() -> new Answer(due, news.look(mode)))
+                             .onSuccess(onSuccess)
+                             .onFailure(e -> LOGGER.warn("Cannot look at the checkout", e));
+    }
+
+    /// The task for a look due later: numbered when it starts, so the looks due meanwhile come first. FX thread.
+    private BackgroundTask<Answer> lookLater(Mode mode, Consumer<Answer> onSuccess) {
+        AtomicLong due = new AtomicLong();
+        return BackgroundTask.wrap(() -> new Answer(due.get(), news.look(mode)))
+                             .onRunning(() -> due.set(++looksDue))
                              .onSuccess(onSuccess)
                              .onFailure(e -> LOGGER.warn("Cannot look at the checkout", e));
     }
@@ -176,8 +196,13 @@ public class WhatsNewViewModel extends AbstractViewModel {
                       .executeWith(taskExecutor);
     }
 
-    /// FX thread.
-    private void show(Look look) {
+    /// Shows the answer unless a look due later was shown already. FX thread.
+    private void show(Answer answer) {
+        if (answer.due() < lastShown) {
+            return;
+        }
+        lastShown = answer.due();
+        Look look = answer.look();
         pending.set(look.news());
         commitsBehind.set(look.commitsBehind());
         title.set(title(look));

@@ -43,6 +43,16 @@ class AnnouncedEntriesTest {
     }
 
     @Test
+    void aTabInTheTextSurvivesTheRoundTrip(@TempDir Path directory) throws IOException {
+        ChangelogEntry tabbed = new ChangelogEntry("Unreleased", "Added", "A\ttabbed\tentry.");
+        AnnouncedEntries announced = new AnnouncedEntries(directory.resolve("announced.tsv"));
+
+        announced.announce(List.of(tabbed));
+
+        assertEquals(Optional.of(Set.of(tabbed)), announced.read());
+    }
+
+    @Test
     void aDamagedLineIsSkipped(@TempDir Path directory) throws IOException {
         Path file = directory.resolve("announced.tsv");
         Files.write(file, List.of("Unreleased\tAdded\tWe added a button.", "not an entry"));

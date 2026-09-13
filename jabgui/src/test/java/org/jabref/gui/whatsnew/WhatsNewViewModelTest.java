@@ -76,6 +76,11 @@ class WhatsNewViewModelTest {
             held.clear();
             due.forEach(super::execute);
         }
+
+        /// Runs the task held last, ahead of the others.
+        void runHeldLast() {
+            super.execute(held.removeLast());
+        }
     }
 
     @TempDir
@@ -163,6 +168,24 @@ class WhatsNewViewModelTest {
         assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE))), presented.get());
         assertEquals(News.NONE, viewModel.getPending());
         assertEquals(Optional.of(Set.of(OLD, MINE)), announced().read());
+    }
+
+    @Test
+    void aFirstLookOvertakenByAClickDoesNotTurnTheClockBack() throws IOException {
+        announced().announce(Set.of(OLD));
+        when(checkout.commitsBehind()).thenReturn(2);
+        when(checkout.blameUpstream()).thenReturn(Optional.of(changelog(Contributor.Me.REMOTE, OLD, PUSHED)));
+        taskExecutor.holding = true;
+        viewModel.startWatching();
+        AtomicReference<News> presented = new AtomicReference<>();
+        viewModel.present(() -> true, presented::set, _ -> fail("the upstream was reached"));
+
+        taskExecutor.runHeldLast();
+        assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.REMOTE, PUSHED))), presented.get());
+        assertTrue(viewModel.updateAvailableProperty().get());
+        taskExecutor.runHeld();
+
+        assertTrue(viewModel.updateAvailableProperty().get());
     }
 
     @Test
