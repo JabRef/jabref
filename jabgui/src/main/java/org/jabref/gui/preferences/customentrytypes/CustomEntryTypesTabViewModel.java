@@ -50,6 +50,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty newFieldToAdd = new SimpleStringProperty("");
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
+    private final List<String> restartWarnings = new ArrayList<>();
 
     private final CliPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
@@ -105,6 +106,9 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        List<BibEntryType> typesBefore = List.copyOf(entryTypesManager.getAllTypes(bibDatabaseMode));
+        Set<Field> multilineFieldsBefore = Set.copyOf(preferences.getFieldPreferences().getNonWrappableFields());
+
         Set<Field> multilineFields = new HashSet<>();
         for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
             List<FieldViewModel> allFields = typeViewModel.fields();
@@ -137,6 +141,17 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
         preferences.getFieldPreferences().setNonWrappableFields(multilineFields);
         preferences.storeCustomEntryTypesRepository(entryTypesManager);
+
+        restartWarnings.clear();
+        if (!typesBefore.equals(List.copyOf(entryTypesManager.getAllTypes(bibDatabaseMode)))
+                || !multilineFieldsBefore.equals(multilineFields)) {
+            restartWarnings.add(Localization.lang("Entry types changed."));
+        }
+    }
+
+    @Override
+    public List<String> getRestartWarnings() {
+        return restartWarnings;
     }
 
     public EntryTypeViewModel addNewCustomEntryType() {
