@@ -179,10 +179,19 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     }
 
     private void testConnection() {
+        String modelName = viewModel.selectedChatModelProperty().get();
         viewModel.testConnectionTask()
                  .onSuccess(response -> dialogService.showInformationDialogAndWait(Localization.lang("Test connection"),
                          Localization.lang("Connection successful. Response: %0", response)))
-                 .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Connection failed"), exception))
+                 .onFailure(exception -> {
+                     // A model missing on the server cannot be downloaded through the OpenAI-compatible API, so the user is pointed to the Ollama command.
+                     if (String.valueOf(exception.getMessage()).contains("not found")) {
+                         dialogService.showErrorDialogAndWait(Localization.lang("Connection failed"),
+                                 exception.getMessage() + "\n\n" + Localization.lang("If you use Ollama, download the model with: %0", "ollama pull " + modelName));
+                     } else {
+                         dialogService.showErrorDialogAndWait(Localization.lang("Connection failed"), exception);
+                     }
+                 })
                  .executeWith(taskExecutor);
     }
 
