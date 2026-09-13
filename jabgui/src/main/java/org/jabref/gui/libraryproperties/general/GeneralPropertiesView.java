@@ -19,6 +19,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 
@@ -39,6 +40,8 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private Button libSpecificFileDirSwitchId;
     @FXML private Button userSpecificFileDirSwitchId;
     @FXML private Button laTexSpecificFileDirSwitchId;
+    @FXML private Button browseLibrarySpecificFileDirectoryButton;
+    @FXML private Button browseUserSpecificFileDirectoryButton;
     @FXML private JabRefIconView libSpecificFileDirSwitchIcon;
     @FXML private JabRefIconView userSpecificFileDirSwitchIcon;
     @FXML private JabRefIconView laTexSpecificFileDirSwitchIcon;
@@ -108,6 +111,14 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         libSpecificFileDirSwitchId.setDisable(this.databaseContext.getDatabasePath().isEmpty());
         userSpecificFileDirSwitchId.setDisable(this.databaseContext.getDatabasePath().isEmpty());
         laTexSpecificFileDirSwitchId.setDisable(this.databaseContext.getDatabasePath().isEmpty());
+
+        // A directory library resolves every linked file against its single root, so overriding the
+        // library- or user-specific file directory would break that; both rows are disabled for it.
+        boolean directoryLibrary = databaseContext.getLocation() == DatabaseLocation.DIRECTORY;
+        librarySpecificFileDirectory.setDisable(directoryLibrary);
+        userSpecificFileDirectory.setDisable(directoryLibrary);
+        browseLibrarySpecificFileDirectoryButton.setDisable(directoryLibrary);
+        browseUserSpecificFileDirectoryButton.setDisable(directoryLibrary);
 
         librarySpecificFileDirectory.textProperty().addListener((_, _, newValue) -> {
             boolean isAbsolute = Path.of(newValue).isAbsolute();
