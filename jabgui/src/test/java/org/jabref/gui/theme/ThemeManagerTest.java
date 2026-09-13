@@ -7,12 +7,16 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
@@ -287,6 +291,34 @@ class ThemeManagerTest {
         JavaFxExtension.invokeAndWait(() -> themeManager.set(new ThemeManager(workspacePreferences, fileUpdateMonitor)));
 
         return themeManager.get();
+    }
+
+    /// Every [ThemeManager] created in this JVM watches all windows, so the test compares a window shown once
+    /// with one shown three times instead of counting absolute updates.
+    @Test
+    void reshownWindowFollowsItsSceneOnce() {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        workspacePreferences.setShouldOverrideDefaultFontSize(true);
+        workspacePreferences.setMainFontSize(16);
+        createThemeManager(workspacePreferences);
+
+        assertEquals(styleClassChangesOnNewScene(1), styleClassChangesOnNewScene(3));
+    }
+
+    private static int styleClassChangesOnNewScene(int timesShown) {
+        StackPane root = new StackPane();
+        AtomicInteger styleClassChanges = new AtomicInteger();
+        root.getStyleClass().addListener((ListChangeListener<String>) _ -> styleClassChanges.incrementAndGet());
+        JavaFxExtension.invokeAndWait(() -> {
+            Stage stage = new Stage();
+            stage.setScene(new Scene(new StackPane()));
+            for (int i = 0; i < timesShown; i++) {
+                stage.show();
+                stage.hide();
+            }
+            stage.setScene(new Scene(root));
+        });
+        return styleClassChanges.get();
     }
 
     private void assertCustomStyleSheet(Optional<StyleSheet> styleSheet, StyleSheet customTheme, Path customCss) {

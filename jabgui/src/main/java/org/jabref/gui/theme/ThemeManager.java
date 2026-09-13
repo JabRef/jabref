@@ -53,6 +53,10 @@ public class ThemeManager {
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
 
+    /// Marks a window whose scene this manager already follows. A window re-enters [Window#getWindows()]
+    /// every time it is shown again.
+    private final Object followsSceneKey = new Object();
+
     private final FileUpdateListener baseCssLiveUpdate = () -> cssLiveUpdate(JABREF_BASE_STYLE_SHEET);
     private @Nullable FileUpdateListener themeCssLiveUpdate;
     private @Nullable FileUpdateListener parentCssLiveUpdate;
@@ -125,12 +129,14 @@ public class ThemeManager {
                     continue;
                 }
                 for (Window window : change.getAddedSubList()) {
-                    window.sceneProperty().addListener((_, _, newScene) -> {
-                        if (newScene != null) {
-                            updateColorSchemeOnScene(newScene);
-                            updateFontOnScene(newScene);
-                        }
-                    });
+                    if (window.getProperties().putIfAbsent(followsSceneKey, Boolean.TRUE) == null) {
+                        window.sceneProperty().addListener((_, _, newScene) -> {
+                            if (newScene != null) {
+                                updateColorSchemeOnScene(newScene);
+                                updateFontOnScene(newScene);
+                            }
+                        });
+                    }
                     Scene scene = window.getScene();
                     if (scene != null) {
                         updateColorSchemeOnScene(scene);
