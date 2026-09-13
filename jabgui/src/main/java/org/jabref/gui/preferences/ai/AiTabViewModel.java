@@ -23,8 +23,8 @@ import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.chatting.ChatModel;
-import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
+import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.models.AiModelService;
@@ -42,12 +42,12 @@ import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
-import dev.langchain4j.data.message.UserMessage;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import dev.langchain4j.data.message.UserMessage;
 import org.apache.commons.io.FileUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
