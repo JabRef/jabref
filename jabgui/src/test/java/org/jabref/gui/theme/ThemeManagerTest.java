@@ -302,7 +302,9 @@ class ThemeManagerTest {
         workspacePreferences.setMainFontSize(16);
         createThemeManager(workspacePreferences);
 
-        assertEquals(styleClassChangesOnNewScene(1), styleClassChangesOnNewScene(3));
+        int shownOnce = styleClassChangesOnNewScene(1);
+        assertTrue(shownOnce > 0, "new scene should receive the font style class");
+        assertEquals(shownOnce, styleClassChangesOnNewScene(3));
     }
 
     private static int styleClassChangesOnNewScene(int timesShown) {
