@@ -42,6 +42,7 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.search.SearchDisplayMode;
+import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResults;
 
@@ -144,19 +145,19 @@ class MainTableDataModelTest {
         // First search matches Alice only.
         searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
 
-        assertTrue(vmA.isMatchedBySearch().get());
-        assertFalse(vmB.isMatchedBySearch().get());
-        assertTrue(vmA.isVisibleBySearch().get());
-        assertFalse(vmB.isVisibleBySearch().get());
+        assertTrue(vmA.isMatchedBySearch());
+        assertFalse(vmB.isMatchedBySearch());
+        assertTrue(vmA.isVisibleBySearch());
+        assertFalse(vmB.isVisibleBySearch());
         assertEquals(1, resultSize.get());
 
         // Second search matches no entries. The old Alice result should not remain visible.
         searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Charlie")));
 
-        assertFalse(vmA.isMatchedBySearch().get());
-        assertFalse(vmB.isMatchedBySearch().get());
-        assertFalse(vmA.isVisibleBySearch().get());
-        assertFalse(vmB.isVisibleBySearch().get());
+        assertFalse(vmA.isMatchedBySearch());
+        assertFalse(vmB.isMatchedBySearch());
+        assertFalse(vmA.isVisibleBySearch());
+        assertFalse(vmB.isVisibleBySearch());
         assertEquals(0, resultSize.get());
     }
 
@@ -269,15 +270,15 @@ class MainTableDataModelTest {
             submittedTasks.getLast().get(5, TimeUnit.SECONDS);
 
             assertFalse(submittedTasks.getFirst().isDone());
-            assertFalse(quantumViewModel.isMatchedBySearch().get());
-            assertTrue(organicViewModel.isMatchedBySearch().get());
+            assertFalse(quantumViewModel.isMatchedBySearch());
+            assertTrue(organicViewModel.isMatchedBySearch());
             assertEquals(1, resultSize.get());
 
             allowFirstSearchToFinish.complete(null);
             submittedTasks.getFirst().get(5, TimeUnit.SECONDS);
 
-            assertFalse(quantumViewModel.isMatchedBySearch().get());
-            assertTrue(organicViewModel.isMatchedBySearch().get());
+            assertFalse(quantumViewModel.isMatchedBySearch());
+            assertTrue(organicViewModel.isMatchedBySearch());
             assertEquals(1, resultSize.get());
         } finally {
             allowFirstSearchToFinish.complete(null);
@@ -325,12 +326,12 @@ class MainTableDataModelTest {
 
         selectedGroups.set(FXCollections.observableArrayList(getKeywordGroup(StandardField.AUTHOR, "Alice")));
 
-        assertTrue(vmA.isMatchedByGroup().get());
-        assertTrue(vmA.isVisibleByGroup().get());
+        assertTrue(vmA.isMatchedByGroup());
+        assertTrue(vmA.isVisibleByGroup());
         assertEquals(1, resultSize.get());
 
-        assertFalse(vmB.isMatchedByGroup().get());
-        assertFalse(vmB.isVisibleByGroup().get());
+        assertFalse(vmB.isMatchedByGroup());
+        assertFalse(vmB.isVisibleByGroup());
     }
 
     @Test
@@ -374,8 +375,67 @@ class MainTableDataModelTest {
         executeTask(groupMatchTasks.getLast());
         executeTask(groupMatchTasks.getFirst());
 
-        assertFalse(vmA.isMatchedByGroup().get());
-        assertTrue(vmB.isMatchedByGroup().get());
+        assertFalse(vmA.isMatchedByGroup());
+        assertTrue(vmB.isMatchedByGroup());
+    }
+
+    @Test
+    void staleIndexedEntryUpdateDoesNotOverrideCurrentSearchOrGroupMatches() throws Exception {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        BibEntry bibEntryA = new BibEntry().withCitationKey("A").withField(StandardField.AUTHOR, "Alice");
+        BibEntry bibEntryB = new BibEntry().withCitationKey("B").withField(StandardField.AUTHOR, "Bob");
+        bibDatabaseContext.getDatabase().insertEntries(List.of(bibEntryA, bibEntryB));
+
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
+        when(preferences.getSearchPreferences()).thenReturn(
+                new SearchPreferences(SearchDisplayMode.FILTER, false, false, false, false, false, false, 0, 0, 0));
+        when(preferences.getNameDisplayPreferences()).thenReturn(NameDisplayPreferences.getDefault());
+
+        SearchContext searchContext = new SearchContext(
+                new SimpleBooleanProperty(false),
+                () -> new InMemorySearchBackend(bibDatabaseContext, new BibEntryPreferences(',')),
+                () -> new InMemorySearchBackend(bibDatabaseContext, new BibEntryPreferences(',')));
+        List<BackgroundTask<?>> submittedTasks = new ArrayList<>();
+        TaskExecutor taskExecutor = mock(TaskExecutor.class);
+        when(taskExecutor.execute(any())).thenAnswer(invocation -> {
+            submittedTasks.add(invocation.getArgument(0));
+            return CompletableFuture.completedFuture(null);
+        });
+
+        SimpleListProperty<GroupTreeNode> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
+        OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
+        IntegerProperty resultSize = new SimpleIntegerProperty();
+        MainTableDataModel model = new MainTableDataModel(
+                bibDatabaseContext,
+                preferences,
+                taskExecutor,
+                searchContext,
+                selectedGroups,
+                searchQueryProperty,
+                resultSize);
+
+        BibEntryTableViewModel vmA = model.getViewModelByCitationKey("A").orElseThrow();
+        BibEntryTableViewModel vmB = model.getViewModelByCitationKey("B").orElseThrow();
+
+        selectedGroups.set(FXCollections.observableArrayList(getKeywordGroup(StandardField.AUTHOR, "Alice")));
+        executeTask(submittedTasks.removeFirst());
+
+        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
+        executeTask(submittedTasks.removeFirst());
+
+        bibDatabaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(bibEntryB)));
+        BackgroundTask<?> staleIndexedEntryUpdate = submittedTasks.removeFirst();
+
+        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Bob")));
+        executeTask(submittedTasks.removeFirst());
+        executeTask(staleIndexedEntryUpdate);
+
+        assertFalse(vmA.isMatchedBySearch());
+        assertTrue(vmA.isMatchedByGroup());
+        assertTrue(vmB.isMatchedBySearch());
+        assertFalse(vmB.isMatchedByGroup());
+        assertEquals(0, resultSize.get());
     }
 
     @Test
