@@ -120,7 +120,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
                                 Localization.lang("Entry preview"),
                                 Localization.lang("Selected"),
-                                Localization.lang("Selected Layouts can not be empty")
+                                Localization.lang("Selected layouts cannot be empty")
                         )
                 )
         );
