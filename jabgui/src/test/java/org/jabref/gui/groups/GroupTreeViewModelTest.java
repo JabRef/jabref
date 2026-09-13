@@ -58,6 +58,7 @@ class GroupTreeViewModelTest {
     private StateManager stateManager;
     private GroupTreeViewModel groupTree;
     private BibDatabaseContext databaseContext;
+    private OptionalObjectProperty<BibDatabaseContext> activeDatabase;
     private TaskExecutor taskExecutor;
     private GuiPreferences preferences;
     private DialogService dialogService;
@@ -68,9 +69,9 @@ class GroupTreeViewModelTest {
         databaseContext = new BibDatabaseContext();
 
         stateManager = mock(JabRefGuiStateManager.class);
-        OptionalObjectProperty<BibDatabaseContext> activeDb = OptionalObjectProperty.empty();
-        activeDb.setValue(Optional.of(databaseContext));
-        when(stateManager.activeDatabaseProperty()).thenReturn(activeDb);
+        activeDatabase = OptionalObjectProperty.empty();
+        activeDatabase.setValue(Optional.of(databaseContext));
+        when(stateManager.activeDatabaseProperty()).thenReturn(activeDatabase);
         when(stateManager.getSearchContext(databaseContext)).thenReturn(new SearchContext(
                 new SimpleBooleanProperty(false),
                 NoOpSearchBackend::new,
@@ -108,6 +109,22 @@ class GroupTreeViewModelTest {
     void rootGroupIsAllEntriesByDefault() {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
         assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
+    }
+
+    @Test
+    void switchingLibraryDetachesThePreviousGroupTreeFromEntryChanges() {
+        GroupNodeViewModel previousRoot = groupTree.rootGroupProperty().getValue();
+        previousRoot.ensureMatchedEntriesLoaded();
+        assertEquals(0, previousRoot.getHits().getValue().intValue());
+
+        BibDatabaseContext newDatabaseContext = new BibDatabaseContext();
+        when(stateManager.getSelectedGroups(newDatabaseContext)).thenReturn(FXCollections.emptyObservableList());
+        activeDatabase.setValue(Optional.empty());
+        activeDatabase.setValue(Optional.of(newDatabaseContext));
+
+        databaseContext.getDatabase().insertEntry(new BibEntry());
+
+        assertEquals(0, previousRoot.getHits().getValue().intValue());
     }
 
     /// Group operations reach the model by editing the tree in place and writing the root back, so
