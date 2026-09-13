@@ -1,10 +1,14 @@
 package org.jabref.gui.preferences.ai;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -35,6 +39,7 @@ import org.jabref.model.ai.llm.AiProvider;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.unitfx.IntegerInputField;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +54,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     private final BooleanBinding aiDisabled;
 
     private final BooleanProperty testingConnection = new SimpleBooleanProperty();
+    /// Details of the last failed connection test, shown below the button; empty otherwise.
+    private final StringProperty testConnectionDetails = new SimpleStringProperty("");
 
     private TabPane templatesTabPane;
     private ComboBox<String> chatModelCombo;
+    private Button testConnectionButton;
 
     public AiTab(AiPreferences workingAiPreferences) {
         AiService aiService = Injector.instantiateModelOrService(AiService.class);
@@ -64,6 +72,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         this.aiDisabled = viewModel.enableAi().not();
 
         buildView();
+        resetTestConnectionStateOnChange();
     }
 
     @Override
@@ -110,7 +119,13 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                           .validate(viewModel.getApiTokenValidationStatus()))
                         // [impl->req~ai.llms.test-connection~1]
                         .button(Localization.lang("Test connection"), this::testConnection,
-                                test -> test.disableWhen(Bindings.or(viewModel.disableBasicSettingsProperty(), testingConnection))))
+                                test -> test.disableWhen(Bindings.or(viewModel.disableBasicSettingsProperty(), testingConnection))
+                                    .configure(button -> testConnectionButton = button))
+                        .info("", details -> details.configure(label -> {
+                                                        label.textProperty().bind(testConnectionDetails);
+                                                        label.setWrapText(true);
+                                                    })
+                                                    .visibleWhen(testConnectionDetails.isNotEmpty())))
 
                 .section(Localization.lang("Expert settings"), expertSettings -> expertSettings
                                 .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
@@ -193,21 +208,38 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         chatModelCombo.commitValue();
         String modelName = viewModel.selectedChatModelProperty().get();
         viewModel.testConnectionTask()
-                 .onRunning(() -> testingConnection.set(true))
+                 .onRunning(() -> {
+                     testingConnection.set(true);
+                     showTestConnectionState(Localization.lang("Testing..."), IconTheme.JabRefIcons.REFRESH, null, "");
+                 })
                  .onFinished(() -> testingConnection.set(false))
-                 .onSuccess(response -> dialogService.showInformationDialogAndWait(Localization.lang("Test connection"),
-                         Localization.lang("Connection successful. Response: %0", response)))
+                 .onSuccess(_ -> showTestConnectionState(Localization.lang("Connection successful"), IconTheme.JabRefIcons.SUCCESS, "text-success", ""))
                  .onFailure(exception -> {
                      LOGGER.debug("AI connection test failed", exception);
                      // A model missing on the server cannot be downloaded through the OpenAI-compatible API, so the user is pointed to the Ollama command.
-                     if (AiModelService.isModelNotFound(exception)) {
-                         dialogService.showErrorDialogAndWait(Localization.lang("Connection failed"),
-                                 Localization.lang("The model %0 was not found on the server. If you use Ollama, download it with: %1", modelName, "ollama pull " + modelName));
-                     } else {
-                         dialogService.showErrorDialogAndWait(Localization.lang("Connection failed"), exception);
-                     }
+                     String details = AiModelService.isModelNotFound(exception)
+                                      ? Localization.lang("The model %0 was not found on the server. If you use Ollama, download it with: %1", modelName, "ollama pull " + modelName)
+                                      : Objects.toString(exception.getMessage(), exception.getClass().getSimpleName());
+                     showTestConnectionState(Localization.lang("Connection failed"), IconTheme.JabRefIcons.ERROR, "text-danger", details);
                  })
                  .executeWith(taskExecutor);
+    }
+
+    private void showTestConnectionState(String text, IconTheme.@Nullable JabRefIcons icon, @Nullable String styleClass, String details) {
+        testConnectionButton.setText(text);
+        testConnectionButton.setGraphic(icon == null ? null : icon.getGraphicNode());
+        testConnectionButton.getStyleClass().removeAll("text-success", "text-danger");
+        if (styleClass != null) {
+            testConnectionButton.getStyleClass().add(styleClass);
+        }
+        testConnectionDetails.set(details);
+    }
+
+    /// A result only holds for the values it was tested with.
+    private void resetTestConnectionStateOnChange() {
+        Stream.of(viewModel.selectedAiProviderProperty(), viewModel.selectedChatModelProperty(), viewModel.apiKeyProperty(),
+                      viewModel.apiBaseUrlProperty(), viewModel.customizeExpertSettingsProperty())
+              .forEach(property -> property.addListener((_, _, _) -> showTestConnectionState(Localization.lang("Test connection"), null, null, "")));
     }
 
     /// Editable combo whose prompt switches to a model-name hint once Hugging Face is selected.
