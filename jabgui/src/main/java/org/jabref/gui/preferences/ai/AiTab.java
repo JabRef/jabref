@@ -97,7 +97,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                                                 .withClearButton()
                                                                                 .field(),
                                 key -> key.disableWhen(viewModel.disableBasicSettingsProperty())
-                                          .validate(viewModel.getApiTokenValidationStatus())))
+                                          .validate(viewModel.getApiTokenValidationStatus()))
+                        .button(Localization.lang("Test connection"), this::testConnection,
+                                test -> test.disableWhen(viewModel.disableBasicSettingsProperty())))
 
                 .section(Localization.lang("Expert settings"), expertSettings -> expertSettings
                                 .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
@@ -173,6 +175,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                 AiNamingUtils::getDisplayName,
                                 estimator -> estimator.disableWhen(viewModel.disableExpertSettingsProperty())))
                 .build());
+    }
+
+    private void testConnection() {
+        viewModel.testConnectionTask()
+                 .onSuccess(response -> dialogService.showInformationDialogAndWait(Localization.lang("Test connection"),
+                         Localization.lang("Connection successful. Response: %0", response)))
+                 .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Connection failed"), exception))
+                 .executeWith(taskExecutor);
     }
 
     /// Editable combo whose prompt switches to a model-name hint once Hugging Face is selected.

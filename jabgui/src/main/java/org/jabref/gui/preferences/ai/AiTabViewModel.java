@@ -22,6 +22,8 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
@@ -40,6 +42,7 @@ import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
+import dev.langchain4j.data.message.UserMessage;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -527,6 +530,21 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         workingAiPreferences.setRagMinScore(LocalizedNumbersUtils.stringToDouble(oldLocale, ragMinScore.get()).get());
 
         aiPreferences.copyFrom(workingAiPreferences);
+    }
+
+    /// Sends a minimal chat request with the values currently entered in the dialog (not the stored preferences).
+    /// A chat request is used instead of listing models, because it works for every provider and also verifies the model name.
+    public BackgroundTask<String> testConnectionTask() {
+        AiProvider provider = selectedAiProvider.get();
+        String modelName = currentChatModel.get();
+        String apiKey = currentApiKey.get();
+        String baseUrl = customizeExpertSettings.get() ? currentApiBaseUrl.get() : provider.getApiUrl();
+        double temperatureValue = LocalizedNumbersUtils.stringToDouble(temperature.get()).orElse((double) AiDefaultExpertSettings.TEMPERATURE);
+        return BackgroundTask.wrap(() -> {
+            try (ChatModel chatModel = ChatModelFactory.create(provider, modelName, apiKey, temperatureValue, baseUrl, contextWindowSize.get(), tokenEstimationAlgorithmProperty.get())) {
+                return chatModel.chat(List.of(UserMessage.from("Reply with OK."))).aiMessage().text();
+            }
+        });
     }
 
     public void resetExpertSettings() {
