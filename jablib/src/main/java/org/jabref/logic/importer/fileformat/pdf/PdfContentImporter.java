@@ -49,8 +49,9 @@ import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 @NullMarked
 public class PdfContentImporter extends PdfImporter {
 
-    // Lookarounds keep the pattern from matching inside longer digit runs such as postal codes or URL path segments
-    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("(?<!\\d)\\d{4}(?!\\d)");
+    // Lookarounds keep the pattern from matching inside longer digit runs such as postal codes or URL path segments,
+    // and from matching either end of a four-digit range such as the page range "pp. 1999-2005"
+    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("(?<!\\d)(?<!\\d\\s?[-–]\\s?)\\d{4}(?!\\d)(?!\\s?[-–]\\s?\\d{4}(?!\\d))");
     // The importer targets first pages of Springer/IEEE-style papers, i.e. 20th century or later. A lower bound
     // would admit ISSN halves ("ISSN 1631-0705") and page ranges ("pp. 1523-1540") printed on the same page.
     private static final int MINIMUM_PLAUSIBLE_YEAR = 1900;

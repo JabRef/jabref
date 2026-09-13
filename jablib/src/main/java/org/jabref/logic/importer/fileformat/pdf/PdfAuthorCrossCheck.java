@@ -37,7 +37,7 @@ class PdfAuthorCrossCheck {
     private static final Pattern SOFT_LINE_BREAK_HYPHEN = Pattern.compile("-\\r?\\n\\s*");
     private static final Pattern COMBINING_MARKS = Pattern.compile("\\p{M}+");
     private static final Set<String> NAME_LIST_LOWERCASE_WORDS = Set.of(
-            "and", "van", "von", "der", "den", "de", "del", "dos", "da", "di", "la", "le", "ten", "ter", "y", "e");
+            "and", "others", "van", "von", "der", "den", "de", "del", "dos", "da", "di", "la", "le", "ten", "ter", "y", "e");
 
     private PdfAuthorCrossCheck() {
     }

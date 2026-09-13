@@ -18,6 +18,8 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,6 +35,7 @@ import static org.mockito.Mockito.when;
 ///
 /// The cross-check logic under test lives in [PdfAuthorCrossCheck], but is exercised here through the
 /// merge importer, which is where it takes effect.
+@NullMarked
 class PdfMergeMetadataImporterOfflineTest {
 
     private static final String DOCUMENT_TEXT = """
@@ -58,12 +61,24 @@ class PdfMergeMetadataImporterOfflineTest {
             Void, Eve                   | Eve Adams and Bob Smith, Example University          |
             van der Berg, Anna          | Anna van der Berg, Example University               | van der Berg, Anna
             """)
-    void singleCreatorCandidateAuthorIsCrossCheckedAgainstText(String author, String leadingPagesText, String expectedAuthor) {
+    void singleCreatorCandidateAuthorIsCrossCheckedAgainstText(String author, @Nullable String leadingPagesText, @Nullable String expectedAuthor) {
         BibEntry candidate = new BibEntry().withField(StandardField.AUTHOR, author);
 
         BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(candidate), leadingPagesText);
 
         assertEquals(Optional.ofNullable(expectedAuthor), merged.getField(StandardField.AUTHOR));
+    }
+
+    @Test
+    void unconfirmedAuthorIsReplacedByBylineEndingInOthers() {
+        BibEntry documentInformation = new BibEntry()
+                .withField(StandardField.AUTHOR, "Void, Eve");
+        BibEntry content = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Alice Doe and others");
+
+        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation, content), DOCUMENT_TEXT);
+
+        assertEquals(Optional.of("Alice Doe and others"), merged.getField(StandardField.AUTHOR));
     }
 
     @Test

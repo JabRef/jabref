@@ -42,7 +42,7 @@ Needs: impl, utest
 ## PDF import extracts only plausible years
 `req~import.pdf.plausible-year~1`
 
-When extracting the year from the text of a PDF's first page, JabRef takes only a standalone four-digit number between 1900 and two years after the current year, so postal codes, ISSNs, and page ranges are not imported as the year.
+When extracting the year from the text of a PDF's first page, JabRef takes only a standalone four-digit number that is not part of a four-digit range (such as a page range), between 1900 and two years after the current year, so postal codes, ISSNs, and page ranges are not imported as the year.
 
 Needs: impl, utest
 
