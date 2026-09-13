@@ -3,10 +3,13 @@ package org.jabref.gui.theme;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
@@ -53,9 +56,9 @@ public class ThemeManager {
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    /// Marks a window whose scene this manager already follows. A window re-enters [Window#getWindows()]
-    /// every time it is shown again.
-    private final Object followsSceneKey = new Object();
+    /// Windows whose scene this manager already follows. A window re-enters [Window#getWindows()]
+    /// every time it is shown again. Weak, so closed windows can be garbage collected.
+    private final Set<Window> windowsFollowingScene = Collections.newSetFromMap(new WeakHashMap<>());
 
     private final FileUpdateListener baseCssLiveUpdate = () -> cssLiveUpdate(JABREF_BASE_STYLE_SHEET);
     private @Nullable FileUpdateListener themeCssLiveUpdate;
@@ -129,7 +132,7 @@ public class ThemeManager {
                     continue;
                 }
                 for (Window window : change.getAddedSubList()) {
-                    if (window.getProperties().putIfAbsent(followsSceneKey, Boolean.TRUE) == null) {
+                    if (windowsFollowingScene.add(window)) {
                         window.sceneProperty().addListener((_, _, newScene) -> {
                             if (newScene != null) {
                                 updateColorSchemeOnScene(newScene);
