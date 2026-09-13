@@ -56,9 +56,7 @@ public class BaseDialog<T> extends Dialog<T> {
     }
 
     /// Key bindings and the pane a walkthrough draws into both belong to the dialog pane, so a dialog that
-    /// swaps in a new one gets them again. The pane goes here rather than into the scene because a [Dialog]
-    /// reassigns its scene root when the dialog pane is set, again on every show, and swaps in a
-    /// placeholder on close.
+    /// swaps in a new one gets them again.
     private void setUpDialogPane(DialogPane dialogPane) {
         setupKeyBindings(dialogPane);
         dialogPane.getChildren().add(new WalkthroughPane());

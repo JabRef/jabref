@@ -14,13 +14,8 @@ import org.jspecify.annotations.NullMarked;
 /// The layer a walkthrough draws into: an initially empty pane covering a whole window, on top of that
 /// window's regular content. Panels, tooltips and highlight effects are added here and removed again.
 ///
-/// A window adds its pane where it is built and keeps it for its lifetime. The pane is a child of a
-/// parent the window already has, never a replacement for the scene root -- three parties already
-/// claim that root (JavaFX's [javafx.scene.control.Dialog] reassigns it on every show, ControlsFX injects
-/// its decoration pane on the first validation decoration, and the walkthrough used to wrap it), and any
-/// two of them colliding drops the third's contribution. Replacing the root of a visible window also
-/// invalidates the CSS of the entire scene graph and makes Scenic View re-attach from scratch, losing the
-/// developer's selection.
+/// A window adds its pane where it is built and keeps it for its lifetime, as a child of a parent the window
+/// already has -- never as a replacement for the scene root, see [Where overlays are rendered](https://devdocs.jabref.org/code-howtos/walkthrough.html#where-overlays-are-rendered).
 ///
 /// @implNote The pane is unmanaged. In the main window and in dialogs it sizes itself to the scene rather
 /// than to its parent, so that one rule covers a pane that fills the window and a dialog pane that is the
@@ -64,29 +59,27 @@ public final class WalkthroughPane extends StackPane {
         // must reach that content, so only the overlay nodes themselves take input.
         setPickOnBounds(false);
 
+        boolean fitsScene = extent == Extent.SCENE;
+        InvalidationListener fitToScene = _ -> fitToScene();
         sceneProperty().addListener((_, oldScene, newScene) -> {
             if (oldScene != null) {
                 oldScene.getProperties().remove(SCENE_PROPERTY_KEY);
-            }
-            if (newScene != null) {
-                newScene.getProperties().put(SCENE_PROPERTY_KEY, this);
-            }
-        });
-
-        if (extent == Extent.SCENE) {
-            InvalidationListener fitToScene = _ -> fitToScene();
-            sceneProperty().addListener((_, oldScene, newScene) -> {
-                if (oldScene != null) {
+                if (fitsScene) {
                     oldScene.widthProperty().removeListener(fitToScene);
                     oldScene.heightProperty().removeListener(fitToScene);
                 }
-                if (newScene != null) {
+            }
+            if (newScene != null) {
+                newScene.getProperties().put(SCENE_PROPERTY_KEY, this);
+                if (fitsScene) {
                     newScene.widthProperty().addListener(fitToScene);
                     newScene.heightProperty().addListener(fitToScene);
                 }
+            }
+            if (fitsScene) {
                 fitToScene();
-            });
-        }
+            }
+        });
     }
 
     /// Returns the pane of the given window.
