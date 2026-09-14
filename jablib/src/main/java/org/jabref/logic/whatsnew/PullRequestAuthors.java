@@ -47,6 +47,8 @@ public final class PullRequestAuthors {
     private static final String FILE_NAME = "whats-new-authors.tsv";
     private static final String FIELD_SEPARATOR = "\t";
     private static final Duration RETRY_UNRESOLVED = Duration.ofDays(1);
+    /// GitHub closes an issue a moment after merging the pull request that fixes it.
+    private static final Duration CLOSED_BY_MERGE = Duration.ofMinutes(1);
     private static final Pattern LINK = Pattern.compile("https?://github\\.com/([\\w.-]+)/([\\w.-]+)/(?:pull|issues)/(\\d+)");
 
     /// A pull request or an issue; GitHub numbers both in one sequence, so the kind of the link does not matter.
@@ -162,7 +164,9 @@ public final class PullRequestAuthors {
         return new AttributedEntry(by, item.entry());
     }
 
-    /// The pull request's author, or the author of the pull request merged last among those that fixed the issue.
+    /// The pull request's author; for an issue, the author of the pull request that closed it: of the merged pull
+    /// requests referencing the issue, the one merged last up to [#CLOSED_BY_MERGE] after the issue was closed.
+    /// A pull request merged later only mentions the issue, and an issue never closed was fixed by nobody yet.
     private Optional<String> resolve(Link link) throws NotAsked {
         Optional<JSONObject> issue = get(link.issuePath()).map(JSONObject::new);
         if (issue.isEmpty()) {
@@ -171,9 +175,10 @@ public final class PullRequestAuthors {
         if (issue.get().has("pull_request")) {
             return login(issue.get());
         }
-        record Merged(String at, String login) {
+        record Merged(Instant at, String login) {
         }
         List<Merged> merged = new ArrayList<>();
+        Optional<Instant> closed = Optional.empty();
         JSONArray timeline = get(link.issuePath() + "/timeline?per_page=100").map(JSONArray::new).orElseGet(JSONArray::new);
         for (int i = 0; i < timeline.length(); i++) {
             JSONObject event = timeline.getJSONObject(i);
@@ -183,17 +188,26 @@ public final class PullRequestAuthors {
                         .map(source -> source.optJSONObject("issue"))
                         .ifPresent(source -> mergedAt(source.optJSONObject("pull_request"))
                                 .ifPresent(at -> login(source).ifPresent(author -> merged.add(new Merged(at, author)))));
-            } else if ("closed".equals(kind) && !event.isNull("commit_id")) {
-                JSONArray pulls = get("repos/" + link.owner() + "/" + link.repository() + "/commits/" + event.getString("commit_id") + "/pulls")
-                        .map(JSONArray::new).orElseGet(JSONArray::new);
-                for (int j = 0; j < pulls.length(); j++) {
-                    JSONObject pull = pulls.getJSONObject(j);
-                    mergedAt(pull).ifPresent(at -> login(pull).ifPresent(author -> merged.add(new Merged(at, author))));
+            } else if ("closed".equals(kind)) {
+                closed = instant(event, "created_at");
+                if (!event.isNull("commit_id")) {
+                    JSONArray pulls = get("repos/" + link.owner() + "/" + link.repository() + "/commits/" + event.getString("commit_id") + "/pulls")
+                            .map(JSONArray::new).orElseGet(JSONArray::new);
+                    for (int j = 0; j < pulls.length(); j++) {
+                        JSONObject pull = pulls.getJSONObject(j);
+                        mergedAt(pull).ifPresent(at -> login(pull).ifPresent(author -> merged.add(new Merged(at, author))));
+                    }
                 }
             }
         }
-        // The timestamps are ISO 8601 in UTC, so they sort as text.
-        return merged.stream().max(Comparator.comparing(Merged::at)).map(Merged::login);
+        if (closed.isEmpty()) {
+            return Optional.empty();
+        }
+        Instant latestFix = closed.get().plus(CLOSED_BY_MERGE);
+        return merged.stream()
+                     .filter(candidate -> !candidate.at().isAfter(latestFix))
+                     .max(Comparator.comparing(Merged::at))
+                     .map(Merged::login);
     }
 
     /// My GitHub login: `github.user`, else the token's user, else the one user whose public email is `user.email`.
@@ -244,8 +258,19 @@ public final class PullRequestAuthors {
                        .filter(login -> !login.isEmpty());
     }
 
-    private static Optional<String> mergedAt(@Nullable JSONObject pull) {
-        return pull == null || pull.isNull("merged_at") ? Optional.empty() : Optional.of(pull.optString("merged_at", "")).filter(at -> !at.isEmpty());
+    private static Optional<Instant> mergedAt(@Nullable JSONObject pull) {
+        return pull == null ? Optional.empty() : instant(pull, "merged_at");
+    }
+
+    private static Optional<Instant> instant(JSONObject object, String key) {
+        if (object.isNull(key)) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Instant.parse(object.optString(key, "")));
+        } catch (DateTimeParseException e) {
+            return Optional.empty();
+        }
     }
 
     private Map<String, Answer> read() {

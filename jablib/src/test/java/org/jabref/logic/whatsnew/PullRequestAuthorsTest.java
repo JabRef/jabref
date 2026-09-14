@@ -29,7 +29,13 @@ class PullRequestAuthorsTest {
             "repos/JabRef/jabref/issues/16929/timeline?per_page=100", """
                     [{"event": "cross-referenced", "source": {"issue": {"user": {"login": "koppor"}, "pull_request": {"merged_at": "2026-09-01T10:00:00Z"}}}},
                      {"event": "cross-referenced", "source": {"issue": {"user": {"login": "unmerged"}, "pull_request": {"merged_at": null}}}},
-                     {"event": "commented"}]""");
+                     {"event": "closed", "commit_id": null, "created_at": "2026-09-01T10:00:02Z"},
+                     {"event": "cross-referenced", "source": {"issue": {"user": {"login": "mentioned-later"}, "pull_request": {"merged_at": "2026-09-05T08:00:00Z"}}}},
+                     {"event": "commented"}]""",
+            "repos/JabRef/jabref/issues/16930", """
+                    {"number": 16930, "user": {"login": "reporter"}}""",
+            "repos/JabRef/jabref/issues/16930/timeline?per_page=100", """
+                    [{"event": "cross-referenced", "source": {"issue": {"user": {"login": "koppor"}, "pull_request": {"merged_at": "2026-09-01T10:00:00Z"}}}}]""");
 
     @TempDir
     Path gitDir;
@@ -85,6 +91,15 @@ class PullRequestAuthorsTest {
         News attributed = authors(github(), "koppor").attribute(news(TYPIST, VIA_ISSUE), Set.of(VIA_ISSUE.text()));
 
         assertEquals(news(Contributor.Me.LOCAL, VIA_ISSUE), attributed);
+    }
+
+    @Test
+    void anOpenIssueIsFixedByNobodyYet() {
+        ChangelogEntry openIssue = entry("We added Y. [#16930](https://github.com/JabRef/jabref/issues/16930)");
+
+        News attributed = authors(github(), "somebody").attribute(news(TYPIST, openIssue), Set.of());
+
+        assertEquals(news(TYPIST, openIssue), attributed);
     }
 
     @Test
