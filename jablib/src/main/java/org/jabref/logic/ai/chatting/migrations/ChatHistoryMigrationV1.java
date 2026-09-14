@@ -82,7 +82,7 @@ public final class ChatHistoryMigrationV1 {
         }
 
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-            LOGGER.warn("Cannot migrate chat history: database path is not set");
+            LOGGER.debug("Cannot migrate chat history: database path is not set");
             return;
         }
 
