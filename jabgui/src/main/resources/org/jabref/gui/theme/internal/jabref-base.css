@@ -1664,6 +1664,19 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-accent, -color-button-pressed;
 }
 
+/* "Dismiss forever" */
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:first-child {
+    -fx-background-color: transparent;
+    -fx-text-fill: -color-fg-muted;
+    -fx-font-size: 0.85em;
+    -fx-pref-width: -1;
+    -fx-max-width: -1;
+}
+
+.info-center-view .donation-notification > .content > .text-container > .actions-box .button:first-child:hover {
+    -fx-underline: true;
+}
+
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
    LinkedFilesEditor binds the ListView pref/max height to this fixed cell size. */
 .linked-files-list {

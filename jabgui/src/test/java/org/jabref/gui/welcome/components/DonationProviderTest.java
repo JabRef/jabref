@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -24,9 +25,12 @@ import static org.mockito.Mockito.when;
 
 class DonationProviderTest extends JavaFxTest {
 
+    private static final int DISMISS_FOREVER = 0;
+    private static final int DISMISS = 1;
+
     private final DialogService dialogService = mock(DialogService.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
-    private final DonationPreferences donationPreferences = new DonationPreferences(-1);
+    private final DonationPreferences donationPreferences = new DonationPreferences(false, -1);
     private final DonationProvider donationProvider = new DonationProvider(preferences, dialogService);
 
     @BeforeEach
@@ -55,10 +59,10 @@ class DonationProviderTest extends JavaFxTest {
     }
 
     @Test
-    public void firstLaunchSchedulesTheNotificationOneWeekLater() {
+    public void firstLaunchSchedulesTheNotificationSixMonthsLater() {
         interact(donationProvider::showIfNeeded);
 
-        assertEquals((int) LocalDate.now().plusDays(7).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
+        assertEquals((int) LocalDate.now().plusMonths(6).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
         verify(dialogService, never()).notify(any(Notifications.DonationNotification.class));
     }
 
@@ -77,8 +81,27 @@ class DonationProviderTest extends JavaFxTest {
         donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
         interact(donationProvider::showIfNeeded);
 
-        assertEquals(OnClickBehaviour.HIDE_AND_REMOVE, triggerAction(0));
+        assertEquals(OnClickBehaviour.HIDE_AND_REMOVE, triggerAction(DISMISS));
         assertEquals((int) LocalDate.now().plusMonths(6).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
+    }
+
+    @Test
+    public void dismissForeverActionStopsFutureNotifications() {
+        donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
+        interact(donationProvider::showIfNeeded);
+
+        assertEquals(OnClickBehaviour.HIDE_AND_REMOVE, triggerAction(DISMISS_FOREVER));
+        assertTrue(donationPreferences.isNeverShowAgain());
+    }
+
+    @Test
+    public void noNotificationIsShownAfterDismissingForever() {
+        donationPreferences.setNeverShowAgain(true);
+        donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
+
+        interact(donationProvider::showIfNeeded);
+
+        verify(dialogService, never()).notify(any(Notifications.DonationNotification.class));
     }
 
     /// GemsFX declares the actions as a raw list, hence the unchecked cast.

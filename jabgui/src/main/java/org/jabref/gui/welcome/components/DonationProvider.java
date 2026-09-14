@@ -24,7 +24,6 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class DonationProvider {
     private static final int DONATION_INTERVAL_MONTHS = 6;
-    private static final int FIRST_NOTIFICATION_DELAY_DAYS = 7;
 
     private final GuiPreferences preferences;
     private final DialogService dialogService;
@@ -37,8 +36,11 @@ public class DonationProvider {
     }
 
     public void showIfNeeded() {
+        if (preferences.getDonationPreferences().isNeverShowAgain()) {
+            return;
+        }
         if (preferences.getDonationPreferences().getNextNotificationEpochDay() < 0) {
-            scheduleNextNotification(LocalDate.now().plusDays(FIRST_NOTIFICATION_DELAY_DAYS));
+            dismiss();
         }
         scheduleAfterDays(calculateDaysUntilNextNotification(
                 preferences.getDonationPreferences().getNextNotificationEpochDay(),
@@ -54,7 +56,12 @@ public class DonationProvider {
 
         Notifications.DonationNotification notification = new Notifications.DonationNotification(
                 Localization.lang("Support JabRef"),
-                Localization.lang("Help us improve JabRef by donating."));
+                Localization.lang("You already used JabRef for %0 months. Do you want to buy us a coffee?", String.valueOf(DONATION_INTERVAL_MONTHS)));
+
+        notification.getActions().add(new NotificationAction<>(Localization.lang("Dismiss forever"), _ -> {
+            preferences.getDonationPreferences().setNeverShowAgain(true);
+            return OnClickBehaviour.HIDE_AND_REMOVE;
+        }));
 
         notification.getActions().add(new NotificationAction<>(Localization.lang("Dismiss"), _ -> {
             dismiss();
