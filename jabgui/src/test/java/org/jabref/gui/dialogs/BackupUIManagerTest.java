@@ -15,10 +15,14 @@ import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.controlsfx.control.HyperlinkLabel;
@@ -30,6 +34,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -98,5 +104,43 @@ class BackupUIManagerTest extends JavaFxTest {
                 This could indicate that JabRef did not shut down cleanly last time the file was used.
 
                 Do you want to recover the library from the backup file?""".formatted(backupFile.getFileName()), dialogContent.get());
+    }
+
+    /// A conflict-aborted original produces an invalid, empty result. Reviewing the backup merges content into that
+    /// same result, so it has to stop counting as invalid - otherwise the caller reports an open error and closes the
+    /// tab right after the user recovered the library.
+    // [utest->req~import.library.unreadable-reported~1]
+    @Test
+    void recoveredEntryMakesAnInvalidResultValid() {
+        ParserResult parserResult = ParserResult.fromErrorMessage("aborted parse");
+        parserResult.getDatabase().insertEntry(new BibEntry(StandardEntryType.Article).withCitationKey("recovered"));
+
+        BackupUIManager.markRecoveredIfContentRestored(parserResult);
+
+        assertFalse(parserResult.isInvalid());
+    }
+
+    /// Accepting a change is not on its own proof that anything came back: a backup differing only in its groups
+    /// yields a metadata change whose acceptance restores nothing. Such a result must stay invalid, so that an
+    /// unreadable original is still reported instead of opening as an empty library.
+    // [utest->req~import.library.unreadable-reported~1]
+    @Test
+    void resultWithoutRestoredContentStaysInvalid() {
+        ParserResult parserResult = ParserResult.fromErrorMessage("aborted parse");
+
+        BackupUIManager.markRecoveredIfContentRestored(parserResult);
+
+        assertTrue(parserResult.isInvalid());
+    }
+
+    // [utest->req~import.library.unreadable-reported~1]
+    @Test
+    void recoveredStringMakesAnInvalidResultValid() {
+        ParserResult parserResult = ParserResult.fromErrorMessage("aborted parse");
+        parserResult.getDatabase().addString(new BibtexString("name", "content"));
+
+        BackupUIManager.markRecoveredIfContentRestored(parserResult);
+
+        assertFalse(parserResult.isInvalid());
     }
 }

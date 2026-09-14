@@ -191,14 +191,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         enableAi.set(workingAiPreferences.getAiFeaturesEnabledCurrently());
         workingAiPreferences.aiFeaturesEnabledCurrentlyProperty().bindBidirectional(enableAi);
 
-        this.enableAi.addListener((_, _, newValue) -> {
-            disableBasicSettings.set(!newValue);
-            disableExpertSettings.set(!newValue || !customizeExpertSettings.get());
-        });
-
-        this.customizeExpertSettings.addListener((_, _, newValue) ->
-                disableExpertSettings.set(!newValue || !enableAi.get())
-        );
+        disableBasicSettings.bind(enableAi.not());
+        disableExpertSettings.bind(enableAi.not().or(customizeExpertSettings.not()));
 
         this.selectedEmbeddingModel.addListener((_, _, newValue) -> updateSelectedEmbeddingModelMetadata(newValue));
 
@@ -389,17 +383,17 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         documentSplitterChunkSize,
                         selectedEmbeddingModelMaxChunkSize));
 
-        this.documentSplitterOverlapSizeValidator = new FunctionBasedValidator<>(
+        this.documentSplitterOverlapSizeValidator = new ObservableRuleBasedValidator(
                 Bindings.createObjectBinding(
-                        () -> documentSplitterOverlapSize.getValue(),
+                        () -> {
+                            int size = documentSplitterOverlapSize.get();
+                            if (size <= 0 || size >= documentSplitterChunkSize.get()) {
+                                return ValidationMessage.error(Localization.lang("Document splitter overlap size must be greater than 0 and less than chunk size"));
+                            }
+                            return null;
+                        },
                         documentSplitterOverlapSize,
-                        documentSplitterChunkSize),
-                size -> {
-                    if (size == null || size.intValue() <= 0 || size.intValue() >= documentSplitterChunkSize.get()) {
-                        return ValidationMessage.error(Localization.lang("Document splitter overlap size must be greater than 0 and less than chunk size"));
-                    }
-                    return null;
-                });
+                        documentSplitterChunkSize));
 
         this.ragMaxResultsCountValidator = new FunctionBasedValidator<>(
                 ragMaxResultsCount,
