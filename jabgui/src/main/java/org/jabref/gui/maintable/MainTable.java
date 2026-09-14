@@ -383,12 +383,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private void showSearchMatchesIfNoneVisible() {
         Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow")).ifPresent(flow -> {
             int firstVisible = Optional.ofNullable(flow.getFirstVisibleCell()).map(IndexedCell::getIndex).orElse(0);
-            if (firstVisible >= getItems().size() || getItems().get(firstVisible).isMatchedBySearch().get()) {
+            if (firstVisible >= getItems().size() || getItems().get(firstVisible).isMatchedBySearch()) {
                 return;
             }
             // Matches are a prefix of the rows, so with a non-match at the top of the viewport, the last match is above it
             int lastMatch = -1;
-            for (int i = 0; i < firstVisible && getItems().get(i).isMatchedBySearch().get(); i++) {
+            for (int i = 0; i < firstVisible && getItems().get(i).isMatchedBySearch(); i++) {
                 lastMatch = i;
             }
             if (lastMatch >= 0) {
