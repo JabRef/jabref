@@ -17,7 +17,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakMapChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -49,6 +51,8 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.collect.Comparators;
 import com.tobiasdiez.easybind.EasyBind;
@@ -112,6 +116,9 @@ public class AiChatViewModel extends AbstractViewModel {
 
     private List<FullBibEntry> currentEntriesSnapshot = new ArrayList<>();
 
+    // Strong reference: only weakly registered on the entries' field maps
+    private MapChangeListener<Field, String> fileFieldListener;
+
     public AiChatViewModel(
             AiPreferences aiPreferences,
             FilePreferences filePreferences,
@@ -157,6 +164,21 @@ public class AiChatViewModel extends AbstractViewModel {
                                 entries.isEmpty() ||
                                 entries.stream().flatMap(identifier -> identifier.entry().getFiles().stream()).findAny().isEmpty(),
                 entries, aiPreferences.aiFeaturesEnabledProperty()
+        );
+
+        // Files can be attached while the entry stays the same (e.g. by dropping a PDF into the entry editor),
+        // which does not touch the entries list. Re-evaluate when the "file" field of an entry changes.
+        fileFieldListener = change -> {
+            if (change.getKey() == StandardField.FILE) {
+                hasNoFiles.invalidate();
+            }
+        };
+        // Weak wrapper: entries outlive this view model (e.g. closed group chat windows), so a strong listener would keep it alive
+        WeakMapChangeListener<Field, String> weakFileFieldListener = new WeakMapChangeListener<>(fileFieldListener);
+        BindingsHelper.listenToListContentChanges(
+                entries,
+                identifier -> identifier.entry().getFieldsObservable().addListener(weakFileFieldListener),
+                identifier -> identifier.entry().getFieldsObservable().removeListener(weakFileFieldListener)
         );
 
         BooleanBinding isError = Bindings.createBooleanBinding(() -> {
