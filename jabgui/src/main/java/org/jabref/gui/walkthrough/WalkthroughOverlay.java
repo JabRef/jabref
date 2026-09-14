@@ -123,11 +123,11 @@ public class WalkthroughOverlay {
     }
 
     private void displayWalkthroughStep(WalkthroughResult result) {
-        Optional<Window> window = result.window();
-        if (window.isEmpty()) {
+        Optional<Window> resultWindow = result.window();
+        if (resultWindow.isEmpty()) {
             throw new IllegalStateException("Resolution should not be successful without Window being resolved.");
         }
-        this.resolvedWindow = window.get();
+        this.resolvedWindow = resultWindow.get();
         this.resolvedNode = result.node().orElse(null);
         VisibleComponent component = (VisibleComponent) walkthrough.getCurrentStep();
 
@@ -137,12 +137,20 @@ public class WalkthroughOverlay {
             this.scroller = new WalkthroughScroller(resolvedNode);
         }
 
+        Optional<WalkthroughPane> pane = WalkthroughPane.of(resolvedWindow);
+        if (pane.isEmpty()) {
+            LOGGER.error("Window '{}' cannot host a walkthrough pane, so step '{}' cannot be shown. Reverting.",
+                    resolvedWindow.getClass().getSimpleName(), component.title());
+            reverter.findAndUndo();
+            return;
+        }
+
         highlighter.applyHighlight(
                 component.highlight().orElse(null),
                 resolvedWindow.getScene(),
                 resolvedNode);
         WindowOverlay overlay = overlays.computeIfAbsent(resolvedWindow,
-                w -> new WindowOverlay(w, WalkthroughPane.getInstance(w), walkthrough));
+                window -> new WindowOverlay(window, pane.orElseThrow(), walkthrough));
 
         switch (component) {
             case TooltipStep tooltip ->

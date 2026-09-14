@@ -250,10 +250,9 @@ class WindowOverlay {
         cleanupTasks.clear();
     }
 
-    /// Detaches the overlay.
+    /// Detaches the overlay. The pane it drew into belongs to the window and stays.
     public void detach() {
         hide();
-        pane.detach();
         LOGGER.debug("WindowOverlay detached for window: {}", window.getClass().getSimpleName());
     }
 
