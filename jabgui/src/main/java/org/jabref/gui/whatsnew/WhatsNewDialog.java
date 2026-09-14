@@ -18,6 +18,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 
 import org.jabref.gui.util.BaseDialog;
@@ -27,7 +29,8 @@ import org.jabref.logic.whatsnew.News;
 import org.jspecify.annotations.Nullable;
 
 /// The non-modal "What's new" window: the news with *Later* and, when something waits to restart JabRef,
-/// *Restart to update*; without news only *Close*, as a restart would bring nothing to read about.
+/// *Restart to update*; without news only *Close*, as a restart would bring nothing to read about, above the
+/// news shown before, greyed.
 ///
 /// It opens on a fetch — "Checking remote…" with a bar, the restart disabled — and [#checked] brings the answer,
 /// so nobody restarts into a version that is already stale. From then on the restart is offered exactly while
@@ -37,6 +40,7 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
 
     private static final double WIDTH = 900;
     private static final double HEIGHT = 650;
+    private static final double SHOWN_BEFORE_OPACITY = 0.6;
 
     private enum Check {
         RUNNING,
@@ -49,9 +53,10 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
     private final ObjectProperty<Check> check = new SimpleObjectProperty<>(Check.RUNNING);
     private final Consumer<String> openUrl;
 
+    /// @param shownBefore     the news presented last, shown greyed while nothing is pending
     /// @param updateAvailable whether the checkout is behind its upstream, as of the latest look; empty when
     ///                        nothing would restart JabRef (no `just run-loop`), so no restart is offered
-    public WhatsNewDialog(News news, Optional<ObservableBooleanValue> updateAvailable, Consumer<String> openUrl) {
+    public WhatsNewDialog(News news, ObservableValue<News> shownBefore, Optional<ObservableBooleanValue> updateAvailable, Consumer<String> openUrl) {
         this.news = new SimpleObjectProperty<>(news);
         this.openUrl = openUrl;
         // JavaFX dialogs are application-modal unless told otherwise; this one must not block JabRef.
@@ -72,7 +77,7 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
         setResultConverter(restart::equals);
 
         BorderPane root = new BorderPane();
-        root.centerProperty().bind(this.news.map(this::body));
+        root.centerProperty().bind(Bindings.createObjectBinding(() -> body(this.news.get(), shownBefore.getValue()), this.news, shownBefore));
         root.bottomProperty().bind(check.map(WhatsNewDialog::statusRow));
         root.setPrefSize(WIDTH, HEIGHT);
         getDialogPane().setContent(root);
@@ -118,13 +123,23 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
         return row;
     }
 
-    /// The news, or a line saying that there are none — a blank sheet reads as a rendering failure.
-    private Node body(News news) {
-        if (news.isEmpty()) {
-            Label nothing = new Label(Localization.lang("Nothing new since the running version."));
-            nothing.setPadding(new Insets(16));
+    /// The news; without any, a line saying so — a blank sheet reads as a rendering failure — above the news
+    /// shown before, greyed.
+    private Node body(News news, News shownBefore) {
+        if (!news.isEmpty()) {
+            return new WhatsNewView(news, openUrl);
+        }
+        Label nothing = new Label(Localization.lang("Nothing new since the running version."));
+        nothing.setPadding(new Insets(16));
+        if (shownBefore.isEmpty()) {
             return nothing;
         }
-        return new WhatsNewView(news, openUrl);
+        Label heading = new Label(Localization.lang("Shown before"));
+        heading.getStyleClass().addAll("h3", "bold");
+        heading.setPadding(new Insets(0, 16, 0, 16));
+        WhatsNewView earlier = new WhatsNewView(shownBefore, openUrl);
+        earlier.setOpacity(SHOWN_BEFORE_OPACITY);
+        VBox.setVgrow(earlier, Priority.ALWAYS);
+        return new VBox(nothing, heading, earlier);
     }
 }

@@ -172,6 +172,20 @@ class WhatsNewViewModelTest {
     }
 
     @Test
+    void thePresentedNewsStayShownBeforeWhenNothingNewArrives() throws IOException {
+        announced().announce(Set.of(OLD));
+        when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
+        viewModel.present(() -> true, _ -> {
+        }, _ -> fail("the look must not fail"));
+        AtomicReference<News> presentedAgain = new AtomicReference<>();
+
+        viewModel.present(() -> true, presentedAgain::set, _ -> fail("the look must not fail"));
+
+        assertEquals(List.of(News.NONE, new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE)))),
+                List.of(presentedAgain.get(), viewModel.shownBeforeProperty().get()));
+    }
+
+    @Test
     void aFirstLookOvertakenByAClickDoesNotTurnTheClockBack() throws IOException {
         announced().announce(Set.of(OLD));
         when(checkout.commitsBehind()).thenReturn(2);

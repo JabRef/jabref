@@ -90,6 +90,7 @@ public final class WhatsNewButton {
             return;
         }
         WhatsNewDialog dialog = new WhatsNewDialog(viewModel.getPending(),
+                viewModel.shownBeforeProperty(),
                 Boolean.getBoolean(RESTART_LOOP_PROPERTY) ? Optional.of(viewModel.updateAvailableProperty()) : Optional.empty(),
                 url -> NativeDesktop.openBrowserShowPopup(url, dialogService, externalApplicationsPreferences));
         dialog.titleProperty().bind(viewModel.titleProperty());
