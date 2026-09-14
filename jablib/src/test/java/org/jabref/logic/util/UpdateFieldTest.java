@@ -60,20 +60,20 @@ class UpdateFieldTest {
     @Test
     void updateFieldCorrectFieldChangeContentsEmptyField() {
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, "2016");
-        assertNull(change.get().getOldValue());
-        assertEquals(StandardField.YEAR, change.get().getField());
-        assertEquals("2016", change.get().getNewValue());
-        assertEquals(entry, change.get().getEntry());
+        assertNull(change.get().oldValue());
+        assertEquals(StandardField.YEAR, change.get().field());
+        assertEquals("2016", change.get().newValue());
+        assertEquals(entry, change.get().entry());
     }
 
     @Test
     void updateFieldCorrectFieldChangeContentsNonEmptyField() {
         entry.setField(StandardField.YEAR, "2015");
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, "2016");
-        assertEquals("2015", change.get().getOldValue());
-        assertEquals(StandardField.YEAR, change.get().getField());
-        assertEquals("2016", change.get().getNewValue());
-        assertEquals(entry, change.get().getEntry());
+        assertEquals("2015", change.get().oldValue());
+        assertEquals(StandardField.YEAR, change.get().field());
+        assertEquals("2016", change.get().newValue());
+        assertEquals(entry, change.get().entry());
     }
 
     @Test
@@ -121,10 +121,10 @@ class UpdateFieldTest {
     void updateFieldSetToNullCorrectFieldChangeContents() {
         entry.setField(StandardField.YEAR, "2016");
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, null);
-        assertNull(change.get().getNewValue());
-        assertEquals(StandardField.YEAR, change.get().getField());
-        assertEquals("2016", change.get().getOldValue());
-        assertEquals(entry, change.get().getEntry());
+        assertNull(change.get().newValue());
+        assertEquals(StandardField.YEAR, change.get().field());
+        assertEquals("2016", change.get().oldValue());
+        assertEquals(entry, change.get().entry());
     }
 
     @Test
@@ -153,10 +153,10 @@ class UpdateFieldTest {
     void updateFieldSameContentHasCorrectFieldChange() {
         entry.setField(StandardField.YEAR, "2016");
         Optional<FieldChange> change = UpdateField.updateField(entry, StandardField.YEAR, "2016", true);
-        assertNull(change.get().getNewValue());
-        assertEquals(StandardField.YEAR, change.get().getField());
-        assertEquals("2016", change.get().getOldValue());
-        assertEquals(entry, change.get().getEntry());
+        assertNull(change.get().newValue());
+        assertEquals(StandardField.YEAR, change.get().field());
+        assertEquals("2016", change.get().oldValue());
+        assertEquals(entry, change.get().entry());
     }
 
     @Test

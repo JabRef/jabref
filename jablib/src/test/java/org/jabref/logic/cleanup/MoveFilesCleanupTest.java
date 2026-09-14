@@ -144,7 +144,7 @@ class MoveFilesCleanupTest {
 
     @Test
     void movesFileWithNoDirectory() {
-        databaseContext.setMetaData(new MetaData());
+        databaseContext.getMetaData().clearLibrarySpecificFileDirectory();
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         List<FieldChange> changes = cleanup.cleanup(entry);
         assertEquals(List.of(), changes);

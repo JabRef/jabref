@@ -17,8 +17,12 @@ public record UndoableInsertString(BibDatabase database, BibtexString string) im
     }
 
     @Override
-    public void apply() {
+    public ApplyResult apply() {
+        if (database.hasStringByName(string.getName())) {
+            return ApplyResult.of(this, "a string named '%s' is already in the library".formatted(string.getName()));
+        }
         database.addString(string);
+        return ApplyResult.SUCCESS;
     }
 
     @Override

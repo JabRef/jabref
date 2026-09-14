@@ -80,7 +80,7 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
     private static Path safeRelativize(Path base, Path child) {
         try {
             return base.relativize(child);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             // If paths are on different roots, fall back to just the file name for relative matching
             return child.getFileName();
         }

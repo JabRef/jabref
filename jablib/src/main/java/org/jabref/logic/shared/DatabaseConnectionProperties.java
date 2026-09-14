@@ -20,8 +20,6 @@ public interface DatabaseConnectionProperties {
 
     boolean isAllowPublicKeyRetrieval();
 
-    String getServerTimezone();
-
     String getJdbcUrl();
 
     boolean isUseExpertMode();

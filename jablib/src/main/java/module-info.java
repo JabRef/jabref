@@ -36,6 +36,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.os;
     exports org.jabref.logic.quality.consistency;
     exports org.jabref.logic.shared.prefs;
+    exports org.jabref.logic.shared.notifications;
     exports org.jabref.logic.util;
     exports org.jabref.logic.util.io;
     exports org.jabref.logic.xmp;

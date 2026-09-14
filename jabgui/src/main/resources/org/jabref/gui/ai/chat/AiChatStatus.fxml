@@ -27,7 +27,7 @@
     </padding>
 
     <Label text="%Chat Status"
-           styleClass="h3,padding-bottom-6"/>
+           styleClass="h3,padding-bottom-4"/>
 
     <VBox spacing="10">
         <Label text="%Chatting parameters"

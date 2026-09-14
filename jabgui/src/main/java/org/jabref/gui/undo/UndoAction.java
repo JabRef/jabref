@@ -5,6 +5,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoStep;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -36,13 +37,22 @@ public class UndoAction extends SimpleCommand {
         LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
         GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
 
-        if (!undoManager.canUndo()) {
-            dialogService.notify(Localization.lang("Nothing to undo") + '.');
-            return;
-        }
+        // A command holding the library is asked about before the stacks: a suspension makes
+        // canUndo() false as well, and "nothing to undo" would then be untrue.
+        undoManager.suspendedBy().ifPresentOrElse(
+                command -> dialogService.notify(Localization.lang("Cannot undo while %0 is running", command)),
+                () -> undo(undoManager));
+    }
 
-        undoManager.undo();
-        dialogService.notify(Localization.lang("Undo"));
-        libraryTab.markChangedOrUnChanged();
+    private void undo(GuiUndoManager undoManager) {
+        undoManager.undo().ifPresentOrElse(
+                step -> dialogService.notify(message(step)),
+                () -> dialogService.notify(Localization.lang("Nothing to undo") + '.'));
+    }
+
+    private static String message(UndoStep step) {
+        return step.complete()
+               ? Localization.lang("Undone: %0", step.name())
+               : Localization.lang("Undone: %0 (some changes could not be applied)", step.name());
     }
 }

@@ -33,9 +33,9 @@
                                 fitToWidth="true"
                                 fitToHeight="true"
                                 styleClass="padding-12">
-                            <VBox spacing="20.0">
+                            <VBox spacing="12">
                                 <GridPane
-                                        hgap="10.0"
+                                        hgap="4.0"
                                         vgap="4.0">
                                     <columnConstraints>
                                         <ColumnConstraints
@@ -109,9 +109,9 @@
                                 fitToWidth="true"
                                 fitToHeight="true"
                                 styleClass="padding-12">
-                            <VBox spacing="20.0">
+                            <VBox spacing="12">
                                 <HBox alignment="CENTER_LEFT"
-                                      spacing="20.0">
+                                      spacing="12">
                                     <Label text="%Add Research Question:"/>
                                     <TextField
                                             fx:id="addResearchQuestion"
@@ -158,9 +158,9 @@
                                 fitToWidth="true"
                                 fitToHeight="true"
                                 styleClass="padding-12">
-                            <VBox spacing="20.0">
+                            <VBox spacing="12">
                                 <HBox alignment="CENTER_LEFT"
-                                      spacing="20.0">
+                                      spacing="12">
                                     <Label text="%Add Query:"/>
                                     <Label fx:id="helpIcon">
                                         <graphic>
@@ -213,7 +213,7 @@
                                 fitToWidth="true"
                                 fitToHeight="true"
                                 styleClass="padding-12">
-                            <VBox spacing="20.0">
+                            <VBox spacing="12">
                                 <Label text="%Select Catalogs:"/>
                                 <HBox alignment="CENTER_LEFT">
                                     <TableView
@@ -250,9 +250,9 @@
                                 fitToWidth="true"
                                 fitToHeight="true"
                                 styleClass="padding-12">
-                            <VBox spacing="20.0">
+                            <VBox spacing="12">
                                 <HBox alignment="CENTER_LEFT"
-                                      spacing="20.0">
+                                      spacing="12">
                                     <Label text="%Select the study directory:"/>
                                     <TextField
                                             fx:id="studyDirectory"

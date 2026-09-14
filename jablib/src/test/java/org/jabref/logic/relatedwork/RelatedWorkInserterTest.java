@@ -34,7 +34,7 @@ class RelatedWorkInserterTest {
         assertEquals(matchResult, insertionResult.matchResult());
         assertEquals(
                 matchedLibraryEntry,
-                insertionResult.fieldChange().getEntry()
+                insertionResult.fieldChange().entry()
         );
         assertEquals("[LunaOstos_2024]: Colombia is a middle-income country with a population of approximately 50 million.",
                 matchedLibraryEntry.getField(new UserSpecificCommentField("koppor")).orElseThrow());

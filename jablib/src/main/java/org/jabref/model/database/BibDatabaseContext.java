@@ -52,7 +52,7 @@ public class BibDatabaseContext {
 
     private final BibDatabase database;
 
-    private MetaData metaData;
+    private final MetaData metaData;
 
     /// Generate a random UID for unique of the concrete context
     /// In contrast to hashCode this stays unique
@@ -120,6 +120,13 @@ public class BibDatabaseContext {
         this.path = null;
     }
 
+    /// The id used to address this library from the outside: the REST API (`/libraries/{id}/...`),
+    /// cite-as-you-write (`libraryid=`), JabMap and in-app links (`jabref://libraries/{id}/entries/{key}`).
+    /// Empty for libraries that have not been saved to disk yet.
+    public Optional<String> getLibraryId() {
+        return getDatabasePath().map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path));
+    }
+
     public BibDatabase getDatabase() {
         return database;
     }
@@ -131,10 +138,6 @@ public class BibDatabaseContext {
 
     public MetaData getMetaData() {
         return metaData;
-    }
-
-    public void setMetaData(MetaData metaData) {
-        this.metaData = metaData;
     }
 
     public boolean isBiblatexMode() {

@@ -42,14 +42,14 @@ public class BibEntryView {
         journal.getStyleClass().add("h6");
 
         VBox entryContainer = new VBox(
-                new HBox(10, entryType, title),
-                new HBox(5, year, journal),
+                new HBox(4, entryType, title),
+                new HBox(4, year, journal),
                 authors
         );
 
         entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -> {
             Node summary = createSummary(summaryText);
-            summary.getStyleClass().add("padding-top-6");
+            summary.getStyleClass().add("padding-top-4");
             entryContainer.getChildren().add(summary);
         });
 

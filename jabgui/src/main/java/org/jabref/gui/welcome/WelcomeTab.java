@@ -5,18 +5,20 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -97,6 +99,9 @@ public class WelcomeTab extends Tab {
                       WorkspacePreferences workspacePreferences) {
         super(Localization.lang("Welcome"));
         setClosable(true);
+        Node tabIcon = IconTheme.JabRefIcons.WELCOME.getGraphicNode();
+        tabIcon.getStyleClass().add("tab-icon");
+        setGraphic(tabIcon);
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.aiService = aiService;
@@ -111,20 +116,19 @@ public class WelcomeTab extends Tab {
         this.buildInfo = buildInfo;
         this.stage = stage;
         this.workspacePreferences = workspacePreferences;
-        this.recentLibrariesBox = new VBox();
+        this.recentLibrariesBox = new VBox(8);
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
-        main = new VBox(createTopTitles(), new VBox(), createCommunityBox());
-        main.getStyleClass().addAll("welcome-main-container", "spacing-24", "align-center", "padding-32-24");
+        main = new VBox(24, createTopTitles(), new VBox(), createCommunityBox());
+        main.getStyleClass().addAll("welcome-main-container", "align-center");
+        // Sized to its content, so the StackPane centers it: whitespace above and below on a tall window.
+        main.setMaxHeight(Region.USE_PREF_SIZE);
         initializeColumns();
 
-        VBox container = new VBox(main);
-        container.setAlignment(Pos.CENTER);
-
-        StackPane rootPane = new StackPane(container);
+        StackPane rootPane = new StackPane(main);
         setContent(rootPane);
 
-        donationProvider = new DonationProvider(rootPane, preferences, dialogService);
+        donationProvider = new DonationProvider(preferences, dialogService);
         donationProvider.showIfNeeded();
 
         setOnClosed(_ -> donationProvider.cleanUp());
@@ -132,17 +136,17 @@ public class WelcomeTab extends Tab {
 
     private VBox createTopTitles() {
         Label welcomeLabel = new Label(Localization.lang("Welcome to JabRef"));
-        welcomeLabel.getStyleClass().addAll("font-size-250", "text-accent");
+        welcomeLabel.getStyleClass().addAll("h1", "text-accent");
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("h2");
-        VBox topTitles = new VBox(welcomeLabel, descriptionLabel);
-        topTitles.getStyleClass().addAll("spacing-10", "align-top-left", "padding-bottom-20");
+        VBox topTitles = new VBox(12, welcomeLabel, descriptionLabel);
+        topTitles.getStyleClass().add("align-top-left");
         return topTitles;
     }
 
     private void initializeColumns() {
-        GridPane grid = new GridPane();
-        grid.getStyleClass().addAll("gap-24", "align-top-center");
+        GridPane grid = new GridPane(24, 24);
+        grid.getStyleClass().add("align-top-center");
 
         VBox leftColumn = createLeftColumn();
         GridPane.setHgrow(leftColumn, Priority.ALWAYS);
@@ -171,19 +175,19 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createLeftColumn() {
-        VBox leftColumn = new VBox(
+        VBox leftColumn = new VBox(24,
                 createWelcomeStartBox(),
                 createWelcomeRecentBox()
         );
-        leftColumn.getStyleClass().addAll("spacing-24", "align-top-left");
+        leftColumn.getStyleClass().addAll("align-top-left");
         return leftColumn;
     }
 
     private VBox createRightColumn() {
         this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);
         this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
-        VBox rightColumn = new VBox(quickSettings, walkthroughs);
-        rightColumn.getStyleClass().addAll("spacing-24", "align-top-left");
+        VBox rightColumn = new VBox(24, quickSettings, walkthroughs);
+        rightColumn.getStyleClass().addAll("align-top-left");
         return rightColumn;
     }
 
@@ -227,6 +231,7 @@ public class WelcomeTab extends Tab {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.getStyleClass().add("bg-transparent");
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
         if (!(main.getChildren().get(1) instanceof ScrollPane)) {
             main.getChildren().set(1, scrollPane);
         }
@@ -252,8 +257,8 @@ public class WelcomeTab extends Tab {
                 this::importIntoNewLibrary
         );
 
-        VBox container = new VBox();
-        container.getStyleClass().addAll("spacing-8", "align-top-left");
+        VBox container = new VBox(8);
+        container.getStyleClass().addAll("align-top-left");
         container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink, importIntoNewLibraryLink);
 
         return createVBoxContainer(header, container);
@@ -305,11 +310,16 @@ public class WelcomeTab extends Tab {
             return;
         }
         recentLibrariesBox.getChildren().clear();
-        recentLibrariesBox.getStyleClass().addAll("spacing-8", "align-top-left");
+        recentLibrariesBox.getStyleClass().addAll("align-top-left");
         fileHistoryMenu.disableProperty().unbind();
         fileHistoryMenu.setDisable(false);
         for (MenuItem item : fileHistoryMenu.getItems()) {
             Hyperlink recentLibraryLink = new Hyperlink(item.getText());
+            // Shortened to whatever the column offers. Character-wise, not word-wise: a path has
+            // hardly any word boundaries, so the word variant drops whole segments and leaves half
+            // of the column empty.
+            recentLibraryLink.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
+            recentLibraryLink.setTooltip(new Tooltip(item.getText()));
             recentLibraryLink.getStyleClass().addAll("welcome-hyperlink", "h4");
             recentLibraryLink.setOnAction(item.getOnAction());
             recentLibrariesBox.getChildren().add(recentLibraryLink);
@@ -331,8 +341,8 @@ public class WelcomeTab extends Tab {
         FlowPane iconLinksContainer = createIconLinksContainer();
         HBox textLinksContainer = createTextLinksContainer();
         HBox versionContainer = createVersionContainer();
-        VBox container = new VBox();
-        container.getStyleClass().addAll("spacing-12", "align-top-left");
+        VBox container = new VBox(12);
+        container.getStyleClass().add("align-top-left");
         container.getChildren().addAll(iconLinksContainer, textLinksContainer, versionContainer);
         return createVBoxContainer(header, container);
     }
@@ -353,8 +363,8 @@ public class WelcomeTab extends Tab {
     }
 
     private HBox createTextLinksContainer() {
-        HBox container = new HBox();
-        container.getStyleClass().addAll("spacing-16", "align-center-left");
+        HBox container = new HBox(12);
+        container.getStyleClass().addAll("align-center-left");
 
         Hyperlink devVersionLink = createFooterLink(Localization.lang("Download development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);
         Hyperlink changelogLink = createFooterLink(Localization.lang("CHANGELOG"), StandardActions.OPEN_CHANGELOG, null);
@@ -365,7 +375,7 @@ public class WelcomeTab extends Tab {
 
     private Hyperlink createFooterLink(String text, StandardActions action, IconTheme.JabRefIcons icon) {
         Hyperlink link = new Hyperlink(text);
-        link.getStyleClass().add("welcome-community-link");
+        link.getStyleClass().addAll("welcome-community-link", "text-accent");
         String url = switch (action) {
             case HELP ->
                     URLs.HELP_URL;
@@ -399,14 +409,14 @@ public class WelcomeTab extends Tab {
         HBox container = new HBox();
         container.getStyleClass().addAll("align-center-left", "padding-top-4");
         Label versionLabel = new Label(Localization.lang("Current JabRef version: %0", buildInfo.version));
-        versionLabel.getStyleClass().addAll("font-size-090", "text-subtle");
+        versionLabel.getStyleClass().addAll("text-subtle");
         container.getChildren().add(versionLabel);
         return container;
     }
 
     private VBox createVBoxContainer(Node... nodes) {
-        VBox box = new VBox();
-        box.getStyleClass().addAll("spacing-12", "align-top-left");
+        VBox box = new VBox(12);
+        box.getStyleClass().add("align-top-left");
         box.getChildren().addAll(nodes);
         return box;
     }

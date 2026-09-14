@@ -72,6 +72,7 @@ Run in this order — cheapest first. Each must pass.
 
 - [ ] PR body built from `.github/PULL_REQUEST_TEMPLATE.md`, every section filled.
 - [ ] All checklist items kept and marked `[x]`, `[ ]`, or `[/]`.
+- [ ] "Steps to test" is a numbered list with a cropped screenshot of the result for every visible change; no video (only allowed when another program is involved, e.g. drag and drop or push to an external application).
 - [ ] All HTML comments removed from the PR body.
 - [ ] PR created with `gh pr create --body-file <file>` (not `--body`).
 - [ ] If `CHANGELOG.md` used a `TODO` placeholder (no issue confidently identified yet — an existing issue link always stays), the PR was opened as draft, the placeholder was replaced with the real PR-number link after PR creation, committed and pushed, and only then was the PR marked ready for review. If an issue is identified or created later, the link is switched to the issue.

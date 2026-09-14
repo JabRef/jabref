@@ -15,6 +15,7 @@ import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.ai.embedding.AsyncEmbeddingModel;
 import org.jabref.logic.ai.embedding.EmbeddingModelCache;
 import org.jabref.logic.ai.embedding.EmbeddingModelFactory;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.embedding.MVStoreEmbeddingStore;
 import org.jabref.logic.ai.ingestion.IngestionTaskAggregator;
 import org.jabref.logic.ai.ingestion.listeners.GenerateEmbeddingsAiDatabaseListener;
@@ -80,6 +81,8 @@ public class AiService implements AutoCloseable {
     private final GenerateSummaryAiDatabaseListener generateSummaryAiDatabaseListener;
     private final ObjectProperty<Summarizator> currentSummarizator = new SimpleObjectProperty<>();
 
+    private final EmbeddingModelMetadataService embeddingModelMetadataService;
+
     public AiService(
             AiPreferences aiPreferences,
             FilePreferences filePreferences,
@@ -89,6 +92,7 @@ public class AiService implements AutoCloseable {
         this.aiPreferences = aiPreferences;
         this.taskExecutor = taskExecutor;
         this.notificationService = notificationService;
+        this.embeddingModelMetadataService = new EmbeddingModelMetadataService(aiPreferences);
 
         // Chatting components
         this.mvStoreChatHistoryRepository = new MVStoreChatHistoryRepository(
@@ -103,7 +107,7 @@ public class AiService implements AutoCloseable {
         this.modelService = new AiModelService();
 
         // Ingestion components
-        this.embeddingModelCache = new EmbeddingModelCache(aiPreferences, notificationService, taskExecutor);
+        this.embeddingModelCache = new EmbeddingModelCache(aiPreferences, notificationService, taskExecutor, embeddingModelMetadataService);
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(
                 Directories.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME),
                 notificationService
@@ -234,6 +238,10 @@ public class AiService implements AutoCloseable {
 
     public AsyncEmbeddingModel getCurrentEmbeddingModel() {
         return currentEmbeddingModel.get();
+    }
+
+    public EmbeddingModelMetadataService getEmbeddingModelMetadataService() {
+        return embeddingModelMetadataService;
     }
 
     public SummariesRepository getSummariesRepository() {

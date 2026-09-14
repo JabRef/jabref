@@ -78,7 +78,7 @@ public class FunctionalTextViewCursor {
                 initialPosition = UnoCursor.createTextCursorByRange(viewCursor);
                 viewCursor.getStart();
                 return OOResult.ok(new FunctionalTextViewCursor(initialPosition, initialSelection, viewCursor));
-            } catch (RuntimeException ex) {
+            } catch (RuntimeException _) {
                 // bad cursor
                 viewCursor = null;
                 initialPosition = null;
@@ -105,7 +105,7 @@ public class FunctionalTextViewCursor {
 
         try {
             viewCursor.getStart();
-        } catch (RuntimeException ex) {
+        } catch (RuntimeException _) {
             restore(doc, initialPosition, initialSelection);
             String errorMessage = "The view cursor failed the functionality test";
             return OOResult.error(errorMessage);

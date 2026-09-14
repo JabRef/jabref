@@ -1,5 +1,6 @@
 package org.jabref.model.undo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
@@ -16,11 +17,10 @@ import org.slf4j.LoggerFactory;
 /// `name` is the only text in the change model, and it exists at this granularity because that
 /// is the granularity the user acts in: "Merge entries", not "change field author of entry X".
 ///
-/// Today it is read in one place, the warning [#apply] logs when part of a set fails, so it is a
-/// diagnostic that is written to be shown. Naming it as the user would recognise the action —
-/// from [org.jabref.gui.actions.Action#getText] where the step comes from a command, from a
-/// localized string otherwise — is what keeps it usable the day something renders it, which is
-/// what the postponed P5 does. A developer token here is a defect, not a shortcut.
+/// It is shown to the user: the notification after an undo names the step, and the warning
+/// [#apply] logs when part of a set fails carries it too. So it is named as the user would
+/// recognise the action — from [org.jabref.gui.actions.Action#getText] where the step comes from
+/// a command, from a localized string otherwise. A developer token here is a defect.
 @NullMarked
 public record ChangeSet(String name, List<BibChange> changes) implements BibChange {
 
@@ -37,21 +37,30 @@ public record ChangeSet(String name, List<BibChange> changes) implements BibChan
         return new ChangeSet(name, changes.reversed().stream().map(BibChange::inverted).toList());
     }
 
-    /// Applies every change, continuing past a failing one.
+    /// Applies every change, continuing past a failing one, and reports what did not make it.
     ///
     /// Aborting midway would leave the library in a state that is neither the old nor the new
     /// one and that no subsequent undo could describe, so a partially applied set is preferred
-    /// over a partially reverted one. Failures are logged rather than propagated because
-    /// callers have no meaningful recovery.
+    /// over a partially reverted one. Failures are not propagated, because a caller half-way
+    /// through a set has no meaningful recovery; they are returned, because a caller that
+    /// believes the whole set was applied has been told something untrue.
+    ///
+    /// Two things come back as failures: an element that threw, and an element that refused
+    /// because the library no longer holds what it recorded. Failures of nested sets travel up as
+    /// they are, so what comes back names the changes that failed rather than the sets that
+    /// contained them.
     @Override
-    public void apply() {
+    public ApplyResult apply() {
+        List<ApplyResult.Failure> failures = new ArrayList<>();
         for (BibChange change : changes) {
             try {
-                change.apply();
+                failures.addAll(change.apply().failures());
             } catch (RuntimeException e) {
                 LOGGER.warn("Could not apply {} as part of '{}'", change, name, e);
+                failures.add(new ApplyResult.Failure(change, e.toString()));
             }
         }
+        return failures.isEmpty() ? ApplyResult.SUCCESS : new ApplyResult(failures);
     }
 
     public boolean isEmpty() {

@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
@@ -24,10 +23,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSSynchronizer;
-import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
+import org.jabref.logic.shared.event.ConnectionRestoredEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.SharedWriteFailedEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
@@ -47,7 +46,6 @@ public class SharedDatabaseUIManager {
 
     private final LibraryTabContainer tabContainer;
     private DatabaseSynchronizer dbmsSynchronizer;
-
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final AiService aiService;
@@ -80,52 +78,20 @@ public class SharedDatabaseUIManager {
         this.gitHandlerRegistry = gitHandlerRegistry;
     }
 
+    /// The synchronizer keeps the changes locally and reconnects by itself (see [DBMSSynchronizer]),
+    /// so the user is informed, not interrupted. notify() marshals to the JavaFX thread itself.
     @Subscribe
-    public void listen(ConnectionLostEvent connectionLostEvent) {
-        // Shared-database events are posted from background threads
-        UiTaskExecutor.runNowOrInJavaFXThread(() -> handleConnectionLost(connectionLostEvent));
+    public void listen(ConnectionLostEvent event) {
+        dialogService.notify(Localization.lang("Connection to the shared database lost. Changes are kept locally and synchronized once it is back."));
     }
 
-    private void handleConnectionLost(ConnectionLostEvent connectionLostEvent) {
-        BibDatabaseContext bibDatabaseContext = connectionLostEvent.bibDatabaseContext();
-        if (bibDatabaseContext.getLocation() != DatabaseLocation.SHARED) {
-            // Already handled - the connection loss is reported by every failing operation
-            return;
-        }
-        ButtonType reconnect = new ButtonType(Localization.lang("Reconnect"), ButtonData.YES);
-        ButtonType workOffline = new ButtonType(Localization.lang("Work offline"), ButtonData.NO);
-        ButtonType closeLibrary = new ButtonType(Localization.lang("Close library"), ButtonData.CANCEL_CLOSE);
-
-        Optional<ButtonType> answer = dialogService.showCustomButtonDialogAndWait(AlertType.WARNING,
-                Localization.lang("Connection lost"),
-                Localization.lang("The connection to the server has been terminated."),
-                reconnect,
-                workOffline,
-                closeLibrary);
-
-        // The affected tab is not necessarily the active one (several shared libraries may be open)
-        Optional<LibraryTab> affectedTab = tabContainer.getLibraryTabs().stream()
-                                                       .filter(tab -> tab.getBibDatabaseContext() == bibDatabaseContext)
-                                                       .findFirst();
-        if (answer.isPresent() && answer.get().equals(workOffline)) {
-            // Same teardown as closing the tab - otherwise the notification listener keeps
-            // reconnecting and would pull the shared state into the now local library
-            bibDatabaseContext.convertToLocalDatabase();
-            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
-            bibDatabaseContext.clearDBMSSynchronizer();
-            affectedTab.ifPresent(tab -> tab.updateTabTitle(tab.isModified()));
-            dialogService.notify(Localization.lang("Working offline."));
-            return;
-        }
-        affectedTab.ifPresent(tabContainer::closeTab);
-        if (answer.isPresent() && answer.get().equals(reconnect)) {
-            dialogService.showCustomDialogAndWait(new SharedDatabaseLoginDialogView(tabContainer));
-        }
+    @Subscribe
+    public void listen(ConnectionRestoredEvent event) {
+        dialogService.notify(Localization.lang("Connection to the shared database restored."));
     }
 
     @Subscribe
     public void listen(SharedWriteFailedEvent event) {
-        // notify() marshals to the JavaFX thread itself
         dialogService.notify(Localization.lang("Could not save changes to the shared database. The latest changes are not synchronized."));
     }
 
@@ -162,6 +128,10 @@ public class SharedDatabaseUIManager {
                 mergedBibEntry.getSharedBibEntryData().setVersion(sharedBibEntry.getSharedBibEntryData().getVersion());
 
                 DatabaseSynchronizer synchronizer = updateRefusedEvent.bibDatabaseContext().getDBMSSynchronizer();
+                // The library may have closed while the event waited for the JavaFX thread.
+                if (synchronizer == null) {
+                    return;
+                }
                 synchronizer.synchronizeSharedEntry(mergedBibEntry);
                 synchronizer.synchronizeLocalDatabase();
             });
@@ -188,15 +158,23 @@ public class SharedDatabaseUIManager {
     ///
     /// @param dbmsConnectionProperties Connection data
     /// @return BasePanel which also used by [org.jabref.gui.exporter.SaveDatabaseAction]
-    public LibraryTab openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
+    /// Connects and loads the shared database. Blocks on the network, so call it off the JavaFX thread and hand the
+    /// result to [#openTab(BibDatabaseContext)].
+    public BibDatabaseContext connect(DBMSConnectionProperties dbmsConnectionProperties)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
-
         BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
-
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
-        dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
+        assert dbmsSynchronizer != null;
+        // Before opening: replaying changes recorded by an earlier session may already ask for a merge
         dbmsSynchronizer.registerListener(this);
-        dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
+        dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
+        return bibDatabaseContext;
+    }
+
+    /// Shows a database returned by [#connect(DBMSConnectionProperties)] in a new tab. JavaFX thread only.
+    public LibraryTab openTab(BibDatabaseContext bibDatabaseContext) {
+        assert dbmsSynchronizer != null;
+        dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsSynchronizer.getConnectionProperties().getType().toString()));
 
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 bibDatabaseContext,
@@ -233,11 +211,21 @@ public class SharedDatabaseUIManager {
         bibDatabaseContext.setDatabasePath(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
-        dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
+        assert dbmsSynchronizer != null;
         dbmsSynchronizer.registerListener(this);
+        dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         dialogService.notify(Localization.lang("Connection to %0 server established.", dbmsConnectionProperties.getType().toString()));
 
         parserResult.setDatabaseContext(bibDatabaseContext);
+    }
+
+    // [impl->req~shared-database.loading-indicator~1]
+    public BibDatabaseContext createDummyContext(DBMSConnectionProperties connectionProperties) {
+        BibDatabaseContext bibDatabaseContext = getBibDatabaseContextForSharedDatabase();
+        DatabaseSynchronizer synchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        assert synchronizer != null;
+        synchronizer.setDBName(connectionProperties.getDatabase());
+        return bibDatabaseContext;
     }
 
     private BibDatabaseContext getBibDatabaseContextForSharedDatabase() {
@@ -250,6 +238,7 @@ public class SharedDatabaseUIManager {
                 preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
                 fileUpdateMonitor,
                 preferences.getFilePreferences().getUserAndHost(),
+                taskExecutor,
                 UiTaskExecutor::runNowOrInJavaFXThread);
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
         return bibDatabaseContext;

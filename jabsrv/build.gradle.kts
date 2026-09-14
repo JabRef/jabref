@@ -1,4 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 
 plugins {
@@ -26,11 +25,6 @@ testModuleInfo {
 }
 
 tasks.test {
-    testLogging {
-        // set options for log level LIFECYCLE
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
-    }
     maxParallelForks = 1
 }
 
@@ -47,11 +41,6 @@ tasks.register<Test>("nativeSmokeTest") {
 
     filter {
         includeTestsMatching("org.jabref.http.server.*")
-    }
-
-    testLogging {
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
     }
 
     val smokePort = providers.gradleProperty("jabsrv.native.smoke")

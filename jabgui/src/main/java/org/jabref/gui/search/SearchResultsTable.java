@@ -13,7 +13,6 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.PersistenceVisualStateTable;
-import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -57,7 +56,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                     .ifPresent(column -> this.getSortOrder().add(column)));
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
-            this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
+            this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         }
 
         this.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
