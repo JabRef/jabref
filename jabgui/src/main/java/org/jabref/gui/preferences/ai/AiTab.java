@@ -195,22 +195,32 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     private void bindTestConnectionButton(Button button) {
         ReadOnlyObjectProperty<ConnectionTestState> state = viewModel.connectionTestStateProperty();
         button.textProperty().bind(state.map(value -> switch (value) {
-            case IDLE -> Localization.lang("Test connection");
-            case TESTING -> Localization.lang("Testing...");
-            case SUCCESS -> Localization.lang("Connection successful");
-            case FAILED -> Localization.lang("Connection failed");
+            case IDLE ->
+                    Localization.lang("Test connection");
+            case TESTING ->
+                    Localization.lang("Testing...");
+            case SUCCESS ->
+                    Localization.lang("Connection successful");
+            case FAILED ->
+                    Localization.lang("Connection failed");
         }));
         button.graphicProperty().bind(state.map(value -> switch (value) {
-            case IDLE -> null;
-            case TESTING -> IconTheme.JabRefIcons.REFRESH.getGraphicNode();
-            case SUCCESS -> IconTheme.JabRefIcons.SUCCESS.getGraphicNode();
-            case FAILED -> IconTheme.JabRefIcons.ERROR.getGraphicNode();
+            case IDLE ->
+                    null;
+            case TESTING ->
+                    IconTheme.JabRefIcons.REFRESH.getGraphicNode();
+            case SUCCESS ->
+                    IconTheme.JabRefIcons.SUCCESS.getGraphicNode();
+            case FAILED ->
+                    IconTheme.JabRefIcons.ERROR.getGraphicNode();
         }));
         BindingsHelper.listen(state, value -> {
             button.getStyleClass().removeAll("text-success", "text-danger");
             switch (value) {
-                case SUCCESS -> button.getStyleClass().add("text-success");
-                case FAILED -> button.getStyleClass().add("text-danger");
+                case SUCCESS ->
+                        button.getStyleClass().add("text-success");
+                case FAILED ->
+                        button.getStyleClass().add("text-danger");
                 default -> {
                 }
             }
