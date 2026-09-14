@@ -26,10 +26,14 @@ jobs:
             exit 1
           fi
   # A PR ejected from the queue (failed check, manual removal) is back to being reviewable.
+  # The PR is re-read live: a queue reset re-enqueues it, a draft conversion races remove-ready-for-review.yml.
   # awaiting-second-review was never removed on entry, so it stays the PR's status.
   unlabel:
     if: github.event_name == 'pull_request_target' && github.event.reason != 'MERGE'
     runs-on: ubuntu-slim
+    concurrency:
+      group: pr-status-${{ github.event.pull_request.head.repo.full_name }}-${{ github.event.pull_request.head.ref }}
+      cancel-in-progress: false
     permissions:
       pull-requests: write
     steps:
@@ -37,9 +41,18 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          AWAITING_SECOND_REVIEW: "${{ contains(github.event.pull_request.labels.*.name, 'status: awaiting-second-review') }}"
         run: |
-          if [ "$AWAITING_SECOND_REVIEW" = "true" ]; then
+          PR=$(gh api graphql -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -F number="$PR_NUMBER" -f query='
+            query($owner: String!, $name: String!, $number: Int!) {
+              repository(owner: $owner, name: $name) {
+                pullRequest(number: $number) { state isDraft isInMergeQueue labels(first: 100) { nodes { name } } }
+              }
+            }' --jq .data.repository.pullRequest)
+          if [ "$(jq -r '.state' <<< "$PR")" != "OPEN" ] || [ "$(jq -r '.isInMergeQueue' <<< "$PR")" = "true" ]; then
+            echo "⊘ PR is merged, closed, or queued again - labels unchanged"
+            exit 0
+          fi
+          if [ "$(jq -r '.isDraft' <<< "$PR")" = "true" ] || jq -e '.labels.nodes[] | select(.name == "status: awaiting-second-review")' <<< "$PR" > /dev/null; then
             gh pr edit "$PR_NUMBER" --remove-label "status: to-be-merged"
           else
             gh pr edit "$PR_NUMBER" --remove-label "status: to-be-merged" --add-label "status: ready-for-review"
