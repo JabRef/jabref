@@ -20,6 +20,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.whatsnew.AnnouncedEntries;
 import org.jabref.logic.whatsnew.Checkout;
 import org.jabref.logic.whatsnew.CheckoutNews;
+import org.jabref.logic.whatsnew.PullRequestAuthors;
 import org.jabref.logic.whatsnew.RestartMarker;
 
 import org.jspecify.annotations.Nullable;
@@ -69,7 +70,7 @@ public final class WhatsNewButton {
         Optional<WhatsNewViewModel> viewModel = Optional.ofNullable(System.getProperty(CHECKOUT_PROPERTY))
                                                         .flatMap(checkout -> Checkout.around(Path.of(checkout), gitHandlerRegistry))
                                                         .flatMap(checkout -> checkout.gitDir().map(gitDir -> new WhatsNewViewModel(
-                                                                new CheckoutNews(checkout, AnnouncedEntries.inGitDir(gitDir)),
+                                                                new CheckoutNews(checkout, AnnouncedEntries.inGitDir(gitDir), PullRequestAuthors.forCheckout(checkout, gitDir)),
                                                                 RestartMarker.inGitDir(gitDir),
                                                                 taskExecutor,
                                                                 quit)));

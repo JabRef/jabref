@@ -22,6 +22,7 @@ import org.jabref.logic.whatsnew.Checkout;
 import org.jabref.logic.whatsnew.CheckoutNews;
 import org.jabref.logic.whatsnew.Contributor;
 import org.jabref.logic.whatsnew.News;
+import org.jabref.logic.whatsnew.PullRequestAuthors;
 import org.jabref.logic.whatsnew.RestartMarker;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -106,7 +107,7 @@ class WhatsNewViewModelTest {
     void setUp() {
         when(checkout.fetch()).thenReturn(true);
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(new Contributor.Other("Somebody"), OLD)));
-        viewModel = new WhatsNewViewModel(new CheckoutNews(checkout, announced()), RestartMarker.inGitDir(gitDir), taskExecutor, () -> {
+        viewModel = new WhatsNewViewModel(new CheckoutNews(checkout, announced(), new PullRequestAuthors(_ -> Optional.empty(), gitDir.resolve("authors.tsv"), Optional.empty(), false, "")), RestartMarker.inGitDir(gitDir), taskExecutor, () -> {
             quitRequested.set(true);
             return quitAllowed.get();
         });
