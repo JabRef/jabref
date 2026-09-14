@@ -1,7 +1,9 @@
 package org.jabref.logic.preferences;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.logic.FilePreferences;
@@ -66,6 +68,11 @@ public interface CliPreferences {
     BibEntryTypesManager getCustomEntryTypesRepository();
 
     void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager);
+
+    /// Returns the custom entry type decisions the user declined to store, as created by the caller
+    Set<String> getDeclinedCustomEntryTypes();
+
+    void addDeclinedCustomEntryTypes(Collection<String> declinedEntryTypes);
 
     CleanupPreferences getCleanupPreferences();
 
