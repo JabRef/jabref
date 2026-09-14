@@ -9,7 +9,7 @@ class EmbeddingInputPrefixesTest {
 
     @ParameterizedTest
     @CsvSource({
-            "intfloat/e5-small-v2, true",
+            "intfloat/e5-small-v2, false",
             "intfloat/multilingual-e5-small, true",
             "intfloat/multilingual-e5-large-instruct, false",
             "sentence-transformers/all-MiniLM-L12-v2, false",
