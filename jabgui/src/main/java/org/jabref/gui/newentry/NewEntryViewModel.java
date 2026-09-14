@@ -528,7 +528,13 @@ public class NewEntryViewModel {
         BackgroundTask.wrap(() -> parseCitations(text, PlainCitationParserChoice.LLM))
                       .setTitle(Localization.lang("Parsing citations with LLM"))
                       .showToUser(true)
-                      .onSuccess(this::importInterpretedCitations)
+                      .onSuccess(result -> {
+                          if (!stateManager.getOpenDatabases().contains(libraryTab.getBibDatabaseContext())) {
+                              LOGGER.debug("Library closed before the LLM answered; skipping import.");
+                              return;
+                          }
+                          importInterpretedCitations(result);
+                      })
                       .onFailure(this::showInterpretCitationsFailure)
                       .executeWith(taskExecutor);
 
