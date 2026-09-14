@@ -67,8 +67,8 @@ public final class CheckoutNews {
         }
         Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
         Set<String> workingTreeTexts = workingTree.map(changelog -> News.allEntries(List.of(changelog)).stream()
-                                                                         .map(ChangelogEntry::text)
-                                                                         .collect(Collectors.toSet()))
+                                                                        .map(ChangelogEntry::text)
+                                                                        .collect(Collectors.toSet()))
                                                   .orElse(Set.of());
         // Only the news are looked up, never the whole changelog: the requests GitHub allows are few.
         News news = authors.attribute(announcedSoFar.map(old -> News.pending(old, changelogs)).orElse(News.NONE), workingTreeTexts);
