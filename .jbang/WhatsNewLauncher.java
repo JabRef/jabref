@@ -13,6 +13,10 @@
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/News.java
 //SOURCES ../jabgui/src/main/java/org/jabref/gui/whatsnew/InlineMarkdown.java
 //SOURCES ../jabgui/src/main/java/org/jabref/gui/whatsnew/WhatsNewView.java
+//FILES icons/JabRef-icon-16.png=../jabgui/src/main/resources/images/external/JabRef-icon-16.png
+//FILES icons/JabRef-icon-32.png=../jabgui/src/main/resources/images/external/JabRef-icon-32.png
+//FILES icons/JabRef-icon-48.png=../jabgui/src/main/resources/images/external/JabRef-icon-48.png
+//FILES icons/JabRef-icon-128.png=../jabgui/src/main/resources/images/external/JabRef-icon-128.png
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +43,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -292,6 +297,9 @@ public class WhatsNewLauncher {
             Scene scene = new Scene(root, 900, 650);
             scene.getStylesheets().add("data:text/css;base64," + Base64.getEncoder().encodeToString(CSS.getBytes(StandardCharsets.UTF_8)));
             stage.setTitle(title);
+            for (int size : new int[] {16, 32, 48, 128}) {
+                stage.getIcons().add(new Image(Window.class.getResource("/icons/JabRef-icon-" + size + ".png").toExternalForm()));
+            }
             stage.setScene(scene);
             stage.show();
             onShown.run();
