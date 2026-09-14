@@ -230,7 +230,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         userAddedFields.removeAll(extractedCustomTabFields);
         fields.addAll(userAddedFields);
         // [impl->req~entry-editor.main-tab.file-editor-always-shown~1]
-        if (isFilesAndLinksSectionOpen(fields)) {
+        if (isFilesAndLinksSectionOpen(fields) && !extractedCustomTabFields.contains(StandardField.FILE)) {
             fields.add(StandardField.FILE);
         }
         return fields;
@@ -547,7 +547,8 @@ public class AllFieldsTab extends FieldsEditorTab {
             // The file editor only exists once determineFieldsToShow has seen the section as
             // open, so opening it for the first time needs a rebuild rather than mere population.
             if (expanded && (type == FieldListSections.SectionType.FILES_AND_LINKS)
-                    && !editors.containsKey(StandardField.FILE)) {
+                    && !editors.containsKey(StandardField.FILE)
+                    && !extractedCustomTabFields.contains(StandardField.FILE)) {
                 rebuildPanel(bibDatabaseContext, entry);
                 return;
             }

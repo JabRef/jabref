@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -341,5 +342,19 @@ class AllFieldsTabTest {
         JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertTrue(tab.editors.containsKey(StandardField.FILE));
+    }
+
+    // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
+    @Test
+    void fileEditorStaysOnCustomTabThatExtractsIt() {
+        when(preferences.getEntryEditorPreferences().getTabModels()).thenReturn(FXCollections.observableArrayList(
+                new EntryEditorTabModel.CustomizedFieldsTab("Files", List.of("file"), Set.of("file"))));
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("CiteKey2021")
+                .withField(StandardField.URL, "https://example.org");
+
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
+
+        assertFalse(tab.editors.containsKey(StandardField.FILE));
     }
 }
