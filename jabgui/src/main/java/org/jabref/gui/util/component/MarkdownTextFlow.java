@@ -1,7 +1,10 @@
 package org.jabref.gui.util.component;
 
+import java.text.Normalizer;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -38,12 +41,18 @@ import com.vladsch.flexmark.ast.OrderedList;
 import com.vladsch.flexmark.ast.OrderedListItem;
 import com.vladsch.flexmark.ast.Paragraph;
 import com.vladsch.flexmark.ast.StrongEmphasis;
+import com.vladsch.flexmark.ext.tables.TableBlock;
+import com.vladsch.flexmark.ext.tables.TableBody;
+import com.vladsch.flexmark.ext.tables.TableCell;
+import com.vladsch.flexmark.ext.tables.TableHead;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.DelimitedNode;
 import com.vladsch.flexmark.util.ast.Document;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.ast.NodeVisitor;
+import com.vladsch.flexmark.util.ast.TextCollectingVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.jspecify.annotations.NonNull;
@@ -68,7 +77,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         super(parent);
         this.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         this.getStyleClass().add("markdown-textflow");
-        MutableDataSet options = new MutableDataSet();
+        MutableDataSet options = new MutableDataSet()
+                .set(Parser.EXTENSIONS, List.of(TablesExtension.create()));
         this.parser = Parser.builder(options).build();
         this.htmlRenderer = HtmlRenderer.builder(options).build();
     }
@@ -273,6 +283,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                     indentedCodeBlock.getChars().toString();
             case BlockQuote _ ->
                     renderedText;
+            case TableBlock tableBlock ->
+                    tableBlock.getChars().toString().stripTrailing();
             case null,
                  default -> {
                 if (BULLET_LIST_PATTERN.matcher(renderedText).matches()) {
@@ -311,7 +323,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                     new VisitHandler<>(OrderedListItem.class, this::visit),
                     new VisitHandler<>(BlockQuote.class, this::visit),
                     new VisitHandler<>(HtmlInline.class, this::visit),
-                    new VisitHandler<>(HtmlBlock.class, this::visit)
+                    new VisitHandler<>(HtmlBlock.class, this::visit),
+                    new VisitHandler<>(TableBlock.class, this::visit)
             );
         }
 
@@ -486,6 +499,79 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             previousBlock = html;
         }
 
+        /// Renders the table as monospaced text with aligned columns, as the selection only works on [Text] nodes.
+        private void visit(TableBlock table) {
+            // [impl->req~ai.chat.markdown-tables~1]
+            // Inside a block quote or list, the enclosing marker is already emitted
+            if (table.getParent() instanceof Document) {
+                addNewlinesBetweenBlocks(table);
+            }
+
+            List<List<String>> rows = new ArrayList<>();
+            List<TableCell.Alignment> alignments = new ArrayList<>();
+            int headerRowCount = 0;
+            for (Node section : table.getChildren()) {
+                if (!(section instanceof TableHead) && !(section instanceof TableBody)) {
+                    continue;
+                }
+                for (Node row : section.getChildren()) {
+                    List<String> cells = new ArrayList<>();
+                    for (Node cell : row.getChildren()) {
+                        if (cell instanceof TableCell tableCell) {
+                            if (alignments.size() == cells.size()) {
+                                alignments.add(tableCell.getAlignment());
+                            }
+                            cells.add(Normalizer.normalize(new TextCollectingVisitor().collectAndGetText(cell).strip(), Normalizer.Form.NFC));
+                        }
+                    }
+                    rows.add(cells);
+                    if (section instanceof TableHead) {
+                        headerRowCount++;
+                    }
+                }
+            }
+
+            int columnCount = rows.stream().mapToInt(List::size).max().orElse(0);
+            int[] widths = new int[columnCount];
+            for (List<String> row : rows) {
+                for (int i = 0; i < row.size(); i++) {
+                    widths[i] = Math.max(widths[i], row.get(i).codePointCount(0, row.get(i).length()));
+                }
+            }
+
+            // A single node, because copying maps each node to the Markdown source of its AST node
+            StringJoiner lines = new StringJoiner("\n");
+            for (int r = 0; r < rows.size(); r++) {
+                StringJoiner line = new StringJoiner(" │ ");
+                for (int i = 0; i < columnCount; i++) {
+                    String cell = i < rows.get(r).size() ? rows.get(r).get(i) : "";
+                    // ponytail: code points, not display width; East Asian wide glyphs still misalign
+                    int padding = widths[i] - cell.codePointCount(0, cell.length());
+                    int leftPadding = switch (alignments.get(i)) {
+                        case RIGHT ->
+                                padding;
+                        case CENTER ->
+                                padding / 2;
+                        case null,
+                             default ->
+                                0;
+                    };
+                    line.add(" ".repeat(leftPadding) + cell + " ".repeat(padding - leftPadding));
+                }
+                lines.add(line.toString().stripTrailing());
+                if (r == headerRowCount - 1) {
+                    StringJoiner separator = new StringJoiner("─┼─");
+                    for (int width : widths) {
+                        separator.add("─".repeat(width));
+                    }
+                    lines.add(separator.toString());
+                }
+            }
+
+            addTextNode(lines.toString(), table, "markdown-code-block", "font-monospace");
+            previousBlock = table;
+        }
+
         private void processQuoteParagraph(BlockQuote quote, Node child) {
             String text = child.getChildChars().toString();
             String[] lines = text.split("\n", -1);
@@ -523,8 +609,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 newlineCount = 2;
             } else if (currentBlock instanceof ListBlock && listIndentationLevel == 0) {
                 newlineCount = 2;
-            } else if (previousBlock instanceof FencedCodeBlock || previousBlock instanceof IndentedCodeBlock ||
-                    currentBlock instanceof FencedCodeBlock || currentBlock instanceof IndentedCodeBlock) {
+            } else if (previousBlock instanceof FencedCodeBlock || previousBlock instanceof IndentedCodeBlock || previousBlock instanceof TableBlock ||
+                    currentBlock instanceof FencedCodeBlock || currentBlock instanceof IndentedCodeBlock || currentBlock instanceof TableBlock) {
                 newlineCount = 2;
             }
 
