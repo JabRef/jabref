@@ -69,12 +69,15 @@ public class ErrorConsoleView extends BaseDialog<Void> {
         messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
         messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);
         messagesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        viewModel.allMessagesDataProperty().addListener((ListChangeListener<LogEventViewModel>) (change -> {
+        ListChangeListener<LogEventViewModel> scrollToEnd = change -> {
             int size = viewModel.allMessagesDataProperty().size();
             if (size > 0) {
                 messagesListView.scrollTo(size - 1);
             }
-        }));
+        };
+        viewModel.allMessagesDataProperty().addListener(scrollToEnd);
+        // The list is a live view on the global log store; stop scrolling a closed dialog on every new log line
+        setOnHidden(_ -> viewModel.allMessagesDataProperty().removeListener(scrollToEnd));
         descriptionLabel.setGraphic(IconTheme.JabRefIcons.CONSOLE.getGraphicNode());
     }
 

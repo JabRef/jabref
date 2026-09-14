@@ -191,14 +191,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         enableAi.set(workingAiPreferences.getAiFeaturesEnabledCurrently());
         workingAiPreferences.aiFeaturesEnabledCurrentlyProperty().bindBidirectional(enableAi);
 
-        this.enableAi.addListener((_, _, newValue) -> {
-            disableBasicSettings.set(!newValue);
-            disableExpertSettings.set(!newValue || !customizeExpertSettings.get());
-        });
-
-        this.customizeExpertSettings.addListener((_, _, newValue) ->
-                disableExpertSettings.set(!newValue || !enableAi.get())
-        );
+        disableBasicSettings.bind(enableAi.not());
+        disableExpertSettings.bind(enableAi.not().or(customizeExpertSettings.not()));
 
         this.selectedEmbeddingModel.addListener((_, _, newValue) -> updateSelectedEmbeddingModelMetadata(newValue));
 
