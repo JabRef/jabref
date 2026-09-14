@@ -2,9 +2,12 @@ name: Label merge-queue PR
 
 on:
   merge_group:
+  pull_request_target:
+    types: [ dequeued ]
 
 jobs:
   label:
+    if: github.event_name == 'merge_group'
     runs-on: ubuntu-slim
     permissions:
       pull-requests: write
@@ -21,4 +24,23 @@ jobs:
           else
             echo "Cannot extract PR number from ref: $ref" >&2
             exit 1
+          fi
+  # A PR ejected from the queue (failed check, manual removal) is back to being reviewable.
+  # awaiting-second-review was never removed on entry, so it stays the PR's status.
+  unlabel:
+    if: github.event_name == 'pull_request_target' && github.event.reason != 'MERGE'
+    runs-on: ubuntu-slim
+    permissions:
+      pull-requests: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          AWAITING_SECOND_REVIEW: ${{ contains(github.event.pull_request.labels.*.name, 'status: awaiting-second-review') }}
+        run: |
+          if [ "$AWAITING_SECOND_REVIEW" = "true" ]; then
+            gh pr edit "$PR_NUMBER" --remove-label "status: to-be-merged"
+          else
+            gh pr edit "$PR_NUMBER" --remove-label "status: to-be-merged" --add-label "status: ready-for-review"
           fi
