@@ -97,6 +97,7 @@ public class ImportHandler {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
+    private Optional<Boolean> downloadLinkedFilesOverride = Optional.empty();
     private final Deque<DuplicateDecisionRequest> duplicateDecisionRequests = new ArrayDeque<>();
     private boolean duplicateDecisionDialogInProgress;
     private DuplicateResolverDialog.DuplicateResolverResult rememberedBatchDuplicateDecision = BREAK;
@@ -558,8 +559,12 @@ public class ImportHandler {
         );
     }
 
+    public void setDownloadLinkedFilesOverride(boolean downloadLinkedFiles) {
+        this.downloadLinkedFilesOverride = Optional.of(downloadLinkedFiles);
+    }
+
     public void downloadLinkedFiles(BibEntry entry) {
-        if (preferences.getFilePreferences().shouldDownloadLinkedFiles()) {
+        if (downloadLinkedFilesOverride.orElseGet(filePreferences::shouldDownloadLinkedFiles)) {
             entry.getFiles().stream()
                  .filter(LinkedFile::isOnlineLink)
                  .forEach(linkedFile ->

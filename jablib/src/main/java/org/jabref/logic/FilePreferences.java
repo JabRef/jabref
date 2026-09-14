@@ -31,6 +31,7 @@ public class FilePreferences {
     private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
+    private final BooleanProperty importDialogDownloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty createBackup = new SimpleBooleanProperty();
@@ -56,6 +57,7 @@ public class FilePreferences {
                 DEFAULT_FILENAME_PATTERNS[1],        // fileNamePattern
                 "",                                  // fileDirectoryPattern
                 true,                                // downloadLinkedFiles
+                true,                                // importDialogDownloadLinkedFiles
                 true,                                // fulltextIndexLinkedFiles
                 Directories.getUserDirectory(),      // workingDirectory
                 true,                                // createBackup
@@ -79,6 +81,7 @@ public class FilePreferences {
                            String fileNamePattern,
                            String fileDirectoryPattern,
                            boolean downloadLinkedFiles,
+                           boolean importDialogDownloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
                            Path workingDirectory,
                            boolean createBackup,
@@ -99,6 +102,7 @@ public class FilePreferences {
         this.fileNamePattern.setValue(fileNamePattern);
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
+        this.importDialogDownloadLinkedFiles.setValue(importDialogDownloadLinkedFiles);
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
         this.workingDirectory.setValue(workingDirectory);
         this.createBackup.setValue(createBackup);
@@ -192,6 +196,18 @@ public class FilePreferences {
 
     public void setDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
         this.downloadLinkedFiles.set(shouldDownloadLinkedFiles);
+    }
+
+    public boolean shouldImportDialogDownloadLinkedFiles() {
+        return importDialogDownloadLinkedFiles.get();
+    }
+
+    public BooleanProperty importDialogDownloadLinkedFilesProperty() {
+        return importDialogDownloadLinkedFiles;
+    }
+
+    public void setImportDialogDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
+        this.importDialogDownloadLinkedFiles.set(shouldDownloadLinkedFiles);
     }
 
     public boolean shouldFulltextIndexLinkedFiles() {
