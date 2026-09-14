@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -14,8 +13,8 @@ import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
+import org.jabref.logic.exporter.AtomicFileOutputStream;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -271,31 +270,40 @@ public class XmpUtilWriter {
             resolvedEntries = database.resolveForStrings(bibtexEntries, false);
         }
 
-        // Read from another file
-        // Reason: Apache PDFBox does not support writing while the file is opened
-        // See https://issues.apache.org/jira/browse/PDFBOX-4028
-        Path newFile = Files.createTempFile("JabRef", "pdf");
-        try (PDDocument document = Loader.loadPDF(path.toFile())) {
-            if (document.isEncrypted()) {
-                throw new EncryptedPdfsNotSupportedException();
-            }
+        // The document is saved into the atomic stream's temporary file and committed only after the
+        // document (and thus PDFBox's read handle on the original) is closed: PDFBox cannot write into
+        // the file it is reading (https://issues.apache.org/jira/browse/PDFBOX-4028). The stream is
+        // aborted on every failure — including a PDFBox serialization error after partial output, which
+        // its own write() bookkeeping cannot see — so the original is never replaced by an incomplete file.
+        // [impl->req~logic.xmp.atomic-pdf-write~1]
+        AtomicFileOutputStream out = new AtomicFileOutputStream(path, false);
+        boolean committed = false;
+        try {
+            try (PDDocument document = Loader.loadPDF(path.toFile())) {
+                if (document.isEncrypted()) {
+                    throw new EncryptedPdfsNotSupportedException();
+                }
 
-            // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
-            if (!resolvedEntries.isEmpty()) {
-                writeDocumentInformation(document, resolvedEntries.getFirst(), null);
-                writeDublinCore(document, resolvedEntries, null);
-            }
+                // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
+                if (!resolvedEntries.isEmpty()) {
+                    writeDocumentInformation(document, resolvedEntries.getFirst(), null);
+                    writeDublinCore(document, resolvedEntries, null);
+                }
 
-            // Save updates to original file
-            try {
-                document.save(newFile.toFile());
-                FileUtil.copyFile(newFile, path, true);
-            } catch (IOException e) {
-                LOGGER.debug("Could not write XMP metadata", e);
-                throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
+                try {
+                    document.save(out);
+                } catch (IOException e) {
+                    LOGGER.debug("Could not write XMP metadata", e);
+                    throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
+                }
+            }
+            out.close();
+            committed = true;
+        } finally {
+            if (!committed) {
+                out.abort();
             }
         }
-        Files.delete(newFile);
     }
 
     /// Removes all XMP metadata associated with the given PDF file.
@@ -304,29 +312,32 @@ public class XmpUtilWriter {
     /// @throws IOException          If the file could not be read from or written to.
     /// @throws TransformerException If the XMP metadata could not be removed.
     public static void removeXmpMetadata(Path path) throws IOException, TransformerException {
-        // Read from another file
-        // Reason: Apache PDFBox does not support writing while the file is opened
-        // See https://issues.apache.org/jira/browse/PDFBOX-4028
-        Path newFile = Files.createTempFile("JabRef", "pdf");
-        FileUtil.copyFile(path, newFile, true);
-        try (PDDocument document = Loader.loadPDF(newFile.toFile())) {
-            if (document.isEncrypted()) {
-                throw new EncryptedPdfsNotSupportedException();
+        // See writeXmp for the commit/abort structure
+        // [impl->req~logic.xmp.atomic-pdf-write~1]
+        AtomicFileOutputStream out = new AtomicFileOutputStream(path, false);
+        boolean committed = false;
+        try {
+            try (PDDocument document = Loader.loadPDF(path.toFile())) {
+                if (document.isEncrypted()) {
+                    throw new EncryptedPdfsNotSupportedException();
+                }
+                PDDocumentCatalog catalog = document.getDocumentCatalog();
+                if (catalog.getMetadata() != null) {
+                    catalog.setMetadata(null);
+                }
+                try {
+                    document.save(out);
+                } catch (IOException e) {
+                    LOGGER.debug("Could not remove XMP metadata", e);
+                    throw new TransformerException(
+                            "Could not remove XMP metadata: " + e.getLocalizedMessage(), e);
+                }
             }
-            PDDocumentCatalog catalog = document.getDocumentCatalog();
-            if (catalog.getMetadata() != null) {
-                catalog.setMetadata(null);
-            }
-            document.save(path.toFile());
-        } catch (IOException e) {
-            LOGGER.debug("Could not remove XMP metadata", e);
-            throw new TransformerException(
-                    "Could not remove XMP metadata: " + e.getLocalizedMessage(), e);
+            out.close();
+            committed = true;
         } finally {
-            try {
-                Files.deleteIfExists(newFile);
-            } catch (IOException e) {
-                LOGGER.debug("Could not delete temporary PDF {}", newFile, e);
+            if (!committed) {
+                out.abort();
             }
         }
     }

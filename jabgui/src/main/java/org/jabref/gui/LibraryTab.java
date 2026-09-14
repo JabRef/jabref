@@ -23,6 +23,7 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -49,6 +50,7 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.git.GitDiffDialogView;
 import org.jabref.gui.git.GitPullScheduler;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -90,6 +92,7 @@ import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
@@ -415,6 +418,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
+        if (result.isInvalid()) {
+            // Nothing could be read from the file - the caller has already reported the reason to the user.
+            // Keeping the tab would leave an empty, untitled library behind, which the user could accidentally
+            // save over the file that failed to load.
+            // [impl->req~import.library.unreadable-reported~1]
+            // Close first, while dataLoadingTask is still set: confirmClose() treats a tab that is still
+            // loading as disposable and drops it. Clearing the task beforehand would instead offer to save
+            // the placeholder - over the very file that failed to load - if anything had modified it.
+            tabContainer.closeTab(this);
+            loading.set(false);
+            dataLoadingTask = null;
+            return;
+        }
+
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
         setDatabaseContext(result.getDatabaseContext());
         if (result.getChangedOnMigration()) {
@@ -589,10 +606,24 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
         }
 
+        IconTheme.JabRefIcons icon = tabIcon(databaseLocation, bibDatabaseContext.getMode());
         UiTaskExecutor.runInJavaFXThread(() -> {
             textProperty().setValue(tabTitle.toString());
             setTooltip(new Tooltip(toolTipText.toString()));
+            if (getGraphic() == null || !icon.matches(getGraphic())) {
+                Node graphic = icon.getGraphicNode();
+                graphic.getStyleClass().add("tab-icon");
+                setGraphic(graphic);
+            }
         });
+    }
+
+    // [impl->req~ux.tabs.library-kind-icon~1]
+    static IconTheme.JabRefIcons tabIcon(DatabaseLocation location, BibDatabaseMode mode) {
+        if (location == DatabaseLocation.SHARED) {
+            return IconTheme.JabRefIcons.SHARED_DATABASE_LIBRARY;
+        }
+        return mode == BibDatabaseMode.BIBLATEX ? IconTheme.JabRefIcons.BIBLATEX_LIBRARY : IconTheme.JabRefIcons.BIBTEX_LIBRARY;
     }
 
     /// Marks the changes the journal does not know about, so that [#changedProperty] can derive
@@ -614,6 +645,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 && (entriesEvent.getEntriesEventSource() == EntriesEventSource.SHARED));
         if (unrecorded) {
             journal().markChanged();
+        }
+        // The mode lives in the metadata, and a change of it while the library is already dirty does
+        // not move changedProperty, so the icon has to be refreshed from here.
+        if (event instanceof MetaDataChangedEvent) {
+            updateTabTitle(changedProperty.get());
         }
     }
 
