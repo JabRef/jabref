@@ -27,7 +27,7 @@ val jbang = "0.141.0"
 extra["jbangVersion"] = jbang
 
 dependencies {
-    api(platform("ai.djl:bom:0.37.0"))
+    api(platform("ai.djl:bom:0.38.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.20.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
@@ -123,7 +123,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:pdfbox:$pdfbox")
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
-    api("org.bouncycastle:bcprov-jdk18on:1.85.2")
+    api("org.bouncycastle:bcprov-jdk18on:1.86")
     api("org.controlsfx:controlsfx:11.2.5")
     api("org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r")
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.8.0.202609011348-r")

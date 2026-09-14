@@ -2,6 +2,7 @@ package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,7 @@ public record CSLStyleLoader(
     }
 
     /// Loads the internal (built-in) CSL styles from the catalog generated at build-time.
+    // [impl->req~ux.citation-styles.lazy-source-loading~1]
     public static void loadInternalStyles() {
         INTERNAL_STYLES.clear();
 
@@ -73,7 +75,6 @@ public record CSLStyleLoader(
                     });
 
             if (!styleInfoList.isEmpty()) {
-                int styleCount = styleInfoList.size();
                 findMissingCatalogKeys(styleInfoList.getFirst())
                         .forEach(key -> LOGGER.error("Citation style catalog has no '{}' entry. Please execute './gradlew jablib:clean jablib:build' to update the citation style cache.", key));
 
@@ -96,41 +97,38 @@ public record CSLStyleLoader(
                     boolean hasBibliographySortOrder = Boolean.TRUE.equals(info.get("hasBibliographySortOrder"));
                     boolean usesHangingIndent = Boolean.TRUE.equals(info.get("usesHangingIndent"));
 
-                    // We use these metadata and just load the content instead of re-parsing for them
-                    // These are located in the resources directly; therefore it is enough to use the class itself for loading
-                    try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
-                        if (styleStream != null) {
-                            String source = new String(styleStream.readAllBytes());
-                            // If cannot find styleId or styleClass, then parse .csl to retrieve them
-                            if (styleId.isBlank() || styleClass.isBlank()) {
-                                Optional<CSLStyleUtils.StyleInfo> parsedStyleInfo = CSLStyleUtils.parseStyleInfo(path, source);
-                                styleId = styleId.isBlank() ? parsedStyleInfo.map(CSLStyleUtils.StyleInfo::styleId).orElse("") : styleId;
-                                styleClass = styleClass.isBlank() ? parsedStyleInfo.map(CSLStyleUtils.StyleInfo::styleClass).orElse("") : styleClass;
-                            }
-                            CitationStyle style = new CitationStyle(
-                                    path,
-                                    styleId,
-                                    styleClass,
-                                    title, shortTitle,
-                                    isNumeric,
-                                    hasBibliography,
-                                    hasBibliographySortOrder,
-                                    usesHangingIndent,
-                                    source,
-                                    true);    // isInternalStyle
-                            INTERNAL_STYLES.add(style);
-                        }
-                    } catch (IOException e) {
-                        LOGGER.error("Error loading style file: {}", path, e);
-                        styleCount--;
-                    }
+                    CitationStyle style = new CitationStyle(
+                            path,
+                            styleId,
+                            styleClass,
+                            title, shortTitle,
+                            isNumeric,
+                            hasBibliography,
+                            hasBibliographySortOrder,
+                            usesHangingIndent,
+                            () -> loadInternalStyleSource(path),
+                            true);
+                    INTERNAL_STYLES.add(style);
                 }
-                LOGGER.debug("Loaded {} CSL styles", styleCount);
+                LOGGER.debug("Loaded {} CSL style metadata entries", INTERNAL_STYLES.size());
             } else {
                 LOGGER.error("Citation style catalog is empty");
             }
         } catch (IOException e) {
             LOGGER.error("Error loading citation style catalog", e);
+        }
+    }
+
+    private static String loadInternalStyleSource(String path) {
+        try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
+            if (styleStream instanceof InputStream inputStream) {
+                return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+            LOGGER.error("Could not find style file: {}", path);
+            return "";
+        } catch (IOException e) {
+            LOGGER.error("Error loading style file: {}", path, e);
+            return "";
         }
     }
 
