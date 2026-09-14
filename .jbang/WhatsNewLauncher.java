@@ -171,7 +171,7 @@ public class WhatsNewLauncher {
 
         /// The commit that first added the entry now reading `text`, following up to [#MAX_REWORDING_HOPS] rewordings back.
         private static Optional<Origin> origin(String text, int hops) throws IOException, InterruptedException {
-            List<String> found = git("log", "--reverse", "--format=%H%x09%ae%x09%an", "-S" + text, "--", CHANGELOG);
+            List<String> found = git("log", "--reverse", "--format=%H%x09%ae%x09%an", "--pickaxe-regex", "-S" + quoteFreeRegex(text), "--", CHANGELOG);
             if (found.isEmpty()) {
                 return Optional.empty();
             }
@@ -220,6 +220,23 @@ public class WhatsNewLauncher {
                 }
             }
             return best;
+        }
+
+        /// An extended regex matching `text` literally, with `"` and `\` matched by `.` instead: on Windows, Java
+        /// passes an argument's embedded quotes unescaped, so git would receive `text` split into several arguments.
+        static String quoteFreeRegex(String text) {
+            StringBuilder regex = new StringBuilder();
+            for (char c : text.toCharArray()) {
+                if (c == '"' || c == '\\') {
+                    regex.append('.');
+                } else {
+                    if (".[]()*+?{}|^$".indexOf(c) >= 0) {
+                        regex.append('\\');
+                    }
+                    regex.append(c);
+                }
+            }
+            return regex.toString();
         }
 
         private static Set<String> words(String text) {
