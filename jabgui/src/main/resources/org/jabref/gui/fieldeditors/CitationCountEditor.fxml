@@ -8,12 +8,12 @@
 <?import org.jabref.gui.fieldeditors.EditorTextField?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
-         spacing="4"
+         spacing="4.0"
          alignment="CENTER_LEFT"
          fx:controller="org.jabref.gui.fieldeditors.CitationCountEditor">
     <EditorTextField fx:id="textField" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
     <ComboBox fx:id="fetcherComboBox"/>
-    <Button fx:id="fetchCitationCountButton" onAction="#fetchCitationCount" styleClass="icon-button">
+    <Button fx:id="fetchCitationCountButton" onAction="#fetchCitationCount" styleClass="icon-button, entry-editor-field-button">
         <graphic>
             <StackPane>
                 <JabRefIconView glyph="LOOKUP_IDENTIFIER"

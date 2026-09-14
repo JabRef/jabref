@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.input.KeyCombination;
@@ -18,10 +19,10 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferencesDialogView;
-import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.Trigger;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
 import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
@@ -35,8 +36,6 @@ import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 import org.jabref.logic.l10n.Localization;
-
-import org.controlsfx.control.textfield.CustomTextField;
 
 public class WalkthroughAction extends SimpleCommand {
     public static final String PDF_LINK_WALKTHROUGH_NAME = "pdfLink";
@@ -132,7 +131,7 @@ public class WalkthroughAction extends SimpleCommand {
                                 new InfoBlock(Localization.lang("The columns you configure here will be displayed whenever you open a library in JabRef. You can always return to this settings page to modify your column preferences."))
                         )
                         .continueButton(Localization.lang("Next"))
-                        .resolver(NodeResolver.fxId("columnsList"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.COLUMNS_LIST))
                         .position(PanelPosition.RIGHT)
                         .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
                         .highlight(preferenceHighlight)
@@ -169,7 +168,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .panel(Localization.lang("Welcome to PDF linking walkthrough"))
                         .content(new TextBlock(Localization.lang("This walkthrough will guide you through how to link your PDF files with JabRef. We've opened an example library so you can see how this feature works with actual bibliography entries.")))
-                        .resolver(NodeResolver.fxId("main-table"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.MAIN_TABLE))
                         .continueButton(Localization.lang("Continue"))
                         .highlight(HighlightEffect.SPOT_LIGHT)
                         .position(PanelPosition.BOTTOM))
@@ -221,7 +220,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Browse for your PDF file"))
                         .content(new TextBlock(Localization.lang("Use the \"Browse\" button to select a PDF file from your computer. Click the folder icon next to the \"Link\" field to open the file browser.")))
-                        .resolver(NodeResolver.fxId("browse"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.LINKED_FILE_BROWSE))
                         .trigger(Trigger.create().withTimeout(Duration.INDEFINITE).onClick())
                         .activeWindow(WindowResolver.title(Localization.lang("Add file link")))
                         .showQuitButton(false)
@@ -229,7 +228,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Add a description for the file"))
                         .content(new TextBlock(Localization.lang("Enter a meaningful description for this file in the \"Description\" field. This helps you identify the file later.")))
-                        .resolver(NodeResolver.fxId("description"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.LINKED_FILE_DESCRIPTION))
                         .trigger(Trigger.onTextInput())
                         .activeWindow(WindowResolver.title(Localization.lang("Add file link")))
                         .showQuitButton(false)
@@ -237,7 +236,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Select the file type"))
                         .content(new TextBlock(Localization.lang("Choose the appropriate file type from the \"Filetype\" dropdown. Usually \"PDF\" is the correct choice for research papers.")))
-                        .resolver(NodeResolver.fxId("fileType"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.LINKED_FILE_TYPE))
                         .trigger(Trigger.onClick())
                         .activeWindow(WindowResolver.title(Localization.lang("Add file link")))
                         .showQuitButton(false)
@@ -245,7 +244,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Optionally add source URL"))
                         .content(new TextBlock(Localization.lang("If you downloaded this file from a website, you can add the source URL in the \"Source URL\" field. This is optional but helpful for tracking where you found the file.")))
-                        .resolver(NodeResolver.fxId("sourceUrl"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.LINKED_FILE_SOURCE_URL))
                         .trigger(Trigger.onTextInput())
                         .activeWindow(WindowResolver.title(Localization.lang("Add file link")))
                         .highlight(pdfDialogEffect)
@@ -334,7 +333,7 @@ public class WalkthroughAction extends SimpleCommand {
                                 new TextBlock(Localization.lang("This walkthrough will guide you through creating and managing groups in JabRef. Groups help you organize your bibliography entries into collections. We've opened an example library so you can practice with real entries.")),
                                 new InfoBlock(Localization.lang("The groups panel on the left side shows all your groups in a tree structure. You can create groups, add entries to them, and organize them hierarchically."))
                         )
-                        .resolver(NodeResolver.fxId("groups-side-pane"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.GROUPS_SIDE_PANE))
                         .continueButton(Localization.lang("Continue"))
                         .position(PanelPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
@@ -350,7 +349,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Enter group name"))
                         .content(new TextBlock(Localization.lang("Type \"%0\" as the name for your group.", groupName)))
-                        .resolver(NodeResolver.fxId("nameField"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.GROUP_NAME))
                         .trigger(Trigger.onTextEquals(groupName))
                         .position(TooltipPosition.RIGHT)
                         .activeWindow(WindowResolver.title(Localization.lang("Add group")))
@@ -359,7 +358,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Add a description (optional)"))
                         .content(new TextBlock(Localization.lang("You can add a description to help remember what this group is for. For example, type \"Important research papers for my project\".")))
-                        .resolver(NodeResolver.fxId("descriptionField"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.GROUP_DESCRIPTION))
                         .trigger(Trigger.onTextInput())
                         .position(TooltipPosition.RIGHT)
                         .continueButton(Localization.lang("Continue"))
@@ -369,7 +368,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Select \"Explicit selection\""))
                         .content(new TextBlock(Localization.lang("This allows you to manually choose which entries belong to this group.")))
-                        .resolver(NodeResolver.fxId("explicitRadioButton"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.GROUP_EXPLICIT_RADIO))
                         .trigger(Trigger.onClick())
                         .position(TooltipPosition.RIGHT)
                         .activeWindow(WindowResolver.title(Localization.lang("Add group")))
@@ -441,7 +440,7 @@ public class WalkthroughAction extends SimpleCommand {
                                 new TextBlock(Localization.lang("You've learned how to create groups and add entries to them. Groups are a powerful way to organize your bibliography and can be nested to create hierarchical structures.")),
                                 new InfoBlock(Localization.lang("For more information about groups: [Groups documentation](%0)", URLs.GROUPS_DOC))
                         )
-                        .resolver(NodeResolver.fxId("groups-side-pane"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.GROUPS_SIDE_PANE))
                         .continueButton(Localization.lang("Finish"))
                         .position(PanelPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
@@ -449,12 +448,7 @@ public class WalkthroughAction extends SimpleCommand {
     }
 
     private Walkthrough createSearchWalkthrough() {
-        NodeResolver searchFieldResolver = scene -> NodeResolver
-                .predicate(GlobalSearchBar.class::isInstance)
-                .resolve(scene)
-                .flatMap(node -> node instanceof GlobalSearchBar bar ?
-                                 bar.getChildren().stream().filter(CustomTextField.class::isInstance).findAny() :
-                                 Optional.empty());
+        NodeResolver searchFieldResolver = NodeResolver.fxId(WalkthroughNodeIds.GLOBAL_SEARCH_FIELD);
 
         return Walkthrough
                 .create(stateManager)
@@ -470,7 +464,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .content(
                                 new TextBlock(Localization.lang("This walkthrough will guide you through JabRef's search capabilities. We've loaded a sample library to demonstrate various search techniques."))
                         )
-                        .resolver(NodeResolver.fxId("main-table"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.MAIN_TABLE))
                         .continueButton(Localization.lang("Continue"))
                         .position(PanelPosition.BOTTOM)
                         .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
@@ -498,7 +492,7 @@ public class WalkthroughAction extends SimpleCommand {
                                 new TextBlock(Localization.lang("Notice how entries not containing \"machine learning\" are dimmed.")),
                                 new InfoBlock(Localization.lang("This found entries with at least a field in their metadata (*e.g.,* title, author, abstract, *etc.*) containing \"machine learning\"."))
                         )
-                        .resolver(NodeResolver.fxId("main-table"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.MAIN_TABLE))
                         .continueButton(Localization.lang("Continue"))
                         .position(PanelPosition.RIGHT)
                         .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
@@ -649,7 +643,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Enable \"Main file directory\" option"))
                         .content(new TextBlock(Localization.lang("Choose this option to tell JabRef where your research files are stored. This makes it easy to attach PDFs and other documents to your bibliography entries. You can browse to select your preferred folder in the next step.")))
-                        .resolver(NodeResolver.fxId("useMainFileDirectory"))
+                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.MAIN_FILE_DIRECTORY_RADIO))
                         .trigger(Trigger.onClick())
                         .position(TooltipPosition.AUTO)
                         .highlight(preferenceHighlight)
@@ -658,7 +652,7 @@ public class WalkthroughAction extends SimpleCommand {
                 )
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Specify \"Main file directory\" option"))
-                        .resolver(scene -> Optional.ofNullable(scene.lookup("#useMainFileDirectory").getParent()))
+                        .resolver(scene -> NodeResolver.fxId(WalkthroughNodeIds.MAIN_FILE_DIRECTORY_RADIO).resolve(scene).map(Node::getParent))
                         .position(TooltipPosition.BOTTOM)
                         .highlight(preferenceHighlight)
                         .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)

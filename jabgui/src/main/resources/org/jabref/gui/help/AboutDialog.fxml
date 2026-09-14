@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
-<?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
@@ -14,12 +13,14 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.util.DialogPaneWithoutButtonBar?>
 <?import tools.maran.svgnode.SvgNode?>
-<DialogPane xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
-            prefWidth="800" prefHeight="700"
-            fx:controller="org.jabref.gui.help.AboutDialogView">
+<DialogPaneWithoutButtonBar xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
+                            fx:controller="org.jabref.gui.help.AboutDialogView"
+                            minWidth="600" minHeight="400" prefWidth="800" prefHeight="700"
+                            id="aboutDialog">
     <content>
-        <GridPane vgap="4" hgap="4">
+        <GridPane>
             <columnConstraints>
                 <ColumnConstraints percentWidth="30"/>
                 <ColumnConstraints percentWidth="70"/>
@@ -28,8 +29,8 @@
                 <RowConstraints vgrow="ALWAYS"/>
             </rowConstraints>
 
-            <VBox spacing="8" styleClass="bg-accent,padding-8,corner-radius" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                <Button onAction="#openJabrefWebsite" styleClass="btn-transparent,padding-4">
+            <VBox spacing="8" styleClass="bg-accent,padding-12" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <Button onAction="#openJabrefWebsite" styleClass="btn-transparent,padding-0">
                     <cursor>
                         <Cursor fx:constant="HAND"/>
                     </cursor>
@@ -43,15 +44,17 @@
                 <VBox spacing="4">
                     <Label styleClass="h1,bold,text-emphasis" text="JabRef"/>
                     <VBox spacing="4">
-                        <Label styleClass="text-emphasis,font-monospace" text="${controller.viewModel.version}"/>
+                        <Label styleClass="text-emphasis,font-monospace" wrapText="true"
+                               text="${controller.viewModel.version}"/>
                         <Label managed="${controller.viewModel.isDevelopmentVersion}"
-                               styleClass="text-emphasis,font-monospace"
+                               styleClass="text-emphasis,font-monospace" wrapText="true"
                                text="${controller.viewModel.developmentVersion}"
                                visible="${controller.viewModel.isDevelopmentVersion}"/>
                     </VBox>
                 </VBox>
-                <VBox spacing="4">
-                    <Hyperlink onAction="#openChangeLog" styleClass="text-emphasis" text="%What's new in this version?"/>
+                <VBox spacing="4" styleClass="padding-top-12">
+                    <Hyperlink onAction="#openChangeLog" styleClass="text-emphasis" wrapText="true"
+                               text="%What's new in this version?"/>
                     <HBox alignment="CENTER_LEFT" spacing="4">
                         <Label styleClass="text-emphasis" text="${controller.viewModel.license}"/>
                         <Hyperlink onAction="#openLicense" styleClass="text-emphasis" text="MIT"/>
@@ -59,9 +62,9 @@
                     <Hyperlink onAction="#openPrivacyPolicy" styleClass="text-emphasis" text="Privacy Policy"/>
                     <Hyperlink onAction="#openExternalLibrariesWebsite" styleClass="text-emphasis" text="%Used libraries"/>
                 </VBox>
-                <Region VBox.vgrow="ALWAYS"/>
+                <Region VBox.vgrow="SOMETIMES"/>
                 <VBox spacing="4">
-                    <Button maxWidth="Infinity" onAction="#openDonation" styleClass="text-emphasis" text="%Make a donation">
+                    <Button id="donationButton" maxWidth="Infinity" onAction="#openDonation" text="%Make a donation">
                         <cursor>
                             <Cursor fx:constant="HAND"/>
                         </cursor>
@@ -74,7 +77,7 @@
                 </VBox>
             </VBox>
 
-            <VBox spacing="4" styleClass="bg-secondary,padding-8" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <VBox spacing="12" styleClass="bg-secondary,padding-12" GridPane.columnIndex="1" GridPane.rowIndex="0">
                 <VBox spacing="4">
                     <Label styleClass="bold,text-accent" text="%Maintainers"/>
                     <Label text="${controller.viewModel.maintainers}" wrapText="true"/>
@@ -87,11 +90,14 @@
                 </VBox>
                 <VBox spacing="4" VBox.vgrow="ALWAYS">
                     <Label styleClass="bold,text-accent" text="%System"/>
-                    <TextArea fx:id="textAreaVersions" editable="false" styleClass="font-monospace" VBox.vgrow="ALWAYS"/>
+                    <TextArea fx:id="textAreaVersions" editable="false" styleClass="font-monospace,bg-accent" VBox.vgrow="ALWAYS"/>
                 </VBox>
+                <HBox alignment="CENTER_RIGHT" spacing="4" styleClass="padding-top-4">
+                    <Button fx:id="copyVersionButton" onAction="#copyVersionToClipboard" text="%Copy Version"/>
+                    <Button fx:id="closeButton" onAction="#closeDialog"/>
+                </HBox>
             </VBox>
         </GridPane>
     </content>
-    <ButtonType fx:id="copyVersionButton" text="%Copy Version" buttonData="OTHER"/>
     <ButtonType fx:constant="CLOSE"/>
-</DialogPane>
+</DialogPaneWithoutButtonBar>

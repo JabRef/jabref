@@ -54,6 +54,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
@@ -117,6 +118,7 @@ public class GlobalSearchBar extends HBox {
         KeyBindingRepository keyBindingRepository = preferences.getKeyBindingRepository();
 
         searchField = SearchTextField.create(keyBindingRepository);
+        searchField.setId(WalkthroughNodeIds.GLOBAL_SEARCH_FIELD);
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
         stateManager.searchQueryProperty().bind(searchField.textProperty());
 

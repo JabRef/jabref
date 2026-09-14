@@ -133,7 +133,7 @@ public class DuplicateSearch extends SimpleCommand {
                 if (dups == null) {
                     continue;
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException _) {
                 return null;
             }
 

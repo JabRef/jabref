@@ -35,7 +35,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.testutils.category.DatabaseTest;
+import org.jabref.support.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +44,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -96,6 +97,7 @@ class DBMSSynchronizerTest {
 
     @AfterEach
     void closeDbmsConnection() throws Exception {
+        dbmsSynchronizer.closeSharedDatabase();
         connectorTest.close();
     }
 
@@ -111,6 +113,26 @@ class DBMSSynchronizerTest {
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
         assertEquals(List.of(expectedEntry), actualEntries);
+    }
+
+    @Test
+    void canCloseBeforeOpeningSharedDatabase() {
+        BibDatabaseContext context = new BibDatabaseContext();
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(
+                context,
+                ',',
+                fieldPreferences,
+                pattern,
+                new DummyFileUpdateMonitor(),
+                "UserAndHost",
+                new VirtualThreadTaskExecutor());
+
+        synchronizer.setDBName("shared-library");
+
+        assertEquals("shared-library", synchronizer.getDBName());
+        assertDoesNotThrow(synchronizer::closeSharedDatabase);
     }
 
     @Test
@@ -218,8 +240,11 @@ class DBMSSynchronizerTest {
         testMetaData.setMode(BibDatabaseMode.BIBTEX);
 
         Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData, pattern);
+        // A metadata notification can apply the database-owned schema version before this assertion.
+        // It is not part of the local metadata change tested here.
+        expectedMap.remove(MetaData.VERSION_DB_STRUCT);
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
-        actualMap.remove("VersionDBStructure");
+        actualMap.remove(MetaData.VERSION_DB_STRUCT);
 
         assertEquals(expectedMap, actualMap);
     }

@@ -3,8 +3,10 @@ package org.jabref.logic.ai.embedding;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 
 import org.jabref.logic.util.ProgressCounter;
+import org.jabref.logic.util.strings.StringUtil;
 
 import ai.djl.MalformedModelException;
 import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory;
@@ -25,20 +27,49 @@ public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeepJavaEmbeddingModel.class);
 
+    private final String modelName;
     private final ZooModel<String, float[]> model;
     private final Predictor<String, float[]> predictor;
 
+    private final EmbeddingModelMetadataService metadataService;
+
     public DeepJavaEmbeddingModel(
             String modelName,
-            ProgressCounter progressCounter
+            ProgressCounter progressCounter,
+            EmbeddingModelMetadataService metadataService
     ) throws ModelNotFoundException, MalformedModelException, IOException {
-        Criteria<String, float[]> criteria = makeCriteriaBuilder()
-                .optModelUrls(DJL_EMBEDDING_MODEL_URL_PREFIX + modelName)
-                .optProgress(progressCounter)
-                .build();
+        this.modelName = modelName;
+        this.metadataService = metadataService;
+        try {
+            Criteria<String, float[]> criteria = makeCriteriaBuilder()
+                    .optModelUrls(DJL_EMBEDDING_MODEL_URL_PREFIX + modelName)
+                    .optProgress(progressCounter)
+                    .build();
 
-        this.model = criteria.loadModel();
-        this.predictor = model.newPredictor();
+            this.model = criteria.loadModel();
+            this.predictor = model.newPredictor();
+        } catch (IllegalArgumentException e) {
+            throw new ModelNotFoundException("Invalid embedding model URL: " + modelName, e);
+        }
+    }
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    /// Returns the maximum snippet size (sequence length in tokens) supported by this embedding model.
+    public OptionalInt getMaxSnippetTokens() {
+        String prop = model.getProperty("maxLength");
+        if (StringUtil.isNotBlank(prop)) {
+            try {
+                return OptionalInt.of(Integer.parseInt(prop.trim()));
+            } catch (NumberFormatException e) {
+                LOGGER.debug("Could not parse maxLength property '{}'", prop, e);
+            }
+        }
+        return metadataService.getMetadata(modelName)
+                              .map(EmbeddingModelMetadata::maxSnippetTokens)
+                              .orElseGet(OptionalInt::empty);
     }
 
     public static boolean isDownloaded(String modelName) {
@@ -47,6 +78,9 @@ public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
             return makeCriteria(modelUrl).isDownloaded();
         } catch (IOException | ModelNotFoundException e) {
             LOGGER.error("Got an error while checking if an embedding model is downloaded", e);
+            return false;
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Invalid embedding model URL: {}", modelName, e);
             return false;
         }
     }

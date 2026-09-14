@@ -135,7 +135,7 @@ public class ArXivIdentifier extends EprintIdentifier {
     public Optional<URI> getExternalURI() {
         try {
             return Optional.of(new URI("https://arxiv.org/abs/" + asString()));
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             return Optional.empty();
         }
     }

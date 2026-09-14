@@ -8,7 +8,14 @@ parent: Requirements
 
 Changes made by one client — entry modifications, groups, and library settings — appear in all other connected clients without any manual action.
 
-Needs: impl
+Needs: impl, utest
+
+## Shared metadata snapshots are atomic
+`req~shared-database.atomic-metadata-snapshots~1`
+
+When a client changes shared metadata, other clients observe either the complete previous snapshot or the complete new snapshot, never an intermediate subset of the change.
+
+Needs: impl, utest
 
 ## Change content travels in the notification
 `req~shared-database.change-content-in-notification~1`
@@ -49,6 +56,13 @@ Needs: impl
 `req~shared-database.automatic-reconnect~1`
 
 After a connection loss, JabRef reconnects by itself with increasing intervals for as long as the library is open. The user is informed when the connection is lost and when it is back, without being interrupted.
+
+Needs: impl
+
+## A shared database's loading state is indicated
+`req~shared-database.loading-indicator~1`
+
+While JabRef opens or reconnects a shared database, its library tab displays a loading indicator until the connection completes or fails.
 
 Needs: impl
 

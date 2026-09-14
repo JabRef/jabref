@@ -27,6 +27,14 @@ No other thread can observe the library holding a change the journal does not ye
 
 Needs: impl, utest
 
+## Undo shortcuts in text fields drive the library's undo history
+`req~logic.undo.text-field-shortcut~1`
+
+Pressing the undo or redo shortcut while a field editor's text control has focus performs the library's undo or redo, the same as the toolbar buttons.
+JavaFX's built-in per-control text undo is bypassed: it would only revert the keystrokes of that one control, and it throws when its history is empty.
+
+Needs: impl, utest
+
 ## A command's writes are reserved against undo
 `req~logic.undo.writes-reserved-against-undo~1`
 
@@ -73,6 +81,14 @@ Needs: impl, utest
 A run of keystrokes in one field of one entry goes on the undo stack as a single step, so undoing takes back the word that was typed rather than the last character.
 The run ends at the end of a word, when the editor moves to something else, when the library is saved at that point, or when a command records a step of its own; a run that ends where it started leaves no step behind.
 Breaking at a word is what every other editor does, and it bounds what a single Ctrl+Z can take back: without it, one keystroke of undo takes back a whole abstract.
+
+Needs: impl, utest
+
+## An entry added to a library is one undo step
+`req~logic.undo.entry-insert-recorded~1`
+
+An entry that reaches a library goes on the undo stack as a single step, whichever way it was added — typed identifier, URL, dropped file, paste or citation relation — together with the citation key and group assignments the insert produces.
+The library counts as modified from that moment, so it is not closed without being offered a save, and undoing removes the entry again.
 
 Needs: impl, utest
 
