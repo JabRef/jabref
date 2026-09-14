@@ -57,6 +57,7 @@ public abstract class BackgroundTask<V> {
     private final DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
     private final BooleanProperty showToUser = new SimpleBooleanProperty(false);
     private final BooleanProperty willBeRecoveredAutomatically = new SimpleBooleanProperty(false);
+    private boolean reportsFailureToUser;
 
     public BackgroundTask() {
         workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));
@@ -169,6 +170,16 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
+    public boolean reportsFailureToUser() {
+        return reportsFailureToUser;
+    }
+
+    /// Declares that the failure consumer shows the error to the user, so a visible task needs no separate failure notification.
+    public BackgroundTask<V> reportsFailureToUser(boolean reportsFailureToUser) {
+        this.reportsFailureToUser = reportsFailureToUser;
+        return this;
+    }
+
     /// Sets the [Runnable] that is invoked after the task is started.
     public BackgroundTask<V> onRunning(Runnable onRunning) {
         this.onRunning = onRunning;
@@ -199,11 +210,6 @@ public abstract class BackgroundTask<V> {
 
     public Consumer<Exception> getOnException() {
         return chain(onFinished, onException);
-    }
-
-    /// Whether a failure consumer was set with [#onFailure(Consumer)]; an [#onFinished(Runnable)] callback does not count.
-    public boolean hasFailureHandler() {
-        return onException != null;
     }
 
     /// Sets the [Consumer] that is invoked after the task has failed with an exception.

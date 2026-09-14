@@ -14,8 +14,6 @@ import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 
 import org.jabref.gui.StateManager;
 import org.jabref.logic.util.BackgroundTask;
@@ -241,18 +239,9 @@ public class UiTaskExecutor implements TaskExecutor {
         });
         Consumer<Exception> onException = task.getOnException();
         if (onException != null) {
-            EventHandler<WorkerStateEvent> onFailed = _ -> onException.accept(convertToException(javaTask.getException()));
-            javaTask.setOnFailed(task.hasFailureHandler() ? new FailureReportingHandler(onFailed) : onFailed);
+            javaTask.setOnFailed(_ -> onException.accept(convertToException(javaTask.getException())));
         }
         return javaTask;
-    }
-
-    /// Marks the failure handler of a task whose caller reports the error to the user, so its notification can be dropped.
-    public record FailureReportingHandler(EventHandler<WorkerStateEvent> delegate) implements EventHandler<WorkerStateEvent> {
-        @Override
-        public void handle(WorkerStateEvent event) {
-            delegate.handle(event);
-        }
     }
 
     private static Exception convertToException(Throwable throwable) {

@@ -14,7 +14,6 @@ import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DelayedExecution;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
@@ -77,14 +76,15 @@ public class Notifications {
     }
 
     public static class TaskNotification extends Notification<Task<?>> {
-        boolean undefinedTask = false;
+        private final boolean untitled;
 
-        public TaskNotification(Task<?> task) {
+        /// @param failureReportedByCaller whether the task's failure handler already shows the error, see [org.jabref.logic.util.BackgroundTask#reportsFailureToUser()]
+        public TaskNotification(Task<?> task, boolean failureReportedByCaller) {
             super(task.getTitle(), task.getMessage());
             setUserObject(task);
-            if (StringUtil.isBlank(task.getTitle())) {
+            untitled = StringUtil.isBlank(task.getTitle());
+            if (untitled) {
                 setTitle(Localization.lang("Background task"));
-                undefinedTask = true;
             }
             setOnClick(_ -> OnClickBehaviour.NONE);
             getActions().add(new NotificationAction<>(Localization.lang("Cancel"), _ -> {
@@ -93,34 +93,35 @@ public class Notifications {
             }));
 
             // Do not overwrite existing handlers
+            // The handlers run on the JavaFX thread after the notification was added: it is created when the task starts running.
             Optional<EventHandler<WorkerStateEvent>> onSucceeded = Optional.ofNullable(task.getOnSucceeded());
             task.setOnSucceeded(event -> {
                 onSucceeded.ifPresent(handler -> handler.handle(event));
-                finishTask(undefinedTask);
+                if (untitled) {
+                    remove();
+                } else {
+                    markFinished();
+                }
             });
-            // A failed task never reaches full progress, so its notification would look like it is still running.
-            // A caller that reports the error itself makes the notification redundant; otherwise the notification shows the error.
             Optional<EventHandler<WorkerStateEvent>> onFailed = Optional.ofNullable(task.getOnFailed());
-            boolean failureReported = onFailed.filter(UiTaskExecutor.FailureReportingHandler.class::isInstance).isPresent();
             task.setOnFailed(event -> {
                 onFailed.ifPresent(handler -> handler.handle(event));
-                if (!failureReported) {
+                if (untitled || failureReportedByCaller) {
+                    remove();
+                } else {
+                    // Without full progress, the notification would otherwise look like the task is still running
                     setType(Type.ERROR);
-                    Optional.ofNullable(task.getException()).map(Throwable::getMessage).ifPresent(this::setSummary);
+                    markFinished();
                 }
-                finishTask(undefinedTask || failureReported);
             });
             Optional<EventHandler<WorkerStateEvent>> onCancelled = Optional.ofNullable(task.getOnCancelled());
             task.setOnCancelled(event -> {
                 onCancelled.ifPresent(handler -> handler.handle(event));
-                finishTask(true);
+                remove();
             });
         }
 
-        private void finishTask(boolean remove) {
-            if (remove) {
-                UiTaskExecutor.runInJavaFXThread(this::remove);
-            }
+        private void markFinished() {
             setOnClick(_ -> OnClickBehaviour.REMOVE);
             getActions().clear();
         }

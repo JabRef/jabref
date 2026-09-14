@@ -26,31 +26,37 @@ class NotificationsTest {
     private static final Callable<Void> FAILING = () -> {
         throw new IOException("connection refused");
     };
+    private static final Callable<Void> SUCCEEDING = () -> null;
 
     private final NotificationGroup<Task<?>, Notifications.TaskNotification> group = new NotificationGroup<>("Tasks");
 
     @Test
-    void failedTaskWithReportedFailureIsRemoved() {
-        Notifications.TaskNotification notification = runToEnd(BackgroundTask.wrap(FAILING).setTitle("Task").onFailure(_ -> {
-        }));
+    void failedTaskReportedByCallerIsRemoved() {
+        Notifications.TaskNotification notification = runToEnd(FAILING, "Task", true);
 
         assertFalse(group.getNotifications().contains(notification));
     }
 
     @Test
-    void failedTaskWithOnlyOnFinishedShowsError() {
-        Notifications.TaskNotification notification = runToEnd(BackgroundTask.wrap(FAILING).setTitle("Task").onFinished(() -> {
-        }));
+    void failedTaskNotReportedByCallerShowsErrorWithoutExceptionMessage() {
+        Notifications.TaskNotification notification = runToEnd(FAILING, "Task", false);
 
         assertTrue(group.getNotifications().contains(notification));
         assertEquals(Notification.Type.ERROR, notification.getType());
-        assertEquals("connection refused", notification.getSummary());
+        assertEquals("", notification.getSummary());
+    }
+
+    @Test
+    void failedUntitledTaskIsRemoved() {
+        Notifications.TaskNotification notification = runToEnd(FAILING, "", false);
+
+        assertFalse(group.getNotifications().contains(notification));
     }
 
     @Test
     void cancelledTaskIsRemoved() {
-        Task<Void> task = UiTaskExecutor.getJavaFXTask(BackgroundTask.wrap(() -> (Void) null).setTitle("Task"));
-        Notifications.TaskNotification notification = addNotification(task);
+        Task<Void> task = UiTaskExecutor.getJavaFXTask(BackgroundTask.wrap(SUCCEEDING).setTitle("Task"));
+        Notifications.TaskNotification notification = addNotification(task, false);
 
         task.cancel();
         flushJavaFXThread();
@@ -60,32 +66,37 @@ class NotificationsTest {
 
     @Test
     void succeededTaskStays() {
-        Notifications.TaskNotification notification = runToEnd(BackgroundTask.wrap(() -> (Void) null).setTitle("Task"));
+        Notifications.TaskNotification notification = runToEnd(SUCCEEDING, "Task", false);
 
         assertTrue(group.getNotifications().contains(notification));
     }
 
-    private Notifications.TaskNotification runToEnd(BackgroundTask<Void> backgroundTask) {
-        Task<Void> task = UiTaskExecutor.getJavaFXTask(backgroundTask);
-        Notifications.TaskNotification notification = addNotification(task);
+    @Test
+    void succeededUntitledTaskIsRemoved() {
+        Notifications.TaskNotification notification = runToEnd(SUCCEEDING, "", false);
+
+        assertFalse(group.getNotifications().contains(notification));
+    }
+
+    private Notifications.TaskNotification runToEnd(Callable<Void> callable, String title, boolean failureReportedByCaller) {
+        Task<Void> task = UiTaskExecutor.getJavaFXTask(BackgroundTask.wrap(callable).setTitle(title));
+        Notifications.TaskNotification notification = addNotification(task, failureReportedByCaller);
         task.run();
         flushJavaFXThread();
         return notification;
     }
 
-    private Notifications.TaskNotification addNotification(Task<Void> task) {
+    private Notifications.TaskNotification addNotification(Task<Void> task, boolean failureReportedByCaller) {
         Notifications.TaskNotification[] notification = new Notifications.TaskNotification[1];
         UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
-            notification[0] = new Notifications.TaskNotification(task);
+            notification[0] = new Notifications.TaskNotification(task, failureReportedByCaller);
             group.getNotifications().add(notification[0]);
         });
         return notification[0];
     }
 
-    /// Worker state events and the removal are each posted to the JavaFX thread; waiting twice lets both run.
+    /// Worker state events are posted to the JavaFX thread; waiting for an empty action lets them run first.
     private static void flushJavaFXThread() {
-        UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
-        });
         UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
         });
     }
