@@ -342,6 +342,7 @@ public final class LibraryBaseline {
         // The synchronization setting itself is never synchronized: switching it on in memory must not be undone by
         // the older value in the file, nor must the file switch it off under a running synchronization
         serialized.remove(MetaData.SYNCHRONIZE_WITH_FILE);
+        serialized.remove(MetaData.MERGE_CONFLICTED_COPIES);
         return serialized;
     }
 }
