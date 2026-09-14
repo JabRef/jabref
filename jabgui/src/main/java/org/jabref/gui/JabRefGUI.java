@@ -53,7 +53,6 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -246,9 +245,8 @@ public class JabRefGUI extends Application {
             while (change.next()) {
                 if (change.wasAdded()) {
                     for (Task<?> task : change.getAddedSubList()) {
-                        dialogService.notify(new Notifications.TaskNotification(
-                                task,
-                                stateManager.getBackgroundTask(task).map(BackgroundTask::reportsFailureToUser).orElse(false)));
+                        stateManager.getBackgroundTask(task).ifPresent(backgroundTask ->
+                                dialogService.notify(new Notifications.TaskNotification(task, backgroundTask)));
                     }
                 }
             }

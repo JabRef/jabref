@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javafx.concurrent.Task;
@@ -16,8 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(JavaFxExtension.class)
 @NullMarked
@@ -31,65 +30,66 @@ class NotificationsTest {
     private final NotificationGroup<Task<?>, Notifications.TaskNotification> group = new NotificationGroup<>("Tasks");
 
     @Test
-    void failedTaskReportedByCallerIsRemoved() {
-        Notifications.TaskNotification notification = runToEnd(FAILING, "Task", true);
+    void failedTaskShowingFailureItselfIsRemoved() {
+        runToEnd(BackgroundTask.wrap(FAILING).setTitle("Task").showsFailureToUser());
 
-        assertFalse(group.getNotifications().contains(notification));
+        assertEquals(List.of(), group.getNotifications());
     }
 
     @Test
-    void failedTaskNotReportedByCallerShowsErrorWithoutExceptionMessage() {
-        Notifications.TaskNotification notification = runToEnd(FAILING, "Task", false);
+    void failedTaskNotShowingFailureShowsErrorWithoutExceptionMessage() {
+        Notifications.TaskNotification notification = runToEnd(BackgroundTask.wrap(FAILING).setTitle("Task"));
 
-        assertTrue(group.getNotifications().contains(notification));
+        assertEquals(List.of(notification), group.getNotifications());
         assertEquals(Notification.Type.ERROR, notification.getType());
         assertEquals("", notification.getSummary());
     }
 
     @Test
     void failedUntitledTaskIsRemoved() {
-        Notifications.TaskNotification notification = runToEnd(FAILING, "", false);
+        runToEnd(BackgroundTask.wrap(FAILING).setTitle(""));
 
-        assertFalse(group.getNotifications().contains(notification));
+        assertEquals(List.of(), group.getNotifications());
     }
 
     @Test
     void cancelledTaskIsRemoved() {
-        Task<Void> task = UiTaskExecutor.getJavaFXTask(BackgroundTask.wrap(SUCCEEDING).setTitle("Task"));
-        Notifications.TaskNotification notification = addNotification(task, false);
+        BackgroundTask<Void> backgroundTask = BackgroundTask.wrap(SUCCEEDING).setTitle("Task");
+        Task<Void> task = UiTaskExecutor.getJavaFXTask(backgroundTask);
+        addNotification(task, backgroundTask);
 
         task.cancel();
         flushJavaFXThread();
 
-        assertFalse(group.getNotifications().contains(notification));
+        assertEquals(List.of(), group.getNotifications());
     }
 
     @Test
     void succeededTaskStays() {
-        Notifications.TaskNotification notification = runToEnd(SUCCEEDING, "Task", false);
+        Notifications.TaskNotification notification = runToEnd(BackgroundTask.wrap(SUCCEEDING).setTitle("Task"));
 
-        assertTrue(group.getNotifications().contains(notification));
+        assertEquals(List.of(notification), group.getNotifications());
     }
 
     @Test
     void succeededUntitledTaskIsRemoved() {
-        Notifications.TaskNotification notification = runToEnd(SUCCEEDING, "", false);
+        runToEnd(BackgroundTask.wrap(SUCCEEDING).setTitle(""));
 
-        assertFalse(group.getNotifications().contains(notification));
+        assertEquals(List.of(), group.getNotifications());
     }
 
-    private Notifications.TaskNotification runToEnd(Callable<Void> callable, String title, boolean failureReportedByCaller) {
-        Task<Void> task = UiTaskExecutor.getJavaFXTask(BackgroundTask.wrap(callable).setTitle(title));
-        Notifications.TaskNotification notification = addNotification(task, failureReportedByCaller);
+    private Notifications.TaskNotification runToEnd(BackgroundTask<Void> backgroundTask) {
+        Task<Void> task = UiTaskExecutor.getJavaFXTask(backgroundTask);
+        Notifications.TaskNotification notification = addNotification(task, backgroundTask);
         task.run();
         flushJavaFXThread();
         return notification;
     }
 
-    private Notifications.TaskNotification addNotification(Task<Void> task, boolean failureReportedByCaller) {
+    private Notifications.TaskNotification addNotification(Task<Void> task, BackgroundTask<Void> backgroundTask) {
         Notifications.TaskNotification[] notification = new Notifications.TaskNotification[1];
         UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
-            notification[0] = new Notifications.TaskNotification(task, failureReportedByCaller);
+            notification[0] = new Notifications.TaskNotification(task, backgroundTask);
             group.getNotifications().add(notification[0]);
         });
         return notification[0];

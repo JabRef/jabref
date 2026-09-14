@@ -15,6 +15,7 @@ import javafx.util.Duration;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DelayedExecution;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.strings.StringUtil;
 
 import com.dlsc.gemsfx.infocenter.Notification;
@@ -78,8 +79,8 @@ public class Notifications {
     public static class TaskNotification extends Notification<Task<?>> {
         private final boolean untitled;
 
-        /// @param failureReportedByCaller whether the task's failure handler already shows the error, see [org.jabref.logic.util.BackgroundTask#reportsFailureToUser()]
-        public TaskNotification(Task<?> task, boolean failureReportedByCaller) {
+        /// @param backgroundTask the task `task` was created from; decides whether a failure needs a notification, see [BackgroundTask#showsFailureToUser()]
+        public TaskNotification(Task<?> task, BackgroundTask<?> backgroundTask) {
             super(task.getTitle(), task.getMessage());
             setUserObject(task);
             untitled = StringUtil.isBlank(task.getTitle());
@@ -106,7 +107,7 @@ public class Notifications {
             Optional<EventHandler<WorkerStateEvent>> onFailed = Optional.ofNullable(task.getOnFailed());
             task.setOnFailed(event -> {
                 onFailed.ifPresent(handler -> handler.handle(event));
-                if (untitled || failureReportedByCaller) {
+                if (untitled || backgroundTask.isFailureShownToUser()) {
                     remove();
                 } else {
                     // Without full progress, the notification would otherwise look like the task is still running

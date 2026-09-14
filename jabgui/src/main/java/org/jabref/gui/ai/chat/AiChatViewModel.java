@@ -322,7 +322,7 @@ public class AiChatViewModel extends AbstractViewModel {
         task.onFailure(ex ->
                 // [impl->feat~ai.chat.show-errors~1]
                 originalChatHistory.add(ChatMessage.errorMessage(ex)));
-        task.reportsFailureToUser(true);
+        task.showsFailureToUser();
 
         task.onFinished(() -> {
             tasksMap.remove(taskEntries);
