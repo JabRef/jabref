@@ -2,7 +2,9 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.concurrent.Task;
 
@@ -25,7 +27,8 @@ class NotificationsTest {
     private static final Callable<Void> FAILING = () -> {
         throw new IOException("connection refused");
     };
-    private static final Callable<Void> SUCCEEDING = () -> null;
+    private static final Runnable SUCCEEDING = () -> {
+    };
 
     private final NotificationGroup<Task<?>, Notifications.TaskNotification> group = new NotificationGroup<>("Tasks");
 
@@ -87,12 +90,13 @@ class NotificationsTest {
     }
 
     private Notifications.TaskNotification addNotification(Task<Void> task, BackgroundTask<Void> backgroundTask) {
-        Notifications.TaskNotification[] notification = new Notifications.TaskNotification[1];
+        AtomicReference<Optional<Notifications.TaskNotification>> notification = new AtomicReference<>(Optional.empty());
         UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
-            notification[0] = new Notifications.TaskNotification(task, backgroundTask);
-            group.getNotifications().add(notification[0]);
+            Notifications.TaskNotification created = new Notifications.TaskNotification(task, backgroundTask);
+            group.getNotifications().add(created);
+            notification.set(Optional.of(created));
         });
-        return notification[0];
+        return notification.get().orElseThrow();
     }
 
     /// Worker state events are posted to the JavaFX thread; waiting for an empty action lets them run first.
