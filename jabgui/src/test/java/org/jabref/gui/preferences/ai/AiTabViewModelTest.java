@@ -100,6 +100,44 @@ class AiTabViewModelTest {
     }
 
     @Test
+    void connectionTestSucceeds() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-4o");
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any())).thenReturn("OK");
+
+        viewModel.testConnection();
+
+        assertEquals(AiTabViewModel.ConnectionTestState.SUCCESS, viewModel.connectionTestStateProperty().get());
+        assertEquals("", viewModel.connectionTestDetailsProperty().get());
+    }
+
+    @Test
+    void connectionTestShowsOllamaPullCommandForMissingModel() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-oss20b");
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any()))
+                .thenThrow(new RuntimeException("404 - message: model 'gpt-oss20b' not found"));
+
+        viewModel.testConnection();
+
+        assertEquals(AiTabViewModel.ConnectionTestState.FAILED, viewModel.connectionTestStateProperty().get());
+        assertTrue(viewModel.connectionTestDetailsProperty().get().contains("ollama pull gpt-oss20b"));
+    }
+
+    @Test
+    void connectionTestResultResetsWhenApiKeyChanges() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any()))
+                .thenThrow(new RuntimeException("401"));
+        viewModel.testConnection();
+
+        viewModel.apiKeyProperty().set("other-key");
+
+        assertEquals(AiTabViewModel.ConnectionTestState.IDLE, viewModel.connectionTestStateProperty().get());
+        assertEquals("", viewModel.connectionTestDetailsProperty().get());
+    }
+
+    @Test
     void maxChunkSizeLabelUpdatesWhenModelSelected() {
         viewModel.selectedEmbeddingModelProperty().set("test-model");
 
