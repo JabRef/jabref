@@ -5,6 +5,8 @@
 # which runs privileged in the context of the base repository.
 
 name: PR Review Activity
+# "Comment on PR" keys its concurrency group on this for issue_comment runs, which all run on main.
+run-name: PR Review Activity for PR ${{ github.event.pull_request.number || github.event.issue.number }}
 
 on:
   # Qodo is not a workflow, so its completion cannot be awaited via workflow_run.
