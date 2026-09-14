@@ -18,7 +18,6 @@ import org.jabref.http.dto.GsonMessageBodyReader;
 import org.jabref.http.dto.GsonMessageBodyWriter;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
-import org.jabref.http.server.command.CommandResource;
 import org.jabref.http.server.resources.CitationsResource;
 import org.jabref.http.server.resources.EntriesResource;
 import org.jabref.http.server.resources.EntryResource;
@@ -28,8 +27,11 @@ import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
 import org.jabref.http.server.resources.MapResource;
 import org.jabref.http.server.resources.RootResource;
+import org.jabref.http.server.resources.callback.CallbackResource;
+import org.jabref.http.server.resources.command.CommandResource;
 import org.jabref.http.server.services.CitationCacheService;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -51,9 +53,11 @@ import org.slf4j.LoggerFactory;
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
     private final CliPreferences preferences;
+    private final OAuthSessionRegistry oAuthSessionRegistry;
 
-    public Server(CliPreferences preferences) {
+    public Server(CliPreferences preferences, OAuthSessionRegistry oAuthSessionRegistry) {
         this.preferences = preferences;
+        this.oAuthSessionRegistry = oAuthSessionRegistry;
     }
 
     /// Entry point for the CLI
@@ -115,6 +119,8 @@ public class Server {
     }
 
     private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
+        // Add remaining services - the difference between CLI and GUI is the SrvStateManager added before
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, oAuthSessionRegistry);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences, "preferences", CliPreferences.class);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new CitationCacheService());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
@@ -139,6 +145,7 @@ public class Server {
 
         // Other resources
         resourceConfig.register(CommandResource.class);
+        resourceConfig.register(CallbackResource.class);
         resourceConfig.register(CAYWResource.class);
 
         // Supporting classes
