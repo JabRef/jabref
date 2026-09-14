@@ -241,6 +241,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
     @CsvSource(delimiter = ';', textBlock = """
             '| a | b |\n|---|---|';                  'a │ b\n──┼──'
             '| a |\n|---|\n| 1 | 2 |';               'a │\n──┼──\n1 │ 2'
+            '| e\u0301 | 🙂 |\n|---|---|\n| ab | cd |'; 'é  │ 🙂\n───┼───\nab │ cd'
             """)
     void setMarkdownRendersHeaderOnlyAndIrregularTables(String markdown, String expected) {
         MarkdownTextFlow textFlow = markdownTextFlow();

@@ -1,5 +1,6 @@
 package org.jabref.gui.util.component;
 
+import java.text.Normalizer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -520,7 +521,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                             if (alignments.size() == cells.size()) {
                                 alignments.add(tableCell.getAlignment());
                             }
-                            cells.add(new TextCollectingVisitor().collectAndGetText(cell).strip());
+                            cells.add(Normalizer.normalize(new TextCollectingVisitor().collectAndGetText(cell).strip(), Normalizer.Form.NFC));
                         }
                     }
                     rows.add(cells);
@@ -534,7 +535,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             int[] widths = new int[columnCount];
             for (List<String> row : rows) {
                 for (int i = 0; i < row.size(); i++) {
-                    widths[i] = Math.max(widths[i], row.get(i).length());
+                    widths[i] = Math.max(widths[i], row.get(i).codePointCount(0, row.get(i).length()));
                 }
             }
 
@@ -544,7 +545,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 StringJoiner line = new StringJoiner(" │ ");
                 for (int i = 0; i < columnCount; i++) {
                     String cell = i < rows.get(r).size() ? rows.get(r).get(i) : "";
-                    int padding = widths[i] - cell.length();
+                    // ponytail: code points, not display width; East Asian wide glyphs still misalign
+                    int padding = widths[i] - cell.codePointCount(0, cell.length());
                     int leftPadding = switch (alignments.get(i)) {
                         case RIGHT ->
                                 padding;
