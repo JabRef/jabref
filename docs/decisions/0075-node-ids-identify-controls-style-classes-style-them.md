@@ -1,5 +1,5 @@
 ---
-nav_order: 74
+nav_order: 75
 parent: Decision Records
 ---
 
@@ -46,12 +46,63 @@ Steps whose target is a virtualized cell — a row of the entry table, of the gr
 
 ## Pros and Cons of the Options
 
+### Node ids identify, style classes style
+
+TL;DR: `#id` is for `lookup`, `.class` is for CSS.
+
+```xml
+<ListView fx:id="preferencesTabList" styleClass="preferences-tab-list"/>
+```
+
+```java
+// identify
+searchField.setId(WalkthroughNodeIds.GLOBAL_SEARCH_FIELD);
+step.resolver(NodeResolver.fxId(WalkthroughNodeIds.GLOBAL_SEARCH_FIELD));
+```
+
+```css
+.preferences-tab-list { -fx-padding: 0.5em; }
+```
+
+* Good, because renaming an id cannot change how the application looks, and restyling cannot break a walkthrough.
+* Good, because an id is unique per node, whereas a style class is deliberately shared, so lookups are unambiguous.
+* Bad, because every `#id` rule in the stylesheets and in external themes has to be converted.
+* Bad, because id selectors outrank class selectors, so converted rules win only by order or length.
+
 ### Keep both uses of ids, resolve conflicts case by case
+
+TL;DR: `#id` is for `lookup` *and* CSS; whoever renames checks both.
+
+```xml
+<VBox id="preferences-sidepane"/>
+```
+
+```java
+step.resolver(NodeResolver.fxId("preferences-sidepane"));
+```
+
+```css
+#preferences-sidepane { -fx-padding: 0.5em; }
+```
 
 * Good, because nothing has to be converted and CSS specificity stays as it is.
 * Bad, because an id has no defined meaning, so every rename needs both a styling and a walkthrough review.
 
 ### Identify by a marker style class per target, leave ids to styling
+
+TL;DR: `.class` is for CSS *and* `lookup`; a walkthrough target gets an extra marker class.
+
+```xml
+<VBox id="preferences-sidepane" styleClass="preferences-sidepane, walkthrough-preferences-sidepane"/>
+```
+
+```java
+step.resolver(NodeResolver.selector(".walkthrough-preferences-sidepane"));
+```
+
+```css
+#preferences-sidepane { -fx-padding: 0.5em; }
+```
 
 * Good, because it needs no CSS change at all, and JavaFX `lookup` accepts style classes.
 * Bad, because style classes are not unique, so a target would have to be found by convention rather than by identity.
