@@ -56,6 +56,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -465,7 +466,7 @@ public class NewEntryViewModel {
         }
     }
 
-    private Optional<List<BibEntry>> parseCitations(String text, PlainCitationParserChoice parserChoice) throws FetcherException {
+    private Optional<List<BibEntry>> parseCitations(@Nullable String text, @Nullable PlainCitationParserChoice parserChoice) throws FetcherException {
         if (text == null || parserChoice == null) {
             return Optional.empty();
         }
@@ -520,6 +521,7 @@ public class NewEntryViewModel {
 
     /// LLM responses can take long, so the dialog closes right away and the entries are added once the LLM answered.
     private void executeInterpretCitationsInBackground() {
+        // [impl->req~ai.citation-parsing.background~1]
         final String text = interpretText.getValue();
         if (!interpretTextValidator.getValidationStatus().isValid()) {
             return;
