@@ -68,7 +68,7 @@ public class PdfMergeDialog {
                     return null;
                 }
                 return parserResult.getDatabase().getEntries().getFirst();
-            } catch (IOException e) {
+            } catch (IOException _) {
                 return null;
             }
         };

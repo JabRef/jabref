@@ -48,7 +48,7 @@ public class ContentSelectorView extends AbstractPropertiesTabView<ContentSelect
 
     @FXML
     public void initialize() {
-        this.viewModel = new ContentSelectorViewModel(databaseContext, dialogService);
+        this.viewModel = new ContentSelectorViewModel(dialogService);
 
         initFieldNameComponents();
         initKeywordsComponents();

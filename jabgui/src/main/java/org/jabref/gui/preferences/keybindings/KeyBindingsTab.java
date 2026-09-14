@@ -88,7 +88,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
         new ViewModelTreeTableCellFactory<KeyBindingViewModel>()
                 .withGraphic(keyBinding -> keyBinding.getResetIcon().map(JabRefIcon::getGraphicNode).orElse(null))
                 .withOnMouseClickedEvent(keyBinding -> _ -> keyBinding.resetToDefault())
-                .withStyleClasses(() -> List.of("align-center-right", "padding-right-6"))
+                .withStyleClasses(() -> List.of("align-center-right", "padding-right-4"))
                 .install(resetColumn);
 
         TreeTableColumn<KeyBindingViewModel, KeyBindingViewModel> clearColumn = new TreeTableColumn<>();
@@ -98,7 +98,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
         new ViewModelTreeTableCellFactory<KeyBindingViewModel>()
                 .withGraphic(keyBinding -> keyBinding.getClearIcon().map(JabRefIcon::getGraphicNode).orElse(null))
                 .withOnMouseClickedEvent(keyBinding -> _ -> keyBinding.clear())
-                .withStyleClasses(() -> List.of("align-center-right", "padding-right-6"))
+                .withStyleClasses(() -> List.of("align-center-right", "padding-right-4"))
                 .install(clearColumn);
 
         keyBindingsTable.getColumns().add(actionColumn);

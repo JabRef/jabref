@@ -104,7 +104,7 @@ public class NotificationListener implements Runnable {
     }
 
     private PGConnection connect() throws SQLException {
-        Connection newConnection = dbmsConnection.openNewConnection();
+        Connection newConnection = dbmsConnection.openNewConnection().getConnection();
         this.connection = newConnection;
         if (stop) {
             // stop() raced with connecting - do not leak the fresh connection

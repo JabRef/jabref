@@ -12,7 +12,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
-import org.jabref.model.undo.UndoableGroupChange;
+import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -34,17 +34,18 @@ public final class KeywordSeparatorMigration {
     }
 
     /// Updates group definitions that capture a keyword separator.
-    public static List<UndoableGroupChange> migrateGroupSeparators(BibDatabaseContext databaseContext, Character newSeparator) {
-        List<UndoableGroupChange> changes = new ArrayList<>();
-        databaseContext.getMetaData().getGroups().ifPresent(root -> root.iterateOverTree().forEach(node -> {
+    ///
+    /// Records nothing: the nodes are edited in place, and a record holding them would be undone
+    /// silently once a later group operation installed a fresh tree. The caller records the tree,
+    /// or the metadata holding it, as a whole.
+    public static void migrateGroupSeparators(MetaData metaData, Character newSeparator) {
+        metaData.getGroups().ifPresent(root -> root.iterateOverTree().forEach(node -> {
             AbstractGroup previousGroup = node.getGroup();
             AbstractGroup newGroup = withKeywordSeparator(previousGroup, newSeparator);
             if (previousGroup != newGroup) {
                 node.setGroup(newGroup);
-                changes.add(new UndoableGroupChange(node, previousGroup, newGroup));
             }
         }));
-        return changes;
     }
 
     private static Optional<FieldChange> migrateField(BibEntry entry,

@@ -180,6 +180,7 @@ public enum StandardActions implements Action {
     MOVE_FILE_TO_FOLDER(Localization.lang("Move file(s) to directory"), IconTheme.JabRefIcons.MOVE_TO_FOLDER),
     MOVE_FILE_TO_FOLDER_AND_RENAME(Localization.lang("Move file to directory and rename file"), IconTheme.JabRefIcons.MOVE_TO_FOLDER),
     COPY_FILE_TO_FOLDER(Localization.lang("Copy linked file(s) to folder..."), IconTheme.JabRefIcons.COPY_TO_FOLDER, KeyBinding.COPY),
+    LINK_FILE(Localization.lang("Link file"), IconTheme.JabRefIcons.AUTO_LINKED_FILE),
     REMOVE_LINK(Localization.lang("Remove link"), IconTheme.JabRefIcons.REMOVE_LINK),
     REMOVE_LINKS(Localization.lang("Remove links"), IconTheme.JabRefIcons.REMOVE_LINK),
     DELETE_FILE(Localization.lang("Permanently delete local file(s)"), IconTheme.JabRefIcons.DELETE_FILE, KeyBinding.DELETE_ENTRY),

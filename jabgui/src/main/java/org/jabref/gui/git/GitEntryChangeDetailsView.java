@@ -52,8 +52,7 @@ public final class GitEntryChangeDetailsView extends AnchorPane {
         Label legendLabel = new Label(Localization.lang("Red: Removed, Blue: Changed, Green: Added"));
         legendLabel.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_LEGEND);
 
-        VBox resultContainer = new VBox(splitPane, legendLabel);
-        resultContainer.setSpacing(5);
+        VBox resultContainer = new VBox(4, splitPane, legendLabel);
         setAllAnchorsAndAttachChild(resultContainer);
     }
 

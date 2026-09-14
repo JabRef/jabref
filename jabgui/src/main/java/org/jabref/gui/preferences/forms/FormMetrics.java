@@ -9,7 +9,7 @@ import org.jspecify.annotations.NullMarked;
 public final class FormMetrics {
 
     /// Gap between elements, both between rows and between an element and what is attached to it.
-    public static final double GAP = 10.0;
+    public static final double GAP = 8.0;
 
     /// Width of a labelled button in a button row, so that the buttons in one row are uniform.
     public static final double BUTTON_WIDTH = 100.0;

@@ -840,7 +840,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                         pdfUrlParsed = XMLUtil.getAttributeContent(linkNode, "href").map(url -> {
                             try {
                                 return URLUtil.create(url);
-                            } catch (MalformedURLException e) {
+                            } catch (MalformedURLException _) {
                                 return null;
                             }
                         });

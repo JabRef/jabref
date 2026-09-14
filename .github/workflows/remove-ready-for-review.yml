@@ -45,8 +45,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ci-running-message: >
-            Do not mark a PR as ready-for-review while the CI is running.
-            CI checks need to be completed and passed.
+            Do not mark a PR as ready-for-review while the CI or the automatic review is running.
+            They need to be completed and passed.
           changes-required-message: |
             Do not mark a PR as ready-for-review if changes are required.
             Address the changes first.

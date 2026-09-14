@@ -13,7 +13,7 @@ class CountResponse {
         }
         try {
             return Integer.parseInt(count);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return 0;
         }
     }

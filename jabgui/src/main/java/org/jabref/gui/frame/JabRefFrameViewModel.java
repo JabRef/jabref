@@ -8,9 +8,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedMap;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -43,6 +45,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.shared.DatabaseConnectionProperties;
+import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.SharedDatabaseSessionService;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -95,7 +100,7 @@ public class JabRefFrameViewModel {
         this.taskExecutor = taskExecutor;
     }
 
-    void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase) {
+    void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase, List<String> sharedDatabaseIds) {
         if (preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
@@ -105,7 +110,24 @@ public class JabRefFrameViewModel {
                 preferences.getLastFilesOpenedPreferences().setLastFilesOpened(filenames);
                 preferences.getLastFilesOpenedPreferences().setLastFocusedFile(focusedDatabase);
             }
+            preferences.getLastFilesOpenedPreferences().setLastSharedDatabasesOpened(sharedDatabaseIds);
         }
+    }
+
+    /// Shared databases that are backed by a local file are reopened through that file (it carries the shared database id).
+    /// The others only live in the connection, so their connection properties are collected here, keyed by a generated id.
+    /// Nothing is written yet: the user may still cancel the quit, and a credential must not land in the keyring for a
+    /// database that then stays open.
+    private static SequencedMap<String, DatabaseConnectionProperties> collectSharedDatabases(List<LibraryTab> tabs) {
+        SequencedMap<String, DatabaseConnectionProperties> sharedDatabases = new LinkedHashMap<>();
+        tabs.stream()
+            .map(LibraryTab::getBibDatabaseContext)
+            .filter(context -> context.getLocation() == DatabaseLocation.SHARED && context.getDatabasePath().isEmpty())
+            .forEach(context -> {
+                String id = context.getDatabase().getSharedDatabaseID().orElseGet(() -> context.getDatabase().generateSharedDatabaseID());
+                sharedDatabases.put(id, context.getDBMSSynchronizer().getConnectionProperties());
+            });
+        return sharedDatabases;
     }
 
     /// Quit JabRef
@@ -136,13 +158,15 @@ public class JabRefFrameViewModel {
                                         .flatMap(BibDatabaseContext::getDatabasePath)
                                         .map(Path::toAbsolutePath)
                                         .orElse(null);
+        SequencedMap<String, DatabaseConnectionProperties> sharedDatabases = collectSharedDatabases(tabContainer.getLibraryTabs());
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         if (!tabContainer.closeTabs(tabContainer.getLibraryTabs(), false)) {
             return false;
         }
 
-        storeLastOpenedFiles(openedLibraries, focusedLibraries); // store only if successfully having closed the libraries
+        new SharedDatabaseSessionService().persistConnections(sharedDatabases);
+        storeLastOpenedFiles(openedLibraries, focusedLibraries, List.copyOf(sharedDatabases.keySet())); // store only if successfully having closed the libraries
 
         ProcessingLibraryDialog processingLibraryDialog = new ProcessingLibraryDialog(dialogService);
         processingLibraryDialog.showAndWait(tabContainer.getLibraryTabs());

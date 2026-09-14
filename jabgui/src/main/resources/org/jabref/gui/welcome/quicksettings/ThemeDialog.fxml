@@ -13,14 +13,15 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import org.jabref.gui.theme.ThemePreviewView?>
 <?import org.jabref.gui.util.component.HelpButton?>
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.welcome.quicksettings.ThemeDialog">
     <content>
-        <VBox styleClass="quick-settings-dialog-container,padding-16,spacing-16">
+        <VBox spacing="4" styleClass="quick-settings-dialog-container,padding-4">
             <Label text="%Choose between different themes, the color scheme or use a custom theme."
                    wrapText="true" HBox.hgrow="ALWAYS"/>
-            <GridPane hgap="10.0" vgap="4.0">
+            <GridPane hgap="4.0" vgap="4.0">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
                     <ColumnConstraints hgrow="ALWAYS"/>
@@ -49,9 +50,11 @@
                         </Button>
                     </HBox>
                     <Label text="%Color scheme"
-                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                     <ComboBox fx:id="themeColorScheme" prefWidth="200.0"
-                              GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                              GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                    <ThemePreviewView fx:id="themePreview"
+                                      GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
                 </children>
             </GridPane>
         </VBox>

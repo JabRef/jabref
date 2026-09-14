@@ -180,7 +180,7 @@ public class BookCoverFetcher {
     private static Optional<Path> resolveNameWithType(Path directory, String name, ExternalFileType fileType) {
         try {
             return Optional.of(directory.resolve(FileUtil.getValidFileName(name + "." + fileType.getExtension())));
-        } catch (InvalidPathException e) {
+        } catch (InvalidPathException _) {
             return Optional.empty();
         }
     }

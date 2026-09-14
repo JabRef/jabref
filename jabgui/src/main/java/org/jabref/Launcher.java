@@ -125,7 +125,7 @@ public class Launcher {
                 handler.setFilter(cssFilter);
             }
             java.util.logging.Logger.getLogger("javafx.css").setFilter(cssFilter);
-        } catch (Throwable ex) {
+        } catch (Throwable _) {
             // If anything goes wrong, do not fail startup because of logging
         }
 

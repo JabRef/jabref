@@ -31,7 +31,7 @@ public class UnoRedlines {
 
         try {
             return (boolean) propertySet.getPropertyValue("RecordChanges");
-        } catch (UnknownPropertyException ex) {
+        } catch (UnknownPropertyException _) {
             throw new IllegalStateException("Caught UnknownPropertyException on 'RecordChanges'");
         }
     }
@@ -70,7 +70,7 @@ public class UnoRedlines {
             Object redline;
             try {
                 redline = enumeration.nextElement();
-            } catch (NoSuchElementException | WrappedTargetException ex) {
+            } catch (NoSuchElementException | WrappedTargetException _) {
                 break;
             }
             if (isDeleteRedline(redline)) {

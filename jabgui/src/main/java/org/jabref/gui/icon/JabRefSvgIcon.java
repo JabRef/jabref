@@ -5,13 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 import javafx.css.CssMetaData;
-import javafx.css.SimpleStyleableObjectProperty;
+import javafx.css.StyleOrigin;
 import javafx.css.Styleable;
-import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
 import javafx.css.converter.PaintConverter;
 import javafx.css.converter.SizeConverter;
-import javafx.scene.Parent;
 import javafx.scene.paint.Paint;
 
 import tools.maran.svgnode.SvgNode;
@@ -34,14 +32,18 @@ public class JabRefSvgIcon extends SvgNode {
 
     private static final CssMetaData<JabRefSvgIcon, Paint> ICON_COLOR =
             new CssMetaData<>("-fx-icon-color", PaintConverter.getInstance()) {
+                /// A color set from code -- [SvgIcon#withColor], or an `-fx-icon-color` forwarded by
+                /// [JabRefIconView] -- has to outlive the next CSS pass. JavaFX lets an author stylesheet win
+                /// over a programmatic value, so the theme's `.ikonli-font-icon { -fx-icon-color }` rule would
+                /// otherwise repaint the icon; withholding the property is the way to keep it.
                 @Override
                 public boolean isSettable(JabRefSvgIcon node) {
-                    return !node.iconColor.isBound();
+                    return node.colorProperty().getStyleOrigin() != StyleOrigin.USER && !node.colorProperty().isBound();
                 }
 
                 @Override
                 public StyleableProperty<Paint> getStyleableProperty(JabRefSvgIcon node) {
-                    return node.iconColor;
+                    return node.colorProperty();
                 }
             };
 
@@ -49,12 +51,12 @@ public class JabRefSvgIcon extends SvgNode {
             new CssMetaData<>("-fx-icon-size", SizeConverter.getInstance()) {
                 @Override
                 public boolean isSettable(JabRefSvgIcon node) {
-                    return !node.iconSize.isBound();
+                    return !node.sizeProperty().isBound();
                 }
 
                 @Override
                 public StyleableProperty<Number> getStyleableProperty(JabRefSvgIcon node) {
-                    return node.iconSize;
+                    return node.sizeProperty();
                 }
             };
 
@@ -62,12 +64,12 @@ public class JabRefSvgIcon extends SvgNode {
             new CssMetaData<>("-glyph-size", SizeConverter.getInstance()) {
                 @Override
                 public boolean isSettable(JabRefSvgIcon node) {
-                    return !node.glyphSize.isBound();
+                    return !node.sizeProperty().isBound();
                 }
 
                 @Override
                 public StyleableProperty<Number> getStyleableProperty(JabRefSvgIcon node) {
-                    return node.glyphSize;
+                    return node.sizeProperty();
                 }
             };
 
@@ -75,19 +77,19 @@ public class JabRefSvgIcon extends SvgNode {
             new CssMetaData<>("-fx-font-size", SizeConverter.getInstance()) {
                 @Override
                 public boolean isSettable(JabRefSvgIcon node) {
-                    return !node.fontSize.isBound();
+                    return !node.sizeProperty().isBound();
                 }
 
                 @Override
                 public StyleableProperty<Number> getStyleableProperty(JabRefSvgIcon node) {
-                    return node.fontSize;
+                    return node.sizeProperty();
                 }
             };
 
     private static final List<CssMetaData<? extends Styleable, ?>> CSS_META_DATA;
 
     static {
-        List<CssMetaData<? extends Styleable, ?>> metaData = new ArrayList<>(Parent.getClassCssMetaData());
+        List<CssMetaData<? extends Styleable, ?>> metaData = new ArrayList<>(SvgNode.getClassCssMetaData());
         metaData.add(ICON_COLOR);
         metaData.add(GLYPH_SIZE);
         metaData.add(ICON_SIZE);
@@ -95,67 +97,9 @@ public class JabRefSvgIcon extends SvgNode {
         CSS_META_DATA = Collections.unmodifiableList(metaData);
     }
 
-    private final StyleableObjectProperty<Paint> iconColor =
-            new SimpleStyleableObjectProperty<>(ICON_COLOR, this, "iconColor") {
-                @Override
-                protected void invalidated() {
-                    Paint color = get();
-                    if (color != null) {
-                        setColor(color);
-                    }
-                }
-            };
-
-    private final StyleableObjectProperty<Number> iconSize =
-            new SimpleStyleableObjectProperty<>(ICON_SIZE, this, "iconSize") {
-                @Override
-                protected void invalidated() {
-                    updateSize();
-                }
-            };
-
-    private final StyleableObjectProperty<Number> glyphSize =
-            new SimpleStyleableObjectProperty<>(GLYPH_SIZE, this, "glyphSize") {
-                @Override
-                protected void invalidated() {
-                    updateSize();
-                }
-            };
-
-    private final StyleableObjectProperty<Number> fontSize =
-            new SimpleStyleableObjectProperty<>(FONT_SIZE, this, "fontSize") {
-                @Override
-                protected void invalidated() {
-                    updateSize();
-                }
-            };
-
     public JabRefSvgIcon(String path, double size) {
         super(path, size);
         getStyleClass().addAll("glyph-icon", "ikonli-font-icon");
-    }
-
-    /// Applies the CSS-resolved size, preferring an explicit `-fx-icon-size` over an em `-fx-font-size`.
-    /// When neither is set by CSS, the constructor/programmatic size is left untouched.
-    private void updateSize() {
-        Number size = iconSize.get() != null ? iconSize.get() : glyphSize.get() != null ? glyphSize.get() : fontSize.get();
-        if (size != null) {
-            setSize(size.doubleValue());
-        }
-    }
-
-    /// Sets the icon color directly (user origin). Overrides any color coming from a stylesheet, so it is the
-    /// right entry point for an explicit, programmatic color (e.g. [SvgIcon#withColor]).
-    public void setIconColor(Paint color) {
-        iconColor.set(color);
-    }
-
-    public Paint getIconColor() {
-        return iconColor.get();
-    }
-
-    public StyleableObjectProperty<Paint> iconColorProperty() {
-        return iconColor;
     }
 
     public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {

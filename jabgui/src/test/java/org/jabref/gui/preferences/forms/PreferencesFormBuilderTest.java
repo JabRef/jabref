@@ -1,10 +1,7 @@
 package org.jabref.gui.preferences.forms;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -18,18 +15,18 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.SearchableElement;
+import org.jabref.gui.testutils.JavaFxExtension;
 
 import com.dlsc.unitfx.IntegerInputField;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class PreferencesFormBuilderTest {
 
     /// The builder only needs its services for help buttons, which these forms do not use.
@@ -72,12 +69,10 @@ class PreferencesFormBuilderTest {
     /// A stacked field must end up with a real size: the AI tab's expert settings are built this
     /// way, and a zero-sized cell would leave that block looking empty.
     @Test
-    void stackedFieldsInColumnsAreLaidOut() throws Exception {
-        CountDownLatch laidOut = new CountDownLatch(1);
-        IntegerInputField integerField = new IntegerInputField();
-        TextField textField = new TextField();
-
-        Platform.runLater(() -> {
+    void stackedFieldsInColumnsAreLaidOut() {
+        JavaFxExtension.invokeAndWait(() -> {
+            IntegerInputField integerField = new IntegerInputField();
+            TextField textField = new TextField();
             VBox root = form()
                     .group(expert -> expert
                             .columns(columns -> columns
@@ -87,24 +82,18 @@ class PreferencesFormBuilderTest {
             new Scene(root, 800, 600);
             root.applyCss();
             root.layout();
-            laidOut.countDown();
+            assertTrue(integerField.getWidth() > 0 && integerField.getHeight() > 0,
+                    "the integer field is laid out, but was " + integerField.getWidth() + "x" + integerField.getHeight());
+            assertTrue(textField.getWidth() > 0 && textField.getHeight() > 0,
+                    "the text field is laid out, but was " + textField.getWidth() + "x" + textField.getHeight());
         });
-
-        assertTrue(laidOut.await(10, TimeUnit.SECONDS), "layout pass ran");
-        assertTrue(integerField.getWidth() > 0 && integerField.getHeight() > 0,
-                "the integer field is laid out, but was " + integerField.getWidth() + "x" + integerField.getHeight());
-        assertTrue(textField.getWidth() > 0 && textField.getHeight() > 0,
-                "the text field is laid out, but was " + textField.getWidth() + "x" + textField.getHeight());
     }
 
     /// Columns are of equal width whatever they contain: a column claiming width in proportion to
     /// its longest caption is what the hand-built grids used percentage constraints to avoid.
     @Test
-    void columnsAreEquallyWideRegardlessOfContent() throws Exception {
-        CountDownLatch laidOut = new CountDownLatch(1);
-        VBox[] columns = new VBox[2];
-
-        Platform.runLater(() -> {
+    void columnsAreEquallyWideRegardlessOfContent() {
+        JavaFxExtension.invokeAndWait(() -> {
             VBox root = form()
                     .columns(row -> row
                             .group(left -> left.stackedField("A very much longer caption than the other", new TextField()))
@@ -115,14 +104,11 @@ class PreferencesFormBuilderTest {
             root.layout();
 
             HBox columnsRow = (HBox) root.getChildren().getFirst();
-            columns[0] = (VBox) columnsRow.getChildren().getFirst();
-            columns[1] = (VBox) columnsRow.getChildren().get(1);
-            laidOut.countDown();
+            VBox leftColumn = (VBox) columnsRow.getChildren().getFirst();
+            VBox rightColumn = (VBox) columnsRow.getChildren().get(1);
+            assertEquals(leftColumn.getWidth(), rightColumn.getWidth(),
+                    "columns are equally wide, but were " + leftColumn.getWidth() + " and " + rightColumn.getWidth());
         });
-
-        assertTrue(laidOut.await(10, TimeUnit.SECONDS), "layout pass ran");
-        assertEquals(columns[0].getWidth(), columns[1].getWidth(),
-                "columns are equally wide, but were " + columns[0].getWidth() + " and " + columns[1].getWidth());
     }
 
     /// The shape of the AI tab's expert settings: a group holding a labelled field and then the

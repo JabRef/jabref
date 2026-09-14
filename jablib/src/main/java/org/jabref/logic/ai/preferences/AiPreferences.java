@@ -20,7 +20,6 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.llm.PredefinedChatModel;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
@@ -79,7 +78,7 @@ public class AiPreferences {
 
     private final ObjectProperty<SummarizatorKind> summarizatorKind;
     private final ObjectProperty<TokenEstimatorKind> tokenEstimatorKind;
-    private final ObjectProperty<PredefinedEmbeddingModel> embeddingModel;
+    private final StringProperty embeddingModel;
     private final DoubleProperty temperature;
     private final IntegerProperty contextWindowSize;
 
@@ -166,7 +165,7 @@ public class AiPreferences {
             String huggingFaceApiBaseUrl,
             SummarizatorKind summarizatorKind,
             TokenEstimatorKind tokenEstimatorKind,
-            PredefinedEmbeddingModel embeddingModel,
+            String embeddingModel,
             double temperature,
             int contextWindowSize,
             DocumentSplitterKind documentSplitterKind,
@@ -207,7 +206,7 @@ public class AiPreferences {
 
         this.summarizatorKind = new SimpleObjectProperty<>(summarizatorKind);
         this.tokenEstimatorKind = new SimpleObjectProperty<>(tokenEstimatorKind);
-        this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
+        this.embeddingModel = new SimpleStringProperty(embeddingModel);
         this.temperature = new SimpleDoubleProperty(temperature);
         this.contextWindowSize = new SimpleIntegerProperty(contextWindowSize);
 
@@ -483,11 +482,11 @@ public class AiPreferences {
         this.tokenEstimatorKind.set(tokenEstimatorKind);
     }
 
-    public ObjectProperty<PredefinedEmbeddingModel> embeddingModelProperty() {
+    public StringProperty embeddingModelProperty() {
         return embeddingModel;
     }
 
-    public PredefinedEmbeddingModel getEmbeddingModel() {
+    public String getEmbeddingModel() {
         if (getCustomizeExpertSettings()) {
             return embeddingModel.get();
         } else {
@@ -495,7 +494,7 @@ public class AiPreferences {
         }
     }
 
-    public void setEmbeddingModel(PredefinedEmbeddingModel embeddingModel) {
+    public void setEmbeddingModel(String embeddingModel) {
         this.embeddingModel.set(embeddingModel);
     }
 
