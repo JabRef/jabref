@@ -3,10 +3,12 @@ package org.jabref.logic.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 class FallbackExceptionHandlerTest {
 
     private final List<Throwable> reported = new ArrayList<>();
