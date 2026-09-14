@@ -17,6 +17,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
@@ -49,6 +50,8 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.collect.Comparators;
 import com.tobiasdiez.easybind.EasyBind;
@@ -157,6 +160,19 @@ public class AiChatViewModel extends AbstractViewModel {
                                 entries.isEmpty() ||
                                 entries.stream().flatMap(identifier -> identifier.entry().getFiles().stream()).findAny().isEmpty(),
                 entries, aiPreferences.aiFeaturesEnabledProperty()
+        );
+
+        // Files can be attached while the entry stays the same (e.g. by dropping a PDF into the entry editor),
+        // which does not touch the entries list. Re-evaluate when the "file" field of an entry changes.
+        MapChangeListener<Field, String> fileFieldListener = change -> {
+            if (change.getKey() == StandardField.FILE) {
+                hasNoFiles.invalidate();
+            }
+        };
+        BindingsHelper.listenToListContentChanges(
+                entries,
+                identifier -> identifier.entry().getFieldsObservable().addListener(fileFieldListener),
+                identifier -> identifier.entry().getFieldsObservable().removeListener(fileFieldListener)
         );
 
         BooleanBinding isError = Bindings.createBooleanBinding(() -> {
