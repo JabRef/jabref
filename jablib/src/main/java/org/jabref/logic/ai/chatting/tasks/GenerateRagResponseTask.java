@@ -8,7 +8,6 @@ import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.chatting.util.ChatHistoryUtils;
 import org.jabref.logic.ai.rag.logic.ResponseEngine;
 import org.jabref.logic.ai.templates.AiTemplateRenderer;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.identifiers.FullBibEntry;
@@ -43,9 +42,6 @@ public class GenerateRagResponseTask extends BackgroundTask<ChatMessage> {
         this.entries = entries;
         this.systemMessageTemplate = systemMessageTemplate;
         this.injectionTemplate = injectionTemplate;
-
-        showToUser(true);
-        titleProperty().set(Localization.lang("Waiting for AI reply..."));
     }
 
     @Override
