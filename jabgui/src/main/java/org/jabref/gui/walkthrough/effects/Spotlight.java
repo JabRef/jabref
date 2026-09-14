@@ -168,6 +168,8 @@ public final class Spotlight extends BaseWindowEffect {
         }
 
         Shape overlayShape = Shape.subtract(backdrop, hole);
+        // The shape is positioned in the pane's coordinates, so the pane must not lay it out.
+        overlayShape.setManaged(false);
         overlayShape.getStyleClass().add("walkthrough-spotlight");
 
         if (onClickHandler != null) {

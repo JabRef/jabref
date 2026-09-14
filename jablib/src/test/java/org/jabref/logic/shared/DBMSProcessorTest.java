@@ -6,9 +6,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
@@ -37,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 @DatabaseTest
 @Execution(ExecutionMode.SAME_THREAD)
 class DBMSProcessorTest {
+
+    private static final int METADATA_ATOMICITY_LOCK_ID = 41_337;
 
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
@@ -384,12 +392,102 @@ class DBMSProcessorTest {
     }
 
     @Test
+        // [utest->req~shared-database.atomic-metadata-snapshots~1]
+    void setSharedMetaDataIsAtomicAcrossConnections() throws Exception {
+        SequencedMap<String, String> metadata = new LinkedHashMap<>();
+        metadata.put("firstMetadataKey", "first metadata value");
+        metadata.put("secondMetadataKey", "second metadata value");
+
+        DatabaseConnection observerDatabaseConnection = dbmsConnection.openNewConnection();
+        try (Connection observerConnection = observerDatabaseConnection.getConnection();
+             ExecutorService writerExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
+            DBMSProcessor observerProcessor = new DBMSProcessor(observerDatabaseConnection);
+            createMetadataWriteBarrier(observerConnection);
+            acquireMetadataWriteLock(observerConnection);
+            Map<String, String> metadataBeforeWrite = observerProcessor.getSharedMetaData();
+
+            Future<?> writer = writerExecutor.submit(() -> {
+                dbmsProcessor.setSharedMetaData(metadata);
+                return null;
+            });
+
+            try {
+                assertTrue(awaitWriterBlockedOnMetadataWrite(observerConnection));
+                assertEquals(metadataBeforeWrite, observerProcessor.getSharedMetaData());
+            } finally {
+                releaseMetadataWriteLock(observerConnection);
+            }
+
+            writer.get(5, TimeUnit.SECONDS);
+            Map<String, String> expectedMetadata = new HashMap<>(metadataBeforeWrite);
+            expectedMetadata.putAll(metadata);
+            assertEquals(expectedMetadata, observerProcessor.getSharedMetaData());
+        }
+    }
+
+    @Test
     void setSharedMetaDataRemovesObsoleteGroupTree() throws SQLException {
         dbmsProcessor.setSharedMetaData(Map.of(MetaData.GROUPSTREE, "group tree"));
 
         dbmsProcessor.setSharedMetaData(Map.of());
 
         assertFalse(dbmsProcessor.getSharedMetaData().containsKey(MetaData.GROUPSTREE));
+    }
+
+    private static void createMetadataWriteBarrier(Connection connection) throws SQLException {
+        try (var statement = connection.createStatement()) {
+            statement.execute("""
+                    CREATE FUNCTION jabref.pause_second_metadata_write() RETURNS trigger AS $$
+                    BEGIN
+                        IF NEW.key = 'secondMetadataKey' THEN
+                            PERFORM pg_advisory_xact_lock(%d);
+                        END IF;
+                        RETURN NEW;
+                    END;
+                    $$ LANGUAGE plpgsql;
+                    """.formatted(METADATA_ATOMICITY_LOCK_ID));
+            statement.execute("""
+                    CREATE TRIGGER pause_second_metadata_write
+                    BEFORE INSERT OR UPDATE ON jabref.metadata
+                    FOR EACH ROW EXECUTE FUNCTION jabref.pause_second_metadata_write();
+                    """);
+        }
+    }
+
+    private static void acquireMetadataWriteLock(Connection connection) throws SQLException {
+        try (var statement = connection.prepareStatement("SELECT pg_advisory_lock(?)")) {
+            statement.setInt(1, METADATA_ATOMICITY_LOCK_ID);
+            statement.execute();
+        }
+    }
+
+    private static boolean awaitWriterBlockedOnMetadataWrite(Connection connection) throws SQLException, InterruptedException {
+        try (var statement = connection.prepareStatement("""
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM pg_locks
+                    WHERE locktype = 'advisory' AND objid = ? AND NOT granted
+                )
+                """)) {
+            statement.setInt(1, METADATA_ATOMICITY_LOCK_ID);
+            for (int attempt = 0; attempt < 100; attempt++) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    resultSet.next();
+                    if (resultSet.getBoolean(1)) {
+                        return true;
+                    }
+                }
+                Thread.sleep(10);
+            }
+        }
+        return false;
+    }
+
+    private static void releaseMetadataWriteLock(Connection connection) throws SQLException {
+        try (var statement = connection.prepareStatement("SELECT pg_advisory_unlock(?)")) {
+            statement.setInt(1, METADATA_ATOMICITY_LOCK_ID);
+            statement.execute();
+        }
     }
 
     private static Map<String, String> getMetaDataExample() {
