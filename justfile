@@ -2,7 +2,7 @@ set windows-shell := ["powershell"]
 
 [unix]
 ensure-gg-cmd:
-    [ ! -f gg.cmd ] && ( echo "gg.cmd not found — downloading..."; ( command -v wget >/dev/null 2>&1 && wget -O gg.cmd https://ggcmd.io/gg.cmd ) || ( command -v curl >/dev/null 2>&1 && curl -L https://ggcmd.io/gg.cmd -o gg.cmd ) || { echo "Error: neither wget nor curl is installed." >&2; exit 1; } )
+    @[ -f gg.cmd ] || ( echo "gg.cmd not found — downloading..."; ( command -v wget >/dev/null 2>&1 && wget -O gg.cmd https://ggcmd.io/gg.cmd ) || ( command -v curl >/dev/null 2>&1 && curl -L https://ggcmd.io/gg.cmd -o gg.cmd ) || { echo "Error: neither wget nor curl is installed." >&2; exit 1; } )
 
 [unix]
 checkout-pr pr-id: ensure-gg-cmd
@@ -49,7 +49,7 @@ run-jabsrv *FLAGS: ensure-gg-cmd
 
 [windows]
 ensure-gg-cmd:
-    if (-not (Test-Path 'gg.cmd')) { Write-Host 'gg.cmd not found — downloading...'; Invoke-WebRequest 'https://ggcmd.io/gg.cmd' -OutFile 'gg.cmd' }
+    @if (-not (Test-Path 'gg.cmd')) { Write-Host 'gg.cmd not found — downloading...'; Invoke-WebRequest 'https://ggcmd.io/gg.cmd' -OutFile 'gg.cmd' }
 
 [windows]
 checkout-pr pr-id: ensure-gg-cmd
@@ -69,7 +69,7 @@ whats-new *FLAGS: ensure-gg-cmd
 
 [windows]
 run-loop: ensure-gg-cmd
-    while ($true) { git pull --no-rebase; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; just whats-new; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $marker = "$(git rev-parse --absolute-git-dir)/restart-requested"; Remove-Item -ErrorAction Ignore $marker; .\gg.cmd gradle :jabgui:run -PrestartLoop; if ($LASTEXITCODE -ne 0) { Remove-Item -ErrorAction Ignore $marker; exit $LASTEXITCODE }; if (-not (Test-Path $marker)) { break }; Remove-Item $marker }
+    @while ($true) { git pull --no-rebase; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; just whats-new; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $marker = "$(git rev-parse --absolute-git-dir)/restart-requested"; Remove-Item -ErrorAction Ignore $marker; .\gg.cmd gradle :jabgui:run -PrestartLoop; if ($LASTEXITCODE -ne 0) { Remove-Item -ErrorAction Ignore $marker; exit $LASTEXITCODE }; if (-not (Test-Path $marker)) { break }; Remove-Item $marker }
 
 [windows]
 run: ensure-gg-cmd
