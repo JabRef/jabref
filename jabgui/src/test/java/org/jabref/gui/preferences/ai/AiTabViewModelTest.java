@@ -49,6 +49,27 @@ class AiTabViewModelTest {
     }
 
     @Test
+    void settingsEnabledWhenAiEnabledAtConstruction() {
+        AiPreferences aiPreferences = AiPreferences.getDefault();
+        aiPreferences.setAiFeaturesEnabledCurrently(true);
+        aiPreferences.setCustomizeExpertSettings(true);
+        AiPreferences workingAiPreferences = AiPreferences.getDefault();
+        workingAiPreferences.copyFrom(aiPreferences);
+
+        AiTabViewModel enabledViewModel = new AiTabViewModel(
+                aiPreferences,
+                workingAiPreferences,
+                aiModelService,
+                new CurrentThreadTaskExecutor(),
+                embeddingModelMetadataService
+        );
+        enabledViewModel.setValues();
+
+        assertFalse(enabledViewModel.disableBasicSettingsProperty().get());
+        assertFalse(enabledViewModel.disableExpertSettingsProperty().get());
+    }
+
+    @Test
     void maxChunkSizeLabelUpdatesWhenModelSelected() {
         viewModel.selectedEmbeddingModelProperty().set("test-model");
 
@@ -136,5 +157,15 @@ class AiTabViewModelTest {
         viewModel.documentSplitterChunkSizeProperty().set(100);
         assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
         assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().getHighestMessage().isEmpty());
+    }
+
+    @Test
+    void documentSplitterOverlapSizeValidWhenChunkSizeSetAfterOverlapSize() {
+        viewModel.documentSplitterChunkSizeProperty().set(0);
+        viewModel.documentSplitterOverlapSizeProperty().set(100);
+        assertFalse(viewModel.getDocumentSplitterOverlapSizeValidationStatus().isValid());
+
+        viewModel.documentSplitterChunkSizeProperty().set(300);
+        assertTrue(viewModel.getDocumentSplitterOverlapSizeValidationStatus().isValid());
     }
 }
