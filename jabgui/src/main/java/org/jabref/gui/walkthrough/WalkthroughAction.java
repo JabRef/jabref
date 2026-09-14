@@ -183,10 +183,14 @@ public class WalkthroughAction extends SimpleCommand {
                         .position(TooltipPosition.BOTTOM))
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Click on \"%0\" button", addFile))
-                        .content(new TextBlock(Localization.lang("Click \"%0\" to add a PDF file. This opens a dialog where you can enter the file details.", addFile)))
-                        .resolver(NodeResolver.fxId(WalkthroughNodeIds.FILE_ADD_CHIP))
+                        .content(new TextBlock(Localization.lang("Click \"%0\" to add a PDF file. This opens a dialog where you can enter the file details. If the \"File\" field is already shown, click its \"+\" button instead.", addFile)))
+                        // The chip disappears once the File field is shown (e.g. after a revert following a
+                        // linked file), so fall back to the editor's own "+" button, which opens the same dialog.
+                        .resolver(NodeResolver.firstOf(
+                                NodeResolver.fxId(WalkthroughNodeIds.FILE_ADD_CHIP),
+                                NodeResolver.buttonWithGraphicIn(LinkedFilesEditor.class, IconTheme.JabRefIcons.LINKED_FILE_ADD)))
                         .trigger(Trigger.create().withWindowChangeListener().onClick().build())
-                        .position(TooltipPosition.LEFT)
+                        .position(TooltipPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Browse for your PDF file"))
@@ -246,9 +250,9 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Click \"Get fulltext\" to find PDFs automatically"))
                         .content(new TextBlock(Localization.lang("Click the \"Get fulltext\" button (second button with a download icon) to let JabRef automatically search for and download the PDF using online fetchers. This works when your entry has proper metadata like DOI or title.")))
-                        .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.FETCH_FULLTEXT))
+                        .resolver(NodeResolver.buttonWithGraphicIn(LinkedFilesEditor.class, IconTheme.JabRefIcons.FETCH_FULLTEXT))
                         .trigger(Trigger.onClick())
-                        .position(TooltipPosition.LEFT)
+                        .position(TooltipPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Wait for fulltext search to complete"))
@@ -261,9 +265,9 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Click \"Download from URL\" to download from a web link"))
                         .content(new TextBlock(Localization.lang("Click the \"Download from URL\" button (third button with a download icon) to download a PDF directly from a web URL. JabRef will prompt you to enter the URL and then download the file automatically.")))
-                        .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.DOWNLOAD))
+                        .resolver(NodeResolver.buttonWithGraphicIn(LinkedFilesEditor.class, IconTheme.JabRefIcons.DOWNLOAD))
                         .trigger(Trigger.create().withWindowChangeListener().onClick().build())
-                        .position(TooltipPosition.LEFT)
+                        .position(TooltipPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Enter URL for download"))
