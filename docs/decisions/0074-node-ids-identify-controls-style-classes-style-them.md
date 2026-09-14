@@ -11,7 +11,7 @@ The walkthrough highlights individual controls, so each step needs a handle on o
 
 JavaFX offers two handles: the node `id` (`#name`) and style classes (`.name`). Stylesheets used both, and a handful of ids existed purely so `jabref-base.css` could reach a control. An id therefore meant nothing in particular — renaming one for styling reasons could silently break a walkthrough step, and vice versa.
 
-This split was settled inside two bug-fix pull requests without a decision record. This ADR states it and the implications that came with it.
+This split was settled inside two bug-fix pull requests ([#16990](https://github.com/JabRef/jabref/pull/16990) and [#16991](https://github.com/JabRef/jabref/pull/16991)) without a decision record. This ADR states it and the implications that came with it.
 
 ## Decision Drivers
 
