@@ -63,9 +63,7 @@ public interface NodeResolver {
                     if (!(node instanceof ButtonBase button) || !NodeResolver.isVisible(button)) {
                         return false;
                     }
-                    Node graphic = button.getGraphic();
-                    return (graphic instanceof JabRefIconView jabRefIconView) && jabRefIconView.getGlyph() == glyph ||
-                            glyph.matches(graphic);
+                    return containsGlyph(button.getGraphic(), glyph);
                 })
                 .findFirst();
     }
@@ -188,6 +186,11 @@ public interface NodeResolver {
         }
 
         return null;
+    }
+
+    private static boolean containsGlyph(@Nullable Node graphic, IconTheme.JabRefIcons glyph) {
+        return graphic != null && findNode(graphic,
+                node -> (node instanceof JabRefIconView jabRefIconView) && jabRefIconView.getGlyph() == glyph || glyph.matches(node)) != null;
     }
 
     private static boolean isVisible(@Nullable Node node) {

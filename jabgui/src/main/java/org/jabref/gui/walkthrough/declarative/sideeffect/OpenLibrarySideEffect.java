@@ -2,6 +2,7 @@ package org.jabref.gui.walkthrough.declarative.sideeffect;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -134,12 +135,13 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
     }
 
     private Optional<LibraryTab> findLibraryTab() {
-        return tabContainer.getLibraryTabs().stream()
-                           .filter(tab -> WALKTHROUGH_LIBRARY_TEMPLATE
-                                   .formatted(libraryName).equals(tab.getText()) ||
-                                   (tab.getBibDatabaseContext().getDatabasePath().isEmpty() &&
-                                           tab.getBibDatabaseContext().getDatabase().getEntryCount() > 0))
-                           .findFirst();
+        return findWalkthroughLibraryTab(tabContainer.getLibraryTabs(), libraryName);
+    }
+
+    static Optional<LibraryTab> findWalkthroughLibraryTab(Collection<LibraryTab> libraryTabs, String libraryName) {
+        return libraryTabs.stream()
+                          .filter(tab -> WALKTHROUGH_LIBRARY_TEMPLATE.formatted(libraryName).equals(tab.getText()))
+                          .findFirst();
     }
 
     private Optional<BibDatabaseContext> loadExampleLibrary() {
