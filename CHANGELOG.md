@@ -89,7 +89,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We improve startup performance by load citation style sources only when used. [#15962](https://github.com/JabRef/jabref/issues/15962)
 - We changed the default prompts for "AI-Chat" & "Chat with Groups" to better handle etiquette, metadata, citationkeys and context separation. [#16981](https://github.com/JabRef/jabref/pull/16981)
-- We changed the default local embedding model to `intfloat/e5-small-v2` for better passage retrieval. [#17120](https://github.com/JabRef/jabref/pull/17120)
+- We changed the default local embedding model to `intfloat/multilingual-e5-small` for better passage retrieval. [#17120](https://github.com/JabRef/jabref/pull/17120)
 - We redesigned the "About JabRef" dialog. [#16950](https://github.com/JabRef/jabref/pull/16950)
 - We now create the group for imported entries when entries are imported, instead of when a library is opened. [#16988](https://github.com/JabRef/jabref/pull/16988)
 - We removed the keystore fields, the server timezone, and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
