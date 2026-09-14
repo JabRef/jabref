@@ -19,6 +19,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakMapChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -115,6 +116,9 @@ public class AiChatViewModel extends AbstractViewModel {
 
     private List<FullBibEntry> currentEntriesSnapshot = new ArrayList<>();
 
+    // Strong reference: only weakly registered on the entries' field maps
+    private MapChangeListener<Field, String> fileFieldListener;
+
     public AiChatViewModel(
             AiPreferences aiPreferences,
             FilePreferences filePreferences,
@@ -164,15 +168,17 @@ public class AiChatViewModel extends AbstractViewModel {
 
         // Files can be attached while the entry stays the same (e.g. by dropping a PDF into the entry editor),
         // which does not touch the entries list. Re-evaluate when the "file" field of an entry changes.
-        MapChangeListener<Field, String> fileFieldListener = change -> {
+        fileFieldListener = change -> {
             if (change.getKey() == StandardField.FILE) {
                 hasNoFiles.invalidate();
             }
         };
+        // Weak wrapper: entries outlive this view model (e.g. closed group chat windows), so a strong listener would keep it alive
+        WeakMapChangeListener<Field, String> weakFileFieldListener = new WeakMapChangeListener<>(fileFieldListener);
         BindingsHelper.listenToListContentChanges(
                 entries,
-                identifier -> identifier.entry().getFieldsObservable().addListener(fileFieldListener),
-                identifier -> identifier.entry().getFieldsObservable().removeListener(fileFieldListener)
+                identifier -> identifier.entry().getFieldsObservable().addListener(weakFileFieldListener),
+                identifier -> identifier.entry().getFieldsObservable().removeListener(weakFileFieldListener)
         );
 
         BooleanBinding isError = Bindings.createBooleanBinding(() -> {
