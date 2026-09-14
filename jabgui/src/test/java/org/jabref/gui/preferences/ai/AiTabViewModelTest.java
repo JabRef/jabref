@@ -54,16 +54,24 @@ class AiTabViewModelTest {
     }
 
     @Test
-    void basicSettingsEnabledWhenAiAlreadyEnabled() {
+    void settingsEnabledWhenAiEnabledAtConstruction() {
         AiPreferences aiPreferences = AiPreferences.getDefault();
         aiPreferences.setAiFeaturesEnabledCurrently(true);
+        aiPreferences.setCustomizeExpertSettings(true);
         AiPreferences workingAiPreferences = AiPreferences.getDefault();
-        workingAiPreferences.setAiFeaturesEnabledCurrently(true);
+        workingAiPreferences.copyFrom(aiPreferences);
 
-        AiTabViewModel enabledViewModel = new AiTabViewModel(aiPreferences, workingAiPreferences, aiModelService, new CurrentThreadTaskExecutor(), embeddingModelMetadataService);
+        AiTabViewModel enabledViewModel = new AiTabViewModel(
+                aiPreferences,
+                workingAiPreferences,
+                aiModelService,
+                new CurrentThreadTaskExecutor(),
+                embeddingModelMetadataService
+        );
         enabledViewModel.setValues();
 
         assertFalse(enabledViewModel.disableBasicSettingsProperty().get());
+        assertFalse(enabledViewModel.disableExpertSettingsProperty().get());
     }
 
     @Test
