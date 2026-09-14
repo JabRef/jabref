@@ -532,7 +532,6 @@ public class NewEntryViewModel {
                       .onFailure(this::showInterpretCitationsFailure)
                       .executeWith(taskExecutor);
 
-        dialogService.notify(Localization.lang("Parsing citations with LLM"));
         executedSuccessfully.set(true);
     }
 
