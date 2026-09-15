@@ -204,6 +204,33 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void doubleClickSelectsWord() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setPlainText("hello world");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        JavaFxExtension.invokeAndWait(() -> {
+            Bounds bounds = firstTextBounds(textFlow);
+            Robot robot = new Robot();
+            robot.mouseMove(bounds.getMinX() + 3, bounds.getMinY() + (bounds.getHeight() / 2));
+            robot.mouseClick(MouseButton.PRIMARY);
+            robot.mouseClick(MouseButton.PRIMARY);
+        });
+        interact(() -> {
+            assertTrue(textFlow.isSelectionActive());
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("hello", clipBoardManager.stringContent.get());
+    }
+
+    @Test
     void hyperlinkHandlerDefaultsToNonNull() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
