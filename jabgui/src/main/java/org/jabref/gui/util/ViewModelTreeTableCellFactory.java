@@ -82,7 +82,7 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
                         setGraphic(toGraphic.call(viewModel));
                     }
                     if (toTooltip != null) {
-                        @Nullable String tooltip = toTooltip.call(viewModel);
+                        String tooltip = toTooltip.call(viewModel);
                         if (StringUtil.isNotBlank(tooltip)) {
                             setTooltip(new Tooltip(tooltip));
                         } else {
