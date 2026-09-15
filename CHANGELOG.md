@@ -24,7 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a "Normalize keyword delimiters" cleanup and save action that rewrites keyword fields to the keyword separator of the library. [#16835](https://github.com/JabRef/jabref/pull/16835)
 - We added a "Commit and push" button which allows to commit and then push in one go for Git operations. [#16339](https://github.com/JabRef/jabref/issues/16339)
 - We added a progress spinner and status indicator to the "Enter Identifier" tab in the New Entry dialog. [#16756](https://github.com/JabRef/jabref/issues/16756)
-- Users can center the selected entry using the View menu or shortcut, as far as table boundaries allow. [#16658](https://github.com/JabRef/jabref/issues/16658)
+- We added centering for the selected entry via the View menu or shortcut, within table boundaries. [#16658](https://github.com/JabRef/jabref/issues/16658)
 - We added the option to close and reopen the PDF preview in the unlinked files dialog. [#16159](https://github.com/JabRef/jabref/issues/16159)
 - We added support for bibliography-defined ordering of numeric CSL styles in the LibreOffice integration. [#16692](https://github.com/JabRef/jabref/pull/16692)
 - We added a new "Primer" theme, based on [AtlantaFX](https://mkpaz.github.io/atlantafx/)'s Primer theme. [#15625](https://github.com/JabRef/jabref/issues/15625)
