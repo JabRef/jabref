@@ -23,8 +23,19 @@ class OpenLibrarySideEffectTest {
         when(walkthroughLibrary.getText()).thenReturn("Example Library (Chocolate.bib)");
 
         Optional<LibraryTab> foundLibrary = OpenLibrarySideEffect.findWalkthroughLibraryTab(
-                List.of(untitledLibrary, walkthroughLibrary), "Chocolate.bib");
+                List.of(untitledLibrary, walkthroughLibrary), null, "Chocolate.bib");
 
         assertEquals(Optional.of(walkthroughLibrary), foundLibrary);
+    }
+
+    @Test
+    void findsCreatedWalkthroughLibraryAfterItsTitleChanges() {
+        LibraryTab createdLibrary = mock(LibraryTab.class);
+        when(createdLibrary.getText()).thenReturn("untitled");
+
+        Optional<LibraryTab> foundLibrary = OpenLibrarySideEffect.findWalkthroughLibraryTab(
+                List.of(createdLibrary), createdLibrary, "Chocolate.bib");
+
+        assertEquals(Optional.of(createdLibrary), foundLibrary);
     }
 }

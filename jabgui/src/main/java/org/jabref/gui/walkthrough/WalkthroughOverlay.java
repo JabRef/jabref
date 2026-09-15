@@ -86,9 +86,22 @@ public class WalkthroughOverlay {
     public void detachAll() {
         cleanUp();
         reverter.revertAll();
+        detachOverlays();
+    }
+
+    public void detachWithoutReverting() {
+        cleanUp();
+        detachOverlays();
+    }
+
+    private void detachOverlays() {
         highlighter.detachAll();
         overlays.values().forEach(WindowOverlay::detach);
         overlays.clear();
+    }
+
+    public void revertToPreviousStep() {
+        reverter.findAndUndo();
     }
 
     public void showQuitConfirmationAndQuit() {

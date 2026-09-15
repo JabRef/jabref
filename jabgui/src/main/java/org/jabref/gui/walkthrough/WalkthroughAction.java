@@ -29,6 +29,7 @@ import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
 import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
+import org.jabref.gui.walkthrough.declarative.sideeffect.EnsureMainTabVisibleSideEffect;
 import org.jabref.gui.walkthrough.declarative.sideeffect.EnsureSearchSettingsSideEffect;
 import org.jabref.gui.walkthrough.declarative.sideeffect.OpenLibrarySideEffect;
 import org.jabref.gui.walkthrough.declarative.sideeffect.OpenPreferencesSideEffect;
@@ -151,6 +152,8 @@ public class WalkthroughAction extends SimpleCommand {
                 // Setup: Open example library and welcome user
                 .addStep(WalkthroughStep.sideEffect(Localization.lang("Open Example Library"))
                                         .sideEffect(new OpenLibrarySideEffect(frame)))
+                .addStep(WalkthroughStep.sideEffect(Localization.lang("Main"))
+                                        .sideEffect(new EnsureMainTabVisibleSideEffect(preferences.getEntryEditorPreferences())))
                 .addStep(WalkthroughStep
                         .panel(Localization.lang("Welcome to PDF linking walkthrough"))
                         .content(new TextBlock(Localization.lang("This walkthrough will guide you through how to link your PDF files with JabRef. We've opened an example library so you can see how this feature works with actual bibliography entries.")))
