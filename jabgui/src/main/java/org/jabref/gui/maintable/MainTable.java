@@ -240,7 +240,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enlarging the entry editor shrinks the table; keep the edited entry visible as the lowest row instead of hiding it
         heightProperty().addListener((_, oldHeight, newHeight) -> {
-            if (newHeight.doubleValue() < oldHeight.doubleValue() && stateManager.getEditorShowing().get()) {
+            if (newHeight.doubleValue() < oldHeight.doubleValue()) {
                 Platform.runLater(this::scrollFirstSelectedIntoView);
             }
         });
@@ -400,7 +400,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private <T extends IndexedCell<?>> void scrollFirstSelectedIntoView(@Nullable VirtualFlow<T> flow) {
-        if (flow == null || getSelectionModel().isEmpty()) {
+        // Checked when the queued callback runs, so closing the editor in between leaves the table alone
+        if (flow == null || !stateManager.getEditorShowing().get() || getSelectionModel().isEmpty()) {
             return;
         }
         int index = getSelectionModel().getSelectedIndices().getFirst();
