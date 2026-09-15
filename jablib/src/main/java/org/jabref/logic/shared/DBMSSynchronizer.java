@@ -941,10 +941,21 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.dbmsConnection = connection;
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
-        this.dbmsProcessor = new DBMSProcessor(connection);
-        this.notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
-        this.offlineChanges = OfflineChanges.load(offlineChangesDirectory, connection.getProperties());
-        initializeDatabases();
+        boolean initialized = false;
+        try {
+            this.dbmsProcessor = new DBMSProcessor(connection);
+            this.notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
+            this.offlineChanges = OfflineChanges.load(offlineChangesDirectory, connection.getProperties());
+            initializeDatabases();
+            initialized = true;
+        } finally {
+            if (!initialized) {
+                // closeSharedDatabase ignores a synchronizer that never finished opening, so a failed attempt has to
+                // release its connection and listener here; otherwise every retry leaves one of each behind
+                Optional.ofNullable(dbmsProcessor).ifPresent(DBMSProcessor::stopNotificationListener);
+                closeQuietly(currentConnection);
+            }
+        }
         sharedDatabaseOpen = true;
     }
 
