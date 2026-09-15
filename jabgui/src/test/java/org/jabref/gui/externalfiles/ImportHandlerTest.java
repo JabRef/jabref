@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
@@ -29,14 +30,19 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
@@ -47,6 +53,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ImportHandlerTest {
@@ -97,6 +105,40 @@ class ImportHandlerTest {
         testEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Test2023")
                 .withField(StandardField.AUTHOR, "Test Author");
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true, false", "false, true"})
+    void downloadOverrideControlsDownloadsWithoutChangingWebSearch(boolean choice, boolean webSearchChoice) {
+        when(preferences.getFilePreferences().shouldDownloadLinkedFiles()).thenReturn(webSearchChoice);
+        if (choice) {
+            importHandler.enableLinkedFileDownloads();
+        } else {
+            importHandler.disableLinkedFileDownloads();
+        }
+        BibEntry entry = new BibEntry().withFiles(List.of(new LinkedFile("", "https://example.org/paper.pdf", "PDF")));
+
+        try (MockedConstruction<LinkedFileViewModel> downloads = mockConstruction(LinkedFileViewModel.class)) {
+            importHandler.downloadLinkedFiles(entry);
+
+            assertEquals(choice ? 1 : 0, downloads.constructed().size());
+            downloads.constructed().forEach(download -> verify(download).download(Mockito.eq(false), any()));
+        }
+        verify(preferences.getFilePreferences(), Mockito.never()).setDownloadLinkedFiles(Mockito.anyBoolean());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void downloadsUseWebSearchPreferenceWithoutOverride(boolean choice) {
+        when(preferences.getFilePreferences().shouldDownloadLinkedFiles()).thenReturn(choice);
+        BibEntry entry = new BibEntry().withFiles(List.of(new LinkedFile("", "https://example.org/paper.pdf", "PDF")));
+
+        try (MockedConstruction<LinkedFileViewModel> downloads = mockConstruction(LinkedFileViewModel.class)) {
+            importHandler.downloadLinkedFiles(entry);
+
+            assertEquals(choice ? 1 : 0, downloads.constructed().size());
+            downloads.constructed().forEach(download -> verify(download).download(Mockito.eq(false), any()));
+        }
     }
 
     @Test

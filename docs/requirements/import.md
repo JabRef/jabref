@@ -41,4 +41,12 @@ A file that parses with warnings is not affected: it still opens, and its warnin
 
 Needs: impl, utest
 
+## Remember the import dialog's download choice
+`req~import.dialog.download-linked-files~1`
+
+The import dialog remembers whether to download referenced files, including after restarting JabRef.
+Confirming an import saves the choice and applies it to that import; canceling leaves the saved choice unchanged.
+The choice is independent of the automatic download setting in Preferences > Web search and is only shown in the import dialog.
+On upgrade, the existing web search setting initializes the dialog preference once, preserving the previous default for existing users.
+
 <!-- markdownlint-disable-file MD022 -->
