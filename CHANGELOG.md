@@ -140,7 +140,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the full text document search to run as a cancelable background task instead of blocking JabRef with a modal dialog. [#16831](https://github.com/JabRef/jabref/pull/16831)
 - We changed [remote SQL database](https://docs.jabref.org/collaborative-work/sqldatabase) synchronization to PostgreSQL-only with live updates; existing database tables are migrated. [#11232](https://github.com/JabRef/jabref/issues/11232)
 - We moved the Git settings into their own preferences tab. [#12630](https://github.com/JabRef/jabref/issues/12630)
-- We moved the "Specified keywords" option in the group dialog next to "Searching for a keyword". [#17166](https://github.com/JabRef/jabref/pull/17166)
+- We changed the group dialog to list "Specified keywords" directly after "Searching for a keyword". [#17166](https://github.com/JabRef/jabref/pull/17166)
 - "Get fulltext", groups "Attach file", "Attach file from URL", "Open folder(s)" and "Open file" commands in right click menu have been moved into a "More file operations..." submenu. [#16829](https://github.com/JabRef/jabref/pull/16829)
 - We changed the logging during full-text search indexing to identify which linked files cause errors. [#15680](https://github.com/JabRef/jabref/issues/15680)
 - We unified the Button style. All Buttons have rounded corners, a hover, pressed and focused color. [#16980](https://github.com/JabRef/jabref/pull/16980)
