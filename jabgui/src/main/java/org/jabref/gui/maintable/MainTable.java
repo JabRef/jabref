@@ -240,7 +240,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enlarging the entry editor shrinks the table; keep the edited entry visible as the lowest row instead of hiding it
         heightProperty().addListener((_, oldHeight, newHeight) -> {
-            if (newHeight.doubleValue() < oldHeight.doubleValue()) {
+            if (newHeight.doubleValue() < oldHeight.doubleValue() && stateManager.getEditorShowing().get()) {
                 Platform.runLater(this::scrollFirstSelectedIntoView);
             }
         });
