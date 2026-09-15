@@ -50,6 +50,10 @@ public final class Spotlight extends BaseWindowEffect {
     public void transitionTo(@NonNull Node newNode) {
         Shape overlayShape = this.overlayShape;
         if (overlayShape == null || !overlayShape.isVisible()) {
+            // The effect was hidden (e.g. target off-screen in a small window); rebuild it on the new target
+            if (node != null) {
+                detach();
+            }
             attach(newNode);
             return;
         }
