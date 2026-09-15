@@ -174,6 +174,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             }
             dialogService.notify(Localization.lang("Auto-detection of %0 path failed", engineSelectionName));
         });
+        autoDetectTask.showsFailureToUser();
         taskExecutor.execute(autoDetectTask);
     }
 

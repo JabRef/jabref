@@ -94,6 +94,8 @@ public interface StateManager extends SrvStateManager {
 
     void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task);
 
+    Optional<BackgroundTask<?>> getBackgroundTask(Task<?> task);
+
     EasyBinding<Boolean> getAnyTasksThatWillNotBeRecoveredRunning();
 
     DialogWindowState getDialogWindowState(String className);

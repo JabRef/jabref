@@ -245,7 +245,8 @@ public class JabRefGUI extends Application {
             while (change.next()) {
                 if (change.wasAdded()) {
                     for (Task<?> task : change.getAddedSubList()) {
-                        dialogService.notify(new Notifications.TaskNotification(task));
+                        stateManager.getBackgroundTask(task).ifPresent(backgroundTask ->
+                                dialogService.notify(new Notifications.TaskNotification(task, backgroundTask)));
                     }
                 }
             }
