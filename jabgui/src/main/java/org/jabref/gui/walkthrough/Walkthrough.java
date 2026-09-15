@@ -223,5 +223,4 @@ public class Walkthrough {
             return new Walkthrough(stateManager, steps);
         }
     }
-
 }
