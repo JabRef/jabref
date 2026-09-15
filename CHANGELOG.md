@@ -130,6 +130,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the example entry for empty libraries to include the citation key `JabRef2023`. [#17113](https://github.com/JabRef/jabref/pull/17113)
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
 - We reworked the entry editor tab preferences into a two-column "Tabs"/"Fields" editor supporting reordering, custom tabs, and regular expressions as field names. [#15998](https://github.com/JabRef/jabref/pull/15998). [#16594](https://github.com/JabRef/jabref/issues/16594)
+- We changed the main table to keep the entry shown in the entry editor visible when enlarging the entry editor. [#17167](https://github.com/JabRef/jabref/pull/17167)
 - We extended library pseudonymization to also pseudonymize group names, not just the entries. [#14117](https://github.com/JabRef/jabref/issues/14117)
 - We introduced a leightweight search engine without fulltext search in linked files as default variant. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - We moved arXiv handling out of the DOI cleanup into the dedicated "arXiv DOI" cleanup. [#16033](https://github.com/JabRef/jabref/pull/16033)
