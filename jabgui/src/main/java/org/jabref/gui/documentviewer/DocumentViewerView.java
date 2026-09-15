@@ -56,6 +56,12 @@ public class DocumentViewerView extends BaseDialog<Void> {
         });
     }
 
+    /// The viewer is a heavy-weight component. [impl->req~ux.dialogs.escape-closes~1]
+    @Override
+    protected boolean closesOnEscape() {
+        return false;
+    }
+
     @FXML
     private void initialize() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);

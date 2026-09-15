@@ -96,6 +96,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed undo and redo to name the step they take back instead of only saying "Undo". [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We changed undo in the entry editor to take back the last typed word instead of one character. [#16988](https://github.com/JabRef/jabref/pull/16988)
 - We moved zotero-related settings from openoffice panel to openoffice/libreoffice preference tab. [#16352](https://github.com/JabRef/jabref/issues/16352)
+- We changed the document viewer to stay open when <kbd>Escape</kbd> is pressed. [#17175](https://github.com/JabRef/jabref/pull/17175)
 - We changed the default size of the "New Entry" dialog to improve visibility. [#11589](https://github.com/JabRef/jabref/issues/11589)
 - We changed the default macOS shortcuts for "Search document identifier online" and "Focus group list" to not insert special characters. [#16528](https://github.com/JabRef/jabref/issues/16528)
 - We changed the extension of backup files from `.bak` to `.bib`, so that they can be opened in JabRef. [#11454](https://github.com/JabRef/jabref/issues/11454)

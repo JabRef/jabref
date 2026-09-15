@@ -92,6 +92,15 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+## Pressing Escape closes the dialog
+`req~ux.dialogs.escape-closes~1`
+
+Pressing Escape in a dialog closes it.
+Heavy-weight dialogs whose content the user builds up over time are exempt, so that a stray key press does not throw that state away.
+Currently, this is only the PDF viewer ("Document viewer").
+
+Needs: impl, utest
+
 ## Pressing Escape when a combo box popup is open closes only the combo box
 `req~ux.combobox.escape-closes-popup-only~1`
 
