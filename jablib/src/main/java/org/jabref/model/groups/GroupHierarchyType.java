@@ -32,7 +32,7 @@ public enum GroupHierarchyType {
     public static GroupHierarchyType safeValueOf(String name) {
         try {
             return GroupHierarchyType.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return INDEPENDENT;
         }
     }
