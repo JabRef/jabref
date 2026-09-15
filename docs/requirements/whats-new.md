@@ -17,7 +17,7 @@ Needs: impl, utest
 ## Attribute an entry to the author of its pull request
 `req~whats-new.pull-request-author~1`
 
-An entry whose text links a GitHub pull request or issue is listed under the author of that pull request, or of the merged pull request that fixed the issue, instead of under whoever typed the changelog line; the last link of an entry counts.
+An entry whose text links a GitHub pull request or issue is listed under the author of that pull request, or of the merged pull request that fixed the issue, or, while none is merged, of the open pull request referencing the issue, instead of under whoever typed the changelog line; the last link of an entry counts.
 The developer's own GitHub login comes from `github.user`, the token's user, or a public profile email matching `user.email`.
 Answers are kept in the checkout's git directory and each look asks GitHub only a bounded number of times, so the anonymous rate limit suffices; without a link, without network or beyond that bound, the entry keeps its `git blame` attribution.
 

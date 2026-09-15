@@ -32,12 +32,13 @@ import org.slf4j.LoggerFactory;
 ///
 /// `git blame` tells who typed an entry, which is wrong once a maintainer rewords or moves somebody else's entry.
 /// Nearly every entry ends with a link to its pull request or its issue; an issue is followed to the merged pull
-/// request that fixed it. What cannot be resolved (no link, offline, rate limited, no merged pull request) keeps
-/// the attribution of the blame.
+/// request that fixed it, or, while none is merged yet (on `experimental`, pull requests land before they are merged
+/// upstream), to the open pull request referencing it. What cannot be resolved (no link, offline, rate limited, no
+/// pull request) keeps the attribution of the blame.
 ///
 /// GitHub answers 60 anonymous requests an hour, so the answers are kept in the checkout's git directory, and one
-/// look sends at most [#REQUESTS_PER_LOOK] requests. The author of a pull request never changes; an issue without
-/// a fixing pull request is asked again after [#RETRY_UNRESOLVED].
+/// look sends at most [#REQUESTS_PER_LOOK] requests. The author of a merged pull request never changes; an issue
+/// without one is asked again after [#RETRY_UNRESOLVED].
 // [impl->req~whats-new.pull-request-author~1]
 public final class PullRequestAuthors {
 
@@ -62,8 +63,18 @@ public final class PullRequestAuthors {
         }
     }
 
-    /// A lookup's result: the author, or none when GitHub knows none, as of `resolvedAt`.
-    private record Answer(Optional<String> login, Instant resolvedAt) {
+    /// A lookup's result as of `resolvedAt`: the author, or none when GitHub knows none; `settled` once a merged
+    /// pull request tells the author for good, an open one may still be closed unmerged.
+    private record Answer(Optional<String> login, Instant resolvedAt, boolean settled) {
+        static final String PROVISIONAL = "open";
+
+        Answer(Optional<String> login, boolean settled) {
+            this(login, Instant.now(), settled && login.isPresent());
+        }
+
+        boolean valid() {
+            return settled || resolvedAt.plus(RETRY_UNRESOLVED).isAfter(Instant.now());
+        }
     }
 
     /// The look ran out of requests, or GitHub cannot be asked: the link stays unresolved and is not remembered.
@@ -129,12 +140,13 @@ public final class PullRequestAuthors {
             Optional<String> login = Optional.empty();
             if (link.isPresent()) {
                 @Nullable Answer known = answers.get(link.get().key());
-                if (known != null && (known.login().isPresent() || known.resolvedAt().plus(RETRY_UNRESOLVED).isAfter(Instant.now()))) {
+                if (known != null && known.valid()) {
                     login = known.login();
                 } else {
                     try {
-                        login = resolve(link.get());
-                        answers.put(link.get().key(), new Answer(login, Instant.now()));
+                        Answer answer = resolve(link.get());
+                        login = answer.login();
+                        answers.put(link.get().key(), answer);
                         learned = true;
                     } catch (NotAsked | JSONException _) {
                         // Blame it is, this time.
@@ -166,18 +178,20 @@ public final class PullRequestAuthors {
 
     /// The pull request's author; for an issue, the author of the pull request that closed it: of the merged pull
     /// requests referencing the issue, the one merged last up to [#CLOSED_BY_MERGE] after the issue was closed.
-    /// A pull request merged later only mentions the issue, and an issue never closed was fixed by nobody yet.
-    private Optional<String> resolve(Link link) throws NotAsked {
+    /// A pull request merged later only mentions the issue. Without such a pull request, the author of the open pull
+    /// request referencing the issue updated last, provisionally; an issue nobody works on was fixed by nobody yet.
+    private Answer resolve(Link link) throws NotAsked {
         Optional<JSONObject> issue = get(link.issuePath()).map(JSONObject::new);
         if (issue.isEmpty()) {
-            return Optional.empty();
+            return new Answer(Optional.empty(), false);
         }
         if (issue.get().has("pull_request")) {
-            return login(issue.get());
+            return new Answer(login(issue.get()), true);
         }
         record Merged(Instant at, String login) {
         }
         List<Merged> merged = new ArrayList<>();
+        List<Merged> open = new ArrayList<>();
         Optional<Instant> closed = Optional.empty();
         JSONArray timeline = get(link.issuePath() + "/timeline?per_page=100").map(JSONArray::new).orElseGet(JSONArray::new);
         for (int i = 0; i < timeline.length(); i++) {
@@ -186,8 +200,13 @@ public final class PullRequestAuthors {
             if ("cross-referenced".equals(kind)) {
                 Optional.ofNullable(event.optJSONObject("source"))
                         .map(source -> source.optJSONObject("issue"))
-                        .ifPresent(source -> mergedAt(source.optJSONObject("pull_request"))
-                                .ifPresent(at -> login(source).ifPresent(author -> merged.add(new Merged(at, author)))));
+                        .filter(source -> source.has("pull_request"))
+                        .ifPresent(source -> login(source).ifPresent(author -> {
+                            mergedAt(source.optJSONObject("pull_request")).ifPresent(at -> merged.add(new Merged(at, author)));
+                            if ("open".equals(source.optString("state", ""))) {
+                                instant(source, "updated_at").ifPresent(at -> open.add(new Merged(at, author)));
+                            }
+                        }));
             } else if ("closed".equals(kind)) {
                 closed = instant(event, "created_at");
                 if (!event.isNull("commit_id")) {
@@ -200,14 +219,15 @@ public final class PullRequestAuthors {
                 }
             }
         }
-        if (closed.isEmpty()) {
-            return Optional.empty();
+        Optional<String> fixedBy = closed.map(at -> at.plus(CLOSED_BY_MERGE))
+                                         .flatMap(latestFix -> merged.stream()
+                                                                     .filter(candidate -> !candidate.at().isAfter(latestFix))
+                                                                     .max(Comparator.comparing(Merged::at))
+                                                                     .map(Merged::login));
+        if (fixedBy.isPresent()) {
+            return new Answer(fixedBy, true);
         }
-        Instant latestFix = closed.get().plus(CLOSED_BY_MERGE);
-        return merged.stream()
-                     .filter(candidate -> !candidate.at().isAfter(latestFix))
-                     .max(Comparator.comparing(Merged::at))
-                     .map(Merged::login);
+        return new Answer(open.stream().max(Comparator.comparing(Merged::at)).map(Merged::login), false);
     }
 
     /// My GitHub login: `github.user`, else the token's user, else the one user whose public email is `user.email`.
@@ -278,9 +298,11 @@ public final class PullRequestAuthors {
         try {
             if (Files.exists(file)) {
                 for (String line : Files.readAllLines(file)) {
-                    String[] fields = line.split(FIELD_SEPARATOR, 3);
-                    if (fields.length == 3) {
-                        answers.put(fields[0], new Answer(Optional.of(fields[1]).filter(login -> !login.isEmpty()), Instant.parse(fields[2])));
+                    String[] fields = line.split(FIELD_SEPARATOR, 4);
+                    if (fields.length >= 3) {
+                        Optional<String> login = Optional.of(fields[1]).filter(value -> !value.isEmpty());
+                        boolean settled = login.isPresent() && !(fields.length == 4 && Answer.PROVISIONAL.equals(fields[3]));
+                        answers.put(fields[0], new Answer(login, Instant.parse(fields[2]), settled));
                     }
                 }
             }
@@ -293,7 +315,11 @@ public final class PullRequestAuthors {
     private void write(Map<String, Answer> answers) {
         try (Writer writer = new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
             for (Map.Entry<String, Answer> answer : answers.entrySet()) {
-                writer.write(String.join(FIELD_SEPARATOR, answer.getKey(), answer.getValue().login().orElse(""), answer.getValue().resolvedAt().toString()));
+                Answer value = answer.getValue();
+                writer.write(String.join(FIELD_SEPARATOR, answer.getKey(), value.login().orElse(""), value.resolvedAt().toString()));
+                if (value.login().isPresent() && !value.settled()) {
+                    writer.write(FIELD_SEPARATOR + Answer.PROVISIONAL);
+                }
                 writer.write(System.lineSeparator());
             }
         } catch (IOException e) {
