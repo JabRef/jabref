@@ -49,7 +49,6 @@ public class WalkthroughOverlay {
         this.stage = stage;
         this.walkthrough = walkthrough;
         this.highlighter = new WalkthroughHighlighter();
-        this.highlighter.setOnBackgroundClick(this::showQuitConfirmationAndQuit);
         this.sideEffectExecutor = new SideEffectExecutor();
         this.reverter = new WalkthroughReverter(walkthrough, stage, sideEffectExecutor);
     }
