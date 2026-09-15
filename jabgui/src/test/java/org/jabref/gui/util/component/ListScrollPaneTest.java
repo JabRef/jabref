@@ -8,10 +8,12 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.testutils.JavaFxTest;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 class ListScrollPaneTest extends JavaFxTest {
     private ListScrollPane<String> scrollPane;
 
@@ -38,6 +40,30 @@ class ListScrollPaneTest extends JavaFxTest {
         interact(() -> scrollPane.setVvalue(0.4));
 
         interact(() -> scrollPane.setItems(second));
+        awaitEvents();
+        assertEquals(1.0, scrollPane.getVvalue(), 0.001);
+
+        interact(() -> scrollPane.setItems(first));
+        awaitEvents();
+        assertEquals(0.4, scrollPane.getVvalue(), 0.001);
+    }
+
+    @Test
+    void switchingAgainBeforeRestoreKeepsSavedPosition() {
+        ObservableList<String> first = FXCollections.observableArrayList("a", "b", "c", "d", "e");
+        ObservableList<String> second = FXCollections.observableArrayList("x", "y", "z");
+
+        interact(() -> scrollPane.setItems(first));
+        awaitEvents();
+        interact(() -> scrollPane.setVvalue(0.4));
+        interact(() -> scrollPane.setItems(second));
+        awaitEvents();
+
+        // Switch back and away again without letting the deferred restore run
+        interact(() -> {
+            scrollPane.setItems(first);
+            scrollPane.setItems(second);
+        });
         awaitEvents();
         assertEquals(1.0, scrollPane.getVvalue(), 0.001);
 

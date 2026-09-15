@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javafx.application.Platform;
@@ -135,25 +136,33 @@ public class ListScrollPane<T> extends ScrollPane {
             }
             contentContainer.getChildren().setAll(nodes);
 
-            Double savedPosition = scrollPositions.remove(list);
-            if (savedPosition != null) {
-                scrollTo(savedPosition);
-            } else if (isAutoScrollToBottom()) {
-                scrollToBottom();
-            }
+            Optional.ofNullable(scrollPositions.remove(list)).ifPresentOrElse(
+                    savedPosition -> scrollTo(list, savedPosition),
+                    () -> {
+                        if (isAutoScrollToBottom()) {
+                            scrollToBottom();
+                        }
+                    });
         }
     }
 
     public void scrollToBottom() {
-        scrollTo(1.0);
+        scrollTo(getItems(), 1.0);
     }
 
-    private void scrollTo(double vvalue) {
+    private void scrollTo(ObservableList<T> list, double vvalue) {
         // A single Platform.runLater fires before JavaFX's layout pass, so the
         // content height may not yet reflect the newly added nodes.
         // Using a double-runLater ensures we set the vvalue AFTER the layout
         // pass in the intermediate pulse has computed the final content height.
-        Platform.runLater(() -> Platform.runLater(() -> setVvalue(vvalue)));
+        Platform.runLater(() -> Platform.runLater(() -> {
+            if (getItems() == list) {
+                setVvalue(vvalue);
+            } else {
+                // The list was switched before the scroll happened: keep the position for its next display
+                scrollPositions.put(list, vvalue);
+            }
+        }));
     }
 
     public final ObservableList<T> getItems() {
