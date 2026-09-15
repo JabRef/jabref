@@ -136,7 +136,7 @@ public final class PullRequestAuthors {
                         login = resolve(link.get());
                         answers.put(link.get().key(), new Answer(login, Instant.now()));
                         learned = true;
-                    } catch (NotAsked | JSONException e) {
+                    } catch (NotAsked | JSONException _) {
                         // Blame it is, this time.
                     }
                 }
@@ -233,7 +233,7 @@ public final class PullRequestAuthors {
             }
             myLogin = login;
             return login;
-        } catch (NotAsked | JSONException e) {
+        } catch (NotAsked | JSONException _) {
             return Optional.empty();
         }
     }
@@ -268,7 +268,7 @@ public final class PullRequestAuthors {
         }
         try {
             return Optional.of(Instant.parse(object.optString(key, "")));
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException _) {
             return Optional.empty();
         }
     }
