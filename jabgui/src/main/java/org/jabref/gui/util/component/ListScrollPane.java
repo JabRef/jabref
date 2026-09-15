@@ -1,7 +1,9 @@
 package org.jabref.gui.util.component;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import javafx.application.Platform;
@@ -36,6 +38,10 @@ public class ListScrollPane<T> extends ScrollPane {
 
     private final ListChangeListener<T> listContentListener = this::handleListContentChange;
 
+    /// Scroll position per list instance, so switching back to a previously shown list restores where the user was.
+    /// Keyed by identity: the AI chat history cache hands out one list instance per entry.
+    private final Map<ObservableList<T>, Double> scrollPositions = new IdentityHashMap<>();
+
     public ListScrollPane() {
         this.contentContainer = new VBox();
         this.contentContainer.setFillWidth(true);
@@ -61,6 +67,7 @@ public class ListScrollPane<T> extends ScrollPane {
 
             if (oldList != null) {
                 oldList.removeListener(listContentListener);
+                scrollPositions.put(oldList, getVvalue());
             }
 
             contentContainer.getChildren().clear();
@@ -128,18 +135,25 @@ public class ListScrollPane<T> extends ScrollPane {
             }
             contentContainer.getChildren().setAll(nodes);
 
-            if (isAutoScrollToBottom()) {
+            Double savedPosition = scrollPositions.remove(list);
+            if (savedPosition != null) {
+                scrollTo(savedPosition);
+            } else if (isAutoScrollToBottom()) {
                 scrollToBottom();
             }
         }
     }
 
     public void scrollToBottom() {
+        scrollTo(1.0);
+    }
+
+    private void scrollTo(double vvalue) {
         // A single Platform.runLater fires before JavaFX's layout pass, so the
-        // content height may not yet reflect the newly added node.
-        // Using a double-runLater ensures we set vvalue=1.0 AFTER the layout
+        // content height may not yet reflect the newly added nodes.
+        // Using a double-runLater ensures we set the vvalue AFTER the layout
         // pass in the intermediate pulse has computed the final content height.
-        Platform.runLater(() -> Platform.runLater(() -> setVvalue(1.0)));
+        Platform.runLater(() -> Platform.runLater(() -> setVvalue(vvalue)));
     }
 
     public final ObservableList<T> getItems() {
