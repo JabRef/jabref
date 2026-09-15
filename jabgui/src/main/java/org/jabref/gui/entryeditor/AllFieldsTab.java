@@ -54,6 +54,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.NodeTraversalUtils;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -640,6 +641,9 @@ public class AllFieldsTab extends FieldsEditorTab {
     private Button createAddChip(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Button chip = new Button(Localization.lang("+ %0", FieldsUtil.getDisplayName(field)));
         chip.getStyleClass().addAll("all-fields-add-chip", "padding-4-12");
+        if (StandardField.FILE == field) {
+            chip.setId(WalkthroughNodeIds.FILE_ADD_CHIP);
+        }
         chip.setOnAction(_ -> showFieldEditor(bibDatabaseContext, entry, field));
         return chip;
     }
