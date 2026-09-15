@@ -56,7 +56,15 @@ class ImportEntriesViewModelTest {
             viewModel.importEntries(entries, choice);
 
             assertEquals(1, handlers.constructed().size());
-            verify(handlers.constructed().getFirst()).setDownloadLinkedFilesOverride(choice);
+            ImportHandler importHandler = handlers.constructed().getFirst();
+
+        if (choice) {
+            verify(importHandler).enableLinkedFileDownloads();
+        } else {
+            verify(importHandler).disableLinkedFileDownloads();
+        }
+
+verify(importHandler).importEntriesWithDuplicateCheck(isNull(), eq(entries), any());
             verify(handlers.constructed().getFirst()).importEntriesWithDuplicateCheck(isNull(), eq(entries), any());
         }
         assertEquals(choice, files.shouldImportDialogDownloadLinkedFiles());
