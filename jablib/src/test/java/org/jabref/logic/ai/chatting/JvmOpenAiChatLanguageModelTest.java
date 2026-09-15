@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @NullMarked
 class JvmOpenAiChatLanguageModelTest {
 
+    // [utest->req~ai.llms.base-url-redacted~1]
     @Test
     @Timeout(30)
     void connectionFailureNamesBaseUrlAndReason() {

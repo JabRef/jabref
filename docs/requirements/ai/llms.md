@@ -66,4 +66,11 @@ User needs to point the client to their specific local server address (e.g., `lo
 
 Needs: impl
 
+## Base URL of the LLM provider should be redacted in logs or dialogs
+`req~ai.llms.base-url-redacted~1`
+
+Base URL might contain secrets (username and password for connection), so they need to be removed in logs and dialogs.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
