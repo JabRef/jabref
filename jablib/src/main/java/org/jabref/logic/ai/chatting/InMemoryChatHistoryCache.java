@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.ai.chatting.repositories.ChatHistoryRepository;
@@ -20,13 +21,15 @@ import org.slf4j.LoggerFactory;
 
 /// An in-memory storage layer for chat history with [BibEntry]. This allows to have an AI chat even if the entry does not have a citation key or it is not unique.
 ///
-/// At the close of JabRef the chats are flushed to the on-disk storage ([ChatHistoryRepository]).
+/// Every change of a chat is written through to the on-disk storage ([ChatHistoryRepository]) as soon as the
+/// chat has a valid [ChatIdentifier]; [#close()] flushes once more as a safety net.
 public class InMemoryChatHistoryCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryChatHistoryCache.class);
 
     private record CachedEntryChat(
             BibDatabaseContext databaseContext,
             Optional<String> originalCitationKey,
+            boolean loadedFromRepository,
             ObservableList<ChatMessage> chatHistory
     ) {
     }
@@ -35,6 +38,7 @@ public class InMemoryChatHistoryCache {
             BibDatabaseContext databaseContext,
             String originalGroupName,
             GroupTreeNode group,
+            boolean loadedFromRepository,
             ObservableList<ChatMessage> chatHistory
     ) {
     }
@@ -51,7 +55,7 @@ public class InMemoryChatHistoryCache {
 
     /// Returns the chat history for `entry`. If none exists in RAM, loads from repository
     /// and caches it. The returned [ObservableList] is the primary working storage - mutations
-    /// are NOT immediately persisted.
+    /// are written through to the repository.
     ///
     /// @param databaseContext the database context for the entry (needed for persistence)
     /// @param entry           the entry to get chat history for
@@ -76,13 +80,15 @@ public class InMemoryChatHistoryCache {
                         entry.getCitationKey().orElse("<no key>"));
             }
 
-            return new CachedEntryChat(databaseContext, originalCitationKey, chatHistory);
+            CachedEntryChat cached = new CachedEntryChat(databaseContext, originalCitationKey, identifierOpt.isPresent(), chatHistory);
+            chatHistory.addListener((ListChangeListener<ChatMessage>) _ -> flushEntryChat(entry, cached));
+            return cached;
         }).chatHistory();
     }
 
     /// Returns the chat history for `group`. If none exists in RAM, loads from repository
     /// and caches it. The returned [ObservableList] is the primary working storage - mutations
-    /// are NOT immediately persisted.
+    /// are written through to the repository.
     ///
     /// @param databaseContext the database context for the group (needed for persistence)
     /// @param group           the group to get chat history for
@@ -107,7 +113,9 @@ public class InMemoryChatHistoryCache {
                         originalGroupName);
             }
 
-            return new CachedGroupChat(databaseContext, originalGroupName, group, chatHistory);
+            CachedGroupChat cached = new CachedGroupChat(databaseContext, originalGroupName, group, identifierOpt.isPresent(), chatHistory);
+            chatHistory.addListener((ListChangeListener<ChatMessage>) _ -> flushGroupChat(group, cached));
+            return cached;
         }).chatHistory();
     }
 
@@ -133,7 +141,7 @@ public class InMemoryChatHistoryCache {
         LOGGER.debug("Finished flushing chat histories to repository");
     }
 
-    private void flushEntryChat(BibEntry entry, CachedEntryChat cached) {
+    private synchronized void flushEntryChat(BibEntry entry, CachedEntryChat cached) {
         Optional<ChatIdentifier> currentIdentifierOpt = ChatIdentifier.from(cached.databaseContext(), entry);
         if (currentIdentifierOpt.isEmpty()) {
             return;
@@ -144,12 +152,13 @@ public class InMemoryChatHistoryCache {
                 currentIdentifierOpt.get(),
                 cached.originalCitationKey().orElse("<empty>"),
                 entry.getCitationKey().orElse("<no key>"),
+                cached.loadedFromRepository(),
                 cached.chatHistory(),
                 "entry"
         );
     }
 
-    private void flushGroupChat(GroupTreeNode group, CachedGroupChat cached) {
+    private synchronized void flushGroupChat(GroupTreeNode group, CachedGroupChat cached) {
         Optional<ChatIdentifier> currentIdentifierOpt = ChatIdentifier.from(cached.databaseContext(), cached.group());
         if (currentIdentifierOpt.isEmpty()) {
             return;
@@ -160,6 +169,7 @@ public class InMemoryChatHistoryCache {
                 currentIdentifierOpt.get(),
                 cached.originalGroupName(),
                 group.getName(),
+                cached.loadedFromRepository(),
                 cached.chatHistory(),
                 "group"
         );
@@ -171,15 +181,21 @@ public class InMemoryChatHistoryCache {
             ChatIdentifier currentIdentifier,
             String originalName,
             String currentName,
+            boolean loadedFromRepository,
             ObservableList<ChatMessage> chatHistory,
             String entityType
     ) {
         // Algorithm:
         // 1. If the entity was deleted from the database, the chat history must not be saved.
-        // 2. If name/key changed: clear old location first (only if old location was valid, not a placeholder)
-        // 3. Write to current location (whether name/key changed or not)
+        // 2. An empty chat that was never loaded (identifier invalid at load time) must not wipe stored history.
+        // 3. If name/key changed: clear old location first (only if old location was valid, not a placeholder)
+        // 4. Write to current location (whether name/key changed or not)
 
         if (!entityExists) {
+            return;
+        }
+
+        if (!loadedFromRepository && chatHistory.isEmpty()) {
             return;
         }
 
