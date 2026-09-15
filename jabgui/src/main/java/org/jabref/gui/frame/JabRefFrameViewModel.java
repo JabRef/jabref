@@ -122,6 +122,8 @@ public class JabRefFrameViewModel {
     private static SequencedMap<String, DatabaseConnectionProperties> collectSharedDatabases(List<LibraryTab> tabs) {
         SequencedMap<String, DatabaseConnectionProperties> sharedDatabases = new LinkedHashMap<>();
         tabs.stream()
+            // A tab still loading has no connection yet, so there is nothing to persist for it
+            .filter(tab -> !tab.isLoading())
             .map(LibraryTab::getBibDatabaseContext)
             .filter(context -> context.getLocation() == DatabaseLocation.SHARED && context.getDatabasePath().isEmpty())
             .forEach(context -> {
