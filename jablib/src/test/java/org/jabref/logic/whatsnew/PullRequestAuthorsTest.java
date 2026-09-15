@@ -1,7 +1,9 @@
 package org.jabref.logic.whatsnew;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +37,19 @@ class PullRequestAuthorsTest {
             "repos/JabRef/jabref/issues/16930", """
                     {"number": 16930, "user": {"login": "reporter"}}""",
             "repos/JabRef/jabref/issues/16930/timeline?per_page=100", """
-                    [{"event": "cross-referenced", "source": {"issue": {"user": {"login": "koppor"}, "pull_request": {"merged_at": "2026-09-01T10:00:00Z"}}}}]""");
+                    [{"event": "cross-referenced", "source": {"issue": {"user": {"login": "koppor"}, "pull_request": {"merged_at": "2026-09-01T10:00:00Z"}}}}]""",
+            "repos/JabRef/jabref/issues/17140", """
+                    {"number": 17140, "user": {"login": "reporter"}}""",
+            "repos/JabRef/jabref/issues/17140/timeline?per_page=100", """
+                    [{"event": "cross-referenced", "source": {"issue": {"state": "closed", "updated_at": "2026-09-14T12:00:00Z", "user": {"login": "gave-up"}, "pull_request": {"merged_at": null}}}},
+                     {"event": "cross-referenced", "source": {"issue": {"state": "open", "updated_at": "2026-09-10T12:00:00Z", "user": {"login": "started-first"}, "pull_request": {"merged_at": null}}}},
+                     {"event": "cross-referenced", "source": {"issue": {"state": "open", "updated_at": "2026-09-13T12:00:00Z", "user": {"login": "Siedlerchr"}, "pull_request": {"merged_at": null}}}}]""",
+            "repos/JabRef/jabref/issues/17141", """
+                    {"number": 17141, "user": {"login": "reporter"}}""",
+            "repos/JabRef/jabref/issues/17141/timeline?per_page=100", """
+                    [{"event": "cross-referenced", "source": {"issue": {"state": "open", "updated_at": "2026-09-14T12:00:00Z", "user": {"login": "still-working"}, "pull_request": {"merged_at": null}}}},
+                     {"event": "cross-referenced", "source": {"issue": {"state": "closed", "updated_at": "2026-09-01T10:00:00Z", "user": {"login": "koppor"}, "pull_request": {"merged_at": "2026-09-01T10:00:00Z"}}}},
+                     {"event": "closed", "commit_id": null, "created_at": "2026-09-01T10:00:02Z"}]""");
 
     @TempDir
     Path gitDir;
@@ -100,6 +114,38 @@ class PullRequestAuthorsTest {
         News attributed = authors(github(), "somebody").attribute(news(TYPIST, openIssue), Set.of());
 
         assertEquals(news(TYPIST, openIssue), attributed);
+    }
+
+    @Test
+    void anOpenIssueIsWorkedOnInTheOpenPullRequestUpdatedLast() {
+        ChangelogEntry inProgress = entry("We fixed Z. [#17140](https://github.com/JabRef/jabref/issues/17140)");
+
+        News attributed = authors(github(), "somebody").attribute(news(TYPIST, inProgress), Set.of());
+
+        assertEquals(news(new Contributor.Other("Siedlerchr"), inProgress), attributed);
+    }
+
+    @Test
+    void theMergedPullRequestWinsOverAnOpenOne() {
+        ChangelogEntry fixed = entry("We fixed Z. [#17141](https://github.com/JabRef/jabref/issues/17141)");
+
+        News attributed = authors(github(), "somebody").attribute(news(TYPIST, fixed), Set.of());
+
+        assertEquals(news(new Contributor.Other("koppor"), fixed), attributed);
+    }
+
+    @Test
+    void anOpenPullRequestIsAskedAgainAfterADay() throws IOException {
+        ChangelogEntry inProgress = entry("We fixed Z. [#17140](https://github.com/JabRef/jabref/issues/17140)");
+        authors(github(), "somebody").attribute(news(TYPIST, inProgress), Set.of());
+        Path file = gitDir.resolve("whats-new-authors.tsv");
+        Files.writeString(file, Files.readString(file).replace(Instant.now().toString().substring(0, 10), "2026-01-01"));
+        asked.clear();
+
+        News again = authors(github(), "somebody").attribute(news(TYPIST, inProgress), Set.of());
+
+        assertEquals(news(new Contributor.Other("Siedlerchr"), inProgress), again);
+        assertEquals(List.of("repos/JabRef/jabref/issues/17140", "repos/JabRef/jabref/issues/17140/timeline?per_page=100"), asked);
     }
 
     @Test
