@@ -218,6 +218,7 @@ public class InMemoryChatHistoryCache {
 
         repository.clear(currentIdentifier);
         chatHistory.forEach(message -> repository.addMessage(currentIdentifier, message));
+        repository.commit();
 
         if (nameChanged) {
             if ("entry".equals(entityType)) {

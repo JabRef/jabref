@@ -227,5 +227,10 @@ class InMemoryChatHistoryCacheTest {
         public int size(ChatIdentifier chatIdentifier) {
             return getAllMessages(chatIdentifier).size();
         }
+
+        @Override
+        public void commit() {
+            // in-memory only
+        }
     }
 }
