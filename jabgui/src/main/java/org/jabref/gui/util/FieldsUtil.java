@@ -27,7 +27,8 @@ public class FieldsUtil {
 
         @Override
         public Field fromString(String string) {
-            return FieldFactory.parseField(string);
+            return FieldTextMapper.fromDisplayName(string)
+                                  .orElseGet(() -> FieldFactory.parseField(string));
         }
     };
 
