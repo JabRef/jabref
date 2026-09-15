@@ -20,7 +20,7 @@ class ListScrollPaneTest extends JavaFxTest {
     @Override
     public void start(Stage stage) {
         scrollPane = new ListScrollPane<>();
-        scrollPane.setRenderer(item -> {
+        scrollPane.setRenderer(_ -> {
             Region region = new Region();
             region.setPrefHeight(100);
             return region;
