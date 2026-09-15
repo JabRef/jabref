@@ -291,7 +291,7 @@ open module org.jabref.jablib {
     uses org.apache.lucene.codecs.lucene104.Lucene104Codec;
     requires org.apache.lucene.analysis.common;
     requires transitive org.apache.lucene.core;
-    requires transitive org.apache.lucene.highlighter;
+    requires org.apache.lucene.highlighter;
     requires org.apache.lucene.queryparser;
     // endregion
 
