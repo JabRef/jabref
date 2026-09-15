@@ -40,7 +40,7 @@ class BaseDialogTest extends JavaFxTest {
     }
 
     @Test
-    // [utest->req~ux.dialogs.escape-closes~1]
+        // [utest->req~ux.dialogs.escape-closes~1]
     void escapeClosesDialog() {
         BaseDialog<Void> dialog = show(true);
         press(dialog, KeyCode.ESCAPE);
@@ -48,7 +48,7 @@ class BaseDialogTest extends JavaFxTest {
     }
 
     @Test
-    // [utest->req~ux.dialogs.escape-closes~1]
+        // [utest->req~ux.dialogs.escape-closes~1]
     void escapeKeepsOptedOutDialogOpen() {
         BaseDialog<Void> dialog = show(false);
         press(dialog, KeyCode.ESCAPE);
