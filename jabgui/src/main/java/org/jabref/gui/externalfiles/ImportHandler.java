@@ -559,8 +559,12 @@ public class ImportHandler {
         );
     }
 
-    public void setDownloadLinkedFilesOverride(boolean downloadLinkedFiles) {
-        this.downloadLinkedFilesOverride = Optional.of(downloadLinkedFiles);
+    public void enableLinkedFileDownloads() {
+        this.downloadLinkedFilesOverride = Optional.of(true);
+    }
+
+    public void disableLinkedFileDownloads() {
+        this.downloadLinkedFilesOverride = Optional.of(false);
     }
 
     public void downloadLinkedFiles(BibEntry entry) {
