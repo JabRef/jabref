@@ -74,7 +74,7 @@ public class SharedDatabasePreferences {
     public Optional<String> getPassword() {
         try (Keyring keyring = Keyring.create()) {
             return Optional.of(keyring.getPassword(KEYRING_SERVICE, keyringAccount)).filter(StringUtil::isNotBlank);
-        } catch (PasswordAccessException e) {
+        } catch (PasswordAccessException _) {
             return migrateLegacyPassword();
         } catch (Exception e) {
             LOGGER.warn("Could not access keyring for retrieving the shared database password", e);
@@ -142,7 +142,7 @@ public class SharedDatabasePreferences {
             if (StringUtil.isBlank(password)) {
                 try {
                     keyring.deletePassword(KEYRING_SERVICE, keyringAccount);
-                } catch (PasswordAccessException e) {
+                } catch (PasswordAccessException _) {
                     // nothing stored, nothing to clear
                 }
             } else {

@@ -418,6 +418,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
+        if (result.isInvalid()) {
+            // Nothing could be read from the file - the caller has already reported the reason to the user.
+            // Keeping the tab would leave an empty, untitled library behind, which the user could accidentally
+            // save over the file that failed to load.
+            // [impl->req~import.library.unreadable-reported~1]
+            // Close first, while dataLoadingTask is still set: confirmClose() treats a tab that is still
+            // loading as disposable and drops it. Clearing the task beforehand would instead offer to save
+            // the placeholder - over the very file that failed to load - if anything had modified it.
+            tabContainer.closeTab(this);
+            loading.set(false);
+            dataLoadingTask = null;
+            return;
+        }
+
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
         setDatabaseContext(result.getDatabaseContext());
         if (result.getChangedOnMigration()) {

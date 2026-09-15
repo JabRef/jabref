@@ -1,6 +1,8 @@
 package org.jabref.logic.cleanup;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jabref.logic.formatter.bibtexfields.TransliterateFormatter;
@@ -99,5 +101,21 @@ class FieldFormatterCleanupTest {
         entry.setField(StandardField.TITLE, "Тiло Е");
         cleanup.cleanup(entry);
         assertEquals("Tilo E", entry.getField(StandardField.TITLE).get());
+    }
+
+    @Test
+    void cleanupDoesNotOverwriteConcurrentModification() {
+        FieldFormatterCleanup cleanup = new FieldFormatterCleanup(StandardField.TITLE, new UpperCaseFormatter());
+        entry.setField(StandardField.TITLE, "initial");
+        List<Runnable> pendingMutations = new ArrayList<>();
+        cleanup.cleanup(entry, pendingMutations::add);
+
+        // Simulate concurrent edit in UI before scheduled mutation executes
+        entry.setField(StandardField.TITLE, "user edited title");
+
+        // Execute scheduled mutation
+        pendingMutations.forEach(Runnable::run);
+
+        assertEquals("user edited title", entry.getField(StandardField.TITLE).get());
     }
 }

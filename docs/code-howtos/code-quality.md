@@ -13,6 +13,7 @@ JabRef has three code style checkers in place:
 * [OpenRewrite](https://docs.openrewrite.org/) for advanced rules. OpenRewrite can also automatically fix issues.
   JabRef's CI toolchain does NOT automatically rewrite the source code, but checks whether OpenRewrite would rewrite something.
   As developer, one can execute `./gradlew rewriteRun` to fix the issues.
+  Gradle itself has to run on JDK 25 for this task: OpenRewrite parses with the JVM running Gradle, not with the toolchain, and both older and newer JDKs misparse the sources.
   Note that [JabRef is available on the Moderne platform](https://app.moderne.io/organizations/JabRef/jabref?branch=main&origin=github.com), too.
 
 In case a check fails, [the CI](https://github.com/JabRef/jabref/blob/main/.github/workflows/tests.yml#L24C6-L24C6) automatically adds a comment on the pull request.

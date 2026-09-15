@@ -177,6 +177,13 @@ javaModulePackaging {
             // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
 
+            // The two-step packaging (app-image, then deb/rpm/msi from it) does not pass these on.
+            // Without "--name", jpackage silently ignores "--file-associations".
+            // https://github.com/JabRef/jabref/issues/17006
+            "--name", applicationName.get(),
+            "--description", applicationDescription.get(),
+            "--vendor", vendor.get(),
+
             // Generic options, but different for each target
             "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
             "--file-associations", "$projectDir\\buildres\\windows\\bibtexAssociations.properties",
@@ -207,6 +214,13 @@ javaModulePackaging {
         options.addAll(
             // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // The two-step packaging (app-image, then deb/rpm/msi from it) does not pass these on.
+            // Without "--name", jpackage silently ignores "--file-associations".
+            // https://github.com/JabRef/jabref/issues/17006
+            "--name", applicationName.get(),
+            "--description", applicationDescription.get(),
+            "--vendor", vendor.get(),
 
             // Generic options, but different for each target
             "--icon", "$projectDir/buildres/linux/JabRef.png",
