@@ -28,18 +28,16 @@ public class InMemoryChatHistoryCache {
 
     private record CachedEntryChat(
             BibDatabaseContext databaseContext,
-            Optional<String> originalCitationKey,
-            boolean loadedFromRepository,
-            ObservableList<ChatMessage> chatHistory
+            ObservableList<ChatMessage> chatHistory,
+            ListChangeListener<ChatMessage> writeThrough
     ) {
     }
 
     private record CachedGroupChat(
             BibDatabaseContext databaseContext,
-            String originalGroupName,
             GroupTreeNode group,
-            boolean loadedFromRepository,
-            ObservableList<ChatMessage> chatHistory
+            ObservableList<ChatMessage> chatHistory,
+            ListChangeListener<ChatMessage> writeThrough
     ) {
     }
 
@@ -47,7 +45,13 @@ public class InMemoryChatHistoryCache {
     private final Map<BibEntry, CachedEntryChat> entryChats = Collections.synchronizedMap(new IdentityHashMap<>());
     private final Map<GroupTreeNode, CachedGroupChat> groupChats = Collections.synchronizedMap(new IdentityHashMap<>());
 
+    /// Where each chat history currently lives in the repository (loaded from there or written there).
+    /// Absent: the chat was never persisted, so an empty history must not overwrite stored data.
+    private final Map<ObservableList<ChatMessage>, ChatIdentifier> persistedAt = new IdentityHashMap<>();
+
     private final ChatHistoryRepository repository;
+
+    private boolean closed;
 
     public InMemoryChatHistoryCache(ChatHistoryRepository repository) {
         this.repository = repository;
@@ -62,27 +66,10 @@ public class InMemoryChatHistoryCache {
     /// @return the live, mutable chat history
     public synchronized ObservableList<ChatMessage> getForEntry(BibDatabaseContext databaseContext, BibEntry entry) {
         return entryChats.computeIfAbsent(entry, _ -> {
-            ObservableList<ChatMessage> chatHistory;
-            Optional<String> originalCitationKey = Optional.empty();
-
-            Optional<ChatIdentifier> identifierOpt = ChatIdentifier.from(databaseContext, entry);
-            if (identifierOpt.isPresent()) {
-                chatHistory = FXCollections.observableArrayList(
-                        repository.getAllMessages(identifierOpt.get())
-                );
-
-                originalCitationKey = entry.getCitationKey();
-                LOGGER.debug("Loaded chat history for entry {} from repository ({} messages)",
-                        originalCitationKey.orElse("<no key>"), chatHistory.size());
-            } else {
-                chatHistory = FXCollections.observableArrayList();
-                LOGGER.debug("Created new in-memory chat history for entry {} (no valid identifier)",
-                        entry.getCitationKey().orElse("<no key>"));
-            }
-
-            CachedEntryChat cached = new CachedEntryChat(databaseContext, originalCitationKey, identifierOpt.isPresent(), chatHistory);
-            chatHistory.addListener((ListChangeListener<ChatMessage>) _ -> flushEntryChat(entry, cached));
-            return cached;
+            ObservableList<ChatMessage> chatHistory = load(ChatIdentifier.from(databaseContext, entry), entry.getCitationKey().orElse("<no key>"));
+            ListChangeListener<ChatMessage> writeThrough = _ -> flushEntryChat(entry, databaseContext, chatHistory);
+            chatHistory.addListener(writeThrough);
+            return new CachedEntryChat(databaseContext, chatHistory, writeThrough);
         }).chatHistory();
     }
 
@@ -95,142 +82,97 @@ public class InMemoryChatHistoryCache {
     /// @return the live, mutable chat history
     public synchronized ObservableList<ChatMessage> getForGroup(BibDatabaseContext databaseContext, GroupTreeNode group) {
         return groupChats.computeIfAbsent(group, _ -> {
-            ObservableList<ChatMessage> chatHistory;
-            String originalGroupName = group.getName();
-
-            Optional<ChatIdentifier> identifierOpt = ChatIdentifier.from(databaseContext, group);
-            if (identifierOpt.isPresent()) {
-                chatHistory = FXCollections.observableArrayList(
-                        repository.getAllMessages(identifierOpt.get())
-                );
-
-                LOGGER.debug("Loaded chat history for group {} from repository ({} messages)",
-                        originalGroupName, chatHistory.size());
-            } else {
-                chatHistory = FXCollections.observableArrayList();
-
-                LOGGER.debug("Created new in-memory chat history for group {} (no valid identifier)",
-                        originalGroupName);
-            }
-
-            CachedGroupChat cached = new CachedGroupChat(databaseContext, originalGroupName, group, identifierOpt.isPresent(), chatHistory);
-            chatHistory.addListener((ListChangeListener<ChatMessage>) _ -> flushGroupChat(group, cached));
-            return cached;
+            ObservableList<ChatMessage> chatHistory = load(ChatIdentifier.from(databaseContext, group), group.getName());
+            ListChangeListener<ChatMessage> writeThrough = _ -> flushGroupChat(group, databaseContext, chatHistory);
+            chatHistory.addListener(writeThrough);
+            return new CachedGroupChat(databaseContext, group, chatHistory, writeThrough);
         }).chatHistory();
+    }
+
+    private ObservableList<ChatMessage> load(Optional<ChatIdentifier> identifier, String name) {
+        if (identifier.isEmpty()) {
+            LOGGER.debug("Created new in-memory chat history for {} (no valid identifier)", name);
+            return FXCollections.observableArrayList();
+        }
+        ObservableList<ChatMessage> chatHistory = FXCollections.observableArrayList(repository.getAllMessages(identifier.get()));
+        persistedAt.put(chatHistory, identifier.get());
+        LOGGER.debug("Loaded chat history for {} from repository ({} messages)", name, chatHistory.size());
+        return chatHistory;
     }
 
     /// Removes the cached chat history for an entry.
     /// The chat history is NOT persisted before removal - it's simply discarded from RAM.
     public synchronized void removeEntry(BibEntry entry) {
-        entryChats.remove(entry);
+        Optional.ofNullable(entryChats.remove(entry)).ifPresent(cached -> forget(cached.chatHistory(), cached.writeThrough()));
     }
 
     /// Removes the cached chat history for a group.
     /// The chat history is NOT persisted before removal - it's simply discarded from RAM.
     public synchronized void removeGroup(GroupTreeNode group) {
-        groupChats.remove(group);
+        Optional.ofNullable(groupChats.remove(group)).ifPresent(cached -> forget(cached.chatHistory(), cached.writeThrough()));
+    }
+
+    private void forget(ObservableList<ChatMessage> chatHistory, ListChangeListener<ChatMessage> writeThrough) {
+        chatHistory.removeListener(writeThrough);
+        persistedAt.remove(chatHistory);
     }
 
     public synchronized void close() {
         LOGGER.debug("Flushing {} entry chats and {} group chats to repository",
                 entryChats.size(), groupChats.size());
 
-        entryChats.forEach(this::flushEntryChat);
-        groupChats.forEach(this::flushGroupChat);
+        entryChats.forEach((entry, cached) -> flushEntryChat(entry, cached.databaseContext(), cached.chatHistory()));
+        groupChats.forEach((group, cached) -> flushGroupChat(group, cached.databaseContext(), cached.chatHistory()));
+
+        entryChats.values().forEach(cached -> cached.chatHistory().removeListener(cached.writeThrough()));
+        groupChats.values().forEach(cached -> cached.chatHistory().removeListener(cached.writeThrough()));
+        closed = true;
 
         LOGGER.debug("Finished flushing chat histories to repository");
     }
 
-    private synchronized void flushEntryChat(BibEntry entry, CachedEntryChat cached) {
-        Optional<ChatIdentifier> currentIdentifierOpt = ChatIdentifier.from(cached.databaseContext(), entry);
-        if (currentIdentifierOpt.isEmpty()) {
-            return;
-        }
-
-        flushChat(
-                cached.databaseContext.getDatabase().getEntries().contains(entry),
-                currentIdentifierOpt.get(),
-                cached.originalCitationKey().orElse("<empty>"),
-                entry.getCitationKey().orElse("<no key>"),
-                cached.loadedFromRepository(),
-                cached.chatHistory(),
-                "entry"
-        );
+    private synchronized void flushEntryChat(BibEntry entry, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
+        ChatIdentifier.from(databaseContext, entry).ifPresent(identifier ->
+                flushChat(databaseContext.getDatabase().getEntries().contains(entry), identifier, chatHistory, "entry"));
     }
 
-    private synchronized void flushGroupChat(GroupTreeNode group, CachedGroupChat cached) {
-        Optional<ChatIdentifier> currentIdentifierOpt = ChatIdentifier.from(cached.databaseContext(), cached.group());
-        if (currentIdentifierOpt.isEmpty()) {
-            return;
-        }
-
-        flushChat(
-                cached.databaseContext.getMetaData().getGroups().map(g -> g.containsGroup(group.getGroup())).orElse(false),
-                currentIdentifierOpt.get(),
-                cached.originalGroupName(),
-                group.getName(),
-                cached.loadedFromRepository(),
-                cached.chatHistory(),
-                "group"
-        );
+    private synchronized void flushGroupChat(GroupTreeNode group, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
+        ChatIdentifier.from(databaseContext, group).ifPresent(identifier ->
+                flushChat(databaseContext.getMetaData().getGroups().map(g -> g.containsGroup(group.getGroup())).orElse(false), identifier, chatHistory, "group"));
     }
 
     /// Generic flush logic for both entry and group chats
     private void flushChat(
             boolean entityExists,
             ChatIdentifier currentIdentifier,
-            String originalName,
-            String currentName,
-            boolean loadedFromRepository,
             ObservableList<ChatMessage> chatHistory,
             String entityType
     ) {
         // Algorithm:
-        // 1. If the entity was deleted from the database, the chat history must not be saved.
-        // 2. An empty chat that was never loaded (identifier invalid at load time) must not wipe stored history.
-        // 3. If name/key changed: clear old location first (only if old location was valid, not a placeholder)
-        // 4. Write to current location (whether name/key changed or not)
+        // 1. After close() or if the entity was deleted from the database, the chat history must not be saved.
+        // 2. An empty chat that was never persisted (identifier invalid at load time) must not wipe stored history.
+        // 3. If the chat lives under another identifier (name/key changed): clear that location first.
+        // 4. Write to the current location and remember it.
 
-        if (!entityExists) {
+        if (closed || !entityExists) {
             return;
         }
 
-        if (!loadedFromRepository && chatHistory.isEmpty()) {
+        Optional<ChatIdentifier> previousIdentifier = Optional.ofNullable(persistedAt.get(chatHistory));
+        if (previousIdentifier.isEmpty() && chatHistory.isEmpty()) {
             return;
         }
 
-        boolean nameChanged = !originalName.equals(currentName);
-
-        if (nameChanged && !"<empty>".equals(originalName)) {
-            ChatIdentifier oldIdentifier = new ChatIdentifier(
-                    currentIdentifier.libraryId(),
-                    currentIdentifier.chatType(),
-                    originalName
-            );
-
-            repository.clear(oldIdentifier);
-
-            LOGGER.debug("Cleared old chat history for {} with old {}: {}",
-                    entityType,
-                    "entry".equals(entityType) ? "key" : "name",
-                    originalName);
-        }
+        previousIdentifier.filter(previous -> !previous.equals(currentIdentifier)).ifPresent(previous -> {
+            repository.clear(previous);
+            LOGGER.debug("Cleared old chat history for {} {}", entityType, previous.chatName());
+        });
 
         repository.clear(currentIdentifier);
         chatHistory.forEach(message -> repository.addMessage(currentIdentifier, message));
         repository.commit();
+        persistedAt.put(chatHistory, currentIdentifier);
 
-        if (nameChanged) {
-            if ("entry".equals(entityType)) {
-                LOGGER.debug("Transferred chat history from {} to {} ({} messages)",
-                        originalName, currentName, chatHistory.size());
-            } else {
-                LOGGER.debug("Transferred chat history from {} '{}' to '{}' ({} messages)",
-                        entityType, originalName, currentName, chatHistory.size());
-            }
-        } else {
-            LOGGER.debug("Flushed chat history for {} {} ({} messages)",
-                    entityType, currentName, chatHistory.size());
-        }
+        LOGGER.debug("Flushed chat history for {} {} ({} messages)", entityType, currentIdentifier.chatName(), chatHistory.size());
     }
 }
