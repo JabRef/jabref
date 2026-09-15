@@ -1726,6 +1726,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: transparent;
 }
 
+.bibtex-code-area {
+    -fx-font-family: 'JetBrains Mono';
+}
+
 .bibtex-code-area .bibtex-keyword {
     -fx-fill: -color-info !important;
 }
