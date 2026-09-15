@@ -77,12 +77,15 @@ public class BaseDialog<T> extends Dialog<T> {
     }
 
     private void handleKeyEvent(KeyEvent event) {
-        if (!closesOnEscape()) {
-            if (event.getCode() == KeyCode.ESCAPE) {
-                // JavaFX's own stage handler closes the dialog on an unconsumed Escape
-                event.consume();
+        if (event.getCode() == KeyCode.ESCAPE) {
+            if (closesOnEscape()) {
+                close();
             }
-        } else if (closeOnKeyBindingMatch(event, this)) {
+            // JavaFX's own stage handler closes a dialog with a cancel button on an unconsumed Escape
+            event.consume();
+            return;
+        }
+        if (closeOnKeyBindingMatch(event, this)) {
             return;
         }
 
