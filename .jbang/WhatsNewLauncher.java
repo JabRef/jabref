@@ -3,6 +3,10 @@
 //REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 //DEPS org.openjfx:javafx-controls:26.0.2
+// JavaFX loads glass/prism through System.load, which Java 25 flags (JEP 472). jbang resolves the //DEPS onto the
+// module path, so the caller is the `javafx.graphics` module, not ALL-UNNAMED as in the other launchers. Without
+// this, every window run prints four WARNING lines before the window and nothing else.
+//RUNTIME_OPTIONS --enable-native-access=javafx.graphics
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/AnnouncedEntries.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/AttributedEntry.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/BlamedChangelog.java
@@ -71,6 +75,9 @@ import org.jspecify.annotations.Nullable;
 /// "Start" (or closing the window) exits 0 and the `just` recipe starts JabRef; "Cancel" exits 1 and stops
 /// it. `--stdout` prints instead of opening a window. The first run only records the changelog. A git failure
 /// is reported and exits 0, and the news stay unannounced for the next run: they never block the start.
+///
+/// The terminal always says what happened: the recipe waits here for as long as the window is open, so a
+/// window that opened behind another one, or a run with nothing new, is otherwise indistinguishable from a hang.
 @NullMarked
 public class WhatsNewLauncher {
 
@@ -101,6 +108,7 @@ public class WhatsNewLauncher {
         Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
         if (announcedSoFar.isEmpty()) {
             announced.announce(entries);
+            System.out.println("What's new: first run, recorded the " + entries.size() + " entries of " + CHANGELOG + " at " + describe(head) + ". News show from the next run on.");
             return;
         }
         Set<String> announcedTexts = announcedSoFar.get().stream().map(ChangelogEntry::text).collect(Collectors.toSet());
@@ -118,6 +126,7 @@ public class WhatsNewLauncher {
         News news = new News(items);
         if (news.isEmpty()) {
             announced.announce(entries);
+            System.out.println("What's new: nothing new in " + CHANGELOG + " at " + describe(head) + ".");
             return;
         }
         if (List.of(args).contains(STDOUT_FLAG) || java.awt.GraphicsEnvironment.isHeadless()) {
@@ -125,8 +134,10 @@ public class WhatsNewLauncher {
             announced.announce(entries);
             return;
         }
+        System.out.println("What's new: showing " + news.size() + (news.size() == 1 ? " change" : " changes") + " at " + describe(head) + ". Close the window to start JabRef.");
         // Announced once the window is on screen: a git or JavaFX failure before that keeps the news for the next run.
         Window.show(news, Localization.lang("What's new") + " — " + describe(head), () -> remember(announced, entries));
+        System.out.println("What's new: window closed, starting JabRef.");
     }
 
     private static void remember(AnnouncedEntries announced, List<ChangelogEntry> entries) {
@@ -274,7 +285,10 @@ public class WhatsNewLauncher {
             run.setOnAction(_ -> stage.close());
             Button cancel = new Button(Localization.lang("Cancel"));
             cancel.setCancelButton(true);
-            cancel.setOnAction(_ -> System.exit(1));
+            cancel.setOnAction(_ -> {
+                System.out.println("What's new: cancelled, not starting JabRef.");
+                System.exit(1);
+            });
             HBox buttons = new HBox(8, cancel, run);
             buttons.setAlignment(Pos.CENTER_RIGHT);
             buttons.setPadding(new Insets(8, 16, 12, 16));
@@ -289,7 +303,14 @@ public class WhatsNewLauncher {
                 stage.getIcons().add(new Image(resource("/icons/JabRef-icon-" + size + ".png")));
             }
             stage.setScene(scene);
+            // This window is a gate: the recipe waits for it before starting JabRef, so a window that opens behind
+            // the others reads as a hang. Windows does not let a process that is not in the foreground raise itself,
+            // and `toFront` alone is ignored there; always-on-top is what lifts it, and fitting for the seconds this
+            // gate lives.
+            stage.setAlwaysOnTop(true);
             stage.show();
+            stage.toFront();
+            stage.requestFocus();
             onShown.run();
         }
 
