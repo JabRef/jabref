@@ -71,6 +71,7 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
                     setText(null);
                     setGraphic(null);
                     setOnMouseClicked(null);
+                    setTooltip(null);
                 } else {
                     if (toText != null) {
                         setText(toText.call(viewModel));
@@ -82,6 +83,8 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
                         String tooltip = toTooltip.call(viewModel);
                         if (StringUtil.isNotBlank(tooltip)) {
                             setTooltip(new Tooltip(tooltip));
+                        } else {
+                            setTooltip(null);
                         }
                     }
                     if (toOnMouseClickedEvent != null) {
