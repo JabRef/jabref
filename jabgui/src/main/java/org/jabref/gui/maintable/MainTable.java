@@ -385,9 +385,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private boolean isFirstRowVisible() {
         return MainTableScroller.findVirtualFlow(this)
-                       .map(VirtualFlow::getFirstVisibleCell)
-                       .map(cell -> cell.getIndex() == 0)
-                       .orElse(true);
+                                .map(VirtualFlow::getFirstVisibleCell)
+                                .map(cell -> cell.getIndex() == 0)
+                                .orElse(true);
     }
 
     private void scrollToNextMatchCategory() {
