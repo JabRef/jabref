@@ -14,6 +14,7 @@ Read your own diff once, top to bottom, and confirm each point.
 - [ ] No `== null` / `!= null` checks — JSpecify annotations (`@NullMarked`, `@Nullable`, `@NonNull`) used instead.
 - [ ] No `Objects.requireNonNull(...)` — nullability expressed via JSpecify annotations.
 - [ ] New classes annotated with `@NullMarked` (`org.jspecify.annotations.NullMarked`).
+- [ ] New packages annotated with `@NullMarked` (`org.jspecify.annotations.NullMarked`).
 - [ ] `Optional` consumed with `ifPresent` / `ifPresentOrElse` / `map` / `orElseThrow` — never `orElse(unusedValue)` nor an `isPresent()` + `get()` block.
 - [ ] `StringUtil.isBlank(...)` used instead of `s == null || s.isBlank()`.
 

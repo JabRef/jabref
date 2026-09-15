@@ -90,7 +90,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         this.nameDisplayPreferences = nameDisplayPreferences;
         this.mainTablePreferences = mainTablePreferences;
 
-        specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
+        specialFieldsEnabledProperty.addListener((_, _, newValue) -> {
             if (newValue) {
                 insertSpecialFieldColumns();
             } else {
@@ -98,7 +98,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        extraFileColumnsEnabledProperty.addListener((observable, oldValue, newValue) -> {
+        extraFileColumnsEnabledProperty.addListener((_, _, newValue) -> {
             if (newValue) {
                 insertExtraFileColumns();
             } else {

@@ -141,8 +141,8 @@ public class MetaData {
         // had been performed, and the panel would rebuild itself from inside its own rebuild.
         if (groupsRoot.getValue() != root) {
             groupsRoot.setValue(root);
-            root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
-            root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+            root.subscribeToDescendantChanged(_ -> groupsRootBinding.invalidate());
+            root.subscribeToDescendantChanged(_ -> eventBus.post(new GroupUpdatedEvent(this)));
         }
         eventBus.post(new GroupUpdatedEvent(this));
         postChange(source);
