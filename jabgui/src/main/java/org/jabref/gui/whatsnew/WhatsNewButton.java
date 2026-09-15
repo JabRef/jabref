@@ -4,7 +4,11 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
@@ -27,7 +31,7 @@ import org.jspecify.annotations.Nullable;
 
 /// The toolbar's "What's new" button, present only while JabRef runs out of a git checkout, i.e. started by the
 /// Gradle `run` task, which names the checkout in [#CHECKOUT_PROPERTY]: its glyph turns
-/// blue once the checkout is behind its upstream, its tooltip lists the news, and a click opens the
+/// blue once the checkout is behind its upstream, a badge on it counts the pending entries, its tooltip lists the news, and a click opens the
 /// [WhatsNewDialog] on a fresh fetch. Binds the button to the [WhatsNewViewModel]; holds no state of its own
 /// beyond the window that is open.
 // [impl->req~whats-new.checkout-news~1]
@@ -43,6 +47,7 @@ public final class WhatsNewButton {
     private final DialogService dialogService;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final Button button;
+    private final Label badge = new Label();
     private @Nullable WhatsNewDialog openDialog;
 
     private WhatsNewButton(WhatsNewViewModel viewModel,
@@ -54,6 +59,10 @@ public final class WhatsNewButton {
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.button = factory.createIconButton(StandardActions.WHATS_NEW, new OpenCommand());
         // The button's tooltip is the action's description plus the command's status message.
+        badge.getStyleClass().add("whats-new-badge");
+        badge.textProperty().bind(viewModel.pendingCountProperty().asString());
+        badge.visibleProperty().bind(viewModel.pendingCountProperty().greaterThan(0));
+        StackPane.setAlignment(badge, Pos.TOP_RIGHT);
         viewModel.updateAvailableProperty().subscribe(this::showGlyph);
     }
 
@@ -80,7 +89,8 @@ public final class WhatsNewButton {
 
     private void showGlyph(boolean updateAvailable) {
         IconTheme.JabRefIcons icon = IconTheme.JabRefIcons.WHATS_NEW;
-        button.setGraphic(updateAvailable ? icon.withColor(IconTheme.SELECTED_COLOR).getGraphicNode() : icon.getGraphicNode());
+        Node glyph = updateAvailable ? icon.withColor(IconTheme.SELECTED_COLOR).getGraphicNode() : icon.getGraphicNode();
+        button.setGraphic(new StackPane(glyph, badge));
     }
 
     /// Opens the window on a fetch; a second click brings the open window to the front instead.

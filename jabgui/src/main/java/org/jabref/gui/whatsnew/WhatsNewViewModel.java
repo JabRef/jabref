@@ -11,6 +11,8 @@ import java.util.function.Consumer;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.IntegerBinding;
+import javafx.beans.binding.IntegerExpression;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -72,6 +74,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
     private final IntegerProperty commitsBehind = new SimpleIntegerProperty();
     private final StringProperty title = new SimpleStringProperty(Localization.lang("What's new"));
     private final BooleanBinding updateAvailable = commitsBehind.greaterThan(0);
+    private final IntegerBinding pendingCount = Bindings.createIntegerBinding(() -> pending.get().size(), pending);
     private final StringBinding tooltip = Bindings.createStringBinding(this::tooltipText, pending, commitsBehind, title);
 
     /// One look's answer with the number of the look. FX thread.
@@ -97,6 +100,11 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// The news not announced yet, as of the last look.
     public News getPending() {
         return pending.get();
+    }
+
+    /// How many entries are pending, for the badge on the button.
+    public IntegerExpression pendingCountProperty() {
+        return pendingCount;
     }
 
     /// The news the window presented last, in this run of JabRef: what it shows greyed while nothing is pending.
