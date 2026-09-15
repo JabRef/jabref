@@ -27,6 +27,7 @@ run-loop: ensure-gg-cmd
     #!/usr/bin/env sh
     while :; do
         git pull --no-rebase || exit 1
+        git submodule update --init || exit 1
         just whats-new || exit $?
         marker="$(git rev-parse --absolute-git-dir)/restart-requested"
         rm -f "$marker"
@@ -69,7 +70,7 @@ whats-new *FLAGS: ensure-gg-cmd
 
 [windows]
 run-loop: ensure-gg-cmd
-    @while ($true) { git pull --no-rebase; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; just whats-new; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $marker = "$(git rev-parse --absolute-git-dir)/restart-requested"; Remove-Item -ErrorAction Ignore $marker; .\gg.cmd gradle :jabgui:run -PrestartLoop; if ($LASTEXITCODE -ne 0) { Remove-Item -ErrorAction Ignore $marker; exit $LASTEXITCODE }; if (-not (Test-Path $marker)) { break }; Remove-Item $marker }
+    @while ($true) { git pull --no-rebase; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; git submodule update --init; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; just whats-new; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $marker = "$(git rev-parse --absolute-git-dir)/restart-requested"; Remove-Item -ErrorAction Ignore $marker; .\gg.cmd gradle :jabgui:run -PrestartLoop; if ($LASTEXITCODE -ne 0) { Remove-Item -ErrorAction Ignore $marker; exit $LASTEXITCODE }; if (-not (Test-Path $marker)) { break }; Remove-Item $marker }
 
 [windows]
 run: ensure-gg-cmd

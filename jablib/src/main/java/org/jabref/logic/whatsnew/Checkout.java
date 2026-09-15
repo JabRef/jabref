@@ -62,6 +62,16 @@ public final class Checkout {
         }
     }
 
+    /// A value of the checkout's git configuration, the user's and the repository's merged, e.g. `user.email`.
+    public Optional<String> config(String section, String name) {
+        try (Git git = handler.open()) {
+            return Optional.ofNullable(git.getRepository().getConfig().getString(section, null, name)).filter(value -> !value.isBlank());
+        } catch (IOException e) {
+            LOGGER.debug("Cannot read the git configuration", e);
+            return Optional.empty();
+        }
+    }
+
     /// Fetches the branch the checked-out branch tracks, asked for by name so a narrow fetch refspec of the
     /// remote cannot leave it out; `false` when that failed (offline, no upstream), in which case
     /// [#commitsBehind()] answers from the last fetch that succeeded. The fetch is anonymous unless JabRef has

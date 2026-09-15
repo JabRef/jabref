@@ -14,6 +14,7 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -67,6 +68,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
     private final BooleanSupplier quit;
 
     private final ObjectProperty<News> pending = new SimpleObjectProperty<>(News.NONE);
+    private final ObjectProperty<News> shownBefore = new SimpleObjectProperty<>(News.NONE);
     private final IntegerProperty commitsBehind = new SimpleIntegerProperty();
     private final StringProperty title = new SimpleStringProperty(Localization.lang("What's new"));
     private final BooleanBinding updateAvailable = commitsBehind.greaterThan(0);
@@ -95,6 +97,11 @@ public class WhatsNewViewModel extends AbstractViewModel {
     /// The news not announced yet, as of the last look.
     public News getPending() {
         return pending.get();
+    }
+
+    /// The news the window presented last, in this run of JabRef: what it shows greyed while nothing is pending.
+    public ReadOnlyObjectProperty<News> shownBeforeProperty() {
+        return shownBefore;
     }
 
     /// Whether the checkout is behind its upstream, i.e. a restart would bring a newer JabRef.
@@ -130,6 +137,9 @@ public class WhatsNewViewModel extends AbstractViewModel {
                 onChecked.accept(look.news());
             } else {
                 onFailed.accept(look.news());
+            }
+            if (!look.news().isEmpty()) {
+                shownBefore.set(look.news());
             }
             pending.set(pending.get().without(look.seen()));
             announce(look);

@@ -22,6 +22,7 @@ import org.jabref.logic.whatsnew.Checkout;
 import org.jabref.logic.whatsnew.CheckoutNews;
 import org.jabref.logic.whatsnew.Contributor;
 import org.jabref.logic.whatsnew.News;
+import org.jabref.logic.whatsnew.PullRequestAuthors;
 import org.jabref.logic.whatsnew.RestartMarker;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -106,7 +107,7 @@ class WhatsNewViewModelTest {
     void setUp() {
         when(checkout.fetch()).thenReturn(true);
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(new Contributor.Other("Somebody"), OLD)));
-        viewModel = new WhatsNewViewModel(new CheckoutNews(checkout, announced()), RestartMarker.inGitDir(gitDir), taskExecutor, () -> {
+        viewModel = new WhatsNewViewModel(new CheckoutNews(checkout, announced(), new PullRequestAuthors(_ -> Optional.empty(), gitDir.resolve("authors.tsv"), Optional.empty(), false, "")), RestartMarker.inGitDir(gitDir), taskExecutor, () -> {
             quitRequested.set(true);
             return quitAllowed.get();
         });
@@ -168,6 +169,20 @@ class WhatsNewViewModelTest {
         assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE))), presented.get());
         assertEquals(News.NONE, viewModel.getPending());
         assertEquals(Optional.of(Set.of(OLD, MINE)), announced().read());
+    }
+
+    @Test
+    void thePresentedNewsStayShownBeforeWhenNothingNewArrives() throws IOException {
+        announced().announce(Set.of(OLD));
+        when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
+        viewModel.present(() -> true, _ -> {
+        }, _ -> fail("the look must not fail"));
+        AtomicReference<News> presentedAgain = new AtomicReference<>();
+
+        viewModel.present(() -> true, presentedAgain::set, _ -> fail("the look must not fail"));
+
+        assertEquals(List.of(News.NONE, new News(List.of(new AttributedEntry(Contributor.Me.LOCAL, MINE)))),
+                List.of(presentedAgain.get(), viewModel.shownBeforeProperty().get()));
     }
 
     @Test

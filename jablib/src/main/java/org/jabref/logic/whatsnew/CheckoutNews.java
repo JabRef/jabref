@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /// The news of a checkout: one look reads the checkout and projects the entries not announced yet; once they
 /// were shown, [#announce] makes them old. What a toolbar button, a window or anything else shows comes from here.
@@ -33,10 +34,12 @@ public final class CheckoutNews {
 
     private final Checkout checkout;
     private final AnnouncedEntries announced;
+    private final PullRequestAuthors authors;
 
-    public CheckoutNews(Checkout checkout, AnnouncedEntries announced) {
+    public CheckoutNews(Checkout checkout, AnnouncedEntries announced, PullRequestAuthors authors) {
         this.checkout = checkout;
         this.announced = announced;
+        this.authors = authors;
     }
 
     /// Reads the checkout: the working tree's changelog, plus the upstream's once the checkout is behind, so an
@@ -51,7 +54,8 @@ public final class CheckoutNews {
         boolean fetched = mode == Mode.WITH_FETCH && checkout.fetch();
         int behind = checkout.commitsBehind();
         List<BlamedChangelog> changelogs = new ArrayList<>();
-        checkout.blameWorkingTree().ifPresent(changelogs::add);
+        Optional<BlamedChangelog> workingTree = checkout.blameWorkingTree();
+        workingTree.ifPresent(changelogs::add);
         if (behind > 0) {
             checkout.blameUpstream().ifPresent(changelogs::add);
         }
@@ -62,7 +66,12 @@ public final class CheckoutNews {
             return new Look(fetched, behind, head, upstream, News.NONE, seen);
         }
         Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
-        News news = announcedSoFar.map(old -> News.pending(old, changelogs)).orElse(News.NONE);
+        Set<String> workingTreeTexts = workingTree.map(changelog -> News.allEntries(List.of(changelog)).stream()
+                                                                        .map(ChangelogEntry::text)
+                                                                        .collect(Collectors.toSet()))
+                                                  .orElse(Set.of());
+        // Only the news are looked up, never the whole changelog: the requests GitHub allows are few.
+        News news = authors.attribute(announcedSoFar.map(old -> News.pending(old, changelogs)).orElse(News.NONE), workingTreeTexts);
         if (announcedSoFar.isEmpty()) {
             announced.announce(seen);
         }

@@ -16,8 +16,7 @@ import org.jabref.logic.whatsnew.News;
 /// The news as a scrollable page: a title per contributor group, the release section and the heading of each
 /// entry, then the entry itself with links opening through `openUrl`.
 ///
-/// Styled through the base stylesheet's `h3`, `h4`, `bold` and `text-muted` classes; the jbang script
-/// `.jbang/WhatsNewLauncher.java`, which shows this view without the base stylesheet, defines them itself.
+/// Styled through the base stylesheet's `h3`, `h4`, `bold` and `text-muted` classes.
 // [impl->req~whats-new.checkout-news~1]
 public class WhatsNewView extends ScrollPane {
 

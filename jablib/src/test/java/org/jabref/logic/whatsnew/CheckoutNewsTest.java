@@ -46,7 +46,7 @@ class CheckoutNewsTest {
         when(checkout.fetch()).thenReturn(true);
         when(checkout.blameWorkingTree()).thenReturn(Optional.of(changelog(Contributor.Me.LOCAL, OLD, MINE)));
         announced = AnnouncedEntries.inGitDir(gitDir);
-        news = new CheckoutNews(checkout, announced);
+        news = new CheckoutNews(checkout, announced, new PullRequestAuthors(_ -> Optional.empty(), gitDir.resolve("authors.tsv"), Optional.empty(), false, ""));
     }
 
     @Test

@@ -3,7 +3,10 @@
 //REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 //DEPS org.openjfx:javafx-controls:26.0.2
-//DEPS io.github.mkpaz:atlantafx-base:2.1.0
+// JavaFX loads glass/prism through System.load, which Java 25 flags (JEP 472). jbang resolves the //DEPS onto the
+// module path, so the caller is the `javafx.graphics` module, not ALL-UNNAMED as in the other launchers. Without
+// this, every window run prints four WARNING lines before the window and nothing else.
+//RUNTIME_OPTIONS --enable-native-access=javafx.graphics
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/AnnouncedEntries.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/AttributedEntry.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/BlamedChangelog.java
@@ -13,6 +16,8 @@
 //SOURCES ../jablib/src/main/java/org/jabref/logic/whatsnew/News.java
 //SOURCES ../jabgui/src/main/java/org/jabref/gui/whatsnew/InlineMarkdown.java
 //SOURCES ../jabgui/src/main/java/org/jabref/gui/whatsnew/WhatsNewView.java
+//FILES css/jabref-theme.css=../jabgui/src/main/themes.jabref.org/themes/JabRef/jabref-theme.css
+//FILES css/jabref-base.css=../jabgui/src/main/resources/org/jabref/gui/theme/internal/jabref-base.css
 //FILES icons/JabRef-icon-16.png=../jabgui/src/main/resources/images/external/JabRef-icon-16.png
 //FILES icons/JabRef-icon-32.png=../jabgui/src/main/resources/images/external/JabRef-icon-32.png
 //FILES icons/JabRef-icon-48.png=../jabgui/src/main/resources/images/external/JabRef-icon-48.png
@@ -23,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -38,7 +42,6 @@ import java.util.regex.Pattern;
 
 import javafx.application.Application;
 import javafx.application.ColorScheme;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -58,10 +61,8 @@ import org.jabref.logic.whatsnew.ChangelogParser;
 import org.jabref.logic.whatsnew.Contributor;
 import org.jabref.logic.whatsnew.News;
 
-import atlantafx.base.theme.PrimerDark;
-import atlantafx.base.theme.PrimerLight;
-import atlantafx.base.theme.Styles;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// "What's new since you last ran JabRef from this checkout", personalized.
 ///
@@ -74,6 +75,9 @@ import org.jspecify.annotations.NullMarked;
 /// "Start" (or closing the window) exits 0 and the `just` recipe starts JabRef; "Cancel" exits 1 and stops
 /// it. `--stdout` prints instead of opening a window. The first run only records the changelog. A git failure
 /// is reported and exits 0, and the news stay unannounced for the next run: they never block the start.
+///
+/// The terminal always says what happened: the recipe waits here for as long as the window is open, so a
+/// window that opened behind another one, or a run with nothing new, is otherwise indistinguishable from a hang.
 @NullMarked
 public class WhatsNewLauncher {
 
@@ -104,6 +108,7 @@ public class WhatsNewLauncher {
         Optional<Set<ChangelogEntry>> announcedSoFar = announced.read();
         if (announcedSoFar.isEmpty()) {
             announced.announce(entries);
+            System.out.println("What's new: first run, recorded the " + entries.size() + " entries of " + CHANGELOG + " at " + describe(head) + ". News show from the next run on.");
             return;
         }
         Set<String> announcedTexts = announcedSoFar.get().stream().map(ChangelogEntry::text).collect(Collectors.toSet());
@@ -121,6 +126,7 @@ public class WhatsNewLauncher {
         News news = new News(items);
         if (news.isEmpty()) {
             announced.announce(entries);
+            System.out.println("What's new: nothing new in " + CHANGELOG + " at " + describe(head) + ".");
             return;
         }
         if (List.of(args).contains(STDOUT_FLAG) || java.awt.GraphicsEnvironment.isHeadless()) {
@@ -128,8 +134,10 @@ public class WhatsNewLauncher {
             announced.announce(entries);
             return;
         }
+        System.out.println("What's new: showing " + news.size() + (news.size() == 1 ? " change" : " changes") + " at " + describe(head) + ". Close the window to start JabRef.");
         // Announced once the window is on screen: a git or JavaFX failure before that keeps the news for the next run.
         Window.show(news, Localization.lang("What's new") + " — " + describe(head), () -> remember(announced, entries));
+        System.out.println("What's new: window closed, starting JabRef.");
     }
 
     private static void remember(AnnouncedEntries announced, List<ChangelogEntry> entries) {
@@ -257,14 +265,6 @@ public class WhatsNewLauncher {
     /// The window: the news, "Cancel" and "Start", in JabRef's light or dark colour scheme.
     public static class Window extends Application {
 
-        /// The classes [WhatsNewView] takes from JabRef's base stylesheet, which this scene does not load.
-        private static final String CSS = """
-                .h3 { -fx-font-size: 1.5em; }
-                .h4 { -fx-font-size: 1.25em; }
-                .bold { -fx-font-weight: bold; }
-                .text-muted { -fx-opacity: 0.7; }
-                .font-monospace { -fx-font-family: monospace; }
-                """;
         // Application.launch instantiates the class by reflection: the news reach the window through these fields.
         private static News news = News.NONE;
         private static String title = "";
@@ -280,38 +280,50 @@ public class WhatsNewLauncher {
 
         @Override
         public void start(Stage stage) {
-            Application.setUserAgentStylesheet(dark() ? new PrimerDark().getUserAgentStylesheet() : new PrimerLight().getUserAgentStylesheet());
             Button run = new Button(Localization.lang("Start"));
-            run.getStyleClass().addAll(Styles.SMALL, Styles.ACCENT);
             run.setDefaultButton(true);
             run.setOnAction(_ -> stage.close());
             Button cancel = new Button(Localization.lang("Cancel"));
-            cancel.getStyleClass().add(Styles.SMALL);
             cancel.setCancelButton(true);
-            cancel.setOnAction(_ -> System.exit(1));
+            cancel.setOnAction(_ -> {
+                System.out.println("What's new: cancelled, not starting JabRef.");
+                System.exit(1);
+            });
             HBox buttons = new HBox(8, cancel, run);
             buttons.setAlignment(Pos.CENTER_RIGHT);
             buttons.setPadding(new Insets(8, 16, 12, 16));
             BorderPane root = new BorderPane(new WhatsNewView(news, url -> getHostServices().showDocument(url)));
             root.setBottom(buttons);
             Scene scene = new Scene(root, 900, 650);
-            scene.getStylesheets().add("data:text/css;base64," + Base64.getEncoder().encodeToString(CSS.getBytes(StandardCharsets.UTF_8)));
+            // The stylesheets JabRef itself installs for its own theme, in the same order.
+            scene.getStylesheets().setAll(resource("/css/jabref-theme.css"), resource("/css/jabref-base.css"));
+            scene.getPreferences().setColorScheme(colorScheme());
             stage.setTitle(title);
             for (int size : new int[] {16, 32, 48, 128}) {
-                stage.getIcons().add(new Image(Window.class.getResource("/icons/JabRef-icon-" + size + ".png").toExternalForm()));
+                stage.getIcons().add(new Image(resource("/icons/JabRef-icon-" + size + ".png")));
             }
             stage.setScene(scene);
+            // This window is a gate: the recipe waits for it before starting JabRef, so a window that opens behind
+            // the others reads as a hang. Windows does not let a process that is not in the foreground raise itself,
+            // and `toFront` alone is ignored there; always-on-top is what lifts it, and fitting for the seconds this
+            // gate lives.
+            stage.setAlwaysOnTop(true);
             stage.show();
+            stage.toFront();
+            stage.requestFocus();
             onShown.run();
         }
 
-        /// Dark if JabRef's colour scheme preference says so, or says "follow system" and the system is dark.
-        private static boolean dark() {
-            String scheme = JABREF_PREFERENCES.get(COLOR_SCHEME_PREFERENCE, "FOLLOW_SYSTEM");
-            return switch (scheme) {
-                case "DARK" -> true;
-                case "LIGHT" -> false;
-                default -> Platform.getPreferences().getColorScheme() == ColorScheme.DARK;
+        private static String resource(String name) {
+            return Window.class.getResource(name).toExternalForm();
+        }
+
+        /// JabRef's colour scheme preference; `null` follows the system, as in JabRef.
+        private static @Nullable ColorScheme colorScheme() {
+            return switch (JABREF_PREFERENCES.get(COLOR_SCHEME_PREFERENCE, "FOLLOW_SYSTEM")) {
+                case "DARK" -> ColorScheme.DARK;
+                case "LIGHT" -> ColorScheme.LIGHT;
+                default -> null;
             };
         }
     }
