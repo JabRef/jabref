@@ -1,5 +1,6 @@
 package org.jabref.gui.frame;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javafx.event.ActionEvent;
@@ -10,6 +11,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -54,6 +56,7 @@ import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
+import org.jabref.gui.maintable.CenterSelectedEntryAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
 import org.jabref.gui.maintable.RightClickMenu;
@@ -367,6 +370,9 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(StandardActions.SHOW_PDF_VIEWER, new ShowDocumentViewerAction(stateManager, preferences)),
                 factory.createMenuItem(StandardActions.EDIT_ENTRY, new OpenEntryEditorAction(frame::getCurrentLibraryTab, stateManager)),
+                factory.createMenuItem(StandardActions.CENTER_SELECTED_ENTRY, new CenterSelectedEntryAction(
+                        () -> Optional.ofNullable(frame.getCurrentLibraryTab()).map(LibraryTab::getMainTable),
+                        stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, preferences, dialogService))
         );
 

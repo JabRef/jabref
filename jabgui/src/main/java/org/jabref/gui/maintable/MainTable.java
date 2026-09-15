@@ -384,10 +384,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private boolean isFirstRowVisible() {
-        return Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow"))
-                       .map(VirtualFlow::getFirstVisibleCell)
-                       .map(cell -> cell.getIndex() == 0)
-                       .orElse(true);
+        return MainTableScroller.findVirtualFlow(this)
+                                .map(VirtualFlow::getFirstVisibleCell)
+                                .map(cell -> cell.getIndex() == 0)
+                                .orElse(true);
     }
 
     private void scrollToNextMatchCategory() {
@@ -483,6 +483,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         scrollToPreviousMatchCategory();
                         event.consume();
                         break;
+                    case CENTER_SELECTED_ENTRY:
+                        centerSelectedEntry();
+                        event.consume();
+                        break;
                     case OPEN_URL_OR_DOI:
                         openUrlAction.execute();
                         event.consume();
@@ -516,6 +520,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         getSelectionModel().clearSelection();
         getSelectionModel().selectLast();
         scrollTo(getItems().size() - 1);
+    }
+
+    /// Scrolls the table so that the currently selected entry is centered vertically among the visible rows.
+    /// Near the beginning or end of the table, the entry is placed as close to the center as possible.
+    // [impl->req~maintable.center-selected~1]
+    public void centerSelectedEntry() {
+        MainTableScroller.centerSelectedRow(this);
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
