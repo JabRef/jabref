@@ -79,6 +79,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -398,7 +399,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         scrollFirstSelectedIntoView((VirtualFlow<?>) lookup(".virtual-flow"));
     }
 
-    private <T extends IndexedCell<?>> void scrollFirstSelectedIntoView(VirtualFlow<T> flow) {
+    private <T extends IndexedCell<?>> void scrollFirstSelectedIntoView(@Nullable VirtualFlow<T> flow) {
         if (flow == null || getSelectionModel().isEmpty()) {
             return;
         }
