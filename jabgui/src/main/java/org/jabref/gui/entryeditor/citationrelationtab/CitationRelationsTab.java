@@ -616,16 +616,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     Button showPreview = ControlHelper.iconButton(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW);
                     showPreview.setTooltip(new Tooltip(Localization.lang("Show preview")));
                     // [impl->req~entry-editor.citations.click-preview~1]
-                    showPreview.setOnMouseClicked(event -> {
-                        if (previewTooltip.isShowing()) {
-                            previewTooltip.hide();
-                            return;
-                        }
-                        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-                            previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
-                            previewTooltip.show(showPreview, event.getScreenX(), event.getScreenY());
-                        });
-                    });
+                    showPreview.setOnMouseClicked(event -> togglePreviewTooltip(event, showPreview, entry));
                     vContainer.getChildren().addLast(showPreview);
 
                     Button showEntrySource = ControlHelper.iconButton(IconTheme.JabRefIcons.SOURCE);
@@ -713,6 +704,18 @@ public class CitationRelationsTab extends EntryEditorTab {
         FieldWriter fieldWriter = new FieldWriter(fieldPreferences);
         new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
         return writer.toString();
+    }
+
+    ///
+    private void togglePreviewTooltip(MouseEvent event, Button showPreview, CitationRelationItem entry) {
+        if (previewTooltip.isShowing()) {
+            previewTooltip.hide();
+            return;
+        }
+        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+            previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
+            previewTooltip.show(showPreview, event.getScreenX(), event.getScreenY());
+        });
     }
 
     private void showEntrySourceDialog(BibEntry entry) {
