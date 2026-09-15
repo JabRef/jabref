@@ -42,6 +42,7 @@ import com.airhacks.afterburner.injection.Injector;
 import org.controlsfx.control.HyperlinkLabel;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -69,6 +70,11 @@ class BackupUIManagerTest extends JavaFxTest {
         dialogService = mock(DialogService.class);
         preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getExternalApplicationsPreferences()).thenReturn(mock(ExternalApplicationsPreferences.class));
+    }
+
+    @AfterEach
+    void tearDown() {
+        Injector.forgetAll();
     }
 
     @Test
