@@ -20,6 +20,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
@@ -50,6 +51,9 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty newFieldToAdd = new SimpleStringProperty("");
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
+    private final List<String> restartWarnings = new ArrayList<>();
+    /// State at dialog open, so that resets (stored immediately) also count as changes
+    private List<String> storedDefinitions;
 
     private final CliPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
@@ -72,6 +76,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         this.bibDatabaseMode = mode;
 
         this.multiLineFields.addAll(preferences.getFieldPreferences().getNonWrappableFields());
+        this.storedDefinitions = currentDefinitions();
 
         entryTypeValidator = new FunctionBasedValidator<>(
                 entryTypeToAdd,
@@ -137,6 +142,32 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
         preferences.getFieldPreferences().setNonWrappableFields(multilineFields);
         preferences.storeCustomEntryTypesRepository(entryTypesManager);
+
+        restartWarnings.clear();
+        List<String> newDefinitions = currentDefinitions();
+        if (!storedDefinitions.equals(newDefinitions)) {
+            restartWarnings.add(Localization.lang("Entry types changed."));
+        }
+        storedDefinitions = newDefinitions;
+    }
+
+    /// Serialized form includes field properties, which `BibEntryType.equals` ignores.
+    /// Multiline state is compared only for fields of the entry types, because saving drops all other non-wrappable fields.
+    private List<String> currentDefinitions() {
+        List<Field> nonWrappableFields = preferences.getFieldPreferences().getNonWrappableFields();
+        return entryTypesManager.getAllTypes(bibDatabaseMode).stream()
+                                .map(type -> MetaDataSerializer.serializeCustomEntryTypesV2(type)
+                                        + type.getAllFields().stream()
+                                              .filter(field -> nonWrappableFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT))
+                                              .map(Field::getName)
+                                              .sorted()
+                                              .toList())
+                                .toList();
+    }
+
+    @Override
+    public List<String> getRestartWarnings() {
+        return restartWarnings;
     }
 
     public EntryTypeViewModel addNewCustomEntryType() {
