@@ -30,7 +30,7 @@ class ViewModelTreeTableCellFactoryTest {
     @Test
     void tooltipSetWhenDescriptionPresent() throws Exception {
         ViewModelTreeTableCellFactory<String> factory = new ViewModelTreeTableCellFactory<String>()
-                .withTooltip(vm -> "A description");
+                .withTooltip(_ -> "A description");
 
         TreeTableCell<String, String> cell = factory.call(new TreeTableColumn<>());
         updateItem(cell, "GroupWithDescription", false);
@@ -64,7 +64,7 @@ class ViewModelTreeTableCellFactoryTest {
     @Test
     void tooltipClearedWhenCellBecomesEmpty() throws Exception {
         ViewModelTreeTableCellFactory<String> factory = new ViewModelTreeTableCellFactory<String>()
-                .withTooltip(vm -> "A description");
+                .withTooltip(_ -> "A description");
 
         TreeTableCell<String, String> cell = factory.call(new TreeTableColumn<>());
 
