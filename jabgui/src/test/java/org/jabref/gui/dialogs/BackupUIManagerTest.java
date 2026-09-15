@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -14,6 +15,7 @@ import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -28,10 +30,12 @@ import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -94,15 +98,20 @@ class BackupUIManagerTest extends JavaFxTest {
     }
 
     /// The review runs while the library is still being opened, so no tab exists for it yet and the active tab may be
-    /// absent altogether (welcome tab, startup). The review must not depend on it.
+    /// absent altogether (welcome tab, startup). The review must not depend on it. The backup adds groups to a library
+    /// without groups, which produces a metadata change and a group change; accepting both has to install the groups.
     @Test
-    void reviewBackupWorksWithoutAnActiveTab(@TempDir Path tempDir) throws IOException {
+    void reviewBackupAcceptingAllChangesWorksWithoutAnActiveTab(@TempDir Path tempDir) throws IOException {
         Path backupDir = tempDir.resolve("backups");
         when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
         when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
                 .thenReturn(Optional.of(BackupResolverDialog.REVIEW_BACKUP));
         when(dialogService.showCustomDialogAndWait(any(DatabaseChangesResolverDialog.class)))
-                .thenReturn(Optional.of(true));
+                .thenAnswer(invocation -> {
+                    DatabaseChangesResolverDialog dialog = invocation.getArgument(0);
+                    dialog.getResolvedChanges().forEach(DatabaseChange::accept);
+                    return Optional.of(true);
+                });
         // Sealed, so deep stubs cannot mock it
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
         doReturn(new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
@@ -116,7 +125,19 @@ class BackupUIManagerTest extends JavaFxTest {
         Path originalFile = tempDir.resolve("library.bib");
         Files.writeString(originalFile, "@Article{original, title = {Original}}");
         Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
-        Files.writeString(backupFile, "@Article{original, title = {Original}}\n@Article{added, title = {Added}}");
+        Files.writeString(backupFile, """
+                @Article{original,
+                  title = {Original},
+                }
+                @Article{added,
+                  title = {Added},
+                }
+
+                @Comment{jabref-meta: grouping:
+                0 AllEntriesGroup:;
+                1 StaticGroup:TODO\\;0\\;1\\;0x8a8a8aff\\;\\;\\;;
+                }
+                """);
 
         // Called off the JavaFX thread, as the library loading task does
         Optional<ParserResult> result = BackupUIManager.showRestoreBackupDialog(
@@ -126,7 +147,9 @@ class BackupUIManagerTest extends JavaFxTest {
                 mock(FileUpdateMonitor.class),
                 new JabRefGuiStateManager());
 
-        assertTrue(result.isPresent());
+        BibDatabaseContext restored = result.orElseThrow().getDatabaseContext();
+        assertEquals(2, restored.getDatabase().getEntryCount());
+        assertEquals(List.of("TODO"), restored.getMetaData().getGroups().orElseThrow().getChildren().stream().map(GroupTreeNode::getName).toList());
     }
 
     @Test
