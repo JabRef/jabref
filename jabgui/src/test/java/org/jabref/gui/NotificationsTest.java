@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+// [utest->req~ux.notifications.finished-task~1]
 @ExtendWith(JavaFxExtension.class)
 @NullMarked
 class NotificationsTest {

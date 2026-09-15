@@ -76,6 +76,7 @@ public class Notifications {
         }
     }
 
+    // [impl->req~ux.notifications.finished-task~1]
     public static class TaskNotification extends Notification<Task<?>> {
         private final boolean untitled;
 
