@@ -184,9 +184,9 @@ class InMemoryChatHistoryCacheTest {
         entry.setCitationKey("C");
         history.add(ChatMessage.userMessage("third"));
 
-        assertTrue(fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "A")).isEmpty());
-        assertTrue(fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "B")).isEmpty());
-        assertEquals(3, fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "C")).size());
+        assertEquals(List.of(), fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "A")));
+        assertEquals(List.of(), fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "B")));
+        assertEquals(List.of("first", "second", "third"), fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "C")).stream().map(ChatMessage::content).toList());
     }
 
     @Test
