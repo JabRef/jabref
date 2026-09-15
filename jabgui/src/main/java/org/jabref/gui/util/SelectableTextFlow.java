@@ -96,11 +96,15 @@ public class SelectableTextFlow extends TextFlow {
         return Math.max(selectionStart, selectionEnd);
     }
 
-    private String getTextFlowContent() {
+    /// The text in the index space of [TextFlow#hitTest(Point2D)] and [TextFlow#rangeShape(int, int)]:
+    /// every embedded non-[Text] child (e.g. a [Hyperlink]) occupies one U+FFFC character there.
+    protected String getTextFlowContent() {
         StringBuilder sb = new StringBuilder();
         for (Node node : getChildren()) {
             if (node instanceof Text text) {
                 sb.append(text.getText());
+            } else {
+                sb.append('\uFFFC');
             }
         }
         return sb.toString();
