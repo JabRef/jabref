@@ -1,0 +1,75 @@
+name: Translate Russian
+
+# Drafts translations whenever the English source strings change, and opens a pull
+# request for human review. Proposed alongside the Russian example; maintainers
+# must decide how reviewed output is reconciled with Crowdin before activation.
+# This workflow is DORMANT until a maintainer:
+#   1. Adds an OPENAI_API_KEY repository secret
+#   2. Enables Settings -> Actions -> General ->
+#      "Allow GitHub Actions to create and approve pull requests".
+# While dormant it runs, detects no key, and exits green without doing anything.
+# It never merges anything on its own — it only opens a PR for you to review, and the
+# accepted text must be kept in sync with Crowdin to avoid later overwrites.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "jablib/src/main/resources/l10n/JabRef_en.properties"
+  workflow_dispatch:
+    inputs:
+      process_all_files:
+        description: "Force Russian file selection even when English did not change"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: localize-jabref-russian
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    if: github.repository == 'JabRef/jabref' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check whether translation is enabled
+        id: guard
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -n "$OPENAI_API_KEY" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::OPENAI_API_KEY not set — translation workflow is dormant. Add the secret to enable."
+          fi
+
+      - name: Checkout
+        if: steps.guard.outputs.enabled == 'true'
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0   # full history so changed source strings can be diffed
+          persist-credentials: false
+
+      - name: Translate selected Russian backlog and open a PR
+        if: steps.guard.outputs.enabled == 'true'
+        uses: bisq-network/localize-pipeline@385a75b25931e1031f7840d7309632e7f98de26e # v0.1.21
+        with:
+          config-file: "translations/config.yaml"
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          diff-base: ${{ github.event.before }}
+          process-all-files: ${{ github.event_name == 'workflow_dispatch' && inputs.process_all_files || false }}
+          open-pr: "true"
+          # A new branch per attempt avoids replacing a branch under review.
+          pr-branch: "localize/ru-${{ github.run_id }}-${{ github.run_attempt }}"
+          pr-title: "Update Russian translations (AI-assisted; review required)"
+          commit-message: "Update Russian translations"
+          github-token: ${{ github.token }}
+          # Normal github-actions[bot] attribution; no signing secret required.
+          commit-signing-method: "none"

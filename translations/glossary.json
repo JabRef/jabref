@@ -1,0 +1,65 @@
+{
+  "_comment": "Converted from JabRef's Crowdin project glossary (TBX export supplied by @Siedlerchr on JabRef/jabref#16176, 2026-07-29). 'ru' holds settled EN->RU mappings supplied to both model passes as preferred lemmas. '_quarantine_ru' documents mappings that are deliberately excluded until a Russian reviewer resolves the recorded ambiguity or typo. Terms that must never be translated live in brand_technical_glossary in config.yaml.",
+  "_source": "JabRef's Glossary.tbx (Crowdin, TBX-Basic), 83 termEntries, 31 with a Russian equivalent",
+  "_source_url": "https://github.com/user-attachments/files/30517256/JabRef.s.Glossary.tbx.zip",
+  "_review_status": "The 23 active mappings reproduce the supplied export, not a newly approved glossary. Edit ru after native review; keep the eight quarantined mappings excluded until their stated issues are resolved. No live Crowdin glossary synchronization is configured.",
+  "ru": {
+    "AI functionality": "ИИ функции",
+    "AI Summary": "ИИ-сводка",
+    "API base URL": "API URL",
+    "attached file": "прикреплённый файл",
+    "bachelor's thesis": "дипломная работа",
+    "binary": "исполняемый файл",
+    "content": "содержимое",
+    "credential store": "хранилище учётных данных",
+    "document splitter": "разбиение документа",
+    "entry": "запись",
+    "file explorer": "файловый менеджер",
+    "follow-up question": "уточняющий вопрос",
+    "functionality": "возможности",
+    "ingestion": "обработка",
+    "keyboard shortcut": "сочетание клавиш",
+    "linked file": "связанный файл",
+    "logs": "журнал событий",
+    "merge": "объединить",
+    "OCR": "оптическое распознавание текста",
+    "offline": "в автономном режиме",
+    "references": "источники",
+    "search group": "группа поиска",
+    "search query": "поисковой запрос"
+  },
+  "_quarantine_ru": {
+    "citation": {
+      "ru": "цитата",
+      "hold_reason": "RU \"цитата\" = a quotation. Many backlog strings use the bibliometric sense (Total Citations, citation count, Refetch citations) where \"цитата\" is wrong. 17 backlog strings affected — needs InAnYan to split the senses."
+    },
+    "Cite As You Write": {
+      "ru": "Цитирование по ходу написания",
+      "hold_reason": "definition marked \"К обсуждению\" (= to be discussed) — not a settled term."
+    },
+    "consistency check": {
+      "ru": "проверка согласованности",
+      "hold_reason": "see \"integrity check\" — same RU term for two distinct English terms."
+    },
+    "importer": {
+      "ru": "средство иморта",
+      "hold_reason": "RU value has a typo: \"средство иморта\" (should be \"импорта\"). Definition is also marked \"К обсуждению\" (= to be discussed), so not settled."
+    },
+    "integrity check": {
+      "ru": "проверка согласованности",
+      "hold_reason": "collides with \"consistency check\" — both pinned to \"проверка согласованности\". JabRef has both \"Checking consistency of '%0'\" and \"Checking integrity of '%0'\"; enforcing both makes them identical in the UI."
+    },
+    "master's thesis": {
+      "ru": "магистерская дисертация",
+      "hold_reason": "RU value has a typo: \"магистерская дисертация\" (should be \"диссертация\")."
+    },
+    "сhunk": {
+      "ru": "фрагмент",
+      "hold_reason": "source term begins with CYRILLIC ES (U+0441), not Latin c — can never match English source. Broken in Crowdin too."
+    },
+    "сitation style": {
+      "ru": "cтиль цитирования",
+      "hold_reason": "source term begins with CYRILLIC ES (U+0441), not Latin c — can never match English source. Also its RU value begins with a LATIN c. Broken in Crowdin too."
+    }
+  }
+}

@@ -1,0 +1,104 @@
+# Localize Pipeline configuration for JabRef
+# Proposed Russian-only automation, alongside a separately reviewed Russian example.
+# Drafts missing/changed keys in jablib/src/main/resources/l10n/JabRef_ru.properties
+# against the English source JabRef_en.properties, then opens a PR for human review.
+#
+# Without OPENAI_API_KEY, the workflow skips inference. Actions PR permission is
+# also required for publication, but is not a guard against model spending.
+#
+# NOTE: this fills missing/empty keys so a native reviewer opens a partially-filled file
+# instead of a blank one. Output is meant to flow through JabRef's normal Crowdin review;
+# it is NOT a replacement for Crowdin. Maintainers choose how accepted PR text is
+# synchronized back to Crowdin before they enable this proposed workflow.
+
+target_project_root: ".."
+input_folder: "jablib/src/main/resources/l10n"
+
+# JabRef uses one .properties file per locale with a JabRef_<locale> suffix
+# (JabRef_de.properties, JabRef_ru.properties, ...). English is the source of truth.
+localization_format: "java_properties"
+localization_layout:
+  id: "suffix"
+  base_name: "JabRef"
+  source_locale: "en"
+
+translation_source: "git"
+placeholder_profile: "java-indexed"
+glossary_file_path: "glossary.json"
+# Russian glossary values are preferred lemmas and must be inflected naturally.
+translation_glossary_enforcement: "prompt-only"
+translation_file_filter_glob: "JabRef_ru.properties"
+
+project_context: >
+  Translate for JabRef, an open-source reference and bibliography manager (JavaFX desktop
+  app) used by researchers and students to organize citations and BibTeX/BibLaTeX
+  libraries. The audience is technical and academic. Many strings are domain terms with a
+  precise meaning in bibliographic tooling (entry types, fields, citation-key patterns,
+  identifiers such as DOI/ISBN/arXiv) — prefer the established term a native academic user
+  would expect over a generic paraphrase, and never invent a translation for a term that
+  is conventionally left in English (see the brand/technical glossary). UI labels should
+  stay concise. Strings use JabRef's indexed placeholders of the form %0, %1, %2 and may
+  contain HTML tags and & mnemonics; all must be preserved exactly and never translated.
+  "Related work" means the research-paper section, not linked work items; in Russian,
+  use the section sense "Связанные работы" (Related Work), not Literature Review.
+  For Russian, consistently prefer the existing-locale term "инструмент выборки"
+  for fetcher; do not use "источники", which the glossary reserves for references.
+  Comments extracted from it are stored on
+  matched bibliography entries. Citations in this workflow are bibliographic references,
+  not verbatim quotations. Preserve this distinction in related-work status messages.
+
+# --- Model provider ---
+model_provider: "aisuite"
+model_name: "gpt-4o-mini"
+review_model_name: "gpt-5.6-terra"
+review_reasoning_effort: "none"
+holistic_review_chunk_size: 15
+max_concurrent_api_calls: 5
+rate_limit_per_minute: 60
+
+dry_run: false
+retranslate_identical_source_strings: false
+process_all_files: false
+
+# Conservative safety gate: block a PR if too many strings come back identical to English
+# (a sign the model punted), a deterministic validation fails, or the pipeline skips work.
+quality_gate:
+  source_identical_min_block_count: 5
+  source_identical_max_count: 20
+  source_identical_max_ratio: 0.30
+  block_on_pipeline_warnings: true
+
+# Proper nouns, formats, protocols and identifiers that must never be translated.
+# Extend freely — this is the first line of defence against the "context-dependent term
+# gets paraphrased" problem Siedlerchr raised.
+brand_technical_glossary:
+  - JabRef
+  - BibTeX
+  - BibLaTeX
+  - biblatex
+  - BibTeXML
+  - RIS
+  - MODS
+  - DOI
+  - ISBN
+  - ISSN
+  - arXiv
+  - PMID
+  - PubMed
+  - Medline
+  - Crossref
+  - ORCID
+  - URL
+  - URI
+  - PDF
+  - LaTeX
+  - Markdown
+  - OpenOffice
+  - LibreOffice
+  - Grobid
+  - CSL
+
+# The first automation is deliberately Russian-only. Add locales only after the
+# Russian pilot has been reviewed and accepted.
+supported_locales:
+  - { code: "ru", name: "Russian" }
