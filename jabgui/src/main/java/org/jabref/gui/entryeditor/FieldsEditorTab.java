@@ -156,7 +156,9 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                 redoAction);
         fieldEditor.bindToEntry(entry);
         editors.put(field, fieldEditor);
-        return new FieldNameLabel(field);
+        Label label = new FieldNameLabel(field);
+        GridPane.setValignment(label, VPos.TOP);
+        return label;
     }
 
     private void setRegularRowLayout(GridPane gridPane) {

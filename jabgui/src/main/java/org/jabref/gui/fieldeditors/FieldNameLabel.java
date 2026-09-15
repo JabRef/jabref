@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Region;
 import javafx.stage.Screen;
 
 import org.jabref.gui.util.FieldsUtil;
@@ -14,9 +15,9 @@ public class FieldNameLabel extends Label {
 
     public FieldNameLabel(Field field) {
         setText(FieldsUtil.getDisplayName(field));
-        setPadding(new Insets(4, 0, 0, 0));
-        setAlignment(Pos.CENTER);
-        setPrefHeight(Double.POSITIVE_INFINITY);
+        setPadding(new Insets(6, 0, 0, 0));
+        setAlignment(Pos.CENTER_LEFT);
+        setPrefHeight(Region.USE_COMPUTED_SIZE);
 
         String description = FieldsUtil.getDescription(field);
         if (StringUtil.isNotBlank(description)) {

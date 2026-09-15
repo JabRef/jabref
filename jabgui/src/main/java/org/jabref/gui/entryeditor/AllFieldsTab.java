@@ -399,10 +399,6 @@ public class AllFieldsTab extends FieldsEditorTab {
         int row = 0;
         for (Field field : fields) {
             Label label = labelForField.get(field);
-            // FieldNameLabel sets prefHeight to infinity to fill the stretch layout's
-            // percent-height rows; in the natural-height list that would blow up every
-            // row's preferred height, so reset it to the computed size.
-            label.setPrefHeight(Region.USE_COMPUTED_SIZE);
             GridPane.setValignment(label, VPos.TOP);
             grid.add(label, 0, row);
             grid.add(wrapWithRemoveButton(bibDatabaseContext, entry, field), 1, row);
