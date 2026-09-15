@@ -111,11 +111,11 @@ class ImportHandlerTest {
     @CsvSource({"true, false", "false, true"})
     void downloadOverrideControlsDownloadsWithoutChangingWebSearch(boolean choice, boolean webSearchChoice) {
         when(preferences.getFilePreferences().shouldDownloadLinkedFiles()).thenReturn(webSearchChoice);
-    if (choice) {
-        importHandler.enableLinkedFileDownloads();
-    } else {
-        importHandler.disableLinkedFileDownloads();
-    }
+        if (choice) {
+            importHandler.enableLinkedFileDownloads();
+        } else {
+            importHandler.disableLinkedFileDownloads();
+        }
         BibEntry entry = new BibEntry().withFiles(List.of(new LinkedFile("", "https://example.org/paper.pdf", "PDF")));
 
         try (MockedConstruction<LinkedFileViewModel> downloads = mockConstruction(LinkedFileViewModel.class)) {
