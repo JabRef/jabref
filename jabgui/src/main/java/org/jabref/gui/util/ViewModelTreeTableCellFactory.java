@@ -14,6 +14,8 @@ import javafx.util.Callback;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.util.strings.StringUtil;
 
+import org.jspecify.annotations.Nullable;
+
 /// Constructs a [TreeTableCell] based on the view model of the row and a bunch of specified converter methods.
 ///
 /// @param <S> view model
@@ -22,7 +24,7 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
     private Callback<S, String> toText;
     private Callback<S, Node> toGraphic;
     private Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
-    private Callback<S, String> toTooltip;
+    private Callback<S, @Nullable String> toTooltip;
     private Supplier<List<String>> styleClassSupplier;
 
     public ViewModelTreeTableCellFactory<S> withText(Callback<S, String> toText) {
@@ -49,7 +51,7 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S> withTooltip(Callback<S, String> toTooltip) {
+    public ViewModelTreeTableCellFactory<S> withTooltip(Callback<S, @Nullable String> toTooltip) {
         this.toTooltip = toTooltip;
         return this;
     }
@@ -80,7 +82,7 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
                         setGraphic(toGraphic.call(viewModel));
                     }
                     if (toTooltip != null) {
-                        String tooltip = toTooltip.call(viewModel);
+                        @Nullable String tooltip = toTooltip.call(viewModel);
                         if (StringUtil.isNotBlank(tooltip)) {
                             setTooltip(new Tooltip(tooltip));
                         } else {
