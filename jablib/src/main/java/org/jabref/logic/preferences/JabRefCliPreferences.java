@@ -2676,7 +2676,7 @@ public class JabRefCliPreferences implements CliPreferences {
         String stored = get(OO_BST_CITATION_FORMAT, defaultFormat.name());
         try {
             return BstCitationFormat.valueOf(stored);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return defaultFormat;
         }
     }
@@ -2685,7 +2685,7 @@ public class JabRefCliPreferences implements CliPreferences {
         String stored = get(OO_CITE_SPECIAL_CITATION_TYPE, defaultType.name());
         try {
             return CitationType.valueOf(stored);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return defaultType;
         }
     }

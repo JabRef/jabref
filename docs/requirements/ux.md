@@ -174,12 +174,26 @@ Every library tab carries an icon: one for a BibTeX library, one for a BibLaTeX 
 
 Needs: impl, utest
 
-### Restore the working position on startup
+## Restore the working position on startup
 `req~ux.startup.restore-position~1`
 
 When JabRef reopens the libraries of the last session, it selects the library tab that was in front when JabRef was closed, and in each library the entry that was selected there.
 
 The position is written while closing, so a session that did not close normally leaves the position of the last regular close in place.
+
+Needs: impl
+
+## Preferences walkthroughs open their settings dialog directly
+`req~ux.walkthrough.preferences-direct~1`
+
+Walkthroughs that require preferences must open the preferences dialog directly, so they can start regardless of the platform menu presentation.
+
+Needs: impl
+
+## Groups walkthroughs make required controls and entries available
+`req~ux.walkthrough.groups-preparation~1`
+
+The groups walkthrough must open its bundled example library, display the Groups pane, and clear the current search before guiding the user.
 
 Needs: impl
 

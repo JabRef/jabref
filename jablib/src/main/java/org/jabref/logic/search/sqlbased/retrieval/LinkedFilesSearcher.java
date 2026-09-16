@@ -99,7 +99,7 @@ public final class LinkedFilesSearcher {
             // Characters such as " or < are literals there, but syntax here, and Lucene reports that as IllegalArgumentException.
             // Such a query is still valid for the metadata search, so only the linked files part is skipped.
             // https://github.com/JabRef/jabref/issues/9482
-            LOGGER.error("Error during query parsing with query {}", searchQuery, e);
+            LOGGER.trace("Error during query parsing with query {}", searchQuery, e);
             return Optional.empty();
         }
     }
@@ -144,7 +144,7 @@ public final class LinkedFilesSearcher {
         Map<String, List<String>> linkedFilesMap = new HashMap<>();
         for (BibEntry bibEntry : databaseContext.getEntries()) {
             for (LinkedFile linkedFile : bibEntry.getFiles()) {
-                linkedFilesMap.computeIfAbsent(linkedFile.getLink(), k -> new ArrayList<>()).add(bibEntry.getId());
+                linkedFilesMap.computeIfAbsent(linkedFile.getLink(), _ -> new ArrayList<>()).add(bibEntry.getId());
             }
         }
         return linkedFilesMap;
