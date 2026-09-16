@@ -283,11 +283,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
         catalogTable.setItems(viewModel.getCatalogs());
     }
-
-    /// Creates a cell factory that renders an editable [TextField] for the given string property of a
-    /// [StudyCatalogItem] row, committing the edited value back to the model when the field loses focus.
-    ///
-    /// @param propertyExtractor extracts the editable [StringProperty] (e.g. reason, native query) from a row item
+    
     private Callback<TableColumn<StudyCatalogItem, String>, TableCell<StudyCatalogItem, String>> createEditableTextFieldCellFactory(
             Function<StudyCatalogItem, StringProperty> propertyExtractor) {
         return column -> {
