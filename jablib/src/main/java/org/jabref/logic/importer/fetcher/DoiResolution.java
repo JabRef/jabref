@@ -166,6 +166,10 @@ public class DoiResolution implements FulltextFetcher {
         if (pdfUrl.isPresent()) {
             try {
                 URL url = base.toURI().resolve(pdfUrl.get()).toURL();
+                if (!URLUtil.isHttpUrl(url)) {
+                    LOGGER.warn("Ignoring embedded PDF link with non-http(s) scheme: {}", url);
+                    return Optional.empty();
+                }
                 return Optional.of(url);
             } catch (MalformedURLException | URISyntaxException _) {
                 return Optional.empty();
