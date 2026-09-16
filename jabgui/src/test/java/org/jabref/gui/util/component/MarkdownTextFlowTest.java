@@ -234,6 +234,27 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void copiedJsonAnswerKeepsBackticksLiteral() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdownWithJsonHighlighting("{\"a\": \"```\"}");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("{\n  \"a\": \"```\"\n}", clipBoardManager.stringContent.get());
+        assertTrue(clipBoardManager.htmlContent.get().contains("```"));
+    }
+
+    @Test
     void jsonIsLeftAloneWithoutHighlighting() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 

@@ -58,6 +58,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
     private static final int MAX_JSON_SEGMENTS = 5_000;
+    private static final Pattern BACKTICK_RUN = Pattern.compile("`+");
 
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
@@ -289,7 +290,10 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     }
 
     private static String fenced(String json) {
-        return "```json\n" + json + "\n```\n";
+        // The fence has to be longer than any run of backticks inside, or the content would close it.
+        int longestRun = BACKTICK_RUN.matcher(json).results().mapToInt(result -> result.group().length()).max().orElse(0);
+        String fence = "`".repeat(Math.max(3, longestRun + 1));
+        return fence + "json\n" + json + "\n" + fence + "\n";
     }
 
     /// The text of one or more adjacent nodes that belong to the same Markdown node, as needed to
