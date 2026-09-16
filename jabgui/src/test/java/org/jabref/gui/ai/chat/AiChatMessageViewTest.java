@@ -5,9 +5,13 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.collections.FXCollections;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
+import javafx.scene.robot.Robot;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
@@ -16,6 +20,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.gui.util.component.ListScrollPane;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.chatting.ChatMessage;
 
@@ -36,6 +41,7 @@ class AiChatMessageViewTest extends JavaFxTest {
     private GuiPreferences preferences;
     private ExternalApplicationsPreferences externalApplicationsPreferences;
     private ClipBoardManager clipBoardManager;
+    private StackPane rootPane;
 
     @Override
     public void start(Stage stage) {
@@ -54,7 +60,7 @@ class AiChatMessageViewTest extends JavaFxTest {
         Injector.setModelOrService(GuiPreferences.class, preferences);
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
-        StackPane rootPane = new StackPane();
+        rootPane = new StackPane();
         stage.setScene(new Scene(rootPane, 400, 300));
         stage.show();
     }
@@ -93,5 +99,35 @@ class AiChatMessageViewTest extends JavaFxTest {
         });
 
         verify(dialogService).notify(Localization.lang("No library open"));
+    }
+
+    @Test
+    void draggingAcrossMessageInChatHistorySelectsText() {
+        AiChatMessageView view = createView();
+        interact(() -> {
+            view.setChatMessage(ChatMessage.aiMessage("Some selectable answer text", List.of()));
+            ListScrollPane<AiChatMessageView> history = new ListScrollPane<>();
+            history.setFocusTraversable(false);
+            history.setRenderer(node -> node);
+            history.itemsProperty().get().add(view);
+            rootPane.getChildren().setAll(new StackPane(history));
+        });
+        awaitEvents();
+
+        interact(() -> {
+            rootPane.applyCss();
+            rootPane.layout();
+            Node text = view.getMarkdownTextFlow().getChildren().getFirst();
+            Bounds bounds = text.localToScreen(text.getBoundsInLocal());
+            double centerY = bounds.getMinY() + (bounds.getHeight() / 2);
+            Robot robot = new Robot();
+            robot.mouseMove(bounds.getMinX() + 1, centerY);
+            robot.mousePress(MouseButton.PRIMARY);
+            robot.mouseMove(bounds.getMaxX() - 1, centerY);
+            robot.mouseRelease(MouseButton.PRIMARY);
+        });
+        awaitEvents();
+
+        assertTrue(view.getMarkdownTextFlow().isSelectionActive());
     }
 }

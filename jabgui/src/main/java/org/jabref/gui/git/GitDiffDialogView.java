@@ -122,7 +122,7 @@ public class GitDiffDialogView extends BaseDialog<Void> {
             changesTableView.getSelectionModel().selectFirst();
         }
 
-        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((_, _, _) -> {
             detailsViewCache.clear();
             DatabaseChange selectedChange = changesTableView.getSelectionModel().getSelectedItem();
             if (selectedChange != null) {
