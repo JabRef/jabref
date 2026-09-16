@@ -134,7 +134,8 @@ public class AiChatMessageView extends HBox {
             return;
         }
 
-        markdownTextFlow.setMarkdown(StringUtil.makeSafe(chatMessage.content()));
+        // Only the AI answers with JSON; a user message is shown the way it was typed.
+        markdownTextFlow.setMarkdown(StringUtil.makeSafe(chatMessage.content()), chatMessage.role() == ChatMessage.Role.AI);
     }
 
     private static Pos determineAlignment(ChatMessage chatMessage) {

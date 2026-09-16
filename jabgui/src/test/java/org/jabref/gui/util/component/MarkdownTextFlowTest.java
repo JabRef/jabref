@@ -186,7 +186,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
         interact(() -> {
-            textFlow.setMarkdown("```json\n{\"a\": 1}\n```");
+            textFlow.setMarkdown("```json\n{\"a\": 1}\n```", true);
             rootPane.applyCss();
             rootPane.layout();
             textFlow.applyCss();
@@ -204,11 +204,29 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void jsonAnswerIsHighlighted() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> textFlow.setMarkdown("{\"a\": 1}", true));
+
+        assertTrue(hasChildWithStyleClass(textFlow, "json-key"));
+    }
+
+    @Test
+    void jsonIsLeftAloneWithoutHighlighting() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> textFlow.setMarkdown("{\"a\": 1}"));
+
+        assertFalse(hasChildWithStyleClass(textFlow, "json-key"));
+    }
+
+    @Test
     void hugeJsonIsNotHighlighted() {
         MarkdownTextFlow textFlow = markdownTextFlow();
         String hugeJson = "{\"a\": [" + "1, ".repeat(40_000) + "1]}";
 
-        interact(() -> textFlow.setMarkdown(hugeJson));
+        interact(() -> textFlow.setMarkdown(hugeJson, true));
 
         assertFalse(hasChildWithStyleClass(textFlow, "json-key"));
     }

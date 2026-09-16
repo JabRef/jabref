@@ -67,6 +67,9 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     /// Governs whether copying reproduces Markdown markup or the displayed text verbatim.
     private boolean plainText;
 
+    /// Whether JSON in the current content is indented and syntax highlighted.
+    private boolean highlightJson;
+
     public MarkdownTextFlow(Pane parent) {
         super(parent);
         this.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
@@ -77,16 +80,28 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     }
 
     public void setMarkdown(@NonNull String markdownText) {
+        setMarkdown(markdownText, false);
+    }
+
+    /// Displays the given Markdown text. With `highlightJson`, a JSON document at the beginning of the
+    /// text or inside a fenced code block is indented and syntax highlighted — AI models often answer
+    /// that way, and the raw document is hard to read.
+    public void setMarkdown(@NonNull String markdownText, boolean highlightJson) {
         super.clearSelection();
         getChildren().clear();
         plainText = false;
+        this.highlightJson = highlightJson;
 
         if (markdownText.isBlank()) {
             return;
         }
 
-        // AI models sometimes answer with plain JSON, often followed by an explanation.
-        // The JSON is shown as a highlighted code block, the explanation as Markdown.
+        if (!highlightJson) {
+            new MarkdownRenderer().render(parser.parse(markdownText));
+            return;
+        }
+
+        // The JSON is shown as a highlighted code block, an explanation following it as Markdown.
         JsonHighlighter.leadingJson(markdownText).ifPresentOrElse(
                 leadingJson -> {
                     addJsonNodes(leadingJson.json(), null);
@@ -150,6 +165,11 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     /// Adds the nodes for a code block, with syntax highlighting if the code is JSON.
     // [impl->feat~ai.chat.json-highlighting~1]
     private void addCodeBlockNodes(String content, @Nullable Node codeBlock) {
+        if (!highlightJson) {
+            addTextNode(content, codeBlock, "markdown-code-block", "font-monospace");
+            return;
+        }
+
         JsonHighlighter.leadingJson(content)
                        .filter(leadingJson -> leadingJson.rest().isEmpty())
                        .ifPresentOrElse(
