@@ -132,7 +132,8 @@ public class ManageStudyDefinitionViewModel {
                                        StudyCatalog savedCatalog = catalogsByName.get(name);
                                        boolean enabled = savedCatalog != null && savedCatalog.isEnabled();
                                        String reason = savedCatalog != null ? savedCatalog.getReason() : "";
-                                       return new StudyCatalogItem(name, enabled, reason);
+                                       String nativeQuery = findNativeQueryForCatalog(name);
+                                       return new StudyCatalogItem(name, enabled, reason, nativeQuery);
                                    })
                                    .toList());
 
@@ -141,6 +142,24 @@ public class ManageStudyDefinitionViewModel {
         this.dialogService = dialogService;
 
         initializeValidationBindings();
+    }
+
+    /// Deterministically finds the native query to display for a catalog when loading an existing study.
+    /// The `catalogSpecific` override is technically stored per [StudyQuery], not per catalog, so several queries
+    /// could in theory carry different overrides for the same catalog. Since the Catalogs tab only offers a single
+    /// field per catalog, we resolve this by taking the first non-blank override found, iterating the study's
+    /// queries in their existing list order - this way, reopening the same unchanged study always shows the same
+    /// value.
+    ///
+    /// @param catalogName the catalog (fetcher) name to look up, matched case-insensitively
+    private String findNativeQueryForCatalog(String catalogName) {
+        return queries.stream()
+                       .flatMap(query -> query.getCatalogSpecific().entrySet().stream())
+                       .filter(entry -> entry.getKey().equalsIgnoreCase(catalogName))
+                       .map(Map.Entry::getValue)
+                       .filter(value -> value != null && !value.isBlank())
+                       .findFirst()
+                       .orElse("");
     }
 
     private void initializeValidationBindings() {
@@ -264,6 +283,7 @@ public class ManageStudyDefinitionViewModel {
 
     /// Builds a [Study] from the current UI state without persisting it.
     public Study buildStudy() {
+        applyNativeQueryOverrides();
         return new Study(
                 authors,
                 title.getValueSafe(),
@@ -273,6 +293,28 @@ public class ManageStudyDefinitionViewModel {
                         .filter(StudyCatalogItem::isEnabled)
                         .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason()))
                         .toList());
+    }
+
+    /// Writes each catalog's native query into every [StudyQuery]'s `catalogSpecific` map under that catalog's key
+    /// (matched case-insensitively, consistent with [org.jabref.logic.crawler.StudyFetcher]). Since `catalogSpecific`
+    /// is stored per query rather than per catalog, applying the same value to every query is the simplest design
+    /// that satisfies "one native query per catalog" as offered by the Catalogs tab; it uniformly overrides all
+    /// queries for that catalog rather than allowing per-query variation.
+    /// A blank native query removes any existing entry for that catalog instead of writing an empty string.
+    private void applyNativeQueryOverrides() {
+        for (StudyCatalogItem catalog : catalogs) {
+            if (!catalog.isEnabled()) {
+                continue;
+            }
+            String nativeQuery = catalog.getNativeQuery();
+            for (StudyQuery query : queries) {
+                Map<String, String> catalogSpecific = query.getCatalogSpecific();
+                catalogSpecific.keySet().removeIf(key -> key.equalsIgnoreCase(catalog.getName()));
+                if (nativeQuery != null && !nativeQuery.isBlank()) {
+                    catalogSpecific.put(catalog.getName(), nativeQuery);
+                }
+            }
+        }
     }
 
     public Property<String> titleProperty() {
