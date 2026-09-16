@@ -174,6 +174,18 @@ Every library tab carries an icon: one for a BibTeX library, one for a BibLaTeX 
 
 Needs: impl, utest
 
+## JabRef opens the last closed library on startup
+`req~ux.startup.last-opened-library~1`
+
+When JabRef reopens the libraries of the last session, it selects the library tab that was in front when JabRef was closed.
+
+Needs: impl
+
+## JabRef selects the last selected entries of the libraries on startup
+`req~ux.startup.last-selected-entries~1`
+
+Needs: impl
+
 ## Preferences walkthroughs open their settings dialog directly
 `req~ux.walkthrough.preferences-direct~1`
 
