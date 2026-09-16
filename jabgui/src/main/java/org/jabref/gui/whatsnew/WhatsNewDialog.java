@@ -64,7 +64,7 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
         // JavaFX dialogs are application-modal unless told otherwise; this one must not block JabRef.
         initModality(Modality.NONE);
         BooleanExpression restartOffered = updateAvailable.<BooleanExpression>map(available -> check.isEqualTo(Check.RUNNING)
-                                                                                .or(check.isEqualTo(Check.DONE).and(available)))
+                                                                                                    .or(check.isEqualTo(Check.DONE).and(available)))
                                                           .orElseGet(() -> new SimpleBooleanProperty(false));
         BooleanExpression laterFits = BooleanExpression.booleanExpression(this.news.map(shown -> !shown.isEmpty())).or(restartOffered);
 
