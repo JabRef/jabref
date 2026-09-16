@@ -85,11 +85,11 @@ public class Pseudonymization {
                     continue;
                 }
 
-                Map<String, Integer> valueToIdMap = fieldToValueToIdMap.computeIfAbsent(field, k -> new HashMap<>());
+                Map<String, Integer> valueToIdMap = fieldToValueToIdMap.computeIfAbsent(field, _ -> new HashMap<>());
                 // TODO: Use {@link org.jabref.model.entry.field.FieldProperty} to distinguish cases.
                 //       See {@link org.jabref.model.entry.field.StandardField} for usages.
                 String fieldContent = entry.getField(field).get();
-                Integer id = valueToIdMap.computeIfAbsent(fieldContent, k -> valueToIdMap.size() + 1);
+                Integer id = valueToIdMap.computeIfAbsent(fieldContent, _ -> valueToIdMap.size() + 1);
                 newEntry.setField(field, field.getName() + "-" + id);
             }
         }
