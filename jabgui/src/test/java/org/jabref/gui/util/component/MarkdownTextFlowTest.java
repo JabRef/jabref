@@ -243,9 +243,10 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
-    void hugeJsonIsNotHighlighted() {
+    void tokenDenseJsonIsNotHighlighted() {
         MarkdownTextFlow textFlow = markdownTextFlow();
-        String hugeJson = "{\"a\": [" + "1, ".repeat(40_000) + "1]}";
+        // Short enough to be formatted, but far too many tokens to give each one its own node.
+        String hugeJson = "{\"a\": [" + "1, ".repeat(5_000) + "1]}";
 
         interact(() -> textFlow.setMarkdownWithJsonHighlighting(hugeJson));
 

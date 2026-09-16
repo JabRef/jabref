@@ -57,6 +57,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     private static final Pattern NUMBERED_LIST_PATTERN = Pattern.compile("^\\s*\\d+\\.\\s+$");
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
+    private static final int MAX_JSON_SEGMENTS = 5_000;
 
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
@@ -184,7 +185,15 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     /// Adds one text node per JSON token; they are merged back into one segment when copying
     /// (see buildCopySegments).
     private void addJsonNodes(String json, @Nullable Node codeBlock) {
-        for (JsonHighlighter.Segment segment : JsonHighlighter.tokenize(json)) {
+        List<JsonHighlighter.Segment> segments = JsonHighlighter.tokenize(json);
+
+        // A token-dense document would put tens of thousands of nodes into the scene graph.
+        if (segments.size() > MAX_JSON_SEGMENTS) {
+            addTextNode(json, codeBlock, "markdown-code-block", "font-monospace");
+            return;
+        }
+
+        for (JsonHighlighter.Segment segment : segments) {
             addTextNode(segment.text(), codeBlock, "markdown-code-block", "font-monospace", segment.styleClass());
         }
     }
