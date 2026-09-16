@@ -140,7 +140,7 @@ class CustomEntryTypesTabViewModelTest {
                 .withType(StandardEntryType.Online)
                 .withRequiredFields(StandardField.TITLE)
                 .build();
-        model.entryTypes().setAll(List.of(new CustomEntryTypeViewModel(modified, x -> false)));
+        model.entryTypes().setAll(List.of(new CustomEntryTypeViewModel(modified, _ -> false)));
 
         model.storeSettings();
         assertFalse(model.getRestartWarnings().isEmpty());
