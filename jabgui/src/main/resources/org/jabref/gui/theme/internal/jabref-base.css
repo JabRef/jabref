@@ -909,12 +909,14 @@ We want to have a look that matches our icons in the tool-bar */
 .entry-editor .all-fields-section-pane > .title {
     -fx-background-color: transparent;
     -fx-font-weight: bold;
+    -fx-padding: 0.5em 0 0.333em 0;
     -fx-border-color: transparent transparent -color-border-light transparent;
 }
 
 .entry-editor .all-fields-section-pane > *.content {
     -fx-background-color: transparent;
     -fx-border-width: 0;
+    -fx-padding: 0.5em 0 0.333em 1.333em;
 }
 
 .entry-editor .all-fields-add-chip {
