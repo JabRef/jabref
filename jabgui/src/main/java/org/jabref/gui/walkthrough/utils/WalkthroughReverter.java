@@ -147,7 +147,7 @@ public class WalkthroughReverter {
         }
 
         LOGGER.warn("No previous resolvable step found, quitting walkthrough.");
-        walkthrough.quit();
+        walkthrough.quitAfterReversion();
     }
 
     private void undo(int stepIndex) {

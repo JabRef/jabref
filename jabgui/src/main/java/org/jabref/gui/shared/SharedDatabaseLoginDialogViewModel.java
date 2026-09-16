@@ -126,7 +126,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 property.setValue(current);
             }
         });
-        EasyBind.subscribe(autosave, selected -> {
+        EasyBind.subscribe(autosave, _ -> {
             String current = folder.getValue();
             folder.setValue(null);
             folder.setValue(current);
@@ -141,7 +141,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     Path p = Path.of(input.trim());
                     p = p.getParent();
                     return (p != null) && Files.isDirectory(p);
-                } catch (InvalidPathException e) {
+                } catch (InvalidPathException _) {
                     return false;
                 }
             }
@@ -305,8 +305,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             Localization.lang("However, a new database was created alongside the pre-3.6 one."),
                     ButtonType.OK, openHelp);
 
-            result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
-            result.filter(ButtonType.OK::equals).ifPresent(btn -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
+            result.filter(btn -> btn.equals(openHelp)).ifPresent(_ -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
+            result.filter(ButtonType.OK::equals).ifPresent(_ -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
             return;
         }
         // [impl->req~shared-database.reconnect-retry~1]
