@@ -81,6 +81,12 @@ class JsonHighlighterTest {
     }
 
     @Test
+    void leadingJsonAcceptsAnUnescapedLineBreakInAString() {
+        assertEquals("{\n  \"a\": \"first\\nsecond\"\n}",
+                JsonHighlighter.leadingJson("{\"a\": \"first\nsecond\"}").orElseThrow().json());
+    }
+
+    @Test
     void prettyPrintRejectsDuplicateNamesInsteadOfDroppingThem() {
         assertEquals(Optional.empty(), JsonHighlighter.leadingJson("{\"a\": 1, \"a\": 2}"));
     }
