@@ -49,6 +49,7 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ZipFileChooser;
+import org.jabref.gui.walkthrough.WalkthroughPane;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -178,9 +179,16 @@ public class JabRefDialogService implements DialogService {
         return choiceDialog.showAndWait();
     }
 
+    /// A stock JavaFX dialog, unlike a [BaseDialog], does not bring the pane a walkthrough draws into, and
+    /// the "Download from URL" walkthrough steps into the input dialog.
+    private static void addWalkthroughPane(Dialog<?> dialog) {
+        dialog.getDialogPane().getChildren().add(new WalkthroughPane());
+    }
+
     @Override
     public Optional<String> showInputDialogAndWait(String title, String content) {
         TextInputDialog inputDialog = new TextInputDialog();
+        addWalkthroughPane(inputDialog);
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
@@ -190,6 +198,7 @@ public class JabRefDialogService implements DialogService {
     @Override
     public Optional<String> showInputDialogWithDefaultAndWait(String title, String content, String defaultValue) {
         TextInputDialog inputDialog = new TextInputDialog(defaultValue);
+        addWalkthroughPane(inputDialog);
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
