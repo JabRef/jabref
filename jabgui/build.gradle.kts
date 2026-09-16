@@ -137,7 +137,7 @@ tasks.named<JavaExec>("run") {
 
 // These modules need to be present in every jpackage runtime image. Keeping them named separately
 // avoids mixing shared image requirements with target-specific embedded Postgres binaries.
-val sharedJpackageImageModules = listOf("jdk.incubator.vector")
+val sharedJpackageImageModules = listOf("jdk.incubator.vector", "java.instrument")
 
 val embeddedPostgresBinaryByJpackageTask = mapOf(
     "jpackageUbuntu-22.04" to EmbeddedPostgresBinaries.linuxAmd64,
