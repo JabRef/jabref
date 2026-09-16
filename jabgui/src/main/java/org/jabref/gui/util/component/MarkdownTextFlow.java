@@ -80,13 +80,17 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     }
 
     public void setMarkdown(@NonNull String markdownText) {
-        setMarkdown(markdownText, false);
+        render(markdownText, false);
     }
 
-    /// Displays the given Markdown text. With `highlightJson`, a JSON document at the beginning of the
-    /// text or inside a fenced code block is indented and syntax highlighted — AI models often answer
-    /// that way, and the raw document is hard to read.
-    public void setMarkdown(@NonNull String markdownText, boolean highlightJson) {
+    /// Displays the given Markdown text, indenting and syntax highlighting a JSON document at its
+    /// beginning or inside a fenced code block — AI models often answer that way, and the raw
+    /// document is hard to read.
+    public void setMarkdownWithJsonHighlighting(@NonNull String markdownText) {
+        render(markdownText, true);
+    }
+
+    private void render(String markdownText, boolean highlightJson) {
         super.clearSelection();
         getChildren().clear();
         plainText = false;
