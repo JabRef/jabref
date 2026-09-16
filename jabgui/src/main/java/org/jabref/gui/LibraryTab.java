@@ -461,7 +461,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         restoreSelectionAfterLoading = true;
     }
 
-    /// [impl->req~ux.startup.restore-position~1]
     /// Restores the entry that was selected in this library when JabRef was closed the last time. A citation key is
     /// the only identity an entry keeps across reloads, so a key held by several entries restores nothing rather than
     /// picking one of them.

@@ -746,15 +746,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         if (!lastFiles.isEmpty()) {
             getOpenDatabaseAction().openFiles(lastFiles);
 
-            // Only the libraries reopened here get their selection back; a library opened later in the session starts
-            // without the selection of an earlier session.
+            // [impl->req~ux.startup.last-selected-entries~1]
             getLibraryTabs().stream()
                             .filter(tab -> tab.getLoading().get())
                             .forEach(LibraryTab::restoreLastSelectedEntryAfterLoading);
 
-            // [impl->req~ux.startup.restore-position~1]
-            // Each opened library raises its tab, so without this the last library in the list would end up in front.
-            // The tabs exist already; only their content is still loading in the background.
+            // [impl->req~ux.startup.last-opened-library~1]
             Optional.ofNullable(preferences.getLastFilesOpenedPreferences().getLastFocusedFile())
                     .map(Path::toAbsolutePath)
                     .flatMap(lastFocusedFile -> getLibraryTabs().stream()
