@@ -68,6 +68,12 @@ class JsonHighlighterTest {
     }
 
     @Test
+    void prettyPrintKeepsHugeExponentsShort() {
+        assertEquals("{\n  \"n\": 1E+100000000\n}",
+                JsonHighlighter.leadingJson("{\"n\": 1e100000000}").orElseThrow().json());
+    }
+
+    @Test
     void prettyPrintRejectsDuplicateNamesInsteadOfDroppingThem() {
         assertEquals(Optional.empty(), JsonHighlighter.leadingJson("{\"a\": 1, \"a\": 2}"));
     }

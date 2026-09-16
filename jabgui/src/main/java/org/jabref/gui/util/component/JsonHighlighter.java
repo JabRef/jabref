@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.StreamReadFeature;
-import tools.jackson.core.StreamWriteFeature;
 import tools.jackson.core.util.DefaultIndenter;
 import tools.jackson.core.util.DefaultPrettyPrinter;
 import tools.jackson.core.util.Separators;
@@ -41,11 +40,11 @@ public class JsonHighlighter {
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonHighlighter.class);
 
     /// Duplicate names make the parse fail, because the tree would silently drop the first value.
-    /// Decimals are kept as [java.math.BigDecimal], so that no digits are lost on the way out.
+    /// Decimals are kept as [java.math.BigDecimal], so that no digits are lost on the way out; they are
+    /// written the way `BigDecimal` prints them, so `1e100000000` stays short instead of growing digits.
     private static final JsonMapper MAPPER = JsonMapper.builder()
                                                        .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
                                                        .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
-                                                       .enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
                                                        .build();
 
     private static final ObjectWriter WRITER = MAPPER.writer().with(prettyPrinter());
