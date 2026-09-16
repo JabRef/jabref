@@ -154,12 +154,12 @@ public class ManageStudyDefinitionViewModel {
     /// @param catalogName the catalog (fetcher) name to look up, matched case-insensitively
     private String findNativeQueryForCatalog(String catalogName) {
         return queries.stream()
-                       .flatMap(query -> query.getCatalogSpecific().entrySet().stream())
-                       .filter(entry -> entry.getKey().equalsIgnoreCase(catalogName))
-                       .map(Map.Entry::getValue)
-                       .filter(value -> value != null && !value.isBlank())
-                       .findFirst()
-                       .orElse("");
+                      .flatMap(query -> query.getCatalogSpecific().entrySet().stream())
+                      .filter(entry -> entry.getKey().equalsIgnoreCase(catalogName))
+                      .map(Map.Entry::getValue)
+                      .filter(value -> value != null && !value.isBlank())
+                      .findFirst()
+                      .orElse("");
     }
 
     private void initializeValidationBindings() {
