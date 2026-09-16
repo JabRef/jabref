@@ -2,28 +2,38 @@ package org.jabref.gui.util.component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import io.github.kusoroadeolu.veneer.JSONLexer;
-import io.github.kusoroadeolu.veneer.JSONParser;
-import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.util.DefaultIndenter;
+import tools.jackson.core.util.DefaultPrettyPrinter;
+import tools.jackson.core.util.Separators;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
 
-/// Splits JSON text into styled segments, so that AI answers containing JSON can be rendered
-/// with syntax highlighting. Lexing and parsing are delegated to the Veneer grammar that is
-/// also used for the BibTeX source editor (see `org.jabref.gui.bibtexhighlighter`).
+/// Formats and splits JSON text into styled segments, so that AI answers containing JSON can be
+/// rendered readably and with syntax highlighting. Parsing and formatting are delegated to Jackson,
+/// tokenizing to the Veneer grammar that is also used for the BibTeX source editor
+/// (see `org.jabref.gui.bibtexhighlighter`).
 ///
 /// The colors for the style classes are defined in `jabref-base.css`.
 @NullMarked
 public class JsonHighlighter {
 
     private static final Set<String> LITERALS = Set.of("true", "false", "null");
+
+    private static final JsonMapper MAPPER = JsonMapper.builder()
+                                                       .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+                                                       .build();
+
+    private static final ObjectWriter WRITER = MAPPER.writer().with(prettyPrinter());
 
     /// A piece of the original text together with the CSS style class it should be rendered with.
     /// `styleClass` is empty for text between tokens (whitespace).
@@ -33,25 +43,18 @@ public class JsonHighlighter {
     private JsonHighlighter() {
     }
 
-    /// Checks whether the given text is a complete JSON object or array.
-    public static boolean isJson(String text) {
+    /// Returns the given text as indented JSON, or empty if it is not a JSON object or array.
+    public static Optional<String> prettyPrint(String text) {
         String trimmed = text.strip();
         if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
-            return false;
+            return Optional.empty();
         }
 
-        ErrorFlag errors = new ErrorFlag();
-        CommonTokenStream tokenStream = tokenStream(trimmed);
-        // Characters the lexer cannot match are dropped silently, so they have to be reported separately.
-        ((JSONLexer) tokenStream.getTokenSource()).addErrorListener(errors);
-        tokenStream.fill();
-
-        JSONParser parser = new JSONParser(tokenStream);
-        parser.removeErrorListeners();
-        parser.addErrorListener(errors);
-        parser.json();
-
-        return !errors.hasError && (parser.getCurrentToken().getType() == Token.EOF);
+        try {
+            return Optional.of(WRITER.writeValueAsString(MAPPER.readTree(trimmed)));
+        } catch (JacksonException _) {
+            return Optional.empty();
+        }
     }
 
     /// Splits the given JSON text into segments carrying a style class each.
@@ -114,14 +117,13 @@ public class JsonHighlighter {
         };
     }
 
-    /// Records whether the lexer or the parser stumbled over the input.
-    private static final class ErrorFlag extends BaseErrorListener {
-        private boolean hasError;
-
-        @Override
-        public void syntaxError(Recognizer<?, ?> recognizer, @Nullable Object offendingSymbol, int line, int charPositionInLine, String msg, @Nullable RecognitionException e) {
-            hasError = true;
-        }
+    /// Two spaces per level for objects and arrays alike, and no space in front of the colon.
+    private static DefaultPrettyPrinter prettyPrinter() {
+        DefaultIndenter indenter = new DefaultIndenter("  ", "\n");
+        return new DefaultPrettyPrinter()
+                .withObjectIndenter(indenter)
+                .withArrayIndenter(indenter)
+                .withSeparators(Separators.createDefaultInstance().withObjectNameValueSpacing(Separators.Spacing.AFTER));
     }
 
     private static CommonTokenStream tokenStream(String text) {
