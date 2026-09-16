@@ -281,6 +281,10 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
     private List<CopySegment> buildCopySegments() {
         List<CopySegment> segments = new ArrayList<>();
+        // The nodes of one Markdown node are collected in a builder: a code block has one node per token.
+        StringBuilder pending = new StringBuilder();
+        @Nullable Node pendingNode = null;
+        boolean pendingIsNewlineMarker = false;
 
         for (javafx.scene.Node fxNode : getChildren()) {
             String renderedText;
@@ -297,12 +301,22 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             }
 
             // The newline nodes between blocks carry the block's node as well, but are copied as newlines.
-            CopySegment previous = segments.isEmpty() ? null : segments.getLast();
-            if ((previous != null) && (astNode != null) && (previous.astNode() == astNode) && !isNewlineMarker(previous.text())) {
-                segments.set(segments.size() - 1, new CopySegment(previous.text() + renderedText, astNode));
-            } else {
-                segments.add(new CopySegment(renderedText, astNode));
+            if ((astNode != null) && (astNode == pendingNode) && !pendingIsNewlineMarker) {
+                pending.append(renderedText);
+                continue;
             }
+
+            if (!pending.isEmpty()) {
+                segments.add(new CopySegment(pending.toString(), pendingNode));
+            }
+            pending.setLength(0);
+            pending.append(renderedText);
+            pendingNode = astNode;
+            pendingIsNewlineMarker = isNewlineMarker(renderedText);
+        }
+
+        if (!pending.isEmpty()) {
+            segments.add(new CopySegment(pending.toString(), pendingNode));
         }
 
         return segments;
