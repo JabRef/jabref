@@ -336,7 +336,7 @@
     -fx-font-size: 0.7em;
     -fx-padding: 0 0.3em;
     -fx-translate-x: 0.6em;
-    -fx-translate-y: -0.5em;
+    -fx-translate-y: 0.5em;
 }
 
 .icon-button:hover {

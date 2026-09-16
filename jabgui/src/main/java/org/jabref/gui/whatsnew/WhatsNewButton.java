@@ -62,7 +62,7 @@ public final class WhatsNewButton {
         badge.getStyleClass().add("whats-new-badge");
         badge.textProperty().bind(viewModel.pendingCountProperty().asString());
         badge.visibleProperty().bind(viewModel.pendingCountProperty().greaterThan(0));
-        StackPane.setAlignment(badge, Pos.TOP_RIGHT);
+        StackPane.setAlignment(badge, Pos.BOTTOM_RIGHT);
         viewModel.updateAvailableProperty().subscribe(this::showGlyph);
     }
 
