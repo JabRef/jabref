@@ -113,7 +113,12 @@ public class JsonHighlighter {
                 segments.add(new Segment(new String(codePoints, position, token.getStartIndex() - position), ""));
             }
 
-            segments.add(new Segment(token.getText(), styleClassOf(token, nextTokenText(tokens, i))));
+            String styleClass = styleClassOf(token, nextTokenText(tokens, i));
+            if ("json-string".equals(styleClass)) {
+                addStringSegments(segments, token.getText());
+            } else {
+                segments.add(new Segment(token.getText(), styleClass));
+            }
             position = token.getStopIndex() + 1;
         }
 
@@ -122,6 +127,35 @@ public class JsonHighlighter {
         }
 
         return segments;
+    }
+
+    /// Splits a string value, so that a quotation inside it (`\"...\"`) gets a style class of its own.
+    /// Answers often quote the paper that way.
+    private static void addStringSegments(List<Segment> segments, String string) {
+        int start = 0;
+        boolean inQuotation = false;
+
+        for (int i = 0; i < string.length(); i++) {
+            if (string.charAt(i) != '\\') {
+                continue;
+            }
+            // A backslash in a valid JSON string is always followed by the escaped character.
+            if (string.charAt(i + 1) == '"') {
+                int boundary = inQuotation ? i + 2 : i;
+                addStringSegment(segments, string.substring(start, boundary), inQuotation);
+                start = boundary;
+                inQuotation = !inQuotation;
+            }
+            i++;
+        }
+
+        addStringSegment(segments, string.substring(start), inQuotation);
+    }
+
+    private static void addStringSegment(List<Segment> segments, String text, boolean quotation) {
+        if (!text.isEmpty()) {
+            segments.add(new Segment(text, quotation ? "json-string-quotation" : "json-string"));
+        }
     }
 
     private static boolean isWhitespace(Token token) {

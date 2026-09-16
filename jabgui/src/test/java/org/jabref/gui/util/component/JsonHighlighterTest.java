@@ -116,6 +116,15 @@ class JsonHighlighterTest {
     }
 
     @Test
+    void tokenizeStylesQuotationsInsideStrings() {
+        assertEquals(List.of(
+                        new JsonHighlighter.Segment("\"a ", "json-string"),
+                        new JsonHighlighter.Segment("\\\"b\\\"", "json-string-quotation"),
+                        new JsonHighlighter.Segment(" \\\\ c\"", "json-string")),
+                JsonHighlighter.tokenize("\"a \\\"b\\\" \\\\ c\""));
+    }
+
+    @Test
     void tokenizeKeepsTheTextComplete() {
         String json = "{\n  \"a\": [1, null]\n}";
         assertEquals(json, JsonHighlighter.tokenize(json).stream().map(JsonHighlighter.Segment::text).reduce("", String::concat));

@@ -1604,6 +1604,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -color-syntax-string;
 }
 
+.json-string-quotation {
+    -fx-fill: -color-syntax-keyword;
+}
+
 .json-number {
     -fx-fill: -color-syntax-tag;
 }
