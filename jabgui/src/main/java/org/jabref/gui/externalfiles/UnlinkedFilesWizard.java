@@ -51,7 +51,7 @@ public class UnlinkedFilesWizard {
         if (dialogScene != null) {
             applyThemeAndStageSettings(dialogScene);
         } else {
-            wizard.getDialog().getDialogPane().sceneProperty().addListener((obs, oldScene, newScene) -> {
+            wizard.getDialog().getDialogPane().sceneProperty().addListener((_, _, newScene) -> {
                 if (!cssInstalled && newScene != null) {
                     applyThemeAndStageSettings(newScene);
                 }
