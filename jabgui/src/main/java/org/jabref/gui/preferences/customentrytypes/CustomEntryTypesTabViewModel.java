@@ -147,7 +147,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, bibDatabaseMode);
         }
 
-        // Fields of no entry type (e.g., [StandardField#PS]) keep their state: this tab does not show them
+        // Fields belonging to no entry type keep their state: this tab does not show them
         Set<Field> nonWrappableFields = new HashSet<>(preferences.getFieldPreferences().getNonWrappableFields());
         nonWrappableFields.removeAll(singleLineFields);
         nonWrappableFields.addAll(multilineFields);
