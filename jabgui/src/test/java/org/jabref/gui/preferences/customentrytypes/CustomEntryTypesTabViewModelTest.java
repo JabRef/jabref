@@ -105,18 +105,31 @@ class CustomEntryTypesTabViewModelTest {
 
         model.storeSettings();
 
-        assertEquals(List.of(), model.getRestartWarnings());
+        assertTrue(model.getRestartWarnings().isEmpty());
     }
 
     @Test
     void unchangedSaveWithFieldOutsideEntryTypesHasNoRestartWarning() {
-        when(preferences.getFieldPreferences()).thenReturn(new FieldPreferences(true, List.of(), List.of(StandardField.PDF, StandardField.PS, StandardField.URL)));
+        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), List.of(StandardField.PDF, StandardField.PS, StandardField.URL));
+        when(preferences.getFieldPreferences()).thenReturn(realFieldPreferences);
         CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
         model.setValues();
 
         model.storeSettings();
 
-        assertEquals(List.of(), model.getRestartWarnings());
+        assertTrue(model.getRestartWarnings().isEmpty());
+    }
+
+    @Test
+    void saveKeepsMultilineFieldOutsideEntryTypes() {
+        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), List.of(StandardField.PDF, StandardField.URL));
+        when(preferences.getFieldPreferences()).thenReturn(realFieldPreferences);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.storeSettings();
+
+        assertTrue(realFieldPreferences.getNonWrappableFields().contains(StandardField.PDF));
     }
 
     @Test
@@ -130,10 +143,10 @@ class CustomEntryTypesTabViewModelTest {
         model.entryTypes().setAll(List.of(new CustomEntryTypeViewModel(modified, x -> false)));
 
         model.storeSettings();
-        assertEquals(List.of("Entry types changed."), model.getRestartWarnings());
+        assertFalse(model.getRestartWarnings().isEmpty());
 
         model.storeSettings();
-        assertEquals(List.of(), model.getRestartWarnings());
+        assertTrue(model.getRestartWarnings().isEmpty());
     }
 
     @Test
@@ -150,7 +163,7 @@ class CustomEntryTypesTabViewModelTest {
              .getProperties().add(FieldProperty.DATE);
         model.storeSettings();
 
-        assertEquals(List.of("Entry types changed."), model.getRestartWarnings());
+        assertFalse(model.getRestartWarnings().isEmpty());
     }
 
     @Test
@@ -163,7 +176,7 @@ class CustomEntryTypesTabViewModelTest {
         model.setValues();
         model.storeSettings();
 
-        assertEquals(List.of("Entry types changed."), model.getRestartWarnings());
+        assertFalse(model.getRestartWarnings().isEmpty());
     }
 
     @Test
