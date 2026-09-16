@@ -133,8 +133,10 @@ public class JsonHighlighter {
         int start = 0;
         boolean inQuotation = false;
 
-        for (int i = 0; i < string.length(); i++, i++) {
+        int i = 0;
+        while (i < string.length()) {
             if (string.charAt(i) != '\\') {
+                i++;
                 continue;
             }
             // A backslash in a valid JSON string is always followed by the escaped character.
@@ -144,6 +146,8 @@ public class JsonHighlighter {
                 start = boundary;
                 inQuotation = !inQuotation;
             }
+            // The escape sequence is two characters long.
+            i += 2;
         }
 
         addStringSegment(segments, string.substring(start), inQuotation);
