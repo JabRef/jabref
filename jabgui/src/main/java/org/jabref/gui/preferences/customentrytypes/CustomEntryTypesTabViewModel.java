@@ -178,6 +178,10 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     }
 
     /// Multiline fields not belonging to any entry type are left out: this tab does not show them.
+    ///
+    /// The non-wrappable fields preference itself cannot be compared: a field is also multiline when it carries
+    /// [FieldProperty#MULTILINE_TEXT] (e.g., `abstract`), and saving adds those to the preference - the first
+    /// unchanged save would thus look like a change.
     private Set<Field> multilineFieldsOfEntryTypes() {
         List<Field> nonWrappableFields = preferences.getFieldPreferences().getNonWrappableFields();
         return entryTypesManager.getAllTypes(bibDatabaseMode).stream()
