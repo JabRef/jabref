@@ -120,7 +120,6 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             BibEntryType type = typeViewModel.entryType().getValue();
             EntryType newPlainType = type.getType();
 
-            // Collect the multiline state for storage in preferences later
             singleLineFields.addAll(allFields.stream()
                                              .filter(model -> !model.isMultiline())
                                              .map(model -> model.toField(newPlainType))
