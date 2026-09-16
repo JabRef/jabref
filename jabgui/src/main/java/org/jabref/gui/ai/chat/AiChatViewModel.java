@@ -140,7 +140,7 @@ public class AiChatViewModel extends AbstractViewModel {
         systemMessageTemplate.bind(aiPreferences.chattingSystemMessageTemplateProperty());
         userMessageTemplate.bind(aiPreferences.chattingUserMessageTemplateProperty());
 
-        this.embeddingModel.bind(ObservablesHelper.createClosableObjectBinding(
+        this.embeddingModel.bind(ObservablesHelper.createObjectBinding(
                 () -> EmbeddingModelFactory.create(aiPreferences, embeddingModelCache),
                 aiPreferences.getEmbeddingsProperties()
         ));
