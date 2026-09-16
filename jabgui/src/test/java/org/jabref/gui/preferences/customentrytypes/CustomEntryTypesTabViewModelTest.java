@@ -26,6 +26,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -105,7 +106,7 @@ class CustomEntryTypesTabViewModelTest {
 
         model.storeSettings();
 
-        assertTrue(model.getRestartWarnings().isEmpty());
+        assertEquals(List.of(), model.getRestartWarnings());
     }
 
     @Test
@@ -117,7 +118,7 @@ class CustomEntryTypesTabViewModelTest {
 
         model.storeSettings();
 
-        assertTrue(model.getRestartWarnings().isEmpty());
+        assertEquals(List.of(), model.getRestartWarnings());
     }
 
     @Test
@@ -143,10 +144,10 @@ class CustomEntryTypesTabViewModelTest {
         model.entryTypes().setAll(List.of(new CustomEntryTypeViewModel(modified, _ -> false)));
 
         model.storeSettings();
-        assertFalse(model.getRestartWarnings().isEmpty());
+        assertNotEquals(List.of(), model.getRestartWarnings());
 
         model.storeSettings();
-        assertTrue(model.getRestartWarnings().isEmpty());
+        assertEquals(List.of(), model.getRestartWarnings());
     }
 
     @Test
@@ -163,7 +164,7 @@ class CustomEntryTypesTabViewModelTest {
              .getProperties().add(FieldProperty.DATE);
         model.storeSettings();
 
-        assertFalse(model.getRestartWarnings().isEmpty());
+        assertNotEquals(List.of(), model.getRestartWarnings());
     }
 
     @Test
@@ -176,7 +177,7 @@ class CustomEntryTypesTabViewModelTest {
         model.setValues();
         model.storeSettings();
 
-        assertFalse(model.getRestartWarnings().isEmpty());
+        assertNotEquals(List.of(), model.getRestartWarnings());
     }
 
     @Test

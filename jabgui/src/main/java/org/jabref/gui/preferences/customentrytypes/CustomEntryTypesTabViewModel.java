@@ -112,23 +112,23 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        Set<Field> multilineFields = new HashSet<>();
         Set<Field> singleLineFields = new HashSet<>();
+        Set<Field> multilineFields = new HashSet<>();
         for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
             List<FieldViewModel> allFields = typeViewModel.fields();
 
             BibEntryType type = typeViewModel.entryType().getValue();
             EntryType newPlainType = type.getType();
 
-            // Collect multilineFields for storage in preferences later
-            multilineFields.addAll(allFields.stream()
-                                            .filter(FieldViewModel::isMultiline)
-                                            .map(model -> model.toField(newPlainType))
-                                            .toList());
+            // Collect the multiline state for storage in preferences later
             singleLineFields.addAll(allFields.stream()
                                              .filter(model -> !model.isMultiline())
                                              .map(model -> model.toField(newPlainType))
                                              .toList());
+            multilineFields.addAll(allFields.stream()
+                                            .filter(FieldViewModel::isMultiline)
+                                            .map(model -> model.toField(newPlainType))
+                                            .toList());
 
             List<OrFields> required = allFields.stream()
                                                .filter(FieldViewModel::isRequired)
