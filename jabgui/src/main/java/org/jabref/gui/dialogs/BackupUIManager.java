@@ -106,7 +106,11 @@ public class BackupUIManager {
     private static Optional<LibraryTab> raiseTabOf(LibraryTabContainer tabContainer, Path originalPath) {
         Path absolutePath = originalPath.toAbsolutePath();
         Optional<LibraryTab> libraryTab = tabContainer.getLibraryTabs().stream()
-                                                      .filter(tab -> tab.getBibDatabaseContext().getDatabasePath().map(Path::toAbsolutePath).filter(absolutePath::equals).isPresent())
+                                                      .filter(tab -> tab.getBibDatabaseContext()
+                                                                        .getDatabasePath()
+                                                                        .map(Path::toAbsolutePath)
+                                                                        .filter(absolutePath::equals)
+                                                                        .isPresent())
                                                       .findFirst();
         libraryTab.ifPresent(tabContainer::showLibraryTab);
         return libraryTab;
