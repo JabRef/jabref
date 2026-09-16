@@ -86,7 +86,7 @@ public class IconTheme {
 
         try {
             return Optional.of(JabRefIcons.valueOf(normalizedIconCode));
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException _) {
             return java.util.Arrays.stream(JabRefIcons.values())
                                    .filter(icon -> icon.matchesPersistedName(normalizedIconCode))
                                    .findFirst()
