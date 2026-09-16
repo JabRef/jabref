@@ -90,6 +90,12 @@ class JsonHighlighterTest {
     }
 
     @Test
+    void tokenizeKeepsTheTextCompleteWithSupplementaryCharacters() {
+        String json = JsonHighlighter.prettyPrint("{\"a\": \"\uD83D\uDE00\", \"b\": 1}").orElseThrow();
+        assertEquals(json, JsonHighlighter.tokenize(json).stream().map(JsonHighlighter.Segment::text).reduce("", String::concat));
+    }
+
+    @Test
     void tokenizeKeepsTheTextComplete() {
         String json = "{\n  \"a\": [1, null]\n}";
         assertEquals(json, JsonHighlighter.tokenize(json).stream().map(JsonHighlighter.Segment::text).reduce("", String::concat));

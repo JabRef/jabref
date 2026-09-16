@@ -76,6 +76,8 @@ public class JsonHighlighter {
 
         List<Segment> segments = new ArrayList<>();
         List<Token> tokens = tokenStream.getTokens();
+        // The lexer counts code points, `String` counts UTF-16 units: an emoji would shift all offsets.
+        int[] codePoints = json.codePoints().toArray();
         int position = 0;
 
         for (int i = 0; i < tokens.size(); i++) {
@@ -89,15 +91,15 @@ public class JsonHighlighter {
 
             // Whitespace is skipped by the lexer, so it has to be taken from the original text.
             if (token.getStartIndex() > position) {
-                segments.add(new Segment(json.substring(position, token.getStartIndex()), ""));
+                segments.add(new Segment(new String(codePoints, position, token.getStartIndex() - position), ""));
             }
 
             segments.add(new Segment(token.getText(), styleClassOf(token, nextTokenText(tokens, i))));
             position = token.getStopIndex() + 1;
         }
 
-        if (position < json.length()) {
-            segments.add(new Segment(json.substring(position), ""));
+        if (position < codePoints.length) {
+            segments.add(new Segment(new String(codePoints, position, codePoints.length - position), ""));
         }
 
         return segments;
