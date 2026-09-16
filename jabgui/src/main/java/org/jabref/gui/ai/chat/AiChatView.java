@@ -81,6 +81,7 @@ public class AiChatView extends StackPane {
 
     private int findTotal;
     private int findCurrent;
+    private boolean findRefreshPending;
 
     public AiChatView() {
         ViewLoader.view(this)
@@ -139,7 +140,15 @@ public class AiChatView extends StackPane {
             updateFind(true);
         });
         // New or deleted messages are rendered after the list change, thus search them afterwards
-        viewModel.chatHistoryProperty().addListener((ListChangeListener<ChatMessage>) _ -> Platform.runLater(() -> updateFind(false)));
+        viewModel.chatHistoryProperty().addListener((ListChangeListener<ChatMessage>) _ -> {
+            if (!findRefreshPending) {
+                findRefreshPending = true;
+                Platform.runLater(() -> {
+                    findRefreshPending = false;
+                    updateFind(false);
+                });
+            }
+        });
     }
 
     /// Highlights all occurrences of the find query in the rendered messages and scrolls to the current one.

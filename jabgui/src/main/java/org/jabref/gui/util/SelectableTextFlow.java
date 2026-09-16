@@ -27,6 +27,7 @@ import org.jspecify.annotations.Nullable;
 public class SelectableTextFlow extends TextFlow {
     private static final Color OCCURRENCE_COLOR = Color.GOLD.deriveColor(0, 1, 1, 0.4);
     private static final Color CURRENT_OCCURRENCE_COLOR = Color.ORANGE.deriveColor(0, 1, 1, 0.7);
+    private static final Pattern EMPTY_QUERY_PATTERN = Pattern.compile("");
 
     @Nullable private HitInfo startHit;
     @Nullable private HitInfo endHit;
@@ -35,6 +36,7 @@ public class SelectableTextFlow extends TextFlow {
     private final List<Path> occurrencePaths = new ArrayList<>();
     @Nullable private Path currentOccurrencePath;
     private String occurrenceQuery = "";
+    private Pattern occurrencePattern = EMPTY_QUERY_PATTERN;
     private int currentOccurrence = -1;
 
     private final Pane parentPane;
@@ -74,13 +76,16 @@ public class SelectableTextFlow extends TextFlow {
         parentPane.getChildren().removeAll(occurrencePaths);
         occurrencePaths.clear();
         currentOccurrencePath = null;
+        if (!query.equals(occurrenceQuery)) {
+            occurrencePattern = Pattern.compile(Pattern.quote(query), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+        }
         occurrenceQuery = query;
         currentOccurrence = current;
         if (query.isEmpty()) {
             return 0;
         }
 
-        Matcher matcher = Pattern.compile(Pattern.quote(query), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE).matcher(getTextFlowContent());
+        Matcher matcher = occurrencePattern.matcher(getTextFlowContent());
         while (matcher.find()) {
             boolean isCurrent = occurrencePaths.size() == current;
             Path path = createHighlight(matcher.start(), matcher.end(), isCurrent ? CURRENT_OCCURRENCE_COLOR : OCCURRENCE_COLOR);

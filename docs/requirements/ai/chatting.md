@@ -112,8 +112,8 @@ Needs: impl, utest
 ### User can find text in AI chat messages
 `feat~ai.chat.find~1`
 
-Pressing <kbd>Ctrl</kbd>+<kbd>F</kbd> inside the AI chat opens a find bar at the top right of the chat instead of focusing the library search.
-All case-insensitive occurrences in the messages are highlighted; <kbd>Enter</kbd> and <kbd>Shift</kbd>+<kbd>Enter</kbd> move to the next and previous occurrence, <kbd>Esc</kbd> closes the bar.
+Pressing <kbd>Ctrl</kbd> + <kbd>F</kbd> inside the AI chat opens a find bar at the top right of the chat instead of focusing the library search.
+All case-insensitive occurrences in the messages are highlighted; <kbd>Enter</kbd> and <kbd>Shift</kbd> + <kbd>Enter</kbd> move to the next and previous occurrence, <kbd>Esc</kbd> closes the bar.
 
 Needs: impl, utest
 
