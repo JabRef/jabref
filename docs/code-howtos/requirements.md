@@ -47,7 +47,7 @@ Tracing requirements is useful because it helps us:
 - track requirement revisions so that updates in Markdown also require updates to the relevant code;
 - add context about why the code was written or why a requirement is needed, including links to issues;
 - provide a useful aid for AI agents;
-- prevent people from forgetting or deleting important requirements as the project evolves.
+- prevent people from forgetting or deleting important requirements or code as the project evolves.
 
 ## How to use OFT
 
@@ -129,7 +129,7 @@ Throughout development, you will mainly work with `feat`, `req`, `impl`, and `ut
 
 We would really like to use the `uman` artifact type, as new features often also need to be explained to users. At the time of writing, we do not use this type in the requirements because we do not have a cross-repository setup for OFT.
 
-The boundary between `feat` and `req` can sometimes be debatable, because from a software engineering perspective they are similar. However, we assign them based on the outcome: a new fetcher is a feature, while special handling of a field is a requirement. This gives us an overview of what we have in JabRef.
+The boundary between `feat` and `req` can sometimes be debatable, because from a software engineering perspective they refer to the same thing. However, we assign them based on the outcome: a new fetcher is a feature, while special handling of a field is a requirement. This gives us an overview of what we have in JabRef.
 
 ## How to write a requirement
 
@@ -189,7 +189,7 @@ The title carries the full constraint, and the description adds only the missing
 
 ### Linking requirements
 
-The syntax for linking a requirement to code was already shown above. However, you should still follow the principle of **linking the requirement to the most specific code location**. Only if there is no specific place, or if too many components are involved, should you link it at the method or class level.
+The syntax for linking a requirement to code was already shown above. However, you should still follow the principle of **linking the requirement to the most specific code location**. Only if there is no specific place, or if too many components are involved, can you link it at the method or class level.
 
 In extreme cases, you can write the linking comment and add a second comment below it explaining how the implementation works.
 
@@ -209,7 +209,7 @@ This way they will be filtered out when running `traceRequirements`, while still
 
 We use OFT mainly to trace small ideas, notes, and wishes rather than to manage the full software engineering requirements process. The concepts and terminology of software requirements engineering are still useful for structuring and writing requirements, and they help us express them clearly. However, we do not apply all of its principles in full.
 
-For example, INVEST is useful for writing better requirement descriptions, but we do not treat our requirements as fully negotiable items because they are more like concrete instructions or decisions than open-ended, negotiable agreements. We also do not explicitly record a separate value dimension for each requirement in this workflow.
+For example, INVEST is useful for writing better requirement descriptions, but we do not treat our requirements as fully negotiable items because they are more like concrete instructions or orders than open-ended, negotiable agreements. We also do not explicitly record a separate value dimension for each requirement in this workflow.
 
 It is better to write more small requirements than one large one. This makes coverage and tracking more detailed.
 
