@@ -27,6 +27,7 @@ import org.jabref.model.ai.chatting.ChatMessage;
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -121,5 +122,20 @@ class AiChatMessageViewTest extends JavaFxTest {
         awaitEvents();
 
         assertTrue(view.getMarkdownTextFlow().isSelectionActive());
+    }
+
+    @Test
+    void highlightOccurrencesFindsAllCaseInsensitive() {
+        AiChatMessageView view = createView();
+        AtomicReference<Integer> count = new AtomicReference<>();
+        interact(() -> {
+            view.setChatMessage(ChatMessage.aiMessage("Chocolate is **chocolate**, CHOCOLATE!", List.of()));
+            rootPane.getChildren().setAll(view);
+        });
+        awaitEvents();
+        interact(() -> count.set(view.getMarkdownTextFlow().highlightOccurrences("chocolate", 1)));
+
+        assertEquals(3, count.get());
+        assertTrue(view.getMarkdownTextFlow().getCurrentOccurrence().isPresent());
     }
 }
