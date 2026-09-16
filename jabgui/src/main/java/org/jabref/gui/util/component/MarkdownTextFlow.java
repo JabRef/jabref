@@ -56,7 +56,6 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     private static final Pattern NUMBERED_LIST_PATTERN = Pattern.compile("^\\s*\\d+\\.\\s+$");
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
-    private static final Pattern SURROUNDING_NEWLINES = Pattern.compile("^\\n+|\\n+$");
 
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
@@ -250,6 +249,15 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     private record CopySegment(String text, @Nullable Node astNode) {
     }
 
+    /// Removes the newlines Flexmark adds around the content of a code block (`\n` at the beginning,
+    /// `\n\n` at the end), keeping blank lines that are part of the code.
+    private static String stripSyntheticNewlines(String content) {
+        if ((content.length() >= 3) && content.startsWith("\n") && content.endsWith("\n\n")) {
+            return content.substring(1, content.length() - 2);
+        }
+        return content;
+    }
+
     private static boolean isNewlineMarker(String text) {
         return "\n".equals(text) || "\n\n".equals(text);
     }
@@ -315,9 +323,9 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 String info = fencedCodeBlock.getInfo().toString();
                 String openingFence = fencedCodeBlock.getOpeningFence().toString();
                 String closingFence = fencedCodeBlock.getClosingFence().toString();
-                // Flexmark reports the content with surrounding newlines, which the fences bring back anyway.
-                String content = SURROUNDING_NEWLINES.matcher(fencedCodeBlock.getContentChars().toString()).replaceAll("");
-                yield openingFence + info + "\n" + content + (closingFence.isEmpty() ? "" : "\n" + closingFence);
+                String content = stripSyntheticNewlines(fencedCodeBlock.getContentChars().toString());
+                String body = content.endsWith("\n") ? content : content + "\n";
+                yield openingFence + info + "\n" + body + closingFence;
             }
             case IndentedCodeBlock indentedCodeBlock ->
                     indentedCodeBlock.getChars().toString();
@@ -425,17 +433,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         private void visit(FencedCodeBlock codeBlock) {
             addNewlinesBetweenBlocks(codeBlock);
             String content = codeBlock.getContentChars().toString();
-            /*
-             * NOTE: Flexmark always append \n at the beginning and \n\n at the end.
-             * For example, ```java
-             * public class HelloWorld { ... }
-             * ``` -> contains content `\npublic class HelloWorld { ... }\n\n`
-             * Therefore, we need to remove the first and last characters.
-             */
-            String processedContent = content;
-            if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
-                processedContent = content.substring(1, content.length() - 2);
-            }
+            String processedContent = stripSyntheticNewlines(content);
             addCodeBlockNodes(processedContent, codeBlock);
             previousBlock = codeBlock;
         }
@@ -443,11 +441,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         private void visit(IndentedCodeBlock codeBlock) {
             addNewlinesBetweenBlocks(codeBlock);
             String content = codeBlock.getContentChars().toString();
-            // NOTE: Similar to FencedCodeBlock, Flexmark always appends \n at the beginning and \n\n at the end.
-            String processedContent = content;
-            if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
-                processedContent = content.substring(1, content.length() - 2);
-            }
+            String processedContent = stripSyntheticNewlines(content);
             addTextNode(processedContent, codeBlock, "markdown-code-block", "font-monospace");
             previousBlock = codeBlock;
         }

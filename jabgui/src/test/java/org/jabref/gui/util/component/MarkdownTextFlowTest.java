@@ -204,6 +204,27 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void copySelectedTextFromCodeBlockKeepsBlankLines() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdown("```java\nint a;\n\nint b;\n```");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            assertTrue(textFlow.isSelectionActive());
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("```java\nint a;\n\nint b;\n```", clipBoardManager.stringContent.get());
+    }
+
+    @Test
     void copySelectedTextFromMarkdownUsesMarkdownClipboardContent() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 

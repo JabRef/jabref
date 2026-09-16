@@ -6,14 +6,12 @@ import java.util.Set;
 
 import io.github.kusoroadeolu.veneer.JSONLexer;
 import io.github.kusoroadeolu.veneer.JSONParser;
-import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -42,24 +40,18 @@ public class JsonHighlighter {
             return false;
         }
 
-        ErrorFlag lexerErrors = new ErrorFlag();
+        ErrorFlag errors = new ErrorFlag();
         CommonTokenStream tokenStream = tokenStream(trimmed);
-        ((JSONLexer) tokenStream.getTokenSource()).addErrorListener(lexerErrors);
+        // Characters the lexer cannot match are dropped silently, so they have to be reported separately.
+        ((JSONLexer) tokenStream.getTokenSource()).addErrorListener(errors);
         tokenStream.fill();
-        // Characters the lexer cannot match are dropped silently, so they have to be checked for separately.
-        if (lexerErrors.hasError) {
-            return false;
-        }
 
         JSONParser parser = new JSONParser(tokenStream);
         parser.removeErrorListeners();
-        parser.setErrorHandler(new BailErrorStrategy());
-        try {
-            parser.json();
-        } catch (ParseCancellationException _) {
-            return false;
-        }
-        return parser.getCurrentToken().getType() == Token.EOF;
+        parser.addErrorListener(errors);
+        parser.json();
+
+        return !errors.hasError && (parser.getCurrentToken().getType() == Token.EOF);
     }
 
     /// Splits the given JSON text into segments carrying a style class each.
@@ -122,7 +114,7 @@ public class JsonHighlighter {
         };
     }
 
-    /// Records whether the lexer stumbled over a character.
+    /// Records whether the lexer or the parser stumbled over the input.
     private static final class ErrorFlag extends BaseErrorListener {
         private boolean hasError;
 
