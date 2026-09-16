@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import io.github.kusoroadeolu.veneer.JSONLexer;
 import org.antlr.v4.runtime.CharStreams;
@@ -36,6 +37,10 @@ public class JsonHighlighter {
     /// Beyond this many characters, parsing the answer and rendering one node per token would cost
     /// more on the UI thread than the formatting is worth.
     private static final int MAX_LENGTH = 100_000;
+
+    /// What separates the JSON from the explanation: the rest of its line and any blank lines.
+    /// The indentation of the first line of the explanation is kept, it may be a code block.
+    private static final Pattern SEPARATOR = Pattern.compile("^(?:[ \\t]*\\r?\\n(?:[ \\t]*\\r?\\n)*|[ \\t]+)");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonHighlighter.class);
 
@@ -74,7 +79,8 @@ public class JsonHighlighter {
             parser.nextToken();
             // Reading through the parser, not through the mapper, leaves whatever follows untouched.
             String json = WRITER.writeValueAsString(parser.readValueAsTree());
-            String rest = trimmed.substring((int) parser.currentLocation().getCharOffset()).strip();
+            String afterJson = trimmed.substring((int) parser.currentLocation().getCharOffset());
+            String rest = SEPARATOR.matcher(afterJson).replaceFirst("").stripTrailing();
             return Optional.of(new LeadingJson(json, rest));
         } catch (JacksonException e) {
             LOGGER.debug("Text starting like JSON could not be formatted as JSON", e);

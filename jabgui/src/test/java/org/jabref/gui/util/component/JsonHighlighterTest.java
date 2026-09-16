@@ -47,6 +47,13 @@ class JsonHighlighterTest {
     }
 
     @Test
+    void leadingJsonKeepsTheIndentationOfTheExplanation() {
+        JsonHighlighter.LeadingJson leadingJson = JsonHighlighter.leadingJson("{\"a\": 1}\n\n    code line\n").orElseThrow();
+
+        assertEquals("    code line", leadingJson.rest());
+    }
+
+    @Test
     void prettyPrintIndentsObjectsAndArrays() {
         assertEquals("""
                         {
