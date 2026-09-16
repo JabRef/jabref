@@ -182,6 +182,28 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void copySelectedTextFromHighlightedJsonBlockKeepsFences() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdown("```json\n{\"a\": 1}\n```");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            assertTrue(textFlow.isSelectionActive());
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("```json\n{\"a\": 1}\n```", clipBoardManager.stringContent.get());
+        assertTrue(clipBoardManager.htmlContent.get().contains("<code"));
+    }
+
+    @Test
     void copySelectedTextFromMarkdownUsesMarkdownClipboardContent() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
