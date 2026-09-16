@@ -159,7 +159,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     /// Compares the definitions with the state at dialog open and re-bases them for the next save.
     ///
-    /// The entry types are compared in their serialized form, because `BibEntryType.equals` compares fields by name
+    /// The entry types are compared in their serialized form, because [BibEntryType#equals(Object)] compares fields by name
     /// only - a changed field property would go unnoticed.
     /// The multiline state is kept out of that form: it lives in the preferences, not in the entry type.
     private Optional<String> detectEntryTypesChanged() {
