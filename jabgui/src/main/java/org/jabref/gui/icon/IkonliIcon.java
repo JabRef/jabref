@@ -93,7 +93,7 @@ public final class IkonliIcon implements JabRefIcon {
                       .collect(Collectors.toUnmodifiableMap(
                               ikon -> keyMapper.apply(ikon).toUpperCase(Locale.ENGLISH),
                               ikon -> ikon,
-                              (existing, duplicate) -> existing
+                              (existing, _) -> existing
                       ));
         }
     }
