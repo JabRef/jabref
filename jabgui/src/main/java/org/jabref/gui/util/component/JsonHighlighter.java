@@ -2,6 +2,7 @@ package org.jabref.gui.util.component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import io.github.kusoroadeolu.veneer.JSONLexer;
 import io.github.kusoroadeolu.veneer.JSONParser;
@@ -23,6 +24,8 @@ import org.jspecify.annotations.Nullable;
 /// The colors for the style classes are defined in `jabref-base.css`.
 @NullMarked
 public class JsonHighlighter {
+
+    private static final Set<String> LITERALS = Set.of("true", "false", "null");
 
     /// A piece of the original text together with the CSS style class it should be rendered with.
     /// `styleClass` is `null` for text between tokens (whitespace).
@@ -109,12 +112,12 @@ public class JsonHighlighter {
 
     private static String styleClassOf(Token token, @Nullable Token nextToken) {
         return switch (token.getType()) {
-            case JSONLexer.NUMBER -> "json-number";
-            case JSONLexer.STRING -> (nextToken != null) && ":".equals(nextToken.getText()) ? "json-key" : "json-string";
-            default -> switch (token.getText()) {
-                case "true", "false", "null" -> "json-literal";
-                default -> "json-punctuation";
-            };
+            case JSONLexer.NUMBER ->
+                    "json-number";
+            case JSONLexer.STRING ->
+                    (nextToken != null) && ":".equals(nextToken.getText()) ? "json-key" : "json-string";
+            default ->
+                    LITERALS.contains(token.getText()) ? "json-literal" : "json-punctuation";
         };
     }
 
