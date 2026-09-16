@@ -28,8 +28,8 @@ public class JsonHighlighter {
     private static final Set<String> LITERALS = Set.of("true", "false", "null");
 
     /// A piece of the original text together with the CSS style class it should be rendered with.
-    /// `styleClass` is `null` for text between tokens (whitespace).
-    public record Segment(String text, @Nullable String styleClass) {
+    /// `styleClass` is empty for text between tokens (whitespace).
+    public record Segment(String text, String styleClass) {
     }
 
     private JsonHighlighter() {
@@ -82,15 +82,15 @@ public class JsonHighlighter {
 
             // Whitespace is skipped by the lexer, so it has to be taken from the original text.
             if (token.getStartIndex() > position) {
-                segments.add(new Segment(json.substring(position, token.getStartIndex()), null));
+                segments.add(new Segment(json.substring(position, token.getStartIndex()), ""));
             }
 
-            segments.add(new Segment(token.getText(), styleClassOf(token, nextToken(tokens, i))));
+            segments.add(new Segment(token.getText(), styleClassOf(token, nextTokenText(tokens, i))));
             position = token.getStopIndex() + 1;
         }
 
         if (position < json.length()) {
-            segments.add(new Segment(json.substring(position), null));
+            segments.add(new Segment(json.substring(position), ""));
         }
 
         return segments;
@@ -100,22 +100,23 @@ public class JsonHighlighter {
         return (token.getType() == JSONLexer.WS) || (token.getType() == JSONLexer.NEWLINE);
     }
 
-    private static @Nullable Token nextToken(List<Token> tokens, int index) {
+    /// The text of the next token that is not whitespace, or the empty string behind the last token.
+    private static String nextTokenText(List<Token> tokens, int index) {
         for (int i = index + 1; i < tokens.size(); i++) {
             Token token = tokens.get(i);
             if (!isWhitespace(token)) {
-                return token;
+                return token.getText();
             }
         }
-        return null;
+        return "";
     }
 
-    private static String styleClassOf(Token token, @Nullable Token nextToken) {
+    private static String styleClassOf(Token token, String nextTokenText) {
         return switch (token.getType()) {
             case JSONLexer.NUMBER ->
                     "json-number";
             case JSONLexer.STRING ->
-                    (nextToken != null) && ":".equals(nextToken.getText()) ? "json-key" : "json-string";
+                    ":".equals(nextTokenText) ? "json-key" : "json-string";
             default ->
                     LITERALS.contains(token.getText()) ? "json-literal" : "json-punctuation";
         };
