@@ -226,18 +226,20 @@ public class WhatsNewViewModel extends AbstractViewModel {
         title.set(title(look));
     }
 
-    /// `What's new - 3 pending change(s) since <running commit> - now at <upstream commit>`: the count only with
-    /// news, the commits only while behind — each variant one sentence, so translators may order it.
+    /// `What's new - 3 pending change(s) since <running commit> - now at <upstream commit> (5 commit(s))`: the
+    /// entry count only with news, the commits only while behind — each variant one sentence, so translators may
+    /// order it.
     private static String title(Look look) {
         String count = String.valueOf(look.news().size());
+        String commits = String.valueOf(look.commitsBehind());
         if (look.head().isEmpty() || look.upstream().isEmpty()) {
             return look.news().isEmpty()
                    ? Localization.lang("What's new")
                    : Localization.lang("What's new - %0 pending change(s)", count);
         }
         return look.news().isEmpty()
-               ? Localization.lang("What's new since %0 - now at %1", look.head().get(), look.upstream().get())
-               : Localization.lang("What's new - %0 pending change(s) since %1 - now at %2", count, look.head().get(), look.upstream().get());
+               ? Localization.lang("What's new since %0 - now at %1 (%2 commit(s))", look.head().get(), look.upstream().get(), commits)
+               : Localization.lang("What's new - %0 pending change(s) since %1 - now at %2 (%3 commit(s))", count, look.head().get(), look.upstream().get(), commits);
     }
 
     private String tooltipText() {

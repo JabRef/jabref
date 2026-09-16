@@ -4,7 +4,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
@@ -28,13 +30,13 @@ import org.jabref.logic.whatsnew.News;
 
 import org.jspecify.annotations.Nullable;
 
-/// The non-modal "What's new" window: the news with *Later* and, when something waits to restart JabRef,
-/// *Restart to update*; without news only *Close*, as a restart would bring nothing to read about, above the
-/// news shown before, greyed.
+/// The non-modal "What's new" window: the news, or a line saying there are none above the news shown before,
+/// greyed; *Later*, or *Close* when there is neither news nor a restart to offer.
 ///
-/// It opens on a fetch — "Checking remote…" with a bar, the restart disabled — and [#checked] brings the answer,
-/// so nobody restarts into a version that is already stale. From then on the restart is offered exactly while
-/// an update is available; after [#checkFailed] it stays disabled.
+/// When something waits to restart JabRef, *Restart to update* is offered while the window checks the remote —
+/// "Checking remote…" with a bar; `just run-loop` pulls anyway, so the answer need not be awaited — and, once
+/// [#checked] brings the answer, exactly while commits landed upstream, whether or not they touched the changelog.
+/// After [#checkFailed] no restart is offered.
 // [impl->req~whats-new.checkout-news~1]
 public class WhatsNewDialog extends BaseDialog<Boolean> {
 
@@ -61,19 +63,21 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
         this.openUrl = openUrl;
         // JavaFX dialogs are application-modal unless told otherwise; this one must not block JabRef.
         initModality(Modality.NONE);
-        ObservableValue<Boolean> hasNews = this.news.map(shown -> !shown.isEmpty());
+        BooleanExpression restartOffered = updateAvailable.<BooleanExpression>map(available -> check.isEqualTo(Check.RUNNING)
+                                                                                .or(check.isEqualTo(Check.DONE).and(available)))
+                                                          .orElseGet(() -> new SimpleBooleanProperty(false));
+        BooleanExpression laterFits = BooleanExpression.booleanExpression(this.news.map(shown -> !shown.isEmpty())).or(restartOffered);
 
         ButtonType later = new ButtonType(Localization.lang("Later"), ButtonBar.ButtonData.CANCEL_CLOSE);
         getDialogPane().getButtonTypes().add(later);
         ((Button) getDialogPane().lookupButton(later)).textProperty()
-                                                      .bind(hasNews.map(some -> some ? Localization.lang("Later") : Localization.lang("Close")));
-        updateAvailable.ifPresent(available -> {
+                                                      .bind(Bindings.when(laterFits).then(Localization.lang("Later")).otherwise(Localization.lang("Close")));
+        if (updateAvailable.isPresent()) {
             getDialogPane().getButtonTypes().add(restart);
             Node restartButton = getDialogPane().lookupButton(restart);
-            restartButton.visibleProperty().bind(hasNews);
-            restartButton.managedProperty().bind(hasNews);
-            restartButton.disableProperty().bind(check.isNotEqualTo(Check.DONE).or(Bindings.not(available)));
-        });
+            restartButton.visibleProperty().bind(restartOffered);
+            restartButton.managedProperty().bind(restartOffered);
+        }
         setResultConverter(restart::equals);
 
         BorderPane root = new BorderPane();

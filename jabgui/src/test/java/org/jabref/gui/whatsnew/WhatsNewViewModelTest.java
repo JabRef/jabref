@@ -151,9 +151,9 @@ class WhatsNewViewModelTest {
         taskExecutor.runScheduled();
 
         assertEquals(new News(List.of(new AttributedEntry(Contributor.Me.REMOTE, PUSHED))), viewModel.getPending());
-        assertEquals("What's new - 1 pending change(s) since 1111111 (2026-09-13 10:00) - now at 2222222 (2026-09-13 11:00)", viewModel.titleProperty().get());
+        assertEquals("What's new - 1 pending change(s) since 1111111 (2026-09-13 10:00) - now at 2222222 (2026-09-13 11:00) (2 commit(s))", viewModel.titleProperty().get());
         assertTrue(viewModel.updateAvailableProperty().get());
-        assertEquals("\n\nWhat's new - 1 pending change(s) since 1111111 (2026-09-13 10:00) - now at 2222222 (2026-09-13 11:00):\n"
+        assertEquals("\n\nWhat's new - 1 pending change(s) since 1111111 (2026-09-13 10:00) - now at 2222222 (2026-09-13 11:00) (2 commit(s)):\n"
                 + "Changes by me (pushed from another machine)\n• An entry pushed from elsewhere.\n\n"
                 + "A new version is available (2 commit(s)) - restart to update.", viewModel.tooltipProperty().get());
     }
