@@ -283,7 +283,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
         catalogTable.setItems(viewModel.getCatalogs());
     }
-    
+
     private Callback<TableColumn<StudyCatalogItem, String>, TableCell<StudyCatalogItem, String>> createEditableTextFieldCellFactory(
             Function<StudyCatalogItem, StringProperty> propertyExtractor) {
         return column -> {
