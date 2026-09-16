@@ -374,9 +374,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         contentColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
         actionColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
         new ValueTableCellFactory<T, String>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove"))
-                .withOnMouseClickedEvent((rowItem, cellValue) -> evt ->
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(_ -> Localization.lang("Remove"))
+                .withOnMouseClickedEvent((rowItem, _) -> _ ->
                         removeAction.accept(rowItem))
                 .install(actionColumn);
     }

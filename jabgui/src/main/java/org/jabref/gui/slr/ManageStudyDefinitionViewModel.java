@@ -3,6 +3,7 @@ package org.jabref.gui.slr;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -294,11 +295,12 @@ public class ManageStudyDefinitionViewModel {
             }
             String nativeQuery = catalog.getNativeQuery();
             for (StudyQuery query : queries) {
-                Map<String, String> catalogSpecific = query.getCatalogSpecific();
-                catalogSpecific.keySet().removeIf(key -> key.equalsIgnoreCase(catalog.getName()));
+                Map<String, String> updated = new LinkedHashMap<>(query.getCatalogSpecific());
+                updated.keySet().removeIf(key -> key.equalsIgnoreCase(catalog.getName()));
                 if (nativeQuery != null && !nativeQuery.isBlank()) {
-                    catalogSpecific.put(catalog.getName(), nativeQuery);
+                    updated.put(catalog.getName(), nativeQuery);
                 }
+                query.setCatalogSpecific(updated);
             }
         }
     }
