@@ -3,13 +3,16 @@ package org.jabref.gui.util.component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.github.kusoroadeolu.veneer.JSONLexer;
+import io.github.kusoroadeolu.veneer.JSONParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.Trees;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +28,12 @@ import tools.jackson.databind.json.JsonMapper;
 
 /// Formats and splits JSON text into styled segments, so that AI answers containing JSON can be
 /// rendered readably and with syntax highlighting. Parsing and formatting are delegated to Jackson,
-/// tokenizing to the Veneer grammar that is also used for the BibTeX source editor
-/// (see `org.jabref.gui.bibtexhighlighter`).
+/// splitting into tokens to the Veneer JSON grammar; Veneer also highlights the BibTeX source editor
+/// (see [org.jabref.gui.bibtexhighlighter.BibTeXHighlighter]).
 ///
 /// The colors for the style classes are defined in `jabref-base.css`.
 @NullMarked
 public class JsonHighlighter {
-
-    private static final Set<String> LITERALS = Set.of("true", "false", "null");
 
     /// Beyond this many characters, parsing the answer and rendering one node per token would cost
     /// more on the UI thread than the formatting is worth.
@@ -91,29 +92,26 @@ public class JsonHighlighter {
     /// Splits the given JSON text into segments carrying a style class each.
     public static List<Segment> tokenize(String json) {
         CommonTokenStream tokenStream = tokenStream(json);
-        tokenStream.fill();
+        JSONParser parser = new JSONParser(tokenStream);
+        parser.removeErrorListeners();
 
         List<Segment> segments = new ArrayList<>();
-        List<Token> tokens = tokenStream.getTokens();
         // The lexer counts code points, `String` counts UTF-16 units: an emoji would shift all offsets.
         int[] codePoints = json.codePoints().toArray();
         int position = 0;
 
-        for (int i = 0; i < tokens.size(); i++) {
-            Token token = tokens.get(i);
-            if (token.getType() == Token.EOF) {
-                break;
-            }
-            if (isWhitespace(token)) {
+        for (ParseTree node : Trees.getDescendants(parser.json())) {
+            if (!(node instanceof TerminalNode terminal) || (terminal.getSymbol().getType() == Token.EOF)) {
                 continue;
             }
+            Token token = terminal.getSymbol();
 
             // Whitespace is skipped by the lexer, so it has to be taken from the original text.
             if (token.getStartIndex() > position) {
                 segments.add(new Segment(new String(codePoints, position, token.getStartIndex() - position), ""));
             }
 
-            String styleClass = styleClassOf(token, nextTokenText(tokens, i));
+            String styleClass = styleClassOf(terminal);
             if ("json-string".equals(styleClass)) {
                 addStringSegments(segments, token.getText());
             } else {
@@ -158,29 +156,16 @@ public class JsonHighlighter {
         }
     }
 
-    private static boolean isWhitespace(Token token) {
-        return (token.getType() == JSONLexer.WS) || (token.getType() == JSONLexer.NEWLINE);
-    }
-
-    /// The text of the next token that is not whitespace, or the empty string behind the last token.
-    private static String nextTokenText(List<Token> tokens, int index) {
-        for (int i = index + 1; i < tokens.size(); i++) {
-            Token token = tokens.get(i);
-            if (!isWhitespace(token)) {
-                return token.getText();
-            }
-        }
-        return "";
-    }
-
-    private static String styleClassOf(Token token, String nextTokenText) {
-        return switch (token.getType()) {
+    /// The role of a token follows from the grammar rule it belongs to: the string of a `pair` is its name,
+    /// and a token of a `value` that is neither string nor number is one of `true`, `false`, `null`.
+    private static String styleClassOf(TerminalNode terminal) {
+        return switch (terminal.getSymbol().getType()) {
             case JSONLexer.NUMBER ->
                     "json-number";
             case JSONLexer.STRING ->
-                    ":".equals(nextTokenText) ? "json-key" : "json-string";
+                    terminal.getParent() instanceof JSONParser.PairContext ? "json-key" : "json-string";
             default ->
-                    LITERALS.contains(token.getText()) ? "json-literal" : "json-punctuation";
+                    terminal.getParent() instanceof JSONParser.ValueContext ? "json-literal" : "json-punctuation";
         };
     }
 
