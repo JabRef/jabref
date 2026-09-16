@@ -1,0 +1,33 @@
+name: "Changelog cherry-pick merge driver"
+description: "Configures the checked-out repository so that a cherry-pick merges CHANGELOG.md on entry level (see .jbang/ChangelogCherryPickMergeDriver.java)"
+
+runs:
+  using: "composite"
+  steps:
+    # Some runners (e.g. ubuntu-slim) do not provide Java, which jbang needs
+    - name: Setup Java
+      uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
+      with:
+        distribution: 'temurin'
+        java-version: '25'
+
+    - name: Setup JBang
+      uses: jbangdev/setup-jbang@2b1b465a7b75f4222b81426f23a01e013aa7b95c # v0.1.1
+
+    - name: Cache JBang
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.jbang
+        key: jbang-changelog-cherry-pick-driver-${{ hashFiles('.jbang/ChangelogCherryPickMergeDriver.java') }}
+
+    - name: Configure merge driver
+      shell: bash
+      run: |
+        set -euo pipefail
+        # Copied out of the workspace: the caller checks out other branches (or a PR head) afterwards,
+        # and the driver must stay the one from the trusted base branch.
+        cp .jbang/ChangelogCherryPickMergeDriver.java "$RUNNER_TEMP/"
+        jbang build "$RUNNER_TEMP/ChangelogCherryPickMergeDriver.java"
+        git config merge.changelog.driver "jbang $RUNNER_TEMP/ChangelogCherryPickMergeDriver.java %O %A %B"
+        # Overrides the checked-in "CHANGELOG.md merge=union" without dirtying the working tree
+        echo "CHANGELOG.md merge=changelog" >> "$(git rev-parse --git-dir)/info/attributes"

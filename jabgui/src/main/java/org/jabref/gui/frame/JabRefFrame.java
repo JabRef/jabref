@@ -272,9 +272,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private void updateSidePane() {
         if (sidePane.getChildren().isEmpty()) {
-            if (horizontalDividerSubscription != null) {
-                horizontalDividerSubscription.unsubscribe();
-            }
+            unsubscribeHorizontalDivider();
             horizontalSplit.getItems().remove(sidePane);
         } else {
             if (!horizontalSplit.getItems().contains(sidePane)) {
@@ -303,13 +301,27 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public void updateHorizontalDividerPosition() {
-        if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
-            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
-                                                    .mapObservable(SplitPane.Divider::positionProperty)
-                                                    .listenToValues((_, newValue) ->
-                                                            preferences.getGuiPreferences()
-                                                                       .setHorizontalDividerPosition(newValue.doubleValue()));
+        // Rapid toggling queues several runLater calls; a leftover listener would keep writing.
+        unsubscribeHorizontalDivider();
+        if (!mainStage.isShowing() || sidePane.getChildren().isEmpty()) {
+            return;
+        }
+        horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
+        horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
+                                                .mapObservable(SplitPane.Divider::positionProperty)
+                                                .listenToValues((_, newValue) -> {
+                                                    double position = newValue.doubleValue();
+                                                    // 0 and 1 occur while the pane is added or removed, not as a user's choice
+                                                    if (position > 0 && position < 1) {
+                                                        preferences.getGuiPreferences().setHorizontalDividerPosition(position);
+                                                    }
+                                                });
+    }
+
+    private void unsubscribeHorizontalDivider() {
+        if (horizontalDividerSubscription != null) {
+            horizontalDividerSubscription.unsubscribe();
+            horizontalDividerSubscription = null;
         }
     }
 
@@ -402,7 +414,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         }
                         break;
                     case CLOSE_DATABASE:
-                        new CloseDatabaseAction(this, stateManager).execute();
+                        if (getCurrentLibraryTab() == null) {
+                            closeSelectedNonLibraryTab(tabbedPane);
+                        } else {
+                            new CloseDatabaseAction(this, stateManager).execute();
+                        }
                         event.consume();
                         break;
                     default:
@@ -412,6 +428,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initBindings() {
+        // Every tab shows its close button, so selecting a tab does not shift its label
+        tabbedPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
         BindingsHelper.bindContentFiltered(tabbedPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
@@ -511,6 +529,23 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                                 .orElse(new SimpleBooleanProperty(false))
                 )
         );
+    }
+
+    /// Closes the selected tab if it is no [LibraryTab] (the welcome tab): [CloseDatabaseAction] only knows library tabs, so the close shortcut would do nothing there.
+    ///
+    /// Mirrors what the tab's close button does in `TabPaneBehavior`: the tab close events are notifications, a [TabPane] never removes a tab in response to one, so the removal has to happen here.
+    static void closeSelectedNonLibraryTab(TabPane tabbedPane) {
+        Tab selectedTab = tabbedPane.getSelectionModel().getSelectedItem();
+        if ((selectedTab == null) || (selectedTab instanceof LibraryTab) || !selectedTab.isClosable()) {
+            return;
+        }
+        Event closeRequest = new Event(selectedTab, selectedTab, Tab.TAB_CLOSE_REQUEST_EVENT);
+        Event.fireEvent(selectedTab, closeRequest);
+        if (closeRequest.isConsumed()) {
+            return;
+        }
+        tabbedPane.getTabs().remove(selectedTab);
+        Event.fireEvent(selectedTab, new Event(selectedTab, selectedTab, Tab.CLOSED_EVENT));
     }
 
     private void updateTabBarVisible() {
