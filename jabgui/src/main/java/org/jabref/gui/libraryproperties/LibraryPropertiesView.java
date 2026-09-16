@@ -32,7 +32,7 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
                   .load()
                   .setAsDialogPane(this);
 
-        ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
+        ControlHelper.setAction(saveButton, getDialogPane(), _ -> savePreferencesAndCloseDialog());
 
         if (databaseContext.getDatabasePath().isPresent()) {
             setTitle(Localization.lang("%0 - Library properties", databaseContext.getDatabasePath().get().getFileName()));

@@ -35,7 +35,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.testutils.category.DatabaseTest;
+import org.jabref.support.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,6 +97,7 @@ class DBMSSynchronizerTest {
 
     @AfterEach
     void closeDbmsConnection() throws Exception {
+        dbmsSynchronizer.closeSharedDatabase();
         connectorTest.close();
     }
 
@@ -239,8 +240,11 @@ class DBMSSynchronizerTest {
         testMetaData.setMode(BibDatabaseMode.BIBTEX);
 
         Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData, pattern);
+        // A metadata notification can apply the database-owned schema version before this assertion.
+        // It is not part of the local metadata change tested here.
+        expectedMap.remove(MetaData.VERSION_DB_STRUCT);
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
-        actualMap.remove("VersionDBStructure");
+        actualMap.remove(MetaData.VERSION_DB_STRUCT);
 
         assertEquals(expectedMap, actualMap);
     }

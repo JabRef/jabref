@@ -6,6 +6,7 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
@@ -26,6 +27,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -199,6 +201,56 @@ class MarkdownTextFlowTest extends JavaFxTest {
 
         assertEquals("**bold**", clipBoardManager.stringContent.get());
         assertTrue(clipBoardManager.htmlContent.get().contains("<strong>bold</strong>"));
+    }
+
+    @Test
+    void hyperlinkHandlerDefaultsToNonNull() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        assertNotNull(textFlow.getHyperlinkHandler());
+    }
+
+    @Test
+    void clickingHyperlinkInvokesCustomHandler() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+        AtomicReference<String> clickedUrl = new AtomicReference<>();
+
+        interact(() -> {
+            textFlow.setHyperlinkHandler(clickedUrl::set);
+            textFlow.setMarkdown("[link](https://example.com)");
+        });
+
+        interact(() -> {
+            Hyperlink hyperlink = (Hyperlink) textFlow.getChildren().getFirst();
+            hyperlink.fire();
+        });
+
+        assertEquals("https://example.com", clickedUrl.get());
+    }
+
+    @Test
+    void mouseClickOnHyperlinkInvokesCustomHandler() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+        AtomicReference<String> clickedUrl = new AtomicReference<>();
+
+        interact(() -> {
+            textFlow.setHyperlinkHandler(clickedUrl::set);
+            textFlow.setMarkdown("[link](https://example.com)");
+            rootPane.applyCss();
+            rootPane.layout();
+        });
+        awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            Hyperlink hyperlink = (Hyperlink) textFlow.getChildren().getFirst();
+            Bounds bounds = hyperlink.localToScreen(hyperlink.getBoundsInLocal());
+            Robot robot = new Robot();
+            robot.mouseMove(bounds.getCenterX(), bounds.getCenterY());
+            robot.mouseClick(MouseButton.PRIMARY);
+        });
+        awaitEvents();
+
+        assertEquals("https://example.com", clickedUrl.get());
     }
 
     private static int childCount(MarkdownTextFlow textFlow) {

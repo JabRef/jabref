@@ -52,7 +52,7 @@ Chosen option: "A single `stable` branch, ports driven by a label and done by CI
 
 ### Confirmation
 
-`.github/workflows/on-pr-bug-linked.yml` adds the label for newly linked bugs; `.github/workflows/port-to-other-branch.yml` implements the check and the port (the port itself is [korthout/backport-action](https://github.com/korthout/backport-action); the workflow adds the target selection, the changelog merge driver, the pre-merge simulation, and the auto-merge label); the merge driver ships a self-test that the `JBang check` job runs. Whether a fix reached both branches is visible on the original pull request (comment and port pull request link from the port job).
+`.github/workflows/on-pr-bug-linked.yml` adds the label for newly linked bugs (and lends the issue's milestone to the pull request); `.github/workflows/port-to-other-branch.yml` implements the check and the port (the port itself is [korthout/backport-action](https://github.com/korthout/backport-action); the workflow adds the target selection, the changelog merge driver, the pre-merge simulation, and the auto-merge label); the merge driver ships a self-test that the `JBang check` job runs. Whether a fix reached both branches is visible on the original pull request (comment and port pull request link from the port job).
 
 ## Pros and Cons of the Options
 
