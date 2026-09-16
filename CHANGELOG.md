@@ -53,6 +53,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for selecting response engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - We added the ability to jump to cited entries and page locations in the PDF viewer from AI chat citations. [#16981](https://github.com/JabRef/jabref/pull/16981)
 - We added a "Test connection" button to the AI preferences. [#17123](https://github.com/JabRef/jabref/pull/17123)
+- We now show JSON answers in the AI chat as a highlighted code block. [#17181](https://github.com/JabRef/jabref/pull/17181)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 - We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
