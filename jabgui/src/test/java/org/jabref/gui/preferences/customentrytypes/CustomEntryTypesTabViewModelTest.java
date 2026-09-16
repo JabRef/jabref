@@ -111,7 +111,7 @@ class CustomEntryTypesTabViewModelTest {
 
     @Test
     void unchangedSaveWithFieldOutsideEntryTypesHasNoRestartWarning() {
-        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), List.of(StandardField.PDF, StandardField.PS, StandardField.URL));
+        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), List.of(StandardField.PS, StandardField.ISRN, StandardField.URL));
         when(preferences.getFieldPreferences()).thenReturn(realFieldPreferences);
         CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
         model.setValues();
@@ -123,14 +123,14 @@ class CustomEntryTypesTabViewModelTest {
 
     @Test
     void saveKeepsMultilineFieldOutsideEntryTypes() {
-        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), List.of(StandardField.PDF, StandardField.URL));
+        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), List.of(StandardField.PS, StandardField.URL));
         when(preferences.getFieldPreferences()).thenReturn(realFieldPreferences);
         CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
         model.setValues();
 
         model.storeSettings();
 
-        assertTrue(realFieldPreferences.getNonWrappableFields().contains(StandardField.PDF));
+        assertTrue(realFieldPreferences.getNonWrappableFields().contains(StandardField.PS));
     }
 
     @Test
