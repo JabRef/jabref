@@ -204,6 +204,16 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void hugeJsonIsRenderedAsASingleNode() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+        String hugeJson = "{\"a\": [" + "1, ".repeat(30_000) + "1]}";
+
+        interact(() -> textFlow.setMarkdown(hugeJson));
+
+        assertEquals(1, textFlow.getChildren().size());
+    }
+
+    @Test
     void copySelectedTextFromCodeBlockKeepsBlankLines() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
