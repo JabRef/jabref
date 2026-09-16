@@ -3,10 +3,12 @@ package org.jabref.gui.actions;
 import java.util.Optional;
 
 import javafx.beans.binding.BooleanExpression;
+import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
@@ -17,11 +19,14 @@ import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.action.ActionUtils;
 
 /// Helper class to create and style controls according to an [Action].
 public class ActionFactory {
+
+    private static final String TOOLTIP_DISPOSER_KEY = ActionFactory.class.getName() + ".tooltipDisposer";
 
     private final KeyBindingRepository keyBindingRepository;
 
@@ -49,6 +54,12 @@ public class ActionFactory {
     /// The row node only exists once the menu has been shown and is recreated when the menu's items change,
     /// so the tooltip is (re)installed whenever the popup is shown.
     private static void enableTooltip(JabRefAction jabRefAction, MenuItem menuItem) {
+        // An item can be configured again with another action (e.g., when the push-to-application target changes),
+        // so the listeners of the previous configuration have to go, or its outdated tooltip would still be installed
+        if (menuItem.getProperties().remove(TOOLTIP_DISPOSER_KEY) instanceof Runnable disposePreviousTooltip) {
+            disposePreviousTooltip.run();
+        }
+
         Tooltip tooltip = new Tooltip();
         tooltip.textProperty().bind(jabRefAction.longTextProperty());
 
@@ -67,11 +78,22 @@ public class ActionFactory {
 
         Optional.ofNullable(menuItem.getParentPopup())
                 .ifPresent(popup -> popup.addEventHandler(WindowEvent.WINDOW_SHOWN, onPopupShown));
-        menuItem.parentPopupProperty().addListener((_, oldPopup, newPopup) -> {
+        ChangeListener<ContextMenu> parentPopupListener = (_, oldPopup, newPopup) -> {
             Optional.ofNullable(oldPopup).ifPresent(popup -> popup.removeEventHandler(WindowEvent.WINDOW_SHOWN, onPopupShown));
             Optional.ofNullable(newPopup).ifPresent(popup -> popup.addEventHandler(WindowEvent.WINDOW_SHOWN, onPopupShown));
-        });
-        EasyBind.subscribe(tooltip.textProperty(), _ -> updateTooltip.run());
+        };
+        menuItem.parentPopupProperty().addListener(parentPopupListener);
+        Subscription textSubscription = EasyBind.subscribe(tooltip.textProperty(), _ -> updateTooltip.run());
+
+        Runnable disposeTooltip = () -> {
+            textSubscription.unsubscribe();
+            menuItem.parentPopupProperty().removeListener(parentPopupListener);
+            Optional.ofNullable(menuItem.getParentPopup())
+                    .ifPresent(popup -> popup.removeEventHandler(WindowEvent.WINDOW_SHOWN, onPopupShown));
+            Optional.ofNullable(menuItem.getStyleableNode()).ifPresent(row -> Tooltip.uninstall(row, tooltip));
+            tooltip.textProperty().unbind();
+        };
+        menuItem.getProperties().put(TOOLTIP_DISPOSER_KEY, disposeTooltip);
     }
 
     public MenuItem createMenuItem(Action action, Command command) {
