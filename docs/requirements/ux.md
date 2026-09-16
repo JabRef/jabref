@@ -188,4 +188,12 @@ The groups walkthrough must open its bundled example library, display the Groups
 
 Needs: impl
 
+## Donation prompt returns every six months
+`req~ux.donation.recurring-prompt~1`
+
+JabRef asks for a donation six months after the first launch and every six months afterwards.
+Dismissing the prompt hides it until the next time; "Dismiss forever" stops it for good.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
