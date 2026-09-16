@@ -226,6 +226,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         int selEnd = getSelectionEndIndex();
 
         StringJoiner result = new StringJoiner("");
+        // Markdown inside a JSON string must not become formatting in the HTML flavor of the clipboard.
+        StringJoiner markdownResult = new StringJoiner("");
         int currentPos = 0;
 
         for (CopySegment segment : buildCopySegments()) {
@@ -250,6 +252,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
                 if (startInSegment == 0 && endInSegment == renderedText.length()) {
                     result.add(markdownText);
+                    markdownResult.add(segment.json() ? fenced(markdownText) : markdownText);
                 } else {
                     String partialText = renderedText.substring(startInSegment, endInSegment);
                     if (astNode instanceof DelimitedNode delimitedNode) {
@@ -257,6 +260,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                         partialText = delimitedNode.getOpeningMarker() + partialText + delimitedNode.getClosingMarker();
                     }
                     result.add(partialText);
+                    markdownResult.add(segment.json() ? fenced(partialText) : partialText);
                 }
             }
 
@@ -268,14 +272,18 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         }
 
         ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
-        clipBoardManager.setHtmlContent(htmlRenderer.render(parser.parse(result.toString())), result.toString());
+        clipBoardManager.setHtmlContent(htmlRenderer.render(parser.parse(markdownResult.toString())), result.toString());
+    }
+
+    private static String fenced(String json) {
+        return "```json\n" + json + "\n```\n";
     }
 
     /// The text of one or more adjacent nodes that belong to the same Markdown node, as needed to
     /// reconstruct the Markdown markup while copying. A syntax-highlighted code block is rendered as
     /// one node per token, but copied as a single block.
     @NullMarked
-    private record CopySegment(String text, @Nullable Node astNode) {
+    private record CopySegment(String text, @Nullable Node astNode, boolean json) {
     }
 
     /// Removes the newlines Flexmark adds around the content of a code block (`\n` at the beginning,
@@ -297,6 +305,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         StringBuilder pending = new StringBuilder();
         @Nullable Node pendingNode = null;
         boolean pendingIsNewlineMarker = false;
+        boolean pendingIsJson = false;
 
         for (javafx.scene.Node fxNode : getChildren()) {
             String renderedText;
@@ -312,23 +321,28 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 continue;
             }
 
+            // Highlighted JSON without a Markdown node of its own: the tokens of a bare JSON answer.
+            boolean json = (astNode == null) && fxNode.getStyleClass().contains("markdown-code-block");
+
             // The newline nodes between blocks carry the block's node as well, but are copied as newlines.
-            if ((astNode != null) && (astNode == pendingNode) && !pendingIsNewlineMarker) {
+            boolean sameNode = (astNode != null) && (astNode == pendingNode) && !pendingIsNewlineMarker;
+            if (!pending.isEmpty() && (sameNode || (json && pendingIsJson))) {
                 pending.append(renderedText);
                 continue;
             }
 
             if (!pending.isEmpty()) {
-                segments.add(new CopySegment(pending.toString(), pendingNode));
+                segments.add(new CopySegment(pending.toString(), pendingNode, pendingIsJson));
             }
             pending.setLength(0);
             pending.append(renderedText);
             pendingNode = astNode;
+            pendingIsJson = json;
             pendingIsNewlineMarker = isNewlineMarker(renderedText);
         }
 
         if (!pending.isEmpty()) {
-            segments.add(new CopySegment(pending.toString(), pendingNode));
+            segments.add(new CopySegment(pending.toString(), pendingNode, pendingIsJson));
         }
 
         return segments;

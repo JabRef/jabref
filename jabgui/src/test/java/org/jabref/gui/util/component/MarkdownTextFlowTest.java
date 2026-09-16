@@ -213,6 +213,27 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void copiedJsonAnswerKeepsMarkdownInsideStringsLiteral() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdown("{\"a\": \"**not bold**\"}", true);
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("{\n  \"a\": \"**not bold**\"\n}", clipBoardManager.stringContent.get());
+        assertFalse(clipBoardManager.htmlContent.get().contains("<strong>"));
+    }
+
+    @Test
     void jsonIsLeftAloneWithoutHighlighting() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
