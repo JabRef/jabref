@@ -13,6 +13,7 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
 import tools.jackson.core.StreamReadFeature;
 import tools.jackson.core.StreamWriteFeature;
 import tools.jackson.core.util.DefaultIndenter;
@@ -38,7 +39,6 @@ public class JsonHighlighter {
     /// Duplicate names make the parse fail, because the tree would silently drop the first value.
     /// Decimals are kept as [java.math.BigDecimal], so that no digits are lost on the way out.
     private static final JsonMapper MAPPER = JsonMapper.builder()
-                                                       .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
                                                        .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
                                                        .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
                                                        .enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
@@ -54,15 +54,25 @@ public class JsonHighlighter {
     private JsonHighlighter() {
     }
 
-    /// Returns the given text as indented JSON, or empty if it is not a JSON object or array.
-    public static Optional<String> prettyPrint(String text) {
+    /// A JSON object or array at the beginning of a text, indented, together with whatever the text
+    /// continues with. Models often follow their JSON up with an explanation in prose.
+    public record LeadingJson(String json, String rest) {
+    }
+
+    /// Returns the JSON object or array the given text starts with, or empty if it starts with
+    /// something else or the JSON is malformed.
+    public static Optional<LeadingJson> leadingJson(String text) {
         String trimmed = text.strip();
         if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
             return Optional.empty();
         }
 
-        try {
-            return Optional.of(WRITER.writeValueAsString(MAPPER.readTree(trimmed)));
+        try (JsonParser parser = MAPPER.createParser(trimmed)) {
+            parser.nextToken();
+            // Reading through the parser, not through the mapper, leaves whatever follows untouched.
+            String json = WRITER.writeValueAsString(parser.readValueAsTree());
+            String rest = trimmed.substring((int) parser.currentLocation().getCharOffset()).strip();
+            return Optional.of(new LeadingJson(json, rest));
         } catch (JacksonException e) {
             LOGGER.debug("Text starting like JSON could not be formatted as JSON", e);
             return Optional.empty();

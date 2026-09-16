@@ -101,7 +101,7 @@ Needs: impl
 ### JSON answers are highlighted in AI chat
 `feat~ai.chat.json-highlighting~1`
 
-An answer that is a JSON document, on its own or inside a fenced code block, is shown as a monospaced code block, indented and with syntax highlighting, instead of flowed text.
+An answer that starts with a JSON document, or contains one inside a fenced code block, shows that JSON as a monospaced code block, indented and with syntax highlighting, instead of flowed text. An explanation following the JSON is rendered as Markdown.
 
 Needs: impl, utest
 

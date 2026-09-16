@@ -23,20 +23,27 @@ class JsonHighlighterTest {
             "{\"a\": {\"b\": \"c\"}}"
     })
     void recognizesJson(String text) {
-        assertTrue(JsonHighlighter.prettyPrint(text).isPresent());
+        assertTrue(JsonHighlighter.leadingJson(text).isPresent());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {
             "The answer is 42.",
             "{\"a\": }",
-            "{\"a\": 1} trailing text",
             "42",
             "\"just a string\"",
             ""
     })
     void rejectsNonJson(String text) {
-        assertEquals(Optional.empty(), JsonHighlighter.prettyPrint(text));
+        assertEquals(Optional.empty(), JsonHighlighter.leadingJson(text));
+    }
+
+    @Test
+    void leadingJsonSeparatesTheExplanationFollowingTheJson() {
+        JsonHighlighter.LeadingJson leadingJson = JsonHighlighter.leadingJson("{\"a\": 1}\n\nThe answer is *one*.").orElseThrow();
+
+        assertEquals("{\n  \"a\": 1\n}", leadingJson.json());
+        assertEquals("The answer is *one*.", leadingJson.rest());
     }
 
     @Test
@@ -51,18 +58,18 @@ class JsonHighlighterTest {
                             "c": true
                           }
                         }""",
-                JsonHighlighter.prettyPrint("{\"a\":[1,2],\"b\":{\"c\":true}}").orElseThrow());
+                JsonHighlighter.leadingJson("{\"a\":[1,2],\"b\":{\"c\":true}}").orElseThrow().json());
     }
 
     @Test
     void prettyPrintKeepsAllDigitsOfDecimals() {
         assertEquals("{\n  \"a\": 0.123456789012345678901234567890\n}",
-                JsonHighlighter.prettyPrint("{\"a\": 0.123456789012345678901234567890}").orElseThrow());
+                JsonHighlighter.leadingJson("{\"a\": 0.123456789012345678901234567890}").orElseThrow().json());
     }
 
     @Test
     void prettyPrintRejectsDuplicateNamesInsteadOfDroppingThem() {
-        assertEquals(Optional.empty(), JsonHighlighter.prettyPrint("{\"a\": 1, \"a\": 2}"));
+        assertEquals(Optional.empty(), JsonHighlighter.leadingJson("{\"a\": 1, \"a\": 2}"));
     }
 
     @Test
@@ -91,7 +98,7 @@ class JsonHighlighterTest {
 
     @Test
     void tokenizeKeepsTheTextCompleteWithSupplementaryCharacters() {
-        String json = JsonHighlighter.prettyPrint("{\"a\": \"\uD83D\uDE00\", \"b\": 1}").orElseThrow();
+        String json = JsonHighlighter.leadingJson("{\"a\": \"\uD83D\uDE00\", \"b\": 1}").orElseThrow().json();
         assertEquals(json, JsonHighlighter.tokenize(json).stream().map(JsonHighlighter.Segment::text).reduce("", String::concat));
     }
 

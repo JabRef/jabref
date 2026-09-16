@@ -85,9 +85,16 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             return;
         }
 
-        // AI models sometimes answer with plain JSON. It is shown as a highlighted code block.
-        JsonHighlighter.prettyPrint(markdownText).ifPresentOrElse(
-                json -> addJsonNodes(json, null),
+        // AI models sometimes answer with plain JSON, often followed by an explanation.
+        // The JSON is shown as a highlighted code block, the explanation as Markdown.
+        JsonHighlighter.leadingJson(markdownText).ifPresentOrElse(
+                leadingJson -> {
+                    addJsonNodes(leadingJson.json(), null);
+                    if (!leadingJson.rest().isEmpty()) {
+                        addTextNode("\n\n", null);
+                        new MarkdownRenderer().render(parser.parse(leadingJson.rest()));
+                    }
+                },
                 () -> new MarkdownRenderer().render(parser.parse(markdownText)));
     }
 
@@ -143,9 +150,11 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     /// Adds the nodes for a code block, with syntax highlighting if the code is JSON.
     // [impl->feat~ai.chat.json-highlighting~1]
     private void addCodeBlockNodes(String content, @Nullable Node codeBlock) {
-        JsonHighlighter.prettyPrint(content).ifPresentOrElse(
-                json -> addJsonNodes(json, codeBlock),
-                () -> addTextNode(content, codeBlock, "markdown-code-block", "font-monospace"));
+        JsonHighlighter.leadingJson(content)
+                       .filter(leadingJson -> leadingJson.rest().isEmpty())
+                       .ifPresentOrElse(
+                               leadingJson -> addJsonNodes(leadingJson.json(), codeBlock),
+                               () -> addTextNode(content, codeBlock, "markdown-code-block", "font-monospace"));
     }
 
     /// Adds one text node per JSON token; they are merged back into one segment when copying
