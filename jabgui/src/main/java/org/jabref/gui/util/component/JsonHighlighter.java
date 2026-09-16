@@ -10,7 +10,11 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
+import tools.jackson.core.StreamReadFeature;
+import tools.jackson.core.StreamWriteFeature;
 import tools.jackson.core.util.DefaultIndenter;
 import tools.jackson.core.util.DefaultPrettyPrinter;
 import tools.jackson.core.util.Separators;
@@ -29,8 +33,15 @@ public class JsonHighlighter {
 
     private static final Set<String> LITERALS = Set.of("true", "false", "null");
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonHighlighter.class);
+
+    /// Duplicate names make the parse fail, because the tree would silently drop the first value.
+    /// Decimals are kept as [java.math.BigDecimal], so that no digits are lost on the way out.
     private static final JsonMapper MAPPER = JsonMapper.builder()
                                                        .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+                                                       .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
+                                                       .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+                                                       .enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
                                                        .build();
 
     private static final ObjectWriter WRITER = MAPPER.writer().with(prettyPrinter());
@@ -52,7 +63,8 @@ public class JsonHighlighter {
 
         try {
             return Optional.of(WRITER.writeValueAsString(MAPPER.readTree(trimmed)));
-        } catch (JacksonException _) {
+        } catch (JacksonException e) {
+            LOGGER.debug("Text starting like JSON could not be formatted as JSON", e);
             return Optional.empty();
         }
     }

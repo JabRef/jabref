@@ -55,6 +55,17 @@ class JsonHighlighterTest {
     }
 
     @Test
+    void prettyPrintKeepsAllDigitsOfDecimals() {
+        assertEquals("{\n  \"a\": 0.123456789012345678901234567890\n}",
+                JsonHighlighter.prettyPrint("{\"a\": 0.123456789012345678901234567890}").orElseThrow());
+    }
+
+    @Test
+    void prettyPrintRejectsDuplicateNamesInsteadOfDroppingThem() {
+        assertEquals(Optional.empty(), JsonHighlighter.prettyPrint("{\"a\": 1, \"a\": 2}"));
+    }
+
+    @Test
     void tokenizeStylesKeysValuesAndPunctuation() {
         assertEquals(List.of(
                         new JsonHighlighter.Segment("{", "json-punctuation"),
