@@ -112,6 +112,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        // Collected across all entry types, applied to the non-wrappable fields preference after the loop
         Set<Field> singleLineFields = new HashSet<>();
         Set<Field> multilineFields = new HashSet<>();
         for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
