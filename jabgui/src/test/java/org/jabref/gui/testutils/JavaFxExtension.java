@@ -92,11 +92,11 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
     }
 
     public static <T extends Node> List<T> lookupAll(Parent root, String selector, Class<T> nodeType) {
-        return lookupAll(root, selector, nodeType, node -> true);
+        return lookupAll(root, selector, nodeType, _ -> true);
     }
 
     public static <T extends Node> T lookup(Parent root, String selector, Class<T> nodeType) {
-        return lookup(root, selector, nodeType, node -> true);
+        return lookup(root, selector, nodeType, _ -> true);
     }
 
     public static <T extends Node> List<T> lookupAll(Parent root, String selector, Class<T> nodeType, Predicate<T> matcher) {
@@ -122,7 +122,7 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
         try {
             Platform.startup(toolkitStarted::countDown);
             toolkitStarted.await();
-        } catch (IllegalStateException exception) {
+        } catch (IllegalStateException _) {
             // The toolkit was initialized by another JavaFX consumer in this test JVM.
         }
         Platform.setImplicitExit(false);
@@ -133,7 +133,7 @@ public class JavaFxExtension implements BeforeEachCallback, AfterEachCallback {
         invokeAndWait(() -> {
             Thread fxApplicationThread = Thread.currentThread();
             previousFxUncaughtExceptionHandler = fxApplicationThread.getUncaughtExceptionHandler();
-            fxApplicationThread.setUncaughtExceptionHandler((thread, throwable) -> ASYNCHRONOUS_FAILURES.add(throwable));
+            fxApplicationThread.setUncaughtExceptionHandler((_, throwable) -> ASYNCHRONOUS_FAILURES.add(throwable));
         });
     }
 

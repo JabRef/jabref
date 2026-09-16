@@ -264,7 +264,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
         catalogReasonColumn.setReorderable(false);
         catalogReasonColumn.setCellValueFactory(param -> param.getValue().reasonProperty());
-        catalogReasonColumn.setCellFactory(column -> {
+        catalogReasonColumn.setCellFactory(_ -> {
             TextField textField = new TextField();
             TableCell<StudyCatalogItem, String> cell = new TableCell<>() {
                 @Override
@@ -287,7 +287,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     }
                 }
             });
-            textField.setOnAction(event -> cell.getTableView().requestFocus());
+            textField.setOnAction(_ -> cell.getTableView().requestFocus());
             return cell;
         });
         Label catalogReasonHeader = new Label(catalogReasonColumn.getText());
@@ -358,9 +358,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         contentColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
         actionColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
         new ValueTableCellFactory<T, String>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove"))
-                .withOnMouseClickedEvent((rowItem, cellValue) -> evt ->
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(_ -> Localization.lang("Remove"))
+                .withOnMouseClickedEvent((rowItem, _) -> _ ->
                         removeAction.accept(rowItem))
                 .install(actionColumn);
     }
