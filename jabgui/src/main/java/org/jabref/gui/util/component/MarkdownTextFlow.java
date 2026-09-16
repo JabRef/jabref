@@ -380,9 +380,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 String info = fencedCodeBlock.getInfo().toString();
                 String openingFence = fencedCodeBlock.getOpeningFence().toString();
                 String closingFence = fencedCodeBlock.getClosingFence().toString();
-                String content = stripSyntheticNewlines(fencedCodeBlock.getContentChars().toString());
-                String body = content.endsWith("\n") ? content : content + "\n";
-                yield openingFence + info + "\n" + body + closingFence;
+                // The content of a fenced block is its body verbatim, ending with the newline before the fence.
+                yield openingFence + info + "\n" + fencedCodeBlock.getContentChars() + closingFence;
             }
             case IndentedCodeBlock indentedCodeBlock ->
                     indentedCodeBlock.getChars().toString();
