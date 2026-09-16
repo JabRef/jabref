@@ -107,7 +107,7 @@ public class SpecialFieldEditor extends HBox implements FieldEditorFX {
         toggle.setGraphic(viewModel.getIcon().getGraphicNode());
         toggle.getStyleClass().add("icon-button");
         toggle.setTooltip(new Tooltip(value.getToolTipText()));
-        EasyBind.subscribe(toggle.selectedProperty(), selected -> {
+        EasyBind.subscribe(toggle.selectedProperty(), _ -> {
             BibEntry boundEntry = entry;
             if (!updatingControls && (boundEntry != null)) {
                 // Setting the single value again clears it, so select and deselect are the same call

@@ -38,7 +38,7 @@ public class CleanupFileViewModel {
         deleteFilesSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
         removeXmpMetadataSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.REMOVE_XMP_METADATA));
 
-        renamePdfSelected.addListener((obs, oldVal, newVal) -> {
+        renamePdfSelected.addListener((_, _, newVal) -> {
             if (!newVal) {
                 renamePdfOnlyRelativeSelected.set(false);
             }

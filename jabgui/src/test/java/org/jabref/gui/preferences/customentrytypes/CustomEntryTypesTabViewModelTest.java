@@ -71,7 +71,7 @@ class CustomEntryTypesTabViewModelTest {
                 .withDetailFields(StandardField.LANGUAGE, StandardField.VERSION,
                         StandardField.ADDENDUM, StandardField.PUBSTATE)
                 .build();
-        model.entryTypes().setAll(List.of(new CustomEntryTypeViewModel(onlineWithoutOrFields, x -> false)));
+        model.entryTypes().setAll(List.of(new CustomEntryTypeViewModel(onlineWithoutOrFields, _ -> false)));
 
         model.storeSettings();
 
@@ -90,7 +90,7 @@ class CustomEntryTypesTabViewModelTest {
                 .withDetailFields(StandardField.LANGUAGE, StandardField.VERSION,
                         StandardField.ADDENDUM, StandardField.PUBSTATE)
                 .build();
-        model.entryTypes().setAll(List.of(new CustomEntryTypeViewModel(modified, x -> false)));
+        model.entryTypes().setAll(List.of(new CustomEntryTypeViewModel(modified, _ -> false)));
 
         model.storeSettings();
 

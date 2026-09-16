@@ -57,7 +57,7 @@ public record DBMSConnectionUrl(DBMSType type,
         URI uri;
         try {
             uri = new URI(url);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             return Optional.empty();
         }
         if (StringUtil.isBlank(uri.getHost())) {
@@ -188,7 +188,7 @@ public record DBMSConnectionUrl(DBMSType type,
     private static Optional<Integer> parsePort(String value) {
         try {
             return Optional.of(Integer.parseInt(value));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }
