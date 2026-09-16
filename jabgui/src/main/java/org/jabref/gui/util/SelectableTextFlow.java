@@ -138,6 +138,8 @@ public class SelectableTextFlow extends TextFlow {
             return;
         }
 
+        // Consumed so that enclosing controls (e.g. the ScrollPane of the AI chat) do not grab the focus, which would clear the selection.
+        event.consume();
         requestFocus();
 
         selectionStart = hitTest(new Point2D(event.getX(), event.getY())).getInsertionIndex();
@@ -152,6 +154,7 @@ public class SelectableTextFlow extends TextFlow {
         if (selectionStart < 0) {
             return;
         }
+        event.consume();
         isDragging = true;
         selectionEnd = hitTest(new Point2D(event.getX(), event.getY())).getInsertionIndex();
         updateSelectionHighlight();
@@ -177,6 +180,7 @@ public class SelectableTextFlow extends TextFlow {
             return;
         }
 
+        event.consume();
         if (event.getClickCount() == 2) {
             selectWordAt(hitTest(new Point2D(event.getX(), event.getY())).getCharIndex());
             return;
