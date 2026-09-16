@@ -124,6 +124,7 @@ class AiChatMessageViewTest extends JavaFxTest {
         assertTrue(view.getMarkdownTextFlow().isSelectionActive());
     }
 
+    // [utest->feat~ai.chat.find~1]
     @Test
     void highlightOccurrencesFindsAllCaseInsensitive() {
         AiChatMessageView view = createView();

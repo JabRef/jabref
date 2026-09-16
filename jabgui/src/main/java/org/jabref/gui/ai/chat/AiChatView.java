@@ -108,6 +108,7 @@ public class AiChatView extends StackPane {
     }
 
     /// Ctrl+F inside the chat searches the chat messages instead of the library, see [org.jabref.gui.frame.JabRefFrame].
+    // [impl->feat~ai.chat.find~1]
     private void setupFind() {
         findBar.managedProperty().bind(findBar.visibleProperty());
         findBar.setVisible(false);
