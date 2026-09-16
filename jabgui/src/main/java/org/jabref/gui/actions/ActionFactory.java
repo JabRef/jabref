@@ -1,33 +1,27 @@
 package org.jabref.gui.actions;
 
-import java.lang.reflect.InaccessibleObjectException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.Optional;
 
 import javafx.beans.binding.BooleanExpression;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.util.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.sun.javafx.scene.control.ContextMenuContent;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.action.ActionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// Helper class to create and style controls according to an [Action].
 public class ActionFactory {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ActionFactory.class);
 
     private final KeyBindingRepository keyBindingRepository;
 
@@ -41,60 +35,43 @@ public class ActionFactory {
         action.getIcon().ifPresent(icon -> node.setGraphic(icon.getGraphicNode()));
     }
 
-    /*
-     * Returns MenuItemContainer node associated with this menu item
-     * which can contain:
-     *   1. label node of type Label for displaying menu item text,
-     *   2. right node of type Label for displaying accelerator text,
-     *      or an arrow if it's a Menu,
-     *   3. graphic node for displaying menu item icon, and
-     *   4. left node for displaying either radio button or check box.
-     *
-     * This is basically rewritten impl_styleableGetNode() which
-     * should not be used since it's marked as deprecated.
-     */
-    private static Label getAssociatedNode(MenuItem menuItem) {
-        ContextMenuContent.MenuItemContainer container = (ContextMenuContent.MenuItemContainer) menuItem.getStyleableNode();
-
-        if (container == null) {
-            return null;
-        } else {
-            // We have to use reflection to get the associated label
-            try {
-                Method getLabel = ContextMenuContent.MenuItemContainer.class.getDeclaredMethod("getLabel");
-                getLabel.setAccessible(true);
-                return (Label) getLabel.invoke(container);
-            } catch (InaccessibleObjectException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                LOGGER.warn("Could not get label of menu item", e);
-            }
-        }
-        return null;
-    }
-
     public MenuItem configureMenuItem(Action action, Command command, MenuItem menuItem) {
-        ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository), menuItem);
+        JabRefAction jabRefAction = new JabRefAction(action, command, keyBindingRepository);
+        ActionUtils.configureMenuItem(jabRefAction, menuItem);
         setGraphic(menuItem, action);
-        enableTooltips(command, menuItem);
+        enableTooltip(jabRefAction, menuItem);
         return menuItem;
     }
 
-    private static void enableTooltips(Command command, MenuItem menuItem) {
-        if (command instanceof SimpleCommand simpleCommand) {
-            EasyBind.subscribe(
-                    simpleCommand.statusMessageProperty(),
-                    message -> {
-                        Label label = getAssociatedNode(menuItem);
-                        if (label != null) {
-                            label.setMouseTransparent(false);
-                            if (StringUtil.isBlank(message)) {
-                                label.setTooltip(null);
-                            } else {
-                                label.setTooltip(new Tooltip(message));
-                            }
-                        }
-                    }
-            );
-        }
+    /// Shows the action's long text (its description and, for a [SimpleCommand], its status message) as tooltip on the menu row.
+    ///
+    /// [MenuItem] has no tooltip property, unlike the buttons [ActionUtils] configures from the same text.
+    /// The row node only exists once the menu has been shown and is recreated when the menu's items change,
+    /// so the tooltip is (re)installed whenever the popup is shown.
+    private static void enableTooltip(JabRefAction jabRefAction, MenuItem menuItem) {
+        Tooltip tooltip = new Tooltip();
+        tooltip.textProperty().bind(jabRefAction.longTextProperty());
+
+        Runnable updateTooltip = () -> {
+            // The row is not disabled itself (only styled as such), so it still receives the mouse events a tooltip needs
+            Optional.ofNullable(menuItem.getStyleableNode()).ifPresent(row -> {
+                // Installing adds the mouse handlers again, so remove any earlier installation first
+                Tooltip.uninstall(row, tooltip);
+                // Several action descriptions merely repeat the label, which is useless as tooltip
+                if (!StringUtil.isBlank(tooltip.getText()) && !tooltip.getText().equals(menuItem.getText())) {
+                    Tooltip.install(row, tooltip);
+                }
+            });
+        };
+        EventHandler<WindowEvent> onPopupShown = _ -> updateTooltip.run();
+
+        Optional.ofNullable(menuItem.getParentPopup())
+                .ifPresent(popup -> popup.addEventHandler(WindowEvent.WINDOW_SHOWN, onPopupShown));
+        menuItem.parentPopupProperty().addListener((_, oldPopup, newPopup) -> {
+            Optional.ofNullable(oldPopup).ifPresent(popup -> popup.removeEventHandler(WindowEvent.WINDOW_SHOWN, onPopupShown));
+            Optional.ofNullable(newPopup).ifPresent(popup -> popup.addEventHandler(WindowEvent.WINDOW_SHOWN, onPopupShown));
+        });
+        EasyBind.subscribe(tooltip.textProperty(), _ -> updateTooltip.run());
     }
 
     public MenuItem createMenuItem(Action action, Command command) {
@@ -132,26 +109,32 @@ public class ActionFactory {
     }
 
     public CheckMenuItem createCheckMenuItem(Action action, Command command, boolean selected) {
-        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));
+        JabRefAction jabRefAction = new JabRefAction(action, command, keyBindingRepository);
+        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(jabRefAction);
         checkMenuItem.setSelected(selected);
         setGraphic(checkMenuItem, action);
+        enableTooltip(jabRefAction, checkMenuItem);
 
         return checkMenuItem;
     }
 
     public CheckMenuItem createCheckMenuItem(Action action, Command command, BooleanExpression selectedBinding) {
-        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));
+        JabRefAction jabRefAction = new JabRefAction(action, command, keyBindingRepository);
+        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(jabRefAction);
         EasyBind.subscribe(selectedBinding, checkMenuItem::setSelected);
         setGraphic(checkMenuItem, action);
+        enableTooltip(jabRefAction, checkMenuItem);
 
         return checkMenuItem;
     }
 
     public Menu createMenu(Action action) {
-        Menu menu = ActionUtils.createMenu(new JabRefAction(action, keyBindingRepository));
+        JabRefAction jabRefAction = new JabRefAction(action, keyBindingRepository);
+        Menu menu = ActionUtils.createMenu(jabRefAction);
 
         // For some reason the graphic is not set correctly, so let's fix this
         setGraphic(menu, action);
+        enableTooltip(jabRefAction, menu);
         return menu;
     }
 
