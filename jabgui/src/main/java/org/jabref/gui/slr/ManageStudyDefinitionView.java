@@ -286,7 +286,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     private Callback<TableColumn<StudyCatalogItem, String>, TableCell<StudyCatalogItem, String>> createEditableTextFieldCellFactory(
             Function<StudyCatalogItem, StringProperty> propertyExtractor) {
-        return column -> {
+        return _ -> {
             TextField textField = new TextField();
             TableCell<StudyCatalogItem, String> cell = new TableCell<>() {
                 @Override
@@ -309,7 +309,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     }
                 }
             });
-            textField.setOnAction(event -> cell.getTableView().requestFocus());
+            textField.setOnAction(_ -> cell.getTableView().requestFocus());
             return cell;
         };
     }
