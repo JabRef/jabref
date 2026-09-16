@@ -76,8 +76,8 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableView<StudyCatalogItem> catalogTable;
     @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
     @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
-    @FXML private TableColumn<StudyCatalogItem, String> catalogReasonColumn;
     @FXML private TableColumn<StudyCatalogItem, String> catalogNativeQueryColumn;
+    @FXML private TableColumn<StudyCatalogItem, String> catalogReasonColumn;
 
     @FXML private Label directoryWarning;
 
