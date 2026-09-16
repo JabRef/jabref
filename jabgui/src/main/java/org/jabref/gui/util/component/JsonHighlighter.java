@@ -135,7 +135,7 @@ public class JsonHighlighter {
         int start = 0;
         boolean inQuotation = false;
 
-        for (int i = 0; i < string.length(); i++) {
+        for (int i = 0; i < string.length(); i++, i++) {
             if (string.charAt(i) != '\\') {
                 continue;
             }
@@ -146,7 +146,6 @@ public class JsonHighlighter {
                 start = boundary;
                 inQuotation = !inQuotation;
             }
-            i++;
         }
 
         addStringSegment(segments, string.substring(start), inQuotation);
