@@ -58,9 +58,6 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
 
-    /// Above this many characters, one text node per JSON token would cost more than the highlighting is worth.
-    private static final int MAX_HIGHLIGHTED_JSON_LENGTH = 100_000;
-
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
     private final ObjectProperty<Consumer<String>> hyperlinkHandler =
@@ -161,13 +158,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     }
 
     /// Adds one text node per JSON token; they are merged back into one segment when copying
-    /// (see buildCopySegments). A document too large for that many nodes stays unhighlighted.
+    /// (see buildCopySegments).
     private void addJsonNodes(String json, @Nullable Node codeBlock) {
-        if (json.length() > MAX_HIGHLIGHTED_JSON_LENGTH) {
-            addTextNode(json, codeBlock, "markdown-code-block", "font-monospace");
-            return;
-        }
-
         for (JsonHighlighter.Segment segment : JsonHighlighter.tokenize(json)) {
             addTextNode(segment.text(), codeBlock, "markdown-code-block", "font-monospace", segment.styleClass());
         }

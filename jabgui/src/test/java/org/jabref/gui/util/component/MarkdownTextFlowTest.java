@@ -204,13 +204,13 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
-    void hugeJsonIsRenderedAsASingleNode() {
+    void hugeJsonIsNotHighlighted() {
         MarkdownTextFlow textFlow = markdownTextFlow();
-        String hugeJson = "{\"a\": [" + "1, ".repeat(30_000) + "1]}";
+        String hugeJson = "{\"a\": [" + "1, ".repeat(40_000) + "1]}";
 
         interact(() -> textFlow.setMarkdown(hugeJson));
 
-        assertEquals(1, textFlow.getChildren().size());
+        assertFalse(hasChildWithStyleClass(textFlow, "json-key"));
     }
 
     @Test

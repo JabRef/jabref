@@ -34,6 +34,10 @@ public class JsonHighlighter {
 
     private static final Set<String> LITERALS = Set.of("true", "false", "null");
 
+    /// Beyond this many characters, parsing the answer and rendering one node per token would cost
+    /// more on the UI thread than the formatting is worth.
+    private static final int MAX_LENGTH = 100_000;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonHighlighter.class);
 
     /// Duplicate names make the parse fail, because the tree would silently drop the first value.
@@ -63,7 +67,7 @@ public class JsonHighlighter {
     /// something else or the JSON is malformed.
     public static Optional<LeadingJson> leadingJson(String text) {
         String trimmed = text.strip();
-        if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
+        if ((trimmed.length() > MAX_LENGTH) || (!trimmed.startsWith("{") && !trimmed.startsWith("["))) {
             return Optional.empty();
         }
 
