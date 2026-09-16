@@ -49,6 +49,7 @@ import com.vladsch.flexmark.util.ast.NodeVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 public class MarkdownTextFlow extends SelectableTextFlow {
@@ -244,6 +245,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     /// The text of one or more adjacent nodes that belong to the same Markdown node, as needed to
     /// reconstruct the Markdown markup while copying. A syntax-highlighted code block is rendered as
     /// one node per token, but copied as a single block.
+    @NullMarked
     private record CopySegment(String text, @Nullable Node astNode) {
     }
 
