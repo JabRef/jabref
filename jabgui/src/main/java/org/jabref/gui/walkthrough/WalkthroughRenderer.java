@@ -32,7 +32,6 @@ public class WalkthroughRenderer {
         VBox tooltip = makePanel();
 
         StackPane titleContainer = new StackPane();
-        titleContainer.getStyleClass().addAll("walkthrough-title-container");
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
         titleFlow.getStyleClass().addAll("walkthrough-tooltip-title", "h2");
         titleFlow.setMarkdown(step.title());
@@ -61,7 +60,6 @@ public class WalkthroughRenderer {
         configurePanelSize(panel, step);
 
         StackPane titleContainer = new StackPane();
-        titleContainer.getStyleClass().addAll("walkthrough-title-container");
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
         titleFlow.getStyleClass().addAll("walkthrough-title", "h2");
         titleFlow.setMarkdown(step.title());
