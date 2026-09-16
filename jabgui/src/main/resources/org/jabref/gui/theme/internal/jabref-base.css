@@ -1596,6 +1596,26 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -fx-text-base-color;
 }
 
+.json-key {
+    -fx-fill: -color-syntax-attribute;
+}
+
+.json-string {
+    -fx-fill: -color-syntax-string;
+}
+
+.json-number {
+    -fx-fill: -color-syntax-tag;
+}
+
+.json-literal {
+    -fx-fill: -color-syntax-keyword;
+}
+
+.json-punctuation {
+    -fx-fill: -color-syntax-punctuation;
+}
+
 .markdown-list-bullet {
     -fx-fill: -color-accent;
     -fx-font-weight: bold;

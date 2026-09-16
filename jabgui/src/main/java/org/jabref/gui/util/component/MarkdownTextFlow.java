@@ -82,6 +82,12 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             return;
         }
 
+        // AI models sometimes answer with plain JSON. It is shown as a highlighted code block.
+        if (JsonHighlighter.isJson(markdownText)) {
+            addCodeBlockNodes(markdownText.strip(), null);
+            return;
+        }
+
         MarkdownRenderer renderer = new MarkdownRenderer();
         renderer.render(parser.parse(markdownText));
     }
@@ -119,7 +125,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                         .getExternalApplicationsPreferences()).execute();
     }
 
-    private void addTextNode(@Nullable String content, Node astNode, String... styleClasses) {
+    private void addTextNode(@Nullable String content, @Nullable Node astNode, String... styleClasses) {
         if (content == null || content.isEmpty()) {
             return;
         }
@@ -133,6 +139,20 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             }
         }
         getChildren().add(textNode);
+    }
+
+    /// Adds the nodes for a code block, with syntax highlighting if the code is JSON.
+    private void addCodeBlockNodes(String content, @Nullable Node codeBlock) {
+        if (!JsonHighlighter.isJson(content)) {
+            addTextNode(content, codeBlock, "markdown-code-block", "font-monospace");
+            return;
+        }
+
+        // One text node per token, so the nodes cannot carry the Markdown representation of the
+        // whole block. They are copied verbatim instead (see getMarkdownRepresentation).
+        for (JsonHighlighter.Segment segment : JsonHighlighter.tokenize(content)) {
+            addTextNode(segment.text(), null, "markdown-code-block", "font-monospace", segment.styleClass());
+        }
     }
 
     private void addHyperlinkNode(String text, String url, Node astNode, String... styleClasses) {
@@ -386,7 +406,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
                 processedContent = content.substring(1, content.length() - 2);
             }
-            addTextNode(processedContent, codeBlock, "markdown-code-block", "font-monospace");
+            addCodeBlockNodes(processedContent, codeBlock);
             previousBlock = codeBlock;
         }
 
@@ -533,9 +553,9 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     }
 
     private static class MarkdownAwareText extends Text {
-        private final Node astNode;
+        private final @Nullable Node astNode;
 
-        public MarkdownAwareText(String text, Node astNode) {
+        public MarkdownAwareText(String text, @Nullable Node astNode) {
             super(text);
             this.astNode = astNode;
             setUserData(astNode);
