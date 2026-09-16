@@ -53,7 +53,7 @@ public class JsonHighlighter {
         parser.setErrorHandler(new BailErrorStrategy());
         try {
             parser.json();
-        } catch (ParseCancellationException e) {
+        } catch (ParseCancellationException _) {
             return false;
         }
         return parser.getCurrentToken().getType() == Token.EOF;

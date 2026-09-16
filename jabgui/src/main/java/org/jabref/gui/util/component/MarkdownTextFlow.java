@@ -142,6 +142,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     }
 
     /// Adds the nodes for a code block, with syntax highlighting if the code is JSON.
+    // [impl->feat~ai.chat.json-highlighting~1]
     private void addCodeBlockNodes(String content, @Nullable Node codeBlock) {
         if (!JsonHighlighter.isJson(content)) {
             addTextNode(content, codeBlock, "markdown-code-block", "font-monospace");

@@ -98,6 +98,13 @@ This requirement ensures that the AI has context to answer a question.
 
 Needs: impl
 
+### JSON answers are highlighted in AI chat
+`feat~ai.chat.json-highlighting~1`
+
+An answer that is a JSON document, on its own or inside a fenced code block, is shown as a monospaced code block with syntax highlighting instead of flowed text.
+
+Needs: impl, utest
+
 ### User can jump to entry PDF from citation links in AI chat
 `feat~ai.chat.jump-to-entry-pdf~1`
 
