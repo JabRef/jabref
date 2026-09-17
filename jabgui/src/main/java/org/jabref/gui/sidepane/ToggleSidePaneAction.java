@@ -27,6 +27,7 @@ public class ToggleSidePaneAction extends SimpleCommand {
 
     @Override
     public void execute() {
+        // [impl->req~ux.side-pane.toggle-preserves-sections~1]
         List<SidePaneType> visibleComponents = stateManager.getVisibleSidePaneComponents();
 
         if (!visibleComponents.isEmpty()) {
