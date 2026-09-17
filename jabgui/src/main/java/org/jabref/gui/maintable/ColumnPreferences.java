@@ -54,12 +54,10 @@ public class ColumnPreferences {
     }
 
     public void setColumns(List<MainTableColumnModel> list) {
-        columns.clear();
-        columns.addAll(list);
+        columns.setAll(list);
     }
 
     public void setColumnSortOrder(List<MainTableColumnModel> list) {
-        columnSortOrder.clear();
-        columnSortOrder.addAll(list);
+        columnSortOrder.setAll(list);
     }
 }

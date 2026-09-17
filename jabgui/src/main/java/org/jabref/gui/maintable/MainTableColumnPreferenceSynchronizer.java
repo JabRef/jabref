@@ -1,0 +1,176 @@
+package org.jabref.gui.maintable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javafx.collections.ListChangeListener;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+
+import org.jabref.gui.maintable.columns.LibraryColumn;
+import org.jabref.gui.maintable.columns.MainTableColumn;
+
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
+class MainTableColumnPreferenceSynchronizer {
+
+    private final TableView<BibEntryTableViewModel> table;
+    private final MainTableColumnFactory columnFactory;
+    private final MainTablePreferences mainTablePreferences;
+    private final PersistenceVisualStateTable persistenceVisualStateTable;
+
+    MainTableColumnPreferenceSynchronizer(TableView<BibEntryTableViewModel> table,
+                                          MainTableColumnFactory columnFactory,
+                                          MainTablePreferences mainTablePreferences,
+                                          PersistenceVisualStateTable persistenceVisualStateTable) {
+        this.table = table;
+        this.columnFactory = columnFactory;
+        this.mainTablePreferences = mainTablePreferences;
+        this.persistenceVisualStateTable = persistenceVisualStateTable;
+    }
+
+    void initializeColumns() {
+        table.getColumns().setAll(columnFactory.createColumns());
+        table.getColumns().removeIf(LibraryColumn.class::isInstance);
+        updateColumnResizePolicy(mainTablePreferences.getResizeColumnsToFit());
+    }
+
+    void addListeners() {
+        mainTablePreferences.getColumnPreferences().getColumns().addListener((ListChangeListener<MainTableColumnModel>) _ -> synchronizeConfiguredColumns());
+        mainTablePreferences.getColumnPreferences().getColumnSortOrder().addListener((ListChangeListener<MainTableColumnModel>) _ -> synchronizeSortOrder());
+        mainTablePreferences.resizeColumnsToFitProperty().addListener((_, _, newValue) -> updateColumnResizePolicy(newValue));
+    }
+
+    void restoreConfiguredSortOrder() {
+        List<TableColumn<BibEntryTableViewModel, ?>> restoredSortOrder =
+                new ArrayList<>(mainTablePreferences.getColumnPreferences()
+                                                    .getColumnSortOrder()
+                                                    .stream()
+                                                    .map(columnModel ->
+                                                            table.getColumns().stream()
+                                                                 .map(column -> (MainTableColumn<?>) column)
+                                                                 .filter(column -> column.getModel().equals(columnModel))
+                                                                 .findFirst()
+                                                                 .orElse(null))
+                                                    .filter(java.util.Objects::nonNull)
+                                                    .map(column -> (TableColumn<BibEntryTableViewModel, ?>) column)
+                                                    .toList());
+
+        if (!table.getColumns().isEmpty()) {
+            restoredSortOrder.addFirst(table.getColumns().getFirst());
+        }
+        table.getSortOrder().setAll(restoredSortOrder);
+    }
+
+    private void synchronizeConfiguredColumns() {
+        if (matchesConfiguredColumns()) {
+            return;
+        }
+
+        persistenceVisualStateTable.runWithoutPersisting(() -> {
+            applyConfiguredColumns();
+            restoreConfiguredSortOrder();
+        });
+    }
+
+    private void synchronizeSortOrder() {
+        if (matchesConfiguredSortOrder()) {
+            return;
+        }
+
+        persistenceVisualStateTable.runWithoutPersisting(this::restoreConfiguredSortOrder);
+    }
+
+    private void applyConfiguredColumns() {
+        List<MainTableColumnModel> preferredColumns = mainTablePreferences.getColumnPreferences().getColumns();
+
+        table.getColumns().removeIf(column -> (column instanceof MainTableColumn<?> mainTableColumn)
+                && mainTableColumn.getModel().getType() != MainTableColumnModel.Type.MATCH_CATEGORY
+                && preferredColumns.stream().noneMatch(preferredColumn -> preferredColumn.equals(mainTableColumn.getModel())));
+
+        for (int i = 0; i < preferredColumns.size(); i++) {
+            MainTableColumnModel preferredColumn = preferredColumns.get(i);
+            TableColumn<BibEntryTableViewModel, ?> tableColumn = findColumn(preferredColumn)
+                    .orElseGet(() -> columnFactory.createColumn(preferredColumn));
+            if (tableColumn == null) {
+                continue;
+            }
+
+            int targetIndex = i + 1;
+            int currentIndex = table.getColumns().indexOf(tableColumn);
+            if (currentIndex == -1) {
+                table.getColumns().add(targetIndex, tableColumn);
+            } else if (currentIndex != targetIndex) {
+                table.getColumns().remove(currentIndex);
+                table.getColumns().add(targetIndex, tableColumn);
+            }
+        }
+
+        updateColumnResizePolicy(mainTablePreferences.getResizeColumnsToFit());
+    }
+
+    private Optional<TableColumn<BibEntryTableViewModel, ?>> findColumn(MainTableColumnModel preferredColumn) {
+        return table.getColumns().stream()
+                    .filter(MainTableColumn.class::isInstance)
+                    .filter(column -> preferredColumn.equals(((MainTableColumn<?>) column).getModel()))
+                    .findFirst();
+    }
+
+    private void updateColumnResizePolicy(boolean resizeColumnsToFit) {
+        if (resizeColumnsToFit) {
+            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
+        } else {
+            table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        }
+    }
+
+    private boolean matchesConfiguredColumns() {
+        List<MainTableColumnModel> currentColumns = getConfiguredColumns(table.getColumns());
+        List<MainTableColumnModel> preferredColumns = mainTablePreferences.getColumnPreferences().getColumns();
+
+        if (currentColumns.size() != preferredColumns.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < currentColumns.size(); i++) {
+            if (!matchesConfiguration(currentColumns.get(i), preferredColumns.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean matchesConfiguredSortOrder() {
+        List<MainTableColumnModel> currentSortOrder = getConfiguredColumns(table.getSortOrder());
+        List<MainTableColumnModel> preferredSortOrder = mainTablePreferences.getColumnPreferences().getColumnSortOrder();
+
+        if (currentSortOrder.size() != preferredSortOrder.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < currentSortOrder.size(); i++) {
+            if (!matchesConfiguration(currentSortOrder.get(i), preferredSortOrder.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private List<MainTableColumnModel> getConfiguredColumns(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
+        return columns.stream()
+                      .filter(MainTableColumn.class::isInstance)
+                      .map(column -> ((MainTableColumn<?>) column).getModel())
+                      .filter(model -> model.getType() != MainTableColumnModel.Type.MATCH_CATEGORY)
+                      .toList();
+    }
+
+    private boolean matchesConfiguration(MainTableColumnModel currentColumn, MainTableColumnModel preferredColumn) {
+        return currentColumn.equals(preferredColumn)
+                && Double.compare(currentColumn.getWidth(), preferredColumn.getWidth()) == 0
+                && currentColumn.getSortType() == preferredColumn.getSortType();
+    }
+}
