@@ -53,6 +53,9 @@ public class ActionFactory {
     /// [MenuItem] has no tooltip property, unlike the buttons [ActionUtils] configures from the same text.
     /// The row node only exists once the menu has been shown and is recreated when the menu's items change,
     /// so the tooltip is (re)installed whenever the popup is shown.
+    ///
+    /// On macOS, the main menu is rendered natively by the system menu bar (see `MainMenu#setUseSystemMenuBar`).
+    /// Its items have no JavaFX row node, so they show no tooltip there; context menus are not affected.
     private static void enableTooltip(JabRefAction jabRefAction, MenuItem menuItem) {
         // An item can be configured again with another action (e.g., when the push-to-application target changes),
         // so the listeners of the previous configuration have to go, or its outdated tooltip would still be installed
