@@ -85,6 +85,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added connection URL pasting to the shared database login dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We added a Dnb Fetcher that uses SRU interface and wired to ISBN Fetcher. [#17070](https://github.com/JabRef/jabref/pull/17070)
 - We added read-only access to shared SQL libraries in `jabkit`: every input file argument accepts a PostgreSQL URL. [#12948](https://github.com/JabRef/jabref/issues/12948)
+- We added a menu item and shortcut to show/hide the entire side pane at once. [#16949](https://github.com/JabRef/jabref/issues/16949)
 
 ### Changed
 
