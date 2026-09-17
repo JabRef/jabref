@@ -134,7 +134,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         // UiThreadObservableList) makes every Change#getList() report the wrapped delegate instead of the
         // list JavaFX is tracking, silently breaking the live sync (a Change#getList() identity mismatch).
         // filesProperty() is only ever mutated on the FX Application Thread, so no extra marshaling is needed.
-        Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
+        Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.getFiles());
     }
 
     @FXML
