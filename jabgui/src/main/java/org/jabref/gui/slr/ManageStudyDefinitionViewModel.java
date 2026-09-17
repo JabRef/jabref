@@ -300,7 +300,7 @@ public class ManageStudyDefinitionViewModel {
                 String name = catalog.getName();
                 updated.keySet().removeIf(key -> key.equalsIgnoreCase(name));
                 String nativeQuery = catalog.getNativeQuery();
-                if (nativeQuery != null && !nativeQuery.isBlank()) {
+                if (StringUtil.isNotBlank(nativeQuery)) {
                     updated.put(name, nativeQuery);
                 }
             }
