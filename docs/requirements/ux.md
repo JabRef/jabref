@@ -188,4 +188,14 @@ The groups walkthrough must open its bundled example library, display the Groups
 
 Needs: impl
 
+## Toggling the side pane preserves which sections were open
+`req~ux.side-pane.toggle-preserves-sections~1`
+
+The whole side pane can be shown or hidden via a single shortcut or menu item,
+independent of focus. Hiding it does not lose track of which sections (Groups,
+Web search, OpenOffice) were open; showing it again restores exactly those
+sections rather than resetting to the default set.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
