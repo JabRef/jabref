@@ -2120,6 +2120,124 @@ class BibtexParserTest {
         assertEquals(bibtexEntry, entry.getParsedSerialization());
     }
 
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseIgnoresAtSignInsidePercentComment() throws IOException {
+        String bibtex = """
+                % Type of BibLaTeX entries    : @online
+                @online{test,
+                  author = {Foo Bar}
+                }
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        BibEntry expected = new BibEntry(StandardEntryType.Online)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Foo Bar");
+        expected.setCommentsBeforeEntry("% Type of BibLaTeX entries    : @online\n");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+        assertEquals(bibtex, result.getDatabase().getEntries().getFirst().getParsedSerialization());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseIgnoresAtSignInsidePercentCommentBetweenEntries() throws IOException {
+        String bibtex = """
+                @article{first,
+                  author = {First Author}
+                }
+                % Type of BibLaTeX entries    : @online
+                @article{second,
+                  author = {Second Author}
+                }
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(2, result.getDatabase().getEntries().size());
+
+        assertEquals(Optional.of("first"),
+                result.getDatabase().getEntries().getFirst().getCitationKey());
+        assertEquals(Optional.of("second"),
+                result.getDatabase().getEntries().get(1).getCitationKey());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseIgnoresAtSignAfterEncodingMetadataComment() throws IOException {
+        String bibtex = """
+                % Encoding: UTF-8 @article{fake}
+                @article{real,
+                  author = {Real Author}
+                }
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(1, result.getDatabase().getEntries().size());
+        assertEquals(Optional.of("real"),
+                result.getDatabase().getEntries().getFirst().getCitationKey());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseIgnoresAtSignAfterDatabaseIdMetadataComment() throws IOException {
+        String bibtex = """
+                % DBID: database @article{fake}
+                @article{real,
+                  author = {Real Author}
+                }
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(1, result.getDatabase().getEntries().size());
+        assertEquals(Optional.of("real"),
+                result.getDatabase().getEntries().getFirst().getCitationKey());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseDoesNotPreserveEscapeStateAcrossWhitespace() throws IOException {
+        String bibtex = """
+                \\
+                % First comment @article{fakeOne}
+                \\   % Second comment @article{fakeTwo}
+                @article{real, author = {Real Author}}""";
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(1, result.getDatabase().getEntries().size());
+        assertEquals(Optional.of("real"),
+                result.getDatabase().getEntries().getFirst().getCitationKey());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"%\n", "%   \n", "%\t\n", "%\r\n", "%   \r\n", "%\r", "%\n%\t\n",
+            "% Encoding:\n", "% Encoding: \t\r\n", "% DBID:\n", "% DBID: \t\r\n"})
+    void parsePreservesEntryAfterBlankPercentComment(String comment) throws IOException {
+        String entry = "@article{real, author = {Real Author}}";
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("real")
+                .withField(StandardField.AUTHOR, "Real Author");
+        if (!comment.contains(SaveConfiguration.ENCODING_PREFIX) && !comment.contains(BibDatabaseWriter.DATABASE_ID_PREFIX)) {
+            expected.setCommentsBeforeEntry(comment);
+        }
+
+        ParserResult result = parser.parse(Reader.of(comment + entry));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
     @Test
     void preserveEncodingPrefixInsideEntry() throws ParseException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
