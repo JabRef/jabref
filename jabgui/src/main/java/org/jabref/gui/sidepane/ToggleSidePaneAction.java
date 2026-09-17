@@ -31,12 +31,16 @@ public class ToggleSidePaneAction extends SimpleCommand {
         List<SidePaneType> visibleComponents = stateManager.getVisibleSidePaneComponents();
 
         if (!visibleComponents.isEmpty()) {
+            // Hide: remember what was open, then clear it
             lastVisibleComponents = new ArrayList<>(visibleComponents);
             visibleComponents.clear();
         } else if (!lastVisibleComponents.isEmpty()) {
+            // Restore exactly what was open before
             visibleComponents.addAll(lastVisibleComponents);
             visibleComponents.sort(new SidePaneViewModel.PreferredIndexSort(sidePanePreferences));
         } else {
+            // Nothing was hidden this session (e.g. pane was already empty at startup) -
+            // fall back to the user's configured default panes.
             visibleComponents.addAll(sidePanePreferences.visiblePanes());
             visibleComponents.sort(new SidePaneViewModel.PreferredIndexSort(sidePanePreferences));
         }
