@@ -389,7 +389,7 @@
                     <text:p>Owner</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>Creationdate</text:p>
+                    <text:p>Creation Date</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Modificationdate</text:p>
