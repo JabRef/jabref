@@ -14,8 +14,10 @@ import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -94,6 +97,87 @@ class CustomEntryTypesTabViewModelTest {
 
         TreeSet<BibEntryType> expected = new TreeSet<>(List.of(modified));
         assertEquals(expected, entryTypesManager.getAllCustomizedTypes(BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    void unchangedSaveHasNoRestartWarning() {
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.storeSettings();
+
+        assertEquals(List.of(), model.getRestartWarnings());
+    }
+
+    @Test
+    void unchangedSaveWithFieldOutsideEntryTypesHasNoRestartWarning() {
+        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), List.of(new UnknownField("mycustomfield"), StandardField.URL));
+        when(preferences.getFieldPreferences()).thenReturn(realFieldPreferences);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.storeSettings();
+
+        assertEquals(List.of(), model.getRestartWarnings());
+    }
+
+    @Test
+    void saveKeepsMultilineFieldOutsideEntryTypes() {
+        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), List.of(new UnknownField("mycustomfield"), StandardField.URL));
+        when(preferences.getFieldPreferences()).thenReturn(realFieldPreferences);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.storeSettings();
+
+        assertTrue(realFieldPreferences.getNonWrappableFields().contains(new UnknownField("mycustomfield")));
+    }
+
+    @Test
+    void changedTypeHasRestartWarningUntilNextUnchangedSave() {
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+        BibEntryType modified = new BibEntryTypeBuilder()
+                .withType(StandardEntryType.Online)
+                .withRequiredFields(StandardField.TITLE)
+                .build();
+        model.entryTypes().setAll(List.of(new CustomEntryTypeViewModel(modified, _ -> false)));
+
+        model.storeSettings();
+        assertNotEquals(List.of(), model.getRestartWarnings());
+
+        model.storeSettings();
+        assertEquals(List.of(), model.getRestartWarnings());
+    }
+
+    @Test
+    void changedFieldPropertyHasRestartWarning() {
+        UnknownField field = new UnknownField("custom");
+        entryTypesManager.update(new BibEntryTypeBuilder().withType(new UnknownEntryType("mytype")).withImportantFields(field).build(), BibDatabaseMode.BIBLATEX);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.entryTypes().stream()
+             .filter(type -> "mytype".equals(type.entryType().getValue().getType().getName()))
+             .findFirst().orElseThrow()
+             .fields().getFirst()
+             .getProperties().add(FieldProperty.DATE);
+        model.storeSettings();
+
+        assertNotEquals(List.of(), model.getRestartWarnings());
+    }
+
+    @Test
+    void resetBeforeSaveHasRestartWarning() {
+        entryTypesManager.update(new BibEntryTypeBuilder().withType(new UnknownEntryType("mytype")).withRequiredFields(StandardField.TITLE).build(), BibDatabaseMode.BIBLATEX);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.resetAllCustomEntryTypes();
+        model.setValues();
+        model.storeSettings();
+
+        assertNotEquals(List.of(), model.getRestartWarnings());
     }
 
     @Test
