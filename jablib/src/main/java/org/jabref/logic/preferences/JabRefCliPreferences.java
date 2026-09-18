@@ -154,6 +154,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String LIBRARY_BIBLATEX_DEFAULT_MODE = "biblatexMode";
     public static final String LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String LIBRARY_AUTO_SAVE = "localAutoSave";
+    public static final String LIBRARY_SYNCHRONIZE_WITH_FILE = "synchronizeWithFile";
     public static final String LIBRARY_ADD_IMPORTED_ENTRIES = "addImportedEntries";
     public static final String LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME = "addImportedEntriesGroupName";
     // endregion
@@ -1351,6 +1352,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(LIBRARY_BIBLATEX_DEFAULT_MODE, defaultValues.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT, defaultValues.shouldAlwaysReformatOnSave()),
                 getBoolean(LIBRARY_AUTO_SAVE, defaultValues.shouldAutoSave()),
+                getBoolean(LIBRARY_SYNCHRONIZE_WITH_FILE, defaultValues.shouldSynchronizeWithFile()),
                 getBoolean(LIBRARY_ADD_IMPORTED_ENTRIES, defaultValues.shouldAddImportedEntries()),
                 get(LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME, defaultValues.getAddImportedEntriesGroupName()));
 
@@ -1361,6 +1363,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 Map.entry(LIBRARY_BIBLATEX_DEFAULT_MODE, BibDatabaseMode.BIBLATEX));
         bindBoolean(libraryPreferences.alwaysReformatOnSaveProperty(), LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT, defaultValues.shouldAlwaysReformatOnSave());
         bindBoolean(libraryPreferences.autoSaveProperty(), LIBRARY_AUTO_SAVE, defaultValues.shouldAutoSave());
+        bindBoolean(libraryPreferences.synchronizeWithFileProperty(), LIBRARY_SYNCHRONIZE_WITH_FILE, defaultValues.shouldSynchronizeWithFile());
         bindBoolean(libraryPreferences.addImportedEntriesProperty(), LIBRARY_ADD_IMPORTED_ENTRIES, defaultValues.shouldAddImportedEntries());
         bindString(libraryPreferences.addImportedEntriesGroupNameProperty(), LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME, defaultValues.getAddImportedEntriesGroupName());
 
