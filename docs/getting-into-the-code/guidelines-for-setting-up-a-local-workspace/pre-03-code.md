@@ -52,6 +52,7 @@ In the following, we will use `c:\git-repositories` as base folder.
 Open the "Command Prompt".
 
 ```cmd
+git config --global core.longpaths true
 cd \
 mkdir git-repositories
 cd git-repositories
@@ -66,6 +67,13 @@ git fetch --all
 > `--recurse-submodules` is necessary to have the required files available to JabRef. (Background: It concerns the files from [citation-style-language/styles](https://github.com/citation-style-language/styles), the journal abbreviations from [abbrv.jabref.org](https://github.com/JabRef/abbrv.jabref.org), the themes from [themes.jabref.org](https://github.com/JabRef/themes.jabref.org) and more).
 >
 > Note that putting the JabRef repository directly on `C:\` or any other drive letter on Windows causes compile errors (**negative example**: `C:\jabref`).
+>
+> `core.longpaths` lets Git handle paths longer than 260 characters, which Gradle's build output can reach.
+
+{: .tip }
+> If you work with many repositories, [ghq](https://github.com/x-motemen/ghq) keeps them organized by host and owner.
+> Install it with `scoop install ghq`, run `git config --global ghq.root C:\git-repositories`, and clone with `ghq get JabRef/jabref` (submodules included).
+> The repository then lives in `C:\git-repositories\github.com\JabRef\jabref`; run the `git remote` commands above there and use that path in the steps below.
 
 #### Exclude the workspace from Windows Defender
 
