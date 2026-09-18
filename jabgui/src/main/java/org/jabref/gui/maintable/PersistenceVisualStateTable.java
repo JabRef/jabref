@@ -1,10 +1,14 @@
 package org.jabref.gui.maintable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -21,7 +25,13 @@ public class PersistenceVisualStateTable {
 
     protected final TableView<BibEntryTableViewModel> table;
     protected final ColumnPreferences preferences;
-    private final Set<MainTableColumnModel> observedColumnModels = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
+    private final ListChangeListener<TableColumn<BibEntryTableViewModel, ?>> columnsListener = _ -> {
+        synchronizeObservedColumns();
+        updateColumns();
+    };
+    private final ListChangeListener<TableColumn<BibEntryTableViewModel, ?>> sortOrderListener = _ -> updateSortOrder();
+    private final Map<MainTableColumnModel, ColumnModelListeners> observedColumnModels = new IdentityHashMap<>();
+    private boolean listenersInstalled;
     private int persistenceSuppressionDepth;
 
     public PersistenceVisualStateTable(TableView<BibEntryTableViewModel> table, ColumnPreferences preferences) {
@@ -30,13 +40,27 @@ public class PersistenceVisualStateTable {
     }
 
     public void addListeners() {
-        table.getColumns().addListener((ListChangeListener<? super TableColumn<BibEntryTableViewModel, ?>>) _ -> {
-            observeCurrentColumns();
-            updateColumns();
-        });
-        table.getSortOrder().addListener((ListChangeListener<? super TableColumn<BibEntryTableViewModel, ?>>) _ -> updateSortOrder());
+        if (listenersInstalled) {
+            return;
+        }
 
-        observeCurrentColumns();
+        table.getColumns().addListener(columnsListener);
+        table.getSortOrder().addListener(sortOrderListener);
+        listenersInstalled = true;
+
+        synchronizeObservedColumns();
+    }
+
+    public void dispose() {
+        if (!listenersInstalled) {
+            return;
+        }
+
+        table.getColumns().removeListener(columnsListener);
+        table.getSortOrder().removeListener(sortOrderListener);
+        listenersInstalled = false;
+
+        new ArrayList<>(observedColumnModels.keySet()).forEach(this::stopObservingColumnModel);
     }
 
     public void runWithoutPersisting(Runnable operation) {
@@ -74,29 +98,49 @@ public class PersistenceVisualStateTable {
         preferences.setColumnSortOrder(toList(table.getSortOrder()));
     }
 
-    private void observeCurrentColumns() {
-        // As we store the ColumnModels of the MainTable, we need to add the listener to the ColumnModel properties,
-        // since the value is bound to the model after the listener to the column itself is called.
-        table.getColumns().stream()
-             .filter(MainTableColumn.class::isInstance)
-             .map(column -> ((MainTableColumn<?>) column).getModel())
-             .forEach(this::observeColumnModel);
+    private void synchronizeObservedColumns() {
+        Set<MainTableColumnModel> currentModels = table.getColumns().stream()
+                                                       .filter(MainTableColumn.class::isInstance)
+                                                       .map(column -> ((MainTableColumn<?>) column).getModel())
+                                                       .collect(Collectors.toCollection(() -> Collections.newSetFromMap(new IdentityHashMap<>())));
+
+        new ArrayList<>(observedColumnModels.keySet()).stream()
+                                                      .filter(model -> !currentModels.contains(model))
+                                                      .forEach(this::stopObservingColumnModel);
+        currentModels.forEach(this::observeColumnModel);
     }
 
     private void observeColumnModel(MainTableColumnModel model) {
-        if (!observedColumnModels.add(model)) {
+        if (observedColumnModels.containsKey(model)) {
             return;
         }
 
-        model.widthProperty().addListener(_ -> updateColumns());
-        model.sortTypeProperty().addListener(_ -> updateColumns());
+        InvalidationListener widthListener = _ -> updateColumns();
+        InvalidationListener sortTypeListener = _ -> updateColumns();
+        model.widthProperty().addListener(widthListener);
+        model.sortTypeProperty().addListener(sortTypeListener);
+        observedColumnModels.put(model, new ColumnModelListeners(widthListener, sortTypeListener));
+    }
+
+    private void stopObservingColumnModel(MainTableColumnModel model) {
+        ColumnModelListeners listeners = observedColumnModels.remove(model);
+        if (listeners == null) {
+            return;
+        }
+
+        model.widthProperty().removeListener(listeners.widthListener());
+        model.sortTypeProperty().removeListener(listeners.sortTypeListener());
     }
 
     private List<MainTableColumnModel> toList(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
         return columns.stream()
                       .filter(col -> col instanceof MainTableColumn<?>)
                       .map(column -> ((MainTableColumn<?>) column).getModel())
-                      .filter(model -> model.getType() != MainTableColumnModel.Type.MATCH_CATEGORY)
+                      .filter(MainTableColumnModel::isConfigurable)
                       .collect(Collectors.toList());
+    }
+
+    private record ColumnModelListeners(InvalidationListener widthListener,
+                                        InvalidationListener sortTypeListener) {
     }
 }

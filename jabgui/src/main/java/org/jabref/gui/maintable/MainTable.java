@@ -95,10 +95,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final ClipboardContentGenerator clipboardContentGenerator;
+    private final MainTableColumnPreferenceSynchronizer columnPreferenceSynchronizer;
+    private final PersistenceVisualStateTable persistenceVisualStateTable;
+    private final ListChangeListener<TableColumn<BibEntryTableViewModel, ?>> sortOrderListener;
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
     private boolean citationMergeMode = false;
+    private boolean disposed;
 
     /// There is one maintable instance per library tab
     public MainTable(MainTableDataModel model,
@@ -143,8 +147,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 dialogService,
                 stateManager,
                 taskExecutor);
-        PersistenceVisualStateTable persistenceVisualStateTable = new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences());
-        MainTableColumnPreferenceSynchronizer columnPreferenceSynchronizer = new MainTableColumnPreferenceSynchronizer(this, mainTableColumnFactory, mainTablePreferences, persistenceVisualStateTable);
+        this.persistenceVisualStateTable = new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences());
+        this.columnPreferenceSynchronizer = new MainTableColumnPreferenceSynchronizer(this, mainTableColumnFactory, mainTablePreferences, persistenceVisualStateTable);
 
         columnPreferenceSynchronizer.initializeColumns();
 
@@ -179,7 +183,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // force match category column to be the first sort order, (match_category column is always the first column)
         this.getSortOrder().addFirst(getColumns().getFirst());
-        this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) _ -> {
+        this.sortOrderListener = _ -> {
             if (getColumns().isEmpty()) {
                 return;
             }
@@ -190,7 +194,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             } else if (!this.getSortOrder().getFirst().equals(matchCategoryColumn)) {
                 this.getSortOrder().addFirst(matchCategoryColumn);
             }
-        });
+        };
+        this.getSortOrder().addListener(sortOrderListener);
 
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -614,6 +619,18 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {
         getSelectionModel().getSelectedItems().addListener(listener);
+    }
+
+    public void dispose() {
+        if (disposed) {
+            return;
+        }
+
+        disposed = true;
+        getSortOrder().removeListener(sortOrderListener);
+        columnPreferenceSynchronizer.dispose();
+        persistenceVisualStateTable.dispose();
+        database.getDatabase().unregisterListener(this);
     }
 
     public MainTableDataModel getTableModel() {

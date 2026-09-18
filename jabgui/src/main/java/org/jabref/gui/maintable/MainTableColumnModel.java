@@ -186,6 +186,24 @@ public class MainTableColumnModel {
                            .toList();
     }
 
+    public boolean isConfigurable() {
+        return switch (getType()) {
+            case MATCH_CATEGORY,
+                 LIBRARY_NAME ->
+                    false;
+            case INDEX,
+                 FILES,
+                 GROUPS,
+                 GROUP_ICONS,
+                 LINKED_IDENTIFIER ->
+                    true;
+            case EXTRAFILE,
+                 NORMALFIELD,
+                 SPECIALFIELD ->
+                    !getQualifier().isBlank();
+        };
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

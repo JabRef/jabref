@@ -76,6 +76,26 @@ class MainTableColumnPreferenceSynchronizerTest {
     }
 
     @Test
+    void ignoresReservedColumnsInPreferences() {
+        MainTableColumnModel reservedColumn = new MainTableColumnModel(MainTableColumnModel.Type.MATCH_CATEGORY);
+
+        mainTablePreferences.getColumnPreferences().setColumns(List.of(titleColumn, reservedColumn, relevanceColumn));
+        mainTablePreferences.getColumnPreferences().setColumnSortOrder(List.of(reservedColumn, relevanceColumn));
+
+        assertEquals(List.of(titleColumn, relevanceColumn), visibleColumns());
+        assertEquals(List.of(relevanceColumn), visibleSortOrder());
+    }
+
+    @Test
+    void disposedSynchronizerStopsReactingToPreferenceChanges() {
+        synchronizer.dispose();
+
+        mainTablePreferences.getColumnPreferences().setColumns(List.of(titleColumn, relevanceColumn));
+
+        assertEquals(List.of(titleColumn), visibleColumns());
+    }
+
+    @Test
     void updatesResizePolicyWhenPreferenceChanges() {
         mainTablePreferences.setResizeColumnsToFit(true);
 
@@ -85,7 +105,9 @@ class MainTableColumnPreferenceSynchronizerTest {
     private List<TableColumn<BibEntryTableViewModel, ?>> createColumns(List<MainTableColumnModel> configuredColumns) {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
         columns.add(new MainTableColumn<>(new MainTableColumnModel(MainTableColumnModel.Type.MATCH_CATEGORY)));
-        configuredColumns.forEach(column -> columns.add(new MainTableColumn<>(column)));
+        configuredColumns.stream()
+                         .filter(MainTableColumnModel::isConfigurable)
+                         .forEach(column -> columns.add(new MainTableColumn<>(column)));
         return columns;
     }
 
