@@ -2,6 +2,7 @@ package org.jabref.gui.maintable;
 
 import java.util.List;
 
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -15,7 +16,9 @@ public class ColumnPreferences {
 
     public ColumnPreferences(List<MainTableColumnModel> columns,
                              List<MainTableColumnModel> columnSortOrder) {
-        this.columns = FXCollections.observableArrayList(columns);
+        // Report width and sort type changes, so that they are persisted without per-column listeners
+        this.columns = FXCollections.observableArrayList(column -> new Observable[] {column.widthProperty(), column.sortTypeProperty()});
+        this.columns.addAll(columns);
         this.columnSortOrder = FXCollections.observableArrayList(columnSortOrder);
     }
 

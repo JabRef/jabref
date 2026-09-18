@@ -95,14 +95,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final ClipboardContentGenerator clipboardContentGenerator;
-    private final MainTableColumnPreferenceSynchronizer columnPreferenceSynchronizer;
-    private final PersistenceVisualStateTable persistenceVisualStateTable;
-    private final ListChangeListener<TableColumn<BibEntryTableViewModel, ?>> sortOrderListener;
+    private final ColumnPreferencesApplier columnPreferencesApplier;
+    private final ColumnPreferencesRecorder columnPreferencesRecorder;
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
     private boolean citationMergeMode = false;
-    private boolean disposed;
 
     /// There is one maintable instance per library tab
     public MainTable(MainTableDataModel model,
@@ -147,10 +145,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 dialogService,
                 stateManager,
                 taskExecutor);
-        this.persistenceVisualStateTable = new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences());
-        this.columnPreferenceSynchronizer = new MainTableColumnPreferenceSynchronizer(this, mainTableColumnFactory, mainTablePreferences, persistenceVisualStateTable);
 
-        columnPreferenceSynchronizer.initializeColumns();
+        this.columnPreferencesApplier = new ColumnPreferencesApplier(this, mainTableColumnFactory, mainTablePreferences);
+        columnPreferencesApplier.bind();
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
@@ -183,22 +180,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // force match category column to be the first sort order, (match_category column is always the first column)
         this.getSortOrder().addFirst(getColumns().getFirst());
-        this.sortOrderListener = _ -> {
-            if (getColumns().isEmpty()) {
-                return;
+        this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) _ -> {
+            if (this.getSortOrder().isEmpty() || !this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
+                this.getSortOrder().addFirst(getColumns().getFirst());
             }
-
-            // JavaFX can briefly clear the sort order while columns are being rebuilt or reordered.
-            // Guard the empty state here so a preference-driven update does not trigger the same
-            // `NoSuchElementException` that occurred with the earlier full-rebuild approach.
-            TableColumn<BibEntryTableViewModel, ?> matchCategoryColumn = getColumns().getFirst();
-            if (this.getSortOrder().isEmpty()) {
-                this.getSortOrder().addFirst(matchCategoryColumn);
-            } else if (!this.getSortOrder().getFirst().equals(matchCategoryColumn)) {
-                this.getSortOrder().addFirst(matchCategoryColumn);
-            }
-        };
-        this.getSortOrder().addListener(sortOrderListener);
+        });
 
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -267,11 +253,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 })
         );
 
-        UiTaskExecutor.runInJavaFXThread(columnPreferenceSynchronizer::restoreConfiguredSortOrder);
-        columnPreferenceSynchronizer.addListeners();
+        UiTaskExecutor.runInJavaFXThread(columnPreferencesApplier::applySortOrder);
 
         // Store visual state
-        persistenceVisualStateTable.addListeners();
+        this.columnPreferencesRecorder = new ColumnPreferencesRecorder(this, mainTablePreferences.getColumnPreferences());
+        columnPreferencesRecorder.bind();
 
         setupKeyBindings(keyBindingRepository);
 
@@ -625,14 +611,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void dispose() {
-        if (disposed) {
-            return;
-        }
-
-        disposed = true;
-        getSortOrder().removeListener(sortOrderListener);
-        columnPreferenceSynchronizer.dispose();
-        persistenceVisualStateTable.dispose();
+        columnPreferencesApplier.unbind();
+        columnPreferencesRecorder.unbind();
         database.getDatabase().unregisterListener(this);
     }
 
