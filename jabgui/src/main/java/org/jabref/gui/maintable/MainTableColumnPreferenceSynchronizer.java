@@ -106,6 +106,12 @@ class MainTableColumnPreferenceSynchronizer {
         persistenceVisualStateTable.runWithoutPersisting(this::restoreConfiguredSortOrder);
     }
 
+    /// Applies configured columns incrementally instead of replacing the whole columns list.
+    ///
+    /// Rebuilding all columns with `setAll(...)` makes JavaFX tear down and recreate the visible
+    /// table structure, which noticeably slows saving preferences and causes a brief flicker where
+    /// the table contents disappear. Updating only added, removed, and reordered columns keeps the
+    /// table responsive and preserves existing column instances where possible.
     private void applyConfiguredColumns() {
         List<MainTableColumnModel> preferredColumns = getConfiguredColumns();
 
