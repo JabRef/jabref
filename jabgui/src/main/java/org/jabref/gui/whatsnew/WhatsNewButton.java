@@ -40,7 +40,7 @@ public final class WhatsNewButton {
     /// The source checkout JabRef was started from; set by `jabgui/build.gradle.kts` for the `run` task only.
     static final String CHECKOUT_PROPERTY = "jabref.checkout";
 
-    /// Whether `just run-loop` waits to pull, rebuild and start JabRef again; only then is a restart offered.
+    /// Whether `just loop` waits to pull, rebuild and start JabRef again; only then is a restart offered.
     static final String RESTART_LOOP_PROPERTY = "jabref.restart.loop";
 
     private final WhatsNewViewModel viewModel;
@@ -67,7 +67,7 @@ public final class WhatsNewButton {
     }
 
     /// The button for the checkout JabRef was started from, watching it from now on; empty for a packaged JabRef
-    /// or an IDE run, which have nothing `just run-loop` could update.
+    /// or an IDE run, which have nothing `just loop` could update.
     ///
     /// @param quit closes JabRef the ordinary way, for *Restart to update*; `false` when the user keeps it open
     public static Optional<Button> create(ActionFactory factory,

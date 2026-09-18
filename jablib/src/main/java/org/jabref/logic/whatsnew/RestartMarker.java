@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// The file `just run-loop` looks for after JabRef quits: present, the recipe pulls, rebuilds and starts JabRef
+/// The file `just loop` looks for after JabRef quits: present, the recipe pulls, rebuilds and starts JabRef
 /// again. It lives in the checkout's git directory, next to the announced entries.
 public final class RestartMarker {
 

@@ -122,7 +122,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
         return tooltip;
     }
 
-    /// One look now without fetching (`just run-loop` has just pulled), then a fetch every five minutes.
+    /// One look now without fetching (`just loop` has just pulled), then a fetch every five minutes.
     public void startWatching() {
         lookNow(Mode.WITHOUT_FETCH, this::show)
                 .onFinished(this::scheduleNextLook)
@@ -162,7 +162,7 @@ public class WhatsNewViewModel extends AbstractViewModel {
         return presentation;
     }
 
-    /// Leaves the marker for `just run-loop` and quits. A user who keeps JabRef open takes the marker back, so
+    /// Leaves the marker for `just loop` and quits. A user who keeps JabRef open takes the marker back, so
     /// an ordinary quit later does not restart JabRef.
     public RestartRequest requestRestart() {
         if (!restartMarker.place()) {

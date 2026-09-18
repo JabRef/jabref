@@ -23,7 +23,7 @@ whats-new *FLAGS: ensure-gg-cmd
 
 # Run JabRef from the checkout until it is really quit: "Restart to update" in its "What's new" window pulls, rebuilds and starts it again.
 [unix]
-run-loop: ensure-gg-cmd
+loop: ensure-gg-cmd
     #!/usr/bin/env sh
     while :; do
         git pull --no-rebase || exit 1
@@ -69,7 +69,7 @@ whats-new *FLAGS: ensure-gg-cmd
     .\gg.cmd jbang .jbang\WhatsNewLauncher.java {{FLAGS}}
 
 [windows]
-run-loop: ensure-gg-cmd
+loop: ensure-gg-cmd
     @while ($true) { git pull --no-rebase; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; git submodule update --init; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; just whats-new; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $marker = "$(git rev-parse --absolute-git-dir)/restart-requested"; Remove-Item -ErrorAction Ignore $marker; .\gg.cmd gradle :jabgui:run -PrestartLoop; if ($LASTEXITCODE -ne 0) { Remove-Item -ErrorAction Ignore $marker; exit $LASTEXITCODE }; if (-not (Test-Path $marker)) { break }; Remove-Item $marker }
 
 [windows]

@@ -34,7 +34,7 @@ import org.jspecify.annotations.Nullable;
 /// greyed; *Later*, or *Close* when there is neither news nor a restart to offer.
 ///
 /// When something waits to restart JabRef, *Restart to update* is offered while the window checks the remote —
-/// "Checking remote…" with a bar; `just run-loop` pulls anyway, so the answer need not be awaited — and, once
+/// "Checking remote…" with a bar; `just loop` pulls anyway, so the answer need not be awaited — and, once
 /// [#checked] brings the answer, exactly while commits landed upstream, whether or not they touched the changelog.
 /// After [#checkFailed] no restart is offered.
 // [impl->req~whats-new.checkout-news~1]
@@ -57,7 +57,7 @@ public class WhatsNewDialog extends BaseDialog<Boolean> {
 
     /// @param shownBefore     the news presented last, shown greyed while nothing is pending
     /// @param updateAvailable whether the checkout is behind its upstream, as of the latest look; empty when
-    ///                        nothing would restart JabRef (no `just run-loop`), so no restart is offered
+    ///                        nothing would restart JabRef (no `just loop`), so no restart is offered
     public WhatsNewDialog(News news, ObservableValue<News> shownBefore, Optional<ObservableBooleanValue> updateAvailable, Consumer<String> openUrl) {
         this.news = new SimpleObjectProperty<>(news);
         this.openUrl = openUrl;

@@ -26,7 +26,7 @@ public final class CheckoutNews {
 
     /// Whether a look fetches the upstream first.
     public enum Mode {
-        /// Right after `just run-loop` pulled: the upstream is as fresh as it gets.
+        /// Right after `just loop` pulled: the upstream is as fresh as it gets.
         WITHOUT_FETCH,
         /// The periodic check.
         WITH_FETCH

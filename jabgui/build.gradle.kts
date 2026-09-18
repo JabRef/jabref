@@ -130,7 +130,7 @@ application {
 
 tasks.named<JavaExec>("run") {
     // For the "What's new" button: the source checkout JabRef runs from (a packaged JabRef has none), and whether
-    // `just run-loop` (which passes -PrestartLoop) waits to pull, rebuild and start JabRef again.
+    // `just loop` (which passes -PrestartLoop) waits to pull, rebuild and start JabRef again.
     systemProperty("jabref.checkout", rootDir.absolutePath)
     if (project.hasProperty("restartLoop")) {
         systemProperty("jabref.restart.loop", "true")
