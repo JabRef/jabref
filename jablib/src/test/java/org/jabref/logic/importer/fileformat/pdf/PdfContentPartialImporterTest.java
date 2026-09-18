@@ -23,6 +23,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -84,7 +85,7 @@ class PdfContentPartialImporterTest {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Link to record in KAR and http://kar.kent.ac.uk/51043/  and Document Version and UNSPECIFIED  and Master of Research (MRes) thesis and University of Kent")
                 .withField(StandardField.TITLE, "Kent Academic Repository Full text document (pdf) Citation for published version Smith, Lucy Anna (2014) Mortality in the Ornamental Fish Retail Sector: an Analysis of Stock Losses and Stakeholder Opinions. DOI")
-                .withField(StandardField.YEAR, "5104");
+                .withField(StandardField.YEAR, "2014");
 
         String firstPageContents = """
                 Kent Academic Repository Full text document (pdf)
@@ -98,6 +99,112 @@ class PdfContentPartialImporterTest {
                 Document Version
                 UNSPECIFIED
                 Master of Research (MRes) thesis, University of Kent,.""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void yearNotExtractedFromLongerDigitRun() {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Alice Sample")
+                .withField(StandardField.TITLE, "Some Title of a Paper");
+
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Universitaetsstr. 38, 70569 Stuttgart, Germany""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"1999-2005", "1999–2005", "1999—2005", "1999  -  2005", "1999 \t— 2005"})
+    void pageRangeSkippedInFavorOfActualYear(String pageRange) {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Alice Sample")
+                .withField(StandardField.TITLE, "Some Title of a Paper")
+                .withField(StandardField.YEAR, "2018");
+
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Proceedings, pp. %s, 2018""".formatted(pageRange);
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void yearAfterIssueNumberAndDashExtracted() {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Alice Sample")
+                .withField(StandardField.TITLE, "Some Title of a Paper")
+                .withField(StandardField.YEAR, "2024");
+
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Journal of Examples, Vol. 1 - 2024""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void yearInsideIdentifierSkippedInFavorOfActualYear() {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Alice Sample")
+                .withField(StandardField.TITLE, "Some Title of a Paper")
+                .withField(StandardField.YEAR, "2021");
+
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Proceedings of IPAC2019, published 2021""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void implausibleYearInSpringerFooterNotImported() {
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                A. Persson and J. Stirna (Eds.): PoEM, LNBIP 39, pp. 161-175, 7056.""";
+
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("161-175"), entry.flatMap(parsed -> parsed.getField(StandardField.PAGES)));
+        assertEquals(Optional.empty(), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
+    }
+
+    // [utest->req~import.pdf.plausible-year~1]
+    @Test
+    void implausibleFourDigitNumberSkippedInFavorOfActualYear() {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Alice Sample")
+                .withField(StandardField.TITLE, "Some Title of a Paper")
+                .withField(StandardField.YEAR, "2018");
+
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                CH-8092 Zurich, 2018""";
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
     }
