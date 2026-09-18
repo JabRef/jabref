@@ -30,6 +30,7 @@ class ColumnPreferencesApplierTest {
     private ColumnPreferences columnPreferences;
     private MainTablePreferences mainTablePreferences;
     private ColumnPreferencesApplier applier;
+    private MainTableColumnFactory columnFactory;
     private MainTableColumnModel titleColumn;
     private MainTableColumnModel yearColumn;
     private MainTableColumnModel relevanceColumn;
@@ -44,7 +45,7 @@ class ColumnPreferencesApplierTest {
         mainTablePreferences = new MainTablePreferences(columnPreferences, false, false);
         table = new TableView<>();
 
-        MainTableColumnFactory columnFactory = mock(MainTableColumnFactory.class);
+        columnFactory = mock(MainTableColumnFactory.class);
         when(columnFactory.createColumn(any(MainTableColumnModel.class))).thenAnswer(invocation -> new MainTableColumn<>((MainTableColumnModel) invocation.getArgument(0)));
         when(columnFactory.createColumns()).thenAnswer(_ -> createColumns(columnPreferences.getColumns()));
 
@@ -78,6 +79,29 @@ class ColumnPreferencesApplierTest {
         columnPreferences.setColumnSortOrder(List.of(yearColumn, titleColumn));
 
         assertEquals(List.of(yearColumn, titleColumn), visibleSortOrder());
+    }
+
+    @Test
+    void reorderingColumnsInOneOpenTableUpdatesOtherOpenTables() {
+        BoundTable secondTable = newBoundTable();
+
+        TableColumn<BibEntryTableViewModel, ?> yearColumnInFirstTable = findColumn(table, yearColumn);
+        table.getColumns().remove(yearColumnInFirstTable);
+        table.getColumns().add(1, yearColumnInFirstTable);
+
+        assertEquals(List.of(yearColumn, titleColumn), visibleColumns(secondTable.table()));
+    }
+
+    @Test
+    void sortingInOneOpenTableUpdatesOtherOpenTables() {
+        BoundTable secondTable = newBoundTable();
+
+        TableColumn<BibEntryTableViewModel, ?> yearColumnInFirstTable = findColumn(table, yearColumn);
+        yearColumnInFirstTable.setSortType(TableColumn.SortType.DESCENDING);
+        table.getSortOrder().setAll(List.of(table.getColumns().getFirst(), yearColumnInFirstTable));
+
+        assertEquals(List.of(yearColumn), visibleSortOrder(secondTable.table()));
+        assertEquals(TableColumn.SortType.DESCENDING, findColumn(secondTable.table(), yearColumn).getSortType());
     }
 
     @Test
@@ -162,15 +186,48 @@ class ColumnPreferencesApplierTest {
         return columns;
     }
 
+    private BoundTable newBoundTable() {
+        TableView<BibEntryTableViewModel> additionalTable = new TableView<>();
+        ColumnPreferencesApplier additionalApplier = new ColumnPreferencesApplier(additionalTable, columnFactory, mainTablePreferences);
+        additionalApplier.bind();
+        additionalApplier.applySortOrder();
+
+        ColumnPreferencesRecorder additionalRecorder = new ColumnPreferencesRecorder(additionalTable, columnPreferences);
+        additionalRecorder.bind();
+        return new BoundTable(additionalTable, additionalApplier, additionalRecorder);
+    }
+
     private static MainTableColumnModel modelOf(TableColumn<BibEntryTableViewModel, ?> column) {
         return ((MainTableColumn<?>) column).getModel();
     }
 
+    private static TableColumn<BibEntryTableViewModel, ?> findColumn(TableView<BibEntryTableViewModel> table,
+                                                                     MainTableColumnModel model) {
+        return table.getColumns().stream()
+                    .filter(column -> column instanceof MainTableColumn<?> mainTableColumn
+                            && model.equals(mainTableColumn.getModel()))
+                    .findFirst()
+                    .orElseThrow();
+    }
+
     private List<MainTableColumnModel> visibleColumns() {
+        return visibleColumns(table);
+    }
+
+    private static List<MainTableColumnModel> visibleColumns(TableView<BibEntryTableViewModel> table) {
         return ColumnPreferencesRecorder.toPersistedModels(table.getColumns());
     }
 
     private List<MainTableColumnModel> visibleSortOrder() {
+        return visibleSortOrder(table);
+    }
+
+    private static List<MainTableColumnModel> visibleSortOrder(TableView<BibEntryTableViewModel> table) {
         return ColumnPreferencesRecorder.toPersistedModels(table.getSortOrder());
+    }
+
+    private record BoundTable(TableView<BibEntryTableViewModel> table,
+                              ColumnPreferencesApplier applier,
+                              ColumnPreferencesRecorder recorder) {
     }
 }
