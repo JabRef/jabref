@@ -39,8 +39,8 @@ class ColumnPreferencesApplier {
     private final ChangeListener<Boolean> resizeColumnsListener = (_, _, resizeColumnsToFit) -> applyResizePolicy(resizeColumnsToFit);
 
     ColumnPreferencesApplier(TableView<BibEntryTableViewModel> table,
-                            MainTableColumnFactory columnFactory,
-                            MainTablePreferences mainTablePreferences) {
+                             MainTableColumnFactory columnFactory,
+                             MainTablePreferences mainTablePreferences) {
         this.table = table;
         this.columnFactory = columnFactory;
         this.mainTablePreferences = mainTablePreferences;
