@@ -26,6 +26,7 @@ class FieldTextMapperTest {
                 Arguments.of(StandardField.DOI, "DOI"),
                 Arguments.of(StandardField.ISBN, "ISBN"),
                 Arguments.of(StandardField.URL, "URL"),
+                Arguments.of(StandardField.CREATIONDATE, "Creation Date"),
 
                 // Internal fields
                 Arguments.of(InternalField.TYPE_HEADER, "Entry Type"),
@@ -86,7 +87,9 @@ class FieldTextMapperTest {
                 Arguments.of("Quality", SpecialField.QUALITY),
                 Arguments.of("Ranking", SpecialField.RANKING),
                 Arguments.of("Read status", SpecialField.READ_STATUS),
-                Arguments.of("Relevance", SpecialField.RELEVANCE)
+                Arguments.of("Relevance", SpecialField.RELEVANCE),
+                Arguments.of("Creation Date", StandardField.CREATIONDATE),
+                Arguments.of("creationdate", StandardField.CREATIONDATE)
         );
     }
 

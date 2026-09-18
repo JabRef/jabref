@@ -13,6 +13,8 @@ public class FieldTextMapper {
         if (field.isStandardField()) {
             StandardField standardField = (StandardField) field;
             return switch (standardField) {
+                case CREATIONDATE ->
+                        "Creation Date";
                 case DOI ->
                         "DOI";
                 case ISBN ->
@@ -105,6 +107,9 @@ public class FieldTextMapper {
                     Optional.of(SpecialField.READ_STATUS);
             case "relevance" ->
                     Optional.of(SpecialField.RELEVANCE);
+            case "creation date",
+                 "creationdate" ->
+                    Optional.of(StandardField.CREATIONDATE);
             default ->
                     Optional.empty();
         };
