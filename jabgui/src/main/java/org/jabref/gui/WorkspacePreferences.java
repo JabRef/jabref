@@ -6,9 +6,7 @@ import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -68,15 +66,6 @@ public class WorkspacePreferences {
         virtualizedCellSize = createCellSizeBinding();
     }
 
-    private @NonNull DoubleBinding createCellSizeBinding() {
-        return Bindings.createDoubleBinding(() -> {
-            if (this.shouldOverrideDefaultFontSize.get()) {
-                return this.mainFontSize.get() * 2d;
-            }
-            return 9d * 2d;
-        }, this.shouldOverrideDefaultFontSize, this.mainFontSize);
-    }
-
     /// Creates Object with default values
     private WorkspacePreferences() {
         this(
@@ -96,6 +85,15 @@ public class WorkspacePreferences {
 
     public static WorkspacePreferences getDefault() {
         return new WorkspacePreferences();
+    }
+
+    private @NonNull DoubleBinding createCellSizeBinding() {
+        return Bindings.createDoubleBinding(() -> {
+            if (this.shouldOverrideDefaultFontSize.get()) {
+                return this.mainFontSize.get() * 2d;
+            }
+            return 9d * 2d;
+        }, this.shouldOverrideDefaultFontSize, this.mainFontSize);
     }
 
     public void setAll(WorkspacePreferences preferences) {
