@@ -10,6 +10,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.AuthorListParser;
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -55,6 +57,19 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
                 .setPathSegments("isbn", identifier + ".json")
                 .build()
                 .toURL();
+    }
+
+    @Override
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        try {
+            return super.performSearchById(identifier);
+        } catch (FetcherClientException e) {
+            if (e.getHttpResponse().map(response -> response.statusCode() == 404).orElse(false)) {
+                LOGGER.debug("No entry found on OpenLibrary for ISBN {}", identifier, e);
+                return Optional.empty();
+            }
+            throw e;
+        }
     }
 
     @Override

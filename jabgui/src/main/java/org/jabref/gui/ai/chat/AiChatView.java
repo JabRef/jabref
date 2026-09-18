@@ -133,7 +133,7 @@ public class AiChatView extends StackPane {
 
     private static String formatNoticeText(ChatModel model) {
         String modelName = AiNamingUtils.getDisplayName(model.getAiProvider()) + " " + model.getName();
-        return Localization.lang("Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided", modelName);
+        return Localization.lang("Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided.", modelName);
     }
 
     private void setupFollowUpQuestions() {

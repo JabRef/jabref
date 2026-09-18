@@ -93,7 +93,7 @@
 - jobName: 'CHANGELOG.md needs to be modified if indicated'
   workflowName: 'Check PR CHANGELOG.md'
   message: >
-    You ticked that you modified `CHANGELOG.md`, but no new entry was found there.
+    The `CHANGELOG.md` checklist item and the actual `CHANGELOG.md` change do not match: either you ticked the item without adding an entry, or you added an entry without ticking the item.
 
 
     If you made changes that are visible to the user, please add a brief description to the `CHANGELOG.md` file, along with the issue number when one exists; otherwise link the pull request.

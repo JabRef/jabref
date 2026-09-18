@@ -164,7 +164,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),
                     linkedFileViewModel.getTypeIcon().getGraphicNode());
-            menuItem.setOnAction(event -> linkedFileViewModel.open());
+            menuItem.setOnAction(_ -> linkedFileViewModel.open());
             contextMenu.getItems().add(menuItem);
         }
 
@@ -172,7 +172,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     }
 
     private Node createFileIcon(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
-        if (entry.hasFullTextResultsProperty().get()) {
+        if (entry.hasFullTextResults()) {
             return IconTheme.JabRefIcons.FILE_SEARCH.getGraphicNode();
         }
         if (linkedFiles.size() > 1) {

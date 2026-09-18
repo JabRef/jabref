@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SqlQueryNode;
-import org.jabref.testutils.category.DatabaseTest;
+import org.jabref.support.DatabaseTest;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.jupiter.api.AfterAll;
