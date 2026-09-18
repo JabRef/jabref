@@ -3,12 +3,13 @@
 This directory contains JBang scripts for JabRef.
 [JBang](https://www.jbang.dev/) allows for running Java applications without having a JDK installed (before).
 
-Four use cases:
+Five use cases:
 
-- Runing `JabKit` - JabRef's CLI tool.
-- Runing `JabLs` - JabRef's LSP Server.
-- Runing `JabSrv` - JabRef's HTTP server.
+- Running `JabKit` - JabRef's CLI tool.
+- Running `JabLs` - JabRef's LSP Server.
+- Running `JabSrv` - JabRef's HTTP server.
 - Try out any pull request with minimal installation. See [our blog entry](https://blog.jabref.org/2025/05/31/run-pr/) for details.
+- See what changed since you last ran JabRef from your checkout (`WhatsNewLauncher.java`).
 
 ## Running `JabKit`
 
@@ -146,3 +147,20 @@ JBang installed: <https://www.jbang.dev/download/>
 ## Try out any pull request
 
 See <https://blog.jabref.org/2025/05/31/run-pr/> for a howto.
+
+## What's new since my last run
+
+`just run-main` pulls the latest `main` and, before starting JabRef, opens a window with the `CHANGELOG.md` entries not shown yet, split into *changes by others* and *changes by me* (the `git config user.email` of the checkout).
+Each entry is attributed to the commit that first added it, so a link fix or a rewording by someone else keeps the original author.
+"Start" starts JabRef, "Cancel" stops the recipe.
+
+```bash
+just whats-new            # the window on its own
+just whats-new --stdout   # plain text instead
+```
+
+The first run only records the current changelog (in the checkout's `.git` directory) and shows nothing.
+
+While JabRef runs from a checkout (started by `just run`, i.e. Gradle's `run` task), the same news lives in a "What's new" toolbar button next to the GitHub one: every five minutes it fetches, turns blue once the checkout is behind, lists the pending entries in its tooltip and, clicked, opens the window.
+Under `just loop` the window also offers *Restart to update*: the loop pulls, rebuilds and starts JabRef again.
+The window before the start and the button share what was shown, so nothing is shown twice.

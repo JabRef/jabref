@@ -2,7 +2,7 @@ set windows-shell := ["powershell"]
 
 [unix]
 ensure-gg-cmd:
-    [ ! -f gg.cmd ] && ( echo "gg.cmd not found — downloading..."; ( command -v wget >/dev/null 2>&1 && wget -O gg.cmd https://ggcmd.io/gg.cmd ) || ( command -v curl >/dev/null 2>&1 && curl -L https://ggcmd.io/gg.cmd -o gg.cmd ) || { echo "Error: neither wget nor curl is installed." >&2; exit 1; } )
+    @[ -f gg.cmd ] || ( echo "gg.cmd not found — downloading..."; ( command -v wget >/dev/null 2>&1 && wget -O gg.cmd https://ggcmd.io/gg.cmd ) || ( command -v curl >/dev/null 2>&1 && curl -L https://ggcmd.io/gg.cmd -o gg.cmd ) || { echo "Error: neither wget nor curl is installed." >&2; exit 1; } )
 
 [unix]
 checkout-pr pr-id: ensure-gg-cmd
@@ -13,7 +13,28 @@ run-brach branch: ensure-gg-cmd
     sh ./gg.cmd jbang git@jbangdev checkout {{branch}}
     sh ./gg.cmd jbang git@jbangdev fetch origin
     sh ./gg.cmd jbang git@jbangdev merge origin/main
+    just whats-new
     just run
+
+# Show the CHANGELOG.md entries that landed since the previous run, by others and by me. "Cancel run" stops the recipe.
+[unix]
+whats-new *FLAGS: ensure-gg-cmd
+    sh ./gg.cmd jbang .jbang/WhatsNewLauncher.java {{FLAGS}}
+
+# Run JabRef from the checkout until it is really quit: "Restart to update" in its "What's new" window pulls, rebuilds and starts it again.
+[unix]
+loop: ensure-gg-cmd
+    #!/usr/bin/env sh
+    while :; do
+        git pull --no-rebase || exit 1
+        git submodule update --init || exit 1
+        just whats-new || exit $?
+        marker="$(git rev-parse --absolute-git-dir)/restart-requested"
+        rm -f "$marker"
+        sh ./gg.cmd gradle :jabgui:run -PrestartLoop || { status=$?; rm -f "$marker"; exit $status; }
+        [ -f "$marker" ] || break
+        rm -f "$marker"
+    done
 
 [unix]
 run: ensure-gg-cmd
@@ -29,7 +50,7 @@ run-jabsrv *FLAGS: ensure-gg-cmd
 
 [windows]
 ensure-gg-cmd:
-    if (-not (Test-Path 'gg.cmd')) { Write-Host 'gg.cmd not found — downloading...'; Invoke-WebRequest 'https://ggcmd.io/gg.cmd' -OutFile 'gg.cmd' }
+    @if (-not (Test-Path 'gg.cmd')) { Write-Host 'gg.cmd not found — downloading...'; Invoke-WebRequest 'https://ggcmd.io/gg.cmd' -OutFile 'gg.cmd' }
 
 [windows]
 checkout-pr pr-id: ensure-gg-cmd
@@ -40,7 +61,16 @@ run-branch branch: ensure-gg-cmd
     .\gg.cmd jbang git@jbangdev checkout {{branch}}
     .\gg.cmd jbang git@jbangdev fetch origin
     .\gg.cmd jbang git@jbangdev merge origin/main
+    just whats-new
     just run
+
+[windows]
+whats-new *FLAGS: ensure-gg-cmd
+    .\gg.cmd jbang .jbang\WhatsNewLauncher.java {{FLAGS}}
+
+[windows]
+loop: ensure-gg-cmd
+    @while ($true) { git pull --no-rebase; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; git submodule update --init; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; just whats-new; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $marker = "$(git rev-parse --absolute-git-dir)/restart-requested"; Remove-Item -ErrorAction Ignore $marker; .\gg.cmd gradle :jabgui:run -PrestartLoop; if ($LASTEXITCODE -ne 0) { Remove-Item -ErrorAction Ignore $marker; exit $LASTEXITCODE }; if (-not (Test-Path $marker)) { break }; Remove-Item $marker }
 
 [windows]
 run: ensure-gg-cmd
