@@ -24,7 +24,7 @@ class ImporterPreferencesTest {
                 false,
                 Path.of(""),
                 false,
-                false,
+                true,
                 Set.of(),
                 Set.of(new FetcherApiKey(FETCHER, true, key)),
                 false,
