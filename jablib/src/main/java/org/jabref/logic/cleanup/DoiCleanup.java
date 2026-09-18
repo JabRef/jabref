@@ -37,7 +37,7 @@ public class DoiCleanup implements CleanupJob {
                  String decodedDoiFieldValue;
                  try {
                      decodedDoiFieldValue = URLDecoder.decode(currentlyStoredDoi, StandardCharsets.UTF_8);
-                 } catch (IllegalArgumentException e) {
+                 } catch (IllegalArgumentException _) {
                      // If decoding fails, we keep the original value
                      decodedDoiFieldValue = currentlyStoredDoi;
                  }

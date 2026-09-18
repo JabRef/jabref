@@ -103,6 +103,25 @@ public class ActionFactory {
         return menuItem;
     }
 
+    /// An item for a context menu, carrying no accelerator.
+    ///
+    /// A [MenuItem]'s accelerator is global: JavaFX keeps one entry per key combination for the
+    /// whole scene, so an item in a context menu takes the keystroke away from the main menu's item
+    /// for the same action — and then does nothing at all whenever its own command is disabled,
+    /// because JavaFX skips a disabled item's accelerator rather than passing the event on.
+    ///
+    /// That is how Ctrl+Z stopped working outside the entry editor: the search field's context menu
+    /// claimed it for `EditorContextAction`, which is enabled only while that field has something to
+    /// undo. A context menu is reached with the mouse, so it loses nothing by leaving the key
+    /// combination to whoever owns it globally.
+    public MenuItem createContextMenuItem(Action action, Command command) {
+        MenuItem menuItem = createMenuItem(action, command);
+        // configureMenuItem binds the property, so it has to be released before it can be cleared.
+        menuItem.acceleratorProperty().unbind();
+        menuItem.setAccelerator(null);
+        return menuItem;
+    }
+
     public MenuItem createCustomMenuItem(Action action, Command command, String text) {
         MenuItem menuItem = new MenuItem();
         configureMenuItem(action, command, menuItem);
@@ -145,14 +164,7 @@ public class ActionFactory {
     public Button createIconButton(Action action, Command command) {
         Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);
 
-        button.getStyleClass().setAll("icon-button");
-
-        // For some reason the graphic is not set correctly, so let's fix this
-        button.graphicProperty().unbind();
-        action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
-
-        // Prevent the buttons from stealing the focus
-        button.setFocusTraversable(false);
+        initButton(action, button);
 
         return button;
     }
@@ -164,13 +176,15 @@ public class ActionFactory {
                 button,
                 ActionUtils.ActionTextBehavior.HIDE);
 
-        button.getStyleClass().add("icon-button");
-
-        // For some reason the graphic is not set correctly, so let's fix this
-        // ToDO: Find a way to reuse JabRefIconView
-        button.graphicProperty().unbind();
-        action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
+        initButton(action, button);
 
         return button;
+    }
+
+    private static void initButton(Action action, ButtonBase button) {
+        button.setFocusTraversable(true);
+        button.getStyleClass().add("icon-button");
+        button.graphicProperty().unbind();
+        action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
     }
 }

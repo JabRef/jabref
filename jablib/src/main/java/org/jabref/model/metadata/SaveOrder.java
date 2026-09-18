@@ -40,7 +40,7 @@ public class SaveOrder {
         OrderType orderType;
         try {
             orderType = OrderType.valueOf(data.getFirst().toUpperCase());
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException _) {
             if (data.size() > 1 && data.size() % 2 == 1) {
                 LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.getFirst());
                 orderType = OrderType.SPECIFIED;

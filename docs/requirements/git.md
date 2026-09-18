@@ -35,6 +35,7 @@ Needs: impl
 `req~git.commit.preview-current-library~1`
 
 Before committing a Git-tracked library, JabRef should let the user preview semantic changes from the committed version to the saved current file for that library.
+Selecting a groups tree change must display the old and new trees with highlighted differences and respect the selected word or character highlighting mode.
 
 Needs: impl
 
@@ -51,6 +52,17 @@ Needs: impl
 When a user commits a library that is not inside a Git repository, JabRef must offer to initialize a repository in the library's directory and commit the library file there.
 Only the library file and the generated `.gitignore` are committed, so unrelated files in that directory stay untracked.
 Declining the offer must leave the directory unchanged, because the user may want to clone an existing repository into it instead.
+
+Needs: impl, utest
+
+## Committing a library with unsaved changes offers to save first
+`req~git.commit.unsaved-changes~1`
+
+When a user commits a library with unsaved changes and autosave is disabled,
+JabRef must offer to write those changes before committing,
+and must allow committing only what is already on disk.
+Git commits operate on the file on disk, so unsaved changes would otherwise be silently left out,
+but the user may deliberately want to commit only the saved work.
 
 Needs: impl, utest
 

@@ -199,7 +199,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
             boolean afterStart = startYear.map(start -> year >= start).orElse(true);
             boolean beforeEnd = endYear.map(end -> year <= end).orElse(true);
             return afterStart && beforeEnd;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return true;
         }
     }

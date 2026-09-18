@@ -178,7 +178,7 @@ public class AcademicPagesExporter extends Exporter {
                 return Optional.of(new LayoutHelper(reader, fileDirForDatabase, layoutPreferences, abbreviationRepository)
                         .getLayoutFromText());
             }
-        } catch (IOException e) {
+        } catch (IOException _) {
             return Optional.empty();
         }
     }
@@ -198,7 +198,7 @@ public class AcademicPagesExporter extends Exporter {
                         try {
                             Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                             return Optional.of(destName);
-                        } catch (IOException ex) {
+                        } catch (IOException _) {
                             return Optional.empty();
                         }
                     });
@@ -218,7 +218,7 @@ public class AcademicPagesExporter extends Exporter {
         try {
             Files.writeString(target, bibContent);
             return Optional.of(bibName);
-        } catch (IOException ex) {
+        } catch (IOException _) {
             return Optional.empty();
         }
     }
@@ -243,10 +243,10 @@ public class AcademicPagesExporter extends Exporter {
     private String formatDate(TemporalAccessor temporal) {
         try {
             return DateTimeFormatter.ofPattern("uuuu-MM-dd").format(temporal);
-        } catch (DateTimeException e1) {
+        } catch (DateTimeException _) {
             try {
                 return DateTimeFormatter.ofPattern("uuuu-MM").format(temporal) + "-01";
-            } catch (DateTimeException e2) {
+            } catch (DateTimeException _) {
                 return DateTimeFormatter.ofPattern("uuuu").format(temporal) + "-01-01";
             }
         }

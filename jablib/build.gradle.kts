@@ -4,7 +4,6 @@ import com.vanniktech.maven.publish.SourcesJar
 import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jabref.gradle.EmbeddedPostgresBinaries
 import java.util.Calendar
 
@@ -18,7 +17,13 @@ plugins {
 
     id("com.vanniktech.maven.publish") version "0.37.0"
 
-    id("dev.jbang") version "0.4.0"
+    // Applied with "apply false": we only need the JBangTask type, not the plugin.
+    // Applying it displays a banner that reads and increments
+    // <gradleUserHome>/caches/kordamp/jbang/<version>/marker.txt at configuration time,
+    // which invalidates the Gradle configuration cache on every single build.
+    // (-Dorg.kordamp.banner=false only silences the output, the file is still written.)
+    // See https://github.com/jbangdev/jbang-gradle-plugin/issues/20
+    id("dev.jbang") version "0.4.0" apply false
 
     id("net.ltgt.errorprone") version "5.1.1"
     id("net.ltgt.nullaway") version "3.2.0"
@@ -47,9 +52,6 @@ testModuleInfo {
     requires("org.junit.jupiter.params")
     requires("org.hamcrest")
     requires("org.mockito")
-
-    // Required for LocalizationConsistencyTest
-    requires("org.testfx.junit5")
 
     requires("org.xmlunit")
     requires("org.xmlunit.matchers")
@@ -174,6 +176,11 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
 // Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
 sourceSets["main"].resources {
     srcDir(layout.buildDirectory.dir("generated/resources"))
+
+    // JabRef only reads the top-level styles (CitationStyleCatalogGenerator scans with depth 1),
+    // but these ~8000 unused files dominate the cost of processResources on Windows.
+    exclude("csl-styles/dependent/**")
+    exclude("csl-styles/spec/**")
 }
 
 // region processResources
@@ -312,6 +319,9 @@ tasks.javadoc {
 }
 
 tasks.test {
+    systemProperty("glass.platform", "Headless")
+    systemProperty("prism.order", "sw")
+
     useJUnitPlatform {
         excludeTags("DatabaseTest", "ExternalServicesTest")
     }
@@ -321,9 +331,6 @@ tasks.test {
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
-    testLogging {
-        showStandardStreams = false
-    }
 }
 
 jmh {
@@ -351,11 +358,6 @@ tasks.register<Test>("databaseTest") {
     classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("DatabaseTest")
-    }
-    testLogging {
-        // set options for log level LIFECYCLE
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
     }
     maxParallelForks = 1
 }

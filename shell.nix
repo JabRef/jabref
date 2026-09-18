@@ -1,7 +1,10 @@
 # Development shell for NixOS / nix-enabled Linux: `nix-shell` in the repo root.
 #
 # Nothing in JabRef needs Nix — this only supplies what an ordinary Linux
-# distribution has in `/usr/lib` and NixOS deliberately does not.
+# distribution has in `/usr/lib` and NixOS deliberately does not. On macOS the
+# JavaFX natives are Cocoa binaries that need nothing from the environment, so
+# there the shell reduces to the bootstrap JDK below; the Linux-only parts are
+# guarded with `stdenv.isLinux` so `nix-shell` still evaluates on Darwin.
 #
 # By default JabRef consumes JavaFX as plain Maven artifacts (see
 # `build-logic/src/main/kotlin/org.jabref.gradle.base.dependency-rules.gradle.kts`),
@@ -76,7 +79,7 @@ let
     zlib
   ];
 
-  runtimeLibs = javafxRuntimeLibs ++ embeddedPostgresLibs;
+  runtimeLibs = pkgs.lib.optionals pkgs.stdenv.isLinux (javafxRuntimeLibs ++ embeddedPostgresLibs);
 
   # Bootstrap JDK for the Gradle wrapper only; see the header. Keep the major
   # version in sync with the toolchain in
@@ -86,12 +89,14 @@ in
 pkgs.mkShell {
   packages = [
     bootstrapJdk
+  ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
     pkgs.xvfb-run # `xvfb-run --auto-servernum ./gradlew :jabgui:check` — the GUI tests
   ] ++ runtimeLibs;
 
   # The Gradle wrapper prefers JAVA_HOME over a `java` found on PATH.
   JAVA_HOME = "${bootstrapJdk}";
 
+  # Empty on macOS: the list is Linux-only and dyld does not read this variable anyway.
   LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath runtimeLibs;
 
   # Fail loudly and early instead of letting Gradle die on the auto-provisioned

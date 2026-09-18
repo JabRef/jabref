@@ -15,11 +15,11 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -44,8 +44,10 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
     /// e.g. fetchers), so bursts of field changes coalesce into one refresh instead of one each.
     private final AtomicBoolean refreshQueued = new AtomicBoolean();
 
+    /// Set when a coalesced burst contains an entry-type change, which forces a rebuild (see [#listen]).
+    private final AtomicBoolean entryTypeChangeQueued = new AtomicBoolean();
+
     public UserDefinedFieldsTab(EntryEditorTabModel.CustomizedFieldsTab model,
-                                UndoManager undoManager,
                                 UndoAction undoAction,
                                 RedoAction redoAction,
                                 GuiPreferences preferences,
@@ -54,7 +56,6 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
                                 PreviewPanel previewPanel) {
         super(
                 false,
-                undoManager,
                 undoAction,
                 redoAction,
                 preferences,
@@ -100,23 +101,31 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
     /// undo, …), since that can change which fields a regex pattern captures. Event bursts coalesce
     /// into a single deferred refresh, and the refresh reads the entry's state at callback time (the
     /// event's payload is deliberately ignored), so a queued callback can never apply stale state.
-    /// Rebuilds only when the resolved field set actually changes, so typing inside this tab's
-    /// editors never steals focus.
+    /// Rebuilds only when the resolved field set actually changes (or the entry type changed),
+    /// so typing inside this tab's editors never steals focus.
     @Subscribe
     public void listen(FieldChangedEvent event) {
+        // An entry-type change can leave the resolved field set unchanged while still changing
+        // which editor implementation a field gets (FieldEditors.getForField chooses per entry
+        // type, e.g. for the "type" field), so the rows must be rebuilt even when the set
+        // comparison below would otherwise skip the rebuild — mirroring the Main tab's handling.
+        if (InternalField.TYPE_HEADER == event.getField()) {
+            entryTypeChangeQueued.set(true);
+        }
         if (refreshQueued.getAndSet(true)) {
             return;
         }
         Platform.runLater(() -> {
             // Cleared before refreshing: an event arriving while we refresh must queue a new callback.
             refreshQueued.set(false);
+            boolean entryTypeChanged = entryTypeChangeQueued.getAndSet(false);
             BibEntry entry = getCurrentEntry();
             if (entry == null) {
                 return;
             }
             SequencedSet<Field> target = determineFieldsToShow(entry);
             hasResolvedFields.set(!target.isEmpty());
-            if ((gridPane != null) && !target.equals(editors.keySet())) {
+            if ((gridPane != null) && (entryTypeChanged || !target.equals(editors.keySet()))) {
                 setupPanel(stateManager.getActiveDatabase().orElse(new BibDatabaseContext()), entry, false);
             }
         });

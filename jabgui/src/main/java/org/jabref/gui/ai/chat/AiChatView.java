@@ -133,7 +133,7 @@ public class AiChatView extends StackPane {
 
     private static String formatNoticeText(ChatModel model) {
         String modelName = AiNamingUtils.getDisplayName(model.getAiProvider()) + " " + model.getName();
-        return Localization.lang("Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided", modelName);
+        return Localization.lang("Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided.", modelName);
     }
 
     private void setupFollowUpQuestions() {
@@ -146,7 +146,7 @@ public class AiChatView extends StackPane {
         followUpQuestionsSimpleListView.itemsProperty().bind(viewModel.followUpQuestionsProperty());
         followUpQuestionsSimpleListView.setRenderer(question -> {
             Button button = new Button(question);
-            button.getStyleClass().add("exampleQuestionStyle");
+            button.getStyleClass().addAll("exampleQuestionStyle", "padding-4-12");
             button.setOnAction(_ -> viewModel.sendFollowUpMessage(question));
             return button;
         });

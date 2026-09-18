@@ -18,6 +18,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -90,7 +91,8 @@ class DownloadLinkedFileActionTest {
                 dialogService,
                 preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
-                new CurrentThreadTaskExecutor());
+                new CurrentThreadTaskExecutor(),
+                new JabRefUndoManager());
         downloadLinkedFileAction.execute();
 
         assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
@@ -115,7 +117,8 @@ class DownloadLinkedFileActionTest {
                 dialogService,
                 preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
-                new CurrentThreadTaskExecutor());
+                new CurrentThreadTaskExecutor(),
+                new JabRefUndoManager());
         downloadLinkedFileAction.execute();
 
         assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());
@@ -137,7 +140,8 @@ class DownloadLinkedFileActionTest {
                 preferences.getFilePreferences(),
                 new CurrentThreadTaskExecutor(),
                 Path.of(linkedFile.getLink()).getFileName().toString(),
-                keepHtml);
+                keepHtml,
+                new JabRefUndoManager());
         downloadLinkedFileAction2.execute();
 
         assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF", url)), entry.getFiles());

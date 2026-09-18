@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.search.Highlighter;
-import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.gui.search.SearchType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.Range;
@@ -163,8 +163,7 @@ public class BibTeXHighlighter implements SyntaxDecorator {
         }
     }
 
-    /// Helper to add a text segment, splitting it if it intersects with search matches to apply
-    /// the `search-highlight-text` CSS class dynamically.
+    /// Helper to add a text segment, splitting it if it intersects with search matches.
     private void addSegmentWithSearchCheck(RichParagraph.Builder builder, String segmentText, int segmentStart, @org.jspecify.annotations.Nullable String baseStyleClass, List<Range> matches) {
         int segmentEnd = segmentStart + segmentText.length();
         int cursor = segmentStart;
@@ -207,9 +206,9 @@ public class BibTeXHighlighter implements SyntaxDecorator {
 
         if (isSearchMatch) {
             if (baseStyleClass != null) {
-                builder.addWithStyleNames(text, baseStyleClass, "search-highlight-text");
+                builder.addWithStyleNames(text, baseStyleClass);
             } else {
-                builder.addWithStyleNames(text, "search-highlight-text");
+                builder.addWithStyleNames(text);
             }
         } else {
             if (baseStyleClass != null) {
@@ -222,13 +221,12 @@ public class BibTeXHighlighter implements SyntaxDecorator {
 
     /// Finds search matches in the current line.
     private List<Range> getSearchMatches(String text, int lineStart) {
-        String query = stateManager.searchQueryProperty().get();
-        if (StringUtil.isBlank(query)) {
+        Optional<SearchQuery> searchQuery = stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get();
+        if (searchQuery.isEmpty()) {
             return List.of();
         }
 
-        SearchQuery searchQuery = new SearchQuery(query);
-        Map<Optional<Field>, List<String>> termsMap = Highlighter.groupTermsByField(searchQuery);
+        Map<Optional<Field>, List<String>> termsMap = Highlighter.groupTermsByField(searchQuery.get());
         Map<Field, Range> fieldPositions = fieldPositionsProvider.get();
 
         List<Range> matches = new ArrayList<>();

@@ -30,6 +30,11 @@ public class OSX extends NativeDesktop {
     }
 
     @Override
+    public void openUrlWithSystemHandler(String url) throws IOException {
+        new ProcessBuilder("/usr/bin/open", url).start();
+    }
+
+    @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
         // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
         String[] cmd = (application != null) && !application.isEmpty() ? new String[] {"/usr/bin/open", "-a",

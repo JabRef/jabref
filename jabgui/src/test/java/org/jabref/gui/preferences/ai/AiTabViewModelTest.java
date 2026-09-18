@@ -1,0 +1,239 @@
+package org.jabref.gui.preferences.ai;
+
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
+
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
+import org.jabref.logic.ai.models.AiModelService;
+import org.jabref.logic.ai.preferences.AiPreferences;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.model.ai.llm.AiProvider;
+
+import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@NullMarked
+class AiTabViewModelTest {
+
+    private EmbeddingModelMetadataService embeddingModelMetadataService;
+    private AiModelService aiModelService;
+    private AiTabViewModel viewModel;
+
+    @BeforeEach
+    void setUp() {
+        embeddingModelMetadataService = mock(EmbeddingModelMetadataService.class);
+        aiModelService = mock(AiModelService.class);
+
+        when(embeddingModelMetadataService.getMetadata("test-model")).thenReturn(
+                Optional.of(new EmbeddingModelMetadata("test-model", OptionalLong.of(1024), OptionalInt.of(256)))
+        );
+
+        AiPreferences aiPreferences = AiPreferences.getDefault();
+        AiPreferences workingAiPreferences = AiPreferences.getDefault();
+
+        viewModel = new AiTabViewModel(
+                aiPreferences,
+                workingAiPreferences,
+                aiModelService,
+                new CurrentThreadTaskExecutor(),
+                embeddingModelMetadataService
+        );
+    }
+
+    @Test
+    void settingsEnabledWhenAiEnabledAtConstruction() {
+        AiPreferences aiPreferences = AiPreferences.getDefault();
+        aiPreferences.setAiFeaturesEnabledCurrently(true);
+        aiPreferences.setCustomizeExpertSettings(true);
+        AiPreferences workingAiPreferences = AiPreferences.getDefault();
+        workingAiPreferences.copyFrom(aiPreferences);
+
+        AiTabViewModel enabledViewModel = new AiTabViewModel(
+                aiPreferences,
+                workingAiPreferences,
+                aiModelService,
+                new CurrentThreadTaskExecutor(),
+                embeddingModelMetadataService
+        );
+        enabledViewModel.setValues();
+
+        assertFalse(enabledViewModel.disableBasicSettingsProperty().get());
+        assertFalse(enabledViewModel.disableExpertSettingsProperty().get());
+    }
+
+    @Test
+    void connectionUsesEnteredValues() throws Exception {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("granite4.2:8b");
+        viewModel.apiKeyProperty().set("key");
+        viewModel.customizeExpertSettingsProperty().set(true);
+        viewModel.apiBaseUrlProperty().set("http://localhost:11434/v1");
+        when(aiModelService.testConnection(eq(AiProvider.OPEN_AI), eq("granite4.2:8b"), eq("key"), anyDouble(), eq("http://localhost:11434/v1"), anyInt(), any()))
+                .thenReturn("OK");
+
+        assertEquals("OK", viewModel.testConnectionTask().call());
+    }
+
+    @Test
+    void connectionUsesProviderUrlWithoutExpertSettings() throws Exception {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-4o");
+        viewModel.apiKeyProperty().set("key");
+        viewModel.apiBaseUrlProperty().set("http://localhost:11434/v1");
+        when(aiModelService.testConnection(eq(AiProvider.OPEN_AI), eq("gpt-4o"), eq("key"), anyDouble(), eq(AiProvider.OPEN_AI.getApiUrl()), anyInt(), any()))
+                .thenReturn("OK");
+
+        assertEquals("OK", viewModel.testConnectionTask().call());
+    }
+
+    @Test
+    void connectionTestSucceeds() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-4o");
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any())).thenReturn("OK");
+
+        viewModel.testConnection();
+
+        assertEquals(AiTabViewModel.ConnectionTestState.SUCCESS, viewModel.connectionTestStateProperty().get());
+        assertEquals("", viewModel.connectionTestDetailsProperty().get());
+    }
+
+    @Test
+    void connectionTestShowsOllamaPullCommandForMissingModel() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-oss20b");
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any()))
+                .thenThrow(new RuntimeException("404 - message: model 'gpt-oss20b' not found"));
+
+        viewModel.testConnection();
+
+        assertEquals(AiTabViewModel.ConnectionTestState.FAILED, viewModel.connectionTestStateProperty().get());
+        assertTrue(viewModel.connectionTestDetailsProperty().get().contains("ollama pull gpt-oss20b"));
+    }
+
+    @Test
+    void connectionTestResultResetsWhenApiKeyChanges() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any()))
+                .thenThrow(new RuntimeException("401"));
+        viewModel.testConnection();
+
+        viewModel.apiKeyProperty().set("other-key");
+
+        assertEquals(AiTabViewModel.ConnectionTestState.IDLE, viewModel.connectionTestStateProperty().get());
+        assertEquals("", viewModel.connectionTestDetailsProperty().get());
+    }
+
+    @Test
+    void maxChunkSizeLabelUpdatesWhenModelSelected() {
+        viewModel.selectedEmbeddingModelProperty().set("test-model");
+
+        assertEquals(256, viewModel.selectedEmbeddingModelMaxChunkSizeProperty().get());
+    }
+
+    @Test
+    void maxChunkSizeFallsBackToDefaultWhenUnknown() {
+        when(embeddingModelMetadataService.getMetadata("unknown-model")).thenReturn(
+                Optional.of(new EmbeddingModelMetadata("unknown-model", OptionalLong.empty(), OptionalInt.empty()))
+        );
+
+        viewModel.selectedEmbeddingModelProperty().set("unknown-model");
+
+        assertEquals(512, viewModel.selectedEmbeddingModelMaxChunkSizeProperty().get());
+    }
+
+    @Test
+    void documentSplitterChunkSizeValidWithinMaxSnippetTokens() {
+        viewModel.selectedEmbeddingModelProperty().set("test-model");
+        viewModel.documentSplitterChunkSizeProperty().set(200);
+
+        assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+    }
+
+    @Test
+    void documentSplitterChunkSizeInvalidWhenExceedingMaxSnippetTokens() {
+        viewModel.selectedEmbeddingModelProperty().set("test-model");
+        viewModel.documentSplitterChunkSizeProperty().set(300);
+
+        assertFalse(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+    }
+
+    @Test
+    void documentSplitterChunkSizeInvalidWhenExceedingMaxSnippetTokensEvenIfSetFirst() {
+        viewModel.documentSplitterChunkSizeProperty().set(300);
+        viewModel.selectedEmbeddingModelProperty().set("test-model");
+
+        assertFalse(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+    }
+
+    @Test
+    void documentSplitterChunkSizeRevalidatesWhenModelChanges() {
+        when(embeddingModelMetadataService.getMetadata("small-model")).thenReturn(
+                Optional.of(new EmbeddingModelMetadata("small-model", OptionalLong.of(1024), OptionalInt.of(128)))
+        );
+
+        viewModel.documentSplitterChunkSizeProperty().set(200);
+        viewModel.selectedEmbeddingModelProperty().set("test-model");
+        assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+
+        viewModel.selectedEmbeddingModelProperty().set("small-model");
+        assertFalse(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+    }
+
+    @Test
+    void validateSettingsFailsWhenChunkSizeExceedsModelMax() {
+        viewModel.enableAi().set(true);
+        viewModel.customizeExpertSettingsProperty().set(true);
+        viewModel.selectedChatModelProperty().set("gpt-4o");
+        viewModel.documentSplitterChunkSizeProperty().set(300);
+        viewModel.selectedEmbeddingModelProperty().set("test-model");
+
+        assertFalse(viewModel.validateSettings());
+    }
+
+    @Test
+    void documentSplitterChunkSizeValidationMessageUpdatesWhenChunkSizeChanges() {
+        when(embeddingModelMetadataService.getMetadata("small-model")).thenReturn(
+                Optional.of(new EmbeddingModelMetadata("small-model", OptionalLong.of(1024), OptionalInt.of(128)))
+        );
+
+        viewModel.selectedEmbeddingModelProperty().set("small-model");
+
+        viewModel.documentSplitterChunkSizeProperty().set(0);
+        assertFalse(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+        assertEquals("Document splitter chunk size must be greater than 0",
+                viewModel.getDocumentSplitterChunkSizeValidationStatus().getHighestMessage().orElseThrow().getMessage());
+
+        viewModel.documentSplitterChunkSizeProperty().set(300);
+        assertFalse(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+        assertEquals("Document splitter chunk size must not exceed 128",
+                viewModel.getDocumentSplitterChunkSizeValidationStatus().getHighestMessage().orElseThrow().getMessage());
+
+        viewModel.documentSplitterChunkSizeProperty().set(100);
+        assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().isValid());
+        assertTrue(viewModel.getDocumentSplitterChunkSizeValidationStatus().getHighestMessage().isEmpty());
+    }
+
+    @Test
+    void documentSplitterOverlapSizeValidWhenChunkSizeSetAfterOverlapSize() {
+        viewModel.documentSplitterChunkSizeProperty().set(0);
+        viewModel.documentSplitterOverlapSizeProperty().set(100);
+        assertFalse(viewModel.getDocumentSplitterOverlapSizeValidationStatus().isValid());
+
+        viewModel.documentSplitterChunkSizeProperty().set(300);
+        assertTrue(viewModel.getDocumentSplitterOverlapSizeValidationStatus().isValid());
+    }
+}

@@ -14,6 +14,7 @@ Read your own diff once, top to bottom, and confirm each point.
 - [ ] No `== null` / `!= null` checks — JSpecify annotations (`@NullMarked`, `@Nullable`, `@NonNull`) used instead.
 - [ ] No `Objects.requireNonNull(...)` — nullability expressed via JSpecify annotations.
 - [ ] New classes annotated with `@NullMarked` (`org.jspecify.annotations.NullMarked`).
+- [ ] New packages annotated with `@NullMarked` (`org.jspecify.annotations.NullMarked`).
 - [ ] `Optional` consumed with `ifPresent` / `ifPresentOrElse` / `map` / `orElseThrow` — never `orElse(unusedValue)` nor an `isPresent()` + `get()` block.
 - [ ] `StringUtil.isBlank(...)` used instead of `s == null || s.isBlank()`.
 
@@ -28,6 +29,7 @@ Read your own diff once, top to bottom, and confirm each point.
 - [ ] New `BibEntry` objects built with withers (`withField`, not `setField`).
 - [ ] Modern Java used: `List.of()` / `Map.of()` / `Set.of()`, `Path.of()`, `SequencedCollection` / `SequencedSet`, text blocks.
 - [ ] Regexes use a precompiled `Pattern.compile(...)` constant, not `String.matches(...)`.
+- [ ] Keep alphabetical ordering when adding variables or enum items.
 - [ ] Background work uses `org.jabref.logic.util.BackgroundTask`, not `new Thread()`.
 - [ ] No commented-out code, no trivial comments restating the code, no AI-disclosure comments in source.
 - [ ] Markdown Javadoc (`///`) uses Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code}`, `[ClassName]` instead of `{@link}`.
@@ -58,6 +60,7 @@ Run in this order — cheapest first. Each must pass.
 - [ ] `./gradlew --no-configuration-cache :rewriteDryRun` reports no changes (run `./gradlew rewriteRun` to fix).
 - [ ] `./gradlew javadoc`.
 - [ ] `npx markdownlint-cli2 "docs/**/*.md" "*.md"` (only if Markdown changed).
+- [ ] `npm ci && npm run textlint` reports no misspellings (only if Markdown changed).
 - [ ] Only if formatting is still off after `rewriteRun`: `docker run -v $(pwd):/github/workspace ghcr.io/leventebajczi/intellij-format:master "*.java" "" ".idea/codeStyles/Project.xml"`.
 
 ## 3. Documentation
@@ -71,6 +74,7 @@ Run in this order — cheapest first. Each must pass.
 
 - [ ] PR body built from `.github/PULL_REQUEST_TEMPLATE.md`, every section filled.
 - [ ] All checklist items kept and marked `[x]`, `[ ]`, or `[/]`.
+- [ ] "Steps to test" is a numbered list with a cropped screenshot of the result for every visible change; no video (only allowed when another program is involved, e.g. drag and drop or push to an external application).
 - [ ] All HTML comments removed from the PR body.
 - [ ] PR created with `gh pr create --body-file <file>` (not `--body`).
-- [ ] If `CHANGELOG.md` used a `TODO` placeholder (no issue confidently identified yet — an existing issue link always stays), it was replaced with the real PR-number link after PR creation, then committed and pushed. If an issue is identified or created later, the link is switched to the issue.
+- [ ] If `CHANGELOG.md` used a `TODO` placeholder (no issue confidently identified yet — an existing issue link always stays), the PR was opened as draft, the placeholder was replaced with the real PR-number link after PR creation, committed and pushed, and only then was the PR marked ready for review. If an issue is identified or created later, the link is switched to the issue.

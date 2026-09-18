@@ -16,7 +16,6 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -41,7 +40,6 @@ public class EntryEditorTabFactory {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileMonitor;
     private final DirectoryMonitor directoryMonitor;
-    private final UndoManager undoManager;
     private final BibEntryTypesManager bibEntryTypesManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final KeyBindingRepository keyBindingRepository;
@@ -58,7 +56,6 @@ public class EntryEditorTabFactory {
                                  StateManager stateManager,
                                  FileUpdateMonitor fileMonitor,
                                  DirectoryMonitor directoryMonitor,
-                                 UndoManager undoManager,
                                  BibEntryTypesManager bibEntryTypesManager,
                                  JournalAbbreviationRepository journalAbbreviationRepository,
                                  KeyBindingRepository keyBindingRepository,
@@ -74,7 +71,6 @@ public class EntryEditorTabFactory {
         this.stateManager = stateManager;
         this.fileMonitor = fileMonitor;
         this.directoryMonitor = directoryMonitor;
-        this.undoManager = undoManager;
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.keyBindingRepository = keyBindingRepository;
@@ -114,7 +110,6 @@ public class EntryEditorTabFactory {
             case EntryEditorTabModel.CustomizedFieldsTab customTab ->
                     new UserDefinedFieldsTab(
                             customTab,
-                            undoManager,
                             undoAction,
                             redoAction,
                             preferences,
@@ -129,7 +124,7 @@ public class EntryEditorTabFactory {
             case PREVIEW ->
                     new PreviewTab(preferences, stateManager, previewPanel);
             case ALL_FIELDS ->
-                    new AllFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
+                    new AllFieldsTab(undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
             case RELATED_ARTICLES ->
                     new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor);
             case AI_SUMMARY ->
@@ -143,7 +138,6 @@ public class EntryEditorTabFactory {
             case CITATION_INFORMATION ->
                     new CitationRelationsTab(
                             dialogService,
-                            undoManager,
                             stateManager,
                             fileMonitor,
                             preferences,
@@ -152,7 +146,6 @@ public class EntryEditorTabFactory {
                             searchCitationsRelationsService);
             case SOURCE ->
                     new SourceTab(
-                            undoManager,
                             preferences.getFieldPreferences(),
                             preferences.getImportFormatPreferences(),
                             fileMonitor,

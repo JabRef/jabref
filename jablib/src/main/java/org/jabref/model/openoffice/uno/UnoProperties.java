@@ -57,7 +57,7 @@ public class UnoProperties {
             throws WrappedTargetException {
         try {
             return Optional.ofNullable(propertySet.getPropertyValue(property));
-        } catch (UnknownPropertyException e) {
+        } catch (UnknownPropertyException _) {
             return Optional.empty();
         }
     }

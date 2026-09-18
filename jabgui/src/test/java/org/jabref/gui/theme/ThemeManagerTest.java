@@ -4,19 +4,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 import org.jabref.gui.WorkspacePreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -27,19 +31,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class ThemeManagerTest {
 
     private static final String TEST_CSS_DATA = "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==";
@@ -57,7 +61,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void themeManagerUsesProvidedTheme() throws IOException, InterruptedException {
+    void themeManagerUsesProvidedTheme() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -72,7 +76,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void nullThemeSettingsFallBackToDefaults() throws InterruptedException {
+    void nullThemeSettingsFallBackToDefaults() {
         WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
         workspacePreferences.setTheme(null);
         workspacePreferences.setColorScheme(null);
@@ -90,7 +94,47 @@ class ThemeManagerTest {
     }
 
     @Test
-    void customThemeChangesFromBackgroundThreadAreAppliedOnJavaFxThread() throws IOException, InterruptedException {
+    void communityThemeIsInstalledOnTopOfItsParent() {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        workspacePreferences.setTheme(ThemePreset.NORD);
+
+        ThemeManager themeManager = createThemeManager(workspacePreferences);
+
+        Scene scene = mock(Scene.class);
+        when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
+
+        themeManager.updateCssOnScene(scene);
+
+        assertEquals(List.of(
+                ThemePreset.JABREF.getStyleSheet().getSceneStylesheetLocation(),
+                ThemePreset.NORD.getStyleSheet().getSceneStylesheetLocation(),
+                ThemeManager.JABREF_BASE_STYLE_SHEET.getSceneStylesheetLocation()), scene.getStylesheets());
+    }
+
+    /// An edit in the parent changes a community theme's look, so both files have to be watched.
+    @Test
+    void communityThemeWatchesItsParentForLiveUpdates() throws IOException {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        workspacePreferences.setTheme(ThemePreset.NORD);
+        FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
+
+        createThemeManager(workspacePreferences, fileUpdateMonitor);
+
+        Path parentPath = assertNotNullWatchPath(ThemePreset.JABREF);
+        Path themePath = assertNotNullWatchPath(ThemePreset.NORD);
+        verify(fileUpdateMonitor).addListenerForFile(eq(themePath), any());
+        // The manager starts on the JabRef theme and switches, so its file is registered again as the parent.
+        verify(fileUpdateMonitor, atLeastOnce()).addListenerForFile(eq(parentPath), any());
+    }
+
+    private static Path assertNotNullWatchPath(ThemePreset theme) {
+        Path watchPath = theme.getStyleSheet().getWatchPath();
+        assertNotNull(watchPath, theme + " is not a file, so live updates cannot be tested");
+        return watchPath;
+    }
+
+    @Test
+    void customThemeChangesFromBackgroundThreadAreAppliedOnJavaFxThread() throws IOException {
         WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
         FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
         AtomicBoolean listenerAddedOnJavaFxThread = new AtomicBoolean();
@@ -104,15 +148,12 @@ class ThemeManagerTest {
 
         workspacePreferences.setCustomTheme(StyleSheet.create(tempFolder.resolve("custom.css").toString()));
 
-        CountDownLatch updateFinished = new CountDownLatch(1);
-        Platform.runLater(updateFinished::countDown);
-
-        assertTrue(updateFinished.await(10, TimeUnit.SECONDS), "Custom theme update timed out");
+        JavaFxExtension.awaitEvents();
         assertTrue(listenerAddedOnJavaFxThread.get());
     }
 
     @Test
-    void customThemeAvailableEvenWhenDeleted() throws IOException, InterruptedException {
+    void customThemeAvailableEvenWhenDeleted() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -131,7 +172,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void customThemeBecomesAvailableAfterFileIsCreated() throws IOException, InterruptedException {
+    void customThemeBecomesAvailableAfterFileIsCreated() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(workspacePreferences.getTheme()).thenReturn(ThemePreset.JABREF);
@@ -152,7 +193,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void largeCustomThemeNotHeldInMemory() throws IOException, InterruptedException {
+    void largeCustomThemeNotHeldInMemory() throws IOException {
         // Create a temporary custom theme that is just a large comment over 48 kilobytes in size.
         Path largeCssTestFile = tempFolder.resolve("test.css");
         Files.createFile(largeCssTestFile);
@@ -189,7 +230,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void installThemeOnScene() throws IOException, InterruptedException {
+    void installThemeOnScene() throws IOException {
         Scene scene = mock(Scene.class);
         when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
         when(scene.getRoot()).thenReturn(mock(Parent.class));
@@ -212,7 +253,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    void liveReloadCssDataUrl() throws IOException, InterruptedException {
+    void liveReloadCssDataUrl() throws IOException {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -242,22 +283,113 @@ class ThemeManagerTest {
                 styleSheet.orElseThrow().getSceneStylesheetLocation(), "stylesheet embedded in data: url should have reloaded");
     }
 
-    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences) throws InterruptedException {
+    /// A third party can replace the scene root of a live window at any time -- ControlsFX injects its
+    /// DecorationPane on the first validation decoration. The font size is carried by a style class on the
+    /// root, so it has to move along instead of being stranded on the node that is no longer the root.
+    @Test
+    void fontSizeStyleClassFollowsSceneRootChange() {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        workspacePreferences.setShouldOverrideDefaultFontSize(true);
+        workspacePreferences.setMainFontSize(16);
+        createThemeManager(workspacePreferences);
+
+        Parent initialRoot = new StackPane();
+        AtomicReference<Stage> stage = new AtomicReference<>();
+        JavaFxExtension.invokeAndWait(() -> {
+            Stage newStage = new Stage();
+            newStage.setScene(new Scene(initialRoot));
+            newStage.show();
+            stage.set(newStage);
+        });
+
+        assertEquals(List.of("font-size-16"), fontSizeStyleClasses(initialRoot));
+
+        Parent replacementRoot = new StackPane();
+        JavaFxExtension.invokeAndWait(() -> {
+            stage.get().getScene().setRoot(replacementRoot);
+            stage.get().close();
+        });
+
+        assertEquals(List.of(), fontSizeStyleClasses(initialRoot), "the replaced root should not keep a stale font size");
+        assertEquals(List.of("font-size-16"), fontSizeStyleClasses(replacementRoot));
+    }
+
+    private static List<String> fontSizeStyleClasses(Parent parent) {
+        return parent.getStyleClass().stream().filter(styleClass -> styleClass.startsWith("font-size-")).toList();
+    }
+
+    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences) {
         return createThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
     }
 
-    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences, FileUpdateMonitor fileUpdateMonitor) throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-
+    private ThemeManager createThemeManager(WorkspacePreferences workspacePreferences, FileUpdateMonitor fileUpdateMonitor) {
         AtomicReference<ThemeManager> themeManager = new AtomicReference<>();
-        Platform.runLater(() -> {
-            themeManager.set(new ThemeManager(workspacePreferences, fileUpdateMonitor));
-            latch.countDown();
-        });
-
-        assertTrue(latch.await(10, TimeUnit.SECONDS), "Theme manager creation timed out");
+        JavaFxExtension.invokeAndWait(() -> themeManager.set(new ThemeManager(workspacePreferences, fileUpdateMonitor)));
 
         return themeManager.get();
+    }
+
+    /// Every [ThemeManager] created in this JVM watches all windows, so the test compares a window shown once
+    /// with one shown three times instead of counting absolute updates.
+    @Test
+    void reshownWindowFollowsItsSceneOnce() {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        workspacePreferences.setShouldOverrideDefaultFontSize(true);
+        workspacePreferences.setMainFontSize(16);
+        createThemeManager(workspacePreferences);
+
+        int shownOnce = styleClassChangesOnNewScene(1);
+        assertTrue(shownOnce > 0, "new scene should receive the font style class");
+        assertEquals(shownOnce, styleClassChangesOnNewScene(3));
+    }
+
+    @Test
+    void reshownWindowRemovesPreviousSceneListenerBeforeRegisteringItAgain() {
+        WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
+        workspacePreferences.setShouldOverrideDefaultFontSize(true);
+        workspacePreferences.setMainFontSize(16);
+        createThemeManager(workspacePreferences);
+
+        List<Integer> styleClassChanges = styleClassChangesAfterSceneReplacementOnReshownWindow(3);
+
+        assertTrue(styleClassChanges.getFirst() > 0, "new scene should receive the font style class");
+        assertEquals(List.of(styleClassChanges.getFirst(), styleClassChanges.getFirst(), styleClassChanges.getFirst()), styleClassChanges);
+    }
+
+    private static int styleClassChangesOnNewScene(int timesShown) {
+        StackPane root = new StackPane();
+        AtomicInteger styleClassChanges = new AtomicInteger();
+        root.getStyleClass().addListener((ListChangeListener<String>) _ -> styleClassChanges.incrementAndGet());
+        JavaFxExtension.invokeAndWait(() -> {
+            Stage stage = new Stage();
+            stage.setScene(new Scene(new StackPane()));
+            for (int i = 0; i < timesShown; i++) {
+                stage.show();
+                stage.hide();
+            }
+            stage.setScene(new Scene(root));
+        });
+        return styleClassChanges.get();
+    }
+
+    private static List<Integer> styleClassChangesAfterSceneReplacementOnReshownWindow(int timesShown) {
+        List<Integer> styleClassChanges = new ArrayList<>(timesShown);
+        JavaFxExtension.invokeAndWait(() -> {
+            Stage stage = new Stage();
+            stage.setScene(new Scene(new StackPane()));
+            for (int i = 0; i < timesShown; i++) {
+                stage.show();
+                stage.hide();
+
+                StackPane replacementRoot = new StackPane();
+                AtomicInteger replacementRootStyleClassChanges = new AtomicInteger();
+                replacementRoot.getStyleClass().addListener((ListChangeListener<String>) _ -> replacementRootStyleClassChanges.incrementAndGet());
+                stage.setScene(new Scene(replacementRoot));
+                styleClassChanges.add(replacementRootStyleClassChanges.get());
+            }
+            stage.close();
+        });
+        return styleClassChanges;
     }
 
     private void assertCustomStyleSheet(Optional<StyleSheet> styleSheet, StyleSheet customTheme, Path customCss) {

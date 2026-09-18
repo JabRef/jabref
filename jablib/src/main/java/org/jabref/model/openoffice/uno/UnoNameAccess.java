@@ -18,7 +18,7 @@ public class UnoNameAccess {
             WrappedTargetException {
         try {
             return UnoCast.cast(XTextContent.class, nameAccess.getByName(name));
-        } catch (NoSuchElementException ex) {
+        } catch (NoSuchElementException _) {
             return Optional.empty();
         }
     }

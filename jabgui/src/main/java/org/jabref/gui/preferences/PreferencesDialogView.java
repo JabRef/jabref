@@ -9,17 +9,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.TreeTableView;
-import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Region;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -76,33 +70,15 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     private void initialize() {
         viewModel = new PreferencesDialogViewModel(dialogService, preferences);
 
-        preferencesTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
-
-        // The list view does not respect the listener for the dialog and needs its own
-        preferencesTabList.setOnKeyReleased(key -> {
-            if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, key)) {
-                this.closeDialog();
-            }
-        });
-
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());
         preferencesTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
-        searchBox.textProperty().addListener((observable, previousText, newText) -> {
+        searchBox.textProperty().addListener((_, _, newText) -> {
             searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
             preferencesTabList.getSelectionModel().clearSelection();
             preferencesTabList.getSelectionModel().selectFirst();
         });
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
-
-        this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {
-                    this.closeDialog();
-                    event.consume();
-                }
-            }
-        });
 
         EasyBind.subscribe(preferencesTabList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab == null) {
@@ -113,10 +89,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             tabTitle.setText(tab.getTitle());
             Node content = tab.getContent();
             preferencesContainer.setContent(content);
-            if (content instanceof Region region) {
-                region.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
-            }
-            content.getStyleClass().add("preferencesTab");
+            content.getStyleClass().addAll("padding-4", "preferences-tab-content");
         });
 
         if (this.preferencesTabToSelectClass != null) {
