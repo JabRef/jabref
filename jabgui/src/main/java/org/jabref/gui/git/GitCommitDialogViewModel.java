@@ -139,7 +139,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         return pushTo(repository, committedNow);
     }
 
-     String generateCommitMessage(DiffDatabases diff) {
+    String generateCommitMessage(DiffDatabases diff) {
         BibDatabaseDiff databaseDiff = BibDatabaseDiff.compare(
                 diff.headDatabase(),
                 diff.workingTreeDatabase()
