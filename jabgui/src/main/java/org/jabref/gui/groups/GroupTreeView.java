@@ -1,5 +1,4 @@
 package org.jabref.gui.groups;
-import org.jabref.logic.util.io.FileUtil;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -68,6 +67,7 @@ import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
