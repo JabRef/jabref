@@ -29,6 +29,6 @@ public class LegacyGroupMembershipWarningAction implements GUIPostOpenAction {
         dialogService.showWarningDialogAndWait(
                 Localization.lang("Group memberships of %0 cannot be read", parserResult.getPath().map(Path::toString).orElse("")),
                 Localization.lang("This library was written by an old JabRef version. Its static groups appear empty, and saving the library removes their entries permanently.") + "\n\n" +
-                        Localization.lang("Create a backup copy of the library. To keep the group memberships, open and save the library once with JabRef 5.15 before using it with this version."));
+                        Localization.lang("Create a backup copy of the library. JabRef 5.15 converts the group memberships to the current format: open and save the library once with JabRef 5.15, then open it here again."));
     }
 }

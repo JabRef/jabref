@@ -26,7 +26,7 @@ Needs: impl, utest
 
 Libraries written by JabRef before 3.4 list the members of a static group inside the group instead of in the entries.
 JabRef does not convert this format anymore, so these groups show up empty and saving the library removes the memberships.
-When such a library is opened, JabRef warns about the loss and recommends a backup and opening and saving the library once with JabRef 5.15.
+When such a library is opened, JabRef warns about the loss and recommends a backup and opening and saving the library once with JabRef 5.15, which converts the memberships to the current format.
 
 Needs: impl, utest
 
