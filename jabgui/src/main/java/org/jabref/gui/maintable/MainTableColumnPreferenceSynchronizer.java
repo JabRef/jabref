@@ -108,10 +108,12 @@ class MainTableColumnPreferenceSynchronizer {
 
     /// Applies configured columns incrementally instead of replacing the whole columns list.
     ///
-    /// Rebuilding all columns with `setAll(...)` makes JavaFX tear down and recreate the visible
-    /// table structure, which noticeably slows saving preferences and causes a brief flicker where
-    /// the table contents disappear. Updating only added, removed, and reordered columns keeps the
-    /// table responsive and preserves existing column instances where possible.
+    /// A simpler listener that rebuilt all columns with `setAll(...)` technically refreshed the
+    /// table, but it made JavaFX tear down and recreate the visible table structure. That caused a
+    /// noticeable delay with a brief flicker where entries disappeared and reappeared, and it also
+    /// exposed transient states such as an empty sort order during the rebuild, which previously led
+    /// to a [NoSuchElementException] in [MainTable]. Updating only added, removed, and reordered
+    /// columns keeps the table responsive and preserves existing column instances where possible.
     private void applyConfiguredColumns() {
         List<MainTableColumnModel> preferredColumns = getConfiguredColumns();
 

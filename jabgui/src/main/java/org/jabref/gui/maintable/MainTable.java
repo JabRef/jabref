@@ -188,6 +188,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 return;
             }
 
+            // JavaFX can briefly clear the sort order while columns are being rebuilt or reordered.
+            // Guard the empty state here so a preference-driven update does not trigger the same
+            // `NoSuchElementException` that occurred with the earlier full-rebuild approach.
             TableColumn<BibEntryTableViewModel, ?> matchCategoryColumn = getColumns().getFirst();
             if (this.getSortOrder().isEmpty()) {
                 this.getSortOrder().addFirst(matchCategoryColumn);
