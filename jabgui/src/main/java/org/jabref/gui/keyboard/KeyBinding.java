@@ -131,7 +131,8 @@ public enum KeyBinding {
     GROUP_RENAME("Rename group", Localization.lang("Rename group"), "F2", KeyBindingCategory.EDIT),
     MERGE_WITH_FETCHED_ENTRY("Get bibliographic data from %0, \"DOI/ISBN/...\"", Localization.lang("Get bibliographic data from %0", "DOI/ISBN/..."), "F5", KeyBindingCategory.EDIT),
     LOOKUP_DOC_IDENTIFIER("Search document identifier online", Localization.lang("Search document identifier online"), "alt+F", "shortcut+alt+F", KeyBindingCategory.EDIT),
-    RENAME_FILE_TO_NAME("Rename file(s) to configured filename format pattern", Localization.lang("Rename file(s) to configured filename format pattern"), "shortcut+P", KeyBindingCategory.EDIT);
+    RENAME_FILE_TO_NAME("Rename file(s) to configured filename format pattern", Localization.lang("Rename file(s) to configured filename format pattern"), "shortcut+P", KeyBindingCategory.EDIT),
+    TOGGLE_SIDE_PANE("Toggle side pane", Localization.lang("Toggle side pane"), "shortcut+alt+P", KeyBindingCategory.VIEW);
 
     private final String constant;
     private final String localization;
