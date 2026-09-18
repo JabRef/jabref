@@ -51,6 +51,10 @@ public class PersistenceVisualStateTable {
         synchronizeObservedColumns();
     }
 
+    /// Releases listeners owned by this helper when the table is discarded.
+    ///
+    /// The width and sort-type listeners are attached to column models, not just to the table, so
+    /// they must be removed explicitly to avoid retaining removed columns.
     public void dispose() {
         if (!listenersInstalled) {
             return;
@@ -63,6 +67,9 @@ public class PersistenceVisualStateTable {
         new ArrayList<>(observedColumnModels.keySet()).forEach(this::stopObservingColumnModel);
     }
 
+    /// Temporarily suppresses preference write-back while programmatic synchronization mutates the
+    /// live table. Without this guard, preference-driven changes would be observed as fresh user
+    /// edits and written straight back into the same preferences.
     public void runWithoutPersisting(Runnable operation) {
         persistenceSuppressionDepth++;
         try {
@@ -98,6 +105,9 @@ public class PersistenceVisualStateTable {
         preferences.setColumnSortOrder(toList(table.getSortOrder()));
     }
 
+    /// Column models come and go as the visible table columns change. Keep the per-model width and
+    /// sort listeners aligned with the current table contents so removed models stop updating the
+    /// preferences and can be garbage-collected.
     private void synchronizeObservedColumns() {
         Set<MainTableColumnModel> currentModels = table.getColumns().stream()
                                                        .filter(MainTableColumn.class::isInstance)

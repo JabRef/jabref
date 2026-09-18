@@ -186,6 +186,10 @@ public class MainTableColumnModel {
                            .toList();
     }
 
+    /// Returns whether this model may appear in the user-editable entry-table column preferences.
+    ///
+    /// Internal helper columns such as `MATCH_CATEGORY`, and typed columns missing their qualifier,
+    /// are valid implementation details but must not be persisted or reconstructed from user input.
     public boolean isConfigurable() {
         return switch (getType()) {
             case MATCH_CATEGORY,

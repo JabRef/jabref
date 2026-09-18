@@ -14,6 +14,11 @@ import org.jabref.gui.maintable.columns.MainTableColumn;
 
 import org.jspecify.annotations.NullMarked;
 
+/// Keeps the visible main-table columns synchronized with the long-lived column preferences.
+///
+/// This is the preference-to-UI direction of synchronization: it applies saved or newly edited
+/// preferences back to the live table, preserves existing column instances where possible, and
+/// ignores internal column models that are not meant to be user-configurable.
 @NullMarked
 class MainTableColumnPreferenceSynchronizer {
 
@@ -54,6 +59,9 @@ class MainTableColumnPreferenceSynchronizer {
         listenersInstalled = true;
     }
 
+    /// The preferences outlive an individual [MainTable], so these listeners need explicit cleanup
+    /// when a library tab closes. Otherwise stale tables would remain reachable and still react to
+    /// later preference changes.
     void dispose() {
         if (!listenersInstalled) {
             return;
