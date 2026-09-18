@@ -1,4 +1,5 @@
 package org.jabref.gui.groups;
+import org.jabref.logic.util.io.FileUtil;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -462,7 +463,12 @@ public class GroupTreeView extends BorderPane {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
+            List<Path> files = dragboard.getFiles().stream() .map(File::toPath) .map(FileUtil::resolveIfShortcut) .toList();
+            if (!importHandler.confirmBibFileImportIfNecessary(files)) {
+                event.setDropCompleted(false);
+                event.consume();
+                return;
+            }
             stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));
             importHandler.importFilesInBackground(files, event.getTransferMode())
                          .executeWith(taskExecutor);
