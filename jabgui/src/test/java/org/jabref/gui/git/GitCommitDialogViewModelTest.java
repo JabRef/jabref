@@ -54,7 +54,7 @@ class GitCommitDialogViewModelTest {
         GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(gitPreferences.getPat()).thenReturn("");
         gitHandlerRegistry = new GitHandlerRegistry(gitPreferences);
-        viewModel = new GitCommitDialogViewModel(stateManager, dialogService, new CurrentThreadTaskExecutor(), gitHandlerRegistry, mock(ImportFormatPreferences.class), new DummyFileUpdateMonitor());
+        viewModel = new GitCommitDialogViewModel(stateManager, dialogService, new CurrentThreadTaskExecutor(), gitHandlerRegistry, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
     @AfterEach
