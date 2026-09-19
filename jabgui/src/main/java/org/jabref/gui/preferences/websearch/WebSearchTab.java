@@ -84,6 +84,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                         .flow(toggles -> toggles
                                         .checkbox(Localization.lang("Enable web search"), viewModel.enableWebSearchProperty())
                                         .checkbox(Localization.lang("Warn about duplicates on import"), viewModel.warnAboutDuplicatesOnImportProperty())
+                                        .checkbox(Localization.lang("Warn before importing a BibTeX file into the current library"), viewModel.warnAboutBibFileImportProperty())
                                         .checkbox(Localization.lang("Download referenced files (PDFs, ...)"), viewModel.shouldDownloadLinkedOnlineFiles())
                                         .checkbox(Localization.lang("Store url for downloaded file"), viewModel.shouldKeepDownloadUrl()),
                                 toggleRow -> toggleRow.styleClass("gap-4"))
