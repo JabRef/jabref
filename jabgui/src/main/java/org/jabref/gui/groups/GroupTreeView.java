@@ -471,7 +471,7 @@ public class GroupTreeView extends BorderPane {
             importHandler.importFilesInBackground(files, event.getTransferMode())
                          .executeWith(taskExecutor);
             success = true;
-        } else if (localDragboard.hasBibEntries()) {
+        } else if (shouldAssignLocalEntries(dragboard, localDragboard)) {
             List<BibEntry> entries = localDragboard.getBibEntries();
             stateManager.getActiveDatabase().ifPresent(database ->
                     stateManager.getUndoManager(database).addEdit(
@@ -481,6 +481,10 @@ public class GroupTreeView extends BorderPane {
         }
         event.setDropCompleted(success);
         event.consume();
+    }
+
+    static boolean shouldAssignLocalEntries(Dragboard dragboard, CustomLocalDragboard localDragboard) {
+        return !dragboard.hasFiles() && localDragboard.hasBibEntries();
     }
 
     private void handleOnDragOver(TreeTableRow<GroupNodeViewModel> row, GroupNodeViewModel originalItem, DragEvent event) {
