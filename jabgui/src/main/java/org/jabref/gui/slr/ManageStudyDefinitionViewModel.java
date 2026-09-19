@@ -3,6 +3,7 @@ package org.jabref.gui.slr;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +35,7 @@ import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyCatalog;
 import org.jabref.model.study.StudyQuery;
@@ -132,7 +134,8 @@ public class ManageStudyDefinitionViewModel {
                                        StudyCatalog savedCatalog = catalogsByName.get(name);
                                        boolean enabled = savedCatalog != null && savedCatalog.isEnabled();
                                        String reason = savedCatalog != null ? savedCatalog.getReason() : "";
-                                       return new StudyCatalogItem(name, enabled, reason);
+                                       String nativeQuery = findNativeQueryForCatalog(name);
+                                       return new StudyCatalogItem(name, enabled, reason, nativeQuery);
                                    })
                                    .toList());
 
@@ -141,6 +144,16 @@ public class ManageStudyDefinitionViewModel {
         this.dialogService = dialogService;
 
         initializeValidationBindings();
+    }
+
+    private String findNativeQueryForCatalog(String catalogName) {
+        return queries.stream()
+                      .flatMap(query -> query.getCatalogSpecific().entrySet().stream())
+                      .filter(entry -> entry.getKey().equalsIgnoreCase(catalogName))
+                      .map(Map.Entry::getValue)
+                      .filter(StringUtil::isNotBlank)
+                      .findFirst()
+                      .orElse("");
     }
 
     private void initializeValidationBindings() {
@@ -264,6 +277,7 @@ public class ManageStudyDefinitionViewModel {
 
     /// Builds a [Study] from the current UI state without persisting it.
     public Study buildStudy() {
+        applyNativeQueryOverrides();
         return new Study(
                 authors,
                 title.getValueSafe(),
@@ -273,6 +287,27 @@ public class ManageStudyDefinitionViewModel {
                         .filter(StudyCatalogItem::isEnabled)
                         .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason()))
                         .toList());
+    }
+
+    private void applyNativeQueryOverrides() {
+        List<StudyCatalogItem> enabledCatalogs = catalogs.stream()
+                                                         .filter(StudyCatalogItem::isEnabled)
+                                                         .toList();
+        for (StudyQuery query : queries) {
+            Map<String, String> original = query.getCatalogSpecific();
+            Map<String, String> updated = new LinkedHashMap<>(original);
+            for (StudyCatalogItem catalog : enabledCatalogs) {
+                String name = catalog.getName();
+                updated.keySet().removeIf(key -> key.equalsIgnoreCase(name));
+                String nativeQuery = catalog.getNativeQuery();
+                if (StringUtil.isNotBlank(nativeQuery)) {
+                    updated.put(name, nativeQuery);
+                }
+            }
+            if (!updated.equals(original)) {
+                query.setCatalogSpecific(updated);
+            }
+        }
     }
 
     public Property<String> titleProperty() {

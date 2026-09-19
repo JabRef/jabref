@@ -955,6 +955,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when shutting down Git pull scheduler", e);
         }
 
+        if (mainTable != null) {
+            mainTable.dispose();
+        }
+
         if (tableModel != null) {
             tableModel.unbind();
         }
