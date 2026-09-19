@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @NullMarked
 class CommandLineParserTest {
 
-    private static Stream<Arguments> splitCommandLine() {
+    private static Stream<Arguments> toArguments() {
         return Stream.of(
                 Arguments.of(
                         List.of("gnome-terminal", "--working-directory=/tmp"),
@@ -63,7 +63,7 @@ class CommandLineParserTest {
 
     @ParameterizedTest
     @MethodSource
-    void splitCommandLine(List<String> expected, String commandLine, String directory) {
+    void toArguments(List<String> expected, String commandLine, String directory) {
         assertEquals(expected, CommandLineParser.toArguments(commandLine, directory));
     }
 }

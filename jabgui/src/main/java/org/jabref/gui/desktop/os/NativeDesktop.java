@@ -30,7 +30,6 @@ import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -266,17 +265,13 @@ public abstract class NativeDesktop {
     }
 
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        if (StringUtil.isBlank(command)) {
-            return;
-        }
-
-        LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
-        dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
-
         List<String> subcommands = CommandLineParser.toArguments(command, absolutePath);
         if (subcommands.isEmpty()) {
             return;
         }
+
+        LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", subcommands);
+        dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(subcommands);
@@ -288,13 +283,6 @@ public abstract class NativeDesktop {
 
             HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
             HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
-
-            process.onExit().thenAccept(p -> {
-                if (p.exitValue() != 0) {
-                    LoggerFactory.getLogger(NativeDesktop.class).warn("Command \"{}\" finished with non-zero exit code: {}", command, p.exitValue());
-                    dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
-                }
-            });
         } catch (IOException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error during command execution", exception);
             dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
