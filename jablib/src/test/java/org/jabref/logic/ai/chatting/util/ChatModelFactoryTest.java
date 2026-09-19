@@ -4,11 +4,13 @@ import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 class ChatModelFactoryTest {
 
     /// Building a model must not fail on module-path service loading (e.g., a missing `uses` for Mistral AI's builder factory)
