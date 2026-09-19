@@ -54,7 +54,13 @@ class GitCommitDialogViewModelTest {
         GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(gitPreferences.getPat()).thenReturn("");
         gitHandlerRegistry = new GitHandlerRegistry(gitPreferences);
-        viewModel = new GitCommitDialogViewModel(stateManager, dialogService, new CurrentThreadTaskExecutor(), gitHandlerRegistry, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+        viewModel = new GitCommitDialogViewModel(
+                stateManager,
+                dialogService,
+                new CurrentThreadTaskExecutor(),
+                gitHandlerRegistry,
+                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                new DummyFileUpdateMonitor());
     }
 
     @AfterEach
@@ -85,7 +91,9 @@ class GitCommitDialogViewModelTest {
         viewModel.commit(() -> {
         });
 
-        verify(dialogService).showErrorDialogAndWait(Localization.lang("Git commit failed"), Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again."));
+        verify(dialogService).showErrorDialogAndWait(
+                Localization.lang("Git commit failed"),
+                Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again."));
     }
 
     @Test
