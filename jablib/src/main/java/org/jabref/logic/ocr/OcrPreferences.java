@@ -4,6 +4,8 @@ import java.util.List;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -16,16 +18,22 @@ public class OcrPreferences {
     private final StringProperty ocrEnginePath;
     private final ObjectProperty<PagesWithTextHandling> pagesWithTextHandling;
     private final ListProperty<OcrLanguage> ocrLanguages;
+    private final BooleanProperty useEasyOcr;
 
     private OcrPreferences() {
         this("ocrmypdf", PagesWithTextHandling.SKIP, EngineSelection.OCRMYPDF, List.of(OcrLanguage.ENGLISH));
     }
 
     public OcrPreferences(String ocrEnginePath, PagesWithTextHandling pagesWithTextHandling, EngineSelection engineSelection, List<OcrLanguage> ocrLanguages) {
+        this(ocrEnginePath, pagesWithTextHandling, engineSelection, ocrLanguages, false);
+    }
+
+    public OcrPreferences(String ocrEnginePath, PagesWithTextHandling pagesWithTextHandling, EngineSelection engineSelection, List<OcrLanguage> ocrLanguages, boolean useEasyOcr) {
         this.ocrEnginePath = new SimpleStringProperty(ocrEnginePath);
         this.pagesWithTextHandling = new SimpleObjectProperty<>(pagesWithTextHandling);
         this.engineSelection = new SimpleObjectProperty<>(engineSelection);
         this.ocrLanguages = new SimpleListProperty<>(FXCollections.observableArrayList(ocrLanguages));
+        this.useEasyOcr = new SimpleBooleanProperty(useEasyOcr);
     }
 
     public EngineSelection getEngineSelection() {
@@ -74,6 +82,18 @@ public class OcrPreferences {
 
     public void setOcrLanguages(ObservableList<OcrLanguage> ocrLanguages) {
         this.ocrLanguages.setAll(ocrLanguages);
+    }
+
+    public boolean getUseEasyOcr() {
+        return useEasyOcr.get();
+    }
+
+    public BooleanProperty useEasyOcrProperty() {
+        return useEasyOcr;
+    }
+
+    public void setUseEasyOcr(boolean useEasyOcr) {
+        this.useEasyOcr.set(useEasyOcr);
     }
 
     public static OcrPreferences getDefault() {

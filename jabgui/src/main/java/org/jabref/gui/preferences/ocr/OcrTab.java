@@ -39,7 +39,9 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
                 .section(Localization.lang("OCR engine"), engine -> engine
                         .combo(Localization.lang("Engine selection"),
                                 viewModel.engineOptions(), viewModel.selectedEngineProperty(), EngineSelection::getDisplayName)
-                        .custom(buildEnginePathRow()))
+                        .custom(buildEnginePathRow())
+
+                .checkbox(Localization.lang("Use EasyOCR plugin (OCRmyPDF only)"), viewModel.useEasyOcrProperty()))
 
                 .section(Localization.lang("OCR languages"), languages -> languages
                         .custom(buildLanguagesRow()))

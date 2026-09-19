@@ -420,6 +420,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
     private static final String PAGES_WITH_TEXT = "pagesHaveText";
     private static final String OCR_LANGUAGES = "ocrLanguages";
+    private static final String OCR_USE_EASY_OCR = "ocrUseEasyOcr";
     // endregion
 
     // region Push to application preferences
@@ -2205,11 +2206,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
                 PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())),
                 EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())),
-                ocrLanguagesToLoad);
+                ocrLanguagesToLoad,
+                getBoolean(OCR_USE_EASY_OCR, defaultValues.getUseEasyOcr()));
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
         bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
+        bindBoolean(ocrPreferences.useEasyOcrProperty(), OCR_USE_EASY_OCR, defaultValues.getUseEasyOcr());
 
         ocrPreferences.getOcrLanguages().addListener((ListChangeListener<OcrLanguage>) _ ->
                 putStringList(OCR_LANGUAGES, ocrPreferences.getOcrLanguages().stream()

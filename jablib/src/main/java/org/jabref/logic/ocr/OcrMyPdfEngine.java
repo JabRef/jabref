@@ -56,6 +56,10 @@ public class OcrMyPdfEngine implements OcrEngine {
             command.add("-l");
             command.add(String.join("+", languages));
         }
+        if (ocrPreferences.getUseEasyOcr()) {
+            command.add("--plugin");
+            command.add("ocrmypdf_easyocr");
+        }
         command.add(pdfPath.toString());
         command.add(outputFile);
         OcrResult ocrResult = OcrUtils.performOcr(command, getName());

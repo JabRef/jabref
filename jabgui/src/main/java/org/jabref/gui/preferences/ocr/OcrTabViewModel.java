@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -56,6 +58,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             new SimpleListProperty<>(FXCollections.observableArrayList(PagesWithTextHandling.values()));
     private final ListProperty<OcrLanguage> ocrLanguageOptions = new SimpleListProperty<>(FXCollections.observableArrayList(OcrLanguage.values()));
     private final ObservableList<OcrLanguage> selectedOcrLanguages = FXCollections.observableArrayList();
+    private final BooleanProperty useEasyOcr = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -90,6 +93,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         ocrEnginePath.setValue(ocrPreferences.getOcrEnginePath());
         selectedPagesHaveText.setValue(ocrPreferences.getPagesHaveText());
         selectedOcrLanguages.setAll(ocrPreferences.getOcrLanguages());
+        useEasyOcr.setValue(ocrPreferences.getUseEasyOcr());
         isInitializing = false;
     }
 
@@ -99,10 +103,15 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         ocrPreferences.setOcrEnginePath(ocrEnginePath.getValue());
         ocrPreferences.setPagesHaveText(selectedPagesHaveText.getValue());
         ocrPreferences.setOcrLanguages(selectedOcrLanguages);
+        ocrPreferences.setUseEasyOcr(useEasyOcr.getValue());
     }
 
     public StringProperty ocrEnginePathProperty() {
         return ocrEnginePath;
+    }
+
+    public BooleanProperty useEasyOcrProperty() {
+        return useEasyOcr;
     }
 
     public ObjectProperty<EngineSelection> selectedEngineProperty() {
