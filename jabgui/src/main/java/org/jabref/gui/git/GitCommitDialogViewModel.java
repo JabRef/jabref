@@ -59,13 +59,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     private final Validator commitMessageValidator;
 
-    public GitCommitDialogViewModel(
-            StateManager stateManager,
-            DialogService dialogService,
-            TaskExecutor taskExecutor,
-            GitHandlerRegistry gitHandlerRegistry,
-            ImportFormatPreferences importFormatPreferences,
-            FileUpdateMonitor fileUpdateMonitor) {
+    public GitCommitDialogViewModel(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor, GitHandlerRegistry gitHandlerRegistry, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -73,11 +67,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
-        this.commitMessageValidator = new FunctionBasedValidator<>(
-                commitMessage,
-                message -> message != null && !message.isBlank(),
-                ValidationMessage.error(Localization.lang("Commit message cannot be empty"))
-        );
+        this.commitMessageValidator = new FunctionBasedValidator<>(commitMessage, message -> message != null && !message.isBlank(), ValidationMessage.error(Localization.lang("Commit message cannot be empty")));
     }
 
     public void commit(Runnable onSuccess) {
@@ -89,22 +79,14 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     }
 
     private void commitAction(Runnable onSuccess, BackgroundTask<CommitOutcome> task) {
-        task
-                .onSuccess(outcome -> {
-                    dialogService.notify(messageFor(outcome));
-                    onSuccess.run();
-                })
-                .onFailure(ex -> {
-                    LOGGER.warn("Git commit failed", ex);
-                    String message = localizedFailureMessage(ex);
-                    dialogService.showErrorDialogAndWait(
-                            ex instanceof PushFailedException
-                            ? Localization.lang("Git push failed")
-                            : Localization.lang("Git commit failed"),
-                            message
-                    );
-                })
-                .executeWith(taskExecutor);
+        task.onSuccess(outcome -> {
+            dialogService.notify(messageFor(outcome));
+            onSuccess.run();
+        }).onFailure(ex -> {
+            LOGGER.warn("Git commit failed", ex);
+            String message = localizedFailureMessage(ex);
+            dialogService.showErrorDialogAndWait(ex instanceof PushFailedException ? Localization.lang("Git push failed") : Localization.lang("Git commit failed"), message);
+        }).executeWith(taskExecutor);
     }
 
     private BackgroundTask<CommitOutcome> commitTask() {
@@ -140,10 +122,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     }
 
     String generateCommitMessage(DiffDatabases diff) {
-        BibDatabaseDiff databaseDiff = BibDatabaseDiff.compare(
-                diff.headDatabase(),
-                diff.workingTreeDatabase()
-        );
+        BibDatabaseDiff databaseDiff = BibDatabaseDiff.compare(diff.headDatabase(), diff.workingTreeDatabase());
 
         int added = 0;
         int deleted = 0;
@@ -162,24 +141,18 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         List<String> changes = new ArrayList<>();
 
         if (added > 0) {
-            changes.add(Localization.lang(
-                    added == 1 ? "Add %0 entry" : "Add %0 entries",
-                    added
-            ));
+            String addedText = added == 1 ? Localization.lang("Add %0 entry", String.valueOf(added)) : Localization.lang("Add %0 entries", String.valueOf(added));
+            changes.add(addedText);
         }
 
         if (deleted > 0) {
-            changes.add(Localization.lang(
-                    deleted == 1 ? "Delete %0 entry" : "Delete %0 entries",
-                    deleted
-            ));
+            String deletedText = deleted == 1 ? Localization.lang("Delete %0 entry", String.valueOf(deleted)) : Localization.lang("Delete %0 entries", String.valueOf(deleted));
+            changes.add(deletedText);
         }
 
         if (modified > 0) {
-            changes.add(Localization.lang(
-                    modified == 1 ? "Modify %0 entry" : "Modify %0 entries",
-                    modified
-            ));
+            String modifiedText = modified == 1 ? Localization.lang("Modify %0 entry", String.valueOf(modified)) : Localization.lang("Modify %0 entries", String.valueOf(modified));
+            changes.add(modifiedText);
         }
 
         return String.join(", ", changes);
@@ -205,10 +178,8 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         Path repositoryRoot = trackedFile.gitHandler().getRepositoryPathAsFile().toPath();
         Path relativeFilePath = repositoryRoot.relativize(trackedFile.bibFilePath());
 
-        BibDatabaseContext headDatabase = GitDiffChecker.checkDiffAgainstLastCommit(
-                trackedFile.gitHandler(), relativeFilePath, importFormatPreferences, fileUpdateMonitor);
-        BibDatabaseContext workingTreeDatabase = GitDiffChecker.checkSavedWorkingTreeVersion(
-                trackedFile.bibFilePath(), importFormatPreferences, fileUpdateMonitor);
+        BibDatabaseContext headDatabase = GitDiffChecker.checkDiffAgainstLastCommit(trackedFile.gitHandler(), relativeFilePath, importFormatPreferences, fileUpdateMonitor);
+        BibDatabaseContext workingTreeDatabase = GitDiffChecker.checkSavedWorkingTreeVersion(trackedFile.bibFilePath(), importFormatPreferences, fileUpdateMonitor);
         return new DiffDatabases(headDatabase, workingTreeDatabase);
     }
 
@@ -232,8 +203,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         }
 
         // getTrackedBibFile() already ensured an active database exists.
-        BibDatabaseContext dbContext = stateManager.getActiveDatabase()
-                                                   .orElseThrow(() -> new JabRefException(Localization.lang("No library open")));
+        BibDatabaseContext dbContext = stateManager.getActiveDatabase().orElseThrow(() -> new JabRefException(Localization.lang("No library open")));
         return new ResolvedRepository(dbContext, trackedFile.bibFilePath(), gitHandler);
     }
 
@@ -260,8 +230,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     private CommitOutcome pushTo(ResolvedRepository repository, boolean committedNow) throws PushFailedException {
         try {
-            PushResult result = GitSyncService.create(importFormatPreferences, gitHandlerRegistry)
-                                              .push(repository.database(), repository.bibFilePath());
+            PushResult result = GitSyncService.create(importFormatPreferences, gitHandlerRegistry).push(repository.database(), repository.bibFilePath());
             if (result.noop() && !committedNow) {
                 return CommitOutcome.NOTHING_TO_PUSH;
             }
@@ -312,19 +281,14 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     /// What a finished dialog action actually achieved, so the user can be told the truth about it.
     private enum CommitOutcome {
-        COMMITTED,
-        COMMITTED_AND_PUSHED,
-        PUSHED,
-        NOTHING_TO_PUSH
+        COMMITTED, COMMITTED_AND_PUSHED, PUSHED, NOTHING_TO_PUSH
     }
 
     private static class PushFailedException extends JabRefException {
         /// Claiming "the commit was saved" is only honest when this attempt actually created one:
         /// the push may also fail with nothing newly committed (e.g. retrying after a failed push).
         PushFailedException(Throwable cause, boolean committedNow) {
-            super(committedNow
-                  ? Localization.lang("The commit was saved locally, but the push failed: %0", causeMessage(cause))
-                  : Localization.lang("Push failed: %0", causeMessage(cause)), cause);
+            super(committedNow ? Localization.lang("The commit was saved locally, but the push failed: %0", causeMessage(cause)) : Localization.lang("Push failed: %0", causeMessage(cause)), cause);
         }
 
         private static String causeMessage(Throwable cause) {
