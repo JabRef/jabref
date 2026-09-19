@@ -19,4 +19,7 @@ public interface ChatHistoryRepository {
     boolean isEmpty(ChatIdentifier chatIdentifier);
 
     int size(ChatIdentifier chatIdentifier);
+
+    /// Makes all previous changes durable. The MVStore-backed implementation runs with auto-commit disabled.
+    void commit();
 }

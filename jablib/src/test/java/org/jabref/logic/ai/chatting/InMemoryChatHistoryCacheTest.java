@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.logic.ai.chatting.repositories.ChatHistoryRepository;
+import org.jabref.logic.ai.chatting.util.ChatHistoryUtils;
 import org.jabref.model.ai.chatting.ChatIdentifier;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.chatting.ChatType;
@@ -96,19 +97,130 @@ class InMemoryChatHistoryCacheTest {
     }
 
     @Test
-    void closeSkipsEntriesRemovedFromDatabase() {
+    void addedMessageIsPersistedBeforeClose() {
+        BibEntry entry = new BibEntry().withCitationKey("Write2024");
+        databaseContext.getDatabase().insertEntry(entry);
+
+        cache.getForEntry(databaseContext, entry).add(ChatMessage.userMessage("written through"));
+
+        ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Write2024");
+        assertEquals(List.of("written through"), fakeRepository.getAllMessages(id).stream().map(ChatMessage::content).toList());
+    }
+
+    @Test
+    void deleteAndRegenerateArePersisted() {
+        BibEntry entry = new BibEntry().withCitationKey("Edit2024");
+        databaseContext.getDatabase().insertEntry(entry);
+        ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Edit2024");
+
+        var history = cache.getForEntry(databaseContext, entry);
+        ChatMessage first = ChatMessage.userMessage(Instant.ofEpochMilli(1000), "first");
+        ChatMessage second = ChatMessage.userMessage(Instant.ofEpochMilli(2000), "second");
+        ChatMessage third = ChatMessage.userMessage(Instant.ofEpochMilli(3000), "third");
+        history.addAll(first, second, third);
+
+        ChatHistoryUtils.delete(history, third.id());
+        assertEquals(List.of("first", "second"), fakeRepository.getAllMessages(id).stream().map(ChatMessage::content).toList());
+
+        ChatHistoryUtils.regenerate(history, second.id());
+        assertEquals(List.of("first"), fakeRepository.getAllMessages(id).stream().map(ChatMessage::content).toList());
+    }
+
+    @Test
+    void invalidIdentifierAtLoadDoesNotWipeStoredHistory() {
+        ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Dup2024");
+        fakeRepository.addMessage(id, ChatMessage.userMessage("stored"));
+
+        BibEntry entry = new BibEntry().withCitationKey("Dup2024");
+        BibEntry duplicate = new BibEntry().withCitationKey("Dup2024");
+        databaseContext.getDatabase().insertEntries(entry, duplicate);
+
+        var history = cache.getForEntry(databaseContext, entry);
+        assertTrue(history.isEmpty());
+
+        databaseContext.getDatabase().removeEntry(duplicate);
+        cache.close();
+
+        assertEquals(1, fakeRepository.getAllMessages(id).size());
+        assertEquals("stored", fakeRepository.getAllMessages(id).getFirst().content());
+    }
+
+    @Test
+    void addedMessageIsCommitted() {
+        BibEntry entry = new BibEntry().withCitationKey("Commit2024");
+        databaseContext.getDatabase().insertEntry(entry);
+
+        cache.getForEntry(databaseContext, entry).add(ChatMessage.userMessage("durable"));
+
+        assertEquals(1, fakeRepository.commits);
+    }
+
+    @Test
+    void clearingChatThatBecameValidAfterLoadIsPersisted() {
+        ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Late2024");
+        BibEntry entry = new BibEntry().withCitationKey("Late2024");
+        BibEntry duplicate = new BibEntry().withCitationKey("Late2024");
+        databaseContext.getDatabase().insertEntries(entry, duplicate);
+
+        var history = cache.getForEntry(databaseContext, entry);
+        databaseContext.getDatabase().removeEntry(duplicate);
+
+        history.add(ChatMessage.userMessage("late"));
+        assertEquals(1, fakeRepository.getAllMessages(id).size());
+
+        history.clear();
+        assertTrue(fakeRepository.getAllMessages(id).isEmpty());
+    }
+
+    @Test
+    void renamingTwiceLeavesNoStaleChat() {
+        BibEntry entry = new BibEntry().withCitationKey("A");
+        databaseContext.getDatabase().insertEntry(entry);
+        var history = cache.getForEntry(databaseContext, entry);
+        history.add(ChatMessage.userMessage("first"));
+
+        entry.setCitationKey("B");
+        history.add(ChatMessage.userMessage("second"));
+        entry.setCitationKey("C");
+        history.add(ChatMessage.userMessage("third"));
+
+        assertEquals(List.of(), fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "A")));
+        assertEquals(List.of(), fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "B")));
+        assertEquals(List.of("first", "second", "third"), fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "C")).stream().map(ChatMessage::content).toList());
+    }
+
+    @Test
+    void retainedListDoesNotWriteAfterRemovalOrClose() {
+        BibEntry entry = new BibEntry().withCitationKey("Gone2024");
+        databaseContext.getDatabase().insertEntry(entry);
+        ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Gone2024");
+
+        var removed = cache.getForEntry(databaseContext, entry);
+        cache.removeEntry(entry);
+        removed.add(ChatMessage.userMessage("after removal"));
+        assertTrue(fakeRepository.getAllMessages(id).isEmpty());
+
+        var retained = cache.getForEntry(databaseContext, entry);
+        cache.close();
+        retained.add(ChatMessage.userMessage("after close"));
+        assertTrue(fakeRepository.getAllMessages(id).isEmpty());
+    }
+
+    @Test
+    void messagesAfterEntryRemovalAreNotPersisted() {
         BibEntry entry = new BibEntry().withCitationKey("Deleted2024");
         databaseContext.getDatabase().insertEntry(entry);
 
         var history = cache.getForEntry(databaseContext, entry);
-        history.add(ChatMessage.userMessage("should not be persisted"));
+        history.add(ChatMessage.userMessage("persisted"));
 
         databaseContext.getDatabase().removeEntry(entry);
+        history.add(ChatMessage.userMessage("should not be persisted"));
 
         cache.close();
 
         ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Deleted2024");
-        assertTrue(fakeRepository.getAllMessages(id).isEmpty());
+        assertEquals(List.of("persisted"), fakeRepository.getAllMessages(id).stream().map(ChatMessage::content).toList());
     }
 
     @Test
@@ -142,6 +254,7 @@ class InMemoryChatHistoryCacheTest {
     private static class FakeChatHistoryRepository implements ChatHistoryRepository {
 
         private final Map<String, List<ChatMessage>> store = new HashMap<>();
+        private int commits;
 
         private String key(ChatIdentifier id) {
             return id.libraryId() + "/" + id.chatType() + "/" + id.chatName();
@@ -175,6 +288,11 @@ class InMemoryChatHistoryCacheTest {
         @Override
         public int size(ChatIdentifier chatIdentifier) {
             return getAllMessages(chatIdentifier).size();
+        }
+
+        @Override
+        public void commit() {
+            commits++;
         }
     }
 }
