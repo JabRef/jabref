@@ -70,9 +70,22 @@ public class BaseDialog<T> extends Dialog<T> {
         dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyEvent);
     }
 
+    /// [impl->req~ux.dialogs.escape-closes~1]
+    /// Heavy-weight dialogs such as the PDF viewer override this to keep their state on a stray Escape.
+    protected boolean closesOnEscape() {
+        return true;
+    }
+
     private void handleKeyEvent(KeyEvent event) {
-        boolean closed = closeOnKeyBindingMatch(event, this);
-        if (closed) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            if (closesOnEscape()) {
+                close();
+            }
+            // JavaFX's own stage handler closes a dialog with a cancel button on an unconsumed Escape
+            event.consume();
+            return;
+        }
+        if (closeOnKeyBindingMatch(event, this)) {
             return;
         }
 
