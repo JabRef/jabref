@@ -182,6 +182,140 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void copySelectedTextFromHighlightedJsonBlockKeepsFences() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdownWithJsonHighlighting("```json\n{\"a\": 1}\n```");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            assertTrue(textFlow.isSelectionActive());
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("```json\n{\"a\": 1}\n```", clipBoardManager.stringContent.get());
+        assertTrue(clipBoardManager.htmlContent.get().contains("<code"));
+    }
+
+    @Test
+    void jsonAnswerIsHighlighted() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> textFlow.setMarkdownWithJsonHighlighting("{\"a\": 1}"));
+
+        assertTrue(hasChildWithStyleClass(textFlow, "json-key"));
+    }
+
+    @Test
+    void copiedJsonAnswerKeepsMarkdownInsideStringsLiteral() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdownWithJsonHighlighting("{\"a\": \"**not bold**\"}");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("{\n  \"a\": \"**not bold**\"\n}", clipBoardManager.stringContent.get());
+        assertFalse(clipBoardManager.htmlContent.get().contains("<strong>"));
+    }
+
+    @Test
+    void copiedJsonAnswerKeepsBackticksLiteral() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdownWithJsonHighlighting("{\"a\": \"```\"}");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("{\n  \"a\": \"```\"\n}", clipBoardManager.stringContent.get());
+        assertTrue(clipBoardManager.htmlContent.get().contains("```"));
+    }
+
+    @Test
+    void jsonIsLeftAloneWithoutHighlighting() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> textFlow.setMarkdown("{\"a\": 1}"));
+
+        assertFalse(hasChildWithStyleClass(textFlow, "json-key"));
+    }
+
+    @Test
+    void tokenDenseJsonIsNotHighlighted() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+        // Short enough to be formatted, but far too many tokens to give each one its own node.
+        String hugeJson = "{\"a\": [" + "1, ".repeat(5_000) + "1]}";
+
+        interact(() -> textFlow.setMarkdownWithJsonHighlighting(hugeJson));
+
+        assertFalse(hasChildWithStyleClass(textFlow, "json-key"));
+    }
+
+    @Test
+    void copySelectedTextFromCodeBlockKeepsBlankLines() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdown("```java\nint a;\n\nint b;\n```");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            assertTrue(textFlow.isSelectionActive());
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("```java\nint a;\n\nint b;\n```", clipBoardManager.stringContent.get());
+    }
+
+    @Test
+    void copySelectedTextFromCodeBlockKeepsATrailingBlankLine() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdown("```java\nint a;\n\n```");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        interact(() -> {
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("```java\nint a;\n\n```", clipBoardManager.stringContent.get());
+    }
+
+    @Test
     void copySelectedTextFromMarkdownUsesMarkdownClipboardContent() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
