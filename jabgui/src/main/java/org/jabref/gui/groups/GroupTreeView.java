@@ -67,7 +67,6 @@ import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -458,7 +457,6 @@ public class GroupTreeView extends BorderPane {
 
             List<Path> files = dragboard.getFiles().stream()
                                         .map(File::toPath)
-                                        .map(FileUtil::resolveIfShortcut)
                                         .toList();
 
             if (!importHandler.confirmBibFileImportIfNecessary(files)) {
