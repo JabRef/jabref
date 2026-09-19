@@ -1,5 +1,7 @@
 package org.jabref.gui.util;
 
+import java.text.BreakIterator;
+
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -9,7 +11,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -19,8 +20,9 @@ import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
 
 public class SelectableTextFlow extends TextFlow {
-    @Nullable private HitInfo startHit;
-    @Nullable private HitInfo endHit;
+    /// Insertion indices into [#getTextFlowContent()]; -1 when there is no selection.
+    private int selectionStart = -1;
+    private int selectionEnd = -1;
     @Nullable private Path selectionPath;
 
     private final Pane parentPane;
@@ -67,38 +69,42 @@ public class SelectableTextFlow extends TextFlow {
         if (getChildren().isEmpty()) {
             return;
         }
-        startHit = hitTest(new Point2D(0, 0));
-        endHit = hitTest(new Point2D(getLayoutBounds().getWidth(), getLayoutBounds().getHeight()));
+        selectionStart = hitTest(new Point2D(0, 0)).getInsertionIndex();
+        selectionEnd = hitTest(new Point2D(getLayoutBounds().getWidth(), getLayoutBounds().getHeight())).getInsertionIndex();
         updateSelectionHighlight();
     }
 
     public void clearSelection() {
-        startHit = null;
-        endHit = null;
+        selectionStart = -1;
+        selectionEnd = -1;
         removeHighlight();
     }
 
     public boolean isSelectionActive() {
-        return startHit != null && endHit != null && startHit.getInsertionIndex() != endHit.getInsertionIndex();
+        return selectionStart >= 0 && selectionEnd >= 0 && selectionStart != selectionEnd;
     }
 
     /// Returns the start index of the selection. Assumes that the selection is active.
     public int getSelectionStartIndex() {
         assert isSelectionActive();
-        return Math.min(startHit.getInsertionIndex(), endHit.getInsertionIndex());
+        return Math.min(selectionStart, selectionEnd);
     }
 
     /// Returns the end index of the selection. Assumes that the selection is active.
     public int getSelectionEndIndex() {
         assert isSelectionActive();
-        return Math.max(startHit.getInsertionIndex(), endHit.getInsertionIndex());
+        return Math.max(selectionStart, selectionEnd);
     }
 
-    private String getTextFlowContent() {
+    /// The text in the index space of [TextFlow#hitTest(Point2D)] and [TextFlow#rangeShape(int, int)]:
+    /// every embedded non-[Text] child (e.g. a [Hyperlink]) occupies one U+FFFC character there.
+    protected String getTextFlowContent() {
         StringBuilder sb = new StringBuilder();
         for (Node node : getChildren()) {
             if (node instanceof Text text) {
                 sb.append(text.getText());
+            } else {
+                sb.append('\uFFFC');
             }
         }
         return sb.toString();
@@ -136,8 +142,8 @@ public class SelectableTextFlow extends TextFlow {
         event.consume();
         requestFocus();
 
-        startHit = hitTest(new Point2D(event.getX(), event.getY()));
-        endHit = startHit;
+        selectionStart = hitTest(new Point2D(event.getX(), event.getY())).getInsertionIndex();
+        selectionEnd = selectionStart;
         isDragging = false;
         justFinishedDrag = false;
 
@@ -145,12 +151,12 @@ public class SelectableTextFlow extends TextFlow {
     }
 
     private void onMouseDragged(MouseEvent event) {
-        if (startHit == null) {
+        if (selectionStart < 0) {
             return;
         }
         event.consume();
         isDragging = true;
-        endHit = hitTest(new Point2D(event.getX(), event.getY()));
+        selectionEnd = hitTest(new Point2D(event.getX(), event.getY())).getInsertionIndex();
         updateSelectionHighlight();
     }
 
@@ -175,7 +181,24 @@ public class SelectableTextFlow extends TextFlow {
         }
 
         event.consume();
+        if (event.getClickCount() == 2) {
+            selectWordAt(hitTest(new Point2D(event.getX(), event.getY())).getCharIndex());
+            return;
+        }
+
         removeHighlight();
+    }
+
+    private void selectWordAt(int charIndex) {
+        String text = getTextFlowContent();
+        if (charIndex < 0 || charIndex >= text.length()) {
+            return;
+        }
+        BreakIterator words = BreakIterator.getWordInstance();
+        words.setText(text);
+        selectionEnd = words.following(charIndex);
+        selectionStart = words.previous();
+        updateSelectionHighlight();
     }
 
     private boolean isInHyperlink(MouseEvent event) {
