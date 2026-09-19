@@ -72,7 +72,7 @@ class JabRefUndoManagerTest {
         try {
             work.get(5, TimeUnit.SECONDS);
             return true;
-        } catch (TimeoutException e) {
+        } catch (TimeoutException _) {
             return false;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -694,7 +694,7 @@ class JabRefUndoManagerTest {
     /// window while the outer block is still writing.
     @Test
     void aNestedBlockDoesNotReleaseTheLibraryWhenItEnds() {
-        undoRedoManager.addEdit("Import entries", edit -> {
+        undoRedoManager.addEdit("Import entries", _ -> {
             undoRedoManager.addEdit("Merge entries", nested -> nested.addEdit(setAuthor("Planck")));
             assertEquals(Optional.of("Import entries"), undoRedoManager.suspendedBy(),
                     "the nested block released the library its caller was holding");
