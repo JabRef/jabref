@@ -2,6 +2,8 @@ package org.jabref.gui.util.component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javafx.application.Platform;
@@ -21,6 +23,8 @@ import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
+import com.google.common.collect.MapMaker;
+
 /// A container for rendering a list of items. it is not that smart as [javafx.scene.control.ListView], which can skip drawing components that are not visible, but it is flexible and supports custom spacing and auto-scroll.
 ///
 /// Mainly used in [org.jabref.gui.ai.chat.AiChatView].
@@ -35,6 +39,11 @@ public class ListScrollPane<T> extends ScrollPane {
     private final ObjectProperty<Insets> contentPadding = new SimpleObjectProperty<>(Insets.EMPTY);
 
     private final ListChangeListener<T> listContentListener = this::handleListContentChange;
+
+    /// Scroll position per list instance, so switching back to a previously shown list restores where the user was.
+    /// Keyed by identity: the AI chat history cache hands out one list instance per entry.
+    /// Weak keys let a list dropped from that cache be garbage collected.
+    private final Map<ObservableList<T>, Double> scrollPositions = new MapMaker().weakKeys().makeMap();
 
     public ListScrollPane() {
         this.contentContainer = new VBox();
@@ -61,6 +70,7 @@ public class ListScrollPane<T> extends ScrollPane {
 
             if (oldList != null) {
                 oldList.removeListener(listContentListener);
+                scrollPositions.put(oldList, getVvalue());
             }
 
             contentContainer.getChildren().clear();
@@ -128,18 +138,33 @@ public class ListScrollPane<T> extends ScrollPane {
             }
             contentContainer.getChildren().setAll(nodes);
 
-            if (isAutoScrollToBottom()) {
-                scrollToBottom();
-            }
+            Optional.ofNullable(scrollPositions.remove(list)).ifPresentOrElse(
+                    savedPosition -> scrollTo(list, savedPosition),
+                    () -> {
+                        if (isAutoScrollToBottom()) {
+                            scrollToBottom();
+                        }
+                    });
         }
     }
 
     public void scrollToBottom() {
+        scrollTo(getItems(), 1.0);
+    }
+
+    private void scrollTo(ObservableList<T> list, double vvalue) {
         // A single Platform.runLater fires before JavaFX's layout pass, so the
-        // content height may not yet reflect the newly added node.
-        // Using a double-runLater ensures we set vvalue=1.0 AFTER the layout
+        // content height may not yet reflect the newly added nodes.
+        // Using a double-runLater ensures we set the vvalue AFTER the layout
         // pass in the intermediate pulse has computed the final content height.
-        Platform.runLater(() -> Platform.runLater(() -> setVvalue(1.0)));
+        Platform.runLater(() -> Platform.runLater(() -> {
+            if (getItems() == list) {
+                setVvalue(vvalue);
+            } else {
+                // The list was switched before the scroll happened: keep the position for its next display
+                scrollPositions.put(list, vvalue);
+            }
+        }));
     }
 
     public final ObservableList<T> getItems() {
