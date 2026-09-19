@@ -229,6 +229,7 @@ public class MedlinePlainImporter extends Importer {
                 fieldConversionMap.put(StandardField.COMMENT, comment.toString());
             }
 
+            MedlineDoiCleanup.cleanup(fieldConversionMap);
             BibEntry b = new BibEntry(type);
 
             // create one here

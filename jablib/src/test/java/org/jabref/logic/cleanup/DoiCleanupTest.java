@@ -25,6 +25,9 @@ class DoiCleanupTest {
 
     private static Stream<Arguments> changeDoi() {
         UnknownField unknownField = new UnknownField("ee");
+        UnknownField articleDoiField = new UnknownField("article-doi");
+        UnknownField locationIdField = new UnknownField("location-id");
+        UnknownField sourceField = new UnknownField("source");
         BibEntry doiResult = new BibEntry().withField(StandardField.DOI, "10.1145/2594455");
 
         return Stream.of(
@@ -38,6 +41,39 @@ class DoiCleanupTest {
                         .withField(StandardField.URL, "https://doi.org/10.1145/2594455")
                         .withField(StandardField.NOTE, "https://doi.org/10.1145/2594455")
                         .withField(unknownField, "https://doi.org/10.1145/2594455")),
+
+                // cleanup article-doi field from MEDLINE entries
+                Arguments.of(doiResult, new BibEntry()
+                        .withField(articleDoiField, "https://doi.org/10.1145/2594455")),
+
+                // cleanup article-doi while preserving other MEDLINE metadata
+                Arguments.of(new BibEntry()
+                                .withField(StandardField.DOI, "10.1145/2594455")
+                                .withField(locationIdField, "0.1145/2594455 [doi]")
+                                .withField(sourceField, "Journal. doi: 10.1145/2594455."),
+                        new BibEntry()
+                                .withField(articleDoiField, "10.1145/2594455")
+                                .withField(locationIdField, "0.1145/2594455 [doi]")
+                                .withField(sourceField, "Journal. doi: 10.1145/2594455.")),
+
+                // cleanup DOI from location-id while preserving its metadata
+                Arguments.of(new BibEntry()
+                                .withField(StandardField.DOI, "10.1145/2594455")
+                                .withField(locationIdField, "10.1145/2594455 [doi]"),
+                        new BibEntry()
+                                .withField(locationIdField, "10.1145/2594455 [doi]")),
+
+                // cleanup DOI from source while preserving its metadata
+                Arguments.of(new BibEntry()
+                                .withField(StandardField.DOI, "10.1145/2594455")
+                                .withField(sourceField, "Journal. doi: 10.1145/2594455."),
+                        new BibEntry()
+                                .withField(sourceField, "Journal. doi: 10.1145/2594455.")),
+
+                // existing DOI takes precedence over article-doi and other embedded fields
+                Arguments.of(doiResult, new BibEntry()
+                        .withField(StandardField.DOI, "10.1145/2594455")
+                        .withField(articleDoiField, "10.1000/other")),
 
                 // cleanup with Doi and no URL to entries
                 Arguments.of(
