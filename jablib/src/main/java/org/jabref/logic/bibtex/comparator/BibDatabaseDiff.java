@@ -71,6 +71,9 @@ public class BibDatabaseDiff {
 
         // Prevent IndexOutOfBoundException
         if (newEntries.isEmpty()) {
+            for (BibEntry originalEntry : originalEntries) {
+                differences.add(new BibEntryDiff(originalEntry, null));
+            }
             return differences;
         }
 
