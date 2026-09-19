@@ -17,8 +17,13 @@ final class MedlineDoiCleanup {
     }
 
     static void cleanup(Map<Field, String> fields) {
-        Optional.ofNullable(fields.remove(new UnknownField("article-doi")))
-                .ifPresent(value -> fields.putIfAbsent(StandardField.DOI, DOI.parse(value).map(DOI::asString).orElse(value)));
+        Optional.ofNullable(fields.get(new UnknownField("article-doi")))
+                .flatMap(DOI::parse)
+                .map(DOI::asString)
+                .ifPresent(doi -> {
+                    fields.remove(new UnknownField("article-doi"));
+                    fields.putIfAbsent(StandardField.DOI, doi);
+                });
 
         if (fields.containsKey(StandardField.DOI)) {
             return;

@@ -160,7 +160,6 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        MedlineDoiCleanup.cleanup(fields);
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(fields);
 
@@ -378,7 +377,6 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        MedlineDoiCleanup.cleanup(fields);
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(fields);
 
