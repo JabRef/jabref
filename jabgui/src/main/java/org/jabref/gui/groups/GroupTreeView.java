@@ -445,14 +445,6 @@ public class GroupTreeView extends BorderPane {
             changedGroups.forEach(value -> selectNode(value, true));
         }
 
-        if (localDragboard.hasBibEntries()) {
-            List<BibEntry> entries = localDragboard.getBibEntries();
-            stateManager.getActiveDatabase().ifPresent(database ->
-                    stateManager.getUndoManager(database).addEdit(Localization.lang("Assign entries to group"),
-                            edit -> edit.addAll(row.getItem().addEntriesToGroup(entries))));
-            success = true;
-        }
-
         if (dragboard.hasFiles()) {
             BibDatabaseContext database = stateManager.getActiveDatabase().orElse(null);
             ImportHandler importHandler = new ImportHandler(
@@ -463,15 +455,28 @@ public class GroupTreeView extends BorderPane {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            List<Path> files = dragboard.getFiles().stream().map(File::toPath).map(FileUtil::resolveIfShortcut).toList();
+
+            List<Path> files = dragboard.getFiles().stream()
+                                        .map(File::toPath)
+                                        .map(FileUtil::resolveIfShortcut)
+                                        .toList();
+
             if (!importHandler.confirmBibFileImportIfNecessary(files)) {
                 event.setDropCompleted(false);
                 event.consume();
                 return;
             }
+
             stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));
             importHandler.importFilesInBackground(files, event.getTransferMode())
                          .executeWith(taskExecutor);
+            success = true;
+        } else if (localDragboard.hasBibEntries()) {
+            List<BibEntry> entries = localDragboard.getBibEntries();
+            stateManager.getActiveDatabase().ifPresent(database ->
+                    stateManager.getUndoManager(database).addEdit(
+                            Localization.lang("Assign entries to group"),
+                            edit -> edit.addAll(row.getItem().addEntriesToGroup(entries))));
             success = true;
         }
         event.setDropCompleted(success);
