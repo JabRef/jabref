@@ -650,16 +650,17 @@ public class DuplicateCheckTest {
 
     @Test
     void duplicateDetectionWithMiscAndDifferentType() {
-        BibEntry one = new BibEntry(StandardEntryType.Misc)
-                .withField(StandardField.AUTHOR, "Billy Bob")
-                .withField(StandardField.TITLE, "A title")
-                .withField(StandardField.YEAR, "2005");
+        BibEntry miscEntry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Albert Einstein")
+                .withField(StandardField.TITLE, "Relativity")
+                .withField(StandardField.YEAR, "1916");
+ 
+        BibEntry techReportEntry = new BibEntry(StandardEntryType.TechReport)
+                .withField(StandardField.AUTHOR, "Albert Einstein")
+                .withField(StandardField.TITLE, "Relativity")
+                .withField(StandardField.YEAR, "1916");
 
-        BibEntry two = new BibEntry(StandardEntryType.TechReport)
-                .withField(StandardField.AUTHOR, "Billy Bob")
-                .withField(StandardField.TITLE, "A title")
-                .withField(StandardField.YEAR, "2005");
-
-        assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
+        assertTrue(duplicateChecker.isDuplicate(miscEntry, techReportEntry, BibDatabaseMode.BIBTEX));
+        assertTrue(duplicateChecker.isDuplicate(techReportEntry, miscEntry, BibDatabaseMode.BIBTEX));
     }
 }
