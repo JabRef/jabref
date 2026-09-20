@@ -202,7 +202,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         }
 
         Label apiKeyStatus = new Label(Localization.lang("API key configured"));
-        apiKeyStatus.visibleProperty().bind(Bindings.createBooleanBinding(() -> !item.getApiKey().isEmpty(), item.apiKeyProperty()));
+        apiKeyStatus.visibleProperty().bind(item.apiKeyProperty().isNotEmpty());
 
         Button configureButton = new Button(Localization.lang("Configure API key"));
         configureButton.getStyleClass().add("configure-button");
