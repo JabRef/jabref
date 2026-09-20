@@ -63,6 +63,18 @@ class MarcXmlParserTest {
 
     @Test
     // [utest->req~import.dnb.marc-metadata~1]
+    void prefersIsbn13RegardlessOfHyphenatedIsbnOrder() throws IOException, ParseException {
+        try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlIsbnOrderingRecord.xml")) {
+            List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
+
+            assertEquals(2, entries.size());
+            assertEquals("9783031996870", entries.getFirst().getField(StandardField.ISBN).orElseThrow());
+            assertEquals("9783031996870", entries.get(1).getField(StandardField.ISBN).orElseThrow());
+        }
+    }
+
+    @Test
+    // [utest->req~import.dnb.marc-metadata~1]
     void importsParentJournalFromDnbMarcXml() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlParentJournalRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);

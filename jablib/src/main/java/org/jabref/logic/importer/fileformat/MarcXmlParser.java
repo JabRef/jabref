@@ -26,6 +26,7 @@ import org.jabref.model.entry.Date;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.slf4j.Logger;
@@ -160,16 +161,14 @@ public class MarcXmlParser implements Parser {
             return;
         }
 
-        int length = isbn.length();
-        if (length != 10 && length != 13) {
-            LOGGER.debug("Malformed ISBN received, length: {}", length);
-            return;
-        }
-
-        Optional<String> existingIsbn = bibEntry.getField(StandardField.ISBN);
-        if (existingIsbn.isEmpty() || isbn.length() == 13) {
-            bibEntry.setField(StandardField.ISBN, isbn);
-        }
+        ISBN.parse(isbn).ifPresentOrElse(
+                parsedIsbn -> {
+                    Optional<ISBN> existingIsbn = bibEntry.getField(StandardField.ISBN).flatMap(ISBN::parse);
+                    if (existingIsbn.isEmpty() || (parsedIsbn.isIsbn13() && existingIsbn.map(ISBN::isIsbn10).orElse(false))) {
+                        bibEntry.setField(StandardField.ISBN, parsedIsbn.asString());
+                    }
+                },
+                () -> LOGGER.debug("Malformed ISBN received: {}", isbn));
     }
 
     private void putIssn(BibEntry bibEntry, Element datafield) {
