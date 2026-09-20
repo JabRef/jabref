@@ -55,6 +55,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to include currently selected entries when creating a new explicit group. [#16588](https://github.com/JabRef/jabref/pull/16588)
 
 ### Changed
+
 - We now show which web search fetchers have a saved API key. [#17214](https://github.com/JabRef/jabref/pull/17214)
 
 - The LibreOffice integration's bibliography generation for CSL styles is now more performant for a large number of entries. [#16555](https://github.com/JabRef/jabref/pull/16555)
