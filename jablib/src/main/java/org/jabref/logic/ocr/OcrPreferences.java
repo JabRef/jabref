@@ -16,16 +16,18 @@ public class OcrPreferences {
     private final StringProperty ocrEnginePath;
     private final ObjectProperty<PagesWithTextHandling> pagesWithTextHandling;
     private final ListProperty<OcrLanguage> ocrLanguages;
+    private final ObjectProperty<OcrMyPdfPlugin> pluginSelection;
 
-    private OcrPreferences() {
-        this("ocrmypdf", PagesWithTextHandling.SKIP, EngineSelection.OCRMYPDF, List.of(OcrLanguage.ENGLISH));
+    private OcrPreferences(OcrMyPdfPlugin pluginSelection) {
+        this("ocrmypdf", PagesWithTextHandling.SKIP, EngineSelection.OCRMYPDF, List.of(OcrLanguage.ENGLISH), pluginSelection);
     }
 
-    public OcrPreferences(String ocrEnginePath, PagesWithTextHandling pagesWithTextHandling, EngineSelection engineSelection, List<OcrLanguage> ocrLanguages) {
+    public OcrPreferences(String ocrEnginePath, PagesWithTextHandling pagesWithTextHandling, EngineSelection engineSelection, List<OcrLanguage> ocrLanguages, OcrMyPdfPlugin pluginSelection) {
         this.ocrEnginePath = new SimpleStringProperty(ocrEnginePath);
         this.pagesWithTextHandling = new SimpleObjectProperty<>(pagesWithTextHandling);
         this.engineSelection = new SimpleObjectProperty<>(engineSelection);
         this.ocrLanguages = new SimpleListProperty<>(FXCollections.observableArrayList(ocrLanguages));
+        this.pluginSelection = new SimpleObjectProperty<>(pluginSelection);
     }
 
     public EngineSelection getEngineSelection() {
@@ -76,7 +78,19 @@ public class OcrPreferences {
         this.ocrLanguages.setAll(ocrLanguages);
     }
 
+    public void setPluginSelection(OcrMyPdfPlugin pluginSelection) {
+        this.pluginSelection.set(pluginSelection);
+    }
+
+    public OcrMyPdfPlugin getPluginSelection() {
+        return pluginSelection.get();
+    }
+
+    public ObjectProperty<OcrMyPdfPlugin> pluginSelectionProperty() {
+        return pluginSelection;
+    }
+
     public static OcrPreferences getDefault() {
-        return new OcrPreferences();
+        return new OcrPreferences(OcrMyPdfPlugin.TESSERACT);
     }
 }

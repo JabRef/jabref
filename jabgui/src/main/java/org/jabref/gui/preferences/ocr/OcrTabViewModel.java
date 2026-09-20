@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
@@ -24,6 +26,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.OcrLanguage;
+import org.jabref.logic.ocr.OcrMyPdfPlugin;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.util.BackgroundTask;
@@ -50,6 +53,10 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<EngineSelection> selectedEngine = new SimpleObjectProperty<>(EngineSelection.OCRMYPDF);
     private final ListProperty<EngineSelection> engineOptions =
             new SimpleListProperty<>(FXCollections.observableArrayList(EngineSelection.values()));
+    private final ObjectProperty<OcrMyPdfPlugin> selectedPlugin = new SimpleObjectProperty<>(OcrMyPdfPlugin.TESSERACT);
+    private final ListProperty<OcrMyPdfPlugin> pluginOptions =
+            new SimpleListProperty<>(FXCollections.observableArrayList(OcrMyPdfPlugin.values()));
+    private final BooleanBinding pluginSectionVisible = Bindings.equal(selectedEngine, EngineSelection.OCRMYPDF);
     private final StringProperty ocrEnginePath = new SimpleStringProperty();
     private final ObjectProperty<PagesWithTextHandling> selectedPagesHaveText = new SimpleObjectProperty<>(PagesWithTextHandling.SKIP);
     private final ListProperty<PagesWithTextHandling> pagesHaveTextOptions =
@@ -87,6 +94,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         isInitializing = true;
         selectedEngine.setValue(ocrPreferences.getEngineSelection());
+        selectedPlugin.setValue(ocrPreferences.getPluginSelection());
         ocrEnginePath.setValue(ocrPreferences.getOcrEnginePath());
         selectedPagesHaveText.setValue(ocrPreferences.getPagesHaveText());
         selectedOcrLanguages.setAll(ocrPreferences.getOcrLanguages());
@@ -96,6 +104,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         ocrPreferences.setEngineSelection(selectedEngine.getValue());
+        ocrPreferences.setPluginSelection(selectedPlugin.getValue());
         ocrPreferences.setOcrEnginePath(ocrEnginePath.getValue());
         ocrPreferences.setPagesHaveText(selectedPagesHaveText.getValue());
         ocrPreferences.setOcrLanguages(selectedOcrLanguages);
@@ -204,5 +213,17 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             LOGGER.debug("{} is not available as engine's path: IOException occurred", path, e);
             return false;
         }
+    }
+
+    public ObjectProperty<OcrMyPdfPlugin> selectedPluginProperty() {
+        return selectedPlugin;
+    }
+
+    public ReadOnlyListProperty<OcrMyPdfPlugin> pluginOptions() {
+        return pluginOptions;
+    }
+
+    public BooleanBinding pluginSectionVisibleProperty() {
+        return pluginSectionVisible;
     }
 }

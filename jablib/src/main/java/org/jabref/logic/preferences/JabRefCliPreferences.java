@@ -81,6 +81,7 @@ import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.OcrLanguage;
+import org.jabref.logic.ocr.OcrMyPdfPlugin;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -418,6 +419,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region OCR preferences
     private static final String OCR_ENGINE_SELECTION = "ocrEngineSelection";
+    private static final String OCR_PLUGIN_SELECTION = "ocrPluginSelection";
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
     private static final String PAGES_WITH_TEXT = "pagesHaveText";
     private static final String OCR_LANGUAGES = "ocrLanguages";
@@ -2192,11 +2194,12 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
                 PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())),
                 EngineSelection.safeValueOf(get(OCR_ENGINE_SELECTION, defaultValues.getEngineSelection().name())),
-                ocrLanguagesToLoad);
+                ocrLanguagesToLoad, OcrMyPdfPlugin.safeValueOf(get(OCR_PLUGIN_SELECTION, defaultValues.getPluginSelection().name())));
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
         bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
         bindObject(ocrPreferences.engineSelectionProperty(), OCR_ENGINE_SELECTION, defaultValues.getEngineSelection(), EngineSelection::name, EngineSelection::safeValueOf);
+        bindObject(ocrPreferences.pluginSelectionProperty(), OCR_PLUGIN_SELECTION, defaultValues.getPluginSelection(), OcrMyPdfPlugin::name, OcrMyPdfPlugin::safeValueOf);
 
         ocrPreferences.getOcrLanguages().addListener((ListChangeListener<OcrLanguage>) _ ->
                 putStringList(OCR_LANGUAGES, ocrPreferences.getOcrLanguages().stream()

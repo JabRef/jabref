@@ -52,6 +52,10 @@ public class OcrMyPdfEngine implements OcrEngine {
         List<String> languages = ocrPreferences.getOcrLanguages().stream()
                                                .map(OcrLanguage::getCode)
                                                .toList();
+        if (!ocrPreferences.getPluginSelection().toString().isEmpty()) {
+            command.add("--plugin");
+            command.add(ocrPreferences.getPluginSelection().getIdentifierName());
+        }
         if (!languages.isEmpty()) {
             command.add("-l");
             command.add(String.join("+", languages));
