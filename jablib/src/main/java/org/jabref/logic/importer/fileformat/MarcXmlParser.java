@@ -108,6 +108,10 @@ public class MarcXmlParser implements Parser {
 
             if ("020".equals(tag)) {
                 putIsbn(bibEntry, datafield);
+            } else if ("022".equals(tag)) {
+                putIssn(bibEntry, datafield);
+            } else if ("024".equals(tag)) {
+                putOtherStandardIdentifier(bibEntry, datafield);
             } else if ("100".equals(tag) || "700".equals(tag) || "710".equals(tag)) {
                 putPersonalName(bibEntry, datafield); // Author, Editor, Publisher
             } else if ("111".equals(tag)) {
@@ -159,14 +163,25 @@ public class MarcXmlParser implements Parser {
             return;
         }
 
-        Optional<String> field = bibEntry.getField(StandardField.ISBN);
-        if (field.isPresent()) {
-            // Only overwrite the field, if it's ISBN13
-            if (field.get().length() == 13) {
-                bibEntry.setField(StandardField.ISBN, isbn);
-            }
-        } else {
+        Optional<String> existingIsbn = bibEntry.getField(StandardField.ISBN);
+        if (existingIsbn.isEmpty() || isbn.length() == 13) {
             bibEntry.setField(StandardField.ISBN, isbn);
+        }
+    }
+
+    private void putIssn(BibEntry bibEntry, Element datafield) {
+        String issn = getSubfield("a", datafield);
+        if (StringUtil.isNotBlank(issn)) {
+            bibEntry.setField(StandardField.ISSN, issn);
+        }
+    }
+
+    private void putOtherStandardIdentifier(BibEntry bibEntry, Element datafield) {
+        String identifier = getSubfield("a", datafield);
+        String source = getSubfield("2", datafield);
+
+        if (StringUtil.isNotBlank(identifier) && "doi".equalsIgnoreCase(source)) {
+            bibEntry.setField(StandardField.DOI, identifier);
         }
     }
 
@@ -335,13 +350,10 @@ public class MarcXmlParser implements Parser {
     private void putSummary(BibEntry bibEntry, Element datafield) {
         String summary = getSubfield("a", datafield);
 
-        String ind1 = datafield.getAttribute("ind1");
-        if (StringUtil.isNotBlank(summary) && StringUtil.isNotBlank(ind1) && "3".equals(ind1)) { // Abstract
-            if (bibEntry.getField(StandardField.ABSTRACT).isPresent()) {
-                bibEntry.setField(StandardField.ABSTRACT, bibEntry.getField(StandardField.ABSTRACT).get().concat(summary));
-            } else {
-                bibEntry.setField(StandardField.ABSTRACT, summary);
-            }
+        if (StringUtil.isNotBlank(summary)) {
+            bibEntry.getField(StandardField.ABSTRACT).ifPresentOrElse(
+                    abstractValue -> bibEntry.setField(StandardField.ABSTRACT, abstractValue.concat(summary)),
+                    () -> bibEntry.setField(StandardField.ABSTRACT, summary));
         }
     }
 
@@ -360,6 +372,11 @@ public class MarcXmlParser implements Parser {
 
     private void putIssue(BibEntry bibEntry, Element datafield) {
         bibEntry.setType(StandardEntryType.Article);
+
+        String journal = getSubfield("t", datafield);
+        if (StringUtil.isNotBlank(journal)) {
+            bibEntry.setField(StandardField.JOURNAL, journal);
+        }
 
         List<String> issues = getSubfields("g", datafield);
 
@@ -400,13 +417,10 @@ public class MarcXmlParser implements Parser {
     }
 
     private void putElectronicLocation(BibEntry bibEntry, Element datafield) {
-        // 856 - fulltext pdf url
-        String ind1 = datafield.getAttribute("ind1");
-        String ind2 = datafield.getAttribute("ind2");
+        String fulltext = getSubfield("3", datafield);
+        String resource = getSubfield("u", datafield);
 
-        if ("4".equals(ind1) && "0".equals(ind2)) {
-            String fulltext = getSubfield("3", datafield);
-            String resource = getSubfield("u", datafield);
+        if ("Volltext".equals(fulltext) && StringUtil.isNotBlank(resource)) {
             handleVolltext(bibEntry, fulltext, resource, StandardField.URL);
         }
     }

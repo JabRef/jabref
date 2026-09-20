@@ -1,0 +1,18 @@
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/" xmlns:marc="http://www.loc.gov/MARC21/slim">
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>1</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+            <zs:recordSchema>info:srw/schema/1/marcxml-v1.1</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <marc:record type="Bibliographic">
+                    <marc:datafield tag="773" ind1="0" ind2="8">
+                        <marc:subfield code="t">In: International Journal for Parasitology: Parasites and Wildlife (2025) 28:101137. https://doi.org/10.1016/j.ijppaw.2025.101137</marc:subfield>
+                    </marc:datafield>
+                </marc:record>
+            </zs:recordData>
+            <zs:recordPosition>6</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+</zs:searchRetrieveResponse>

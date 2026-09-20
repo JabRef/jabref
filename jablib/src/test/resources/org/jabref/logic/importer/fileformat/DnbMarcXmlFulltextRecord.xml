@@ -1,0 +1,19 @@
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/" xmlns:marc="http://www.loc.gov/MARC21/slim">
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>1</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+            <zs:recordSchema>info:srw/schema/1/marcxml-v1.1</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <marc:record type="Bibliographic">
+                    <marc:datafield tag="856" ind1="4" ind2="2">
+                        <marc:subfield code="u">https://d-nb.info/1415413312/34</marc:subfield>
+                        <marc:subfield code="3">Volltext</marc:subfield>
+                    </marc:datafield>
+                </marc:record>
+            </zs:recordData>
+            <zs:recordPosition>1</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+</zs:searchRetrieveResponse>

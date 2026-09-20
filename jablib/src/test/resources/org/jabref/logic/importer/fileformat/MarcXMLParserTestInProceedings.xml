@@ -14,12 +14,15 @@
                     <controlfield tag="007">t</controlfield>
                     <controlfield tag="008">230630m1988uuuu |||| 10||| eng d</controlfield>
                     <datafield tag="020" ind1=" " ind2=" ">
-                        <subfield code="a">1851662529</subfield>
-                        <subfield code="9">1-85166-252-9</subfield>
+                        <subfield code="a">9783570184783</subfield>
+                        <subfield code="9">978-3-570-18478-3</subfield>
                     </datafield>
                     <datafield tag="020" ind1=" " ind2=" ">
                         <subfield code="a">0912053208</subfield>
                         <subfield code="9">0-912053-20-8</subfield>
+                    </datafield>
+                    <datafield tag="022" ind1=" " ind2=" ">
+                        <subfield code="a">1234-5679</subfield>
                     </datafield>
                     <datafield tag="040" ind1=" " ind2=" ">
                         <subfield code="a">DE-604</subfield>
@@ -46,6 +49,9 @@
                         <subfield code="a">London</subfield>
                         <subfield code="b">Elsevier [u.a.]</subfield>
                         <subfield code="c">1988</subfield>
+                    </datafield>
+                    <datafield tag="520" ind1=" " ind2=" ">
+                        <subfield code="a">Summary of the conference proceedings.</subfield>
                     </datafield>
                     <datafield tag="655" ind1=" " ind2="7">
                         <subfield code="0">(DE-588)1071861417</subfield>

@@ -5,18 +5,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -43,6 +46,49 @@ class MarcXmlParserTest {
     void importEntries(String fileName) throws IOException, ParseException {
         String bibName = FileUtil.getBaseName(fileName) + ".bib";
         doTest(fileName, bibName);
+    }
+
+    @Test
+    void importsDoiFromDnbMarcXml() throws IOException, ParseException {
+        try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlDoiRecord.xml")) {
+            List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
+
+            assertEquals(1, entries.size());
+            assertEquals("9783031996870", entries.getFirst().getField(StandardField.ISBN).orElseThrow());
+            assertEquals("10.1007/978-3-031-99687-0", entries.getFirst().getField(StandardField.DOI).orElseThrow());
+        }
+    }
+
+    @Test
+    void importsParentJournalFromDnbMarcXml() throws IOException, ParseException {
+        try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlParentJournalRecord.xml")) {
+            List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
+
+            assertEquals(1, entries.size());
+            assertEquals("In: International Journal for Parasitology: Parasites and Wildlife (2025) 28:101137. https://doi.org/10.1016/j.ijppaw.2025.101137", entries.getFirst().getField(StandardField.JOURNAL).orElseThrow());
+        }
+    }
+
+    @Test
+    void ignoresDnbContentDescriptionUrl() throws IOException, ParseException {
+        try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlContentDescriptionRecord.xml")) {
+            List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
+
+            assertEquals(1, entries.size());
+            assertEquals(List.of(), entries.getFirst().getFiles());
+            assertEquals(Optional.empty(), entries.getFirst().getField(StandardField.URL));
+        }
+    }
+
+    @Test
+    void importsDnbFulltextUrl() throws IOException, ParseException {
+        try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlFulltextRecord.xml")) {
+            List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
+
+            assertEquals(1, entries.size());
+            assertEquals("https://d-nb.info/1415413312/34", entries.getFirst().getFiles().getFirst().getLink());
+            assertEquals(Optional.empty(), entries.getFirst().getField(StandardField.URL));
+        }
     }
 
     @Test
