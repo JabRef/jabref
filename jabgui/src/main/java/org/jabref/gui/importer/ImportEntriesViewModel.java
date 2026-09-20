@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -37,6 +35,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -177,7 +176,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         try {
             // Force reformatting so the displayed BibTeX is consistently formatted
             new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode(), true);
-        } catch (IOException ioException) {
+        } catch (IOException _) {
             // In case of error, fall back to the original parsed serialization if available
             return entry.getParsedSerialization();
         }
@@ -196,29 +195,30 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         // Remember the selection in the dialog
         preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
 
-        new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeStrings(
+        new DatabaseMerger(databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator())).mergeStrings(
                 databaseContext.getDatabase(),
                 parserResult.getDatabase());
-        new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
+        new DatabaseMerger(databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator())).mergeMetaData(
                 databaseContext.getMetaData(),
                 parserResult.getMetaData(),
                 parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
                 parserResult.getDatabase().getEntries());
+        BibDatabaseContext selectedDatabaseContext = selectedDb.getValue();
         ImportHandler importHandler = new ImportHandler(
-                selectedDb.getValue(),
+                selectedDatabaseContext,
                 preferences,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
                 dialogService,
                 taskExecutor);
-        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entriesToImport.size());
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, selectedDatabaseContext, entriesToImport.size());
         if (StringUtil.isNotBlank(targetGroup)) {
             // Assign the group to the actually imported BibEntry instances (the copies inserted into the
             // database), not to the originals. The import runs asynchronously, so this must happen in the
             // tracker's onFinish callback after all entries have been inserted/merged.
             tracker.setOnFinish(() ->
-                    GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator()));
+                    GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator())));
         }
         importHandler.importEntriesWithDuplicateCheck(null, entriesToImport, tracker);
     }

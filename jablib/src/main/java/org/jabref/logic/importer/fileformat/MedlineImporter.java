@@ -872,9 +872,9 @@ public class MedlineImporter extends Importer implements Parser {
         articleIdList.forEach(id -> {
             if (!id.idType().isBlank() && !"url".equals(id.idType())) {
                 if ("pubmed".equals(id.idType())) {
-                    fields.computeIfAbsent(StandardField.PMID, k -> id.content());
+                    fields.computeIfAbsent(StandardField.PMID, _ -> id.content());
                 } else {
-                    fields.computeIfAbsent(FieldFactory.parseField(StandardEntryType.Article, id.idType()), k -> id.content());
+                    fields.computeIfAbsent(FieldFactory.parseField(StandardEntryType.Article, id.idType()), _ -> id.content());
                 }
             }
         });
@@ -1053,7 +1053,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-    /// Handles text entities that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
+    /// Handles text entities that can have inner tags such as `<i>`, `<b>` etc.
     /// We ignore the tags and return only the characters present in the enclosing parent element.
     ///
     private void handleTextElement(XMLStreamReader reader, List<String> textList, String startElement)
@@ -1062,7 +1062,7 @@ public class MedlineImporter extends Importer implements Parser {
         handleText(reader, textList, startElement, result);
     }
 
-    /// Handles text entities of abstracts that can have inner tags such as {@literal <}i{@literal >}, {@literal <}b{@literal >} etc.
+    /// Handles text entities of abstracts that can have inner tags such as `<i>`, `<b>` etc.
     /// We ignore the tags and return only the characters present in the enclosing parent element.
     ///
     private void handleAbstractTextElement(XMLStreamReader reader, List<String> textList, String startElement)

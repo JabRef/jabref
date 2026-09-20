@@ -37,7 +37,8 @@ final class StyleSheetFile extends StyleSheet {
 
     private final AtomicReference<String> dataUrl = new AtomicReference<>();
 
-    StyleSheetFile(URL url) {
+    StyleSheetFile(String name, URL url) {
+        super(name);
         this.url = url;
         this.path = Path.of(URLUtil.createUri(url.toExternalForm()));
         reload();
@@ -54,13 +55,20 @@ final class StyleSheetFile extends StyleSheet {
     }
 
     @Override
+    public URL getSceneStylesheet() {
+        return url;
+    }
+
+    /// @return the stylesheet location if the stylesheet is present and available. The location will be a local
+    /// URL. Typically, it will be a `'data:'` URL where the CSS is embedded. However, for large themes it can be
+    /// `'file:'`.
+    @Override
     String getSceneStylesheetLocation() {
         if (Strings.isNullOrEmpty(dataUrl.get())) {
             reload();
         }
         if (Strings.isNullOrEmpty(dataUrl.get())) {
-            URL stylesheet = getSceneStylesheet();
-            return stylesheet == null ? "" : stylesheet.toExternalForm();
+            return getStylesheetURL().map(URL::toExternalForm).orElse("");
         }
         return dataUrl.get();
     }
@@ -87,19 +95,18 @@ final class StyleSheetFile extends StyleSheet {
         return Optional.empty();
     }
 
-    @Override
-    public URL getSceneStylesheet() {
+    private Optional<URL> getStylesheetURL() {
         if (!Files.exists(path)) {
-            LOGGER.warn("Cannot load additional css {} because the file does not exist.", path);
-            return null;
+            LOGGER.warn("Cannot load custom css {} because the file does not exist.", path);
+            return Optional.empty();
         }
 
         if (Files.isDirectory(path)) {
-            LOGGER.warn("Failed to loadCannot load additional css {} because it is a directory.", path);
-            return null;
+            LOGGER.warn("Cannot load custom css {} because it is a directory.", path);
+            return Optional.empty();
         }
 
-        return url;
+        return Optional.of(url);
     }
 
     @Override

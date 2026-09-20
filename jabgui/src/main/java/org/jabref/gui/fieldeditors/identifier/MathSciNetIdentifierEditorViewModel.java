@@ -2,8 +2,6 @@ package org.jabref.gui.fieldeditors.identifier;
 
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -11,6 +9,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.browserext.BrowserExtensionBridgeClient;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -59,7 +58,7 @@ public class MathSciNetIdentifierEditorViewModel extends BaseIdentifierEditorVie
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
-        EasyBind.subscribe(identifier, ignored -> syncCurrentIdentifier());
+        EasyBind.subscribe(identifier, _ -> syncCurrentIdentifier());
     }
 
     /// Sends the currently shown entry's MathSciNet id to the browser extension, if sync is on and an id is

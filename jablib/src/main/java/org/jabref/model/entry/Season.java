@@ -49,6 +49,7 @@ public enum Season {
     }
 
     /// This method accepts three types of seasons:
+    ///
     /// - Double Digit seasons from 21 to 24
     /// - Full English Season identifiers.
     ///
@@ -73,7 +74,7 @@ public enum Season {
         try {
             int number = Integer.parseInt(value);
             return Season.getSeasonByNumber(number);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }

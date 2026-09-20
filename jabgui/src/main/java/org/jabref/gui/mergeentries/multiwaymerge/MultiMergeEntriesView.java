@@ -167,7 +167,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         // add header
         int columnIndex = supplierHeader.getChildren().size();
         ToggleButton header = generateEntryHeader(entrySourceColumn, columnIndex);
-        header.getStyleClass().add("toggle-button");
+        header.getStyleClass().addAll("toggle-button", "padding-4");
         HBox.setHgrow(header, Priority.ALWAYS);
         supplierHeader.getChildren().add(header);
         header.setMinWidth(250);
@@ -208,7 +208,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             progressIndicator.visibleProperty().bind(column.isLoadingProperty());
         }
 
-        column.isLoadingProperty().addListener((obs, oldValue, newValue) -> {
+        column.isLoadingProperty().addListener((_, _, newValue) -> {
             if (!newValue) {
                 header.setGraphic(null);
                 if (column.entryProperty().get() == null) {
@@ -356,7 +356,9 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                 cellButton.setTooltip(buttonTooltip);
 
                 cellButton.setToggleGroup(row.toggleGroup);
-                if (row.toggleGroup.getSelectedToggle() == null) {
+                // An empty cell is only added so the user can explicitly clear the merged field. Auto-selecting it
+                // would clear the value that was just merged (rows are created as a reaction to that value being set).
+                if (!content.isEmpty() && (row.toggleGroup.getSelectedToggle() == null)) {
                     cellButton.setSelected(true);
                 }
 
@@ -464,7 +466,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
             addRow(field);
 
-            fieldEditorCell.addEventFilter(KeyEvent.KEY_PRESSED, event -> toggleGroup.selectToggle(null));
+            fieldEditorCell.addEventFilter(KeyEvent.KEY_PRESSED, _ -> toggleGroup.selectToggle(null));
 
             toggleGroup.selectedToggleProperty().addListener((_, _, newValue) -> {
                 if (newValue == null) {

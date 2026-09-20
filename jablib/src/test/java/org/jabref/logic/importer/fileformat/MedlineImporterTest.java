@@ -16,13 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// Articles in the medline format can be downloaded from http://www.ncbi.nlm.nih.gov/pubmed/.
-/// <ol>
-/// - Search for a term and make sure you have selected the **PubMed** database.
-/// - Select the results you want to export by checking their checkboxes.
-/// - Press on the **'Send to'** drop down menu on top of the search results.
-/// - Select **'File'** as Destination and **'XML'** as Format.
-/// - Press **'Create File'** to download your search results in a medline xml file.
-/// </ol>
+/// 1. Search for a term and make sure you have selected the **PubMed** database.
+/// 2. Select the results you want to export by checking their checkboxes.
+/// 3. Press on the **'Send to'** drop down menu on top of the search results.
+/// 4. Select **'File'** as Destination and **'XML'** as Format.
+/// 5. Press **'Create File'** to download your search results in a medline xml file.
 class MedlineImporterTest {
 
     private static final String AALTO_INPUT_FACTORY = "com.fasterxml.aalto.stax.InputFactoryImpl";

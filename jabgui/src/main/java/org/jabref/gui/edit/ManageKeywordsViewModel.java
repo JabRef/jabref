@@ -1,19 +1,15 @@
 package org.jabref.gui.edit;
 
 import java.util.List;
-import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.FieldChange;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 
@@ -23,13 +19,15 @@ public class ManageKeywordsViewModel {
 
     private final List<BibEntry> entries;
     private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
-    private final BibEntryPreferences bibEntryPreferences;
+    private final Character keywordSeparator;
+    private final UndoManager undoManager;
     private final ObjectProperty<ManageKeywordsDisplayType> displayType = new SimpleObjectProperty<>(ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES);
     private final ObservableList<String> keywords;
 
-    public ManageKeywordsViewModel(BibEntryPreferences bibEntryPreferences, List<BibEntry> entries) {
-        this.bibEntryPreferences = bibEntryPreferences;
+    public ManageKeywordsViewModel(Character keywordSeparator, List<BibEntry> entries, UndoManager undoManager) {
+        this.keywordSeparator = keywordSeparator;
         this.entries = entries;
+        this.undoManager = undoManager;
         this.keywords = FXCollections.observableArrayList();
 
         EasyBind.subscribe(displayType, this::fillKeywordsList);
@@ -46,7 +44,6 @@ public class ManageKeywordsViewModel {
     private void fillKeywordsList(ManageKeywordsDisplayType type) {
         keywords.clear();
         sortedKeywordsOfAllEntriesBeforeUpdateByUser.clear();
-        Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
 
         if (type == ManageKeywordsDisplayType.CONTAINED_IN_ALL_ENTRIES) {
             for (BibEntry entry : entries) {
@@ -104,27 +101,18 @@ public class ManageKeywordsViewModel {
             return;
         }
 
-        NamedCompoundEdit compoundEdit = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
-        // TODO: bp.getUndoManager().addEdit(compoundEdit);
-    }
+        undoManager.addEdit(StandardActions.MANAGE_KEYWORDS.getText(), edit -> {
 
-    private NamedCompoundEdit updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,
-                                             KeywordList keywordsToRemove) {
-        Character keywordSeparator = bibEntryPreferences.getKeywordSeparator();
+            for (BibEntry entry : entries) {
+                KeywordList entryKeywords = entry.getKeywords(keywordSeparator);
 
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Update keywords"));
-        for (BibEntry entry : entries) {
-            KeywordList keywords = entry.getKeywords(keywordSeparator);
+                // update keywords
+                entryKeywords.removeAll(keywordsToRemove);
+                entryKeywords.addAll(keywordsToAdd);
 
-            // update keywords
-            keywords.removeAll(keywordsToRemove);
-            keywords.addAll(keywordsToAdd);
-
-            // put keywords back
-            Optional<FieldChange> change = entry.putKeywords(keywords, keywordSeparator);
-            change.ifPresent(fieldChange -> compoundEdit.addEdit(new UndoableFieldChange(fieldChange)));
-        }
-        compoundEdit.end();
-        return compoundEdit;
+                // put keywords back
+                edit.addEdit(entry.putKeywords(entryKeywords, keywordSeparator));
+            }
+        });
     }
 }

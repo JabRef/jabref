@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
@@ -20,22 +18,22 @@ import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Stores all user dialogs related to {@link BackupManager}.
+/// Stores all user dialogs related to [BackupManager].
 public class BackupUIManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
 
@@ -46,7 +44,6 @@ public class BackupUIManager {
                                                                  Path originalPath,
                                                                  GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
-                                                                 UndoManager undoManager,
                                                                  StateManager stateManager) {
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
@@ -55,10 +52,34 @@ public class BackupUIManager {
                 preferences.getFilePreferences().getBackupDirectory());
         return actionOpt.flatMap(action -> {
             if (action == BackupResolverDialog.RESTORE_FROM_BACKUP) {
-                BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                BackupManager.RestoreResult result = BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
+                switch (result) {
+                    case BackupManager.RestoreResult.Empty(
+                            Path backupPath
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("The backup file '%0' is empty and was not restored.", backupPath));
+                    case BackupManager.RestoreResult.Failed(
+                            Path backupPath,
+                            IOException exception
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("Could not restore the backup file '%0'.", backupPath),
+                                    exception);
+                    case BackupManager.RestoreResult.NotFound(
+                            Path missingOriginalPath
+                    ) ->
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("Restore backup"),
+                                    Localization.lang("No backup file was found for '%0'.", missingOriginalPath));
+                    case BackupManager.RestoreResult.Restored _ -> {
+                    }
+                }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, stateManager);
             }
             return Optional.empty();
         });
@@ -77,7 +98,6 @@ public class BackupUIManager {
             Path originalPath,
             GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
-            UndoManager undoManager,
             StateManager stateManager) {
         try {
             ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
@@ -87,7 +107,7 @@ public class BackupUIManager {
             // This will be modified by using the `DatabaseChangesResolverDialog`.
             BibDatabaseContext originalDatabase = originalParserResult.getDatabaseContext();
 
-            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
+            Path backupPath = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, preferences.getFilePreferences().getBackupDirectory()).orElseThrow();
             BibDatabaseContext backupDatabase = OpenDatabase.loadDatabase(backupPath, importFormatPreferences, new DummyFileUpdateMonitor()).getDatabaseContext();
 
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferences, stateManager);
@@ -96,32 +116,51 @@ public class BackupUIManager {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
-                        originalDatabase, "Review Backup"
+                        originalDatabase, Localization.lang("Review backup")
                 );
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
-                LibraryTab saveState = stateManager.activeTabProperty().get().get();
-                final NamedCompoundEdit CE = new NamedCompoundEdit(Localization.lang("Merged external changes"));
-                changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(CE));
-                CE.end();
-                undoManager.addEdit(CE);
-                if (allChangesResolved.get()) {
+                if (allChangesResolved.orElse(false)) {
+                    List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
+                    LibraryTab saveState = stateManager.activeTabProperty().get().get();
+                    stateManager.getUndoManager(originalDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
+                            resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
                         saveState.resetChangeMonitor();
-                    } else {
-                        // In case any change of the backup is accepted, this means, the in-memory file differs from the file on disk (which is not the backup file)
-                        saveState.markBaseChanged();
                     }
+
+                    // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
+                    markRecoveredIfContentRestored(originalParserResult);
                     return Optional.of(originalParserResult);
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, stateManager);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);
             return Optional.empty();
+        }
+    }
+
+    /// An original that could not be parsed at all (e.g. it still contains merge conflict markers) leaves its
+    /// [ParserResult] marked invalid, and the caller reports that as an open error and closes the tab. Reviewing a
+    /// backup merges content into that same result, so the flag has to be cleared once something was actually
+    /// recovered - otherwise the recovery is discarded right after the user performed it.
+    ///
+    /// Whether a change was accepted is not a sufficient signal: a backup that differs only in its groups produces
+    /// both a metadata change and a group change, and accepting the metadata change alone restores nothing. So the
+    /// restored content itself is what decides. If nothing was restored the result stays invalid and the unreadable
+    /// original is still reported.
+    @VisibleForTesting
+    static void markRecoveredIfContentRestored(ParserResult parserResult) {
+        BibDatabase database = parserResult.getDatabase();
+        boolean restoredContent = database.hasEntries()
+                || !database.hasNoStrings()
+                || database.getPreamble().isPresent();
+        if (restoredContent) {
+            parserResult.setInvalid(false);
         }
     }
 }

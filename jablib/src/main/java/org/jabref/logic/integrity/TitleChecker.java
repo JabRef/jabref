@@ -23,6 +23,7 @@ public class TitleChecker implements ValueChecker {
     }
 
     /// Algorithm:
+    ///
     /// - remove everything that is in curly brackets
     /// - split the title into subtitles based on the delimiters
     /// (defined in the local variable DELIMITERS, currently . ! ? ; : [)

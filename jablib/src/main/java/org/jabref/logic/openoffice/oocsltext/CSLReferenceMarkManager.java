@@ -2,6 +2,7 @@ package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -467,9 +468,13 @@ public class CSLReferenceMarkManager {
     }
 
     private void updateAllCitationNumbers() throws Exception, CreationException {
+        updateAllCitationNumbers(Map.of());
+    }
+
+    public void updateAllCitationNumbers(Map<String, Integer> preferredCitationKeyToNumber) throws Exception, CreationException {
         sortMarksInOrder();
-        Map<String, Integer> newCitationKeyToNumber = new HashMap<>();
-        int currentNumber = 1;
+        Map<String, Integer> newCitationKeyToNumber = new LinkedHashMap<>(preferredCitationKeyToNumber);
+        int currentNumber = newCitationKeyToNumber.values().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
 
         for (CSLReferenceMark mark : marksInOrder) {
             List<String> citationKeys = mark.getCitationKeys();

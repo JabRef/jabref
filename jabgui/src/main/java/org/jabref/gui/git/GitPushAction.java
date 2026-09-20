@@ -110,27 +110,23 @@ public class GitPushAction extends SimpleCommand {
         switch (ex) {
             case JabRefException e ->
                     dialogService.showErrorDialogAndWait(
-                            Localization.lang("Git Push Failed"),
-                            e.getLocalizedMessage(),
-                            e
+                            Localization.lang("Git push failed"),
+                            e.getLocalizedMessage()
                     );
             case GitAPIException e ->
                     dialogService.showErrorDialogAndWait(
-                            Localization.lang("Git Push Failed"),
-                            Localization.lang("An unexpected Git error occurred: %0", e.getLocalizedMessage()),
-                            e
+                            Localization.lang("Git push failed"),
+                            Localization.lang("An unexpected Git error occurred: %0", e.getLocalizedMessage())
                     );
             case IOException e ->
                     dialogService.showErrorDialogAndWait(
-                            Localization.lang("Git Push Failed"),
-                            Localization.lang("I/O error: %0", e.getLocalizedMessage()),
-                            e
+                            Localization.lang("Git push failed"),
+                            Localization.lang("I/O error: %0", e.getLocalizedMessage())
                     );
             default ->
                     dialogService.showErrorDialogAndWait(
-                            Localization.lang("Git Push Failed"),
-                            Localization.lang("Unexpected error: %0", ex.getMessage()),
-                            ex
+                            Localization.lang("Git push failed"),
+                            Localization.lang("Unexpected error: %0", ex.getMessage())
                     );
         }
     }

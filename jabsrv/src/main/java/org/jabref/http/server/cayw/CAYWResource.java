@@ -1,9 +1,6 @@
 package org.jabref.http.server.cayw;
 
 import java.awt.GraphicsEnvironment;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +26,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.VBox;
 
 import org.jabref.architecture.AllowedToUseAwt;
@@ -66,7 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-@AllowedToUseAwt("Requires java.awt.datatransfer.Clipboard")
+@AllowedToUseAwt("Requires java.awt.GraphicsEnvironment.isHeadless()")
 @jakarta.ws.rs.Path("better-bibtex/cayw")
 public class CAYWResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
@@ -154,10 +152,17 @@ public class CAYWResource {
 
         // Clipboard parameter handling
         if (queryParams.isClipboard()) {
-            Toolkit toolkit = Toolkit.getDefaultToolkit();
-            Clipboard systemClipboard = toolkit.getSystemClipboard();
-            StringSelection strSel = new StringSelection(formattedResponse);
-            systemClipboard.setContents(strSel, null);
+            // JavaFX requires running clipboard handling on JavaFX application thread.
+            initializeGUI();
+            Platform.runLater(() -> {
+                ClipboardContent content = new ClipboardContent();
+                content.putString(formattedResponse);
+                javafx.scene.input.Clipboard.getSystemClipboard().setContent(content);
+            });
+            return Response.accepted()
+                           .header(X_CONTENT_TYPE_OPTIONS, NO_SNIFF)
+                           .header(CONTENT_SECURITY_POLICY, CAYW_CONTENT_SECURITY_POLICY)
+                           .build();
         }
 
         // Push to Application parameter handling
@@ -190,6 +195,7 @@ public class CAYWResource {
     }
 
     /// Filter strategy:
+    ///
     /// - Empty input → return everything.
     /// - Valid Search.g4 expression → grammar-based filter via [InMemoryLibrarySearcher].
     /// - Invalid expression (e.g. user is mid-typing `author=`) → fall back to a plain
@@ -258,7 +264,15 @@ public class CAYWResource {
             return false;
         }
 
-        if (GraphicsEnvironment.isHeadless()) {
+        boolean headless;
+        try {
+            headless = GraphicsEnvironment.isHeadless();
+        } catch (LinkageError awtUnavailable) {
+            // Native image doesn't bundle AWT libs, so isHeadless() fails to link; treat that as headless.
+            LOGGER.debug("AWT unavailable (native image without bundled AWT libs); treating as headless.", awtUnavailable);
+            headless = true;
+        }
+        if (headless) {
             LOGGER.warn("Rejecting CAYW library path access in headless mode: {}", requestedLibraryPath);
             return false;
         }

@@ -14,6 +14,8 @@ import org.jabref.support.DisabledOnCIServer;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -84,5 +86,71 @@ class KeyBindingViewModelTest {
 
         Optional<String> saved = liveRepo.get(binding);
         assertEquals(Optional.of("shortcut+shift+L"), saved);
+    }
+
+    @Test
+    @EnabledOnOs(OS.MAC)
+    void controlKeyIsRecordedAsBindingOnMacOs() {
+        KeyBindingRepository liveRepo = new KeyBindingRepository();
+
+        KeyBindingsTabViewModel viewModel =
+                new KeyBindingsTabViewModel(liveRepo, mock(DialogService.class));
+
+        KeyBinding binding = KeyBinding.CLOSE_DATABASE;
+
+        KeyBindingViewModel selectedVM = new KeyBindingViewModel(viewModel.getKeyBindingRepository(), binding, binding.getDefaultKeyBinding());
+        viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
+
+        // Control (distinct from Shortcut/Cmd on macOS) held with 'A', no other modifiers
+        KeyEvent event = new KeyEvent(
+                KeyEvent.KEY_PRESSED,
+                "A",
+                "A",
+                KeyCode.A,
+                false,
+                true,
+                false,
+                false
+        );
+
+        viewModel.setNewBindingForCurrent(event);
+
+        viewModel.storeSettings();
+
+        Optional<String> saved = liveRepo.get(binding);
+        assertEquals(Optional.of("ctrl+A"), saved);
+    }
+
+    @Test
+    @EnabledOnOs(OS.MAC)
+    void controlKeyCombinedWithShiftIsRecordedAsBindingOnMacOs() {
+        KeyBindingRepository liveRepo = new KeyBindingRepository();
+
+        KeyBindingsTabViewModel viewModel =
+                new KeyBindingsTabViewModel(liveRepo, mock(DialogService.class));
+
+        KeyBinding binding = KeyBinding.CLOSE_DATABASE;
+
+        KeyBindingViewModel selectedVM = new KeyBindingViewModel(viewModel.getKeyBindingRepository(), binding, binding.getDefaultKeyBinding());
+        viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
+
+        // Control and Shift held together with 'A'
+        KeyEvent event = new KeyEvent(
+                KeyEvent.KEY_PRESSED,
+                "A",
+                "A",
+                KeyCode.A,
+                true,
+                true,
+                false,
+                false
+        );
+
+        viewModel.setNewBindingForCurrent(event);
+
+        viewModel.storeSettings();
+
+        Optional<String> saved = liveRepo.get(binding);
+        assertEquals(Optional.of("shift+ctrl+A"), saved);
     }
 }

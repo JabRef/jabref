@@ -11,6 +11,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.walkthrough.WalkthroughAction;
 import org.jabref.logic.l10n.Localization;
 
@@ -29,10 +30,11 @@ public class Walkthroughs extends VBox {
         this.stateManager = stateManager;
         this.preferences = preferences;
 
-        getStyleClass().add("welcome-section");
+        setSpacing(12);
+        getStyleClass().addAll("align-top-left", "padding-top-12");
 
         header = new Label(Localization.lang("Walkthroughs"));
-        header.getStyleClass().add("welcome-header-label");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
         enableScroll();
     }
 
@@ -55,8 +57,8 @@ public class Walkthroughs extends VBox {
     }
 
     private VBox createWalkthroughContent() {
-        VBox content = new VBox();
-        content.getStyleClass().add("walkthroughs-container");
+        VBox content = new VBox(4);
+        content.getStyleClass().add("align-top-left");
 
         Button mainFileDirWalkthroughButton = createWalkthroughButton(
                 Localization.lang("Set main file directory"),
@@ -102,7 +104,7 @@ public class Walkthroughs extends VBox {
     private Button createWalkthroughButton(String text, IconTheme.JabRefIcons icon, String walkthroughId) {
         Button button = new Button(text);
         button.setGraphic(icon.getGraphicNode());
-        button.getStyleClass().add("quick-settings-button");
+        button.getStyleClass().addAll("quick-settings-button", "padding-12", "align-center-left");
         button.setMaxWidth(Double.MAX_VALUE);
         button.setOnAction(_ -> new WalkthroughAction(stage, tabContainer, stateManager, preferences, walkthroughId).execute());
         return button;

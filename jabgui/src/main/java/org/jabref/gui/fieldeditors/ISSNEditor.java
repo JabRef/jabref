@@ -2,8 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -18,6 +16,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -36,7 +35,6 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
-    @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private StateManager stateManager;
 
@@ -45,6 +43,7 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
     public ISSNEditor(Field field,
                       SuggestionProvider<?> suggestionProvider,
                       FieldCheckers fieldCheckers,
+                      UndoManager undoManager,
                       UndoAction undoAction,
                       RedoAction redoAction) {
 

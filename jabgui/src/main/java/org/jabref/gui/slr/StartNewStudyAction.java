@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
 /// - Let JabRef do the crawling afterwards.
 ///
 ///
-/// Needs to inherit {@link ExistingStudySearchAction}, because that action implements the real crawling.
+/// Needs to inherit [ExistingStudySearchAction], because that action implements the real crawling.
 ///
-/// There is the hook {@link StartNewStudyAction#crawlPreparation(Path)}, which is used by {@link ExistingStudySearchAction#crawl()}.
+/// There is the hook [StartNewStudyAction#crawlPreparation(Path)], which is used by [ExistingStudySearchAction#crawl()].
 public class StartNewStudyAction extends ExistingStudySearchAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartNewStudyAction.class);
 

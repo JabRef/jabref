@@ -7,7 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 
-/// Pure, stateless DOM traversal helpers shared by {@link EntryEditorFocusUtils}.
+/// Pure, stateless DOM traversal helpers shared by [EntryEditorFocusUtils].
 final class EntryEditorFocusTraversal {
 
     private EntryEditorFocusTraversal() {
@@ -29,7 +29,7 @@ final class EntryEditorFocusTraversal {
         return findLastMatching(parent, EntryEditorFocusTraversal::isNodeFocusable);
     }
 
-    /// Tries to locate the editor grid (style class {@code "editorPane"}) to avoid including preview
+    /// Tries to locate the editor grid (style class `"editorPane"`) to avoid including preview
     /// or other sibling panels when determining focus-order boundaries.
     static Optional<Parent> findEditorGridParent(Parent root) {
         if (root.getStyleClass().contains("editorPane")) {

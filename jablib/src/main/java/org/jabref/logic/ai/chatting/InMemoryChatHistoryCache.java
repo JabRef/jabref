@@ -50,7 +50,7 @@ public class InMemoryChatHistoryCache {
     }
 
     /// Returns the chat history for `entry`. If none exists in RAM, loads from repository
-    /// and caches it. The returned {@link ObservableList} is the primary working storage - mutations
+    /// and caches it. The returned [ObservableList] is the primary working storage - mutations
     /// are NOT immediately persisted.
     ///
     /// @param databaseContext the database context for the entry (needed for persistence)
@@ -81,7 +81,7 @@ public class InMemoryChatHistoryCache {
     }
 
     /// Returns the chat history for `group`. If none exists in RAM, loads from repository
-    /// and caches it. The returned {@link ObservableList} is the primary working storage - mutations
+    /// and caches it. The returned [ObservableList] is the primary working storage - mutations
     /// are NOT immediately persisted.
     ///
     /// @param databaseContext the database context for the group (needed for persistence)

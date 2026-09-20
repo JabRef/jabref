@@ -5,24 +5,25 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -34,14 +35,12 @@ public class AutoLinkFilesAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
 
-    public AutoLinkFilesAction(DialogService dialogService, GuiPreferences preferences, StateManager stateManager, UndoManager undoManager, UiTaskExecutor taskExecutor) {
+    public AutoLinkFilesAction(DialogService dialogService, GuiPreferences preferences, StateManager stateManager, UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager)));
@@ -51,14 +50,18 @@ public class AutoLinkFilesAction extends SimpleCommand {
     @Override
     public void execute() {
         final BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        final List<BibEntry> entries = stateManager.getSelectedEntries();
+        final UndoManager undoManager = stateManager.getUndoManager(database);
+        final List<BibEntry> entries = List.copyOf(stateManager.getSelectedEntries());
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 database,
                 preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
-        final NamedCompoundEdit nc = new NamedCompoundEdit(Localization.lang("Automatically set file links"));
+        final CompoundEdit compound = new CompoundEdit(StandardActions.AUTO_LINK_FILES.getText());
+        // The file fields are written round by round in the task and handed over only in
+        // succeeded(), so the library is held against undo across both.
+        final UndoSuspension suspended = undoManager.suspendUndo(StandardActions.AUTO_LINK_FILES.getText());
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
             final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
@@ -66,7 +69,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 String newVal = FileFieldWriter.getStringRepresentation(newLinkedFiles);
                 String oldVal = entry.getField(StandardField.FILE).orElse(null);
                 UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
-                nc.addEdit(fieldChange); // push to undo manager is in succeeded
+                compound.addEdit(fieldChange); // push to undo manager is in succeeded
 
                 // Wait because there are several rounds in one auto-link operation
                 // The later round depends on the updated bibEntry of the previous round
@@ -80,8 +83,37 @@ public class AutoLinkFilesAction extends SimpleCommand {
 
             @Override
             protected void succeeded() {
-                AutoSetFileLinksUtil.LinkFilesResult result = getValue();
+                try {
+                    report(getValue());
+                } finally {
+                    handOver();
+                }
+            }
 
+            @Override
+            protected void failed() {
+                handOver();
+            }
+
+            @Override
+            protected void cancelled() {
+                handOver();
+            }
+
+            /// Hands over what the worker changed and releases the library, on every way this task
+            /// can end. Failing and cancelling reach here too: the file fields they had already
+            /// rewritten are in the library whether the task finished or not, so they belong on the
+            /// stack, and holding the library against undo afterwards would disable it for good.
+            private void handOver() {
+                if (compound.hasEdits()) {
+                    undoManager.addEdit(compound.toChangeSet());
+                }
+                suspended.close();
+            }
+
+            /// Only reports; handing the changes over is [#handOver]'s job, so an early return
+            /// here cannot lose them.
+            private void report(AutoSetFileLinksUtil.LinkFilesResult result) {
                 if (!result.getFileExceptions().isEmpty()) {
                     dialogService.showWarningDialogAndWait(
                             Localization.lang("Automatically set file links"),
@@ -95,11 +127,6 @@ public class AutoLinkFilesAction extends SimpleCommand {
                             Localization.lang("Finished automatically setting external links.") + "\n"
                                     + Localization.lang("No files found."));
                     return;
-                }
-
-                if (nc.hasEdits()) {
-                    nc.end();
-                    undoManager.addEdit(nc);
                 }
 
                 dialogService.notify("%s %s\n%s".formatted(

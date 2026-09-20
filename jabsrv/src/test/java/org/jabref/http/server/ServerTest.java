@@ -120,7 +120,7 @@ public abstract class ServerTest extends JerseyTest {
     /// `configure()` time (see [#filesToServe]).
     ///
     /// Calls `super.setUp()` rather than this class's `setUp()` because the latter resets
-    /// {@link #filesToServe} to the default, which would discard the caller's selection.
+    /// [#filesToServe] to the default, which would discard the caller's selection.
     protected void setAvailableLibraries(EnumSet<TestBibFile> files) {
         try {
             tearDown();

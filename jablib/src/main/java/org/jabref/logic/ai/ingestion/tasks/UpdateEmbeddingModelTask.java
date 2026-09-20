@@ -3,6 +3,7 @@ package org.jabref.logic.ai.ingestion.tasks;
 import java.io.IOException;
 
 import org.jabref.logic.ai.embedding.DeepJavaEmbeddingModel;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;
@@ -14,17 +15,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Downloads (or verifies) the local embedding model and returns the ready-to-use
-/// {@link DeepJavaEmbeddingModel}. The caller is responsible for updating any
+/// [DeepJavaEmbeddingModel]. The caller is responsible for updating any
 /// property / field once the task succeeds (via `onSuccess`).
 public class UpdateEmbeddingModelTask extends BackgroundTask<DeepJavaEmbeddingModel> {
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateEmbeddingModelTask.class);
 
     private final String embeddingModelName;
+    private final EmbeddingModelMetadataService metadataService;
 
     private final ProgressCounter progressCounter = new ProgressCounter();
 
-    public UpdateEmbeddingModelTask(String embeddingModelName) {
+    public UpdateEmbeddingModelTask(
+            String embeddingModelName,
+            EmbeddingModelMetadataService metadataService
+    ) {
         this.embeddingModelName = embeddingModelName;
+        this.metadataService = metadataService;
 
         configure();
     }
@@ -48,7 +54,8 @@ public class UpdateEmbeddingModelTask extends BackgroundTask<DeepJavaEmbeddingMo
         try {
             DeepJavaEmbeddingModel model = new DeepJavaEmbeddingModel(
                     embeddingModelName,
-                    progressCounter
+                    progressCounter,
+                    metadataService
             );
 
             if (!originallyDownloaded) {

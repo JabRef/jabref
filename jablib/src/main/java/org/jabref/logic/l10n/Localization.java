@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /// them in unescaped form inside a [LocalizationBundle] which provides fast access because it caches the key-value
 /// pairs.
 ///
-/// The access to this is given by the functions [#lang(String,String...)] and
+/// The access to this is given by the functions [#lang(String, Object...)] and
 /// that developers should use whenever they use strings for the e.g. GUI that need to be translatable.
 @AllowedToUseStandardStreams("Needs to have acess to System.err because it's called very early before our loggers")
 public class Localization {
@@ -96,8 +96,8 @@ public class Localization {
     }
 
     /// Creates and caches the language bundles used in JabRef for a particular language. This function first loads
-    /// correct version of the "escaped" bundles that are given in {@link l10n}. After that, it stores the unescaped
-    /// version in a cached {@link LocalizationBundle} for fast access.
+    /// correct version of the "escaped" bundles that are given in [l10n]. After that, it stores the unescaped
+    /// version in a cached [LocalizationBundle] for fast access.
     ///
     /// @param locale Localization to use.
     private static void createResourceBundles(Locale locale) {
@@ -123,7 +123,7 @@ public class Localization {
     /// This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given. Note that
     /// the keys are the "unescaped" strings from the bundle property files.
     ///
-    /// @param bundle The {@link LocalizationBundle} which is usually {@link Localization#localizedMessages}.
+    /// @param bundle The [LocalizationBundle] which is usually [Localization#localizedMessages].
     /// @param key    The lookup key.
     /// @param params The parameters that should be inserted into the message
     /// @return The final message with replaced parameters.
@@ -168,4 +168,3 @@ public class Localization {
         }
     }
 }
-

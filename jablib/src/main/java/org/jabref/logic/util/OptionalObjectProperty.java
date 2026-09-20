@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import com.tobiasdiez.easybind.PreboundBinding;
 
-/// Similar to {@link com.tobiasdiez.easybind.monadic.MonadicObservableValue}
+/// Similar to [com.tobiasdiez.easybind.monadic.MonadicObservableValue]
 public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>> {
 
     private OptionalObjectProperty(Optional<T> initialValue) {
@@ -17,6 +17,10 @@ public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>>
 
     public static <T> OptionalObjectProperty<T> empty() {
         return new OptionalObjectProperty<>(Optional.empty());
+    }
+
+    public static <T> OptionalObjectProperty<T> ofNullable(T value) {
+        return new OptionalObjectProperty<>(Optional.ofNullable(value));
     }
 
     /// Returns a new ObservableValue that holds the value held by this

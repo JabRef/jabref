@@ -2,8 +2,6 @@ package org.jabref.gui.externalfiles;
 
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 
@@ -23,7 +21,6 @@ public class UnlinkedFilesWizard {
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
-    @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
@@ -52,7 +49,8 @@ public class UnlinkedFilesWizard {
             }
         });
 
-        Optional<ButtonType> result = wizard.showAndWait();
+        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(wizard.getDialog());
+        page2.shutdown();
 
         if (result.isPresent()) {
             if (result.get() == ButtonType.FINISH) {
@@ -75,10 +73,10 @@ public class UnlinkedFilesWizard {
         }
         this.bibDatabaseContext = activeDatabase.get();
 
-        viewModel = new UnlinkedFilesDialogViewModel(dialogService, undoManager, fileUpdateMonitor, preferences, stateManager, taskExecutor);
+        viewModel = new UnlinkedFilesDialogViewModel(dialogService, stateManager.getUndoManager(bibDatabaseContext), fileUpdateMonitor, preferences, stateManager, taskExecutor);
 
         page1 = new SearchConfigurationPage(viewModel, bibDatabaseContext, preferences);
-        page2 = new FileSelectionPage(stateManager, viewModel);
+        page2 = new FileSelectionPage(stateManager, viewModel, preferences.getImportFormatPreferences(), taskExecutor);
         page3 = new ImportResultsPage(viewModel);
 
         page1.setPrefSize(650, 550);

@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -25,6 +26,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.util.Callback;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionHelper;
@@ -74,6 +76,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableView<StudyCatalogItem> catalogTable;
     @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
     @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
+    @FXML private TableColumn<StudyCatalogItem, String> catalogNativeQueryColumn;
     @FXML private TableColumn<StudyCatalogItem, String> catalogReasonColumn;
 
     @FXML private Label directoryWarning;
@@ -206,7 +209,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 } else {
                     directoryWarning.setVisible(false);
                 }
-            } catch (IOException e) {
+            } catch (IOException _) {
                 directoryWarning.setText(Localization.lang("Warning: Failed to check if the directory is empty."));
                 directoryWarning.setVisible(true);
             }
@@ -230,7 +233,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         setupCellFactories(queriesColumn, queriesActionColumn, StudyQuery::getQuery, viewModel::deleteQuery);
         queryTableView.setItems(viewModel.getQueries());
 
-        // TODO: Keep until PR #7279 is merged
         helpIcon.setTooltip(new Tooltip(new StringJoiner("\n")
                 .add(Localization.lang("Query terms are separated by spaces."))
                 .add(Localization.lang("All query terms are joined using the logical AND, and OR operators") + ".")
@@ -265,7 +267,26 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
         catalogReasonColumn.setReorderable(false);
         catalogReasonColumn.setCellValueFactory(param -> param.getValue().reasonProperty());
-        catalogReasonColumn.setCellFactory(column -> {
+        catalogReasonColumn.setCellFactory(createEditableTextFieldCellFactory(StudyCatalogItem::reasonProperty));
+        Label catalogReasonHeader = new Label(catalogReasonColumn.getText());
+        catalogReasonHeader.setTooltip(new Tooltip(Localization.lang("Click a cell to edit the reason")));
+        catalogReasonColumn.setGraphic(catalogReasonHeader);
+        catalogReasonColumn.setText("");
+
+        catalogNativeQueryColumn.setReorderable(false);
+        catalogNativeQueryColumn.setCellValueFactory(param -> param.getValue().nativeQueryProperty());
+        catalogNativeQueryColumn.setCellFactory(createEditableTextFieldCellFactory(StudyCatalogItem::nativeQueryProperty));
+        Label catalogNativeQueryHeader = new Label(catalogNativeQueryColumn.getText());
+        catalogNativeQueryHeader.setTooltip(new Tooltip(Localization.lang("Click a cell to edit the native query")));
+        catalogNativeQueryColumn.setGraphic(catalogNativeQueryHeader);
+        catalogNativeQueryColumn.setText("");
+
+        catalogTable.setItems(viewModel.getCatalogs());
+    }
+
+    private Callback<TableColumn<StudyCatalogItem, String>, TableCell<StudyCatalogItem, String>> createEditableTextFieldCellFactory(
+            Function<StudyCatalogItem, StringProperty> propertyExtractor) {
+        return _ -> {
             TextField textField = new TextField();
             TableCell<StudyCatalogItem, String> cell = new TableCell<>() {
                 @Override
@@ -284,19 +305,13 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     TableView<StudyCatalogItem> tableView = cell.getTableView();
                     int index = cell.getIndex();
                     if (tableView != null && index >= 0 && index < tableView.getItems().size()) {
-                        tableView.getItems().get(index).setReason(textField.getText());
+                        propertyExtractor.apply(tableView.getItems().get(index)).setValue(textField.getText());
                     }
                 }
             });
-            textField.setOnAction(event -> cell.getTableView().requestFocus());
+            textField.setOnAction(_ -> cell.getTableView().requestFocus());
             return cell;
-        });
-        Label catalogReasonHeader = new Label(catalogReasonColumn.getText());
-        catalogReasonHeader.setTooltip(new Tooltip(Localization.lang("Click a cell to edit the reason")));
-        catalogReasonColumn.setGraphic(catalogReasonHeader);
-        catalogReasonColumn.setText("");
-
-        catalogTable.setItems(viewModel.getCatalogs());
+        };
     }
 
     private void initValidationBindings() {
@@ -349,9 +364,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     }
 
     /// Generic over the row type so that all three columns (authors, research questions, queries)
-    /// can share the same delete button setup. {@code displayExtractor} pulls the display string
-    /// from each row - {@link Function#identity()} for the {@code String} columns (authors and
-    /// questions), {@link org.jabref.model.study.StudyQuery#getQuery()} for the queries column.
+    /// can share the same delete button setup. `displayExtractor` pulls the display string
+    /// from each row - [Function#identity()] for the `String` columns (authors and
+    /// questions), [org.jabref.model.study.StudyQuery#getQuery()] for the queries column.
     private <T> void setupCellFactories(TableColumn<T, String> contentColumn,
                                         TableColumn<T, String> actionColumn,
                                         Function<T, String> displayExtractor,
@@ -359,9 +374,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         contentColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
         actionColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
         new ValueTableCellFactory<T, String>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove"))
-                .withOnMouseClickedEvent((rowItem, cellValue) -> evt ->
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(_ -> Localization.lang("Remove"))
+                .withOnMouseClickedEvent((rowItem, _) -> _ ->
                         removeAction.accept(rowItem))
                 .install(actionColumn);
     }

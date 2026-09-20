@@ -2,6 +2,7 @@ package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -273,6 +274,57 @@ public class BSTReferenceMarkManager {
         mark.updateTextContent(newContent);
         mark.updateName(updatedName);
         mark.setCitationNumbers(newNumbers);
+        Optional.ofNullable(newContent.getAnchor())
+                .ifPresent(anchor -> UnoDispatch.resetAttributesAtRangeEnd(document, componentContext, anchor));
+    }
+
+    public void updateAllStyleDefinedCitationTexts(Map<String, String> identifierToLabelMap)
+            throws Exception, CreationException, MissingStyleDefinedCitationLabelException {
+        sortMarksInOrder();
+        for (BSTReferenceMark mark : marksInOrder) {
+            String updatedText = BSTCitationOOAdapter.buildStyleDefinedCitationText(mark.getCitationKeys(), identifierToLabelMap);
+            updateMarkText(mark, updatedText);
+        }
+    }
+
+    public void updateAllCitationNumbers(Map<String, Integer> preferredIdentifierToNumber)
+            throws Exception, CreationException {
+        sortMarksInOrder();
+
+        Map<String, Integer> completeIdentifierToNumber = new LinkedHashMap<>(preferredIdentifierToNumber);
+        int nextNumber = completeIdentifierToNumber.values().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
+
+        for (BSTReferenceMark mark : marksInOrder) {
+            List<Integer> assignedNumbers = new ArrayList<>();
+            for (String identifier : mark.getCitationKeys()) {
+                Integer assignedNumber = completeIdentifierToNumber.get(identifier);
+                if (assignedNumber == null) {
+                    assignedNumber = nextNumber++;
+                    completeIdentifierToNumber.put(identifier, assignedNumber);
+                }
+                assignedNumbers.add(assignedNumber);
+            }
+
+            mark.setCitationNumbers(assignedNumbers);
+            updateMarkAndTextWithNewNumbers(mark, assignedNumbers);
+        }
+
+        identifierToNumber = completeIdentifierToNumber;
+        highestCitationNumber = completeIdentifierToNumber.values().stream().mapToInt(Integer::intValue).max().orElse(0);
+    }
+
+    private void updateMarkText(BSTReferenceMark mark, String newText) throws Exception, CreationException {
+        String currentText = mark.getTextContent().getAnchor().getString();
+        if (currentText.equals(newText)) {
+            return;
+        }
+
+        updateMarkAndText(mark, newText, mark.getName());
+
+        XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
+        XNameAccess marks = supplier.getReferenceMarks();
+        XTextContent newContent = UnoRuntime.queryInterface(XTextContent.class, marks.getByName(mark.getName()));
+        mark.updateTextContent(newContent);
         Optional.ofNullable(newContent.getAnchor())
                 .ifPresent(anchor -> UnoDispatch.resetAttributesAtRangeEnd(document, componentContext, anchor));
     }

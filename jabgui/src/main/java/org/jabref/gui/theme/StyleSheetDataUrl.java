@@ -2,13 +2,14 @@ package org.jabref.gui.theme;
 
 import java.net.URL;
 
-public class StyleSheetDataUrl extends StyleSheet {
+final class StyleSheetDataUrl extends StyleSheet {
 
     private final URL url;
 
     private volatile String dataUrl;
 
-    StyleSheetDataUrl(URL url) {
+    StyleSheetDataUrl(String name, URL url) {
+        super(name);
         this.url = url;
         reload();
     }

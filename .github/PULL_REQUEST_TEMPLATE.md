@@ -36,8 +36,9 @@ Unreviewed, misleading, or misrepresented AI-generated submissions may be closed
    <!--
    1. Describe how reviewers can test this fix/feature.
       Ideally, think of how you would guide a beginner user of JabRef to try out your change.
-   2. Add screenshots (preferred) or videos.
-      (E.g. using Loom - https://www.loom.com or by just adding .mp4 files).
+   2. Write numbered steps, with a screenshot (cropped to the relevant area) of what the reviewer should see after the decisive step.
+      No videos: a numbered list lets a reviewer say "at step 3 I could not click X", a video does not.
+      A video is only acceptable when the interaction involves another program (drag and drop from a file manager, push to a LaTeX editor, ...).
    -->
 
 ### Related issues and pull requests
@@ -91,6 +92,5 @@ _____
 - [.] I manually tested my changes in running JabRef (always required)
 - [.] I added JUnit tests for changes (if applicable)
 - [.] I added screenshots in the PR description (if change is visible to the user)
-- [.] I added a screenshot in the PR description showing a library with a single entry with me as author and as title the issue number
-- [.] I described the change in `CHANGELOG.md` in a way that can be understood by the average user (if change is visible to the user)
+- [.] I added **one sentence (max 20 words)** to `CHANGELOG.md` describing the change from the user's point of view (if the change is visible to the user)
 - [.] I checked the [user documentation](https://docs.jabref.org/) for up to dateness and submitted a pull request to our [user documentation repository](https://github.com/JabRef/user-documentation/tree/main/en)

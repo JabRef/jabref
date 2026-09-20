@@ -18,7 +18,6 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -35,9 +34,8 @@ public class ServerUtils {
     /// collection (libraries listing, batch query, ...).
     public static List<String> openLibraryIds(SrvStateManager srvStateManager) {
         return srvStateManager.getOpenDatabases().stream()
-                              .map(BibDatabaseContext::getDatabasePath)
+                              .map(BibDatabaseContext::getLibraryId)
                               .flatMap(Optional::stream)
-                              .map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path))
                               .toList();
     }
 
@@ -48,20 +46,20 @@ public class ServerUtils {
     public static @NonNull Path getLibraryPath(String id, SrvStateManager srvStateManager) {
         return srvStateManager.getOpenDatabases()
                               .stream()
+                              .filter(context -> context.getLibraryId().filter(id::equals).isPresent())
                               .map(BibDatabaseContext::getDatabasePath)
-                              .flatMap(java.util.Optional::stream)
-                              .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
+                              .flatMap(Optional::stream)
                               .findAny()
                               .orElseThrow(NotFoundException::new);
     }
 
-    /// Returns the {@link BibDatabaseContext} for the given library id.
+    /// Returns the [BibDatabaseContext] for the given library id.
     ///
     /// Looks up the context from the state manager's open databases. In stand-alone server
     /// mode those are parsed once at startup and held for the lifetime of the process; in
     /// GUI mode they are the user's open library tabs. Either way, the returned context is
-    /// the *same* object the state manager registered a {@link org.jabref.logic.search.SearchContext}
-    /// for, so callers can pass it straight to {@link SrvStateManager#getSearchContext}.
+    /// the *same* object the state manager registered a [org.jabref.logic.search.SearchContext]
+    /// for, so callers can pass it straight to [SrvStateManager#getSearchContext].
     ///
     /// @param id - also "demo" for the bundled Chocolate.bib demo library, and "current" for the active GUI database
     /// @throws NotFoundException if no library with the given id is found
@@ -77,16 +75,12 @@ public class ServerUtils {
             return srvStateManager.getActiveDatabase().orElseThrow(NotFoundException::new);
         }
         return srvStateManager.getOpenDatabases().stream()
-                              .filter(context -> context.getDatabasePath().isPresent())
-                              .filter(context -> {
-                                  Path p = context.getDatabasePath().get();
-                                  return (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id);
-                              })
+                              .filter(context -> context.getLibraryId().filter(id::equals).isPresent())
                               .findFirst()
                               .orElseThrow(() -> new NotFoundException("No library with id " + HtmlEscapers.htmlEscaper().escape(id) + " found"));
     }
 
-    /// Parses a single plain-text bibliography reference into a {@link BibEntry} using the
+    /// Parses a single plain-text bibliography reference into a [BibEntry] using the
     /// plain-citation parser the user selected in preferences (including the LLM parser).
     ///
     /// Shared by the `entries` and `citations` resources so the parser wiring stays in one place.

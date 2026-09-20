@@ -1,14 +1,16 @@
 package org.jabref.gui;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -19,12 +21,15 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.actions.StandardActions;
@@ -35,27 +40,31 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.git.GitDiffDialogView;
+import org.jabref.gui.git.GitPullScheduler;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.gui.util.InsertUtil;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.command.CommandSelectionTab;
+import org.jabref.logic.git.diff.GitDiffChecker;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -70,16 +79,20 @@ import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.search.sqlbased.SqlSearchBackend;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.DatabaseSynchronizer;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
@@ -88,13 +101,18 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.undo.UndoableRemoveEntries;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -102,6 +120,7 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +130,6 @@ import static org.jabref.gui.util.InsertUtil.addEntriesWithFeedback;
 public class LibraryTab extends Tab implements CommandSelectionTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
-    private final CountingUndoManager undoManager;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -120,7 +138,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
-    private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     private final NavigationHistory navigationHistory = new NavigationHistory();
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
@@ -158,10 +175,97 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
-    private BackgroundTask<ParserResult> dataLoadingTask;
+    private BackgroundTask<?> dataLoadingTask;
+
+    static final class SharedDatabaseLoadingCallbacks {
+        private final LibraryTab tab;
+        private final BiConsumer<LibraryTab, BibDatabaseContext> onSuccess;
+        private final Consumer<Exception> onFailure;
+        private Optional<BibDatabaseContext> connectedContext = Optional.empty();
+        private boolean cancelled;
+
+        SharedDatabaseLoadingCallbacks(LibraryTab tab,
+                                       BiConsumer<LibraryTab, BibDatabaseContext> onSuccess,
+                                       Consumer<Exception> onFailure) {
+            this.tab = tab;
+            this.onSuccess = onSuccess;
+            this.onFailure = onFailure;
+        }
+
+        private void onConnected(BibDatabaseContext bibDatabaseContext) {
+            boolean closeContext;
+            synchronized (this) {
+                closeContext = cancelled;
+                if (!closeContext) {
+                    connectedContext = Optional.of(bibDatabaseContext);
+                }
+            }
+            if (closeContext) {
+                closeSharedDatabase(bibDatabaseContext);
+            }
+        }
+
+        private void onDatabaseLoadingSucceed(BibDatabaseContext loadedContext) {
+            boolean closeContext;
+            synchronized (this) {
+                closeContext = cancelled;
+                connectedContext = Optional.empty();
+            }
+            if (closeContext) {
+                closeSharedDatabase(loadedContext);
+                return;
+            }
+            tab.setDatabaseContext(loadedContext);
+            Optional.ofNullable(tab.autoCompleterChangedListener).ifPresent(Runnable::run);
+            tab.loading.set(false);
+            tab.dataLoadingTask = null;
+            onSuccess.accept(tab, loadedContext);
+        }
+
+        private void onDatabaseLoadingFailed(Exception exception) {
+            tab.loading.set(false);
+            tab.dataLoadingTask = null;
+            tab.tabContainer.closeTab(tab);
+            onFailure.accept(exception);
+        }
+
+        private void cancel() {
+            Optional<BibDatabaseContext> contextToClose;
+            synchronized (this) {
+                cancelled = true;
+                contextToClose = connectedContext;
+                connectedContext = Optional.empty();
+            }
+            contextToClose.ifPresent(LibraryTab::closeSharedDatabase);
+        }
+    }
+
+    static final class SharedDatabaseLoadingTask extends BackgroundTask<BibDatabaseContext> {
+        private final Callable<BibDatabaseContext> connectionTask;
+        private final SharedDatabaseLoadingCallbacks callbacks;
+
+        SharedDatabaseLoadingTask(Callable<BibDatabaseContext> connectionTask, SharedDatabaseLoadingCallbacks callbacks) {
+            this.connectionTask = connectionTask;
+            this.callbacks = callbacks;
+        }
+
+        @Override
+        public BibDatabaseContext call() throws Exception {
+            BibDatabaseContext bibDatabaseContext = connectionTask.call();
+            callbacks.onConnected(bibDatabaseContext);
+            return bibDatabaseContext;
+        }
+
+        @Override
+        public void cancel(boolean mayInterruptIfRunning) {
+            super.cancel(mayInterruptIfRunning);
+            callbacks.cancel();
+        }
+    }
 
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     private final AiService aiService;
 
@@ -170,7 +274,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private Runnable autoCompleterChangedListener;
 
-    /// If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
+    /// If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path [BibDatabaseContext#getFulltextIndexPath()].
     /// If the index is created for the dummy context, the actual context will not be able to open the index until it is closed by the dummy context.
     /// Closing the index takes time and will slow down opening the library.
     ///
@@ -183,13 +287,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
-                       CountingUndoManager undoManager,
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
+                       GitHandlerRegistry gitHandlerRegistry,
                        boolean isDummyContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.tabContainer = tabContainer;
-        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
@@ -198,6 +301,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
         this.aiService = aiService;
 
         this.journalAbbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
@@ -235,7 +339,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 bibDatabaseContext,
                 preferences,
                 fileUpdateMonitor,
-                undoManager,
+                getUndoManager(),
                 stateManager,
                 dialogService,
                 taskExecutor);
@@ -261,6 +365,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
         Platform.runLater(() -> {
+            // [impl->req~logic.undo.modified-marker-derived~1]
+            changedProperty.bind(journal().hasChangedProperty());
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ ->
                     updateTabTitle(changedProperty.getValue()));
@@ -298,24 +404,42 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     private static void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
-        text.append(bibDatabaseContext.getDBMSSynchronizer().getDBName());
+        Optional.ofNullable(bibDatabaseContext.getDBMSSynchronizer())
+                .map(DatabaseSynchronizer::getDBName)
+                .ifPresent(text::append);
         text.append(" [");
         text.append(Localization.lang("shared"));
         text.append("]");
     }
 
-    private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
+    private void setDataLoadingTask(BackgroundTask<?> dataLoadingTask) {
         this.loading.set(true);
         this.dataLoadingTask = dataLoadingTask;
     }
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
-        OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
-        if (result.getChangedOnMigration()) {
-            this.markBaseChanged();
+        if (result.isInvalid()) {
+            // Nothing could be read from the file - the caller has already reported the reason to the user.
+            // Keeping the tab would leave an empty, untitled library behind, which the user could accidentally
+            // save over the file that failed to load.
+            // [impl->req~import.library.unreadable-reported~1]
+            // Close first, while dataLoadingTask is still set: confirmClose() treats a tab that is still
+            // loading as disposable and drops it. Clearing the task beforehand would instead offer to save
+            // the placeholder - over the very file that failed to load - if anything had modified it.
+            tabContainer.closeTab(this);
+            loading.set(false);
+            dataLoadingTask = null;
+            return;
         }
 
+        OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
         setDatabaseContext(result.getDatabaseContext());
+        if (result.getChangedOnMigration()) {
+            // Rewritten while loading, so there is no step to undo it with. After the context is
+            // installed: until then, journal() answers for the loading placeholder, whose journal
+            // setDatabaseContext then discards.
+            journal().markChanged();
+        }
         // Notify listeners that the auto-completer may have changed
         if (autoCompleterChangedListener != null) {
             autoCompleterChangedListener.run();
@@ -370,6 +494,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         stateManager.getOpenDatabases().removeIf(databaseContext -> databaseContext == previousDatabaseContext);
 
+        // The context being replaced is the placeholder this tab showed while the file loaded. Its
+        // journal describes a library that is about to stop existing, and nothing else can reach it
+        // once the tab moves on, so it goes with the context rather than staying for the session.
+        stateManager.removeUndoManager(previousDatabaseContext);
+
         this.bibDatabaseContext = bibDatabaseContext;
 
         initializeComponentsAndListeners(false);
@@ -396,6 +525,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
         }
+
+        GitPullScheduler.start(bibDatabaseContext,
+                dialogService,
+                preferences,
+                stateManager,
+                taskExecutor,
+                gitHandlerRegistry,
+                this::isModified);
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -469,15 +606,51 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
         }
 
+        IconTheme.JabRefIcons icon = tabIcon(databaseLocation, bibDatabaseContext.getMode());
         UiTaskExecutor.runInJavaFXThread(() -> {
             textProperty().setValue(tabTitle.toString());
             setTooltip(new Tooltip(toolTipText.toString()));
+            if (getGraphic() == null || !icon.matches(getGraphic())) {
+                Node graphic = icon.getGraphicNode();
+                graphic.getStyleClass().add("tab-icon");
+                setGraphic(graphic);
+            }
         });
     }
 
+    // [impl->req~ux.tabs.library-kind-icon~1]
+    static IconTheme.JabRefIcons tabIcon(DatabaseLocation location, BibDatabaseMode mode) {
+        if (location == DatabaseLocation.SHARED) {
+            return IconTheme.JabRefIcons.SHARED_DATABASE_LIBRARY;
+        }
+        return mode == BibDatabaseMode.BIBLATEX ? IconTheme.JabRefIcons.BIBLATEX_LIBRARY : IconTheme.JabRefIcons.BIBTEX_LIBRARY;
+    }
+
+    /// Marks the changes the journal does not know about, so that [#changedProperty] can derive
+    /// the rest from it.
+    ///
+    /// Both kinds of change say where they came from, and the marker follows that: an entry
+    /// pushed in from a shared database and a setting written by something that recorded nothing
+    /// can only be taken back by saving, so they mark. A change the journal is behind is described
+    /// by a step, so undoing it brings the library back to the saved position and the marker
+    /// clears itself.
+    ///
+    /// Saying nothing counts as unrecorded, which is the safe answer: it costs an asterisk on a
+    /// library that does not need saving, never a library closing without asking.
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        this.changedProperty.setValue(true);
+        boolean unrecorded = ((event instanceof MetaDataChangedEvent metaDataChangedEvent)
+                && (metaDataChangedEvent.getSource() == MetaDataChangeSource.LOCAL))
+                || ((event instanceof EntriesEvent entriesEvent)
+                && (entriesEvent.getEntriesEventSource() == EntriesEventSource.SHARED));
+        if (unrecorded) {
+            journal().markChanged();
+        }
+        // The mode lives in the metadata, and a change of it while the library is already dirty does
+        // not move changedProperty, so the icon has to be refreshed from here.
+        if (event instanceof MetaDataChangedEvent) {
+            updateTabTitle(changedProperty.get());
+        }
     }
 
     /// Returns a collection of suggestion providers, which are populated from the current library.
@@ -486,14 +659,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void registerUndoableChanges(List<FieldChange> changes) {
-        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Save actions"));
-        for (FieldChange change : changes) {
-            compoundEdit.addEdit(new UndoableFieldChange(change));
-        }
-        compoundEdit.end();
-        if (compoundEdit.hasEdits()) {
-            getUndoManager().addEdit(compoundEdit);
-        }
+        getUndoManager().addEdit(Localization.lang("Save actions"), edit -> edit.addAll(changes));
     }
 
     private void createMainTable() {
@@ -542,7 +708,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
-                this.changedProperty.setValue(true);
+                journal().markChanged();
             }
         }
     }
@@ -590,13 +756,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Put an asterisk behind the filename to indicate the database has changed.
-    public synchronized void markChangedOrUnChanged() {
-        if (undoManager.hasChanged()) {
-            this.changedProperty.setValue(true);
-        } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
-            this.changedProperty.setValue(false);
-        }
-    }
 
     public BibDatabase getDatabase() {
         return bibDatabaseContext.getDatabase();
@@ -660,19 +819,29 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 .map(Path::toString)
                 .orElse(Localization.lang("untitled"));
 
+        // LEFT: same position on every platform's button order, and never the default button
+        ButtonType showDiff = new ButtonType(Localization.lang("Show diff"), ButtonBar.ButtonData.LEFT);
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
         ButtonType returnToLibrary = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
-                Localization.lang("Save before closing"),
-                Localization.lang("Library '%0' has been modified.", filename),
-                saveChanges, discardChanges, returnToLibrary);
+        FXDialog dialog = new FXDialog(Alert.AlertType.CONFIRMATION, Localization.lang("Save before closing"), true);
+        dialog.setHeaderText(null);
+        dialog.setResizable(true);
+        TextArea content = new TextArea(Localization.lang("Library '%0' has been modified.", filename));
+        content.setWrapText(true);
+        dialog.getDialogPane().setContent(content);
+        dialog.getButtonTypes().setAll(showDiff, saveChanges, discardChanges, returnToLibrary);
+        // Consuming the action keeps the dialog open: the diff is informational, the user still has to decide
+        dialog.getDialogPane().lookupButton(showDiff).addEventFilter(ActionEvent.ACTION, event -> {
+            event.consume();
+            showDiffToSavedFile();
+        });
 
+        Optional<ButtonType> response = dialogService.showCustomDialogAndWait(dialog);
         if (response.isEmpty()) {
             return true;
         }
-
         ButtonType buttonType = response.get();
 
         if (buttonType.equals(returnToLibrary)) {
@@ -682,7 +851,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (buttonType.equals(saveChanges)) {
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
-                if (saveAction.save()) {
+                if (saveAction.save() != SaveDatabaseAction.SaveResult.FAILURE) {
                     return true;
                 }
                 // The action was either canceled or unsuccessful.
@@ -703,6 +872,41 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return false;
     }
 
+    /// Shows the unsaved in-memory changes compared to the file on disk (or to an empty library if never saved).
+    // [impl->req~ux.close.show-diff~1]
+    private void showDiffToSavedFile() {
+        BackgroundTask.wrap(this::loadSavedFile)
+                      .onSuccess(this::showDiffDialog)
+                      .onFailure(this::showDiffError)
+                      .executeWith(taskExecutor);
+    }
+
+    /// Parses the file on disk; its TeX groups must not register with the shared file monitor because the snapshot is discarded after the diff.
+    private BibDatabaseContext loadSavedFile() {
+        return bibDatabaseContext.getDatabasePath()
+                                 .map(this::parseSavedFile)
+                                 .orElseGet(BibDatabaseContext::empty);
+    }
+
+    private BibDatabaseContext parseSavedFile(Path path) {
+        try {
+            return GitDiffChecker.checkSavedWorkingTreeVersion(path, preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private void showDiffDialog(BibDatabaseContext savedDatabase) {
+        List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(savedDatabase, bibDatabaseContext, null);
+        dialogService.showCustomDialogAndWait(new GitDiffDialogView(changes, savedDatabase, bibDatabaseContext,
+                Localization.lang("Saved file"), Localization.lang("Unsaved changes")));
+    }
+
+    private void showDiffError(Exception exception) {
+        LOGGER.error("Could not read saved library for diff", exception);
+        dialogService.showErrorDialogAndWait(Localization.lang("Show diff"), Localization.lang("Could not read file."), exception);
+    }
+
     private void onCloseRequest(Event event) {
         if (!requestClose()) {
             event.consume();
@@ -715,9 +919,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             dataLoadingTask.cancel();
         }
         if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
-            bibDatabaseContext.convertToLocalDatabase();
-            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
-            bibDatabaseContext.clearDBMSSynchronizer();
+            closeSharedDatabase(bibDatabaseContext);
         }
         try {
             changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
@@ -732,6 +934,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when closing search context", e);
         }
 
+        stateManager.removeUndoManager(bibDatabaseContext);
+
         try {
             AutosaveManager.shutdown(bibDatabaseContext);
         } catch (RuntimeException e) {
@@ -745,6 +949,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
 
+        try {
+            GitPullScheduler.shutdown(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down Git pull scheduler", e);
+        }
+
+        if (mainTable != null) {
+            mainTable.dispose();
+        }
+
         if (tableModel != null) {
             tableModel.unbind();
         }
@@ -755,6 +969,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
+    }
+
+    private static void closeSharedDatabase(BibDatabaseContext bibDatabaseContext) {
+        bibDatabaseContext.convertToLocalDatabase();
+        bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+        bibDatabaseContext.clearDBMSSynchronizer();
     }
 
     /// Get an array containing the currently selected entries. The array is stable and not changed if the selection changes
@@ -781,8 +1001,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return loading;
     }
 
-    public CountingUndoManager getUndoManager() {
-        return undoManager;
+    /// The journal to record a change to this library on.
+    ///
+    /// Recording is what a tab's collaborators do with the journal. The few classes that undo, redo
+    /// or track the saved position name the library to the state manager instead.
+    public UndoManager getUndoManager() {
+        return journal();
+    }
+
+    private GuiUndoManager journal() {
+        return stateManager.getUndoManager(bibDatabaseContext);
     }
 
     public MainTable getMainTable() {
@@ -813,16 +1041,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 taskExecutor,
                 dialogService,
                 preferences,
-                undoManager,
-                stateManager));
+                getUndoManager(),
+                stateManager,
+                this));
     }
 
     public void suspendChangeMonitor() {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        changeMonitor.ifPresent(DatabaseChangeMonitor::suspendChangeDetection);
     }
 
+    /// Resuming also scans for external changes that arrived while the monitor was suspended, e.g. a concurrent write
+    /// that aborted the suspended save — the standard external-changes review flow is offered for them.
     public void resumeChangeMonitor() {
-        bibDatabaseContext.getDatabasePath().ifPresent(_ -> resetChangeMonitor());
+        changeMonitor.ifPresent(DatabaseChangeMonitor::resumeChangeDetection);
     }
 
     public void insertEntry(final BibEntry bibEntry) {
@@ -847,9 +1078,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
+        // One step, opened by importCleanedEntries around the insert, so that the automatic
+        // assignment it sets off is recorded inside it rather than as a second step.
         importHandler.importCleanedEntries(null, entries);
-        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-        markBaseChanged();
         stateManager.setSelectedEntries(entries);
 
         // Only show/select individual entry for single-entry imports.
@@ -901,7 +1132,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         // Now, the BibEntries to add are known
         // The definitive insertion needs to happen now.
         addEntriesWithFeedback(
-                clipBoardManager.getJabRefClipboardTransferData(),
+                clipBoardManager.getJabRefClipboardTransferData().orElse(null),
                 entriesToAdd,
                 bibDatabaseContext,
                 params -> Localization.lang("Pasted %0 entry(s) to %1", params),
@@ -930,30 +1161,44 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
+    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> originalEntries, List<BibEntry> entriesToAdd, TransferMode mode) {
+        InsertUtil.FeedbackMessage successMessage;
+        InsertUtil.FeedbackMessage partialMessage;
+        if (mode == TransferMode.MOVE) {
+            successMessage = params -> Localization.lang("Moved %0 entry(s) to %1", params);
+            partialMessage = params -> Localization.lang("Moved %0 entry(s) to %1. %2 were skipped", params);
+        } else {
+            successMessage = params -> Localization.lang("Copied %0 entry(s) to %1", params);
+            partialMessage = params -> Localization.lang("Copied %0 entry(s) to %1. %2 were skipped", params);
+        }
         addEntriesWithFeedback(
-                new TransferInformation(sourceBibDatabaseContext, TransferMode.NONE), // "NONE", because we don't know the modifiers here and thus cannot say whether the attached file (and entry(s)) should be copied or moved
+                new TransferInformation(sourceBibDatabaseContext, mode, originalEntries),
                 entriesToAdd,
                 bibDatabaseContext,
-                params -> Localization.lang("Moved %0 entry(s) to %1", params),
-                params -> Localization.lang("Moved %0 entry(s) to %1. %2 were skipped", params),
+                successMessage,
+                partialMessage,
                 dialogService,
                 importHandler,
                 stateManager
         );
     }
 
+    /// Copies the selection to the clipboard, then removes it from the library. The delete is
+    /// reached only once the copy has succeeded, so a cut that cannot reach the clipboard leaves
+    /// the entries where they are — there is no half-done cut to compensate for.
     public void cutEntry() {
-        int entriesCopied = doCopyEntry(TransferMode.MOVE, getSelectedEntries());
-        int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
+        List<BibEntry> selectedEntries = getSelectedEntries();
 
-        if (entriesCopied == entriesDeleted) {
-            dialogService.notify(Localization.lang("Cut %0 entry(s)", entriesCopied));
-        } else {
-            dialogService.notify(Localization.lang("Cut failed", entriesCopied));
-            undoManager.undo();
-            clipBoardManager.setContent("");
+        int entriesCopied = doCopyEntry(TransferMode.MOVE, selectedEntries);
+        if (entriesCopied < 0) {
+            // Nothing to clean up: the clipboard is written only after the entries have been
+            // serialized, so a failure leaves it holding whatever the user put there earlier.
+            dialogService.notify(Localization.lang("Cut failed"));
+            return;
         }
+
+        int entriesDeleted = doDeleteEntry(StandardActions.CUT, selectedEntries);
+        dialogService.notify(Localization.lang("Cut %0 entry(s)", entriesDeleted));
     }
 
     /// Removes the selected entries and files linked to selected entries from the database
@@ -980,8 +1225,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         // Delete selected entries
-        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, mode == StandardActions.CUT));
-        bibDatabaseContext.getDatabase().removeEntries(entries);
+        getUndoManager().applyEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries));
 
         if (mode != StandardActions.CUT) {
             List<LinkedFile> linkedFileList = entries.stream()
@@ -998,8 +1242,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
         }
 
-        markBaseChanged();
-
         // prevent the main table from loosing focus
         mainTable.requestFocus();
 
@@ -1010,18 +1252,18 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return changedProperty.getValue();
     }
 
-    public void markBaseChanged() {
-        this.changedProperty.setValue(true);
-    }
-
-    public void markNonUndoableBaseChanged() {
-        this.nonUndoableChangeProperty.setValue(true);
-        this.changedProperty.setValue(true);
-    }
-
     public void resetChangedProperties() {
-        this.nonUndoableChangeProperty.setValue(false);
-        this.changedProperty.setValue(false);
+        resetChangedProperties(null);
+    }
+
+    /// All call sites mean "in-memory library now matches the disk", so file events for that state need no scan.
+    ///
+    /// @param diskState the on-disk state the library matches, as reported by the writer that committed it; `null` to determine it from the file (e.g. after merging all external changes)
+    public void resetChangedProperties(@Nullable FileSnapshot diskState) {
+        // The marker derives from the saved position, so stamping it is what clears the marker -
+        // including a change the journal could not have taken back.
+        journal().markUnchanged();
+        changeMonitor.ifPresent(monitor -> monitor.markConsistentWithDisk(diskState));
     }
 
     public void back() {
@@ -1077,9 +1319,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              CountingUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
-                                              TaskExecutor taskExecutor) {
+                                              TaskExecutor taskExecutor,
+                                              GitHandlerRegistry gitHandlerRegistry) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
@@ -1092,9 +1334,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipBoardManager,
                 taskExecutor,
+                gitHandlerRegistry,
                 true);
 
         newTab.setDataLoadingTask(dataLoadingTask);
@@ -1105,6 +1347,52 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return newTab;
     }
 
+    /// Creates a shared-library tab that displays the main table's loading indicator until `connectionTask` has connected.
+    /// The dummy context is replaced with the connected context on success; cancellation closes the connected context instead.
+    // [impl->req~shared-database.loading-indicator~1]
+    public static LibraryTab createLibraryTab(Callable<BibDatabaseContext> connectionTask,
+                                              BibDatabaseContext dummyContext,
+                                              DialogService dialogService,
+                                              AiService aiService,
+                                              GuiPreferences preferences,
+                                              StateManager stateManager,
+                                              LibraryTabContainer tabContainer,
+                                              FileUpdateMonitor fileUpdateMonitor,
+                                              BibEntryTypesManager entryTypesManager,
+                                              ClipBoardManager clipBoardManager,
+                                              TaskExecutor taskExecutor,
+                                              GitHandlerRegistry gitHandlerRegistry,
+                                              BiConsumer<LibraryTab, BibDatabaseContext> onSuccess,
+                                              Consumer<Exception> onFailure) {
+        LibraryTab newTab = new LibraryTab(
+                dummyContext,
+                tabContainer,
+                dialogService,
+                aiService,
+                preferences,
+                stateManager,
+                fileUpdateMonitor,
+                entryTypesManager,
+                clipBoardManager,
+                taskExecutor,
+                gitHandlerRegistry,
+                true);
+
+        SharedDatabaseLoadingCallbacks callbacks = new SharedDatabaseLoadingCallbacks(newTab, onSuccess, onFailure);
+        BackgroundTask<BibDatabaseContext> dataLoadingTask = new SharedDatabaseLoadingTask(connectionTask, callbacks);
+        newTab.setDataLoadingTask(dataLoadingTask);
+        dataLoadingTask.onSuccess(callbacks::onDatabaseLoadingSucceed)
+                       .onFailure(callbacks::onDatabaseLoadingFailed);
+
+        return newTab;
+    }
+
+    /// Starts a loading task after its tab has been added to the tab container.
+    public void startDataLoadingTask() {
+        assert dataLoadingTask != null;
+        dataLoadingTask.executeWith(taskExecutor);
+    }
+
     public static LibraryTab createLibraryTab(@NonNull BibDatabaseContext databaseContext,
                                               LibraryTabContainer tabContainer,
                                               DialogService dialogService,
@@ -1113,9 +1401,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
-                                              UndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
-                                              TaskExecutor taskExecutor) {
+                                              TaskExecutor taskExecutor,
+                                              GitHandlerRegistry gitHandlerRegistry) {
         return new LibraryTab(
                 databaseContext,
                 tabContainer,
@@ -1125,9 +1413,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
-                (CountingUndoManager) undoManager,
                 clipBoardManager,
                 taskExecutor,
+                gitHandlerRegistry,
                 false);
     }
 
@@ -1148,10 +1436,21 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 return;
             }
 
+            // Nor when the journal is replaying an insertion: a redo reads its stack, applies, and
+            // then moves the entry across, so recording anything here would clear the stack it is
+            // still holding. The entries are back either way; assigning them again is not this
+            // listener's business.
+            if (getUndoManager() instanceof GuiUndoManager journal && journal.isApplying()) {
+                return;
+            }
+
             // Automatically add new entries to the selected group (or set of groups)
             if (preferences.getGroupsPreferences().shouldAutoAssignGroup()) {
-                stateManager.getSelectedGroups(bibDatabaseContext).forEach(
-                        selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
+                // A step of its own, which nests into the caller's block when the insert opened one
+                // (import, paste), so the assignment is taken back together with the entries.
+                getUndoManager().addEdit(Localization.lang("Assign entries to group"), edit ->
+                        stateManager.getSelectedGroups(bibDatabaseContext).forEach(
+                                selectedGroup -> edit.addAll(selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()))));
             }
         }
     }

@@ -96,8 +96,11 @@ jvmDependencyConflicts.patch {
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
 
-    module("org.testfx:testfx-core") {
-        removeDependency("org.osgi:org.osgi.core")
+    listOf("org.apache.sshd:sshd-osgi", "org.apache.sshd:sshd-sftp").forEach { sshd ->
+        module(sshd) {
+            // sshd logs via slf4j directly; the declared JCL bridge conflicts with commons-logging (needed by pdfbox)
+            removeDependency("org.slf4j:jcl-over-slf4j")
+        }
     }
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
@@ -105,6 +108,7 @@ jvmDependencyConflicts.patch {
     module("dev.langchain4j:langchain4j-core") {
         addRuntimeOnlyDependency("com.knuddels:jtokkit")
     }
+
     module("org.jabref:afterburner.fx") {
         // POM pins javafx-* to 20; strip and re-add without version so :versions platform resolves them to current
         removeDependency("org.openjfx:javafx-controls")
@@ -229,6 +233,7 @@ extraJavaModuleInfo {
         // requires("jackson.annotations")
     }
     module("dev.langchain4j:langchain4j", "langchain4j")
+    module("dev.langchain4j:langchain4j-jackson3", "langchain4j.jackson3")
     module("dev.langchain4j:langchain4j-core", "langchain4j.core") {
         // workaround for https://github.com/langchain4j/langchain4j/issues/3668
         patchRealModule()
@@ -240,6 +245,10 @@ extraJavaModuleInfo {
         mergeJar("dev.langchain4j:langchain4j-google-ai-gemini")
         requires("java.net.http")
         uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
+        uses("dev.langchain4j.spi.json.ProviderJsonCodecFactory")
+        // Loaded by MistralAiChatModel.builder() and build(); missing uses crashes JabRef start with Mistral AI selected
+        uses("dev.langchain4j.model.mistralai.spi.MistralAiChatModelBuilderFactory")
+        uses("dev.langchain4j.model.mistralai.internal.client.MistralAiClientBuilderFactory")
         exportAllPackages()
         requireAllDefinedDependencies()
     }
@@ -249,6 +258,11 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-hugging-face", "langchain4j.hugging.face")
     module("dev.langchain4j:langchain4j-mistral-ai", "langchain4j.mistral.ai")
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
+
+    module("io.smallrye.reactive:mutiny-zero", "io.smallrye.mutiny.zero") {
+        preserveExisting()
+    }
+
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
@@ -282,11 +296,43 @@ extraJavaModuleInfo {
         requires("org.apache.commons.logging")
     }
     module("org.apache.pdfbox:pdfbox-io", "org.apache.pdfbox.io")
+    module("org.apache.sshd:sshd-osgi", "org.apache.sshd.osgi") {
+        exportAllPackages()
+        requires("java.logging")
+        requires("java.management") // Reason: ExceptionUtils unwraps javax.management exceptions
+        requires("java.rmi") // Reason: ExceptionUtils unwraps java.rmi exceptions
+        requires("java.security.jgss")
+        requires("org.slf4j")
+        uses("org.apache.sshd.common.io.IoServiceFactoryFactory")
+    }
+    module("org.apache.sshd:sshd-sftp", "org.apache.sshd.sftp") {
+        exportAllPackages()
+        requires("org.apache.sshd.osgi")
+        requires("org.slf4j")
+    }
     module("org.apache.velocity:velocity-engine-core", "velocity.engine.core")
     module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit") {
         exportAllPackages()
         requires("org.slf4j")
         uses("org.eclipse.jgit.lib.SignerFactory")
+        uses("org.eclipse.jgit.transport.SshSessionFactory")
+    }
+    module("org.eclipse.jgit:org.eclipse.jgit.ssh.apache", "org.eclipse.jgit.ssh.apache") {
+        exportAllPackages()
+        requires("org.apache.sshd.osgi")
+        requires("org.apache.sshd.sftp")
+        requires("org.eclipse.jgit")
+        requires("java.security.jgss")
+        requires("org.slf4j")
+        uses("org.eclipse.jgit.transport.sshd.agent.ConnectorFactory")
+    }
+    module("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent", "org.eclipse.jgit.ssh.apache.agent") {
+        exportAllPackages()
+        requires("com.sun.jna")
+        requires("com.sun.jna.platform")
+        requires("org.eclipse.jgit")
+        requires("org.eclipse.jgit.ssh.apache")
+        requires("org.slf4j")
     }
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "wellbehavedfx") {
@@ -303,19 +349,6 @@ extraJavaModuleInfo {
         requiresTransitive("java.xml")
     }
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
-
-    module("org.testfx:testfx-core", "org.testfx") {
-        exportAllPackages()
-        // Content based on https://github.com/TestFX/TestFX/commit/bf4a08aa82c008fdd3c296aaafee1d222f3824cb
-        requires("java.desktop")
-        requiresTransitive("javafx.controls")
-        requiresTransitive("org.hamcrest")
-    }
-    module("org.testfx:testfx-junit5", "org.testfx.junit5") {
-        exportAllPackages()
-        requires("org.junit.jupiter.api")
-        requiresTransitive("org.testfx")
-    }
 
     module("org.xmlunit:xmlunit-core", "org.xmlunit") {
         exportAllPackages()
@@ -445,6 +478,7 @@ extraJavaModuleInfo {
         requires("java.management")
         requires("java.naming")
         requires("java.sql")
+        requires("java.security.jgss")
     }
     module("org.apache.pdfbox:pdfbox", "org.apache.pdfbox") {
         exportAllPackages()
@@ -480,7 +514,6 @@ extraJavaModuleInfo {
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         preserveExisting()
         exports("com.sun.javafx.scene")
-        opens("com.sun.javafx.application", "org.testfx")
         opens("javafx.scene", "org.controlsfx.controls")
     }
 

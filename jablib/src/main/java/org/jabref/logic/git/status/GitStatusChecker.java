@@ -8,11 +8,14 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.git.util.GitExceptionUtil;
+import org.jabref.logic.l10n.Localization;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LsRemoteCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.lib.BranchConfig;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
@@ -21,12 +24,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This class is used to determine the status of a Git repository from any given path inside it.
-/// If no repository is found, it returns a {@link GitStatusSnapshot} with tracking = false.
+/// If no repository is found, it returns a [GitStatusSnapshot] with tracking = false.
 /// Otherwise, it returns a full snapshot including tracking status, sync status, and conflict state.
 public class GitStatusChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitStatusChecker.class);
 
     public static GitStatusSnapshot checkStatus(GitHandler gitHandler) {
+        try {
+            return checkStatusOrThrow(gitHandler);
+        } catch (JabRefException e) {
+            LOGGER.warn("Failed to check Git status", e);
+            return new GitStatusSnapshot(
+                    GitStatusSnapshot.TRACKING,
+                    SyncStatus.UNKNOWN,
+                    !GitStatusSnapshot.CONFLICT,
+                    !GitStatusSnapshot.UNCOMMITTED,
+                    Optional.empty()
+            );
+        }
+    }
+
+    public static GitStatusSnapshot checkStatusOrThrow(GitHandler gitHandler) throws JabRefException {
         try (Git git = Git.open(gitHandler.getRepositoryPathAsFile())) {
             Repository repo = git.getRepository();
             Status status = git.status().call();
@@ -40,14 +58,8 @@ public class GitStatusChecker {
             SyncStatus syncStatus;
 
             if (remoteHead == null) {
-                boolean remoteEmpty = isRemoteEmpty(gitHandler);
-                if (remoteEmpty) {
-                    LOGGER.debug("Remote has NO heads -> REMOTE_EMPTY");
-                    syncStatus = SyncStatus.REMOTE_EMPTY;
-                } else {
-                    LOGGER.debug("Remote is NOT empty but remoteHead unresolved -> UNKNOWN");
-                    syncStatus = SyncStatus.UNKNOWN;
-                }
+                // [impl->req~git.commit.remote-independent~1]
+                syncStatus = determineSyncStatusWithoutRemoteHead(gitHandler);
             } else {
                 syncStatus = determineSyncStatus(repo, localHead, remoteHead);
             }
@@ -59,15 +71,8 @@ public class GitStatusChecker {
                     hasUncommittedChanges,
                     Optional.ofNullable(localHead).map(ObjectId::getName)
             );
-        } catch (IOException | GitAPIException e) {
-            LOGGER.warn("Failed to check Git status", e);
-            return new GitStatusSnapshot(
-                    GitStatusSnapshot.TRACKING,
-                    SyncStatus.UNKNOWN,
-                    !GitStatusSnapshot.CONFLICT,
-                    !GitStatusSnapshot.UNCOMMITTED,
-                    Optional.empty()
-            );
+        } catch (IOException | GitAPIException | JGitInternalException e) {
+            throw translateStatusFailure(e);
         }
     }
 
@@ -83,9 +88,30 @@ public class GitStatusChecker {
                          ));
     }
 
-    public static GitStatusSnapshot checkStatusAndFetch(GitHandler gitHandler) throws IOException, JabRefException {
+    public static GitStatusSnapshot checkStatusAndFetch(GitHandler gitHandler) throws JabRefException {
         gitHandler.fetchOnCurrentBranch();
-        return checkStatus(gitHandler);
+        return checkStatusOrThrow(gitHandler);
+    }
+
+    /// The remote is only consulted to tell "remote exists but is empty" apart from "cannot tell".
+    /// Any failure to reach it (no `origin`, unsupported or unreachable URI, ...) must not affect the
+    /// local working-tree result the caller relies on, so it degrades to [SyncStatus#UNKNOWN].
+    private static SyncStatus determineSyncStatusWithoutRemoteHead(GitHandler gitHandler) {
+        if (!gitHandler.hasRemote("origin")) {
+            LOGGER.debug("No origin remote configured -> UNKNOWN");
+            return SyncStatus.UNKNOWN;
+        }
+        try {
+            if (isRemoteEmpty(gitHandler)) {
+                LOGGER.debug("Remote has NO heads -> REMOTE_EMPTY");
+                return SyncStatus.REMOTE_EMPTY;
+            }
+            LOGGER.debug("Remote is NOT empty but remoteHead unresolved -> UNKNOWN");
+            return SyncStatus.UNKNOWN;
+        } catch (IOException | GitAPIException | JGitInternalException e) {
+            LOGGER.warn("Could not query remote origin", e);
+            return SyncStatus.UNKNOWN;
+        }
     }
 
     private static SyncStatus determineSyncStatus(Repository repo, ObjectId localHead, ObjectId remoteHead) throws IOException {
@@ -127,5 +153,25 @@ public class GitStatusChecker {
             }
             return empty;
         }
+    }
+
+    private static JabRefException translateStatusFailure(Exception exception) {
+        LOGGER.warn("Failed to check Git status", exception);
+        if (GitExceptionUtil.isLockFailure(exception)) {
+            return new JabRefException(
+                    "Failed to check Git status because the repository is locked",
+                    Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again."),
+                    exception);
+        }
+        if (GitExceptionUtil.isMissingObjectFailure(exception)) {
+            return new JabRefException(
+                    "Failed to check Git status because the repository is incomplete or corrupted",
+                    Localization.lang("The local Git repository is incomplete or corrupted. Remove the broken .git directory in that folder or choose another folder, then try again."),
+                    exception);
+        }
+        return new JabRefException(
+                "Failed to check Git status",
+                Localization.lang("Could not read the Git repository status. Please check the repository and try again."),
+                exception);
     }
 }

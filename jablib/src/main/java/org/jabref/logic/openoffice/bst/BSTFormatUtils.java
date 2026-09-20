@@ -16,6 +16,14 @@ import org.jspecify.annotations.NullMarked;
 public final class BSTFormatUtils {
 
     private static final Pattern INLINE_MATH_SPAN = Pattern.compile("(?s)<span\\s+class=\\\"math inline\\\"[^>]*>(.*?)</span>");
+    private static final Pattern BRACED_ETALCHAR_PATTERN = Pattern.compile("\\{\\\\etalchar\\{([^}]*)}}");
+    private static final Pattern ETALCHAR_PATTERN = Pattern.compile("\\\\etalchar\\{([^}]*)}");
+    private static final Pattern DIV_OPEN_TAG = Pattern.compile("<div[^>]*>");
+    private static final Pattern A_OPEN_TAG = Pattern.compile("<a[^>]*>");
+    private static final Pattern REMAINING_SPAN_TAGS = Pattern.compile("</?span[^>]*>");
+    private static final Pattern LINE_BREAKS = Pattern.compile("[\n\r]+");
+    private static final Pattern LEADING_EMPTY_PARAGRAPH_MARKER = Pattern.compile("^\\s*<p>\\s*</p>");
+    private static final Pattern TRAILING_EMPTY_PARAGRAPH_MARKERS = Pattern.compile("(?:<p>\\s*</p>\\s*){2,}$");
 
     private BSTFormatUtils() {
     }
@@ -63,18 +71,29 @@ public final class BSTFormatUtils {
         return s;
     }
 
+    /// Normalizes a BST `\\bibitem[...]` label by replacing supported label-only helper macros
+    /// with their plain-text equivalents.
+    ///
+    /// Currently this converts alpha-style `\\etalchar{...}` markers such as
+    /// `TLY{\\etalchar{+}}21` to `TLY+21` so the label can be shown directly in previews and
+    /// LibreOffice citations.
+    public static String normalizeBibItemLabel(String label) {
+        String normalized = BRACED_ETALCHAR_PATTERN.matcher(label).replaceAll("$1");
+        return ETALCHAR_PATTERN.matcher(normalized).replaceAll("$1");
+    }
+
     private static String replaceLegacySwitch(String input, String legacy, String modern) {
-        String needle = "{\\" + legacy; // e.g., "{\\sc"
+        String legacyCommandPrefix = "{\\" + legacy; // e.g., "{\\sc"
         StringBuilder out = new StringBuilder(input.length());
         int i = 0;
         while (i < input.length()) {
-            int j = input.indexOf(needle, i);
+            int j = input.indexOf(legacyCommandPrefix, i);
             if (j < 0) {
                 out.append(input, i, input.length());
                 break;
             }
             out.append(input, i, j);
-            int k = j + needle.length();
+            int k = j + legacyCommandPrefix.length();
             // Skip whitespace after the legacy command
             int whitespacePos = k;
             while (whitespacePos < input.length() && Character.isWhitespace(input.charAt(whitespacePos))) {
@@ -134,25 +153,25 @@ public final class BSTFormatUtils {
         html = StringEscapeUtils.unescapeHtml4(html);
 
         // Strip <div> tags (pandoc emits them for block-level content such as block quotes)
-        html = html.replaceAll("<div[^>]*>", "");
+        html = DIV_OPEN_TAG.matcher(html).replaceAll("");
         html = html.replace("</div>", "");
 
         // Strip hyperlinks - LibreOffice OOText does not support arbitrary <a> links
-        html = html.replaceAll("<a[^>]*>", "");
+        html = A_OPEN_TAG.matcher(html).replaceAll("");
         html = html.replace("</a>", "");
 
         // Strip remaining <span> tags (pandoc-specific semantic tags are already handled
         // earlier by mapPandocInlineToOO before this method is called)
-        html = html.replaceAll("</?span[^>]*>", "");
+        html = REMAINING_SPAN_TAGS.matcher(html).replaceAll("");
 
         // Convert line breaks to OOText paragraph separators
-        html = html.replaceAll("[\n\r]+", "<p></p>");
+        html = LINE_BREAKS.matcher(html).replaceAll("<p></p>");
 
         // Remove a leading empty paragraph separator
-        html = html.replaceAll("^\\s*<p>\\s*</p>", "");
+        html = LEADING_EMPTY_PARAGRAPH_MARKER.matcher(html).replaceAll("");
 
         // Collapse two or more consecutive trailing paragraph separators into one
-        html = html.replaceAll("(?:<p>\\s*</p>\\s*){2,}$", "<p></p>");
+        html = TRAILING_EMPTY_PARAGRAPH_MARKERS.matcher(html).replaceAll("<p></p>");
 
         return html.trim();
     }

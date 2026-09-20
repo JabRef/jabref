@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -35,15 +33,16 @@ import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.gui.walkthrough.WalkthroughPane;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.git.GitSsh;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -92,7 +91,6 @@ public class JabRefGUI extends Application {
     private static FileUpdateMonitor fileUpdateMonitor;
     private static StateManager stateManager;
     private static ThemeManager themeManager;
-    private static CountingUndoManager countingUndoManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
     private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
@@ -124,6 +122,8 @@ public class JabRefGUI extends Application {
 
         try {
             this.mainStage = stage;
+            // Load JavaFX stylesheet now instead of loading it later when the first Control is initialized.
+            setUserAgentStylesheet(null);
             Injector.setModelOrService(Stage.class, mainStage);
 
             initialize();
@@ -135,7 +135,6 @@ public class JabRefGUI extends Application {
                     preferences,
                     aiService,
                     stateManager,
-                    countingUndoManager,
                     Injector.instantiateModelOrService(BibEntryTypesManager.class),
                     clipBoardManager,
                     taskExecutor,
@@ -239,10 +238,6 @@ public class JabRefGUI extends Application {
                 fileUpdateMonitor
         );
         Injector.setModelOrService(ThemeManager.class, themeManager);
-
-        JabRefGUI.countingUndoManager = new CountingUndoManager();
-        Injector.setModelOrService(UndoManager.class, countingUndoManager);
-        Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
@@ -378,12 +373,15 @@ public class JabRefGUI extends Application {
         powerpane.setContent(JabRefGUI.mainFrame);
         powerpane.getInfoCenterPane().setInfoCenterViewPos(InfoCenterViewPos.BOTTOM_RIGHT);
         powerpane.getInfoCenterPane().autoHideProperty().bind(Bindings.isEmpty(dialogService.getPersistentNotifications()));
+        // PowerPane is a StackPane, so the walkthrough draws into a sibling of the info center pane
+        // rather than into a wrapper around the scene root.
+        powerpane.getChildren().add(new WalkthroughPane());
 
         Scene scene = new Scene(powerpane);
         installControlsFxDecorationPane(powerpane);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCssOnScene(scene);
+        themeManager.updateCssOnScene(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -603,6 +601,17 @@ public class JabRefGUI extends Application {
                 LOGGER.trace("Stopping background tasks");
                 Unirest.shutDown();
                 LOGGER.trace("Unirest shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Closing Git SSH session factory");
+                try {
+                    GitSsh.shutdown();
+                } catch (RuntimeException e) {
+                    // Log only: the submitted task's future is never read (a rethrow would vanish) and the UI is already gone
+                    LOGGER.error("Unable to close Git SSH session factory", e);
+                }
+                LOGGER.trace("Git SSH session factory closed");
             });
 
             // region All threading related shutdowns

@@ -42,7 +42,7 @@ public class HtmlExportFormatTest {
         exportFormat = new TemplateExporter("HTML",
                 "html",
                 "html",
-                null,
+                "",
                 StandardFileType.HTML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder());

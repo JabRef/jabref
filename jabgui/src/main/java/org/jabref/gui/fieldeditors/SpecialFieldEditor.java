@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -22,6 +20,7 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
@@ -62,7 +61,7 @@ public class SpecialFieldEditor extends HBox implements FieldEditorFX {
         this.viewModel = new SpecialFieldViewModel(specialField, preferences, undoManager);
 
         setAlignment(Pos.CENTER_LEFT);
-        setSpacing(2);
+        setSpacing(4);
 
         if (specialField == SpecialField.RANKING) {
             Rating rating = createRatingControl();
@@ -108,7 +107,7 @@ public class SpecialFieldEditor extends HBox implements FieldEditorFX {
         toggle.setGraphic(viewModel.getIcon().getGraphicNode());
         toggle.getStyleClass().add("icon-button");
         toggle.setTooltip(new Tooltip(value.getToolTipText()));
-        EasyBind.subscribe(toggle.selectedProperty(), selected -> {
+        EasyBind.subscribe(toggle.selectedProperty(), _ -> {
             BibEntry boundEntry = entry;
             if (!updatingControls && (boundEntry != null)) {
                 // Setting the single value again clears it, so select and deselect are the same call

@@ -18,6 +18,18 @@ import org.jabref.logic.os.OS;
 
 import com.sun.javafx.scene.control.Properties;
 
+/// A context-menu command acting on one [TextInputControl], through the control's own API.
+///
+/// [StandardActions#UNDO] and [StandardActions#REDO] therefore drive *that control's* private
+/// undo stack, which is right only where the control's text is not a value of the library —
+/// today that is the search field alone. In a field editor the same two items would fight the
+/// library's journal: `Ctrl+Z` there is routed to the global stack by the filter in
+/// [org.jabref.gui.fieldeditors.FieldEditorFX#establishBinding] (issue #11420), so a menu Undo
+/// would revert the control's text, the text listener would see a fresh edit, and the undo the
+/// user asked for would arrive on the stack as a new forward change.
+///
+/// That is why [#getDefaultContextMenuItems] leaves both out. Wiring undo into a field editor's
+/// menu means routing it to [org.jabref.gui.undo.UndoAction], not to the control.
 public class EditorContextAction extends SimpleCommand {
 
     private static final boolean SHOW_HANDLES = Properties.IS_TOUCH_SUPPORTED && !OS.OS_X;
@@ -85,21 +97,23 @@ public class EditorContextAction extends SimpleCommand {
         textInputControl.requestFocus();
     }
 
-    /// Returns the default context menu items (except undo/redo)
+    /// The items every text field in the entry editor gets, deliberately without Undo and Redo:
+    /// in a field editor those belong to the library's journal, not to the control. See the class
+    /// javadoc.
     public static List<MenuItem> getDefaultContextMenuItems(TextInputControl textInputControl) {
         ActionFactory factory = new ActionFactory();
 
-        MenuItem selectAllMenuItem = factory.createMenuItem(StandardActions.SELECT_ALL,
+        MenuItem selectAllMenuItem = factory.createContextMenuItem(StandardActions.SELECT_ALL,
                 new EditorContextAction(StandardActions.SELECT_ALL, textInputControl));
         if (SHOW_HANDLES) {
             selectAllMenuItem.getProperties().put("refreshMenu", Boolean.TRUE);
         }
 
         return List.of(
-                factory.createMenuItem(StandardActions.CUT, new EditorContextAction(StandardActions.CUT, textInputControl)),
-                factory.createMenuItem(StandardActions.COPY, new EditorContextAction(StandardActions.COPY, textInputControl)),
-                factory.createMenuItem(StandardActions.PASTE, new EditorContextAction(StandardActions.PASTE, textInputControl)),
-                factory.createMenuItem(StandardActions.DELETE, new EditorContextAction(StandardActions.DELETE, textInputControl)),
+                factory.createContextMenuItem(StandardActions.CUT, new EditorContextAction(StandardActions.CUT, textInputControl)),
+                factory.createContextMenuItem(StandardActions.COPY, new EditorContextAction(StandardActions.COPY, textInputControl)),
+                factory.createContextMenuItem(StandardActions.PASTE, new EditorContextAction(StandardActions.PASTE, textInputControl)),
+                factory.createContextMenuItem(StandardActions.DELETE, new EditorContextAction(StandardActions.DELETE, textInputControl)),
                 selectAllMenuItem);
     }
 }

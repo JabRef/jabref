@@ -1,7 +1,5 @@
 package org.jabref.gui.search;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
@@ -33,7 +31,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @FXML private ToggleButton keepOnTop;
     @FXML private HBox searchBarContainer;
 
-    private final UndoManager undoManager;
     private final LibraryTabContainer libraryTabContainer;
 
     // Reference needs to be kept, since java garbage collection would otherwise destroy the subscription
@@ -44,8 +41,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
 
-    public GlobalSearchResultDialog(UndoManager undoManager, LibraryTabContainer libraryTabContainer) {
-        this.undoManager = undoManager;
+    public GlobalSearchResultDialog(LibraryTabContainer libraryTabContainer) {
         this.libraryTabContainer = libraryTabContainer;
 
         setTitle(Localization.lang("Search results from open libraries"));
@@ -59,20 +55,20 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     private void initialize() {
         GlobalSearchResultDialogViewModel viewModel = new GlobalSearchResultDialogViewModel(preferences.getSearchPreferences());
 
-        GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferences, undoManager, dialogService, SearchType.GLOBAL_SEARCH);
+        GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferences, dialogService, SearchType.GLOBAL_SEARCH);
         searchBarContainer.getChildren().addFirst(searchBar);
         HBox.setHgrow(searchBar, Priority.ALWAYS);
 
-        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.searchQueryProperty());
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH));
         previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setDatabaseContext(viewModel.getSearchDatabaseContext());
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferences, stateManager, taskExecutor);
-        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferences, undoManager, dialogService, stateManager, taskExecutor);
+        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferences, dialogService, stateManager, taskExecutor);
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
 
-        resultsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+        resultsTable.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
             } else {
@@ -95,14 +91,14 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                                  : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
         });
 
-        stage.setOnShown(event -> {
+        stage.setOnShown(_ -> {
             stage.setHeight(preferences.getSearchPreferences().getSearchWindowHeight());
             stage.setWidth(preferences.getSearchPreferences().getSearchWindowWidth());
             container.setDividerPositions(preferences.getSearchPreferences().getSearchWindowDividerPosition());
             searchBar.requestFocus();
         });
 
-        stage.setOnHidden(event -> {
+        stage.setOnHidden(_ -> {
             preferences.getSearchPreferences().setSearchWindowHeight(getHeight());
             preferences.getSearchPreferences().setSearchWindowWidth(getWidth());
             preferences.getSearchPreferences().setSearchWindowDividerPosition(container.getDividers().getFirst().getPosition());

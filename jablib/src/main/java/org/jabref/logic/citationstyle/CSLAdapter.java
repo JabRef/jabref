@@ -11,6 +11,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.DefaultAbbreviationProvider;
+import de.undercouch.citeproc.csl.CSLItemData;
 import de.undercouch.citeproc.output.Bibliography;
 import de.undercouch.citeproc.output.Citation;
 import org.jspecify.annotations.Nullable;
@@ -32,7 +33,7 @@ public class CSLAdapter {
 
     /// Creates the bibliography of the provided items.
     ///
-    /// @param databaseContext {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
+    /// @param databaseContext [BibDatabaseContext] is used to be able to resolve fields and their aliases
     public synchronized List<String> makeBibliography(List<BibEntry> bibEntries,
                                                       String style,
                                                       CitationStyleOutputFormat outputFormat,
@@ -65,6 +66,21 @@ public class CSLAdapter {
         cslInstance.registerCitationItems(dataProvider.getIds());
 
         return cslInstance.makeCitation(bibEntries.stream().map(entry -> entry.getCitationKey().orElse("")).toList()).getFirst();
+    }
+
+    public synchronized List<String> getBibliographyEntryIds(List<BibEntry> bibEntries,
+                                                             String style,
+                                                             CitationStyleOutputFormat outputFormat,
+                                                             BibDatabaseContext databaseContext,
+                                                             BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
+        dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
+
+        CSL cslInstance = getCslInstance(style, outputFormat);
+        cslInstance.registerCitationItems(dataProvider.getIds());
+
+        return cslInstance.getRegisteredItems().stream()
+                          .map(CSLItemData::getId)
+                          .toList();
     }
 
     /// Return the stored CSL instance (if the same style is used) or reinitialize it.

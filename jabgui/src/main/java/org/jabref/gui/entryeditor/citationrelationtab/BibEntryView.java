@@ -22,34 +22,34 @@ public class BibEntryView {
     public static final EnumSet<StandardEntryType> CROSS_REF_TYPES = EnumSet.of(StandardEntryType.InBook,
             StandardEntryType.InProceedings, StandardEntryType.InCollection);
 
-    /// Creates a layout for a given {@link BibEntry} to be displayed in a List
+    /// Creates a layout for a given [BibEntry] to be displayed in a List
     ///
-    /// @param entry {@link BibEntry} to display
+    /// @param entry [BibEntry] to display
     /// @return layout container displaying the entry
     public static Node getEntryNode(BibEntry entry) {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
-        entryType.getStyleClass().add("type");
+        entryType.getStyleClass().add("h5");
         String authorsText = entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse("");
         Node authors = createLabel(authorsText);
-        authors.getStyleClass().add("authors");
+        authors.getStyleClass().add("h6");
         String titleText = entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse("");
         Node title = createLabel(titleText);
-        title.getStyleClass().add("title");
+        title.getStyleClass().addAll("h5", "bold");
         Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
-        year.getStyleClass().add("year");
+        year.getStyleClass().addAll("h6", "bold");
         String journalText = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse("");
         Node journal = createLabel(journalText);
-        journal.getStyleClass().add("journal");
+        journal.getStyleClass().add("h6");
 
         VBox entryContainer = new VBox(
-                new HBox(10, entryType, title),
-                new HBox(5, year, journal),
+                new HBox(4, entryType, title),
+                new HBox(4, year, journal),
                 authors
         );
 
         entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -> {
             Node summary = createSummary(summaryText);
-            summary.getStyleClass().add("summary");
+            summary.getStyleClass().add("padding-top-4");
             entryContainer.getChildren().add(summary);
         });
 
@@ -57,10 +57,10 @@ public class BibEntryView {
         return entryContainer;
     }
 
-    /// Gets the correct Icon for a given {@link EntryType}
+    /// Gets the correct Icon for a given [EntryType]
     ///
-    /// @param type {@link EntryType} to get Icon for
-    /// @return Icon corresponding to {@link EntryType}
+    /// @param type [EntryType] to get Icon for
+    /// @return Icon corresponding to [EntryType]
     private static IconTheme.JabRefIcons getIcon(EntryType type) {
         if (type instanceof StandardEntryType standardEntry) {
             if (standardEntry == StandardEntryType.Book) {
@@ -91,6 +91,7 @@ public class BibEntryView {
     ///
     /// @param text The summary text content
     /// @return Node with either:
+    ///
     /// - ScrollPane (for RTL text)
     /// - TextFlowLimited (for LTR text)
     private static Node createSummary(String text) {
@@ -110,6 +111,7 @@ public class BibEntryView {
     ///
     /// @param text The label text content
     /// @return Node with either:
+    ///
     /// - ScrollPane (for RTL text)
     /// - Wrapped Label (for LTR text)
     private static Node createLabel(String text) {

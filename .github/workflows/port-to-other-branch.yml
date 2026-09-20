@@ -1,0 +1,204 @@
+name: Port to other branch
+
+# [impl->req~ci.port-to-other-branch.label-driven-ports~1]
+# [impl->adr~single-stable-branch-with-automatic-ports~1]
+# Keeps "main" and "stable" in sync: a PR into main labeled "dev: into-stable" is
+# ported to stable once merged; a PR into stable is always ported to main once merged.
+# Before the merge, the port is simulated, so a conflict shows up as a failed check on the PR.
+#
+# pull_request_target: the port needs a push-capable token, and the PR may come from a fork.
+# Nothing from the PR head is executed - the workspace is the base branch, and the merge
+# driver is copied out of it before any other tree is checked out. On merge_group the check
+# also checks out the base branch tip and fetches the queued commit only as data; the job has
+# read-only permissions and uses no secret beyond GITHUB_TOKEN.
+
+on:
+  pull_request_target:
+    types: [ opened, reopened, synchronize, labeled, unlabeled, closed ]
+  # The check is a required status, so the merge queue needs it on its own commit as well
+  merge_group:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.event.merge_group.head_ref }}-${{ github.event.action == 'closed' && 'port' || 'check' }}"
+  cancel-in-progress: ${{ github.event.action != 'closed' }}
+
+jobs:
+  check:
+    # Fixed name: it is listed as a required status check, whichever branch is the target
+    name: Would merge into the other branch
+    if: github.repository == 'JabRef/jabref' && github.event.action != 'closed'
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      # Decides here, not in the job's "if": on merge_group the labels are not in the event, and a
+      # required check has to report (success) on every PR anyway.
+      - name: Resolve the pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          QUEUE_REF: ${{ github.event.merge_group.head_ref }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "merge_group" ]; then
+            # gh-readonly-queue/<base>/pr-<N>-<sha>, same parsing as on-pr-awaiting-second-review-check.yml
+            PR_NUMBER=$(sed -E 's#.*/pr-([0-9]+)-.*#\1#' <<< "$QUEUE_REF")
+          fi
+          gh pr view "$PR_NUMBER" --json state,baseRefName,headRefName,headRepositoryOwner,headRepository,labels \
+            --jq '"state=\(.state|@sh)\nbase=\(.baseRefName|@sh)\nhead_repo=\("\(.headRepositoryOwner.login)/\(.headRepository.name)"|@sh)\nhead_ref=\(.headRefName|@sh)\ninto_stable=\(any(.labels[]; .name == "dev: into-stable"))"' > pr.env
+          # shellcheck disable=SC1091
+          source pr.env
+          port=false
+          # A port PR (head "port-*" in this repository - a fork branch of that name is just a branch)
+          # carries a change the other branch already has - never port it back.
+          if [ "$state" = "OPEN" ] && ! { [ "$head_repo" = "JabRef/jabref" ] && [[ "$head_ref" == port-* ]]; }; then
+            if [ "$base" = "stable" ] || { [ "$base" = "main" ] && [ "$into_stable" = "true" ]; }; then
+              port=true
+            fi
+          fi
+          target=main
+          [ "$base" = "main" ] && target=stable
+          {
+            echo "number=$PR_NUMBER"
+            echo "base=$base"
+            echo "target=$target"
+            echo "port=$port"
+          } >> "$GITHUB_OUTPUT"
+          if [ "$port" != "true" ]; then
+            echo "Nothing to check for #$PR_NUMBER: not a port candidate (base \`$base\`, label \`dev: into-stable\` $([ "$into_stable" = true ] && echo present || echo absent))" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      # The base branch tip, explicitly: on merge_group the event's ref is the queued commit, which
+      # contains the PR - the composite action and the merge driver must come from the trusted base.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: steps.pr.outputs.port == 'true'
+        with:
+          ref: ${{ steps.pr.outputs.base }}
+          fetch-depth: 0
+          submodules: 'false'
+          show-progress: 'false'
+      - uses: ./.github/actions/changelog-cherry-pick-driver
+        if: steps.pr.outputs.port == 'true'
+      - name: Simulate the port
+        if: steps.pr.outputs.port == 'true'
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          BASE_REF: ${{ steps.pr.outputs.base }}
+          TARGET: ${{ steps.pr.outputs.target }}
+          HEAD_SHA: ${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha }}
+          QUEUE_REF: ${{ github.event.merge_group.head_ref }}
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
+        run: |
+          set -euo pipefail
+          if ! git ls-remote --exit-code --heads origin "$TARGET" > /dev/null; then
+            echo "Branch \`$TARGET\` does not exist yet - nothing to check" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if [ -n "$QUEUE_REF" ]; then
+            # The queued commit merges this PR onto the previous queue entry (or the base tip), so its
+            # first parent bounds exactly this PR's change even when several PRs are batched.
+            git fetch --no-tags origin "$TARGET" "$QUEUE_REF"
+            parent=$(git rev-parse "$HEAD_SHA^1")
+          else
+            git fetch --no-tags origin "$TARGET" "+refs/pull/$PR_NUMBER/head:refs/remotes/pr/$PR_NUMBER"
+            parent=$(git merge-base "origin/$BASE_REF" "$HEAD_SHA")
+          fi
+          # The PR as it lands: one commit carrying the PR's whole change (squash merge)
+          squash=$(git commit-tree "$HEAD_SHA^{tree}" -p "$parent" -m "Squash of #$PR_NUMBER")
+          git checkout -q "origin/$TARGET"
+          if git cherry-pick --no-commit "$squash"; then
+            echo "✅ PR #$PR_NUMBER applies cleanly to \`$TARGET\`" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          {
+            echo "❌ PR #$PR_NUMBER conflicts with \`$TARGET\` in:"
+            echo
+            git diff --name-only --diff-filter=U | sed 's/^/- `/; s/$/`/'
+            echo
+            echo "After the merge, the port PR is opened as a draft containing the conflict markers; a maintainer resolves them there (see <https://devdocs.jabref.org/contributing.html#branching-strategy>)."
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          exit 1
+
+  port:
+    name: Port to ${{ github.event.pull_request.base.ref == 'stable' && 'main' || 'stable' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      TARGET: ${{ github.event.pull_request.base.ref == 'stable' && 'main' || 'stable' }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      GH_REPO: ${{ github.repository }}
+    if: >
+      github.repository == 'JabRef/jabref' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged &&
+      !(github.event.pull_request.head.repo.full_name == 'JabRef/jabref' && startsWith(github.event.pull_request.head.ref, 'port-')) &&
+      (
+        github.event.pull_request.base.ref == 'stable' ||
+        (github.event.pull_request.base.ref == 'main' && contains(github.event.pull_request.labels.*.name, 'dev: into-stable'))
+      )
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          submodules: 'false'
+          show-progress: 'false'
+      - uses: ./.github/actions/changelog-cherry-pick-driver
+      - name: Check that ${{ env.TARGET }} exists
+        id: target
+        run: |
+          if git ls-remote --exit-code --heads origin "$TARGET" > /dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Branch \`$TARGET\` does not exist yet - nothing to port" >> "$GITHUB_STEP_SUMMARY"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Cherry-pick into a port PR
+        if: steps.target.outputs.exists == 'true'
+        id: port
+        uses: korthout/backport-action@2e830a1d0b8269505846ddd407a70876913ad1f8 # v4.6.0
+        with:
+          # A PAT, so that CI runs on the port PR and jabref-machine (another account) can approve it
+          github_token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
+          target_branches: ${{ env.TARGET }}
+          # The target comes from the base branch and the label above, not from "backport <branch>" labels
+          label_pattern: ^()$
+          branch_name: port-${pull_number}-to-${target_branch}
+          pull_title: "[Port to ${target_branch}] ${pull_title}"
+          pull_description: |
+            Port of #${pull_number} to `${target_branch}`, see [Branching strategy](https://devdocs.jabref.org/contributing.html#branching-strategy).
+
+            If this PR is a draft, the cherry-pick conflicted: the conflicting files are committed with Git's conflict markers left in. Resolve the markers locally, push, and mark the PR ready.
+          # A PR branch usually contains merges from main; the squash commit is what gets ported
+          merge_commits: skip
+          experimental: >
+            {"conflict_resolution": "draft_commit_conflicts"}
+      - name: Auto-merge a clean port
+        if: steps.port.outputs.was_successful == 'true'
+        env:
+          # jabref-machine's token: "On PR labeled" only fires for labels added with a PAT, and it approves as jabref-machine
+          GH_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
+          CREATED: ${{ steps.port.outputs.created_pull_numbers }}
+        run: |
+          for pr in $CREATED; do
+            gh pr edit "$pr" --add-label automerge
+            echo "✅ Port PR #$pr opened with auto-merge" >> "$GITHUB_STEP_SUMMARY"
+          done
+      - name: Report a conflicting port
+        if: steps.target.outputs.exists == 'true' && steps.port.outputs.was_successful != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CREATED: ${{ steps.port.outputs.created_pull_numbers }}
+        run: |
+          for pr in $CREATED; do
+            gh pr edit "$pr" --add-label "status: changes-required"
+          done
+          echo "❌ Port of #$PR_NUMBER to \`$TARGET\` conflicts - resolve it in the draft port PR ${CREATED:+#$CREATED}" | tee -a "$GITHUB_STEP_SUMMARY"
+          exit 1

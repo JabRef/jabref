@@ -37,6 +37,8 @@ Needs: impl
 One can also state that there should be detailed design document (`dsn`).
 However, typically in JabRef, we go from the requirement directly to the implementation.
 
+When writing a requirement, ensure that it is atomic. One requirement is related to 1 thing/feature at a time.
+
 ## Linking implementations
 
 After writing the requirement, at the implementation, a comment is added that this implementation is covered:
@@ -56,6 +58,8 @@ In case of a tracing error, one can inspect `build/tracing.txt` to see which req
 
 - `pp`: means that this requirement should be guarded with a privacy policy banner. The feature should not do anything if the user does not accept the privacy policy. The specific privacy policy depends on the feature.
 - `guard`: means that this action might be dangerous and should be guarded with a confirmation dialog.
+- `adr`: an architectural decision record in `docs/decisions/` that code carries out. The identifier follows the ADR's title (`adr~hardcode-fieldnames~1`, without the file's number prefix, because an identifier must not start with a digit), and implementations link to it with `// [impl->adr~hardcode-fieldnames~1]`.
+- `model`: means that this feature requires a model.
 
 While not a custom artifact, but we interpret these OpenFastTrace artifact types as follows:
 
@@ -64,6 +68,6 @@ While not a custom artifact, but we interpret these OpenFastTrace artifact types
 ## More Information
 
 - [General reading on traceability](https://www.sodiuswillert.com/en/blog/implementing-requirements-traceability-in-systems-software-engineering)
-- [User manual of OpenFastTrace](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md)
+- [User manual of OpenFastTrace](https://openfasttrace.itsallcode.org/user_guide/user_guide.html)
 
 We recommend using VS Code with `markdownlint` extension to edit requirement files, and not IntelliJ, as VS Code understands `markdownlintdisable` directives.

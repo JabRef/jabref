@@ -19,13 +19,13 @@ import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 
-/// Static factory for creating {@link ChatModel} instances.
+/// Static factory for creating [ChatModel] instances.
 ///
-/// Each call creates its own {@link HttpClient} and {@link ExecutorService}.
-/// The returned model implements {@link AutoCloseable}; callers should close it
+/// Each call creates its own [HttpClient] and [ExecutorService].
+/// The returned model implements [AutoCloseable]; callers should close it
 /// when it is no longer needed so the underlying resources are released.
 ///
-/// Returns {@code null} when AI is disabled or the API key is empty.
+/// Returns `null` when AI is disabled or the API key is empty.
 public final class ChatModelFactory {
     private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(5);
 
@@ -33,7 +33,7 @@ public final class ChatModelFactory {
         throw new UnsupportedOperationException("cannot instantiate a utility class");
     }
 
-    /// Creates a {@link ChatModel} from explicit parameters.
+    /// Creates a [ChatModel] from explicit parameters.
     /// All decisions about provider, model name, API key, etc. must be made by the caller.
     public static ChatModel create(
             AiProvider provider,

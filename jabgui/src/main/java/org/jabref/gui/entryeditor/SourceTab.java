@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
@@ -27,10 +25,7 @@ import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableChangeType;
-import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -46,6 +41,9 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.undo.CompoundEdit;
+import org.jabref.model.undo.UndoableChangeType;
+import org.jabref.model.undo.UndoableFieldChange;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
@@ -64,11 +62,10 @@ public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
     private final FieldPreferences fieldPreferences;
-    private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
     private final InvalidationListener entryTypeListener = _ -> updateCodeArea();
     private final InvalidationListener entryFieldsListener = _ -> updateCodeArea();
-    private final Subscription activeTabSubscription;
+    private final Subscription activeDatabaseSubscription;
     private final Subscription searchQuerySubscription;
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
     private final ImportFormatPreferences importFormatPreferences;
@@ -82,19 +79,18 @@ public class SourceTab extends EntryEditorTab {
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
-    public SourceTab(CountingUndoManager undoManager,
-                     FieldPreferences fieldPreferences,
-                     ImportFormatPreferences importFormatPreferences,
-                     FileUpdateMonitor fileMonitor,
-                     DialogService dialogService,
-                     BibEntryTypesManager entryTypesManager,
-                     KeyBindingRepository keyBindingRepository,
-                     StateManager stateManager,
-                     BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
+    public SourceTab(
+            FieldPreferences fieldPreferences,
+            ImportFormatPreferences importFormatPreferences,
+            FileUpdateMonitor fileMonitor,
+            DialogService dialogService,
+            BibEntryTypesManager entryTypesManager,
+            KeyBindingRepository keyBindingRepository,
+            StateManager stateManager,
+            BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
         this.stateManager = stateManager;
         this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
-        this.undoManager = undoManager;
         this.fieldPreferences = fieldPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
@@ -102,18 +98,15 @@ public class SourceTab extends EntryEditorTab {
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
-        activeTabSubscription = EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
-            if (library.isEmpty()) {
-                this.setText(Localization.lang("Source"));
-                this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
-            } else {
-                BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
-                                                   .orElse(BibDatabaseMode.BIBLATEX);
-                this.setText(Localization.lang("%0 source", mode.getFormattedName()));
-                this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
-            }
-        });
-        searchQuerySubscription = EasyBind.subscribe(stateManager.searchQueryProperty(), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
+        activeDatabaseSubscription = EasyBind.subscribe(stateManager.activeDatabaseProperty(), database -> database.ifPresentOrElse(context -> {
+            BibDatabaseMode mode = context.getMode();
+            this.setText(Localization.lang("%0 source", mode.getFormattedName()));
+            this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
+        }, () -> {
+            this.setText(Localization.lang("Source"));
+            this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
+        }));
+        searchQuerySubscription = EasyBind.subscribe(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
     }
 
     private void refreshCodeAreaDecorator() {
@@ -147,7 +140,7 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.getModel().replace(null, caretPos, caretPos, committed);
             }
         });
-        codeArea.getStyleClass().add("bibtex-code-area");
+        codeArea.getStyleClass().addAll("bibtex-code-area");
 
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
@@ -171,8 +164,8 @@ public class SourceTab extends EntryEditorTab {
         sourceValidator.addRule(validationMessage);
 
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
-            if (!onFocus && (getCurrentEntry() != null)) {
-                storeSource(getCurrentEntry(), codeArea.getText());
+            if (!onFocus) {
+                storeVisibleSource();
             }
         });
 
@@ -185,16 +178,23 @@ public class SourceTab extends EntryEditorTab {
                 setupSourceEditor();
             }
 
+            if (previousEntry == null) {
+                codeArea.setEditable(false);
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), "");
+                return;
+            }
+
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
             try {
-                codeArea.clear();
-                codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
+                // [impl->req~entry-editor.source-tab.atomic-replacement~1]
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(),
+                        getSourceString(previousEntry, mode, fieldPreferences));
                 codeArea.setEditable(true);
                 Platform.runLater(this::refreshCodeAreaDecorator);
             } catch (IOException ex) {
                 codeArea.setEditable(false);
-                codeArea.appendText(ex.getMessage() + "\n\n" +
+                codeArea.replaceText(TextPos.ZERO, codeArea.getDocumentEnd(), ex.getMessage() + "\n\n" +
                         Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                 LOGGER.debug("Incorrect entry", ex);
             }
@@ -205,9 +205,7 @@ public class SourceTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (previousEntry != null) {
             removeEntryListeners(previousEntry);
-            if (codeArea != null) {
-                storeSource(previousEntry, codeArea.getText());
-            }
+            storeVisibleSource();
         }
         this.previousEntry = entry;
 
@@ -223,13 +221,22 @@ public class SourceTab extends EntryEditorTab {
             removeEntryListeners(previousEntry);
             previousEntry = null;
         }
-        activeTabSubscription.unsubscribe();
+        activeDatabaseSubscription.unsubscribe();
         searchQuerySubscription.unsubscribe();
     }
 
     private void removeEntryListeners(BibEntry entry) {
         entry.typeProperty().removeListener(entryTypeListener);
         entry.getFieldsObservable().removeListener(entryFieldsListener);
+    }
+
+    // [impl->req~entry-editor.source-tab.atomic-replacement~1] — keep the visible source paired with the entry it was rendered from even while selection changes are still settling
+    private void storeVisibleSource() {
+        if (codeArea == null) {
+            return;
+        }
+
+        storeSource(previousEntry, codeArea.getText());
     }
 
     private void storeSource(BibEntry outOfFocusEntry, String text) {
@@ -281,7 +288,7 @@ public class SourceTab extends EntryEditorTab {
             validationMessage.setValue(ValidationMessage.error(Localization.lang("Failed to parse Bib(La)TeX: %0", errors)));
         }
 
-        NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("source edit"));
+        CompoundEdit compound = new CompoundEdit(Localization.lang("source edit"));
         BibEntry newEntry = database.getEntries().getFirst();
         newEntry.getCitationKey()
                 .ifPresentOrElse(
@@ -294,8 +301,7 @@ public class SourceTab extends EntryEditorTab {
             String fieldValue = field.getValue();
 
             if (!newEntry.hasField(fieldName)) {
-                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
-                outOfFocusEntry.clearField(fieldName);
+                compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
             }
         }
 
@@ -313,18 +319,16 @@ public class SourceTab extends EntryEditorTab {
                     return;
                 }
 
-                compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
-                outOfFocusEntry.setField(fieldName, newValue);
+                compound.applyEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
             }
         }
 
         // See if the user has changed the entry type:
         if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
-            compound.addEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
-            outOfFocusEntry.setType(newEntry.getType());
+            compound.applyEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
         }
-        compound.end();
-        undoManager.addEdit(compound);
+        stateManager.getActiveDatabase().ifPresent(databaseContext ->
+                stateManager.getUndoManager(databaseContext).addEdit(compound.toChangeSet()));
 
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         if (selectedEntries == null || selectedEntries.isEmpty()) {
@@ -342,7 +346,7 @@ public class SourceTab extends EntryEditorTab {
                 case SAVE_LIBRARY,
                      SAVE_ALL,
                      SAVE_LIBRARY_AS ->
-                        storeSource(getCurrentEntry(), codeArea.getText());
+                        storeVisibleSource();
             }
         });
     }

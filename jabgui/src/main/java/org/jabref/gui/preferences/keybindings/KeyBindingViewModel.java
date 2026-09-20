@@ -15,6 +15,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.logic.os.OS;
 
 /// This class represents a view model for objects of the KeyBinding
 /// class. It has two properties representing the localized name of an
@@ -107,6 +108,10 @@ public class KeyBindingViewModel {
         }
         if (evt.isAltDown()) {
             modifiers += "alt+";
+        }
+        // Control and Shortcut are the same key on Windows/Linux; only macOS needs Control handled separately
+        if (OS.OS_X && evt.isControlDown()) {
+            modifiers += "ctrl+";
         }
 
         // if no modifier keys are pressed, only special keys can be shortcuts

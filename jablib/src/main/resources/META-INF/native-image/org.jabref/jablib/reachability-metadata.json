@@ -270,7 +270,7 @@
       "type": "org.jabref.model.database.BibDatabase"
     },
     {
-      "type": "org.jabref.model.database.KeyChangeListener"
+      "type": "org.jabref.model.database.CitationKeyListener"
     },
     {
       "type": "sun.text.resources.cldr.FormatData"
@@ -321,6 +321,12 @@
     },
     {
       "glob": "protectedterms/months_weekdays.terms"
+    },
+    {
+      "condition": {
+        "typeReached": "org.jabref.logic.ai.preferences.AiDefaultTemplates"
+      },
+      "glob": "ai/templates/*.vm"
     },
     {
       "glob": "build.properties"

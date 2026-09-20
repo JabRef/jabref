@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
 /// The Markdown output is produced by rendering a configurable Velocity template.
 /// The template has access to the following variables:
 ///
-/// - `$metadata` - {@link AiMetadata} with provider, model, and timestamp.
+/// - `$metadata` - [AiMetadata] with provider, model, and timestamp.
 /// - `$bibtex` - pre-rendered BibTeX string of all associated entries.
-/// - `$messages` - filtered list of {@link ChatMessage} objects (SYSTEM messages excluded).
+/// - `$messages` - filtered list of [ChatMessage] objects (SYSTEM messages excluded).
 ///
 public class AiChatMarkdownExporter implements AiChatExporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatMarkdownExporter.class);

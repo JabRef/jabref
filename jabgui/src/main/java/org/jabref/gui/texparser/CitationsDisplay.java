@@ -47,13 +47,13 @@ public class CitationsDisplay extends ListView<Citation> {
         Text contextText = new Text(LatexToUnicodeAdapter.format(item.getContext()));
         contextText.wrappingWidthProperty().bind(this.widthProperty().subtract(85));
         HBox contextBox = new HBox(8, citationIcon, contextText);
-        contextBox.getStyleClass().add("contextBox");
+        contextBox.getStyleClass().addAll("contextBox", "padding-12");
 
         Label fileNameLabel = new Label("%s".formatted(basePath.get().relativize(item.path())));
         fileNameLabel.setGraphic(IconTheme.JabRefIcons.LATEX_FILE.getGraphicNode());
         Label positionLabel = new Label("(%s:%s-%s)".formatted(item.line(), item.colStart(), item.colEnd()));
         positionLabel.setGraphic(IconTheme.JabRefIcons.LATEX_LINE.getGraphicNode());
-        HBox dataBox = new HBox(5, fileNameLabel, positionLabel);
+        HBox dataBox = new HBox(4, fileNameLabel, positionLabel);
 
         return new VBox(contextBox, dataBox);
     }
@@ -72,7 +72,7 @@ public class CitationsDisplay extends ListView<Citation> {
 
         // Citation text (highlighted).
         Text citation = new Text(line.substring(start, end));
-        citation.getStyleClass().setAll("tooltip-text-bold");
+        citation.getStyleClass().setAll("bold");
         texts.add(citation);
 
         // Text after the citation.

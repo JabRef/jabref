@@ -41,10 +41,10 @@ import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 ///
 /// Currently, Springer, and IEEE formats are supported.
 ///
-/// In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
-/// please see {@link RuleBasedBibliographyPdfImporter}.
+/// In case one wants to have a list of [BibEntry] matching the bibliography of a PDF,
+/// please see [RuleBasedBibliographyPdfImporter].
 ///
-/// If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
+/// If several PDF importers should be tried, use [PdfMergeMetadataImporter].
 public class PdfContentImporter extends PdfImporter {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
@@ -86,8 +86,25 @@ public class PdfContentImporter extends PdfImporter {
         return result;
     }
 
+    /// Converts an author line as found in a PDF (a "byline") into a BibTeX author list, mapping a trailing `et al.` to `others`.
+    ///
+    /// Neither [org.jabref.logic.importer.AuthorListParser] nor
+    /// [org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter] (which delegates to
+    /// [org.jabref.logic.importer.AuthorListParser#normalizeSimply]) can take the byline directly. Both keep BibTeX
+    /// semantics, where a comma separates family and given names: `Smith, John and Doe, Jane` has the same shape as
+    /// `Karen Cooper, Jennifer Donovan and Gary Williamson`. Only this importer knows that its input is a byline and
+    /// thus in "Given Family" order. Measured on the raw bylines of the importer's tests:
+    ///
+    /// | Byline                                                                     | AuthorListParser result                                        |
+    /// |----------------------------------------------------------------------------|----------------------------------------------------------------|
+    /// | `Karen A. Cooper, Jennifer L. Donovan, Andrew L. Waterhouse and Gary Williamson` | 2 persons: "Andrew L. Waterhouse Karen A. Cooper, Jennifer L. Donovan" and "Gary Williamson" |
+    /// | `Karen A. Cooper1, Jennifer L. Donovan2 and Gary Williamson1*`            | 2 persons, affiliation markers kept as part of the family names |
+    /// | `Karen A. Cooper, Jennifer L. Donovan, et al.`                             | 1 garbled person plus `others` (the initials-first heuristic of `normalizeSimply` needs `K. A. Cooper`) |
+    /// | `Anke Lüdeling Merja Kytö` (separated by spaces only)                      | 1 person                                                       |
+    ///
+    /// Hence the byline is split heuristically here; the result is a plain BibTeX list that
+    /// [org.jabref.model.entry.AuthorList#parse] handles afterwards.
     private String streamlineNames(String names) {
-        // TODO: replace with NormalizeNamesFormatter?!
         String res;
         // supported formats:
         //   Matthias Schrepfer1, Johannes Wolf1, Jan Mendling1, and Hajo A. Reijers2
@@ -339,6 +356,7 @@ public class PdfContentImporter extends PdfImporter {
     /// the different lines are joined into one and thereby separated by " "
     ///
     /// This method follows the structure typically found in academic paper PDFs:
+    ///
     /// - First, it attempts to detect the title by font size, if available, or by text position.
     /// - Authors are then processed line-by-line until reaching the next section.
     /// - Abstract and keywords, if found, are extracted as they appear on the page.

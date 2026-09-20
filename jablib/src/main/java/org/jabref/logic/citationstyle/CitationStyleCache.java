@@ -13,7 +13,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /// Caches the generated Citations for quicker access
-/// {@link CitationStyleGenerator} generates the citation with JavaScript which may take some time
+/// [CitationStyleGenerator] generates the citation with JavaScript which may take some time
 public class CitationStyleCache {
 
     private static final int CACHE_SIZE = 1024;

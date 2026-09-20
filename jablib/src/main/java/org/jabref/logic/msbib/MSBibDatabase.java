@@ -37,18 +37,18 @@ public class MSBibDatabase {
 
     private Set<MSBibEntry> entriesForExport;
 
-    /// Creates a {@link MSBibDatabase} for **import**
+    /// Creates a [MSBibDatabase] for **import**
     public MSBibDatabase() {
         entriesForExport = new HashSet<>();
         factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
     }
 
-    /// Creates a new {@link MSBibDatabase} for **export**.
+    /// Creates a new [MSBibDatabase] for **export**.
     /// Directly converts the given entries.
     ///
     /// @param database The bib database
-    /// @param entries  List of {@link BibEntry}
+    /// @param entries  List of [BibEntry]
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         this();
         List<BibEntry> resolvedEntries;
@@ -62,7 +62,7 @@ public class MSBibDatabase {
 
     /// Imports entries from an office XML file
     ///
-    /// @return List of {@link BibEntry}
+    /// @return List of [BibEntry]
     public List<BibEntry> importEntriesFromXml(BufferedReader reader) {
         entriesForExport = new HashSet<>();
         Document inputDocument;

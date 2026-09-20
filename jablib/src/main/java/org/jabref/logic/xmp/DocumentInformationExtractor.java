@@ -17,7 +17,7 @@ import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
-/// Related class: {@link org.jabref.logic.xmp.DublinCoreExtractor}
+/// Related class: [org.jabref.logic.xmp.DublinCoreExtractor]
 public class DocumentInformationExtractor {
 
     private static final Map<COSName, Field> FIELD_MAPPING = Map.ofEntries(

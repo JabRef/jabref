@@ -11,7 +11,6 @@ import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.DirectoryMonitor;
@@ -24,10 +23,10 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 
-/// Builds the {@link EntryEditorTab} controls shown in the {@link EntryEditor}.
+/// Builds the [EntryEditorTab] controls shown in the [EntryEditor].
 ///
-/// Analogous to {@link org.jabref.gui.maintable.MainTableColumnFactory}: it turns the tab configuration
-/// ({@link EntryEditorTabModel}) plus the fixed, always-present tabs into the concrete JavaFX tab views,
+/// Analogous to [org.jabref.gui.maintable.MainTableColumnFactory]: it turns the tab configuration
+/// ([EntryEditorTabModel]) plus the fixed, always-present tabs into the concrete JavaFX tab views,
 /// keeping tab creation (and the GUI dependencies it needs) out of the view and the view model.
 public class EntryEditorTabFactory {
 
@@ -41,7 +40,6 @@ public class EntryEditorTabFactory {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileMonitor;
     private final DirectoryMonitor directoryMonitor;
-    private final CountingUndoManager undoManager;
     private final BibEntryTypesManager bibEntryTypesManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final KeyBindingRepository keyBindingRepository;
@@ -58,7 +56,6 @@ public class EntryEditorTabFactory {
                                  StateManager stateManager,
                                  FileUpdateMonitor fileMonitor,
                                  DirectoryMonitor directoryMonitor,
-                                 CountingUndoManager undoManager,
                                  BibEntryTypesManager bibEntryTypesManager,
                                  JournalAbbreviationRepository journalAbbreviationRepository,
                                  KeyBindingRepository keyBindingRepository,
@@ -74,7 +71,6 @@ public class EntryEditorTabFactory {
         this.stateManager = stateManager;
         this.fileMonitor = fileMonitor;
         this.directoryMonitor = directoryMonitor;
-        this.undoManager = undoManager;
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.keyBindingRepository = keyBindingRepository;
@@ -82,7 +78,7 @@ public class EntryEditorTabFactory {
         this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
     }
 
-    /// Creates all tabs that can possibly be shown from {@link EntryEditorTabModel}, in display order.
+    /// Creates all tabs that can possibly be shown from [EntryEditorTabModel], in display order.
     public List<EntryEditorTab> createTabs() {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
@@ -93,7 +89,7 @@ public class EntryEditorTabFactory {
         return tabs;
     }
 
-    /// Maps a single {@link EntryEditorTabModel} to its concrete {@link EntryEditorTab} view, wiring in the
+    /// Maps a single [EntryEditorTabModel] to its concrete [EntryEditorTab] view, wiring in the
     /// user-controlled visibility derived from the same model. The Preview tab's toggle lives in the preview
     /// preferences ("show preview as a separate tab"), not in its tab model.
     public EntryEditorTab createTab(EntryEditorTabModel model) {
@@ -109,6 +105,17 @@ public class EntryEditorTabFactory {
                                                   : entryEditorPreferences.tabVisibleProperty(type));
                 yield tab;
             }
+            // Custom tabs have no preference-driven visibility gate: they exist exactly while configured,
+            // and hide themselves via content-driven visibility when their patterns resolve to no fields.
+            case EntryEditorTabModel.CustomizedFieldsTab customTab ->
+                    new UserDefinedFieldsTab(
+                            customTab,
+                            undoAction,
+                            redoAction,
+                            preferences,
+                            journalAbbreviationRepository,
+                            stateManager,
+                            previewPanel);
         };
     }
 
@@ -117,7 +124,7 @@ public class EntryEditorTabFactory {
             case PREVIEW ->
                     new PreviewTab(preferences, stateManager, previewPanel);
             case ALL_FIELDS ->
-                    new AllFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
+                    new AllFieldsTab(undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
             case RELATED_ARTICLES ->
                     new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor);
             case AI_SUMMARY ->
@@ -131,7 +138,6 @@ public class EntryEditorTabFactory {
             case CITATION_INFORMATION ->
                     new CitationRelationsTab(
                             dialogService,
-                            undoManager,
                             stateManager,
                             fileMonitor,
                             preferences,
@@ -140,7 +146,6 @@ public class EntryEditorTabFactory {
                             searchCitationsRelationsService);
             case SOURCE ->
                     new SourceTab(
-                            undoManager,
                             preferences.getFieldPreferences(),
                             preferences.getImportFormatPreferences(),
                             fileMonitor,

@@ -7,7 +7,7 @@ import org.jspecify.annotations.NonNull;
 
 /// Remove {} braces around words in case they appear balanced
 ///
-/// Related formatter: {@link ProtectTermsFormatter}
+/// Related formatter: [ProtectTermsFormatter]
 public class UnprotectTermsFormatter extends Formatter {
 
     @Override

@@ -40,12 +40,14 @@ import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTab;
 import org.jabref.gui.preferences.websearch.WebSearchTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -57,7 +59,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -66,7 +67,7 @@ import static org.mockito.Mockito.mock;
 /// as a [SearchableElement], whether the form builder placed it or a `custom(...)` node brought it.
 /// Without this test, a custom node whose texts nobody registered is a hole in the search that
 /// nothing else reports.
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 class PreferencesSearchCoverageTest {
 
     /// The dialog-scoped working copy the AI and web search tabs share.
@@ -87,6 +88,7 @@ class PreferencesSearchCoverageTest {
         Injector.setModelOrService(LanguageServerController.class, mock(LanguageServerController.class));
         Injector.setModelOrService(UiMessageHandler.class, mock(UiMessageHandler.class));
         Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+        Injector.setModelOrService(UndoManager.class, mock(UndoManager.class));
     }
 
     /// The tabs are created inside the test rather than here, because a parameter source runs

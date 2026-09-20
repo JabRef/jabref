@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.application.Platform;
@@ -13,26 +14,32 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.NotificationService;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import org.jspecify.annotations.Nullable;
 
-/// Handles all focus and keyboard-navigation concerns for {@link EntryEditor}.
+/// Handles all focus and keyboard-navigation concerns for [EntryEditor].
 ///
 /// Owns: field-level focus capture/restore across entry changes; tab-to-tab keyboard navigation
-/// (Tab/Shift-Tab wrapping) and jump-to-field lookups. DOM traversal is delegated to {@link EntryEditorFocusTraversal}.
+/// (Tab/Shift-Tab wrapping) and jump-to-field lookups. DOM traversal is delegated to [EntryEditorFocusTraversal].
 class EntryEditorFocusUtils {
 
     private final TabPane tabPane;
     private final Node sceneSource;
+    private final NotificationService notificationService;
 
     private @Nullable Field lastFocusedField;
 
-    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource) {
+    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource, NotificationService notificationService) {
         this.tabPane = tabPane;
         this.sceneSource = sceneSource;
+        this.notificationService = notificationService;
     }
 
     // region — field focus capture / restore
@@ -68,13 +75,32 @@ class EntryEditorFocusUtils {
     // region — jump to field
 
     void setFocusToField(Field field) {
+        focusField(field, () -> {
+        });
+    }
+
+    void focusOrAddField(Field field) {
+        focusField(field, () -> addFieldViaAllFieldsTab(field));
+    }
+
+    private void focusField(Field field, Runnable onNotFound) {
         UiTaskExecutor.runInJavaFXThread(() -> getTabContainingField(field).ifPresentOrElse(
                 tab -> selectTabAndField(tab, field),
                 () -> {
                     Field aliasField = EntryConverter.FIELD_ALIASES.get(field);
-                    getTabContainingField(aliasField).ifPresent(tab -> selectTabAndField(tab, aliasField));
+                    getTabContainingField(aliasField).ifPresentOrElse(
+                            tab -> selectTabAndField(tab, aliasField),
+                            onNotFound
+                    );
                 }
         ));
+    }
+
+    private Field canonicalFieldForActiveMode(Field field, BibDatabaseMode mode) {
+        Map<Field, Field> aliasesToCanonical = mode == BibDatabaseMode.BIBTEX
+                                               ? EntryConverter.FIELD_ALIASES_BIBLATEX_TO_BIBTEX
+                                               : EntryConverter.FIELD_ALIASES_BIBTEX_TO_BIBLATEX;
+        return aliasesToCanonical.getOrDefault(field, field);
     }
 
     private Optional<FieldsEditorTab> getTabContainingField(Field field) {
@@ -83,6 +109,24 @@ class EntryEditorFocusUtils {
                       .map(FieldsEditorTab.class::cast)
                       .filter(tab -> tab.getShownFields().contains(field))
                       .findFirst();
+    }
+
+    private void addFieldViaAllFieldsTab(Field field) {
+        tabPane.getTabs().stream()
+               .filter(AllFieldsTab.class::isInstance)
+               .map(AllFieldsTab.class::cast)
+               .findFirst()
+               .ifPresentOrElse(allFieldsTab -> {
+                           BibDatabaseMode mode = allFieldsTab.getDatabaseMode();
+                           // Custom field names are added as they are typed, like the tab's free-form add row does.
+                           Field canonicalField = canonicalFieldForActiveMode(field, mode);
+                           tabPane.getSelectionModel().select(allFieldsTab);
+                           allFieldsTab.addFieldAndFocus(canonicalField);
+                       },
+                       // No other tab can show a field it was not configured for, so say why nothing happens
+                       // instead of swallowing the jump.
+                       () -> notificationService.notify(Localization.lang("Cannot show \"%0\" because the \"%1\" tab is hidden",
+                               FieldTextMapper.getDisplayName(field), EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName())));
     }
 
     private void selectTabAndField(FieldsEditorTab tab, Field field) {
@@ -98,7 +142,7 @@ class EntryEditorFocusUtils {
 
     // region — tab keyboard navigation (Tab / Shift-Tab wrapping)
 
-    /// Installs Tab/Shift-Tab wrapping key filters on every focusable node inside {@code tab}'s content.
+    /// Installs Tab/Shift-Tab wrapping key filters on every focusable node inside `tab`'s content.
     void setupNavigationForTab(FieldsEditorTab tab) {
         Node content = tab.getContent();
         if (content instanceof Parent parent) {
@@ -151,7 +195,7 @@ class EntryEditorFocusUtils {
         if (!shownFields.isEmpty() && node.getId() != null) {
             Optional<Field> boundaryField = first
                                             ? shownFields.stream().findFirst()
-                                            : shownFields.stream().reduce((firstField, secondField) -> secondField);
+                                            : shownFields.stream().reduce((_, secondField) -> secondField);
             boolean matchesBoundaryFieldId = boundaryField.map(Field::getName)
                                                           .map(name -> name.equalsIgnoreCase(node.getId()))
                                                           .orElse(false);
@@ -225,7 +269,7 @@ class EntryEditorFocusUtils {
 
         Collection<Field> shownFields = tab.getShownFields();
         if (!shownFields.isEmpty()) {
-            Optional<Field> lastField = shownFields.stream().reduce((first, second) -> second);
+            Optional<Field> lastField = shownFields.stream().reduce((_, second) -> second);
             Optional<Node> lastTextInput = EntryEditorFocusTraversal.findFirstTextInputById(parent, lastField.get().getName());
             if (lastTextInput.isPresent()) {
                 lastTextInput.get().requestFocus();

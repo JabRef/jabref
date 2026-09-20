@@ -12,7 +12,7 @@ import org.jabref.model.entry.field.StandardField;
 /// It is based on the information of <a href="https://tug.org/texmf-docs/bibtex/btxdoc.pdf">BibTeXing</a>, a manual
 /// by the original BibTeX author. Also enriched by new fields not existing back then (e.g., ISSN).
 ///
-/// The BibLaTeX entry types are defined at {@link BiblatexEntryTypeDefinitions}.
+/// The BibLaTeX entry types are defined at [BiblatexEntryTypeDefinitions].
 public class BibtexEntryTypeDefinitions {
     /// An article from a journal or magazine.
     ///

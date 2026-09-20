@@ -261,7 +261,7 @@ public class RepecNepImporter extends Importer {
                         .append(this.lastLine.substring(this.lastLine.indexOf('(') + 1,
                                             institutionDone && (this.lastLine
                                                     .indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine
-                                                    .indexOf(')') : this.lastLine.length())
+                                                                                                        .indexOf(')') : this.lastLine.length())
                                              .trim());
             } else {
                 author = this.lastLine.trim();

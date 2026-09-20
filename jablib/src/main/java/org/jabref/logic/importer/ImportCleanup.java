@@ -28,7 +28,7 @@ public abstract class ImportCleanup {
         };
     }
 
-    /// @implNote Related method: {@link ParserFetcher#doPostCleanup(BibEntry)}
+    /// @implNote Related method: [ParserFetcher#doPostCleanup(BibEntry)]
     public BibEntry doPostCleanup(BibEntry entry) {
         normalizeWhitespacesCleanup.cleanup(entry);
         return entry;

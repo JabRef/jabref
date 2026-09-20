@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /// and the options relevant for this file in Defaults.
 ///
 ///
-/// To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
+/// To get an instance for a .bib file, use [org.jabref.logic.importer.fileformat.BibtexParser].
 ///
 @AllowedToUseLogic("because it needs access to shared database features")
 @NullMarked
@@ -52,7 +52,7 @@ public class BibDatabaseContext {
 
     private final BibDatabase database;
 
-    private MetaData metaData;
+    private final MetaData metaData;
 
     /// Generate a random UID for unique of the concrete context
     /// In contrast to hashCode this stays unique
@@ -120,23 +120,31 @@ public class BibDatabaseContext {
         this.path = null;
     }
 
+    /// The id used to address this library from the outside: the REST API (`/libraries/{id}/...`),
+    /// cite-as-you-write (`libraryid=`), JabMap and in-app links (`jabref://libraries/{id}/entries/{key}`).
+    /// Empty for libraries that have not been saved to disk yet.
+    public Optional<String> getLibraryId() {
+        return getDatabasePath().map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path));
+    }
+
     public BibDatabase getDatabase() {
         return database;
+    }
+
+    /// The keyword separator of this library, falling back to the given separator (typically the global preference) when the library does not declare one
+    public Character getKeywordSeparator(Character fallbackKeywordSeparator) {
+        return metaData.getKeywordSeparator().orElse(fallbackKeywordSeparator);
     }
 
     public MetaData getMetaData() {
         return metaData;
     }
 
-    public void setMetaData(MetaData metaData) {
-        this.metaData = metaData;
-    }
-
     public boolean isBiblatexMode() {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
-    /// Returns whether this .bib file belongs to a {@link org.jabref.model.study.Study}
+    /// Returns whether this .bib file belongs to a [org.jabref.model.study.Study]
     public boolean isStudy() {
         return this.getDatabasePath()
                    .map(path -> Crawler.FILENAME_STUDY_RESULT_BIB.equals(path.getFileName().toString()) &&
@@ -222,7 +230,7 @@ public class BibDatabaseContext {
         });
     }
 
-    /// Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}
+    /// Returns the first existing file directory from  [#getFileDirectories(FilePreferences)]
     ///
     /// @return the path - or an empty optional, if none of the directories exists
     public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
@@ -360,7 +368,7 @@ public class BibDatabaseContext {
 
     /// Get the generated UID for the current context. Can be used to distinguish contexts with changing metadata etc
     ///
-    /// This is required, because of {@link #hashCode()} implementation.
+    /// This is required, because of [#hashCode()] implementation.
     ///
     /// @return The generated UID in UUIDv4 format with the prefix bibdatabasecontext_
     public String getUid() {

@@ -6,7 +6,7 @@ import org.jabref.model.entry.BibEntry;
 
 /// Strategy interface for resolving semantic entry-level conflicts during Git merges.
 ///
-/// Implementations decide how to resolve {@link ThreeWayEntryConflict}s, such as via GUI or CLI.
+/// Implementations decide how to resolve [ThreeWayEntryConflict]s, such as via GUI or CLI.
 public interface GitConflictResolverStrategy {
     /// Resolves all given entry-level semantic conflicts, and produces a new, resolved remote state.
     ///

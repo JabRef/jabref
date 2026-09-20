@@ -28,7 +28,7 @@ public class UnoTextDocument {
         if (!missing) {
             try {
                 UnoReferenceMark.getNameAccess(doc);
-            } catch (NoDocumentException | DisposedException ex) {
+            } catch (NoDocumentException | DisposedException _) {
                 missing = true;
             }
         }

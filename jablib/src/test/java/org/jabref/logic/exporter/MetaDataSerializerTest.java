@@ -64,6 +64,13 @@ public class MetaDataSerializerTest {
     }
 
     @Test
+    void serializeKeywordSeparator() {
+        metaData.setKeywordSeparator(';');
+
+        assertEquals(Map.of("keywordSeparator", "\\;;"), MetaDataSerializer.getSerializedStringMap(metaData, pattern));
+    }
+
+    @Test
     void serializeSingleSaveAction() {
         FieldFormatterCleanupActions saveActions = new FieldFormatterCleanupActions(true,
                 List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
@@ -119,7 +126,7 @@ public class MetaDataSerializerTest {
         assertEquals(Set.of(), type.get().getOptionalFields());
     }
 
-    /// Code clone of {@link org.jabref.logic.importer.util.MetaDataParserTest#parseCustomizedEntryType()}
+    /// Code clone of [org.jabref.logic.importer.util.MetaDataParserTest#parseCustomizedEntryType()]
     public static Stream<Arguments> serializeCustomizedEntryType() {
         return Stream.of(
                 Arguments.of(

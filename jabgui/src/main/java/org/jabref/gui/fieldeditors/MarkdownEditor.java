@@ -9,8 +9,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -24,6 +22,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;

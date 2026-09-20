@@ -56,7 +56,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         return this.allMessagesData;
     }
 
-    /// Concatenates the formatted message of the given {@link LogEventViewModel}s by using a new line separator.
+    /// Concatenates the formatted message of the given [LogEventViewModel]s by using a new line separator.
     ///
     /// @return all messages as String
     private String getLogMessagesAsString(List<LogEventViewModel> messages) {
@@ -70,7 +70,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         copyLog(allMessagesData);
     }
 
-    /// Copies the given list of {@link LogEventViewModel}s to the clipboard.
+    /// Copies the given list of [LogEventViewModel]s to the clipboard.
     public void copyLog(List<LogEventViewModel> messages) {
         if (messages.isEmpty()) {
             return;
@@ -79,7 +79,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         dialogService.notify(Localization.lang("Log copied to clipboard."));
     }
 
-    /// Copies the detailed text of the given {@link LogEventViewModel} to the clipboard.
+    /// Copies the detailed text of the given [LogEventViewModel] to the clipboard.
     public void copyLogEntry(LogEventViewModel logEvent) {
         clipBoardManager.setContent(logEvent.getDetailedText());
     }

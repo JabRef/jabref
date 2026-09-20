@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-
 plugins {
     id("org.jabref.gradle.module")
     id("application")
@@ -31,11 +29,6 @@ application{
 }
 
 tasks.test {
-    testLogging {
-        // set options for log level LIFECYCLE
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
-    }
     maxParallelForks = 1
 }
 
@@ -70,7 +63,6 @@ graalvmNative {
         named("main") {
             imageName.set("jabsrv")
             mainClass.set("org.jabref.http.server.cli.ServerCli")
-            buildArgs.add("-Djava.awt.headless=true")
         }
     }
 }

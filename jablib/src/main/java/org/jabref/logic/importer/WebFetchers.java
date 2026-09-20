@@ -14,6 +14,7 @@ import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import org.jabref.logic.importer.fetcher.BaseSearchFetcher;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.BvbFetcher;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
@@ -23,6 +24,7 @@ import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.DOABFetcher;
 import org.jabref.logic.importer.fetcher.DOAJFetcher;
 import org.jabref.logic.importer.fetcher.DiVA;
+import org.jabref.logic.importer.fetcher.DnbFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.EuropePmcFetcher;
@@ -42,12 +44,14 @@ import org.jabref.logic.importer.fetcher.OpenAlex;
 import org.jabref.logic.importer.fetcher.ResearchGate;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScholarArchiveFetcher;
+import org.jabref.logic.importer.fetcher.ScholarFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.Scopus;
 import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.SpringerNatureFullTextFetcher;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.importer.fetcher.SsrnFetcher;
+import org.jabref.logic.importer.fetcher.SwhidFetcher;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.UnpaywallFetcher;
 import org.jabref.logic.importer.fetcher.WileyFetcher;
@@ -65,6 +69,7 @@ import org.jabref.model.entry.identifier.IacrEprint;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.identifier.SSRN;
+import org.jabref.model.entry.identifier.SWHID;
 
 import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;
@@ -78,7 +83,7 @@ public class WebFetchers {
     private WebFetchers() {
     }
 
-    /// @implNote Needs to be consistent with [#getIdBasedFetcherFoIdentifier(Identifier, ImportFormatPreferences) ]
+    /// @implNote Needs to be consistent with [#getIdBasedFetcherFoIdentifier(Identifier, ImportFormatPreferences)]
     public static Optional<IdBasedFetcher> getIdBasedFetcherForField(Field field, ImportFormatPreferences importFormatPreferences) {
         IdBasedFetcher fetcher;
 
@@ -99,7 +104,7 @@ public class WebFetchers {
         return Optional.of(fetcher);
     }
 
-    /// @implNote Needs to be consistent with [#getIdBasedFetcherForField(Field, ImportFormatPreferences) ]
+    /// @implNote Needs to be consistent with [#getIdBasedFetcherForField(Field, ImportFormatPreferences)]
     public static Optional<IdBasedFetcher> getIdBasedFetcherForIdentifier(Identifier identifier, ImportFormatPreferences importFormatPreferences) {
         IdBasedFetcher fetcher;
 
@@ -121,6 +126,8 @@ public class WebFetchers {
                             new RfcFetcher(importFormatPreferences);
                     case SSRN _ ->
                             new SsrnFetcher(importFormatPreferences);
+                    case SWHID _ ->
+                            new SwhidFetcher(importFormatPreferences);
                     // No fetcher for ARK and MathSciNet
                     default ->
                             null;
@@ -156,6 +163,7 @@ public class WebFetchers {
         searchBasedFetchers.add(new ISIDOREFetcher());
         searchBasedFetchers.add(new INSPIREFetcher(importFormatPreferences));
         searchBasedFetchers.add(new GvkFetcher(importFormatPreferences));
+        searchBasedFetchers.add(new DnbFetcher(importFormatPreferences));
         searchBasedFetchers.add(new BvbFetcher());
         searchBasedFetchers.add(new MedlineFetcher(importerPreferences));
         searchBasedFetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
@@ -169,9 +177,11 @@ public class WebFetchers {
         searchBasedFetchers.add(new OpenAlex(importerPreferences));
         searchBasedFetchers.add(new DOAJFetcher(importFormatPreferences));
         searchBasedFetchers.add(new IEEE(importFormatPreferences, importerPreferences));
+        searchBasedFetchers.add(new BaseSearchFetcher(importerPreferences));
         // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         searchBasedFetchers.add(new DOABFetcher());
         // set.add(new JstorFetcher(importFormatPreferences));
+        searchBasedFetchers.add(new ScholarFetcher(importerPreferences));
         searchBasedFetchers.add(new SemanticScholar(importerPreferences));
         searchBasedFetchers.add(new ResearchGate(importFormatPreferences));
         searchBasedFetchers.add(new BiodiversityLibrary(importerPreferences));
@@ -211,6 +221,7 @@ public class WebFetchers {
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
         set.add(new Medra());
+        set.add(new SwhidFetcher(importFormatPreferences));
         // set.add(new JstorFetcher(importFormatPreferences));
         return set;
     }
@@ -282,6 +293,7 @@ public class WebFetchers {
         fetchers.add(new OpenAccessDoi());
         // OpenAlex provides OA locations and direct PDF links via its API
         fetchers.add(new OpenAlex(importerPreferences));
+        fetchers.add(new ScholarFetcher(importerPreferences));
         fetchers.add(new ResearchGate(importFormatPreferences));
         fetchers.add(new SemanticScholar(importerPreferences));
         fetchers.add(new UnpaywallFetcher(importerPreferences));
@@ -293,11 +305,13 @@ public class WebFetchers {
     public static Set<CustomizableKeyFetcher> getCustomizableKeyFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         Set<CustomizableKeyFetcher> fetchers = Set.of(
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
+                new BaseSearchFetcher(importerPreferences),
                 new BiodiversityLibrary(importerPreferences),
                 new CrossRef(importerPreferences),
                 new IEEE(importFormatPreferences, importerPreferences),
                 new MedlineFetcher(importerPreferences),
                 new OpenAlex(importerPreferences),
+                new ScholarFetcher(importerPreferences),
                 new SemanticScholar(importerPreferences),
                 new Scopus(importerPreferences),
                 new SpringerNatureWebFetcher(importerPreferences),

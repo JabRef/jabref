@@ -10,6 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -28,23 +29,50 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                   BibEntryTypesManager entryTypesManager,
                                   PreviewViewer previewViewer,
                                   TaskExecutor taskExecutor) {
-        Label inJabRef = new Label(Localization.lang("In JabRef"));
-        inJabRef.getStyleClass().add("lib-change-header");
-        Label onDisk = new Label(Localization.lang("On disk"));
-        onDisk.getStyleClass().add("lib-change-header");
+        this(
+                oldEntry,
+                newEntry,
+                databaseContext,
+                databaseContext,
+                dialogService,
+                preferences,
+                entryTypesManager,
+                previewViewer,
+                taskExecutor,
+                Localization.lang("In JabRef"),
+                Localization.lang("On disk")
+        );
+    }
+
+    public EntryChangeDetailsView(BibEntry oldEntry,
+                                  BibEntry newEntry,
+                                  BibDatabaseContext oldDatabaseContext,
+                                  BibDatabaseContext newDatabaseContext,
+                                  DialogService dialogService,
+                                  GuiPreferences preferences,
+                                  BibEntryTypesManager entryTypesManager,
+                                  PreviewViewer previewViewer,
+                                  TaskExecutor taskExecutor,
+                                  String leftLabelText,
+                                  String rightLabelText) {
+        Label inJabRef = new Label(leftLabelText);
+        inJabRef.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
+        Label onDisk = new Label(rightLabelText);
+        onDisk.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
 
         // we need a copy here as we otherwise would set the same entry twice
         PreviewViewer previewClone = new PreviewViewer(dialogService, preferences, taskExecutor);
-        previewClone.setDatabaseContext(databaseContext);
+        previewClone.setDatabaseContext(oldDatabaseContext);
+        previewViewer.setDatabaseContext(newDatabaseContext);
 
         // PreviewViewer is a plain ScrollPane now, so its own scroll bars can be synchronized directly
         previewClone.vvalueProperty().bindBidirectional(previewViewer.vvalueProperty());
         // TODO: Also sync scrolling for BibTeX view.
 
         PreviewWithSourceTab oldPreviewWithSourcesTab = new PreviewWithSourceTab();
-        TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferences, entryTypesManager, previewClone, Localization.lang("Entry Preview"));
+        TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, oldDatabaseContext, preferences, entryTypesManager, previewClone, Localization.lang("Entry Preview"));
         PreviewWithSourceTab newPreviewWithSourcesTab = new PreviewWithSourceTab();
-        TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferences, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));
+        TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, newDatabaseContext, preferences, entryTypesManager, previewViewer, Localization.lang("Entry Preview"));
 
         EasyBind.subscribe(
                 oldEntryTabPane.getSelectionModel().selectedIndexProperty(),

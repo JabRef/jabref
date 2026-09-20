@@ -7,5 +7,8 @@ public enum BstCitationFormat {
     NUMERIC,
 
     /// Author-year markers: (Cooper et al., 2007), (Smith, 2016), ...
-    AUTHOR_YEAR
+    AUTHOR_YEAR,
+
+    /// Style-defined markers from `\bibitem[label]{key}`: [ABC20], [ABC20a], ...
+    STYLE_DEFINED
 }

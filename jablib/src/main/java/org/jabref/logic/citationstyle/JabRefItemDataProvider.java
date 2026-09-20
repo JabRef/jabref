@@ -30,7 +30,7 @@ import org.jbibtex.BibTeXEntry;
 import org.jbibtex.DigitStringValue;
 import org.jbibtex.Key;
 
-/// Custom {@link ItemDataProvider} that allows to set the data so that we don't have to instantiate a new CSL object
+/// Custom [ItemDataProvider] that allows to set the data so that we don't have to instantiate a new CSL object
 /// every time.
 public class JabRefItemDataProvider implements ItemDataProvider {
 
@@ -48,9 +48,8 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         stringJsonBuilderFactory = new StringJsonBuilderFactory();
     }
 
-    /// Converts the {@link BibEntry} into {@link CSLItemData}.
+    /// Converts the [BibEntry] into [CSLItemData].
     ///
-    /// <br>
     /// <table>
     /// <thead>
     /// <tr>

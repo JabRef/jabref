@@ -7,6 +7,9 @@ import javafx.scene.paint.Color;
 
 public class ColorUtil {
 
+    private ColorUtil() {
+    }
+
     public static String toRGBCode(Color color) {
         return "#%02X%02X%02X".formatted(
                 (int) (color.getRed() * 255),
@@ -29,7 +32,7 @@ public class ColorUtil {
     public static StringProperty createFlashingColorStringProperty(final ObjectProperty<Color> flashingColor) {
         final StringProperty flashingColorStringProperty = new SimpleStringProperty();
         setColorStringFromColor(flashingColorStringProperty, flashingColor);
-        flashingColor.addListener((observable, oldValue, newValue) -> setColorStringFromColor(flashingColorStringProperty, flashingColor));
+        flashingColor.addListener((_, _, _) -> setColorStringFromColor(flashingColorStringProperty, flashingColor));
         return flashingColorStringProperty;
     }
 

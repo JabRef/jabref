@@ -56,7 +56,8 @@ import org.controlsfx.control.textfield.CustomTextField;
 
 public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
-    private static final String PANDOC_WARNING_LABEL_STYLE = "-fx-text-fill: #c9a227;";
+    /// Turns [#bstPandocWarning] into a warning; without it the label reads as a plain hint.
+    private static final String WARNING_STYLE_CLASS = "text-warning";
 
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
@@ -95,6 +96,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private Button addBstStyleButton;
     @FXML private RadioButton numericFormatButton;
     @FXML private RadioButton authorYearFormatButton;
+    @FXML private RadioButton styleDefinedFormatButton;
     @FXML private VBox bstPreviewBox;
 
     @FXML private VBox cslPreviewBox;
@@ -333,11 +335,13 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         if (StringUtil.isBlank(pandocPath)) {
             bstPandocWarning.setText(
                     Localization.lang("Pandoc path is required to be set. Please set it in your preferences."));
-            bstPandocWarning.setStyle(PANDOC_WARNING_LABEL_STYLE);
+            if (!bstPandocWarning.getStyleClass().contains(WARNING_STYLE_CLASS)) {
+                bstPandocWarning.getStyleClass().add(WARNING_STYLE_CLASS);
+            }
         } else {
             bstPandocWarning.setText(
                     Localization.lang("Pandoc path: %0", pandocPath));
-            bstPandocWarning.setStyle("");
+            bstPandocWarning.getStyleClass().remove(WARNING_STYLE_CLASS);
         }
 
         bstNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -399,10 +403,12 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         ToggleGroup formatGroup = new ToggleGroup();
         numericFormatButton.setToggleGroup(formatGroup);
         authorYearFormatButton.setToggleGroup(formatGroup);
+        styleDefinedFormatButton.setToggleGroup(formatGroup);
 
         BstCitationFormat currentFormat = viewModel.bstCitationFormatProperty().get();
         numericFormatButton.setSelected(currentFormat == BstCitationFormat.NUMERIC);
         authorYearFormatButton.setSelected(currentFormat == BstCitationFormat.AUTHOR_YEAR);
+        styleDefinedFormatButton.setSelected(currentFormat == BstCitationFormat.STYLE_DEFINED);
 
         numericFormatButton.selectedProperty().addListener((_, _, selected) -> {
             if (selected) {
@@ -412,6 +418,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         authorYearFormatButton.selectedProperty().addListener((_, _, selected) -> {
             if (selected) {
                 viewModel.bstCitationFormatProperty().set(BstCitationFormat.AUTHOR_YEAR);
+            }
+        });
+        styleDefinedFormatButton.selectedProperty().addListener((_, _, selected) -> {
+            if (selected) {
+                viewModel.bstCitationFormatProperty().set(BstCitationFormat.STYLE_DEFINED);
             }
         });
     }

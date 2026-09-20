@@ -4,13 +4,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.EmptySuggestionProvider;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -26,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-// @FetcherTest("Downloads a PDF file")
+// @ExternalServicesTest("Downloads a PDF file")
 class LinkedFilesEditorViewModelTest {
     private LinkedFilesEditorViewModel viewModel;
     private final GuiPreferences preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -35,7 +34,7 @@ class LinkedFilesEditorViewModelTest {
     private final UndoManager undoManager = mock(UndoManager.class);
 
     @Test
-    @Disabled("Runs in UI AND downloads data. This causes troubles. If @FetcherTest: UI framework cannot be started. If GuiTest: Too many connection errors")
+    @Disabled("Runs in UI AND downloads data. This causes troubles. If @ExternalServicesTest: UI framework cannot be started. If GuiTest: Too many connection errors")
     void urlFieldShouldDownloadFile(@TempDir Path tempDir) {
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
