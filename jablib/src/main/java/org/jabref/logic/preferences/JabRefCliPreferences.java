@@ -1750,6 +1750,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         FilePreferences defaultValues = FilePreferences.getDefault();
 
+        // [impl->req~import.dialog.download-linked-files~1]
         if (!hasKey(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES)) {
             putBoolean(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES, getBoolean(FILES_DOWNLOAD_LINKED, defaultValues.shouldDownloadLinkedFiles()));
         }

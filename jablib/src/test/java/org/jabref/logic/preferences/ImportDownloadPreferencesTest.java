@@ -53,6 +53,7 @@ class ImportDownloadPreferencesTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void migratesExistingChoiceOnlyOnce(boolean originalChoice) {
+        // [utest->req~import.dialog.download-linked-files~1]
         JabRefCliPreferences preferences = new JabRefCliPreferences();
         preferences.putBoolean(WEB_SEARCH_DOWNLOAD, originalChoice);
 
@@ -69,6 +70,7 @@ class ImportDownloadPreferencesTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void persistsDialogChoiceWithoutChangingWebSearch(boolean choice) {
+        // [utest->req~import.dialog.download-linked-files~1]
         JabRefCliPreferences preferences = new JabRefCliPreferences();
         preferences.putBoolean(WEB_SEARCH_DOWNLOAD, !choice);
         FilePreferences files = preferences.getFilePreferences();

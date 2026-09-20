@@ -49,4 +49,6 @@ Confirming an import saves the choice and applies it to that import; canceling l
 The choice is independent of the automatic download setting in Preferences > Web search and is only shown in the import dialog.
 On upgrade, the existing web search setting initializes the dialog preference once, preserving the previous default for existing users.
 
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

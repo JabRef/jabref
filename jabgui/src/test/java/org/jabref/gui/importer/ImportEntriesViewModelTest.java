@@ -37,6 +37,7 @@ class ImportEntriesViewModelTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void importRemembersDialogChoiceAndPassesItToHandlerWithoutChangingWebSearch(boolean choice) {
+        // [utest->req~import.dialog.download-linked-files~1]
         FilePreferences files = FilePreferences.getDefault();
         files.setDownloadLinkedFiles(!choice);
         files.setImportDialogDownloadLinkedFiles(!choice);

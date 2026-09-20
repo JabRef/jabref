@@ -316,6 +316,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
 
+        // [impl->req~import.dialog.download-linked-files~1]
         downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldImportDialogDownloadLinkedFiles());
 
         setResultConverter(button -> {

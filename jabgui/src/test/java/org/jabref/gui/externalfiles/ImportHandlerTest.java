@@ -110,6 +110,7 @@ class ImportHandlerTest {
     @ParameterizedTest
     @CsvSource({"true, false", "false, true"})
     void downloadOverrideControlsDownloadsWithoutChangingWebSearch(boolean choice, boolean webSearchChoice) {
+        // [utest->req~import.dialog.download-linked-files~1]
         when(preferences.getFilePreferences().shouldDownloadLinkedFiles()).thenReturn(webSearchChoice);
         if (choice) {
             importHandler.enableLinkedFileDownloads();

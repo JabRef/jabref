@@ -559,6 +559,7 @@ public class ImportHandler {
         );
     }
 
+    // [impl->req~import.dialog.download-linked-files~1]
     public void enableLinkedFileDownloads() {
         this.downloadLinkedFilesOverride = Optional.of(true);
     }
