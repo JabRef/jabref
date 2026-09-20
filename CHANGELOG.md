@@ -88,9 +88,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added read-only access to shared SQL libraries in `jabkit`: every input file argument accepts a PostgreSQL URL. [#12948](https://github.com/JabRef/jabref/issues/12948)
 
 ### Changed
-
 - We now show which web search fetchers have a saved API key. [#16250](https://github.com/JabRef/jabref/issues/16250)
-
 - We improve startup performance by load citation style sources only when used. [#15962](https://github.com/JabRef/jabref/issues/15962)
 - We changed the default prompts for "AI-Chat" & "Chat with Groups" to better handle etiquette, metadata, citationkeys and context separation. [#16981](https://github.com/JabRef/jabref/pull/16981)
 - We changed the default local embedding model to `intfloat/multilingual-e5-small` for better passage retrieval. [#17120](https://github.com/JabRef/jabref/pull/17120)
@@ -2339,3 +2337,4 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-alpha...v5.0-beta
 [5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
 <!-- markdownlint-disable-file MD024 MD033 MD053 -->
+
