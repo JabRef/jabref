@@ -56,7 +56,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We now show which web search fetchers have a saved API key. [#17214](https://github.com/JabRef/jabref/pull/17214)
+- We now show which web search fetchers have a saved API key. [#16250](https://github.com/JabRef/jabref/issues/16250)
 
 - The LibreOffice integration's bibliography generation for CSL styles is now more performant for a large number of entries. [#16555](https://github.com/JabRef/jabref/pull/16555)
 - We now identify Crossref requests with a configured email address, allowing them to use Crossref's polite pool. [#16535](https://github.com/JabRef/jabref/pull/16535)
