@@ -65,13 +65,13 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         this.abbreviationsPreferences = abbreviationsPreferences;
 
         abbreviationsCount.bind(abbreviations.sizeProperty());
-        currentAbbreviation.addListener((observable, oldValue, newValue) -> {
+        currentAbbreviation.addListener((_, _, newValue) -> {
             boolean isAbbreviation = (newValue != null) && !newValue.isPseudoAbbreviation();
             boolean isEditableFile = (currentFile.get() != null) && !currentFile.get().isBuiltInListProperty().get();
             isEditableAndRemovable.set(isEditableFile);
             isAbbreviationEditableAndRemovable.set(isAbbreviation && isEditableFile);
         });
-        currentFile.addListener((observable, oldValue, newValue) -> {
+        currentFile.addListener((_, oldValue, newValue) -> {
             if (oldValue != null) {
                 abbreviations.unbindBidirectional(oldValue.abbreviationsProperty());
                 currentAbbreviation.set(null);

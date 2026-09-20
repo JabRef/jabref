@@ -177,7 +177,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private Optional<Integer> getPortAsInt(String value) {
         try {
             return Optional.of(Integer.parseInt(value));
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }
@@ -249,9 +249,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             } else {
                 dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
             }
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException _) {
             // Why would that happen? Because one of developers inserted a failing url in testUrl...
-        } catch (UnirestException e) {
+        } catch (UnirestException _) {
             dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
         }
 

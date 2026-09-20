@@ -87,6 +87,42 @@ public class UiTaskExecutor implements TaskExecutor {
         }
     }
 
+    /// Runs the specified [Runnable] on the JavaFX application thread and waits for completion.
+    ///
+    /// Unlike [#runAndWaitInJavaFXThread(Runnable)], this method propagates an exception raised
+    /// by the action to the waiting thread.
+    ///
+    /// @param action the [Runnable] to run
+    /// @throws ExecutionException if the action fails
+    public static void runAndWaitInJavaFXThreadWithFailurePropagation(@NonNull Runnable action) throws ExecutionException {
+        FutureTask<Void> task = new FutureTask<>(action, null);
+        if (Platform.isFxApplicationThread()) {
+            task.run();
+        } else {
+            try {
+                Platform.runLater(task);
+            } catch (RuntimeException exception) {
+                throw new ExecutionException(exception);
+            }
+        }
+
+        boolean interrupted = false;
+        try {
+            while (true) {
+                try {
+                    task.get();
+                    return;
+                } catch (InterruptedException _) {
+                    interrupted = true;
+                }
+            }
+        } finally {
+            if (interrupted) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
     /// Runs the runnable later. This will guarantee that it runs on the FX UI Thread.
     ///
     /// @param runnable runnable BackgroundTask to run

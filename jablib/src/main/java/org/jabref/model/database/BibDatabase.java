@@ -644,8 +644,9 @@ public class BibDatabase {
 
         if (isLinkedField) {
             BibEntry entry = event.getBibEntry();
-            String oldValue = event.getOldValue();
-            String newValue = event.getNewValue();
+            // An absent value is no key: treated like the empty string, it links nothing.
+            String oldValue = Objects.toString(event.getOldValue(), "");
+            String newValue = Objects.toString(event.getNewValue(), "");
 
             // split the old multiple key string into individual keys and remove the entry from all old keys
             if (!StringUtil.isBlank(oldValue)) {
@@ -670,7 +671,7 @@ public class BibDatabase {
                 for (String rawKey : newValue.split(",")) {
                     if (!StringUtil.isBlank(rawKey)) {
                         String newKey = rawKey.trim();
-                        citationIndex.computeIfAbsent(newKey, k -> ConcurrentHashMap.newKeySet()).add(entry);
+                        citationIndex.computeIfAbsent(newKey, _ -> ConcurrentHashMap.newKeySet()).add(entry);
                     }
                 }
             }

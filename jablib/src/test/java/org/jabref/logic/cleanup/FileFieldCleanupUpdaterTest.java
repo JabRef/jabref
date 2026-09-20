@@ -49,7 +49,7 @@ class FileFieldCleanupUpdaterTest {
 
         assertTrue(schedulerCalled.get());
         assertEquals(1, changes.size());
-        assertEquals(StandardField.FILE, changes.getFirst().getField());
+        assertEquals(StandardField.FILE, changes.getFirst().field());
         assertEquals(FileFieldWriter.getStringRepresentation(files), entry.getField(StandardField.FILE).orElseThrow());
     }
 }

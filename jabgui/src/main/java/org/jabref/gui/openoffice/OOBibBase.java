@@ -281,7 +281,7 @@ public class OOBibBase {
         if (result.isError()) {
             LOGGER.warn(result.getError());
         }
-        return result.mapError(detail -> new OOError(errorTitle, messageOnFailureToObtain));
+        return result.mapError(_ -> new OOError(errorTitle, messageOnFailureToObtain));
     }
 
     private static OOVoidResult<OOError> checkRangeOverlaps(XTextDocument doc, OOFrontend frontend) {
@@ -624,33 +624,33 @@ public class OOBibBase {
         try {
 
             UnoUndo.enterUndoContext(doc, "Insert citation");
-            OOVoidResult<OOError> result = OOVoidResult.ok();
-            if (style instanceof CitationStyle citationStyle) {
-                // Handle insertion of CSL Style citations
-                result = insertCSLCitation(entries,
-                        doc,
-                        citationType,
-                        citationStyle,
-                        bibDatabaseContext,
-                        selectedDatabases,
-                        cursor,
-                        syncOptions);
-            } else if (style instanceof BstStyle bstStyle) {
-                // Handle insertion of BST citations
-                result = insertBstCitation(entries, doc, bstStyle, bibDatabaseContext, cursor);
-            } else if (style instanceof JStyle jStyle) {
-                // Handle insertion of JStyle citations
-                result = insertJStyleCitation(entries,
-                        doc,
-                        citationType,
-                        jStyle,
-                        frontend,
-                        cursor,
-                        bibDatabaseContext,
-                        syncOptions,
-                        pageInfo,
-                        fcursor);
-            }
+            OOVoidResult<OOError> result = switch (style) {
+                case CitationStyle citationStyle ->
+                        insertCSLCitation(entries,
+                                doc,
+                                citationType,
+                                citationStyle,
+                                bibDatabaseContext,
+                                selectedDatabases,
+                                cursor,
+                                syncOptions);
+                case BstStyle bstStyle ->
+                        insertBstCitation(entries, doc, bstStyle, bibDatabaseContext, cursor);
+                case JStyle jStyle ->
+                        insertJStyleCitation(entries,
+                                doc,
+                                citationType,
+                                jStyle,
+                                frontend,
+                                cursor,
+                                bibDatabaseContext,
+                                syncOptions,
+                                pageInfo,
+                                fcursor);
+                case null,
+                     default ->
+                        OOVoidResult.ok();
+            };
             testDialog(errorTitle, result);
         } finally {
             UnoUndo.leaveUndoContext(doc);
@@ -796,7 +796,7 @@ public class OOBibBase {
                 try {
                     bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
                     return OOVoidResult.ok();
-                } catch (MissingStyleDefinedCitationLabelException e) {
+                } catch (MissingStyleDefinedCitationLabelException _) {
                     return OOVoidResult.error(OOError.bstStyleDoesNotDefineCitationFormat());
                 } catch (CreationException | com.sun.star.uno.Exception e) {
                     return OOVoidResult.error(OOError.fromMisc(e));
@@ -940,14 +940,15 @@ public class OOBibBase {
         ExportCited.GenerateDatabaseResult result = null;
         try {
             UnoUndo.enterUndoContext(doc, "Changes during \"Export cited\"");
-            OOResult<ExportCited.GenerateDatabaseResult, JabRefException> generateResult;
-            if (style instanceof CitationStyle) {
-                generateResult = exportCitedForCSL(databases);
-            } else if (style instanceof BstStyle) {
-                generateResult = exportCitedForBST(databases);
-            } else {
-                generateResult = ExportCited.generateDatabase(doc, databases);
-            }
+            OOResult<ExportCited.GenerateDatabaseResult, JabRefException> generateResult = switch (style) {
+                case CitationStyle _ ->
+                        exportCitedForCSL(databases);
+                case BstStyle _ ->
+                        exportCitedForBST(databases);
+                case null,
+                     default ->
+                        ExportCited.generateDatabase(doc, databases);
+            };
             if (testDialog(errorTitle, generateResult.asVoidResult().mapError(OOError::from))) {
                 return FAIL;
             }
@@ -1150,7 +1151,7 @@ public class OOBibBase {
             try {
                 bstUpdateBibliography.rebuildBstBibliography(
                         doc, bstCitationOOAdapter, bstStyle, citedEntries, bibDatabaseContext);
-            } catch (MissingStyleDefinedCitationLabelException e) {
+            } catch (MissingStyleDefinedCitationLabelException _) {
                 return OOVoidResult.error(OOError.bstStyleDoesNotDefineCitationFormat());
             } catch (IOException | InterruptedException | com.sun.star.uno.Exception | CreationException e) {
                 LOGGER.error("Could not update BST bibliography", e);

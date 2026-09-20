@@ -48,7 +48,6 @@ public class EntryTypeFactory {
         types.addAll(Arrays.<EntryType>asList(BiblatexSoftwareEntryType.values()));
         types.addAll(Arrays.<EntryType>asList(BiblatexApaEntryType.values()));
         types.addAll(Arrays.<EntryType>asList(BiblatexNonStandardEntryType.values()));
-        types.addAll(Arrays.<EntryType>asList(SystematicLiteratureReviewStudyEntryType.values()));
 
         return types.stream().filter(type -> type.getName().equals(typeName.toLowerCase(Locale.ENGLISH))).findFirst().orElse(new UnknownEntryType(typeName));
     }

@@ -172,7 +172,7 @@ public class DOI implements Identifier {
             }
 
             return Optional.of(new DOI(cleanedDOI));
-        } catch (IllegalArgumentException | NullPointerException e) {
+        } catch (IllegalArgumentException | NullPointerException _) {
             return Optional.empty();
         }
     }

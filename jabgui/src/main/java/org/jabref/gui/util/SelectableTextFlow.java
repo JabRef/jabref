@@ -3,6 +3,7 @@ package org.jabref.gui.util;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -126,6 +127,12 @@ public class SelectableTextFlow extends TextFlow {
     }
 
     private void onMousePressed(MouseEvent event) {
+        if (isInHyperlink(event)) {
+            clearSelection();
+            return;
+        }
+
+        // Consumed so that enclosing controls (e.g. the ScrollPane of the AI chat) do not grab the focus, which would clear the selection.
         event.consume();
         requestFocus();
 
@@ -162,8 +169,29 @@ public class SelectableTextFlow extends TextFlow {
             return;
         }
 
+        if (isInHyperlink(event)) {
+            clearSelection();
+            return;
+        }
+
         event.consume();
         removeHighlight();
+    }
+
+    private boolean isInHyperlink(MouseEvent event) {
+        if (!(event.getTarget() instanceof Node eventTarget)) {
+            return false;
+        }
+
+        Node currentNode = eventTarget;
+        while (currentNode != null && currentNode != this) {
+            if (currentNode instanceof Hyperlink) {
+                return true;
+            }
+            currentNode = currentNode.getParent();
+        }
+
+        return false;
     }
 
     private void removeHighlight() {

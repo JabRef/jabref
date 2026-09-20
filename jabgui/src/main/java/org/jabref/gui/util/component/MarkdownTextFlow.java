@@ -3,7 +3,11 @@ package org.jabref.gui.util.component;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.Pane;
@@ -46,13 +50,15 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class MarkdownTextFlow extends SelectableTextFlow {
-    private static final String BULLET_LIST_PATTERN = "^\\s*[-*•]\\s+$";
-    private static final String NUMBERED_LIST_PATTERN = "^\\s*\\d+\\.\\s+$";
+    private static final Pattern BULLET_LIST_PATTERN = Pattern.compile("^\\s*[-*•]\\s+$");
+    private static final Pattern NUMBERED_LIST_PATTERN = Pattern.compile("^\\s*\\d+\\.\\s+$");
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
 
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
+    private final ObjectProperty<Consumer<String>> hyperlinkHandler =
+            new SimpleObjectProperty<>(this, "hyperlinkHandler", MarkdownTextFlow::defaultHyperlinkHandler);
 
     /// Whether the current content was set via `setPlainText` rather than `setMarkdown`.
     /// Governs whether copying reproduces Markdown markup or the displayed text verbatim.
@@ -93,6 +99,26 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         getChildren().add(new Text(text));
     }
 
+    public ObjectProperty<Consumer<String>> hyperlinkHandlerProperty() {
+        return hyperlinkHandler;
+    }
+
+    public Consumer<String> getHyperlinkHandler() {
+        return hyperlinkHandler.get();
+    }
+
+    public void setHyperlinkHandler(Consumer<String> hyperlinkHandler) {
+        this.hyperlinkHandler.set(hyperlinkHandler);
+    }
+
+    public static void defaultHyperlinkHandler(String url) {
+        new OpenBrowserAction(
+                url,
+                Injector.instantiateModelOrService(DialogService.class),
+                Injector.instantiateModelOrService(GuiPreferences.class)
+                        .getExternalApplicationsPreferences()).execute();
+    }
+
     private void addTextNode(@Nullable String content, Node astNode, String... styleClasses) {
         if (content == null || content.isEmpty()) {
             return;
@@ -115,12 +141,12 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         }
 
         MarkdownAwareHyperlink hyperlink = new MarkdownAwareHyperlink(text, astNode);
-        hyperlink.setOnAction(_ -> new OpenBrowserAction(
-                url,
-                Injector.instantiateModelOrService(DialogService.class),
-                Injector.instantiateModelOrService(GuiPreferences.class)
-                        .getExternalApplicationsPreferences()).execute()
-        );
+        hyperlink.setOnAction(_ -> {
+            Consumer<String> handler = getHyperlinkHandler();
+            if (handler != null) {
+                handler.accept(url);
+            }
+        });
 
         if (styleClasses != null) {
             for (String styleClass : styleClasses) {
@@ -210,45 +236,54 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     private String getMarkdownRepresentation(Node astNode, String renderedText) {
         if ("\n".equals(renderedText) || "\n\n".equals(renderedText)) {
             return renderedText;
-        } else if (astNode instanceof Heading heading) {
-            return "#".repeat(heading.getLevel()) + " " + heading.getText().toString().trim();
-        } else if (astNode instanceof Code) {
-            return "`" + astNode.getChildChars() + "`";
-        } else if (astNode instanceof Emphasis) {
-            return "*" + astNode.getChildChars() + "*";
-        } else if (astNode instanceof StrongEmphasis) {
-            return "**" + astNode.getChildChars() + "**";
-        } else if (astNode instanceof Link link) {
-            String linkText = link.getText().toString();
-            String url = link.getUrl().toString();
-            String title = link.getTitle().toString();
-            if (title.isEmpty()) {
-                return "[" + linkText + "](" + url + ")";
-            } else {
-                return "[" + linkText + "](" + url + " \"" + title + "\")";
-            }
-        } else if (astNode instanceof LinkRef linkRef) {
-            String linkText = linkRef.getText().toString();
-            String reference = linkRef.getReference().toString();
-            return "[" + linkText + "][" + reference + "]";
-        } else if (astNode instanceof FencedCodeBlock fencedCodeBlock) {
-            String info = fencedCodeBlock.getInfo().toString();
-            String openingFence = fencedCodeBlock.getOpeningFence().toString();
-            String closingFence = fencedCodeBlock.getClosingFence().toString();
-            // NOTE: Hack. Flexmark always add \n at beginning, \n\n at end.
-            String content = fencedCodeBlock.getContentChars().toString();
-            return openingFence + info + content.substring(0, content.length() - 1) + closingFence;
-        } else if (astNode instanceof IndentedCodeBlock) {
-            return astNode.getChars().toString();
-        } else if (astNode instanceof BlockQuote) {
-            return renderedText;
-        } else if (renderedText.matches(BULLET_LIST_PATTERN)) {
-            return renderedText.replace(UNICODE_BULLET, "-");
-        } else if (renderedText.matches(NUMBERED_LIST_PATTERN)) {
-            return renderedText;
-        } else {
-            return renderedText;
         }
+        return switch (astNode) {
+            case Heading heading ->
+                    "#".repeat(heading.getLevel()) + " " + heading.getText().toString().trim();
+            case Code code ->
+                    "`" + code.getChildChars() + "`";
+            case Emphasis emphasis ->
+                    "*" + emphasis.getChildChars() + "*";
+            case StrongEmphasis strongEmphasis ->
+                    "**" + strongEmphasis.getChildChars() + "**";
+            case Link link -> {
+                String linkText = link.getText().toString();
+                String url = link.getUrl().toString();
+                String title = link.getTitle().toString();
+                if (title.isEmpty()) {
+                    yield "[" + linkText + "](" + url + ")";
+                } else {
+                    yield "[" + linkText + "](" + url + " \"" + title + "\")";
+                }
+            }
+            case LinkRef linkRef -> {
+                String linkText = linkRef.getText().toString();
+                String reference = linkRef.getReference().toString();
+                yield "[" + linkText + "][" + reference + "]";
+            }
+            case FencedCodeBlock fencedCodeBlock -> {
+                String info = fencedCodeBlock.getInfo().toString();
+                String openingFence = fencedCodeBlock.getOpeningFence().toString();
+                String closingFence = fencedCodeBlock.getClosingFence().toString();
+                // NOTE: Hack. Flexmark always add \n at beginning, \n\n at end.
+                String content = fencedCodeBlock.getContentChars().toString();
+                yield openingFence + info + content.substring(0, content.length() - 1) + closingFence;
+            }
+            case IndentedCodeBlock indentedCodeBlock ->
+                    indentedCodeBlock.getChars().toString();
+            case BlockQuote _ ->
+                    renderedText;
+            case null,
+                 default -> {
+                if (BULLET_LIST_PATTERN.matcher(renderedText).matches()) {
+                    yield renderedText.replace(UNICODE_BULLET, "-");
+                } else if (NUMBERED_LIST_PATTERN.matcher(renderedText).matches()) {
+                    yield renderedText;
+                } else {
+                    yield renderedText;
+                }
+            }
+        };
     }
 
     private class MarkdownRenderer {

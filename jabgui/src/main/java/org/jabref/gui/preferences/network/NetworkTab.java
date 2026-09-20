@@ -155,7 +155,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
         actions.setReorderable(false);
         actions.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getThumbprint()));
         new ValueTableCellFactory<CustomCertificateViewModel, String>()
-                .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove formatter '%0'", name))
                 .withOnMouseClickedEvent(thumbprint -> _ -> viewModel.customCertificateListProperty().removeIf(cert -> cert.getThumbprint().equals(thumbprint)))
                 .install(actions);

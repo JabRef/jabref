@@ -1,8 +1,11 @@
 package org.jabref.gui.undo;
 
+import java.util.Optional;
+
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.UndoStep;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -21,20 +24,26 @@ import org.jspecify.annotations.NullMarked;
 public interface GuiUndoManager extends UndoManager {
 
     /// Reverses the change on top of the undo stack.
-    void undo();
+    Optional<UndoStep> undo();
 
     /// Re-applies the change last undone.
-    void redo();
+    Optional<UndoStep> redo();
 
     boolean canUndo();
 
-    boolean canRedo();
+    /// The command currently applying changes to this library that are not yet on the stack, if
+    /// one is — the reading end of [org.jabref.logic.undo.UndoManager#suspendUndo]. While it is
+    /// present, undo and redo decline, and `canUndo`/`canRedo` are false for that reason rather
+    /// than for an empty stack.
+    Optional<String> suspendedBy();
 
-    /// Whether the library differs from the last saved position.
-    boolean hasChanged();
+    boolean canRedo();
 
     /// Marks the current position as saved.
     void markUnchanged();
+
+    /// See [org.jabref.logic.undo.JabRefUndoManager#isApplying].
+    boolean isApplying();
 
     /// Discards both stacks and the saved position.
     ///
@@ -52,4 +61,7 @@ public interface GuiUndoManager extends UndoManager {
 
     /// Whether there is anything to redo.
     ReadOnlyBooleanProperty redoableProperty();
+
+    /// Whether the library differs from the last saved position.
+    ReadOnlyBooleanProperty hasChangedProperty();
 }

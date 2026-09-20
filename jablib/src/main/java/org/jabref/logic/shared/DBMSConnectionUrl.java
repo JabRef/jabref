@@ -57,7 +57,7 @@ public record DBMSConnectionUrl(DBMSType type,
         URI uri;
         try {
             uri = new URI(url);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             return Optional.empty();
         }
         if (StringUtil.isBlank(uri.getHost())) {
@@ -161,7 +161,9 @@ public record DBMSConnectionUrl(DBMSType type,
         boolean useSSL = false;
         List<String> remaining = new ArrayList<>();
         for (Map.Entry<String, String> parameter : parameters) {
-            String key = parameter.getKey();
+            // PostgreSQL treats the parameter keywords case-insensitively, so "PASSWORD" must not slip
+            // through into the query part - it would end up in every JDBC URL built from this record
+            String key = parameter.getKey().toLowerCase(Locale.ROOT);
             String value = parameter.getValue();
             if ("user".equals(key)) {
                 user = Optional.of(user.orElse(value));
@@ -186,7 +188,7 @@ public record DBMSConnectionUrl(DBMSType type,
     private static Optional<Integer> parsePort(String value) {
         try {
             return Optional.of(Integer.parseInt(value));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }

@@ -61,7 +61,6 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.SharedDatabaseSessionService;
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -254,8 +253,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 journalAbbreviationRepository
         );
 
-        VBox head = new VBox(mainMenu, mainToolBar);
-        head.setSpacing(0d);
+        VBox head = new VBox(0, mainMenu, mainToolBar);
         setTop(head);
 
         verticalSplit.getItems().addAll(tabbedPane);
@@ -274,9 +272,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private void updateSidePane() {
         if (sidePane.getChildren().isEmpty()) {
-            if (horizontalDividerSubscription != null) {
-                horizontalDividerSubscription.unsubscribe();
-            }
+            unsubscribeHorizontalDivider();
             horizontalSplit.getItems().remove(sidePane);
         } else {
             if (!horizontalSplit.getItems().contains(sidePane)) {
@@ -305,13 +301,27 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public void updateHorizontalDividerPosition() {
-        if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
-            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
-                                                    .mapObservable(SplitPane.Divider::positionProperty)
-                                                    .listenToValues((_, newValue) ->
-                                                            preferences.getGuiPreferences()
-                                                                       .setHorizontalDividerPosition(newValue.doubleValue()));
+        // Rapid toggling queues several runLater calls; a leftover listener would keep writing.
+        unsubscribeHorizontalDivider();
+        if (!mainStage.isShowing() || sidePane.getChildren().isEmpty()) {
+            return;
+        }
+        horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
+        horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
+                                                .mapObservable(SplitPane.Divider::positionProperty)
+                                                .listenToValues((_, newValue) -> {
+                                                    double position = newValue.doubleValue();
+                                                    // 0 and 1 occur while the pane is added or removed, not as a user's choice
+                                                    if (position > 0 && position < 1) {
+                                                        preferences.getGuiPreferences().setHorizontalDividerPosition(position);
+                                                    }
+                                                });
+    }
+
+    private void unsubscribeHorizontalDivider() {
+        if (horizontalDividerSubscription != null) {
+            horizontalDividerSubscription.unsubscribe();
+            horizontalDividerSubscription = null;
         }
     }
 
@@ -404,7 +414,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         }
                         break;
                     case CLOSE_DATABASE:
-                        new CloseDatabaseAction(this, stateManager).execute();
+                        if (getCurrentLibraryTab() == null) {
+                            closeSelectedNonLibraryTab(tabbedPane);
+                        } else {
+                            new CloseDatabaseAction(this, stateManager).execute();
+                        }
                         event.consume();
                         break;
                     default:
@@ -414,6 +428,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initBindings() {
+        // Every tab shows its close button, so selecting a tab does not shift its label
+        tabbedPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
         BindingsHelper.bindContentFiltered(tabbedPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
@@ -513,6 +529,23 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                                 .orElse(new SimpleBooleanProperty(false))
                 )
         );
+    }
+
+    /// Closes the selected tab if it is no [LibraryTab] (the welcome tab): [CloseDatabaseAction] only knows library tabs, so the close shortcut would do nothing there.
+    ///
+    /// Mirrors what the tab's close button does in `TabPaneBehavior`: the tab close events are notifications, a [TabPane] never removes a tab in response to one, so the removal has to happen here.
+    static void closeSelectedNonLibraryTab(TabPane tabbedPane) {
+        Tab selectedTab = tabbedPane.getSelectionModel().getSelectedItem();
+        if ((selectedTab == null) || (selectedTab instanceof LibraryTab) || !selectedTab.isClosable()) {
+            return;
+        }
+        Event closeRequest = new Event(selectedTab, selectedTab, Tab.TAB_CLOSE_REQUEST_EVENT);
+        Event.fireEvent(selectedTab, closeRequest);
+        if (closeRequest.isConsumed()) {
+            return;
+        }
+        tabbedPane.getTabs().remove(selectedTab);
+        Event.fireEvent(selectedTab, new Event(selectedTab, selectedTab, Tab.CLOSED_EVENT));
     }
 
     private void updateTabBarVisible() {
@@ -720,29 +753,45 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             String sharedDatabaseId = reconnection.sharedDatabaseId();
             SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
             // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
-            // The callbacks check the stage: a quit while the attempt is pending must neither add a tab nor pop a dialog.
-            BackgroundTask.wrap(() -> manager.connect(reconnection.connectionProperties()))
-                          .onSuccess(bibDatabaseContext -> {
-                              if (!mainStage.isShowing()) {
-                                  bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
-                                  return;
-                              }
-                              sessionService.restoreSharedDatabaseId(manager.openTab(bibDatabaseContext).getBibDatabaseContext(), sharedDatabaseId);
-                          })
-                          .onFailure(exception -> {
-                              LOGGER.error("Could not reconnect to shared database {}", sharedDatabaseId, exception);
-                              if (mainStage.isShowing()) {
-                                  dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                                          Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
-                              }
-                          })
-                          .executeWith(taskExecutor);
+            // The callbacks check the stage so a connection that completes during shutdown is closed with its loading tab.
+            BibDatabaseContext dummyContext = manager.createDummyContext(reconnection.connectionProperties());
+            LibraryTab newTab = LibraryTab.createLibraryTab(
+                    () -> manager.connect(reconnection.connectionProperties()),
+                    dummyContext,
+                    dialogService,
+                    aiService,
+                    preferences,
+                    stateManager,
+                    this,
+                    fileUpdateMonitor,
+                    entryTypesManager,
+                    clipBoardManager,
+                    taskExecutor,
+                    gitHandlerRegistry,
+                    (tab, bibDatabaseContext) -> handleSharedDatabaseReconnectionSuccess(sessionService, reconnection, tab, bibDatabaseContext),
+                    exception -> handleSharedDatabaseReconnectionFailure(reconnection, exception));
+            addTab(newTab, true);
+            newTab.startDataLoadingTask();
         }
     }
 
-    @Deprecated
-    public Stage getMainStage() {
-        return mainStage;
+    private void handleSharedDatabaseReconnectionSuccess(SharedDatabaseSessionService sessionService,
+                                                         SharedDatabaseSessionService.Reconnection reconnection,
+                                                         LibraryTab tab,
+                                                         BibDatabaseContext bibDatabaseContext) {
+        if (!mainStage.isShowing()) {
+            closeTab(tab);
+            return;
+        }
+        sessionService.restoreSharedDatabaseId(bibDatabaseContext, reconnection.sharedDatabaseId());
+    }
+
+    private void handleSharedDatabaseReconnectionFailure(SharedDatabaseSessionService.Reconnection reconnection, Exception exception) {
+        LOGGER.error("Could not reconnect to shared database {}", reconnection.sharedDatabaseId(), exception);
+        if (mainStage.isShowing()) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
+                    Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
+        }
     }
 
     @Override

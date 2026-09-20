@@ -115,7 +115,7 @@ class PdfExtractReferences implements Callable<Integer> {
         for (String input : inputFiles) {
             Path inputFile;
             try {
-                inputFile = InputOption.resolveInput(input);
+                inputFile = InputOption.resolveInput(input, preferences);
             } catch (ImportServiceException e) {
                 // One unreachable URL or malformed path must not abort the remaining inputs.
                 LOGGER.error("Skipped - could not resolve input {}", displayName(input), e);
@@ -210,7 +210,7 @@ class PdfExtractReferences implements Callable<Integer> {
             String urlPath = URI.create(input).getPath();
             Path lastSegment = (urlPath == null || urlPath.isEmpty()) ? null : Path.of(urlPath).getFileName();
             return lastSegment == null ? "downloaded" : FileUtil.getBaseName(lastSegment);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             // Downloadable URL that is no strict URI (or whose path is no valid Path) - it carries no usable file name
             return "downloaded";
         }

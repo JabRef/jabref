@@ -7,6 +7,7 @@ import java.util.Optional;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -59,6 +60,6 @@ public class BackupResolverDialog extends FXDialog {
                 }
             }
         });
-        getDialogPane().setContent(contentLabel);
+        getDialogPane().setContent(new StackPane(contentLabel));
     }
 }

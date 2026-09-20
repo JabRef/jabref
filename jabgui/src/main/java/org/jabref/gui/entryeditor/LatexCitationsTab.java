@@ -76,7 +76,8 @@ public class LatexCitationsTab extends EntryEditorTab {
 
         searchPane.getColumnConstraints().setAll(column);
         searchPane.getRowConstraints().setAll(mainRow, bottomRow);
-        searchPane.setId("citationsPane");
+        searchPane.setId("citations-pane");
+        searchPane.getStyleClass().add("citations-pane");
         searchPane.getStyleClass().add("padding-0");
         setContent(searchPane);
 
@@ -112,7 +113,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         latexDirectoryPath.getStyleClass().addAll("font-monospace", "bold");
         Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
         latexDirectoryButton.setGraphic(IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY.getGraphicNode());
-        latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
+        latexDirectoryButton.setOnAction(_ -> viewModel.setLatexDirectory());
         HBox latexDirectoryBox = new HBox(10, latexDirectoryText, latexDirectoryPath, latexDirectoryButton);
         latexDirectoryBox.setAlignment(Pos.CENTER);
         return latexDirectoryBox;

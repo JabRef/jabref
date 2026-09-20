@@ -1,17 +1,23 @@
 package org.jabref.gui.undo;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.undo.ChangeSet;
 import org.jabref.model.undo.UndoableFieldChange;
+import org.jabref.model.undo.UndoableRemoveString;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /// Pins that the two actions act on the journal of the library the user is looking at, and read
@@ -40,6 +47,7 @@ class UndoRedoActionTest {
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
 
+    private DialogService dialogService;
     private BibEntry entryInA;
     private BibEntry entryInB;
     private LibraryTab tabA;
@@ -63,8 +71,9 @@ class UndoRedoActionTest {
         when(stateManager.getUndoManager(libraryA)).thenReturn(journalOfA);
         when(stateManager.getUndoManager(libraryB)).thenReturn(journalOfB);
 
-        undoAction = new UndoAction(mock(DialogService.class), stateManager);
-        redoAction = new RedoAction(mock(DialogService.class), stateManager);
+        dialogService = mock(DialogService.class);
+        undoAction = new UndoAction(dialogService, stateManager);
+        redoAction = new RedoAction(dialogService, stateManager);
     }
 
     @Test
@@ -118,6 +127,73 @@ class UndoRedoActionTest {
 
         assertEquals(Optional.of("Bohr"), entryInA.getField(StandardField.AUTHOR), "redone again in the library switched away from");
         assertEquals(Optional.of("Meitner"), entryInB.getField(StandardField.AUTHOR));
+    }
+
+    @Test
+    void theNotificationSaysWhatWasUndoneAndRedone() {
+        journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
+        showLibrary(tabA, libraryA);
+
+        undoAction.execute();
+        verify(dialogService).notify("Undone: Change field Author");
+
+        redoAction.execute();
+        verify(dialogService).notify("Redone: Change field Author");
+    }
+
+    @Test
+    void theNotificationNamesTheCommandWhenTheStepIsASet() {
+        journalOfA.addEdit(Localization.lang("Replace string"), edit -> edit.addEdit(setAuthor(entryInA, "Bohr")));
+        showLibrary(tabA, libraryA);
+
+        undoAction.execute();
+
+        verify(dialogService).notify("Undone: Replace string");
+    }
+
+    @Test
+    void theNotificationSaysWhenPartOfTheStepCouldNotBeUndone() {
+        BibtexString string = new BibtexString("name", "content");
+        libraryA.getDatabase().addString(string);
+        // Recorded without being performed, so undoing it puts back a string the library still
+        // holds - the shape a change has when the library moved on underneath the journal.
+        journalOfA.addEdit(new ChangeSet("Remove string", List.of(new UndoableRemoveString(libraryA.getDatabase(), string))));
+        showLibrary(tabA, libraryA);
+
+        undoAction.execute();
+
+        verify(dialogService).notify("Undone: Remove string (some changes could not be applied)");
+    }
+
+    @Test
+    void theNotificationNamesTheCommandHoldingTheLibrary() {
+        journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
+        showLibrary(tabA, libraryA);
+
+        try (UndoSuspension suspended = journalOfA.suspendUndo("Import entries")) {
+            undoAction.execute();
+            redoAction.execute();
+        }
+
+        verify(dialogService).notify("Cannot undo while Import entries is running");
+        verify(dialogService).notify("Cannot redo while Import entries is running");
+        assertEquals(Optional.of("Bohr"), entryInA.getField(StandardField.AUTHOR), "the undo ran anyway");
+    }
+
+    /// Enablement stays on while a command holds the library, so that pressing Ctrl+Z reaches the
+    /// action and the user is told why nothing happened. A disabled menu item swallows its
+    /// accelerator, which would make the keystroke do nothing at all.
+    @Test
+    void enablementStaysOnWhileACommandHoldsTheActiveLibrary() {
+        journalOfA.addEdit(setAuthor(entryInA, "Bohr"));
+        showLibrary(tabA, libraryA);
+
+        try (UndoSuspension suspended = journalOfA.suspendUndo("Import entries")) {
+            assertTrue(undoAction.executableProperty().get(), "the keystroke could not reach the action");
+            undoAction.execute();
+            verify(dialogService).notify("Cannot undo while Import entries is running");
+            assertEquals(Optional.of("Bohr"), entryInA.getField(StandardField.AUTHOR), "the undo ran anyway");
+        }
     }
 
     @Test

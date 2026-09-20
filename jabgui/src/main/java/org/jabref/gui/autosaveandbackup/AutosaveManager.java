@@ -76,7 +76,7 @@ public class AutosaveManager {
         needsSave.set(false);
         try {
             coarseChangeFilter.unregisterListener(this);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             // ignore exception if the listener was not registered before
         }
         runningInstances.remove(this);

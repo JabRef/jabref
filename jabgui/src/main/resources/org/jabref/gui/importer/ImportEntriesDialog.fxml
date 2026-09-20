@@ -15,7 +15,7 @@
 <?import org.controlsfx.control.CheckListView?>
 <DialogPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.importer.ImportEntriesDialog"
-            id="importEntriesDialog">
+            id="import-entries-dialog">
     <content>
         <VBox spacing="10.0">
             <Label text="%Select the entries to be imported:"/>

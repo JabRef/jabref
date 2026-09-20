@@ -3,6 +3,7 @@ package org.jabref.model.database;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.model.database.event.EntriesRemovedEvent;
@@ -29,7 +30,9 @@ public class CitationKeyListener {
     @Subscribe
     public void listen(FieldChangedEvent event) {
         if (event.getField().equals(InternalField.KEY_FIELD)) {
-            updateEntryLinks(event.getOldValue(), event.getNewValue());
+            // Without an old key nothing can link to the entry yet, so there is nothing to update.
+            Optional.ofNullable(event.getOldValue())
+                    .ifPresent(oldKey -> updateEntryLinks(oldKey, event.getNewValue()));
         }
     }
 

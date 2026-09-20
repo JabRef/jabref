@@ -368,7 +368,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             // (the remaining race between the check and the write cannot be closed by a path-based API)
             Optional.ofNullable(committedTargetFileState)
                     .filter(state -> state.matches(targetFile))
-                    .ifPresent(state -> applyAttributes(targetFile, preservedAttributes));
+                    .ifPresent(_ -> applyAttributes(targetFile, preservedAttributes));
 
             // Restore file permissions
             if (FileUtil.IS_POSIX_COMPLIANT) {
@@ -380,8 +380,12 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             }
 
             if (!keepBackup) {
-                // Remove backup file for saving
-                Files.deleteIfExists(backupFile);
+                try {
+                    Files.deleteIfExists(backupFile);
+                } catch (IOException exception) {
+                    // The commit itself succeeded — a leftover backup is not worth reporting the write as failed
+                    LOGGER.warn("Could not delete backup file {} after successful write", backupFile, exception);
+                }
             }
         } finally {
             // Remove temporary file (but not the backup!)
