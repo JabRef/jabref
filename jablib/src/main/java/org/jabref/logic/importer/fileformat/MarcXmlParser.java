@@ -101,6 +101,7 @@ public class MarcXmlParser implements Parser {
     private BibEntry parseEntry(Element element) {
         BibEntry bibEntry = new BibEntry(BibEntry.DEFAULT_TYPE);
 
+        // [impl->req~import.dnb.marc-metadata~1]
         List<Element> datafields = getChildren("datafield", element);
         for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");

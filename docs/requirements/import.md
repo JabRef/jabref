@@ -3,6 +3,13 @@ parent: Requirements
 ---
 # Import
 
+## Import DNB MARC metadata
+`req~import.dnb.marc-metadata~1`
+
+When importing DNB MARC21-XML records, JabRef stores summaries as abstracts, prefers ISBN-13s, and imports ISSNs, DOIs, and parent journal titles. A MARC 856 link is imported only when subfield `3` is exactly `Volltext`; `Inhaltstext` and other descriptive links are not imported.
+
+Needs: impl, utest
+
 ## Normalize imported BibTeX keyword delimiters
 `req~import.bibtex.keywords.normalize-delimiters~1`
 

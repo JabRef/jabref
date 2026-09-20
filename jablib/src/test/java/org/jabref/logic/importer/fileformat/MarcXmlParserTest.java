@@ -49,6 +49,7 @@ class MarcXmlParserTest {
     }
 
     @Test
+    // [utest->req~import.dnb.marc-metadata~1]
     void importsDoiFromDnbMarcXml() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlDoiRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -60,6 +61,7 @@ class MarcXmlParserTest {
     }
 
     @Test
+    // [utest->req~import.dnb.marc-metadata~1]
     void importsParentJournalFromDnbMarcXml() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlParentJournalRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -70,6 +72,7 @@ class MarcXmlParserTest {
     }
 
     @Test
+    // [utest->req~import.dnb.marc-metadata~1]
     void ignoresDnbContentDescriptionUrl() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlContentDescriptionRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -81,6 +84,7 @@ class MarcXmlParserTest {
     }
 
     @Test
+    // [utest->req~import.dnb.marc-metadata~1]
     void importsDnbFulltextUrl() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlFulltextRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
