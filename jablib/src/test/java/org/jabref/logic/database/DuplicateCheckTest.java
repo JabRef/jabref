@@ -654,7 +654,7 @@ public class DuplicateCheckTest {
                 .withField(StandardField.AUTHOR, "Albert Einstein")
                 .withField(StandardField.TITLE, "Relativity")
                 .withField(StandardField.YEAR, "1916");
- 
+
         BibEntry techReportEntry = new BibEntry(StandardEntryType.TechReport)
                 .withField(StandardField.AUTHOR, "Albert Einstein")
                 .withField(StandardField.TITLE, "Relativity")
