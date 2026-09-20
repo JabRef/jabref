@@ -7,16 +7,19 @@
             <zs:recordPacking>xml</zs:recordPacking>
             <zs:recordData>
                 <marc:record type="Bibliographic">
-                    <marc:leader>00000naa a2200000uc 4500</marc:leader>
-                    <marc:datafield tag="773" ind1="1" ind2="8">
-                        <marc:subfield code="7">|||s</marc:subfield>
+                    <marc:leader>00000nam a2200000 cc4500</marc:leader>
+                    <marc:controlfield tag="001">1396020055</marc:controlfield>
+                    <marc:datafield tag="245" ind1="1" ind2="0">
+                        <marc:subfield code="a">1000 Jahre Mörschbach 1006-2006</marc:subfield>
+                        <marc:subfield code="n">Teil 1</marc:subfield>
                     </marc:datafield>
                     <marc:datafield tag="773" ind1="0" ind2="8">
-                        <marc:subfield code="t">In: International Journal for Parasitology: Parasites and Wildlife (2025) 28:101137. https://doi.org/10.1016/j.ijppaw.2025.101137</marc:subfield>
+                        <marc:subfield code="q">11</marc:subfield>
+                        <marc:subfield code="w">(DE-101)1396790446</marc:subfield>
                     </marc:datafield>
                 </marc:record>
             </zs:recordData>
-            <zs:recordPosition>6</zs:recordPosition>
+            <zs:recordPosition>1</zs:recordPosition>
         </zs:record>
     </zs:records>
 </zs:searchRetrieveResponse>

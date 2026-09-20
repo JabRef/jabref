@@ -13,6 +13,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,33 @@ class MarcXmlParserTest {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
 
             assertEquals(1, entries.size());
+            assertEquals(StandardEntryType.Article, entries.getFirst().getType());
             assertEquals("In: International Journal for Parasitology: Parasites and Wildlife (2025) 28:101137. https://doi.org/10.1016/j.ijppaw.2025.101137", entries.getFirst().getField(StandardField.JOURNAL).orElseThrow());
+        }
+    }
+
+    @Test
+    // [utest->req~import.dnb.marc-metadata~1]
+    void doesNotChangeMonographicPartToArticle() throws IOException, ParseException {
+        try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlMonographicPartRecord.xml")) {
+            List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
+
+            assertEquals(1, entries.size());
+            assertEquals(StandardEntryType.Misc, entries.getFirst().getType());
+            assertEquals(Optional.empty(), entries.getFirst().getField(StandardField.JOURNAL));
+        }
+    }
+
+    @Test
+    // [utest->req~import.dnb.marc-metadata~1]
+    void importsMonographicHostTitleWithoutChangingToArticle() throws IOException, ParseException {
+        try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlMonographicHostRecord.xml")) {
+            List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
+
+            assertEquals(1, entries.size());
+            assertEquals(StandardEntryType.Misc, entries.getFirst().getType());
+            assertEquals("Collected essays on DNB metadata", entries.getFirst().getField(StandardField.BOOKTITLE).orElseThrow());
+            assertEquals(Optional.empty(), entries.getFirst().getField(StandardField.JOURNAL));
         }
     }
 

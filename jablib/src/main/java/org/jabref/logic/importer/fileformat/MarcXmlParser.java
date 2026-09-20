@@ -101,8 +101,10 @@ public class MarcXmlParser implements Parser {
     private BibEntry parseEntry(Element element) {
         BibEntry bibEntry = new BibEntry(BibEntry.DEFAULT_TYPE);
 
-        // [impl->req~import.dnb.marc-metadata~1]
         List<Element> datafields = getChildren("datafield", element);
+        Optional<Character> hostItemBibliographicLevel = getHostItemBibliographicLevel(datafields);
+
+        // [impl->req~import.dnb.marc-metadata~1]
         for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
             LOGGER.debug("tag: {}", tag);
@@ -135,7 +137,7 @@ public class MarcXmlParser implements Parser {
             } else if ("653".equals(tag)) {
                 putKeywords(bibEntry, datafield);
             } else if ("773".equals(tag)) {
-                putIssue(bibEntry, datafield);
+                putHostItem(bibEntry, datafield, hostItemBibliographicLevel);
             } else if ("856".equals(tag)) {
                 putElectronicLocation(bibEntry, datafield);
             } else if ("966".equals(tag)) {
@@ -371,12 +373,15 @@ public class MarcXmlParser implements Parser {
         }
     }
 
-    private void putIssue(BibEntry bibEntry, Element datafield) {
-        bibEntry.setType(StandardEntryType.Article);
-
-        String journal = getSubfield("t", datafield);
-        if (StringUtil.isNotBlank(journal)) {
-            bibEntry.setField(StandardField.JOURNAL, journal);
+    private void putHostItem(BibEntry bibEntry, Element datafield, Optional<Character> hostItemBibliographicLevel) {
+        String hostTitle = getSubfield("t", datafield);
+        if (hostItemBibliographicLevel.filter(level -> level == 's').isPresent()) {
+            bibEntry.setType(StandardEntryType.Article);
+            if (StringUtil.isNotBlank(hostTitle)) {
+                bibEntry.setField(StandardField.JOURNAL, hostTitle);
+            }
+        } else if (hostItemBibliographicLevel.filter(level -> level == 'm').isPresent() && StringUtil.isNotBlank(hostTitle)) {
+            bibEntry.setField(StandardField.BOOKTITLE, hostTitle);
         }
 
         List<String> issues = getSubfields("g", datafield);
@@ -405,6 +410,16 @@ public class MarcXmlParser implements Parser {
                 }
             }
         }
+    }
+
+    private Optional<Character> getHostItemBibliographicLevel(List<Element> datafields) {
+        return datafields.stream()
+                         .filter(datafield -> "773".equals(datafield.getAttribute("tag")))
+                         .map(datafield -> getSubfield("7", datafield))
+                         .filter(StringUtil::isNotBlank)
+                         .filter(controlSubfield -> controlSubfield.length() > 3)
+                         .map(controlSubfield -> controlSubfield.charAt(3))
+                         .findFirst();
     }
 
     private void putDoi(BibEntry bibEntry, Element datafield) {
