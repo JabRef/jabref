@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a native query field for catalogs on the SLR dialog. [#17199](https://github.com/JabRef/jabref/pull/17199)
 - We made almost everything in JabRef navigatable by keyboard, including adding visiual indicators. [#17059](https://github.com/JabRef/jabref/pull/17059)
 - We added a fetcher for Software Heritage identifiers (SWHID). [#16809](https://github.com/JabRef/jabref/issues/16809)
 - We added the community themes from [themes.jabref.org](https://themes.jabref.org/) (Everforest, Nord, Papers, Chocolate Honey, and Dino Girl's collection) as selectable themes. [#15915](https://github.com/JabRef/jabref/issues/15915)
@@ -44,7 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We now offer `jabkit` as a native binary (no Java runtime required, instant startup) for Linux (amd64/arm64) and macOS (Apple Silicon) as part of the binary distribution. [#16291](https://github.com/JabRef/jabref/pull/16291)
 - The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts CSL-JSON (`application/vnd.citationstyles.csl+json`), mapping each item to the correct entry type (e.g. conference paper, book chapter, thesis) via the citation-js-based mapping. [#16151](https://github.com/JabRef/jabref/pull/16151)
 - We added the ability for LibreOffice BST citations to use style-defined labels. [forum#3764](https://discourse.jabref.org/t/feature-request-custom-citation-styles-from-bst/3764). [#16357](https://github.com/JabRef/jabref/issues/16357)
-- We added a new "Main" tab to the entry editor showing all fields of an entry in a single scrollable list, with one-click chips for adding optional fields and a free-form box for adding arbitrary fields. Identifiers, files and links, bibliometrics, comments, and meta fields (groups, owner, timestamps, special fields) live in collapsible sections — collapsed when empty — each offering chips for its unset fields. [#12711](https://github.com/JabRef/jabref/issues/12711)
+- We added a new "Main" tab to the entry editor showing all fields of an entry in a single scrollable list, with one-click chips for adding optional fields and a free-form box for adding arbitrary fields. Identifiers, files and links, bibliometrics, comments, and meta fields (groups, owner, timestamps, special fields) live in collapsible sections — collapsed when empty — each offering chips for its unset fields; an open files and links section always shows the file editor. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
 - We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)
 - We added the ability to view citation previews rendered using the selected style on hover in the "Citations" tab. [#15914](https://github.com/JabRef/jabref/pull/15914)
@@ -52,6 +53,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts any open library id, switching JabRef to that library before importing, instead of only the currently active one. [#15929](https://github.com/JabRef/jabref/pull/15929)
 - We added support for selecting response engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - We added the ability to jump to cited entries and page locations in the PDF viewer from AI chat citations. [#16981](https://github.com/JabRef/jabref/pull/16981)
+- We added a "Test connection" button to the AI preferences. [#17123](https://github.com/JabRef/jabref/pull/17123)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 - We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
@@ -89,6 +91,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We improve startup performance by load citation style sources only when used. [#15962](https://github.com/JabRef/jabref/issues/15962)
 - We changed the default prompts for "AI-Chat" & "Chat with Groups" to better handle etiquette, metadata, citationkeys and context separation. [#16981](https://github.com/JabRef/jabref/pull/16981)
+- We changed the default local embedding model to `intfloat/multilingual-e5-small` for better passage retrieval. [#17120](https://github.com/JabRef/jabref/pull/17120)
 - We redesigned the "About JabRef" dialog. [#16950](https://github.com/JabRef/jabref/pull/16950)
 - We now create the group for imported entries when entries are imported, instead of when a library is opened. [#16988](https://github.com/JabRef/jabref/pull/16988)
 - We removed the keystore fields, the server timezone, and the database type selection from the "Connect to shared database" dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
@@ -98,6 +101,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We moved zotero-related settings from openoffice panel to openoffice/libreoffice preference tab. [#16352](https://github.com/JabRef/jabref/issues/16352)
 - We changed the document viewer to stay open when <kbd>Escape</kbd> is pressed. [#17175](https://github.com/JabRef/jabref/pull/17175)
 - We changed the default size of the "New Entry" dialog to improve visibility. [#11589](https://github.com/JabRef/jabref/issues/11589)
+- We changed LLM citation parsing in the "New Entry" dialog to run in the background. [#17158](https://github.com/JabRef/jabref/pull/17158)
 - We changed the default macOS shortcuts for "Search document identifier online" and "Focus group list" to not insert special characters. [#16528](https://github.com/JabRef/jabref/issues/16528)
 - We changed the extension of backup files from `.bak` to `.bib`, so that they can be opened in JabRef. [#11454](https://github.com/JabRef/jabref/issues/11454)
 - We changed spacing, padding and font sizes across the interface for a more consistent look and feel. [#16042](https://github.com/JabRef/jabref/issues/16042)
@@ -156,7 +160,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where an author list ending with "et al." was parsed as a person named "et al." instead of "and others". [#16937](https://github.com/JabRef/jabref/pull/16937)
 - We fixed an issue where dialog buttons cut off their text at a larger font size. [#16787](https://github.com/JabRef/jabref/issues/16787)
 - We fixed an issue where the font size was wrong after a walkthrough had been running. [#17108](https://github.com/JabRef/jabref/pull/17108)
+- We fixed preferences walkthroughs on macOS and made the Groups and PDF-link walkthroughs run through reliably. [#17140](https://github.com/JabRef/jabref/issues/17140)
 - We fixed an issue where main table columns could not be resized while "Fit table horizontally on screen" was enabled. Resizing a column now adjusts only the columns to its right, and column widths keep their proportions when the window is resized. [#10516](https://github.com/JabRef/jabref/issues/10516)
+- We fixed an issue where entry table column changes would not take effect before restarting JabRef. [#17204](https://github.com/JabRef/jabref/pull/17204)
 - We fixed an issue where the sidebar width jumped after repeatedly showing and hiding a side panel. [#17100](https://github.com/JabRef/jabref/issues/17100)
 - We fixed an issue where entries imported in the background could not be selected or updated in the main table. [#16893](https://github.com/JabRef/jabref/pull/16893)
 - We fixed an issue where editing a library's string constants could not be undone. [#16936](https://github.com/JabRef/jabref/pull/16936)
@@ -165,6 +171,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an exception when switching to a group in a shared library. [#17089](https://github.com/JabRef/jabref/issues/17089)
 - We fixed an issue where undoing could overwrite a newer value when a background operation had changed the same field. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where adding, removing, moving, sorting or editing groups could not be undone. [#16936](https://github.com/JabRef/jabref/pull/16936)
+- We fixed an issue where hovering over a group without description showed a stale tooltip from another group. [#11487](https://github.com/JabRef/jabref/issues/11487)
 - We fixed an issue where Ctrl+Z and Ctrl+Y only worked while the entry editor had focus. [#16936](https://github.com/JabRef/jabref/pull/16936)
 - We fixed an issue where the entry editor kept showing an entry of another library after switching libraries. [#16892](https://github.com/JabRef/jabref/pull/16892)
 - We fixed an issue where search results were out of view when the entry table had been scrolled down. [#16897](https://github.com/JabRef/jabref/pull/16897)
@@ -230,6 +237,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where generating AI embeddings for an entry with a linked URL logged a misleading error about a missing file. [#16123](https://github.com/JabRef/jabref/issues/16123)
 - We fixed an issue where the basic AI preferences stayed disabled although AI was enabled. [#17128](https://github.com/JabRef/jabref/pull/17128)
 - We fixed an issue where the AI preferences could not be saved because the document splitter overlap size was wrongly reported as invalid. [#17119](https://github.com/JabRef/jabref/pull/17119)
+- We fixed an issue where JabRef did not start when Mistral AI was selected as AI provider. [#17212](https://github.com/JabRef/jabref/pull/17212)
 - We fixed an issue with the LibreOffice integration where the ordering for numeric CSL styles in footnotes was broken. [#12484](https://github.com/JabRef/jabref/issues/12484)
 - We fixed an issue where `git push` did not report rejected remote updates. [#16367](https://github.com/JabRef/jabref/pull/16367)
 - We fixed formatting issues in entry preview when `.bst` styles were used. [#16314](https://github.com/JabRef/jabref/issues/16314)
@@ -292,6 +300,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where long recent library paths overflowed and were cut off in the Welcome tab. [#16808](https://github.com/JabRef/jabref/issues/16808)
 - We fixed an issue where a library file containing merge conflict markers was opened without any warning. [#9167](https://github.com/JabRef/jabref/issues/9167)
 - We fixed an issue where the deb, rpm and msi packages did not register JabRef for `.bib` files. [#17006](https://github.com/JabRef/jabref/issues/17006)
+- We fixed AI chat connection errors to show the server URL and the reason. [#17125](https://github.com/JabRef/jabref/pull/17125)
 
 ### Removed
 
