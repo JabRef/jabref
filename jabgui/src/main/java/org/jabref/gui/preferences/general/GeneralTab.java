@@ -16,7 +16,7 @@ import org.jabref.gui.theme.ThemePreset;
 import org.jabref.gui.theme.ThemePreviewView;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.citedrive.OAuthSessionRegistry;

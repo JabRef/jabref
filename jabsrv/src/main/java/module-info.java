@@ -1,7 +1,7 @@
 /// HTTP server exposing libraries via a REST API, used by the browser extension and for
 /// collaborative editing. Built on Jersey/Grizzly.
 ///
-/// Entry points: [org.jabref.http.server.Server], [org.jabref.http.manager.HttpServerManager].
+/// Entry points: [org.jabref.http.server.Server], [org.jabref.http.server.manager.HttpServerManager].
 ///
 /// @see <a href="https://devdocs.jabref.org/code-howtos/http-server.html">HTTP server code howto</a>
 module org.jabref.jabsrv {
