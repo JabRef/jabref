@@ -103,7 +103,7 @@ class FulltextFetchersTest {
         Files.writeString(pdf, "%PDF-1.4\n%fake\n");
         URL fileUrl = pdf.toUri().toURL();
 
-        FulltextFetcherWithTrustLevel finder = e -> Optional.of(fileUrl);
+        FulltextFetcherWithTrustLevel finder = _ -> Optional.of(fileUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
         assertEquals(Optional.empty(), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
@@ -115,7 +115,7 @@ class FulltextFetchersTest {
         Files.writeString(pdf, "%PDF-1.4\n%fake\n");
         URL fileUrl = pdf.toUri().toURL();
 
-        TrustedFileFetcher finder = e -> Optional.of(fileUrl);
+        TrustedFileFetcher finder = _ -> Optional.of(fileUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
         assertEquals(Optional.of(fileUrl), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
@@ -144,8 +144,8 @@ class FulltextFetchersTest {
         URL fileUrl = pdf.toUri().toURL();
         AtomicBoolean fallbackCalled = new AtomicBoolean(false);
 
-        TrustedFileFetcher primary = e -> Optional.of(fileUrl);
-        FallbackFileFetcher fallback = e -> {
+        TrustedFileFetcher primary = _ -> Optional.of(fileUrl);
+        FallbackFileFetcher fallback = _ -> {
             fallbackCalled.set(true);
             return Optional.of(fileUrl);
         };
@@ -162,8 +162,8 @@ class FulltextFetchersTest {
         URL fileUrl = pdf.toUri().toURL();
         AtomicBoolean fallbackCalled = new AtomicBoolean(false);
 
-        FulltextFetcherWithTrustLevel primary = e -> Optional.empty();
-        FallbackFileFetcher fallback = e -> {
+        FulltextFetcherWithTrustLevel primary = _ -> Optional.empty();
+        FallbackFileFetcher fallback = _ -> {
             fallbackCalled.set(true);
             return Optional.of(fileUrl);
         };
@@ -180,15 +180,15 @@ class FulltextFetchersTest {
         URL fileUrl = pdf.toUri().toURL();
 
         // A direct fetcher that is slow and ultimately finds nothing (like DoiResolution on IEEE).
-        FulltextFetcherWithTrustLevel slowPrimary = e -> {
+        FulltextFetcherWithTrustLevel slowPrimary = _ -> {
             try {
                 Thread.sleep(5_000);
-            } catch (InterruptedException ie) {
+            } catch (InterruptedException _) {
                 Thread.currentThread().interrupt();
             }
             return Optional.empty();
         };
-        FallbackFileFetcher fallback = e -> Optional.of(fileUrl);
+        FallbackFileFetcher fallback = _ -> Optional.of(fileUrl);
 
         // Head start of 200 ms: the fallback must launch and win while the primary is still sleeping,
         // instead of waiting out the primary's full run (ADR-0076).

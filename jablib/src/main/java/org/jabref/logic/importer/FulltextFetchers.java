@@ -212,7 +212,7 @@ public class FulltextFetchers {
                 more.ifPresent(results::add);
             }
             return best(results);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             Thread.currentThread().interrupt();
             return Optional.empty();
         } finally {

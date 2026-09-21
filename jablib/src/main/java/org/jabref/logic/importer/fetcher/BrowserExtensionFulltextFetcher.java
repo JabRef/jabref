@@ -137,7 +137,7 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
             for (Future<?> task : tasks) {
                 try {
                     task.get();
-                } catch (CancellationException | ExecutionException ignored) {
+                } catch (CancellationException | ExecutionException _) {
                     // Losers get cancelled once winner completes — expected.
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -154,7 +154,7 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
             Thread.currentThread().interrupt();
             LOGGER.debug("Interrupted while waiting for the browser-extension fulltext race", e);
             return Optional.empty();
-        } catch (TimeoutException e) {
+        } catch (TimeoutException _) {
             LOGGER.debug("Browser-extension fulltext race timed out after {}", socketTimeout);
             return Optional.empty();
         } catch (ExecutionException e) {
