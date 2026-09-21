@@ -53,7 +53,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts any open library id, switching JabRef to that library before importing, instead of only the currently active one. [#15929](https://github.com/JabRef/jabref/pull/15929)
 - We added support for selecting response engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - We added the ability to jump to cited entries and page locations in the PDF viewer from AI chat citations. [#16981](https://github.com/JabRef/jabref/pull/16981)
-- We added Markdown table rendering to AI chat responses and AI summaries. [#17142](https://github.com/JabRef/jabref/pull/17142)
 - We added a "Test connection" button to the AI preferences. [#17123](https://github.com/JabRef/jabref/pull/17123)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
@@ -87,6 +86,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added connection URL pasting to the shared database login dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We added a Dnb Fetcher that uses SRU interface and wired to ISBN Fetcher. [#17070](https://github.com/JabRef/jabref/pull/17070)
 - We added read-only access to shared SQL libraries in `jabkit`: every input file argument accepts a PostgreSQL URL. [#12948](https://github.com/JabRef/jabref/issues/12948)
+- We added Markdown table rendering to AI chat responses and AI summaries. [#17142](https://github.com/JabRef/jabref/pull/17142)
 
 ### Changed
 
