@@ -79,8 +79,7 @@ public class AiChatView extends StackPane {
 
     private AiChatViewModel viewModel;
 
-    private int findTotal;
-    private int findCurrent;
+    private final AiChatFindViewModel findViewModel = new AiChatFindViewModel();
     private boolean findRefreshPending;
 
     public AiChatView() {
@@ -112,11 +111,13 @@ public class AiChatView extends StackPane {
     // [impl->feat~ai.chat.find~1]
     private void setupFind() {
         findBar.managedProperty().bind(findBar.visibleProperty());
-        findBar.setVisible(false);
+        findBar.visibleProperty().bind(findViewModel.visibleProperty());
+        findField.textProperty().bindBidirectional(findViewModel.queryProperty());
+        findResultLabel.textProperty().bind(findViewModel.resultTextProperty());
 
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (preferences.getKeyBindingRepository().matches(event, KeyBinding.SEARCH)) {
-                findBar.setVisible(true);
+                findViewModel.visibleProperty().set(true);
                 findField.requestFocus();
                 findField.selectAll();
                 event.consume();
@@ -135,10 +136,10 @@ public class AiChatView extends StackPane {
                 event.consume();
             }
         });
-        findField.textProperty().addListener(_ -> {
-            findCurrent = 0;
-            updateFind(true);
-        });
+
+        findViewModel.queryProperty().addListener((_, _, _) -> updateFind(true));
+        findViewModel.currentProperty().addListener((_, _, _) -> updateFind(true));
+        findViewModel.visibleProperty().addListener((_, _, _) -> updateFind(false));
         // New or deleted messages are rendered after the list change, thus search them afterwards
         viewModel.chatHistoryProperty().addListener((ListChangeListener<ChatMessage>) _ -> {
             if (!findRefreshPending) {
@@ -153,7 +154,8 @@ public class AiChatView extends StackPane {
 
     /// Highlights all occurrences of the find query in the rendered messages and scrolls to the current one.
     private void updateFind(boolean scrollToCurrent) {
-        String query = findBar.isVisible() ? findField.getText() : "";
+        String query = findViewModel.getActiveQuery();
+        int current = findViewModel.getCurrent();
         List<MarkdownTextFlow> flows = chatHistoryScrollPane.getContent() instanceof Pane content
                                        ? content.getChildrenUnmodifiable().stream()
                                                 .filter(AiChatMessageView.class::isInstance)
@@ -161,17 +163,15 @@ public class AiChatView extends StackPane {
                                                 .toList()
                                        : List.of();
 
-        findTotal = 0;
+        int total = 0;
         for (MarkdownTextFlow flow : flows) {
-            findTotal += flow.highlightOccurrences(query, findCurrent - findTotal);
+            total += flow.highlightOccurrences(query, current - total);
         }
-        if (findTotal > 0 && findCurrent >= findTotal) {
-            findCurrent = 0;
-            updateFind(scrollToCurrent);
+        if (!findViewModel.setTotal(total)) {
+            // Resetting the current occurrence triggers another update
             return;
         }
 
-        findResultLabel.setText(query.isEmpty() ? "" : (findTotal == 0 ? 0 : findCurrent + 1) + "/" + findTotal);
         if (scrollToCurrent) {
             flows.stream()
                  .flatMap(flow -> flow.getCurrentOccurrence().stream())
@@ -182,24 +182,17 @@ public class AiChatView extends StackPane {
 
     @FXML
     private void findNext() {
-        if (findTotal > 0) {
-            findCurrent = (findCurrent + 1) % findTotal;
-            updateFind(true);
-        }
+        findViewModel.next();
     }
 
     @FXML
     private void findPrevious() {
-        if (findTotal > 0) {
-            findCurrent = (findCurrent - 1 + findTotal) % findTotal;
-            updateFind(true);
-        }
+        findViewModel.previous();
     }
 
     @FXML
     private void closeFind() {
-        findBar.setVisible(false);
-        updateFind(false);
+        findViewModel.visibleProperty().set(false);
         chatHistoryScrollPane.requestFocus();
     }
 
