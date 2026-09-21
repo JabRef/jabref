@@ -165,10 +165,8 @@ public class AiService implements AutoCloseable {
         if (!isDummyContext && aiPreferences.getAiFeaturesEnabled()) {
             ensureAiLibraryIdPresent(context);
             // Version 1 stored AI data by .bib path. Libraries without a path (shared SQL, unsaved) have nothing to migrate.
-            if (context.getDatabasePath().isPresent()) {
-                BackgroundTask.wrap(() -> migrateDatabase(context))
-                              .executeWith(taskExecutor);
-            }
+            context.getDatabasePath().ifPresent(_ -> BackgroundTask.wrap(() -> migrateDatabase(context))
+                                                                  .executeWith(taskExecutor));
         }
     }
 
