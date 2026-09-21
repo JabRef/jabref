@@ -22,7 +22,7 @@ public enum OcrMyPdfPlugin {
     public static OcrMyPdfPlugin safeValueOf(String name) {
         try {
             return OcrMyPdfPlugin.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return OcrMyPdfPlugin.TESSERACT;
         }
     }
