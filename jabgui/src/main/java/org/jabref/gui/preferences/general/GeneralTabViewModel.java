@@ -553,7 +553,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private Optional<Integer> getPortAsInt(String value) {
         try {
             return Optional.of(Integer.parseInt(value));
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }

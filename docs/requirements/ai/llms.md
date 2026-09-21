@@ -66,4 +66,19 @@ User needs to point the client to their specific local server address (e.g., `lo
 
 Needs: impl
 
+### User can test the connection to the AI provider
+`req~ai.llms.test-connection~1`
+
+User can check provider, chat model, API key, and API base URL entered in the preferences with a minimal chat request before saving them.
+
+Needs: impl
+
+<!-- markdownlint-disable-file MD022 -->
+## Base URL of the LLM provider should be redacted in logs or dialogs
+`req~ai.llms.base-url-redacted~1`
+
+Base URL might contain secrets (username and password for connection), so they need to be removed in logs and dialogs.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
