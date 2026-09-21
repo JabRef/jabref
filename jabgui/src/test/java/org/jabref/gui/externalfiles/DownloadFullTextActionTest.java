@@ -6,12 +6,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import javafx.application.Platform;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
+import org.jabref.gui.util.EntryLookupsInProgress;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherResult;
 import org.jabref.logic.importer.fetcher.TrustLevel;
@@ -23,16 +29,20 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
+@ExtendWith(JavaFxExtension.class)
 class DownloadFullTextActionTest {
 
     private DialogService dialogService;
@@ -111,6 +121,37 @@ class DownloadFullTextActionTest {
         completeTask(task);
 
         assertEquals(List.of(entry), action.downloadedEntries);
+    }
+
+    @Test
+    void queuedOrFinishedTaskLeavesNoFulltextLookupInProgress() throws Exception {
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.empty());
+
+        BackgroundTask<?> task = captureTask(action);
+        assertFalse(EntryLookupsInProgress.FULLTEXT.inProgress(entry).get());
+
+        task.call();
+        drainJavaFxEvents();
+        assertFalse(EntryLookupsInProgress.FULLTEXT.inProgress(entry).get());
+    }
+
+    @Test
+    void entryShowsFulltextLookupInProgressWhileItsLookupRuns() throws Exception {
+        List<Boolean> inProgressDuringLookup = new ArrayList<>();
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> {
+            inProgressDuringLookup.add(UiTaskExecutor.runInJavaFXThread(() -> EntryLookupsInProgress.FULLTEXT.inProgress(entry).get()));
+            return Optional.empty();
+        });
+
+        captureTask(action).call();
+
+        assertEquals(List.of(true), inProgressDuringLookup);
+    }
+
+    private static void drainJavaFxEvents() throws InterruptedException {
+        CountDownLatch drained = new CountDownLatch(1);
+        Platform.runLater(drained::countDown);
+        assertTrue(drained.await(5, TimeUnit.SECONDS));
     }
 
     private BackgroundTask<?> captureTask(DownloadFullTextAction action) {

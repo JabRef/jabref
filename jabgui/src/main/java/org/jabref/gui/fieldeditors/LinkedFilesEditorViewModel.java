@@ -32,6 +32,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.EntryLookupsInProgress;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -179,6 +180,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
+        fulltextLookupInProgress.bind(EntryLookupsInProgress.FULLTEXT.inProgress(entry));
 
         if (preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
             LOGGER.debug("Auto-linking files for entry {}", entry);
@@ -247,10 +249,11 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
             download_success = downloadFile(urlField.get());
         }
         if (urlField.isEmpty() || !download_success) {
+            BibEntry lookedUpEntry = entry;
             BackgroundTask
-                    .wrap(() -> fetcher.findFullTextPDF(entry))
-                    .onRunning(() -> fulltextLookupInProgress.setValue(true))
-                    .onFinished(() -> fulltextLookupInProgress.setValue(false))
+                    .wrap(() -> fetcher.findFullTextPDF(lookedUpEntry))
+                    .onRunning(() -> EntryLookupsInProgress.FULLTEXT.started(lookedUpEntry))
+                    .onFinished(() -> EntryLookupsInProgress.FULLTEXT.finished(lookedUpEntry))
                     .onSuccess(result -> {
                         if (result.isPresent()) {
                             addFromURLAndDownload(result.get().source(), result.get().headers());
