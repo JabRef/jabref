@@ -93,13 +93,13 @@ public class DownloadFullTextAction extends SimpleCommand {
             }
         }
 
-        // Every selected entry shows the entry editor's fulltext spinner until its own lookup is done.
-        entries.forEach(EntryLookupsInProgress.FULLTEXT::started);
         BackgroundTask<List<EntryDownload>> findFullTextsTask = new BackgroundTask<>() {
             @Override
             public List<EntryDownload> call() {
                 List<EntryDownload> downloads = new ArrayList<>(entries.size());
                 int count = 0;
+                // Marked here, not before submission, so a task cancelled while queued leaves no spinner behind
+                UiTaskExecutor.runInJavaFXThread(() -> entries.forEach(EntryLookupsInProgress.FULLTEXT::started));
                 try {
                     for (BibEntry entry : entries) {
                         if (isCancelled()) {

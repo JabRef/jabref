@@ -124,15 +124,28 @@ class DownloadFullTextActionTest {
     }
 
     @Test
-    void entryShowsFulltextLookupInProgressUntilItsLookupFinished() throws Exception {
+    void queuedOrFinishedTaskLeavesNoFulltextLookupInProgress() throws Exception {
         RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.empty());
 
         BackgroundTask<?> task = captureTask(action);
-        assertTrue(EntryLookupsInProgress.FULLTEXT.inProgress(entry).get());
+        assertFalse(EntryLookupsInProgress.FULLTEXT.inProgress(entry).get());
 
         task.call();
         drainJavaFxEvents();
         assertFalse(EntryLookupsInProgress.FULLTEXT.inProgress(entry).get());
+    }
+
+    @Test
+    void entryShowsFulltextLookupInProgressWhileItsLookupRuns() throws Exception {
+        List<Boolean> inProgressDuringLookup = new ArrayList<>();
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> {
+            inProgressDuringLookup.add(UiTaskExecutor.runInJavaFXThread(() -> EntryLookupsInProgress.FULLTEXT.inProgress(entry).get()));
+            return Optional.empty();
+        });
+
+        captureTask(action).call();
+
+        assertEquals(List.of(true), inProgressDuringLookup);
     }
 
     private static void drainJavaFxEvents() throws InterruptedException {
