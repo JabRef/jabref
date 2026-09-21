@@ -15,7 +15,7 @@ public class GrobidPreferences {
         this(
                 false,                          // Grobid enabled
                 false,                          // Grobid use asked
-               " "
+                " "
         );
     }
 
