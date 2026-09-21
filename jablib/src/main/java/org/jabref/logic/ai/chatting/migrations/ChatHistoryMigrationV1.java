@@ -81,6 +81,11 @@ public final class ChatHistoryMigrationV1 {
             return;
         }
 
+        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
+            // Version 1 stored AI data by .bib path. Libraries without a path (shared SQL, unsaved) have nothing to migrate.
+            return;
+        }
+
         String libraryId = bibDatabaseContext.getMetaData().getAiLibraryId().get();
 
         Path oldFilePath = Directories.getAiFilesDirectory()
