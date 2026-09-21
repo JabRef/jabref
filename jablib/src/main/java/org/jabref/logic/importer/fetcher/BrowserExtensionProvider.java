@@ -14,5 +14,6 @@ public record BrowserExtensionProvider(
         String displayName,
         int port,
         Path tokenFile,
-        int protocolVersion) {
+        int protocolVersion,
+        Path discoveryFile) {
 }

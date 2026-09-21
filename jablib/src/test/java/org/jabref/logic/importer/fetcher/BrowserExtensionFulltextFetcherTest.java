@@ -150,8 +150,8 @@ class BrowserExtensionFulltextFetcherTest {
 
         BrowserExtensionFulltextFetcher fetcher = new BrowserExtensionFulltextFetcher(
                 () -> List.of(
-                        new BrowserExtensionProvider("slow", "Slow", slow.getPort(), tokenFile, 1),
-                        new BrowserExtensionProvider("fast", "Fast", fast.getPort(), tokenFile, 1)),
+                        new BrowserExtensionProvider("slow", "Slow", slow.getPort(), tokenFile, 1, Path.of("test.json")),
+                        new BrowserExtensionProvider("fast", "Fast", fast.getPort(), tokenFile, 1, Path.of("test.json"))),
                 TEST_SOCKET_TIMEOUT);
         BibEntry entry = new BibEntry().withField(StandardField.DOI, EXAMPLE_DOI);
 
@@ -206,7 +206,7 @@ class BrowserExtensionFulltextFetcherTest {
     void unreachableTokenFileSkipsProvider(@TempDir Path tempDir) throws IOException {
         Path missingToken = tempDir.resolve("missing.token");
         Supplier<List<BrowserExtensionProvider>> providers = () -> List.of(
-                new BrowserExtensionProvider("dead", "Dead", 1, missingToken, 1));
+                new BrowserExtensionProvider("dead", "Dead", 1, missingToken, 1, Path.of("test.json")));
 
         BrowserExtensionFulltextFetcher fetcher = new BrowserExtensionFulltextFetcher(
                 providers, TEST_SOCKET_TIMEOUT);
@@ -226,7 +226,7 @@ class BrowserExtensionFulltextFetcherTest {
 
     private static Supplier<List<BrowserExtensionProvider>> providerFor(MockWebServer server, Path tokenFile) {
         BrowserExtensionProvider provider = new BrowserExtensionProvider(
-                "test", "Test", server.getPort(), tokenFile, 1);
+                "test", "Test", server.getPort(), tokenFile, 1, Path.of("test.json"));
         return () -> List.of(provider);
     }
 

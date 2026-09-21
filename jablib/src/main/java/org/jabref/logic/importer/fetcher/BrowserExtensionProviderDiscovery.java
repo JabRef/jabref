@@ -2,11 +2,16 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +36,7 @@ public final class BrowserExtensionProviderDiscovery {
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowserExtensionProviderDiscovery.class);
     private static final Gson GSON = new Gson();
     private static final int SUPPORTED_PROTOCOL_VERSION = 1;
+    private static final Duration HEALTH_TIMEOUT = Duration.ofSeconds(2);
 
     /// Wire-format mirror of the discovery JSON, deserialised directly by Gson.
     /// Fields are boxed so missing entries surface as `null` for validation.
@@ -92,6 +98,61 @@ public final class BrowserExtensionProviderDiscovery {
         return List.copyOf(providers);
     }
 
+    /// Like [#discover()], but drops providers that do not answer `GET /v1/health`, such as a
+    /// discovery file left behind by a bridge that no longer runs.
+    public static List<BrowserExtensionProvider> discoverReachable() {
+        return discoverReachableIn(discoveryDirectory());
+    }
+
+    static List<BrowserExtensionProvider> discoverReachableIn(Path directory) {
+        return discoverIn(directory).stream().filter(provider -> {
+            boolean reachable = isReachable(provider);
+            if (!reachable) {
+                LOGGER.debug("Skipping fulltext-provider {}: not reachable on port {}, stale discovery file {}",
+                        provider.name(), provider.port(), provider.discoveryFile());
+            }
+            return reachable;
+        }).toList();
+    }
+
+    /// Probes the provider's `GET /v1/health` endpoint. Blocks for at most a few seconds; call it off
+    /// the UI thread.
+    // [impl->req~bxf.health~1]
+    public static boolean isReachable(BrowserExtensionProvider provider) {
+        Optional<String> token = readToken(provider);
+        if (token.isEmpty()) {
+            return false;
+        }
+        HttpRequest request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + provider.port() + "/v1/health"))
+                                         .timeout(HEALTH_TIMEOUT)
+                                         .header("Authorization", "Bearer " + token.get())
+                                         .GET()
+                                         .build();
+        try (HttpClient client = HttpClient.newBuilder().connectTimeout(HEALTH_TIMEOUT).build()) {
+            return client.send(request, BodyHandlers.discarding()).statusCode() == 200;
+        } catch (IOException e) {
+            LOGGER.debug("Health check of fulltext-provider {} failed", provider.name(), e);
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    static Optional<String> readToken(BrowserExtensionProvider provider) {
+        try {
+            String token = Files.readString(provider.tokenFile(), StandardCharsets.UTF_8).strip();
+            if (StringUtil.isBlank(token)) {
+                LOGGER.debug("Token file for provider {} is empty: {}", provider.name(), provider.tokenFile());
+                return Optional.empty();
+            }
+            return Optional.of(token);
+        } catch (IOException e) {
+            LOGGER.debug("Could not read token file for provider {}: {}", provider.name(), provider.tokenFile(), e);
+            return Optional.empty();
+        }
+    }
+
     // [impl->req~bxf.discovery-schema~1]
     private static Optional<BrowserExtensionProvider> parseProvider(Path file) {
         DiscoveryFile parsed;
@@ -140,6 +201,7 @@ public final class BrowserExtensionProviderDiscovery {
                 parsed.displayName(),
                 port,
                 tokenFile,
-                parsed.protocolVersion()));
+                parsed.protocolVersion(),
+                file));
     }
 }

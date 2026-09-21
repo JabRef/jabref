@@ -50,7 +50,8 @@ import org.slf4j.LoggerFactory;
 ///
 /// At fetch time this class:
 ///   1. reads the entry's DOI (and URL, if any),
-///   2. enumerates providers from the well-known discovery directory,
+///   2. enumerates providers from the well-known discovery directory and drops those
+///      not answering `GET /v1/health`,
 ///   3. races all enabled providers in parallel,
 ///   4. returns the first `200` response's local file path as a `file://`
 ///      URL, so JabRef's existing attach pipeline performs the
@@ -71,7 +72,7 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
     private final Duration socketTimeout;
 
     public BrowserExtensionFulltextFetcher() {
-        this(BrowserExtensionProviderDiscovery::discover, DEFAULT_SOCKET_TIMEOUT);
+        this(BrowserExtensionProviderDiscovery::discoverReachable, DEFAULT_SOCKET_TIMEOUT);
     }
 
     /// Test-visible constructor. Allows injecting a provider list (for unit
@@ -170,8 +171,8 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
                                       String requestBody,
                                       ExecutorService executor) {
         // [impl->req~bxf.auth-bearer~1]
-        @Nullable String token = readToken(provider);
-        if (token == null) {
+        Optional<String> token = BrowserExtensionProviderDiscovery.readToken(provider);
+        if (token.isEmpty()) {
             return Optional.empty();
         }
 
@@ -186,7 +187,7 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
         HttpRequest request = HttpRequest.newBuilder(endpoint)
                                          .timeout(socketTimeout)
                                          .header("Content-Type", "application/json")
-                                         .header("Authorization", "Bearer " + token)
+                                         .header("Authorization", "Bearer " + token.get())
                                          .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
                                          .build();
 
@@ -244,20 +245,6 @@ public class BrowserExtensionFulltextFetcher implements FileSchemeFulltextFetche
         } catch (MalformedURLException e) {
             LOGGER.debug("Provider {} returned an unrepresentable file path: {}", provider.name(), parsed.path(), e);
             return Optional.empty();
-        }
-    }
-
-    private static @Nullable String readToken(BrowserExtensionProvider provider) {
-        try {
-            String token = Files.readString(provider.tokenFile(), StandardCharsets.UTF_8).strip();
-            if (StringUtil.isBlank(token)) {
-                LOGGER.debug("Token file for provider {} is empty: {}", provider.name(), provider.tokenFile());
-                return null;
-            }
-            return token;
-        } catch (IOException e) {
-            LOGGER.debug("Could not read token file for provider {}: {}", provider.name(), provider.tokenFile(), e);
-            return null;
         }
     }
 

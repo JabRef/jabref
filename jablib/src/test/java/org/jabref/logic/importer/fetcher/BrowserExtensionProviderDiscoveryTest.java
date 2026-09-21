@@ -1,29 +1,38 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import mockwebserver3.RecordedRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BrowserExtensionProviderDiscoveryTest {
 
     /// Builds a discovery file whose `tokenFile` is absolute on the running OS.
     private static String discoveryJson(Path tokenFile) {
+        return discoveryJson("example", 17893, tokenFile);
+    }
+
+    private static String discoveryJson(String name, int port, Path tokenFile) {
         return """
                 {
-                  "name": "example",
+                  "name": "%s",
                   "displayName": "Example Provider",
-                  "port": 17893,
+                  "port": %d,
                   "tokenFile": "%s",
                   "protocolVersion": 1
                 }
-                """.formatted(tokenFile.toString().replace("\\", "\\\\"));
+                """.formatted(name, port, tokenFile.toString().replace("\\", "\\\\"));
     }
 
     @Test
@@ -50,7 +59,7 @@ class BrowserExtensionProviderDiscoveryTest {
         Files.writeString(tempDir.resolve("example.json"), discoveryJson(tokenFile));
 
         BrowserExtensionProvider expected = new BrowserExtensionProvider(
-                "example", "Example Provider", 17893, tokenFile, 1);
+                "example", "Example Provider", 17893, tokenFile, 1, tempDir.resolve("example.json"));
 
         assertEquals(List.of(expected), BrowserExtensionProviderDiscovery.discoverIn(tempDir));
     }
@@ -155,5 +164,45 @@ class BrowserExtensionProviderDiscoveryTest {
         Files.writeString(tempDir.resolve("good.json"), discoveryJson(tempDir.resolve("token")));
 
         assertEquals(1, BrowserExtensionProviderDiscovery.discoverIn(tempDir).size());
+    }
+
+    @Test
+    void discoverReachableInKeepsLiveProviderAndDropsStaleFile(@TempDir Path tempDir) throws IOException, InterruptedException {
+        Path tokenFile = tempDir.resolve("token");
+        Files.writeString(tokenFile, "secret");
+        int closedPort;
+        try (ServerSocket socket = new ServerSocket(0)) {
+            closedPort = socket.getLocalPort();
+        }
+        try (MockWebServer server = new MockWebServer()) {
+            server.enqueue(new MockResponse.Builder()
+                    .code(200)
+                    .body("{\"ok\":true,\"name\":\"live\",\"protocolVersion\":1}")
+                    .build());
+            server.start();
+            Files.writeString(tempDir.resolve("live.json"), discoveryJson("live", server.getPort(), tokenFile));
+            Files.writeString(tempDir.resolve("stale.json"), discoveryJson("stale", closedPort, tokenFile));
+
+            List<BrowserExtensionProvider> providers = BrowserExtensionProviderDiscovery.discoverReachableIn(tempDir);
+
+            assertEquals(List.of("live"), providers.stream().map(BrowserExtensionProvider::name).toList());
+            RecordedRequest health = server.takeRequest();
+            assertEquals("/v1/health", health.getTarget());
+            assertEquals("Bearer secret", health.getHeaders().get("Authorization"));
+        }
+    }
+
+    @Test
+    void isReachableIsFalseForNon200Health(@TempDir Path tempDir) throws IOException {
+        Path tokenFile = tempDir.resolve("token");
+        Files.writeString(tokenFile, "secret");
+        try (MockWebServer server = new MockWebServer()) {
+            server.enqueue(new MockResponse.Builder().code(401).build());
+            server.start();
+            BrowserExtensionProvider provider = new BrowserExtensionProvider(
+                    "p", "P", server.getPort(), tokenFile, 1, tempDir.resolve("p.json"));
+
+            assertFalse(BrowserExtensionProviderDiscovery.isReachable(provider));
+        }
     }
 }

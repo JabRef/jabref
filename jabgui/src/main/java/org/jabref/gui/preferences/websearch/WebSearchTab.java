@@ -13,8 +13,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -171,8 +173,23 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         port.setEditable(false);
         port.setCellValueFactory(param -> new ReadOnlyStringWrapper(Integer.toString(param.getValue().port())));
 
+        TableColumn<BrowserExtensionProvider, String> status = new TableColumn<>(Localization.lang("Status"));
+        status.setMinWidth(120.0);
+        status.setEditable(false);
+        status.setCellValueFactory(param -> viewModel.externalFetcherStatus(param.getValue()));
+
         table.getColumns().add(name);
         table.getColumns().add(port);
+        table.getColumns().add(status);
+        table.setRowFactory(_ -> new TableRow<>() {
+            @Override
+            protected void updateItem(BrowserExtensionProvider provider, boolean empty) {
+                super.updateItem(provider, empty);
+                setTooltip(empty || provider == null
+                           ? null
+                           : new Tooltip(Localization.lang("Discovery file: %0", provider.discoveryFile().toString())));
+            }
+        });
 
         sizeToContent(table, externalFetcherNote);
 
