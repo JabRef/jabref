@@ -166,7 +166,7 @@ public class AiService implements AutoCloseable {
             ensureAiLibraryIdPresent(context);
             // Version 1 stored AI data by .bib path. Libraries without a path (shared SQL, unsaved) have nothing to migrate.
             context.getDatabasePath().ifPresent(_ -> BackgroundTask.wrap(() -> migrateDatabase(context))
-                                                                  .executeWith(taskExecutor));
+                                                                   .executeWith(taskExecutor));
         }
     }
 
