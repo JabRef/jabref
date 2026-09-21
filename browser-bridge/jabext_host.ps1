@@ -31,7 +31,7 @@ function Ensure-Token {
     New-Item -ItemType Directory -Force -Path $TokenDir | Out-Null
     $f = Join-Path $TokenDir "$ProviderName.token"
     if ((Test-Path $f) -and (Get-Item $f).Length -gt 0) { return @($f, (Get-Content $f -Raw).Trim()) }
-    $bytes = New-Object byte[] 32; [System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+    $bytes = New-Object byte[] 32; [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
     $tok = [Convert]::ToBase64String($bytes).TrimEnd('=').Replace('+','-').Replace('/','_')
     Set-Content -Path $f -Value $tok -NoNewline    # %APPDATA% is already user-only ACL
     return @($f, $tok)
