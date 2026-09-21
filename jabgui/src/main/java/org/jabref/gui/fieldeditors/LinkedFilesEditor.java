@@ -129,11 +129,10 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        // Bind directly to the view model's own list (not a wrapper): JavaFX's bindContentBidirectional
-        // dispatches change events by identity of the lists it was given, so wrapping one side (e.g. in
-        // UiThreadObservableList) makes every Change#getList() report the wrapped delegate instead of the
-        // list JavaFX is tracking, silently breaking the live sync (a Change#getList() identity mismatch).
-        // filesProperty() is only ever mutated on the FX Application Thread, so no extra marshaling is needed.
+        // Bind directly to the view model's underlying list (viewModel.getFiles()) rather than
+        // a wrapper like viewModel.filesProperty() (SimpleListProperty): JavaFX's Bindings.bindContentBidirectional
+        // dispatches change events based on list instance identity (change.getList()), so wrapping the list
+        // causes an identity mismatch that silently breaks live synchronization.
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.getFiles());
     }
 
