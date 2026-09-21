@@ -135,6 +135,7 @@ public final class BrowserExtensionProviderDiscovery {
             return false;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            LOGGER.debug("Interrupted while checking health of fulltext-provider {}", provider.name(), e);
             return false;
         }
     }
