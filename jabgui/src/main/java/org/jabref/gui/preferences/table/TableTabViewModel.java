@@ -90,7 +90,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         this.nameDisplayPreferences = nameDisplayPreferences;
         this.mainTablePreferences = mainTablePreferences;
 
-        specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
+        specialFieldsEnabledProperty.addListener((_, _, newValue) -> {
             if (newValue) {
                 insertSpecialFieldColumns();
             } else {
@@ -98,7 +98,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        extraFileColumnsEnabledProperty.addListener((observable, oldValue, newValue) -> {
+        extraFileColumnsEnabledProperty.addListener((_, _, newValue) -> {
             if (newValue) {
                 insertExtraFileColumns();
             } else {
@@ -209,6 +209,11 @@ public class TableTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
+        if (!addColumnProperty.getValue().isConfigurable()) {
+            addColumnProperty.setValue(null);
+            return;
+        }
+
         if (columnsListProperty.getValue().stream().filter(item -> item.equals(addColumnProperty.getValue())).findAny().isEmpty()) {
             columnsListProperty.add(addColumnProperty.getValue());
             addColumnProperty.setValue(null);
@@ -245,7 +250,9 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        mainTablePreferences.getColumnPreferences().setColumns(columnsListProperty.getValue());
+        mainTablePreferences.getColumnPreferences().setColumns(columnsListProperty.getValue().stream()
+                                                                                  .filter(MainTableColumnModel::isConfigurable)
+                                                                                  .toList());
         mainTablePreferences.setResizeColumnsToFit(autoResizeColumnsProperty.getValue());
         mainTablePreferences.setExtraFileColumnsEnabled(extraFileColumnsEnabledProperty.getValue());
 

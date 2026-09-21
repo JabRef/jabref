@@ -68,6 +68,6 @@ While not a custom artifact, but we interpret these OpenFastTrace artifact types
 ## More Information
 
 - [General reading on traceability](https://www.sodiuswillert.com/en/blog/implementing-requirements-traceability-in-systems-software-engineering)
-- [User manual of OpenFastTrace](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md)
+- [User manual of OpenFastTrace](https://openfasttrace.itsallcode.org/user_guide/user_guide.html)
 
 We recommend using VS Code with `markdownlint` extension to edit requirement files, and not IntelliJ, as VS Code understands `markdownlintdisable` directives.
