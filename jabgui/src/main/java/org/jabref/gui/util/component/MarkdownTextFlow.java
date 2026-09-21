@@ -20,6 +20,7 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.SelectableTextFlow;
+import org.jabref.logic.ai.chatting.util.JsonAnswerFormatter;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.vladsch.flexmark.ast.BlockQuote;
@@ -89,7 +90,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     /// document is hard to read.
     public void setMarkdownWithJsonHighlighting(@NonNull String markdownText) {
         // Bare JSON becomes a fenced code block, so that it is rendered and copied like any other one.
-        render(JsonHighlighter.fenceJson(markdownText), true);
+        render(JsonAnswerFormatter.fenceJson(markdownText), true);
     }
 
     private void render(String markdownText, boolean highlightJson) {
@@ -162,11 +163,11 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             return;
         }
 
-        JsonHighlighter.leadingJson(content)
-                       .filter(leadingJson -> leadingJson.rest().isEmpty())
-                       .ifPresentOrElse(
-                               leadingJson -> addJsonNodes(leadingJson.json(), codeBlock),
-                               () -> addTextNode(content, codeBlock, "markdown-code-block", "font-monospace"));
+        JsonAnswerFormatter.leadingJson(content)
+                           .filter(leadingJson -> leadingJson.rest().isEmpty())
+                           .ifPresentOrElse(
+                                   leadingJson -> addJsonNodes(leadingJson.json(), codeBlock),
+                                   () -> addTextNode(content, codeBlock, "markdown-code-block", "font-monospace"));
     }
 
     /// Adds one text node per JSON token; they are merged back into one segment when copying

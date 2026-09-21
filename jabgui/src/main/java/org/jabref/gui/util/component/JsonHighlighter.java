@@ -2,9 +2,6 @@ package org.jabref.gui.util.component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.MatchResult;
-import java.util.regex.Pattern;
 
 import io.github.kusoroadeolu.veneer.JSONLexer;
 import io.github.kusoroadeolu.veneer.JSONParser;
@@ -15,21 +12,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.Trees;
 import org.jspecify.annotations.NullMarked;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import tools.jackson.core.JacksonException;
-import tools.jackson.core.JsonParser;
-import tools.jackson.core.StreamReadFeature;
-import tools.jackson.core.json.JsonReadFeature;
-import tools.jackson.core.util.DefaultIndenter;
-import tools.jackson.core.util.DefaultPrettyPrinter;
-import tools.jackson.core.util.Separators;
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.ObjectWriter;
-import tools.jackson.databind.json.JsonMapper;
 
-/// Formats and splits JSON text into styled segments, so that AI answers containing JSON can be
-/// rendered readably and with syntax highlighting.
+/// Splits JSON into styled segments, so that JSON in AI answers can be rendered with syntax highlighting.
+/// Finding and indenting the JSON is done beforehand by [org.jabref.logic.ai.chatting.util.JsonAnswerFormatter].
 ///
 /// Highlighting reuses [Veneer](https://apidia.net/mvn/io.github.kusoroadeolu/veneer), which already
 /// highlights the BibTeX source editor (see [org.jabref.gui.bibtexhighlighter.BibTeXHighlighter]).
@@ -38,42 +23,15 @@ import tools.jackson.databind.json.JsonMapper;
 /// * It is made for terminals: `highlight(String)` returns the text with ANSI escape codes and line
 ///   numbers. For BibTeX, Veneer offers `computeHighlightRegions(String)`, which JavaFX can style; there
 ///   is no such method for JSON.
-/// * It neither validates nor formats. An answer has to be recognized as JSON first — often followed by
-///   an explanation — and indented, because models tend to send everything on one line.
+/// * It neither validates nor formats. An answer has to be recognized as JSON first — often with an
+///   explanation before or after it — and indented, because models tend to send everything on one line.
 ///
-/// Therefore, Jackson parses and indents the JSON, and only Veneer's JSON grammar (`JSONLexer` and
-/// `JSONParser`) is used to split the result into tokens. The parse tree tells keys from string values
-/// and `true`, `false`, `null` from punctuation, which the tokens alone do not.
+/// Therefore, only Veneer's JSON grammar (`JSONLexer` and `JSONParser`) is used here. The parse tree tells
+/// keys from string values and `true`, `false`, `null` from punctuation, which the tokens alone do not.
 ///
 /// The colors for the style classes are defined in `jabref-base.css`.
 @NullMarked
 public class JsonHighlighter {
-
-    /// Beyond this many characters, parsing the answer and rendering one node per token would cost
-    /// more on the UI thread than the formatting is worth.
-    private static final int MAX_LENGTH = 100_000;
-
-    /// What separates the JSON from the explanation: the rest of its line and any blank lines.
-    /// The indentation of the first line of the explanation is kept, it may be a code block.
-    /// Line starts where a JSON document following an explanation may begin.
-    private static final Pattern JSON_LINE_START = Pattern.compile("(?m)^[ \\t]*[\\[{]");
-
-    private static final Pattern SEPARATOR = Pattern.compile("^(?:[ \\t]*\\r?\\n(?:[ \\t]*\\r?\\n)*|[ \\t]+)");
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonHighlighter.class);
-
-    /// Duplicate names make the parse fail, because the tree would silently drop the first value.
-    /// Decimals are kept as [java.math.BigDecimal], so that no digits are lost on the way out; they are
-    /// written the way `BigDecimal` prints them, so `1e100000000` stays short instead of growing digits.
-    /// Models sometimes put a line break into a string without escaping it; that is accepted, and the
-    /// formatted JSON escapes it again.
-    private static final JsonMapper MAPPER = JsonMapper.builder()
-                                                       .enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS)
-                                                       .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
-                                                       .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
-                                                       .build();
-
-    private static final ObjectWriter WRITER = MAPPER.writer().with(prettyPrinter());
 
     /// A piece of the original text together with the CSS style class it should be rendered with.
     /// `styleClass` is empty for text between tokens (whitespace).
@@ -81,65 +39,6 @@ public class JsonHighlighter {
     }
 
     private JsonHighlighter() {
-    }
-
-    /// A JSON object or array at the beginning of a text, indented, together with whatever the text
-    /// continues with. Models often follow their JSON up with an explanation in prose.
-    public record LeadingJson(String json, String rest) {
-    }
-
-    /// Returns the JSON object or array the given text starts with, or empty if it starts with
-    /// something else or the JSON is malformed.
-    public static Optional<LeadingJson> leadingJson(String text) {
-        String trimmed = text.strip();
-        if ((trimmed.length() > MAX_LENGTH) || (!trimmed.startsWith("{") && !trimmed.startsWith("["))) {
-            return Optional.empty();
-        }
-
-        try (JsonParser parser = MAPPER.createParser(trimmed)) {
-            parser.nextToken();
-            // Reading through the parser, not through the mapper, leaves whatever follows untouched.
-            String json = WRITER.writeValueAsString(parser.readValueAsTree());
-            String afterJson = trimmed.substring((int) parser.currentLocation().getCharOffset());
-            String rest = SEPARATOR.matcher(afterJson).replaceFirst("").stripTrailing();
-            return Optional.of(new LeadingJson(json, rest));
-        } catch (JacksonException e) {
-            LOGGER.debug("Text starting like JSON could not be formatted as JSON", e);
-            return Optional.empty();
-        }
-    }
-
-    /// Wraps a JSON object or array at the beginning or at the end of the given Markdown into a fenced
-    /// `json` code block, so that it is rendered and copied like a code block the model fenced itself.
-    /// The JSON is indented on the way.
-    public static String fenceJson(String markdown) {
-        return leadingJson(markdown)
-                .map(leadingJson -> leadingJson.rest().isEmpty()
-                                    ? fenced(leadingJson.json())
-                                    : fenced(leadingJson.json()) + "\n\n" + leadingJson.rest())
-                .or(() -> trailingJson(markdown))
-                .orElse(markdown);
-    }
-
-    private static Optional<String> trailingJson(String markdown) {
-        // A line starting with a brace might belong to a code block; JSON in a code block is highlighted anyway.
-        if (markdown.contains("```") || markdown.contains("~~~")) {
-            return Optional.empty();
-        }
-
-        return JSON_LINE_START.matcher(markdown).results()
-                              .map(MatchResult::start)
-                              .filter(start -> start > 0)
-                              .flatMap(start -> leadingJson(markdown.substring(start))
-                                      .filter(leadingJson -> leadingJson.rest().isEmpty())
-                                      .map(leadingJson -> markdown.substring(0, start).stripTrailing() + "\n\n" + fenced(leadingJson.json()))
-                                      .stream())
-                              .findFirst();
-    }
-
-    /// Indented JSON has no line starting with backticks, so the content cannot close the fence.
-    private static String fenced(String json) {
-        return "```json\n" + json + "\n```";
     }
 
     /// Splits the given JSON text into segments carrying a style class each.
@@ -223,15 +122,6 @@ public class JsonHighlighter {
             default ->
                     terminal.getParent() instanceof JSONParser.ValueContext ? "json-literal" : "json-punctuation";
         };
-    }
-
-    /// Two spaces per level for objects and arrays alike, and no space in front of the colon.
-    private static DefaultPrettyPrinter prettyPrinter() {
-        DefaultIndenter indenter = new DefaultIndenter("  ", "\n");
-        return new DefaultPrettyPrinter()
-                .withObjectIndenter(indenter)
-                .withArrayIndenter(indenter)
-                .withSeparators(Separators.createDefaultInstance().withObjectNameValueSpacing(Separators.Spacing.AFTER));
     }
 
     private static CommonTokenStream tokenStream(String text) {
