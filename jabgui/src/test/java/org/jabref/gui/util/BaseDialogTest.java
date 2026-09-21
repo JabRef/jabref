@@ -40,36 +40,43 @@ class BaseDialogTest extends JavaFxTest {
     }
 
     @Test
-        // [utest->req~ux.dialogs.escape-closes~1]
-    void escapeClosesDialog() {
+    // [utest->req~ux.dialogs.close-key-binding~1]
+    void closeKeyBindingClosesDialog() {
+        closeKeyBindingIs(KeyCode.W);
         BaseDialog<Void> dialog = show(true);
-        press(dialog, KeyCode.ESCAPE);
+        press(dialog, KeyCode.W);
         interact(() -> assertFalse(dialog.isShowing()));
     }
 
     @Test
-        // [utest->req~ux.dialogs.escape-closes~1]
-    void escapeKeepsOptedOutDialogOpen() {
+    // [utest->req~ux.dialogs.close-key-binding~1]
+    void closeKeyBindingKeepsOptedOutDialogOpen() {
+        closeKeyBindingIs(KeyCode.W);
+        BaseDialog<Void> dialog = show(false);
+        press(dialog, KeyCode.W);
+        interact(() -> assertTrue(dialog.isShowing()));
+    }
+
+    @Test
+    void escapeKeepsOptedOutDialogOpenWhenCloseKeyBindingIsRemapped() {
+        closeKeyBindingIs(KeyCode.W);
         BaseDialog<Void> dialog = show(false);
         press(dialog, KeyCode.ESCAPE);
         interact(() -> assertTrue(dialog.isShowing()));
     }
 
-    @Test
-    void customCloseShortcutClosesOptedOutDialog() {
-        when(keyBindingRepository.checkKeyCombinationEquality(eq(KeyBinding.CLOSE), any(KeyEvent.class))).thenReturn(true);
-        BaseDialog<Void> dialog = show(false);
-        press(dialog, KeyCode.W);
-        interact(() -> assertFalse(dialog.isShowing()));
+    private void closeKeyBindingIs(KeyCode key) {
+        when(keyBindingRepository.checkKeyCombinationEquality(eq(KeyBinding.CLOSE), any(KeyEvent.class)))
+                .thenAnswer(invocation -> invocation.<KeyEvent>getArgument(1).getCode() == key);
     }
 
-    private BaseDialog<Void> show(boolean closesOnEscape) {
+    private BaseDialog<Void> show(boolean closesOnCloseKeyBinding) {
         AtomicReference<BaseDialog<Void>> dialog = new AtomicReference<>();
         interact(() -> {
             dialog.set(new BaseDialog<>() {
                 @Override
-                protected boolean closesOnEscape() {
-                    return closesOnEscape;
+                protected boolean closesOnCloseKeyBinding() {
+                    return closesOnCloseKeyBinding;
                 }
             });
             dialog.get().getDialogPane().getButtonTypes().add(ButtonType.CLOSE);

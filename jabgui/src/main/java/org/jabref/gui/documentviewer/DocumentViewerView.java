@@ -56,9 +56,9 @@ public class DocumentViewerView extends BaseDialog<Void> {
         });
     }
 
-    /// The viewer is a heavy-weight component. [impl->req~ux.dialogs.escape-closes~1]
+    /// The viewer is a heavy-weight component. [impl->req~ux.dialogs.close-key-binding~1]
     @Override
-    protected boolean closesOnEscape() {
+    protected boolean closesOnCloseKeyBinding() {
         return false;
     }
 

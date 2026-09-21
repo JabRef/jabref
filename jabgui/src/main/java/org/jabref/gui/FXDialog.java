@@ -71,7 +71,7 @@ public class FXDialog extends Alert {
 
     /// Same as [BaseDialog]: key bindings and the walkthrough pane belong to the dialog pane.
     private void setUpDialogPane(DialogPane dialogPane) {
-        dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> BaseDialog.closeOnEscapeOrKeyBinding(event, this));
+        dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> BaseDialog.closeOnKeyBindingMatch(event, this));
         dialogPane.getChildren().add(new WalkthroughPane());
     }
 
