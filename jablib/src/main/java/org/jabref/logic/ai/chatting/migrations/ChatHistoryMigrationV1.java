@@ -81,11 +81,6 @@ public final class ChatHistoryMigrationV1 {
             return;
         }
 
-        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-            LOGGER.debug("Cannot migrate chat history: database path is not set");
-            return;
-        }
-
         String libraryId = bibDatabaseContext.getMetaData().getAiLibraryId().get();
 
         Path oldFilePath = Directories.getAiFilesDirectory()
