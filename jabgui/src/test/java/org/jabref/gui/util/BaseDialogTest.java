@@ -40,7 +40,7 @@ class BaseDialogTest extends JavaFxTest {
     }
 
     @Test
-    // [utest->req~ux.dialogs.close-key-binding~1]
+        // [utest->req~ux.dialogs.close-key-binding~1]
     void closeKeyBindingClosesDialog() {
         closeKeyBindingIs(KeyCode.W);
         BaseDialog<Void> dialog = show(true);
@@ -49,7 +49,7 @@ class BaseDialogTest extends JavaFxTest {
     }
 
     @Test
-    // [utest->req~ux.dialogs.close-key-binding~1]
+        // [utest->req~ux.dialogs.close-key-binding~1]
     void closeKeyBindingKeepsOptedOutDialogOpen() {
         closeKeyBindingIs(KeyCode.W);
         BaseDialog<Void> dialog = show(false);
