@@ -143,9 +143,9 @@ class LibraryMigrationActionTest {
         when(dialogService.showCustomDialogAndWait(anyString(), any(DialogPane.class), any(ButtonType[].class))).thenAnswer(invocation -> {
             DialogPane pane = invocation.getArgument(1);
             List<CheckBox> checkBoxes = ((VBox) pane.getContent()).getChildren().stream()
-                                                                 .filter(CheckBox.class::isInstance)
-                                                                 .map(CheckBox.class::cast)
-                                                                 .toList();
+                                                                  .filter(CheckBox.class::isInstance)
+                                                                  .map(CheckBox.class::cast)
+                                                                  .toList();
             assertEquals(3, checkBoxes.size());
             if (deselectedIndex >= 0) {
                 checkBoxes.get(deselectedIndex).setSelected(false);
