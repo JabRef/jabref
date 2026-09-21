@@ -1622,7 +1622,7 @@ public class JabRefCliPreferences implements CliPreferences {
             if (!newValue) {
                 try (final Keyring keyring = Keyring.create()) {
                     keyring.deletePassword("org.jabref", "citedrive");
-                } catch (Exception ex) {
+                } catch (Exception _) {
                     LOGGER.warn("Unable to remove citedrive token");
                 }
             }
