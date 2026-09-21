@@ -17,14 +17,14 @@ public class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
         BindingsHelper.bindBidirectional(
                 this.widthProperty(),
                 model.widthProperty(),
-                value -> this.setPrefWidth(model.widthProperty().getValue()),
-                value -> model.widthProperty().setValue(this.getWidth()));
+                _ -> this.setPrefWidth(model.widthProperty().getValue()),
+                _ -> model.widthProperty().setValue(this.getWidth()));
 
         BindingsHelper.bindBidirectional(
                 this.sortTypeProperty(),
                 (ObservableValue<SortType>) model.sortTypeProperty(),
-                value -> this.setSortType(model.sortTypeProperty().getValue()),
-                value -> model.sortTypeProperty().setValue(this.getSortType()));
+                _ -> this.setSortType(model.sortTypeProperty().getValue()),
+                _ -> model.sortTypeProperty().setValue(this.getSortType()));
     }
 
     public MainTableColumnModel getModel() {
