@@ -43,9 +43,12 @@ public class BaseDialog<T> extends Dialog<T> {
         setResizable(true);
     }
 
-    public static boolean closeOnKeyBindingMatch(KeyEvent event, Dialog<?> dialog) {
+    /// Closes the dialog on Escape, even if the "Close dialog" shortcut is remapped, and on that shortcut.
+    ///
+    /// [impl->req~ux.dialogs.escape-closes~1]
+    public static boolean closeOnEscapeOrKeyBinding(KeyEvent event, Dialog<?> dialog) {
         KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-        if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+        if (event.getCode() == KeyCode.ESCAPE || keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
             dialog.close();
             event.consume();
 
@@ -70,22 +73,18 @@ public class BaseDialog<T> extends Dialog<T> {
         dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyEvent);
     }
 
-    /// [impl->req~ux.dialogs.escape-closes~1]
     /// Heavy-weight dialogs such as the PDF viewer override this to keep their state on a stray Escape.
     protected boolean closesOnEscape() {
         return true;
     }
 
     private void handleKeyEvent(KeyEvent event) {
-        if (event.getCode() == KeyCode.ESCAPE) {
-            if (closesOnEscape()) {
-                close();
-            }
+        if (!closesOnEscape() && event.getCode() == KeyCode.ESCAPE) {
             // JavaFX's own stage handler closes a dialog with a cancel button on an unconsumed Escape
             event.consume();
             return;
         }
-        if (closeOnKeyBindingMatch(event, this)) {
+        if (closeOnEscapeOrKeyBinding(event, this)) {
             return;
         }
 

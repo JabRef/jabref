@@ -95,7 +95,7 @@ Needs: impl
 ## Pressing Escape closes the dialog
 `req~ux.dialogs.escape-closes~1`
 
-Pressing Escape in a dialog closes it.
+Pressing Escape in a dialog closes it ([#8888](https://github.com/JabRef/jabref/issues/8888), [#15133](https://github.com/JabRef/jabref/issues/15133)).
 Heavy-weight dialogs whose content the user builds up over time are exempt, so that a stray key press does not throw that state away.
 Currently, this is only the PDF viewer ("Document viewer").
 
@@ -105,7 +105,7 @@ Needs: impl, utest
 `req~ux.combobox.escape-closes-popup-only~1`
 
 When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
-The enclosing dialog must remain open.
+The enclosing dialog must remain open ([#16596](https://github.com/JabRef/jabref/issues/16596)).
 
 ## Saving keeps external change detection active
 `req~ux.external-library-changes.after-save~1`
