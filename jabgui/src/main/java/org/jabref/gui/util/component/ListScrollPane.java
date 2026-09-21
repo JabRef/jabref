@@ -3,7 +3,6 @@ package org.jabref.gui.util.component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 import javafx.application.Platform;
@@ -138,13 +137,12 @@ public class ListScrollPane<T> extends ScrollPane {
             }
             contentContainer.getChildren().setAll(nodes);
 
-            Optional.ofNullable(scrollPositions.remove(list)).ifPresentOrElse(
-                    savedPosition -> scrollTo(list, savedPosition),
-                    () -> {
-                        if (isAutoScrollToBottom()) {
-                            scrollToBottom();
-                        }
-                    });
+            Double savedPosition = scrollPositions.remove(list);
+            if (savedPosition != null) {
+                scrollTo(list, savedPosition);
+            } else if (isAutoScrollToBottom()) {
+                scrollToBottom();
+            }
         }
     }
 
