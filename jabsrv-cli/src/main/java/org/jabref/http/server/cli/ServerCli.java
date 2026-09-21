@@ -66,7 +66,7 @@ public class ServerCli implements Callable<Void> {
         URI uri;
         try {
             uri = new URI(url);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             LOGGER.error("Invalid URL: {}", url);
             return null;
         }

@@ -59,7 +59,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
         boxDifferentCustomization.visibleProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         boxDifferentCustomization.managedProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         unknownEntryTypesCheckList.setItems(viewModel.newTypes());
-        unknownEntryTypesCheckList.setCellFactory(listView -> new CheckBoxListCell<>(unknownEntryTypesCheckList::getItemBooleanProperty) {
+        unknownEntryTypesCheckList.setCellFactory(_ -> new CheckBoxListCell<>(unknownEntryTypesCheckList::getItemBooleanProperty) {
             @Override
             public void updateItem(BibEntryType bibEntryType, boolean empty) {
                 super.updateItem(bibEntryType, empty);
