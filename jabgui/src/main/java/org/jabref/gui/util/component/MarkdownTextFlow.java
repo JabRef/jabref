@@ -58,7 +58,6 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
     private static final int MAX_JSON_SEGMENTS = 5_000;
-    private static final Pattern BACKTICK_RUN = Pattern.compile("`+");
 
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
@@ -89,7 +88,8 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     /// beginning or inside a fenced code block — AI models often answer that way, and the raw
     /// document is hard to read.
     public void setMarkdownWithJsonHighlighting(@NonNull String markdownText) {
-        render(markdownText, true);
+        // Bare JSON becomes a fenced code block, so that it is rendered and copied like any other one.
+        render(JsonHighlighter.fenceJson(markdownText), true);
     }
 
     private void render(String markdownText, boolean highlightJson) {
@@ -102,21 +102,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             return;
         }
 
-        if (!highlightJson) {
-            new MarkdownRenderer().render(parser.parse(markdownText));
-            return;
-        }
-
-        // The JSON is shown as a highlighted code block, an explanation following it as Markdown.
-        JsonHighlighter.leadingJson(markdownText).ifPresentOrElse(
-                leadingJson -> {
-                    addJsonNodes(leadingJson.json(), null);
-                    if (!leadingJson.rest().isEmpty()) {
-                        addTextNode("\n\n", null);
-                        new MarkdownRenderer().render(parser.parse(leadingJson.rest()));
-                    }
-                },
-                () -> new MarkdownRenderer().render(parser.parse(markdownText)));
+        new MarkdownRenderer().render(parser.parse(markdownText));
     }
 
     /// Displays the given text as-is, without interpreting any Markdown syntax.
@@ -170,7 +156,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
     /// Adds the nodes for a code block, with syntax highlighting if the code is JSON.
     // [impl->feat~ai.chat.json-highlighting~1]
-    private void addCodeBlockNodes(String content, @Nullable Node codeBlock) {
+    private void addCodeBlockNodes(String content, Node codeBlock) {
         if (!highlightJson) {
             addTextNode(content, codeBlock, "markdown-code-block", "font-monospace");
             return;
@@ -185,7 +171,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
     /// Adds one text node per JSON token; they are merged back into one segment when copying
     /// (see buildCopySegments).
-    private void addJsonNodes(String json, @Nullable Node codeBlock) {
+    private void addJsonNodes(String json, Node codeBlock) {
         List<JsonHighlighter.Segment> segments = JsonHighlighter.tokenize(json);
 
         // A token-dense document would put tens of thousands of nodes into the scene graph.
@@ -240,8 +226,6 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         int selEnd = getSelectionEndIndex();
 
         StringJoiner result = new StringJoiner("");
-        // Markdown inside a JSON string must not become formatting in the HTML flavor of the clipboard.
-        StringJoiner markdownResult = new StringJoiner("");
         int currentPos = 0;
 
         for (CopySegment segment : buildCopySegments()) {
@@ -266,7 +250,6 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
                 if (startInSegment == 0 && endInSegment == renderedText.length()) {
                     result.add(markdownText);
-                    markdownResult.add(segment.json() ? fenced(markdownText) : markdownText);
                 } else {
                     String partialText = renderedText.substring(startInSegment, endInSegment);
                     if (astNode instanceof DelimitedNode delimitedNode) {
@@ -274,7 +257,6 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                         partialText = delimitedNode.getOpeningMarker() + partialText + delimitedNode.getClosingMarker();
                     }
                     result.add(partialText);
-                    markdownResult.add(segment.json() ? fenced(partialText) : partialText);
                 }
             }
 
@@ -286,21 +268,14 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         }
 
         ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
-        clipBoardManager.setHtmlContent(htmlRenderer.render(parser.parse(markdownResult.toString())), result.toString());
-    }
-
-    private static String fenced(String json) {
-        // The fence has to be longer than any run of backticks inside, or the content would close it.
-        int longestRun = BACKTICK_RUN.matcher(json).results().mapToInt(result -> result.group().length()).max().orElse(0);
-        String fence = "`".repeat(Math.max(3, longestRun + 1));
-        return fence + "json\n" + json + "\n" + fence + "\n";
+        clipBoardManager.setHtmlContent(htmlRenderer.render(parser.parse(result.toString())), result.toString());
     }
 
     /// The text of one or more adjacent nodes that belong to the same Markdown node, as needed to
     /// reconstruct the Markdown markup while copying. A syntax-highlighted code block is rendered as
     /// one node per token, but copied as a single block.
     @NullMarked
-    private record CopySegment(String text, @Nullable Node astNode, boolean json) {
+    private record CopySegment(String text, @Nullable Node astNode) {
     }
 
     /// Removes the newlines Flexmark adds around the content of a code block (`\n` at the beginning,
@@ -322,7 +297,6 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         StringBuilder pending = new StringBuilder();
         @Nullable Node pendingNode = null;
         boolean pendingIsNewlineMarker = false;
-        boolean pendingIsJson = false;
 
         for (javafx.scene.Node fxNode : getChildren()) {
             String renderedText;
@@ -338,28 +312,23 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 continue;
             }
 
-            // Highlighted JSON without a Markdown node of its own: the tokens of a bare JSON answer.
-            boolean json = (astNode == null) && fxNode.getStyleClass().contains("markdown-code-block");
-
             // The newline nodes between blocks carry the block's node as well, but are copied as newlines.
-            boolean sameNode = (astNode != null) && (astNode == pendingNode) && !pendingIsNewlineMarker;
-            if (!pending.isEmpty() && (sameNode || (json && pendingIsJson))) {
+            if (!pending.isEmpty() && (astNode != null) && (astNode == pendingNode) && !pendingIsNewlineMarker) {
                 pending.append(renderedText);
                 continue;
             }
 
             if (!pending.isEmpty()) {
-                segments.add(new CopySegment(pending.toString(), pendingNode, pendingIsJson));
+                segments.add(new CopySegment(pending.toString(), pendingNode));
             }
             pending.setLength(0);
             pending.append(renderedText);
             pendingNode = astNode;
-            pendingIsJson = json;
             pendingIsNewlineMarker = isNewlineMarker(renderedText);
         }
 
         if (!pending.isEmpty()) {
-            segments.add(new CopySegment(pending.toString(), pendingNode, pendingIsJson));
+            segments.add(new CopySegment(pending.toString(), pendingNode));
         }
 
         return segments;

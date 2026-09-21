@@ -3,6 +3,7 @@ package org.jabref.gui.util.component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
 import io.github.kusoroadeolu.veneer.JSONLexer;
@@ -54,6 +55,9 @@ public class JsonHighlighter {
 
     /// What separates the JSON from the explanation: the rest of its line and any blank lines.
     /// The indentation of the first line of the explanation is kept, it may be a code block.
+    /// Line starts where a JSON document following an explanation may begin.
+    private static final Pattern JSON_LINE_START = Pattern.compile("(?m)^[ \\t]*[\\[{]");
+
     private static final Pattern SEPARATOR = Pattern.compile("^(?:[ \\t]*\\r?\\n(?:[ \\t]*\\r?\\n)*|[ \\t]+)");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonHighlighter.class);
@@ -103,6 +107,39 @@ public class JsonHighlighter {
             LOGGER.debug("Text starting like JSON could not be formatted as JSON", e);
             return Optional.empty();
         }
+    }
+
+    /// Wraps a JSON object or array at the beginning or at the end of the given Markdown into a fenced
+    /// `json` code block, so that it is rendered and copied like a code block the model fenced itself.
+    /// The JSON is indented on the way.
+    public static String fenceJson(String markdown) {
+        return leadingJson(markdown)
+                .map(leadingJson -> leadingJson.rest().isEmpty()
+                                    ? fenced(leadingJson.json())
+                                    : fenced(leadingJson.json()) + "\n\n" + leadingJson.rest())
+                .or(() -> trailingJson(markdown))
+                .orElse(markdown);
+    }
+
+    private static Optional<String> trailingJson(String markdown) {
+        // A line starting with a brace might belong to a code block; JSON in a code block is highlighted anyway.
+        if (markdown.contains("```") || markdown.contains("~~~")) {
+            return Optional.empty();
+        }
+
+        return JSON_LINE_START.matcher(markdown).results()
+                              .map(MatchResult::start)
+                              .filter(start -> start > 0)
+                              .flatMap(start -> leadingJson(markdown.substring(start))
+                                      .filter(leadingJson -> leadingJson.rest().isEmpty())
+                                      .map(leadingJson -> markdown.substring(0, start).stripTrailing() + "\n\n" + fenced(leadingJson.json()))
+                                      .stream())
+                              .findFirst();
+    }
+
+    /// Indented JSON has no line starting with backticks, so the content cannot close the fence.
+    private static String fenced(String json) {
+        return "```json\n" + json + "\n```";
     }
 
     /// Splits the given JSON text into segments carrying a style class each.

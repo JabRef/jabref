@@ -54,6 +54,29 @@ class JsonHighlighterTest {
     }
 
     @Test
+    void fenceJsonFencesJsonFollowedByAnExplanation() {
+        assertEquals("```json\n{\n  \"a\": 1\n}\n```\n\nThe answer is *one*.",
+                JsonHighlighter.fenceJson("{\"a\": 1}\n\nThe answer is *one*."));
+    }
+
+    @Test
+    void fenceJsonFencesJsonFollowingAnExplanation() {
+        assertEquals("The result:\n\n```json\n{\n  \"a\": 1\n}\n```",
+                JsonHighlighter.fenceJson("The result:\n{\"a\": 1}\n"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Plain text with a [link](entries/Key).",
+            "[@Key](entries/Key) starts this line.",
+            "```json\n{\"a\": 1}\n```",
+            "Explained first.\n{\"a\": 1}\nExplained last."
+    })
+    void fenceJsonLeavesOtherTextAlone(String markdown) {
+        assertEquals(markdown, JsonHighlighter.fenceJson(markdown));
+    }
+
+    @Test
     void prettyPrintIndentsObjectsAndArrays() {
         assertEquals("""
                         {
