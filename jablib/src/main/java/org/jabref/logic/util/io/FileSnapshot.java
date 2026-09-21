@@ -37,7 +37,7 @@ public record FileSnapshot(boolean exists, long size, @Nullable FileTime lastMod
         try {
             BasicFileAttributes attributes = Files.readAttributes(file, BasicFileAttributes.class);
             return new FileSnapshot(true, attributes.size(), attributes.lastModifiedTime());
-        } catch (NoSuchFileException exception) {
+        } catch (NoSuchFileException _) {
             return ABSENT;
         } catch (IOException exception) {
             LOGGER.warn("Could not read attributes of {}", file, exception);

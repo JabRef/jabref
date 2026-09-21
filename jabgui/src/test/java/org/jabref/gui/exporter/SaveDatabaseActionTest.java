@@ -215,7 +215,7 @@ class SaveDatabaseActionTest {
 
         assertEquals(database
                         .getEntries().stream()
-                        .map(BibEntry::hasChanged).filter(changed -> false).collect(Collectors.toList()),
+                        .map(BibEntry::hasChanged).filter(_ -> false).collect(Collectors.toList()),
                 List.of());
     }
 
