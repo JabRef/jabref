@@ -12,8 +12,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jspecify.annotations.NullMarked;
 
 /// Counts the running lookups of one kind per entry, so a progress indicator in the entry editor
-/// survives the editor rebuilding its field editors on an entry switch and stays on until the last of
-/// several concurrent lookups of the same entry finishes.
+/// survives the editor rebuilding its field editors on an entry switch, reflects lookups started
+/// elsewhere (e.g. from the main menu for several entries), and stays on until the last of several
+/// concurrent lookups of the same entry finishes.
 ///
 /// Entries are compared by identity because a lookup usually changes the entry it runs for.
 /// Must only be used on the JavaFX thread.
@@ -21,6 +22,7 @@ import org.jspecify.annotations.NullMarked;
 public final class EntryLookupsInProgress {
 
     public static final EntryLookupsInProgress DOI = new EntryLookupsInProgress();
+    public static final EntryLookupsInProgress FULLTEXT = new EntryLookupsInProgress();
 
     private final ObservableMap<BibEntry, Integer> running = FXCollections.observableMap(new IdentityHashMap<>());
 
