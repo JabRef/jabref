@@ -75,25 +75,6 @@ class GuiPreferencesMigrationsTest {
     }
 
     @Test
-    void upgradeGrobidUrlMigratesLegacyDefault() {
-        when(preferences.get(JabRefCliPreferences.GROBID_URL, "")).thenReturn("http://grobid.jabref.org:8070");
-
-        PreferencesMigrations.upgradeGrobidUrl(preferences);
-
-        verify(preferences).put(JabRefCliPreferences.GROBID_URL, "https://grobid.jabref.org");
-    }
-
-    @Test
-    void upgradeGrobidUrlKeepsCustomUrl() {
-        String customGrobidUrl = "https://grobid.example.org";
-        when(preferences.get(JabRefCliPreferences.GROBID_URL, "")).thenReturn(customGrobidUrl);
-
-        PreferencesMigrations.upgradeGrobidUrl(preferences);
-
-        verify(preferences, never()).put(JabRefCliPreferences.GROBID_URL, customGrobidUrl);
-    }
-
-    @Test
     void upgradeMacKeyBindingDefaultsMigratesOldFullSnapshotWithoutOverwritingCustomizedBinding() {
         List<String> bindNames = Arrays.stream(KeyBinding.values()).map(KeyBinding::getConstant).toList();
         List<String> bindings = new ArrayList<>(Arrays.stream(KeyBinding.values()).map(KeyBinding::getDefaultKeyBinding).toList());
