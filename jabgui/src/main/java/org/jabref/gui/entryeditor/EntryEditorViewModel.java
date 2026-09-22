@@ -30,7 +30,6 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -55,7 +54,6 @@ public class EntryEditorViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
-    private final UndoManager undoManager;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final Supplier<LibraryTab> tabSupplier;
     private final EntryEditorTabFactory tabFactory;
@@ -81,7 +79,6 @@ public class EntryEditorViewModel extends AbstractViewModel {
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
                                 DialogService dialogService,
-                                UndoManager undoManager,
                                 JournalAbbreviationRepository journalAbbreviationRepository,
                                 Supplier<LibraryTab> tabSupplier,
                                 EntryEditorTabFactory tabFactory) {
@@ -89,7 +86,6 @@ public class EntryEditorViewModel extends AbstractViewModel {
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
-        this.undoManager = undoManager;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.tabSupplier = tabSupplier;
         this.tabFactory = tabFactory;
@@ -257,7 +253,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
         if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
             GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
         }
-        new FetchAndMergeEntry(activeDatabaseContext(), taskExecutor, preferences, dialogService, undoManager, stateManager)
+        new FetchAndMergeEntry(activeDatabaseContext(), taskExecutor, preferences, dialogService, stateManager.getUndoManager(activeDatabaseContext()), stateManager)
                 .fetchAndMerge(entry, fetcher);
     }
 
@@ -266,7 +262,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
         if (entry == null) {
             return;
         }
-        new GenerateCitationKeySingleAction(entry, tabSupplier.get().getBibDatabaseContext(), dialogService, preferences, undoManager).execute();
+        new GenerateCitationKeySingleAction(entry, tabSupplier.get().getBibDatabaseContext(), dialogService, preferences, tabSupplier.get().getUndoManager()).execute();
     }
 
     public void cleanup() {
@@ -274,7 +270,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
         if (entry == null) {
             return;
         }
-        new CleanupSingleAction(entry, preferences, dialogService, stateManager, undoManager, journalAbbreviationRepository).execute();
+        new CleanupSingleAction(entry, preferences, dialogService, stateManager, stateManager.getUndoManager(activeDatabaseContext()), journalAbbreviationRepository).execute();
     }
 
     public void deleteEntry() {

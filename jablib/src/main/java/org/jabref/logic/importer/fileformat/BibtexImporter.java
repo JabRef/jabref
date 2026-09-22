@@ -126,9 +126,10 @@ public class BibtexImporter extends Importer {
         return result;
     }
 
-    /// Postprocessing for imported entries that normalizes keyword separators to the configured delimiter.
+    /// Postprocessing for imported entries that normalizes keyword separators to the library's delimiter.
     private void normalizeKeywordDelimiters(ParserResult result) {
-        KeywordImportNormalizer.normalizeKeywords(result.getDatabase().getEntries(), importFormatPreferences.bibEntryPreferences());
+        Character separator = result.getDatabaseContext().getKeywordSeparator(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+        KeywordImportNormalizer.normalizeKeywords(result.getDatabase().getEntries(), importFormatPreferences.bibEntryPreferences(), separator);
     }
 
     @Override

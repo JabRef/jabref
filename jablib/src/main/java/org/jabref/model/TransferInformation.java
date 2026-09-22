@@ -1,6 +1,9 @@
 package org.jabref.model;
 
+import java.util.List;
+
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -9,6 +12,10 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public record TransferInformation(
         BibDatabaseContext bibDatabaseContext,
-        TransferMode transferMode
+        TransferMode transferMode,
+        List<BibEntry> sourceEntries
 ) {
+    public TransferInformation(BibDatabaseContext bibDatabaseContext, TransferMode transferMode) {
+        this(bibDatabaseContext, transferMode, List.of());
+    }
 }

@@ -32,6 +32,23 @@ Since some data fetchers take time, we need to open the dialog and wait until al
 
 Needs: impl
 
+## Main Table Focus
+`req~maintable.focus~1`
+
+Prevents the main table from losing focus when adding a new library or  when changing tabs.
+This provides immediate keyboard interaction capabilities (such as Ctrl+V for pasting operations when changing tabs) without requiring explicit focus via mouse click.
+
+Needs: impl
+
+## Main table column headers are user-friendly
+`req~maintable.column-headers.user-friendly~1`
+
+Column headers of the main table show readable names, not raw BibTeX field names.
+JabRef-internal fields such as the entry type and the citation key are shown as "Entry Type" and "Citation Key".
+Headers use Title Case, as an exception to the sentence-case rule for UI text, so they read like the other headers ("Author/Editor").
+
+Needs: impl
+
 ## Critical startup failures show an error dialog
 `req~ux.startup.critical-error-dialog~1`
 
@@ -39,6 +56,13 @@ If a critical error occurs before the main window is fully constructed, it must 
 The user needs a visible error dialog, in addition to the log entry, since [digging through log files is not accessible to most users](https://github.com/JabRef/jabref/issues/14967).
 
 Needs: impl
+
+## Citation style sources are loaded on demand
+`req~ux.citation-styles.lazy-source-loading~1`
+
+JabRef must load built-in citation-style metadata at startup without retaining every CSL source in memory. A style's source is loaded only when that style is used.
+
+Needs: impl, utest
 
 ## Merge entries dialog allows selecting empty field values
 `req~ux.merge-entries.select-empty-field~1`
@@ -51,48 +75,6 @@ Needs: impl
 `req~ux.update-entry-web-info.apply-merge-result~1`
 
 When a user chooses `Update with bibliographic information via entry data` and confirms the merge dialog, the selected merged values must be written back to the original entry as one undoable update.
-
-Needs: impl
-
-## GitHub personal access token verification
-`req~ux.git-share.personal-access-token-verification~1`
-
-The GitHub sharing dialog must allow users to verify that their personal access token has push access to the configured GitHub repository before sharing a library.
-
-Needs: impl
-
-## Git pull with unrelated histories
-`req~ux.git-pull.unrelated-histories~1`
-
-Git pull must support a local library and its configured remote when their commit histories have no common ancestor.
-
-Needs: impl
-
-## Git push to an empty remote
-`req~ux.git-push.empty-remote~1`
-
-Git push must publish the current branch and configure its upstream when the configured remote has no branches.
-
-Needs: impl
-
-## Git push rejection reporting
-`req~ux.git-push.rejected-update-reporting~1`
-
-Git push must report a rejected remote update to the user.
-
-Needs: impl
-
-## Git commit previews changes in the current library
-`req~ux.git-commit.preview-current-library~1`
-
-Before committing a Git-tracked library, JabRef should let the user preview semantic changes from the committed version to the saved current file for that library.
-
-Needs: impl
-
-## Committing does not depend on the remote
-`req~ux.git-commit.remote-independent~1`
-
-Git commit must offer the uncommitted changes of the local library even when no remote is configured or the configured remote cannot be reached.
 
 Needs: impl
 
@@ -110,6 +92,12 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+## Pressing Escape when a combo box popup is open closes only the combo box
+`req~ux.combobox.escape-closes-popup-only~1`
+
+When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
+The enclosing dialog must remain open.
+
 ## Saving keeps external change detection active
 `req~ux.external-library-changes.after-save~1`
 
@@ -117,15 +105,6 @@ When JabRef saves a library, it must keep observing filesystem changes, defer ch
 Since inspecting a library file means parsing it completely, the inspection is skipped when the file's size and modification time show that it has not changed since the last state known to match the in-memory library.
 
 Needs: impl
-
-## Committing a library that is not under version control
-`req~ux.git-commit.initialize-repository~1`
-
-When a user commits a library that is not inside a Git repository, JabRef must offer to initialize a repository in the library's directory and commit the library file there.
-Only the library file and the generated `.gitignore` are committed, so unrelated files in that directory stay untracked.
-Declining the offer must leave the directory unchanged, because the user may want to clone an existing repository into it instead.
-
-Needs: impl, utest
 
 ## Deleting many entries keeps the main table responsive
 `req~ux.large-library.bulk-entry-removal~1`
@@ -141,12 +120,71 @@ When a dialog with text input as a main component is opened, the text field shou
 
 Needs: impl
 
+## Text filtering is case-insensitive and separator-aware
+`req~ux.text-filtering.case-insensitive-separators~1`
+
+When users filter textual lists, matching must ignore case and treat punctuation or whitespace separators as equivalent.
+For example, a search for `Springer lecture` or `SPRINGER LECTURE` or `springer lecture` should match `Springer - Lecture Notes in Computer Science`.
+
+Needs: impl
+
+## Show unsaved changes before closing a library
+`req~ux.close.show-diff~1`
+
+When closing a modified library, the "Save before closing" dialog should offer to show the unsaved changes compared to the file on disk, so the user can decide between saving and discarding on an informed basis.
+
+Needs: impl
+
 ## Automatically paste clipboard content when useful
 `req~ux.textdialogs.autopaste~1`
 
 When a dialog with text input as a main component is opened, and it is expected that while working with it, the user will paste from clipboard, JabRef should already automatically paste it.
 
 Example: new entry dialog by ID. It is expected that user would copy some paper ID (from browser, PDF, etc.), and then paste it in the dialog. As said above, JabRef automatically pastes the ID into the text field.
+
+Needs: impl
+
+### Automatic Identifier Detection and Focus in New Entry Dialog
+`req~newentry.clipboard.autofocus~1`
+
+When the "New Entry" dialog is opened:
+
+- If the clipboard contains a valid identifier (e.g., DOI, ISBN, ArXiv, RFC):
+
+  - The dialog automatically switches to the "Enter Identifier" tab.
+  - The identifier input field is automatically filled with the clipboard content.
+  - The field receives keyboard focus and its content is selected.
+  - The corresponding fetcher (e.g., DOI, ISBN) is automatically selected based on the detected identifier type.
+
+This behavior streamlines the process of creating new entries by allowing users to copy an identifier and open the dialog, without needing to manually select the input field, switch tabs, or choose a fetcher manually.
+
+Needs: impl
+
+## Community themes are selectable out of the box
+`req~ux.themes.bundled-community-themes~1`
+
+The themes from <https://themes.jabref.org/> that cover both color schemes are bundled with JabRef and appear in the theme selection next to the built-in themes, without the user having to download a CSS file.
+
+Needs: impl
+
+## Library tabs show what kind of library they hold
+`req~ux.tabs.library-kind-icon~1`
+
+Every library tab carries an icon: one for a BibTeX library, one for a BibLaTeX library, and one for a shared database. A shared database shows the database icon regardless of its mode.
+
+Needs: impl, utest
+
+## Preferences walkthroughs open their settings dialog directly
+`req~ux.walkthrough.preferences-direct~1`
+
+Walkthroughs that require preferences must open the preferences dialog directly, so they can start regardless of the platform menu presentation.
+
+Needs: impl
+
+## Groups walkthroughs make required controls and entries available
+`req~ux.walkthrough.groups-preparation~1`
+
+The groups walkthrough must open its bundled example library, display the Groups pane, and clear the current search before guiding the user.
 
 Needs: impl
 

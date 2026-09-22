@@ -46,6 +46,9 @@ public class OpenOfficeTab extends AbstractPreferenceTabView<OpenOfficeTabViewMo
         setContent(form()
                 .section(Localization.lang("Pandoc"), pandoc -> pandoc
                         .custom(buildPandocPathRow()))
+                .section(Localization.lang("Zotero"), zotero -> zotero
+                        .checkbox(Localization.lang("Zotero compatibility mode"), viewModel.zoteroCompatibilityModeProperty(), mode -> mode
+                                .disableWhen(viewModel.zoteroCompatibilityModeDisabledProperty())))
                 .build());
     }
 

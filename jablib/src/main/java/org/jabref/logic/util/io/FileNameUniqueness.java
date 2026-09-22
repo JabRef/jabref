@@ -77,7 +77,7 @@ public class FileNameUniqueness {
                 try {
                     Files.delete(duplicateFile);
                     messageOnDeletion.accept(Localization.lang("File '%1' is a duplicate of '%0'. Keeping '%0'", originalFileName, fileName));
-                } catch (IOException e) {
+                } catch (IOException _) {
                     LOGGER.error("File '{}' is a duplicate of '{}'. Could not delete '{}'.", fileName, originalFileName, fileName);
                 }
                 return true;

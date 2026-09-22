@@ -2,14 +2,17 @@ package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.function.UnaryOperator;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -32,6 +35,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private TextField librarySpecificFileDirectory;
     @FXML private TextField userSpecificFileDirectory;
     @FXML private TextField latexFileDirectory;
+    @FXML private TextField keywordSeparator;
     @FXML private Button libSpecificFileDirSwitchId;
     @FXML private Button userSpecificFileDirSwitchId;
     @FXML private Button laTexSpecificFileDirSwitchId;
@@ -52,6 +56,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     private final String switchToAbsoluteText = Localization.lang("Switch to absolute path: converts the path to an absolute path.");
 
     @Inject private CliPreferences preferences;
+    @Inject private StateManager stateManager;
 
     public GeneralPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -67,7 +72,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     }
 
     public void initialize() {
-        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferences);
+        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferences, stateManager.getUndoManager(databaseContext));
 
         new ViewModelListCellFactory<Charset>()
                 .withText(Charset::displayName)
@@ -87,6 +92,11 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
 
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
         latexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
+        keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
+        // Limit the keyword separator to a single character (same as the global preference control)
+        UnaryOperator<TextFormatter.Change> singleCharacterFilter =
+                change -> change.getControlNewText().length() <= 1 ? change : null;
+        keywordSeparator.setTextFormatter(new TextFormatter<>(singleCharacterFilter));
 
         userSpecificFileDirectoryTooltip.setText(Localization.lang("User-specific file directory: %0", preferences.getFilePreferences().getUserAndHost()));
         userSpecificFileDirectory.setTooltip(userSpecificFileDirectoryTooltip);

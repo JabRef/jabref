@@ -20,10 +20,10 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -57,8 +57,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),
             // Migrate search groups fielded terms to use the new operators (RegEx, case sensitive)
-            new SearchGroupsMigrationAction(),
-            new AddGroupImportEntriesAction()
+            new SearchGroupsMigrationAction()
     );
 
     private final LibraryTabContainer tabContainer;
@@ -68,9 +67,9 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
-    private final GuiUndoManager undoManager;
     private final ClipBoardManager clipboardManager;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
                               GuiPreferences preferences,
@@ -79,9 +78,9 @@ public class OpenDatabaseAction extends SimpleCommand {
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
                               BibEntryTypesManager entryTypesManager,
-                              GuiUndoManager undoManager,
                               ClipBoardManager clipBoardManager,
-                              TaskExecutor taskExecutor) {
+                              TaskExecutor taskExecutor,
+                              GitHandlerRegistry gitHandlerRegistry) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
         this.aiService = aiService;
@@ -89,9 +88,9 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.undoManager = undoManager;
         this.clipboardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
     }
 
     public static void performPostOpenActions(ParserResult result, DialogService dialogService, CliPreferences preferences) {
@@ -115,7 +114,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         try {
             FileDialogConfiguration initialDirectoryConfig = getFileDialogConfiguration(getInitialDirectory());
             filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(initialDirectoryConfig);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             // See https://github.com/JabRef/jabref/issues/10548 for details
             // Rebuild a new config with the home directory
             FileDialogConfiguration homeDirectoryConfig = getFileDialogConfiguration(Directories.getUserDirectory());
@@ -208,7 +207,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 if (Files.exists(theFile) && preferences.getInternalPreferences().isMemoryStickMode()) {
                     try {
                         file = baseDirectoryPath.relativize(file).normalize();
-                    } catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException _) {
                         file = theFile.normalize();
                     }
                 }
@@ -247,13 +246,14 @@ public class OpenDatabaseAction extends SimpleCommand {
                 tabContainer,
                 fileUpdateMonitor,
                 entryTypesManager,
-                undoManager,
                 clipboardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
         tabContainer.addTab(newTab, true);
     }
 
-    private ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
+    @VisibleForTesting
+    ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
         Path fileToLoad = file.toAbsolutePath();
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
@@ -265,7 +265,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, undoManager, stateManager)
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, stateManager)
                                           .orElse(null);
         }
 
@@ -276,16 +276,23 @@ public class OpenDatabaseAction extends SimpleCommand {
                         preferences.getImportFormatPreferences(),
                         fileUpdateMonitor);
             }
-
-            if (parserResult.hasWarnings()) {
-                String content = Localization.lang("Please check your library file for wrong syntax.")
-                        + "\n\n" + parserResult.getErrorMessage();
-                UiTaskExecutor.runInJavaFXThread(() ->
-                        dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
-            }
         } catch (IOException e) {
             parserResult = ParserResult.fromError(e);
             LOGGER.error("Error opening file '{}'", fileToLoad, e);
+        }
+
+        if (parserResult.isInvalid()) {
+            // The file could not be read at all. LibraryTab closes the tab again after this.
+            // [impl->req~import.library.unreadable-reported~1]
+            String content = Localization.lang("Error opening file '%0'", fileToLoad.toString())
+                    + "\n\n" + parserResult.getErrorMessage();
+            UiTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showErrorDialogAndWait(Localization.lang("Open library error"), content));
+        } else if (parserResult.hasWarnings()) {
+            String content = Localization.lang("Please check your library file for wrong syntax.")
+                    + "\n\n" + parserResult.getErrorMessage();
+            UiTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
         }
 
         if (parserResult.getDatabase().isShared()) {
@@ -298,9 +305,9 @@ public class OpenDatabaseAction extends SimpleCommand {
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
-                    undoManager,
                     clipboardManager,
-                    taskExecutor);
+                    taskExecutor,
+                    gitHandlerRegistry);
         }
         return parserResult;
     }
@@ -313,9 +320,9 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
-                                          GuiUndoManager undoManager,
                                           ClipBoardManager clipBoardManager,
-                                          TaskExecutor taskExecutor)
+                                          TaskExecutor taskExecutor,
+                                          GitHandlerRegistry gitHandlerRegistry)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
         try {
             new SharedDatabaseUIManager(
@@ -326,9 +333,9 @@ public class OpenDatabaseAction extends SimpleCommand {
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
-                    undoManager,
                     clipBoardManager,
-                    taskExecutor)
+                    taskExecutor,
+                    gitHandlerRegistry)
                     .openSharedDatabaseFromParserResult(parserResult);
         } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                  NotASharedDatabaseException e) {

@@ -28,7 +28,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import io.github.adr.linked.ADR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +85,7 @@ public class JabRefSrvStateManager extends AbstractSrvStateManager {
     /// the last parse. If it changed, the library is re-parsed, the context in
     /// [#openDatabases] is replaced, the old [SearchContext] is removed, and a
     /// fresh one is registered under the new context's uid.
-    @ADR(61)
+    // [impl->adr~jabsrv-reload-via-mtime-polling~1]
     private void refreshStaleLibraries() {
         ListIterator<BibDatabaseContext> it = openDatabases.listIterator();
         while (it.hasNext()) {

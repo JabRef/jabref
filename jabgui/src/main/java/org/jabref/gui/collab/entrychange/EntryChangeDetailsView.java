@@ -10,6 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -55,9 +56,9 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                   String leftLabelText,
                                   String rightLabelText) {
         Label inJabRef = new Label(leftLabelText);
-        inJabRef.getStyleClass().add("lib-change-header");
+        inJabRef.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
         Label onDisk = new Label(rightLabelText);
-        onDisk.getStyleClass().add("lib-change-header");
+        onDisk.getStyleClass().addAll(StyleClasses.CHANGE_VIEW_HEADER);
 
         // we need a copy here as we otherwise would set the same entry twice
         PreviewViewer previewClone = new PreviewViewer(dialogService, preferences, taskExecutor);

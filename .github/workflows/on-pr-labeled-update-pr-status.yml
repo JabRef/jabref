@@ -15,7 +15,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Download artifact from triggering run
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           run-id: ${{ github.event.workflow_run.id }}
           name: pr_number
@@ -30,7 +30,7 @@ jobs:
           else
             echo "continue=false" >> "$GITHUB_OUTPUT"
           fi
-      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+      - uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
           packages: jq
           version: 1.0

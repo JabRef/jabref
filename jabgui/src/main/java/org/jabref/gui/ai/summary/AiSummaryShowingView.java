@@ -172,13 +172,13 @@ public class AiSummaryShowingView extends VBox {
         viewModel.regenerateCustom();
     }
 
-    // [impl->req~ai.summarization.general.export~1]
+    // [impl->feat~ai.summarization.general.export~1]
     @FXML
     private void exportMarkdown() {
         viewModel.exportMarkdown();
     }
 
-    // [impl->req~ai.summarization.general.export~1]
+    // [impl->feat~ai.summarization.general.export~1]
     @FXML
     private void exportJson() {
         viewModel.exportJson();

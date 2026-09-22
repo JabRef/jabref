@@ -33,6 +33,13 @@ public class ExplicitGroup extends WordKeywordGroup {
     }
 
     @Override
+    public ExplicitGroup withKeywordSeparator(Character newKeywordSeparator) {
+        ExplicitGroup copy = new ExplicitGroup(getName(), getHierarchicalContext(), newKeywordSeparator);
+        copy.legacyEntryKeys.addAll(legacyEntryKeys);
+        return copy;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

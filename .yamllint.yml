@@ -1,0 +1,16 @@
+# Catches what a merge or a hand edit silently breaks: duplicate keys, invalid
+# syntax, trailing whitespace. Style rules stay off so existing files keep
+# their formatting.
+extends: relaxed
+
+rules:
+  line-length: disable
+  colons: disable
+
+ignore:
+  # Git submodules with their own upstream
+  - jablib/src/main/resources/csl-locales/
+  - jablib/src/main/resources/csl-styles/
+  - jablib/src/main/resources/ltwa/
+  # Test fixtures, some with deliberate CRLF line endings
+  - jablib/src/test/resources/

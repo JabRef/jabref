@@ -1,23 +1,27 @@
 ---
-parent: ai
+parent: AI
+grand_parent: Requirements
 ---
 
 # Citation parsing with LLMs
 `feat~ai.citation-parsing~1`
 
-Rationale: to enable the automatic extraction and identification of references within text using AI capabilities
+Enables the automatic extraction and identification of references within text using AI capabilities.
 
 Needs: impl, pp
 
-Covers: `feat~ai~1`
+## User can customize system prompt for LLM citation parsing
+`feat~ai.citation-parsing.system-prompt-config~1`
 
-## Allow customization of the system prompt for LLM citation parsing
-`req~ai.citation-parsing.system-prompt-config~1`
-
-Rationale: different citation styles or strictness levels require adjusting the baseline instructions (system prompt) given to the AI
+Different citation styles or strictness levels require adjusting the baseline instructions (system prompt) given to the AI.
 
 Needs: impl
 
-Covers: `feat~ai.citation-parsing~1`, `feat~ai.expert-settings~1`
+## New entry dialog does not wait for LLM citation parsing
+`req~ai.citation-parsing.background~1`
+
+An LLM can take long to answer. The "New Entry" dialog closes immediately and the parsed entries are added to the library once the answer arrives.
+
+Needs: impl
 
 <!-- markdownlint-disable-file MD022 -->

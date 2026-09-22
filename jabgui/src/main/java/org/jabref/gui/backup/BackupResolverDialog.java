@@ -7,6 +7,7 @@ import java.util.Optional;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -29,7 +30,6 @@ public class BackupResolverDialog extends FXDialog {
     public BackupResolverDialog(Path originalPath, Path backupDir, ExternalApplicationsPreferences externalApplicationsPreferences) {
         super(AlertType.CONFIRMATION, Localization.lang("Backup found"), true);
         setHeaderText(null);
-        getDialogPane().setMinHeight(180);
         getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);
 
         Optional<Path> backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, backupDir);
@@ -41,10 +41,10 @@ public class BackupResolverDialog extends FXDialog {
                 Localization.lang("Backup size: %0", backupSize) + "\n" +
                 Localization.lang("This could indicate that JabRef did not shut down cleanly last time the file was used.") + "\n\n" +
                 Localization.lang("Do you want to recover the library from the backup file?");
-        setContentText(content);
 
         HyperlinkLabel contentLabel = new HyperlinkLabel(content);
         contentLabel.setPrefWidth(360);
+        contentLabel.setPrefHeight(180);
         contentLabel.setOnAction(e -> {
             if (backupPathOpt.isPresent()) {
                 if (!(e.getSource() instanceof Hyperlink)) {
@@ -60,6 +60,6 @@ public class BackupResolverDialog extends FXDialog {
                 }
             }
         });
-        getDialogPane().setContent(contentLabel);
+        getDialogPane().setContent(new StackPane(contentLabel));
     }
 }

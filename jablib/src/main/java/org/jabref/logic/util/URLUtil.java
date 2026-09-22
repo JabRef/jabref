@@ -65,7 +65,7 @@ public class URLUtil {
                 }
             }
             return url;
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException _) {
             return url;
         }
     }
@@ -89,7 +89,7 @@ public class URLUtil {
         try {
             create(url);
             return true;
-        } catch (MalformedURLException | IllegalArgumentException e) {
+        } catch (MalformedURLException | IllegalArgumentException _) {
             return false;
         }
     }
@@ -154,7 +154,7 @@ public class URLUtil {
             new URIBuilder(url);
             String lowerUrl = url.toLowerCase().trim();
             return lowerUrl.startsWith("http://") || lowerUrl.startsWith("https://");
-        } catch (URISyntaxException ex) {
+        } catch (URISyntaxException _) {
             return false;
         }
     }

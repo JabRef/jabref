@@ -1,8 +1,11 @@
 package org.jabref.logic.xmp;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.xml.transform.TransformerException;
 
@@ -13,6 +16,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +28,9 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_COVERAGE;
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_RIGHTS;
 import static org.jabref.logic.xmp.DublinCoreExtractor.DC_SOURCE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -197,6 +203,42 @@ class XmpUtilWriterTest {
         vapnik2000.clearField(StandardField.FILE);
         entryList.forEach(entry -> entry.clearField(StandardField.FILE));
         assertEquals(List.of(vapnik2000), entryList);
+    }
+
+    @Test
+        // [utest->req~logic.xmp.atomic-pdf-write~1]
+    void writeAndRemoveLeaveLoadablePdfAndNoTempFiles(@TempDir Path tempDir) throws IOException, TransformerException {
+        Path pdfFile = this.createDefaultFile("JabRef_atomic.pdf", tempDir);
+
+        new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), List.of(olly2018), null);
+        try (PDDocument document = Loader.loadPDF(pdfFile.toFile())) {
+            assertEquals(1, document.getNumberOfPages());
+        }
+
+        XmpUtilWriter.removeXmpMetadata(pdfFile.toAbsolutePath());
+        try (PDDocument document = Loader.loadPDF(pdfFile.toFile())) {
+            assertEquals(1, document.getNumberOfPages());
+        }
+
+        try (Stream<Path> files = Files.list(tempDir)) {
+            assertEquals(List.of(pdfFile), files.toList());
+        }
+    }
+
+    @Test
+        // [utest->req~logic.xmp.atomic-pdf-write~1]
+    void failedWriteLeavesOriginalUntouchedAndNoTempFiles(@TempDir Path tempDir) throws IOException, URISyntaxException {
+        Path pdfFile = tempDir.resolve("encrypted.pdf");
+        Files.copy(Path.of(XmpUtilWriterTest.class.getResource("/pdfs/encrypted.pdf").toURI()), pdfFile);
+        byte[] originalBytes = Files.readAllBytes(pdfFile);
+
+        assertThrows(IOException.class,
+                () -> new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), List.of(olly2018), null));
+
+        assertArrayEquals(originalBytes, Files.readAllBytes(pdfFile));
+        try (Stream<Path> files = Files.list(tempDir)) {
+            assertEquals(List.of(pdfFile), files.toList());
+        }
     }
 
     /// Creates a temporary PDF-file with a single empty page.

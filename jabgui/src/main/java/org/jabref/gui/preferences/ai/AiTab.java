@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.ai;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -21,13 +22,15 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.preferences.ai.AiTabViewModel.ConnectionTestState;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -42,13 +45,16 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     private final BooleanBinding aiDisabled;
 
     private TabPane templatesTabPane;
+    private ComboBox<String> chatModelCombo;
 
     public AiTab(AiPreferences workingAiPreferences) {
+        AiService aiService = Injector.instantiateModelOrService(AiService.class);
         this.viewModel = new AiTabViewModel(
                 preferences.getAiPreferences(),
                 workingAiPreferences,
-                Injector.instantiateModelOrService(AiService.class).getModelService(),
-                taskExecutor);
+                aiService.getModelService(),
+                taskExecutor,
+                new EmbeddingModelMetadataService(workingAiPreferences));
         this.aiDisabled = viewModel.enableAi().not();
 
         buildView();
@@ -60,6 +66,16 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     }
 
     private void buildView() {
+        TextField embeddingModelSizeField = new TextField();
+        embeddingModelSizeField.setEditable(false);
+        embeddingModelSizeField.setFocusTraversable(false);
+        embeddingModelSizeField.textProperty().bind(viewModel.selectedEmbeddingModelSizeProperty());
+
+        TextField embeddingModelMaxChunkSizeField = new TextField();
+        embeddingModelMaxChunkSizeField.setEditable(false);
+        embeddingModelMaxChunkSizeField.setFocusTraversable(false);
+        embeddingModelMaxChunkSizeField.textProperty().bind(viewModel.selectedEmbeddingModelMaxChunkSizeProperty().asString());
+
         setContent(form()
 
                 .section(Localization.lang("General"), general -> general
@@ -85,7 +101,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                                                 .withClearButton()
                                                                                 .field(),
                                 key -> key.disableWhen(viewModel.disableBasicSettingsProperty())
-                                          .validate(viewModel.getApiTokenValidationStatus())))
+                                          .validate(viewModel.getApiTokenValidationStatus()))
+                        // [impl->req~ai.llms.test-connection~1]
+                        .button(Localization.lang("Test connection"), this::testConnection,
+                                test -> test.disableWhen(Bindings.or(viewModel.disableBasicSettingsProperty(),
+                                                    viewModel.connectionTestStateProperty().isEqualTo(ConnectionTestState.TESTING)))
+                                            .configure(this::bindTestConnectionButton))
+                        .custom(buildTestConnectionDetailsArea(),
+                                details -> details.visibleWhen(viewModel.connectionTestDetailsProperty().isNotEmpty())))
 
                 .section(Localization.lang("Expert settings"), expertSettings -> expertSettings
                                 .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
@@ -97,12 +120,13 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                 .searchableCombo(Localization.lang("Embedding model"),
                                                         viewModel.embeddingModelsProperty(),
                                                         viewModel.selectedEmbeddingModelProperty(),
-                                                        PredefinedEmbeddingModel::fullInfo,
+                                                        model -> model != null ? model : "",
                                                         embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
-                                                .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
+                                                .field(Localization.lang("Embedding model size"), embeddingModelSizeField)
+                                                .field(Localization.lang("Embedding model maximum chunk size"), embeddingModelMaxChunkSizeField)
                                                 // The six numeric expert settings, as two columns of caption-above-field cells.
-                                                // [impl->req~ai.expert-settings.chat-inference-global~1]
-                                                // [impl->req~ai.expert-settings.rag-global~1]
+                                                // [impl->feat~ai.expert-settings.chat-inference-global~1]
+                                                // [impl->feat~ai.expert-settings.rag-global~1]
                                                 .columns(expertColumns -> expertColumns
                                                         .group(leftColumn -> leftColumn
                                                                 .stackedField(Localization.lang("Context window size"), integerField(viewModel.contextWindowSizeProperty()),
@@ -127,28 +151,28 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                                   .disableWhen(viewModel.disableExpertSettingsProperty())),
                         expertSection -> expertSection.help(HelpFile.AI_EXPERT_SETTINGS))
 
-                // [impl->req~ai.expert-settings.templates~1]
+                // [impl->feat~ai.expert-settings.templates~1]
                 .section(Localization.lang("Templates"), templates -> templates
                                 .custom(buildTemplatesRegion()),
                         templatesSection -> templatesSection.help(HelpFile.AI_TEMPLATES))
 
                 .section(Localization.lang("Miscellaneous"), miscellaneous -> miscellaneous
-                        // [impl->req~ai.ingestion.automatic-trigger~1]
+                        // [impl->feat~ai.ingestion.automatic-trigger~1]
                         .checkbox(Localization.lang("Automatically generate embeddings for new entries"), viewModel.autoGenerateEmbeddings(),
                                 embeddings -> embeddings.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateEmbeddings())))
-                        // [impl->req~ai.summarization.entries.auto~1]
+                        // [impl->feat~ai.summarization.entries.auto~1]
                         .checkbox(Localization.lang("Automatically generate summaries for new entries"), viewModel.autoGenerateSummaries(),
                                 summaries -> summaries.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateSummaries())))
                         .checkbox(Localization.lang("Generate follow-up questions after AI response"), viewModel.generateFollowUpQuestionsProperty(),
                                 followUp -> followUp.disableWhen(viewModel.disableBasicSettingsProperty()))
                         .field(Localization.lang("Number of follow-up questions"), buildFollowUpQuestionsCountSpinner())
-                        // [impl->req~ai.response-engines.default~1]
+                        // [impl->feat~ai.response-engines.default~1]
                         .combo(Localization.lang("Default response engine"),
                                 viewModel.responseEngineKindsProperty(),
                                 viewModel.responseEngineProperty(),
                                 AiNamingUtils::getDisplayName,
                                 engine -> engine.disableWhen(viewModel.disableExpertSettingsProperty()))
-                        // [impl->req~ai.summarization.algorithm.default~1]
+                        // [impl->feat~ai.summarization.algorithm.default~1]
                         .combo(Localization.lang("Default summarization algorithm"),
                                 viewModel.summarizationAlgorithmsProperty(),
                                 viewModel.summarizationAlgorithmProperty(),
@@ -162,9 +186,61 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                 .build());
     }
 
+    private void testConnection() {
+        // A typed model name reaches the view model only on commit.
+        chatModelCombo.commitValue();
+        viewModel.testConnection();
+    }
+
+    private void bindTestConnectionButton(Button button) {
+        ReadOnlyObjectProperty<ConnectionTestState> state = viewModel.connectionTestStateProperty();
+        button.textProperty().bind(state.map(value -> switch (value) {
+            case IDLE ->
+                    Localization.lang("Test connection");
+            case TESTING ->
+                    Localization.lang("Testing...");
+            case SUCCESS ->
+                    Localization.lang("Connection successful");
+            case FAILED ->
+                    Localization.lang("Connection failed");
+        }));
+        button.graphicProperty().bind(state.map(value -> switch (value) {
+            case IDLE ->
+                    null;
+            case TESTING ->
+                    IconTheme.JabRefIcons.REFRESH.getGraphicNode();
+            case SUCCESS ->
+                    IconTheme.JabRefIcons.SUCCESS.getGraphicNode();
+            case FAILED ->
+                    IconTheme.JabRefIcons.ERROR.getGraphicNode();
+        }));
+        BindingsHelper.listen(state, value -> {
+            button.getStyleClass().removeAll("text-success", "text-danger");
+            switch (value) {
+                case SUCCESS ->
+                        button.getStyleClass().add("text-success");
+                case FAILED ->
+                        button.getStyleClass().add("text-danger");
+                default -> {
+                }
+            }
+        });
+    }
+
+    /// Read-only text area rather than a label, so that the error message (e.g., the `ollama pull` command) can be copied.
+    private TextArea buildTestConnectionDetailsArea() {
+        TextArea details = new TextArea();
+        details.setEditable(false);
+        details.setWrapText(true);
+        details.setPrefRowCount(2);
+        details.textProperty().bind(viewModel.connectionTestDetailsProperty());
+        return details;
+    }
+
     /// Editable combo whose prompt switches to a model-name hint once Hugging Face is selected.
     private ComboBox<String> buildChatModelCombo() {
         ComboBox<String> combo = new ComboBox<>();
+        chatModelCombo = combo;
         combo.setEditable(true);
         combo.setMaxWidth(Double.MAX_VALUE);
         combo.itemsProperty().bind(viewModel.chatModelsProperty());
@@ -191,8 +267,19 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     /// primitive property in both directions, mapping `null` to zero.
     private IntegerInputField integerField(IntegerProperty value) {
         IntegerInputField field = new IntegerInputField();
-        field.valueProperty().addListener((_, _, newValue) -> value.set(newValue == null ? 0 : newValue));
-        value.addListener((_, _, newValue) -> field.valueProperty().set(newValue == null ? 0 : newValue.intValue()));
+        field.setValue(value.getValue());
+        field.valueProperty().addListener((_, _, newValue) -> {
+            int newInt = newValue == null ? 0 : newValue;
+            if (value.get() != newInt) {
+                value.set(newInt);
+            }
+        });
+        value.addListener((_, _, newValue) -> {
+            int newInt = newValue == null ? 0 : newValue.intValue();
+            if (field.getValue() == null || field.getValue() != newInt) {
+                field.setValue(newInt);
+            }
+        });
         return field;
     }
 
@@ -206,18 +293,18 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     private Node buildTemplatesRegion() {
         templatesTabPane = new TabPane();
         templatesTabPane.getTabs().addAll(
-                // [impl->req~ai.chat.customize-system-prompt~1]
+                // [impl->feat~ai.chat.customize-system-prompt~1]
                 templateTab(Localization.lang("System message for chatting"), viewModel.chattingSystemMessageTemplateProperty(), viewModel::resetChattingSystemMessageTemplate),
-                // [impl->req~ai.response-engines.embeddings-search.prompt~1]
-                // [impl->req~ai.response-engines.full-document.prompt~1]
+                // [impl->feat~ai.response-engines.embeddings-search.prompt~1]
+                // [impl->feat~ai.response-engines.full-document.prompt~1]
                 templateTab(Localization.lang("User message for chatting"), viewModel.chattingUserMessageTemplateProperty(), viewModel::resetChattingUserMessageTemplate),
-                // [impl->req~ai.summarization.algorithms.chunked.system-prompt-chunk~1]
+                // [impl->feat~ai.summarization.algorithms.chunked.system-prompt-chunk~1]
                 templateTab(Localization.lang("System message for summarization of a chunk"), viewModel.summarizationChunkSystemMessageTemplateProperty(), viewModel::resetSummarizationChunkSystemMessageTemplate),
-                // [impl->req~ai.summarization.algorithms.chunked.system-prompt-combine~1]
+                // [impl->feat~ai.summarization.algorithms.chunked.system-prompt-combine~1]
                 templateTab(Localization.lang("System message for summarization of several chunks"), viewModel.summarizationCombineSystemMessageTemplateProperty(), viewModel::resetSummarizationCombineSystemMessageTemplate),
-                // [impl->req~ai.summarization.algorithms.full.system-prompt~1]
+                // [impl->feat~ai.summarization.algorithms.full.system-prompt~1]
                 templateTab(Localization.lang("System message for 'full document' summarization"), viewModel.summarizationFullDocumentSystemMessageTemplateProperty(), viewModel::resetSummarizationFullDocumentSystemMessageTemplate),
-                // [impl->req~ai.citation-parsing.system-prompt-config~1]
+                // [impl->feat~ai.citation-parsing.system-prompt-config~1]
                 templateTab(Localization.lang("System message for parsing raw citations"), viewModel.citationParsingSystemMessageTemplateProperty(), viewModel::resetCitationParsingSystemMessageTemplate),
                 templateTab(Localization.lang("Markdown chat export template"), viewModel.markdownChatExportTemplateProperty(), viewModel::resetMarkdownChatExportTemplate),
                 templateTab(Localization.lang("Template for follow-up questions"), viewModel.followUpQuestionsTemplateProperty(), viewModel::resetFollowUpQuestionsTemplate));

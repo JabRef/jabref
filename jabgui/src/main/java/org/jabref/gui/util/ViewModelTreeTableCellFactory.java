@@ -1,5 +1,8 @@
 package org.jabref.gui.util;
 
+import java.util.List;
+import java.util.function.Supplier;
+
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
@@ -11,6 +14,8 @@ import javafx.util.Callback;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.util.strings.StringUtil;
 
+import org.jspecify.annotations.Nullable;
+
 /// Constructs a [TreeTableCell] based on the view model of the row and a bunch of specified converter methods.
 ///
 /// @param <S> view model
@@ -19,16 +24,20 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
     private Callback<S, String> toText;
     private Callback<S, Node> toGraphic;
     private Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
-    private Callback<S, String> toTooltip;
-    private Callback<S, String> toStyleClass;
+    private Callback<S, @Nullable String> toTooltip;
+    private Supplier<List<String>> styleClassSupplier;
 
     public ViewModelTreeTableCellFactory<S> withText(Callback<S, String> toText) {
         this.toText = toText;
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S> withStyleClass(Callback<S, String> toStyleClass) {
-        this.toStyleClass = toStyleClass;
+    /// Supplies styleClasses that are set on the cell right after creation, only once.
+    ///
+    /// @param styleClassSupplier the supplier that is called only once on the cell
+    /// @return the factory
+    public ViewModelTreeTableCellFactory<S> withStyleClasses(Supplier<List<String>> styleClassSupplier) {
+        this.styleClassSupplier = styleClassSupplier;
         return this;
     }
 
@@ -42,7 +51,7 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S> withTooltip(Callback<S, String> toTooltip) {
+    public ViewModelTreeTableCellFactory<S> withTooltip(Callback<S, @Nullable String> toTooltip) {
         this.toTooltip = toTooltip;
         return this;
     }
@@ -55,7 +64,7 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
 
     @Override
     public TreeTableCell<S, S> call(TreeTableColumn<S, S> param) {
-        return new TreeTableCell<>() {
+        TreeTableCell<S, S> treeTableCell = new TreeTableCell<>() {
             @Override
             protected void updateItem(S viewModel, boolean empty) {
                 super.updateItem(viewModel, empty);
@@ -64,6 +73,7 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
                     setText(null);
                     setGraphic(null);
                     setOnMouseClicked(null);
+                    setTooltip(null);
                 } else {
                     if (toText != null) {
                         setText(toText.call(viewModel));
@@ -75,17 +85,20 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
                         String tooltip = toTooltip.call(viewModel);
                         if (StringUtil.isNotBlank(tooltip)) {
                             setTooltip(new Tooltip(tooltip));
+                        } else {
+                            setTooltip(null);
                         }
                     }
                     if (toOnMouseClickedEvent != null) {
                         setOnMouseClicked(toOnMouseClickedEvent.call(viewModel));
                     }
-                    if (toStyleClass != null) {
-                        getStyleClass().add(toStyleClass.call(viewModel));
-                    }
                 }
             }
         };
+        if (styleClassSupplier != null) {
+            treeTableCell.getStyleClass().addAll(styleClassSupplier.get());
+        }
+        return treeTableCell;
     }
 
     public void install(TreeTableColumn<S, S> column) {

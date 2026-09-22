@@ -38,7 +38,7 @@ public class InsertUtil {
                                               ImportHandler importHandler,
                                               StateManager stateManager
     ) {
-        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entriesToAdd.size());
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, targetDatabaseContext, entriesToAdd.size());
         tracker.setOnFinish(() -> {
             int importedCount = tracker.getImportedCount();
             int skippedCount = tracker.getSkippedCount();

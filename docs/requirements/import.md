@@ -6,9 +6,38 @@ parent: Requirements
 ## Normalize imported BibTeX keyword delimiters
 `req~import.bibtex.keywords.normalize-delimiters~1`
 
-When importing BibTeX entries, JabRef interprets the configured accepted keyword delimiters and stores the resulting keywords using the configured keyword separator.
+When importing BibTeX entries, JabRef applies the "Normalize keyword delimiters" cleanup (see `req~save.keywords.normalize-delimiters~1`) to every imported entry, so groups, search, and the keyword editor split the field on the library's separator from the start.
+The library's separator is the one declared in the library's metadata; if none is declared, it is the accepted delimiter that the library's keyword fields already use most; if the keyword fields contain no delimiter, it is the globally configured keyword separator.
+Keyword fields that already use the library's separator are left untouched, so opening a library does not rewrite them.
 
 Delimiter characters that are part of a keyword remain part of that keyword and are escaped when necessary.
+
+Needs: impl, utest
+
+## Imported entries stay locatable in the library
+`req~import.entries.sorted-by-id~1`
+
+Entries are kept in the library in the order of their internal ids, regardless of the order in which a batch of imported entries arrives (e.g. after per-entry background duplicate checks). Looking up an entry's position in the library therefore succeeds for every imported entry, so the main table can select and update it.
+
+Needs: impl, utest
+
+## Unresolved merge conflict markers abort the import
+`req~import.bibtex.merge-conflict-markers~1`
+
+A BibTeX file that still contains version control conflict markers is rejected with an error naming the line of the first marker, instead of importing an arbitrary side of the conflict or storing the markers inside an entry.
+A marker is a line starting with at least seven `<` or `>` characters.
+The `=======` and `|||||||` lines of a conflict are not looked for on their own: they always follow a `<<<<<<<` line, and such lines also occur as decorative rules in field values.
+
+Needs: impl, utest
+
+## A library that cannot be read is reported and leaves no tab behind
+`req~import.library.unreadable-reported~1`
+
+When a library file cannot be read or parsed at all, JabRef names the file and the reason it failed, instead of failing silently or only logging it.
+
+No library tab is left behind for such a file. The tab that was opened to hold the loading library would otherwise stay as an empty, untitled library, which the user could save over the file that had just failed to load.
+
+A file that parses with warnings is not affected: it still opens, and its warnings are reported separately.
 
 Needs: impl, utest
 

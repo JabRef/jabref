@@ -150,6 +150,27 @@ class BstFunctionsTest {
     }
 
     @Test
+    void missingCrossrefWithoutEntryDeclaration() throws RecognitionException {
+        BstVM vm = new BstVM("""
+                ENTRY { title } { } { }
+                READ
+                FUNCTION { test } { crossref missing$ }
+                ITERATE { test }
+                """);
+        List<BibEntry> testEntries = List.of(
+                new BibEntry(StandardEntryType.InProceedings)
+                        .withCitationKey("child")
+                        .withField(StandardField.CROSSREF, "parent"),
+                BstVMTest.defaultTestEntry());
+
+        vm.render(testEntries);
+
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
+    }
+
+    @Test
     void numNames() throws RecognitionException {
         BstVM vm = new BstVM("""
                 FUNCTION { test } {

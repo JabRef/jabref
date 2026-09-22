@@ -10,7 +10,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -22,7 +21,6 @@ public class UnlinkedFilesWizard {
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
-    @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
@@ -75,7 +73,7 @@ public class UnlinkedFilesWizard {
         }
         this.bibDatabaseContext = activeDatabase.get();
 
-        viewModel = new UnlinkedFilesDialogViewModel(dialogService, undoManager, fileUpdateMonitor, preferences, stateManager, taskExecutor);
+        viewModel = new UnlinkedFilesDialogViewModel(dialogService, stateManager.getUndoManager(bibDatabaseContext), fileUpdateMonitor, preferences, stateManager, taskExecutor);
 
         page1 = new SearchConfigurationPage(viewModel, bibDatabaseContext, preferences);
         page2 = new FileSelectionPage(stateManager, viewModel, preferences.getImportFormatPreferences(), taskExecutor);

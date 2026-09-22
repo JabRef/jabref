@@ -20,7 +20,7 @@ public class SearchTextField {
     public static CustomTextField create(KeyBindingRepository keyBindingRepository, IconTheme.JabRefIcons icon) {
         CustomTextField textField = (CustomTextField) TextFields.createClearableTextField();
         textField.setPromptText(Localization.lang("Search..."));
-        textField.setId("searchField");
+        textField.setId("search-field");
         textField.getStyleClass().add("search-field");
 
         Node graphicNode = icon.getGraphicNode();

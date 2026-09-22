@@ -3,6 +3,9 @@ nav_order: 0065
 parent: Decision Records
 ---
 # Accept an http(s)/ftp URL as `jabkit` Input File
+`adr~download-url-input-files~1`
+
+Needs: impl
 
 ## Context and Problem Statement
 
@@ -68,3 +71,5 @@ Tests in `jabkit` start a local `okhttp3.mockwebserver3.MockWebServer` and exerc
 * [ADR 57](0057-allow-positional-input-file-argument.md) - the shared `InputOption` mixin this decision builds on
 * [ADR 63](0063-use-picocli-exceptionhandler.md) - the `CliException`/exit-code model this decision reuses
 * `org.jabref.logic.net.URLDownload` (`jablib`) - the existing download utility, also used by `jabgui`'s `CliImportHelper` for `--importToOpen`
+
+<!-- markdownlint-disable-file MD022 -->

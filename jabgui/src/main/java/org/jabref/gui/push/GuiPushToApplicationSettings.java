@@ -10,6 +10,7 @@ import javafx.scene.layout.Priority;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
@@ -42,7 +43,7 @@ public class GuiPushToApplicationSettings {
 
         browse.setTooltip(new Tooltip(Localization.lang("Browse")));
         browse.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
-        browse.getStyleClass().addAll("icon-button", "narrow");
+        browse.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
         browse.setPrefHeight(20.0);
         browse.setPrefWidth(20.0);
 
@@ -61,7 +62,7 @@ public class GuiPushToApplicationSettings {
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(filePreferences.getWorkingDirectory()).build();
-        browse.setOnAction(e -> dialogService.showFileOpenDialog(fileDialogConfiguration)
+        browse.setOnAction(_ -> dialogService.showFileOpenDialog(fileDialogConfiguration)
                                              .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         settingsPane.add(browse, 2, 0);
 

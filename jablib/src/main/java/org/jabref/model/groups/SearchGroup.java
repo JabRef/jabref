@@ -10,7 +10,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 
-import io.github.adr.linked.ADR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class SearchGroup extends AbstractGroup {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
 
-    @ADR(38)
+    // [impl->adr~use-entryid-for-bibentries~1]
     private final Set<String> matchedEntries = new HashSet<>();
 
     private SearchQuery searchQuery;

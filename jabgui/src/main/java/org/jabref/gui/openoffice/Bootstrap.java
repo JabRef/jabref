@@ -218,7 +218,7 @@ public class Bootstrap {
                 boolean disable_dynloading = false;
                 try {
                     System.loadLibrary("lo-bootstrap");
-                } catch (UnsatisfiedLinkError e) {
+                } catch (UnsatisfiedLinkError _) {
                     disable_dynloading = true;
                 }
 

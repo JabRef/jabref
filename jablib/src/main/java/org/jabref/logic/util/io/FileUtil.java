@@ -97,7 +97,7 @@ public class FileUtil {
                 return Optional.empty();
             }
             realFileNameString = realFileName.toString();
-        } catch (InvalidPathException e) {
+        } catch (InvalidPathException _) {
             realFileNameString = FilenameUtils.getName(fileName.trim());
         }
         String extension = FilenameUtils.getExtension(realFileNameString);
@@ -129,7 +129,7 @@ public class FileUtil {
         Path path;
         try {
             path = Path.of(fileName.trim());
-        } catch (InvalidPathException e) {
+        } catch (InvalidPathException _) {
             return FilenameUtils.getBaseName(FilenameUtils.getName(fileName.trim()));
         }
         String realFileName = path.getFileName().toString();
@@ -164,7 +164,7 @@ public class FileUtil {
         Path path;
         try {
             path = Path.of(pathFragment);
-        } catch (InvalidPathException e) {
+        } catch (InvalidPathException _) {
             // Try to keep something of the invalid path fragment
             return Optional.of(FileNameCleaner.cleanFileName(pathFragment));
         }

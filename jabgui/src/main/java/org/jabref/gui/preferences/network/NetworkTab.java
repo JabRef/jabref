@@ -29,7 +29,6 @@ import org.jabref.logic.l10n.Localization;
 import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.tobiasdiez.easybind.EasyBind;
 
-import static javafx.beans.binding.Bindings.not;
 import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
@@ -44,7 +43,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
         this.viewModel = new NetworkTabViewModel(
                 dialogService,
                 preferences.getProxyPreferences(),
-                preferences.getGitPreferences(),
                 preferences.getInternalPreferences(),
                 preferences.getSSLPreferences(),
                 preferences.getFilePreferences());
@@ -70,9 +68,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
                                 .validate(viewModel.proxyPortValidationStatus(), proxyPort)
                                 .validate(viewModel.proxyUsernameValidationStatus(), proxyUsername)
                                 .validate(viewModel.proxyPasswordValidationStatus(), proxyPassword)))
-
-                .section(Localization.lang("Git configuration"), git -> git
-                        .custom(buildGitGrid()))
 
                 .section(Localization.lang("SSL configuration"), ssl -> ssl
                         .custom(buildSslGrid()))
@@ -140,31 +135,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
         return grid;
     }
 
-    private GridPane buildGitGrid() {
-        Label usernameLabel = new Label(Localization.lang("Username"));
-        TextField gitUsername = new TextField();
-        gitUsername.setPrefWidth(200.0);
-        gitUsername.textProperty().bindBidirectional(viewModel.gitUsernameProperty());
-
-        Label patLabel = new Label(Localization.lang("PAT"));
-        patLabel.setTooltip(new Tooltip(Localization.lang("Personal Access Token")));
-        EnhancedPasswordField gitPat = PasswordFieldEditor.create(viewModel.gitPatProperty()).withRevealButton().withClearButton().field();
-        gitPat.setPrefWidth(200.0);
-
-        CheckBox gitPersistPat = new CheckBox(Localization.lang("Persist PAT between sessions"));
-        gitPersistPat.selectedProperty().bindBidirectional(viewModel.gitPersistPatProperty());
-        gitPersistPat.disableProperty().bind(not(viewModel.passwordPersistAvailable()));
-        SplitPane persistWrapper = credentialTooltipWrapper(gitPersistPat);
-
-        GridPane grid = threeColumnGrid();
-        grid.add(usernameLabel, 0, 0);
-        grid.add(gitUsername, 1, 0);
-        grid.add(patLabel, 0, 1);
-        grid.add(gitPat, 1, 1);
-        grid.add(persistWrapper, 2, 1);
-        return grid;
-    }
-
     private GridPane buildSslGrid() {
         TableView<CustomCertificateViewModel> table = new TableView<>();
         table.setPrefHeight(200.0);
@@ -185,7 +155,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
         actions.setReorderable(false);
         actions.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getThumbprint()));
         new ValueTableCellFactory<CustomCertificateViewModel, String>()
-                .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove formatter '%0'", name))
                 .withOnMouseClickedEvent(thumbprint -> _ -> viewModel.customCertificateListProperty().removeIf(cert -> cert.getThumbprint().equals(thumbprint)))
                 .install(actions);

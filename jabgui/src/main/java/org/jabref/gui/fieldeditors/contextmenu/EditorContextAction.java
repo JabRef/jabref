@@ -103,17 +103,17 @@ public class EditorContextAction extends SimpleCommand {
     public static List<MenuItem> getDefaultContextMenuItems(TextInputControl textInputControl) {
         ActionFactory factory = new ActionFactory();
 
-        MenuItem selectAllMenuItem = factory.createMenuItem(StandardActions.SELECT_ALL,
+        MenuItem selectAllMenuItem = factory.createContextMenuItem(StandardActions.SELECT_ALL,
                 new EditorContextAction(StandardActions.SELECT_ALL, textInputControl));
         if (SHOW_HANDLES) {
             selectAllMenuItem.getProperties().put("refreshMenu", Boolean.TRUE);
         }
 
         return List.of(
-                factory.createMenuItem(StandardActions.CUT, new EditorContextAction(StandardActions.CUT, textInputControl)),
-                factory.createMenuItem(StandardActions.COPY, new EditorContextAction(StandardActions.COPY, textInputControl)),
-                factory.createMenuItem(StandardActions.PASTE, new EditorContextAction(StandardActions.PASTE, textInputControl)),
-                factory.createMenuItem(StandardActions.DELETE, new EditorContextAction(StandardActions.DELETE, textInputControl)),
+                factory.createContextMenuItem(StandardActions.CUT, new EditorContextAction(StandardActions.CUT, textInputControl)),
+                factory.createContextMenuItem(StandardActions.COPY, new EditorContextAction(StandardActions.COPY, textInputControl)),
+                factory.createContextMenuItem(StandardActions.PASTE, new EditorContextAction(StandardActions.PASTE, textInputControl)),
+                factory.createContextMenuItem(StandardActions.DELETE, new EditorContextAction(StandardActions.DELETE, textInputControl)),
                 selectAllMenuItem);
     }
 }

@@ -11,8 +11,6 @@
 //REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
-// see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
-//DEPS io.github.adr:e-adr:2.0.0
 
 // requirements needed by jabkit project need to be listed; requirements by jablib are loaded transitively
 //DEPS info.picocli:picocli:4.7.7
@@ -34,6 +32,8 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateCitationKeys.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitedWorks.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitingWorks.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Git.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GitMergeDriver.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/InputOption.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabKit.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pdf.java
