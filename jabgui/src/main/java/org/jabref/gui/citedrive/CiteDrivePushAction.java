@@ -6,6 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citedrive.CiteDrivePush;
 import org.jabref.logic.citedrive.OAuthSessionRegistry;
@@ -51,7 +52,9 @@ public class CiteDrivePushAction extends SimpleCommand {
 
                     AccessToken accessToken = accessTokenOpt.get();
                     try {
-                        CiteDrivePush.push(database, accessToken, preferences, dialogService);
+                        if (CiteDrivePush.push(database, accessToken, preferences, dialogService)) {
+                            NativeDesktop.openBrowserShowPopup(CiteDrivePush.IMPORT_PAGE, dialogService, preferences.getExternalApplicationsPreferences());
+                        }
                     } catch (IOException e) {
                         LOGGER.error("CiteDrive push failed", e);
                         dialogService.notify(Localization.lang("CiteDrive push failed: %0", e.getMessage()));

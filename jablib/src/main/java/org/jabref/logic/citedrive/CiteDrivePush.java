@@ -21,6 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CiteDrivePush {
+    /// Web page where the user picks which of the pushed entries to import into a CiteDrive project
+    public static final String IMPORT_PAGE = "https://app-dev.citedrive.com/jabref/push/";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CiteDrivePush.class);
     private static final URI PUSH_ENDPOINT;
 
@@ -32,11 +35,12 @@ public class CiteDrivePush {
         }
     }
 
-    public static void push(BibDatabaseContext context, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService) throws IOException {
-        push(context, accessToken, cliPreferences, notificationService, PUSH_ENDPOINT);
+    /// @return true if CiteDrive accepted the library
+    public static boolean push(BibDatabaseContext context, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService) throws IOException {
+        return push(context, accessToken, cliPreferences, notificationService, PUSH_ENDPOINT);
     }
 
-    static void push(BibDatabaseContext context, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService, URI pushEndpoint) throws IOException {
+    static boolean push(BibDatabaseContext context, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService, URI pushEndpoint) throws IOException {
         StringWriter writer = new StringWriter();
         BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(writer, context, cliPreferences);
         bibDatabaseWriter.writeDatabase(context);
@@ -72,5 +76,6 @@ public class CiteDrivePush {
             }
             notificationService.notify(message);
         });
+        return httpResponse.isSuccess();
     }
 }

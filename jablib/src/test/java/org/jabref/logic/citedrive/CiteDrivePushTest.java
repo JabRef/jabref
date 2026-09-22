@@ -52,12 +52,13 @@ class CiteDrivePushTest {
             return bodyEntity;
         }).when(postRequest).body(anyString());
         when(bodyEntity.asString()).thenReturn(response);
+        when(response.isSuccess()).thenReturn(true);
 
         NotificationService notificationService = mock(NotificationService.class);
 
         try (MockedStatic<Unirest> unirestMock = Mockito.mockStatic(Unirest.class)) {
             unirestMock.when(() -> Unirest.post("https://example.com/jabref/push/")).thenReturn(postRequest);
-            CiteDrivePush.push(
+            boolean pushed = CiteDrivePush.push(
                     createDatabaseContext(),
                     new BearerAccessToken("access-token"),
                     createPreferences(),
@@ -71,6 +72,7 @@ class CiteDrivePushTest {
             assertTrue(body.contains("@Article{test-key,"), body);
             assertTrue(body.contains("  author = {Doe, Jane},"), body);
             verify(response).ifSuccess(Mockito.any());
+            assertTrue(pushed);
         }
     }
 
