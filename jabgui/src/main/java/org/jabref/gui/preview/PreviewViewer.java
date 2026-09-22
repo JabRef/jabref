@@ -224,7 +224,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void downloadCoverAndRefresh(BibEntry entry, String previewText, long currentUpdateSequence) {
         BackgroundTask.wrap(() -> bookCoverFetcher.downloadCoversForEntry(entry))
-                      .onSuccess((ignored) -> {
+                      .onSuccess(_ -> {
                           if (currentUpdateSequence == updateSequence) {
                               setPreviewText(previewText);
                           }
