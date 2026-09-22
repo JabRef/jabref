@@ -68,7 +68,7 @@ git fetch --all
 >
 > Note that putting the JabRef repository directly on `C:\` or any other drive letter on Windows causes compile errors (**negative example**: `C:\jabref`).
 >
-> `core.longpaths` lets Git handle paths longer than 260 characters, which Gradle's build output can reach.
+> `core.longpaths` lets Git handle paths longer than [260 characters](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry), which Gradle's build output can reach.
 
 #### Exclude the workspace from Windows Defender
 
