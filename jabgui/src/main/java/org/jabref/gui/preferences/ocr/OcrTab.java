@@ -18,7 +18,6 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.EngineSelection;
 import org.jabref.logic.ocr.OcrLanguage;
-import org.jabref.logic.ocr.OcrMyPdfPlugin;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 
 import org.controlsfx.control.CheckComboBox;
@@ -40,9 +39,7 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
                 .section(Localization.lang("OCR engine"), engine -> engine
                         .combo(Localization.lang("Engine selection"),
                                 viewModel.engineOptions(), viewModel.selectedEngineProperty(), EngineSelection::getDisplayName)
-                        .custom(buildEnginePathRow())
-                        .combo(Localization.lang("OCRmyPDF plugin"),
-                                viewModel.pluginOptions(), viewModel.selectedPluginProperty(), OcrMyPdfPlugin::getDisplayName))
+                        .custom(buildEnginePathRow()))
 
                 .section(Localization.lang("OCR languages"), languages -> languages
                         .custom(buildLanguagesRow()))

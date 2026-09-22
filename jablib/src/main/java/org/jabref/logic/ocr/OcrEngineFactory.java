@@ -12,7 +12,8 @@ public final class OcrEngineFactory {
         return switch (preferences.getEngineSelection()) {
             case DOCLING ->
                     new DoclingEngine(preferences);
-            case OCRMYPDF ->
+            case OCRMYPDF,
+                 EASYOCR ->
                     new OcrMyPdfEngine(preferences);
         };
     }
