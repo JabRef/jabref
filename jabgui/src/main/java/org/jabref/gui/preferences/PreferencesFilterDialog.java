@@ -51,7 +51,7 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        showOnlyDeviatingPreferenceOptions.setOnAction(event -> updateModel());
+        showOnlyDeviatingPreferenceOptions.setOnAction(_ -> updateModel());
         filteredOptions.predicateProperty().bind(EasyBind.map(searchField.textProperty(), searchText -> {
             if ((searchText == null) || searchText.isEmpty()) {
                 return null;
