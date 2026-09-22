@@ -20,7 +20,7 @@ public enum EngineSelection {
     public static EngineSelection safeValueOf(String name) {
         try {
             return EngineSelection.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return EngineSelection.OCRMYPDF;
         }
     }
