@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory;
 /// Implements an API to a GROBID server, as described at
 /// https://grobid.readthedocs.io/en/latest/Grobid-service/#grobid-web-services
 ///
-/// Note: Currently a custom GROBID server is used...
-/// https://github.com/NikodemKch/grobid
 ///
 /// The methods are structured to match the GROBID server api.
 /// Each method corresponds to a GROBID service request. Only the ones already used are already implemented.
@@ -67,7 +65,7 @@ public class GrobidService {
         String httpResponse = response.body();
         LOGGER.debug("raw citation -> response: {}, {}", rawCitation, httpResponse);
 
-        if (httpResponse == null || "@misc{-1,\n  author = {}\n}\n".equals(httpResponse) || httpResponse.equals("@misc{-1,\n  author = {" + rawCitation + "}\n}\n")) { // This filters empty BibTeX entries
+        if ("@misc{-1,\n  author = {}\n}\n".equals(httpResponse) || httpResponse.equals("@misc{-1,\n  author = {" + rawCitation + "}\n}\n")) { // This filters empty BibTeX entries
             throw new IOException("The GROBID server response does not contain anything.");
         }
 

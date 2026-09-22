@@ -101,6 +101,14 @@ public class PreferencesMigrations {
         upgradeTheme(preferences);
         migrateFileAnnotationsTabVisibility(preferences);
         upgradeEntryEditorCustomTabs(preferences);
+        upgradeGrobidUrl(preferences);
+    }
+
+    static void upgradeGrobidUrl(JabRefGuiPreferences preferences) {
+        String legacyGrobidUrl = "http://grobid.jabref.org:8070";
+        if (legacyGrobidUrl.equals(preferences.get(JabRefCliPreferences.GROBID_URL, ""))) {
+            preferences.put(JabRefCliPreferences.GROBID_URL, "https://grobid.jabref.org");
+        }
     }
 
     /// Up to and including v6.0-alpha.6, custom entry editor tabs were stored in two parallel numbered
