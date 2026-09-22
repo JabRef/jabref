@@ -23,7 +23,7 @@ public enum PagesWithTextHandling {
     public static PagesWithTextHandling safeValueOf(String name) {
         try {
             return PagesWithTextHandling.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return PagesWithTextHandling.SKIP;
         }
     }
