@@ -67,7 +67,7 @@ jobs:
             fi
             # GitHub stores the type name in lower case ("bug") while the issue template writes "Bug"
             if [ "$labeled" = false ] && [ "${type,,}" = "bug" ]; then
-              # `gh pr edit` also reads the assignees, which needs read:org the token does not have
+              # `gh pr edit` queries fields that need the read:org scope, which the token lacks
               gh api "repos/JabRef/jabref/issues/$PR_NUMBER/labels" -f "labels[]=dev: into-stable" > /dev/null
               echo "Added \`dev: into-stable\`" >> "$GITHUB_STEP_SUMMARY"
               labeled=true
