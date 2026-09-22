@@ -433,6 +433,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
+        if (result.isInvalid()) {
+            // Nothing could be read from the file - the caller has already reported the reason to the user.
+            // Keeping the tab would leave an empty, untitled library behind, which the user could accidentally
+            // save over the file that failed to load.
+            // [impl->req~import.library.unreadable-reported~1]
+            // Close first, while dataLoadingTask is still set: confirmClose() treats a tab that is still
+            // loading as disposable and drops it. Clearing the task beforehand would instead offer to save
+            // the placeholder - over the very file that failed to load - if anything had modified it.
+            tabContainer.closeTab(this);
+            loading.set(false);
+            dataLoadingTask = null;
+            return;
+        }
+
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
         setDatabaseContext(result.getDatabaseContext());
         if (result.getChangedOnMigration()) {
@@ -918,6 +932,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     /// Perform necessary cleanup when this Library is closed.
+    ///
+    /// Cleanup steps catch [Throwable]: anything escaping (e.g., a [NoClassDefFoundError] when the classpath
+    /// has vanished under a running JVM) aborts the tab close, leaving JabRef unclosable behind a recurring
+    /// uncaught-exception dialog. Closing must always succeed, so even fatal errors are only logged here.
     private void onClosed(Event event) {
         closed = true;
         if (dataLoadingTask != null) {
@@ -928,7 +946,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
         try {
             changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             LOGGER.error("Problem when closing change monitor", e);
         }
         // Dropped before closing, so a failing backend shutdown cannot skip it: the registration keeps
@@ -938,7 +956,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             if (searchContext != null) {
                 searchContext.close();
             }
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             LOGGER.error("Problem when closing search context", e);
         }
 
@@ -946,14 +964,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         try {
             AutosaveManager.shutdown(bibDatabaseContext);
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             LOGGER.error("Problem when shutting down autosave manager", e);
         }
         try {
             BackupManager.shutdown(bibDatabaseContext,
                     preferences.getFilePreferences().getBackupDirectory(),
                     preferences.getFilePreferences().shouldCreateBackup());
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
 
@@ -961,6 +979,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             GitPullScheduler.shutdown(bibDatabaseContext);
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down Git pull scheduler", e);
+        }
+
+        if (mainTable != null) {
+            mainTable.dispose();
         }
 
         if (tableModel != null) {
