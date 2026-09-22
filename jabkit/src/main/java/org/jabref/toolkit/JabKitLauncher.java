@@ -66,7 +66,7 @@ public class JabKitLauncher {
     ///       Use `--args="..."` as parameters to "Run"
     ///
     /// @implNote method needs to be public, because JabKitLauncher calls it.
-    static void main(String[] args) {
+   public static void main(String[] args) {
         initLogging(args);
 
         try {
