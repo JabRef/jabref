@@ -1,12 +1,17 @@
 package org.jabref.gui.fieldeditors.identifier;
 
+import java.util.IdentityHashMap;
+
+import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.EntryLookupsInProgress;
 import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -23,6 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<DOI> {
+
+    /// Running lookups per entry, so the progress indicator survives the entry editor rebuilding its
+    /// field editors on an entry switch. Entries are compared by identity because the lookup changes
+    /// the entry. Only touched on the JavaFX thread.
+    private static final ObservableMap<BibEntry, Integer> RUNNING_LOOKUPS = FXCollections.observableMap(new IdentityHashMap<>());
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiIdentifierEditorViewModel.class);
 
     private final ShortenDOIFormatter shortenDOIFormatter;
@@ -45,8 +55,8 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
 
         BibEntry lookedUpEntry = entry;
         BackgroundTask.wrap(() -> doiFetcher.findIdentifier(lookedUpEntry))
-                      .onRunning(() -> EntryLookupsInProgress.DOI.started(lookedUpEntry))
-                      .onFinished(() -> EntryLookupsInProgress.DOI.finished(lookedUpEntry))
+                      .onRunning(() -> RUNNING_LOOKUPS.merge(lookedUpEntry, 1, Integer::sum))
+                      .onFinished(() -> RUNNING_LOOKUPS.computeIfPresent(lookedUpEntry, (_, count) -> count == 1 ? null : count - 1))
                       .onSuccess(identifier -> identifier.ifPresentOrElse(
                               doi -> lookedUpEntry.setField(field, doi.asString()),
                               () -> dialogService.notify(Localization.lang("No %0 found", FieldTextMapper.getDisplayName(field))))).onFailure(e -> handleIdentifierFetchingError(e, doiFetcher)).executeWith(taskExecutor);
@@ -55,7 +65,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
-        identifierLookupInProgress.bind(EntryLookupsInProgress.DOI.inProgress(entry));
+        identifierLookupInProgress.bind(Bindings.createBooleanBinding(() -> RUNNING_LOOKUPS.containsKey(entry), RUNNING_LOOKUPS));
     }
 
     @Override
