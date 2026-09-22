@@ -14,8 +14,9 @@ jobs:
     steps:
       - name: Decline self-assignment of untriaged issues
         id: untriaged
-        if: ${{ contains(github.event.comment.body, '/assign-me') && contains(github.event.issue.labels.*.name, 'status: needs-triage') }}
-        run: gh issue comment "${{ github.event.issue.html_url }}" --body "Hi @${{ github.event.comment.user.login }}, this issue needs triage by a maintainer first. Please wait until the \`status: needs-triage\` label is removed."
+        if: "${{ contains(github.event.comment.body, '/assign-me') && contains(github.event.issue.labels.*.name, 'status: needs-triage') }}"
+        run: |
+          gh issue comment "${{ github.event.issue.html_url }}" --body "Hi @${{ github.event.comment.user.login }}, this issue needs triage by a maintainer first. Please wait until the \`status: needs-triage\` label is removed."
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Assign the user or unassign stale assignments
