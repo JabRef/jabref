@@ -304,6 +304,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
             return;
         }
 
+        error.set(null);
         GenerateSummaryTask task = summarizationTaskAggregator.start(
                 new GenerateSummaryTaskRequest(
                         filePreferences,
