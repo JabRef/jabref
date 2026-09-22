@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added `jabkit git merge-driver`, a Git merge driver that merges `.bib` files semantically. [#16838](https://github.com/JabRef/jabref/pull/16838)
+- We added a list of saved connections to the "Connect to shared database" dialog. [#12948](https://github.com/JabRef/jabref/issues/12948)
 
 ### Changed
 
