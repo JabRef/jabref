@@ -75,7 +75,6 @@ class InMemoryLuceneSearchBackendTest {
         );
     }
 
-    /// [Issue 13048](https://github.com/JabRef/jabref/issues/13048): `any ==! SEE` also matched `See`.
     // [utest->req~jabgui.search.fulltext.case-sensitive~1]
     @ParameterizedTest
     @MethodSource
@@ -83,7 +82,6 @@ class InMemoryLuceneSearchBackendTest {
         assertEquals(expectedCitationKeys, search(searchExpression, EnumSet.of(SearchFlags.FULLTEXT)));
     }
 
-    /// [Issue 9482](https://github.com/JabRef/jabref/issues/9482): a quotation mark used to make the search throw.
     @Test
     void searchesPhraseInLinkedFileContents() throws IOException, URISyntaxException {
         assertEquals(
