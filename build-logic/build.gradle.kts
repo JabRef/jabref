@@ -28,7 +28,7 @@ dependencies {
     implementation("org.gradlex:java-module-testing:1.8.1")
     implementation("org.gradlex:jvm-dependency-conflict-resolution:2.5")
     implementation("org.gradle.toolchains:foojay-resolver:1.0.0")
-    implementation("org.itsallcode:openfasttrace-gradle:3.2.0")
+    implementation("org.itsallcode:openfasttrace-gradle:3.4.0")
     implementation("org.itsallcode.openfasttrace:openfasttrace-api:4.10.0")
     implementation("org.itsallcode.openfasttrace:openfasttrace-core:4.10.0")
     implementation("org.itsallcode.openfasttrace:openfasttrace-exporter-specobject:4.10.0")
