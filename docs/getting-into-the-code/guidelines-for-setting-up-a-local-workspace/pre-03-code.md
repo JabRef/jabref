@@ -70,11 +70,6 @@ git fetch --all
 >
 > `core.longpaths` lets Git handle paths longer than 260 characters, which Gradle's build output can reach.
 
-{: .tip }
-> If you work with many repositories, [ghq](https://github.com/x-motemen/ghq) keeps them organized by host and owner.
-> Install it with `scoop install ghq`, run `git config --global ghq.root C:\git-repositories`, and clone with `ghq get JabRef/jabref` (submodules included).
-> The repository then lives in `C:\git-repositories\github.com\JabRef\jabref`; run the `git remote` commands above there and use that path in the steps below.
-
 #### Exclude the workspace from Windows Defender
 
 Windows Defender's real-time protection scans every file the build touches.
