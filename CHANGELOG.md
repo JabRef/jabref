@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added `jabkit git merge-driver`, a Git merge driver that merges `.bib` files semantically. [#16838](https://github.com/JabRef/jabref/pull/16838)
+- We added Markdown table rendering to AI chat responses and AI summaries. [#17142](https://github.com/JabRef/jabref/pull/17142)
 
 ### Changed
 
