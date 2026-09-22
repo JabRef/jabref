@@ -447,7 +447,11 @@ public class BibDatabaseWriter {
         for (BibEntry bes : entries) {
             Optional<String> oldKey = bes.getCitationKey();
             if (StringUtil.isBlank(oldKey)) {
-                mutationScheduler.accept(() -> keyGenerator.generateAndSetKey(bes).ifPresent(changes::add));
+                mutationScheduler.accept(() -> {
+                    if (StringUtil.isBlank(bes.getCitationKey())) {
+                        keyGenerator.generateAndSetKey(bes).ifPresent(changes::add);
+                    }
+                });
             }
         }
         return changes;

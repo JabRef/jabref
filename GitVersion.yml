@@ -10,5 +10,10 @@ strategies: [ConfiguredNextVersion, TaggedCommit, TrackReleaseBranches, VersionI
 branches:
   main:
     regex: ^main
-    label: 'alpha' # Update this to the label for the alpha/beta release (e.g., "alpha2") or leave empty
-    pre-release-weight: 34000 # 0 after stable release, 15000 before alpha release, 30000 before beta release, 50000 before stable release
+    # Label of the current pre-release phase ("alpha", "beta"); leave empty for a stable release
+    label: 'beta'
+    # Third component of AssemblySemVer: pre-release-weight + commits since the last tag.
+    # The count restarts at every release tag, so each new phase needs a weight above the highest number the previous phase reached
+    # (v6.0-alpha.6 + 956 commits reached 34956, hence 50000 for beta). Stay below 60000: GitVersion always uses that for a stable release.
+    # Ignored while `label` is empty.
+    pre-release-weight: 50000

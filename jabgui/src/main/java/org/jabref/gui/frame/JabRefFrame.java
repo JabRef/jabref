@@ -272,9 +272,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private void updateSidePane() {
         if (sidePane.getChildren().isEmpty()) {
-            if (horizontalDividerSubscription != null) {
-                horizontalDividerSubscription.unsubscribe();
-            }
+            unsubscribeHorizontalDivider();
             horizontalSplit.getItems().remove(sidePane);
         } else {
             if (!horizontalSplit.getItems().contains(sidePane)) {
@@ -303,13 +301,27 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public void updateHorizontalDividerPosition() {
-        if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
-            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
-                                                    .mapObservable(SplitPane.Divider::positionProperty)
-                                                    .listenToValues((_, newValue) ->
-                                                            preferences.getGuiPreferences()
-                                                                       .setHorizontalDividerPosition(newValue.doubleValue()));
+        // Rapid toggling queues several runLater calls; a leftover listener would keep writing.
+        unsubscribeHorizontalDivider();
+        if (!mainStage.isShowing() || sidePane.getChildren().isEmpty()) {
+            return;
+        }
+        horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition());
+        horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
+                                                .mapObservable(SplitPane.Divider::positionProperty)
+                                                .listenToValues((_, newValue) -> {
+                                                    double position = newValue.doubleValue();
+                                                    // 0 and 1 occur while the pane is added or removed, not as a user's choice
+                                                    if (position > 0 && position < 1) {
+                                                        preferences.getGuiPreferences().setHorizontalDividerPosition(position);
+                                                    }
+                                                });
+    }
+
+    private void unsubscribeHorizontalDivider() {
+        if (horizontalDividerSubscription != null) {
+            horizontalDividerSubscription.unsubscribe();
+            horizontalDividerSubscription = null;
         }
     }
 

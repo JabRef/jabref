@@ -37,6 +37,8 @@ public class WalkthroughScroller {
                 .map(parent -> EasyBind.listen(parent.boundsInParentProperty(), debouncedScroller))
                 .forEach(subscriptions::add);
         subscriptions.add(EasyBind.listen(node.localToSceneTransformProperty(), debouncedScroller));
+
+        scrollNodeIntoView(node, scrollableParents);
     }
 
     public void cleanup() {
