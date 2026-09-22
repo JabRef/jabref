@@ -329,6 +329,16 @@
     -fx-border-color: transparent;
 }
 
+.icon-button .whats-new-badge {
+    -fx-background-color: -color-badge-bg;
+    -fx-background-radius: 1em;
+    -fx-text-fill: -color-fg-emphasis;
+    -fx-font-size: 0.7em;
+    -fx-padding: 0 0.3em;
+    -fx-translate-x: 0.6em;
+    -fx-translate-y: 0.5em;
+}
+
 .icon-button:hover {
     -fx-background: -color-overlay-hover;
     -fx-background-color: -color-overlay-hover;
