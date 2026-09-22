@@ -15,6 +15,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where importing a PDF could set the exporter's account name as author. [#16247](https://github.com/JabRef/jabref/pull/16247)
+- We fixed an issue where importing a PDF could set an implausible year, such as a postal code. [#16247](https://github.com/JabRef/jabref/pull/16247)
+
 ### Removed
 
 ## [6.0-beta.1] - 2026-09-21
