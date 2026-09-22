@@ -131,7 +131,7 @@ public class EntriesResource {
     /// currently selected library.
     ///
     /// The reference is run through the plain-citation parser the user selected in JabRef's
-    /// preferences ({@link org.jabref.logic.importer.ImporterPreferences#getDefaultPlainCitationParser()}),
+    /// preferences ([org.jabref.logic.importer.ImporterPreferences#getDefaultPlainCitationParser()]),
     /// including the LLM parser.
     ///
     /// @param group optional name of a group the imported entry is additionally assigned to.
@@ -184,7 +184,7 @@ public class EntriesResource {
     ///
     /// "current" keeps the previous behaviour (empty Optional -> active library). Any other id
     /// is looked up among the open libraries; an unknown or closed id yields 404 via
-    /// {@link ServerUtils#getLibraryPath}.
+    /// [ServerUtils#getLibraryPath].
     private Optional<java.nio.file.Path> resolveTargetLibrary(String id) {
         if ("current".equals(id)) {
             return Optional.empty();

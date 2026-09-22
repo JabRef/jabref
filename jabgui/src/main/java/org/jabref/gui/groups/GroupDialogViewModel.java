@@ -162,11 +162,11 @@ public class GroupDialogViewModel {
 
         nameContainsDelimiterValidator = new FunctionBasedValidator<>(
                 nameProperty,
-                name -> !name.contains(Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())),
+                name -> !name.contains(Character.toString(currentDatabase.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))),
                 ValidationMessage.warning(
                         Localization.lang(
                                 "The group name contains the keyword separator \"%0\" and thus probably does not work as expected.",
-                                Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())
+                                Character.toString(currentDatabase.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))
                         )));
 
         sameNameValidator = new FunctionBasedValidator<>(
@@ -315,7 +315,7 @@ public class GroupDialogViewModel {
                 ExplicitGroup explicitGroup = new ExplicitGroup(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
-                        preferences.getBibEntryPreferences().getKeywordSeparator());
+                        currentDatabase.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()));
                 if (Boolean.TRUE.equals(explicitIncludeSelectedProperty.getValue())) {
                     explicitGroup.add(stateManager.getSelectedEntries());
                 }
@@ -335,7 +335,7 @@ public class GroupDialogViewModel {
                             FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
                             keywordGroupSearchTermProperty.getValue().trim(),
                             keywordGroupCaseSensitiveProperty.getValue(),
-                            preferences.getBibEntryPreferences().getKeywordSeparator(),
+                            currentDatabase.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()),
                             false);
                 }
             } else if (Boolean.TRUE.equals(typeSearchProperty.getValue())) {
@@ -436,7 +436,7 @@ public class GroupDialogViewModel {
                           .getIconName()
                           .filter(iconName -> !GroupsFactory.GroupIcon.ALL_ENTRIES_GROUP_ICON.name().equals(iconName))
                           .ifPresent(iconProperty::setValue);
-                parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
+                parentNode.getGroup().getColor().ifPresent(_ -> colorUseProperty.setValue(true));
             }
             typeExplicitProperty.setValue(true);
             explicitIncludeSelectedProperty.setValue(selectedEntriesAvailableProperty.get() && preferences.getGroupsPreferences().shouldAutoIncludeSelectedEntries());

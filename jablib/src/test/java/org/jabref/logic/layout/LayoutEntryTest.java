@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 
 /// The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry. Indirectly the
 /// net.sf.jabref.export.layout.Layout is tested too.
-/// <p/>
+///
 /// The LayoutEntry creates a human readable String assigned with HTML formatters. To test the Highlighting Feature, an
 /// instance of LayoutEntry will be instantiated via Layout and LayoutHelper. With these instance the doLayout() Method
 /// is called several times for each test case. To simulate a search, a BibEntry will be created, which will be used by

@@ -63,11 +63,9 @@ import org.xml.sax.SAXException;
 /// Fetcher for ArXiv that merges fields from arXiv-issued DOIs (and user-issued ones when applicable) to get more information overall.
 ///
 /// These are the post-processing steps applied to the original fetch from ArXiv's API:
-/// <ol>
-/// - Use ArXiv-issued DOI to get more merge more data with original entry, overwriting some of those fields;
-/// - Use user-issued DOI (if it was provided) to merge even more data with the result of the previous step, overwriting some of those fields;
-/// - Modify keywords: remove repetitions and adapt some edge cases (commas in keyword transformed into forward slashes).
-/// </ol>
+/// 1. Use ArXiv-issued DOI to get more merge more data with original entry, overwriting some of those fields;
+/// 2. Use user-issued DOI (if it was provided) to merge even more data with the result of the previous step, overwriting some of those fields;
+/// 3. Modify keywords: remove repetitions and adapt some edge cases (commas in keyword transformed into forward slashes).
 ///
 /// @see <a href="https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/">arXiv.org blog </a> for more info about arXiv-issued DOIs
 /// @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
@@ -170,9 +168,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get ArXiv-issued DOI from the entry's arXiv ID
-    /// <br/><br/>
+    ///
     /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed
-    /// {@link #DOI_PREFIX} + the entry's ArXiv ID
+    /// [#DOI_PREFIX] + the entry's ArXiv ID
     ///
     /// @param arXivId An ArXiv ID
     /// @return ArXiv-issued DOI
@@ -181,8 +179,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get ArXiv-issued DOI from the arXiv entry itself.
-    /// <br/><br/>
-    /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed {@link #DOI_PREFIX} + the entry's ArXiv ID
+    ///
+    /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed [#DOI_PREFIX] + the entry's ArXiv ID
     ///
     /// @param arXivBibEntry A Bibtex Entry, formatted as a ArXiv entry. Must contain an EPRINT field
     /// @return ArXiv-issued DOI, or Empty, if method could not retrieve it
@@ -199,8 +197,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get ArXiv-issued DOI from ArXiv Identifier object
-    /// <br/><br/>
-    /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed {@link #DOI_PREFIX} + the entry's ArXiv ID
+    ///
+    /// ArXiv-issued DOIs are identifiers associated with every ArXiv entry. They are composed of a fixed [#DOI_PREFIX] + the entry's ArXiv ID
     ///
     /// @param arXivId An ArXiv ID as internal object
     /// @return ArXiv-issued DOI
@@ -214,12 +212,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Get user-issued DOI from ArXiv Bibtex entry, if any
-    /// <br/><br/>
+    ///
     /// User-issued DOIs are identifiers associated with some ArXiv entries that can associate an entry with an external service, like
     /// <a href="https://link.springer.com/">Springer Link</a>.
     ///
     /// @param arXivBibEntry An ArXiv Bibtex entry from where the DOI is extracted
-    /// @return User-issued DOI, if any field exists and if it's not an automatic one (see {@link #getAutomaticDoi(ArXivIdentifier)})
+    /// @return User-issued DOI, if any field exists and if it's not an automatic one (see [#getAutomaticDoi(ArXivIdentifier)])
     private static Optional<String> getManualDoi(BibEntry arXivBibEntry) {
         return arXivBibEntry.getField(StandardField.DOI).filter(ArXivFetcher::isManualDoi);
     }
@@ -416,7 +414,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                                                        .findFirst()
                                                        .flatMap(BibEntry::getCitationKey)
                                                        .ifPresent(entry::setCitationKey);
-        } catch (FetcherClientException e) {
+        } catch (FetcherClientException _) {
             // Most arXiv categories aren't indexed by INSPIRE, so a 404 here is an expected miss, not an error
             LOGGER.trace("No INSPIRE entry found for arXiv ID '{}'", eprint);
         } catch (FetcherException e) {
@@ -482,7 +480,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                                                               .filter(Optional::isPresent)
                                                               .map(Optional::get)
                                                               .findFirst();
-                pdfUrl.ifPresent(url -> LOGGER.info("Fulltext PDF found @ arXiv."));
+                pdfUrl.ifPresent(_ -> LOGGER.info("Fulltext PDF found @ arXiv."));
                 return pdfUrl;
             } catch (FetcherException e) {
                 LOGGER.warn("arXiv API request failed", e);
@@ -598,9 +596,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             } catch (URISyntaxException e) {
                 throw new FetcherException("Invalid URL", e);
             }
-            // The arXiv API has problems with accents, so we remove them (i.e. Fréchet -> Frechet)
             if (StringUtil.isNotBlank(searchQuery)) {
-                uriBuilder.addParameter("search_query", StringUtil.stripAccents(searchQuery));
+                uriBuilder.addParameter("search_query", searchQuery);
             }
             if (!ids.isEmpty()) {
                 uriBuilder.addParameter("id_list",
@@ -843,7 +840,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                         pdfUrlParsed = XMLUtil.getAttributeContent(linkNode, "href").map(url -> {
                             try {
                                 return URLUtil.create(url);
-                            } catch (MalformedURLException e) {
+                            } catch (MalformedURLException _) {
                                 return null;
                             }
                         });

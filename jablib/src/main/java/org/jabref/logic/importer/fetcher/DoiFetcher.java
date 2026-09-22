@@ -204,7 +204,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 LOGGER.info("Updated Crossref API rate limit from {} to {}", oldRate, newRate);
                 CROSSREF_DCN_RATE_LIMITER.setRate(newRate);
             }
-        } catch (NullPointerException | IllegalArgumentException e) {
+        } catch (NullPointerException | IllegalArgumentException _) {
             LOGGER.warn("Could not deduce Crossref API's rate limit from response header. API might have changed");
         }
     }
@@ -232,7 +232,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             if (response != null) {
                 agency = Optional.ofNullable(response.optString("RA"));
             }
-        } catch (JSONException e) {
+        } catch (JSONException _) {
             LOGGER.error("Cannot parse agency fetcher response to JSON");
             return Optional.empty();
         }

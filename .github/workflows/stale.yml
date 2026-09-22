@@ -30,7 +30,7 @@ jobs:
       # days-before-close against the GitHub field `updated_at`, which is bumped by any
       # activity on the pull request - including activity that is not the contributor's.
       # PRs whose `updated_at` keeps moving therefore never reach the close threshold.
-      - uses: actions/stale@v11
+      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
         id: stale
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -158,7 +158,7 @@ jobs:
 
           echo "closed_prs=${closed# }" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         if: ${{ steps.close.outputs.closed_prs != '' }}
       - name: Process closed PRs
         if: ${{ steps.close.outputs.closed_prs != '' }}

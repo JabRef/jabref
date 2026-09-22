@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.importer.fetcher.MergingIdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.model.entry.BibEntry;
@@ -43,7 +45,7 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
         this.notificationService = notificationService;
         this.keywordSeparator = keywordSeparator;
 
-        this.compoundEdit = new CompoundEdit(Localization.lang("Merge entries"));
+        this.compoundEdit = new CompoundEdit(StandardActions.MERGE_ENTRIES.getText());
         this.processedEntries = 0;
         this.successfulUpdates = 0;
 
@@ -59,15 +61,20 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
             return null;
         }
 
-        List<String> updatedEntries = processMergeEntries();
+        // The merge writes into the entries as it goes and hands the step over at the end, on
+        // both the cancelled and the completed path. Undo waits for neither, so the library is
+        // held against it until whichever of the two has pushed.
+        try (UndoSuspension suspended = undoManager.suspendUndo(StandardActions.MERGE_ENTRIES.getText())) {
+            List<String> updatedEntries = processMergeEntries();
 
-        if (isCancelled()) {
-            notifyCancellation();
+            if (isCancelled()) {
+                notifyCancellation();
+                updateUndoManager(updatedEntries);
+                return null;
+            }
+
             updateUndoManager(updatedEntries);
-            return null;
         }
-
-        updateUndoManager(updatedEntries);
         LOGGER.debug("Merge operation completed. Processed: {}, Successfully updated: {}",
                 processedEntries, successfulUpdates);
         notifySuccess(successfulUpdates);

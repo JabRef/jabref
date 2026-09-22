@@ -37,9 +37,9 @@ import org.slf4j.LoggerFactory;
 ///
 /// Currently, IEEE two column format is supported.
 ///
-/// To extract a {@link BibEntry} matching the PDF, see {@link PdfContentImporter}.
+/// To extract a [BibEntry] matching the PDF, see [PdfContentImporter].
 ///
-/// TODO: This class is similar to {@link org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser}, we need to unify them.
+/// TODO: This class is similar to [org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser], we need to unify them.
 @AllowedToUseApacheCommonsLang3("Fastest method to count spaces in a string")
 public class RuleBasedBibliographyPdfImporter extends BibliographyFromPdfImporter implements PlainCitationParser {
 

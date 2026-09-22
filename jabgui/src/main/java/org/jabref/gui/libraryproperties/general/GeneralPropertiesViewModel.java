@@ -20,13 +20,16 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.logic.formatter.bibtexfields.KeywordSeparatorMigration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -43,6 +46,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final StringProperty librarySpecificDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
+    private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
 
     private final Validator librarySpecificFileDirectoryValidator;
     private final Validator userSpecificFileDirectoryValidator;
@@ -50,15 +54,15 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private final DialogService dialogService;
     private final CliPreferences preferences;
+    private final UndoManager undoManager;
 
     private final BibDatabaseContext databaseContext;
-    private final MetaData metaData;
 
-    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences) {
+    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences, UndoManager undoManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.undoManager = undoManager;
         this.databaseContext = databaseContext;
-        this.metaData = databaseContext.getMetaData();
 
         librarySpecificFileDirectoryValidator = new FunctionBasedValidator<>(
                 librarySpecificDirectoryProperty,
@@ -77,7 +81,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     @Override
-    public void setValues() {
+    public void setValues(MetaData metaData) {
         boolean isShared = databaseContext.getLocation() == DatabaseLocation.SHARED;
         encodingDisableProperty.setValue(isShared); // the encoding of shared database is always UTF-8
 
@@ -86,37 +90,59 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         librarySpecificDirectoryProperty.setValue(metaData.getLibrarySpecificFileDirectory().orElse("").trim());
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
+        keywordSeparatorProperty.setValue(metaData.getKeywordSeparator().map(Object::toString).orElse(""));
     }
 
     @Override
-    public void storeSettings() {
-        MetaData newMetaData = databaseContext.getMetaData();
-
-        newMetaData.setEncoding(selectedEncodingProperty.getValue());
-        newMetaData.setMode(selectedDatabaseModeProperty.getValue());
+    public void storeSettings(MetaData metaData) {
+        metaData.setEncoding(selectedEncodingProperty.getValue());
+        metaData.setMode(selectedDatabaseModeProperty.getValue());
 
         String librarySpecificFileDirectory = librarySpecificDirectoryProperty.getValue().trim();
         if (librarySpecificFileDirectory.isEmpty()) {
-            newMetaData.clearLibrarySpecificFileDirectory();
+            metaData.clearLibrarySpecificFileDirectory();
         } else if (librarySpecificFileDirectoryStatus().isValid()) {
-            newMetaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
+            metaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
         }
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
-            newMetaData.clearUserFileDirectory(preferences.getFilePreferences().getUserAndHost());
+            metaData.clearUserFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else if (userSpecificFileDirectoryStatus().isValid()) {
-            newMetaData.setUserFileDirectory(preferences.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
+            metaData.setUserFileDirectory(preferences.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
         }
 
         String latexFileDirectory = laTexFileDirectoryProperty.getValue();
         if (latexFileDirectory.isEmpty()) {
-            newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
+            metaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else if (laTexFileDirectoryStatus().isValid()) {
-            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
+            metaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
         }
 
-        databaseContext.setMetaData(newMetaData);
+        storeKeywordSeparator(metaData);
+    }
+
+    /// The separator and the group definitions the migration rewrites are both metadata, so the
+    /// snapshot the dialog records covers them; only the entries it rewrites are recorded here,
+    /// and they join the dialog's step.
+    private void storeKeywordSeparator(MetaData metaData) {
+        Optional<Character> previousSeparator = metaData.getKeywordSeparator();
+        Optional<Character> newSeparator = Optional.of(keywordSeparatorProperty.getValue().trim())
+                                                   .filter(separator -> !separator.isEmpty())
+                                                   .map(separator -> separator.charAt(0));
+        if (previousSeparator.equals(newSeparator)) {
+            return;
+        }
+
+        Character previousEffectiveSeparator = previousSeparator.orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
+        Character newEffectiveSeparator = newSeparator.orElse(preferences.getBibEntryPreferences().getKeywordSeparator());
+        newSeparator.ifPresentOrElse(metaData::setKeywordSeparator, metaData::clearKeywordSeparator);
+        if (previousEffectiveSeparator.equals(newEffectiveSeparator)) {
+            return;
+        }
+        KeywordSeparatorMigration.migrateEntryFields(databaseContext, previousEffectiveSeparator, newEffectiveSeparator)
+                                 .forEach(fieldChange -> undoManager.addEdit(new UndoableFieldChange(fieldChange)));
+        KeywordSeparatorMigration.migrateGroupSeparators(metaData, newEffectiveSeparator);
     }
 
     ValidationStatus librarySpecificFileDirectoryStatus() {
@@ -195,6 +221,10 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return this.laTexFileDirectoryProperty;
     }
 
+    public StringProperty keywordSeparatorProperty() {
+        return this.keywordSeparatorProperty;
+    }
+
     private Path getBrowseDirectory(String configuredDir) {
         Optional<Path> libPath = this.databaseContext.getDatabasePath();
         Path workingDir = preferences.getFilePreferences().getWorkingDirectory();
@@ -234,7 +264,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
                         Localization.lang("The file directory '%0' for the %1 file path is not found or is inaccessible.", directoryPath, messageKey)
                 );
             }
-        } catch (InvalidPathException ex) {
+        } catch (InvalidPathException _) {
             return ValidationMessage.error(
                     Localization.lang("Invalid path: '%0'.\nCheck \"%1\".", directoryPath, messageKey)
             );

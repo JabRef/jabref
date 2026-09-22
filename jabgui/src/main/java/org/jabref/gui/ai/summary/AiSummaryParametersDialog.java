@@ -10,7 +10,7 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-// [impl->req~ai.expert-settings.summarization-local~1]
+// [impl->feat~ai.expert-settings.summarization-local~1]
 public class AiSummaryParametersDialog extends BaseDialog<Boolean> {
     @FXML private AiSummaryParametersView aiSummaryParametersView;
 

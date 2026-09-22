@@ -11,7 +11,7 @@ import org.apache.xmpbox.xml.XmpParsingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// XMPUtilShared provides support for reading {@link org.jabref.logic.xmp.XmpUtilReader} and writing {@link org.jabref.logic.xmp.XmpUtilWriter} BibTeX data as XMP metadata
+/// XMPUtilShared provides support for reading [org.jabref.logic.xmp.XmpUtilReader] and writing [org.jabref.logic.xmp.XmpUtilWriter] BibTeX data as XMP metadata
 /// in PDF-documents.
 public class XmpUtilShared {
 
@@ -53,10 +53,10 @@ public class XmpUtilShared {
         try {
             List<XMPMetadata> metadata = new XmpUtilReader().readRawXmp(path);
             return !metadata.isEmpty();
-        } catch (EncryptedPdfsNotSupportedException ex) {
+        } catch (EncryptedPdfsNotSupportedException _) {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;
-        } catch (IOException e) {
+        } catch (IOException _) {
             XmpUtilShared.LOGGER.debug("No metadata was found. Path: {}", path.toString());
             return false;
         }

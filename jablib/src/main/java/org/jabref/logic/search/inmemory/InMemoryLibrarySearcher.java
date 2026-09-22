@@ -28,13 +28,13 @@ public class InMemoryLibrarySearcher implements LibrarySearcher {
 
     public InMemoryLibrarySearcher(BibDatabaseContext databaseContext, BibEntryPreferences bibEntryPreferences) {
         this.databaseContext = databaseContext;
-        this.keywordSeparator = bibEntryPreferences.getKeywordSeparator();
+        this.keywordSeparator = databaseContext.getKeywordSeparator(bibEntryPreferences.getKeywordSeparator());
     }
 
     @Override
     public List<BibEntry> getMatches(SearchQuery query) {
         if (!query.isValid()) {
-            LOGGER.warn("Search failed: invalid search expression '{}'", query.getSearchExpression());
+            LOGGER.trace("Search failed: invalid search expression '{}'", query.getSearchExpression());
             return List.of();
         }
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT)) {

@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import com.tobiasdiez.easybind.PreboundBinding;
 
-/// Similar to {@link com.tobiasdiez.easybind.monadic.MonadicObservableValue}
+/// Similar to [com.tobiasdiez.easybind.monadic.MonadicObservableValue]
 public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>> {
 
     private OptionalObjectProperty(Optional<T> initialValue) {

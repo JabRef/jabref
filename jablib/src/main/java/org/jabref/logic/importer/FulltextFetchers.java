@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 /// Utility class for trying to resolve URLs to full-text PDF for articles.
 ///
-/// Combines multiple {@link FulltextFetcher}s together. Each fetcher is invoked, the "best" result (sorted by the fetcher trust level) is returned.
+/// Combines multiple [FulltextFetcher]s together. Each fetcher is invoked, the "best" result (sorted by the fetcher trust level) is returned.
 public class FulltextFetchers {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetchers.class);
 
@@ -46,7 +46,7 @@ public class FulltextFetchers {
             URLDownload download = new URLDownload(url);
             headers.forEach(download::addHeader);
             return download.isPdf();
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException _) {
             LOGGER.warn("URL returned by fulltext fetcher is invalid");
         }
         return false;
@@ -98,9 +98,9 @@ public class FulltextFetchers {
     private static Optional<FetcherResult> getResults(Future<Optional<FetcherResult>> future) {
         try {
             return future.get();
-        } catch (InterruptedException ignore) {
+        } catch (InterruptedException _) {
             // ignore thread interruptions
-        } catch (ExecutionException | CancellationException e) {
+        } catch (ExecutionException | CancellationException _) {
             LOGGER.debug("Fetcher execution failed or was cancelled");
         }
         return Optional.empty();

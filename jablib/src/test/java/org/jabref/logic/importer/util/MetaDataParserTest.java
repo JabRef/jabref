@@ -45,7 +45,7 @@ public class MetaDataParserTest {
         assertEquals(expected, MetaDataParser.parseDirectory(input));
     }
 
-    /// In case of any change, copy the content to {@link org.jabref.logic.exporter.MetaDataSerializerTest#serializeCustomizedEntryType()}
+    /// In case of any change, copy the content to [org.jabref.logic.exporter.MetaDataSerializerTest#serializeCustomizedEntryType()]
     public static Stream<Arguments> parseCustomizedEntryType() {
         return Stream.of(
                 Arguments.of(
@@ -104,6 +104,14 @@ public class MetaDataParserTest {
         MetaData parsed = parser.parse(Map.of(MetaData.AI_LIBRARY_ID, "test-ai-library-id;"), ',', "userAndHost");
 
         assertEquals(Optional.of("test-ai-library-id"), parsed.getAiLibraryId());
+    }
+
+    @Test
+    void parsesKeywordSeparator() throws ParseException {
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(Map.of(MetaData.KEYWORD_SEPARATOR, "\\;;"), ',', "userAndHost");
+
+        assertEquals(Optional.of(';'), parsed.getKeywordSeparator());
     }
 
     @Test

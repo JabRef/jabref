@@ -29,7 +29,7 @@ public interface FulltextFetcher {
     /// @return The trust level of the fetcher, the higher the better
     TrustLevel getTrustLevel();
 
-    /// Returns HTTP headers required for downloading the PDF returned by {@link #findFullText}.
+    /// Returns HTTP headers required for downloading the PDF returned by [#findFullText].
     /// Fetchers that require authentication (for ex: API tokens) should override this method.
     ///
     /// @return A map of header name to header value, empty by default

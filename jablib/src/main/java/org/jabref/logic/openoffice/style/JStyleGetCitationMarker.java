@@ -65,6 +65,7 @@ class JStyleGetCitationMarker {
 
     ///
     /// Note:
+    ///
     /// - The "Au[AS]Bu[AS]Cu" (or the "Au") part may be empty (maxAuthors==0 or nAuthors==0).
     /// - OXFORD_COMMA is only emitted if nAuthors is at least 3.
     /// - andString  is only emitted if nAuthors is at least 2.
@@ -517,7 +518,7 @@ class JStyleGetCitationMarker {
     /// @return A normalized citation marker for deciding which
     /// citations need uniqueLetters.
     ///
-    /// For details of what "normalized" means: See {@link JStyleGetCitationMarker#getAuthorYearParenthesisMarker2}
+    /// For details of what "normalized" means: See [JStyleGetCitationMarker#getAuthorYearParenthesisMarker2]
     ///
     /// Note: now includes some markup.
     static OOText getNormalizedCitationMarker(JStyle style,

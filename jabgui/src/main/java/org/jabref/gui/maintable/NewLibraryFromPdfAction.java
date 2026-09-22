@@ -19,7 +19,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Similar to {@link ExtractReferencesAction}. This action creates a new library, the other action "just" appends to the current library
+/// Similar to [ExtractReferencesAction]. This action creates a new library, the other action "just" appends to the current library
 ///
 ///
 /// - Mode choice A: online or offline

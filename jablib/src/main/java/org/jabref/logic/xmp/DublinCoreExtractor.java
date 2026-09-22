@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /// This class is used for *both* conversion from Dublin Core to BibTeX and conversion form BibTeX to Dublin Core
 ///
-/// Related class: {@link org.jabref.logic.xmp.DocumentInformationExtractor}
+/// Related class: [org.jabref.logic.xmp.DocumentInformationExtractor]
 public class DublinCoreExtractor {
 
     public static final String DC_COVERAGE = "coverage";
@@ -198,7 +198,7 @@ public class DublinCoreExtractor {
     }
 
     /// Type is equivalent in both formats (BibTeX and DublinCore)
-    /// Opposite method: {@link DublinCoreExtractor#fillType()}
+    /// Opposite method: [DublinCoreExtractor#fillType()]
     private void extractType() {
         List<String> types = dcSchema.getTypes();
         if ((types != null) && !types.isEmpty()) {
@@ -236,7 +236,7 @@ public class DublinCoreExtractor {
     /// a bibtex bibEntry. In case special "bibtex/" entries are contained, the normal dublin core fields take
     /// precedence. For instance, the dublin core date takes precedence over bibtex/month.
     ///
-    /// The opposite method is {@link DublinCoreExtractor#fillDublinCoreSchema()}
+    /// The opposite method is [DublinCoreExtractor#fillDublinCoreSchema()]
     ///
     /// @return The bibEntry extracted from the document information.
     public Optional<BibEntry> extractBibtexEntry() {
@@ -337,7 +337,7 @@ public class DublinCoreExtractor {
     }
 
     /// All others (+ citation key) get packaged in the dc:relation attribute with `bibtex/` prefix in the content.
-    /// The value of the given field is fetched from the class variable {@link DublinCoreExtractor#bibEntry}.
+    /// The value of the given field is fetched from the class variable [DublinCoreExtractor#bibEntry].
     private void fillCustomField(Field field) {
         // We write the plain content of the field, because this is a custom DC field content with the semantics that
         // BibTeX data is stored. Thus, we do not need to get rid of BibTeX, but can keep it.
@@ -345,7 +345,7 @@ public class DublinCoreExtractor {
         dcSchema.addRelation(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName() + '/' + value);
     }
 
-    /// Opposite method: {@link DublinCoreExtractor#extractType()}
+    /// Opposite method: [DublinCoreExtractor#extractType()]
     private void fillType() {
         // BibTeX: entry type; DC: 'dc:type'
         TypedBibEntry typedEntry = new TypedBibEntry(bibEntry, BibDatabaseMode.BIBTEX);

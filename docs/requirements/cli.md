@@ -24,13 +24,29 @@ See [ADR 57](../decisions/0057-allow-positional-input-file-argument.md) for more
 Needs: impl
 
 ## Input file argument accepts an http(s)/ftp URL
-`req~jabkit.cli.input-url~1`
+`req~jabkit.cli.input-url~2`
 
 The positional `FILE` argument and its `--input` alias additionally accept an `http://`,
-`https://`, or `ftp://` URL wherever a `jabkit` command reads a single file.
+`https://`, or `ftp://` URL. This holds for every input a `jabkit` command reads, including
+each argument of a command taking several of them.
 The URL is downloaded to a local temporary file before use; a download failure is reported
 as a regular CLI error (exit code `SOFTWARE`) rather than a "file not found" usage error.
+For a command reading several inputs, an unusable input is skipped and the remaining ones are
+still processed, with the command exiting non-zero afterwards.
 See [ADR 65](../decisions/0065-download-url-input-files.md) for more details.
+
+Needs: impl
+
+## Input file argument accepts a shared database URL
+`req~jabkit.cli.input-shared-db~1`
+
+The positional `FILE` argument and its `--input` alias additionally accept a PostgreSQL connection
+URL (for example `postgresql://user:secret@host:5432/library`) pointing at a JabRef shared library.
+The library is exported to a local temporary file before use; the access is read-only, nothing is
+written back to the database.
+A database that is not a JabRef shared library, and any connection failure, is reported as a regular
+CLI error (exit code `SOFTWARE`).
+See [ADR 74](../decisions/0074-shared-database-url-as-jabkit-input.md) for more details.
 
 Needs: impl
 

@@ -2,6 +2,7 @@ package org.jabref.gui.walkthrough.declarative.sideeffect;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -12,8 +13,8 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -79,9 +80,9 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
                     stateManager,
                     Injector.instantiateModelOrService(FileUpdateMonitor.class),
                     Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                    Injector.instantiateModelOrService(UndoManager.class),
                     Injector.instantiateModelOrService(ClipBoardManager.class),
-                    Injector.instantiateModelOrService(TaskExecutor.class)
+                    Injector.instantiateModelOrService(TaskExecutor.class),
+                    Injector.instantiateModelOrService(GitHandlerRegistry.class)
             );
 
             libraryTab.setText(WALKTHROUGH_LIBRARY_TEMPLATE.formatted(libraryName));
@@ -134,12 +135,16 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
     }
 
     private Optional<LibraryTab> findLibraryTab() {
-        return tabContainer.getLibraryTabs().stream()
-                           .filter(tab -> WALKTHROUGH_LIBRARY_TEMPLATE
-                                   .formatted(libraryName).equals(tab.getText()) ||
-                                   (tab.getBibDatabaseContext().getDatabasePath().isEmpty() &&
-                                           tab.getBibDatabaseContext().getDatabase().getEntryCount() > 0))
-                           .findFirst();
+        return findWalkthroughLibraryTab(tabContainer.getLibraryTabs(), createdTab, libraryName);
+    }
+
+    static Optional<LibraryTab> findWalkthroughLibraryTab(Collection<LibraryTab> libraryTabs, @Nullable LibraryTab createdTab, String libraryName) {
+        if (createdTab != null && libraryTabs.contains(createdTab)) {
+            return Optional.of(createdTab);
+        }
+        return libraryTabs.stream()
+                          .filter(tab -> WALKTHROUGH_LIBRARY_TEMPLATE.formatted(libraryName).equals(tab.getText()))
+                          .findFirst();
     }
 
     private Optional<BibDatabaseContext> loadExampleLibrary() {

@@ -3,10 +3,8 @@ package org.jabref.gui.maintable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,6 +19,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -48,23 +47,22 @@ import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
-import org.jabref.gui.maintable.columns.LibraryColumn;
-import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -94,10 +92,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final MainTableDataModel model;
     private final CustomLocalDragboard localDragboard;
     private final TaskExecutor taskExecutor;
-    private final UndoManager undoManager;
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final ClipboardContentGenerator clipboardContentGenerator;
+    private final ColumnPreferencesApplier columnPreferencesApplier;
+    private final ColumnPreferencesRecorder columnPreferencesRecorder;
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
@@ -125,7 +124,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.dialogService = dialogService;
         this.model = model;
         this.taskExecutor = taskExecutor;
-        this.undoManager = libraryTab.getUndoManager();
         this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
         this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), journalAbbreviationRepository);
@@ -137,19 +135,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setOnDragOver(this::handleOnDragOverTableView);
         this.setOnDragDropped(this::handleOnDragDroppedTableView);
 
+        this.setId(WalkthroughNodeIds.MAIN_TABLE);
         this.getStyleClass().add("main-table");
 
         MainTableColumnFactory mainTableColumnFactory = new MainTableColumnFactory(
                 database,
                 preferences,
                 preferences.getMainTableColumnPreferences(),
-                undoManager,
                 dialogService,
                 stateManager,
                 taskExecutor);
 
-        this.getColumns().addAll(mainTableColumnFactory.createColumns());
-        this.getColumns().removeIf(LibraryColumn.class::isInstance);
+        this.columnPreferencesApplier = new ColumnPreferencesApplier(this, mainTableColumnFactory, mainTablePreferences);
+        columnPreferencesApplier.bind();
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
@@ -162,7 +160,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         dialogService,
                         stateManager,
                         preferences,
-                        undoManager,
                         clipBoardManager,
                         taskExecutor,
                         journalAbbreviationRepository,
@@ -183,38 +180,34 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // force match category column to be the first sort order, (match_category column is always the first column)
         this.getSortOrder().addFirst(getColumns().getFirst());
-        this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
-            if (!this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
+        this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) _ -> {
+            if (this.getSortOrder().isEmpty() || !this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
                 this.getSortOrder().addFirst(getColumns().getFirst());
             }
         });
-
-        if (mainTablePreferences.getResizeColumnsToFit()) {
-            this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
-        }
 
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         this.setItems(model.getEntriesFilteredAndSorted());
 
         Button addExampleButton = new Button(Localization.lang("Add example entry"));
-        addExampleButton.getStyleClass().add("text-button-blue");
+        addExampleButton.getStyleClass().addAll("text-button-blue", "h4");
         addExampleButton.setOnAction(_ -> {
             BibEntry entry = addExampleEntry();
             libraryTab.showAndEdit(entry);
         });
 
         Button importPdfsButton = new Button(Localization.lang("Import existing PDFs"));
-        importPdfsButton.getStyleClass().add("text-button-blue");
+        importPdfsButton.getStyleClass().addAll("text-button-blue", "h4");
         importPdfsButton.setOnAction(_ -> importPdfs());
 
         Label noContentLabel = new Label(Localization.lang("No content in table"));
-        noContentLabel.getStyleClass().add("welcome-header-label");
+        noContentLabel.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
 
-        HBox buttonBox = new HBox(20, addExampleButton, importPdfsButton);
+        HBox buttonBox = new HBox(12, addExampleButton, importPdfsButton);
         buttonBox.setAlignment(Pos.CENTER);
 
-        VBox placeholderBox = new VBox(15, noContentLabel, buttonBox);
+        VBox placeholderBox = new VBox(12, noContentLabel, buttonBox);
         placeholderBox.setAlignment(Pos.CENTER);
 
         VBox loadingPlaceholder = new VBox(new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS));
@@ -222,11 +215,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         updatePlaceholder(placeholderBox, loadingPlaceholder);
 
-        database.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> updatePlaceholder(placeholderBox, loadingPlaceholder));
+        database.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) _ -> updatePlaceholder(placeholderBox, loadingPlaceholder));
 
-        this.getItems().addListener((ListChangeListener<BibEntryTableViewModel>) change -> updatePlaceholder(placeholderBox, loadingPlaceholder));
+        this.getItems().addListener((ListChangeListener<BibEntryTableViewModel>) _ -> updatePlaceholder(placeholderBox, loadingPlaceholder));
 
         libraryTab.getLoading().addListener((_, _, _) -> updatePlaceholder(placeholderBox, loadingPlaceholder));
+
+        // Matches float to the top (or are the only rows left), so a table scrolled down before searching would show none of them.
+        // Only scroll when the top is actually out of view, so the table does not jump while typing a query
+        libraryTab.searchQueryProperty().addListener((_, _, query) -> query.ifPresent(_ -> {
+            if (!isFirstRowVisible()) {
+                scrollTo(0);
+            }
+        }));
 
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
@@ -252,10 +253,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 })
         );
 
-        UiTaskExecutor.runInJavaFXThread(() -> restoreConfiguredSortOrder(mainTablePreferences));
+        UiTaskExecutor.runInJavaFXThread(columnPreferencesApplier::applySortOrder);
 
         // Store visual state
-        new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
+        this.columnPreferencesRecorder = new ColumnPreferencesRecorder(this, mainTablePreferences.getColumnPreferences());
+        columnPreferencesRecorder.bind();
 
         setupKeyBindings(keyBindingRepository);
 
@@ -273,34 +275,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
     }
 
-    private void restoreConfiguredSortOrder(MainTablePreferences mainTablePreferences) {
-        List<TableColumn<BibEntryTableViewModel, ?>> restoredSortOrder =
-                new ArrayList<>(mainTablePreferences.getColumnPreferences()
-                                                    .getColumnSortOrder()
-                                                    .stream()
-                                                    .map(columnModel ->
-                                                            this.getColumns().stream()
-                                                                .map(column -> (MainTableColumn<?>) column)
-                                                                .filter(column -> column.getModel().equals(columnModel))
-                                                                .findFirst()
-                                                                .orElse(null))
-                                                    .filter(Objects::nonNull)
-                                                    .map(column -> (TableColumn<BibEntryTableViewModel, ?>) column)
-                                                    .toList());
-
-        if (restoredSortOrder.isEmpty()) {
-            return;
-        }
-
-        restoredSortOrder.forEach(column -> LOGGER.trace("Adding sort order for col {} ", column));
-        restoredSortOrder.addFirst(getColumns().getFirst());
-        this.getSortOrder().setAll(restoredSortOrder);
-    }
-
-    /// This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link MainTable} will scroll to the cell with the same starting column value and typed string
+    /// This is called, if a user starts typing some characters into the keyboard with focus on main table. The [MainTable] will scroll to the cell with the same starting column value and typed string
     /// If the user presses any other special key as well, e.g. alt or shift we don't jump
     ///
-    /// @param sortedColumn The sorted column in {@link MainTable}
+    /// @param sortedColumn The sorted column in [MainTable]
     /// @param keyEvent     The pressed character
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
         if (keyEvent.isAltDown() || keyEvent.isControlDown() || keyEvent.isMetaDown() || keyEvent.isShiftDown()) {
@@ -356,8 +334,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         } else {
             // select new entries
             List<Integer> indices = bibEntries.stream()
-                                              .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                              .flatMap(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()).stream())
+                                              .flatMap(bibEntry -> findEntry(bibEntry).stream())
                                               .map(entry -> getItems().indexOf(entry))
                                               .filter(index -> index >= 0)
                                               .toList();
@@ -375,6 +352,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 scrollTo(indices.getFirst());
             }
         }
+    }
+
+    private boolean isFirstRowVisible() {
+        return Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow"))
+                       .map(VirtualFlow::getFirstVisibleCell)
+                       .map(cell -> cell.getIndex() == 0)
+                       .orElse(true);
     }
 
     private void scrollToNextMatchCategory() {
@@ -417,14 +401,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
-        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager);
-        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager);
-        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager);
-        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
+        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager);
+        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager);
+        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager);
+        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
         OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
-        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);
-        LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, undoManager, dialogService, taskExecutor);
+        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences);
+        LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(new CrossRef(preferences.getImporterPreferences()), stateManager, dialogService, taskExecutor);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -626,6 +610,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         getSelectionModel().getSelectedItems().addListener(listener);
     }
 
+    public void dispose() {
+        columnPreferencesApplier.unbind();
+        columnPreferencesRecorder.unbind();
+        database.getDatabase().unregisterListener(this);
+    }
+
     public MainTableDataModel getTableModel() {
         return model;
     }
@@ -640,10 +630,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private Optional<BibEntryTableViewModel> findEntry(@NonNull BibEntry entry) {
         return model.getViewModelByIndex(database.getDatabase().indexOf(entry));
-    }
-
-    private Optional<BibEntryTableViewModel> findEntryByCitationKey(String citationKey) {
-        return model.getViewModelByCitationKey(citationKey);
     }
 
     public void setCitationMergeMode(boolean citationMerge) {
@@ -667,6 +653,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private BibEntry addExampleEntry() {
         BibEntry exampleEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("JabRef2023")
                 .withField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker")
                 .withField(StandardField.TITLE, "JabRef: BibTeX-based literature management software")
                 .withField(StandardField.JOURNAL, "TUGboat")

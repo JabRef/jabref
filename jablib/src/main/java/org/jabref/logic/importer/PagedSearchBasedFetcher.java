@@ -41,7 +41,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     /// This method is used to send complex queries using fielded search.
     ///
     /// @param queryNode the first search node
-    /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+    /// @return a list of [BibEntry], which are matched by the query (may be empty)
     @Override
     default List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
         return new ArrayList<>(performSearchPaged(queryNode, 0).getContent());

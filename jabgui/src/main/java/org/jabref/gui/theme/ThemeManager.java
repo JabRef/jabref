@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -24,7 +25,7 @@ import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,27 +43,41 @@ import static java.util.function.Predicate.not;
 ///
 /// @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in
 /// the JabRef documentation.
+@NullMarked
 public class ThemeManager {
     public static Map<String, Node> downloadIconTitleMap = Map.of(
             Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
     );
     public static final StyleSheet JABREF_BASE_STYLE_SHEET = StyleSheet.create("internal/jabref-base.css").orElseThrow();
 
+    private static final String FONT_SIZE_STYLE_CLASS_PREFIX = "font-size-";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
 
+    private final ChangeListener<Scene> sceneChangeListener = (_, _, newScene) -> {
+        if (newScene != null) {
+            registerScene(newScene);
+        }
+    };
+
+    /// Marks a scene whose root this manager already follows for the font size. A window re-enters
+    /// [Window#getWindows()] every time it is shown again, and the scene it brings is the same one.
+    private final Object fontSizeFollowsRootKey = new Object();
+
     private final FileUpdateListener baseCssLiveUpdate = () -> cssLiveUpdate(JABREF_BASE_STYLE_SHEET);
     private @Nullable FileUpdateListener themeCssLiveUpdate;
+    private @Nullable FileUpdateListener parentCssLiveUpdate;
     private @Nullable FileUpdateListener customCssLiveUpdate;
 
     private ThemePreset theme = ThemePreset.JABREF;
     private ThemeColorScheme colorScheme = ThemeColorScheme.FOLLOW_SYSTEM;
     private @Nullable StyleSheet customTheme;
 
-    public ThemeManager(@NonNull WorkspacePreferences workspacePreferences,
-                        @NonNull FileUpdateMonitor fileUpdateMonitor) {
+    public ThemeManager(WorkspacePreferences workspacePreferences,
+                        FileUpdateMonitor fileUpdateMonitor) {
         this.workspacePreferences = workspacePreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
@@ -85,10 +100,12 @@ public class ThemeManager {
     ///
     /// The theme stylesheet comes first, the user's custom stylesheet on top of it, and the base
     /// stylesheet last -- the base sheet only maps JabRef's own selectors onto the color tokens the
-    /// theme defines, so it has to win over both.
+    /// theme defines, so it has to win over both. A theme with a parent declares only the tokens it
+    /// changes, so the parent's stylesheet goes beneath it to supply the rest.
     public void updateCssOnScene(Scene scene) {
-        List<String> toAdd = new ArrayList<>(3);
+        List<String> toAdd = new ArrayList<>(4);
 
+        theme.getParent().ifPresent(parent -> toAdd.add(parent.getStyleSheet().getSceneStylesheetLocation()));
         toAdd.add(theme.getStyleSheet().getSceneStylesheetLocation());
         if (customTheme != null) {
             toAdd.add(customTheme.getSceneStylesheetLocation());
@@ -98,23 +115,11 @@ public class ThemeManager {
         scene.getStylesheets().setAll(toAdd.stream().filter(not(String::isEmpty)).toList());
     }
 
-    /// Updates the font size settings of a scene. Originally, this methods must be
-    /// called by each Dialog, PopOver, or window when it's created. Now, this is done
-    /// automatically when the scene is created.
-    ///
-    /// @param scene is the scene, the font size should be applied to
-    private void updateFontOnScene(@NonNull Scene scene) {
-        UiTaskExecutor.runNowOrInJavaFXThread(() -> updateFontStyleForScene(scene));
-    }
-
-    private void updateFontStyleForScene(@NonNull Scene scene) {
+    private void updateFontStyleForScene(Scene scene) {
+        scene.getRoot().getStyleClass().removeIf(styleClass -> styleClass.startsWith(FONT_SIZE_STYLE_CLASS_PREFIX));
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
-            scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
-        } else {
-            int mainFontSize = WorkspacePreferences.getDefault().getMainFontSize();
-            LOGGER.debug("Using default font size of {}pt", mainFontSize);
-            scene.getRoot().setStyle("-fx-font-size: " + mainFontSize + "pt;");
+            scene.getRoot().getStyleClass().add(FONT_SIZE_STYLE_CLASS_PREFIX + workspacePreferences.getMainFontSize());
         }
     }
 
@@ -125,16 +130,11 @@ public class ThemeManager {
                     continue;
                 }
                 for (Window window : change.getAddedSubList()) {
-                    window.sceneProperty().addListener((_, _, newScene) -> {
-                        if (newScene != null) {
-                            updateColorSchemeOnScene(newScene);
-                            updateFontOnScene(newScene);
-                        }
-                    });
+                    window.sceneProperty().removeListener(sceneChangeListener);
+                    window.sceneProperty().addListener(sceneChangeListener);
                     Scene scene = window.getScene();
                     if (scene != null) {
-                        updateColorSchemeOnScene(scene);
-                        updateFontOnScene(scene);
+                        registerScene(scene);
                     }
                 }
             }
@@ -144,9 +144,24 @@ public class ThemeManager {
         LOGGER.debug("Window theme monitoring initialized");
     }
 
+    private void registerScene(Scene scene) {
+        updateColorSchemeOnScene(scene);
+        updateFontStyleForScene(scene);
+        if (scene.getProperties().putIfAbsent(fontSizeFollowsRootKey, Boolean.TRUE) != null) {
+            return;
+        }
+        scene.rootProperty().addListener((_, oldRoot, _) -> {
+            // The font size is carried by a style class on the scene root, so it has to follow the root
+            // whenever a third party replaces it.
+            if (oldRoot != null) {
+                oldRoot.getStyleClass().removeIf(styleClass -> styleClass.startsWith(FONT_SIZE_STYLE_CLASS_PREFIX));
+            }
+            updateFontStyleForScene(scene);
+        });
+    }
+
     private void updateColorSchemeOnScene(Scene scene) {
-        ThemeColorScheme effectiveColorScheme = Optional.ofNullable(colorScheme).orElse(ThemeColorScheme.FOLLOW_SYSTEM);
-        ColorScheme javafxColorScheme = switch (effectiveColorScheme) {
+        ColorScheme javafxColorScheme = switch (colorScheme) {
             case FOLLOW_SYSTEM ->
                     null;
             case LIGHT ->
@@ -168,10 +183,7 @@ public class ThemeManager {
 
         boolean cssChanged = false;
         if (theme != newTheme) {
-            if (themeCssLiveUpdate != null) {
-                removeStylesheetFromWatchList(theme.getStyleSheet(), themeCssLiveUpdate);
-            }
-
+            removeThemeStylesheetsFromWatchList(theme);
             addThemeStylesheetToWatchlist(newTheme);
 
             cssChanged = true;
@@ -251,6 +263,25 @@ public class ThemeManager {
         StyleSheet themeStyleSheet = theme.getStyleSheet();
         themeCssLiveUpdate = () -> cssLiveUpdate(themeStyleSheet);
         addStylesheetToWatchlist(themeStyleSheet, themeCssLiveUpdate);
+
+        // The parent supplies every token the theme itself does not declare, so an edit there changes
+        // the look just as much as one in the selected theme.
+        theme.getParent().ifPresent(parent -> {
+            StyleSheet parentStyleSheet = parent.getStyleSheet();
+            parentCssLiveUpdate = () -> cssLiveUpdate(parentStyleSheet);
+            addStylesheetToWatchlist(parentStyleSheet, parentCssLiveUpdate);
+        });
+    }
+
+    private void removeThemeStylesheetsFromWatchList(ThemePreset theme) {
+        if (themeCssLiveUpdate != null) {
+            removeStylesheetFromWatchList(theme.getStyleSheet(), themeCssLiveUpdate);
+            themeCssLiveUpdate = null;
+        }
+        if (parentCssLiveUpdate != null) {
+            theme.getParent().ifPresent(parent -> removeStylesheetFromWatchList(parent.getStyleSheet(), parentCssLiveUpdate));
+            parentCssLiveUpdate = null;
+        }
     }
 
     private void cssLiveUpdate(StyleSheet styleSheet) {
@@ -277,11 +308,12 @@ public class ThemeManager {
         Window.getWindows().stream()
               .map(Window::getScene)
               .filter(Objects::nonNull)
-              .forEach(this::updateFontOnScene);
+              .forEach(this::updateFontStyleForScene);
     }
 
     /// @return the currently active custom theme
     @VisibleForTesting
+    @Nullable
     StyleSheet getCustomTheme() {
         return this.customTheme;
     }

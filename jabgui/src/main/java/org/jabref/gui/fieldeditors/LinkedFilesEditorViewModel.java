@@ -96,10 +96,10 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return FileFieldWriter.getStringRepresentation(filesToSerialize);
     }
 
-    /// Creates an instance of {@link LinkedFile} based on the given file.
+    /// Creates an instance of [LinkedFile] based on the given file.
     /// We try to guess the file type and relativize the path against the given file directories.
     ///
-    /// TODO: Move this method to {@link LinkedFile} as soon as {@link org.jabref.gui.externalfiletype.CustomExternalFileType} lives in model.
+    /// TODO: Move this method to [LinkedFile] as soon as [org.jabref.gui.externalfiletype.CustomExternalFileType] lives in model.
     public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalApplicationsPreferences externalApplicationsPreferences) {
         String fileExtension = FileUtil.getFileExtension(file).orElse("");
         ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, externalApplicationsPreferences)
@@ -169,6 +169,11 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 taskExecutor,
                 dialogService,
                 preferences));
+    }
+
+    /// For the linked-file context menu, whose actions record into this library's journal.
+    public UndoManager getUndoManager() {
+        return undoManager;
     }
 
     @Override
@@ -275,7 +280,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 dialogService,
                 preferences);
         files.add(onlineFile);
-        onlineFile.download(true, headers);
+        onlineFile.download(true, headers, undoManager);
     }
 
     public void deleteFile(LinkedFileViewModel file) {

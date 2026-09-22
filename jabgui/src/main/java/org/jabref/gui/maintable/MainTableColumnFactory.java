@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,6 @@ import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
@@ -57,7 +57,6 @@ public class MainTableColumnFactory {
     private final ColumnPreferences columnPreferences;
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
-    private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final StateManager stateManager;
@@ -66,7 +65,6 @@ public class MainTableColumnFactory {
     public MainTableColumnFactory(@NonNull BibDatabaseContext database,
                                   @NonNull GuiPreferences preferences,
                                   ColumnPreferences abstractColumnPrefs,
-                                  UndoManager undoManager,
                                   DialogService dialogService,
                                   StateManager stateManager,
                                   TaskExecutor taskExecutor) {
@@ -75,8 +73,7 @@ public class MainTableColumnFactory {
         this.columnPreferences = abstractColumnPrefs;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-        this.cellFactory = new CellFactory(preferences, undoManager);
-        this.undoManager = undoManager;
+        this.cellFactory = new CellFactory(preferences);
         this.stateManager = stateManager;
         this.tooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
     }
@@ -139,7 +136,11 @@ public class MainTableColumnFactory {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         columns.add(createMatchCategoryColumn(new MainTableColumnModel(MainTableColumnModel.Type.MATCH_CATEGORY)));
-        columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
+        columnPreferences.getColumns().stream()
+                         .filter(MainTableColumnModel::isConfigurable)
+                         .map(this::createColumn)
+                         .filter(Objects::nonNull)
+                         .forEach(columns::add);
         return columns;
     }
 
@@ -151,7 +152,7 @@ public class MainTableColumnFactory {
 
     /// Creates a column for the match category.
     /// This column is always hidden but is used for sorting the table
-    /// in the floating mode. The order of the {@link MatchCategory} enum constants
+    /// in the floating mode. The order of the [MatchCategory] enum constants
     /// determines the sorting order.
     private TableColumn<BibEntryTableViewModel, MatchCategory> createMatchCategoryColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, MatchCategory> column = new MainTableColumn<>(columnModel);
@@ -166,7 +167,7 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
         Node header = new Text("#");
-        header.getStyleClass().add("mainTable-header");
+        header.getStyleClass().add("text-muted");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName()));
         column.setGraphic(header);
         column.getStyleClass().add("align-center-right");
@@ -257,8 +258,7 @@ public class MainTableColumnFactory {
                                                                               .stream())
                                                    .toList();
         if (!groupIcons.isEmpty()) {
-            HBox container = new HBox();
-            container.setSpacing(2);
+            HBox container = new HBox(4);
             container.setMinWidth(10);
             container.setAlignment(Pos.CENTER_LEFT);
             container.setPadding(new Insets(0, 2, 0, 2));
@@ -286,19 +286,18 @@ public class MainTableColumnFactory {
         return new LinkedIdentifierColumn(columnModel, cellFactory, database, dialogService, preferences, stateManager);
     }
 
-    /// Creates a column that displays a {@link SpecialField}
+    /// Creates a column that displays a [SpecialField]
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
-        return new SpecialFieldColumn(columnModel, preferences, undoManager);
+        return new SpecialFieldColumn(columnModel, preferences, stateManager);
     }
 
     /// Creates a column for fields with content selectors.
     private TableColumn<BibEntryTableViewModel, ?> createContentSelectorColumn(MainTableColumnModel columnModel,
                                                                                List<String> values) {
-        return new ContentSelectorColumn(columnModel, values, undoManager);
+        return new ContentSelectorColumn(columnModel, values, stateManager);
     }
 
-    /// Creates a column for all the linked files. Instead of creating a column for a single file type, like {@link
-    /// #createExtraFileColumn(MainTableColumnModel)} createExtraFileColumn} does, this creates one single column collecting all file links.
+    /// Creates a column for all the linked files. Instead of creating a column for a single file type, like [createExtraFileColumn][#createExtraFileColumn(MainTableColumnModel)] does, this creates one single column collecting all file links.
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,
                 database,

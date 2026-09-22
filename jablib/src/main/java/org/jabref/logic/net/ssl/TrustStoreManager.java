@@ -27,7 +27,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// @implNote SSL certificates are installed at {@link TrustStoreManager#configureTrustStore(Path)}
+/// @implNote SSL certificates are installed at [TrustStoreManager#configureTrustStore(Path)]
 public class TrustStoreManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrustStoreManager.class);
@@ -243,7 +243,7 @@ public class TrustStoreManager {
             public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
                 try {
                     customTrustManager.checkServerTrusted(chain, authType);
-                } catch (CertificateException e) {
+                } catch (CertificateException _) {
                     // This will throw another CertificateException if this fails too.
                     jreTrustManager.checkServerTrusted(chain, authType);
                 }

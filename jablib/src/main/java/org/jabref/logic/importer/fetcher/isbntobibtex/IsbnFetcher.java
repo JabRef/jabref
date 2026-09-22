@@ -12,6 +12,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+import org.jabref.logic.importer.fetcher.DnbFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -23,9 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Fetcher to generate the Bibtex entry from an ISBN.
-/// The default fetcher is the {@link OpenLibraryIsbnFetcher}.
-/// If the entry is not found in the {@link OpenLibraryIsbnFetcher}.
-/// Alternative fetcher can be specified with the {@link IsbnFetcher#addRetryFetcher(AbstractIsbnFetcher)} method.
+/// The default fetcher is the [OpenLibraryIsbnFetcher].
+/// If the entry is not found in the [OpenLibraryIsbnFetcher].
+/// Alternative fetcher can be specified with the [IsbnFetcher#addRetryFetcher(AbstractIsbnFetcher)] method.
 public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsbnFetcher.class);
@@ -40,6 +41,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         OpenLibraryIsbnFetcher openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
         this.gvkIsbnFetcher = new GvkFetcher(importFormatPreferences);
         this.retryIsbnFetcher = new ArrayList<>();
+        this.addRetryFetcher(new DnbFetcher(importFormatPreferences));
         this.addRetryFetcher(lobidIsbnFetcher);
         this.addRetryFetcher(openLibraryIsbnFetcher);
     }

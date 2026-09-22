@@ -14,13 +14,13 @@ jobs:
     # ubuntu-slim does not offer Java (required by the update action)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
       - name: Update Gradle Wrapper
         # See https://github.com/JabRef/jabref/pull/15034
         if: false
-        uses: gradle-update/update-gradle-wrapper-action@v2
+        uses: gradle-update/update-gradle-wrapper-action@512b1875f3b6270828abfe77b247d5895a2da1e5 # v2
         with:
           labels: dependencies
           repo-token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}

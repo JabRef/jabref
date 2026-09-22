@@ -11,6 +11,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.PostgresConstants;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SqlQueryNode;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
@@ -161,7 +162,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     @Override
     public SqlQueryNode visitComparison(SearchParser.ComparisonContext ctx) {
         EnumSet<SearchFlags> searchFlags = EnumSet.noneOf(SearchFlags.class);
-        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
+        String term = SearchQuery.unescapeSearchValue(ctx.searchValue());
 
         // unfielded expression
         if (ctx.FIELD() == null) {

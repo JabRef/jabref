@@ -31,7 +31,7 @@ public final class SummarizatorFactory {
         };
     }
 
-    /// Convenience overload that reads all parameters from {@link AiPreferences}.
+    /// Convenience overload that reads all parameters from [AiPreferences].
     public static Summarizator create(AiPreferences aiPreferences) {
         return create(
                 aiPreferences.getSummarizatorKind(),

@@ -43,4 +43,40 @@ The user can enter an arbitrary URL to create an entry from it. JabRef tries URL
 
 Needs: impl
 
+## Download full text from ScholarAPI
+`req~fetchers.scholarapi-fulltext~1`
+
+For entries that contain a ScholarAPI identifier and have a PDF available, JabRef discovers the ScholarAPI PDF endpoint and uses the configured ScholarAPI API key to download the full text.
+
+## Full text search runs in the background
+`req~fetchers.fulltext-background-search~1`
+
+The search for full text documents runs as a background task shown in the status bar with progress and a cancel option, so JabRef stays usable while it runs. Its results are applied to the library the entries were selected in, and are discarded if that library was closed meanwhile.
+
+Needs: impl
+
+## Fetch entry by Software Heritage identifier (SWHID)
+`feat~fetchers.swhid~1`
+
+The user can look up and import bibliography entries by providing a Software Heritage identifier (SWHID).
+
+Needs: impl
+
+## Search the German National Library (DNB)
+`req~fetchers.dnb-search~1`
+
+The user can search the German National Library (DNB) catalog as a search-based
+fetcher, retrieving matching bibliographic entries by title, author, or other
+search terms.
+
+Needs: impl
+
+## Look up entries in the German National Library by ISBN
+`req~fetchers.dnb-isbn-lookup~1`
+
+The user can retrieve a bibliographic entry from the German National Library
+(DNB) by providing an ISBN.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

@@ -9,7 +9,7 @@ import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.entry.BibEntry;
 
 /// Placeholder class for a custom generic type safe dragboard to be used in drag and drop, does not depend on serialization
-/// Don't use this class directly. Use the instance provided in {@link org.jabref.gui.StateManager#getLocalDragboard()}
+/// Don't use this class directly. Use the instance provided in [org.jabref.gui.StateManager#getLocalDragboard()]
 public class CustomLocalDragboard {
 
     @SuppressWarnings("unchecked") private static final Class<List<BibEntry>> BIB_ENTRIES = (Class<List<BibEntry>>) (Class<?>) List.class;
@@ -41,14 +41,14 @@ public class CustomLocalDragboard {
         contents.clear();
     }
 
-    /// Puts A List of {@link BibEntry} in the map All previous content is cleared
+    /// Puts A List of [BibEntry] in the map All previous content is cleared
     ///
     /// @param entries The list to put
     public void putBibEntries(List<BibEntry> entries) {
         putValue(BIB_ENTRIES, entries);
     }
 
-    /// Get a List of {@link BibEntry} from the dragboard
+    /// Get a List of [BibEntry] from the dragboard
     ///
     /// @return List of BibEntry or empty list if no entries are avaiable
     public List<BibEntry> getBibEntries() {
@@ -62,14 +62,14 @@ public class CustomLocalDragboard {
         return hasType(BIB_ENTRIES);
     }
 
-    /// Puts A List of {@link PreviewLayout} in the map All previous content is cleared
+    /// Puts A List of [PreviewLayout] in the map All previous content is cleared
     ///
     /// @param previewLayouts The list to put
     public void putPreviewLayouts(List<PreviewLayout> previewLayouts) {
         putValue(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS, previewLayouts);
     }
 
-    /// Get a List of {@link PreviewLayout} from the dragboard
+    /// Get a List of [PreviewLayout] from the dragboard
     ///
     /// @return List of PreviewLayout or empty list if no entries are avaiable
     public List<PreviewLayout> getPreviewLayouts() {

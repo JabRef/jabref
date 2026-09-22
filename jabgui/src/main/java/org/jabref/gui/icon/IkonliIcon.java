@@ -16,41 +16,42 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
-import org.jabref.gui.util.ColorUtil;
-
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-/// {@link JabRefIcon} backed by an <a href="https://kordamp.org/ikonli/">Ikonli</a> font glyph, rendered as a
-/// {@link FontIcon}. The font-backed counterpart to {@link SvgIcon}. Immutable: {@link #withColor} and
-/// {@link #withSize} return copies.
+/// [JabRefIcon] backed by an <a href="https://kordamp.org/ikonli/">Ikonli</a> font glyph, rendered as a
+/// [FontIcon]. The font-backed counterpart to [SvgIcon]. Immutable: [#withColor] and
+/// [#withSize] return copies.
 @NullMarked
 public final class IkonliIcon implements JabRefIcon {
 
+    /// Ikonli's own default, so an icon that was never given a size renders as it always has.
+    private static final int DEFAULT_SIZE = 8;
+
     private final List<Ikon> icons;
     private final @Nullable Color color;
-    private final @Nullable Integer size;
+    private final int size;
 
     public IkonliIcon(Ikon... icons) {
-        this(List.of(icons), null, null);
+        this(List.of(icons), null, DEFAULT_SIZE);
     }
 
     public IkonliIcon(List<Ikon> icons) {
-        this(icons, null, null);
+        this(icons, null, DEFAULT_SIZE);
     }
 
     public IkonliIcon(Color color, Ikon... icons) {
-        this(List.of(icons), color, null);
+        this(List.of(icons), color, DEFAULT_SIZE);
     }
 
     IkonliIcon(Color color, List<Ikon> icons) {
-        this(icons, color, null);
+        this(icons, color, DEFAULT_SIZE);
     }
 
-    private IkonliIcon(List<Ikon> icons, @Nullable Color color, @Nullable Integer size) {
+    private IkonliIcon(List<Ikon> icons, @Nullable Color color, int size) {
         this.icons = List.copyOf(icons);
         this.color = color;
         this.size = size;
@@ -72,7 +73,7 @@ public final class IkonliIcon implements JabRefIcon {
         return IkonliIcons.ALL;
     }
 
-    /// Holds every {@link Ikon} discovered via the {@link IkonProvider} service loader. Initialization on first
+    /// Holds every [Ikon] discovered via the [IkonProvider] service loader. Initialization on first
     /// access guaranteed by JVM.
     private static final class IkonliIcons {
         private static final SequencedSet<Ikon> ALL = load();
@@ -92,7 +93,7 @@ public final class IkonliIcon implements JabRefIcon {
                       .collect(Collectors.toUnmodifiableMap(
                               ikon -> keyMapper.apply(ikon).toUpperCase(Locale.ENGLISH),
                               ikon -> ikon,
-                              (existing, duplicate) -> existing
+                              (existing, _) -> existing
                       ));
         }
     }
@@ -112,20 +113,10 @@ public final class IkonliIcon implements JabRefIcon {
     }
 
     private FontIcon buildFontIcon(Ikon ikon) {
-        FontIcon fontIcon = FontIcon.of(ikon);
+        // An explicit color (via withColor/disabled) has to survive the theme's .glyph-icon rules, which is what
+        // JabRefFontIcon takes care of. Without one, those rules are what colors the icon.
+        FontIcon fontIcon = color == null ? FontIcon.of(ikon, size) : new JabRefFontIcon(ikon, size, color);
         fontIcon.getStyleClass().add("glyph-icon");
-        if (size != null) {
-            fontIcon.setIconSize(size);
-        }
-
-        // Override the default color from the css files
-        // FIXME: Inline style should be removed eventually.
-        if (color != null) {
-            fontIcon.setStyle(fontIcon.getStyle() +
-                    "-fx-fill: %s;".formatted(ColorUtil.toRGBCode(color)) +
-                    "-fx-icon-color: %s;".formatted(ColorUtil.toRGBCode(color)));
-        }
-
         return fontIcon;
     }
 

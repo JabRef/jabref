@@ -44,7 +44,7 @@ public class EntryResource {
     @Inject
     SrvStateManager srvStateManager;
 
-    /// At [http://localhost:23119/libraries/){id}/entries/{entryId}](http://localhost:23119/libraries/){id}/entries/{entryId} <br><br>
+    /// At [http://localhost:23119/libraries/){id}/entries/{entryId}](http://localhost:23119/libraries/){id}/entries/{entryId}
     ///
     /// Combines attributes of a given BibEntry into a basic entry preview for as plain text.
     ///
@@ -86,7 +86,7 @@ public class EntryResource {
                 + "\nReleased on: " + releaseDate;
     }
 
-    /// At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
+    /// At http://localhost:23119/libraries/{id}/entries/{entryId}
     ///
     /// Combines attributes of a given BibEntry into a basic entry preview for as HTML text.
     ///

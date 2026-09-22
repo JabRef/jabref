@@ -10,14 +10,12 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
+import org.jabref.gui.maintable.ColumnPreferencesRecorder;
 import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTablePreferences;
-import org.jabref.gui.maintable.PersistenceVisualStateTable;
-import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -27,7 +25,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
     public SearchResultsTable(SearchResultsTableDataModel model,
                               BibDatabaseContext database,
                               GuiPreferences preferences,
-                              UndoManager undoManager,
                               DialogService dialogService,
                               StateManager stateManager,
                               TaskExecutor taskExecutor) {
@@ -41,7 +38,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                 database,
                 preferences,
                 preferences.getSearchDialogColumnPreferences(),
-                undoManager,
                 dialogService,
                 stateManager,
                 taskExecutor).createColumns();
@@ -60,7 +56,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                     .ifPresent(column -> this.getSortOrder().add(column)));
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
-            this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
+            this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         }
 
         this.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -69,7 +65,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
         // Store visual state
-        new PersistenceVisualStateTable(this, preferences.getSearchDialogColumnPreferences()).addListeners();
+        new ColumnPreferencesRecorder(this, preferences.getSearchDialogColumnPreferences()).bind();
 
         database.getDatabase().registerListener(this);
     }

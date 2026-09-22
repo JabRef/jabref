@@ -54,7 +54,7 @@ public class BibFieldsIndexer {
     public BibFieldsIndexer(BibEntryPreferences bibEntryPreferences, BibDatabaseContext databaseContext, Connection connection) {
         this.databaseContext = databaseContext;
         this.connection = connection;
-        this.keywordSeparator = bibEntryPreferences.getKeywordSeparator();
+        this.keywordSeparator = databaseContext.getKeywordSeparator(bibEntryPreferences.getKeywordSeparator());
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("unsaved");
 
         this.mainTable = CUID.randomCUID2(12).toString();

@@ -18,6 +18,7 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
@@ -63,7 +64,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
                                                                 .radio(Localization.lang("Show names unchanged"), viewModel.nameAsIsProperty())
                                                                 .radio(Localization.lang("Show 'Firstname Lastname'"), viewModel.nameFirstLastProperty())
                                                                 .radio(Localization.lang("Show 'Lastname, Firstname'"), viewModel.nameLastFirstProperty())),
-                                                indent -> indent.styleClass("prefIndent").spacing(4.0)))
+                                                indent -> indent.styleClass("padding-left-12").spacing(4.0)))
                                 .group(abbreviation -> abbreviation
                                         .label(Localization.lang("Abbreviations"))
                                         .group(choices -> choices
@@ -71,7 +72,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
                                                                 .radio(Localization.lang("Do not abbreviate names"), viewModel.abbreviationDisabledProperty())
                                                                 .radio(Localization.lang("Abbreviate names"), viewModel.abbreviationEnabledProperty())
                                                                 .radio(Localization.lang("Show last names only"), viewModel.abbreviationLastNameOnlyProperty())),
-                                                indent -> indent.styleClass("prefIndent")
+                                                indent -> indent.styleClass("padding-left-12")
                                                                 .spacing(4.0)
                                                                 // Natbib and "unchanged" render names verbatim,
                                                                 // so abbreviation does not apply.
@@ -103,6 +104,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
     }
 
     private void setupColumnsList() {
+        columnsList.setId(WalkthroughNodeIds.COLUMNS_LIST);
         columnsList.setPrefHeight(300.0);
         columnsList.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 

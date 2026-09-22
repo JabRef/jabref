@@ -49,6 +49,7 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ZipFileChooser;
+import org.jabref.gui.walkthrough.WalkthroughPane;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -69,10 +70,10 @@ import org.slf4j.LoggerFactory;
 /// This class provides methods to create default
 /// JavaFX dialogs which will also work on top of Swing
 /// windows. The created dialogs are instances of the
-/// {@link FXDialog} class. The available dialogs in this class
+/// [FXDialog] class. The available dialogs in this class
 /// are useful for displaying small information graphic dialogs
 /// rather than complex windows. For more complex dialogs it is
-/// advised to rather create a new sub class of {@link FXDialog}.
+/// advised to rather create a new sub class of [FXDialog].
 @NullMarked
 public class JabRefDialogService implements DialogService {
     // Snackbar dialog maximum size
@@ -84,6 +85,7 @@ public class JabRefDialogService implements DialogService {
     private final NotificationGroup<Path, Notifications.FileNotification> fileNotifications = new NotificationGroup<>(Localization.lang("Files"));
     private final NotificationGroup<Object, Notifications.UiNotification> uiNotifications = new NotificationGroup<>(Localization.lang("Preview"));
     private final NotificationGroup<Task<?>, Notifications.TaskNotification> taskNotifications = new NotificationGroup<>(Localization.lang("Tasks"));
+    private final NotificationGroup<Object, Notifications.DonationNotification> donationNotifications = new NotificationGroup<>(Localization.lang("Support JabRef"));
 
     private final ObservableList<Notification<?>> persistentNotifications;
 
@@ -93,6 +95,7 @@ public class JabRefDialogService implements DialogService {
         this.mainWindow = mainWindow;
 
         taskNotifications.setViewFactory(Notifications.TaskNotificationView::new);
+        donationNotifications.setViewFactory(Notifications.DonationNotificationView::new);
         persistentNotifications = EasyBind.concat(fileNotifications.getNotifications());
     }
 
@@ -176,9 +179,16 @@ public class JabRefDialogService implements DialogService {
         return choiceDialog.showAndWait();
     }
 
+    /// A stock JavaFX dialog, unlike a [BaseDialog], does not bring the pane a walkthrough draws into, and
+    /// the "Download from URL" walkthrough steps into the input dialog.
+    private static void addWalkthroughPane(Dialog<?> dialog) {
+        dialog.getDialogPane().getChildren().add(new WalkthroughPane());
+    }
+
     @Override
     public Optional<String> showInputDialogAndWait(String title, String content) {
         TextInputDialog inputDialog = new TextInputDialog();
+        addWalkthroughPane(inputDialog);
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
@@ -188,6 +198,7 @@ public class JabRefDialogService implements DialogService {
     @Override
     public Optional<String> showInputDialogWithDefaultAndWait(String title, String content, String defaultValue) {
         TextInputDialog inputDialog = new TextInputDialog(defaultValue);
+        addWalkthroughPane(inputDialog);
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
@@ -371,8 +382,7 @@ public class JabRefDialogService implements DialogService {
 
         CustomPasswordField passwordField = new CustomPasswordField();
 
-        HBox box = new HBox();
-        box.setSpacing(10);
+        HBox box = new HBox(8);
         box.getChildren().addAll(new Label(content), passwordField);
         dialog.setTitle(title);
         dialog.getDialogPane().setContent(box);
@@ -468,6 +478,8 @@ public class JabRefDialogService implements DialogService {
                     uiNotifications.getNotifications().add(uiNotification);
             case Notifications.TaskNotification taskNotification ->
                     taskNotifications.getNotifications().add(taskNotification);
+            case Notifications.DonationNotification donationNotification ->
+                    donationNotifications.getNotifications().add(donationNotification);
             default ->
                     undefinedNotifications.getNotifications().add(new Notifications.UndefinedNotification(notification.getTitle(), notification.getSummary()));
         }
@@ -483,8 +495,13 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
+        return showFileOpenDialog(fileDialogConfiguration, mainWindow);
+    }
+
+    @Override
+    public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration, Window owner) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
-        File file = chooser.showOpenDialog(mainWindow);
+        File file = chooser.showOpenDialog(owner);
         Optional.ofNullable(chooser.getSelectedExtensionFilter()).ifPresent(fileDialogConfiguration::setSelectedExtensionFilter);
         return Optional.ofNullable(file).map(File::toPath);
     }
@@ -574,7 +591,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     public List<NotificationGroup<?, ? extends Notification<?>>> getNotificationGroups() {
-        return List.of(undefinedNotifications, fileNotifications, uiNotifications, taskNotifications);
+        return List.of(undefinedNotifications, fileNotifications, uiNotifications, taskNotifications, donationNotifications);
     }
 
     public ObservableList<? extends Notification<?>> getPersistentNotifications() {

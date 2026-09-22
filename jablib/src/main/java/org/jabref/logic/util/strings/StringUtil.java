@@ -378,17 +378,18 @@ public class StringUtil {
     /// We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
     ///
     /// <h4>Example</h4>
-    /// <pre>{@code
+    /// ```text
     /// Legacy Macintosh \r -> OS.NEWLINE
     /// Windows \r\n -> OS.NEWLINE
-    /// }</pre>
+    /// ```
     ///
     /// @return a String with only OS.NEWLINE as line breaks
     public static String unifyLineBreaks(String s, String newline) {
         return LINE_BREAKS.matcher(s).replaceAll(newline);
     }
 
-    /// Checks if the given String has exactly one pair of surrounding curly braces <br>
+    /// Checks if the given String has exactly one pair of surrounding curly braces
+    ///
     /// Strings with escaped characters in curly braces at the beginning and end are respected, too
     ///
     /// @param toCheck The string to check
@@ -520,7 +521,7 @@ public class StringUtil {
 
     /// @param buffer    String to be tokenized
     /// @param delimiter Delimiter string
-    /// @return list      {@link java.util.List} of <tt>String</tt>
+    /// @return list      [java.util.List] of `String`
     public static List<String> tokenizeToList(String buffer, String delimiter) {
         // delimiter is a set of characters, so it is turned into a character class.
         // \Q...\E keeps any regex metacharacter inside the class literal.
@@ -729,7 +730,7 @@ public class StringUtil {
 
     /// Splits a string by whitespace, treating backslash-escaped spaces as part of the same token.
     ///
-    /// Example: {@code ""C:\Current Python\python.exe" -m ocrmypdf"} -> {@code [""C:\Current Python\python.exe"", "-m", "ocrmypdf"]}
+    /// Example: `""C:\Current Python\python.exe" -m ocrmypdf"` -> `[""C:\Current Python\python.exe"", "-m", "ocrmypdf"]`
     ///
     /// @param path the string to split
     /// @return a list of tokens

@@ -16,20 +16,21 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Provides a convenient interface for {@link IdFetcher}, which follow the usual three-step procedure:
+/// Provides a convenient interface for [IdFetcher], which follow the usual three-step procedure:
+///
 /// 1. Open a URL based on the search query
-/// 2. Parse the response to get a list of {@link BibEntry}
+/// 2. Parse the response to get a list of [BibEntry]
 /// 3. Extract identifier
 public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T>, ParserFetcher {
 
     Logger LOGGER = LoggerFactory.getLogger(IdParserFetcher.class);
 
-    /// Constructs a URL based on the {@link BibEntry}.
+    /// Constructs a URL based on the [BibEntry].
     ///
     /// @param entry the entry to look information for
     URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException;
 
-    /// Returns the parser used to convert the response to a list of {@link BibEntry}.
+    /// Returns the parser used to convert the response to a list of [BibEntry].
     Parser getParser();
 
     /// Extracts the identifier from the list of fetched entries.

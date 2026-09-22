@@ -5,9 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.l10n.Localization;
 
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
@@ -259,6 +261,23 @@ class GitStatusCheckerTest {
         GitHandler gitHandler = gitHandlerRegistry.get(localLibrary.getParent());
         GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
         assertEquals(SyncStatus.DIVERGED, snapshot.syncStatus());
+    }
+
+    @Test
+    void invalidHeadIsReportedAsJabRefException(@TempDir Path tempDir) throws Exception {
+        Path repoDir = tempDir.resolve("broken");
+        try (Git git = Git.init().setInitialBranch("main").setDirectory(repoDir.toFile()).call()) {
+            Path file = repoDir.resolve("library.bib");
+            Files.writeString(file, baseContent, StandardCharsets.UTF_8);
+            git.add().addFilepattern("library.bib").call();
+            git.commit().setAuthor(author).setMessage("Initial commit").call();
+        }
+        Files.writeString(repoDir.resolve(".git").resolve("refs").resolve("heads").resolve("main"), "0000000000000000000000000000000000000000");
+
+        GitHandler gitHandler = gitHandlerRegistry.get(repoDir);
+        JabRefException exception = assertThrows(JabRefException.class, () -> GitStatusChecker.checkStatusOrThrow(gitHandler));
+
+        assertEquals(Localization.lang("The local Git repository is incomplete or corrupted. Remove the broken .git directory in that folder or choose another folder, then try again."), exception.getLocalizedMessage());
     }
 
     private RevCommit commitFile(Git git, String content, String message) throws Exception {

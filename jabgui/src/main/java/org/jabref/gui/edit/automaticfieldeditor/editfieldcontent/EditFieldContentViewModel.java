@@ -16,8 +16,8 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfieldeditor.AbstractAutomaticFieldEditorTabViewModel;
-import org.jabref.gui.edit.automaticfieldeditor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfieldeditor.FieldHelper;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -75,7 +75,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
     }
 
     public void setFieldValue() {
-        AutomaticFieldEditorUndoableEdit edits = new AutomaticFieldEditorUndoableEdit("CHANGE_SELECTED_FIELD");
+        CompoundEdit edits = new CompoundEdit(Localization.lang("Set"));
         String toSetFieldValue = fieldValue.getValue();
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
@@ -88,13 +88,12 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
                 affectedEntriesCount++;
             }
         }
-        edits.setAffectedEntries(affectedEntriesCount);
 
-        addEdit(edits);
+        addEdit(edits, affectedEntriesCount);
     }
 
     public void appendToFieldValue() {
-        AutomaticFieldEditorUndoableEdit edits = new AutomaticFieldEditorUndoableEdit("APPEND_TO_SELECTED_FIELD");
+        CompoundEdit edits = new CompoundEdit(Localization.lang("Append"));
         String toAppendFieldValue = fieldValue.getValue();
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
@@ -110,9 +109,8 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
                 affectedEntriesCount++;
             }
         }
-        edits.setAffectedEntries(affectedEntriesCount);
 
-        addEdit(edits);
+        addEdit(edits, affectedEntriesCount);
     }
 
     public ObjectProperty<Field> selectedFieldProperty() {

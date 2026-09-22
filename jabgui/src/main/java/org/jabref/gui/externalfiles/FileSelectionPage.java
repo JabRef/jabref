@@ -12,7 +12,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -126,8 +125,8 @@ public class FileSelectionPage extends WizardPane {
     private void setupUI() {
         BorderPane mainLayout = new BorderPane();
 
-        progressPane = new VBox(10);
-        progressPane.getStyleClass().add("file-selection-progress-pane");
+        progressPane = new VBox(4);
+        progressPane.getStyleClass().addAll("align-center", "padding-4");
 
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.progressProperty().bind(viewModel.progressValueProperty());
@@ -137,7 +136,7 @@ public class FileSelectionPage extends WizardPane {
 
         progressPane.getChildren().addAll(progressIndicator, progressLabel);
 
-        contentPane = new VBox(10);
+        contentPane = new VBox(4);
 
         fileCountLabel = new Label();
         fileCountLabel.getStyleClass().add("bold");
@@ -170,11 +169,11 @@ public class FileSelectionPage extends WizardPane {
         closePreviewButton.setTooltip(new Tooltip(Localization.lang("Close PDF preview")));
         closePreviewButton.setOnAction(_ -> hidePreviewPane());
 
-        HBox previewControls = new HBox(8, enablePreviewCheckBox, closePreviewButton);
+        HBox previewControls = new HBox(4, enablePreviewCheckBox, closePreviewButton);
         HBox.setHgrow(enablePreviewCheckBox, Priority.ALWAYS);
 
-        VBox previewContent = new VBox(8, previewControls, pdfPreview, metadataLabel, metadataPreview);
-        previewContent.setPadding(new Insets(8));
+        VBox previewContent = new VBox(4, previewControls, pdfPreview, metadataLabel, metadataPreview);
+        previewContent.getStyleClass().add("padding-4");
         previewPane = new TitledPane(Localization.lang("PDF preview"), previewContent);
         previewPane.setExpanded(true);
         previewPane.setCollapsible(false);
@@ -183,18 +182,18 @@ public class FileSelectionPage extends WizardPane {
         splitPane.setDividerPositions(0.58);
         VBox.setVgrow(splitPane, Priority.ALWAYS);
 
-        HBox buttonBar = new HBox(5);
+        HBox buttonBar = new HBox(4);
         selectAllButton = new Button(Localization.lang("Select all"));
-        selectAllButton.setOnAction(e -> unlinkedFilesList.getCheckModel().checkAll());
+        selectAllButton.setOnAction(_ -> unlinkedFilesList.getCheckModel().checkAll());
 
         unselectAllButton = new Button(Localization.lang("Unselect all"));
-        unselectAllButton.setOnAction(e -> unlinkedFilesList.getCheckModel().clearChecks());
+        unselectAllButton.setOnAction(_ -> unlinkedFilesList.getCheckModel().clearChecks());
 
         expandAllButton = new Button(Localization.lang("Expand all"));
-        expandAllButton.setOnAction(e -> expandTree(unlinkedFilesList.getRoot(), true));
+        expandAllButton.setOnAction(_ -> expandTree(unlinkedFilesList.getRoot(), true));
 
         collapseAllButton = new Button(Localization.lang("Collapse all"));
-        collapseAllButton.setOnAction(e -> expandTree(unlinkedFilesList.getRoot(), false));
+        collapseAllButton.setOnAction(_ -> expandTree(unlinkedFilesList.getRoot(), false));
 
         showPreviewButton = new Button(Localization.lang("Show PDF preview"));
         showPreviewButton.setManaged(false);
@@ -233,9 +232,9 @@ public class FileSelectionPage extends WizardPane {
             }
         });
 
-        unlinkedFilesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        unlinkedFilesList.getSelectionModel().selectedItemProperty().addListener((_, _, _) ->
                 previewThrottler.schedule(() -> UiTaskExecutor.runNowOrInJavaFXThread(this::refreshPreviewForCurrentSelection)));
-        enablePreviewCheckBox.selectedProperty().addListener((observable, oldValue, enabled) -> refreshPreviewForCurrentSelection());
+        enablePreviewCheckBox.selectedProperty().addListener((_, _, _) -> refreshPreviewForCurrentSelection());
 
         invalidProperty().bind(Bindings.isEmpty(viewModel.checkedFileListProperty()).or(viewModel.taskActiveProperty()));
 

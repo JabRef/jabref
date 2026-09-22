@@ -2,6 +2,8 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -25,9 +27,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
@@ -41,18 +41,24 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
+import org.jabref.gui.fieldeditors.EditorTextArea;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.fieldeditors.TagsEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.FieldsUtil;
+import org.jabref.gui.util.NodeTraversalUtils;
+import org.jabref.gui.walkthrough.declarative.WalkthroughNodeIds;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -65,14 +71,19 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.undo.UndoableFieldChange;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// The single scroll-list tab ("Main") showing *all* fields of an entry (issue #12711):
-/// the citation key, all required fields (even when unset), and every set field.
-/// Replaces the classic category tabs (required / optional / other / …).
+/// the citation key, all required fields (even when unset), and every set field. Multiline
+/// editors grow with their text, capped at a few rows until focused. Replaces the classic
+/// category tabs (required / optional / other / …) and the former "Abstract" tab.
 ///
 /// Below the main fields sits a chip bar for adding unset optional fields ("Show more"
 /// reveals the secondary-optional ones). The identifiers, files & links, bibliometrics,
@@ -82,9 +93,16 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class AllFieldsTab extends FieldsEditorTab {
 
-    /// Preferred number of visible text rows for multiline editors in the scroll list
-    /// (instead of the JavaFX TextArea default of 10).
-    private static final int MULTILINE_ROWS = 4;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AllFieldsTab.class);
+
+    /// Chips offered after the entry type's important optional fields, for every entry type. The
+    /// abstract is no optional field of any type, so it would otherwise only be reachable through
+    /// the free-form field-name box.
+    private static final List<Field> COMMON_CHIP_FIELDS = List.of(StandardField.ABSTRACT);
+
+    /// Rows a multiline editor shows before it is focused for the first time (a long abstract
+    /// must not push the other fields out of view just by being selected).
+    private static final int COLLAPSED_MULTILINE_ROWS = 5;
 
     /// Pixels of preferred height granted per weight unit for editors with weight > 1
     /// (e.g. the linked-files list), since percent-height rows do not exist in the scroll list.
@@ -104,6 +122,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     private final Set<Field> userAddedFields = new LinkedHashSet<>();
     private @Nullable BibEntry entryOfUserAddedFields;
 
+    /// Multiline fields the user has focused (and thereby expanded) while editing the current
+    /// entry; editors are rebuilt for the same entry, so the expansion must outlive them.
+    private final Set<Field> expandedFields = new HashSet<>();
+
     /// Required fields of the current entry's type, refreshed on every [#determineFieldsToShow];
     /// used to keep the remove-field button (see [#wrapWithRemoveButton]) off required rows.
     private final Set<Field> requiredFields = new LinkedHashSet<>();
@@ -114,18 +136,31 @@ public class AllFieldsTab extends FieldsEditorTab {
     private final Map<FieldListSections.SectionType, Boolean> sectionExpandOverrides =
             new EnumMap<>(FieldListSections.SectionType.class);
 
+    /// Tracks the [TitledPane] created for each section type, so we can expand a collapsed
+    /// section on demand (e.g. when jump-to-field targets a field inside it).
+    private final Map<FieldListSections.SectionType, TitledPane> sectionPanes =
+            new EnumMap<>(FieldListSections.SectionType.class);
+
     /// Sticky per tab instance: whether the secondary-optional chips are expanded.
     private boolean showSecondaryOptionalChips;
+
+    /// Fields extracted by the configured custom tabs ("Extract field" checked in the preferences);
+    /// the Main tab shows no editor and no add-chip for these. Recomputed in [#determineFieldsToShow]
+    /// — which every rebuild runs first — and reused by the chip-building paths, so the custom-tab
+    /// regexes are evaluated once per rebuild instead of once per chip bar.
+    private Set<Field> extractedCustomTabFields = Set.of();
+
+    /// Last laid-out width of each field's growing text area (see [#normalizeInputHeights]).
+    private final Map<Field, Double> textAreaWidths = new HashMap<>();
 
     /// The entry whose event bus this tab is currently subscribed to (for live refresh
     /// when fields are set/unset from outside, e.g. Source tab, fetchers, undo).
     private Optional<BibEntry> subscribedEntry = Optional.empty();
 
     /// Scroll content: main grid + chip bar + section panes + free-form add row.
-    private final VBox listContainer = new VBox();
+    private final VBox listContainer = new VBox(8);
 
-    public AllFieldsTab(UndoManager undoManager,
-                        UndoAction undoAction,
+    public AllFieldsTab(UndoAction undoAction,
                         RedoAction redoAction,
                         GuiPreferences preferences,
                         BibEntryTypesManager entryTypesManager,
@@ -134,7 +169,6 @@ public class AllFieldsTab extends FieldsEditorTab {
                         PreviewPanel previewPanel) {
         super(
                 false,
-                undoManager,
                 undoAction,
                 redoAction,
                 preferences,
@@ -148,7 +182,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         String defaultOwner = NON_ALPHANUMERIC.matcher(
                 preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT)).replaceAll("-");
         this.userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
-        this.listContainer.getStyleClass().add("all-fields-container");
+        this.listContainer.getStyleClass().addAll("all-fields-container", "padding-12");
 
         setText(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show all fields")));
@@ -163,6 +197,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         if (entry != entryOfUserAddedFields) {
             userAddedFields.clear();
+            expandedFields.clear();
             sectionExpandOverrides.clear();
             entryOfUserAddedFields = entry;
         }
@@ -187,8 +222,32 @@ public class AllFieldsTab extends FieldsEditorTab {
         setFields.stream()
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
+        // Fields a custom tab extracts are moved there, not displayed twice. Also dropped from
+        // userAddedFields: a chip-added field whose value starts matching an extracted custom-tab
+        // regex must not linger on the Main tab (its editor moves to the custom tab on that rebuild).
+        extractedCustomTabFields = EntryEditorTabModel.extractedFieldsOnCustomTabs(
+                guiPreferences.getEntryEditorPreferences().getTabModels(), entry);
+        fields.removeAll(extractedCustomTabFields);
+        userAddedFields.removeAll(extractedCustomTabFields);
         fields.addAll(userAddedFields);
+        // [impl->req~entry-editor.main-tab.file-editor-always-shown~1]
+        if (isFilesAndLinksSectionOpen(fields) && !extractedCustomTabFields.contains(StandardField.FILE)) {
+            fields.add(StandardField.FILE);
+        }
         return fields;
+    }
+
+    /// An open files-and-links section always shows the file editor: its own buttons
+    /// (add / search / download) are what a "+ File" chip could only reach by popping up a
+    /// file dialog. Decided from the fields the section would show anyway — required ones
+    /// included, so an entry type requiring `url` (BibLaTeX `Online`) counts even while that
+    /// field is unset — which is the same set [#createSectionPane] derives its expanded state
+    /// from, so the two cannot disagree.
+    private boolean isFilesAndLinksSectionOpen(SequencedSet<Field> shownFields) {
+        return sectionExpandOverrides.getOrDefault(
+                FieldListSections.SectionType.FILES_AND_LINKS,
+                shownFields.stream()
+                           .anyMatch(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.FILES_AND_LINKS));
     }
 
     @Override
@@ -209,6 +268,45 @@ public class AllFieldsTab extends FieldsEditorTab {
             subscribedEntry = Optional.of(entry);
         }
         super.bindToEntry(entry);
+        showFileFieldIfAutoLinkFindsFiles(entry);
+    }
+
+    /// Only set fields get an editor, so an entry without a file field has no
+    /// [LinkedFilesEditor] — whose view model is what searches the file directories and
+    /// shows not-yet-linked files as auto-found suggestions
+    /// (issue <https://github.com/JabRef/jabref/issues/16737>). Probe for such
+    /// files here and, on a hit, show the (empty) file editor; its own bind then re-runs
+    /// the search and renders the suggestion rows. An existing editor already scans on its
+    /// own, so the guard below is what keeps the two searches from running side by side.
+    // [impl->req~entry-editor.main-tab.autolink-suggestions~1]
+    private void showFileFieldIfAutoLinkFindsFiles(BibEntry entry) {
+        if (editors.containsKey(StandardField.FILE)
+                || !guiPreferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
+            return;
+        }
+        BibDatabaseContext databaseContext = activeDatabaseContext();
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                databaseContext,
+                guiPreferences.getExternalApplicationsPreferences(),
+                guiPreferences.getFilePreferences(),
+                guiPreferences.getAutoLinkPreferences());
+        Optional<String> keyAtProbeStart = entry.getCitationKey();
+        BackgroundTask.wrap(() -> util.findAssociatedNotLinkedFiles(entry))
+                      .onSuccess(foundFiles -> {
+                          // subscribedEntry is cleared on dispose() and replaced on entry switch,
+                          // so this also invalidates callbacks that outlive the tab. The citation
+                          // key comparison drops results of probes started for a stale key.
+                          if (!foundFiles.isEmpty()
+                                  && guiPreferences.getEntryEditorPreferences().autoLinkFilesEnabled()
+                                  && subscribedEntry.filter(current -> current == entry).isPresent()
+                                  && entry.getCitationKey().equals(keyAtProbeStart)
+                                  && !editors.containsKey(StandardField.FILE)) {
+                              userAddedFields.add(StandardField.FILE);
+                              rebuildPanel(databaseContext, entry);
+                          }
+                      })
+                      .onFailure(exception -> LOGGER.warn("Could not search the file directories for files matching entry {}", entry.getCitationKey().orElse(entry.getAuthorTitleYear()), exception))
+                      .executeWith(Injector.instantiateModelOrService(TaskExecutor.class));
     }
 
     @Override
@@ -250,6 +348,19 @@ public class AllFieldsTab extends FieldsEditorTab {
         if (entryTypeChanged || !target.equals(editors.keySet())) {
             rebuildPanel(activeDatabaseContext(), entry);
         }
+        // A changed citation key can make files in the file directory match this entry,
+        // so the suggestions must be re-discovered without switching entries.
+        if (InternalField.KEY_FIELD == event.getField()) {
+            showFileFieldIfAutoLinkFindsFiles(entry);
+        }
+    }
+
+    @Override
+    public void requestFocus(Field fieldName) {
+        Optional.ofNullable(sectionPanes.get(FieldListSections.sectionOf(fieldName)))
+                .filter(pane -> !pane.isExpanded())
+                .ifPresent(pane -> pane.setExpanded(true));
+        super.requestFocus(fieldName);
     }
 
     /// Main fields as a grid with natural row heights, then the optional-field chip bar,
@@ -259,6 +370,9 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// tab height.
     @Override
     protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
+        // Every layout pass builds fresh TitledPanes, so the ones tracked from the previous pass are
+        // detached from the scene graph: expanding one (requestFocus) would do nothing visible.
+        sectionPanes.clear();
         // labels were created in editors-map iteration order (see FieldsEditorTab#setupPanel)
         Map<Field, Label> labelForField = new LinkedHashMap<>();
         int labelIndex = 0;
@@ -273,11 +387,17 @@ public class AllFieldsTab extends FieldsEditorTab {
             buckets.put(type, new LinkedHashSet<>());
         }
         editors.keySet().forEach(field -> buckets.get(FieldListSections.sectionOf(field)).add(field));
-
-        // Main section rows go into the (already cleared) inherited gridPane
-        if (!gridPane.getStyleClass().contains("all-fields-list")) {
-            gridPane.getStyleClass().add("all-fields-list");
+        // Buckets inherit the global field order, in which the file field trails the link fields
+        // an entry type requires (BibLaTeX `Online` requires `url`); its editor heads the section.
+        // [impl->req~entry-editor.main-tab.file-editor-always-shown~1]
+        SequencedSet<Field> filesAndLinks = buckets.get(FieldListSections.SectionType.FILES_AND_LINKS);
+        if (filesAndLinks.contains(StandardField.FILE)) {
+            filesAndLinks.addFirst(StandardField.FILE);
         }
+
+        // Main section rows go into the (already cleared) inherited gridPane.
+        // The list variant sits flush in its scroll pane, unlike the padded grid of the other tabs.
+        gridPane.getStyleClass().remove("padding-4");
         addFieldRows(gridPane, buckets.get(FieldListSections.SectionType.MAIN), labelForField, bibDatabaseContext, entry);
 
         listContainer.getChildren().setAll(gridPane, createMainChipBar(bibDatabaseContext, entry));
@@ -290,7 +410,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
         listContainer.getChildren().add(createFreeFormAddRow(bibDatabaseContext, entry));
 
-        editors.values().forEach(AllFieldsTab::applyNaturalHeight);
+        editors.forEach(this::applyNaturalHeight);
     }
 
     /// Label/editor rows with natural heights, label column as narrow as its content.
@@ -324,14 +444,18 @@ public class AllFieldsTab extends FieldsEditorTab {
     // [impl->req~entry-editor.main-tab.remove-field~1]
     private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Node editorNode = editors.get(field).getNode();
-        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)) {
+        // The file row exists only inside an open files and links section, which re-adds it on every
+        // rebuild — removing it would bring it straight back, so it gets no remove button either.
+        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)
+                || (StandardField.FILE == field)) {
             return editorNode;
         }
 
         ObservableValue<Optional<String>> fieldValue = entry.getFieldBinding(field);
         Button removeButton = new Button();
         removeButton.setGraphic(IconTheme.JabRefIcons.CLOSE.getGraphicNode());
-        removeButton.getStyleClass().addAll("icon-button", "narrow", "field-remove-button");
+        removeButton.getStyleClass().addAll(StyleClasses.NARROW_ICON_BUTTON);
+        removeButton.getStyleClass().add("field-remove-button");
         removeButton.setTooltip(new Tooltip(Localization.lang("Remove field")));
         removeButton.setFocusTraversable(false);
         removeButton.setOnAction(_ -> removeFieldRow(bibDatabaseContext, entry, field));
@@ -360,7 +484,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// preserving its HBox grow priority) and overlays `button` on it. Returns the new overlay
     /// pane, or empty if the editor exposes no plain text input to overlay onto.
     private static Optional<StackPane> overlayInsideTextInput(Node editorNode, Button button) {
-        return findPrimaryTextInput(editorNode).flatMap(input -> {
+        return NodeTraversalUtils.findFirstTextInput(editorNode).flatMap(input -> {
             if (!(input.getParent() instanceof Pane parent)) {
                 return Optional.empty();
             }
@@ -380,29 +504,15 @@ public class AllFieldsTab extends FieldsEditorTab {
         });
     }
 
-    /// First [TextInputControl] in the editor node's subtree (the row-filling text field/area),
-    /// or empty for composite editors that have none.
-    private static Optional<TextInputControl> findPrimaryTextInput(Node node) {
-        if (node instanceof TextInputControl textInput) {
-            return Optional.of(textInput);
-        }
-        if (node instanceof Parent parent) {
-            for (Node child : parent.getChildrenUnmodifiable()) {
-                Optional<TextInputControl> found = findPrimaryTextInput(child);
-                if (found.isPresent()) {
-                    return found;
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
     /// Hides a still-empty, user-added field row again (reachable only for non-required,
     /// currently blank fields; see [#wrapWithRemoveButton]).
     private void removeFieldRow(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         userAddedFields.remove(field);
         if (entry.hasField(field)) {
-            entry.clearField(field);
+            // Recorded like every other field edit: the modified marker derives from the journal,
+            // so a write nobody records leaves the library looking saved.
+            stateManager.getUndoManager(bibDatabaseContext)
+                        .applyEdit(new UndoableFieldChange(entry, field, entry.getField(field).orElse(null), null));
         }
         rebuildPanel(bibDatabaseContext, entry);
     }
@@ -418,8 +528,7 @@ public class AllFieldsTab extends FieldsEditorTab {
                                          Map<Field, Label> labelForField,
                                          BibDatabaseContext bibDatabaseContext,
                                          BibEntry entry) {
-        VBox content = new VBox();
-        content.getStyleClass().add("all-fields-section-content");
+        VBox content = new VBox(8);
 
         Runnable populateContent = () -> populateSectionContent(
                 content,
@@ -436,6 +545,14 @@ public class AllFieldsTab extends FieldsEditorTab {
         pane.setExpanded(sectionExpandOverrides.getOrDefault(type, !shownFields.isEmpty()));
         pane.expandedProperty().addListener((_, _, expanded) -> {
             sectionExpandOverrides.put(type, expanded);
+            // The file editor only exists once determineFieldsToShow has seen the section as
+            // open, so opening it for the first time needs a rebuild rather than mere population.
+            if (expanded && (type == FieldListSections.SectionType.FILES_AND_LINKS)
+                    && !editors.containsKey(StandardField.FILE)
+                    && !extractedCustomTabFields.contains(StandardField.FILE)) {
+                rebuildPanel(bibDatabaseContext, entry);
+                return;
+            }
             if (expanded && content.getChildren().isEmpty()) {
                 populateContent.run();
             }
@@ -443,6 +560,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         if (pane.isExpanded()) {
             populateContent.run();
         }
+        sectionPanes.put(type, pane);
         return pane;
     }
 
@@ -460,10 +578,12 @@ public class AllFieldsTab extends FieldsEditorTab {
             content.getChildren().add(sectionGrid);
         }
 
-        SequencedSet<Field> chipFields = FieldListSections.subtract(sectionMemberFields(type), editors.keySet());
+        Set<Field> hidden = new LinkedHashSet<>(editors.keySet());
+        hidden.addAll(extractedCustomTabFields);
+        SequencedSet<Field> chipFields = FieldListSections.subtract(sectionMemberFields(type), hidden);
         if (!chipFields.isEmpty()) {
             FlowPane chips = new FlowPane();
-            chips.getStyleClass().add("all-fields-add-chips");
+            chips.getStyleClass().add("gap-4");
             chipFields.forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
             content.getChildren().add(chips);
         }
@@ -471,7 +591,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// All member fields of a section offered as add-chips; the comments section offers the
     /// general comment plus the current user's personal comment field (if enabled).
-    // [impl->req~entry-editor.main-tab.section-chips~1]
+    // [impl->req~entry-editor.main-tab.section-chips~2]
     private SequencedSet<Field> sectionMemberFields(FieldListSections.SectionType type) {
         if (type == FieldListSections.SectionType.COMMENTS) {
             SequencedSet<Field> commentFields = new LinkedHashSet<>();
@@ -489,18 +609,23 @@ public class AllFieldsTab extends FieldsEditorTab {
     // region add-field controls
 
     /// Chips for the entry type's unset optional fields that belong to the main section
-    /// (identifier/file/comment fields get their chips inside their own section);
-    /// "Show more" reveals the secondary-optional ones.
+    /// (identifier/file/comment fields get their chips inside their own section), followed by
+    /// the [#COMMON_CHIP_FIELDS]; "Show more" reveals the secondary-optional ones.
     private Node createMainChipBar(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         BibDatabaseMode mode = getDatabaseMode();
 
         FlowPane chips = new FlowPane();
-        chips.getStyleClass().add("all-fields-add-chips");
+        chips.getStyleClass().add("gap-4");
 
         entryTypesManager.enrich(entry.getType(), mode).ifPresent(entryType -> {
-            List<Field> shown = List.copyOf(editors.keySet());
+            // Custom-tab fields get no chip here: clicking one would show the field on its
+            // custom tab, not below this chip bar.
+            Set<Field> shown = new LinkedHashSet<>(editors.keySet());
+            shown.addAll(extractedCustomTabFields);
             FieldListSections.subtract(entryType.getImportantOptionalFields(), shown).stream()
                              .filter(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.MAIN)
+                             .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
+            FieldListSections.subtract(COMMON_CHIP_FIELDS, shown)
                              .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
 
             List<Field> secondary = FieldListSections.subtract(
@@ -543,15 +668,18 @@ public class AllFieldsTab extends FieldsEditorTab {
         Runnable addAction = () -> addFreeFormField(bibDatabaseContext, entry, fieldNameBox.getEditor().getText());
         addButton.setOnAction(_ -> addAction.run());
         fieldNameBox.getEditor().setOnAction(_ -> addAction.run());
-        HBox freeFormRow = new HBox(fieldNameBox, addButton);
-        freeFormRow.getStyleClass().add("all-fields-add-free-form");
+        HBox freeFormRow = new HBox(4, fieldNameBox, addButton);
+        freeFormRow.getStyleClass().add("padding-top-4");
         freeFormRow.setAlignment(Pos.CENTER_LEFT);
         return freeFormRow;
     }
 
     private Button createAddChip(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Button chip = new Button(Localization.lang("+ %0", FieldsUtil.getDisplayName(field)));
-        chip.getStyleClass().add("all-fields-add-chip");
+        chip.getStyleClass().addAll("all-fields-add-chip", "padding-4-12");
+        if (StandardField.FILE == field) {
+            chip.setId(WalkthroughNodeIds.FILE_ADD_CHIP);
+        }
         chip.setOnAction(_ -> showFieldEditor(bibDatabaseContext, entry, field));
         return chip;
     }
@@ -569,20 +697,24 @@ public class AllFieldsTab extends FieldsEditorTab {
     private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
+        // The outer runLater lets one pulse pass so the editors rebuilt become focusable
+        // before the inner runLater requests focus on them.
         Platform.runLater(() -> {
-            // The tab may have been rebound to a different entry before this deferred block runs;
-            // the editors map would then belong to that other entry, so focusing/adding here would
-            // act on the wrong entry. Bail out unless we are still showing the entry we started with.
-            if (getCurrentEntry() != entry) {
-                return;
-            }
-            requestFocus(field);
-            // Adding the File field via its "+" chip should immediately open the add-file dialog,
-            // since an empty File editor has no other purpose than to receive a file.
-            if ((StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
-                linkedFilesEditor.addNewFile();
-            }
+            Platform.runLater(() -> {
+                // The tab may have been rebound to a different entry, or disposed, before this deferred
+                // block runs. getCurrentEntry() survives disposal, so subscribedEntry (cleared by dispose())
+                // must match too: focusing can expand a section, and expanding rebuilds the panel.
+                if ((getCurrentEntry() != entry) || subscribedEntry.filter(current -> current == entry).isEmpty()) {
+                    return;
+                }
+                requestFocus(field);
+            });
         });
+    }
+
+    public void addFieldAndFocus(Field field) {
+        Optional.ofNullable(getCurrentEntry())
+                .ifPresent(entry -> showFieldEditor(activeDatabaseContext(), entry, field));
     }
 
     private void rebuildPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -591,7 +723,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     // endregion
 
-    private BibDatabaseMode getDatabaseMode() {
+    BibDatabaseMode getDatabaseMode() {
         return stateManager.getActiveDatabase()
                            .map(BibDatabaseContext::getMode)
                            .orElse(BibDatabaseMode.BIBLATEX);
@@ -601,8 +733,8 @@ public class AllFieldsTab extends FieldsEditorTab {
         return stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
     }
 
-    private static void applyNaturalHeight(FieldEditorFX editor) {
-        normalizeInputHeights(editor.getNode());
+    private void applyNaturalHeight(Field field, FieldEditorFX editor) {
+        normalizeInputHeights(field, editor.getNode());
         if (editor instanceof LinkedFilesEditor || editor instanceof TagsEditor) {
             // Sizes itself to the file rows plus the trailing button row; a fixed weight-based height would override that.
             return;
@@ -615,15 +747,35 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// The classic stretch layout lets text inputs fill their percent-height rows by setting
     /// an infinite pref height ([org.jabref.gui.fieldeditors.EditorTextField]); in the
     /// natural-height list that blows up the rows' preferred heights, so reset text fields to
-    /// their computed size and cap text areas at a few visible rows.
-    private static void normalizeInputHeights(Node node) {
-        if (node instanceof TextArea textArea) {
-            textArea.setPrefRowCount(MULTILINE_ROWS);
-            textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
-        } else if (node instanceof TextField textField) {
-            textField.setPrefHeight(Region.USE_COMPUTED_SIZE);
-        } else if (node instanceof Parent parent) {
-            parent.getChildrenUnmodifiable().forEach(AllFieldsTab::normalizeInputHeights);
+    /// their computed size and let text areas grow with their content.
+    private void normalizeInputHeights(Field field, Node node) {
+        switch (node) {
+            case EditorTextArea textArea -> {
+                textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
+                // Editors are rebuilt on every entry switch; the width the field had for the previous
+                // entry lets the new area wrap correctly before its own first layout.
+                textArea.setGrowWithContent(textAreaWidths.getOrDefault(field, -1.0), COLLAPSED_MULTILINE_ROWS);
+                if (expandedFields.contains(field)) {
+                    textArea.expand();
+                }
+                textArea.focusedProperty().addListener((_, _, focused) -> {
+                    if (focused) {
+                        expandedFields.add(field);
+                    }
+                });
+                textArea.widthProperty().addListener((_, _, width) -> {
+                    if (width.doubleValue() > 0) {
+                        textAreaWidths.put(field, width.doubleValue());
+                    }
+                });
+            }
+            case TextField textField ->
+                    textField.setPrefHeight(Region.USE_COMPUTED_SIZE);
+            case Parent parent ->
+                    parent.getChildrenUnmodifiable().forEach(child -> normalizeInputHeights(field, child));
+            case null,
+                 default -> {
+            }
         }
     }
 }

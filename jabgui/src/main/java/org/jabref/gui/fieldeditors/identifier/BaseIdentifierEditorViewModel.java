@@ -127,7 +127,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     }
 
     /// Whether this identifier should currently be synced to the browser extension. Only meaningful when
-    /// {@link #getCanSyncWithBrowser()} is true; overridden by the (currently only) editor that supports it.
+    /// [#getCanSyncWithBrowser()] is true; overridden by the (currently only) editor that supports it.
     public boolean getSyncWithBrowser() {
         return false;
     }
@@ -195,7 +195,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
         identifierParser = new IdentifierParser(entry);
-        EasyBind.subscribe(textProperty(), ignored -> updateIdentifier());
+        EasyBind.subscribe(textProperty(), _ -> updateIdentifier());
         EasyBind.subscribe(identifier, newIdentifier -> isInvalidIdentifier.set(newIdentifier.isEmpty()));
     }
 }

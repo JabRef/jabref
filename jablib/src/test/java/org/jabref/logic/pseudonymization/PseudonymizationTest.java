@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -144,6 +145,20 @@ class PseudonymizationTest {
         String pseudoGroups = pseudoEntry.getField(StandardField.GROUPS).orElse("");
         assertTrue(pseudoGroups.startsWith("group-"));
         assertTrue(result.valueMapping().containsValue("not-in-tree"));
+    }
+
+    @Test
+    void preservesLibraryKeywordSeparatorWhenPseudonymizingGroups() {
+        BibEntry entry = new BibEntry()
+                .withCitationKey("test")
+                .withField(StandardField.GROUPS, "first; second");
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        context.getMetaData().setKeywordSeparator(';');
+
+        Pseudonymization.Result result = new Pseudonymization(';').pseudonymizeLibrary(context);
+
+        assertEquals(Optional.of(';'), result.bibDatabaseContext().getMetaData().getKeywordSeparator());
+        assertEquals("group-1; group-2", result.bibDatabaseContext().getEntries().getFirst().getField(StandardField.GROUPS).orElseThrow());
     }
 
     @Test

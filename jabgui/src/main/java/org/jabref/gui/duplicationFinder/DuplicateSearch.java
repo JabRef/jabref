@@ -95,7 +95,7 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
-        duplicateCountObservable.addListener((obj, oldValue, newValue) -> UiTaskExecutor.runAndWaitInJavaFXThread(() -> duplicateTotal.set(newValue)));
+        duplicateCountObservable.addListener((_, _, newValue) -> UiTaskExecutor.runAndWaitInJavaFXThread(() -> duplicateTotal.set(newValue)));
 
         duplicateSearchTask = HeadlessExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
@@ -133,7 +133,7 @@ public class DuplicateSearch extends SimpleCommand {
                 if (dups == null) {
                     continue;
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException _) {
                 return null;
             }
 
@@ -220,16 +220,16 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         LibraryTab libraryTab = tabSupplier.get();
+        // Named for the effect, not for the command: "Find duplicates" started this, but what a
+        // reader undoes is the removal and the merges their review of each pair produced.
         libraryTab.getUndoManager().addEdit(Localization.lang("duplicate removal"), edit -> {
             // Now, do the actual removal:
             if (!result.getToRemove().isEmpty()) {
-                edit.apply(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
-                libraryTab.markBaseChanged();
+                edit.applyEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
             }
             // and adding merged entries:
             if (!result.getToAdd().isEmpty()) {
-                edit.apply(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
-                libraryTab.markBaseChanged();
+                edit.applyEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
             }
         });
 
@@ -240,8 +240,8 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     /// Result of a duplicate search.
-    /// Uses {@link System#identityHashCode(Object)} for identifying objects for removal, as completely identical
-    /// {@link BibEntry BibEntries} are equal to each other.
+    /// Uses [System#identityHashCode(Object)] for identifying objects for removal, as completely identical
+    /// [BibEntries][BibEntry] are equal to each other.
     static class DuplicateSearchResult {
 
         private final Map<String, BibEntry> toRemove = new HashMap<>();

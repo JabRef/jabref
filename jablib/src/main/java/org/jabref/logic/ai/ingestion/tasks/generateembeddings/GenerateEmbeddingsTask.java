@@ -8,7 +8,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// This task generates embeddings for a {@link LinkedFile}.
+/// This task generates embeddings for a [LinkedFile].
 /// It will check if embeddings were already generated.
 /// And it also will store the embeddings.
 public class GenerateEmbeddingsTask extends TrackedBackgroundTask<Void> {
@@ -48,7 +48,7 @@ public class GenerateEmbeddingsTask extends TrackedBackgroundTask<Void> {
                     request.bibDatabaseContext(),
                     request.linkedFile()
             );
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             LOGGER.debug("There is a embeddings generation task. It will be cancelled, because user quits JabRef");
         }
 
