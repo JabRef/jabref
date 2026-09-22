@@ -1,7 +1,10 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
@@ -9,20 +12,32 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class FieldEditorFXTest extends JavaFxTest {
 
     private TextField textField;
+    private UndoAction undoAction;
+    private RedoAction redoAction;
+    /// Set when a key press reaches the control's own handlers, i.e. was not consumed by the field editor's filter
+    private final AtomicBoolean keyPressReachedControl = new AtomicBoolean();
 
     @Override
     public void start(Stage stage) {
@@ -40,8 +55,15 @@ class FieldEditorFXTest extends JavaFxTest {
             }
         };
 
-        editor.establishBinding(textField, textProperty, new KeyBindingRepository(),
-                mock(UndoAction.class), mock(RedoAction.class));
+        undoAction = mock(UndoAction.class);
+        redoAction = mock(RedoAction.class);
+        // Stubbed: the real repository matches the event against every binding, and matching a
+        // KeyCharacterCombination throws UnsupportedOperationException on the headless toolkit
+        KeyBindingRepository keyBindingRepository = mock(KeyBindingRepository.class);
+        when(keyBindingRepository.matches(any(), eq(KeyBinding.UNDO))).thenAnswer(invocation -> isShortcut(invocation.getArgument(0), KeyCode.Z));
+        when(keyBindingRepository.matches(any(), eq(KeyBinding.REDO))).thenAnswer(invocation -> isShortcut(invocation.getArgument(0), KeyCode.Y));
+        editor.establishBinding(textField, textProperty, keyBindingRepository, undoAction, redoAction);
+        textField.addEventHandler(KeyEvent.KEY_PRESSED, _ -> keyPressReachedControl.set(true));
 
         stage.setScene(new Scene(textField, 400, 100));
         stage.show();
@@ -84,5 +106,43 @@ class FieldEditorFXTest extends JavaFxTest {
         });
 
         assertEquals("hello{", textField.getText());
+    }
+
+    // [utest->req~logic.undo.text-field-shortcut~1]
+    @Test
+    void undoShortcutTriggersLibraryUndoInsteadOfTextControlUndo() {
+        interact(() -> {
+            textField.setText("hello");
+            pressShortcutOnFocusedField(KeyCode.Z);
+        });
+
+        verify(undoAction).execute();
+        verify(redoAction, never()).execute();
+        // Consumed before reaching TextInputControl's behavior, whose own undo would throw on an empty history
+        assertFalse(keyPressReachedControl.get());
+        assertEquals("hello", textField.getText());
+    }
+
+    // [utest->req~logic.undo.text-field-shortcut~1]
+    @Test
+    void redoShortcutTriggersLibraryRedo() {
+        interact(() -> pressShortcutOnFocusedField(KeyCode.Y));
+
+        verify(redoAction).execute();
+        verify(undoAction, never()).execute();
+        assertFalse(keyPressReachedControl.get());
+    }
+
+    private static boolean isShortcut(KeyEvent event, KeyCode code) {
+        return event.getCode() == code && event.isShortcutDown();
+    }
+
+    /// Delivers the key press the way the scene does for a real keystroke: to its focus owner
+    private void pressShortcutOnFocusedField(KeyCode code) {
+        textField.requestFocus();
+        Node focusOwner = textField.getScene().getFocusOwner();
+        assertEquals(textField, focusOwner);
+        focusOwner.fireEvent(new KeyEvent(focusOwner, focusOwner, KeyEvent.KEY_PRESSED, "", code.getName(), code,
+                false, !OS.OS_X, false, OS.OS_X));
     }
 }

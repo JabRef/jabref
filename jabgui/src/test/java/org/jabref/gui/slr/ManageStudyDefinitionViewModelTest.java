@@ -2,6 +2,7 @@ package org.jabref.gui.slr;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.WorkspacePreferences;
@@ -10,6 +11,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyCatalog;
+import org.jabref.model.study.StudyQuery;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -140,6 +142,107 @@ class ManageStudyDefinitionViewModelTest {
         ManageStudyDefinitionViewModel viewModel = getManageStudyDefinitionViewModel(tempDir);
         SlrStudyAndDirectory result = viewModel.saveStudy();
         assertEquals(Study.CURRENT_SCHEMA_VERSION, result.getStudy().getVersion());
+    }
+
+    @Test
+    void nativeQueryPropagatesToEveryQueriesCatalogSpecificMap(@TempDir Path tempDir) {
+        StudyQuery query1 = new StudyQuery("Q1");
+        StudyQuery query2 = new StudyQuery("Q2");
+        List<StudyCatalog> catalogs = List.of(new StudyCatalog("ACM Portal", true));
+        Study study = new Study(List.of("Name"), "title", List.of("RQ1"), List.of(query1, query2), catalogs);
+        ManageStudyDefinitionViewModel viewModel = new ManageStudyDefinitionViewModel(
+                study, tempDir, importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
+
+        viewModel.getCatalogs().stream()
+                 .filter(item -> "ACM Portal".equals(item.getName()))
+                 .findFirst()
+                 .orElseThrow()
+                 .setNativeQuery("ti:Test");
+
+        Study builtStudy = viewModel.buildStudy();
+        for (StudyQuery query : builtStudy.getQueries()) {
+            assertEquals(Map.of("ACM Portal", "ti:Test"), query.getCatalogSpecific());
+        }
+    }
+
+    @Test
+    void blankNativeQueryRemovesCatalogSpecificKeyInsteadOfWritingEmptyString(@TempDir Path tempDir) {
+        StudyQuery query = new StudyQuery("Q1");
+        query.getCatalogSpecific().put("ACM Portal", "ti:Existing");
+        List<StudyCatalog> catalogs = List.of(new StudyCatalog("ACM Portal", true));
+        Study study = new Study(List.of("Name"), "title", List.of("RQ1"), List.of(query), catalogs);
+        ManageStudyDefinitionViewModel viewModel = new ManageStudyDefinitionViewModel(
+                study, tempDir, importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
+
+        viewModel.getCatalogs().stream()
+                 .filter(item -> "ACM Portal".equals(item.getName()))
+                 .findFirst()
+                 .orElseThrow()
+                 .setNativeQuery("");
+
+        Study builtStudy = viewModel.buildStudy();
+        assertEquals(Map.of(), builtStudy.getQueries().getFirst().getCatalogSpecific());
+    }
+
+    @Test
+    void disabledCatalogNativeQueryIsNotApplied(@TempDir Path tempDir) {
+        StudyQuery query = new StudyQuery("Q1");
+        Study study = new Study(List.of("Name"), "title", List.of("RQ1"), List.of(query), List.of());
+        ManageStudyDefinitionViewModel viewModel = new ManageStudyDefinitionViewModel(
+                study, tempDir, importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
+
+        // "arXiv" is not part of the study's catalogs, so it stays disabled by default
+        viewModel.getCatalogs().stream()
+                 .filter(item -> "arXiv".equals(item.getName()))
+                 .findFirst()
+                 .orElseThrow()
+                 .setNativeQuery("ti:Test");
+
+        Study builtStudy = viewModel.buildStudy();
+        assertEquals(Map.of(), builtStudy.getQueries().getFirst().getCatalogSpecific());
+    }
+
+    @Test
+    void applyNativeQueryOverridesMatchesCatalogNameCaseInsensitively(@TempDir Path tempDir) {
+        StudyQuery query = new StudyQuery("Q1");
+        query.getCatalogSpecific().put("acm portal", "ti:Old");
+        List<StudyCatalog> catalogs = List.of(new StudyCatalog("ACM Portal", true));
+        Study study = new Study(List.of("Name"), "title", List.of("RQ1"), List.of(query), catalogs);
+        ManageStudyDefinitionViewModel viewModel = new ManageStudyDefinitionViewModel(
+                study, tempDir, importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
+
+        viewModel.getCatalogs().stream()
+                 .filter(item -> "ACM Portal".equals(item.getName()))
+                 .findFirst()
+                 .orElseThrow()
+                 .setNativeQuery("ti:New");
+
+        Study builtStudy = viewModel.buildStudy();
+        // The differently-cased key must be replaced, not kept alongside the new one
+        assertEquals(Map.of("ACM Portal", "ti:New"), builtStudy.getQueries().getFirst().getCatalogSpecific());
+    }
+
+    @Test
+    void existingStudyLoadPicksFirstNonBlankCatalogSpecificOverrideInQueryOrder(@TempDir Path tempDir) {
+        StudyQuery query1 = new StudyQuery("Q1");
+        query1.getCatalogSpecific().put("ACM Portal", " ");
+        StudyQuery query2 = new StudyQuery("Q2");
+        query2.getCatalogSpecific().put("ACM Portal", "ti:First");
+        StudyQuery query3 = new StudyQuery("Q3");
+        query3.getCatalogSpecific().put("ACM Portal", "ti:Second");
+        List<StudyCatalog> catalogs = List.of(new StudyCatalog("ACM Portal", true));
+        Study study = new Study(List.of("Name"), "title", List.of("RQ1"), List.of(query1, query2, query3), catalogs);
+
+        ManageStudyDefinitionViewModel viewModel = new ManageStudyDefinitionViewModel(
+                study, tempDir, importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
+
+        String nativeQuery = viewModel.getCatalogs().stream()
+                                      .filter(item -> "ACM Portal".equals(item.getName()))
+                                      .findFirst()
+                                      .map(StudyCatalogItem::getNativeQuery)
+                                      .orElse("");
+
+        assertEquals("ti:First", nativeQuery);
     }
 
     private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
