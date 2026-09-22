@@ -47,6 +47,10 @@ import org.slf4j.LoggerFactory;
 class WindowOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WindowOverlay.class);
     private static final int POPOVER_CREATION_DELAY = 200;
+    /// Negative = distance between the arrow tip and the target node. The popup window is ~22px larger
+    /// than the visible box (arrow plus drop shadow) and swallows clicks in that margin, so with the
+    /// default overlap of 4px an icon button next to the arrow could not be clicked.
+    private static final double POPOVER_ARROW_GAP = -24;
 
     private final Window window;
     private final WalkthroughPane pane;
@@ -149,7 +153,7 @@ class WindowOverlay {
                     };
                     popoverShowingListenerRef.set(newListener);
                     newPopover.showingProperty().addListener(newListener);
-                    newPopover.show(node);
+                    newPopover.show(node, POPOVER_ARROW_GAP);
                 });
                 delayedExecution.start();
                 return delayedExecution;

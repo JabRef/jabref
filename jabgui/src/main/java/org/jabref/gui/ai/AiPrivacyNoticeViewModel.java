@@ -3,6 +3,7 @@ package org.jabref.gui.ai;
 import java.io.IOException;
 import java.util.OptionalLong;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -54,14 +55,16 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
     }
 
     private void setupBindings() {
-        embeddingModelSize.bind(aiPreferences.embeddingModelProperty().map(modelName ->
-                embeddingModelMetadataService
-                        .getMetadata(modelName)
-                        .map(EmbeddingModelMetadata::downloadSizeBytes)
-                        .filter(OptionalLong::isPresent)
-                        .map(OptionalLong::getAsLong)
-                        .map(FileUtils::byteCountToDisplaySize)
-                        .orElse("")));
+        embeddingModelSize.bind(Bindings.createStringBinding(() ->
+                        embeddingModelMetadataService
+                                .getMetadata(aiPreferences.getEmbeddingModel())
+                                .map(EmbeddingModelMetadata::downloadSizeBytes)
+                                .filter(OptionalLong::isPresent)
+                                .map(OptionalLong::getAsLong)
+                                .map(FileUtils::byteCountToDisplaySize)
+                                .orElse(""),
+                aiPreferences.embeddingModelProperty(),
+                aiPreferences.customizeExpertSettingsProperty()));
     }
 
     public void onPrivacyAgree() {

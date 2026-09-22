@@ -47,15 +47,15 @@ public class SidePaneComponent extends BorderPane {
     private Node createHeaderView() {
         Button closeButton = ControlHelper.iconButton(IconTheme.JabRefIcons.CLOSE);
         closeButton.setTooltip(new Tooltip(Localization.lang("Hide panel")));
-        closeButton.setOnAction(e -> closeCommand.execute());
+        closeButton.setOnAction(_ -> closeCommand.execute());
 
         Button upButton = ControlHelper.iconButton(IconTheme.JabRefIcons.UP);
         upButton.setTooltip(new Tooltip(Localization.lang("Move panel up")));
-        upButton.setOnAction(e -> moveUpCommand.execute());
+        upButton.setOnAction(_ -> moveUpCommand.execute());
 
         Button downButton = ControlHelper.iconButton(IconTheme.JabRefIcons.DOWN);
         downButton.setTooltip(new Tooltip(Localization.lang("Move panel down")));
-        downButton.setOnAction(e -> moveDownCommand.execute());
+        downButton.setOnAction(_ -> moveDownCommand.execute());
 
         this.buttonContainer = new HBox();
         buttonContainer.getChildren().addAll(upButton, downButton, closeButton);
