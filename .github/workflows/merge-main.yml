@@ -59,6 +59,10 @@ jobs:
           ref: ${{ steps.resolve.outputs.branch }}
           token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
 
+      - name: Remember head before merge
+        id: before
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       # Pushes the merge commit back to the PR branch (the reason this workflow exists).
       # "$/" resolves the action from this workflow's own commit, not from the workspace -
       # the workspace holds the PR head (possibly a fork), whose copy of the action must
@@ -66,7 +70,32 @@ jobs:
       # The PR may live in a fork ("repository" above); the base branch is always taken from
       # JabRef/jabref. For a stacked PR, the base is the next lower PR's head branch, not main.
       - name: Merge ${{ steps.resolve.outputs.base }}
+        id: merge
         uses: $/.github/actions/merge-upstream-branch
         with:
           target-branch: ${{ steps.resolve.outputs.branch }}
           base-branch: ${{ steps.resolve.outputs.base }}
+
+      - name: Summary
+        if: always()
+        env:
+          REPO: ${{ steps.resolve.outputs.repo }}
+          PR_NUMBER: ${{ inputs.pr || github.event.pull_request.number }}
+          BEFORE: ${{ steps.before.outputs.sha }}
+          MERGED: ${{ steps.merge.outcome == 'success' }}
+        run: |
+          {
+            echo "PR: https://github.com/${{ github.repository }}/pull/$PR_NUMBER"
+            echo
+            # Only pushed commits are linked; a failed merge or push leaves nothing to link.
+            commits=""
+            if [ "$MERGED" = "true" ]; then
+              commits=$(git log --first-parent --format=%H "$BEFORE..HEAD")
+            fi
+            if [ -z "$commits" ]; then
+              echo "No commit pushed."
+            else
+              echo "Commits:"
+              for c in $commits; do echo "- https://github.com/$REPO/commit/$c"; done
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

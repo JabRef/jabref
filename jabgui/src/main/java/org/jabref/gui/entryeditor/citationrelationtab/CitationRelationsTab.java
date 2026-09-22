@@ -606,7 +606,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                             }
                             try {
                                 NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
-                            } catch (IOException ex) {
+                            } catch (IOException _) {
                                 dialogService.notify(Localization.lang("Unable to open link."));
                             }
                         });
@@ -999,7 +999,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
         BooleanBinding booleanBind = Bindings.isEmpty(citationComponents.listView().getCheckModel().getCheckedItems());
         citationComponents.importButton().disableProperty().bind(booleanBind);
-        citationComponents.importButton().setOnMouseClicked(event -> importEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
+        citationComponents.importButton().setOnMouseClicked(_ -> importEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
         showNodes(citationComponents.refreshButton(), citationComponents.importButton());
     }
 

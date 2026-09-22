@@ -28,23 +28,18 @@ Permitted dependencies in our architecture are:
 
 ```mermaid
 flowchart TD
-    subgraph shared["Accessible from every layer"]
-        direction TD
-        preferences["Preferences"]
-        global["Global Classes"]
-    end
     gui["gui"] --> logic["logic"]
     cli["cli"] --> logic
     logic --> model["model"]
-    model ~~~ shared
+    model --- preferences
+    model --- global
+    linkStyle 3 stroke:transparent
+    linkStyle 4 stroke:transparent
 
-    preferences:::component
-    global:::component
-    gui:::layer
-    logic:::component
-    cli:::layer
-    model:::component
-
+    subgraph shared["Accessible from every layer"]
+        preferences["Preferences"]
+        global["Global Classes"]
+    end
 ```
 
 All packages and classes which are currently not part of these packages (we are still in the process of structuring) are considered as gui classes from a dependency standpoint.

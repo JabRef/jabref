@@ -1,7 +1,9 @@
 package org.jabref.gui.ai;
 
 import java.io.IOException;
+import java.util.OptionalLong;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -13,9 +15,11 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadata;
+import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
-import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,25 +34,37 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
     private final EntryEditorPreferences entryEditorPreferences;
     private final GroupsPreferences groupsPreferences;
     private final DialogService dialogService;
+    private final EmbeddingModelMetadataService embeddingModelMetadataService;
 
     public AiPrivacyNoticeViewModel(
             AiPreferences aiPreferences,
             ExternalApplicationsPreferences externalApplicationsPreferences,
             EntryEditorPreferences entryEditorPreferences,
             GroupsPreferences groupsPreferences,
-            DialogService dialogService
+            DialogService dialogService,
+            EmbeddingModelMetadataService embeddingModelMetadataService
     ) {
         this.aiPreferences = aiPreferences;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.entryEditorPreferences = entryEditorPreferences;
         this.groupsPreferences = groupsPreferences;
         this.dialogService = dialogService;
+        this.embeddingModelMetadataService = embeddingModelMetadataService;
 
         setupBindings();
     }
 
     private void setupBindings() {
-        embeddingModelSize.bind(aiPreferences.embeddingModelProperty().map(PredefinedEmbeddingModel::sizeInfo));
+        embeddingModelSize.bind(Bindings.createStringBinding(() ->
+                        embeddingModelMetadataService
+                                .getMetadata(aiPreferences.getEmbeddingModel())
+                                .map(EmbeddingModelMetadata::downloadSizeBytes)
+                                .filter(OptionalLong::isPresent)
+                                .map(OptionalLong::getAsLong)
+                                .map(FileUtils::byteCountToDisplaySize)
+                                .orElse(""),
+                aiPreferences.embeddingModelProperty(),
+                aiPreferences.customizeExpertSettingsProperty()));
     }
 
     public void onPrivacyAgree() {

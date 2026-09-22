@@ -141,8 +141,8 @@ public class MetaData {
         // had been performed, and the panel would rebuild itself from inside its own rebuild.
         if (groupsRoot.getValue() != root) {
             groupsRoot.setValue(root);
-            root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
-            root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+            root.subscribeToDescendantChanged(_ -> groupsRootBinding.invalidate());
+            root.subscribeToDescendantChanged(_ -> eventBus.post(new GroupUpdatedEvent(this)));
         }
         eventBus.post(new GroupUpdatedEvent(this));
         postChange(source);
@@ -523,7 +523,7 @@ public class MetaData {
     public void unregisterListener(Object listener) {
         try {
             this.eventBus.unregister(listener);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             // occurs if the event source has not been registered, should not prevent shutdown
         }
     }

@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.ai.embedding.EmbeddingInputPrefixes;
 import org.jabref.logic.ai.ingestion.logic.EmbeddingsCleaner;
+import org.jabref.logic.ai.ingestion.logic.ingestion.FileIngestor;
 import org.jabref.logic.ai.ingestion.util.FileHasher;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.ai.pipeline.RelevantInformation;
@@ -85,7 +87,7 @@ public class EmbeddingsSearchResponseEngine implements ResponseEngine {
                 .maxResults(maximumResultsCount)
                 .minScore(minimumScore)
                 .filter(filter.orElse(null))
-                .queryEmbedding(embeddingModel.embed(query).content())
+                .queryEmbedding(embeddingModel.embed(EmbeddingInputPrefixes.forQuery(embeddingModel, query)).content())
                 .build();
 
         EmbeddingSearchResult<TextSegment> embeddingSearchResult = embeddingStore.search(embeddingSearchRequest);
@@ -101,7 +103,8 @@ public class EmbeddingsSearchResponseEngine implements ResponseEngine {
                                          : findEntryByFileHash(entriesFilter, fileHash)
                                            .flatMap(BibEntry::getCitationKey)
                                            .orElse(null);
-                    return new RelevantInformation(citationKey, textSegment.text());
+                    Integer pageNumber = textSegment.metadata().getInteger(FileIngestor.PAGE_NUMBER_METADATA_KEY);
+                    return new RelevantInformation(citationKey, pageNumber, textSegment.text());
                 })
                 .toList();
 

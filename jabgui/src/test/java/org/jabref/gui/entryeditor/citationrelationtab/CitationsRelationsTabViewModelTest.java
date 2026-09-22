@@ -9,6 +9,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -86,6 +87,9 @@ class CitationsRelationsTabViewModelTest {
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
 
         StateManager stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
+        // A real journal: the import records itself, and a deep-stubbed manager would answer the
+        // recording block without running it, so nothing would be imported at all.
+        when(stateManager.getUndoManager(any(BibDatabaseContext.class))).thenReturn(new HeadlessGuiUndoManager());
         bibDatabaseContext = new BibDatabaseContext(new BibDatabase());
         bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(bibDatabaseContext));

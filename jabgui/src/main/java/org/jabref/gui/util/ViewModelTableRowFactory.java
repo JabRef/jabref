@@ -56,7 +56,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     }
 
     public ViewModelTableRowFactory<S> setOnDragDetected(BiConsumer<S, ? super MouseEvent> toOnDragDetected) {
-        this.toOnDragDetected = (row, viewModel, event) -> toOnDragDetected.accept(viewModel, event);
+        this.toOnDragDetected = (_, viewModel, event) -> toOnDragDetected.accept(viewModel, event);
         return this;
     }
 
@@ -66,7 +66,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     }
 
     public ViewModelTableRowFactory<S> setOnDragDropped(BiConsumer<S, ? super DragEvent> toOnDragDropped) {
-        return setOnDragDropped((row, viewModel, event) -> toOnDragDropped.accept(viewModel, event));
+        return setOnDragDropped((_, viewModel, event) -> toOnDragDropped.accept(viewModel, event));
     }
 
     public ViewModelTableRowFactory<S> setOnDragEntered(BiConsumer<S, ? super DragEvent> toOnDragEntered) {
@@ -80,7 +80,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     }
 
     public ViewModelTableRowFactory<S> setOnMouseDragEntered(BiConsumer<S, ? super MouseDragEvent> toOnDragEntered) {
-        return setOnMouseDragEntered((row, viewModel, event) -> toOnDragEntered.accept(viewModel, event));
+        return setOnMouseDragEntered((_, viewModel, event) -> toOnDragEntered.accept(viewModel, event));
     }
 
     public ViewModelTableRowFactory<S> setOnDragExited(TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragExited) {
@@ -89,7 +89,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     }
 
     public ViewModelTableRowFactory<S> setOnDragExited(BiConsumer<S, ? super DragEvent> toOnDragExited) {
-        return setOnDragExited((row, viewModel, event) -> toOnDragExited.accept(viewModel, event));
+        return setOnDragExited((_, viewModel, event) -> toOnDragExited.accept(viewModel, event));
     }
 
     public ViewModelTableRowFactory<S> setOnDragOver(TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragOver) {
@@ -98,7 +98,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     }
 
     public ViewModelTableRowFactory<S> setOnDragOver(BiConsumer<S, ? super DragEvent> toOnDragOver) {
-        return setOnDragOver((row, viewModel, event) -> toOnDragOver.accept(viewModel, event));
+        return setOnDragOver((_, viewModel, event) -> toOnDragOver.accept(viewModel, event));
     }
 
     public ViewModelTableRowFactory<S> withTooltip(Callback<S, String> toTooltip) {
@@ -119,7 +119,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
                 super.updateItem(item, empty);
 
                 if (empty || getItem() == null) {
-                    pseudoClasses.forEach((pseudoClass, toCondition) -> pseudoClassStateChanged(pseudoClass, false));
+                    pseudoClasses.forEach((pseudoClass, _) -> pseudoClassStateChanged(pseudoClass, false));
                 } else {
                     pseudoClasses.forEach((pseudoClass, toCondition) ->
                             pseudoClassStateChanged(pseudoClass, toCondition.call(getItem()).getValue()));

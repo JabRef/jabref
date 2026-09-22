@@ -57,7 +57,7 @@ public class Windows extends NativeDesktop {
         try {
             try {
                 return Path.of(Shell32Util.getKnownFolderPath(KnownFolders.FOLDERID_Documents));
-            } catch (UnsatisfiedLinkError e) {
+            } catch (UnsatisfiedLinkError _) {
                 // Windows Vista or earlier
                 return Path.of(Shell32Util.getFolderPath(ShlObj.CSIDL_MYDOCUMENTS));
             }

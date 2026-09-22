@@ -100,6 +100,7 @@ They carry no RPATH and are not patchelf'ed, so the GTK/X11 stack they link agai
 Enabling `programs.nix-ld` is not enough: it supplies an ELF interpreter, not the libraries these natives load at runtime.
 
 The repository ships a [`shell.nix`](https://github.com/JabRef/jabref/blob/main/shell.nix) that provides them, along with a bootstrap JDK for the Gradle wrapper and `xvfb-run` for the GUI tests.
+On macOS with Nix installed, `nix-shell` works too, but only provides the bootstrap JDK: the JavaFX natives there are Cocoa binaries and need no extra libraries.
 
 ### Prerequisite: `programs.nix-ld`
 

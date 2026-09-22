@@ -57,6 +57,13 @@ The user needs a visible error dialog, in addition to the log entry, since [digg
 
 Needs: impl
 
+## Citation style sources are loaded on demand
+`req~ux.citation-styles.lazy-source-loading~1`
+
+JabRef must load built-in citation-style metadata at startup without retaining every CSL source in memory. A style's source is loaded only when that style is used.
+
+Needs: impl, utest
+
 ## Merge entries dialog allows selecting empty field values
 `req~ux.merge-entries.select-empty-field~1`
 
@@ -157,6 +164,27 @@ Needs: impl
 `req~ux.themes.bundled-community-themes~1`
 
 The themes from <https://themes.jabref.org/> that cover both color schemes are bundled with JabRef and appear in the theme selection next to the built-in themes, without the user having to download a CSS file.
+
+Needs: impl
+
+## Library tabs show what kind of library they hold
+`req~ux.tabs.library-kind-icon~1`
+
+Every library tab carries an icon: one for a BibTeX library, one for a BibLaTeX library, and one for a shared database. A shared database shows the database icon regardless of its mode.
+
+Needs: impl, utest
+
+## Preferences walkthroughs open their settings dialog directly
+`req~ux.walkthrough.preferences-direct~1`
+
+Walkthroughs that require preferences must open the preferences dialog directly, so they can start regardless of the platform menu presentation.
+
+Needs: impl
+
+## Groups walkthroughs make required controls and entries available
+`req~ux.walkthrough.groups-preparation~1`
+
+The groups walkthrough must open its bundled example library, display the Groups pane, and clear the current search before guiding the user.
 
 Needs: impl
 

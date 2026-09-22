@@ -72,7 +72,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());
         preferencesTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
-        searchBox.textProperty().addListener((observable, previousText, newText) -> {
+        searchBox.textProperty().addListener((_, _, newText) -> {
             searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
             preferencesTabList.getSelectionModel().clearSelection();
             preferencesTabList.getSelectionModel().selectFirst();
@@ -89,7 +89,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
             tabTitle.setText(tab.getTitle());
             Node content = tab.getContent();
             preferencesContainer.setContent(content);
-            content.getStyleClass().add("padding-4");
+            content.getStyleClass().addAll("padding-4", "preferences-tab-content");
         });
 
         if (this.preferencesTabToSelectClass != null) {

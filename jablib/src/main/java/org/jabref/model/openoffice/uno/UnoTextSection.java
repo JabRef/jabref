@@ -39,7 +39,7 @@ public class UnoTextSection {
         XNameAccess nameAccess = getNameAccess(doc);
         try {
             return Optional.ofNullable((XTextSection) ((Any) nameAccess.getByName(name)).getObject());
-        } catch (NoSuchElementException ex) {
+        } catch (NoSuchElementException _) {
             return Optional.empty();
         }
     }

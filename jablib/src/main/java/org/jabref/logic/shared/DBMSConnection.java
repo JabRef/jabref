@@ -72,7 +72,7 @@ public class DBMSConnection implements DatabaseConnection {
             try {
                 Class.forName(dbms.getDriverClassPath());
                 dbmsTypes.add(dbms);
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException _) {
                 // In case that the driver is not available do not perform tests for this system.
                 LOGGER.info(Localization.lang("%0 driver not available.", dbms.toString()));
             }

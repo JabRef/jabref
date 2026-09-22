@@ -13,8 +13,9 @@ module org.jabref.jabkit {
     opens org.jabref.toolkit.converter;
     opens org.jabref.toolkit;
 
-    requires transitive org.jspecify;
+    requires static org.jspecify;
     requires java.prefs;
+    requires java.sql;
 
     requires javafx.base;
     requires afterburner.fx;

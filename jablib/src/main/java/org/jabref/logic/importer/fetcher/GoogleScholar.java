@@ -214,7 +214,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
                 URL url;
                 try {
                     url = uriBuilder.build().toURL();
-                } catch (URISyntaxException | MalformedURLException ex) {
+                } catch (URISyntaxException | MalformedURLException _) {
                     throw new FetcherException("Wrong URL syntax", e);
                 }
                 throw new FetcherException(url, "Error while fetching from " + getName(), e);
