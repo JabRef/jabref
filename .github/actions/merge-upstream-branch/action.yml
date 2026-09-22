@@ -12,7 +12,7 @@ inputs:
   driver-revision:
     description: "Commit of changelog-merge-driver to run (immutable pin; bump explicitly to pick up driver fixes)"
     required: false
-    default: "efd607a74d7dc52038e24d4a8994e3c27d6e6818"
+    default: "e3918645b2c15b5c010e7b1edd56e8721afcfedf"
 
 runs:
   using: "composite"
