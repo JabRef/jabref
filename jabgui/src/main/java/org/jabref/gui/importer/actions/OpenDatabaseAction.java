@@ -199,7 +199,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         // locking until the file is loaded.
         if (!resolvedFiles.isEmpty()) {
             assert fileUpdateMonitor != null;
-            List<Path> historyFiles = new ArrayList<>();
             resolvedFiles.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile);
@@ -213,9 +212,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                     }
                 }
 
-                historyFiles.add(file);
+                fileHistory.newFile(file);
             });
-            fileHistory.newFiles(historyFiles);
         } else if (toRaise != null && tabContainer.getCurrentLibraryTab() == null) {
             // If no files are remaining to open, this could mean that a file was
             // already open. If so, we may have to raise the correct tab:
