@@ -3,10 +3,12 @@ package org.jabref.gui.fieldeditors;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -17,6 +19,7 @@ import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -76,6 +79,8 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     private ListView<LinkedFileViewModel> listView;
     @FXML
     private HBox buttonRow;
+    @FXML
+    private TextField noFilePlaceholder;
     @FXML
     private JabRefIconView fulltextFetcher;
     @FXML
@@ -192,6 +197,12 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         // The button row acts as the list's trailing row: same height as a list row, buttons only.
         buttonRow.prefHeightProperty().bind(listView.fixedCellSizeProperty());
         buttonRow.minHeightProperty().bind(listView.fixedCellSizeProperty());
+        // Without a file, the row looks like an empty text field with its buttons to the right (as the
+        // identifier editors do); with files, the buttons follow the list as its trailing row.
+        BooleanBinding noFiles = Bindings.isEmpty(listView.getItems());
+        noFilePlaceholder.visibleProperty().bind(noFiles);
+        noFilePlaceholder.managedProperty().bind(noFiles);
+        buttonRow.paddingProperty().bind(Bindings.when(noFiles).then(Insets.EMPTY).otherwise(new Insets(0, 0, 0, 4)));
 
         fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
         progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());

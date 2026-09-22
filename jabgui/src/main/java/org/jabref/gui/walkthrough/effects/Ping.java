@@ -64,6 +64,10 @@ public final class Ping extends BaseWindowEffect {
 
     public void transitionTo(@NonNull Node newNode) {
         if (ping == null || !ping.isVisible()) {
+            // The effect was hidden (e.g. target off-screen in a small window); rebuild it on the new target
+            if (node != null) {
+                detach();
+            }
             attach(newNode);
             return;
         }
