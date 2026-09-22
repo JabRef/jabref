@@ -105,7 +105,7 @@ public class MarcXmlParser implements Parser {
         List<Element> datafields = getChildren("datafield", element);
         Optional<Character> hostItemBibliographicLevel = getHostItemBibliographicLevel(datafields);
 
-        // [impl->req~import.dnb.marc-metadata~1]
+        // [impl->req~import.marc21-xml~1]
         for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
             LOGGER.debug("tag: {}", tag);

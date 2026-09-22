@@ -1,3 +1,5 @@
+<!-- Extracted from DNB SRU record 138813876X on 2026-09-22:
+     https://services.dnb.de/sru/dnb?version=1.1&operation=searchRetrieve&query=idn%3D138813876X&recordSchema=MARC21-xml&maximumRecords=1 -->
 <zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/" xmlns:marc="http://www.loc.gov/MARC21/slim">
     <zs:version>1.1</zs:version>
     <zs:numberOfRecords>1</zs:numberOfRecords>
@@ -7,6 +9,7 @@
             <zs:recordPacking>xml</zs:recordPacking>
             <zs:recordData>
                 <marc:record type="Bibliographic">
+                    <marc:controlfield tag="001">138813876X</marc:controlfield>
                     <marc:datafield tag="020" ind1=" " ind2=" ">
                         <marc:subfield code="a">9783031996870</marc:subfield>
                         <marc:subfield code="9">978-3-031-99687-0</marc:subfield>
@@ -21,7 +24,7 @@
                     </marc:datafield>
                 </marc:record>
             </zs:recordData>
-            <zs:recordPosition>16</zs:recordPosition>
+            <zs:recordPosition>1</zs:recordPosition>
         </zs:record>
     </zs:records>
 </zs:searchRetrieveResponse>

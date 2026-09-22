@@ -1,3 +1,5 @@
+<!-- Extracted from DNB SRU record 1164985388 on 2026-09-22:
+     https://services.dnb.de/sru/dnb?version=1.1&operation=searchRetrieve&query=idn%3D1164985388&recordSchema=MARC21-xml&maximumRecords=1 -->
 <zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/" xmlns:marc="http://www.loc.gov/MARC21/slim">
     <zs:version>1.1</zs:version>
     <zs:numberOfRecords>1</zs:numberOfRecords>
@@ -8,11 +10,13 @@
             <zs:recordData>
                 <marc:record type="Bibliographic">
                     <marc:leader>00000naa a2200000uc 4500</marc:leader>
+                    <marc:controlfield tag="001">1164985388</marc:controlfield>
                     <marc:datafield tag="773" ind1="1" ind2="8">
                         <marc:subfield code="7">|||s</marc:subfield>
                     </marc:datafield>
                     <marc:datafield tag="773" ind1="0" ind2="8">
-                        <marc:subfield code="t">In: International Journal for Parasitology: Parasites and Wildlife (2025) 28:101137. https://doi.org/10.1016/j.ijppaw.2025.101137</marc:subfield>
+                        <marc:subfield code="i">Enthalten in</marc:subfield>
+                        <marc:subfield code="t">Seminars in speech and language</marc:subfield>
                     </marc:datafield>
                 </marc:record>
             </zs:recordData>

@@ -1,3 +1,5 @@
+<!-- Extracted from DNB SRU record 1396020055 on 2026-09-22:
+     https://services.dnb.de/sru/dnb?version=1.1&operation=searchRetrieve&query=idn%3D1396020055&recordSchema=MARC21-xml&maximumRecords=1 -->
 <zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/" xmlns:marc="http://www.loc.gov/MARC21/slim">
     <zs:version>1.1</zs:version>
     <zs:numberOfRecords>1</zs:numberOfRecords>

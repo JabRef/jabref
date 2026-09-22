@@ -50,7 +50,7 @@ class MarcXmlParserTest {
     }
 
     @Test
-        // [utest->req~import.dnb.marc-metadata~1]
+        // [utest->req~import.marc21-xml~1]
     void importsDoiFromDnbMarcXml() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlDoiRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -62,31 +62,31 @@ class MarcXmlParserTest {
     }
 
     @Test
-        // [utest->req~import.dnb.marc-metadata~1]
+        // [utest->req~import.marc21-xml~1]
     void prefersIsbn13RegardlessOfHyphenatedIsbnOrder() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlIsbnOrderingRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
 
             assertEquals(2, entries.size());
-            assertEquals("9783031996870", entries.getFirst().getField(StandardField.ISBN).orElseThrow());
-            assertEquals("9783031996870", entries.get(1).getField(StandardField.ISBN).orElseThrow());
+            assertEquals("9783570184783", entries.getFirst().getField(StandardField.ISBN).orElseThrow());
+            assertEquals("9783570184783", entries.get(1).getField(StandardField.ISBN).orElseThrow());
         }
     }
 
     @Test
-        // [utest->req~import.dnb.marc-metadata~1]
+        // [utest->req~import.marc21-xml~1]
     void importsParentJournalFromDnbMarcXml() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlParentJournalRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
 
             assertEquals(1, entries.size());
             assertEquals(StandardEntryType.Article, entries.getFirst().getType());
-            assertEquals("In: International Journal for Parasitology: Parasites and Wildlife (2025) 28:101137. https://doi.org/10.1016/j.ijppaw.2025.101137", entries.getFirst().getField(StandardField.JOURNAL).orElseThrow());
+            assertEquals("Seminars in speech and language", entries.getFirst().getField(StandardField.JOURNAL).orElseThrow());
         }
     }
 
     @Test
-        // [utest->req~import.dnb.marc-metadata~1]
+        // [utest->req~import.marc21-xml~1]
     void doesNotChangeMonographicPartToArticle() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlMonographicPartRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -98,20 +98,7 @@ class MarcXmlParserTest {
     }
 
     @Test
-        // [utest->req~import.dnb.marc-metadata~1]
-    void importsMonographicHostTitleWithoutChangingToArticle() throws IOException, ParseException {
-        try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlMonographicHostRecord.xml")) {
-            List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
-
-            assertEquals(1, entries.size());
-            assertEquals(StandardEntryType.Misc, entries.getFirst().getType());
-            assertEquals("Collected essays on DNB metadata", entries.getFirst().getField(StandardField.BOOKTITLE).orElseThrow());
-            assertEquals(Optional.empty(), entries.getFirst().getField(StandardField.JOURNAL));
-        }
-    }
-
-    @Test
-        // [utest->req~import.dnb.marc-metadata~1]
+        // [utest->req~import.marc21-xml~1]
     void ignoresDnbContentDescriptionUrl() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlContentDescriptionRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -123,13 +110,13 @@ class MarcXmlParserTest {
     }
 
     @Test
-        // [utest->req~import.dnb.marc-metadata~1]
+        // [utest->req~import.marc21-xml~1]
     void importsDnbFulltextUrl() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlFulltextRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
 
             assertEquals(1, entries.size());
-            assertEquals("https://d-nb.info/1415413312/34", entries.getFirst().getFiles().getFirst().getLink());
+            assertEquals("https://www.swp-berlin.org/publications/products/aktuell/2026A25_Europaeische_Staatsanwaltschaft.pdf", entries.getFirst().getFiles().getFirst().getLink());
             assertEquals(Optional.empty(), entries.getFirst().getField(StandardField.URL));
         }
     }

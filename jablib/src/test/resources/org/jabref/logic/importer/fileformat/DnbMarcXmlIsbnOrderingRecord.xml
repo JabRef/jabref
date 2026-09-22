@@ -1,3 +1,6 @@
+<!-- ISBN values from DNB SRU record 1415413312, MARC 020 subfield 9, retrieved on 2026-09-22:
+     https://services.dnb.de/sru/dnb?version=1.1&operation=searchRetrieve&query=idn%3D1415413312&recordSchema=MARC21-xml&maximumRecords=1
+     The two records deliberately reverse the source order to test ISBN preference. -->
 <zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/" xmlns:marc="http://www.loc.gov/MARC21/slim">
     <zs:version>1.1</zs:version>
     <zs:numberOfRecords>2</zs:numberOfRecords>
@@ -8,10 +11,10 @@
             <zs:recordData>
                 <marc:record type="Bibliographic">
                     <marc:datafield tag="020" ind1=" " ind2=" ">
-                        <marc:subfield code="a">3-031-99687-6</marc:subfield>
+                        <marc:subfield code="a">3-570-18478-1</marc:subfield>
                     </marc:datafield>
                     <marc:datafield tag="020" ind1=" " ind2=" ">
-                        <marc:subfield code="a">978-3-031-99687-0</marc:subfield>
+                        <marc:subfield code="a">978-3-570-18478-3</marc:subfield>
                     </marc:datafield>
                 </marc:record>
             </zs:recordData>
@@ -23,10 +26,10 @@
             <zs:recordData>
                 <marc:record type="Bibliographic">
                     <marc:datafield tag="020" ind1=" " ind2=" ">
-                        <marc:subfield code="a">978-3-031-99687-0</marc:subfield>
+                        <marc:subfield code="a">978-3-570-18478-3</marc:subfield>
                     </marc:datafield>
                     <marc:datafield tag="020" ind1=" " ind2=" ">
-                        <marc:subfield code="a">3-031-99687-6</marc:subfield>
+                        <marc:subfield code="a">3-570-18478-1</marc:subfield>
                     </marc:datafield>
                 </marc:record>
             </zs:recordData>

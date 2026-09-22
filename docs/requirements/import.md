@@ -3,10 +3,12 @@ parent: Requirements
 ---
 # Import
 
-## Import DNB MARC metadata
-`req~import.dnb.marc-metadata~1`
+## Import MARC21-XML bibliographic records
+`req~import.marc21-xml~1`
 
-When importing DNB MARC21-XML records, JabRef stores summaries as abstracts, prefers validated ISBN-13s, and imports ISSNs and DOIs. A serial MARC 773 host imports its title as `journal` and makes the entry an article; a monographic host imports its title as `booktitle` without changing the entry to an article. A MARC 856 link is imported only when subfield `3` is exactly `Volltext`; `Inhaltstext` and other descriptive links are not imported.
+JabRef supports importing MARC21 bibliographic records encoded as [MARCXML](https://www.loc.gov/standards/marcxml/) and maps recognised fields according to the [MARC 21 Format for Bibliographic Data](https://www.loc.gov/marc/bibliographic/) and the [DNB MARC21 export format](https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21.html).
+
+For DNB records, only an electronic-location field explicitly labelled `Volltext` is treated as a linked full-text document; content descriptions and tables of contents are not.
 
 Needs: impl, utest
 

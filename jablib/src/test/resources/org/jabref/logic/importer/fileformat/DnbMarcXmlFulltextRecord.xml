@@ -1,3 +1,5 @@
+<!-- Extracted from DNB SRU record 1413727956 on 2026-09-22:
+     https://services.dnb.de/sru/dnb?version=1.1&operation=searchRetrieve&query=idn%3D1413727956&recordSchema=MARC21-xml&maximumRecords=1 -->
 <zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/" xmlns:marc="http://www.loc.gov/MARC21/slim">
     <zs:version>1.1</zs:version>
     <zs:numberOfRecords>1</zs:numberOfRecords>
@@ -7,8 +9,12 @@
             <zs:recordPacking>xml</zs:recordPacking>
             <zs:recordData>
                 <marc:record type="Bibliographic">
-                    <marc:datafield tag="856" ind1="4" ind2="2">
-                        <marc:subfield code="u">https://d-nb.info/1415413312/34</marc:subfield>
+                    <marc:controlfield tag="001">1413727956</marc:controlfield>
+                    <marc:datafield tag="856" ind1="4" ind2=" ">
+                        <marc:subfield code="q">application/pdf</marc:subfield>
+                        <marc:subfield code="u">https://www.swp-berlin.org/publications/products/aktuell/2026A25_Europaeische_Staatsanwaltschaft.pdf</marc:subfield>
+                        <marc:subfield code="x">Verlag</marc:subfield>
+                        <marc:subfield code="z">kostenfrei</marc:subfield>
                         <marc:subfield code="3">Volltext</marc:subfield>
                     </marc:datafield>
                 </marc:record>
