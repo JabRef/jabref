@@ -96,6 +96,12 @@ jobs:
               echo "No commit pushed."
             else
               echo "Commits:"
-              for c in $commits; do echo "- https://github.com/$REPO/commit/$c"; done
+              for c in $commits; do
+                echo "- https://github.com/$REPO/commit/$c"
+                # GitHub's file anchor is the SHA-256 of the path
+                if ! git diff --quiet "$c^" "$c" -- CHANGELOG.md; then
+                  echo "  - [CHANGELOG.md](https://github.com/$REPO/commit/$c#diff-$(printf %s CHANGELOG.md | sha256sum | cut -d' ' -f1))"
+                fi
+              done
             fi
           } >> "$GITHUB_STEP_SUMMARY"
