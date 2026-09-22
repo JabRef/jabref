@@ -11,6 +11,21 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added `jabkit git merge-driver`, a Git merge driver that merges `.bib` files semantically. [#16838](https://github.com/JabRef/jabref/pull/16838)
+- We added support for fetching fulltext PDFs through a locally-running browser-extension provider. [#16124](https://github.com/JabRef/jabref/pull/16124)
+
+### Changed
+
+### Fixed
+
+- We fixed an issue where the AI chat lost its scroll position when switching back to an entry. [#17172](https://github.com/JabRef/jabref/pull/17172)
+
+### Removed
+
+## [6.0-beta.1] - 2026-09-21
+
+### Added
+
 - We added a native query field for catalogs on the SLR dialog. [#17199](https://github.com/JabRef/jabref/pull/17199)
 - We made almost everything in JabRef navigatable by keyboard, including adding visiual indicators. [#17059](https://github.com/JabRef/jabref/pull/17059)
 - We added a fetcher for Software Heritage identifiers (SWHID). [#16809](https://github.com/JabRef/jabref/issues/16809)
@@ -70,7 +85,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added generic CSV export filter that exports all standard BibTeX fields. [#15711](https://github.com/JabRef/jabref/issues/15711)
 - We added OCR engine's executable path as the first OCR preference to let users specify the exact path of the engine they are using. [#15990](https://github.com/JabRef/jabref/pull/15990)
 - We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
-- We added support for fetching fulltext PDFs through a locally-running browser-extension provider. [#16124](https://github.com/JabRef/jabref/pull/16124)
 - We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
 - The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
 - We added a `jabkit pdf extract-references` command that extracts the references from the end of one or more PDFs and outputs them as BibTeX, mirroring the GUI's "Extract references" action. Each PDF can be given as a local file or as an http(s)/ftp URL. [#16186](https://github.com/JabRef/jabref/pull/16186)
@@ -2311,7 +2325,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-alpha.6...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-beta.1...HEAD
+[6.0-beta.1]: https://github.com/JabRef/jabref/compare/v6.0-alpha.6...v6.0-beta.1
 [6.0-alpha.6]: https://github.com/JabRef/jabref/compare/v6.0-alpha.5...v6.0-alpha.6
 [6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...v6.0-alpha.5
 [6.0-alpha.4]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...v6.0-alpha.4

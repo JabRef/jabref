@@ -13,7 +13,7 @@ val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
 // Keep version in sync build-support/src/main/java/JournalListMvGenerator.java and build-support/src/main/java/LtwaListMvGenerator.java
-val javafxDefault = "26.0.2"
+val javafxDefault = "27"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
@@ -136,10 +136,10 @@ dependencies.constraints {
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.3.Final")
-    api("org.hisp.dhis:json-tree:1.9.4")
+    api("org.hisp.dhis:json-tree:1.9.5")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
-    api("org.jabref:html-to-node:0.2.0")
+    api("org.jabref:html-to-node:0.3.0")
     api("org.jabref:latex-conv:0.1.0")
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
@@ -160,8 +160,8 @@ dependencies.constraints {
     api("org.tinylog:slf4j-tinylog:2.8.0")
     api("org.tinylog:tinylog-api:2.8.0")
     api("org.tinylog:tinylog-impl:2.8.0")
-    api("org.xmlunit:xmlunit-core:2.13.0")
-    api("org.xmlunit:xmlunit-matchers:2.13.0")
+    api("org.xmlunit:xmlunit-core:2.14.0")
+    api("org.xmlunit:xmlunit-matchers:2.14.0")
     api("org.yaml:snakeyaml:2.7")
     api("tech.units:indriya:2.2.4")
     api("tools.maran:svg:1.0.0")
