@@ -185,7 +185,7 @@ class PdfUpdate implements Callable<Integer> {
         } catch (IOException
                  | ParserConfigurationException
                  | SaveException
-                 | TransformerException e) {
+                 | TransformerException _) {
             LOGGER.error("Failed writing metadata on a linked file of {}.", citeKey);
         }
     }
@@ -256,7 +256,7 @@ class PdfUpdate implements Callable<Integer> {
             } catch (IOException
                      | ParserConfigurationException
                      | SaveException
-                     | TransformerException e) {
+                     | TransformerException _) {
                 LOGGER.error("Error writing entry to {}.", filePath);
             }
         }

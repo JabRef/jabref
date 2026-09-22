@@ -3,8 +3,10 @@ package org.jabref.gui.preferences.ai;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -12,6 +14,8 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -51,6 +55,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
+    public enum ConnectionTestState { IDLE, TESTING, SUCCESS, FAILED }
+
     public static final int DEFAULT_MAX_CHUNK_SIZE = 512;
 
     protected static SpinnerValueFactory<Integer> followUpQuestionsCountValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 3);
@@ -143,6 +149,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final AiModelService aiModelService;
     private final TaskExecutor taskExecutor;
     private final EmbeddingModelMetadataService embeddingModelMetadataService;
+
+    private final ObjectProperty<ConnectionTestState> connectionTestState = new SimpleObjectProperty<>(ConnectionTestState.IDLE);
+    /// Details of the last failed connection test; empty otherwise.
+    private final StringProperty connectionTestDetails = new SimpleStringProperty("");
 
     private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
@@ -330,6 +340,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         huggingFaceApiBaseUrl.set(newValue);
             }
         });
+
+        // A result only holds for the values it was tested with.
+        Stream.of(selectedAiProvider, currentChatModel, currentApiKey, currentApiBaseUrl, customizeExpertSettings)
+              .forEach(property -> property.addListener((_, _, _) -> {
+                  connectionTestState.set(ConnectionTestState.IDLE);
+                  connectionTestDetails.set("");
+              }));
 
         this.apiKeyValidator = new FunctionBasedValidator<>(
                 currentApiKey,
@@ -523,6 +540,37 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.copyFrom(workingAiPreferences);
     }
 
+    /// Tests the connection with the values currently entered in the dialog, not the stored preferences.
+    public BackgroundTask<String> testConnectionTask() {
+        AiProvider provider = selectedAiProvider.get();
+        String modelName = currentChatModel.get();
+        String apiKey = currentApiKey.get();
+        String baseUrl = customizeExpertSettings.get() ? currentApiBaseUrl.get() : provider.getApiUrl();
+        double temperatureValue = LocalizedNumbersUtils.stringToDouble(temperature.get()).orElse((double) AiDefaultExpertSettings.TEMPERATURE);
+        int contextWindow = contextWindowSize.get();
+        TokenEstimatorKind tokenEstimatorKind = tokenEstimationAlgorithmProperty.get();
+        return BackgroundTask.wrap(() -> aiModelService.testConnection(provider, modelName, apiKey, temperatureValue, baseUrl, contextWindow, tokenEstimatorKind));
+    }
+
+    public void testConnection() {
+        String modelName = currentChatModel.get();
+        testConnectionTask()
+                .onRunning(() -> {
+                    connectionTestState.set(ConnectionTestState.TESTING);
+                    connectionTestDetails.set("");
+                })
+                .onSuccess(_ -> connectionTestState.set(ConnectionTestState.SUCCESS))
+                .onFailure(exception -> {
+                    LOGGER.debug("AI connection test failed", exception);
+                    // A model missing on the server cannot be downloaded through the OpenAI-compatible API, so the user is pointed to the Ollama command.
+                    connectionTestDetails.set(AiModelService.isModelNotFound(exception)
+                                              ? Localization.lang("The model %0 was not found on the server. If you use Ollama, download it with: %1", modelName, "ollama pull " + modelName)
+                                              : Objects.toString(exception.getMessage(), exception.getClass().getSimpleName()));
+                    connectionTestState.set(ConnectionTestState.FAILED);
+                })
+                .executeWith(taskExecutor);
+    }
+
     public void resetExpertSettings() {
         String resetApiBaseUrl = selectedAiProvider.get().getApiUrl();
         currentApiBaseUrl.set(resetApiBaseUrl);
@@ -684,6 +732,14 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty selectedEmbeddingModelProperty() {
         return selectedEmbeddingModel;
+    }
+
+    public ReadOnlyObjectProperty<ConnectionTestState> connectionTestStateProperty() {
+        return connectionTestState;
+    }
+
+    public ReadOnlyStringProperty connectionTestDetailsProperty() {
+        return connectionTestDetails;
     }
 
     public StringProperty apiBaseUrlProperty() {
