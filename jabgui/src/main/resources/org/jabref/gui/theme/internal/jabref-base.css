@@ -1731,7 +1731,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .bibtex-code-area .bibtex-keyword {
-    -fx-fill: -color-info !important;
+    -fx-fill: -color-bibtex-keyword !important;
 }
 
 .bibtex-code-area .bibtex-field {
