@@ -10,9 +10,9 @@ inputs:
     required: false
     default: "main"
   driver-revision:
-    description: "Commit of maven-flow/changelog-merge-driver to run (immutable pin; bump explicitly to pick up driver fixes)"
+    description: "Commit of changelog-merge-driver to run (immutable pin; bump explicitly to pick up driver fixes)"
     required: false
-    default: "4f9446a29a9e6b935b0fd710aa047f9ff03641ad"
+    default: "efd607a74d7dc52038e24d4a8994e3c27d6e6818"
 
 runs:
   using: "composite"
@@ -34,6 +34,8 @@ runs:
         path: ~/.jbang
         key: jbang-changelog-merge-driver-${{ inputs.driver-revision }}
 
+    # Runs the fix of https://github.com/maven-flow/changelog-merge-driver/pull/14 from its fork; switch back
+    # to maven-flow once that is merged.
     - name: Merge upstream/${{ inputs.base-branch }}
       shell: bash
       env:
@@ -45,10 +47,10 @@ runs:
         # The PR head may live in a fork; the base branch always comes from JabRef/jabref
         git remote add upstream "https://github.com/JabRef/jabref.git" || true
         git fetch upstream "$BASE_BRANCH"
-        jbang trust add https://github.com/maven-flow/changelog-merge-driver/
+        jbang trust add https://github.com/koppor/changelog-merge-driver/
         # Pinned to an immutable commit - never the repo's mutable HEAD/alias - since the
         # driver runs with a push-capable token in this job.
-        git config merge.changelog.driver "jbang https://github.com/maven-flow/changelog-merge-driver/blob/$DRIVER_REVISION/ChangelogMergeDriver.java %A %O %B --rebase"
+        git config merge.changelog.driver "jbang https://github.com/koppor/changelog-merge-driver/blob/$DRIVER_REVISION/ChangelogMergeDriver.java %A %O %B --rebase"
         # Overrides the checked-in "CHANGELOG.md merge=union" without dirtying the working tree
         echo "CHANGELOG.md merge=changelog" >> "$(git rev-parse --git-dir)/info/attributes"
         git config user.email "github-actions[bot]@users.noreply.github.com"
