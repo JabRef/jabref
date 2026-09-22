@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where the AI chat lost its scroll position when switching back to an entry. [#17172](https://github.com/JabRef/jabref/pull/17172)
+- We fixed the "Field will be created" hint staying visible although the "Jump to field" dialog suggested an existing field. [#17060](https://github.com/JabRef/jabref/issues/17060)
 
 ### Removed
 
