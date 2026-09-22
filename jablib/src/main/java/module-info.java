@@ -126,6 +126,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.preferences;
     exports org.jabref.logic.icore;
     exports org.jabref.model.icore;
+    exports org.jabref.logic.git.merge;
     exports org.jabref.logic.git.merge.planning;
     exports org.jabref.logic.git.merge.execution;
     exports org.jabref.model.sciteTallies;
