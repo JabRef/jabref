@@ -353,6 +353,8 @@ public class JabRefCliPreferences implements CliPreferences {
     // RefreshToken
     private static final String CITE_DRIVE_TOKEN = "citeDriveToken";
     private static final String CITE_DRIVE_PERSIST_TOKEN = "citeDrivePersistToken";
+    private static final String CITE_DRIVE_API_BASE_URL = "citeDriveApiBaseUrl";
+    private static final String CITE_DRIVE_APP_BASE_URL = "citeDriveAppBaseUrl";
 
     // SSL
     private static final String SSL_TRUSTSTORE_PATH = "truststorePath";
@@ -1628,6 +1630,9 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         });
 
+        EasyBind.listen(citeDrivePreferences.apiBaseUrlProperty(), (_, _, newValue) -> put(CITE_DRIVE_API_BASE_URL, newValue));
+        EasyBind.listen(citeDrivePreferences.appBaseUrlProperty(), (_, _, newValue) -> put(CITE_DRIVE_APP_BASE_URL, newValue));
+
         EasyBind.listen(citeDrivePreferences.getRefreshTokenProperty(), (_, _, newValue) -> {
             if (citeDrivePreferences.shouldPersistRefreshToken()) {
                 setCiteDriveToken(newValue);
@@ -1640,7 +1645,9 @@ public class JabRefCliPreferences implements CliPreferences {
     private CiteDrivePreferences getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences defaults) {
         return new CiteDrivePreferences(
                 getCiteDriveToken(),
-                getBoolean(CITE_DRIVE_PERSIST_TOKEN, defaults.shouldPersistRefreshToken())
+                getBoolean(CITE_DRIVE_PERSIST_TOKEN, defaults.shouldPersistRefreshToken()),
+                get(CITE_DRIVE_API_BASE_URL, defaults.getApiBaseUrl()),
+                get(CITE_DRIVE_APP_BASE_URL, defaults.getAppBaseUrl())
         );
     }
 

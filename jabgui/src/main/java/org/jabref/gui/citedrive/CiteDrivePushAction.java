@@ -53,7 +53,7 @@ public class CiteDrivePushAction extends SimpleCommand {
                     AccessToken accessToken = accessTokenOpt.get();
                     try {
                         if (CiteDrivePush.push(database, accessToken, preferences, dialogService)) {
-                            NativeDesktop.openBrowserShowPopup(CiteDrivePush.IMPORT_PAGE, dialogService, preferences.getExternalApplicationsPreferences());
+                            NativeDesktop.openBrowserShowPopup(preferences.getCiteDrivePreferences().getImportPage().toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences());
                         }
                     } catch (IOException e) {
                         LOGGER.error("CiteDrive push failed", e);

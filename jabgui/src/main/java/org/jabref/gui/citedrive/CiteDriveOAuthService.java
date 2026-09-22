@@ -2,7 +2,6 @@ package org.jabref.gui.citedrive;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -44,18 +43,6 @@ public class CiteDriveOAuthService {
 
     private static final ClientID CLIENT_ID = new ClientID("jabref-desktop");
 
-    private static final URI DEFAULT_AUTH_ENDPOINT;
-    private static final URI DEFAULT_TOKEN_ENDPOINT;
-
-    static {
-        try {
-            DEFAULT_AUTH_ENDPOINT = new URI("https://api-dev.citedrive.com/jabref/login/");
-            DEFAULT_TOKEN_ENDPOINT = new URI("https://api-dev.citedrive.com/o/token/");
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private final DialogService dialogService;
     private final URI AUTH_ENDPOINT;
     private final URI TOKEN_ENDPOINT;
@@ -73,7 +60,7 @@ public class CiteDriveOAuthService {
             CiteDrivePreferences citeDrivePreferences,
             OAuthSessionRegistry sessionRegistry,
             DialogService dialogService) {
-        this(externalApplicationsPreferences, remotePreferences, citeDrivePreferences, sessionRegistry, dialogService, DEFAULT_AUTH_ENDPOINT, DEFAULT_TOKEN_ENDPOINT);
+        this(externalApplicationsPreferences, remotePreferences, citeDrivePreferences, sessionRegistry, dialogService, citeDrivePreferences.getAuthorizationEndpoint(), citeDrivePreferences.getTokenEndpoint());
     }
 
     @VisibleForTesting
