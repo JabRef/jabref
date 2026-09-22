@@ -17,6 +17,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where JabRef showed an "Executor has been shut down" error on Windows after resuming from suspend. [#17144](https://github.com/JabRef/jabref/pull/17144)
+
 ### Removed
 
 ## [6.0-beta.1] - 2026-09-21
