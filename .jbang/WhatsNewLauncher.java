@@ -115,9 +115,11 @@ public class WhatsNewLauncher {
         // Without `--default`, an unset user.email is a failing command, not an empty answer.
         EntryOrigins origins = new EntryOrigins(git("config", "--default", "", "--get", "user.email").getFirst());
         List<AttributedEntry> items = new ArrayList<>();
+        // An entry listed in two sections (a merge filing it under a release too) shows once, in the newest.
+        Set<String> listedTexts = new HashSet<>();
         for (Map.Entry<Integer, ChangelogEntry> entryAtLine : entriesByLine.entrySet()) {
             ChangelogEntry entry = entryAtLine.getValue();
-            if (!announcedTexts.contains(entry.text())) {
+            if (!announcedTexts.contains(entry.text()) && listedTexts.add(entry.text())) {
                 // The history is searched for the bullet line as committed: an entry continued on further lines
                 // is joined for display only.
                 items.add(origins.attribute(entry, changelog.get(entryAtLine.getKey()).substring(2).strip()));
