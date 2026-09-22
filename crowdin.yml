@@ -17,7 +17,7 @@
 #
 "preserve_hierarchy": true
 
-"commit_message": "New translations {fileName} ({languageName})"
+"commit_message": "New translations %original_file_name% for (%language%)"
 # prevent ci-skip beeing added
 "append_commit_message": false
 
