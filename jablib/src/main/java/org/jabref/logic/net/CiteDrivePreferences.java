@@ -10,6 +10,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
+import org.jabref.logic.util.URLUtil;
+
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -77,20 +79,20 @@ public class CiteDrivePreferences {
     }
 
     public URI getAuthorizationEndpoint() {
-        return URI.create(getApiBaseUrl()).resolve("jabref/login/");
+        return URLUtil.createUri(getApiBaseUrl()).resolve("jabref/login/");
     }
 
     public URI getTokenEndpoint() {
-        return URI.create(getApiBaseUrl()).resolve("o/token/");
+        return URLUtil.createUri(getApiBaseUrl()).resolve("o/token/");
     }
 
     public URI getPushEndpoint() {
-        return URI.create(getApiBaseUrl()).resolve("jabref/push/");
+        return URLUtil.createUri(getApiBaseUrl()).resolve("jabref/push/");
     }
 
     /// Web page where the user picks which of the pushed entries to import into a CiteDrive project
     public URI getImportPage() {
-        return URI.create(getAppBaseUrl()).resolve("jabref/push/");
+        return URLUtil.createUri(getAppBaseUrl()).resolve("jabref/push/");
     }
 
     public final @Nullable RefreshToken getRefreshToken() {

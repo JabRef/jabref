@@ -96,7 +96,7 @@ public enum StandardActions implements Action {
     GIT(Localization.lang("Git"), IconTheme.JabRefIcons.GIT_SYNC),
     GIT_PULL(Localization.lang("Pull")),
     GIT_PUSH(Localization.lang("Push")),
-    GIT_COMMIT(Localization.lang("Commit...")),
+    GIT_COMMIT(Localization.lang("Commit")),
     GIT_SHARE(Localization.lang("Share this library to GitHub")),
 
     CITE_DRIVE(Localization.lang("CiteDrive")),
