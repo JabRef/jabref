@@ -20,6 +20,10 @@ import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
 
 public class SelectableTextFlow extends TextFlow {
+    /// Unicode "OBJECT REPLACEMENT CHARACTER". JavaFX's [TextFlow] puts it in place of every child that is not a [Text]
+    /// (e.g. a [Hyperlink]), so such a child counts as exactly one character in [TextFlow#hitTest(Point2D)] indices.
+    private static final char OBJECT_REPLACEMENT_CHARACTER = '\uFFFC';
+
     /// Insertion indices into [#getTextFlowContent()]; -1 when there is no selection.
     private int selectionStart = -1;
     private int selectionEnd = -1;
@@ -97,14 +101,14 @@ public class SelectableTextFlow extends TextFlow {
     }
 
     /// The text in the index space of [TextFlow#hitTest(Point2D)] and [TextFlow#rangeShape(int, int)]:
-    /// every embedded non-[Text] child (e.g. a [Hyperlink]) occupies one U+FFFC character there.
+    /// every embedded non-[Text] child occupies one [#OBJECT_REPLACEMENT_CHARACTER] there.
     protected String getTextFlowContent() {
         StringBuilder sb = new StringBuilder();
         for (Node node : getChildren()) {
             if (node instanceof Text text) {
                 sb.append(text.getText());
             } else {
-                sb.append('\uFFFC');
+                sb.append(OBJECT_REPLACEMENT_CHARACTER);
             }
         }
         return sb.toString();
