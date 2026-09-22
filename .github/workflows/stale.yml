@@ -26,31 +26,40 @@ jobs:
       # "status: changes-required" was set, so exempting it would take most PRs out of the process.
       EXEMPT_LABELS: "📌 Pinned"
     steps:
-      # Marking only. Closing is done below, because actions/stale measures
-      # days-before-close against the GitHub field `updated_at`, which is bumped by any
-      # activity on the pull request - including activity that is not the contributor's.
-      # PRs whose `updated_at` keeps moving therefore never reach the close threshold.
-      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
-        id: stale
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          exempt-pr-labels: ${{ env.EXEMPT_LABELS }}
-
-          days-before-issue-stale: -1
-          days-before-issue-close: -1
-
-          only-pr-labels: ${{ env.CHANGES_REQUIRED_LABEL }}
-          stale-pr-label: ${{ env.STALE_LABEL }}
-          remove-pr-stale-when-updated: false
-
-          days-before-pr-stale: ${{ env.DAYS_BEFORE_PR_STALE }}
-          stale-pr-message: >
+      # Only pull requests from forks: maintainers' pull requests (branches in this repository)
+      # are never marked. actions/stale cannot filter by head repository, hence the script.
+      - name: Mark PRs from forks idle for more than ${{ env.DAYS_BEFORE_PR_STALE }} days as stale
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          DRY_RUN: ${{ github.event_name == 'pull_request' }}
+          MESSAGE: >
             The requested changes were not addressed for ${{ env.DAYS_BEFORE_PR_STALE }} days.
             Please follow-up in the next ${{ env.DAYS_BEFORE_PR_CLOSE }} days or your PR will be automatically closed.
             You can check the [contributing guidelines](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) for hints on the pull request process.
+        run: |
+          set -euo pipefail
+          export CUTOFF="$(date -u -d "-${DAYS_BEFORE_PR_STALE} days" +%Y-%m-%dT%H:%M:%SZ)"
+          candidates="$(gh pr list --repo "$REPO" --state open --limit 1000 \
+            --label "$CHANGES_REQUIRED_LABEL" \
+            --json number,isCrossRepository,updatedAt,labels \
+            --jq '.[] | select(.isCrossRepository and .updatedAt < env.CUTOFF)
+                      | select([.labels[].name] - [env.STALE_LABEL] - (env.EXEMPT_LABELS | split(",")) == [.labels[].name])
+                      | .number')"
+          for pr in $candidates; do
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "#$pr: would be marked stale (dry run)"
+              continue
+            fi
+            echo "#$pr: marking stale"
+            gh issue edit "$pr" --repo "$REPO" --add-label "$STALE_LABEL"
+            gh pr comment "$pr" --repo "$REPO" --body "$MESSAGE"
+          done
 
-          days-before-pr-close: -1
-
+      # Closing is done here, not by actions/stale, because that measures days-before-close
+      # against the GitHub field `updated_at`, which is bumped by any activity on the pull
+      # request - including activity that is not the contributor's.
+      # PRs whose `updated_at` keeps moving therefore never reach the close threshold.
       - name: Close PRs labeled stale for more than ${{ env.DAYS_BEFORE_PR_CLOSE }} days
         id: close
         env:
@@ -67,12 +76,12 @@ jobs:
           echo "Assessing PRs labeled '$STALE_LABEL' on or before $cutoff"
 
           closed=""
-          # Both labels are required, mirroring the only-pr-labels of the marking step above:
+          # Both labels are required, mirroring the marking step above:
           # a PR whose requested changes were addressed is no longer a candidate.
           # gh paginates internally up to --limit, so this is not a page size.
           candidates="$(gh pr list --repo "$REPO" --state open --limit 1000 \
             --label "$STALE_LABEL" --label "$CHANGES_REQUIRED_LABEL" \
-            --json number --jq '.[].number')"
+            --json number,isCrossRepository --jq '.[] | select(.isCrossRepository) | .number')"
 
           IFS=',' read -ra exempt_labels <<< "$EXEMPT_LABELS"
 
