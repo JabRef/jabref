@@ -66,7 +66,7 @@ class DownloadFullTextActionTest {
 
     @Test
     void downloadsForUnchangedEntry() throws Exception {
-        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(snapshot -> Optional.of(fetcherResult));
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.of(fetcherResult));
 
         BackgroundTask<?> task = captureTask(action);
         completeTask(task);
@@ -77,7 +77,7 @@ class DownloadFullTextActionTest {
 
     @Test
     void skipsDownloadWhenEntryChangedAfterLookup() throws Exception {
-        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(snapshot -> Optional.of(fetcherResult));
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.of(fetcherResult));
 
         BackgroundTask<?> task = captureTask(action);
         Object downloads = task.call();
@@ -89,7 +89,7 @@ class DownloadFullTextActionTest {
 
     @Test
     void skipsDownloadWhenEntryDeletedAfterLookup() throws Exception {
-        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(snapshot -> Optional.of(fetcherResult));
+        RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.of(fetcherResult));
 
         BackgroundTask<?> task = captureTask(action);
         Object downloads = task.call();

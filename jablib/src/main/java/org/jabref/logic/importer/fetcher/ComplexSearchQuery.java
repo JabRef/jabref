@@ -222,7 +222,7 @@ public class ComplexSearchQuery {
 
         public ComplexSearchQueryBuilder fromYearAndToYear(@NonNull Integer fromYear, @NonNull Integer toYear) {
             if (singleYear != null) {
-                throw new IllegalArgumentException("You can not use single year and year range search.");
+                throw new IllegalArgumentException("You cannot use single year and year range search.");
             }
             this.fromYear = fromYear;
             this.toYear = toYear;
@@ -231,7 +231,7 @@ public class ComplexSearchQuery {
 
         public ComplexSearchQueryBuilder singleYear(@NonNull Integer singleYear) {
             if (fromYear != null || toYear != null) {
-                throw new IllegalArgumentException("You can not use single year and year range search.");
+                throw new IllegalArgumentException("You cannot use single year and year range search.");
             }
             this.singleYear = singleYear;
             return this;
