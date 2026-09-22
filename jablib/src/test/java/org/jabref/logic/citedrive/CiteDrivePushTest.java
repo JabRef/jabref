@@ -29,6 +29,7 @@ import org.mockito.Answers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -58,8 +59,10 @@ class CiteDrivePushTest {
 
         try (MockedStatic<Unirest> unirestMock = Mockito.mockStatic(Unirest.class)) {
             unirestMock.when(() -> Unirest.post("https://example.com/jabref/push/")).thenReturn(postRequest);
+            BibDatabaseContext context = createDatabaseContext();
             boolean pushed = CiteDrivePush.push(
-                    createDatabaseContext(),
+                    context,
+                    context.getEntries(),
                     new BearerAccessToken("access-token"),
                     createPreferences(),
                     notificationService,
@@ -73,6 +76,7 @@ class CiteDrivePushTest {
             assertTrue(body.contains("  author = {Doe, Jane},"), body);
             verify(response).ifSuccess(Mockito.any());
             assertTrue(pushed);
+            assertFalse(body.contains("jabref-meta"), body);
         }
     }
 
@@ -85,7 +89,9 @@ class CiteDrivePushTest {
 
         BibDatabase database = new BibDatabase();
         database.insertEntry(entry);
-        return new BibDatabaseContext(database);
+        BibDatabaseContext context = new BibDatabaseContext(database);
+        context.getMetaData().setLibrarySpecificFileDirectory("/home/user/papers");
+        return context;
     }
 
     private CliPreferences createPreferences() {

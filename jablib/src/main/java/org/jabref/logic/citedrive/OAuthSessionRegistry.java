@@ -33,13 +33,14 @@ public class OAuthSessionRegistry {
         return future;
     }
 
-    public void complete(String state, String code) {
+    /// @return false if no login is waiting for this state (unknown, timed out, or already completed)
+    public boolean complete(String state, String code) {
         CompletableFuture<String> future = pending.remove(state);
-        if (future != null) {
-            future.complete(code);
-        } else {
+        if (future == null) {
             LOGGER.warn("No pending OAuth session for the received state");
+            return false;
         }
+        return future.complete(code);
     }
 
     public void fail(String state, Throwable t) {

@@ -1,6 +1,7 @@
 package org.jabref.gui.citedrive;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -14,6 +15,7 @@ import org.jabref.logic.citedrive.CiteDrivePush;
 import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -42,6 +44,11 @@ public class CiteDrivePushAction extends SimpleCommand {
         assert this.stateManager.getActiveDatabase().isPresent();
 
         BibDatabaseContext database = this.stateManager.getActiveDatabase().get();
+        // Snapshot on the FX thread; the push runs in the background
+        List<BibEntry> entries = database.getEntries().stream()
+                                         .filter(entry -> !entry.isEmpty())
+                                         .map(BibEntry::new)
+                                         .toList();
 
         citeDriveOAuthService
                 .getAccessToken()
@@ -52,7 +59,7 @@ public class CiteDrivePushAction extends SimpleCommand {
                         return;
                     }
                     try {
-                        if (CiteDrivePush.push(database, accessTokenOpt.get(), preferences, dialogService)) {
+                        if (CiteDrivePush.push(database, entries, accessTokenOpt.get(), preferences, dialogService)) {
                             // [impl->req~citedrive.push.import-page~1]
                             UiTaskExecutor.runInJavaFXThread(() -> NativeDesktop.openBrowserShowPopup(preferences.getCiteDrivePreferences().getImportPage().toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences()));
                         }

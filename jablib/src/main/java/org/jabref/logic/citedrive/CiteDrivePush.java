@@ -3,13 +3,17 @@ package org.jabref.logic.citedrive;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.List;
 
 import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import kong.unirest.core.HttpResponse;
@@ -26,15 +30,27 @@ public class CiteDrivePush {
 
     /// [impl->req~citedrive.push~1]
     ///
+    /// Uploads the entries as plain BibTeX: JabRef's metadata (local directories etc.) stays local.
+    ///
+    /// @param entries copies of the library's entries: writing applies save actions and key generation to them,
+    ///                which must not touch the live library
     /// @return true if CiteDrive accepted the library
-    public static boolean push(BibDatabaseContext context, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService) throws IOException {
-        return push(context, accessToken, cliPreferences, notificationService, cliPreferences.getCiteDrivePreferences().getPushEndpoint());
+    public static boolean push(BibDatabaseContext context, List<BibEntry> entries, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService) throws IOException {
+        return push(context, entries, accessToken, cliPreferences, notificationService, cliPreferences.getCiteDrivePreferences().getPushEndpoint());
     }
 
-    static boolean push(BibDatabaseContext context, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService, URI pushEndpoint) throws IOException {
+    static boolean push(BibDatabaseContext context, List<BibEntry> entries, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService, URI pushEndpoint) throws IOException {
         StringWriter writer = new StringWriter();
-        BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(writer, context, cliPreferences);
-        bibDatabaseWriter.writeDatabase(context);
+        SelfContainedSaveConfiguration exportConfiguration = cliPreferences.getSelfContainedExportConfiguration();
+        SelfContainedSaveConfiguration plainBibtex = new SelfContainedSaveConfiguration(
+                exportConfiguration.getSelfContainedSaveOrder(), false, BibDatabaseWriter.SaveType.PLAIN_BIBTEX, exportConfiguration.shouldReformatFile());
+        new BibDatabaseWriter(
+                new BibWriter(writer, context.getDatabase().getNewLineSeparator()),
+                plainBibtex,
+                cliPreferences.getFieldPreferences(),
+                cliPreferences.getCitationKeyPatternPreferences(),
+                cliPreferences.getCustomEntryTypesRepository())
+                .writePartOfDatabase(context, entries);
 
         HttpResponse<String> httpResponse = Unirest.post(pushEndpoint.toASCIIString())
                                                    .header("Authorization", accessToken.toAuthorizationHeader())

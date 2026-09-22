@@ -4,8 +4,6 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeoutException;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
-import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -22,15 +20,11 @@ import org.slf4j.LoggerFactory;
 public class CiteDriveLoginAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(CiteDriveLoginAction.class);
     private final DialogService dialogService;
-    private final StateManager stateManager;
     private final CiteDriveOAuthService citeDriveOAuthService;
 
-    public CiteDriveLoginAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, OAuthSessionRegistry oAuthSessionRegistry) {
+    public CiteDriveLoginAction(DialogService dialogService, GuiPreferences preferences, OAuthSessionRegistry oAuthSessionRegistry) {
         this.dialogService = dialogService;
-        this.stateManager = stateManager;
         this.citeDriveOAuthService = createOAuthService(dialogService, preferences, oAuthSessionRegistry);
-
-        this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
     static CiteDriveOAuthService createOAuthService(DialogService dialogService, GuiPreferences preferences, OAuthSessionRegistry oAuthSessionRegistry) {
@@ -47,19 +41,21 @@ public class CiteDriveLoginAction extends SimpleCommand {
         if (cause instanceof TimeoutException) {
             return Localization.lang("Login was not completed in time.");
         }
-        return String.valueOf(cause.getMessage());
+        return String.valueOf(cause.getLocalizedMessage());
     }
 
     @Override
     public void execute() {
-        assert this.stateManager.getActiveDatabase().isPresent();
+        // The token itself is not needed here: the refresh token is stored in the preferences
         citeDriveOAuthService
                 .authorizeInteractive()
-                .exceptionally(throwable -> {
-                    LOGGER.error("CiteDrive login failed", throwable);
-                    dialogService.notify(Localization.lang("CiteDrive login failed: %0", describeFailure(throwable)));
-                    return null;
+                .whenComplete((token, throwable) -> {
+                    if (throwable != null) {
+                        LOGGER.error("CiteDrive login failed", throwable);
+                        dialogService.notify(Localization.lang("CiteDrive login failed: %0", describeFailure(throwable)));
+                    } else if (token.isEmpty()) {
+                        dialogService.notify(Localization.lang("CiteDrive login failed: could not obtain access token."));
+                    }
                 });
-        // Token is ignored, because the refresh token is stored in the preferences
     }
 }

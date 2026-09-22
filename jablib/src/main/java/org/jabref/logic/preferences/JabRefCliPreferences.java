@@ -1121,6 +1121,9 @@ public class JabRefCliPreferences implements CliPreferences {
         initializeAll();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
+
+        // CiteDrive preferences are not registered in allBindings (the token lives in the keyring), so reload them explicitly.
+        getCiteDrivePreferences().setAll(getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences.getDefault()));
     }
 
     /// Instantiates every preference group so its bindings are registered in [#allBindings] before a bulk reset/import

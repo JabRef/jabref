@@ -204,7 +204,7 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
                 factory.createSubMenu(StandardActions.CITE_DRIVE,
-                        factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, stateManager, preferences, oAuthSessionRegistry)),
+                        factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, preferences, oAuthSessionRegistry)),
                         factory.createMenuItem(StandardActions.CITE_DRIVE_PUSH, new CiteDrivePushAction(dialogService, stateManager, preferences, oAuthSessionRegistry))),
                 factory.createSubMenu(StandardActions.REMOTE_DB,
                         factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService))),

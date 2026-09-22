@@ -49,7 +49,9 @@ public class CallbackResource {
             return Response.serverError().entity("<html><body>" + Localization.lang("Missing information. You can close this window.") + "</body></html>").build();
         }
 
-        sessionRegistry.complete(state, code);
+        if (!sessionRegistry.complete(state, code)) {
+            return Response.serverError().entity("<html><body>" + Localization.lang("Authorization failed. You can close this window.") + "</body></html>").build();
+        }
         return Response.ok("<html><body>" + Localization.lang("Authorization successful. You can close this window.") + "</body></html>").build();
     }
 }

@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.remote.RemotePreferences;
@@ -83,7 +84,8 @@ public class CiteDriveOAuthService {
     /// Fails if the HTTP server receiving the browser redirect is disabled, or if the user does not finish logging in in time.
     public CompletableFuture<Optional<AccessToken>> authorizeInteractive() {
         if (!remotePreferences.shouldEnableHttpServer()) {
-            return CompletableFuture.failedFuture(new IllegalStateException(
+            return CompletableFuture.failedFuture(new JabRefException(
+                    "HTTP server disabled",
                     Localization.lang("Logging in to CiteDrive needs the HTTP server. Please enable it in the preferences.")));
         }
 
@@ -97,7 +99,6 @@ public class CiteDriveOAuthService {
                 .redirectionURI(getCallBackUri())
                 .state(new State(state))
                 .scope(new Scope("read", "write")) // required for CiteDrive API
-                // .scope(new Scope("openid", "read", "write")) // only required for https://github.com/navikt/mock-oauth2-server
                 .codeChallenge(codeVerifier, CodeChallengeMethod.S256)
                 .build()
                 .toURI();
