@@ -73,6 +73,15 @@ However, JabRef is able to analyze the entries and determine that:
 
 Therefore, JabRef performs an automatic merge without requiring manual conflict resolution.
 
+## Using the semantic merge as Git merge driver
+
+`jabkit git merge-driver` exposes the semantic merge as a [Git merge driver](https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver).
+The user-visible behavior (setup, what is merged, conflicts, refusals) is described in the user documentation, [Share](https://docs.jabref.org/collaborative-work/) → "Merging a Bib(la)TeX Library with Git".
+
+The command class `GitMergeDriver` (jabkit) only translates between Git's contract (`%O %A %B`, exit code) and `BibFileMerger` (jablib, package `org.jabref.logic.git.merge`), which returns a `MergeOutcome`: either `Refused` with the reasons, or `Merged` with the remaining conflicts.
+`BibFileMerger` composes the existing `SemanticMergeAnalyzer` with `EntryPropertyMerge`, which applies the same three-way rules to the entry type and the comment above an entry, because the merge plan carries field values only.
+`MergePreconditions` refuses the merge when writing the result would lose content; `Refusal.Reason` documents each case and the parser or writer behavior behind it.
+
 ## Related Test Cases
 
 The semantic conflict detection and merge resolution logic is covered by:
