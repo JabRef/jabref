@@ -112,6 +112,7 @@ recipeList:
   - org.openrewrite.java.migrate.lang.SwitchCaseAssignmentsToSwitchExpression
   - org.openrewrite.java.migrate.lang.SwitchCaseReturnsToSwitchExpression
   - org.openrewrite.java.migrate.lang.SwitchExpressionYieldToArrow
+  - org.openrewrite.java.migrate.lang.ReplaceUnusedVariablesWithUnderscore
   - org.openrewrite.java.migrate.net.JavaNetAPIs
   - org.openrewrite.java.migrate.net.URLConstructorToURICreate
   - org.openrewrite.java.migrate.net.URLConstructorsToNewURI
@@ -150,7 +151,7 @@ recipeList:
   - org.openrewrite.staticanalysis.ExternalizableHasNoArgsConstructor
   - org.openrewrite.staticanalysis.FallThrough
 #  - org.openrewrite.staticanalysis.ForLoopControlVariablePostfixOperators
-  - org.openrewrite.staticanalysis.ForLoopIncrementInUpdate
+#  - org.openrewrite.staticanalysis.ForLoopIncrementInUpdate # https://github.com/openrewrite/rewrite-static-analysis/issues/1061
   - org.openrewrite.staticanalysis.IndexOfChecksShouldUseAStartPosition
   - org.openrewrite.staticanalysis.IndexOfReplaceableByContains
 #  - org.openrewrite.staticanalysis.IndexOfShouldNotCompareGreaterThanZero
