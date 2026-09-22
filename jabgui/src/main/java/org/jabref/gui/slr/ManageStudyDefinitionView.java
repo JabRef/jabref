@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -25,6 +26,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.util.Callback;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionHelper;
@@ -74,6 +76,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableView<StudyCatalogItem> catalogTable;
     @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
     @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
+    @FXML private TableColumn<StudyCatalogItem, String> catalogNativeQueryColumn;
     @FXML private TableColumn<StudyCatalogItem, String> catalogReasonColumn;
 
     @FXML private Label directoryWarning;
@@ -264,7 +267,26 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
         catalogReasonColumn.setReorderable(false);
         catalogReasonColumn.setCellValueFactory(param -> param.getValue().reasonProperty());
-        catalogReasonColumn.setCellFactory(column -> {
+        catalogReasonColumn.setCellFactory(createEditableTextFieldCellFactory(StudyCatalogItem::reasonProperty));
+        Label catalogReasonHeader = new Label(catalogReasonColumn.getText());
+        catalogReasonHeader.setTooltip(new Tooltip(Localization.lang("Click a cell to edit the reason")));
+        catalogReasonColumn.setGraphic(catalogReasonHeader);
+        catalogReasonColumn.setText("");
+
+        catalogNativeQueryColumn.setReorderable(false);
+        catalogNativeQueryColumn.setCellValueFactory(param -> param.getValue().nativeQueryProperty());
+        catalogNativeQueryColumn.setCellFactory(createEditableTextFieldCellFactory(StudyCatalogItem::nativeQueryProperty));
+        Label catalogNativeQueryHeader = new Label(catalogNativeQueryColumn.getText());
+        catalogNativeQueryHeader.setTooltip(new Tooltip(Localization.lang("Click a cell to edit the native query")));
+        catalogNativeQueryColumn.setGraphic(catalogNativeQueryHeader);
+        catalogNativeQueryColumn.setText("");
+
+        catalogTable.setItems(viewModel.getCatalogs());
+    }
+
+    private Callback<TableColumn<StudyCatalogItem, String>, TableCell<StudyCatalogItem, String>> createEditableTextFieldCellFactory(
+            Function<StudyCatalogItem, StringProperty> propertyExtractor) {
+        return _ -> {
             TextField textField = new TextField();
             TableCell<StudyCatalogItem, String> cell = new TableCell<>() {
                 @Override
@@ -283,19 +305,13 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     TableView<StudyCatalogItem> tableView = cell.getTableView();
                     int index = cell.getIndex();
                     if (tableView != null && index >= 0 && index < tableView.getItems().size()) {
-                        tableView.getItems().get(index).setReason(textField.getText());
+                        propertyExtractor.apply(tableView.getItems().get(index)).setValue(textField.getText());
                     }
                 }
             });
-            textField.setOnAction(event -> cell.getTableView().requestFocus());
+            textField.setOnAction(_ -> cell.getTableView().requestFocus());
             return cell;
-        });
-        Label catalogReasonHeader = new Label(catalogReasonColumn.getText());
-        catalogReasonHeader.setTooltip(new Tooltip(Localization.lang("Click a cell to edit the reason")));
-        catalogReasonColumn.setGraphic(catalogReasonHeader);
-        catalogReasonColumn.setText("");
-
-        catalogTable.setItems(viewModel.getCatalogs());
+        };
     }
 
     private void initValidationBindings() {
@@ -358,9 +374,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         contentColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
         actionColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
         new ValueTableCellFactory<T, String>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove"))
-                .withOnMouseClickedEvent((rowItem, cellValue) -> evt ->
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(_ -> Localization.lang("Remove"))
+                .withOnMouseClickedEvent((rowItem, _) -> _ ->
                         removeAction.accept(rowItem))
                 .install(actionColumn);
     }

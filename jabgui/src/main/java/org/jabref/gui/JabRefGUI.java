@@ -42,6 +42,7 @@ import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.git.GitSsh;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -600,6 +601,17 @@ public class JabRefGUI extends Application {
                 LOGGER.trace("Stopping background tasks");
                 Unirest.shutDown();
                 LOGGER.trace("Unirest shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Closing Git SSH session factory");
+                try {
+                    GitSsh.shutdown();
+                } catch (RuntimeException e) {
+                    // Log only: the submitted task's future is never read (a rethrow would vanish) and the UI is already gone
+                    LOGGER.error("Unable to close Git SSH session factory", e);
+                }
+                LOGGER.trace("Git SSH session factory closed");
             });
 
             // region All threading related shutdowns
