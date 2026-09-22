@@ -351,7 +351,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // CiteDrive
     // RefreshToken
-    private static final String CITE_DRIVE_TOKEN = "citeDriveToken";
+    private static final String CITE_DRIVE_KEYRING_SERVICE = "org.jabref";
+    private static final String CITE_DRIVE_KEYRING_ACCOUNT = "citedrive";
     private static final String CITE_DRIVE_PERSIST_TOKEN = "citeDrivePersistToken";
     private static final String CITE_DRIVE_API_BASE_URL = "citeDriveApiBaseUrl";
     private static final String CITE_DRIVE_APP_BASE_URL = "citeDriveAppBaseUrl";
@@ -1621,13 +1622,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         EasyBind.listen(citeDrivePreferences.persistRefreshTokenProperty(), (_, _, newValue) -> {
             putBoolean(CITE_DRIVE_PERSIST_TOKEN, newValue);
-            if (!newValue) {
-                try (final Keyring keyring = Keyring.create()) {
-                    keyring.deletePassword("org.jabref", "citedrive");
-                } catch (Exception _) {
-                    LOGGER.warn("Unable to remove citedrive token");
-                }
-            }
+            setCiteDriveToken(newValue ? citeDrivePreferences.getRefreshToken() : null);
         });
 
         EasyBind.listen(citeDrivePreferences.apiBaseUrlProperty(), (_, _, newValue) -> put(CITE_DRIVE_API_BASE_URL, newValue));
@@ -1643,45 +1638,39 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private CiteDrivePreferences getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences defaults) {
+        boolean persistToken = getBoolean(CITE_DRIVE_PERSIST_TOKEN, defaults.shouldPersistRefreshToken());
         return new CiteDrivePreferences(
-                getCiteDriveToken(),
-                getBoolean(CITE_DRIVE_PERSIST_TOKEN, defaults.shouldPersistRefreshToken()),
+                persistToken ? getCiteDriveToken() : null,
+                persistToken,
                 get(CITE_DRIVE_API_BASE_URL, defaults.getApiBaseUrl()),
                 get(CITE_DRIVE_APP_BASE_URL, defaults.getAppBaseUrl())
         );
     }
 
+    /// The refresh token lives in the system keyring only: never in the preferences, which can be exported as plain text
     private @Nullable RefreshToken getCiteDriveToken() {
         try (final Keyring keyring = Keyring.create()) {
-            RefreshToken token = parseCiteDriveToken(keyring.getPassword("org.jabref", "citedrive"));
-            if (token != null) {
-                return token;
-            }
+            return parseCiteDriveToken(keyring.getPassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT));
+        } catch (PasswordAccessException _) {
+            LOGGER.debug("No CiteDrive token stored in keyring");
         } catch (Exception ex) {
-            LOGGER.warn("Unable to read citedrive token", ex);
+            LOGGER.warn("Unable to read CiteDrive token from keyring", ex);
         }
-
-        return parseCiteDriveToken(get(CITE_DRIVE_TOKEN, null));
+        return null;
     }
 
+    /// If the keyring is not available, the token is kept in memory only (login needed after restart)
     private void setCiteDriveToken(@Nullable RefreshToken refreshToken) {
-        if (refreshToken == null) {
-            try (final Keyring keyring = Keyring.create()) {
-                keyring.deletePassword("org.jabref", "citedrive");
-            } catch (Exception ex) {
-                LOGGER.warn("Unable to remove citedrive token", ex);
-            }
-            remove(CITE_DRIVE_TOKEN);
-            return;
-        }
-
-        String refreshTokenJson = refreshToken.toJSONObject().toJSONString();
         try (final Keyring keyring = Keyring.create()) {
-            keyring.setPassword("org.jabref", "citedrive", refreshTokenJson);
-            remove(CITE_DRIVE_TOKEN);
+            if (refreshToken == null) {
+                keyring.deletePassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT);
+            } else {
+                keyring.setPassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT, refreshToken.toJSONObject().toJSONString());
+            }
+        } catch (PasswordAccessException _) {
+            LOGGER.debug("No CiteDrive token stored in keyring, nothing to remove");
         } catch (Exception ex) {
-            LOGGER.warn("Unable to store citedrive token in keyring", ex);
-            put(CITE_DRIVE_TOKEN, refreshTokenJson);
+            LOGGER.warn("Unable to update CiteDrive token in keyring", ex);
         }
     }
 

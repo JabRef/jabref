@@ -10,10 +10,13 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// This resource is triggered by [org.jabref.gui.citedrive.CiteDriveOAuthService]
+/// The browser is redirected here after logging in at CiteDrive, see [org.jabref.logic.citedrive.CiteDriveOAuthService]
+@NullMarked
 @Path("/callback")
 public class CallbackResource {
 
@@ -24,25 +27,29 @@ public class CallbackResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Response citeDriveCallback(@QueryParam("code") String code,
-                                      @QueryParam("state") String state,
-                                      @QueryParam("error") String error,
-                                      @QueryParam("error_description") String errorDescription) {
-        if (error != null && !error.isBlank()) {
-            LOGGER.warn("CiteDrive CallbackResource error: {} ({}) (state={})", error, errorDescription, state);
-            sessionRegistry.fail(state, new IllegalStateException("CallbackResource error: " + error));
-            return Response.serverError().entity("<html><body>" + Localization.lang("Authorization failed. You can close this window.") + "</body></html>").build();
-        }
-
-        if (code == null || state == null) {
-            LOGGER.warn("Missing code or state in CiteDrive callback: code={}, state={}", code, state);
-            sessionRegistry.fail(state, new IllegalStateException("Missing code or state"));
+    public Response citeDriveCallback(@QueryParam("code") @Nullable String code,
+                                      @QueryParam("state") @Nullable String state,
+                                      @QueryParam("error") @Nullable String error,
+                                      @QueryParam("error_description") @Nullable String errorDescription) {
+        if (state == null || state.isBlank()) {
+            // Without state, no pending login can be identified
+            LOGGER.warn("Missing state in CiteDrive callback (error: {})", error);
             return Response.serverError().entity("<html><body>" + Localization.lang("Missing information. You can close this window.") + "</body></html>").build();
         }
 
-        LOGGER.debug("Received CiteDrive callback: state={}, code={}", state, code);
-        sessionRegistry.complete(state, code);
+        if (error != null && !error.isBlank()) {
+            LOGGER.warn("CiteDrive callback error: {} ({})", error, errorDescription);
+            sessionRegistry.fail(state, new IllegalStateException("CiteDrive authorization error: " + error));
+            return Response.serverError().entity("<html><body>" + Localization.lang("Authorization failed. You can close this window.") + "</body></html>").build();
+        }
 
+        if (code == null || code.isBlank()) {
+            LOGGER.warn("Missing code in CiteDrive callback");
+            sessionRegistry.fail(state, new IllegalStateException("Missing code"));
+            return Response.serverError().entity("<html><body>" + Localization.lang("Missing information. You can close this window.") + "</body></html>").build();
+        }
+
+        sessionRegistry.complete(state, code);
         return Response.ok("<html><body>" + Localization.lang("Authorization successful. You can close this window.") + "</body></html>").build();
     }
 }

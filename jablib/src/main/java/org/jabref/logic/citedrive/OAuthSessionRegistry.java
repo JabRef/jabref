@@ -3,37 +3,55 @@ package org.jabref.logic.citedrive;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// Pending OAuth logins, keyed by the OAuth `state` parameter
+@NullMarked
 public class OAuthSessionRegistry {
+
+    /// Time the user has to finish logging in in the browser
+    static final long TIMEOUT_MINUTES = 10;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OAuthSessionRegistry.class);
 
     private final Map<String, CompletableFuture<String>> pending = new ConcurrentHashMap<>();
 
+    /// @return the authorization code; fails with a `TimeoutException` if no callback arrives in time
     public CompletableFuture<String> register(String state) {
-        var future = new CompletableFuture<String>();
+        return register(state, TIMEOUT_MINUTES, TimeUnit.MINUTES);
+    }
+
+    CompletableFuture<String> register(String state, long timeout, TimeUnit unit) {
+        CompletableFuture<String> future = new CompletableFuture<>();
         pending.put(state, future);
+        future.orTimeout(timeout, unit)
+              .whenComplete((_, _) -> pending.remove(state, future));
         return future;
     }
 
     public void complete(String state, String code) {
-        var future = pending.remove(state);
+        CompletableFuture<String> future = pending.remove(state);
         if (future != null) {
             future.complete(code);
         } else {
-            LOGGER.warn("No pending OAuth session for state {}", state);
+            LOGGER.warn("No pending OAuth session for the received state");
         }
     }
 
     public void fail(String state, Throwable t) {
-        var future = pending.remove(state);
+        CompletableFuture<String> future = pending.remove(state);
         if (future != null) {
             future.completeExceptionally(t);
         } else {
-            LOGGER.warn("No pending OAuth session for state {} (fail)", state);
+            LOGGER.warn("No pending OAuth session for the received state (fail)");
         }
+    }
+
+    boolean isPending(String state) {
+        return pending.containsKey(state);
     }
 }

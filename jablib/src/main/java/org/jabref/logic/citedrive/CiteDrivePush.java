@@ -16,12 +16,16 @@ import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class CiteDrivePush {
     private static final Logger LOGGER = LoggerFactory.getLogger(CiteDrivePush.class);
 
+    /// [impl->req~citedrive.push~1]
+    ///
     /// @return true if CiteDrive accepted the library
     public static boolean push(BibDatabaseContext context, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService) throws IOException {
         return push(context, accessToken, cliPreferences, notificationService, cliPreferences.getCiteDrivePreferences().getPushEndpoint());
