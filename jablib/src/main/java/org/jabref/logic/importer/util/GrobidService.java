@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -65,7 +66,11 @@ public class GrobidService {
         String httpResponse = response.body();
         LOGGER.debug("raw citation -> response: {}, {}", rawCitation, httpResponse);
 
-        if ("@misc{-1,\n  author = {}\n}\n".equals(httpResponse) || httpResponse.equals("@misc{-1,\n  author = {" + rawCitation + "}\n}\n")) { // This filters empty BibTeX entries
+        if ("""
+                @misc{-1,
+                  author = {}
+                }
+                """.equals(httpResponse) || httpResponse.equals("@misc{%s,\n  author = {%s}\n}\n".formatted(rawCitation.toLowerCase(Locale.ROOT), rawCitation))) { // This filters empty BibTeX entries, lowercase!!
             throw new IOException("The GROBID server response does not contain anything.");
         }
 
