@@ -1,10 +1,15 @@
 package org.jabref.logic.shared;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+
+import org.jspecify.annotations.Nullable;
 
 /// Keeps all essential data for establishing a new connection to a DBMS using [DBMSConnection].
 public class DBMSConnectionProperties implements DatabaseConnectionProperties {
@@ -107,6 +112,26 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
 
     public String getUrl() {
         return type.getUrl(host, port, database);
+    }
+
+    /// Whether both point at the same data: same server, database, and user - regardless of whether the connection
+    /// was entered as form fields or as a JDBC URL, and of password or SSL settings. [#equals(Object)] tells those apart.
+    public static boolean isSameDatabase(DatabaseConnectionProperties first, DatabaseConnectionProperties second) {
+        return databaseIdentity(first).equals(databaseIdentity(second));
+    }
+
+    private static List<String> databaseIdentity(DatabaseConnectionProperties properties) {
+        if (properties.isUseExpertMode()) {
+            // In expert mode only the JDBC URL is authoritative; the fields may be empty or hold defaults
+            return DBMSConnectionUrl.parse(properties.getJdbcUrl())
+                                    .map(url -> identity(url.host(), url.port(), url.database(), url.user().orElse(properties.getUser())))
+                                    .orElseGet(() -> Arrays.asList(properties.getJdbcUrl(), properties.getUser()));
+        }
+        return identity(properties.getHost(), properties.getPort(), properties.getDatabase(), properties.getUser());
+    }
+
+    private static List<String> identity(@Nullable String host, int port, @Nullable String database, @Nullable String user) {
+        return Arrays.asList(Objects.toString(host, "").toLowerCase(Locale.ROOT), Integer.toString(port), database, user);
     }
 
     /// Returns username, password and ssl as Properties Object

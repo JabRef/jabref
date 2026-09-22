@@ -23,6 +23,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSSynchronizer;
+import org.jabref.logic.shared.DatabaseConnectionProperties;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
@@ -169,6 +171,16 @@ public class SharedDatabaseUIManager {
         dbmsSynchronizer.registerListener(this);
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         return bibDatabaseContext;
+    }
+
+    /// The tab already connected to the database `connectionProperties` points at, if any.
+    /// Tabs still connecting are skipped: they only know their database after connecting.
+    // [impl->req~shared-database.single-tab~1]
+    public static Optional<LibraryTab> findOpenTab(LibraryTabContainer tabContainer, DatabaseConnectionProperties connectionProperties) {
+        return tabContainer.getLibraryTabs().stream()
+                           .filter(tab -> !tab.getLoading().get() && tab.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED)
+                           .filter(tab -> DBMSConnectionProperties.isSameDatabase(connectionProperties, tab.getBibDatabaseContext().getDBMSSynchronizer().getConnectionProperties()))
+                           .findFirst();
     }
 
     /// Shows a database returned by [#connect(DBMSConnectionProperties)] in a new tab. JavaFX thread only.
