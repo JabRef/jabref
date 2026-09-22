@@ -49,7 +49,6 @@ public class WalkthroughOverlay {
         this.stage = stage;
         this.walkthrough = walkthrough;
         this.highlighter = new WalkthroughHighlighter();
-        this.highlighter.setOnBackgroundClick(this::showQuitConfirmationAndQuit);
         this.sideEffectExecutor = new SideEffectExecutor();
         this.reverter = new WalkthroughReverter(walkthrough, stage, sideEffectExecutor);
     }
@@ -87,9 +86,22 @@ public class WalkthroughOverlay {
     public void detachAll() {
         cleanUp();
         reverter.revertAll();
+        detachOverlays();
+    }
+
+    public void detachWithoutReverting() {
+        cleanUp();
+        detachOverlays();
+    }
+
+    private void detachOverlays() {
         highlighter.detachAll();
         overlays.values().forEach(WindowOverlay::detach);
         overlays.clear();
+    }
+
+    public void revertToPreviousStep() {
+        reverter.findAndUndo();
     }
 
     public void showQuitConfirmationAndQuit() {

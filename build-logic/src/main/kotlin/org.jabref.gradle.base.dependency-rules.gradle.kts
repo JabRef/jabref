@@ -246,6 +246,9 @@ extraJavaModuleInfo {
         requires("java.net.http")
         uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
         uses("dev.langchain4j.spi.json.ProviderJsonCodecFactory")
+        // Loaded by MistralAiChatModel.builder() and build(); missing uses crashes JabRef start with Mistral AI selected
+        uses("dev.langchain4j.model.mistralai.spi.MistralAiChatModelBuilderFactory")
+        uses("dev.langchain4j.model.mistralai.internal.client.MistralAiClientBuilderFactory")
         exportAllPackages()
         requireAllDefinedDependencies()
     }

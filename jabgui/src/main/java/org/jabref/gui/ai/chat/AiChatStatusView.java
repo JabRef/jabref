@@ -153,7 +153,7 @@ public class AiChatStatusView extends VBox {
 
     private Button constructErrorButton(AiChatStatusViewModel.IngestionStatusRow row) {
         Button errorButton = new Button(Localization.lang("Show Error"));
-        errorButton.setOnAction(event ->
+        errorButton.setOnAction(_ ->
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Ingestion Error"),
                         row.getError()

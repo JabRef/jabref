@@ -414,7 +414,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                                                        .findFirst()
                                                        .flatMap(BibEntry::getCitationKey)
                                                        .ifPresent(entry::setCitationKey);
-        } catch (FetcherClientException e) {
+        } catch (FetcherClientException _) {
             // Most arXiv categories aren't indexed by INSPIRE, so a 404 here is an expected miss, not an error
             LOGGER.trace("No INSPIRE entry found for arXiv ID '{}'", eprint);
         } catch (FetcherException e) {
@@ -480,7 +480,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                                                               .filter(Optional::isPresent)
                                                               .map(Optional::get)
                                                               .findFirst();
-                pdfUrl.ifPresent(url -> LOGGER.info("Fulltext PDF found @ arXiv."));
+                pdfUrl.ifPresent(_ -> LOGGER.info("Fulltext PDF found @ arXiv."));
                 return pdfUrl;
             } catch (FetcherException e) {
                 LOGGER.warn("arXiv API request failed", e);

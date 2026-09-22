@@ -29,9 +29,9 @@ public class SearchResultContainer extends ListView<CAYWEntry> {
     }
 
     private void setup() {
-        this.setCellFactory(listView -> {
+        this.setCellFactory(_ -> {
             SearchResultCell searchResultCell = new SearchResultCell();
-            searchResultCell.setOnMouseClicked(event -> {
+            searchResultCell.setOnMouseClicked(_ -> {
                 if (searchResultCell.getItem() == null || selectedEntries.contains(searchResultCell.getItem())) {
                     return;
                 }
