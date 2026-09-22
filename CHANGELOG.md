@@ -11,6 +11,21 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added `jabkit git merge-driver`, a Git merge driver that merges `.bib` files semantically. [#16838](https://github.com/JabRef/jabref/pull/16838)
+- We added a find bar to the AI chat, opened with <kbd>Ctrl</kbd> + <kbd>F</kbd>. [#17183](https://github.com/JabRef/jabref/pull/17183)
+
+### Changed
+
+### Fixed
+
+- We fixed an issue where the AI chat lost its scroll position when switching back to an entry. [#17172](https://github.com/JabRef/jabref/pull/17172)
+
+### Removed
+
+## [6.0-beta.1] - 2026-09-21
+
+### Added
+
 - We added a native query field for catalogs on the SLR dialog. [#17199](https://github.com/JabRef/jabref/pull/17199)
 - We made almost everything in JabRef navigatable by keyboard, including adding visiual indicators. [#17059](https://github.com/JabRef/jabref/pull/17059)
 - We added a fetcher for Software Heritage identifiers (SWHID). [#16809](https://github.com/JabRef/jabref/issues/16809)
@@ -54,7 +69,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for selecting response engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - We added the ability to jump to cited entries and page locations in the PDF viewer from AI chat citations. [#16981](https://github.com/JabRef/jabref/pull/16981)
 - We added a "Test connection" button to the AI preferences. [#17123](https://github.com/JabRef/jabref/pull/17123)
-- We added a find bar to the AI chat, opened with <kbd>Ctrl</kbd> + <kbd>F</kbd>. [#17183](https://github.com/JabRef/jabref/pull/17183)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 - We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
@@ -2311,7 +2325,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-alpha.6...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-beta.1...HEAD
+[6.0-beta.1]: https://github.com/JabRef/jabref/compare/v6.0-alpha.6...v6.0-beta.1
 [6.0-alpha.6]: https://github.com/JabRef/jabref/compare/v6.0-alpha.5...v6.0-alpha.6
 [6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...v6.0-alpha.5
 [6.0-alpha.4]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...v6.0-alpha.4
