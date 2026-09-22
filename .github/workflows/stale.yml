@@ -52,8 +52,9 @@ jobs:
               continue
             fi
             echo "#$pr: marking stale"
-            gh issue edit "$pr" --repo "$REPO" --add-label "$STALE_LABEL"
+            # Comment first: a labeled PR is never marked again, so its warning must not get lost.
             gh pr comment "$pr" --repo "$REPO" --body "$MESSAGE"
+            gh issue edit "$pr" --repo "$REPO" --add-label "$STALE_LABEL"
           done
 
       # Closing is done here, not by actions/stale, because that measures days-before-close
