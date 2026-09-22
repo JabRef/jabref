@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where the AI chat lost its scroll position when switching back to an entry. [#17172](https://github.com/JabRef/jabref/pull/17172)
+- We fixed an issue where a custom terminal or file browser command with quoted paths was not executed correctly. [#12531](https://github.com/JabRef/jabref/issues/12531)
 
 ### Removed
 
