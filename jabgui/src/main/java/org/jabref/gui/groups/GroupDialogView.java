@@ -226,9 +226,9 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
         searchGroupSearchTerm.textProperty().bindBidirectional(viewModel.searchGroupSearchTermProperty());
         searchGroupCaseSensitive.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.CASE_SENSITIVE));
-        searchGroupCaseSensitive.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.CASE_SENSITIVE, newValue));
+        searchGroupCaseSensitive.selectedProperty().addListener((_, _, newValue) -> viewModel.setSearchFlag(SearchFlags.CASE_SENSITIVE, newValue));
         searchGroupRegex.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.REGULAR_EXPRESSION));
-        searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, newValue));
+        searchGroupRegex.selectedProperty().addListener((_, _, newValue) -> viewModel.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, newValue));
 
         autoGroupKeywordsOption.selectedProperty().bindBidirectional(viewModel.autoGroupKeywordsOptionProperty());
         autoGroupKeywordsField.textProperty().bindBidirectional(viewModel.autoGroupKeywordsFieldProperty());
@@ -263,7 +263,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         });
 
         autoColorCheckbox.setSelected(useAutoColoring);
-        autoColorCheckbox.setOnAction(event -> {
+        autoColorCheckbox.setOnAction(_ -> {
             useAutoColoring = autoColorCheckbox.isSelected();
             if (!autoColorCheckbox.isSelected()) {
                 return;
@@ -303,7 +303,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         });
 
         GridView<GroupIconPickerItem> ikonGridView = new GridView<>(FXCollections.observableArrayList());
-        ikonGridView.setCellFactory(gridView -> new IkonliCell());
+        ikonGridView.setCellFactory(_ -> new IkonliCell());
         ikonGridView.setPrefWidth(520);
         ikonGridView.setPrefHeight(400);
         ikonGridView.setHorizontalCellSpacing(4);
@@ -365,7 +365,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 setPadding(new Insets(1));
                 setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN)));
 
-                setOnMouseClicked(event -> {
+                setOnMouseClicked(_ -> {
                     iconField.textProperty().setValue(ikon.persistedIdentifier());
                     PopOver stage = (PopOver) this.getGridView().getParent().getScene().getWindow();
                     stage.hide();
