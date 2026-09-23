@@ -17,6 +17,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -34,14 +35,12 @@ public class AutoLinkFilesAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
 
-    public AutoLinkFilesAction(DialogService dialogService, GuiPreferences preferences, StateManager stateManager, UndoManager undoManager, UiTaskExecutor taskExecutor) {
+    public AutoLinkFilesAction(DialogService dialogService, GuiPreferences preferences, StateManager stateManager, UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager)));
@@ -51,7 +50,8 @@ public class AutoLinkFilesAction extends SimpleCommand {
     @Override
     public void execute() {
         final BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        final List<BibEntry> entries = stateManager.getSelectedEntries();
+        final UndoManager undoManager = stateManager.getUndoManager(database);
+        final List<BibEntry> entries = List.copyOf(stateManager.getSelectedEntries());
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 database,
@@ -59,6 +59,9 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
         final CompoundEdit compound = new CompoundEdit(StandardActions.AUTO_LINK_FILES.getText());
+        // The file fields are written round by round in the task and handed over only in
+        // succeeded(), so the library is held against undo across both.
+        final UndoSuspension suspended = undoManager.suspendUndo(StandardActions.AUTO_LINK_FILES.getText());
 
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
             final BiConsumer<List<LinkedFile>, BibEntry> onLinkedFilesUpdated = (newLinkedFiles, entry) -> {
@@ -80,8 +83,37 @@ public class AutoLinkFilesAction extends SimpleCommand {
 
             @Override
             protected void succeeded() {
-                AutoSetFileLinksUtil.LinkFilesResult result = getValue();
+                try {
+                    report(getValue());
+                } finally {
+                    handOver();
+                }
+            }
 
+            @Override
+            protected void failed() {
+                handOver();
+            }
+
+            @Override
+            protected void cancelled() {
+                handOver();
+            }
+
+            /// Hands over what the worker changed and releases the library, on every way this task
+            /// can end. Failing and cancelling reach here too: the file fields they had already
+            /// rewritten are in the library whether the task finished or not, so they belong on the
+            /// stack, and holding the library against undo afterwards would disable it for good.
+            private void handOver() {
+                if (compound.hasEdits()) {
+                    undoManager.addEdit(compound.toChangeSet());
+                }
+                suspended.close();
+            }
+
+            /// Only reports; handing the changes over is [#handOver]'s job, so an early return
+            /// here cannot lose them.
+            private void report(AutoSetFileLinksUtil.LinkFilesResult result) {
                 if (!result.getFileExceptions().isEmpty()) {
                     dialogService.showWarningDialogAndWait(
                             Localization.lang("Automatically set file links"),
@@ -95,10 +127,6 @@ public class AutoLinkFilesAction extends SimpleCommand {
                             Localization.lang("Finished automatically setting external links.") + "\n"
                                     + Localization.lang("No files found."));
                     return;
-                }
-
-                if (compound.hasEdits()) {
-                    undoManager.addEdit(compound.toChangeSet());
                 }
 
                 dialogService.notify("%s %s\n%s".formatted(

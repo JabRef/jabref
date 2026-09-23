@@ -13,9 +13,11 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
+import org.jabref.logic.undo.UndoSuspension;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.undo.CompoundEdit;
@@ -33,18 +35,15 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     private final IdFetcher<T> fetcher;
     private final StateManager stateManager;
-    private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
     public LookupIdentifierAction(IdFetcher<T> fetcher,
                                   StateManager stateManager,
-                                  UndoManager undoManager,
                                   DialogService dialogService,
                                   TaskExecutor taskExecutor) {
         this.fetcher = fetcher;
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
@@ -54,8 +53,19 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     @Override
     public void execute() {
+        stateManager.getActiveDatabase().ifPresent(this::lookUpIn);
+    }
+
+    /// The journal and the entries are taken here rather than when the lookup runs: the work
+    /// belongs to the library the user started on, the state manager replaces its selection when
+    /// they switch away from it, and asking for a journal after that library closed would create
+    /// one nothing can reach.
+    private void lookUpIn(BibDatabaseContext databaseContext) {
+        UndoManager undoManager = stateManager.getUndoManager(databaseContext);
+        List<BibEntry> selectedEntries = List.copyOf(stateManager.getSelectedEntries());
+
         try {
-            BackgroundTask.wrap(() -> lookupIdentifiers(stateManager.getSelectedEntries()))
+            BackgroundTask.wrap(() -> lookupIdentifiers(undoManager, selectedEntries))
                           .onSuccess(dialogService::notify)
                           .executeWith(taskExecutor);
         } catch (Exception e) {
@@ -67,41 +77,60 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
         return fetcher::getIdentifierName;
     }
 
-    private String lookupIdentifiers(List<BibEntry> bibEntries) {
+    private String lookupIdentifiers(UndoManager undoManager, List<BibEntry> bibEntries) {
         String totalCount = Integer.toString(bibEntries.size());
-        CompoundEdit compoundEdit = new CompoundEdit(Localization.lang("Look up %0", fetcher.getIdentifierName()));
+        String name = Localization.lang("Look up %0", fetcher.getIdentifierName());
+        CompoundEdit compoundEdit = new CompoundEdit(name);
         int count = 0;
         int foundCount = 0;
-        for (BibEntry bibEntry : bibEntries) {
-            count++;
-            final String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
-                    fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-            UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(statusMessage));
-            Optional<T> identifier = Optional.empty();
-            try {
-                identifier = fetcher.findIdentifier(bibEntry);
-            } catch (FetcherException e) {
-                LOGGER.error("Could not fetch {}", fetcher.getIdentifierName(), e);
-            }
-            if (identifier.isPresent()) {
-                T foundIdentifier = identifier.get();
-                // BibEntry uses an ObservableMap which notifies JavaFX listeners.
-                Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> {
-                    if (bibEntry.hasField(foundIdentifier.getDefaultField())) {
-                        return Optional.empty();
-                    }
-                    return bibEntry.setField(foundIdentifier.getDefaultField(), foundIdentifier.asString());
-                });
-                if (fieldChange != null && fieldChange.isPresent()) {
-                    compoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
+        // The fields are written as the lookup goes and handed over only at the end, so the
+        // library holds unrecorded writes for the whole loop: hold it against undo until then.
+        try (UndoSuspension suspended = undoManager.suspendUndo(name)) {
+            for (BibEntry bibEntry : bibEntries) {
+                count++;
+                notifyProgress(count, totalCount, foundCount);
+                if (lookUpAndRecord(bibEntry, compoundEdit)) {
                     foundCount++;
-                    final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
-                            fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-                    UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(nextStatusMessage));
+                    notifyProgress(count, totalCount, foundCount);
                 }
             }
+            undoManager.addEdit(compoundEdit.toChangeSet());
         }
-        undoManager.addEdit(compoundEdit.toChangeSet());
         return Localization.lang("Determined %0 for %1 entries", fetcher.getIdentifierName(), Integer.toString(foundCount));
+    }
+
+    /// Looks the identifier up for one entry and writes it, unless the entry already has one.
+    ///
+    /// @return whether the entry gained an identifier
+    private boolean lookUpAndRecord(BibEntry bibEntry, CompoundEdit compoundEdit) {
+        Optional<T> identifier;
+        try {
+            identifier = fetcher.findIdentifier(bibEntry);
+        } catch (FetcherException e) {
+            LOGGER.error("Could not fetch {}", fetcher.getIdentifierName(), e);
+            return false;
+        }
+        if (identifier.isEmpty()) {
+            return false;
+        }
+        T foundIdentifier = identifier.get();
+        // BibEntry uses an ObservableMap which notifies JavaFX listeners.
+        Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> {
+            if (bibEntry.hasField(foundIdentifier.getDefaultField())) {
+                return Optional.empty();
+            }
+            return bibEntry.setField(foundIdentifier.getDefaultField(), foundIdentifier.asString());
+        });
+        if (fieldChange == null || fieldChange.isEmpty()) {
+            return false;
+        }
+        compoundEdit.addEdit(new UndoableFieldChange(fieldChange.get()));
+        return true;
+    }
+
+    private void notifyProgress(int count, String totalCount, int foundCount) {
+        String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
+                fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
+        UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(statusMessage));
     }
 }

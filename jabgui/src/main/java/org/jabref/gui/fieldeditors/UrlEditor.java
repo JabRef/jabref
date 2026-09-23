@@ -34,11 +34,11 @@ public class UrlEditor extends HBox implements FieldEditorFX {
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
-    @Inject private UndoManager undoManager;
 
     public UrlEditor(Field field,
                      SuggestionProvider<?> suggestionProvider,
                      FieldCheckers fieldCheckers,
+                     UndoManager undoManager,
                      UndoAction undoAction,
                      RedoAction redoAction) {
         ViewLoader.view(this)

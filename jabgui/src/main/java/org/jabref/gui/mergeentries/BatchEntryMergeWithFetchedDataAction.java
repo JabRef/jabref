@@ -8,7 +8,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.fetcher.MergingIdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,18 +20,15 @@ import org.jabref.model.entry.BibEntry;
 public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
 
     private final StateManager stateManager;
-    private final UndoManager undoManager;
     private final GuiPreferences preferences;
     private final NotificationService notificationService;
     private final TaskExecutor taskExecutor;
 
     public BatchEntryMergeWithFetchedDataAction(StateManager stateManager,
-                                                UndoManager undoManager,
                                                 GuiPreferences preferences,
                                                 NotificationService notificationService,
                                                 TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
-        this.undoManager = undoManager;
         this.preferences = preferences;
         this.notificationService = notificationService;
         this.taskExecutor = taskExecutor;
@@ -42,13 +38,12 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
-            return;
-        }
+        stateManager.getActiveDatabase().ifPresent(this::mergeEntriesOf);
+    }
 
-        List<BibEntry> entries = stateManager.getActiveDatabase()
-                                             .map(BibDatabaseContext::getEntries)
-                                             .orElse(List.of());
+    private void mergeEntriesOf(BibDatabaseContext databaseContext) {
+        List<BibEntry> entries = databaseContext.getEntries();
+        Character keywordSeparator = databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator());
 
         if (entries.isEmpty()) {
             notificationService.notify(Localization.lang("No entries available for merging"));
@@ -59,9 +54,9 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
         BatchEntryMergeTask mergeTask = new BatchEntryMergeTask(
                 entries,
                 fetcher,
-                undoManager,
+                stateManager.getUndoManager(databaseContext),
                 notificationService,
-                preferences.getBibEntryPreferences().getKeywordSeparator());
+                keywordSeparator);
 
         mergeTask.executeWith(taskExecutor);
     }

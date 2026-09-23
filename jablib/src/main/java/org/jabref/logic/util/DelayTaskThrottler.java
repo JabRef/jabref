@@ -39,7 +39,7 @@ public class DelayTaskThrottler {
         }
         try {
             scheduledTask = executor.schedule(command, delay, TimeUnit.MILLISECONDS);
-        } catch (RejectedExecutionException e) {
+        } catch (RejectedExecutionException _) {
             LOGGER.debug("Rejecting while another process is already running.");
         }
         return scheduledTask;
@@ -51,7 +51,7 @@ public class DelayTaskThrottler {
         }
         try {
             scheduledTask = executor.schedule(command, delay, TimeUnit.MILLISECONDS);
-        } catch (RejectedExecutionException e) {
+        } catch (RejectedExecutionException _) {
             LOGGER.debug("Rejecting while another process is already running.");
         }
         return scheduledTask;

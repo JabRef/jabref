@@ -243,7 +243,7 @@ public class TrustStoreManager {
             public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
                 try {
                     customTrustManager.checkServerTrusted(chain, authType);
-                } catch (CertificateException e) {
+                } catch (CertificateException _) {
                     // This will throw another CertificateException if this fails too.
                     jreTrustManager.checkServerTrusted(chain, authType);
                 }

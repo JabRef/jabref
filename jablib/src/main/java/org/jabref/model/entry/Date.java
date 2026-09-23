@@ -293,7 +293,7 @@ public class Date {
     private static Optional<Integer> convertToInt(String value) {
         try {
             return Optional.of(Integer.valueOf(value));
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }

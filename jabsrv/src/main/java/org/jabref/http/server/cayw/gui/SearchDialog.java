@@ -70,7 +70,7 @@ public class SearchDialog {
         SelectedItemsContainer selectedContainer = new SelectedItemsContainer(selectedItems);
 
         Button finishButton = new Button(Localization.lang("Cite"));
-        finishButton.setOnAction(event -> {
+        finishButton.setOnAction(_ -> {
             dialogStage.close();
         });
 

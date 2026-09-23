@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.logic.l10n.Localization;
 
 public final class BibTexStringChangeDetailsView extends DatabaseChangeDetailsView {
@@ -11,7 +12,7 @@ public final class BibTexStringChangeDetailsView extends DatabaseChangeDetailsVi
     public BibTexStringChangeDetailsView(BibTexStringChange stringChange) {
         VBox container = new VBox();
         Label header = new Label(Localization.lang("Modified string"));
-        header.getStyleClass().add("sectionHeader");
+        header.getStyleClass().addAll(StyleClasses.SECTION_HEADER);
         container.getChildren().addAll(
                 header,
                 new Label(Localization.lang("Label: %0", stringChange.getOldString().getName())),

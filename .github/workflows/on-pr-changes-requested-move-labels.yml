@@ -14,7 +14,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Download artifact from triggering run
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           run-id: ${{ github.event.workflow_run.id }}
           name: pr_number
@@ -34,7 +34,11 @@ jobs:
       - name: Apply label operations
         if: steps.check.outputs.continue == 'true'
         shell: bash -euxo pipefail {0}
-        run: >
-          gh issue --repo ${{ github.repository }} edit ${{ steps.check.outputs.pr_number }} --remove-label "status: ready-for-review,status: awaiting-second-review,status: to-be-merged,status: no-bot-comments" --add-label "status: changes-required"
+        run: |
+          # The PR number comes from an artifact the triggering (untrusted) run wrote: pass it via env
+          # and accept digits only, so it can never be expanded into the shell as code.
+          [[ "$PR_NUMBER" =~ ^[0-9]+$ ]] || { echo "Invalid PR number: $PR_NUMBER"; exit 1; }
+          gh issue --repo "$GITHUB_REPOSITORY" edit "$PR_NUMBER" --remove-label "status: ready-for-review,status: awaiting-second-review,status: to-be-merged" --add-label "status: changes-required"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.check.outputs.pr_number }}

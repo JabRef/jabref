@@ -171,6 +171,11 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences));
     }
 
+    /// For the linked-file context menu, whose actions record into this library's journal.
+    public UndoManager getUndoManager() {
+        return undoManager;
+    }
+
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
@@ -275,7 +280,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 dialogService,
                 preferences);
         files.add(onlineFile);
-        onlineFile.download(true, headers);
+        onlineFile.download(true, headers, undoManager);
     }
 
     public void deleteFile(LinkedFileViewModel file) {

@@ -22,9 +22,12 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import static org.jabref.model.search.LinkedFilesConstants.ANNOTATIONS;
+import static org.jabref.model.search.LinkedFilesConstants.ANNOTATIONS_CASE_SENSITIVE;
 import static org.jabref.model.search.LinkedFilesConstants.CONTENT;
+import static org.jabref.model.search.LinkedFilesConstants.CONTENT_CASE_SENSITIVE;
 import static org.jabref.model.search.LinkedFilesConstants.MODIFIED;
 import static org.jabref.model.search.LinkedFilesConstants.PAGE_NUMBER;
 import static org.jabref.model.search.LinkedFilesConstants.PATH;
@@ -38,6 +41,7 @@ public final class DocumentReader {
 
     public List<Document> readPdfContents(String fileLink, Path resolvedPdfPath) {
         List<Document> pages = new ArrayList<>();
+        MDC.put("file", fileLink);
         try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
             int numberOfPages = pdfDocument.getNumberOfPages();
             LOGGER.debug("Reading file {} content with {} pages", resolvedPdfPath.toAbsolutePath(), numberOfPages);
@@ -52,6 +56,8 @@ public final class DocumentReader {
         } catch (IOException e) {
             LOGGER.warn("Could not read {}", resolvedPdfPath.toAbsolutePath(), e);
             return pages;
+        } finally {
+            MDC.remove("file");
         }
         if (pages.isEmpty()) {
             Document newDocument = new Document();
@@ -97,7 +103,10 @@ public final class DocumentReader {
         try {
             String pdfContent = pdfTextStripper.getText(pdfDocument);
             if (StringUtil.isNotBlank(pdfContent)) {
-                newDocument.add(new TextField(CONTENT.toString(), mergeLines(pdfContent), Field.Store.YES));
+                String mergedContent = mergeLines(pdfContent);
+                newDocument.add(new TextField(CONTENT.toString(), mergedContent, Field.Store.YES));
+                // Only indexed, not stored: the stored text is read from CONTENT.
+                newDocument.add(new TextField(CONTENT_CASE_SENSITIVE.toString(), mergedContent, Field.Store.NO));
             }
 
             // Apache PDFTextStripper is 1-based. See {@link org.apache.pdfbox.text.PDFTextStripper.processPages}
@@ -109,7 +118,9 @@ public final class DocumentReader {
                                            .toList();
 
             if (!annotations.isEmpty()) {
-                newDocument.add(new TextField(ANNOTATIONS.toString(), String.join("\n", annotations), Field.Store.YES));
+                String joinedAnnotations = String.join("\n", annotations);
+                newDocument.add(new TextField(ANNOTATIONS.toString(), joinedAnnotations, Field.Store.YES));
+                newDocument.add(new TextField(ANNOTATIONS_CASE_SENSITIVE.toString(), joinedAnnotations, Field.Store.NO));
             }
         } catch (IOException e) {
             LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPath.toAbsolutePath(), e);

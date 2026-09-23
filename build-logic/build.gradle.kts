@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     implementation("com.adarshr:gradle-test-logger-plugin:4.0.0")
-    implementation("com.autonomousapps:dependency-analysis-gradle-plugin:3.19.1")
+    implementation("com.autonomousapps:dependency-analysis-gradle-plugin:3.19.2")
     implementation("com.github.andygoossens:gradle-modernizer-plugin:1.15.0")
     implementation("com.gradleup.shadow:shadow-gradle-plugin:9.6.1")
     implementation("de.undercouch.download:de.undercouch.download.gradle.plugin:5.7.0")
@@ -28,4 +28,9 @@ dependencies {
     implementation("org.gradlex:java-module-testing:1.8.1")
     implementation("org.gradlex:jvm-dependency-conflict-resolution:2.5")
     implementation("org.gradle.toolchains:foojay-resolver:1.0.0")
+    implementation("org.itsallcode:openfasttrace-gradle:3.4.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace-api:4.10.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace-core:4.10.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace-exporter-specobject:4.10.0")
+    implementation("org.itsallcode.openfasttrace:openfasttrace:4.10.0")
 }

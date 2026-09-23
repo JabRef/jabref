@@ -36,8 +36,9 @@ Unreviewed, misleading, or misrepresented AI-generated submissions may be closed
    <!--
    1. Describe how reviewers can test this fix/feature.
       Ideally, think of how you would guide a beginner user of JabRef to try out your change.
-   2. Add screenshots (preferred) or videos.
-      (E.g. using Loom - https://www.loom.com or by just adding .mp4 files).
+   2. Write numbered steps, with a screenshot (cropped to the relevant area) of what the reviewer should see after the decisive step.
+      No videos: a numbered list lets a reviewer say "at step 3 I could not click X", a video does not.
+      A video is only acceptable when the interaction involves another program (drag and drop from a file manager, push to a LaTeX editor, ...).
    -->
 
 ### Related issues and pull requests

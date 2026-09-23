@@ -23,12 +23,13 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,6 @@ public class BackupUIManager {
                                                                  Path originalPath,
                                                                  GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
-                                                                 UndoManager undoManager,
                                                                  StateManager stateManager) {
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
@@ -79,7 +79,7 @@ public class BackupUIManager {
                 }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, stateManager);
             }
             return Optional.empty();
         });
@@ -98,7 +98,6 @@ public class BackupUIManager {
             Path originalPath,
             GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
-            UndoManager undoManager,
             StateManager stateManager) {
         try {
             ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
@@ -123,25 +122,45 @@ public class BackupUIManager {
                 if (allChangesResolved.orElse(false)) {
                     List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
                     LibraryTab saveState = stateManager.activeTabProperty().get().get();
-                    undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
+                    stateManager.getUndoManager(originalDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
                             resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
                         saveState.resetChangeMonitor();
-                    } else {
-                        // In case any change of the backup is accepted, this means, the in-memory file differs from the file on disk (which is not the backup file)
-                        saveState.markBaseChanged();
                     }
+
+                    // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
+                    markRecoveredIfContentRestored(originalParserResult);
                     return Optional.of(originalParserResult);
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, stateManager);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);
             return Optional.empty();
+        }
+    }
+
+    /// An original that could not be parsed at all (e.g. it still contains merge conflict markers) leaves its
+    /// [ParserResult] marked invalid, and the caller reports that as an open error and closes the tab. Reviewing a
+    /// backup merges content into that same result, so the flag has to be cleared once something was actually
+    /// recovered - otherwise the recovery is discarded right after the user performed it.
+    ///
+    /// Whether a change was accepted is not a sufficient signal: a backup that differs only in its groups produces
+    /// both a metadata change and a group change, and accepting the metadata change alone restores nothing. So the
+    /// restored content itself is what decides. If nothing was restored the result stays invalid and the unreadable
+    /// original is still reported.
+    @VisibleForTesting
+    static void markRecoveredIfContentRestored(ParserResult parserResult) {
+        BibDatabase database = parserResult.getDatabase();
+        boolean restoredContent = database.hasEntries()
+                || !database.hasNoStrings()
+                || database.getPreamble().isPresent();
+        if (restoredContent) {
+            parserResult.setInvalid(false);
         }
     }
 }

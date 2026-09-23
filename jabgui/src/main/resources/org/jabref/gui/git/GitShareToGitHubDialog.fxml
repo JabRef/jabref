@@ -3,10 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
@@ -20,6 +18,14 @@
         fx:controller="org.jabref.gui.git.GitShareToGitHubDialogView">
     <content>
         <BorderPane>
+            <top>
+                <Label fx:id="credentialsHint"
+                       wrapText="true">
+                    <padding>
+                        <Insets top="20" right="20" bottom="0" left="20"/>
+                    </padding>
+                </Label>
+            </top>
             <center>
                 <GridPane
                         hgap="10.0"
@@ -49,33 +55,11 @@
                         </tooltip>
                     </Label>
 
-                    <Label text="%GitHub Username:"
-                           GridPane.rowIndex="1"
-                           GridPane.columnIndex="0"/>
-                    <TextField
-                            fx:id="username"
-                            GridPane.rowIndex="1"
-                            GridPane.columnIndex="1"/>
-
-                    <Label text="%Personal Access Token:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <PasswordField fx:id="personalAccessToken" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                    <Label fx:id="patHelpIcon" text="?" styleClass="help-icon" GridPane.rowIndex="2" GridPane.columnIndex="2">
-                        <tooltip>
-                            <Tooltip fx:id="patHelpTooltip"/>
-                        </tooltip>
-                    </Label>
-
                     <Button
                             fx:id="checkGitHubAccessButton"
                             mnemonicParsing="false"
                             onAction="#checkGitHubAccess"
-                            GridPane.rowIndex="3"
-                            GridPane.columnIndex="1"/>
-
-                    <CheckBox
-                            fx:id="rememberSettingsCheck"
-                            text="%Remember Git settings"
-                            GridPane.rowIndex="4"
+                            GridPane.rowIndex="1"
                             GridPane.columnIndex="1"/>
 
                 </GridPane>

@@ -40,20 +40,21 @@ public class SpecialFieldViewModel {
         return field;
     }
 
-    public SpecialFieldAction getSpecialFieldAction(SpecialFieldValue value,
-                                                    Supplier<LibraryTab> tabSupplier,
-                                                    DialogService dialogService,
-                                                    StateManager stateManager) {
+    public static SpecialFieldAction getSpecialFieldAction(SpecialField field,
+                                                           SpecialFieldValue value,
+                                                           Supplier<LibraryTab> tabSupplier,
+                                                           DialogService dialogService,
+                                                           CliPreferences preferences,
+                                                           StateManager stateManager) {
         return new SpecialFieldAction(
                 tabSupplier,
                 field,
                 value.getFieldValue().orElse(null),
                 // if field contains only one value, it has to be nulled, as another setting does not empty the field
                 field.getValues().size() == 1,
-                getLocalization(),
+                getAction(field).getText(),
                 dialogService,
                 preferences,
-                undoManager,
                 stateManager);
     }
 

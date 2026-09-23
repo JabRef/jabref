@@ -113,7 +113,7 @@ class GitHandlerTest {
         WindowCache.reconfigure(new WindowCacheConfig());
     }
 
-    // [utest->req~ux.git-commit.initialize-repository~1]
+    // [utest->req~git.commit.initialize-repository~1]
     @Test
     void initAndCommitTracksOnlyTheGivenFile() throws Exception {
         Path libraryFile = libraryPath.resolve("library.bib");
@@ -129,7 +129,7 @@ class GitHandlerTest {
         }
     }
 
-    // [utest->req~ux.git-commit.initialize-repository~1]
+    // [utest->req~git.commit.initialize-repository~1]
     @Test
     void initAndCommitRejectsAFileOutsideTheRepository(@TempDir Path otherDirectory) throws Exception {
         Path libraryFile = otherDirectory.resolve("library.bib");
@@ -141,7 +141,7 @@ class GitHandlerTest {
         assertFalse(Files.exists(libraryPath.resolve(".git")));
     }
 
-    // [utest->req~ux.git-commit.initialize-repository~1]
+    // [utest->req~git.commit.initialize-repository~1]
     @Test
     void initAndCommitTracksANestedFile() throws Exception {
         Path libraryFile = Files.createDirectory(libraryPath.resolve("sub")).resolve("library.bib");
@@ -155,7 +155,7 @@ class GitHandlerTest {
         }
     }
 
-    // [utest->req~ux.git-commit.initialize-repository~1]
+    // [utest->req~git.commit.initialize-repository~1]
     @Test
     @DisabledOnOs(OS.WINDOWS)
     // creating symlinks requires elevated rights on Windows
@@ -171,7 +171,7 @@ class GitHandlerTest {
         assertTrue(Files.exists(dotGit, LinkOption.NOFOLLOW_LINKS));
     }
 
-    // [utest->req~ux.git-commit.initialize-repository~1]
+    // [utest->req~git.commit.initialize-repository~1]
     @Test
     void initAndCommitKeepsAPreexistingGitignoreUncommitted() throws Exception {
         Path libraryFile = libraryPath.resolve("library.bib");
@@ -187,7 +187,7 @@ class GitHandlerTest {
         }
     }
 
-    // [utest->req~ux.git-commit.initialize-repository~1]
+    // [utest->req~git.commit.initialize-repository~1]
     @Test
     void initAndCommitRemovesItsTracesWhenTheFileIsIgnored() throws Exception {
         Path libraryFile = libraryPath.resolve("library.bib");
@@ -298,5 +298,28 @@ class GitHandlerTest {
         assertTrue(handlerOpt.isPresent(), "Expected GitHandler to be created");
         assertEquals(repositoryPath.toRealPath(), handlerOpt.get().repositoryPath.toRealPath(),
                 "Expected repositoryPath to match Git root");
+    }
+
+    @Test
+    void commitForFileStagesOnlyThatFile() throws Exception {
+        Path libraryFile = repositoryPath.resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        Files.writeString(repositoryPath.resolve("notes.txt"), "unrelated");
+
+        assertTrue(gitHandler.createCommitForFileOnCurrentBranch(libraryFile, "Update references"));
+
+        try (Git git = Git.open(repositoryPath.toFile())) {
+            assertTrue(committedPaths(git).contains("library.bib"));
+            assertEquals(Set.of("notes.txt"), git.status().call().getUntracked());
+        }
+    }
+
+    @Test
+    void commitForFileDoesNothingWhenUnchanged() throws Exception {
+        Path libraryFile = repositoryPath.resolve("library.bib");
+        Files.writeString(libraryFile, "@Article{test,}");
+        gitHandler.createCommitForFileOnCurrentBranch(libraryFile, "Update references");
+
+        assertFalse(gitHandler.createCommitForFileOnCurrentBranch(libraryFile, "Update references"));
     }
 }

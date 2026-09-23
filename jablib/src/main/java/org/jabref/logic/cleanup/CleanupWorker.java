@@ -71,7 +71,7 @@ public class CleanupWorker {
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {
-            jobs.addAll(preset.getFieldFormatterCleanups().getConfiguredActions());
+            jobs.addAll(preset.getFieldFormatterCleanups().getConfiguredActions(databaseContext.getMetaData().getKeywordSeparator().orElse(null)));
         }
 
         return jobs;
