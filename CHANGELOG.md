@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added `jabkit git merge-driver`, a Git merge driver that merges `.bib` files semantically. [#16838](https://github.com/JabRef/jabref/pull/16838)
+- We added suggested groups for special fields nested under a new "Marking and Grading" group when clicking "Add JabRef suggested groups". [#16222](https://github.com/JabRef/jabref/pull/16222)
 
 ### Changed
 
