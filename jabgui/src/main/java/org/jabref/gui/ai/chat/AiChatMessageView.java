@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -40,6 +41,8 @@ public class AiChatMessageView extends HBox {
     @FXML private Label sourceLabel;
     @FXML private StackPane markdownContentPane;
     @FXML private ContextMenu contextMenu;
+    @FXML private MenuItem deleteMenuItem;
+    @FXML private MenuItem regenerateMenuItem;
 
     @FXML private VBox buttons;
     // [impl->feat~ai.chat.regenerate-response~1]
@@ -93,6 +96,8 @@ public class AiChatMessageView extends HBox {
 
         regenerateButton.visibleProperty().bind(viewModel.showRegenerateProperty());
         deleteButton.visibleProperty().bind(viewModel.showDeleteProperty());
+        regenerateMenuItem.visibleProperty().bind(viewModel.showRegenerateProperty());
+        deleteMenuItem.visibleProperty().bind(viewModel.showDeleteProperty());
 
         setupPseudoClasses();
     }
