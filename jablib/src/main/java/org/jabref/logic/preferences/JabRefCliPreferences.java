@@ -2455,13 +2455,13 @@ public class JabRefCliPreferences implements CliPreferences {
         List<String> persists;
         if (hasKey(FETCHER_CUSTOM_KEY_PERSIST)) {
             List<String> rawPersists = getStringList(FETCHER_CUSTOM_KEY_PERSIST);
-            if (rawPersists.size() == 1 && names.size() > 1) {
+            if (rawPersists.size() == names.size()) {
+                persists = rawPersists;
+            } else if (rawPersists.size() == 1) {
                 boolean legacyPersist = Boolean.parseBoolean(rawPersists.getFirst());
                 persists = Collections.nCopies(names.size(), String.valueOf(legacyPersist));
-            } else if (rawPersists.size() == names.size()) {
-                persists = rawPersists;
             } else {
-                // Size mismatch but not the legacy single case -> treat as missing/defaults
+                // Size mismatch and not the legacy single case -> treat as missing/defaults
                 LOGGER.warn("Could not load fetcher keys from preferences (persist size mismatch). Will ignore.");
                 return defaults;
             }
