@@ -131,10 +131,10 @@ class DirectoryLibrarySynchronizerTest {
     private final List<Path> disposedFiles = new ArrayList<>();
 
     /// Tests opt into pattern renames by replacing this; the default keeps file names as-is.
-    private Function<BibEntry, Optional<String>> fileNameGenerator = entry -> Optional.empty();
+    private Function<BibEntry, Optional<String>> fileNameGenerator = _ -> Optional.empty();
 
     /// The default resolver behaves like a cancelled dialog: the library's state wins.
-    private GitConflictResolverStrategy conflictResolver = conflicts -> List.of();
+    private GitConflictResolverStrategy conflictResolver = _ -> List.of();
 
     private BibDatabaseContext context;
     private DirectoryLibrarySynchronizer synchronizer;
@@ -169,7 +169,7 @@ class DirectoryLibrarySynchronizerTest {
         try {
             ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(content));
             return result.isInvalid() ? Optional.empty() : Optional.of(result.getDatabaseContext());
-        } catch (IOException e) {
+        } catch (IOException _) {
             return Optional.empty();
         }
     }
