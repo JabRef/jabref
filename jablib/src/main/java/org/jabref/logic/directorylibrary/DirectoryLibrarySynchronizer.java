@@ -232,7 +232,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         syncExecutor.shutdown();
         try {
             syncExecutor.awaitTermination(2, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             Thread.currentThread().interrupt();
         }
         return flush();
