@@ -76,7 +76,7 @@ class FetcherRetryTest {
                     () -> {
                         throw rateLimited;
                     },
-                    delay -> {
+                    _ -> {
                         throw new InterruptedException();
                     }));
 
