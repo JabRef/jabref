@@ -27,6 +27,7 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.GrobidUrlMigration;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.shared.security.Password;
@@ -101,6 +102,7 @@ public class PreferencesMigrations {
         upgradeTheme(preferences);
         migrateFileAnnotationsTabVisibility(preferences);
         upgradeEntryEditorCustomTabs(preferences);
+        GrobidUrlMigration.migrate(preferences);
     }
 
     /// Up to and including v6.0-alpha.6, custom entry editor tabs were stored in two parallel numbered
