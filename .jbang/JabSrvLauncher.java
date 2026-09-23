@@ -116,6 +116,7 @@
 // new jablib sources not yet in the 6.0-SNAPSHOT artifact
 //SOURCES ../jablib/src/main/java/org/jabref/logic/importer/plaincitation/PlainCitationParserFactory.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/UiCommand.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/citedrive/OAuthSessionRegistry.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/LibrarySearcher.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/NoOpSearchBackend.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchBackend.java

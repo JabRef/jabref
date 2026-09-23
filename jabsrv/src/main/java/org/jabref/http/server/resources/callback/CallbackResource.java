@@ -1,5 +1,6 @@
 package org.jabref.http.server.resources.callback;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.l10n.Localization;
 
@@ -39,13 +40,13 @@ public class CallbackResource {
 
         if (error != null && !error.isBlank()) {
             LOGGER.warn("CiteDrive callback error: {} ({})", error, errorDescription);
-            sessionRegistry.fail(state, new IllegalStateException("CiteDrive authorization error: " + error));
+            sessionRegistry.fail(state, new JabRefException("CiteDrive authorization error: " + error, Localization.lang("Authorization failed. You can close this window.")));
             return Response.serverError().entity("<html><body>" + Localization.lang("Authorization failed. You can close this window.") + "</body></html>").build();
         }
 
         if (code == null || code.isBlank()) {
             LOGGER.warn("Missing code in CiteDrive callback");
-            sessionRegistry.fail(state, new IllegalStateException("Missing code"));
+            sessionRegistry.fail(state, new JabRefException("Missing code in CiteDrive callback", Localization.lang("Missing information. You can close this window.")));
             return Response.serverError().entity("<html><body>" + Localization.lang("Missing information. You can close this window.") + "</body></html>").build();
         }
 

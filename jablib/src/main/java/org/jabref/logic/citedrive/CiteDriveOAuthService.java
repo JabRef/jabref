@@ -129,7 +129,11 @@ public class CiteDriveOAuthService {
             return Optional.empty();
         }
         AccessTokenResponse successResponse = response.toSuccessResponse();
-        citeDrivePreferences.setRefreshToken(successResponse.getTokens().getRefreshToken());
+        RefreshToken newRefreshToken = successResponse.getTokens().getRefreshToken();
+        // Some providers may omit refresh_token; keep the stored one in that case
+        if (newRefreshToken != null) {
+            citeDrivePreferences.setRefreshToken(newRefreshToken);
+        }
         return Optional.of(successResponse.getTokens().getAccessToken());
     }
 

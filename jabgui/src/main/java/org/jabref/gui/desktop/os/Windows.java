@@ -2,6 +2,7 @@ package org.jabref.gui.desktop.os;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -26,13 +27,10 @@ public class Windows extends NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
+
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
-            if (filePath.length() > 260) {
-                LoggerFactory.getLogger(Windows.class).warn("filePath exceeds Windows maximum length of 260 characters: {}", filePath);
-                // It could be that PowerShell could be used as workaround with `Start-Process "URL"`
-            }
             // quote String so explorer handles URL query strings correctly
             String quotePath = "\"" + filePath + "\"";
             new ProcessBuilder("explorer.exe", quotePath).start();
@@ -41,8 +39,17 @@ public class Windows extends NativeDesktop {
 
     @Override
     public void openUrlWithSystemHandler(String url) throws IOException {
+        new ProcessBuilder(urlOpenCommand(url)).start();
+    }
+
+    /// Explorer truncates its argument at the Windows path limit of 260 characters, which OAuth login URLs exceed.
+    /// The URL protocol handler takes the URL unquoted and without that limit.
+    static List<String> urlOpenCommand(String url) {
+        if (url.length() > 260) {
+            return List.of("rundll32.exe", "url.dll,FileProtocolHandler", url);
+        }
         // quote String so explorer handles URL query strings correctly
-        new ProcessBuilder("explorer.exe", "\"" + url + "\"").start();
+        return List.of("explorer.exe", "\"" + url + "\"");
     }
 
     @Override

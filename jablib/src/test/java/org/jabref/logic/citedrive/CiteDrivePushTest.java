@@ -29,7 +29,7 @@ import org.mockito.Answers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -72,11 +72,14 @@ class CiteDrivePushTest {
             verify(postRequest).header("Content-Type", "application/x-bibtex");
             String body = requestBody.get();
             assertNotNull(body);
-            assertTrue(body.contains("@Article{test-key,"), body);
-            assertTrue(body.contains("  author = {Doe, Jane},"), body);
+            assertEquals("""
+                    @Article{test-key,
+                      author = {Doe, Jane},
+                      title  = {CiteDrive push},
+                    }
+                    """.stripLeading(), body);
             verify(response).ifSuccess(Mockito.any());
             assertTrue(pushed);
-            assertFalse(body.contains("jabref-meta"), body);
         }
     }
 
