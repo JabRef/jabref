@@ -51,6 +51,8 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.event.MetaDataChangeSource;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -1024,6 +1026,29 @@ class DirectoryLibrarySynchronizerTest {
                 children.stream().map(child -> child.getGroup().getClass()).toList());
         assertEquals("My group", children.getLast().getName());
         assertEquals(Optional.of("My group"), entries().getFirst().getField(StandardField.GROUPS));
+    }
+
+    /// [utest->req~directory-library.bib-mirror~2]
+    @Test
+    void librarySettingsFromMirrorMetadataAreRestoredAtOpen() throws IOException, InterruptedException, ExecutionException {
+        Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
+        openLibrary();
+        synchronizer.doInitializeMirror();
+        synchronizer.flush();
+        context.getMetaData().setKeywordSeparator(';');
+        context.getMetaData().setAutoRenameFilesOnChange(false);
+        // Delivered by the context's change filter in the application
+        synchronizer.listen(new MetaDataChangedEvent(context.getMetaData(), MetaDataChangeSource.LOCAL));
+        synchronizer.awaitPendingEvents();
+        synchronizer.flush();
+        synchronizer.shutdown();
+
+        openLibrary();
+        synchronizer.doInitializeMirror();
+        synchronizer.flush();
+
+        assertEquals(Optional.of(';'), context.getMetaData().getKeywordSeparator());
+        assertEquals(Optional.of(false), context.getMetaData().getAutoRenameFilesOnChange());
     }
 
     /// [utest->req~directory-library.convert~1]

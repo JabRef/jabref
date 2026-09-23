@@ -20,6 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.DirectoryStructureGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -120,9 +121,12 @@ public class BibMirror {
                 writeScheduler.accept(mirror);
                 return;
             }
-            // The mirror's metadata is the only place user-defined groups of a directory
-            // library survive a restart — the sidecars carry entries, not library metadata
-            readBibContext(mirror).ifPresent(this::adoptUserGroups);
+            // The mirror's metadata is the only place library settings and user-defined groups of
+            // a directory library survive a restart — the sidecars carry entries, not library metadata
+            readBibContext(mirror).ifPresent(remote -> {
+                adoptLibrarySettings(remote);
+                adoptUserGroups(remote);
+            });
             try {
                 if (Files.exists(baseFile(root)) && Files.mismatch(mirror, baseFile(root)) == -1L) {
                     return;
@@ -178,6 +182,22 @@ public class BibMirror {
         }
         // The merged state (or, on cancel, the library's state) becomes the new mirror + base
         markDirty();
+    }
+
+    /// Restores the library properties that the sidecars do not carry. The keyword separator
+    /// comes first: explicit group memberships in the sidecars are separated by it.
+    private void adoptLibrarySettings(BibDatabaseContext remote) {
+        MetaData remoteMetaData = remote.getMetaData();
+        Optional<Character> keywordSeparator = remoteMetaData.getKeywordSeparator();
+        Optional<Boolean> autoRename = remoteMetaData.getAutoRenameFilesOnChange();
+        if (keywordSeparator.isEmpty() && autoRename.isEmpty()) {
+            return;
+        }
+        modelUpdateMarshaller.accept(() -> {
+            MetaData metaData = databaseContext.getMetaData();
+            keywordSeparator.ifPresent(metaData::setKeywordSeparator);
+            autoRename.ifPresent(metaData::setAutoRenameFilesOnChange);
+        });
     }
 
     /// Restores user-defined groups from the mirror's metadata into the freshly scanned
