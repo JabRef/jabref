@@ -42,7 +42,7 @@ class LocalizationConsistencyTest {
     static void initializeJavaFx() {
         try {
             Platform.startup(() -> Platform.setImplicitExit(false));
-        } catch (IllegalStateException exception) {
+        } catch (IllegalStateException _) {
             Platform.setImplicitExit(false);
         }
     }
