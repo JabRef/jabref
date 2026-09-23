@@ -5,12 +5,15 @@
 # which runs privileged in the context of the base repository.
 
 name: PR Review Activity
+# "Comment on PR" keys its concurrency group on this for issue_comment runs, which all run on main.
+run-name: PR Review Activity for PR ${{ github.event.pull_request.number || github.event.issue.number }}
 
 on:
   # Qodo is not a workflow, so its completion cannot be awaited via workflow_run.
   # It submits a review when done - that is the signal to re-evaluate the status labels.
+  # A human review changes the review decision, which "Comment on PR" turns into a label as well.
   pull_request_review:
-    types: [ submitted ]
+    types: [ submitted, dismissed ]
   # The PR author replying in a Qodo thread changes the label outcome but completes no
   # workflow - listen to this event directly. Deleting the author's last reply flips a
   # thread back to unaddressed, so deletions count as well. (Thread resolve/unresolve has
@@ -35,7 +38,6 @@ jobs:
     # a pull request can end the wait for Qodo.
     if: >-
       ${{ github.repository == 'JabRef/jabref'
-          && (github.event_name != 'pull_request_review' || github.event.review.user.login == 'qodo-free-for-open-source-projects[bot]')
           && (github.event_name != 'pull_request_review_comment' || github.event.comment.user.login == github.event.pull_request.user.login)
           && (github.event_name != 'issue_comment' || (github.event.issue.pull_request != null && github.event.comment.user.login == 'qodo-free-for-open-source-projects[bot]')) }}
     # A burst of review activity on one PR only needs the last event to reach "Comment on PR";

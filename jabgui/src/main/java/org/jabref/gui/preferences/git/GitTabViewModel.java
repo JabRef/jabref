@@ -68,7 +68,7 @@ public class GitTabViewModel implements PreferenceTabViewModel {
     private Optional<Integer> getIntervalAsInt(String value) {
         try {
             return Optional.of(Integer.parseInt(value));
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException _) {
             return Optional.empty();
         }
     }
