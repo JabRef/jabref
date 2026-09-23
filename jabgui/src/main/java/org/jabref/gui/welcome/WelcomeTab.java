@@ -340,10 +340,9 @@ public class WelcomeTab extends Tab {
         header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
         FlowPane iconLinksContainer = createIconLinksContainer();
         HBox textLinksContainer = createTextLinksContainer();
-        HBox versionContainer = createVersionContainer();
         VBox container = new VBox(12);
         container.getStyleClass().add("align-top-left");
-        container.getChildren().addAll(iconLinksContainer, textLinksContainer, versionContainer);
+        container.getChildren().addAll(iconLinksContainer, textLinksContainer);
         return createVBoxContainer(header, container);
     }
 
@@ -369,7 +368,13 @@ public class WelcomeTab extends Tab {
         Hyperlink devVersionLink = createFooterLink(Localization.lang("Download development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);
         Hyperlink changelogLink = createFooterLink(Localization.lang("CHANGELOG"), StandardActions.OPEN_CHANGELOG, null);
 
-        container.getChildren().addAll(devVersionLink, changelogLink);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label versionLabel = new Label(Localization.lang("Current JabRef version: %0", buildInfo.version));
+        versionLabel.getStyleClass().addAll("text-subtle");
+
+        container.getChildren().addAll(devVersionLink, changelogLink, spacer, versionLabel);
         return container;
     }
 
@@ -403,15 +408,6 @@ public class WelcomeTab extends Tab {
             link.setGraphic(icon.getGraphicNode());
         }
         return link;
-    }
-
-    private HBox createVersionContainer() {
-        HBox container = new HBox();
-        container.getStyleClass().addAll("align-center-left", "padding-top-4");
-        Label versionLabel = new Label(Localization.lang("Current JabRef version: %0", buildInfo.version));
-        versionLabel.getStyleClass().addAll("text-subtle");
-        container.getChildren().add(versionLabel);
-        return container;
     }
 
     private VBox createVBoxContainer(Node... nodes) {
