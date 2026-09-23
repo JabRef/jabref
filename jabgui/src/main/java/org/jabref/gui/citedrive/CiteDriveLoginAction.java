@@ -33,7 +33,10 @@ public class CiteDriveLoginAction extends SimpleCommand {
                 preferences.getRemotePreferences(),
                 preferences.getCiteDrivePreferences(),
                 oAuthSessionRegistry,
-                uri -> UiTaskExecutor.runInJavaFXThread(() -> NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences())),
+                uri -> UiTaskExecutor.runInJavaFXThread(() -> {
+                    dialogService.notify(Localization.lang("Opening the CiteDrive login page in the browser"));
+                    NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences());
+                }),
                 () -> enableHttpServer(dialogService, preferences.getRemotePreferences()));
     }
 
