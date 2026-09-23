@@ -81,7 +81,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());
         entryTypeCombo.valueProperty().bindBidirectional(viewModel.selectedEntryTypeProperty());
-        EasyBind.listen(entryTypeCombo.getEditor().textProperty(), observable -> entryTypeCombo.commitValue());
+        EasyBind.listen(entryTypeCombo.getEditor().textProperty(), _ -> entryTypeCombo.commitValue());
         entryTypeCombo.getSelectionModel().selectFirst();
 
         FilteredList<ConsistencyMessage> filteredData = new FilteredList<>(viewModel.getTableData(), message ->
