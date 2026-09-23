@@ -70,12 +70,20 @@ public class CiteDrivePreferences {
         return apiBaseUrl;
     }
 
+    public void setApiBaseUrl(String apiBaseUrl) {
+        this.apiBaseUrl.set(apiBaseUrl);
+    }
+
     public String getAppBaseUrl() {
         return appBaseUrl.get();
     }
 
     public StringProperty appBaseUrlProperty() {
         return appBaseUrl;
+    }
+
+    public void setAppBaseUrl(String appBaseUrl) {
+        this.appBaseUrl.set(appBaseUrl);
     }
 
     public URI getAuthorizationEndpoint() {
