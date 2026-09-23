@@ -1,7 +1,7 @@
 {
     "app-id" : "org.jabref.jabref",
     "runtime" : "org.freedesktop.Platform",
-    "runtime-version" : "18.08",
+    "runtime-version" : "26.08",
     "sdk" : "org.freedesktop.Sdk",
     "command" : "JabRef",
     "modules" : [
@@ -16,8 +16,20 @@
             "sources" : [
                 {
                     "type" : "file",
-                    "url": "http://builds.jabref.org/master/JabRef-portable_linux.tar.gz",
-                    "sha256": "be69feee0536fa8500dda867290dbeeeda6191c60e636a0b6e254fbaac02d471"
+                    "url": "https://builds.jabref.org/main/linux-amd64/JabRef-portable_linux.tar.gz",
+                    "sha256": "53e136e94beb0cb6174788352faf7983750945f5d397e7f6013b8921830b3b59",
+                    "only-arches": [
+                        "x86_64"
+                    ]
+                },
+                {
+                    "type" : "file",
+                    "url": "https://builds.jabref.org/main/linux-arm/JabRef-portable_linux_arm64.tar.gz",
+                    "sha256": "afa12af2d0e63d3e9016e3a44ea712ce98473222bffd0a94f4d302143a700e58",
+                    "dest-filename": "JabRef-portable_linux.tar.gz",
+                    "only-arches": [
+                        "aarch64"
+                    ]
                 },
                 {
                     "type": "file",
