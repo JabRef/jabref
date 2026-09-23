@@ -224,6 +224,7 @@ public class BibtexParser implements Parser {
     }
 
     // [impl->req~import.bibtex.percent-comments~1]
+
     /// Reads database metadata before the first `@` and leaves that marker for [#parseFileContent()].
     /// This boundary prevents comments after an entry from being mistaken for database headers.
     /// Consecutive backslashes determine whether a `%` begins a comment or a legacy escaped header.
@@ -1298,6 +1299,7 @@ public class BibtexParser implements Parser {
     }
 
     // [impl->req~import.bibtex.percent-comments~1]
+
     /// Finds the next delimiter after [#parseDatabaseID()] has read leading metadata headers.
     /// Unescaped `%` starts a line comment; only an immediately preceding odd number of backslashes escapes it.
     /// This counts consecutive backslashes outside entries, unlike `isEscapeSymbol(char)` for bracketed field content.

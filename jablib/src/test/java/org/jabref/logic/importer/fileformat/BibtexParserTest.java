@@ -2233,8 +2233,8 @@ class BibtexParserTest {
         assertFalse(result.hasWarnings());
         assertEquals(Optional.empty(), result.getDatabase().getSharedDatabaseID());
         assertEquals(List.of("first", "second"), result.getDatabase().getEntries().stream()
-                .map(entry -> entry.getCitationKey().orElseThrow())
-                .toList());
+                                                       .map(entry -> entry.getCitationKey().orElseThrow())
+                                                       .toList());
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
@@ -2250,8 +2250,8 @@ class BibtexParserTest {
 
         assertFalse(result.hasWarnings());
         assertEquals(List.of("first", "second"), result.getDatabase().getEntries().stream()
-                .map(entry -> entry.getCitationKey().orElseThrow())
-                .toList());
+                                                       .map(entry -> entry.getCitationKey().orElseThrow())
+                                                       .toList());
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
