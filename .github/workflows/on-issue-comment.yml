@@ -12,8 +12,16 @@ jobs:
       contents: read
       issues: write
     steps:
+      - name: Decline self-assignment of untriaged issues
+        id: untriaged
+        if: "${{ contains(github.event.comment.body, '/assign-me') && contains(github.event.issue.labels.*.name, 'status: needs-triage') }}"
+        run: |
+          gh issue comment "${{ github.event.issue.html_url }}" --body "Hi @${{ github.event.comment.user.login }}, this issue needs triage by a maintainer first. Please wait until the \`status: needs-triage\` label is removed."
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Assign the user or unassign stale assignments
         id: assign
+        if: ${{ steps.untriaged.outcome == 'skipped' }}
         uses: takanome-dev/assign-issue-action@fad4b83750f7df31e03c2a42e8f1880b0b4b3573 # edge
         with:
           github_token: '${{ secrets.GH_TOKEN_ASSIGN_ISSUE_ACTION  || github.token }}'
