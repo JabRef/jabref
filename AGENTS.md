@@ -402,38 +402,125 @@ Quick check of core library:
 
 ## Requirements tracing (OpenFastTrace)
 
-JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) to trace requirements to implementation and tests.
+JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT) to trace requirements to implementation and tests.
+Requirements capture what JabRef should do as a structured representation of issues and features, enabling bidirectional traceability.
 
 For a new feature or significant bug fix, **at minimum add the requirement** to the appropriate `docs/requirements/<area>.md` file. Full tracing (`Needs: impl` + implementation comments) is encouraged but can be skipped if the effort is disproportionate.
+Prefer writing more small, granular requirements over a single large one.
 
-**Defining a requirement** in `docs/requirements/<area>.md`:
+### Requirement types and ID format
+
+Format: `<type>~<area>.<name>~<revision>`
+
+- Paths are hierarchical and separated by `.`; words in names use hyphens (`kebab-case`).
+- Revision starts at `1` and is incremented when the requirement changes significantly.
+- Core artifact types:
+  - `feat`: User-facing capability or broad feature ("User can verb").
+  - `req`: Specific constraint, nuance, cross-cutting requirement, or bug fix the system must satisfy ("Subject must verb").
+  - `impl`: Code implementation (Java, GitHub CI/CD, etc.).
+  - `utest`: Unit test.
+  - `itest`: Integration / external service test.
+  - `dsn`: Design document / specification (MADR/ADR).
+  - `arch`: High-level architecture requirement.
+  - `adr`: Architectural Decision Record.
+- Custom artifact markers:
+  - `pp`: Feature must be guarded with a privacy policy banner.
+  - `guard`: Dangerous action that must be guarded by a confirmation dialog.
+
+Throughout development, you will primarily work with `feat`, `req`, `impl`, and `utest`.
+
+### How to write requirements
+
+#### Title rules
+
+- **Grammar matches the tag**:
+  - `req~` → **"Subject must verb"** (e.g., `## GitHub personal access token push access must be verifiable before sharing`).
+  - `feat~` → **"User can verb"** (e.g., `## User can share library via GitHub`).
+- **Subject first**: Put the subject first, followed by the modal verb.
+- **Strict modal verb for `req~`**: Always use **must** — never "should", "needs to", or "is required to". Use one modal verb only.
+- **Avoid nominalizations**: Write "must be verified" instead of "verification".
+- **Avoid system-as-narrator phrasing**: Do not write "allows the user to" or "offers to"; state directly what must happen or what the user can do.
+- **One item, one requirement**: If a title needs "and", split it into two separate requirements.
+- **The title carries the full normative statement**: Anyone reading only the heading should understand the complete requirement constraint.
+
+#### Description rules
+
+Use the description only for details that the title cannot carry:
+
+- Triggering condition.
+- Edge cases and boundary behavior.
+- Brief rationale (if needed).
+- Relevant GitHub issue link or context.
+- **Do not repeat** the subject and verb from the title.
+- **Do not smuggle** secondary requirements into the description.
+- **Do not write marketing copy**.
+
+#### Draft status
+
+For ideas or planned requirements not yet implemented, mark them as draft so they are preserved without failing coverage checks:
 
 ```markdown
-### Example
-`req~ai.example~1`
-
-Description of the requirement.
+Status: draft
 ```
 
-The identifier must follow the heading with no blank line between them. Add `<!-- markdownlint-disable-file MD022 -->` at the end of the file.
+### Syntax and placement
 
-**Optionally — linking an implementation** to a requirement (full trace):
+Requirements belong in `docs/requirements/<area>.md` (grouped by feature domain, or in cross-cutting files like `ux.md`).
+
+- The identifier must be placed on the line immediately below the Markdown heading with **no empty line**.
+- Add `<!-- markdownlint-disable-file MD022 -->` at the end of the file.
+- Specify coverage needs at the end of the requirement: `Needs: impl` (and optionally `utest`, `itest`, etc.).
+
+#### Example: Bad vs. Good
+
+**Bad** (vague heading, no modal verb, normative content hidden in body):
 
 ```markdown
+## GitHub personal access token verification
+`req~git.share.personal-access-token-verification~1`
+
+The GitHub sharing dialog must allow users to verify that their personal
+access token has push access to the configured GitHub repository before
+sharing a library.
+
 Needs: impl
 ```
 
-```java
-// [impl->req~ai.example~1]
+**Good** (subject-first title carrying full constraint, description adds only contextual details):
+
+```markdown
+## GitHub personal access token push access must be verifiable before sharing
+`req~git.share.personal-access-token-verification~1`
+
+Verification happens in the GitHub sharing dialog before the library is shared.
+
+Needs: impl
 ```
 
-**Checking coverage:**
+### Linking implementations and tests
+
+Link requirements to the **most specific code location possible** (method or statement level rather than class level, unless multiple components are involved).
+
+- In Java, place comments **before annotations**:
+
+```java
+// [impl->req~git.share.personal-access-token-verification~1]
+@Override
+public void checkAccess() {
+    ...
+}
+```
+
+- In tests: `// [utest->req~...~1]`
+- In Markdown / ADRs: `<!-- [dsn->req~...~1] -->`
+
+### Checking coverage
 
 ```bash
-./gradlew traceRequirements   # output: build/tracing.txt
+./gradlew traceRequirements   # output: build/reports/tracing.txt
 ```
 
-See `docs/requirements/` for existing requirements and `docs/requirements/index.md` for full guidance.
+See `docs/requirements/` for existing requirements and [docs/code-howtos/requirements.md](docs/code-howtos/requirements.md) for full guidance.
 
 ---
 
