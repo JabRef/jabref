@@ -123,7 +123,7 @@ class DirectoryLibrarySynchronizerTest {
     private final List<Path> disposedFiles = new ArrayList<>();
 
     /// Tests opt into pattern renames by replacing this; the default keeps file names as-is.
-    private Function<BibEntry, Optional<String>> fileNameGenerator = entry -> Optional.empty();
+    private Function<BibEntry, Optional<String>> fileNameGenerator = _ -> Optional.empty();
 
     /// The default resolver behaves like a cancelled dialog: the library's state wins.
     private GitConflictResolverStrategy conflictResolver = conflicts -> List.of();
