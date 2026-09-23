@@ -32,6 +32,7 @@ class CiteDriveOAuthServiceTest {
                 _ -> {
                     throw new AssertionError("Browser must not be opened");
                 },
+                () -> false,
                 UNREACHABLE, UNREACHABLE);
 
         assertThrows(ExecutionException.class, () -> service.authorizeInteractive().get(5, TimeUnit.SECONDS));
@@ -46,6 +47,7 @@ class CiteDriveOAuthServiceTest {
                 _ -> {
                     throw new AssertionError("Browser must not be opened");
                 },
+                () -> false,
                 UNREACHABLE, UNREACHABLE);
 
         assertThrows(ExecutionException.class, () -> service.getAccessToken().get(30, TimeUnit.SECONDS));

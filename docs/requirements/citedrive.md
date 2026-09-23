@@ -7,7 +7,7 @@ parent: Requirements
 `req~citedrive.login~1`
 
 JabRef logs the user in to CiteDrive in the browser (OAuth 2.0 authorization code flow with PKCE).
-The browser returns to JabRef's HTTP server; if it is disabled, JabRef reports that instead of opening the browser.
+The browser returns to JabRef's HTTP server; if it is disabled, JabRef asks the user to enable it and only then opens the browser.
 A login not completed within ten minutes fails.
 The refresh token is stored in the system keyring only, never in the preferences.
 

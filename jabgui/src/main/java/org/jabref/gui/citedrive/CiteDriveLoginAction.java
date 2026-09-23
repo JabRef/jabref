@@ -11,6 +11,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citedrive.CiteDriveOAuthService;
 import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.remote.RemotePreferences;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -32,7 +33,22 @@ public class CiteDriveLoginAction extends SimpleCommand {
                 preferences.getRemotePreferences(),
                 preferences.getCiteDrivePreferences(),
                 oAuthSessionRegistry,
-                uri -> UiTaskExecutor.runInJavaFXThread(() -> NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences())));
+                uri -> UiTaskExecutor.runInJavaFXThread(() -> NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences())),
+                () -> enableHttpServer(dialogService, preferences.getRemotePreferences()));
+    }
+
+    /// The browser returns to JabRef's HTTP server, which is off by default, so the user is asked to switch it on.
+    ///
+    /// @return whether the server is enabled now
+    private static boolean enableHttpServer(DialogService dialogService, RemotePreferences remotePreferences) {
+        boolean enable = Boolean.TRUE.equals(UiTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Log in to CiteDrive"),
+                Localization.lang("Logging in to CiteDrive needs JabRef's HTTP server, which is currently disabled."),
+                Localization.lang("Enable HTTP server"))));
+        if (enable) {
+            remotePreferences.setEnableHttpServer(true);
+        }
+        return enable;
     }
 
     /// User-facing reason of a failed login or push

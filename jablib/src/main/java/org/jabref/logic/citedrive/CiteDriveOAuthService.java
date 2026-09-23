@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import org.jabref.logic.JabRefException;
@@ -53,13 +54,16 @@ public class CiteDriveOAuthService {
     private final CiteDrivePreferences citeDrivePreferences;
     private final OAuthSessionRegistry sessionRegistry;
     private final Consumer<URI> authorizationPageOpener;
+    private final BooleanSupplier callbackServerEnabler;
 
     /// @param authorizationPageOpener shows the CiteDrive login page to the user (in the browser)
+    /// @param callbackServerEnabler makes the HTTP server receiving the browser redirect run; false if it stays off
     public CiteDriveOAuthService(RemotePreferences remotePreferences,
                                  CiteDrivePreferences citeDrivePreferences,
                                  OAuthSessionRegistry sessionRegistry,
-                                 Consumer<URI> authorizationPageOpener) {
-        this(remotePreferences, citeDrivePreferences, sessionRegistry, authorizationPageOpener, citeDrivePreferences.getAuthorizationEndpoint(), citeDrivePreferences.getTokenEndpoint());
+                                 Consumer<URI> authorizationPageOpener,
+                                 BooleanSupplier callbackServerEnabler) {
+        this(remotePreferences, citeDrivePreferences, sessionRegistry, authorizationPageOpener, callbackServerEnabler, citeDrivePreferences.getAuthorizationEndpoint(), citeDrivePreferences.getTokenEndpoint());
     }
 
     @VisibleForTesting
@@ -67,12 +71,14 @@ public class CiteDriveOAuthService {
                                  CiteDrivePreferences citeDrivePreferences,
                                  OAuthSessionRegistry sessionRegistry,
                                  Consumer<URI> authorizationPageOpener,
+                                 BooleanSupplier callbackServerEnabler,
                                  URI authEndpoint,
                                  URI tokenEndpoint) {
         this.remotePreferences = remotePreferences;
         this.citeDrivePreferences = citeDrivePreferences;
         this.sessionRegistry = sessionRegistry;
         this.authorizationPageOpener = authorizationPageOpener;
+        this.callbackServerEnabler = callbackServerEnabler;
         this.authEndpoint = authEndpoint;
         this.tokenEndpoint = tokenEndpoint;
     }
@@ -83,7 +89,7 @@ public class CiteDriveOAuthService {
     ///
     /// Fails if the HTTP server receiving the browser redirect is disabled, or if the user does not finish logging in in time.
     public CompletableFuture<Optional<AccessToken>> authorizeInteractive() {
-        if (!remotePreferences.shouldEnableHttpServer()) {
+        if (!remotePreferences.shouldEnableHttpServer() && !callbackServerEnabler.getAsBoolean()) {
             return CompletableFuture.failedFuture(new JabRefException(
                     "HTTP server disabled",
                     Localization.lang("Logging in to CiteDrive needs the HTTP server. Please enable it in the preferences.")));
