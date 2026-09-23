@@ -2466,8 +2466,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 return defaults;
             }
         } else {
-            // No persist key at all -> assume all false
-            persists = Collections.nCopies(names.size(), "false");
+            // No persist key at all -> assume all true (default to persisting)
+            persists = Collections.nCopies(names.size(), "true");
         }
 
         if (names.size() != uses.size() || names.size() != keys.size()) {

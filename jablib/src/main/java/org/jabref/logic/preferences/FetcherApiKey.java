@@ -19,7 +19,7 @@ public class FetcherApiKey {
     }
 
     public FetcherApiKey(String name, boolean use, String key) {
-        this(name, use, key, false);
+        this(name, use, key, true);
     }
 
     public String getName() {

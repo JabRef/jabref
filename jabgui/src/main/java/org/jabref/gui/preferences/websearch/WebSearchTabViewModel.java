@@ -364,7 +364,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         private final BooleanProperty customizable = new SimpleBooleanProperty();
         private final StringProperty apiKey = new SimpleStringProperty("");
         private final BooleanProperty useCustomApiKey = new SimpleBooleanProperty(false);
-        private final BooleanProperty persistApiKey = new SimpleBooleanProperty(false);
+        private final BooleanProperty persistApiKey = new SimpleBooleanProperty(true);
         private final WebFetcher fetcher;
 
         public FetcherViewModel(WebFetcher fetcher, boolean enabled, boolean customizable) {

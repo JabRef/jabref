@@ -113,13 +113,13 @@ class ImporterPreferencesTest {
     }
 
     @Test
-    void getDefaultReturnsKeysWithUseAndPersistFalse() {
+    void getDefaultReturnsKeysWithUseFalseAndPersistTrue() {
         ImporterPreferences defaultPrefs = ImporterPreferences.getDefault();
 
         assertFalse(defaultPrefs.getApiKeys().isEmpty());
         for (FetcherApiKey key : defaultPrefs.getApiKeys()) {
             assertFalse(key.shouldUse(), "shouldUse must be false for default key: " + key.getName());
-            assertFalse(key.shouldPersist(), "shouldPersist must be false for default key: " + key.getName());
+            assertTrue(key.shouldPersist(), "shouldPersist must be true for default key: " + key.getName());
         }
     }
 

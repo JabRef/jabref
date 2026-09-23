@@ -93,7 +93,7 @@ public class ImporterPreferences {
         ImporterPreferences preferences = new ImporterPreferences();
         preferences.setApiKeys(new HashSet<>(getDefaultFetcherKeys()
                 .entrySet().stream()
-                .map(entry -> new FetcherApiKey(entry.getKey(), false, entry.getValue(), false))
+                .map(entry -> new FetcherApiKey(entry.getKey(), false, entry.getValue(), true))
                 .toList()));
         return preferences;
     }
