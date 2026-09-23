@@ -879,6 +879,17 @@ jobs:
           subdir: ""
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
 
+      - name: Upload portable JabRef for Flatpak packaging
+        if: >
+          needs.conditions.outputs.should-build == 'true' &&
+          startsWith(matrix.os, 'ubuntu') &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: flatpak-source (${{ matrix.displayName }})
+          path: jabgui/build/packages/${{ matrix.os }}/JabRef-portable_linux${{ matrix.suffix }}.tar.gz
+          if-no-files-found: error
+
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ needs.conditions.outputs.should-build == 'true' && (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -889,6 +900,61 @@ jobs:
             jabgui/build/packages/${{ matrix.os }}
             jabls-cli/build/packages/${{ matrix.os }}
           compression-level: 0 # no compression
+
+  flatpak:
+    needs: [ build, conditions ]
+    if: >
+      needs.conditions.outputs.should-build == 'true' &&
+      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            os: ubuntu-22.04
+            displayName: linux-amd64
+            archive: JabRef-portable_linux.tar.gz
+          - arch: aarch64
+            os: ubuntu-22.04-arm
+            displayName: linux-arm
+            archive: JabRef-portable_linux_arm64.tar.gz
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.displayName }} ${{ github.ref == 'refs/heads/main' && 'nightly' || contains(github.ref_name, '-beta') && 'beta' || 'stable' }} Flatpak
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
+      options: --privileged
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Download portable JabRef
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: flatpak-source (${{ matrix.displayName }})
+          path: flatpak
+
+      - name: Configure the manifest for the local portable archive
+        env:
+          ARCH: ${{ matrix.arch }}
+          ARCHIVE: ${{ matrix.archive }}
+        run: |
+          jq --arg arch "$ARCH" --arg archive "$ARCHIVE" '
+            .modules[0].sources |= map(
+              if .["only-arches"] == [$arch]
+              then del(.url, .sha256) + {"path": $archive}
+              else .
+              end
+            )
+          ' flatpak/org.jabref.jabref.json > flatpak/org.jabref.jabref.ci.json
+
+      - name: Build and upload Flatpak
+        uses: flatpak/flatpak-github-actions/flatpak-builder@79327416609af08178ad73b352877e51450790b3 # v6
+        with:
+          manifest-path: flatpak/org.jabref.jabref.ci.json
+          arch: ${{ matrix.arch }}
+          branch: ${{ github.ref == 'refs/heads/main' && 'nightly' || contains(github.ref_name, '-beta') && 'beta' || 'stable' }}
+          bundle: org.jabref.jabref-${{ github.ref == 'refs/heads/main' && 'nightly' || contains(github.ref_name, '-beta') && 'beta' || 'stable' }}.flatpak
+          artifact-name: JabRef Flatpak (${{ github.ref == 'refs/heads/main' && 'nightly' || contains(github.ref_name, '-beta') && 'beta' || 'stable' }}, ${{ matrix.arch }})
 
   jabkit-native:
     needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
