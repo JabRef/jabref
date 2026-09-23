@@ -37,6 +37,7 @@ public interface FieldEditorFX {
 
         // We need to use the "global" UndoManager instead of JavaFX TextInputControls's native undo/redo handling.
         // This also prevents NPEs. See https://github.com/JabRef/jabref/issues/11420 for details.
+        // [impl->req~logic.undo.text-field-shortcut~1]
         textInputControl.addEventFilter(KeyEvent.ANY, e -> {
             // Fix based on https://stackoverflow.com/a/37575818/873282
             if (e.getEventType() == KeyEvent.KEY_PRESSED // if not checked, it will be fired twice: once for key pressed and once for key released

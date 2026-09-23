@@ -2,7 +2,7 @@ package org.jabref.logic.shared;
 
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
-import org.jabref.testutils.category.DatabaseTest;
+import org.jabref.support.DatabaseTest;
 
 import com.google.common.eventbus.Subscribe;
 
