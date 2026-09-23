@@ -566,8 +566,42 @@ jobs:
           echo "Link to PR: ${{ github.event.pull_request.html_url }}" >> _h5ai.header.md
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/
 
+  flatpak-channel:
+    needs: conditions
+    runs-on: ubuntu-slim
+    outputs:
+      build: ${{ steps.channel.outputs.build }}
+      channel: ${{ steps.channel.outputs.channel }}
+    steps:
+      - name: Determine Flatpak channel
+        id: channel
+        shell: bash
+        env:
+          SHOULD_BUILD: ${{ needs.conditions.outputs.should-build }}
+        run: |
+          channel=unsupported
+          build=false
+
+          if [[ "$SHOULD_BUILD" == true ]]; then
+            if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+              channel=nightly
+              build=true
+            elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+              if [[ "$GITHUB_REF_NAME" == *-beta* ]]; then
+                channel=beta
+                build=true
+              elif [[ "$GITHUB_REF_NAME" =~ ^v?[0-9]+(\.[0-9]+)+$ ]]; then
+                channel=stable
+                build=true
+              fi
+            fi
+          fi
+
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+
   build:
-    needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
+    needs: [ compute-matrix, conditions, disk-space-check, pre-build, flatpak-channel ]
     strategy:
       fail-fast: false
       matrix:
@@ -881,9 +915,9 @@ jobs:
 
       - name: Upload portable JabRef for Flatpak packaging
         if: >
-          needs.conditions.outputs.should-build == 'true' &&
+          needs.flatpak-channel.outputs.build == 'true' &&
           startsWith(matrix.os, 'ubuntu') &&
-          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+          needs.conditions.outputs.should-build == 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: flatpak-source (${{ matrix.displayName }})
@@ -902,10 +936,8 @@ jobs:
           compression-level: 0 # no compression
 
   flatpak:
-    needs: [ build, conditions ]
-    if: >
-      needs.conditions.outputs.should-build == 'true' &&
-      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
+    needs: [ build, flatpak-channel ]
+    if: needs.flatpak-channel.outputs.build == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -919,7 +951,7 @@ jobs:
             displayName: linux-arm
             archive: JabRef-portable_linux_arm64.tar.gz
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.displayName }} ${{ github.ref == 'refs/heads/main' && 'nightly' || contains(github.ref_name, '-beta') && 'beta' || 'stable' }} Flatpak
+    name: ${{ matrix.displayName }} ${{ needs.flatpak-channel.outputs.channel }} Flatpak
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
       options: --privileged
@@ -952,9 +984,9 @@ jobs:
         with:
           manifest-path: flatpak/org.jabref.jabref.ci.json
           arch: ${{ matrix.arch }}
-          branch: ${{ github.ref == 'refs/heads/main' && 'nightly' || contains(github.ref_name, '-beta') && 'beta' || 'stable' }}
-          bundle: org.jabref.jabref-${{ github.ref == 'refs/heads/main' && 'nightly' || contains(github.ref_name, '-beta') && 'beta' || 'stable' }}.flatpak
-          artifact-name: JabRef Flatpak (${{ github.ref == 'refs/heads/main' && 'nightly' || contains(github.ref_name, '-beta') && 'beta' || 'stable' }}, ${{ matrix.arch }})
+          branch: ${{ needs.flatpak-channel.outputs.channel }}
+          bundle: org.jabref.jabref-${{ needs.flatpak-channel.outputs.channel }}.flatpak
+          artifact-name: JabRef Flatpak (${{ needs.flatpak-channel.outputs.channel }}, ${{ matrix.arch }})
 
   jabkit-native:
     needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
