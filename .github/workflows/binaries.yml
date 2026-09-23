@@ -567,38 +567,27 @@ jobs:
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' _h5ai.header.md jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.normalize.outputs.branch }}/
 
   flatpak-channel:
-    needs: conditions
     runs-on: ubuntu-slim
     outputs:
-      build: ${{ steps.channel.outputs.build }}
       channel: ${{ steps.channel.outputs.channel }}
     steps:
       - name: Determine Flatpak channel
         id: channel
         shell: bash
-        env:
-          SHOULD_BUILD: ${{ needs.conditions.outputs.should-build }}
         run: |
           channel=unsupported
-          build=false
 
-          if [[ "$SHOULD_BUILD" == true ]]; then
-            if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-              channel=nightly
-              build=true
-            elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
-              if [[ "$GITHUB_REF_NAME" == *-beta* ]]; then
-                channel=beta
-                build=true
-              elif [[ "$GITHUB_REF_NAME" =~ ^v?[0-9]+(\.[0-9]+)+$ ]]; then
-                channel=stable
-                build=true
-              fi
+          if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+            channel=nightly
+          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            if [[ "$GITHUB_REF_NAME" == *-beta* ]]; then
+              channel=beta
+            elif [[ "$GITHUB_REF_NAME" =~ ^v?[0-9]+(\.[0-9]+)+$ ]]; then
+              channel=stable
             fi
           fi
 
           echo "channel=$channel" >> "$GITHUB_OUTPUT"
-          echo "build=$build" >> "$GITHUB_OUTPUT"
 
   build:
     needs: [ compute-matrix, conditions, disk-space-check, flatpak-channel, pre-build ]
@@ -913,12 +902,11 @@ jobs:
           subdir: ""
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
 
-        # depends on the flatpak-channel evaluation that's why we need the addtional variable
       - name: Upload portable JabRef for Flatpak packaging
         if: >
-          needs.flatpak-channel.outputs.build == 'true' &&
-          startsWith(matrix.os, 'ubuntu') &&
-          needs.conditions.outputs.should-build == 'true'
+          needs.conditions.outputs.should-build == 'true' &&
+          needs.flatpak-channel.outputs.channel != 'unsupported' &&
+          startsWith(matrix.os, 'ubuntu')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: flatpak-source (${{ matrix.displayName }})
@@ -937,8 +925,8 @@ jobs:
           compression-level: 0 # no compression
 
   flatpak:
-    needs: [ build, flatpak-channel ]
-    if: needs.flatpak-channel.outputs.build == 'true'
+    needs: [ build, conditions, flatpak-channel ]
+    if: needs.conditions.outputs.should-build == 'true' && needs.flatpak-channel.outputs.channel != 'unsupported'
     strategy:
       fail-fast: false
       matrix:
