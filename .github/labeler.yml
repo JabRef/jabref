@@ -14,10 +14,13 @@
       - any-glob-to-any-file:
           - 'jablib/src/**/org/jabref/logic/ai/**'
           - 'jabgui/src/**/org/jabref/gui/ai/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/ai/**'
 
 "component: autocompletion":
   - changed-files:
-      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/autocompleter/**'
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/autocompleter/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/autocompletion/**'
 
 "component: automatic-field-editor":
   - changed-files:
@@ -48,6 +51,7 @@
       - any-glob-to-any-file:
           - 'jablib/src/**/org/jabref/logic/citationkeypattern/**'
           - 'jabgui/src/**/org/jabref/gui/citationkeypattern/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/citationkeypattern/**'
 
 "component: citation-relations":
   - changed-files:
@@ -96,6 +100,7 @@
       - any-glob-to-any-file:
           - 'jabgui/src/**/org/jabref/gui/entryeditor/**'
           - 'jabgui/src/**/org/jabref/gui/fieldeditors/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/entryeditor/**'
 
 "component: entry-preview":
   - changed-files:
@@ -103,6 +108,7 @@
           - 'jablib/src/**/org/jabref/logic/preview/**'
           - 'jablib/src/**/org/jabref/logic/citationstyle/**'
           - 'jabgui/src/**/org/jabref/gui/preview/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/preview/**'
 
 "component: export-or-save":
   - changed-files:
@@ -110,12 +116,15 @@
           - 'jablib/src/**/org/jabref/logic/exporter/**'
           - 'jablib/src/**/org/jabref/logic/layout/**'
           - 'jabgui/src/**/org/jabref/gui/exporter/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/customexporter/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/export/**'
 
 "component: external-application-integration":
   - changed-files:
       - any-glob-to-any-file:
           - 'jablib/src/**/org/jabref/logic/push/**'
           - 'jabgui/src/**/org/jabref/gui/push/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/external/**'
 
 "component: external-changes":
   - changed-files:
@@ -129,16 +138,21 @@
           - 'jabgui/src/**/org/jabref/gui/externalfiletype/**'
           - 'jabgui/src/**/org/jabref/gui/linkedfile/**'
           - 'jabgui/src/**/org/jabref/gui/copyfiles/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/externalfiletypes/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/linkedfiles/**'
 
 "component: fetcher":
   - changed-files:
-      - any-glob-to-any-file: 'jablib/src/**/org/jabref/logic/importer/fetcher/**'
+      - any-glob-to-any-file:
+          - 'jablib/src/**/org/jabref/logic/importer/fetcher/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/websearch/**'
 
 "component: git":
   - changed-files:
       - any-glob-to-any-file:
           - 'jablib/src/**/org/jabref/logic/git/**'
           - 'jabgui/src/**/org/jabref/gui/git/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/git/**'
 
 "component: groups":
   - changed-files:
@@ -146,6 +160,7 @@
           - 'jablib/src/**/org/jabref/logic/groups/**'
           - 'jablib/src/**/org/jabref/model/groups/**'
           - 'jabgui/src/**/org/jabref/gui/groups/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/groups/**'
 
 # Importer changes that are not fetcher changes (fetchers have their own label).
 "component: import-load":
@@ -154,6 +169,7 @@
           - any-glob-to-any-file:
               - 'jablib/src/**/org/jabref/logic/importer/**'
               - 'jabgui/src/**/org/jabref/gui/importer/**'
+              - 'jabgui/src/**/org/jabref/gui/preferences/customimporter/**'
           - all-globs-to-all-files: '!jablib/src/**/org/jabref/logic/importer/fetcher/**'
 
 "component: integrity-checker":
@@ -183,10 +199,13 @@
       - any-glob-to-any-file:
           - 'jablib/src/**/org/jabref/logic/journals/**'
           - 'jablib/src/main/abbrv.jabref.org/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/journals/**'
 
 "component: keybinding":
   - changed-files:
-      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/keyboard/**'
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/keyboard/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/keybindings/**'
 
 # AUX/BLG/BST/TEX files JabRef reads or writes alongside a LaTeX document.
 "component: latex-file-support":
@@ -208,6 +227,7 @@
           - 'jablib/src/**/org/jabref/logic/openoffice/**'
           - 'jablib/src/**/org/jabref/model/openoffice/**'
           - 'jabgui/src/**/org/jabref/gui/openoffice/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/openoffice/**'
 
 "component: logging":
   - changed-files:
@@ -223,7 +243,9 @@
 
 "component: maintable":
   - changed-files:
-      - any-glob-to-any-file: 'jabgui/src/**/org/jabref/gui/maintable/**'
+      - any-glob-to-any-file:
+          - 'jabgui/src/**/org/jabref/gui/maintable/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/table/**'
 
 "component: microsoft-word-integration":
   - changed-files:
@@ -234,6 +256,7 @@
       - any-glob-to-any-file:
           - 'jablib/src/**/org/jabref/logic/ocr/**'
           - 'jablib/src/**/org/jabref/model/ocr/**'
+          - 'jabgui/src/**/org/jabref/gui/preferences/ocr/**'
 
 "component: pdf-viewer":
   - changed-files:
