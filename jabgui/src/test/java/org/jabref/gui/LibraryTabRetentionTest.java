@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -53,7 +50,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -94,6 +90,7 @@ class LibraryTabRetentionTest {
         when(preferences.getSearchPreferences().searchDisplayModeProperty()).thenReturn(new SimpleObjectProperty<>(SearchDisplayMode.FILTER));
         when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
         when(preferences.getFilePreferences().fulltextIndexLinkedFilesProperty()).thenReturn(new SimpleBooleanProperty(false));
+        when(preferences.getMainTablePreferences().resizeColumnsToFitProperty()).thenReturn(new SimpleBooleanProperty(false));
 
         stateManager = new JabRefGuiStateManager();
 
@@ -116,28 +113,10 @@ class LibraryTabRetentionTest {
         Injector.forgetAll();
     }
 
-    private static void runOnFxThreadAndWait(Runnable action) throws InterruptedException {
-        CountDownLatch done = new CountDownLatch(1);
-        @Nullable Throwable[] failure = new Throwable[1];
-        Platform.runLater(() -> {
-            try {
-                action.run();
-            } catch (Throwable t) {
-                failure[0] = t;
-            } finally {
-                done.countDown();
-            }
-        });
-        assertTrue(done.await(60, TimeUnit.SECONDS));
-        if (failure[0] != null) {
-            throw new AssertionError(failure[0]);
-        }
-    }
-
     /// Mirrors [org.jabref.gui.frame.JabRefFrame#initBindings]: the libraries the [StateManager]
     /// reports as open are the library tabs of the tab pane.
-    private void setUpTabPane() throws InterruptedException {
-        runOnFxThreadAndWait(() -> {
+    private void setUpTabPane() {
+        JavaFxExtension.invokeAndWait(() -> {
             tabPane = new TabPane();
             BindingsHelper.bindContentFiltered(tabPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
             // ... and the active library follows the selected tab, so closing one hands the state
@@ -154,13 +133,13 @@ class LibraryTabRetentionTest {
         });
     }
 
-    private LibraryTab openTab() throws InterruptedException {
+    private LibraryTab openTab() {
         return openTab(false);
     }
 
     /// @param closeImmediately closes the tab in the same JavaFX pulse that created it, before the
     ///                         listener registrations it queued with `Platform.runLater` have run
-    private LibraryTab openTab(boolean closeImmediately) throws InterruptedException {
+    private LibraryTab openTab(boolean closeImmediately) {
         LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
         when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList());
 
@@ -174,7 +153,7 @@ class LibraryTabRetentionTest {
         BibDatabaseContext context = new BibDatabaseContext(database);
 
         @Nullable LibraryTab[] created = new LibraryTab[1];
-        runOnFxThreadAndWait(() -> {
+        JavaFxExtension.invokeAndWait(() -> {
             LibraryTab tab = LibraryTab.createLibraryTab(
                     context,
                     tabContainer,
@@ -196,33 +175,31 @@ class LibraryTabRetentionTest {
             created[0] = tab;
         });
         // Part of the tab's listeners are registered from a Platform.runLater, so let that run
-        runOnFxThreadAndWait(() -> {
-        });
+        JavaFxExtension.awaitEvents();
         return created[0];
     }
 
     /// Mirrors [org.jabref.gui.frame.JabRefFrame#closeTabs].
-    private void closeTab(LibraryTab tab) throws InterruptedException {
-        runOnFxThreadAndWait(() -> {
+    private void closeTab(LibraryTab tab) {
+        JavaFxExtension.invokeAndWait(() -> {
             tabPane.getTabs().remove(tab);
             Event.fireEvent(tab, new Event(tabPane, tab, Tab.CLOSED_EVENT));
         });
-        runOnFxThreadAndWait(() -> {
-        });
+        JavaFxExtension.awaitEvents();
     }
 
     /// Mockito keeps the last invocation per mock plus a per-thread "ongoing stubbing", and both
     /// hold on to the arguments they saw. Deep stubs record on whichever thread called them, so the
     /// JavaFX thread has state of its own. Left in place, that roots the objects under test and the
     /// assertions below would be measuring the harness instead of the code.
-    private static void releaseMocks() throws InterruptedException {
-        runOnFxThreadAndWait(Mockito::validateMockitoUsage);
+    private static void releaseMocks() {
+        JavaFxExtension.invokeAndWait(Mockito::validateMockitoUsage);
         Mockito.validateMockitoUsage();
         Mockito.framework().clearInlineMocks();
     }
 
     @Test
-    void closedTabIsReleased() throws InterruptedException {
+    void closedTabIsReleased() {
         setUpTabPane();
 
         // Held in a slot the assertion can empty: a local variable, or a lambda capturing one, would
@@ -238,7 +215,7 @@ class LibraryTabRetentionTest {
     }
 
     @Test
-    void tabClosedBeforeItsDeferredSetupRanIsReleased() throws InterruptedException {
+    void tabClosedBeforeItsDeferredSetupRanIsReleased() {
         setUpTabPane();
 
         @Nullable LibraryTab[] tab = {openTab(true)};
@@ -251,7 +228,7 @@ class LibraryTabRetentionTest {
     }
 
     @Test
-    void closedTabIsReleasedWhileAnotherLibraryStaysOpen() throws InterruptedException {
+    void closedTabIsReleasedWhileAnotherLibraryStaysOpen() {
         setUpTabPane();
 
         LibraryTab stays = openTab();
@@ -267,7 +244,7 @@ class LibraryTabRetentionTest {
     }
 
     @Test
-    void closedLibrariesDoNotAccumulate() throws InterruptedException {
+    void closedLibrariesDoNotAccumulate() {
         setUpTabPane();
 
         List<BibDatabaseContext> contexts = new ArrayList<>();
