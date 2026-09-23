@@ -414,20 +414,12 @@ Format: `<type>~<area>.<name>~<revision>`
 
 - Paths are hierarchical and separated by `.`; words in names use hyphens (`kebab-case`).
 - Revision starts at `1` and is incremented when the requirement changes significantly.
-- Core artifact types:
+- Artifact types used:
   - `feat`: User-facing capability or broad feature ("User can verb").
   - `req`: Specific constraint, nuance, cross-cutting requirement, or bug fix the system must satisfy ("Subject must verb").
-  - `impl`: Code implementation (Java, GitHub CI/CD, etc.).
+  - `impl`: Code implementation.
   - `utest`: Unit test.
-  - `itest`: Integration / external service test.
-  - `dsn`: Design document / specification (MADR/ADR).
-  - `arch`: High-level architecture requirement.
   - `adr`: Architectural Decision Record.
-- Custom artifact markers:
-  - `pp`: Feature must be guarded with a privacy policy banner.
-  - `guard`: Dangerous action that must be guarded by a confirmation dialog.
-
-Throughout development, you will primarily work with `feat`, `req`, `impl`, and `utest`.
 
 ### How to write requirements
 
@@ -469,24 +461,9 @@ Requirements belong in `docs/requirements/<area>.md` (grouped by feature domain,
 
 - The identifier must be placed on the line immediately below the Markdown heading with **no empty line**.
 - Add `<!-- markdownlint-disable-file MD022 -->` at the end of the file.
-- Specify coverage needs at the end of the requirement: `Needs: impl` (and optionally `utest`, `itest`, etc.).
+- Specify coverage needs at the end of the requirement: `Needs: impl` (and optionally `utest`).
 
-#### Example: Bad vs. Good
-
-**Bad** (vague heading, no modal verb, normative content hidden in body):
-
-```markdown
-## GitHub personal access token verification
-`req~git.share.personal-access-token-verification~1`
-
-The GitHub sharing dialog must allow users to verify that their personal
-access token has push access to the configured GitHub repository before
-sharing a library.
-
-Needs: impl
-```
-
-**Good** (subject-first title carrying full constraint, description adds only contextual details):
+### Example
 
 ```markdown
 ## GitHub personal access token push access must be verifiable before sharing
@@ -512,7 +489,7 @@ public void checkAccess() {
 ```
 
 - In tests: `// [utest->req~...~1]`
-- In Markdown / ADRs: `<!-- [dsn->req~...~1] -->`
+- In Markdown / ADRs: `<!-- [impl->adr~...~1] -->`
 
 ### Checking coverage
 
