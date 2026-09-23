@@ -224,6 +224,9 @@ public class BibtexParser implements Parser {
     }
 
     // [impl->req~import.bibtex.percent-comments~1]
+    /// Reads database metadata before the first `@` and leaves that marker for [#parseFileContent()].
+    /// This boundary prevents comments after an entry from being mistaken for database headers.
+    /// Consecutive backslashes determine whether a `%` begins a comment or a legacy escaped header.
     private void parseDatabaseID() throws IOException {
         boolean escaped = false;
 
@@ -265,6 +268,7 @@ public class BibtexParser implements Parser {
         }
     }
 
+    /// Skips whitespace on the current line without consuming the line break or the next entry.
     private void skipWhitespaceOnLine() throws IOException {
         while (!eof) {
             int character = read();
@@ -280,6 +284,7 @@ public class BibtexParser implements Parser {
         }
     }
 
+    /// Skips the remainder of a percent comment, including its first line-break character.
     private void skipUntilEndOfLine() throws IOException {
         while (!eof) {
             int character = read();
@@ -1293,6 +1298,11 @@ public class BibtexParser implements Parser {
     }
 
     // [impl->req~import.bibtex.percent-comments~1]
+    /// Finds the next delimiter after [#parseDatabaseID()] has read leading metadata headers.
+    /// Unescaped `%` starts a line comment; only an immediately preceding odd number of backslashes escapes it.
+    /// This counts consecutive backslashes outside entries, unlike `isEscapeSymbol(char)` for bracketed field content.
+    ///
+    /// @return whether the delimiter was found before the end of the file
     private boolean consumeUncritically(char expected) throws IOException {
         boolean escaped = false;
 

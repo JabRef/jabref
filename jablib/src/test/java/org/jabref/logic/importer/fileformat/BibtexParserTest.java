@@ -2220,6 +2220,41 @@ class BibtexParserTest {
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseDoesNotReadDatabaseIdAfterFirstEntry() throws IOException {
+        String bibtex = """
+                @article{first}
+                % DBID: later
+                @article{second}
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(Optional.empty(), result.getDatabase().getSharedDatabaseID());
+        assertEquals(List.of("first", "second"), result.getDatabase().getEntries().stream()
+                .map(entry -> entry.getCitationKey().orElseThrow())
+                .toList());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @Test
+    void parseUsesBackslashParityForPercentComments() throws IOException {
+        String bibtex = """
+                @article{first}
+                \\\\% Comment with @article{fake}
+                \\% Literal percent before @article{second}
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(List.of("first", "second"), result.getDatabase().getEntries().stream()
+                .map(entry -> entry.getCitationKey().orElseThrow())
+                .toList());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
     @ParameterizedTest
     @ValueSource(strings = {"%\n", "%   \n", "%\t\n", "%\r\n", "%   \r\n", "%\r", "%\n%\t\n",
             "% Encoding:\n", "% Encoding: \t\r\n", "% DBID:\n", "% DBID: \t\r\n"})
