@@ -8,7 +8,7 @@ parent: Requirements
 
 JabRef supports importing MARC21 bibliographic records encoded as [MARCXML](https://www.loc.gov/standards/marcxml/) and maps recognised fields according to the [MARC 21 Format for Bibliographic Data](https://www.loc.gov/marc/bibliographic/) and the [DNB MARC21 export format](https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21.html).
 
-For DNB records, only an electronic-location field explicitly labelled `Volltext` is treated as a linked full-text document; content descriptions and tables of contents are not.
+An importer should prefer proper fulltext links (e.g. Volltext) for PDFs over other content links.
 
 Needs: impl, utest
 

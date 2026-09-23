@@ -37,7 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-/// A parser for the bavarian flavour (Bibliotheksverbund Bayern) of the marc xml standard
+/// A parser for the MARC21-XML standard, used by DNB and BVB
 ///
 /// See [Feldbeschreibung der Titeldaten bei der Deutschen Nationalbibliothek](https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html)
 ///

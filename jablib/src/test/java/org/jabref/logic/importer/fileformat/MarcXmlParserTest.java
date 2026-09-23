@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+// [utest->req~import.marc21-xml~1]
 class MarcXmlParserTest {
 
     private static final String FILE_ENDING = ".xml";
@@ -50,7 +51,6 @@ class MarcXmlParserTest {
     }
 
     @Test
-        // [utest->req~import.marc21-xml~1]
     void importsDoiFromDnbMarcXml() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlDoiRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -62,7 +62,6 @@ class MarcXmlParserTest {
     }
 
     @Test
-        // [utest->req~import.marc21-xml~1]
     void prefersIsbn13RegardlessOfHyphenatedIsbnOrder() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlIsbnOrderingRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -74,7 +73,6 @@ class MarcXmlParserTest {
     }
 
     @Test
-        // [utest->req~import.marc21-xml~1]
     void importsParentJournalFromDnbMarcXml() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlParentJournalRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -86,7 +84,6 @@ class MarcXmlParserTest {
     }
 
     @Test
-        // [utest->req~import.marc21-xml~1]
     void doesNotChangeMonographicPartToArticle() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlMonographicPartRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -98,7 +95,6 @@ class MarcXmlParserTest {
     }
 
     @Test
-        // [utest->req~import.marc21-xml~1]
     void ignoresDnbContentDescriptionUrl() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlContentDescriptionRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
@@ -110,7 +106,6 @@ class MarcXmlParserTest {
     }
 
     @Test
-        // [utest->req~import.marc21-xml~1]
     void importsDnbFulltextUrl() throws IOException, ParseException {
         try (InputStream inputStream = MarcXmlParserTest.class.getResourceAsStream("DnbMarcXmlFulltextRecord.xml")) {
             List<BibEntry> entries = new MarcXmlParser().parseEntries(inputStream);
