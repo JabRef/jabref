@@ -1009,7 +1009,11 @@ jobs:
       - name: Upload Flatpak bundle
         shell: bash
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' flatpak/JabRef-${{ needs.pre-build.outputs.Major }}.${{ needs.pre-build.outputs.Minor }}${{ matrix.suffix }}.flatpak jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
+            --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }} && rsync" \
+            -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
+            flatpak/JabRef-${{ needs.pre-build.outputs.Major }}.${{ needs.pre-build.outputs.Minor }}${{ matrix.suffix }}.flatpak \
+            jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/
 
   jabkit-native:
     needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
