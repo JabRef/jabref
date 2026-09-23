@@ -238,7 +238,11 @@ public enum StandardActions implements Action {
     GIT_PULL(Localization.lang("Pull")),
     GIT_PUSH(Localization.lang("Push")),
     GIT_COMMIT(Localization.lang("Commit")),
-    GIT_SHARE(Localization.lang("Share this library to GitHub"));
+    GIT_SHARE(Localization.lang("Share this library to GitHub")),
+
+    CITE_DRIVE(Localization.lang("CiteDrive")),
+    CITE_DRIVE_LOGIN(Localization.lang("Login...")), // "Authorize" would be the more technical term here.
+    CITE_DRIVE_PUSH(Localization.lang("Push to CiteDrive"));
 
     private String text;
     private final String description;
