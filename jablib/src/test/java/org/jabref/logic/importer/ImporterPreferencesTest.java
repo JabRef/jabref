@@ -1,7 +1,6 @@
 package org.jabref.logic.importer;
 
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -142,9 +141,9 @@ class ImporterPreferencesTest {
     void persistFlagPreservedThroughSetApiKeys() {
         ImporterPreferences prefs = withApiKeys(Set.of());
 
-        Set<FetcherApiKey> keys = new HashSet<>();
-        keys.add(new FetcherApiKey("FetcherA", true, "key-a", true));
-        keys.add(new FetcherApiKey("FetcherB", false, "key-b", false));
+        Set<FetcherApiKey> keys = Set.of(
+                new FetcherApiKey("FetcherA", true, "key-a", true),
+                new FetcherApiKey("FetcherB", false, "key-b", false));
         prefs.setApiKeys(keys);
 
         assertAll(
