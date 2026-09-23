@@ -2499,6 +2499,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return slots.stream().map(stored::get).toList();
     }
 
+    // [impl->req~fetchers.api-key-persistence~1]
     private void storeFetcherKeys(ImporterPreferences defaults) {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
