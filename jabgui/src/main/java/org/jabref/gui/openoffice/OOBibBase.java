@@ -281,7 +281,7 @@ public class OOBibBase {
         if (result.isError()) {
             LOGGER.warn(result.getError());
         }
-        return result.mapError(detail -> new OOError(errorTitle, messageOnFailureToObtain));
+        return result.mapError(_ -> new OOError(errorTitle, messageOnFailureToObtain));
     }
 
     private static OOVoidResult<OOError> checkRangeOverlaps(XTextDocument doc, OOFrontend frontend) {
@@ -796,7 +796,7 @@ public class OOBibBase {
                 try {
                     bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
                     return OOVoidResult.ok();
-                } catch (MissingStyleDefinedCitationLabelException e) {
+                } catch (MissingStyleDefinedCitationLabelException _) {
                     return OOVoidResult.error(OOError.bstStyleDoesNotDefineCitationFormat());
                 } catch (CreationException | com.sun.star.uno.Exception e) {
                     return OOVoidResult.error(OOError.fromMisc(e));
@@ -1151,7 +1151,7 @@ public class OOBibBase {
             try {
                 bstUpdateBibliography.rebuildBstBibliography(
                         doc, bstCitationOOAdapter, bstStyle, citedEntries, bibDatabaseContext);
-            } catch (MissingStyleDefinedCitationLabelException e) {
+            } catch (MissingStyleDefinedCitationLabelException _) {
                 return OOVoidResult.error(OOError.bstStyleDoesNotDefineCitationFormat());
             } catch (IOException | InterruptedException | com.sun.star.uno.Exception | CreationException e) {
                 LOGGER.error("Could not update BST bibliography", e);
