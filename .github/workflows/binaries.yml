@@ -601,7 +601,7 @@ jobs:
           echo "build=$build" >> "$GITHUB_OUTPUT"
 
   build:
-    needs: [ compute-matrix, conditions, disk-space-check, pre-build, flatpak-channel ]
+    needs: [ compute-matrix, conditions, disk-space-check, flatpak-channel, pre-build ]
     strategy:
       fail-fast: false
       matrix:
@@ -913,6 +913,7 @@ jobs:
           subdir: ""
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
 
+        # depends on the flatpak-channel evaluation that's why we need the addtional variable
       - name: Upload portable JabRef for Flatpak packaging
         if: >
           needs.flatpak-channel.outputs.build == 'true' &&
