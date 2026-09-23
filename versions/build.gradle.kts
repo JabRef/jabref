@@ -33,7 +33,7 @@ dependencies {
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.2.2"))
+    api(platform("tools.jackson:jackson-bom:3.2.3"))
 }
 
 dependencies.constraints {
@@ -49,14 +49,14 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.2")
 
-    api("com.dlsc.gemsfx:gemsfx:4.4.5")
+    api("com.dlsc.gemsfx:gemsfx:4.5.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.5.0")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.4.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:1.0.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:1.0.0")
-    api("com.github.ben-manes.caffeine:caffeine:3.2.4")
+    api("com.github.ben-manes.caffeine:caffeine:3.3.0")
     api("com.github.javakeyring:java-keyring:1.0.4")
     api("com.github.javaparser:javaparser-core:3.28.2")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
