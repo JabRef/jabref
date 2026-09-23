@@ -91,6 +91,8 @@ class CiteDrivePushTest {
                 .withChanged(true);
 
         BibDatabase database = new BibDatabase();
+        // The writer uses the library's separator; pinning it keeps the expected body the same on Windows
+        database.setNewLineSeparator("\n");
         database.insertEntry(entry);
         BibDatabaseContext context = new BibDatabaseContext(database);
         context.getMetaData().setLibrarySpecificFileDirectory("/home/user/papers");
