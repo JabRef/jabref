@@ -216,13 +216,20 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 return;
             }
             tab.setDatabaseContext(loadedContext);
+            tab.tabContainer.removeSharedDatabaseErrorTabFor(loadedContext);
             Optional.ofNullable(tab.autoCompleterChangedListener).ifPresent(Runnable::run);
             tab.loading.set(false);
             tab.dataLoadingTask = null;
             onSuccess.accept(tab, loadedContext);
         }
 
-        private void onDatabaseLoadingFailed(Exception exception) {
+        void onDatabaseLoadingFailed(Exception exception) {
+            synchronized (this) {
+                if (cancelled) {
+                    // The user closed the loading tab meanwhile: the attempt is over, no error tab may bring it back
+                    return;
+                }
+            }
             tab.loading.set(false);
             tab.dataLoadingTask = null;
             tab.tabContainer.closeTab(tab);
@@ -410,6 +417,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         text.append(" [");
         text.append(Localization.lang("shared"));
         text.append("]");
+    }
+
+    public boolean isLoading() {
+        return loading.get();
     }
 
     private void setDataLoadingTask(BackgroundTask<?> dataLoadingTask) {

@@ -15,6 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We changed failed shared database connections to show a tab with "Retry" instead of an error dialog. [#16968](https://github.com/JabRef/jabref/pull/16968)
+
 ### Fixed
 
 - We re-enabled the [Grobid](https://github.com/grobidOrg/grobid) citation fetcher again. It is now reachable via https. [#16668](https://github.com/JabRef/jabref/issues/16668)
