@@ -57,7 +57,7 @@ public class CiteDriveOAuthService {
     private final BooleanSupplier callbackServerEnabler;
 
     /// @param authorizationPageOpener shows the CiteDrive login page to the user (in the browser)
-    /// @param callbackServerEnabler makes the HTTP server receiving the browser redirect run; false if it stays off
+    /// @param callbackServerEnabler   makes the HTTP server receiving the browser redirect run; false if it stays off
     public CiteDriveOAuthService(RemotePreferences remotePreferences,
                                  CiteDrivePreferences citeDrivePreferences,
                                  OAuthSessionRegistry sessionRegistry,
