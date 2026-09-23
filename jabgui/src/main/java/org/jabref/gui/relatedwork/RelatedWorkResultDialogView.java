@@ -48,7 +48,7 @@ public class RelatedWorkResultDialogView extends BaseDialog<Void> {
 
         ViewLoader.view(this).load().setAsDialogPane(this);
 
-        ControlHelper.setAction(insertButtonType, getDialogPane(), event -> {
+        ControlHelper.setAction(insertButtonType, getDialogPane(), _ -> {
             if (viewModel.insertComments()) {
                 close();
             }
