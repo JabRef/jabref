@@ -13,7 +13,7 @@ val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
 // Keep version in sync build-support/src/main/java/JournalListMvGenerator.java and build-support/src/main/java/LtwaListMvGenerator.java
-val javafxDefault = "26.0.2"
+val javafxDefault = "27"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
@@ -136,11 +136,11 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-utils:4.0.2")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
-    api("org.hibernate.validator:hibernate-validator:9.1.3.Final")
+    api("org.hibernate.validator:hibernate-validator:9.1.4.Final")
     api("org.hisp.dhis:json-tree:1.9.5")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
-    api("org.jabref:html-to-node:0.2.0")
+    api("org.jabref:html-to-node:0.3.0")
     api("org.jabref:latex-conv:0.1.0")
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
