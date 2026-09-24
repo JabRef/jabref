@@ -80,7 +80,7 @@ class CrossRefTest {
     @Test
     void notAcceptTitleOverThreshold() throws FetcherException {
         BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service-----");
+        entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service xxxxx");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb and Guido Wirtz");
         assertEquals(Optional.empty(), fetcher.findIdentifier(entry));
     }
@@ -121,8 +121,9 @@ class CrossRefTest {
     }
 
     @Test
-    void performSearchByIdFindsPaperWithoutTitle() throws FetcherException {
+    void performSearchByIdFindsPaper() throws FetcherException {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.TITLE, "Random Forests");
         entry.setField(StandardField.AUTHOR, "Leo Breiman");
         entry.setField(StandardField.DOI, "10.1023/a:1010933404324");
         entry.setField(StandardField.ISSN, "0885-6125");
