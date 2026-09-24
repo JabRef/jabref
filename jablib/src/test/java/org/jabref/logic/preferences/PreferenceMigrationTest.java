@@ -20,14 +20,18 @@ class PreferenceMigrationTest {
     private static final String AI_ANSWER_ENGINE_KIND = "aiAnswerEngineKind";
     private static final String AI_RESPONSE_ENGINE_KIND = "aiResponseEngineKind";
     private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
+    private static final String LEGACY_GROBID_URL = "http://grobid.jabref.org:8070";
+    private static final String HTTPS_GROBID_URL = "https://grobid.jabref.org";
     private static final String UNUSED_DEFAULT_VALUE = "";
 
     private boolean hasLegacyResponseEngineKindValue;
     private boolean hasResponseEngineKindValue;
     private boolean hasEmbeddingModelValue;
+    private boolean hasGrobidUrlValue;
     private String legacyResponseEngineKindValue;
     private String responseEngineKindValue;
     private String embeddingModelValue;
+    private String grobidUrlValue;
 
     @BeforeEach
     void setUp() {
@@ -36,13 +40,16 @@ class PreferenceMigrationTest {
         hasLegacyResponseEngineKindValue = preferences.hasKey(AI_ANSWER_ENGINE_KIND);
         hasResponseEngineKindValue = preferences.hasKey(AI_RESPONSE_ENGINE_KIND);
         hasEmbeddingModelValue = preferences.hasKey(AI_EMBEDDING_MODEL);
+        hasGrobidUrlValue = preferences.hasKey(JabRefCliPreferences.GROBID_URL);
         legacyResponseEngineKindValue = preferences.get(AI_ANSWER_ENGINE_KIND, UNUSED_DEFAULT_VALUE);
         responseEngineKindValue = preferences.get(AI_RESPONSE_ENGINE_KIND, UNUSED_DEFAULT_VALUE);
         embeddingModelValue = preferences.get(AI_EMBEDDING_MODEL, UNUSED_DEFAULT_VALUE);
+        grobidUrlValue = preferences.get(JabRefCliPreferences.GROBID_URL, UNUSED_DEFAULT_VALUE);
 
         preferences.remove(AI_ANSWER_ENGINE_KIND);
         preferences.remove(AI_RESPONSE_ENGINE_KIND);
         preferences.remove(AI_EMBEDDING_MODEL);
+        preferences.remove(JabRefCliPreferences.GROBID_URL);
     }
 
     @AfterEach
@@ -52,6 +59,7 @@ class PreferenceMigrationTest {
         restorePreference(preferences, AI_ANSWER_ENGINE_KIND, hasLegacyResponseEngineKindValue, legacyResponseEngineKindValue);
         restorePreference(preferences, AI_RESPONSE_ENGINE_KIND, hasResponseEngineKindValue, responseEngineKindValue);
         restorePreference(preferences, AI_EMBEDDING_MODEL, hasEmbeddingModelValue, embeddingModelValue);
+        restorePreference(preferences, JabRefCliPreferences.GROBID_URL, hasGrobidUrlValue, grobidUrlValue);
     }
 
     @Test
@@ -98,6 +106,29 @@ class PreferenceMigrationTest {
 
         assertEquals(AiDefaultExpertSettings.EMBEDDING_MODEL, embeddingModel);
         assertEquals(AiDefaultExpertSettings.EMBEDDING_MODEL, preferences.get(AI_EMBEDDING_MODEL, UNUSED_DEFAULT_VALUE));
+    }
+
+    @Test
+    void migrateGrobidUrlMigratesLegacyUrl() {
+        JabRefCliPreferences preferences = new JabRefCliPreferences();
+        preferences.put(JabRefCliPreferences.GROBID_URL, LEGACY_GROBID_URL);
+
+        GrobidUrlMigration.migrate(preferences);
+
+        assertEquals(HTTPS_GROBID_URL, preferences.get(JabRefCliPreferences.GROBID_URL, UNUSED_DEFAULT_VALUE));
+        assertEquals(HTTPS_GROBID_URL, preferences.getGrobidPreferences().getGrobidURL());
+    }
+
+    @Test
+    void migrateGrobidUrlKeepsCustomUrl() {
+        String customGrobidUrl = "https://grobid.example.org";
+        JabRefCliPreferences preferences = new JabRefCliPreferences();
+        preferences.put(JabRefCliPreferences.GROBID_URL, customGrobidUrl);
+
+        GrobidUrlMigration.migrate(preferences);
+
+        assertEquals(customGrobidUrl, preferences.get(JabRefCliPreferences.GROBID_URL, UNUSED_DEFAULT_VALUE));
+        assertEquals(customGrobidUrl, preferences.getGrobidPreferences().getGrobidURL());
     }
 
     private void restorePreference(JabRefCliPreferences preferences, String key, boolean hasValue, String value) {
