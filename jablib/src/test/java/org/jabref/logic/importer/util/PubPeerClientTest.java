@@ -1,9 +1,8 @@
-package org.jabref.logic.pubpeer;
+package org.jabref.logic.importer.util;
 
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.util.PubPeerClient;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.pubpeer.PubPeerFeedback;
 import org.jabref.support.ExternalServicesTest;
