@@ -1,9 +1,12 @@
 package org.jabref.logic.search.query;
 
+import java.util.EnumSet;
 import java.util.stream.Stream;
 
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -20,9 +23,11 @@ class SearchQueryLuceneConversionTest {
                 Arguments.of("term", "any = term"),
                 Arguments.of("term", "any CONTAINS term"),
                 Arguments.of("term", "any MATCHES term"),
-                Arguments.of("term", "any =! term"),
+                Arguments.of("(contentCaseSensitive:term OR annotationsCaseSensitive:term)", "any =! term"),
                 Arguments.of("term", "any == term"),
-                Arguments.of("term", "any ==! term"),
+                Arguments.of("(contentCaseSensitive:term OR annotationsCaseSensitive:term)", "any ==! term"),
+                Arguments.of("contentCaseSensitive:Term", "content =! Term"),
+                Arguments.of("annotationsCaseSensitive:Term", "annotations ==! Term"),
 
                 Arguments.of("\"two terms\"", "\"two terms\""),
                 Arguments.of("\"two terms\"", "any = \"two terms\""),
@@ -37,7 +42,7 @@ class SearchQueryLuceneConversionTest {
 
                 Arguments.of("NOT term", "any != term"),
                 Arguments.of("NOT term", "any !== term"),
-                Arguments.of("NOT term", "any !=! term"),
+                Arguments.of("NOT (contentCaseSensitive:term OR annotationsCaseSensitive:term)", "any !=! term"),
                 Arguments.of("NOT \"two terms\"", "any != \"two terms\""),
                 Arguments.of("content:image AND NOT annotations:processing", "content = image AND annotations != processing"),
 
@@ -64,5 +69,12 @@ class SearchQueryLuceneConversionTest {
     @MethodSource
     void searchConversion(String expected, String searchExpression) {
         assertEquals(expected, SearchQueryConversion.searchToLucene(new SearchQuery(searchExpression)));
+    }
+
+    /// The case-sensitivity toggle of the search bar applies to unfielded terms.
+    @Test
+    void caseSensitiveSearchBarFlagAppliesToUnfieldedTerm() {
+        assertEquals("(contentCaseSensitive:Term OR annotationsCaseSensitive:Term)",
+                SearchQueryConversion.searchToLucene(new SearchQuery("Term", EnumSet.of(SearchFlags.CASE_SENSITIVE))));
     }
 }
