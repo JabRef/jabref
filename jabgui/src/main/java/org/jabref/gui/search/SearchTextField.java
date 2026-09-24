@@ -19,7 +19,7 @@ public class SearchTextField {
 
     public static CustomTextField create(KeyBindingRepository keyBindingRepository, IconTheme.JabRefIcons icon) {
         CustomTextField textField = (CustomTextField) TextFields.createClearableTextField();
-        textField.setPromptText(Localization.lang("Search..."));
+        textField.setPromptText(Localization.lang("Please enter a search string"));
         textField.setId("search-field");
         textField.getStyleClass().add("search-field");
 
