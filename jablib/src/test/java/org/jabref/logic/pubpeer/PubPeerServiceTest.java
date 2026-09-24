@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.util.PubPeerClient;
+import org.jabref.logic.importer.util.PubPeerService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;

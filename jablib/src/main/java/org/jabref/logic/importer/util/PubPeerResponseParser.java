@@ -1,4 +1,4 @@
-package org.jabref.logic.pubpeer;
+package org.jabref.logic.importer.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NullMarked
-class PubPeerResponseParser {
+public class PubPeerResponseParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(PubPeerResponseParser.class);
     private static final Pattern USER_SEPARATOR = Pattern.compile(",");
     private static final String SUCCESS = "good";

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.util.PubPeerResponseParser;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.pubpeer.PubPeerFeedback;
 

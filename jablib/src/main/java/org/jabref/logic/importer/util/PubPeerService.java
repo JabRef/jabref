@@ -1,4 +1,4 @@
-package org.jabref.logic.pubpeer;
+package org.jabref.logic.importer.util;
 
 import java.util.HashMap;
 import java.util.List;
