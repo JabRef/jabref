@@ -925,7 +925,7 @@ jobs:
           compression-level: 0 # no compression
 
   flatpak:
-    needs: [ build, conditions, flatpak-channel ]
+    needs: [ build, conditions, flatpak-channel, pre-build ]
     if: needs.conditions.outputs.should-build == 'true' && needs.flatpak-channel.outputs.channel != 'unsupported'
     strategy:
       fail-fast: false
@@ -935,10 +935,12 @@ jobs:
             os: ubuntu-22.04
             displayName: linux-amd64
             archive: JabRef-portable_linux.tar.gz
+            suffix: ''
           - arch: aarch64
             os: ubuntu-22.04-arm
             displayName: linux-arm
             archive: JabRef-portable_linux_arm64.tar.gz
+            suffix: _arm64
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.displayName }} ${{ needs.flatpak-channel.outputs.channel }} Flatpak
     container:
@@ -974,8 +976,44 @@ jobs:
           manifest-path: flatpak/org.jabref.jabref.ci.json
           arch: ${{ matrix.arch }}
           branch: ${{ needs.flatpak-channel.outputs.channel }}
-          bundle: org.jabref.jabref-${{ needs.flatpak-channel.outputs.channel }}.flatpak
-          artifact-name: JabRef Flatpak (${{ needs.flatpak-channel.outputs.channel }}, ${{ matrix.arch }})
+          bundle: JabRef-${{ needs.pre-build.outputs.Major }}.${{ needs.pre-build.outputs.Minor }}${{ matrix.suffix }}.flatpak
+          artifact-name: Flatpak bundle (${{ matrix.arch }})
+
+  upload-flatpak:
+    needs: [ conditions, disk-space-check, flatpak, pre-build ]
+    if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true' && needs.disk-space-check.outputs.available == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            displayName: linux-amd64
+            suffix: ''
+          - arch: aarch64
+            displayName: linux-arm
+            suffix: _arm64
+    runs-on: ubuntu-22.04
+    name: Upload ${{ matrix.displayName }} Flatpak to builds.jabref.org
+    steps:
+      - name: Download Flatpak bundle
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: Flatpak bundle (${{ matrix.arch }})
+          path: flatpak
+
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+
+      - name: Upload Flatpak bundle
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
+            --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }} && rsync" \
+            -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
+            flatpak/JabRef-${{ needs.pre-build.outputs.Major }}.${{ needs.pre-build.outputs.Minor }}${{ matrix.suffix }}.flatpak \
+            jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/
 
   jabkit-native:
     needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
