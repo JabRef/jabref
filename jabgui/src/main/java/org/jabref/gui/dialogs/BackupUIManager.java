@@ -8,6 +8,8 @@ import java.util.Optional;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupResolverDialog;
@@ -40,12 +42,14 @@ public class BackupUIManager {
     }
 
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
+                                                                 LibraryTabContainer tabContainer,
                                                                  Path originalPath,
                                                                  GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  StateManager stateManager) {
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
+                tabContainer,
                 preferences.getExternalApplicationsPreferences(),
                 originalPath,
                 preferences.getFilePreferences().getBackupDirectory());
@@ -78,22 +82,43 @@ public class BackupUIManager {
                 }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, stateManager);
+                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
             }
             return Optional.empty();
         });
     }
 
     private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService,
+                                                                 LibraryTabContainer tabContainer,
                                                                  ExternalApplicationsPreferences externalApplicationsPreferences,
                                                                  Path originalPath,
                                                                  Path backupDir) {
-        return UiTaskExecutor.runInJavaFXThread(
-                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences)));
+        return UiTaskExecutor.runInJavaFXThread(() -> {
+            raiseTabOf(tabContainer, originalPath);
+            return dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences));
+        });
+    }
+
+    /// Selects the tab of the library the dialog is about, so that the dialog does not appear over an unrelated
+    /// library when several libraries load at once. Must run in the same FX runnable as showing the dialog:
+    /// a separate `runLater` could be interleaved with another loading library's selection.
+    /// A dialog of a concurrently loading library can still open nested on top and switch the tab meanwhile.
+    private static Optional<LibraryTab> raiseTabOf(LibraryTabContainer tabContainer, Path originalPath) {
+        Path absolutePath = originalPath.toAbsolutePath();
+        Optional<LibraryTab> libraryTab = tabContainer.getLibraryTabs().stream()
+                                                      .filter(tab -> tab.getBibDatabaseContext()
+                                                                        .getDatabasePath()
+                                                                        .map(Path::toAbsolutePath)
+                                                                        .filter(absolutePath::equals)
+                                                                        .isPresent())
+                                                      .findFirst();
+        libraryTab.ifPresent(tabContainer::showLibraryTab);
+        return libraryTab;
     }
 
     private static Optional<ParserResult> showReviewBackupDialog(
             DialogService dialogService,
+            LibraryTabContainer tabContainer,
             Path originalPath,
             GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
@@ -117,6 +142,7 @@ public class BackupUIManager {
                         changes,
                         originalDatabase, Localization.lang("Review backup")
                 );
+                raiseTabOf(tabContainer, originalPath);
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.orElse(false)) {
                     List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
@@ -132,7 +158,7 @@ public class BackupUIManager {
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, stateManager);
+                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);
