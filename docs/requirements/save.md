@@ -3,16 +3,19 @@ parent: Requirements
 ---
 # Saving a Library
 
-## Concurrent modification of the library file is detected on save
+## Library save must detect concurrent modification of library file
 `req~logic.exporter.concurrent-save-detection~1`
 
-Two processes (e.g., two JabRef instances on different machines using a network share) may write the same library file at overlapping times.
 When the target file is modified by another process between the start of a save and its commit, the save must be aborted with an error instead of silently overwriting the other process's changes.
 The detection is best-effort: it is based on the file's size and modification time, so it is subject to the file system's timestamp resolution.
 
+Rationale:
+
+Two processes (e.g., two JabRef instances on different machines using a network share) may write the same library file at overlapping times, risking silent data loss.
+
 Needs: impl, utest
 
-## File attributes survive an atomic save
+## Atomic save must preserve existing file attributes
 `req~logic.exporter.preserve-file-attributes~1`
 
 An atomic save replaces the target file with a newly created one.
@@ -21,7 +24,7 @@ This is best-effort: an attribute class the file system does not support, or the
 
 Needs: impl, utest
 
-## PDF metadata writes replace the file atomically
+## PDF metadata writer must replace target file atomically
 `req~logic.xmp.atomic-pdf-write~1`
 
 Writing metadata into a PDF (XMP metadata, embedded bib file, or metadata removal) must never rewrite the original file in place.
@@ -30,14 +33,14 @@ A failed write must leave the original file untouched and must not leave tempora
 
 Needs: impl, utest
 
-## Failed backup writes do not replace recoverable files
+## Backup system must not overwrite valid backups on write failure
 `req~jabgui.autosaveandbackup.complete-backup~1`
 
 When creating a backup, a serialization failure must not replace a previous backup with incomplete content. JabRef must not restore an empty backup over an existing library.
 
 Needs: impl, utest
 
-## Autosave reacts to library changes
+## Autosave must trigger save automatically upon library changes
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 
 While autosave is enabled for a library, every change to the library must lead to the library being saved shortly afterwards without user interaction.
@@ -47,7 +50,7 @@ When the autosave manager is shut down, its periodic task must stop and pending 
 
 Needs: impl, utest
 
-## Keyword delimiter normalization is a cleanup
+## Library cleanup must normalize keyword delimiters using library separator
 `req~save.keywords.normalize-delimiters~1`
 
 Rewriting a keyword field from an accepted import delimiter to the library's keyword separator is a field formatter cleanup ("Normalize keyword delimiters").

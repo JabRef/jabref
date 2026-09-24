@@ -3,7 +3,7 @@ parent: Requirements
 ---
 # CLI
 
-## Remote server health check
+## Remote server must respond to plain-text health check ping
 `req~jabref.remote.health-check~1`
 
 The remote listener accepts the versioned plain-text request `JABREF/1 PING` and responds with
@@ -13,7 +13,7 @@ supported.
 
 Needs: impl
 
-## Input file as positional argument across all commands
+## JabKit commands must accept input file as positional argument
 `req~jabkit.cli.input-flag~2`
 
 All `jabkit` commands that need a file input must accept it as a positional `FILE` argument.
@@ -23,7 +23,7 @@ See [ADR 57](../decisions/0057-allow-positional-input-file-argument.md) for more
 
 Needs: impl
 
-## Input file argument accepts an http(s)/ftp URL
+## JabKit input argument must accept HTTP, HTTPS, and FTP URLs
 `req~jabkit.cli.input-url~2`
 
 The positional `FILE` argument and its `--input` alias additionally accept an `http://`,
@@ -37,7 +37,7 @@ See [ADR 65](../decisions/0065-download-url-input-files.md) for more details.
 
 Needs: impl
 
-## Input file argument accepts a shared database URL
+## JabKit input argument must accept shared database URLs
 `req~jabkit.cli.input-shared-db~1`
 
 The positional `FILE` argument and its `--input` alias additionally accept a PostgreSQL connection
@@ -50,17 +50,18 @@ See [ADR 74](../decisions/0074-shared-database-url-as-jabkit-input.md) for more 
 
 Needs: impl
 
-## Banner shown only at `--help`
+## JabKit must display banner only when help is requested
 `req~jabkit.cli.banner-shown~1`
 
-The banner for the CLI ("JabKit") is only shown if the help is output.
-Meaning: If there is no command given (falling back to help) or explicitly `--help` requested.
+The banner for the CLI ("JabKit") is only shown if the help is output, meaning when no command is given (falling back to help) or when `--help` is explicitly requested.
 
-This increases the accessibility. Source: [Accessibility of Command Line Interfaces](https://dl.acm.org/doi/10.1145/3411764.3445544)
+Rationale:
+
+Suppressing decorative banners during normal command invocations prevents noise in automated scripts and increases accessibility (source: [Accessibility of Command Line Interfaces](https://dl.acm.org/doi/10.1145/3411764.3445544)).
 
 Needs: impl
 
-## Machine-readable output of the `check` commands
+## JabKit check commands must emit findings in machine-readable format
 `req~jabkit.cli.check-errorformat-output~1`
 
 The `jabkit check` subcommands emit their findings in a line-oriented
@@ -71,7 +72,7 @@ Field-level findings additionally carry the affected field name.
 
 Needs: impl
 
-## Standard output conversion format
+## JabKit convert command must write pure converted data to standard output
 `req~jabkit.cli.convert-stdout-format~1`
 
 When `jabkit convert` writes to standard output, it uses the exporter selected by
@@ -80,7 +81,7 @@ contains only the exported data.
 
 Needs: impl
 
-## GitHub Actions output of the `check` commands
+## JabKit check commands must support GitHub Actions output format
 `req~jabkit.cli.check-github-actions-output~1`
 
 The `jabkit check` subcommands support an additional `github-actions` output format
