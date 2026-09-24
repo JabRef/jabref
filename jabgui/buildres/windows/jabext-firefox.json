@@ -1,0 +1,9 @@
+{
+  "name": "jabext_bridge",
+  "description": "JabRef Browser Extension - fulltext bridge",
+  "path": "jabext_host.bat",
+  "type": "stdio",
+  "allowed_extensions": [
+    "@jabfox"
+  ]
+}

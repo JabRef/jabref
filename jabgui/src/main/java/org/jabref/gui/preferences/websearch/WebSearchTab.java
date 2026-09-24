@@ -6,14 +6,17 @@ import java.util.Optional;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -25,6 +28,7 @@ import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.fetcher.BrowserExtensionProvider;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -45,6 +49,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     /// Also the source of the table's row height: it is a themed control in the tree, so its font
     /// tracks the configured font size.
     private final Label tableNote = new Label(Localization.lang("( Note: Press return to commit changes in the table! )"));
+
+    private final Label externalFetcherNote = new Label(Localization.lang("Browser-extension fulltext providers discovered in JabRef's fulltext-providers directory. Each provider runs locally and exposes the Browser-Extension Fulltext Protocol."));
 
     /// @param workingAiPreferences the dialog-scoped working copy edited by the AI tab; this tab observes its master switch to offer or hide the LLM citation parser
     public WebSearchTab(AiPreferences workingAiPreferences) {
@@ -78,6 +84,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     }
 
     private void buildView() {
+        externalFetcherNote.setWrapText(true);
+
         setContent(form()
 
                 .section(Localization.lang("General"), general -> general
@@ -100,6 +108,10 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                         .checkbox(Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."), viewModel.grobidEnabledProperty())
                         .stringField(Localization.lang("Grobid URL"), viewModel.grobidURLProperty(),
                                 url -> url.disableWhen(viewModel.grobidEnabledProperty().not())))
+
+                .section(Localization.lang("External Fetchers"), externalFetchers -> externalFetchers
+                        .custom(externalFetcherNote)
+                        .custom(buildExternalFetcherTable()))
 
                 .section(Localization.lang("Search Engine URL Templates"), searchEngines -> searchEngines
                         .custom(tableNote)
@@ -145,6 +157,57 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         return field;
     }
 
+    /// The providers found on disk, read-only: they are discovered, not configured here.
+    private Node buildExternalFetcherTable() {
+        TableView<BrowserExtensionProvider> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        table.setItems(viewModel.getExternalFetchers());
+
+        TableColumn<BrowserExtensionProvider, String> name = new TableColumn<>(Localization.lang("Provider"));
+        name.setMinWidth(220.0);
+        name.setEditable(false);
+        name.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().displayName()));
+
+        TableColumn<BrowserExtensionProvider, String> port = new TableColumn<>(Localization.lang("Port"));
+        port.setMinWidth(80.0);
+        port.setEditable(false);
+        port.setCellValueFactory(param -> new ReadOnlyStringWrapper(Integer.toString(param.getValue().port())));
+
+        TableColumn<BrowserExtensionProvider, String> status = new TableColumn<>(Localization.lang("Status"));
+        status.setMinWidth(120.0);
+        status.setEditable(false);
+        status.setCellValueFactory(param -> viewModel.externalFetcherStatus(param.getValue()));
+
+        table.getColumns().add(name);
+        table.getColumns().add(port);
+        table.getColumns().add(status);
+        table.setRowFactory(_ -> new TableRow<>() {
+            @Override
+            protected void updateItem(BrowserExtensionProvider provider, boolean empty) {
+                super.updateItem(provider, empty);
+                setTooltip(empty || provider == null
+                           ? null
+                           : new Tooltip(Localization.lang("Discovery file: %0", provider.discoveryFile().toString())));
+            }
+        });
+
+        sizeToContent(table, externalFetcherNote);
+
+        // Content fits prefHeight exactly, but JavaFX still reserves a vertical scrollbar gutter.
+        // Hide it once the skin is attached so the table reads as a tight read-only list.
+        table.skinProperty().addListener((_, _, newSkin) -> {
+            if (newSkin == null) {
+                return;
+            }
+            Node verticalBar = table.lookup(".scroll-bar:vertical");
+            if (verticalBar != null) {
+                verticalBar.setVisible(false);
+                verticalBar.setManaged(false);
+            }
+        });
+        return table;
+    }
+
     private Node buildSearchEngineTable() {
         TableView<SearchEngineItem> table = new TableView<>();
         table.setEditable(true);
@@ -166,16 +229,21 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         table.getColumns().add(name);
         table.getColumns().add(urlTemplate);
 
-        // Size the table to its content so it never scrolls inside the already scrolling dialog.
+        sizeToContent(table, tableNote);
+        return table;
+    }
+
+    /// Sizes a table to its content so it never scrolls inside the already scrolling dialog. The row
+    /// height follows `fontSource`, a themed control in the tree, so it tracks the configured font size.
+    private static void sizeToContent(TableView<?> table, Label fontSource) {
         DoubleBinding rowHeight = Bindings.createDoubleBinding(
-                () -> tableNote.getFont() != null ? tableNote.getFont().getSize() * FONT_HEIGHT_MULTIPLIER : DEFAULT_ROW_HEIGHT,
-                tableNote.fontProperty());
+                () -> fontSource.getFont() != null ? fontSource.getFont().getSize() * FONT_HEIGHT_MULTIPLIER : DEFAULT_ROW_HEIGHT,
+                fontSource.fontProperty());
         table.fixedCellSizeProperty().bind(rowHeight);
         table.prefHeightProperty().bind(
                 Bindings.size(table.getItems())
                         .add(HEADER_HEIGHT_ESTIMATE)
                         .multiply(rowHeight));
-        return table;
     }
 
     private Node createFetcherNode(WebSearchTabViewModel.FetcherViewModel item) {
