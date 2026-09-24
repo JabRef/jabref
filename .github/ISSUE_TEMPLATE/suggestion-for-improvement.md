@@ -2,7 +2,7 @@
 name: Suggestion for improvement
 about: Suggest an enhancement
 title: ''
-labels: ''
+labels: 'status: needs-triage'
 type: 'feature'
 assignees: ''
 
