@@ -125,8 +125,8 @@ public enum StandardActions implements Action {
     EDIT_EXISTING_STUDY(Localization.lang("Manage study definition")),
 
     OPEN_DATABASE_FOLDER(Localization.lang("Reveal in file explorer")),
-    OPEN_FOLDER(Localization.lang("Open folder(s)"), Localization.lang("Open folder"), IconTheme.JabRefIcons.FOLDER, KeyBinding.OPEN_FOLDER),
-    OPEN_FILE(Localization.lang("Open file(s)"), Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
+    OPEN_FOLDER(Localization.lang("Open folder(s)"), IconTheme.JabRefIcons.FOLDER, KeyBinding.OPEN_FOLDER),
+    OPEN_FILE(Localization.lang("Open file(s)"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     OPEN_CONSOLE(Localization.lang("Open terminal here"), Localization.lang("Open terminal here"), IconTheme.JabRefIcons.CONSOLE, KeyBinding.OPEN_CONSOLE),
     SORT_TABS_ALPHABETICALLY(Localization.lang("Sort tabs alphabetically")),
     COPY_LINKED_FILES(Localization.lang("Copy linked file(s) to folder...")),
