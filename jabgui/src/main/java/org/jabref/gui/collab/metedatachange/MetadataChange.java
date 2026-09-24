@@ -1,5 +1,7 @@
 package org.jabref.gui.collab.metedatachange;
 
+import java.util.Optional;
+
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
@@ -22,9 +24,10 @@ public final class MetadataChange extends DatabaseChange {
     public void applyChange(CompoundEdit undoEdit) {
         MetaData newMetaData = metaDataDiff.getNewMetaData();
         // group change is handled by GroupChange, so the groups root keeps its original value
-        // to prevent any inconsistency
+        // to prevent any inconsistency - a library without groups stays without groups
         metaDataDiff.getGroupDifferences()
-                    .ifPresent(groupDiff -> newMetaData.setGroups(groupDiff.getOriginalGroupRoot()));
+                    .ifPresent(groupDiff -> Optional.ofNullable(groupDiff.getOriginalGroupRoot())
+                                                    .ifPresentOrElse(newMetaData::setGroups, newMetaData::clearGroups));
 
         undoEdit.applyEdit(new UndoableMetaDataChange(databaseContext, databaseContext.getMetaData(), newMetaData));
     }
