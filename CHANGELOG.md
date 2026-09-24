@@ -18,6 +18,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We reduced the amount of special spacing, padding and font sizes across the interface for a more unified interface. ([#16887](https://github.com/JabRef/jabref/pull/16887), [#16787](https://github.com/JabRef/jabref/issues/16787))
+
 ### Fixed
 
 - We re-enabled the [Grobid](https://github.com/grobidOrg/grobid) citation fetcher again. It is now reachable via https. [#16668](https://github.com/JabRef/jabref/issues/16668)
