@@ -142,18 +142,14 @@ public class BackupUIManager {
                         changes,
                         originalDatabase, Localization.lang("Review backup")
                 );
-                Optional<LibraryTab> libraryTab = raiseTabOf(tabContainer, originalPath);
+                raiseTabOf(tabContainer, originalPath);
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.orElse(false)) {
                     List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
-                    // The change monitor to reset belongs to the loading library, not to whichever tab is active by now
-                    LibraryTab saveState = libraryTab.or(() -> stateManager.activeTabProperty().get()).orElseThrow();
+                    // The library is still being opened, so no tab exists for it yet - the active tab (if any) belongs to another
+                    // library. Its change monitor is set up when the tab is created.
                     stateManager.getUndoManager(originalDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
                             resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
-                    if (reviewBackupDialog.areAllChangesDenied()) {
-                        // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
-                        saveState.resetChangeMonitor();
-                    }
 
                     // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected

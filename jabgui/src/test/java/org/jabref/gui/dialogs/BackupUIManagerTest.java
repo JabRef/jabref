@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -11,27 +12,40 @@ import javafx.collections.FXCollections;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.backup.BackupResolverDialog;
+import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.BackupFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.controlsfx.control.HyperlinkLabel;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -43,6 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -60,6 +75,11 @@ class BackupUIManagerTest extends JavaFxTest {
         dialogService = mock(DialogService.class);
         preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getExternalApplicationsPreferences()).thenReturn(mock(ExternalApplicationsPreferences.class));
+    }
+
+    @AfterEach
+    void tearDown() {
+        Injector.forgetAll();
     }
 
     @Test
@@ -89,6 +109,65 @@ class BackupUIManagerTest extends JavaFxTest {
                 eq(Localization.lang("Restore backup")),
                 eq(Localization.lang("Could not restore the backup file '%0'.", backupFile)),
                 any(DirectoryNotEmptyException.class));
+    }
+
+    /// The review runs while the library is still being opened, so no tab exists for it yet and the active tab may be
+    /// absent altogether (welcome tab, startup). The review must not depend on it. The backup adds groups to a library
+    /// without groups, which produces a metadata change and a group change; accepting both has to install the groups.
+    @Test
+    void reviewBackupAcceptingAllChangesWorksWithoutAnActiveTab(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.REVIEW_BACKUP));
+        when(dialogService.showCustomDialogAndWait(any(DatabaseChangesResolverDialog.class)))
+                .thenAnswer(invocation -> {
+                    DatabaseChangesResolverDialog dialog = invocation.getArgument(0);
+                    dialog.getResolvedChanges().forEach(DatabaseChange::accept);
+                    return Optional.of(true);
+                });
+        // Sealed, so deep stubs cannot mock it
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+        doReturn(new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
+                .when(previewPreferences).getSelectedPreviewLayout();
+        Injector.setModelOrService(DialogService.class, dialogService);
+        Injector.setModelOrService(GuiPreferences.class, preferences);
+        Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
+        Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));
+        Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@Article{original, title = {Original}}");
+        Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
+        Files.writeString(backupFile, """
+                @Article{original,
+                  title = {Original},
+                }
+                @Article{added,
+                  title = {Added},
+                }
+
+                @Comment{jabref-meta: grouping:
+                0 AllEntriesGroup:;
+                1 StaticGroup:TODO\\;0\\;1\\;0x8a8a8aff\\;\\;\\;;
+                }
+                """);
+
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.emptyObservableList());
+
+        // Called off the JavaFX thread, as the library loading task does
+        Optional<ParserResult> result = BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                tabContainer,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                new JabRefGuiStateManager());
+
+        BibDatabaseContext restored = result.orElseThrow().getDatabaseContext();
+        assertEquals(2, restored.getDatabase().getEntryCount());
+        assertEquals(List.of("TODO"), restored.getMetaData().getGroups().orElseThrow().getChildren().stream().map(GroupTreeNode::getName).toList());
     }
 
     @Test
