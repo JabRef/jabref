@@ -161,14 +161,17 @@ public class MarcXmlParser implements Parser {
             return;
         }
 
-        ISBN.parse(isbn).ifPresentOrElse(
-                parsedIsbn -> {
-                    Optional<ISBN> existingIsbn = bibEntry.getField(StandardField.ISBN).flatMap(ISBN::parse);
-                    if (existingIsbn.isEmpty() || (parsedIsbn.isIsbn13() && existingIsbn.map(ISBN::isIsbn10).orElse(false))) {
-                        bibEntry.setField(StandardField.ISBN, parsedIsbn.asString());
-                    }
-                },
-                () -> LOGGER.debug("Malformed ISBN received: {}", isbn));
+        Optional<ISBN> parsedIsbn = ISBN.parse(isbn);
+        if (parsedIsbn.isEmpty()) {
+            LOGGER.debug("Malformed ISBN received: {}", isbn);
+            return;
+        }
+
+        ISBN validIsbn = parsedIsbn.get();
+        Optional<ISBN> existingIsbn = bibEntry.getField(StandardField.ISBN).flatMap(ISBN::parse);
+        if (existingIsbn.isEmpty() || (validIsbn.isIsbn13() && existingIsbn.get().isIsbn10())) {
+            bibEntry.setField(StandardField.ISBN, validIsbn.asString());
+        }
     }
 
     private void putIssn(BibEntry bibEntry, Element datafield) {
