@@ -56,6 +56,44 @@ class KeyBindingViewModelTest {
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
     }
 
+@Test
+@EnabledOnOs(OS.MAC)
+void controlBackspaceIsRecordedAsBindingOnMacOs() {
+    KeyBindingRepository liveRepo = new KeyBindingRepository();
+
+    KeyBindingsTabViewModel viewModel =
+            new KeyBindingsTabViewModel(liveRepo, mock(DialogService.class));
+
+    KeyBinding binding = KeyBinding.EDITOR_KILL_WORD_BACKWARD;
+
+    KeyBindingViewModel selectedVM =
+            new KeyBindingViewModel(
+                    viewModel.getKeyBindingRepository(),
+                    binding,
+                    binding.getDefaultKeyBinding());
+
+    viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
+
+    KeyEvent event = new KeyEvent(
+            KeyEvent.KEY_PRESSED,
+            "",
+            "",
+            KeyCode.BACK_SPACE,
+            false,
+            true,
+            false,
+            false
+    );
+
+    viewModel.setNewBindingForCurrent(event);
+    viewModel.storeSettings();
+
+    Optional<String> saved = liveRepo.get(binding);
+
+    assertEquals(Optional.of("ctrl+BACK_SPACE"), saved);
+}
+
+
     @Test
     @DisabledOnCIServer("locally runs fine")
     void verifyStoreSettingsWritesChanges() {
