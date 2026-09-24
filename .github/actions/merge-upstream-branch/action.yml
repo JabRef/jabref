@@ -55,5 +55,26 @@ runs:
         echo "CHANGELOG.md merge=changelog" >> "$(git rev-parse --git-dir)/info/attributes"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git config user.name "github-actions[bot]"
+        before=$(git rev-parse HEAD)
         git merge --no-ff --no-edit "upstream/$BASE_BRANCH"
         git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+
+        # Link the pushed commits in the run summary; the merge commit's full diff is large,
+        # so its CHANGELOG.md diff gets its own link (GitHub's file anchor is the SHA-256 of the path)
+        repo_url=$(git remote get-url origin)
+        repo_url=${repo_url%.git}
+        changelog_anchor=$(printf %s CHANGELOG.md | sha256sum | cut -d' ' -f1)
+        commits=$(git log --first-parent --format=%H "$before..HEAD")
+        {
+          if [ -z "$commits" ]; then
+            echo "No commit pushed."
+          else
+            echo "Commits:"
+            for c in $commits; do
+              echo "- $repo_url/commit/$c"
+              if ! git diff --quiet "$c^" "$c" -- CHANGELOG.md; then
+                echo "  - [CHANGELOG.md]($repo_url/commit/$c#diff-$changelog_anchor)"
+              fi
+            done
+          fi
+        } >> "$GITHUB_STEP_SUMMARY"

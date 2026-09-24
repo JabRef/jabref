@@ -120,6 +120,8 @@ public class BackupUIManager {
                 );
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 if (allChangesResolved.orElse(false)) {
+                    // The library is still being opened, so no tab exists for it yet - the active tab (if any) belongs to another
+                    // library. Its change monitor is set up when the tab is created.
                     // Not recorded in a journal: the tab is built from a fresh context object of this ParserResult,
                     // so a journal keyed by originalDatabase would never be reachable from the tab
                     CompoundEdit edit = new CompoundEdit(Localization.lang("Merged external changes"));
