@@ -1,0 +1,7 @@
+{
+  "resources": [
+    {
+      "glob": "org/controlsfx/dialog/*.png"
+    }
+  ]
+}

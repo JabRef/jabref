@@ -421,9 +421,19 @@ sourceSets["main"].resources.srcDir(generateThemePreviews)
 // Common buildArgs (--no-fallback, -march=compatibility, etc.) come from
 // org.jabref.gradle.feature.nativecompile; transitive jablib/jabls/jabsrv modules already
 // ship their own META-INF/native-image metadata, which the builder picks up automatically.
+// StaticFX (https://github.com/HebiRobotics/jfx-static-feature): jfx-static-libs ships generated metadata
+// covering all of JavaFX plus static archives of its natives; jfx-static-feature (activated via its own
+// native-image.properties) links those archives into the image. Kept off the JVM module path on purpose.
+val nativeImageOnly by configurations.creating
+dependencies {
+    nativeImageOnly("us.hebi.graalvm:jfx-static-libs:26.0.2-1")
+    nativeImageOnly("us.hebi.graalvm:jfx-static-feature:1.0")
+}
+
 graalvmNative {
     binaries {
         named("main") {
+            classpath(nativeImageOnly)
             imageName.set("jabref")
             mainClass.set("org.jabref.Launcher")
             resources {
