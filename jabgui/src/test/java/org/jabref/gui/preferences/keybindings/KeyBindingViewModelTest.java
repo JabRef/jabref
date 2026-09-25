@@ -60,20 +60,20 @@ class KeyBindingViewModelTest {
     @EnabledOnOs(OS.MAC)
     void controlBackspaceIsRecordedAsBindingOnMacOS() {
         KeyBindingRepository liveRepo = new KeyBindingRepository();
-    
+
         KeyBindingsTabViewModel viewModel =
                 new KeyBindingsTabViewModel(liveRepo, mock(DialogService.class));
-    
+
         KeyBinding binding = KeyBinding.EDITOR_KILL_WORD_BACKWARD;
-    
+
         KeyBindingViewModel selectedVM =
                 new KeyBindingViewModel(
                         viewModel.getKeyBindingRepository(),
                         binding,
                         binding.getDefaultKeyBinding());
-    
+
         viewModel.selectedKeyBindingProperty().set(Optional.of(selectedVM));
-    
+
         KeyEvent event = new KeyEvent(
                 KeyEvent.KEY_PRESSED,
                 "",
@@ -84,12 +84,12 @@ class KeyBindingViewModelTest {
                 false,
                 false
         );
-    
+
         viewModel.setNewBindingForCurrent(event);
         viewModel.storeSettings();
-    
+
         Optional<String> saved = liveRepo.get(binding);
-    
+
         assertEquals(Optional.of("ctrl+BACK_SPACE"), saved);
     }
 
