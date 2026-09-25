@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -19,6 +21,8 @@ import org.jabref.gui.theme.ThemePreset;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.util.OptionalObjectProperty;
 
+import org.jspecify.annotations.NonNull;
+
 public class WorkspacePreferences {
     private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
@@ -32,6 +36,8 @@ public class WorkspacePreferences {
     private final BooleanProperty confirmDelete;
     private final BooleanProperty confirmHideTabBar;
     private final ObservableList<String> selectedSlrCatalogs;
+
+    private final DoubleBinding virtualizedCellSize;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -56,6 +62,8 @@ public class WorkspacePreferences {
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
         this.confirmHideTabBar = new SimpleBooleanProperty(confirmHideTabBar);
         this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
+
+        virtualizedCellSize = createCellSizeBinding();
     }
 
     /// Creates Object with default values
@@ -77,6 +85,15 @@ public class WorkspacePreferences {
 
     public static WorkspacePreferences getDefault() {
         return new WorkspacePreferences();
+    }
+
+    private @NonNull DoubleBinding createCellSizeBinding() {
+        return Bindings.createDoubleBinding(() -> {
+            if (this.shouldOverrideDefaultFontSize.get()) {
+                return this.mainFontSize.get() * 2d;
+            }
+            return 9d * 2d;
+        }, this.shouldOverrideDefaultFontSize, this.mainFontSize);
     }
 
     public void setAll(WorkspacePreferences preferences) {
@@ -218,5 +235,9 @@ public class WorkspacePreferences {
 
     public void setCustomTheme(Optional<StyleSheet> customTheme) {
         this.customTheme.set(customTheme);
+    }
+
+    public DoubleBinding virtualizedCellSizeProperty() {
+        return virtualizedCellSize;
     }
 }
