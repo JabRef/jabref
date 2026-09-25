@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:bf="http://id.loc.gov/ontologies/bibframe/" xmlns:bflc="http://id.loc.gov/ontologies/bflc/" xmlns:madsrdf="http://www.loc.gov/mads/rdf/v1#">
+  <bf:Work rdf:about="https://example.org/jabref/article-001#Work">
+    <bf:adminMetadata>
+      <bf:AdminMetadata>
+        <bf:status>
+          <bf:Status rdf:about="http://id.loc.gov/vocabulary/mstatus/n">
+            <rdfs:label>new</rdfs:label>
+          </bf:Status>
+        </bf:status>
+        <bf:date rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2023-05-26T00:00:00</bf:date>
+      </bf:AdminMetadata>
+    </bf:adminMetadata>
+    <bf:adminMetadata>
+      <bf:AdminMetadata>
+        <bf:status>
+          <bf:Status rdf:about="http://id.loc.gov/vocabulary/mstatus/c">
+            <rdfs:label>changed</rdfs:label>
+          </bf:Status>
+        </bf:status>
+        <bf:agent rdf:resource="http://id.loc.gov/vocabulary/organizations/dlc"/>
+        <bf:generationProcess rdf:resource="https://github.com/lcnetdev/marc2bibframe2/releases/tag/v3.1.0"/>
+        <bf:date rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2020-01-01T00:00:00Z</bf:date>
+      </bf:AdminMetadata>
+    </bf:adminMetadata>
+    <bf:adminMetadata>
+      <bf:AdminMetadata>
+        <bf:descriptionLevel rdf:resource="http://id.loc.gov/ontologies/bibframe-3-0-1/"/>
+        <bflc:encodingLevel>
+          <bflc:EncodingLevel rdf:about="http://id.loc.gov/vocabulary/menclvl/f">
+            <rdfs:label>full</rdfs:label>
+          </bflc:EncodingLevel>
+        </bflc:encodingLevel>
+        <bf:descriptionConventions>
+          <bf:DescriptionConventions rdf:about="http://id.loc.gov/vocabulary/descriptionConventions/aacr">
+            <bf:code>aacr</bf:code>
+          </bf:DescriptionConventions>
+        </bf:descriptionConventions>
+        <bf:identifiedBy>
+          <bf:Local>
+            <rdf:value>article-001</rdf:value>
+            <bf:assigner>
+              <bf:Agent rdf:about="http://id.loc.gov/vocabulary/organizations/dlc">
+                <bf:code>DLC</bf:code>
+              </bf:Agent>
+            </bf:assigner>
+          </bf:Local>
+        </bf:identifiedBy>
+      </bf:AdminMetadata>
+    </bf:adminMetadata>
+    <rdf:type rdf:resource="http://id.loc.gov/ontologies/bibframe/Text"/>
+    <bf:content>
+      <bf:Content rdf:about="http://id.loc.gov/vocabulary/contentTypes/txt">
+        <rdfs:label>text</rdfs:label>
+      </bf:Content>
+    </bf:content>
+    <rdf:type rdf:resource="http://id.loc.gov/ontologies/bibframe/Monograph"/>
+    <bf:language rdf:resource="http://id.loc.gov/vocabulary/languages/eng"/>
+    <bf:contribution>
+      <bf:Contribution>
+        <rdf:type rdf:resource="http://id.loc.gov/ontologies/bibframe/PrimaryContribution"/>
+        <bf:agent>
+          <bf:Agent rdf:about="https://example.org/jabref/article-001#Agent100-6">
+            <rdf:type rdf:resource="http://id.loc.gov/ontologies/bibframe/Person"/>
+            <rdfs:label>Bello, Emmanuel G.</rdfs:label>
+            <bflc:marcKey>1001 $aBello, Emmanuel G.$4aut</bflc:marcKey>
+          </bf:Agent>
+        </bf:agent>
+        <bf:role>
+          <bf:Role rdf:about="http://id.loc.gov/vocabulary/relators/aut"/>
+        </bf:role>
+      </bf:Contribution>
+    </bf:contribution>
+    <bf:title>
+      <bf:Title>
+        <bf:mainTitle>Article 22 of the African Charter</bf:mainTitle>
+      </bf:Title>
+    </bf:title>
+    <bf:relation>
+      <bf:Relation>
+        <bf:relationship rdf:resource="http://id.loc.gov/vocabulary/relationship/partof"/>
+        <bf:associatedResource>
+          <bf:Work rdf:about="https://example.org/jabref/article-001#Work773-9">
+            <bf:title>
+              <bf:Title>
+                <bf:mainTitle>Journal of African Law</bf:mainTitle>
+              </bf:Title>
+            </bf:title>
+            <bf:identifiedBy>
+              <bf:Issn>
+                <rdf:value>0021-8553</rdf:value>
+              </bf:Issn>
+            </bf:identifiedBy>
+            <bf:hasInstance>
+              <bf:Instance rdf:about="https://example.org/jabref/article-001#Instance773-9">
+                <bf:title>
+                  <bf:Title>
+                    <bf:mainTitle>Journal of African Law</bf:mainTitle>
+                  </bf:Title>
+                </bf:title>
+                <bf:part>pages:447-473</bf:part>
+                <bf:instanceOf rdf:resource="https://example.org/jabref/article-001#Work773-9"/>
+              </bf:Instance>
+            </bf:hasInstance>
+          </bf:Work>
+        </bf:associatedResource>
+      </bf:Relation>
+    </bf:relation>
+    <bf:hasInstance rdf:resource="https://example.org/jabref/article-001#Instance"/>
+  </bf:Work>
+  <bf:Instance rdf:about="https://example.org/jabref/article-001#Instance">
+    <bf:issuance rdf:resource="http://id.loc.gov/vocabulary/issuance/mono"/>
+    <bf:provisionActivity>
+      <bf:ProvisionActivity>
+        <rdf:type rdf:resource="http://id.loc.gov/ontologies/bibframe/Publication"/>
+        <bf:date rdf:datatype="http://id.loc.gov/datatypes/edtf">1992</bf:date>
+        <bf:place rdf:resource="http://id.loc.gov/vocabulary/countries/xx"/>
+        <bflc:simpleDate>1992</bflc:simpleDate>
+      </bf:ProvisionActivity>
+    </bf:provisionActivity>
+    <bf:publicationStatement>1992</bf:publicationStatement>
+    <bf:media>
+      <bf:Media rdf:about="http://id.loc.gov/vocabulary/mediaTypes/n">
+        <rdfs:label>unmediated</rdfs:label>
+      </bf:Media>
+    </bf:media>
+    <bf:identifiedBy>
+      <bf:Doi>
+        <rdf:value>10.1234/article.001</rdf:value>
+      </bf:Doi>
+    </bf:identifiedBy>
+    <bf:title>
+      <bf:Title>
+        <bf:mainTitle>Article 22 of the African Charter</bf:mainTitle>
+      </bf:Title>
+    </bf:title>
+    <bf:instanceOf rdf:resource="https://example.org/jabref/article-001#Work"/>
+  </bf:Instance>
+</rdf:RDF>

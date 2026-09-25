@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns="http://www.loc.gov/MARC21/slim">
+    <leader>00000nam a2200000 a 4500</leader>
+    <controlfield tag="001">book-001</controlfield>
+    <controlfield tag="008">230626s2023    xx            000 0 eng d</controlfield>
+    <datafield tag="020" ind1=" " ind2=" ">
+        <subfield code="a">9781800567566</subfield>
+    </datafield>
+    <datafield tag="024" ind1="7" ind2=" ">
+        <subfield code="a">10.1234/book.001</subfield>
+        <subfield code="2">doi</subfield>
+    </datafield>
+    <datafield tag="041" ind1="0" ind2=" ">
+        <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+        <subfield code="a">Caraballo, Margarita J.</subfield>
+        <subfield code="4">aut</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+        <subfield code="a">Marketing Automation with Mailchimp</subfield>
+        <subfield code="b">Expert Tips</subfield>
+    </datafield>
+    <datafield tag="264" ind1=" " ind2="1">
+        <subfield code="a">Birmingham</subfield>
+        <subfield code="b">Packt Publishing</subfield>
+        <subfield code="c">2023</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+        <subfield code="a">A guide to marketing automation.</subfield>
+    </datafield>
+    <datafield tag="856" ind1="4" ind2="0">
+        <subfield code="u">https://example.org/book</subfield>
+        <subfield code="3">Volltext</subfield>
+    </datafield>
+</record>

@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.importer.fileformat.BibframeImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
@@ -11,6 +12,7 @@ import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
+import org.jabref.logic.importer.fileformat.MarcXmlImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
@@ -84,6 +86,7 @@ public class ImporterTest {
         return Stream.of(
                 // all classes implementing {@link Importer}
                 // sorted alphabetically
+                new BibframeImporter(),
                 new BiblioscapeImporter(),
                 new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()),
                 new CitaviXmlImporter(),
@@ -91,6 +94,7 @@ public class ImporterTest {
                 new EndnoteImporter(citationKeyPatternPreferences),
                 new InspecImporter(),
                 new IsiImporter(),
+                new MarcXmlImporter(),
                 new MedlineImporter(),
                 new MedlinePlainImporter(importFormatPreferences),
                 new ModsImporter(importFormatPreferences),
