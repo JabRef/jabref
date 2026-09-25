@@ -106,7 +106,7 @@ class PreviewStyleMigrationTest {
 
         List<CustomizedPreviewStyle> customizedStyles = result.getCustomizedPreviewStyles();
         assertEquals(1, customizedStyles.size());
-        assertEquals(TextBasedPreviewLayout.NAME, customizedStyles.getFirst().name());
+        assertEquals(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, customizedStyles.getFirst().name());
         assertEquals(TextBasedPreviewLayout.NAME, customizedStyles.getFirst().id());
         assertEquals(legacyText.replace("__NEWLINE__", "\n"), customizedStyles.getFirst().text());
         assertTrue(preferences.getBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, false));
@@ -130,7 +130,7 @@ class PreviewStyleMigrationTest {
         PreviewPreferences secondLoad = secondLoadPreferences.getPreviewPreferences();
         assertEquals(1, secondLoad.getCustomizedPreviewStyles().size());
         assertNotEquals(TextBasedPreviewLayout.NAME, secondLoad.getCustomizedPreviewStyles().getFirst().id());
-        assertEquals(TextBasedPreviewLayout.NAME, secondLoad.getCustomizedPreviewStyles().getFirst().name());
+        assertEquals(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, secondLoad.getCustomizedPreviewStyles().getFirst().name());
         assertTrue(secondLoad.getCustomizedPreviewStyles().stream()
                              .noneMatch(style -> legacyText.replace("__NEWLINE__", "\n").equals(style.text())));
     }
@@ -142,7 +142,7 @@ class PreviewStyleMigrationTest {
 
         assertEquals(1, result.getCustomizedPreviewStyles().size());
         assertNotEquals(TextBasedPreviewLayout.NAME, result.getCustomizedPreviewStyles().getFirst().id());
-        assertEquals(TextBasedPreviewLayout.NAME, result.getCustomizedPreviewStyles().getFirst().name());
+        assertEquals(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, result.getCustomizedPreviewStyles().getFirst().name());
         assertEquals(TextBasedPreviewLayout.DEFAULT, result.getCustomizedPreviewStyles().getFirst().text());
         assertTrue(preferences.getBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, false));
     }
@@ -164,7 +164,7 @@ class PreviewStyleMigrationTest {
         assertEquals(2, cycle.size());
         assertInstanceOf(TextBasedPreviewLayout.class, migratedLayout);
         assertEquals(legacyText.replace("__NEWLINE__", "\n"), migratedLayout.getText());
-        assertEquals(TextBasedPreviewLayout.NAME, migratedLayout.getName());
+        assertEquals(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, migratedLayout.getName());
         assertEquals(TextBasedPreviewLayout.NAME, migratedLayout.getId());
     }
 

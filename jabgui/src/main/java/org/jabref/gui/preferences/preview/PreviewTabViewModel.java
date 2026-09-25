@@ -465,11 +465,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     List<PreviewLayout> filteredLayouts = draggedLayouts.stream().filter(layout -> !targetList.getValue().contains(layout)).toList();
                     targetList.getValue().addAll(filteredLayouts);
                     success = true;
-                    
                     if (!filteredLayouts.isEmpty()) {
                         lastRoutedLayoutProperty.setValue(filteredLayouts.getLast());
                     }
-
                     if (targetList == cslListProperty) {
                         targetList.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
                     }

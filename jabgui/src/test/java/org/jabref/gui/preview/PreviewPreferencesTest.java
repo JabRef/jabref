@@ -41,7 +41,7 @@ class PreviewPreferencesTest {
         ObservableList<CustomizedPreviewStyle> customizedPreviewStyles = preferences.getCustomizedPreviewStyles();
         assertEquals(1, customizedPreviewStyles.size());
         assertEquals(TextBasedPreviewLayout.DEFAULT, customizedPreviewStyles.getFirst().text());
-        assertEquals(TextBasedPreviewLayout.NAME, customizedPreviewStyles.getFirst().name());
+        assertEquals(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, customizedPreviewStyles.getFirst().name());
     }
 
     @Test
