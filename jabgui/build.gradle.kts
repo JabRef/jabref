@@ -33,6 +33,8 @@ testModuleInfo {
     requires("org.junit.jupiter.params")
     requires("org.mockito")
 
+    requires("de.sandec.jmemorybuddy")
+
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
 
