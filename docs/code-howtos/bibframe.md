@@ -1,12 +1,6 @@
 ---
 parent: Code Howtos
 ---
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](./AGENTS.md)
-> • [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 # BIBFRAME 2.0 import and export
 
@@ -24,16 +18,16 @@ allow this implementation to use the existing XML stack without another runtime
 dependency. The importer uses StAX to read XML and resolves the supported
 resource links from its parsed descriptions.
 
-| JabRef field | BIBFRAME path | Owner |
-| --- | --- | --- |
-| Title, subtitle | `bf:title/bf:Title/bf:mainTitle`, `bf:subtitle` | Instance, then Work |
-| Author, editor | `bf:contribution/bf:Contribution/bf:agent/rdfs:label` with `bf:role` (`aut`, `edt`) | Work |
-| Address, publisher, year | `bf:provisionActivity/bf:ProvisionActivity/bflc:simplePlace`, `bflc:simpleAgent`, `bflc:simpleDate` | Instance |
-| ISBN, DOI | `bf:identifiedBy/bf:Isbn` or `bf:Doi`/`rdf:value` | Instance |
-| ISSN | `bf:identifiedBy/bf:Issn/rdf:value` | Instance or journal host Work |
-| Language, abstract | `bf:language`, `bf:summary/bf:Summary/rdfs:label` | Work |
-| URL | `bf:electronicLocator` | Instance, then Work |
-| Journal, pages | `bf:relation` with `partof` host Work and an ISSN; host Instance `bf:part` | Work relation |
+| JabRef field             | BIBFRAME path                                                                                       | Owner                         |
+|--------------------------|-----------------------------------------------------------------------------------------------------|-------------------------------|
+| Title, subtitle          | `bf:title/bf:Title/bf:mainTitle`, `bf:subtitle`                                                     | Instance, then Work           |
+| Author, editor           | `bf:contribution/bf:Contribution/bf:agent/rdfs:label` with `bf:role` (`aut`, `edt`)                 | Work                          |
+| Address, publisher, year | `bf:provisionActivity/bf:ProvisionActivity/bflc:simplePlace`, `bflc:simpleAgent`, `bflc:simpleDate` | Instance                      |
+| ISBN, DOI                | `bf:identifiedBy/bf:Isbn` or `bf:Doi`/`rdf:value`                                                   | Instance                      |
+| ISSN                     | `bf:identifiedBy/bf:Issn/rdf:value`                                                                 | Instance or journal host Work |
+| Language, abstract       | `bf:language`, `bf:summary/bf:Summary/rdfs:label`                                                   | Work                          |
+| URL                      | `bf:electronicLocator`                                                                              | Instance, then Work           |
+| Journal, pages           | `bf:relation` with `partof` host Work and an ISSN; host Instance `bf:part`                          | Work relation                 |
 
 A Work with an identified serial host becomes an Article; other linked Works
 become Books. A host title alone is not enough to identify a journal. Data
