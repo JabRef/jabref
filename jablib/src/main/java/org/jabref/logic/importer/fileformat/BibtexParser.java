@@ -223,22 +223,80 @@ public class BibtexParser implements Parser {
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
+    // [impl->req~import.bibtex.percent-comments~1]
+
+    /// Reads database metadata before the first `@` and leaves that marker for [#parseFileContent()].
+    /// This boundary prevents comments after an entry from being mistaken for database headers.
+    /// Consecutive backslashes determine whether a `%` begins a comment or a legacy escaped header.
     private void parseDatabaseID() throws IOException {
+        boolean escaped = false;
+
         while (!eof) {
-            skipWhitespace();
+            if (!escaped) {
+                skipWhitespace();
+            }
+
             char c = (char) read();
 
             if (c == '%') {
-                skipWhitespace();
+                skipWhitespaceOnLine();
                 String label = parseTextToken().trim();
 
                 if (BibDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {
-                    skipWhitespace();
+                    skipWhitespaceOnLine();
                     database.setSharedDatabaseID(parseTextToken().trim());
+                    skipUntilEndOfLine();
+                } else if (SaveConfiguration.ENCODING_PREFIX.trim().equals(label)) {
+                    skipWhitespaceOnLine();
+                    parseTextToken();
+
+                    if (peek() != '@') {
+                        skipUntilEndOfLine();
+                    }
+                } else if (!escaped) {
+                    skipUntilEndOfLine();
                 }
             } else if (c == '@') {
                 unread(c);
                 break;
+            }
+
+            if (c == '\\') {
+                escaped = !escaped;
+            } else {
+                escaped = false;
+            }
+        }
+    }
+
+    /// Skips whitespace on the current line without consuming the line break or the next entry.
+    private void skipWhitespaceOnLine() throws IOException {
+        while (!eof) {
+            int character = read();
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return;
+            }
+
+            if (!Character.isWhitespace((char) character) || (character == '\n') || (character == '\r')) {
+                unread(character);
+                return;
+            }
+        }
+    }
+
+    /// Skips the remainder of a percent comment, including its first line-break character.
+    private void skipUntilEndOfLine() throws IOException {
+        while (!eof) {
+            int character = read();
+
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return;
+            }
+
+            if ((character == '\n') || (character == '\r')) {
+                return;
             }
         }
     }
@@ -1240,20 +1298,42 @@ public class BibtexParser implements Parser {
         }
     }
 
-    private boolean consumeUncritically(char expected) throws IOException {
-        int character;
-        // @formatter:off
-        do {
-            // @formatter:on
-            character = read();
-        } while ((character != expected) && (character != -1) && (character != 65535));
+    // [impl->req~import.bibtex.percent-comments~1]
 
-        if (isEOFCharacter(character)) {
-            eof = true;
+    /// Finds the next delimiter after [#parseDatabaseID()] has read leading metadata headers.
+    /// Unescaped `%` starts a line comment; only an immediately preceding odd number of backslashes escapes it.
+    /// This counts consecutive backslashes outside entries, unlike `isEscapeSymbol(char)` for bracketed field content.
+    ///
+    /// @return whether the delimiter was found before the end of the file
+    private boolean consumeUncritically(char expected) throws IOException {
+        boolean escaped = false;
+
+        while (!eof) {
+            int character = read();
+
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return false;
+            }
+
+            if (character == expected) {
+                return true;
+            }
+
+            if ((character == '%') && !escaped) {
+                skipUntilEndOfLine();
+                escaped = false;
+                continue;
+            }
+
+            if (character == '\\') {
+                escaped = !escaped;
+            } else {
+                escaped = false;
+            }
         }
 
-        // Return true if we actually found the character we were looking for:
-        return character == expected;
+        return false;
     }
 
     private void consume(char firstOption, char secondOption) throws IOException {
