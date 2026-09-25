@@ -93,7 +93,6 @@ class KeyBindingViewModelTest {
         assertEquals(Optional.of("ctrl+BACK_SPACE"), saved);
     }
 
-
     @Test
     @DisabledOnCIServer("locally runs fine")
     void verifyStoreSettingsWritesChanges() {
