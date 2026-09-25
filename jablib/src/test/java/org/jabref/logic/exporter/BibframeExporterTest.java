@@ -93,8 +93,8 @@ class BibframeExporterTest {
                 ((Element) document.getElementsByTagName("bf:Work").item(1)).getAttribute("rdf:about"));
         assertEquals(2, importer.importDatabase(output).getDatabase().getEntryCount());
         assertEquals(List.of("A < B & \"C\"", "Second book"), importer.importDatabase(output).getDatabase().getEntries().stream()
-                                                               .map(entry -> entry.getField(StandardField.TITLE).orElseThrow())
-                                                               .toList());
+                                                                      .map(entry -> entry.getField(StandardField.TITLE).orElseThrow())
+                                                                      .toList());
         assertFalse(Files.readString(output).contains("first-key"));
     }
 

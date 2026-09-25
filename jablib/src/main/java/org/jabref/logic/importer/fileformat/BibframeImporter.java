@@ -163,7 +163,7 @@ public class BibframeImporter extends Importer {
     private static boolean linksTo(XmlNode work, XmlNode instance) {
         String uri = instance.getAttributeNS(RDF, "about");
         return !uri.isEmpty() && children(work, BF, "hasInstance").stream()
-                                 .anyMatch(link -> uri.equals(link.getAttributeNS(RDF, "resource")));
+                                                                  .anyMatch(link -> uri.equals(link.getAttributeNS(RDF, "resource")));
     }
 
     private static BibEntry readEntry(XmlNode instance, Optional<XmlNode> work, Map<String, XmlNode> resources) {
@@ -214,12 +214,12 @@ public class BibframeImporter extends Importer {
 
     private static boolean hasJournalHost(XmlNode work, Map<String, XmlNode> resources) {
         return children(work, BF, "relation").stream()
-                       .map(property -> object(Optional.of(property), resources))
-                       .flatMap(Optional::stream)
-                       .filter(BibframeImporter::isPartOf)
-                       .map(relation -> object(first(relation, BF, "associatedResource"), resources))
-                       .flatMap(Optional::stream)
-                       .anyMatch(host -> hasIdentifier(host, "Issn", resources));
+                                             .map(property -> object(Optional.of(property), resources))
+                                             .flatMap(Optional::stream)
+                                             .filter(BibframeImporter::isPartOf)
+                                             .map(relation -> object(first(relation, BF, "associatedResource"), resources))
+                                             .flatMap(Optional::stream)
+                                             .anyMatch(host -> hasIdentifier(host, "Issn", resources));
     }
 
     private static boolean isPartOf(XmlNode relation) {
@@ -273,19 +273,19 @@ public class BibframeImporter extends Importer {
     private static void readIdentifier(BibEntry entry, XmlNode resource, Map<String, XmlNode> resources,
                                        String type, StandardField field) {
         children(resource, BF, "identifiedBy").stream()
-                .map(property -> object(Optional.of(property), resources))
-                .flatMap(Optional::stream)
-                .filter(identifier -> isType(identifier, type))
-                .map(identifier -> value(identifier, RDF, "value"))
-                .flatMap(Optional::stream)
-                .findFirst().ifPresent(value -> putIfAbsent(entry, field, Optional.of(value)));
+                                              .map(property -> object(Optional.of(property), resources))
+                                              .flatMap(Optional::stream)
+                                              .filter(identifier -> isType(identifier, type))
+                                              .map(identifier -> value(identifier, RDF, "value"))
+                                              .flatMap(Optional::stream)
+                                              .findFirst().ifPresent(value -> putIfAbsent(entry, field, Optional.of(value)));
     }
 
     private static boolean hasIdentifier(XmlNode resource, String type, Map<String, XmlNode> resources) {
         return children(resource, BF, "identifiedBy").stream()
-                       .map(property -> object(Optional.of(property), resources))
-                       .flatMap(Optional::stream)
-                       .anyMatch(identifier -> isType(identifier, type));
+                                                     .map(property -> object(Optional.of(property), resources))
+                                                     .flatMap(Optional::stream)
+                                                     .anyMatch(identifier -> isType(identifier, type));
     }
 
     private static Optional<String> locator(XmlNode resource, Map<String, XmlNode> resources) {
@@ -295,7 +295,7 @@ public class BibframeImporter extends Importer {
                 return Optional.of(uri);
             }
             return object(Optional.of(property), resources).flatMap(element -> value(element, RDF, "value"))
-                         .or(() -> Optional.of(property.getTextContent().trim()).filter(text -> !text.isBlank()));
+                                                           .or(() -> Optional.of(property.getTextContent().trim()).filter(text -> !text.isBlank()));
         });
     }
 
@@ -311,18 +311,18 @@ public class BibframeImporter extends Importer {
 
     private static Optional<String> value(XmlNode parent, String namespace, String localName) {
         return first(parent, namespace, localName).map(element -> element.getTextContent().trim())
-                    .filter(text -> !text.isBlank());
+                                                  .filter(text -> !text.isBlank());
     }
 
     private static Optional<XmlNode> object(Optional<XmlNode> property, Map<String, XmlNode> resources) {
         return property.flatMap(element -> children(element).stream().findFirst()
-                .or(() -> Optional.ofNullable(resources.get(element.getAttributeNS(RDF, "resource")))));
+                                                            .or(() -> Optional.ofNullable(resources.get(element.getAttributeNS(RDF, "resource")))));
     }
 
     private static boolean isType(XmlNode element, String localName) {
         return is(element, BF, localName) || is(element, RDF, "Description")
                 && children(element, RDF, "type").stream()
-                           .anyMatch(type -> (BF + localName).equals(type.getAttributeNS(RDF, "resource")));
+                                                 .anyMatch(type -> (BF + localName).equals(type.getAttributeNS(RDF, "resource")));
     }
 
     private static boolean is(XmlNode element, String namespace, String localName) {

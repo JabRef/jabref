@@ -68,8 +68,8 @@ class MarcXmlImporterTest {
 
         assertTrue(importer.isRecognizedFormat(collection));
         assertEquals(List.of("First book", "Second book"), importer.importDatabase(collection).getDatabase().getEntries().stream()
-                                                               .map(entry -> entry.getField(StandardField.TITLE).orElseThrow())
-                                                               .toList());
+                                                                   .map(entry -> entry.getField(StandardField.TITLE).orElseThrow())
+                                                                   .toList());
     }
 
     @Test
