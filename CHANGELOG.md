@@ -30,6 +30,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
+- We removed the "Waiting for AI reply..." notification; the AI chat already shows a progress indicator. [#17145](https://github.com/JabRef/jabref/pull/17145)
+
 ## [6.0-beta.1] - 2026-09-21
 
 ### Added
