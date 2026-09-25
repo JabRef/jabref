@@ -18,6 +18,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We changed the opening of libraries from older JabRef versions to ask which conversions to perform and to remember the choice. [#16941](https://github.com/JabRef/jabref/pull/16941)
+
 ### Fixed
 
 - We re-enabled the [Grobid](https://github.com/grobidOrg/grobid) citation fetcher again. It is now reachable via https. [#16668](https://github.com/JabRef/jabref/issues/16668)
