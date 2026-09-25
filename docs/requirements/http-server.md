@@ -3,7 +3,7 @@ parent: Requirements
 ---
 # HTTP Server
 
-## Cross-library search
+## HTTP server must support cross-library search via query endpoint
 `req~jabsrv.query.search~1`
 
 The HTTP server exposes `POST /libraries:query` accepting `{ "queries": ["…"] }`, where each query is a Search.g4 expression.
@@ -14,7 +14,7 @@ An entry that matches in more than one library produces one match per library.
 
 Needs: impl, utest
 
-## List library groups
+## HTTP server must return library groups as pre-order list
 `req~jabsrv.groups.list~1`
 
 The HTTP server exposes `GET /libraries/{id}/groups` returning the groups of the library as a flat, depth-first pre-order list.
@@ -25,7 +25,7 @@ Group names are unique within a library, so the name identifies the group.
 
 Needs: impl, utest
 
-## Import entries into a group
+## HTTP server must allow importing entries directly into group
 `req~jabsrv.import.group~1`
 
 `POST /libraries/{id}/entries` accepts an optional `group` query parameter naming a group the imported entries are additionally assigned to.
