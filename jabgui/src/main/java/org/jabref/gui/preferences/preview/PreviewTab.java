@@ -304,7 +304,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         viewModel.availableSelectionModelProperty().setValue(cslListView.getSelectionModel());
         availableTabPane.getSelectionModel()
                         .selectedItemProperty()
-                        .addListener((obs, oldTab, newTab) -> {
+                        .addListener((_, _, newTab) -> {
                             if (newTab == cslTab) {
                                 viewModel.availableSelectionModelProperty().setValue(cslListView.getSelectionModel());
                             } else {

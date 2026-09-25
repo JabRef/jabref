@@ -22,7 +22,7 @@ public final class JavaFxThreadingUtil {
         CountDownLatch latch = new CountDownLatch(1);
         try {
             Platform.startup(latch::countDown);
-        } catch (IllegalStateException alreadyRunning) {
+        } catch (IllegalStateException _) {
             // Started by something outside this utility (another test class, a TestFX extension, etc.).
             // The toolkit is up either way, so there is nothing left to wait for.
             return;
@@ -32,14 +32,4 @@ public final class JavaFxThreadingUtil {
             throw new IllegalStateException("Timed out waiting for JavaFX toolkit to initialize");
         }
     }
-
-    //    public static void initializeJavaFxToolkit() throws InterruptedException {
-    //        if (STARTED.compareAndSet(false, true)) {
-    //            CountDownLatch latch = new CountDownLatch(1);
-    //            Platform.startup(latch::countDown);
-    //            if (!latch.await(5, TimeUnit.SECONDS)) {
-    //                throw new IllegalStateException("Timed out waiting for JavaFX toolkit to initialize");
-    //            }
-    //        }
-    //    }
 }
