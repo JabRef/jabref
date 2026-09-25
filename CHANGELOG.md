@@ -24,7 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We re-enabled the [Grobid](https://github.com/grobidOrg/grobid) citation fetcher again. It is now reachable via https. [#16668](https://github.com/JabRef/jabref/issues/16668)
 - We fixed an issue where the AI chat lost its scroll position when switching back to an entry. [#17172](https://github.com/JabRef/jabref/pull/17172)
-- We fixed the "Search for unlinked local files" that was not applying JabRef's theme. [#16158](https://github.com/JabRef/jabref/issues/16158)
+- We fixed issues with the "Search for unlinked local files" wizard. [#16158](https://github.com/JabRef/jabref/issues/16158)
 - We fixed the question-mark icon appearing in the "Search for unlinked local files" wizard pages. [#16158](https://github.com/JabRef/jabref/issues/16158)
 - We fixed the "select files to import" header, it no longer shows during the file scan. [#16158](https://github.com/JabRef/jabref/issues/16158)
 - We fixed the space key not toggling the file checkboxes after we scan the document in "Search for unlinked local files". [#16158](https://github.com/JabRef/jabref/issues/16158)
@@ -377,10 +377,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
 - We replaced the various notifications for file changes, tasks and popup toasts with a new info center. [#14762](https://github.com/JabRef/jabref/issues/14762)
 - We upgraded to Lucene 10.4 for the fulltext search.
-    Thus, the now created search index cannot be read from older versions of JabRef anylonger.
-    ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
-    Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
-    [#15220](https://github.com/JabRef/jabref/pull/15220)
+  Thus, the now created search index cannot be read from older versions of JabRef anylonger.
+  ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
+  Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
+  [#15220](https://github.com/JabRef/jabref/pull/15220)
 - We enabled drag and drop of Windows shortcut (`.lnk`) files to open libraries. [#15036](https://github.com/JabRef/jabref/issues/15036)
 - We refined the "Select files to import" page in "Search for unlinked local files" dialog to give the users the choice of linking the file to a related entry or import it to a new entry. [#13689](https://github.com/JabRef/jabref/issues/13689)
 - The "Make/Sync bibliography" button in OO/LO panel now refreshes citations before generating bibliographies. [#14387](https://github.com/JabRef/jabref/issues/14387)
@@ -2340,29 +2340,54 @@ The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-beta.1...HEAD
+
 [6.0-beta.1]: https://github.com/JabRef/jabref/compare/v6.0-alpha.6...v6.0-beta.1
+
 [6.0-alpha.6]: https://github.com/JabRef/jabref/compare/v6.0-alpha.5...v6.0-alpha.6
+
 [6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...v6.0-alpha.5
+
 [6.0-alpha.4]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...v6.0-alpha.4
+
 [6.0-alpha.3]: https://github.com/JabRef/jabref/compare/v6.0-alpha2...v6.0-alpha.3
+
 [6.0-alpha2]: https://github.com/JabRef/jabref/compare/v6.0-alpha...v6.0-alpha2
+
 [6.0-alpha]: https://github.com/JabRef/jabref/compare/v5.15...v6.0-alpha
+
 [5.15]: https://github.com/JabRef/jabref/compare/v5.14...v5.15
+
 [5.14]: https://github.com/JabRef/jabref/compare/v5.13...v5.14
+
 [5.13]: https://github.com/JabRef/jabref/compare/v5.12...v5.13
+
 [5.12]: https://github.com/JabRef/jabref/compare/v5.11...v5.12
+
 [5.11]: https://github.com/JabRef/jabref/compare/v5.10...v5.11
+
 [5.10]: https://github.com/JabRef/jabref/compare/v5.9...v5.10
+
 [5.9]: https://github.com/JabRef/jabref/compare/v5.8...v5.9
+
 [5.8]: https://github.com/JabRef/jabref/compare/v5.7...v5.8
+
 [5.7]: https://github.com/JabRef/jabref/compare/v5.6...v5.7
+
 [5.6]: https://github.com/JabRef/jabref/compare/v5.5...v5.6
+
 [5.5]: https://github.com/JabRef/jabref/compare/v5.4...v5.5
+
 [5.4]: https://github.com/JabRef/jabref/compare/v5.3...v5.4
+
 [5.3]: https://github.com/JabRef/jabref/compare/v5.2...v5.3
+
 [5.2]: https://github.com/JabRef/jabref/compare/v5.1...v5.2
+
 [5.1]: https://github.com/JabRef/jabref/compare/v5.0...v5.1
+
 [5.0]: https://github.com/JabRef/jabref/compare/v5.0-beta...v5.0
+
 [5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-alpha...v5.0-beta
+
 [5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
 <!-- markdownlint-disable-file MD024 MD033 MD053 -->
