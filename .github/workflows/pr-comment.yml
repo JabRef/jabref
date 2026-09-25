@@ -35,8 +35,11 @@ jobs:
     # label evaluation below (which re-reads isDraft right before writing the label).
     # The PR number is only known after the artifact is read, too late for a group expression -
     # head repository plus head branch identifies the same pull request just as well, for fork PRs too.
+    # Exception: "PR Review Activity" runs triggered by issue_comment run on the default branch, so
+    # head_branch is "main" for every PR - one group for all PRs, which cancelled the pending
+    # evaluations of other PRs. Their run title carries the PR number instead.
     concurrency:
-      group: pr-status-${{ github.event.workflow_run.head_repository.full_name || github.repository }}-${{ github.event.workflow_run.head_branch || github.event.inputs.pr_number }}
+      group: pr-status-${{ github.event.workflow_run.head_repository.full_name || github.repository }}-${{ (github.event.workflow_run.event == 'issue_comment' && github.event.workflow_run.display_title) || github.event.workflow_run.head_branch || github.event.inputs.pr_number }}
       cancel-in-progress: false
     runs-on: ubuntu-slim
     permissions:
@@ -246,8 +249,10 @@ jobs:
             --jq '[.[] | select(.workflow == "Source Code Tests" or .workflow == "On PR opened/updated" or .workflow == "Check PR Format"
                                  or .workflow == "Link PR to Issue" or .workflow == "Check PR Modifications" or .workflow == "Check PR CHANGELOG.md")]')
           PENDING=$(jq -r '[.[] | select(.state == "IN_PROGRESS" or .state == "QUEUED" or .state == "PENDING") | .workflow] | unique | join(", ")' <<< "$CHECKS")
+          # Only Qodo's most recently touched comment counts: a "busy" comment Qodo never completed
+          # would otherwise block the labels forever, although later reviews finished.
           if gh api repos/$REPO/issues/$PR_NUMBER/comments --paginate \
-               --jq '.[] | select(.user.login == "qodo-free-for-open-source-projects[bot]") | .body' \
+             | jq -s '[.[][] | select(.user.login == "qodo-free-for-open-source-projects[bot]")] | max_by(.updated_at) | .body // ""' \
              | grep -q "Qodo is busy working"; then
             PENDING="${PENDING:+$PENDING, }Qodo"
           fi
@@ -292,17 +297,20 @@ jobs:
           # no trace here - count the failures themselves, for forks as well.
           FAILED=$(jq -r '[.[] | select(.state == "FAILURE") | .workflow] | unique | join(", ")' <<< "$CHECKS")
 
-          if [[ -n "$COMMENTS" || "$QODO_THREADS" -gt 0 || -n "$FAILED" ]]; then
-            echo "Bot comments or failed checks ($FAILED) - adding label changes-required"
+          # A human "Request changes" review counts like a bot finding, unless the PR is a draft.
+          CHANGES_REQUESTED=$(gh pr view --repo $REPO $PR_NUMBER --json isDraft,reviewDecision \
+            --jq '(.isDraft | not) and .reviewDecision == "CHANGES_REQUESTED"')
+
+          if [[ -n "$COMMENTS" || "$QODO_THREADS" -gt 0 || -n "$FAILED" || "$CHANGES_REQUESTED" == "true" ]]; then
+            echo "Bot comments, failed checks ($FAILED) or changes requested by a reviewer - adding label changes-required"
             gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: ready-for-review,status: stale" --add-label "status: changes-required"
             echo "Bot comments - added label changes-required" >> $GITHUB_STEP_SUMMARY
           else
-            # A PR without bot comments is ready for review unless it is a draft, a human requested changes,
-            # or it already progressed further in the review process. Drafts and pending human re-reviews
-            # end up without any status label ("nothing for the bots, a human decides what is next");
+            # A PR without bot comments is ready for review unless it is a draft
+            # or it already progressed further in the review process. Drafts end up without any status label;
             # progressed PRs keep their awaiting-second-review / to-be-merged label.
-            PR_STATE=$(gh pr view --repo $REPO $PR_NUMBER --json isDraft,reviewDecision,labels \
-              --jq 'if .isDraft or .reviewDecision == "CHANGES_REQUESTED"
+            PR_STATE=$(gh pr view --repo $REPO $PR_NUMBER --json isDraft,labels \
+              --jq 'if .isDraft
                        or ([.labels[].name] | any(. == "status: awaiting-second-review" or . == "status: to-be-merged"))
                     then "not-ready" else "ready" end')
             if [ "$PR_STATE" = "ready" ]; then
@@ -310,7 +318,7 @@ jobs:
               gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale" --add-label "status: ready-for-review"
               echo "No bot comments - removed label changes-required and added ready-for-review" >> $GITHUB_STEP_SUMMARY
             else
-              echo "No bot comments, but PR is draft, has changes requested, or is already further in review - removing changes-required, stale and ready-for-review"
+              echo "No bot comments, but PR is draft or is already further in review - removing changes-required, stale and ready-for-review"
               gh issue --repo $REPO edit $PR_NUMBER --remove-label "status: changes-required,status: stale,status: ready-for-review"
               echo "No bot comments, but not ready for review - removed changes-required, stale and ready-for-review" >> $GITHUB_STEP_SUMMARY
             fi

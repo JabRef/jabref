@@ -10,6 +10,13 @@ Changes made by one client — entry modifications, groups, and library settings
 
 Needs: impl, utest
 
+## Shared metadata snapshots are atomic
+`req~shared-database.atomic-metadata-snapshots~1`
+
+When a client changes shared metadata, other clients observe either the complete previous snapshot or the complete new snapshot, never an intermediate subset of the change.
+
+Needs: impl, utest
+
 ## Change content travels in the notification
 `req~shared-database.change-content-in-notification~1`
 
