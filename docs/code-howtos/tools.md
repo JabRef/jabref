@@ -28,6 +28,11 @@ Note: Running JabRef using gradle from the command line requires a JDK to be ins
 One can also test without a JDK installed.
 See [How to try any JabRef pull request](https://blog.jabref.org/2025/05/31/run-pr/).
 
+[ghq](https://github.com/x-motemen/ghq) keeps many repository clones organized by host and owner.
+Set its root once (e.g., `git config --global ghq.root C:\git-repositories`; on Windows, install with `scoop install ghq`).
+Then, `ghq get JabRef/jabref` clones JabRef including its submodules into `C:\git-repositories\github.com\JabRef\jabref`.
+Continue with the `git remote` commands from [the setup guide](../getting-into-the-code/guidelines-for-setting-up-a-local-workspace/pre-03-code.md) there.
+
 ## Drawing diagrams
 
 A free tool to make UI mockups: <https://draw.io> with `Software -> Mockups` shapes.
