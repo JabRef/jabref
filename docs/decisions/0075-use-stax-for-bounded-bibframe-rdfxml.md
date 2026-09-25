@@ -2,12 +2,6 @@
 nav_order: 75
 parent: Decision Records
 ---
-> [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
->
-> Read and follow:
-> • [AGENTS.md](./AGENTS.md)
-> • [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 # Use StAX for bounded BIBFRAME RDF/XML import
 
@@ -37,4 +31,3 @@ additional bibliographic fields. The pinned converter fixtures use child
 elements and URI links for the mapped fields, without `rdf:nodeID` or
 `rdf:parseType`; other RDF/XML producers may choose different syntax.
 
-<!-- markdownlint-disable-file MD013 MD033 MD041 -->
