@@ -3,6 +3,13 @@ parent: Requirements
 ---
 # Fetchers
 
+## Independent per-fetcher API key persistence
+`req~fetchers.api-key-persistence~1`
+
+Each fetcher's API key persistence preference is stored independently. By default, API keys are persisted to the system keyring unless the user explicitly opts out for a specific fetcher. When a user disables persistence for a fetcher, its key is removed from the keyring on the next save, while other fetchers' keys remain persisted.
+
+Needs: impl
+
 ## Respect provider request limits
 `req~fetchers.rate-limiting~1`
 
