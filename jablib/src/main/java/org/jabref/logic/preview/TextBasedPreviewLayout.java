@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 /// Caching supports only one instance
 public final class TextBasedPreviewLayout implements PreviewLayout {
     public static final String NAME = "PREVIEW";
+    public static final String DEFAULT_DISPLAY_NAME = "Default";
     public static final String DEFAULT = "<font face=\"sans-serif\">" +
             "<b>\\bibtextype</b><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>\\end{citationkey}__NEWLINE__" +
             "\\begin{author}<BR><BR>\\format[Authors(LastFirst, FullName,Sep= / ,LastSep= / ),HTMLChars]{\\author}\\end{author}__NEWLINE__" +
@@ -116,7 +117,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
 
     @Override
     public String getName() {
-        return this.name.isBlank() ? NAME : this.name;
+        return this.name.isBlank() ? DEFAULT_DISPLAY_NAME : this.name;
     }
 
     public void setName(@NonNull String name) {

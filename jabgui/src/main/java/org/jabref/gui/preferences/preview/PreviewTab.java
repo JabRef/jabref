@@ -466,9 +466,12 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
         boolean success = viewModel.dragDropped(targetList, event.getDragboard());
         event.setDropCompleted(success);
-        // switch tabs dragging OUT of Selected INTO Available. Drop into Selected has no need to refocus the Available tabs.
-        if (success && targetList != viewModel.chosenListProperty()) {
-            focusTabOnLastRoutedLayout();
+        if (success) {
+            if (targetList == viewModel.chosenListProperty()) {
+                focusChosenOnLastRoutedLayout();
+            } else {
+                focusAvailableOnLastRoutedLayout();
+            }
         }
         event.consume();
     }
@@ -476,6 +479,10 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private void dragDroppedInChosenCell(PreviewLayout targetLayout, DragEvent event) {
         boolean success = viewModel.dragDroppedInChosenCell(targetLayout, event.getDragboard());
         event.setDropCompleted(success);
+        if (success && !chosenListView.getSelectionModel().isEmpty()) {
+            chosenListView.scrollTo(chosenListView.getSelectionModel().getSelectedIndex());
+            chosenListView.requestFocus();
+        }
         event.consume();
     }
 
@@ -485,11 +492,12 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         } else {
             viewModel.addToChosen(viewModel.customizedListProperty());
         }
+        focusChosenOnLastRoutedLayout();
     }
 
     public void toLeftButtonAction() {
         viewModel.removeFromChosen();
-        focusTabOnLastRoutedLayout();
+        focusAvailableOnLastRoutedLayout();
     }
 
     public void sortUpButtonAction() {
@@ -516,6 +524,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
             } else {
                 viewModel.addToChosen(viewModel.customizedListProperty());
             }
+            focusChosenOnLastRoutedLayout();
             event.consume();
         }
     }
@@ -523,7 +532,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private void mouseClickedChosen(MouseEvent event) {
         if (event.getClickCount() == 2) {
             viewModel.removeFromChosen();
-            focusTabOnLastRoutedLayout();
+            focusAvailableOnLastRoutedLayout();
             event.consume();
         }
     }
@@ -539,20 +548,37 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         return null;
     }
 
-    private void focusTabOnLastRoutedLayout() {
-        PreviewLayout lastLayout = viewModel.lastRoutedLayoutProperty().getValue();
-        if (lastLayout != null) {
-            availableTabPane.getSelectionModel()
-                            .select((lastLayout instanceof TextBasedPreviewLayout) ? customizedTab : cslTab);
-        }
-    }
-
     private void focusRightButtonBinding() {
         toRightButton.disableProperty().unbind();
         toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty()
                                                       .getValue()
                                                       .selectedItemProperty()
                                                       .isNull());
+    }
+
+    private void focusAvailableOnLastRoutedLayout() {
+        PreviewLayout lastLayout = viewModel.lastRoutedLayoutProperty().getValue();
+        if (lastLayout != null) {
+            availableTabPane.getSelectionModel()
+                            .select((lastLayout instanceof TextBasedPreviewLayout) ? customizedTab : cslTab);
+
+            viewModel.availableSelectionModelProperty().getValue().clearSelection();
+            viewModel.availableSelectionModelProperty().getValue().select(lastLayout);
+
+            ListView<PreviewLayout> targetListView = (lastLayout instanceof TextBasedPreviewLayout) ? customizedListView : cslListView;
+            targetListView.scrollTo(lastLayout);
+            targetListView.requestFocus();
+        }
+    }
+
+    private void focusChosenOnLastRoutedLayout() {
+        PreviewLayout lastLayout = viewModel.lastRoutedLayoutProperty().getValue();
+        if (lastLayout != null) {
+            viewModel.chosenSelectionModelProperty().getValue().clearSelection();
+            viewModel.chosenSelectionModelProperty().getValue().select(lastLayout);
+            chosenListView.scrollTo(lastLayout);
+            chosenListView.requestFocus();
+        }
     }
 
     private ListCell<PreviewLayout> createCustomizedStyleCell(ListView<PreviewLayout> listView) {

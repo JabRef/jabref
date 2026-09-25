@@ -50,7 +50,7 @@ public class PreviewPreferences {
         this(
                 List.of(),  // Layout cycle - empty by default, see JabRefPreferences::getPreviewPreferencesFromBackingStore
                 0,          // Layout cycle position
-                List.of(new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)),   // default custom style
+                List.of(new CustomizedPreviewStyle(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, TextBasedPreviewLayout.DEFAULT)),   // default custom style
                 false,      // Show preview as an extra tab
                 false,      // Show the preview entry table tooltip
                 List.of(),  // BST-Paths

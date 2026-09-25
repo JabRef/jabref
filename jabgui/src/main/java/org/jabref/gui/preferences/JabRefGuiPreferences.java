@@ -1049,7 +1049,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (cycle.isEmpty()) {
             if (customizedLayouts.isEmpty()) {
                 CustomizedPreviewStyle defaultStyle = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
-                        TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT);
+                        TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, TextBasedPreviewLayout.DEFAULT);
                 customizedLayouts.add(defaultStyle);
                 cycle.add(defaultStyle.id());
             } else {
@@ -1143,7 +1143,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 // Legacy PREVIEW_CYCLE reference TextBasedPreviewLayout.NAME (reference PreferencesMigrations.upgradeBuiltinPreviewName)
                 // set migrated id to this default value, else cycle inherited from before this change silently drops the customized layout on load
                 CustomizedPreviewStyle migrated = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
-                        TextBasedPreviewLayout.NAME, legacyText);
+                        TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, legacyText);
                 storeCustomizedPreviewStyle(List.of(migrated));
                 return List.of(migrated);
             }

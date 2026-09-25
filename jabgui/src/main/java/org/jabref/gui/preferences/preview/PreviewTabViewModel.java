@@ -282,6 +282,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         availableSelectionModelProperty.getValue().clearSelection();
         sourceList.removeAll(selected);
         chosenListProperty.addAll(selected);
+
+        if (!selected.isEmpty()) {
+            lastRoutedLayoutProperty.setValue(selected.getLast());
+        }
     }
 
     public void removeFromChosen() {
@@ -461,6 +465,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     List<PreviewLayout> filteredLayouts = draggedLayouts.stream().filter(layout -> !targetList.getValue().contains(layout)).toList();
                     targetList.getValue().addAll(filteredLayouts);
                     success = true;
+                    
+                    if (!filteredLayouts.isEmpty()) {
+                        lastRoutedLayoutProperty.setValue(filteredLayouts.getLast());
+                    }
 
                     if (targetList == cslListProperty) {
                         targetList.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
