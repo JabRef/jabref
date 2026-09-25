@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
@@ -49,10 +47,9 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     private static final List<String> DEFAULT_DOCLING_PATHS = List.of(
             "docling"
     );
-    private final ObjectProperty<EngineSelection> selectedEngine = new SimpleObjectProperty<>(EngineSelection.OCRMYPDF);
+    private final ObjectProperty<EngineSelection> selectedEngine = new SimpleObjectProperty<>(EngineSelection.TESSERACT);
     private final ListProperty<EngineSelection> engineOptions =
             new SimpleListProperty<>(FXCollections.observableArrayList(EngineSelection.values()));
-    private final BooleanBinding pluginSectionVisible = Bindings.equal(selectedEngine, EngineSelection.OCRMYPDF);
     private final StringProperty ocrEnginePath = new SimpleStringProperty();
     private final ObjectProperty<PagesWithTextHandling> selectedPagesHaveText = new SimpleObjectProperty<>(PagesWithTextHandling.SKIP);
     private final ListProperty<PagesWithTextHandling> pagesHaveTextOptions =
@@ -141,7 +138,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     }
 
     public Optional<String> autoDetectDefaultEnginePath(EngineSelection engineToDetect) {
-        if (engineToDetect == EngineSelection.OCRMYPDF) {
+        if (engineToDetect != EngineSelection.DOCLING) {
             return DEFAULT_OCRMYPDF_PATHS.stream()
                                          .filter(this::enginePathExists)
                                          .findFirst();

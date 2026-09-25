@@ -6,8 +6,10 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public enum EngineSelection {
-    OCRMYPDF("OCRmyPDF", Optional.empty()),
-    EASYOCR("EasyOCR", Optional.of("ocrmypdf_easyocr")),
+    TESSERACT("Tesseract", Optional.of("tesseract")),
+    EASYOCR("EasyOCR", Optional.of("easyocr")),
+    PADDLEOCR("PaddleOCR", Optional.of("ocrmypdf_paddleocr")),
+    APPLEOCR("AppleOCR", Optional.of("appleocr")),
     DOCLING("Docling", Optional.empty());
 
     private final String displayName;
@@ -30,7 +32,7 @@ public enum EngineSelection {
         try {
             return EngineSelection.valueOf(name);
         } catch (IllegalArgumentException _) {
-            return EngineSelection.OCRMYPDF;
+            return EngineSelection.TESSERACT;
         }
     }
 }

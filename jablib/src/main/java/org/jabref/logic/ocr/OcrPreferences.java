@@ -18,7 +18,7 @@ public class OcrPreferences {
     private final ListProperty<OcrLanguage> ocrLanguages;
 
     private OcrPreferences() {
-        this("ocrmypdf", PagesWithTextHandling.SKIP, EngineSelection.OCRMYPDF, List.of(OcrLanguage.ENGLISH));
+        this("ocrmypdf", PagesWithTextHandling.SKIP, EngineSelection.TESSERACT, List.of(OcrLanguage.ENGLISH));
     }
 
     public OcrPreferences(String ocrEnginePath, PagesWithTextHandling pagesWithTextHandling, EngineSelection engineSelection, List<OcrLanguage> ocrLanguages) {
@@ -77,6 +77,6 @@ public class OcrPreferences {
     }
 
     public static OcrPreferences getDefault() {
-        return new OcrPreferences("ocrmypdf", PagesWithTextHandling.SKIP, EngineSelection.OCRMYPDF, List.of(OcrLanguage.ENGLISH));
+        return new OcrPreferences();
     }
 }

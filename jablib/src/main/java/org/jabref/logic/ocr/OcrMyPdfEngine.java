@@ -53,7 +53,7 @@ public class OcrMyPdfEngine implements OcrEngine {
                                                .map(OcrLanguage::getCode)
                                                .toList();
         ocrPreferences.getEngineSelection().getIdentifierName().ifPresent(pluginId -> {
-            command.add("--plugin");
+            command.add("--ocr-engine");
             command.add(pluginId);
         });
         if (!languages.isEmpty()) {
