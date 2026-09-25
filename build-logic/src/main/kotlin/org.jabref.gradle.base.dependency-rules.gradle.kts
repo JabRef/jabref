@@ -221,6 +221,12 @@ extraJavaModuleInfo {
     module("de.rototor.jeuclid:jeuclid-core", "jeuclid.core")
     module("de.rototor.snuggletex:snuggletex-core", "snuggletex.core")
     module("de.rototor.snuggletex:snuggletex-jeuclid", "snuggletex.jeuclid")
+    module("de.sandec:JMemoryBuddy", "de.sandec.jmemorybuddy") {
+        exportAllPackages()
+        // The heap dump written when a reachability assertion fails goes through ManagementFactory
+        requires("java.management")
+        requires("jdk.management")
+    }
     module("de.swiesend:secret-service", "secret.service")
     module("de.undercouch:citeproc-java", "citeproc.java") {
         exportAllPackages()

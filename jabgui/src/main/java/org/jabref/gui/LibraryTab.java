@@ -3,6 +3,7 @@ package org.jabref.gui;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -169,6 +170,17 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     @SuppressWarnings({"FieldCanBeLocal"})
     private Subscription dividerPositionSubscription;
 
+    /// Everything this tab listens to on the [StateManager], which outlives every library. Without
+    /// dropping these in [#onClosed], a closed tab stays reachable from a listener list for the rest
+    /// of the session, and with it its table model, its context and all its entries.
+    /// Verified by [org.jabref.gui.LibraryTabRetentionTest].
+    private final List<Subscription> stateManagerSubscriptions = new ArrayList<>();
+
+    /// Set by [#onClosed], so listener registrations still queued behind it are skipped instead of
+    /// registering after the cleanup already ran.
+    /// A plain field suffices: it is only written and read on the JavaFX application thread.
+    private boolean closed;
+
     private ListProperty<GroupTreeNode> selectedGroupsProperty;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
     private final IntegerProperty resultSize = new SimpleIntegerProperty(0);
@@ -314,11 +326,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         setOnCloseRequest(this::onCloseRequest);
         setOnClosed(this::onClosed);
 
-        stateManager.activeDatabaseProperty().addListener((_, _, _) -> {
+        stateManagerSubscriptions.add(EasyBind.listen(stateManager.activeDatabaseProperty(), (_, _, _) -> {
             if (preferences.getSearchPreferences().isFulltext()) {
                 mainTable.getTableModel().refreshSearchMatches();
             }
-        });
+        }));
     }
 
     private void initializeComponentsAndListeners(boolean isDummyContext) {
@@ -365,11 +377,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
         Platform.runLater(() -> {
+            // The tab was closed before this ran: registering now would add listeners no one removes.
+            if (closed) {
+                return;
+            }
             // [impl->req~logic.undo.modified-marker-derived~1]
             changedProperty.bind(journal().hasChangedProperty());
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
-            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ ->
-                    updateTabTitle(changedProperty.getValue()));
+            ListChangeListener<BibDatabaseContext> openDatabasesListener = _ -> updateTabTitle(changedProperty.getValue());
+            stateManager.getOpenDatabases().addListener(openDatabasesListener);
+            stateManagerSubscriptions.add(() -> stateManager.getOpenDatabases().removeListener(openDatabasesListener));
         });
     }
 
@@ -498,6 +515,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         // journal describes a library that is about to stop existing, and nothing else can reach it
         // once the tab moves on, so it goes with the context rather than staying for the session.
         stateManager.removeUndoManager(previousDatabaseContext);
+        // Same for its search context: initializeComponentsAndListeners below registers one for the
+        // new context, and the old registration would otherwise linger under a uid nobody holds.
+        stateManager.removeSearchContext(previousDatabaseContext);
 
         this.bibDatabaseContext = bibDatabaseContext;
 
@@ -919,6 +939,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// has vanished under a running JVM) aborts the tab close, leaving JabRef unclosable behind a recurring
     /// uncaught-exception dialog. Closing must always succeed, so even fatal errors are only logged here.
     private void onClosed(Event event) {
+        closed = true;
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
         }
@@ -930,6 +951,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         } catch (Throwable e) {
             LOGGER.error("Problem when closing change monitor", e);
         }
+        // Dropped before closing, so a failing backend shutdown cannot skip it: the registration keeps
+        // the context reachable from the StateManager, and its backend factories capture this tab.
+        stateManager.removeSearchContext(bibDatabaseContext);
         try {
             if (searchContext != null) {
                 searchContext.close();
@@ -970,6 +994,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (autoRenameFileOnEntryChange != null) {
             coarseChangeFilter.unregisterListener(autoRenameFileOnEntryChange);
         }
+
+        stateManagerSubscriptions.forEach(Subscription::unsubscribe);
+        stateManagerSubscriptions.clear();
 
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
