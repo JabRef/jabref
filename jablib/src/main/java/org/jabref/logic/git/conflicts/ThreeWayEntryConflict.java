@@ -1,5 +1,8 @@
 package org.jabref.logic.git.conflicts;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NullMarked;
@@ -17,5 +20,14 @@ public record ThreeWayEntryConflict(
 ) {
     public ThreeWayEntryConflict {
         assert !(local == null && remote == null) : "Both local and remote are null: conflict must involve at least one side.";
+    }
+
+    /// The key shared by all versions of the entry; conflicts are detected for entries with a citation key only.
+    public String citationKey() {
+        return Stream.of(local, remote, base)
+                     .filter(Objects::nonNull)
+                     .findFirst()
+                     .flatMap(BibEntry::getCitationKey)
+                     .orElseThrow();
     }
 }

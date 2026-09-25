@@ -86,7 +86,7 @@ public class IconTheme {
 
         try {
             return Optional.of(JabRefIcons.valueOf(normalizedIconCode));
-        } catch (IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException _) {
             return java.util.Arrays.stream(JabRefIcons.values())
                                    .filter(icon -> icon.matchesPersistedName(normalizedIconCode))
                                    .findFirst()
@@ -221,6 +221,7 @@ public class IconTheme {
         PLAIN_TEXT_IMPORT_TODO(MaterialDesignC.CHECKBOX_BLANK_CIRCLE_OUTLINE),
         PLAIN_TEXT_IMPORT_DONE(MaterialDesignC.CHECKBOX_MARKED_CIRCLE_OUTLINE),
         DONATE(MaterialDesignG.GIFT),
+        CONTRIBUTE(MaterialDesignS.SOURCE_PULL),
         MOVE_TAB_ARROW(MaterialDesignA.ARROW_UP_BOLD),
         OPTIONAL(MaterialDesignL.LABEL_OUTLINE),
         REQUIRED(MaterialDesignL.LABEL),
