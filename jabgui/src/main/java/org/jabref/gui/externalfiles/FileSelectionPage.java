@@ -26,6 +26,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -112,7 +113,6 @@ public class FileSelectionPage extends WizardPane {
         this.importFormatPreferences = importFormatPreferences;
         this.previewThrottler = taskExecutor.createThrottler(PREVIEW_REFRESH_DELAY);
 
-        setHeaderText(Localization.lang("Select files to import"));
         setGraphic(null);
         setupUI();
         setupBindings();
@@ -146,6 +146,15 @@ public class FileSelectionPage extends WizardPane {
 
         unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         unlinkedFilesList.setContextMenu(createContextMenu());
+        unlinkedFilesList.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.SPACE) {
+                TreeItem<FileNodeViewModel> selectedItem = unlinkedFilesList.getSelectionModel().getSelectedItem();
+                if (selectedItem instanceof CheckBoxTreeItem<FileNodeViewModel> checkBoxItem) {
+                    checkBoxItem.setSelected(!checkBoxItem.isSelected());
+                    event.consume();
+                }
+            }
+        });
         VBox.setVgrow(unlinkedFilesList, Priority.ALWAYS);
 
         VBox treePane = new VBox(unlinkedFilesList);
@@ -211,6 +220,8 @@ public class FileSelectionPage extends WizardPane {
     private void setupBindings() {
         progressPane.managedProperty().bind(viewModel.taskActiveProperty());
         progressPane.visibleProperty().bind(viewModel.taskActiveProperty());
+
+        headerTextProperty().bind(Bindings.when(viewModel.taskActiveProperty()).then(Localization.lang("Loading...")).otherwise(Localization.lang("Select files to import")));
 
         unlinkedFilesList.rootProperty().bind(EasyBind.map(viewModel.treeRootProperty(), fileNode -> fileNode.map(fileNodeViewModel -> new RecursiveTreeItem<>(fileNodeViewModel, FileNodeViewModel::getChildren)).orElse(null)));
 
