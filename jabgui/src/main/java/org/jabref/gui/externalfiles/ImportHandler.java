@@ -146,8 +146,7 @@ public class ImportHandler {
     public boolean confirmBibFileImportIfNecessary(List<Path> files) {
         boolean containsBibFile = files.stream().anyMatch(FileUtil::isBibFile);
 
-        if (!containsBibFile
-                || !preferences.getImporterPreferences().shouldWarnAboutBibFileImport()) {
+        if (!containsBibFile || !preferences.getImporterPreferences().shouldWarnAboutBibFileImport()) {
             return true;
         }
 
