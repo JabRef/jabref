@@ -11,3 +11,8 @@ Normally the `scpt` file is a binary compiled variant and the `.applescript` the
 
 To generate icns files use the script under `src/main/resources/icons`
 Install [svg2png](https://formulae.brew.sh/formula/svg2png) and call the script with the svg filename as first argument.
+
+To regenerate the macOS application icon's light/dark `.icns`, install `librsvg` and run
+`python3 jabgui/src/main/resources/icons/generate-dynamic-icns.py` from the repository root.
+The script derives `JabRef-dark.svg` from the existing JabRef logo and embeds its rendered iconset
+as the dark variant in `JabRef.icns` and `launcher.icns`. The DMG volume icon remains unchanged.

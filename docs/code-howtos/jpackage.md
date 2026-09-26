@@ -26,6 +26,13 @@ Install [WiX Toolset](https://wixtoolset.org)
 
 `jabgui/build/packages/` contains a subdir for the operating systems with the packages.
 
+## macOS application icon
+
+The macOS app uses `jabgui/buildres/macos/JabRef.icns`. To regenerate its embedded dark variant,
+install `librsvg` and run `python3 jabgui/src/main/resources/icons/generate-dynamic-icns.py`.
+The script keeps the light icon artwork, derives the dark SVG from the shared JabRef logo,
+and updates both icon files used by `jpackage`.
+
 ## Debugging jpackage installations
 
 Sometimes issues with modularity only arise in the installed version and do not occur if you run from source. Using remote debugging, it's still possible to hook your IDE into the running JabRef application to enable debugging.
