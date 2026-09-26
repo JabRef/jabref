@@ -12,6 +12,13 @@ An importer should prefer proper fulltext links (e.g. Volltext) for PDFs over ot
 
 Needs: impl, utest
 
+## Import MARCXML files and BIBFRAME descriptions
+`req~import.bibliographic.xml-formats~1`
+
+JabRef imports standalone MARCXML records and collections as well as MARCXML in SRU responses. It also imports linked BIBFRAME 2.0 Work and Instance descriptions in RDF/XML, keeping multiple entries separate and rejecting external entities.
+
+Needs: impl, utest
+
 ## Normalize imported BibTeX keyword delimiters
 `req~import.bibtex.keywords.normalize-delimiters~1`
 

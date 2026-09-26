@@ -63,6 +63,7 @@ public class ExporterFactory {
         exporters.add(new XmpPdfExporter(xmpPreferences));
         exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, preferences.getCustomEntryTypesRepository(), fieldPreferences));
         exporters.add(new CffExporter());
+        exporters.add(new BibframeExporter());
         exporters.add(new EndnoteXmlExporter(preferences.getBibEntryPreferences()));
         exporters.add(new AcademicPagesExporter(layoutPreferences, fieldPreferences, preferences.getCustomEntryTypesRepository()));
 
