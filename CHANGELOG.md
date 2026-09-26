@@ -29,6 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where accepting a backup that adds groups to a library without groups failed with an error. [#17165](https://github.com/JabRef/jabref/pull/17165)
 - We fixed menu items not showing why they are disabled when a menu was opened for the first time. [#17200](https://github.com/JabRef/jabref/pull/17200)
 - We fixed an issue where "Community forum" in the Help menu opened the donation page instead of the forum. [#17162](https://github.com/JabRef/jabref/pull/17162)
+- We fixed dropped BibTeX files being imported without confirmation and added an option to not ask again. [#16338](https://github.com/JabRef/jabref/issues/16338)
 
 ### Removed
 
@@ -325,6 +326,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where a library file containing merge conflict markers was opened without any warning. [#9167](https://github.com/JabRef/jabref/issues/9167)
 - We fixed an issue where the deb, rpm and msi packages did not register JabRef for `.bib` files. [#17006](https://github.com/JabRef/jabref/issues/17006)
 - We fixed AI chat connection errors to show the server URL and the reason. [#17125](https://github.com/JabRef/jabref/pull/17125)
+- We fixed an issue where dropped BibTeX files were imported without confirmation and added an option to not ask again. [#16338](https://github.com/JabRef/jabref/issues/16338)
 
 ### Removed
 
