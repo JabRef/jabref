@@ -142,6 +142,7 @@ public final class ChangeTriage {
     /// from the file are carried over from memory first.
     private static void keepLocalSettings(MetaData local, MetaData fromDisk) {
         local.getSynchronizeWithFile().ifPresentOrElse(fromDisk::setSynchronizeWithFile, fromDisk::clearSynchronizeWithFile);
+        local.getMergeConflictedCopies().ifPresentOrElse(fromDisk::setMergeConflictedCopies, fromDisk::clearMergeConflictedCopies);
     }
 
     private record BibEntryMerge(Side side, DatabaseChange change) {
