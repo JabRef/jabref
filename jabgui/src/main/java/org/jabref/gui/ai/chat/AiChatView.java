@@ -1,12 +1,19 @@
 package org.jabref.gui.ai.chat;
 
+import java.util.List;
+
+import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ListProperty;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -15,9 +22,12 @@ import javafx.scene.layout.StackPane;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.AiPrivacyNoticeView;
 import org.jabref.gui.ai.statuspane.UniversalStatusPaneView;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.ScrollUtils;
 import org.jabref.gui.util.component.HistoryTextArea;
 import org.jabref.gui.util.component.ListScrollPane;
+import org.jabref.gui.util.component.MarkdownTextFlow;
 import org.jabref.gui.util.component.SimpleListView;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
@@ -46,6 +56,10 @@ public class AiChatView extends StackPane {
     @FXML private Pane transparentPane;
     @FXML private ProgressIndicator loadingIndicator;
 
+    @FXML private HBox findBar;
+    @FXML private TextField findField;
+    @FXML private Label findResultLabel;
+
     @FXML private HBox followUpQuestionsArea;
     @FXML private SimpleListView<String> followUpQuestionsSimpleListView;
 
@@ -64,6 +78,9 @@ public class AiChatView extends StackPane {
     @Inject private TaskExecutor taskExecutor;
 
     private AiChatViewModel viewModel;
+
+    private final AiChatFindViewModel findViewModel = new AiChatFindViewModel();
+    private boolean findRefreshPending;
 
     public AiChatView() {
         ViewLoader.view(this)
@@ -87,6 +104,96 @@ public class AiChatView extends StackPane {
         setupBindings();
         setupValues();
         setupFollowUpQuestions();
+        setupFind();
+    }
+
+    /// Ctrl+F inside the chat searches the chat messages instead of the library, see [org.jabref.gui.frame.JabRefFrame].
+    // [impl->feat~ai.chat.find~1]
+    private void setupFind() {
+        findBar.managedProperty().bind(findBar.visibleProperty());
+        findBar.visibleProperty().bind(findViewModel.visibleProperty());
+        findField.textProperty().bindBidirectional(findViewModel.queryProperty());
+        findResultLabel.textProperty().bind(findViewModel.resultTextProperty());
+
+        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (preferences.getKeyBindingRepository().matches(event, KeyBinding.SEARCH)) {
+                findViewModel.visibleProperty().set(true);
+                findField.requestFocus();
+                findField.selectAll();
+                event.consume();
+            }
+        });
+        findField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                if (event.isShiftDown()) {
+                    findPrevious();
+                } else {
+                    findNext();
+                }
+                event.consume();
+            } else if (event.getCode() == KeyCode.ESCAPE) {
+                closeFind();
+                event.consume();
+            }
+        });
+
+        findViewModel.queryProperty().addListener((_, _, _) -> updateFind(true));
+        findViewModel.currentProperty().addListener((_, _, _) -> updateFind(true));
+        findViewModel.visibleProperty().addListener((_, _, _) -> updateFind(false));
+        // New or deleted messages are rendered after the list change, thus search them afterwards
+        viewModel.chatHistoryProperty().addListener((ListChangeListener<ChatMessage>) _ -> {
+            if (!findRefreshPending) {
+                findRefreshPending = true;
+                Platform.runLater(() -> {
+                    findRefreshPending = false;
+                    updateFind(false);
+                });
+            }
+        });
+    }
+
+    /// Highlights all occurrences of the find query in the rendered messages and scrolls to the current one.
+    private void updateFind(boolean scrollToCurrent) {
+        String query = findViewModel.getActiveQuery();
+        int current = findViewModel.getCurrent();
+        List<MarkdownTextFlow> flows = chatHistoryScrollPane.getContent() instanceof Pane content
+                                       ? content.getChildrenUnmodifiable().stream()
+                                                .filter(AiChatMessageView.class::isInstance)
+                                                .map(node -> ((AiChatMessageView) node).getMarkdownTextFlow())
+                                                .toList()
+                                       : List.of();
+
+        int total = 0;
+        for (MarkdownTextFlow flow : flows) {
+            total += flow.highlightOccurrences(query, current - total);
+        }
+        if (!findViewModel.setTotal(total)) {
+            // Resetting the current occurrence triggers another update
+            return;
+        }
+
+        if (scrollToCurrent) {
+            flows.stream()
+                 .flatMap(flow -> flow.getCurrentOccurrence().stream())
+                 .findFirst()
+                 .ifPresent(node -> ScrollUtils.scrollIntoScrollPane(chatHistoryScrollPane, node.localToScene(node.getBoundsInLocal())));
+        }
+    }
+
+    @FXML
+    private void findNext() {
+        findViewModel.next();
+    }
+
+    @FXML
+    private void findPrevious() {
+        findViewModel.previous();
+    }
+
+    @FXML
+    private void closeFind() {
+        findViewModel.visibleProperty().set(false);
+        chatHistoryScrollPane.requestFocus();
     }
 
     private void setupBindings() {
