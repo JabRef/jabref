@@ -1,6 +1,7 @@
 package org.jabref.logic.ocr;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /// Represents the result of an OCR operation.
 ///
@@ -14,8 +15,8 @@ public sealed interface OcrResult {
 
     /// Represents a failed OCR result.
     ///
-    /// Contains the reason why the failure occurred that the GUI part can localize it and output to the user.
-    record Failure(OcrFailureReason reason) implements OcrResult {
+    /// Contains the failure reason and diagnostic information from the OCR process.
+    record Failure(OcrFailureReason reason, List<String> command, String output) implements OcrResult {
     }
 
     /// Checks if this result is success.
@@ -33,8 +34,13 @@ public sealed interface OcrResult {
         return new Success(outputFile);
     }
 
-    /// Factory method to create a failure result with an error message.
+    /// Factory method to create a failure result without process diagnostics.
     static OcrResult failure(OcrFailureReason reason) {
-        return new Failure(reason);
+        return new Failure(reason, List.of(), "");
+    }
+
+    /// Factory method to create a failure result with process diagnostics.
+    static OcrResult failure(OcrFailureReason reason, List<String> command, String output) {
+        return new Failure(reason, command, output);
     }
 }

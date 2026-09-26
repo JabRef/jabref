@@ -90,7 +90,23 @@ public class OcrLinkedFileAction extends SimpleCommand {
                 case OcrResult.Failure failure -> {
                     String failureReason = failure.reason().getMessage(ocrEngine.getName(),
                             preferences.getOcrPreferences().getOcrEnginePath());
-                    dialogService.showErrorDialogAndWait(Localization.lang("OCR failed"), failureReason);
+
+                    String detailedMessage = failureReason;
+                    if (!failure.command().isEmpty()) {
+                        detailedMessage += "\n\n"
+                                + Localization.lang("Command")
+                                + ":\n"
+                                + String.join(" ", failure.command());
+                    }
+
+                    if (!failure.output().isBlank()) {
+                        detailedMessage += "\n\n"
+                                + Localization.lang("Output")
+                                + ":\n"
+                                + failure.output();
+                    }
+
+                    dialogService.showErrorDialogAndWait(Localization.lang("OCR failed"), detailedMessage);
                 }
             }
         });
