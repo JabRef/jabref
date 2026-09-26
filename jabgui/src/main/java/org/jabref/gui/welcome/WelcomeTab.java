@@ -16,7 +16,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -339,7 +338,7 @@ public class WelcomeTab extends Tab {
         Label header = new Label(Localization.lang("Community"));
         header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
         FlowPane iconLinksContainer = createIconLinksContainer();
-        HBox textLinksContainer = createTextLinksContainer();
+        FlowPane textLinksContainer = createTextLinksContainer();
         VBox container = new VBox(12);
         container.getStyleClass().add("align-top-left");
         container.getChildren().addAll(iconLinksContainer, textLinksContainer);
@@ -361,20 +360,17 @@ public class WelcomeTab extends Tab {
         return container;
     }
 
-    private HBox createTextLinksContainer() {
-        HBox container = new HBox(12);
-        container.getStyleClass().addAll("align-center-left");
+    private FlowPane createTextLinksContainer() {
+        FlowPane container = new FlowPane();
+        container.getStyleClass().addAll("gap-12", "align-center-left");
 
         Hyperlink devVersionLink = createFooterLink(Localization.lang("Download development version"), StandardActions.OPEN_DEV_VERSION_LINK, null);
-        Hyperlink changelogLink = createFooterLink(Localization.lang("CHANGELOG"), StandardActions.OPEN_CHANGELOG, null);
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
 
         Label versionLabel = new Label(Localization.lang("Current JabRef version: %0", buildInfo.version));
         versionLabel.getStyleClass().addAll("text-subtle");
 
-        container.getChildren().addAll(devVersionLink, changelogLink, spacer, versionLabel);
+        Hyperlink changelogLink = createFooterLink(Localization.lang("CHANGELOG"), StandardActions.OPEN_CHANGELOG, null);
+        container.getChildren().addAll(devVersionLink, versionLabel, changelogLink);
         return container;
     }
 
