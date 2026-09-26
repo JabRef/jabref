@@ -26,6 +26,15 @@ Install [WiX Toolset](https://wixtoolset.org)
 
 `jabgui/build/packages/` contains a subdir for the operating systems with the packages.
 
+## macOS application icon
+
+The macOS app uses `jabgui/buildres/macos/JabRef.icns` as its legacy icon and
+`jabgui/buildres/macos/Resources/Assets.car` for appearance variants on macOS Tahoe.
+The `JabRef.icon` Icon Composer source is compiled with Xcode's `actool`; its icon name
+must match `CFBundleIconName` in `jabgui/buildres/macos/Info.plist`.
+To regenerate the SVG artwork and `.icns` fallback, install `librsvg` and run
+`python3 jabgui/src/main/resources/icons/generate-dynamic-icns.py`.
+
 ## Debugging jpackage installations
 
 Sometimes issues with modularity only arise in the installed version and do not occur if you run from source. Using remote debugging, it's still possible to hook your IDE into the running JabRef application to enable debugging.

@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,15 +90,17 @@ public class SearchDialog {
 
         dialogStage.setScene(scene);
 
-        try (InputStream inputStream = getClass().getResourceAsStream("/JabRef-icon-64.png")) {
-            if (inputStream == null) {
-                LOGGER.warn("Error loading icon for SearchDialog");
-            } else {
-                Image icon = new Image(inputStream);
-                dialogStage.getIcons().add(icon);
+        if (!OS.OS_X) {
+            try (InputStream inputStream = getClass().getResourceAsStream("/JabRef-icon-64.png")) {
+                if (inputStream == null) {
+                    LOGGER.warn("Error loading icon for SearchDialog");
+                } else {
+                    Image icon = new Image(inputStream);
+                    dialogStage.getIcons().add(icon);
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Error loading icon for SearchDialog", e);
             }
-        } catch (Exception e) {
-            LOGGER.warn("Error loading icon for SearchDialog", e);
         }
 
         dialogStage.setX((screenBounds.getWidth() - dialogWidth) / 2);
