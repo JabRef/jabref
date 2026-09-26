@@ -47,7 +47,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     private static final List<String> DEFAULT_DOCLING_PATHS = List.of(
             "docling"
     );
-    private final ObjectProperty<EngineSelection> selectedEngine = new SimpleObjectProperty<>(EngineSelection.OCRMYPDF);
+    private final ObjectProperty<EngineSelection> selectedEngine = new SimpleObjectProperty<>(EngineSelection.TESSERACT);
     private final ListProperty<EngineSelection> engineOptions =
             new SimpleListProperty<>(FXCollections.observableArrayList(EngineSelection.values()));
     private final StringProperty ocrEnginePath = new SimpleStringProperty();
@@ -138,7 +138,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     }
 
     public Optional<String> autoDetectDefaultEnginePath(EngineSelection engineToDetect) {
-        if (engineToDetect == EngineSelection.OCRMYPDF) {
+        if (engineToDetect != EngineSelection.DOCLING) {
             return DEFAULT_OCRMYPDF_PATHS.stream()
                                          .filter(this::enginePathExists)
                                          .findFirst();
