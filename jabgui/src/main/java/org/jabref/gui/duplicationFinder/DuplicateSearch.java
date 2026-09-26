@@ -104,6 +104,8 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
+        final DuplicateCheck duplicateCheck = new DuplicateCheck(entryTypesManager);
+
         for (int i = 0; i < (entries.size() - 1); i++) {
             for (int j = i + 1; j < entries.size(); j++) {
                 if (duplicateSearchCancelled.get() || Thread.interrupted()) {
@@ -113,7 +115,7 @@ public class DuplicateSearch extends SimpleCommand {
                 BibEntry first = entries.get(i);
                 BibEntry second = entries.get(j);
 
-                if (new DuplicateCheck(entryTypesManager).isDuplicate(first, second, databaseMode)) {
+                if (duplicateCheck.isDuplicate(first, second, databaseMode)) {
                     duplicates.add(Arrays.asList(first, second));
                     duplicateCountObservable.set(String.valueOf(duplicateCount.incrementAndGet()));
                 }
