@@ -64,12 +64,21 @@ def dark_artwork(source, destination):
     ET.ElementTree(root).write(destination, encoding="utf-8", xml_declaration=True)
 
 
+def logo_artwork(source, destination):
+    root = ET.Element(f"{SVG}svg", {"width": "1024", "height": "1024", "viewBox": "0 0 1024 1024"})
+    add_logo(root, source, "#ffffff")
+    ET.indent(root, space="  ")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    ET.ElementTree(root).write(destination, encoding="utf-8", xml_declaration=True)
+
+
 def main():
     icons = Path(__file__).resolve().parent
     macos = icons.parents[3] / "buildres" / "macos"
     light_icon = macos / "JabRef.icns"
     artwork = macos / "JabRef-dark.svg"
     dark_artwork(icons / "jabref.svg", artwork)
+    logo_artwork(icons / "jabref.svg", macos / "JabRef.icon" / "Assets" / "JabRef-logo.svg")
 
     with tempfile.TemporaryDirectory(prefix="jabref-dark-icon-") as work:
         work = Path(work)

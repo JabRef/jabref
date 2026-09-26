@@ -157,6 +157,8 @@ val embeddedPostgresDependencyByTarget = mapOf(
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     verbose = true
+    // The packaging plugin appends the target OS directory to this path.
+    jpackageResources = layout.projectDirectory.dir("buildres")
 
     applicationName = "JabRef"
     applicationDescription = "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX."
@@ -167,7 +169,6 @@ javaModulePackaging {
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
-        jpackageResources = layout.projectDirectory.dir("buildres").dir("windows")
         appImageOptions.addAll(
             // Generic options, but different for each target
             "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
@@ -205,7 +206,6 @@ javaModulePackaging {
         })
     }
     targetsWithOs("linux") {
-        jpackageResources = layout.projectDirectory.dir("buildres").dir("linux")
         appImageOptions.addAll(
             // Generic options, but different for each target
             "--icon", "$projectDir/buildres/linux/JabRef.png",
@@ -237,22 +237,15 @@ javaModulePackaging {
         })
     }
     targetsWithOs("macos") {
-        jpackageResources = layout.projectDirectory.dir("buildres").dir("macos")
-        appImageOptions.addAll(
-            // Generic options, but different for each target
-            "--icon", "$projectDir/buildres/macos/JabRef.icns",
-        )
         options.addAll(
             // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
 
-            // Generic options, but different for each target
-            "--icon", "$projectDir/buildres/macos/JabRef.icns",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
             "--resource-dir", layout.projectDirectory.dir("buildres").dir("macos").asFile.absolutePath,
 
             // Target-speccific options
-            "--mac-package-identifier", "JabRef",
+            "--mac-package-identifier", "org.jabref",
             "--mac-package-name", "JabRef"
         )
         if (providers.environmentVariable("OSXCERT").map { it == "true" }.orNull ?: false) {

@@ -10,8 +10,8 @@
   <true/>
   <key>CFBundleExecutable</key>
   <string>DEPLOY_LAUNCHER_NAME</string>
-  <key>CFBundleIconFile</key>
-  <string>DEPLOY_ICON_FILE</string>
+  <key>CFBundleIconName</key>
+  <string>JabRef</string>
   <key>CFBundleIdentifier</key>
   <string>DEPLOY_BUNDLE_IDENTIFIER</string>
   <key>CFBundleInfoDictionaryVersion</key>

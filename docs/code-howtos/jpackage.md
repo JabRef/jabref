@@ -28,10 +28,12 @@ Install [WiX Toolset](https://wixtoolset.org)
 
 ## macOS application icon
 
-The macOS app uses `jabgui/buildres/macos/JabRef.icns`. To regenerate its embedded dark variant,
-install `librsvg` and run `python3 jabgui/src/main/resources/icons/generate-dynamic-icns.py`.
-The script keeps the light icon artwork, derives the dark SVG from the shared JabRef logo,
-and updates both icon files used by `jpackage`.
+The macOS app uses `jabgui/buildres/macos/JabRef.icns` as its legacy icon and
+`jabgui/buildres/macos/Resources/Assets.car` for appearance variants on macOS Tahoe.
+The `JabRef.icon` Icon Composer source is compiled with Xcode's `actool`; its icon name
+must match `CFBundleIconName` in `jabgui/buildres/macos/Info.plist`.
+To regenerate the SVG artwork and `.icns` fallback, install `librsvg` and run
+`python3 jabgui/src/main/resources/icons/generate-dynamic-icns.py`.
 
 ## Debugging jpackage installations
 

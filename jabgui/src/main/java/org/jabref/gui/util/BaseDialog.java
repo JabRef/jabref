@@ -103,8 +103,7 @@ public class BaseDialog<T> extends Dialog<T> {
     }
 
     private void setDialogIcon(Image image) {
-        Stage dialogWindow = (Stage) getDialogPane().getScene().getWindow();
-        dialogWindow.getIcons().add(image);
+        IconTheme.applyLogo(this, image);
     }
 
     /// Fits the dialog window around its content.
