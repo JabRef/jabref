@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added support for users to create, manage, and persist customized preview styles. UI updated to split "Available" panel into two tabs. [#16075](https://github.com/JabRef/jabref/issues/16075)
 - We added ARM64 Flatpak builds and nightly, beta, and stable channels. [#13349](https://github.com/JabRef/jabref/issues/13349)
 - We added `jabkit git merge-driver`, a Git merge driver that merges `.bib` files semantically. [#16838](https://github.com/JabRef/jabref/pull/16838)
 - We added tooltips with action descriptions to menu items. [#9615](https://github.com/JabRef/jabref/issues/9615)
