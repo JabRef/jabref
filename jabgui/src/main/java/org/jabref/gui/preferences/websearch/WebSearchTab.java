@@ -201,12 +201,15 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
             helpButton.setVisible(false);
         }
 
+        Label apiKeyStatus = new Label(Localization.lang("API key configured"));
+        apiKeyStatus.visibleProperty().bind(item.apiKeyProperty().isNotEmpty());
+
         Button configureButton = new Button(Localization.lang("Configure API key"));
         configureButton.getStyleClass().addAll("configure-button", "padding-4");
         configureButton.setOnAction(_ -> showApiKeyDialog(item));
         configureButton.setVisible(item.isCustomizable());
 
-        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
+        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton, apiKeyStatus);
         return container;
     }
 
