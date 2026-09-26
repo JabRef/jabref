@@ -12,6 +12,9 @@ gradlew text eol=lf
 *.java text eol=lf
 *.properties text eol=lf
 
-CHANGELOG.md merge=union
+# "union" causes wrong entries in case of PRs created before a release and not merged.
+# Therefore, it is disabled.
+# CHANGELOG.md merge=union
+
 jablib/src/main/resources/l10n/JabRef_en.properties merge=union
 src/main/resources/l10n/JabRef_en.properties merge=union
