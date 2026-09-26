@@ -92,11 +92,21 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+## The "Close dialog" key binding closes the dialog
+`req~ux.dialogs.close-key-binding~1`
+
+Pressing the "Close dialog" key binding in a dialog closes it ([#8888](https://github.com/JabRef/jabref/issues/8888), [#15133](https://github.com/JabRef/jabref/issues/15133)).
+Its default is <kbd>Esc</kbd>; users can change it in the key binding preferences.
+Heavy-weight dialogs whose content the user builds up over time are exempt, so that a stray key press does not throw that state away.
+Currently, this is only the PDF viewer ("Document viewer").
+
+Needs: impl, utest
+
 ## Pressing Escape when a combo box popup is open closes only the combo box
 `req~ux.combobox.escape-closes-popup-only~1`
 
 When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
-The enclosing dialog must remain open.
+The enclosing dialog must remain open ([#16596](https://github.com/JabRef/jabref/issues/16596)).
 
 ## Saving keeps external change detection active
 `req~ux.external-library-changes.after-save~1`

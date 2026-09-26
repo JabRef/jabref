@@ -18,6 +18,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We changed the document viewer to stay open when <kbd>Escape</kbd> is pressed. [#17175](https://github.com/JabRef/jabref/pull/17175)
+
 ### Fixed
 
 - We fixed an issue where Backspace could not be registered as a keyboard shortcut. [#17241](https://github.com/JabRef/jabref/issues/17241)
