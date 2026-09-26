@@ -28,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where case-sensitive search (`=!`, `==!`, `=~!`) in linked files ignored the casing and matched text in any casing. [#13048](https://github.com/JabRef/jabref/issues/13048)
 - We fixed an issue where accepting a backup that adds groups to a library without groups failed with an error. [#17165](https://github.com/JabRef/jabref/pull/17165)
 - We fixed menu items not showing why they are disabled when a menu was opened for the first time. [#17200](https://github.com/JabRef/jabref/pull/17200)
+- We fixed an issue where linked files in the entry editor were not updated immediately upon addition or removal. [#16067](https://github.com/JabRef/jabref/issues/16067)
 - We fixed an issue where "Community forum" in the Help menu opened the donation page instead of the forum. [#17162](https://github.com/JabRef/jabref/pull/17162)
 
 ### Removed
