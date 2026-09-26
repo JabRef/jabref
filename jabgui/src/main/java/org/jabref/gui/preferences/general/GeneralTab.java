@@ -123,6 +123,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                         .checkbox(Localization.lang("Always reformat library on save and export"), viewModel.alwaysReformatBibProperty())
                         .checkbox(Localization.lang("Autosave local libraries"), viewModel.autosaveLocalLibrariesProperty(),
                                 autosave -> autosave.help(HelpFile.AUTOSAVE))
+                        .checkbox(Localization.lang("Synchronize local libraries with their files (libraries can override this)"), viewModel.synchronizeLocalLibrariesProperty())
                         .checkWithField(Localization.lang("Create backup"), viewModel.createBackupProperty(),
                                 viewModel.backupDirectoryProperty(),
                                 directory -> directory

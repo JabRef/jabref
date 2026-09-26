@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+
+import javafx.beans.value.ChangeListener;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -12,15 +15,19 @@ import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.sync.LibraryBaseline;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileSnapshot;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.dlsc.gemsfx.infocenter.NotificationAction;
+import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +35,10 @@ import org.slf4j.LoggerFactory;
 public class DatabaseChangeMonitor implements FileUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
+    private static final int STABLE_FILE_ATTEMPTS = 20;
+    private static final long STABLE_FILE_INTERVAL_MILLIS = 250;
+    /// A writer pausing between two chunks must not pass as finished: the file has to look the same this many times in a row
+    private static final int STABLE_FILE_CONFIRMATIONS = 2;
 
     private final BibDatabaseContext database;
     private final FileUpdateMonitor fileMonitor;
@@ -46,6 +57,18 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// match the disk (library load, successful save, all external changes merged). Guarded by
     /// `synchronized (database)`; `null` when unknown, in which case the next event triggers a full scan.
     @Nullable private FileSnapshot knownDiskState;
+
+    /// The library as of the last point where it was known to match the disk, for telling external changes apart
+    /// from unsaved in-memory edits. Guarded like [#knownDiskState]; `null` while synchronizing is off, in which case
+    /// every external change is offered for review.
+    @Nullable private LibraryBaseline baseline;
+
+    /// Counts started scans and invalidations, so that a scan overtaken by a later one (whose result reflects the
+    /// newer file state), by a save, by switching synchronization off, or by closing the tab discards its result
+    /// instead of applying stale content.
+    private volatile int scanGeneration;
+
+    private final ChangeListener<Boolean> synchronizingListener = (_, _, _) -> onSynchronizingChanged(isSynchronizing());
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
                                  FileUpdateMonitor fileMonitor,
@@ -69,10 +92,17 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
 
         monitoredPath.ifPresent(path -> {
             knownDiskState = FileSnapshot.read(path);
+            baseline = captureBaseline();
             try {
                 fileMonitor.addListenerForFile(path, this);
             } catch (IOException e) {
                 LOGGER.error("Error while trying to monitor {}", path, e);
+            }
+            // Registered once per monitor; a tab replacing its monitor calls unregister() on the old one first, which
+            // removes this listener again, so the preference never accumulates listeners
+            if (database.getLocation() == DatabaseLocation.LOCAL) {
+                preferences.getLibraryPreferences().synchronizeWithFileProperty().addListener(synchronizingListener);
+                database.getMetaData().registerListener(this);
             }
         });
 
@@ -80,7 +110,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     void notifyExternalChanges(List<DatabaseChange> changes) {
-        Optional.ofNullable(activeNotification).ifPresent(ExternalLibraryChangeNotification::remove);
+        withdrawActiveNotification();
 
         ExternalLibraryChangeNotification notification = new ExternalLibraryChangeNotification(changes);
         dialogService.notify(notification);
@@ -114,9 +144,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                         Localization.lang("External Changes Resolver"));
                 Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
                 if (areAllChangesResolved.orElse(false)) {
-                    applyResolvedChanges(
-                            databaseChangesResolverDialog.getResolvedChanges(),
-                            databaseChangesResolverDialog.resolvedChangesMatchDisk());
+                    List<DatabaseChange> resolved = databaseChangesResolverDialog.getResolvedChanges();
+                    applyResolvedChanges(resolved, databaseChangesResolverDialog.resolvedChangesMatchDisk());
+                    rebaseAfterReview(resolved);
 
                     clearActiveNotification(this);
                     return OnClickBehaviour.REMOVE;
@@ -167,7 +197,57 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             } else {
                 monitoredPath.ifPresent(path -> knownDiskState = FileSnapshot.read(path));
             }
+            baseline = captureBaseline();
+            scanGeneration++;
         }
+    }
+
+    /// Synchronizing (silently merging external changes) is decided by the library itself, or, if it does not, by the
+    /// global preference.
+    private boolean isSynchronizing() {
+        return database.getLocation() == DatabaseLocation.LOCAL
+                && database.getMetaData().getSynchronizeWithFile().orElseGet(() -> preferences.getLibraryPreferences().shouldSynchronizeWithFile());
+    }
+
+    /// The library's own setting is part of its metadata, which the library properties dialog changes.
+    @Subscribe
+    public void listen(MetaDataChangedEvent event) {
+        onSynchronizingChanged(isSynchronizing());
+    }
+
+    /// Synchronization switched on for an open library needs a baseline right away: as long as the library is
+    /// unmodified, it still matches its file. Otherwise the next save establishes the baseline.
+    private void onSynchronizingChanged(boolean enabled) {
+        boolean captured = false;
+        synchronized (database) {
+            if (!enabled) {
+                if (baseline != null) {
+                    baseline = null;
+                    scanGeneration++;
+                }
+            } else if (baseline == null && (!libraryTab.isModified() || !undoManager.canUndo())) {
+                // A modified tab without an undoable step was only dirtied by a setting, such as the one just
+                // switched on; its entries still match the file
+                baseline = captureBaseline();
+                captured = baseline != null;
+            }
+        }
+        if (captured) {
+            // A review offered while synchronization was off holds changes computed against an older state; from now
+            // on the scan decides, so the pending review is withdrawn and the file is looked at again
+            withdrawActiveNotification();
+            activeNotification = null;
+            synchronized (database) {
+                scanForChanges();
+            }
+        }
+    }
+
+    private @Nullable LibraryBaseline captureBaseline() {
+        if (!isSynchronizing()) {
+            return null;
+        }
+        return LibraryBaseline.of(database, preferences.getCitationKeyPatternPreferences().getKeyPatterns());
     }
 
     /// A full scan parses the whole library file, so it is skipped when size and modification time show that the file
@@ -185,14 +265,137 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// there are such changes.
     private void scanForChanges() {
         ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences, stateManager);
-        BackgroundTask.wrap(scanner::scanForChanges)
-                      .onSuccess(changes -> {
-                          if (!changes.isEmpty()) {
-                              listeners.forEach(listener -> listener.databaseChanged(changes));
-                          }
-                      })
-                      .onFailure(e -> LOGGER.error("Error while watching for changes", e))
+        LibraryBaseline scannedBaseline = baseline;
+        int generation = ++scanGeneration;
+        if (scannedBaseline != null && isSynchronizing()) {
+            // [impl->req~ux.external-library-changes.synchronize~1]
+            BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
+                          .onSuccess(changes -> changes.ifPresent(scanned -> onScannedForSynchronization(generation, scanner, scannedBaseline, scanned)))
+                          .onFailure(e -> forgetDiskState("Error while synchronizing with the library file", e))
+                          .executeWith(taskExecutor);
+            return;
+        }
+        BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
+                      .onSuccess(changes -> changes.filter(scanned -> !scanned.isEmpty())
+                                                   .ifPresent(scanned -> offerReview(generation, scanned)))
+                      .onFailure(e -> forgetDiskState("Error while watching for changes", e))
                       .executeWith(taskExecutor);
+    }
+
+    /// A scan that failed to read the file must not leave its state recorded as handled: forgetting it makes the next
+    /// file event scan again.
+    private void forgetDiskState(String message, Exception exception) {
+        LOGGER.error(message, exception);
+        synchronized (database) {
+            knownDiskState = null;
+        }
+    }
+
+    /// A notification that was never shown (no dialog service showed it) has no group to be removed from.
+    private void withdrawActiveNotification() {
+        if (activeNotification != null && activeNotification.getGroup() != null) {
+            activeNotification.remove();
+        }
+    }
+
+    @Nullable ExternalLibraryChangeNotification getActiveNotification() {
+        return activeNotification;
+    }
+
+    /// A scan overtaken by a newer file change, a save, or the tab closing must not replace the current review either.
+    private void offerReview(int generation, List<DatabaseChange> changes) {
+        synchronized (database) {
+            if (generation != scanGeneration) {
+                LOGGER.debug("Discarding review of a scan overtaken by a newer file change");
+                return;
+            }
+            listeners.forEach(listener -> listener.databaseChanged(changes));
+        }
+    }
+
+    /// Sorting the changes on the FX thread right before applying them leaves no window for a user edit to slip in
+    /// between classification and application.
+    private void onScannedForSynchronization(int generation, ChangeScanner scanner, LibraryBaseline scannedBaseline, List<DatabaseChange> changes) {
+        // The lock keeps a file event from starting a newer scan between the check and the application
+        synchronized (database) {
+            if (generation != scanGeneration) {
+                LOGGER.debug("Discarding result of a scan overtaken by a newer file change");
+                return;
+            }
+            synchronize(scannedBaseline, scanner.triage(scannedBaseline, changes));
+        }
+    }
+
+    /// Sync clients and editors may write the file in several steps. A file that is still growing must not be parsed:
+    /// half of a library parses fine and would look like every later entry had been deleted. Waits (bounded) until
+    /// size and modification time have stopped changing for a while. The state seen becomes the known disk state, so
+    /// that the events of the write just waited for do not trigger another scan; only for the current scan, since a
+    /// scan already overtaken will not apply what it sees, and recording it would make the next event look handled.
+    ///
+    /// @return `false` when the wait was interrupted or the file did not settle; it may still be incomplete, so the scan must not go on
+    private boolean awaitStableLibraryFile(int generation) {
+        Path path = monitoredPath.orElse(null);
+        if (path == null) {
+            return true;
+        }
+        FileSnapshot last = FileSnapshot.read(path);
+        int unchanged = 0;
+        for (int attempt = 0; attempt < STABLE_FILE_ATTEMPTS && unchanged < STABLE_FILE_CONFIRMATIONS; attempt++) {
+            try {
+                Thread.sleep(STABLE_FILE_INTERVAL_MILLIS);
+            } catch (InterruptedException e) {
+                LOGGER.debug("Interrupted while waiting for {} to stop changing; the scan is abandoned", path, e);
+                Thread.currentThread().interrupt();
+                return false;
+            }
+            FileSnapshot current = FileSnapshot.read(path);
+            unchanged = Objects.equals(current, last) ? unchanged + 1 : 0;
+            last = current;
+        }
+        if (unchanged < STABLE_FILE_CONFIRMATIONS) {
+            // Still being written when the budget ran out: the writer's next events start a fresh scan
+            LOGGER.debug("{} kept changing; the scan is abandoned", path);
+            return false;
+        }
+        synchronized (database) {
+            if (generation == scanGeneration) {
+                knownDiskState = last;
+            }
+        }
+        return true;
+    }
+
+    /// Applies what changed on disk only, and offers the review for what changed on both sides.
+    private void synchronize(LibraryBaseline scannedBaseline, ChangeTriage.Triage triage) {
+        List<DatabaseChange> unresolved = new ArrayList<>(triage.bothSides());
+        unresolved.addAll(triage.memoryOnly());
+        if (!triage.diskOnly().isEmpty()) {
+            applyResolvedChanges(triage.diskOnly(), unresolved.isEmpty() && !libraryTab.isModified());
+            dialogService.notify(Localization.lang("Merged %0 change(s) from the library file", String.valueOf(triage.diskOnly().size())));
+        }
+        synchronized (database) {
+            LibraryBaseline updated = captureBaseline();
+            if (updated != null) {
+                ChangeTriage.keepUnresolved(updated, scannedBaseline, unresolved);
+            }
+            baseline = updated;
+        }
+        if (!triage.bothSides().isEmpty()) {
+            listeners.forEach(listener -> listener.databaseChanged(triage.bothSides()));
+        }
+    }
+
+    /// After a review, the accepted changes are in memory and must not count as a divergence anymore; the rejected
+    /// ones keep their ancestor, so that the next scan reports them again instead of taking memory for the ancestor.
+    private void rebaseAfterReview(List<DatabaseChange> resolved) {
+        synchronized (database) {
+            LibraryBaseline previous = baseline;
+            LibraryBaseline updated = captureBaseline();
+            if (updated != null && previous != null) {
+                ChangeTriage.keepUnresolved(updated, previous, resolved.stream().filter(change -> !change.isAccepted()).toList());
+            }
+            baseline = updated;
+        }
     }
 
     /// Applies the accepted external changes and updates the library's dirty state.
@@ -219,6 +422,18 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     public void unregister() {
-        monitoredPath.ifPresent(path -> fileMonitor.removeListener(path, this));
+        synchronized (database) {
+            scanGeneration++;
+        }
+        // A review offered by this monitor must not outlive it: its changes belong to the file it watched
+        withdrawActiveNotification();
+        activeNotification = null;
+        monitoredPath.ifPresent(path -> {
+            fileMonitor.removeListener(path, this);
+            // Unconditionally: the library may have been converted to a shared one since the listener was added,
+            // and removing a listener that was never added is a no-op
+            preferences.getLibraryPreferences().synchronizeWithFileProperty().removeListener(synchronizingListener);
+            database.getMetaData().unregisterListener(this);
+        });
     }
 }
