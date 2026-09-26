@@ -260,6 +260,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed arXiv title searches containing accented characters. [#16477](https://github.com/JabRef/jabref/issues/16477)
 - We fixed an issue where generating AI embeddings for an entry with a linked URL logged a misleading error about a missing file. [#16123](https://github.com/JabRef/jabref/issues/16123)
 - We fixed an issue where the basic AI preferences stayed disabled although AI was enabled. [#17128](https://github.com/JabRef/jabref/pull/17128)
+- We fixed an issue where AI chats were lost when JabRef did not quit regularly. [#17177](https://github.com/JabRef/jabref/pull/17177)
 - We fixed an issue where the AI preferences could not be saved because the document splitter overlap size was wrongly reported as invalid. [#17119](https://github.com/JabRef/jabref/pull/17119)
 - We fixed an issue where JabRef did not start when Mistral AI was selected as AI provider. [#17212](https://github.com/JabRef/jabref/pull/17212)
 - We fixed an issue with the LibreOffice integration where the ordering for numeric CSL styles in footnotes was broken. [#12484](https://github.com/JabRef/jabref/issues/12484)
