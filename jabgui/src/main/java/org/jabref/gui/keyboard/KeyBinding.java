@@ -31,6 +31,7 @@ public enum KeyBinding {
     AUTOGENERATE_CITATION_KEYS("Autogenerate citation keys", Localization.lang("Autogenerate citation keys"), "shortcut+G", KeyBindingCategory.QUALITY),
     ACCEPT("Accept", Localization.lang("Accept"), "shortcut+ENTER", KeyBindingCategory.EDIT),
     AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically set file links"), "F7", KeyBindingCategory.QUALITY),
+    CENTER_SELECTED_ENTRY("Center selected entry", Localization.lang("Center selected entry"), "shortcut+alt+L", KeyBindingCategory.VIEW),
     CHECK_INTEGRITY("Check integrity", Localization.lang("Check integrity"), "shortcut+F8", KeyBindingCategory.QUALITY),
     CHECK_CONSISTENCY("Check consistency", Localization.lang("Check consistency"), "shortcut+F9", KeyBindingCategory.QUALITY),
     CLEANUP("Clean up", Localization.lang("Clean up entries"), "alt+F8", KeyBindingCategory.QUALITY),
