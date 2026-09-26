@@ -30,6 +30,7 @@ public class AiSummaryView extends StackPane {
     @FXML private UniversalStatusPaneView cancelledPane;
 
     @FXML private UniversalStatusPaneView noFilesPane;
+    @FXML private UniversalStatusPaneView noLocalFilePane;
     @FXML private UniversalStatusPaneView noSupportedFileTypesPane;
 
     @FXML private AiSummaryShowingView summaryShowing;
@@ -78,6 +79,7 @@ public class AiSummaryView extends StackPane {
         errorPane.managedProperty().bind(errorPane.visibleProperty());
         cancelledPane.managedProperty().bind(cancelledPane.visibleProperty());
         noFilesPane.managedProperty().bind(noFilesPane.visibleProperty());
+        noLocalFilePane.managedProperty().bind(noLocalFilePane.visibleProperty());
         noSupportedFileTypesPane.managedProperty().bind(noSupportedFileTypesPane.visibleProperty());
         summaryShowing.managedProperty().bind(summaryShowing.visibleProperty());
 
@@ -88,6 +90,7 @@ public class AiSummaryView extends StackPane {
         errorPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.ERROR_WHILE_GENERATING));
         cancelledPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.CANCELLED));
         noFilesPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.NO_FILES));
+        noLocalFilePane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.NO_LOCAL_FILE));
         noSupportedFileTypesPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.NO_SUPPORTED_FILE_TYPES));
         summaryShowing.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.DONE));
     }

@@ -1,8 +1,5 @@
 package org.jabref.gui.util;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.jspecify.annotations.Nullable;
 
 public final class ExceptionsUtil {
@@ -15,9 +12,6 @@ public final class ExceptionsUtil {
             return "";
         }
 
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        throwable.printStackTrace(pw);
-        return sw.toString();
+        return throwable.getMessage();
     }
 }
