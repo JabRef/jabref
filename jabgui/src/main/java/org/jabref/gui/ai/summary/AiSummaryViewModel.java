@@ -58,7 +58,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
     private final ObjectProperty<Summarizator> summarizator = new SimpleObjectProperty<>();
 
     private final ObjectProperty<GenerateSummaryTask> currentTask = new SimpleObjectProperty<>();
-    private final ChangeListener<TrackedBackgroundTask.Status> taskStateListener = (_, _, value) -> updateByTaskState(value);
+    private @Nullable ChangeListener<TrackedBackgroundTask.Status> taskStateListener;
 
     private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
@@ -139,6 +139,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
                 propertyExtractor.apply(oldVal).removeListener(taskStateListener);
             }
             if (newVal != null) {
+                taskStateListener = (_, _, value) -> updateByTaskState(newVal, value);
                 propertyExtractor.apply(newVal).addListener(taskStateListener);
             }
         });
@@ -304,6 +305,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
             return;
         }
 
+        error.set(null);
         GenerateSummaryTask task = summarizationTaskAggregator.start(
                 new GenerateSummaryTaskRequest(
                         filePreferences,
@@ -315,15 +317,15 @@ public class AiSummaryViewModel extends AbstractViewModel {
         );
 
         currentTask.set(task);
+        // The task may have finished before the status listener was attached
+        updateByTaskState(task, task.getStatus());
     }
 
-    private void updateByTaskState(TrackedBackgroundTask.Status value) {
-        GenerateSummaryTask task = currentTask.get();
-        if (task == null) {
-            return;
-        }
-
+    private void updateByTaskState(GenerateSummaryTask task, TrackedBackgroundTask.Status value) {
         UiTaskExecutor.runInJavaFXThread(() -> {
+            if (currentTask.get() != task) {
+                return;
+            }
             switch (value) {
                 case TrackedBackgroundTask.Status.ERROR -> {
                     error.set(task.getException());

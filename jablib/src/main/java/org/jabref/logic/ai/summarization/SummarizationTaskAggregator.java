@@ -6,7 +6,6 @@ import java.util.TreeMap;
 
 import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTask;
 import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTaskRequest;
-import org.jabref.logic.ai.util.TrackedBackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
@@ -54,7 +53,8 @@ public class SummarizationTaskAggregator {
             return startNewTask(request, showToUser);
         }
 
-        if (task.get().getStatus() == TrackedBackgroundTask.Status.CANCELLED && request.regenerate()) {
+        // A cancelled task ends as ERROR without running onFinished, so it stays in the map
+        if (task.get().getStatus().isFinished() && request.regenerate()) {
             tasks.remove(request.fullEntry().entry());
             return startNewTask(request, showToUser);
         }
