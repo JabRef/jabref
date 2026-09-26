@@ -72,6 +72,7 @@ public enum StandardActions implements Action {
     RANK_5(Localization.lang("Set rank to five"), IconTheme.JabRefIcons.RANK5),
     PRINTED(Localization.lang("Printed"), IconTheme.JabRefIcons.PRINTED),
     TOGGLE_PRINTED(Localization.lang("Toggle print status"), IconTheme.JabRefIcons.PRINTED),
+    TOGGLE_SIDE_PANE(Localization.lang("Show/Hide side pane"), KeyBinding.TOGGLE_SIDE_PANE),
     READ_STATUS(Localization.lang("Read status"), IconTheme.JabRefIcons.READ_STATUS),
     CLEAR_READ_STATUS(Localization.lang("Clear read status"), KeyBinding.CLEAR_READ_STATUS),
     READ(Localization.lang("Set read status to read"), IconTheme.JabRefIcons.READ_STATUS_READ, KeyBinding.READ),
