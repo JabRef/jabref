@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.identifier.DOI;
 
-/// Formats the DOI (e.g. removes http part) and also infers DOIs from the note, url, eprint or ee fields.
+/// Formats the DOI (e.g. removes http part) and also infers DOIs from the note, url, eprint, ee, article-doi, location-id or source fields.
 public class DoiCleanup implements CleanupJob {
 
     /// Fields to check for DOIs.
@@ -23,7 +23,14 @@ public class DoiCleanup implements CleanupJob {
             StandardField.NOTE,
             StandardField.URL,
             StandardField.EPRINT,
-            new UnknownField("ee")
+            new UnknownField("ee"),
+            new UnknownField("article-doi")
+    );
+
+    /// Fields that may contain a DOI alongside bibliographic metadata.
+    private static final List<Field> EMBEDDED_DOI_FIELDS = List.of(
+            new UnknownField("location-id"),
+            new UnknownField("source")
     );
 
     @Override
@@ -55,7 +62,7 @@ public class DoiCleanup implements CleanupJob {
                             changes.add(change);
                         }
 
-                        // Doi field seems to contain Doi -> cleanup note, url, ee field
+                        // Doi field seems to contain Doi -> cleanup note, url, eprint, ee, article-doi field
                         for (Field field : FIELDS) {
                             entry.getField(field)
                                  .flatMap(DOI::parse) // only returns something if **complete** field is a DOI
@@ -74,6 +81,15 @@ public class DoiCleanup implements CleanupJob {
                      }
                      removeFieldValue(entry, field, changes);
                  });
+        }
+
+        if (entry.getField(StandardField.DOI).isEmpty()) {
+            EMBEDDED_DOI_FIELDS.stream()
+                               .map(entry::getField)
+                               .flatMap(Optional::stream)
+                               .flatMap(value -> DOI.findInText(value).stream())
+                               .findFirst()
+                               .ifPresent(doi -> entry.setField(StandardField.DOI, doi.asString()).ifPresent(changes::add));
         }
 
         return changes;

@@ -18,6 +18,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
@@ -149,6 +150,9 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
 
     @Override
     public void doPostCleanup(BibEntry entry) {
+        // [impl->req~import.medline.doi-normalization~1]
+        new DoiCleanup().cleanup(entry);
+
         new FieldFormatterCleanup(new UnknownField("journal-abbreviation"), new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup(new UnknownField("status"), new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup(new UnknownField("copyright"), new ClearFormatter()).cleanup(entry);

@@ -50,4 +50,11 @@ A file that parses with warnings is not affected: it still opens, and its warnin
 
 Needs: impl, utest
 
+## Normalize DOIs from MEDLINE alternative fields
+`req~import.medline.doi-normalization~1`
+
+When importing MEDLINE entries, JabRef moves a DOI from `article-doi`, `location-id`, or `source` to the standard `doi` field, normalizing valid DOI values. An unparseable `article-doi` remains unchanged, so a DOI in `location-id` or `source` can still be used. It retains `location-id` and `source` metadata and does not overwrite an existing `doi` field.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
