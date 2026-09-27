@@ -83,7 +83,7 @@ public class LspLauncher extends Thread {
     }
 
     private void handleClient(Socket socket) {
-        LspClientHandler clientHandler = new LspClientHandler(messageHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager, true);
+        LspClientHandler clientHandler = createClientHandler();
         LOGGER.debug("LSP clientHandler started.");
         try (socket; // socket should be closed on error
              InputStream in = socket.getInputStream();
@@ -98,6 +98,11 @@ public class LspLauncher extends Thread {
         } finally {
             LOGGER.info("LSP Client disconnected.");
         }
+    }
+
+    /// Only a standalone server may exit the JVM when a client sends `exit`; inside JabGui this would close JabRef.
+    LspClientHandler createClientHandler() {
+        return new LspClientHandler(messageHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager, standalone);
     }
 
     @Override
