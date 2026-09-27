@@ -8,18 +8,14 @@ grand_parent: Requirements
 
 Provides the core connectivity and abstraction layer for interacting with various Large Language Model backends.
 
-Needs: impl, feat
+Needs: impl
 
 ## User can select from different LLM providers
 `feat~ai.llms.providers~1`
 
 Different providers offer varying trade-offs between cost, performance, privacy, and reasoning capabilities.
 
-Needs: impl, req
-
-Covers:
-
-- feat~ai.llms~1
+Needs: req, impl
 
 ### JabRef must support OpenAI LLM provider
 `req~ai.llms.providers.openai~1`
@@ -70,11 +66,7 @@ Covers:
 
 Allows users to connect to self-hosted models or proxy services, ensuring data privacy and cost control.
 
-Needs: impl, req
-
-Covers:
-
-- feat~ai.llms~1
+Needs: req, impl
 
 ### JabRef must support OpenAI-compatible LLM provider
 `req~ai.llms.custom.openai-compatible~1`

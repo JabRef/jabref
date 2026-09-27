@@ -55,9 +55,7 @@ Needs: impl
 
 The banner for the CLI ("JabKit") is only shown if the help is output, meaning when no command is given (falling back to help) or when `--help` is explicitly requested.
 
-Rationale:
-
-Suppressing decorative banners during normal command invocations prevents noise in automated scripts and increases accessibility (source: [Accessibility of Command Line Interfaces](https://dl.acm.org/doi/10.1145/3411764.3445544)).
+Rationale: Suppressing decorative banners during normal command invocations prevents noise in automated scripts and increases accessibility (source: [Accessibility of Command Line Interfaces](https://dl.acm.org/doi/10.1145/3411764.3445544)).
 
 Needs: impl
 

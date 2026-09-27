@@ -132,16 +132,8 @@ This establishes a link between the child requirement and the parent feature in 
 Covers:
 
 - feat~ai.chatting~1
-- feat~ai.expert-settings~1
+- feat~ai.llms~1
 ```
-
-### Why use `Covers:`
-
-OpenFastTrace natively understands hierarchical coverage relationships:
-
-- **Traceability matrix**: In the generated tracing report (`build/reports/tracing.txt`), OFT connects child `req` items back to their parent `feat` items, visualizing complete coverage chains from code implementation up to user-facing features.
-- **Decoupled specifications**: The parent feature definition stays concise and does not need to maintain an exhaustive list of child items. Instead, child requirements declare what they cover.
-- **Workflow clarity**: A user-facing capability is captured as a `feat`, specific constraints and edge cases are captured as `req` items that reference the feature with `Covers:`, and code or test comments link directly to the relevant `req` or `feat`.
 
 ## Conventions used in JabRef
 
@@ -190,9 +182,9 @@ Use it only for what the title cannot carry:
 - the triggering condition;
 - edge cases or boundary behavior;
 - the GitHub issue;
-- other relevant operational context.
+- other relevant context.
 
-If you need to explain the reasoning or justification for the requirement, do not bury it in the description—use a dedicated `Rationale:` section instead (see below).
+If you need to explain the reasoning or justification for the requirement, do not bury it in the description—use a dedicated `Rationale:` section instead.
 
 Do not repeat the subject + verb from the title, do not smuggle in a second requirement, and do not write marketing copy.
 
@@ -221,27 +213,6 @@ Verification happens in the GitHub sharing dialog before the library is shared.
 ```
 
 The title carries the full constraint, and the description adds only the missing detail about where it happens.
-
-### Documenting rationale with `Rationale:`
-
-Requirements should be accompanied by a rationale in all cases where the reason for the requirement is not immediately obvious.
-
-While the requirement description defines *what* the system must do and under what conditions, the rationale explains *why* the rule or behavior exists. Keeping them distinct prevents requirement descriptions from becoming bloated with historical background, design debates, or business motivations.
-
-If an existing requirement description contains both the operational rule and the justification, separate them and place the reasoning into a `Rationale:` block:
-
-```markdown
-## GitHub personal access token push access must be verifiable before sharing
-`req~git.share.personal-access-token-verification~1`
-
-Verification happens in the GitHub sharing dialog before the library is shared.
-
-Rationale:
-
-Validating token permissions upfront prevents confusing partial push failures and network timeouts after user confirmation.
-
-Needs: impl
-```
 
 ### Linking requirements
 

@@ -35,9 +35,7 @@ Needs: impl, utest
 
 When a library file cannot be read or parsed at all, JabRef names the file and the reason it failed, and leaves no open tab behind. A file that parses with warnings is not affected: it still opens, and its warnings are reported separately.
 
-Rationale:
-
-Closing the tab prevents leaving an empty, untitled library that the user could accidentally save over the original file that failed to load.
+Rationale: Closing the tab prevents leaving an empty, untitled library that the user could accidentally save over the original file that failed to load.
 
 Needs: impl, utest
 

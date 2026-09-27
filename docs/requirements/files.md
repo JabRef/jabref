@@ -27,9 +27,7 @@ Needs: impl
 
 The function `Quality -> Automatically set file links` relinks moved files based on the broken file name or the entry citation key.
 
-Rationale:
-
-Users frequently move or organize files on disk outside of JabRef, leaving behind broken file links that need automated recovery.
+Rationale: Users frequently move or organize files on disk outside of JabRef, leaving behind broken file links that need automated recovery.
 
 Needs: impl, utest
 

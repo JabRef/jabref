@@ -81,9 +81,7 @@ Needs: impl, utest
 A run of keystrokes in one field of one entry goes on the undo stack as a single step, so undoing takes back the word that was typed rather than the last character.
 The run ends at the end of a word, when the editor moves to something else, when the library is saved at that point, or when a command records a step of its own; a run that ends where it started leaves no step behind.
 
-Rationale:
-
-Breaking at a word matches conventional editor expectations and bounds undo granularity so that a single undo command does not erase an entire multiline field.
+Rationale: Breaking at a word matches conventional editor expectations and bounds undo granularity so that a single undo command does not erase an entire multiline field.
 
 Needs: impl, utest
 

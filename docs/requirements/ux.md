@@ -19,9 +19,7 @@ Needs: impl
 
 In confirmation dialogs, the confirm button must be labeled with the specific action name (e.g., "Download full text documents") rather than a generic label such as "OK" or "Yes".
 
-Rationale:
-
-Action-specific labels eliminate ambiguity about the consequence of the button press and reduce the risk of accidental confirmation.
+Rationale: Action-specific labels eliminate ambiguity about the consequence of the button press and reduce the risk of accidental confirmation.
 
 Needs: impl
 
@@ -40,9 +38,7 @@ Needs: impl
 
 The main table maintains focus when adding a new library or switching between library tabs.
 
-Rationale:
-
-Retaining focus enables immediate keyboard interaction (such as Ctrl+V paste shortcuts) without requiring the user to click with the mouse first.
+Rationale: Retaining focus enables immediate keyboard interaction (such as Ctrl+V paste shortcuts) without requiring the user to click with the mouse first.
 
 Needs: impl
 
@@ -60,9 +56,7 @@ Needs: impl
 
 If a critical error occurs before the main window is fully constructed, JabRef displays a visible error dialog in addition to logging the error.
 
-Rationale:
-
-Digging through log files is not accessible or obvious to non-technical users ([#14967](https://github.com/JabRef/jabref/issues/14967)).
+Rationale: Digging through log files is not accessible or obvious to non-technical users ([#14967](https://github.com/JabRef/jabref/issues/14967)).
 
 Needs: impl
 
@@ -165,9 +159,7 @@ When the "New Entry" dialog is opened:
   - The field receives keyboard focus and its content is selected.
   - The corresponding fetcher (e.g., DOI, ISBN) is automatically selected based on the detected identifier type.
 
-Rationale:
-
-Pre-filling and auto-focusing the detected identifier eliminates repetitive mouse clicks and tab switching when creating entries from copied DOIs or ISBNs.
+Rationale: Pre-filling and auto-focusing the detected identifier eliminates repetitive mouse clicks and tab switching when creating entries from copied DOIs or ISBNs.
 
 Needs: impl
 

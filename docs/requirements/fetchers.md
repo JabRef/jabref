@@ -24,8 +24,8 @@ Identifier fetchers retry a request rejected with HTTP 429 using bounded exponen
 
 Needs: impl
 
-## Journal information popup must retrieve metadata from public sources
-`req~fetchers.journal-information~1`
+## User can view journal information from public metadata sources
+`feat~fetchers.journal-information~1`
 
 The journal-information popup retrieves journal identity information and metrics directly from public metadata providers.
 
@@ -36,8 +36,8 @@ Needs: impl
 
 MODS and Medline XML imports and PICA, MARC, ISIDORE, and arXiv XML fetcher responses disable DTD processing so that external entities cannot be resolved.
 
-## JabRef must create entry from arbitrary URL
-`req~fetchers.generic-url~1`
+## User can create entry from arbitrary URL
+`feat~fetchers.generic-url~1`
 
 The user can enter an arbitrary URL to create an entry from it. JabRef tries URL-based fetchers first; if none handles the URL, it falls back to creating a `@Misc` entry with the plain URL, using the linked page's title when it can be reached (falling back to the URL itself otherwise) and recording the date the link was added (`urldate`).
 
@@ -62,8 +62,8 @@ The user can look up and import bibliography entries by providing a Software Her
 
 Needs: impl
 
-## DNB fetcher must search German National Library catalog
-`req~fetchers.dnb-search~1`
+## User can search German National Library catalog
+`feat~fetchers.dnb-search~1`
 
 The user can search the German National Library (DNB) catalog as a search-based
 fetcher, retrieving matching bibliographic entries by title, author, or other

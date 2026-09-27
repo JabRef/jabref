@@ -26,9 +26,7 @@ Needs: impl
 
 When the user clicks the preview icon on a citation entry inside the Entry Editor's "Citations" tab, a tooltip containing the entry preview rendered in the currently selected style should be displayed.
 
-Rationale:
-
-The preview is not shown automatically on hover because a large floating card popping up on every cursor pass is visually intrusive and disrupts navigation.
+Rationale: The preview is not shown automatically on hover because a large floating card popping up on every cursor pass is visually intrusive and disrupts navigation.
 
 Needs: impl
 
@@ -53,14 +51,14 @@ The entry type's unset important-optional fields that belong to the main group a
 
 Needs: impl
 
-## Collapsible sections must offer chips for unset member fields
+## Main tab collapsible sections must offer chips for unset member fields
 `req~entry-editor.main-tab.section-chips~2`
 
 Every section offers "+" chips for its unset member fields: the identifiers section collects all identifier fields, the files and links section its link fields (URL, URI, urldate — the file field is always shown instead), the bibliometrics section its fields, the comments section the general comment plus the current user's personal comment field (only when user-specific comment fields are enabled), and the meta section crossref, groups, owner, and the special fields (ranking, priority, read status, quality, relevance, printed). The automatically managed timestamp fields have no chip.
 
 Needs: impl
 
-## Files and links section must always display file editor when expanded
+## Main tab files and links section must always display file editor when expanded
 `req~entry-editor.main-tab.file-editor-always-shown~1`
 
 Whenever the files and links section is expanded, it shows the file editor as its first row, also when the entry has no file linked. The editor's own buttons add, search for, or download a file; no file dialog opens on its own.
