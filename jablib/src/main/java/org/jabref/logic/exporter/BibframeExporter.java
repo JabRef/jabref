@@ -97,9 +97,9 @@ public class BibframeExporter extends Exporter {
         StringJoiner content = new StringJoiner("");
         appendCanonical(content, "type", entry.getType().getName());
         EXPORTED_FIELDS.forEach(field -> entry.getField(field)
-                .ifPresent(value -> appendCanonical(content, field.getName(), value)));
+                                              .ifPresent(value -> appendCanonical(content, field.getName(), value)));
         entry.getField(StandardField.YEAR).or(() -> entry.getField(StandardField.DATE))
-                .ifPresent(value -> appendCanonical(content, "publicationDate", value));
+             .ifPresent(value -> appendCanonical(content, "publicationDate", value));
         if (entry.getType() == StandardEntryType.Article && entry.getField(StandardField.JOURNAL).isPresent()) {
             entry.getField(StandardField.JOURNAL).ifPresent(value -> appendCanonical(content, "journal", value));
             entry.getField(StandardField.PAGES).ifPresent(value -> appendCanonical(content, "pages", value));
@@ -168,18 +168,18 @@ public class BibframeExporter extends Exporter {
     private static Optional<String> languageCode(String language) {
         String normalized = language.trim();
         Optional<String> marcCode = MARC_LANGUAGE_ALIASES.values().stream()
-                .filter(code -> code.equalsIgnoreCase(normalized)).findFirst();
+                                                         .filter(code -> code.equalsIgnoreCase(normalized)).findFirst();
         if (marcCode.isPresent()) {
             return marcCode;
         }
         return Arrays.stream(Locale.getISOLanguages()).map(Locale::of)
-                .filter(locale -> normalized.equalsIgnoreCase(locale.getLanguage())
-                        || normalized.equalsIgnoreCase(locale.getISO3Language())
-                        || normalized.equalsIgnoreCase(locale.getDisplayLanguage(Locale.ENGLISH))
-                        || normalized.equalsIgnoreCase(locale.getDisplayLanguage(Locale.GERMAN)))
-                .map(Locale::getISO3Language)
-                .map(code -> MARC_LANGUAGE_ALIASES.getOrDefault(code, code))
-                .findFirst();
+                     .filter(locale -> normalized.equalsIgnoreCase(locale.getLanguage())
+                             || normalized.equalsIgnoreCase(locale.getISO3Language())
+                             || normalized.equalsIgnoreCase(locale.getDisplayLanguage(Locale.ENGLISH))
+                             || normalized.equalsIgnoreCase(locale.getDisplayLanguage(Locale.GERMAN)))
+                     .map(Locale::getISO3Language)
+                     .map(code -> MARC_LANGUAGE_ALIASES.getOrDefault(code, code))
+                     .findFirst();
     }
 
     private static void writeTitle(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {

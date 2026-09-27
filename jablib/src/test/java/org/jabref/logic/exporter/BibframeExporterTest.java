@@ -55,10 +55,10 @@ class BibframeExporterTest {
             Path reexported = directory.resolve(name + "-reexported.rdf");
             exporter.export(new BibDatabaseContext(), reexported, List.of(restored));
             assertFalse(DiffBuilder.compare(Files.readString(output))
-                    .withTest(Files.readString(reexported))
-                    .ignoreWhitespace()
-                    .checkForSimilar()
-                    .build().hasDifferences());
+                                   .withTest(Files.readString(reexported))
+                                   .ignoreWhitespace()
+                                   .checkForSimilar()
+                                   .build().hasDifferences());
         }
     }
 
@@ -81,7 +81,7 @@ class BibframeExporterTest {
     void identifiersIgnoreFieldsOutsideTheExportedMapping(@TempDir Path directory) throws SaveException, IOException {
         BibEntry first = new BibEntry(StandardEntryType.Book).withField(StandardField.TITLE, "A book");
         BibEntry second = new BibEntry(StandardEntryType.Book).withField(StandardField.TITLE, "A book")
-                .withField(StandardField.NOTE, "Local note").withField(StandardField.FILE, "local.pdf");
+                                                              .withField(StandardField.NOTE, "Local note").withField(StandardField.FILE, "local.pdf");
         Path firstFile = directory.resolve("first.rdf");
         Path secondFile = directory.resolve("second.rdf");
 
@@ -146,9 +146,12 @@ class BibframeExporterTest {
             BibEntry restored = importer.importDatabase(output).getDatabase().getEntries().getFirst();
 
             String expected = switch (language) {
-                case "English" -> "eng";
-                case "Deutsch" -> "ger";
-                default -> "English, Japanese";
+                case "English" ->
+                        "eng";
+                case "Deutsch" ->
+                        "ger";
+                default ->
+                        "English, Japanese";
             };
             assertEquals(expected, restored.getField(StandardField.LANGUAGE).orElseThrow());
             assertFalse(xml.contains("/languages/English"));

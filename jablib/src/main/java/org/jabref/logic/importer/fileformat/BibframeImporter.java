@@ -168,7 +168,7 @@ public class BibframeImporter extends Importer {
 
     private static BibEntry readEntry(XmlNode instance, Optional<XmlNode> work, Map<String, XmlNode> resources) {
         BibEntry entry = new BibEntry(work.map(element -> hasJournalHost(element, resources)
-                ? StandardEntryType.Article : StandardEntryType.Book).orElse(StandardEntryType.Misc));
+                                                          ? StandardEntryType.Article : StandardEntryType.Book).orElse(StandardEntryType.Misc));
 
         Optional<XmlNode> title = object(first(instance, BF, "title"), resources)
                 .or(() -> work.flatMap(element -> object(first(element, BF, "title"), resources)));
@@ -228,7 +228,7 @@ public class BibframeImporter extends Importer {
 
     private static boolean isSerialHost(XmlNode host, Map<String, XmlNode> resources) {
         return hasIdentifier(host, "Issn", resources) || children(host, RDF, "type").stream()
-                .anyMatch(type -> (BF + "Serial").equals(type.getAttributeNS(RDF, "resource")));
+                                                                                    .anyMatch(type -> (BF + "Serial").equals(type.getAttributeNS(RDF, "resource")));
     }
 
     private static boolean isPartOf(XmlNode relation) {
