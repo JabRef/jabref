@@ -48,7 +48,7 @@ public class LspLinkHandler {
     }
 
     public void documentClosed(String fileUri) {
-        parserHandler.documentClosed(fileUri);
+        parserHandler.documentClosed(fileUri, importFormatPreferences);
     }
 
     public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> provideDefinition(String languageId, String uri, String content, Position position) {

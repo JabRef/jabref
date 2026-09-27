@@ -136,4 +136,36 @@ class MarkdownDefinitionProviderTest {
 
                 *\\*Cocoa\\* \\[and\\](https://example.org) \\<b\\>health\\</b\\>*""", hover.getContents().getRight().getValue());
     }
+
+    @Test
+    void closingUnsavedDocumentFallsBackToFileOnDisk() throws Exception {
+        String bibUri = tempDir.resolve("Chocolate.bib").toUri().toString();
+        parserHandler.parserResultFromString(bibUri, """
+                @Article{Cooper_2007,
+                  title = {Unsaved title},
+                }
+                """, importFormatPreferences);
+        parserHandler.documentClosed(bibUri, importFormatPreferences);
+
+        int column = "Starting literature: [@Corti_2009; @Coop".length();
+        Hover hover = provider.provideHover(MARKDOWN, new Position(4, column)).orElseThrow();
+        assertTrue(hover.getContents().getRight().getValue().endsWith("*Cocoa and health: a decade of research* (2007)"));
+    }
+
+    @Test
+    void aliasedEditorPathIsNotLoadedTwice() throws Exception {
+        parserHandler.parserResultFromString(tempDir.resolve("sub/../Chocolate.bib").toUri().toString(), """
+                @Article{Cooper_2007,
+                  title = {Unsaved title},
+                }
+                """, importFormatPreferences);
+        parserHandler.loadBibliographiesFromFrontMatter(tempDir.resolve("topics.md").toUri().toString(), MARKDOWN, importFormatPreferences);
+        assertEquals(1, parserHandler.searchForEntryByCitationKey("Cooper_2007").size());
+    }
+
+    @Test
+    void untitledDocumentIsIgnored() {
+        parserHandler.loadBibliographiesFromFrontMatter("untitled:Untitled-1", MARKDOWN, importFormatPreferences);
+        assertTrue(parserHandler.getParserResultForUri("untitled:Untitled-1").isEmpty());
+    }
 }

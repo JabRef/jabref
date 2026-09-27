@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -52,19 +53,28 @@ public class LspParserHandler {
     public ParserResult parserResultFromString(String fileUri, String content, ImportFormatPreferences importFormatPreferences) throws JabRefException, IOException {
         // We use BibtexParser directly, because we do not want to add an extra DummyFileMonitor
         // Otherwise, we could use `OpenDatabase.loadDatabase(path, importFormatPreferences, new DummyFileUpdateMonitor())`
-        URI uri;
-        try {
-            uri = new URI(fileUri);
-        } catch (URISyntaxException e) {
-            return ParserResult.fromError(e);
+        Optional<Path> path = toPath(fileUri);
+        if (path.isEmpty()) {
+            return ParserResult.fromErrorMessage("Could not convert " + fileUri + " to a path");
         }
-        Path path = Path.of(uri);
-        openInEditor.add(path);
-        return parse(path, content, importFormatPreferences);
+        openInEditor.add(path.get());
+        return parse(path.get(), content, importFormatPreferences);
     }
 
-    public void documentClosed(String fileUri) {
-        toPath(fileUri).ifPresent(openInEditor::remove);
+    /// Unsaved edits of a closed document are discarded: the library falls back to the file on disk
+    public void documentClosed(String fileUri, ImportFormatPreferences importFormatPreferences) {
+        toPath(fileUri).filter(openInEditor::remove).ifPresent(path -> {
+            parserResults.remove(path);
+            loadFromDisk(path, importFormatPreferences);
+        });
+    }
+
+    private void loadFromDisk(Path path, ImportFormatPreferences importFormatPreferences) {
+        try {
+            parse(path, Files.readString(path, BibtexImporter.getEncoding(path)), importFormatPreferences);
+        } catch (IOException | JabRefException e) {
+            LOGGER.debug("Could not load bibliography {}", path, e);
+        }
     }
 
     private ParserResult parse(Path path, String content, ImportFormatPreferences importFormatPreferences) throws JabRefException, IOException {
@@ -101,13 +111,15 @@ public class LspParserHandler {
             return;
         }
         for (String bibliography : getBibliographiesFromFrontMatter(content)) {
+            Path bibPath;
             try {
-                Path bibPath = markdownPath.get().resolveSibling(bibliography).normalize();
-                if (!openInEditor.contains(bibPath)) {
-                    parse(bibPath, Files.readString(bibPath, BibtexImporter.getEncoding(bibPath)), importFormatPreferences);
-                }
-            } catch (InvalidPathException | IOException | JabRefException e) {
-                LOGGER.debug("Could not load bibliography {} referenced from {}", bibliography, markdownUri, e);
+                bibPath = markdownPath.get().resolveSibling(bibliography).normalize();
+            } catch (InvalidPathException e) {
+                LOGGER.debug("Invalid bibliography path {} referenced from {}", bibliography, markdownUri, e);
+                continue;
+            }
+            if (!openInEditor.contains(bibPath)) {
+                loadFromDisk(bibPath, importFormatPreferences);
             }
         }
     }
@@ -136,8 +148,8 @@ public class LspParserHandler {
 
     private static Optional<Path> toPath(String fileUri) {
         try {
-            return Optional.of(Path.of(new URI(fileUri)));
-        } catch (URISyntaxException | IllegalArgumentException e) {
+            return Optional.of(Path.of(new URI(fileUri)).normalize());
+        } catch (URISyntaxException | IllegalArgumentException | FileSystemNotFoundException e) {
             LOGGER.debug("Could not convert {} to a path", fileUri, e);
             return Optional.empty();
         }
