@@ -404,7 +404,10 @@ Quick check of core library:
 
 JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) to trace requirements to implementation and tests.
 
-For a new feature or significant bug fix, **at minimum add the requirement** to the appropriate `docs/requirements/<area>.md` file. Full tracing (`Needs: impl` + implementation comments) is encouraged but can be skipped if the effort is disproportionate.
+For a new feature or significant bug fix, add the requirement to the appropriate `docs/requirements/<area>.md` file.
+Link the issue where the reqirement originites from.
+Respect INVEST criteria. Better more high-level and than too detailed.
+Add tracing (`Needs: impl` + implementation comments).
 
 **Defining a requirement** in `docs/requirements/<area>.md`:
 
@@ -417,7 +420,7 @@ Description of the requirement.
 
 The identifier must follow the heading with no blank line between them. Add `<!-- markdownlint-disable-file MD022 -->` at the end of the file.
 
-**Optionally — linking an implementation** to a requirement (full trace):
+Linking an implementation to a requirement (full trace):
 
 ```markdown
 Needs: impl
