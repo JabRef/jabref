@@ -47,6 +47,10 @@ public class LspLinkHandler {
         parserHandler.loadBibliographiesFromFrontMatter(markdownUri, content, importFormatPreferences);
     }
 
+    public void documentClosed(String fileUri) {
+        parserHandler.documentClosed(fileUri);
+    }
+
     public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> provideDefinition(String languageId, String uri, String content, Position position) {
         if (!clientHandler.isStandalone() && !"bibtex".equals(languageId)) {
             return CompletableFuture.completedFuture(Either.forLeft(List.of()));

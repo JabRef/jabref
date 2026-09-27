@@ -5,10 +5,12 @@ import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +41,9 @@ public class LspParserHandler {
     /// Otherwise, a `.bib` file opened in the editor and referenced from front matter would be held twice.
     private final Map<Path, ParserResult> parserResults;
 
+    /// Libraries whose (possibly unsaved) content comes from the editor; front matter must not replace it by the file on disk
+    private final Set<Path> openInEditor = ConcurrentHashMap.newKeySet();
+
     public LspParserHandler() {
         this.parserResults = new ConcurrentHashMap<>();
     }
@@ -46,8 +51,6 @@ public class LspParserHandler {
     public ParserResult parserResultFromString(String fileUri, String content, ImportFormatPreferences importFormatPreferences) throws JabRefException, IOException {
         // We use BibtexParser directly, because we do not want to add an extra DummyFileMonitor
         // Otherwise, we could use `OpenDatabase.loadDatabase(path, importFormatPreferences, new DummyFileUpdateMonitor())`
-        BibtexParser parser = new BibtexParser(importFormatPreferences);
-        ParserResult parserResult = parser.parse(Reader.of(content));
         URI uri;
         try {
             uri = new URI(fileUri);
@@ -55,6 +58,17 @@ public class LspParserHandler {
             return ParserResult.fromError(e);
         }
         Path path = Path.of(uri);
+        openInEditor.add(path);
+        return parse(path, content, importFormatPreferences);
+    }
+
+    public void documentClosed(String fileUri) {
+        toPath(fileUri).ifPresent(openInEditor::remove);
+    }
+
+    private ParserResult parse(Path path, String content, ImportFormatPreferences importFormatPreferences) throws JabRefException, IOException {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        ParserResult parserResult = parser.parse(Reader.of(content));
         parserResult.getDatabaseContext().setDatabasePath(path);
         parserResults.put(path, parserResult);
         return parserResult;
@@ -86,11 +100,13 @@ public class LspParserHandler {
             return;
         }
         for (String bibliography : getBibliographiesFromFrontMatter(content)) {
-            Path bibPath = markdownPath.get().resolveSibling(bibliography).normalize();
             try {
-                parserResultFromString(bibPath.toUri().toString(), Files.readString(bibPath), importFormatPreferences);
-            } catch (IOException | JabRefException e) {
-                LOGGER.debug("Could not load bibliography {} referenced from {}", bibPath, markdownUri, e);
+                Path bibPath = markdownPath.get().resolveSibling(bibliography).normalize();
+                if (!openInEditor.contains(bibPath)) {
+                    parse(bibPath, Files.readString(bibPath), importFormatPreferences);
+                }
+            } catch (InvalidPathException | IOException | JabRefException e) {
+                LOGGER.debug("Could not load bibliography {} referenced from {}", bibliography, markdownUri, e);
             }
         }
     }

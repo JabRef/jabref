@@ -90,6 +90,7 @@ public class BibtexTextDocumentService implements TextDocumentService {
     public void didClose(DidCloseTextDocumentParams params) {
         fileUriToLanguageId.remove(params.getTextDocument().getUri());
         contentCache.remove(params.getTextDocument().getUri());
+        linkHandler.documentClosed(params.getTextDocument().getUri());
     }
 
     @Override

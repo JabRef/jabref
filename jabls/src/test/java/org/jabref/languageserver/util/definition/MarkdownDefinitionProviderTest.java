@@ -11,6 +11,7 @@ import org.jabref.model.entry.BibEntryPreferences;
 
 import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.Position;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@NullMarked
 class MarkdownDefinitionProviderTest {
 
     private static final String MARKDOWN = """
@@ -33,9 +35,11 @@ class MarkdownDefinitionProviderTest {
     private final LspParserHandler parserHandler = new LspParserHandler();
     private final MarkdownDefinitionProvider provider = new MarkdownDefinitionProvider(parserHandler);
     private ImportFormatPreferences importFormatPreferences;
+    private Path tempDir;
 
     @BeforeEach
     void setUp(@TempDir Path tempDir) throws IOException {
+        this.tempDir = tempDir;
         importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -64,7 +68,7 @@ class MarkdownDefinitionProviderTest {
         int column = "Starting literature: [@Corti_2009; @Coop".length();
         Hover hover = provider.provideHover(MARKDOWN, new Position(4, column)).orElseThrow();
         assertEquals("""
-                **Cooper_2007**
+                **Cooper\\_2007**
 
                 Cooper, Karen A. and Donovan, Jennifer L. and Waterhouse, Andrew L. and Williamson, Gary
 
@@ -75,11 +79,55 @@ class MarkdownDefinitionProviderTest {
     void hoverOnFirstKeyOfMultiCitation() {
         int column = "Starting literature: [@Cor".length();
         Hover hover = provider.provideHover(MARKDOWN, new Position(4, column)).orElseThrow();
-        assertTrue(hover.getContents().getRight().getValue().startsWith("**Corti_2009**"));
+        assertTrue(hover.getContents().getRight().getValue().startsWith("**Corti\\_2009**"));
     }
 
     @Test
     void noHoverOutsideCitation() {
         assertTrue(provider.provideHover(MARKDOWN, new Position(4, 3)).isEmpty());
+    }
+
+    @Test
+    void unsavedEditorContentIsNotReplacedByFileOnDisk() throws Exception {
+        parserHandler.parserResultFromString(tempDir.resolve("Chocolate.bib").toUri().toString(), """
+                @Article{Cooper_2007,
+                  title = {Unsaved title},
+                }
+                """, importFormatPreferences);
+        parserHandler.loadBibliographiesFromFrontMatter(tempDir.resolve("topics.md").toUri().toString(), MARKDOWN, importFormatPreferences);
+
+        int column = "Starting literature: [@Corti_2009; @Coop".length();
+        Hover hover = provider.provideHover(MARKDOWN, new Position(4, column)).orElseThrow();
+        assertEquals("""
+                **Cooper\\_2007**
+
+                *Unsaved title*""", hover.getContents().getRight().getValue());
+    }
+
+    @Test
+    void invalidBibliographyPathIsSkipped() {
+        LspParserHandler otherParserHandler = new LspParserHandler();
+        otherParserHandler.loadBibliographiesFromFrontMatter(tempDir.resolve("topics.md").toUri().toString(), """
+                ---
+                bibliography: ["invalid\\0.bib", Chocolate.bib]
+                ---
+                """, importFormatPreferences);
+        assertEquals(1, otherParserHandler.searchForEntryByCitationKey("Corti_2009").size());
+    }
+
+    @Test
+    void entryDataIsNotInterpretedAsMarkdown() throws Exception {
+        parserHandler.parserResultFromString(tempDir.resolve("Chocolate.bib").toUri().toString(), """
+                @Article{Cooper_2007,
+                  title = {*Cocoa* [and](https://example.org) <b>health</b>},
+                }
+                """, importFormatPreferences);
+
+        int column = "Starting literature: [@Corti_2009; @Coop".length();
+        Hover hover = provider.provideHover(MARKDOWN, new Position(4, column)).orElseThrow();
+        assertEquals("""
+                **Cooper\\_2007**
+
+                *\\*Cocoa\\* \\[and\\](https://example.org) \\<b\\>health\\</b\\>*""", hover.getContents().getRight().getValue());
     }
 }

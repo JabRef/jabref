@@ -25,6 +25,8 @@ import org.eclipse.lsp4j.Range;
 
 public abstract class DefinitionProvider {
 
+    private static final Pattern MARKDOWN_SPECIAL_CHARACTERS = Pattern.compile("[\\\\`*_\\[\\]<>#~|]");
+
     protected final LspParserHandler parserHandler;
 
     protected Pattern citationCommandPattern;
@@ -63,11 +65,16 @@ public abstract class DefinitionProvider {
     }
 
     private static String formatForHover(String citationKey, BibEntry entry) {
-        StringBuilder result = new StringBuilder("**").append(citationKey).append("**");
-        entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).ifPresent(author -> result.append("\n\n").append(author));
-        entry.getFieldOrAliasLatexFree(StandardField.TITLE).ifPresent(title -> result.append("\n\n*").append(title).append('*'));
-        entry.getFieldOrAliasLatexFree(StandardField.YEAR).ifPresent(year -> result.append(" (").append(year).append(')'));
+        StringBuilder result = new StringBuilder("**").append(escapeMarkdown(citationKey)).append("**");
+        entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).ifPresent(author -> result.append("\n\n").append(escapeMarkdown(author)));
+        entry.getFieldOrAliasLatexFree(StandardField.TITLE).ifPresent(title -> result.append("\n\n*").append(escapeMarkdown(title)).append('*'));
+        entry.getFieldOrAliasLatexFree(StandardField.YEAR).ifPresent(year -> result.append(" (").append(escapeMarkdown(year)).append(')'));
         return result.toString();
+    }
+
+    /// Entry data is shown literally, not interpreted as Markdown (emphasis, links, images, HTML)
+    private static String escapeMarkdown(String text) {
+        return MARKDOWN_SPECIAL_CHARACTERS.matcher(text).replaceAll("\\\\$0");
     }
 
     public List<DocumentLink> provideDocumentLinks(String fileUri, String content) {
