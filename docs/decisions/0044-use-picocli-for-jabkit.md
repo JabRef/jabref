@@ -81,7 +81,7 @@ Available at <https://github.com/rvesse/airline>.
 
 ### ritopt
 
-Availale at <https://ritopt.sourceforge.net/index.shtml>.
+Available at <https://ritopt.sourceforge.net/index.shtml>.
 
 * Good, because simple interface
 * Good, because used in JabRef a long time ago (before 2.10)

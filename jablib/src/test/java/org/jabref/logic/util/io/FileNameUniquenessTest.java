@@ -74,14 +74,14 @@ class FileNameUniquenessTest {
     }
 
     @Test
-    void taseDuplicateMarksReturnsOrignalFileName1() throws IOException {
+    void taseDuplicateMarksReturnsOriginalFileName1() throws IOException {
         String fileName1 = "abc def (1)";
         String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
         assertEquals("abc def", fileName2);
     }
 
     @Test
-    void taseDuplicateMarksReturnsOrignalFileName2() {
+    void taseDuplicateMarksReturnsOriginalFileName2() {
         String fileName1 = "abc (def) gh (1)";
         String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
         assertEquals("abc (def) gh", fileName2);
