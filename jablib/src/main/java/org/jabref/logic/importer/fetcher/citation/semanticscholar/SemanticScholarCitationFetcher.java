@@ -113,7 +113,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
             if (!disclaimer.isBlank()) {
                 LOGGER.debug("Received a disclaimer from Semantic Scholar: {}", disclaimer);
                 if (disclaimer.contains("references")) {
-                    throw new FetcherException(Localization.lang("Restricted access to references: %0", disclaimer));
+                    throw new FetcherException(Localization.lang("Semantic Scholar cannot provide this paper's reference list because of publisher restrictions.\n\n%0", disclaimer));
                 }
             }
             return List.of();
