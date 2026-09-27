@@ -483,6 +483,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        if (enableAi.get() != aiPreferences.getAiFeaturesEnabledCurrently()) {
+            restartWarnings.add(Localization.lang("AI features turned on/off."));
+        }
+
         workingAiPreferences.setAiFeaturesEnabledCurrently(enableAi.get());
         workingAiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
         workingAiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
