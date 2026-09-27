@@ -209,7 +209,7 @@ This way they will be filtered out when running `traceRequirements`, while still
 
 We use OFT mainly to trace small ideas, notes, and wishes rather than to manage the full software engineering requirements process. The concepts and terminology of software requirements engineering are still useful for structuring and writing requirements, and they help us express them clearly. However, we do not apply all of its principles in full.
 
-For example, INVEST is useful for writing better requirement descriptions, but we do not treat our requirements as fully negotiable items because they are more like concrete instructions or orders than open-ended, negotiable agreements. We also do not explicitly record a separate value dimension for each requirement in this workflow.
+For example, [INVEST](https://www.boost.co.nz/blog/2021/10/invest-criteria/) is useful for writing better requirement descriptions, but we do not treat our requirements as fully negotiable items because they are more like concrete instructions or orders than open-ended, negotiable agreements. We also do not explicitly record a separate value dimension for each requirement in this workflow.
 
 It is better to write more small requirements than one large one. This makes coverage and tracking more detailed.
 
