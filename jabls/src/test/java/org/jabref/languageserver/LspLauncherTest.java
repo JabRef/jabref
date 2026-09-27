@@ -19,10 +19,6 @@ class LspLauncherTest {
         LspLauncher launcher = new LspLauncher(_ -> {
         }, mock(CliPreferences.class, RETURNS_DEEP_STUBS), mock(JournalAbbreviationRepository.class), new BibEntryTypesManager(), 0);
 
-        LspClientHandler clientHandler = launcher.createClientHandler();
-
-        assertFalse(clientHandler.isStandalone());
-        // Would terminate the test JVM if the handler were standalone
-        clientHandler.exit();
+        assertFalse(launcher.createClientHandler().isStandalone());
     }
 }
