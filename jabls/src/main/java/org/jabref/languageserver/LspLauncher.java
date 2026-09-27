@@ -16,7 +16,6 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -84,7 +83,7 @@ public class LspLauncher extends Thread {
     }
 
     private void handleClient(Socket socket) {
-        LspClientHandler clientHandler = createClientHandler();
+        LspClientHandler clientHandler = new LspClientHandler(messageHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager, standalone);
         LOGGER.debug("LSP clientHandler started.");
         try (socket; // socket should be closed on error
              InputStream in = socket.getInputStream();
@@ -99,12 +98,6 @@ public class LspLauncher extends Thread {
         } finally {
             LOGGER.info("LSP Client disconnected.");
         }
-    }
-
-    /// Only a standalone server may exit the JVM when a client sends `exit`; inside JabGui this would close JabRef.
-    @VisibleForTesting
-    LspClientHandler createClientHandler() {
-        return new LspClientHandler(messageHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager, standalone);
     }
 
     @Override
