@@ -88,7 +88,7 @@ class FileNameUniquenessTest {
     }
 
     @Test
-    void taseDuplicateMarksReturnsSameName1() {
+    void testDuplicateMarksReturnsSameName1() {
         String fileName1 = "abc def (g)";
         String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
         assertEquals("abc def (g)", fileName2);
