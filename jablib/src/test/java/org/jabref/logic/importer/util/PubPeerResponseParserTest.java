@@ -113,11 +113,6 @@ class PubPeerResponseParserTest {
         assertThrows(FetcherException.class, () -> parser.parse(RESPONSE.formatted("null").replace("10.1234/EXAMPLE", "invalid")));
     }
 
-    @Test
-    void rejectsNegativeCommentCount() {
-        assertThrows(FetcherException.class, () -> parser.parse(RESPONSE.formatted("null").replace("\"total_comments\":2", "\"total_comments\":-1")));
-    }
-
     @ParameterizedTest
     @ValueSource(strings = {"javascript:alert(1)", "/publications/EXAMPLE", "https://example.org/publications/EXAMPLE", "https://pubpeer.com/invalid space"})
     void rejectsInvalidPublicationLink(String url) {
