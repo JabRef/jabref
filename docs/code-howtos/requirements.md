@@ -113,21 +113,18 @@ Markdown:
 
 For requirement IDs, we follow the OFT standard artifact types, with the addition of `adr`. For the main part, we separate the path with `.`, and separate words with a hyphen, as in the example above.
 
-We use these artifact types:
+In JabRef, we use the following artifact types:
 
 - `feat`: general features or ideas, primarily user-facing, unrefined requirements of varying size;
-- `req`: a specific nuance, cross-cutting requirement, or bug fix;
+- `req`: a specific constraint, nuance, cross-cutting requirement, or bug fix;
 - `impl`: a code implementation (typically Java, but can also be GitHub CI/CD code, etc.);
 - `utest`: a unit test;
-- `itest`: a test involving external services;
-- `dsn`: a design document for specifications;
-- `arch`: a high-level design requirement;
-- `uman`: a user manual page or section;
 - `adr`: an Architectural Decision Record.
 
-Throughout development, you will mainly work with `feat`, `req`, `impl`, and `utest`. Please try to use these four types, as the others are rarely needed and we do not have good examples for them.
+Throughout development, you should work only with these types (`feat`, `req`, `impl`, `utest`, and `adr`). Please do not write other standard OFT artifact types (such as `uman`, `itest`, `dsn`, or `arch`), as they are not supported by our active verification workflow:
 
-We would really like to use the `uman` artifact type, as new features often also need to be explained to users. At the time of writing, we do not use this type in the requirements because we do not have a cross-repository setup for OFT.
+- **Do not write `uman`**: Although new features often need to be explained to users, JabRef's user documentation is maintained in a separate repository ([`JabRef/user-documentation`](https://github.com/JabRef/user-documentation)). Because there is currently no cross-repository setup for OFT, specifying `uman` (e.g., in `Needs: uman` or as an artifact identifier) cannot be resolved across repositories and will cause requirement coverage checks to fail.
+- **Do not write `itest`, `dsn`, or `arch`**: These types are not part of JabRef's configured requirement tracing workflow, and using them can cause unrecognized identifier or coverage check failures in `./gradlew traceRequirements`.
 
 The boundary between `feat` and `req` can sometimes be debatable, because from a software engineering perspective they refer to the same thing. However, we assign them based on the outcome: a new fetcher is a feature, while special handling of a field is a requirement. This gives us an overview of what we have in JabRef.
 

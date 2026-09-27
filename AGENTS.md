@@ -420,6 +420,7 @@ Format: `<type>~<area>.<name>~<revision>`
   - `impl`: Code implementation.
   - `utest`: Unit test.
   - `adr`: Architectural Decision Record.
+- Do not write other artifact types (such as `uman`, `itest`, or `dsn`): `uman` is intentionally excluded because user documentation is maintained in a separate repository without cross-repository tracing.
 
 ### How to write requirements
 
