@@ -151,7 +151,7 @@ recipeList:
   - org.openrewrite.staticanalysis.ExternalizableHasNoArgsConstructor
   - org.openrewrite.staticanalysis.FallThrough
 #  - org.openrewrite.staticanalysis.ForLoopControlVariablePostfixOperators
-  - org.openrewrite.staticanalysis.ForLoopIncrementInUpdate
+#  - org.openrewrite.staticanalysis.ForLoopIncrementInUpdate # https://github.com/openrewrite/rewrite-static-analysis/issues/1061
   - org.openrewrite.staticanalysis.IndexOfChecksShouldUseAStartPosition
   - org.openrewrite.staticanalysis.IndexOfReplaceableByContains
 #  - org.openrewrite.staticanalysis.IndexOfShouldNotCompareGreaterThanZero
