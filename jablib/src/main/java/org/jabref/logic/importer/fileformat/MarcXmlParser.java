@@ -295,7 +295,10 @@ public class MarcXmlParser implements Parser {
             }
 
             if (StringUtil.isNotBlank(date)) {
-                String strippedDate = StringUtil.stripBrackets(date);
+                String strippedDate = StringUtil.stripBrackets(date).trim();
+                if (strippedDate.endsWith(".")) {
+                    strippedDate = strippedDate.substring(0, strippedDate.length() - 1);
+                }
                 try {
                     Date.parse(strippedDate).ifPresent(bibEntry::setDate);
                 } catch (DateTimeException _) {
@@ -376,10 +379,16 @@ public class MarcXmlParser implements Parser {
 
     private void putHostItem(BibEntry bibEntry, Element datafield, Optional<Character> hostItemBibliographicLevel) {
         String hostTitle = getSubfield("t", datafield);
-        if (hostItemBibliographicLevel.filter(level -> level == 's').isPresent()) {
+        String hostIssn = getSubfield("x", datafield);
+        boolean serialHost = hostItemBibliographicLevel.filter(level -> level == 's').isPresent()
+                || (hostItemBibliographicLevel.isEmpty() && StringUtil.isNotBlank(hostIssn));
+        if (serialHost) {
             bibEntry.setType(StandardEntryType.Article);
             if (StringUtil.isNotBlank(hostTitle)) {
                 bibEntry.setField(StandardField.JOURNAL, hostTitle);
+            }
+            if (StringUtil.isNotBlank(hostIssn) && bibEntry.getField(StandardField.ISSN).isEmpty()) {
+                bibEntry.setField(StandardField.ISSN, hostIssn);
             }
         } else if (hostItemBibliographicLevel.filter(level -> level == 'm').isPresent() && StringUtil.isNotBlank(hostTitle)) {
             bibEntry.setField(StandardField.BOOKTITLE, hostTitle);

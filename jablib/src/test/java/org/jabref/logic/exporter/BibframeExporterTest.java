@@ -20,10 +20,12 @@ import org.junit.jupiter.api.io.TempDir;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // [utest->req~export.bibframe.rdfxml~1]
 @NullMarked
@@ -49,6 +51,14 @@ class BibframeExporterTest {
                     StandardField.URL, StandardField.JOURNAL, StandardField.PAGES)) {
                 assertEquals(original.getField(field), restored.getField(field), field.getName());
             }
+
+            Path reexported = directory.resolve(name + "-reexported.rdf");
+            exporter.export(new BibDatabaseContext(), reexported, List.of(restored));
+            assertFalse(DiffBuilder.compare(Files.readString(output))
+                    .withTest(Files.readString(reexported))
+                    .ignoreWhitespace()
+                    .checkForSimilar()
+                    .build().hasDifferences());
         }
     }
 
@@ -65,6 +75,85 @@ class BibframeExporterTest {
         exporter.export(new BibDatabaseContext(), secondFile, List.of(second));
 
         assertEquals(Files.readString(firstFile), Files.readString(secondFile));
+    }
+
+    @Test
+    void identifiersIgnoreFieldsOutsideTheExportedMapping(@TempDir Path directory) throws SaveException, IOException {
+        BibEntry first = new BibEntry(StandardEntryType.Book).withField(StandardField.TITLE, "A book");
+        BibEntry second = new BibEntry(StandardEntryType.Book).withField(StandardField.TITLE, "A book")
+                .withField(StandardField.NOTE, "Local note").withField(StandardField.FILE, "local.pdf");
+        Path firstFile = directory.resolve("first.rdf");
+        Path secondFile = directory.resolve("second.rdf");
+
+        exporter.export(new BibDatabaseContext(), firstFile, List.of(first));
+        exporter.export(new BibDatabaseContext(), secondFile, List.of(second));
+
+        assertEquals(Files.readString(firstFile), Files.readString(secondFile));
+    }
+
+    @Test
+    void articleWithoutIssnRetainsJournalAndType(@TempDir Path directory) throws SaveException, IOException {
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "An article")
+                .withField(StandardField.JOURNAL, "A journal")
+                .withField(StandardField.PAGES, "1-5");
+        Path output = directory.resolve("article.rdf");
+
+        exporter.export(new BibDatabaseContext(), output, List.of(article));
+        BibEntry restored = importer.importDatabase(output).getDatabase().getEntries().getFirst();
+
+        assertEquals(StandardEntryType.Article, restored.getType());
+        assertEquals(article.getField(StandardField.JOURNAL), restored.getField(StandardField.JOURNAL));
+        assertEquals(article.getField(StandardField.PAGES), restored.getField(StandardField.PAGES));
+    }
+
+    @Test
+    void articleWithoutJournalRetainsIssn(@TempDir Path directory) throws SaveException, IOException {
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "An article")
+                .withField(StandardField.ISSN, "1234-5678");
+        Path output = directory.resolve("article.rdf");
+
+        exporter.export(new BibDatabaseContext(), output, List.of(article));
+        BibEntry restored = importer.importDatabase(output).getDatabase().getEntries().getFirst();
+
+        assertEquals(article.getField(StandardField.ISSN), restored.getField(StandardField.ISSN));
+    }
+
+    @Test
+    void publicationYearIsAlsoExportedAsStructuredEdtfDate(@TempDir Path directory) throws SaveException, IOException {
+        BibEntry book = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "A book")
+                .withField(StandardField.YEAR, "2023");
+        Path output = directory.resolve("book.rdf");
+
+        exporter.export(new BibDatabaseContext(), output, List.of(book));
+
+        assertTrue(Files.readString(output).contains(
+                "<bf:date rdf:datatype=\"http://id.loc.gov/datatypes/edtf\">2023</bf:date>"));
+    }
+
+    @Test
+    void languagesUseCodesOnlyForRecognizedSingleLanguages(@TempDir Path directory) throws SaveException, IOException {
+        for (String language : List.of("English", "Deutsch", "English, Japanese")) {
+            BibEntry book = new BibEntry(StandardEntryType.Book)
+                    .withField(StandardField.TITLE, "A book")
+                    .withField(StandardField.LANGUAGE, language);
+            Path output = directory.resolve("language.rdf");
+
+            exporter.export(new BibDatabaseContext(), output, List.of(book));
+            String xml = Files.readString(output);
+            BibEntry restored = importer.importDatabase(output).getDatabase().getEntries().getFirst();
+
+            String expected = switch (language) {
+                case "English" -> "eng";
+                case "Deutsch" -> "ger";
+                default -> "English, Japanese";
+            };
+            assertEquals(expected, restored.getField(StandardField.LANGUAGE).orElseThrow());
+            assertFalse(xml.contains("/languages/English"));
+            assertFalse(xml.contains("/languages/Deutsch"));
+        }
     }
 
     @Test

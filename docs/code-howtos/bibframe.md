@@ -27,14 +27,17 @@ resource links from its parsed descriptions.
 | ISSN                     | `bf:identifiedBy/bf:Issn/rdf:value`                                                                 | Instance or journal host Work |
 | Language, abstract       | `bf:language`, `bf:summary/bf:Summary/rdfs:label`                                                   | Work                          |
 | URL                      | `bf:electronicLocator`                                                                              | Instance, then Work           |
-| Journal, pages           | `bf:relation` with `partof` host Work and an ISSN; host Instance `bf:part`                          | Work relation                 |
+| Journal, pages           | `bf:relation` with `partof` host Work typed `bf:Serial`; host Instance `bf:part`                    | Work relation                 |
 
-A Work with an identified serial host becomes an Article; other linked Works
-become Books. A host title alone is not enough to identify a journal. Data
-outside this table, such as MARC administrative fields, edition, series,
+A Work with a serial host becomes an Article; the host is identified by
+`bf:Serial` type or an ISSN. Other linked Works become Books.
+A host title alone is not enough to identify a journal. Recognized single-language
+names and codes export as MARC language URIs; other language text exports as a
+literal label. Data outside this table, such as MARC administrative fields,
+edition, series,
 physical description, subject headings, and additional Instances, is lost.
 Citation keys are never inferred from resource URIs. The exporter hashes the
-entry type and sorted bibliographic fields with SHA-256 to mint stable Work
+entry type and mapped exported fields with SHA-256 to mint stable Work
 and Instance URIs. Citation keys are excluded. Identical entries in one export
 receive numbered suffixes so their resources remain separate. ISBN, ISSN, and
 DOI values are preserved as bibliographic identifiers.
@@ -46,11 +49,15 @@ multi-entry export into linked Work/Instance pairs before passing it to that
 converter.
 
 The pinned reverse converter emits an article host as MARC `773` without
-subfield `7`. The unchanged `MarcXmlParser` uses that subfield to recognize an
-Article and its journal, so those two values are lost at the final MARC import
-stage. It also emits the language only in MARC `008`, which that parser does
-not read. A generic URL becomes MARC `856` without the `Volltext` label that
-the parser requires for a linked file. The reverse converter may add ISBD
-punctuation to title and publication fields.
+subfield `7`. The MARC parser can still recognize a serial host when `773$x`
+contains an ISSN; without either signal, the article type and journal are lost
+at the final MARC import stage. It does not infer Book from the MARC leader
+either. Language is emitted only in MARC `008`, which that parser does not read.
+The MARC parser removes the converter's trailing period from publication dates.
+Four-digit years also export as structured EDTF `bf:date`, which the reverse
+converter uses for MARC `008` date positions.
+A generic URL becomes MARC `856` without the `Volltext` label that the parser requires
+for a linked file. The reverse converter may add ISBD punctuation to title and
+publication fields.
 
 <!-- markdownlint-disable-file MD013 MD033 MD041 -->

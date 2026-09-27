@@ -7,10 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -23,21 +24,35 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// Exports the Work and Instance subset of BIBFRAME 2.0 as striped RDF/XML.
 // [impl->req~export.bibframe.rdfxml~1]
 @NullMarked
 public class BibframeExporter extends Exporter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibframeExporter.class);
     private static final String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     private static final String RDFS = "http://www.w3.org/2000/01/rdf-schema#";
     private static final String BF = "http://id.loc.gov/ontologies/bibframe/";
     private static final String BFLC = "http://id.loc.gov/ontologies/bflc/";
     private static final String RESOURCE_BASE = "https://jabref.org/bibframe/sha256/";
+    private static final List<StandardField> EXPORTED_FIELDS = List.of(StandardField.TITLE, StandardField.SUBTITLE,
+            StandardField.AUTHOR, StandardField.EDITOR, StandardField.LANGUAGE, StandardField.ABSTRACT,
+            StandardField.ADDRESS, StandardField.PUBLISHER, StandardField.ISBN, StandardField.ISSN,
+            StandardField.DOI, StandardField.URL);
+    private static final Map<String, String> MARC_LANGUAGE_ALIASES = Map.ofEntries(
+            Map.entry("deu", "ger"), Map.entry("fra", "fre"), Map.entry("nld", "dut"),
+            Map.entry("zho", "chi"), Map.entry("ces", "cze"), Map.entry("ell", "gre"),
+            Map.entry("ron", "rum"), Map.entry("slk", "slo"), Map.entry("hye", "arm"),
+            Map.entry("eus", "baq"), Map.entry("isl", "ice"), Map.entry("mkd", "mac"),
+            Map.entry("mri", "mao"), Map.entry("msa", "may"), Map.entry("mya", "bur"),
+            Map.entry("fas", "per"), Map.entry("sqi", "alb"), Map.entry("bod", "tib"),
+            Map.entry("cym", "wel"), Map.entry("kat", "geo"));
 
     public BibframeExporter() {
         super("bibframe", "BIBFRAME 2.0 RDF/XML", StandardFileType.RDF);
@@ -73,6 +88,7 @@ public class BibframeExporter extends Exporter {
                 writer.close();
             }
         } catch (IOException | NoSuchAlgorithmException | XMLStreamException e) {
+            LOGGER.debug("Could not export BIBFRAME RDF/XML", e);
             throw new SaveException(e);
         }
     }
@@ -80,10 +96,14 @@ public class BibframeExporter extends Exporter {
     private static String contentHash(BibEntry entry, MessageDigest digest) {
         StringJoiner content = new StringJoiner("");
         appendCanonical(content, "type", entry.getType().getName());
-        entry.getFieldMap().entrySet().stream()
-             .filter(field -> InternalField.KEY_FIELD != field.getKey())
-             .sorted(Comparator.comparing(field -> field.getKey().getName()))
-             .forEach(field -> appendCanonical(content, field.getKey().getName(), field.getValue()));
+        EXPORTED_FIELDS.forEach(field -> entry.getField(field)
+                .ifPresent(value -> appendCanonical(content, field.getName(), value)));
+        entry.getField(StandardField.YEAR).or(() -> entry.getField(StandardField.DATE))
+                .ifPresent(value -> appendCanonical(content, "publicationDate", value));
+        if (entry.getType() == StandardEntryType.Article && entry.getField(StandardField.JOURNAL).isPresent()) {
+            entry.getField(StandardField.JOURNAL).ifPresent(value -> appendCanonical(content, "journal", value));
+            entry.getField(StandardField.PAGES).ifPresent(value -> appendCanonical(content, "pages", value));
+        }
         return HexFormat.of().formatHex(digest.digest(content.toString().getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -101,11 +121,7 @@ public class BibframeExporter extends Exporter {
         writeContributors(writer, entry, StandardField.AUTHOR, "aut");
         writeContributors(writer, entry, StandardField.EDITOR, "edt");
         writeTitle(writer, entry);
-        Optional<String> language = entry.getField(StandardField.LANGUAGE);
-        if (language.isPresent()) {
-            resource(writer, "bf", "language", BF, "rdf", RDF,
-                    "http://id.loc.gov/vocabulary/languages/" + language.orElseThrow());
-        }
+        writeLanguage(writer, entry.getField(StandardField.LANGUAGE));
         writeSummary(writer, entry.getField(StandardField.ABSTRACT));
         writeHost(writer, entry);
         resource(writer, "bf", "hasInstance", BF, "rdf", RDF, instanceUri);
@@ -121,7 +137,7 @@ public class BibframeExporter extends Exporter {
         writePublication(writer, entry);
         writeIdentifier(writer, entry, StandardField.ISBN, "Isbn");
         writeIdentifier(writer, entry, StandardField.DOI, "Doi");
-        if (entry.getType() != StandardEntryType.Article) {
+        if (entry.getType() != StandardEntryType.Article || entry.getField(StandardField.JOURNAL).isEmpty()) {
             writeIdentifier(writer, entry, StandardField.ISSN, "Issn");
         }
         Optional<String> url = entry.getField(StandardField.URL);
@@ -130,6 +146,40 @@ public class BibframeExporter extends Exporter {
         }
         resource(writer, "bf", "instanceOf", BF, "rdf", RDF, workUri);
         writer.writeEndElement();
+    }
+
+    private static void writeLanguage(XMLStreamWriter writer, Optional<String> language) throws XMLStreamException {
+        if (language.isEmpty()) {
+            return;
+        }
+        Optional<String> code = languageCode(language.orElseThrow());
+        if (code.isPresent()) {
+            resource(writer, "bf", "language", BF, "rdf", RDF,
+                    "http://id.loc.gov/vocabulary/languages/" + code.orElseThrow());
+            return;
+        }
+        start(writer, "bf", "language", BF);
+        start(writer, "bf", "Language", BF);
+        literal(writer, "rdfs", "label", RDFS, language.orElseThrow());
+        writer.writeEndElement();
+        writer.writeEndElement();
+    }
+
+    private static Optional<String> languageCode(String language) {
+        String normalized = language.trim();
+        Optional<String> marcCode = MARC_LANGUAGE_ALIASES.values().stream()
+                .filter(code -> code.equalsIgnoreCase(normalized)).findFirst();
+        if (marcCode.isPresent()) {
+            return marcCode;
+        }
+        return Arrays.stream(Locale.getISOLanguages()).map(Locale::of)
+                .filter(locale -> normalized.equalsIgnoreCase(locale.getLanguage())
+                        || normalized.equalsIgnoreCase(locale.getISO3Language())
+                        || normalized.equalsIgnoreCase(locale.getDisplayLanguage(Locale.ENGLISH))
+                        || normalized.equalsIgnoreCase(locale.getDisplayLanguage(Locale.GERMAN)))
+                .map(Locale::getISO3Language)
+                .map(code -> MARC_LANGUAGE_ALIASES.getOrDefault(code, code))
+                .findFirst();
     }
 
     private static void writeTitle(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
@@ -194,6 +244,12 @@ public class BibframeExporter extends Exporter {
         optionalLiteral(writer, "bflc", "simplePlace", BFLC, place);
         optionalLiteral(writer, "bflc", "simpleAgent", BFLC, publisher);
         optionalLiteral(writer, "bflc", "simpleDate", BFLC, date);
+        if (date.filter(value -> value.length() == 4 && value.chars().allMatch(Character::isDigit)).isPresent()) {
+            start(writer, "bf", "date", BF);
+            attribute(writer, "rdf", RDF, "datatype", "http://id.loc.gov/datatypes/edtf");
+            writer.writeCharacters(date.orElseThrow());
+            writer.writeEndElement();
+        }
         writer.writeEndElement();
         writer.writeEndElement();
     }
@@ -218,6 +274,7 @@ public class BibframeExporter extends Exporter {
         resource(writer, "bf", "relationship", BF, "rdf", RDF, "http://id.loc.gov/vocabulary/relationship/partof");
         start(writer, "bf", "associatedResource", BF);
         start(writer, "bf", "Work", BF);
+        resource(writer, "rdf", "type", RDF, "rdf", RDF, BF + "Serial");
         start(writer, "bf", "title", BF);
         start(writer, "bf", "Title", BF);
         literal(writer, "bf", "mainTitle", BF, entry.getField(StandardField.JOURNAL).orElseThrow());

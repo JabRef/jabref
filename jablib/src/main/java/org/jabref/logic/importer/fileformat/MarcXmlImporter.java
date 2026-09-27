@@ -79,7 +79,7 @@ public class MarcXmlImporter extends Importer {
             }
             return new ParserResult(new MarcXmlParser().parseEntries(
                     new ByteArrayInputStream(scanResult.sruXml().getBytes(StandardCharsets.UTF_8))));
-        } catch (ParseException | XMLStreamException e) {
+        } catch (ParseException | XMLStreamException | NumberFormatException e) {
             LOGGER.debug("Could not parse MARCXML", e);
             return ParserResult.fromError(e);
         }
