@@ -240,18 +240,6 @@ jobs:
             *.md
             docs/**/*.md
 
-  typos:
-    name: Spelling
-    runs-on: ubuntu-slim
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          submodules: 'false'
-          show-progress: 'false'
-      - name: Check spelling
-        run: pipx run typos==1.50.3
-
   yaml:
     name: YAML
     runs-on: ubuntu-slim
@@ -264,8 +252,8 @@ jobs:
       - name: yamllint
         run: pipx run yamllint==1.38.0 --strict .
 
-  textlint:
-    name: Textlint
+  spelling:
+    name: Spellling
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
@@ -282,6 +270,8 @@ jobs:
         run: npm ci
       - name: textlint
         run: npm run textlint
+      - name: typos
+        run: pipx run typos==1.50.3
 
   madr:
     name: MADR ADRs
