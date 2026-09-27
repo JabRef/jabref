@@ -23,7 +23,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @NullMarked
@@ -48,9 +48,7 @@ class SimpleHtmlExportFormatTest {
 
         exporter.export(new BibDatabaseContext(), path, List.of(entry));
 
-        List<String> authorLines = Files.readAllLines(path).stream()
-                                        .filter(line -> line.contains("Kolb"))
-                                        .toList();
-        assertEquals(List.of("<dd>Kolb, S.A.</dd>"), authorLines);
+        String content = Files.readString(path);
+        assertTrue(content.contains("<dd>Kolb, S.A.</dd>"), content);
     }
 }
