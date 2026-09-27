@@ -372,7 +372,7 @@ public class MainMenu extends MenuBar {
 
         help.getItems().addAll(
                 factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService, preferences.getExternalApplicationsPreferences())),
-                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction(URLs.DONATE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
+                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction(URLs.FORUM_URL, dialogService, preferences.getExternalApplicationsPreferences())),
 
                 new SeparatorMenuItem(),
 
@@ -381,6 +381,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction(URLs.DONATION_URL, dialogService, preferences.getExternalApplicationsPreferences())),
+                factory.createMenuItem(StandardActions.CONTRIBUTE, new OpenBrowserAction(URLs.CONTRIBUTE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                 factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(preferences, dialogService, taskExecutor)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
                         factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction(URLs.WEBPAGE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
