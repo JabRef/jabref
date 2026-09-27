@@ -8,12 +8,15 @@ import org.jabref.languageserver.LspClientHandler;
 import org.jabref.languageserver.util.definition.DefinitionProvider;
 import org.jabref.languageserver.util.definition.DefinitionProviderFactory;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
 
 import org.eclipse.lsp4j.DocumentLink;
+import org.eclipse.lsp4j.Hover;
 import org.eclipse.lsp4j.Location;
 import org.eclipse.lsp4j.LocationLink;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +27,24 @@ public class LspLinkHandler {
     private final LspClientHandler clientHandler;
     private final LspParserHandler parserHandler;
     private final FilePreferences preferences;
+    private final ImportFormatPreferences importFormatPreferences;
 
-    public LspLinkHandler(LspClientHandler clientHandler, LspParserHandler parserHandler, FilePreferences preferences) {
+    public LspLinkHandler(LspClientHandler clientHandler, LspParserHandler parserHandler, FilePreferences preferences, ImportFormatPreferences importFormatPreferences) {
         this.clientHandler = clientHandler;
         this.parserHandler = parserHandler;
         this.preferences = preferences;
+        this.importFormatPreferences = importFormatPreferences;
+    }
+
+    public CompletableFuture<@Nullable Hover> provideHover(String languageId, String content, Position position) {
+        Optional<Hover> hover = DefinitionProviderFactory.getDefinitionProvider(preferences, parserHandler, languageId)
+                                                         .flatMap(provider -> provider.provideHover(content, position));
+        // LSP requires `null` if there is nothing to show
+        return CompletableFuture.completedFuture(hover.orElse(null));
+    }
+
+    public void loadBibliographiesFromFrontMatter(String markdownUri, String content) {
+        parserHandler.loadBibliographiesFromFrontMatter(markdownUri, content, importFormatPreferences);
     }
 
     public CompletableFuture<Either<List<? extends Location>, List<? extends LocationLink>>> provideDefinition(String languageId, String uri, String content, Position position) {

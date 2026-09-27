@@ -2,6 +2,8 @@ package org.jabref.languageserver.util.definition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.languageserver.util.LspParserHandler;
 import org.jabref.languageserver.util.LspRangeUtil;
@@ -34,6 +36,14 @@ public class LatexDefinitionProvider extends DefinitionProvider {
             }
         });
         return locations;
+    }
+
+    @Override
+    Optional<String> getCitationKeyAtPosition(String content, Position position) {
+        return latexParser.parse(content).getCitations().entries().stream()
+                          .filter(entry -> LspRangeUtil.isPositionInRange(position, LspRangeUtil.convertToLspRange(entry.getValue().line(), entry.getValue().colStart(), entry.getValue().colEnd())))
+                          .map(Map.Entry::getKey)
+                          .findFirst();
     }
 
     @Override
