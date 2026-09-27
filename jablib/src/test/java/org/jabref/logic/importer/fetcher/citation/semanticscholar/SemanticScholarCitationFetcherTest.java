@@ -93,7 +93,7 @@ class SemanticScholarCitationFetcherTest {
 
         try {
             fetcherWithMockedPreferences.getCitations(entry);
-        } catch (FetcherException e) {
+        } catch (FetcherException _) {
             // The live network outcome is irrelevant here; only the API-key lookup name matters.
         }
 
@@ -110,7 +110,7 @@ class SemanticScholarCitationFetcherTest {
 
         try {
             fetcherWithMockedPreferences.getReferences(entry);
-        } catch (FetcherException e) {
+        } catch (FetcherException _) {
             // The live network outcome is irrelevant here; only the API-key lookup name matters.
         }
 
@@ -127,7 +127,7 @@ class SemanticScholarCitationFetcherTest {
 
         try {
             fetcherWithMockedPreferences.getCitationCount(entry);
-        } catch (FetcherException e) {
+        } catch (FetcherException _) {
             // The live network outcome is irrelevant here; only the API-key lookup name matters.
         }
 
