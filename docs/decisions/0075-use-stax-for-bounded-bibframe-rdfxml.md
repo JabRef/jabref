@@ -30,4 +30,3 @@ These are alternate ways to serialize RDF relationships and values, not
 additional bibliographic fields. The pinned converter fixtures use child
 elements and URI links for the mapped fields, without `rdf:nodeID` or
 `rdf:parseType`; other RDF/XML producers may choose different syntax.
-
