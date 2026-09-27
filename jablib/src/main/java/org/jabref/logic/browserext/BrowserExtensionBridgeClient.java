@@ -102,7 +102,7 @@ public class BrowserExtensionBridgeClient {
         } catch (IOException | JacksonException | URISyntaxException e) {
             LOGGER.warn("Could not reach browser-extension bridge for MathSciNet browser sync", e);
             return Optional.empty();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException _) {
             Thread.currentThread().interrupt();
             return Optional.empty();
         }

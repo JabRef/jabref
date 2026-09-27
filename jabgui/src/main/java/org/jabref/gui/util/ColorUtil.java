@@ -32,7 +32,7 @@ public class ColorUtil {
     public static StringProperty createFlashingColorStringProperty(final ObjectProperty<Color> flashingColor) {
         final StringProperty flashingColorStringProperty = new SimpleStringProperty();
         setColorStringFromColor(flashingColorStringProperty, flashingColor);
-        flashingColor.addListener((observable, oldValue, newValue) -> setColorStringFromColor(flashingColorStringProperty, flashingColor));
+        flashingColor.addListener((_, _, _) -> setColorStringFromColor(flashingColorStringProperty, flashingColor));
         return flashingColorStringProperty;
     }
 

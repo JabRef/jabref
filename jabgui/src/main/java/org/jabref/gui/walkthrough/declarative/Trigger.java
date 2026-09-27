@@ -314,10 +314,10 @@ public interface Trigger {
                             Replace this line with `onNavigate.run` WILL LEAD TO [IndexOutOfBoundsException] when JavaFX performs layout
                             calculation on the dialog pane opened by [org.jabref.gui.preferences.ShowPreferencesAction].
                             It seems that directly listening to MOUSE_PRESSED event (which is necessary)
-                            triggers a race condition between [org.jabref.gui.walkthrough.WalkthroughPane] trying to
-                            attach on the new window and JavaFX trying to perform layout. It's unclear if this
-                            timeout need to change based configuration to prevent error. You cannot catch this exception
-                            because it occurs directly in the `jdk.internals` package.
+                            triggered a race condition between the walkthrough replacing the new window's scene root
+                            (which it no longer does, see [org.jabref.gui.walkthrough.WalkthroughPane]) and JavaFX
+                            performing layout. The delay is kept because the step's own layout still races the dialog's.
+                            You cannot catch this exception because it occurs directly in the `jdk.internals` package.
                           */
                         new DelayedExecution(NAVIGATION_DELAY, onNavigate).start();
                     }

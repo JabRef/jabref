@@ -436,7 +436,7 @@ public class GroupDialogViewModel {
                           .getIconName()
                           .filter(iconName -> !GroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON.equals(iconName))
                           .ifPresent(iconProperty::setValue);
-                parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
+                parentNode.getGroup().getColor().ifPresent(_ -> colorUseProperty.setValue(true));
             }
             typeExplicitProperty.setValue(true);
             explicitIncludeSelectedProperty.setValue(selectedEntriesAvailableProperty.get() && preferences.getGroupsPreferences().shouldAutoIncludeSelectedEntries());

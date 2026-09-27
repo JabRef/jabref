@@ -4,16 +4,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -29,7 +35,9 @@ import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
@@ -56,6 +64,7 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -94,6 +103,7 @@ class AllFieldsTabTest {
     private GuiPreferences preferences;
     private DeferringTaskExecutor taskExecutor;
     private AllFieldsTab tab;
+    private BibDatabaseContext databaseContext;
 
     @BeforeEach
     void setUp(@TempDir Path fileDirectory) {
@@ -108,7 +118,7 @@ class AllFieldsTabTest {
         when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
         when(preferences.getAutoLinkPreferences()).thenReturn(new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", false, ';'));
 
-        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+        databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of(fileDirectory));
         when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBTEX);
         when(databaseContext.getMetaData()).thenReturn(new MetaData());
@@ -227,6 +237,123 @@ class AllFieldsTabTest {
             entry.setCitationKey("CiteKey2021");
             taskExecutor.runNextDeferredTask();
         });
+
+        assertFalse(tab.editors.containsKey(StandardField.FILE));
+    }
+
+    private TitledPane filesAndLinksPane() {
+        return ((Parent) tab.getEditorContent()).getChildrenUnmodifiable().stream()
+                                                .filter(TitledPane.class::isInstance)
+                                                .map(TitledPane.class::cast)
+                                                .filter(pane -> Localization.lang("Files and links").equals(pane.getText()))
+                                                .findFirst()
+                                                .orElseThrow();
+    }
+
+    // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
+    @Test
+    void fileEditorAppearsWhenEmptyFilesAndLinksSectionIsExpanded() {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc).withCitationKey("CiteKey2021");
+
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
+        assertFalse(tab.editors.containsKey(StandardField.FILE));
+
+        JavaFxExtension.invokeAndWait(() -> filesAndLinksPane().setExpanded(true));
+
+        assertTrue(tab.editors.containsKey(StandardField.FILE));
+    }
+
+    /// The section's row labels, top to bottom (labels sit in the grid's first column).
+    private List<String> filesAndLinksRowLabels() {
+        GridPane grid = (GridPane) ((VBox) filesAndLinksPane().getContent()).getChildren().getFirst();
+        return grid.getChildren().stream()
+                   .filter(node -> Integer.valueOf(0).equals(GridPane.getColumnIndex(node)))
+                   .sorted(Comparator.comparingInt(GridPane::getRowIndex))
+                   .map(node -> ((Label) node).getText())
+                   .toList();
+    }
+
+    /// BibLaTeX `Online` requires `url`, so the section opens for a field that is not set.
+    // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
+    @Test
+    void fileEditorAppearsForRequiredButUnsetLinkField() {
+        when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
+        BibEntry entry = new BibEntry(StandardEntryType.Online).withCitationKey("CiteKey2021");
+
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
+
+        assertTrue(tab.editors.containsKey(StandardField.FILE));
+        assertEquals(
+                List.of(FieldsUtil.getDisplayName(StandardField.FILE), FieldsUtil.getDisplayName(StandardField.URL)),
+                filesAndLinksRowLabels());
+    }
+
+    /// An unwrapped editor node means no remove button was overlaid on the row.
+    // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
+    @Test
+    void fileEditorRowOffersNoRemoveButton() {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("CiteKey2021")
+                .withField(StandardField.URL, "https://example.org");
+
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
+
+        GridPane grid = (GridPane) ((VBox) filesAndLinksPane().getContent()).getChildren().getFirst();
+        Node fileRow = grid.getChildren().stream()
+                           .filter(node -> Integer.valueOf(1).equals(GridPane.getColumnIndex(node))
+                                   && Integer.valueOf(0).equals(GridPane.getRowIndex(node)))
+                           .findFirst()
+                           .orElseThrow();
+
+        assertSame(tab.editors.get(StandardField.FILE).getNode(), fileRow);
+    }
+
+    /// Focusing a field in a collapsed files and links section expands it, which rebuilds the panel;
+    /// a tab disposed before that deferred focus runs must not rebuild.
+    @Test
+    void disposedTabDoesNotRebuildOnDeferredFocus() {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("CiteKey2021")
+                .withField(StandardField.URL, "https://example.org");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            tab.currentEntryProperty().set(entry);
+            tab.bindToEntry(entry);
+            filesAndLinksPane().setExpanded(false);
+            tab.addFieldAndFocus(StandardField.URI);
+            tab.dispose();
+        });
+        // Two passes: the focus callback is nested in a second runLater.
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+
+        assertFalse(tab.editors.containsKey(StandardField.FILE));
+    }
+
+    // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
+    @Test
+    void fileEditorAppearsWhenFilesAndLinksSectionIsOpen() {
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("CiteKey2021")
+                .withField(StandardField.URL, "https://example.org");
+
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
+
+        assertTrue(tab.editors.containsKey(StandardField.FILE));
+    }
+
+    // [utest->req~entry-editor.main-tab.file-editor-always-shown~1]
+    @Test
+    void fileEditorStaysOnCustomTabThatExtractsIt() {
+        when(preferences.getEntryEditorPreferences().getTabModels()).thenReturn(FXCollections.observableArrayList(
+                new EntryEditorTabModel.CustomizedFieldsTab("Files", List.of("file"), Set.of("file"))));
+        BibEntry entry = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("CiteKey2021")
+                .withField(StandardField.URL, "https://example.org");
+
+        JavaFxExtension.invokeAndWait(() -> tab.bindToEntry(entry));
 
         assertFalse(tab.editors.containsKey(StandardField.FILE));
     }

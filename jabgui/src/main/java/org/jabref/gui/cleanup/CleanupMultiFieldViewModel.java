@@ -40,28 +40,28 @@ public class CleanupMultiFieldViewModel {
         timestampToModificationSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
 
         bibTexSelected.addListener(
-                (obs, oldVal, newVal) -> {
+                (_, _, newVal) -> {
                     if (newVal) {
                         bibLaTexSelected.set(false);
                     }
                 }
         );
         bibLaTexSelected.addListener(
-                (obs, oldVal, newVal) -> {
+                (_, _, newVal) -> {
                     if (newVal) {
                         bibTexSelected.set(false);
                     }
                 }
         );
         timestampToCreationSelected.addListener(
-                (obs, oldVal, newVal) -> {
+                (_, _, newVal) -> {
                     if (newVal) {
                         timestampToModificationSelected.set(false);
                     }
                 }
         );
         timestampToModificationSelected.addListener(
-                (obs, oldVal, newVal) -> {
+                (_, _, newVal) -> {
                     if (newVal) {
                         timestampToCreationSelected.set(false);
                     }

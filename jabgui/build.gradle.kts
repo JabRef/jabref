@@ -68,8 +68,7 @@ val useLibericaJdkFullJvmArgs = if (useLibericaJdkFull) listOf(
     "--add-opens", "javafx.controls/javafx.scene.control=org.jabref,ALL-UNNAMED",
     "--add-opens", "javafx.controls/javafx.scene.control.cell=org.jabref,ALL-UNNAMED",
     "--add-opens", "javafx.controls/javafx.scene.control.skin=org.jabref,ALL-UNNAMED",
-    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED",
-    "--add-opens", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED"
+    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED"
 ) else emptyList()
 
 // Compile-time counterpart of the JavaFX --add-exports above. When JavaFX is patched Maven jars, those
