@@ -24,10 +24,10 @@ class MarkdownDefinitionProviderTest {
 
     private static final String MARKDOWN = """
             ---
-            bibliography: literature.bib
+            bibliography: Chocolate.bib
             ---
 
-            Starting literature: [@Nygard2011; @Kopp2018adr]
+            Starting literature: [@Corti_2009; @Cooper_2007]
             """;
 
     private final LspParserHandler parserHandler = new LspParserHandler();
@@ -41,17 +41,19 @@ class MarkdownDefinitionProviderTest {
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.filePreferences()).thenReturn(mock(FilePreferences.class));
 
-        Files.writeString(tempDir.resolve("literature.bib"), """
-                @Misc{Nygard2011,
-                  author = {Michael Nygard},
-                  title  = {Documenting Architecture Decisions},
-                  year   = {2011},
+        Files.writeString(tempDir.resolve("Chocolate.bib"), """
+                @Article{Corti_2009,
+                  author       = {Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.},
+                  date         = {2009-03},
+                  journaltitle = {Circulation},
+                  title        = {Cocoa and Cardiovascular Health},
                 }
 
-                @InProceedings{Kopp2018adr,
-                  author    = {Oliver Kopp and Anita Armbruster and Olaf Zimmermann},
-                  title     = {Markdown Architectural Decision Records: Format and Tool Support},
-                  year      = {2018},
+                @Article{Cooper_2007,
+                  author       = {Cooper, Karen A. and Donovan, Jennifer L. and Waterhouse, Andrew L. and Williamson, Gary},
+                  date         = {2007-08},
+                  journaltitle = {British Journal of Nutrition},
+                  title        = {Cocoa and health: a decade of research},
                 }
                 """);
         parserHandler.loadBibliographiesFromFrontMatter(tempDir.resolve("topics.md").toUri().toString(), MARKDOWN, importFormatPreferences);
@@ -59,21 +61,21 @@ class MarkdownDefinitionProviderTest {
 
     @Test
     void hoverOnSecondKeyOfMultiCitation() {
-        int column = "Starting literature: [@Nygard2011; @Kopp".length();
+        int column = "Starting literature: [@Corti_2009; @Coop".length();
         Hover hover = provider.provideHover(MARKDOWN, new Position(4, column)).orElseThrow();
         assertEquals("""
-                **Kopp2018adr**
+                **Cooper_2007**
 
-                Oliver Kopp and Anita Armbruster and Olaf Zimmermann
+                Cooper, Karen A. and Donovan, Jennifer L. and Waterhouse, Andrew L. and Williamson, Gary
 
-                *Markdown Architectural Decision Records: Format and Tool Support* (2018)""", hover.getContents().getRight().getValue());
+                *Cocoa and health: a decade of research* (2007)""", hover.getContents().getRight().getValue());
     }
 
     @Test
     void hoverOnFirstKeyOfMultiCitation() {
-        int column = "Starting literature: [@Nyg".length();
+        int column = "Starting literature: [@Cor".length();
         Hover hover = provider.provideHover(MARKDOWN, new Position(4, column)).orElseThrow();
-        assertTrue(hover.getContents().getRight().getValue().startsWith("**Nygard2011**"));
+        assertTrue(hover.getContents().getRight().getValue().startsWith("**Corti_2009**"));
     }
 
     @Test
