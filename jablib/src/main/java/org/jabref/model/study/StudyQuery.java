@@ -3,6 +3,9 @@ package org.jabref.model.study;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -39,6 +42,15 @@ public class StudyQuery {
 
     public void setCatalogSpecific(Map<String, String> catalogSpecific) {
         this.catalogSpecific = catalogSpecific != null ? catalogSpecific : new LinkedHashMap<>();
+    }
+
+    /// Returns the first non-blank override for the catalog, matched case-insensitively.
+    public Optional<String> getCatalogOverride(String catalogName) {
+        return catalogSpecific.entrySet().stream()
+                              .filter(entry -> entry.getKey().equalsIgnoreCase(catalogName))
+                              .map(Map.Entry::getValue)
+                              .filter(StringUtil::isNotBlank)
+                              .findFirst();
     }
 
     @Override
