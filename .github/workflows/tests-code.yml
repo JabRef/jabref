@@ -242,22 +242,15 @@ jobs:
 
   typos:
     name: Spelling
-    # Only changed files are checked, because the existing code base still contains many typos
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          fetch-depth: 0
           submodules: 'false'
           show-progress: 'false'
-      - name: Check spelling of changed files
-        shell: bash
-        # --force-exclude applies the excludes of _typos.toml also to explicitly passed files
-        run: |
-          git diff -z --name-only --diff-filter=d "origin/${{ github.base_ref }}...HEAD" \
-            | xargs -0 --no-run-if-empty pipx run typos==1.50.3 --force-exclude
+      - name: Check spelling
+        run: pipx run typos==1.50.3
 
   yaml:
     name: YAML
