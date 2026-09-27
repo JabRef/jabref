@@ -29,6 +29,7 @@ public class PubPeerResponseParser {
 
     public List<PubPeerFeedback> parse(String response) throws FetcherException {
         if (!response.stripLeading().startsWith("{")) {
+            LOGGER.debug("Expected a JSON object from PubPeer, but received: {}", response);
             throw new FetcherException("Expected a JSON object in PubPeer response");
         }
         try {
