@@ -45,7 +45,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         database.insertEntry(second);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
 
         Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
@@ -76,7 +76,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
 
         Path csvFile = tempDir.resolve("checkDifferentOutputSymbols-result.csv");
@@ -122,7 +122,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         database.insertEntry(fifth);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
 
         Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
@@ -161,7 +161,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
         });
 
         Path csvFile = tempDir.resolve("checkLibraryWithoutIssues-result.csv");

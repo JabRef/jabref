@@ -137,7 +137,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                     return null;
                 }
             }
-                    .onSuccess(result -> {
+                    .onSuccess(_ -> {
                         if (showFeedback) {
                             showResults();
                         }

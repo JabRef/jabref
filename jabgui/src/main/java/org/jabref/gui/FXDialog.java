@@ -10,6 +10,7 @@ import javafx.stage.WindowEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.walkthrough.WalkthroughPane;
 
 /// This class provides a super class for all dialogs implemented in JavaFX.
 ///
@@ -44,12 +45,12 @@ public class FXDialog extends Alert {
     public FXDialog(AlertType type, boolean isModal) {
         super(type);
 
+        setUpDialogPane(getDialogPane());
         dialogPaneProperty().addListener((_, _, newPane) -> {
             if (newPane != null) {
-                setupKeyBindings(newPane);
+                setUpDialogPane(newPane);
             }
         });
-        setupKeyBindings(getDialogPane());
 
         setDialogIcon(IconTheme.getJabRefIcon());
 
@@ -68,8 +69,10 @@ public class FXDialog extends Alert {
         this(type, true);
     }
 
-    private void setupKeyBindings(DialogPane newPane) {
-        newPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> BaseDialog.closeOnKeyBindingMatch(event, this));
+    /// Same as [BaseDialog]: key bindings and the walkthrough pane belong to the dialog pane.
+    private void setUpDialogPane(DialogPane dialogPane) {
+        dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> BaseDialog.closeOnKeyBindingMatch(event, this));
+        dialogPane.getChildren().add(new WalkthroughPane());
     }
 
     private void setDialogIcon(Image image) {

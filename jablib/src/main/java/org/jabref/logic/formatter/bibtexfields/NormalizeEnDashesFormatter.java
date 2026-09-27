@@ -19,7 +19,7 @@ public class NormalizeEnDashesFormatter extends Formatter {
 
     @Override
     public String format(@NonNull String value) {
-        return value.replaceAll(" - ", " -- ");
+        return value.replace(" - ", " -- ");
     }
 
     @Override

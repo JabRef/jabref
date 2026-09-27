@@ -167,7 +167,7 @@ public class NamedRangeReferenceMark implements NamedRange {
             NoDocumentException,
             WrappedTargetException {
         return UnoReferenceMark.getAnchor(doc, refMarkName)
-                               .map(entry -> new NamedRangeReferenceMark(refMarkName));
+                               .map(_ -> new NamedRangeReferenceMark(refMarkName));
     }
 
     /// Remove it from the document.

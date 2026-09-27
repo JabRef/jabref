@@ -18,6 +18,12 @@ public final class BSTFormatUtils {
     private static final Pattern INLINE_MATH_SPAN = Pattern.compile("(?s)<span\\s+class=\\\"math inline\\\"[^>]*>(.*?)</span>");
     private static final Pattern BRACED_ETALCHAR_PATTERN = Pattern.compile("\\{\\\\etalchar\\{([^}]*)}}");
     private static final Pattern ETALCHAR_PATTERN = Pattern.compile("\\\\etalchar\\{([^}]*)}");
+    private static final Pattern DIV_OPEN_TAG = Pattern.compile("<div[^>]*>");
+    private static final Pattern A_OPEN_TAG = Pattern.compile("<a[^>]*>");
+    private static final Pattern REMAINING_SPAN_TAGS = Pattern.compile("</?span[^>]*>");
+    private static final Pattern LINE_BREAKS = Pattern.compile("[\n\r]+");
+    private static final Pattern LEADING_EMPTY_PARAGRAPH_MARKER = Pattern.compile("^\\s*<p>\\s*</p>");
+    private static final Pattern TRAILING_EMPTY_PARAGRAPH_MARKERS = Pattern.compile("(?:<p>\\s*</p>\\s*){2,}$");
 
     private BSTFormatUtils() {
     }
@@ -147,25 +153,25 @@ public final class BSTFormatUtils {
         html = StringEscapeUtils.unescapeHtml4(html);
 
         // Strip <div> tags (pandoc emits them for block-level content such as block quotes)
-        html = html.replaceAll("<div[^>]*>", "");
+        html = DIV_OPEN_TAG.matcher(html).replaceAll("");
         html = html.replace("</div>", "");
 
         // Strip hyperlinks - LibreOffice OOText does not support arbitrary <a> links
-        html = html.replaceAll("<a[^>]*>", "");
+        html = A_OPEN_TAG.matcher(html).replaceAll("");
         html = html.replace("</a>", "");
 
         // Strip remaining <span> tags (pandoc-specific semantic tags are already handled
         // earlier by mapPandocInlineToOO before this method is called)
-        html = html.replaceAll("</?span[^>]*>", "");
+        html = REMAINING_SPAN_TAGS.matcher(html).replaceAll("");
 
         // Convert line breaks to OOText paragraph separators
-        html = html.replaceAll("[\n\r]+", "<p></p>");
+        html = LINE_BREAKS.matcher(html).replaceAll("<p></p>");
 
         // Remove a leading empty paragraph separator
-        html = html.replaceAll("^\\s*<p>\\s*</p>", "");
+        html = LEADING_EMPTY_PARAGRAPH_MARKER.matcher(html).replaceAll("");
 
         // Collapse two or more consecutive trailing paragraph separators into one
-        html = html.replaceAll("(?:<p>\\s*</p>\\s*){2,}$", "<p></p>");
+        html = TRAILING_EMPTY_PARAGRAPH_MARKERS.matcher(html).replaceAll("<p></p>");
 
         return html.trim();
     }

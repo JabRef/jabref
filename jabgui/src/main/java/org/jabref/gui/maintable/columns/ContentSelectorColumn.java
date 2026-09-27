@@ -50,7 +50,7 @@ public class ContentSelectorColumn extends MainTableColumn<Optional<String>> {
 
         for (String item : values) {
             MenuItem menuItem = new MenuItem(item);
-            menuItem.setOnAction(event -> {
+            menuItem.setOnAction(_ -> {
                 UndoableFieldChange change = new UndoableFieldChange(entry, field, entry.getField(field).orElse(null), item);
                 stateManager.getUndoManager(model.getBibDatabaseContext()).applyEdit(change);
             });
