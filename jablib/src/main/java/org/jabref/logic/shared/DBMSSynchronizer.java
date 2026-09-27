@@ -134,6 +134,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final Set<Integer> sharedIdsInConflict = ConcurrentHashMap.newKeySet();
     // The shared metadata as last pulled or written: the merge base for metadata recorded offline
     private volatile Map<String, String> lastSharedMetaData = Map.of();
+    // Only model-thread applications count here; local writes also change lastSharedMetaData.
+    private Map<String, String> lastAppliedRemoteMetaData = Map.of();
+    private boolean hasAppliedRemoteMetaData;
     private final String userAndHost;
     private final Executor remoteUpdateExecutor;
     private final Executor syncExecutor;
@@ -595,10 +598,20 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Model thread
     private void applyRemoteMetaData(Map<String, String> sharedMetaData) {
+        if (hasAppliedRemoteMetaData && sharedMetaData.equals(lastAppliedRemoteMetaData)) {
+            return;
+        }
         lastSharedMetaData = sharedMetaData;
         try {
             metaData.setEventPropagation(false);
             new MetaDataParser(fileMonitor).parse(metaData, sharedMetaData, keywordSeparator, userAndHost);
+            if (!sharedMetaData.containsKey(MetaData.GROUPSTREE)
+                    && !sharedMetaData.containsKey(MetaData.GROUPSTREE_LEGACY)
+                    && metaData.getGroups().isPresent()) {
+                metaData.clearGroups();
+            }
+            lastAppliedRemoteMetaData = Map.copyOf(sharedMetaData);
+            hasAppliedRemoteMetaData = true;
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         } finally {

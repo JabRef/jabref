@@ -41,10 +41,15 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.DatabaseTest;
 
+import com.google.common.eventbus.Subscribe;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -260,9 +265,15 @@ class DBMSSynchronizerTest {
         CountDownLatch allowFirstMetadataReadToReturn = new CountDownLatch(1);
         CountDownLatch secondMetadataReadFinished = new CountDownLatch(1);
         AtomicInteger metadataReadCount = new AtomicInteger();
+        AtomicInteger groupApplicationCount = new AtomicInteger();
         BlockingQueue<Runnable> pendingDatabaseTasks = new LinkedBlockingQueue<>();
         BibDatabase remoteDatabase = new BibDatabase();
         BibDatabaseContext remoteContext = new BibDatabaseContext(remoteDatabase);
+        GroupTreeNode groupRoot = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        groupRoot.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        MetaData groupMetaData = new MetaData();
+        groupMetaData.setGroups(groupRoot);
+        Map<String, String> groupSnapshot = MetaDataSerializer.getSerializedStringMap(groupMetaData, pattern);
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
 
@@ -280,7 +291,6 @@ class DBMSSynchronizerTest {
                     offlineChangesDirectory) {
                 @Override
                 Map<String, String> readSharedMetaData() throws SQLException {
-                    Map<String, String> sharedMetaData = super.readSharedMetaData();
                     if (metadataReadCount.incrementAndGet() == 1) {
                         firstMetadataReadFinished.countDown();
                         try {
@@ -294,11 +304,17 @@ class DBMSSynchronizerTest {
                     } else {
                         secondMetadataReadFinished.countDown();
                     }
-                    return sharedMetaData;
+                    return groupSnapshot;
                 }
             };
             remoteDatabase.registerListener(remoteSynchronizer);
             remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+            remoteContext.getMetaData().registerListener(new Object() {
+                @Subscribe
+                public void onGroupUpdated(GroupUpdatedEvent event) {
+                    groupApplicationCount.incrementAndGet();
+                }
+            });
 
             try {
                 remoteSynchronizer.handleRemoteMetaDataChange();
@@ -317,6 +333,8 @@ class DBMSSynchronizerTest {
                 taskExecutor.submit(secondDatabaseTask).get(5, TimeUnit.SECONDS);
                 assertTrue(secondMetadataReadFinished.await(5, TimeUnit.SECONDS));
                 assertEquals(2, metadataReadCount.get());
+                assertEquals(Optional.of(groupRoot), remoteContext.getMetaData().getGroups());
+                assertEquals(1, groupApplicationCount.get());
             } finally {
                 allowFirstMetadataReadToReturn.countDown();
                 remoteSynchronizer.closeSharedDatabase();
