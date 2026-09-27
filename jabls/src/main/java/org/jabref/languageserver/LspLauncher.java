@@ -16,6 +16,7 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.launch.LSPLauncher;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -101,6 +102,7 @@ public class LspLauncher extends Thread {
     }
 
     /// Only a standalone server may exit the JVM when a client sends `exit`; inside JabGui this would close JabRef.
+    @VisibleForTesting
     LspClientHandler createClientHandler() {
         return new LspClientHandler(messageHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager, standalone);
     }
