@@ -57,7 +57,8 @@ public class PubPeerResponseParser {
         }
         int totalComments = publication.getInt("total_comments");
         if (totalComments < 0) {
-            throw new FetcherException("Invalid comment count in PubPeer response");
+            LOGGER.debug("Negative total comments number: {}", totalComments);
+            totalComments = 0;
         }
         List<String> users = USER_SEPARATOR.splitAsStream(publication.getString("users"))
                                            .map(String::strip)
