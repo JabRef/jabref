@@ -161,8 +161,12 @@ public class MarcXmlImporter extends Importer {
                 depth++;
                 if (depth == 2) {
                     recognized |= switch (reader.getLocalName()) {
-                        case "leader", "controlfield", "datafield" -> true;
-                        default -> false;
+                        case "leader",
+                             "controlfield",
+                             "datafield" ->
+                                true;
+                        default ->
+                                false;
                     };
                     if ("datafield".equals(reader.getLocalName())) {
                         writer.writeStartElement("datafield");
