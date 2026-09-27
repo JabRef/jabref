@@ -409,11 +409,13 @@ class BibliographyConsistencyCheckTest {
         BibEntry a = new BibEntry(StandardEntryType.Misc, "a")
                 .withField(StandardField.COMMENT, "note")
                 .withField(StandardField.PDF, "file.pdf")
+                .withField(StandardField.FILE, ":home/user/pdf/file.pdf:PDF")
                 .withField(new UserSpecificCommentField("XYZ"), "foo")
                 .withField(SpecialField.PRIORITY, "high");
         BibEntry b = new BibEntry(StandardEntryType.Misc, "b")
                 .withField(StandardField.COMMENT, "another note")
-                .withField(StandardField.PDF, "other.pdf");
+                .withField(StandardField.PDF, "other.pdf")
+                .withField(StandardField.FILE, ":home/user/pdf/other.pdf:PDF");
 
         BibDatabase bibDatabase = new BibDatabase(List.of(a, b));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);

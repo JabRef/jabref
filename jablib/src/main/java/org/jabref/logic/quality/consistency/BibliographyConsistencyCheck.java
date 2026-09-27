@@ -41,6 +41,7 @@ public class BibliographyConsistencyCheck {
             StandardField.CROSSREF,
             StandardField.CITES,
             StandardField.PDF,
+            StandardField.FILE,
             StandardField.REVIEW,
             StandardField.SORTKEY,
             StandardField.SORTNAME,
