@@ -33,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where entries of type Misc were penalized too strictly during duplicate detection. [#16578](https://github.com/JabRef/jabref/issues/16578)
 - We fixed an issue where the "Simple HTML" export separated author initials with spaces. [#17306](https://github.com/JabRef/jabref/pull/17306)
 - We fixed an issue where "Community forum" in the Help menu opened the donation page instead of the forum. [#17162](https://github.com/JabRef/jabref/pull/17162)
+- We fixed an issue where the Semantic Scholar API key was ignored when fetching citations and references. [#17291](https://github.com/JabRef/jabref/issues/17291)
 
 ### Removed
 
