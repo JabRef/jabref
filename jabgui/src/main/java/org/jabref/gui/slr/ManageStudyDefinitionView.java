@@ -296,6 +296,8 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                         setGraphic(null);
                     } else {
                         textField.setText(item == null ? "" : item);
+                        // Values of disabled catalogs are not saved
+                        textField.disableProperty().bind(getTableView().getItems().get(getIndex()).enabledProperty().not());
                         setGraphic(textField);
                     }
                 }
