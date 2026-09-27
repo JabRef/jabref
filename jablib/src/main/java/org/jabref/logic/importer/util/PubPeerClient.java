@@ -2,7 +2,6 @@ package org.jabref.logic.importer.util;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Locale;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.identifier.DOI;
@@ -38,7 +37,7 @@ public class PubPeerClient {
         }
 
         JSONObject body = new JSONObject().put("dois", dois.stream()
-                                                           .map(doi -> doi.asString().toLowerCase(Locale.ROOT))
+                                                           .map(DOI::asString)
                                                            .toList());
         HttpResponse<String> response;
         try {
