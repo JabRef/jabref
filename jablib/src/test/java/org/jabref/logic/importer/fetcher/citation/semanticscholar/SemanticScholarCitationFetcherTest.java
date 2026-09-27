@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -21,6 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExternalServicesTest
 class SemanticScholarCitationFetcherTest {
@@ -78,5 +82,56 @@ class SemanticScholarCitationFetcherTest {
         Optional<Integer> result = fetcher.getCitationCount(entry);
         assertNotNull(result.get());
         assertThat(result.get(), greaterThan(0));
+    }
+
+    @Test
+    void getCitationsLooksUpApiKeyUnderSemanticScholarFetcherName() {
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME)).thenReturn(Optional.empty());
+        SemanticScholarCitationFetcher fetcherWithMockedPreferences = new SemanticScholarCitationFetcher(importerPreferences);
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1016/j.appet.2007.05.004");
+
+        try {
+            fetcherWithMockedPreferences.getCitations(entry);
+        } catch (FetcherException e) {
+            // The live network outcome is irrelevant here; only the API-key lookup name matters.
+        }
+
+        verify(importerPreferences).getApiKey(SemanticScholar.FETCHER_NAME);
+        verify(importerPreferences, never()).getApiKey(SemanticScholarCitationFetcher.FETCHER_NAME);
+    }
+
+    @Test
+    void getReferencesLooksUpApiKeyUnderSemanticScholarFetcherName() {
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME)).thenReturn(Optional.empty());
+        SemanticScholarCitationFetcher fetcherWithMockedPreferences = new SemanticScholarCitationFetcher(importerPreferences);
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1016/j.appet.2007.05.004");
+
+        try {
+            fetcherWithMockedPreferences.getReferences(entry);
+        } catch (FetcherException e) {
+            // The live network outcome is irrelevant here; only the API-key lookup name matters.
+        }
+
+        verify(importerPreferences).getApiKey(SemanticScholar.FETCHER_NAME);
+        verify(importerPreferences, never()).getApiKey(SemanticScholarCitationFetcher.FETCHER_NAME);
+    }
+
+    @Test
+    void getCitationCountLooksUpApiKeyUnderSemanticScholarFetcherName() {
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME)).thenReturn(Optional.empty());
+        SemanticScholarCitationFetcher fetcherWithMockedPreferences = new SemanticScholarCitationFetcher(importerPreferences);
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1016/j.appet.2007.05.004");
+
+        try {
+            fetcherWithMockedPreferences.getCitationCount(entry);
+        } catch (FetcherException e) {
+            // The live network outcome is irrelevant here; only the API-key lookup name matters.
+        }
+
+        verify(importerPreferences).getApiKey(SemanticScholar.FETCHER_NAME);
+        verify(importerPreferences, never()).getApiKey(SemanticScholarCitationFetcher.FETCHER_NAME);
     }
 }
