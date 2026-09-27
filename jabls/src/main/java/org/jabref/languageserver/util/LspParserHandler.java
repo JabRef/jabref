@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 
@@ -92,7 +93,7 @@ public class LspParserHandler {
     /// Parses the `.bib` files listed in the `bibliography` key of the YAML front matter of the given Markdown document.
     /// Relative paths are resolved against the directory of the Markdown document.
     ///
-    /// @see <a href="https://pandoc.org/MANUAL.html#specifying-bibliographic-data">Pandoc: Specifying bibliographic data</a>
+    /// See [Pandoc: Specifying bibliographic data](https://pandoc.org/MANUAL.html#specifying-bibliographic-data).
     // [impl->req~jabls.markdown.front-matter-bibliography~1]
     public void loadBibliographiesFromFrontMatter(String markdownUri, String content, ImportFormatPreferences importFormatPreferences) {
         Optional<Path> markdownPath = toPath(markdownUri);
@@ -103,7 +104,7 @@ public class LspParserHandler {
             try {
                 Path bibPath = markdownPath.get().resolveSibling(bibliography).normalize();
                 if (!openInEditor.contains(bibPath)) {
-                    parse(bibPath, Files.readString(bibPath), importFormatPreferences);
+                    parse(bibPath, Files.readString(bibPath, BibtexImporter.getEncoding(bibPath)), importFormatPreferences);
                 }
             } catch (InvalidPathException | IOException | JabRefException e) {
                 LOGGER.debug("Could not load bibliography {} referenced from {}", bibliography, markdownUri, e);
@@ -118,7 +119,11 @@ public class LspParserHandler {
         }
         JsonNode bibliography;
         try {
-            bibliography = YAML_MAPPER.readTree(matcher.group("yaml")).path("bibliography");
+            JsonNode frontMatter = YAML_MAPPER.readTree(matcher.group("yaml"));
+            if (frontMatter == null) {
+                return List.of();
+            }
+            bibliography = frontMatter.path("bibliography");
         } catch (JacksonException e) {
             LOGGER.debug("Could not parse front matter", e);
             return List.of();

@@ -41,6 +41,11 @@ class LspParserHandlerTest {
                         ---
                         """),
                 Arguments.of(List.of(), """
+                        ---
+
+                        ---
+                        """),
+                Arguments.of(List.of(), """
                         # No front matter
 
                         ---

@@ -88,6 +88,12 @@ class MarkdownDefinitionProviderTest {
     }
 
     @Test
+    void noHoverOnSeparatorAfterKey() {
+        int column = "Starting literature: [@Corti_2009".length();
+        assertTrue(provider.provideHover(MARKDOWN, new Position(4, column)).isEmpty());
+    }
+
+    @Test
     void unsavedEditorContentIsNotReplacedByFileOnDisk() throws Exception {
         parserHandler.parserResultFromString(tempDir.resolve("Chocolate.bib").toUri().toString(), """
                 @Article{Cooper_2007,

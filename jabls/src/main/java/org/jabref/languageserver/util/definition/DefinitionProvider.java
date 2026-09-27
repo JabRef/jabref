@@ -126,7 +126,7 @@ public abstract class DefinitionProvider {
         }
 
         for (KeyBounds kb : findCitationKeys(content)) {
-            if (caret >= kb.start() && caret <= kb.end()) {
+            if (caret >= kb.start() && caret < kb.end()) {
                 return Optional.of(kb.key());
             }
         }
