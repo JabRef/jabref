@@ -1,8 +1,13 @@
 package org.jabref.gui.search;
 
+import java.io.IOException;
+import java.util.List;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
@@ -11,7 +16,10 @@ import javafx.stage.Stage;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -19,13 +27,21 @@ import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.BibtexString;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GlobalSearchResultDialog extends BaseDialog<Void> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchResultDialog.class);
 
     @FXML private SplitPane container;
     @FXML private ToggleButton keepOnTop;
@@ -40,6 +56,8 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private ClipBoardManager clipBoardManager;
+    @Inject private BibEntryTypesManager entryTypesManager;
 
     public GlobalSearchResultDialog(LibraryTabContainer libraryTabContainer) {
         this.libraryTabContainer = libraryTabContainer;
@@ -79,6 +97,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         Stage stage = (Stage) getDialogPane().getScene().getWindow();
 
         setupTableDoubleClickHandler(resultsTable, stage);
+        setupTableCopyHandler(resultsTable);
 
         container.getItems().addAll(resultsTable, previewViewer);
 
@@ -122,6 +141,30 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                 if (!keepOnTop.isSelected()) {
                     stage.hide();
                 }
+            }
+        });
+    }
+
+    private void setupTableCopyHandler(SearchResultsTable resultsTable) {
+        KeyBindingRepository keyBindingRepository = preferences.getKeyBindingRepository();
+        resultsTable.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (keyBindingRepository.mapToKeyBinding(event).filter(KeyBinding.COPY::equals).isEmpty()) {
+                return;
+            }
+            BibEntryTableViewModel selected = resultsTable.getSelectionModel().getSelectedItem();
+            if (selected == null) {
+                return;
+            }
+            BibEntry entry = selected.getEntry();
+            BibDatabaseContext context = selected.getBibDatabaseContext();
+            List<BibtexString> stringConstants = context.getDatabase().getUsedStrings(List.of(entry));
+            try {
+                clipBoardManager.setContent(TransferMode.COPY, context, List.of(entry), entryTypesManager, stringConstants);
+                dialogService.notify(Localization.lang("Copied %0 entry(s)", 1));
+                event.consume();
+            } catch (IOException e) {
+                LOGGER.warn("Could not copy selected entry to clipboard", e);
+                dialogService.notify(Localization.lang("Copy failed"));
             }
         });
     }
