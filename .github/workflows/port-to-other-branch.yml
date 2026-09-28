@@ -165,8 +165,8 @@ jobs:
         id: port
         uses: korthout/backport-action@2e830a1d0b8269505846ddd407a70876913ad1f8 # v4.6.0
         with:
-          # A PAT, so that CI runs on the port PR and jabref-machine (another account) can approve it
-          github_token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
+          # A PAT, so that CI runs on the port PR; the PR and its comment are authored by jabref-machine
+          github_token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           target_branches: ${{ env.TARGET }}
           # The target comes from the base branch and the label above, not from "backport <branch>" labels
           label_pattern: ^()$
@@ -183,11 +183,14 @@ jobs:
       - name: Auto-merge a clean port
         if: steps.port.outputs.was_successful == 'true'
         env:
-          # jabref-machine's token: "On PR labeled" only fires for labels added with a PAT, and it approves as jabref-machine
+          # jabref-machine's token: "On PR labeled" only fires for labels added with a PAT
           GH_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
+          APPROVE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CREATED: ${{ steps.port.outputs.created_pull_numbers }}
         run: |
           for pr in $CREATED; do
+            # jabref-machine cannot approve its own PR; github-actions[bot] does it instead
+            GH_TOKEN="$APPROVE_TOKEN" gh pr review --approve "$pr"
             gh pr edit "$pr" --add-label automerge
             echo "✅ Port PR #$pr opened with auto-merge" >> "$GITHUB_STEP_SUMMARY"
           done
