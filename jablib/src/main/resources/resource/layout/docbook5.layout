@@ -1,4 +1,4 @@
-<!--Default fallback for unkown entry types -->
+<!--Default fallback for unknown entry types -->
 <biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\author} (\year)" xml:id="\citationkey">
    <authorgroup>
 <!--AUTHORS-->
