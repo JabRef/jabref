@@ -163,7 +163,7 @@ public class OOTextIntoOO {
             String tagName = isStartTag ? startTagName : endTagName;
             Objects.requireNonNull(tagName);
 
-            // Attibutes parsed into (name,value) pairs.
+            // Attributes parsed into (name,value) pairs.
             List<OOPair<String, String>> attributes = parseAttributes(attributeListPart);
 
             // Handle tags:
@@ -746,7 +746,7 @@ public class OOTextIntoOO {
         } catch (UnknownPropertyException
                  | PropertyVetoException
                  | IllegalArgumentException
-                 | WrappedTargetException ex) {
+                 | WrappedTargetException _) {
             return FAIL;
         }
     }

@@ -57,12 +57,12 @@ public class FileAnnotationTabView {
 
         // Set-up files list
         files.getItems().setAll(viewModel.filesProperty().get());
-        files.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedFile(newValue));
+        files.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> viewModel.notifyNewSelectedFile(newValue));
         files.getSelectionModel().selectFirst();
 
         // Set-up annotation list
         annotationList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.notifyNewSelectedAnnotation(newValue));
+        annotationList.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> viewModel.notifyNewSelectedAnnotation(newValue));
         ViewModelListCellFactory<FileAnnotationViewModel> cellFactory = new ViewModelListCellFactory<FileAnnotationViewModel>()
                 .withGraphic(this::createFileAnnotationNode);
         annotationList.setCellFactory(cellFactory);
@@ -70,7 +70,7 @@ public class FileAnnotationTabView {
         Bindings.bindContent(annotationList.itemsProperty().get(), viewModel.annotationsProperty());
         annotationList.getSelectionModel().selectFirst();
         annotationList.itemsProperty().get().addListener(
-                (ListChangeListener<? super FileAnnotationViewModel>) c -> annotationList.getSelectionModel().selectFirst());
+                (ListChangeListener<? super FileAnnotationViewModel>) _ -> annotationList.getSelectionModel().selectFirst());
 
         // Set-up details pane
         content.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::contentProperty));

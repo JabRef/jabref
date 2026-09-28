@@ -46,7 +46,7 @@ public class SearchResultsTableDataModel {
         this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
 
         populateEntriesViewModel();
-        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> {
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> {
             populateEntriesViewModel();
             updateSearchMatches(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).getValue());
         });

@@ -228,6 +228,31 @@ class MarkdownTextFlowTest extends JavaFxTest {
         assertEquals("https://example.com", clickedUrl.get());
     }
 
+    @Test
+    void mouseClickOnHyperlinkInvokesCustomHandler() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+        AtomicReference<String> clickedUrl = new AtomicReference<>();
+
+        interact(() -> {
+            textFlow.setHyperlinkHandler(clickedUrl::set);
+            textFlow.setMarkdown("[link](https://example.com)");
+            rootPane.applyCss();
+            rootPane.layout();
+        });
+        awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            Hyperlink hyperlink = (Hyperlink) textFlow.getChildren().getFirst();
+            Bounds bounds = hyperlink.localToScreen(hyperlink.getBoundsInLocal());
+            Robot robot = new Robot();
+            robot.mouseMove(bounds.getCenterX(), bounds.getCenterY());
+            robot.mouseClick(MouseButton.PRIMARY);
+        });
+        awaitEvents();
+
+        assertEquals("https://example.com", clickedUrl.get());
+    }
+
     private static int childCount(MarkdownTextFlow textFlow) {
         AtomicReference<Integer> childCountReference = new AtomicReference<>();
         JavaFxExtension.invokeAndWait(() -> childCountReference.set(textFlow.getChildren().size()));

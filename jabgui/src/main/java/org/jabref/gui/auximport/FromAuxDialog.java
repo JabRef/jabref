@@ -69,7 +69,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
         new ViewModelListCellFactory<BibDatabaseContext>()
                 .withText(viewModel::getDatabaseName)
                 .install(libraryListView);
-        EasyBind.listen(libraryListView.getSelectionModel().selectedItemProperty(), (obs, oldValue, newValue) -> parseActionPerformed());
+        EasyBind.listen(libraryListView.getSelectionModel().selectedItemProperty(), (_, _, _) -> parseActionPerformed());
     }
 
     @FXML

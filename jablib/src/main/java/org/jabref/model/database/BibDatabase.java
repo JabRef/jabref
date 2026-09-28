@@ -671,7 +671,7 @@ public class BibDatabase {
                 for (String rawKey : newValue.split(",")) {
                     if (!StringUtil.isBlank(rawKey)) {
                         String newKey = rawKey.trim();
-                        citationIndex.computeIfAbsent(newKey, k -> ConcurrentHashMap.newKeySet()).add(entry);
+                        citationIndex.computeIfAbsent(newKey, _ -> ConcurrentHashMap.newKeySet()).add(entry);
                     }
                 }
             }

@@ -9,6 +9,7 @@ import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.models.AiModelService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.model.ai.llm.AiProvider;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +72,69 @@ class AiTabViewModelTest {
 
         assertFalse(enabledViewModel.disableBasicSettingsProperty().get());
         assertFalse(enabledViewModel.disableExpertSettingsProperty().get());
+    }
+
+    @Test
+    void connectionUsesEnteredValues() throws Exception {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("granite4.2:8b");
+        viewModel.apiKeyProperty().set("key");
+        viewModel.customizeExpertSettingsProperty().set(true);
+        viewModel.apiBaseUrlProperty().set("http://localhost:11434/v1");
+        when(aiModelService.testConnection(eq(AiProvider.OPEN_AI), eq("granite4.2:8b"), eq("key"), anyDouble(), eq("http://localhost:11434/v1"), anyInt(), any()))
+                .thenReturn("OK");
+
+        assertEquals("OK", viewModel.testConnectionTask().call());
+    }
+
+    @Test
+    void connectionUsesProviderUrlWithoutExpertSettings() throws Exception {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-4o");
+        viewModel.apiKeyProperty().set("key");
+        viewModel.apiBaseUrlProperty().set("http://localhost:11434/v1");
+        when(aiModelService.testConnection(eq(AiProvider.OPEN_AI), eq("gpt-4o"), eq("key"), anyDouble(), eq(AiProvider.OPEN_AI.getApiUrl()), anyInt(), any()))
+                .thenReturn("OK");
+
+        assertEquals("OK", viewModel.testConnectionTask().call());
+    }
+
+    @Test
+    void connectionTestSucceeds() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-4o");
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any())).thenReturn("OK");
+
+        viewModel.testConnection();
+
+        assertEquals(AiTabViewModel.ConnectionTestState.SUCCESS, viewModel.connectionTestStateProperty().get());
+        assertEquals("", viewModel.connectionTestDetailsProperty().get());
+    }
+
+    @Test
+    void connectionTestShowsOllamaPullCommandForMissingModel() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.selectedChatModelProperty().set("gpt-oss20b");
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any()))
+                .thenThrow(new RuntimeException("404 - message: model 'gpt-oss20b' not found"));
+
+        viewModel.testConnection();
+
+        assertEquals(AiTabViewModel.ConnectionTestState.FAILED, viewModel.connectionTestStateProperty().get());
+        assertTrue(viewModel.connectionTestDetailsProperty().get().contains("ollama pull gpt-oss20b"));
+    }
+
+    @Test
+    void connectionTestResultResetsWhenApiKeyChanges() {
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        when(aiModelService.testConnection(any(), any(), any(), anyDouble(), any(), anyInt(), any()))
+                .thenThrow(new RuntimeException("401"));
+        viewModel.testConnection();
+
+        viewModel.apiKeyProperty().set("other-key");
+
+        assertEquals(AiTabViewModel.ConnectionTestState.IDLE, viewModel.connectionTestStateProperty().get());
+        assertEquals("", viewModel.connectionTestDetailsProperty().get());
     }
 
     @Test

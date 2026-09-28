@@ -130,7 +130,7 @@ public class AiService implements AutoCloseable {
                 embeddingModelCache,
                 ingestionTaskAggregator
         );
-        this.currentEmbeddingModel.bind(ObservablesHelper.createClosableObjectBinding(
+        this.currentEmbeddingModel.bind(ObservablesHelper.createObjectBinding(
                 () -> EmbeddingModelFactory.create(aiPreferences, this.embeddingModelCache),
                 aiPreferences.getEmbeddingsProperties()
         ));

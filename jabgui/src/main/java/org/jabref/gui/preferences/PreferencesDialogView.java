@@ -72,7 +72,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         PreferencesSearchHandler searchHandler = new PreferencesSearchHandler(viewModel.getPreferenceTabs());
         preferencesTabList.itemsProperty().bindBidirectional(searchHandler.filteredPreferenceTabsProperty());
-        searchBox.textProperty().addListener((observable, previousText, newText) -> {
+        searchBox.textProperty().addListener((_, _, newText) -> {
             searchHandler.filterTabs(newText.toLowerCase(Locale.ROOT));
             preferencesTabList.getSelectionModel().clearSelection();
             preferencesTabList.getSelectionModel().selectFirst();

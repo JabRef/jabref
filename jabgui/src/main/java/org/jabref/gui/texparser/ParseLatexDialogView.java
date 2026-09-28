@@ -54,7 +54,7 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
 
         ViewLoader.view(this).load().setAsDialogPane(this);
 
-        ControlHelper.setAction(parseButtonType, getDialogPane(), event -> viewModel.parseButtonClicked());
+        ControlHelper.setAction(parseButtonType, getDialogPane(), _ -> viewModel.parseButtonClicked());
         Button parseButton = (Button) getDialogPane().lookupButton(parseButtonType);
         parseButton.disableProperty().bind(viewModel.noFilesFoundProperty().or(
                 Bindings.isEmpty(viewModel.getCheckedFileList())));
