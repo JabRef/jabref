@@ -3,6 +3,15 @@ parent: Requirements
 ---
 # Import
 
+## Import MARC21-XML bibliographic records
+`req~import.marc21-xml~1`
+
+JabRef supports importing MARC21 bibliographic records encoded as [MARCXML](https://www.loc.gov/standards/marcxml/) and maps recognised fields according to the [MARC 21 Format for Bibliographic Data](https://www.loc.gov/marc/bibliographic/) and the [DNB MARC21 export format](https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21.html).
+
+An importer should prefer proper fulltext links (e.g. Volltext) for PDFs over other content links.
+
+Needs: impl, utest
+
 ## Normalize imported BibTeX keyword delimiters
 `req~import.bibtex.keywords.normalize-delimiters~1`
 

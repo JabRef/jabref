@@ -257,16 +257,21 @@ public final class HayagrivaMapping {
     }
 
     /// Hayagriva person strings already use BibTeX's structured "Family, Given" form and are kept
-    /// verbatim; the structured map form is converted to it.
+    /// verbatim; the structured map form is converted to it. A name without given name is one
+    /// family name in Hayagriva (`Some company`); BibTeX needs braces to not split it.
     private static Optional<String> formatPerson(JsonNode personNode) {
         if (personNode.isObject()) {
             // Structured form: `name` is the family name, next to optional `given-name`, `prefix`, `suffix`, `alias`
             return scalarText(personNode.get("name"))
                     .map(name -> scalarText(personNode.get("given-name"))
                             .map(givenName -> name + ", " + givenName)
-                            .orElse(name));
+                            .orElseGet(() -> protectFamilyName(name)));
         }
-        return scalarText(personNode);
+        return scalarText(personNode).map(name -> name.contains(",") ? name : protectFamilyName(name));
+    }
+
+    private static String protectFamilyName(String name) {
+        return name.contains(" ") ? "{" + name + "}" : name;
     }
 
     /// Returns the text of a scalar node (string, number, boolean); empty for containers and null.

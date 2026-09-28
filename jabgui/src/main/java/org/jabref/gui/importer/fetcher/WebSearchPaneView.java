@@ -126,7 +126,7 @@ public class WebSearchPaneView extends VBox {
         return search;
     }
 
-    /// Creatse help button for currently selected fetcher
+    /// Creates help button for currently selected fetcher
     private StackPane createHelpButtonContainer() {
         StackPane helpButtonContainer = new StackPane();
         ActionFactory factory = new ActionFactory();
