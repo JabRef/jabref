@@ -281,7 +281,7 @@ class GroupTreeViewModelTest {
     }
 
     @Test
-    void shouldShowDialogWhenCaseSensitivyDiffers() {
+    void shouldShowDialogWhenCaseSensitivityDiffers() {
         AbstractGroup oldGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordTest", false, ',', true);
         AbstractGroup newGroup = new WordKeywordGroup("group", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "keywordChanged", true, ',', true);
 
