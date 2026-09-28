@@ -34,6 +34,13 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Entries are keyed by the id of the in-memory entry they were taken from, so that a citation key change in memory
 /// does not break the association. The metadata is kept in its serialized form, which is the only way to snapshot it.
+///
+/// The Git merge ([org.jabref.logic.git.merge.BibFileMerger]) is the same three-way comparison with the same field
+/// rules, but takes its ancestor from the repository history: the merge-base commit
+/// ([org.jabref.logic.git.io.GitRevisionLocator#findMergeBase]), parsed into a library and matched by citation key.
+/// A library file outside a repository has no history, so this class remembers the ancestor itself, in memory, and
+/// renews it whenever library and file are known to match again: after loading, after saving, and after a review.
+/// The GUI maps its change objects onto it in `org.jabref.gui.collab.ChangeTriage`.
 @NullMarked
 public final class LibraryBaseline {
 

@@ -33,6 +33,13 @@ import org.jspecify.annotations.Nullable;
 /// Sorts the external changes of a library, as computed by [DatabaseChangeList#compareAndGetChanges], by the side
 /// that changed according to a [LibraryBaseline]. The policy lives in the baseline; this class only maps the GUI's
 /// [DatabaseChange] objects onto it.
+///
+/// Shared SQL libraries never come through here. [org.jabref.logic.shared.DBMSSynchronizer] pulls every newer
+/// database version of an entry straight into the library, because the database rather than a file is the source of
+/// truth; a local edit that a newer version overtook is refused on write
+/// ([org.jabref.logic.shared.event.UpdateRefusedEvent]) and offered for a merge as a whole entry. This triage instead
+/// merges a disk change into a locally edited entry field by field and only asks when the same field differs on both
+/// sides.
 @NullMarked
 public final class ChangeTriage {
 
