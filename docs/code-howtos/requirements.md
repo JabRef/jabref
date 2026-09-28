@@ -127,7 +127,7 @@ We use these artifact types:
 
 Throughout development, you will mainly work with `feat`, `req`, `impl`, and `utest`. Please try to use these four types, as the others are rarely needed and we do not have good examples for them.
 
-We would really like to use the `uman` artifact type, as new features often also need to be explained to users. At the time of writing, we do not use this type in the requirements because we do not have a cross-repository setup for OFT.
+We would really like to use the `uman` artifact type, as new features often also need to be explained to users. At the time of writing, please do not write them in the requirements, as we do not have a cross-repository setup for OFT.
 
 The boundary between `feat` and `req` can sometimes be debatable, because from a software engineering perspective they refer to the same thing. However, we assign them based on the outcome: a new fetcher is a feature, while special handling of a field is a requirement. This gives us an overview of what we have in JabRef.
 
