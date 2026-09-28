@@ -105,6 +105,8 @@ public class BibtexParser implements Parser {
     private PushbackReader pushbackReader;
     private BibDatabase database;
     private Set<BibEntryType> entryTypes;
+    // Kept across block parsing because skipOneNewline can consume the next line's boundary.
+    private boolean atLineStart;
     private boolean eof;
 
     private int line = 1;
@@ -217,6 +219,7 @@ public class BibtexParser implements Parser {
     }
 
     private void initializeParserResult(String newLineSeparator) {
+        atLineStart = true;
         database = new BibDatabase();
         database.setNewLineSeparator(newLineSeparator);
         entryTypes = new HashSet<>(); // To store custom entry types parsed.
@@ -226,18 +229,20 @@ public class BibtexParser implements Parser {
     // [impl->req~import.bibtex.percent-comments~1]
 
     /// Scans leading library comments for a shared SQL database ID and skips legacy encoding declarations.
-    /// Stops at the first `@` outside a percent comment, leaving that block marker for [#parseFileContent()].
-    /// An `@` later in a header comment is not part of the database ID; other library metadata is parsed there.
-    /// Consecutive backslashes distinguish percent comments from legacy escaped headers.
+    /// Stops before the first BibTeX block, leaving its `@` marker for [#parseFileContent()].
     private void parseDatabaseID() throws IOException {
-        boolean escaped = false;
-
         while (!eof) {
-            if (!escaped) {
-                skipWhitespace();
+            int character = read();
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return;
             }
 
-            char c = (char) read();
+            char c = (char) character;
+            if (c == '@') {
+                unread(c);
+                return;
+            }
 
             if (c == '%') {
                 skipWhitespaceOnLine();
@@ -247,25 +252,28 @@ public class BibtexParser implements Parser {
                     skipWhitespaceOnLine();
                     database.setSharedDatabaseID(parseTextToken().trim());
                     skipUntilEndOfLine();
+                    atLineStart = true;
+                    continue;
                 } else if (SaveConfiguration.ENCODING_PREFIX.trim().equals(label)) {
                     skipWhitespaceOnLine();
                     parseTextToken();
 
                     if (peek() != '@') {
                         skipUntilEndOfLine();
+                        atLineStart = true;
+                        continue;
                     }
-                } else if (!escaped) {
+                } else if (atLineStart) {
                     skipUntilEndOfLine();
+                    atLineStart = true;
+                    continue;
                 }
-            } else if (c == '@') {
-                unread(c);
-                break;
             }
 
-            if (c == '\\') {
-                escaped = !escaped;
-            } else {
-                escaped = false;
+            if ((c == '\n') || (c == '\r')) {
+                atLineStart = true;
+            } else if (!Character.isWhitespace(c)) {
+                atLineStart = false;
             }
         }
     }
@@ -332,8 +340,6 @@ public class BibtexParser implements Parser {
                     // Not a comment, preamble, or string. Thus, it is an entry
                         parseAndAddEntry(entryType);
             }
-
-            skipWhitespace();
         }
 
         int startLine = line;
@@ -667,9 +673,11 @@ public class BibtexParser implements Parser {
         skipSpace();
         if (peek() == '\r') {
             read();
+            atLineStart = true;
         }
         if (peek() == '\n') {
             read();
+            atLineStart = true;
         }
     }
 
@@ -1301,14 +1309,10 @@ public class BibtexParser implements Parser {
 
     // [impl->req~import.bibtex.percent-comments~1]
 
-    /// Finds the next delimiter after [#parseDatabaseID()] has scanned leading library comments.
-    /// Unescaped `%` starts a line comment; only an immediately preceding odd number of backslashes escapes it.
-    /// This counts consecutive backslashes outside entries, unlike `isEscapeSymbol(char)` for bracketed field content.
+    /// Finds the next delimiter outside an entry, skipping lines whose first non-whitespace character is `%`.
     ///
     /// @return whether the delimiter was found before the end of the file
     private boolean consumeUncritically(char expected) throws IOException {
-        boolean escaped = false;
-
         while (!eof) {
             int character = read();
 
@@ -1317,20 +1321,21 @@ public class BibtexParser implements Parser {
                 return false;
             }
 
-            if (character == expected) {
-                return true;
-            }
-
-            if ((character == '%') && !escaped) {
+            if ((character == '%') && atLineStart) {
                 skipUntilEndOfLine();
-                escaped = false;
+                atLineStart = true;
                 continue;
             }
 
-            if (character == '\\') {
-                escaped = !escaped;
-            } else {
-                escaped = false;
+            if (character == expected) {
+                atLineStart = false;
+                return true;
+            }
+
+            if ((character == '\n') || (character == '\r')) {
+                atLineStart = true;
+            } else if (!Character.isWhitespace((char) character)) {
+                atLineStart = false;
             }
         }
 

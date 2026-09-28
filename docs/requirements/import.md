@@ -23,10 +23,10 @@ Delimiter characters that are part of a keyword remain part of that keyword and 
 
 Needs: impl, utest
 
-## Ignore entry markers in percent comments
+## Ignore entry markers on percent-prefixed lines
 `req~import.bibtex.percent-comments~1`
 
-When importing BibTeX or BibLaTeX, JabRef ignores entry markers inside unescaped `%` comments, including comments containing recognized metadata.
+Outside BibTeX or BibLaTeX entries, JabRef ignores entry markers on lines whose first non-whitespace character is `%`, including leading library metadata comments.
 
 Immediately adjacent entry markers after legacy encoding declarations remain supported for backwards compatibility.
 

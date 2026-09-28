@@ -2143,8 +2143,9 @@ class BibtexParserTest {
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
-    @Test
-    void parseIgnoresAtSignInsidePercentCommentBetweenEntries() throws IOException {
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\r"})
+    void parseIgnoresAtSignInsidePercentCommentBetweenEntries(String newline) throws IOException {
         String bibtex = """
                 @article{first,
                   author = {First Author}
@@ -2155,7 +2156,7 @@ class BibtexParserTest {
                 }
                 """;
 
-        ParserResult result = parser.parse(Reader.of(bibtex));
+        ParserResult result = parser.parse(Reader.of(bibtex.replace("\n", newline)));
 
         assertFalse(result.hasWarnings());
         assertEquals(2, result.getDatabase().getEntries().size());
@@ -2164,6 +2165,23 @@ class BibtexParserTest {
                 result.getDatabase().getEntries().getFirst().getCitationKey());
         assertEquals(Optional.of("second"),
                 result.getDatabase().getEntries().get(1).getCitationKey());
+    }
+
+    // [utest->req~import.bibtex.percent-comments~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"@preamble{\"text\"}", "@string{journal = {Journal}}", "@comment{comment}"})
+    void parseIgnoresIndentedPercentCommentAfterBlock(String block) throws IOException {
+        String bibtex = block + "\n" + """
+                  % Comment containing @article{fake}
+                @article{real, author = {Real Author}}
+                """;
+
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
+        assertEquals(List.of("real"), result.getDatabase().getEntries().stream()
+                                            .map(entry -> entry.getCitationKey().orElseThrow())
+                                            .toList());
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
@@ -2205,19 +2223,19 @@ class BibtexParserTest {
 
     // [utest->req~import.bibtex.percent-comments~1]
     @Test
-    void parseDoesNotPreserveEscapeStateAcrossWhitespace() throws IOException {
+    void parsePreservesEntriesAfterPercentInOrdinaryText() throws IOException {
         String bibtex = """
-                \\
-                % First comment @article{fakeOne}
-                \\   % Second comment @article{fakeTwo}
-                @article{real, author = {Real Author}}""";
+                Some text 100% of entries @article{first, author = {First Author}}
+                  % Comment containing @article{fake}
+                More text 50% of entries @article{second, author = {Second Author}}
+                """;
 
         ParserResult result = parser.parse(Reader.of(bibtex));
 
         assertFalse(result.hasWarnings());
-        assertEquals(1, result.getDatabase().getEntries().size());
-        assertEquals(Optional.of("real"),
-                result.getDatabase().getEntries().getFirst().getCitationKey());
+        assertEquals(List.of("first", "second"), result.getDatabase().getEntries().stream()
+                                                       .map(entry -> entry.getCitationKey().orElseThrow())
+                                                       .toList());
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
@@ -2239,25 +2257,8 @@ class BibtexParserTest {
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
-    @Test
-    void parseUsesBackslashParityForPercentComments() throws IOException {
-        String bibtex = """
-                @article{first}
-                \\\\% Comment with @article{fake}
-                \\% Literal percent before @article{second}
-                """;
-
-        ParserResult result = parser.parse(Reader.of(bibtex));
-
-        assertFalse(result.hasWarnings());
-        assertEquals(List.of("first", "second"), result.getDatabase().getEntries().stream()
-                                                       .map(entry -> entry.getCitationKey().orElseThrow())
-                                                       .toList());
-    }
-
-    // [utest->req~import.bibtex.percent-comments~1]
     @ParameterizedTest
-    @ValueSource(strings = {"%\n", "%   \n", "%\t\n", "%\r\n", "%   \r\n", "%\r", "%\n%\t\n",
+    @ValueSource(strings = {"%\n", "  %\n", "%   \n", "%\t\n", "%\r\n", "%   \r\n", "%\r", "%\n%\t\n",
             "% Encoding:\n", "% Encoding: \t\r\n", "% DBID:\n", "% DBID: \t\r\n"})
     void parsePreservesEntryAfterBlankPercentComment(String comment) throws IOException {
         String entry = "@article{real, author = {Real Author}}";
