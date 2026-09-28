@@ -3,7 +3,7 @@ parent: Requirements
 ---
 # Import
 
-## Import MARC21-XML bibliographic records
+## JabRef must import MARC21-XML bibliographic records
 `req~import.marc21-xml~1`
 
 JabRef supports importing MARC21 bibliographic records encoded as [MARCXML](https://www.loc.gov/standards/marcxml/) and maps recognised fields according to the [MARC 21 Format for Bibliographic Data](https://www.loc.gov/marc/bibliographic/) and the [DNB MARC21 export format](https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21.html).
@@ -12,7 +12,7 @@ An importer should prefer proper fulltext links (e.g. Volltext) for PDFs over ot
 
 Needs: impl, utest
 
-## Normalize imported BibTeX keyword delimiters
+## Importer must normalize imported BibTeX keyword delimiters
 `req~import.bibtex.keywords.normalize-delimiters~1`
 
 When importing BibTeX entries, JabRef applies the "Normalize keyword delimiters" cleanup (see `req~save.keywords.normalize-delimiters~1`) to every imported entry, so groups, search, and the keyword editor split the field on the library's separator from the start.
@@ -23,14 +23,14 @@ Delimiter characters that are part of a keyword remain part of that keyword and 
 
 Needs: impl, utest
 
-## Imported entries stay locatable in the library
+## Library must maintain imported entries sorted by internal id
 `req~import.entries.sorted-by-id~1`
 
 Entries are kept in the library in the order of their internal ids, regardless of the order in which a batch of imported entries arrives (e.g. after per-entry background duplicate checks). Looking up an entry's position in the library therefore succeeds for every imported entry, so the main table can select and update it.
 
 Needs: impl, utest
 
-## Unresolved merge conflict markers abort the import
+## Importer must abort when unresolved merge conflict markers are detected
 `req~import.bibtex.merge-conflict-markers~1`
 
 A BibTeX file that still contains version control conflict markers is rejected with an error naming the line of the first marker, instead of importing an arbitrary side of the conflict or storing the markers inside an entry.
@@ -39,14 +39,12 @@ The `=======` and `|||||||` lines of a conflict are not looked for on their own:
 
 Needs: impl, utest
 
-## A library that cannot be read is reported and leaves no tab behind
+## JabRef must report unreadable libraries and close temporary tab
 `req~import.library.unreadable-reported~1`
 
-When a library file cannot be read or parsed at all, JabRef names the file and the reason it failed, instead of failing silently or only logging it.
+When a library file cannot be read or parsed at all, JabRef names the file and the reason it failed, and leaves no open tab behind. A file that parses with warnings is not affected: it still opens, and its warnings are reported separately.
 
-No library tab is left behind for such a file. The tab that was opened to hold the loading library would otherwise stay as an empty, untitled library, which the user could save over the file that had just failed to load.
-
-A file that parses with warnings is not affected: it still opens, and its warnings are reported separately.
+Rationale: Closing the tab prevents leaving an empty, untitled library that the user could accidentally save over the original file that failed to load.
 
 Needs: impl, utest
 

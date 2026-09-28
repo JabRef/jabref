@@ -109,6 +109,32 @@ Markdown:
 <!-- [dsn->req~ai.summarization.general.storage~1] -->
 ```
 
+## Linking requirements across layers with `Covers:`
+
+If you have a broader feature (`feat`) and one or more detailed requirements (`req`) that detail or constrain that feature, you can indicate that the requirement is part of the feature by adding `Covers:` to the requirement:
+
+```markdown
+### Detailed requirement
+`req~ai.chat.markdown-tables~1`
+
+Markdown tables within AI chat responses must be rendered legibly.
+
+Needs: impl
+
+Covers:
+
+- feat~ai.chatting~1
+```
+
+This establishes a link between the child requirement and the parent feature in OpenFastTrace. You can also list multiple parent features if a requirement contributes to more than one:
+
+```markdown
+Covers:
+
+- feat~ai.chatting~1
+- feat~ai.llms~1
+```
+
 ## Conventions used in JabRef
 
 For requirement IDs, we follow the OFT standard artifact types, with the addition of `adr`. For the main part, we separate the path with `.`, and separate words with a hyphen, as in the example above.
@@ -155,9 +181,10 @@ Use it only for what the title cannot carry:
 
 - the triggering condition;
 - edge cases or boundary behavior;
-- a brief rationale if needed;
 - the GitHub issue;
 - other relevant context.
+
+If you need to explain the reasoning or justification for the requirement, do not bury it in the description—use a dedicated `Rationale:` section instead.
 
 Do not repeat the subject + verb from the title, do not smuggle in a second requirement, and do not write marketing copy.
 
