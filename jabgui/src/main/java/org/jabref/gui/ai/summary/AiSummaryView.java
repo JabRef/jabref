@@ -9,7 +9,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.AiPrivacyNoticeView;
 import org.jabref.gui.ai.statuspane.UniversalStatusPaneView;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.ExceptionsUtil;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.ChatModel;
@@ -63,7 +62,7 @@ public class AiSummaryView extends StackPane {
     }
 
     private void setupBindings() {
-        errorPane.textAreaContentProperty().bind(viewModel.errorProperty().map(ExceptionsUtil::generateExceptionMessage));
+        errorPane.textAreaContentProperty().bind(viewModel.errorProperty().map(Throwable::getMessage));
 
         summaryShowing.summaryProperty().bind(viewModel.summaryProperty());
         summaryShowing.entryProperty().bind(viewModel.entryProperty());
