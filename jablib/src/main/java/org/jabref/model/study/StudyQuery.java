@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.util.strings.StringUtil;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -49,7 +47,7 @@ public class StudyQuery {
         return catalogSpecific.entrySet().stream()
                               .filter(entry -> entry.getKey().equalsIgnoreCase(catalogName))
                               .map(Map.Entry::getValue)
-                              .filter(StringUtil::isNotBlank)
+                              .filter(value -> value != null && !value.isBlank())
                               .findFirst();
     }
 
