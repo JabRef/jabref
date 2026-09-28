@@ -57,6 +57,11 @@ public class ChunkedSummarizator implements Summarizator {
         return combineFinalSummaries(chatModel, summaries);
     }
 
+    /// Splits `text` into chunks that fit the context window.
+    ///
+    /// The splitter counts characters while the context window is given in tokens, so a text is split only once it
+    /// is longer than about one character per available token. A paper below that size stays a single chunk, and
+    /// this algorithm then sends the same text as [FullDocumentSummarizator] - only the system message differs.
     private List<String> splitTextIntoChunks(ChatModel chatModel, String text) {
         int chunkSystemMessageTokens = chatModel.getTokenizer().estimate(
                 ChatMessage.Role.SYSTEM,

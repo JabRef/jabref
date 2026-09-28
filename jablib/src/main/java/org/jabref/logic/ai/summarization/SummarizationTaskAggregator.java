@@ -65,7 +65,8 @@ public class SummarizationTaskAggregator {
     private synchronized GenerateSummaryTask startNewTask(GenerateSummaryTaskRequest request, boolean showToUser) {
         GenerateSummaryTask task = new GenerateSummaryTask(request, showToUser);
 
-        task.onFinished(() -> tasks.remove(request.fullEntry().entry()));
+        // Only remove this task: a regeneration may have replaced it in the meantime
+        task.onFinished(() -> tasks.remove(request.fullEntry().entry(), task));
 
         task.onSuccess(result -> inMemoryCache.put(request.fullEntry(), result));
 

@@ -46,6 +46,18 @@ class SummarizationTaskAggregatorTest {
     }
 
     @Test
+    void finishedTaskDoesNotUnregisterItsReplacement() {
+        GenerateSummaryTask failed = aggregator.start(request(true));
+        assertThrows(RuntimeException.class, failed::call);
+        GenerateSummaryTask replacement = aggregator.start(request(true));
+
+        // The finish callback of the failed task runs only now
+        failed.getOnException().accept(new RuntimeException());
+
+        assertSame(replacement, aggregator.getTask(fullEntry.entry()).orElse(null));
+    }
+
+    @Test
     void startReusesRunningTask() {
         GenerateSummaryTask running = aggregator.start(request(false));
 
