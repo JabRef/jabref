@@ -14,6 +14,8 @@ public class AiDefaultExpertSettings {
     public static final TokenEstimatorKind TOKEN_ESTIMATOR_KIND = TokenEstimatorKind.MAX;
     public static final String EMBEDDING_MODEL = "intfloat/multilingual-e5-small";
     public static final float TEMPERATURE = 0.7F;
+    /// Used for models JabRef does not know, e.g., local ones served by Ollama or LM Studio
+    public static final int CONTEXT_WINDOW_SIZE = 64 * 1024;
 
     public static final DocumentSplitterKind DOCUMENT_SPLITTER_KIND = DocumentSplitterKind.SLIDING_WINDOW;
     public static final int DOCUMENT_SPLITTER_CHUNK_SIZE = 300;
