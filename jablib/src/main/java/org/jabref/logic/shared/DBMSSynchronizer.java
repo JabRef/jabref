@@ -91,6 +91,9 @@ import org.slf4j.LoggerFactory;
 /// value on, and says so, rather than overwriting the newer value
 /// ([org.jabref.model.undo.BibChange#apply]); and the pulled change marks the library as needing a
 /// save, because it arrives as [org.jabref.model.entry.event.EntriesEventSource#SHARED].
+///
+/// A local `.bib` file changed by another program is handled differently: by a three-way comparison with the
+/// library as it last matched the file, see [org.jabref.logic.sync.LibraryBaseline].
 public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);
@@ -466,7 +469,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         } catch (OfflineLockException exception) {
             sharedIdsInConflict.add(sharedId);
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
-        } catch (SharedEntryNotPresentException exception) {
+        } catch (SharedEntryNotPresentException _) {
             // Deleted on the shared side: the pull removes it locally and tells the user
             pullEntries();
         } catch (SQLException e) {
@@ -694,7 +697,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // not interleave with them
         try {
             syncExecutor.execute(() -> useConnection(newConnection));
-        } catch (RejectedExecutionException e) {
+        } catch (RejectedExecutionException _) {
             // Closed while connecting
             closeQuietly(newConnection.getConnection());
         }
@@ -973,7 +976,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                     LOGGER.warn("Queued shared database writes did not finish in time - closing anyway");
                     ownedSyncExecutor.shutdownNow();
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException _) {
                 Thread.currentThread().interrupt();
             }
         } else {

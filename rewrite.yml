@@ -40,7 +40,7 @@ recipeList:
   #  - org.openrewrite.staticanalysis.InlineVariable
   # Leads to unreadable code
   #  - org.openrewrite.staticanalysis.LambdaBlockToExpression
-  # Works on case-senstive file systems only
+  # Works on case-sensitive file systems only
   #  - org.openrewrite.staticanalysis.LowercasePackage
   # Needs manual intervention (not fixable at existing code)
   #  - org.openrewrite.staticanalysis.MethodNameCasing
@@ -60,7 +60,7 @@ recipeList:
   #  - org.openrewrite.staticanalysis.RemoveUnusedPrivateMethods
   # Crashes
   #  - org.openrewrite.staticanalysis.RenameExceptionInEmptyCatch
-  # Also renames private static final varialbes (e.g., LOGGER, ALL_ENTRIES_GROUP_DEFAULT_ICON, ...)
+  # Also renames private static final variables (e.g., LOGGER, ALL_ENTRIES_GROUP_DEFAULT_ICON, ...)
   #  - org.openrewrite.staticanalysis.RenamePrivateFieldsToCamelCase
   # Does something else (deleting a field in TreeNode)
   #  - org.openrewrite.staticanalysis.ReplaceDeprecatedRuntimeExecMethods
@@ -112,6 +112,7 @@ recipeList:
   - org.openrewrite.java.migrate.lang.SwitchCaseAssignmentsToSwitchExpression
   - org.openrewrite.java.migrate.lang.SwitchCaseReturnsToSwitchExpression
   - org.openrewrite.java.migrate.lang.SwitchExpressionYieldToArrow
+  - org.openrewrite.java.migrate.lang.ReplaceUnusedVariablesWithUnderscore
   - org.openrewrite.java.migrate.net.JavaNetAPIs
   - org.openrewrite.java.migrate.net.URLConstructorToURICreate
   - org.openrewrite.java.migrate.net.URLConstructorsToNewURI
@@ -150,7 +151,7 @@ recipeList:
   - org.openrewrite.staticanalysis.ExternalizableHasNoArgsConstructor
   - org.openrewrite.staticanalysis.FallThrough
 #  - org.openrewrite.staticanalysis.ForLoopControlVariablePostfixOperators
-  - org.openrewrite.staticanalysis.ForLoopIncrementInUpdate
+#  - org.openrewrite.staticanalysis.ForLoopIncrementInUpdate # https://github.com/openrewrite/rewrite-static-analysis/issues/1061
   - org.openrewrite.staticanalysis.IndexOfChecksShouldUseAStartPosition
   - org.openrewrite.staticanalysis.IndexOfReplaceableByContains
 #  - org.openrewrite.staticanalysis.IndexOfShouldNotCompareGreaterThanZero

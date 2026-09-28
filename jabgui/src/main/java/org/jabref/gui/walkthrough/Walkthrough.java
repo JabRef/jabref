@@ -109,11 +109,17 @@ public class Walkthrough {
             return;
         }
 
-        currentStep.set(prevIndex);
         if (overlay == null) {
             LOGGER.warn("Overlay is null, cannot display previous step");
             return;
         }
+
+        if (getStepAtIndex(prevIndex) instanceof SideEffect) {
+            overlay.revertToPreviousStep();
+            return;
+        }
+
+        currentStep.set(prevIndex);
 
         WalkthroughStep step = getCurrentStep();
         overlay.show(step);
@@ -123,6 +129,18 @@ public class Walkthrough {
         if (overlay != null) {
             overlay.detachAll();
         }
+        deactivate();
+    }
+
+    /// Ends a walkthrough after its reverter already reversed the side effects.
+    public void quitAfterReversion() {
+        if (overlay != null) {
+            overlay.detachWithoutReverting();
+        }
+        deactivate();
+    }
+
+    private void deactivate() {
         active.set(false);
         stateManager.setActiveWalkthrough(null);
     }
@@ -206,4 +224,3 @@ public class Walkthrough {
         }
     }
 }
-

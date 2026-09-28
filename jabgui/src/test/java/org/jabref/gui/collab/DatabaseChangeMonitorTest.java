@@ -313,6 +313,33 @@ class DatabaseChangeMonitorTest {
     }
 
     @Test
+    void applyResolvedChangesKeepsTheLibraryModifiedWhenItHasUnsavedEditsElsewhere() {
+        BibEntry oldEntry = new BibEntry().withCitationKey("Key")
+                                          .withField(StandardField.TITLE, "Old title");
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(oldEntry)));
+        EntryChange diskChange = new EntryChange(oldEntry, new BibEntry(oldEntry).withField(StandardField.TITLE, "Disk title"), databaseContext);
+        diskChange.accept();
+
+        JabRefUndoManager undoManager = new JabRefUndoManager();
+        LibraryTab libraryTab = mock(LibraryTab.class);
+        when(libraryTab.isModified()).thenReturn(true);
+        DatabaseChangeMonitor monitor = new DatabaseChangeMonitor(
+                databaseContext,
+                mock(FileUpdateMonitor.class),
+                mock(TaskExecutor.class),
+                mock(DialogService.class),
+                mock(GuiPreferences.class),
+                undoManager,
+                mock(StateManager.class),
+                libraryTab);
+
+        monitor.applyResolvedChanges(List.of(diskChange), true);
+
+        assertTrue(undoManager.hasChanged());
+        verify(libraryTab, never()).resetChangedProperties();
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void notifyExternalChangesReplacesPreviousNotification(@TempDir Path tempDir) throws Exception {
         Path monitoredPath = tempDir.resolve("library.bib");
@@ -376,9 +403,12 @@ class DatabaseChangeMonitorTest {
         BibDatabaseContext databaseContext = new BibDatabaseContext(database);
         databaseContext.setDatabasePath(library);
 
-        createSynchronizingMonitor(databaseContext, mock(DialogService.class));
+        DatabaseChangeMonitor monitor = createSynchronizingMonitor(databaseContext, mock(DialogService.class));
 
         assertEquals(List.of("a", "b", "c"), database.getEntries().stream().map(entry -> entry.getCitationKey().orElseThrow()).sorted().toList());
+        // Relative to the library file, what came from a copy is an unsaved addition, so the baseline does not hold it
+        BibEntry fromCopy = database.getEntries().stream().filter(entry -> entry.getCitationKey().orElseThrow().equals("b")).findFirst().orElseThrow();
+        assertFalse(monitor.getBaseline().hasEntry(fromCopy.getId()));
     }
 
     @Test
@@ -415,14 +445,14 @@ class DatabaseChangeMonitorTest {
         List<Boolean> outcomes = new ArrayList<>();
 
         // rejected: memory wins and the conflict is reported again next time
-        monitor.completeReview(triage.bothSides(), false, outcomes::add);
+        monitor.completeReview(triage.bothSides(), triage.bothSides(), false, false, outcomes::add);
         assertEquals(Optional.of("Memory"), entry.getField(StandardField.TITLE));
         ChangeTriage.Triage again = ChangeTriage.triage(monitor.getBaseline(), DatabaseChangeList.compareAndGetChanges(databaseContext, copy, null), databaseContext, null);
         assertEquals(1, again.bothSides().size());
 
         // accepted: the copy's value is applied and no longer a divergence
         again.bothSides().getFirst().accept();
-        monitor.completeReview(again.bothSides(), false, outcomes::add);
+        monitor.completeReview(again.bothSides(), again.bothSides(), false, false, outcomes::add);
         assertEquals(Optional.of("Copy"), entry.getField(StandardField.TITLE));
         ChangeTriage.Triage settled = ChangeTriage.triage(monitor.getBaseline(), DatabaseChangeList.compareAndGetChanges(databaseContext, copy, null), databaseContext, null);
         assertEquals(List.of(), settled.bothSides());

@@ -93,7 +93,7 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
         results.add(entryType);
         results.add(bibEntry.getCitationKey().orElse(""));
         allReportedFields.forEach(field -> results.add(
-                bibEntry.getField(field).map(value -> {
+                bibEntry.getField(field).map(_ -> {
                     if (requiredFields.contains(field)) {
                         return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
                     } else if (optionalFields.contains(field)) {

@@ -102,7 +102,7 @@ public class ThemeDialogViewModel extends AbstractViewModel {
 
         try {
             return Files.isRegularFile(Path.of(customThemePath));
-        } catch (InvalidPathException e) {
+        } catch (InvalidPathException _) {
             return false;
         }
     }

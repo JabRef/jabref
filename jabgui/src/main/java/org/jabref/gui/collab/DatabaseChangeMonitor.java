@@ -161,8 +161,9 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                         Localization.lang("External Changes Resolver"));
                 Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
                 if (areAllChangesResolved.orElse(false)) {
-                    completeReview(databaseChangesResolverDialog.getResolvedChanges(),
-                            fromLibraryFile && databaseChangesResolverDialog.resolvedChangesMatchDisk(), afterReview);
+                    completeReview(changes, databaseChangesResolverDialog.getResolvedChanges(), fromLibraryFile,
+                            databaseChangesResolverDialog.resolvedChangesMatchDisk(), afterReview);
+
                     clearActiveNotification(this);
                     return OnClickBehaviour.REMOVE;
                 }
@@ -236,30 +237,65 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         onSynchronizingChanged(isSynchronizing());
     }
 
-    /// Synchronization switched on for an open library needs a baseline right away: as long as the library is
-    /// unmodified, it still matches its file. Otherwise the next save establishes the baseline.
+    /// Synchronization switched on for an open library needs a baseline right away. An unmodified library still
+    /// matches its file. A modified one is compared with the file first: the same apart from the setting just switched
+    /// on, it becomes the baseline; otherwise the differences are offered for review, and the baseline follows from
+    /// the review or from the next save. Whether the library is modified says nothing about the undo journal: a
+    /// declined external change, a migration on load, or an undone edit after a save leave it modified without a step.
     private void onSynchronizingChanged(boolean enabled) {
         boolean captured = false;
+        boolean verify = false;
         synchronized (database) {
             if (!enabled) {
                 if (baseline != null) {
                     baseline = null;
                     scanGeneration++;
                 }
-            } else if (baseline == null && (!libraryTab.isModified() || !undoManager.canUndo())) {
-                // A modified tab without an undoable step was only dirtied by a setting, such as the one just
-                // switched on; its entries still match the file
-                baseline = captureBaseline();
-                captured = baseline != null;
+            } else if (baseline == null) {
+                if (libraryTab.isModified()) {
+                    verify = true;
+                } else {
+                    baseline = captureBaseline();
+                    captured = baseline != null;
+                }
             }
         }
-        if (captured) {
+        if (captured || verify) {
             // A review offered while synchronization was off holds changes computed against an older state; from now
             // on the scan decides, so the pending review is withdrawn and the file is looked at again
             withdrawActiveNotification();
             activeNotification = null;
             synchronized (database) {
-                scanForChanges();
+                if (verify) {
+                    scanToVerifyMatch();
+                } else {
+                    scanForChanges();
+                }
+            }
+        }
+    }
+
+    /// Compares the modified library with its file: the same apart from the synchronization setting, the library
+    /// becomes the baseline; otherwise the differences are offered for review, as without synchronization.
+    private void scanToVerifyMatch() {
+        ChangeScanner scanner = new ChangeScanner(database, dialogService, preferences, stateManager);
+        int generation = ++scanGeneration;
+        BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
+                      .onSuccess(changes -> changes.ifPresent(scanned -> {
+                          if (ChangeTriage.matchesFile(scanned, preferences.getCitationKeyPatternPreferences().getKeyPatterns())) {
+                              captureIfCurrent(generation);
+                          } else {
+                              offerReview(generation, scanned);
+                          }
+                      }))
+                      .onFailure(e -> forgetDiskState("Error while comparing with the library file", e))
+                      .executeWith(taskExecutor);
+    }
+
+    private void captureIfCurrent(int generation) {
+        synchronized (database) {
+            if (generation == scanGeneration && baseline == null) {
+                baseline = captureBaseline();
             }
         }
         mergeConflictedCopies(baseline);
@@ -290,7 +326,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         LibraryBaseline scannedBaseline = baseline;
         int generation = ++scanGeneration;
         if (scannedBaseline != null && isSynchronizing()) {
-            // [impl->req~ux.external-library-changes.synchronize~1]
+            // [impl->req~ux.external-library-changes.automatic-merge~1]
             BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
                           .onSuccess(changes -> changes.ifPresent(scanned -> onScannedForSynchronization(generation, scanner, scannedBaseline, scanned)))
                           .onFailure(e -> forgetDiskState("Error while synchronizing with the library file", e))
@@ -409,17 +445,23 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         List<DatabaseChange> unresolved = new ArrayList<>(triage.bothSides());
         unresolved.addAll(triage.memoryOnly());
         // A conflicted copy is never the file the library must match, so the library stays marked as changed
-        boolean matchesDisk = conflictedCopy == null && unresolved.isEmpty() && !libraryTab.isModified();
+        boolean matchesDisk = conflictedCopy == null && unresolved.isEmpty();
         if (!triage.diskOnly().isEmpty()) {
             applyResolvedChanges(triage.diskOnly(), matchesDisk);
             dialogService.notify(mergedMessage);
         }
-        synchronized (database) {
-            LibraryBaseline updated = captureBaseline();
-            if (updated != null) {
-                ChangeTriage.keepUnresolved(updated, scannedBaseline, unresolved);
+        // Nor does a conflicted copy move the baseline: relative to the library file, what was taken over from the
+        // copy is an unsaved edit until the library is saved, and the next scan of the file must see it as such
+        if (conflictedCopy == null) {
+            synchronized (database) {
+                LibraryBaseline updated = captureBaseline();
+                if (updated != null) {
+                    ChangeTriage.keepUnresolved(updated, scannedBaseline, unresolved);
+                    // A merged entry holds more than the file: what it holds beyond is an unsaved edit, not the ancestor
+                    triage.diskEntries().forEach(updated::recordEntry);
+                }
+                baseline = updated;
             }
-            baseline = updated;
         }
         if (conflictedCopy == null) {
             if (!triage.bothSides().isEmpty()) {
@@ -545,24 +587,30 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         return baseline;
     }
 
-    /// Applies what the review accepted, rebases, and tells the caller whether everything was accepted.
+    /// Applies what the review accepted, moves the baseline on for the library file's own changes, and tells the
+    /// caller whether everything was accepted.
     ///
-    /// @param resolved    the reviewed changes, accepted or not
-    /// @param matchesDisk whether the library now matches its file, see [#applyResolvedChanges]
-    void completeReview(List<DatabaseChange> resolved, boolean matchesDisk, Consumer<Boolean> afterReview) {
-        applyResolvedChanges(resolved, matchesDisk);
-        rebaseAfterReview(resolved);
+    /// @param scanned                  the changes as offered for review
+    /// @param resolved                 the reviewed changes, accepted or not
+    /// @param fromLibraryFile          whether the changes come from the library file; those of a conflicted copy leave the baseline alone, as what was taken over from a copy is an unsaved edit relative to the library file
+    /// @param resolvedChangesMatchDisk whether the accepted result matches the reviewed file, see [#applyResolvedChanges]
+    void completeReview(List<DatabaseChange> scanned, List<DatabaseChange> resolved, boolean fromLibraryFile, boolean resolvedChangesMatchDisk, Consumer<Boolean> afterReview) {
+        applyResolvedChanges(resolved, fromLibraryFile && resolvedChangesMatchDisk);
+        if (fromLibraryFile) {
+            rebaseAfterReview(scanned, resolved);
+        }
         afterReview.accept(resolved.stream().allMatch(DatabaseChange::isAccepted));
     }
 
-    /// After a review, the accepted changes are in memory and must not count as a divergence anymore; the rejected
-    /// ones keep their ancestor, so that the next scan reports them again instead of taking memory for the ancestor.
-    private void rebaseAfterReview(List<DatabaseChange> resolved) {
+    /// After a review, every judged item has the disk version as its ancestor ([ChangeTriage#advance]); everything
+    /// else, unsaved edits made since the scan included, keeps the ancestor it had. Without a baseline so far
+    /// (synchronization switched on while the library was modified, the review settling the difference), the library
+    /// is taken as the ancestor first.
+    private void rebaseAfterReview(List<DatabaseChange> scanned, List<DatabaseChange> resolved) {
         synchronized (database) {
-            LibraryBaseline previous = baseline;
-            LibraryBaseline updated = captureBaseline();
-            if (updated != null && previous != null) {
-                ChangeTriage.keepUnresolved(updated, previous, resolved.stream().filter(change -> !change.isAccepted()).toList());
+            LibraryBaseline updated = baseline == null ? captureBaseline() : baseline.copy();
+            if (updated != null) {
+                ChangeTriage.advance(updated, scanned, resolved);
             }
             baseline = updated;
         }
@@ -571,14 +619,17 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// Applies the accepted external changes and updates the library's dirty state.
     ///
     /// @param resolvedChanges          the externally resolved changes to apply to the in-memory database
-    /// @param resolvedChangesMatchDisk `true` if the accepted result now matches the file on disk, so the library can be marked clean; `false` if the resolved result differs from disk and still needs saving
+    /// @param resolvedChangesMatchDisk `true` if the accepted result now matches the file on disk for the resolved items, so the library can be marked clean unless it was modified elsewhere; `false` if the resolved result differs from disk and still needs saving
     void applyResolvedChanges(List<DatabaseChange> resolvedChanges, boolean resolvedChangesMatchDisk) {
+        // Decided before applying: the changes cover the differences to the file only, an unsaved edit elsewhere
+        // (not an external change, so never part of them) keeps the library modified
+        boolean matchesDisk = resolvedChangesMatchDisk && !libraryTab.isModified();
         undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
                 resolvedChanges.stream()
                                .filter(DatabaseChange::isAccepted)
                                .forEach(change -> change.applyChange(edit)));
 
-        if (resolvedChangesMatchDisk) {
+        if (matchesDisk) {
             libraryTab.resetChangedProperties();
         } else {
             // Nothing on the stack describes a denied change - denying one records nothing - but the

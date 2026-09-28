@@ -100,7 +100,7 @@ public class KeyBindingRepository {
     }
 
     public void resetToDefault() {
-        bindings.forEach((b, s) -> bindings.put(b, b.getDefaultKeyBinding()));
+        bindings.forEach((b, _) -> bindings.put(b, b.getDefaultKeyBinding()));
     }
 
     public int size() {

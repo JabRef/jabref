@@ -24,7 +24,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
     public CitationKeyPatternSuggestionCell(List<String> citationKeyPatterns) {
         this.searchField = new CitationKeyPatternSuggestionTextField(citationKeyPatterns);
-        searchField.setOnAction(event -> commitEdit(searchField.getText()));
+        searchField.setOnAction(_ -> commitEdit(searchField.getText()));
     }
 
     @Override
@@ -178,7 +178,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
                 for (CitationKeyPattern pattern : patterns) {
                     MenuItem menuItem = new MenuItem(pattern.stringRepresentation());
-                    menuItem.setOnAction(event -> {
+                    menuItem.setOnAction(_ -> {
                         setText(pattern.stringRepresentation());
                         positionCaret(pattern.stringRepresentation().length());
                         suggestionsList.hide();

@@ -49,7 +49,7 @@ public final class EntryChange extends DatabaseChange {
     public void applyChange(CompoundEdit undoEdit) {
         CompoundEdit entryEdit = new CompoundEdit(getName());
         // First in the compound, so that undo restores it after the field edits have marked the entry changed again
-        entryEdit.applyEdit(new UndoableChangedFlag(oldEntry, oldEntry.hasChanged(), true));
+        entryEdit.applyEdit(UndoableChangedFlag.marking(oldEntry));
         if (!Objects.equals(oldEntry.getType(), newEntry.getType())) {
             entryEdit.applyEdit(new UndoableChangeType(oldEntry, oldEntry.getType(), newEntry.getType()));
         }

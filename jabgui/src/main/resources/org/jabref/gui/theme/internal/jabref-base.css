@@ -1553,11 +1553,24 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-line-spacing: 0.5em;
 }
 
+.walkthrough-quit-button {
+    -fx-background-color: -color-accent;
+    -fx-background-radius: 50%;
+}
+
+.walkthrough-quit-button:hover {
+    -fx-background-color: derive(-color-accent, 15%);
+}
+
+.walkthrough-quit-button:armed {
+    -fx-background-color: derive(-color-accent, -15%);
+}
+
 .walkthrough-quit-button .glyph-icon,
 .walkthrough-quit-button .ikonli-font-icon {
-    -fx-icon-color: -color-accent;
-    -fx-fill: -color-accent;
-    -fx-text-fill: -color-accent;
+    -fx-icon-color: -color-fg-emphasis;
+    -fx-fill: -color-fg-emphasis;
+    -fx-text-fill: -color-fg-emphasis;
     -fx-font-size: 2em;
 }
 
@@ -1713,8 +1726,12 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: transparent;
 }
 
+.bibtex-code-area {
+    -fx-font-family: 'JetBrains Mono';
+}
+
 .bibtex-code-area .bibtex-keyword {
-    -fx-fill: -color-info !important;
+    -fx-fill: -color-bibtex-keyword !important;
 }
 
 .bibtex-code-area .bibtex-field {

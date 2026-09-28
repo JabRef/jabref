@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.collab.entrydelete.EntryDelete;
+import org.jabref.gui.collab.groupchange.GroupChange;
 import org.jabref.gui.collab.metedatachange.MetadataChange;
 import org.jabref.gui.collab.stringadd.BibTexStringAdd;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.sync.LibraryBaseline;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -17,6 +19,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.undo.CompoundEdit;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +37,10 @@ class ChangeTriageTest {
     private static final GlobalCitationKeyPatterns PATTERNS = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
 
     private BibEntry local;
+    private BibEntry other;
     private BibDatabaseContext localContext;
     private BibEntry disk;
+    private BibEntry otherOnDisk;
     private BibDatabaseContext diskContext;
     private LibraryBaseline baseline;
 
@@ -42,13 +49,14 @@ class ChangeTriageTest {
         local = new BibEntry(StandardEntryType.Article).withCitationKey("Key")
                                                        .withField(StandardField.TITLE, "Title")
                                                        .withField(StandardField.YEAR, "2020");
-        // A second, never touched entry keeps the file from becoming empty, which the two-way diff cannot handle
-        BibEntry other = new BibEntry(StandardEntryType.Book).withCitationKey("Other").withField(StandardField.TITLE, "Other");
+        // A second, mostly untouched entry keeps the file from becoming empty, which the two-way diff cannot handle
+        other = new BibEntry(StandardEntryType.Book).withCitationKey("Other").withField(StandardField.TITLE, "Other");
         localContext = new BibDatabaseContext(new BibDatabase(List.of(local, other)));
         baseline = LibraryBaseline.of(localContext, PATTERNS);
         // the file as it would be parsed: same content, different entry objects
         disk = new BibEntry(local);
-        diskContext = new BibDatabaseContext(new BibDatabase(List.of(disk, new BibEntry(other))));
+        otherOnDisk = new BibEntry(other);
+        diskContext = new BibDatabaseContext(new BibDatabase(List.of(disk, otherOnDisk)));
     }
 
     private ChangeTriage.Triage triage() {
@@ -299,5 +307,80 @@ class ChangeTriageTest {
 
         assertEquals(1, second.bothSides().size());
         assertEquals(List.of(), second.diskOnly());
+    }
+
+    @Test
+    void mergedEntryHasTheDiskVersionAsAncestor() {
+        local.setField(StandardField.TITLE, "Memory title");
+        disk.setField(StandardField.YEAR, "2021");
+        ChangeTriage.Triage first = triage();
+        assertInstanceOf(EntryChange.class, first.diskOnly().getFirst()).applyChange(new CompoundEdit("test"));
+        LibraryBaseline updated = LibraryBaseline.of(localContext, PATTERNS);
+        first.diskEntries().forEach(updated::recordEntry);
+        baseline = updated;
+
+        // The file changes elsewhere while the merged entry stays as it is on disk: the title kept from memory is
+        // still an unsaved edit, not a disk change to take over
+        otherOnDisk.setField(StandardField.TITLE, "Other on disk");
+        ChangeTriage.Triage second = triage();
+
+        assertEquals(1, second.diskOnly().size());
+        assertEquals(1, second.memoryOnly().size());
+        assertEquals(List.of(), second.bothSides());
+    }
+
+    @Test
+    void reviewKeepsTheAncestorOfAnUnsavedMemoryChange() {
+        // "Other" is changed differently on both sides and reviewed; the unsaved edit of "Key" is not part of the review
+        local.setField(StandardField.TITLE, "Memory title");
+        other.setField(StandardField.TITLE, "Other in memory");
+        otherOnDisk.setField(StandardField.TITLE, "Other on disk");
+        ChangeTriage.Triage first = triage();
+        assertEquals(1, first.bothSides().size());
+        first.bothSides().getFirst().accept();
+        first.bothSides().getFirst().applyChange(new CompoundEdit("test"));
+        LibraryBaseline updated = baseline.copy();
+        ChangeTriage.advance(updated, first.bothSides(), first.bothSides());
+        baseline = updated;
+
+        // The file now changes the field edited in memory: a conflict, not a change to take over silently
+        disk.setField(StandardField.TITLE, "Disk title");
+        ChangeTriage.Triage second = triage();
+
+        assertEquals(1, second.bothSides().size());
+        assertEquals(List.of(), second.diskOnly());
+    }
+
+    @Test
+    void metadataAcceptedAndGroupsDeclinedAreNotReportedAgain() {
+        localContext.getMetaData().setEncoding(StandardCharsets.ISO_8859_1);
+        GroupTreeNode root = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
+        root.addSubgroup(new ExplicitGroup("Group", GroupHierarchyType.INDEPENDENT, ','));
+        diskContext.getMetaData().setGroups(root);
+        ChangeTriage.Triage first = triage();
+        MetadataChange metadataChange = assertInstanceOf(MetadataChange.class, first.bothSides().get(0));
+        assertInstanceOf(GroupChange.class, first.bothSides().get(1));
+        metadataChange.accept();
+        metadataChange.applyChange(new CompoundEdit("test"));
+        // Applying installed the disk metadata object without its groups; the file itself still has them
+        diskContext.getMetaData().setGroups(root);
+        LibraryBaseline updated = baseline.copy();
+        ChangeTriage.advance(updated, first.bothSides(), first.bothSides());
+        baseline = updated;
+
+        ChangeTriage.Triage second = triage();
+
+        assertEquals(List.of(), second.bothSides());
+        assertEquals(List.of(), second.diskOnly());
+        assertEquals(2, second.memoryOnly().size());
+    }
+
+    @Test
+    void onlyTheSynchronizationSettingDifferingCountsAsMatchingTheFile() {
+        localContext.getMetaData().setSynchronizeWithFile(true);
+        assertTrue(ChangeTriage.matchesFile(DatabaseChangeList.compareAndGetChanges(localContext, diskContext, null), PATTERNS));
+
+        disk.setField(StandardField.TITLE, "Disk title");
+        assertFalse(ChangeTriage.matchesFile(DatabaseChangeList.compareAndGetChanges(localContext, diskContext, null), PATTERNS));
     }
 }

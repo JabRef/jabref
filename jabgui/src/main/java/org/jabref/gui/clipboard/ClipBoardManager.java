@@ -69,7 +69,7 @@ public class ClipBoardManager {
     public static void addX11Support(TextInputControl input) {
         input.selectedTextProperty().addListener(
                 // using InvalidationListener because of https://bugs.openjdk.java.net/browse/JDK-8176270
-                observable -> Platform.runLater(() -> {
+                _ -> Platform.runLater(() -> {
                     String newValue = input.getSelectedText();
                     if (!newValue.isEmpty() && (primary != null)) {
                         primary.setContents(new StringSelection(newValue), null);
