@@ -23,7 +23,7 @@ Why
 * `model`
   * `util` : general utilities
     * (`OOPair`, `OOTuple3`) collect two or three objects without creating a new class
-    * `OOResult` : while an Optional.empty can comunicate failure, it cannot provide details.\
+    * `OOResult` : while an Optional.empty can communicate failure, it cannot provide details.\
       `OOResult` allows an arbitrary error object to be provided in case of failure.
     * `OOVoidResult` : for functions returning no result on success, only diagnostics on failure.
     * `OOListUtil`: some utilities working on List
