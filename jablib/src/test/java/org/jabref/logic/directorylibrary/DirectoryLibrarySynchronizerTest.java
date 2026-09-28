@@ -730,7 +730,7 @@ class DirectoryLibrarySynchronizerTest {
     }
 
     @Test
-    void patternRenameSkipsTargetNameOfAnotherEntrysPdf() throws IOException {
+    void patternRenameSkipsTargetNameOfPdfOfAnotherEntry() throws IOException {
         fileNameGenerator = _ -> Optional.of("taken");
         Path sidecar = root.resolve("smith2020.yml");
         Files.writeString(sidecar, ARTICLE_YAML);
