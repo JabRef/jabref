@@ -751,6 +751,31 @@ class DBMSSynchronizerTest {
     }
 
     @Test
+    void recordedGroupDeletionIsAppliedLocallyOnNextConnect() throws Exception {
+        MetaData groupedMetaData = new MetaData();
+        GroupTreeNode groupRoot = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        groupRoot.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        groupedMetaData.setGroups(groupRoot);
+        Map<String, String> base = Map.of("databaseType", "bibtex;",
+                MetaData.GROUPSTREE, MetaDataSerializer.getSerializedStringMap(groupedMetaData, pattern).get(MetaData.GROUPSTREE));
+        dbmsProcessor.setSharedMetaData(base);
+        DBMSConnection connection = connectorTest.getTestDBMSConnection();
+        // An earlier session deleted all groups while offline
+        OfflineChanges.load(offlineChangesDirectory, connection.getProperties())
+                      .recordMetaData(Map.of("databaseType", "bibtex;"), base);
+
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase());
+        DBMSSynchronizer synchronizer = newSynchronousSynchronizer(context);
+        synchronizer.openSharedDatabase(connection);
+        try {
+            assertFalse(dbmsProcessor.getSharedMetaData().containsKey(MetaData.GROUPSTREE));
+            assertEquals(Optional.empty(), context.getMetaData().getGroups());
+        } finally {
+            synchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
     void recordedMetaDataIsMergedWithWhatOtherClientsChangedMeanwhile() throws Exception {
         Map<String, String> base = Map.of("databaseType", "bibtex;");
         dbmsProcessor.setSharedMetaData(base);

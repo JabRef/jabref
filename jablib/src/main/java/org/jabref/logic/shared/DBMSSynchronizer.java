@@ -575,9 +575,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private boolean writeRecordedMetaData(Map<String, String> recordedMetaData, OfflineChanges.Recorded recorded) {
         return writeOrRecord("Could not write metadata to the shared database",
                 () -> {
-                    Map<String, String> merged = recorded.mergeMetaDataInto(dbmsProcessor.getSharedMetaData());
+                    Map<String, String> shared = dbmsProcessor.getSharedMetaData();
+                    Map<String, String> merged = recorded.mergeMetaDataInto(shared);
                     dbmsProcessor.setSharedMetaData(merged);
-                    lastSharedMetaData = merged;
+                    // Not `merged`: the pull ending the replay applies it and must see a recorded group deletion as one
+                    lastSharedMetaData = shared;
                 },
                 () -> offlineChanges.recordMetaData(recordedMetaData, recorded.metaDataBase()));
     }
