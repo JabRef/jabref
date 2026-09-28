@@ -149,7 +149,7 @@ jobs:
           repository: 'rmuller/Convert2MarkdownJavadoc'
           path: 'Convert2MarkdownJavadoc'
       - name: Setup JDK
-        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
           java-version: '24'
           distribution: 'corretto'
@@ -252,8 +252,8 @@ jobs:
       - name: yamllint
         run: pipx run yamllint==1.38.0 --strict .
 
-  textlint:
-    name: Textlint
+  spelling:
+    name: Spellling
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
@@ -270,6 +270,8 @@ jobs:
         run: npm ci
       - name: textlint
         run: npm run textlint
+      - name: typos
+        run: pipx run typos==1.50.3
 
   madr:
     name: MADR ADRs
@@ -299,7 +301,7 @@ jobs:
       - name: Resolve //DEPS into the cached directory
         # JBang resolves script dependencies into ~/.m2, which is not cached here.
         run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
-      - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
           distribution: 'corretto'
           java-version: '25'
@@ -636,7 +638,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
           java-version: 25
           distribution: 'corretto'

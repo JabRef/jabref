@@ -391,7 +391,7 @@ public class NamedRangeReferenceMark implements NamedRange {
         }
     }
 
-    /// Remove brackets, but if the result would become empty, leave them; if the result would be a single characer, leave the left bracket.
+    /// Remove brackets, but if the result would become empty, leave them; if the result would be a single character, leave the left bracket.
     ///
     /// See: cleanFillCursorForCitationGroup
     @Override
