@@ -34,7 +34,7 @@ class FormattersTest {
                     "org.jabref.logic.formatter.bibtexfields.RemoveHyphenatedNewlinesFormatter",
                     "org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter",
                     "org.jabref.logic.formatter.bibtexfields.RemoveRedundantSpacesFormatter",
-                    "org.jabref.logic.formatter.bibtexfields.ReplaceTabsBySpaceFormater",
+                    "org.jabref.logic.formatter.bibtexfields.ReplaceTabsBySpaceFormatter",
                     "org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter"));
 
             assertEquals(expected, Formatters.getAll().stream().map(formatter -> formatter.getClass().getName()).collect(Collectors.toSet()));
