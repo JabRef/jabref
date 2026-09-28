@@ -27,36 +27,36 @@ class BibframeImporterTest {
         assertTrue(importer.isRecognizedFormat(file));
 
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(1, entries.size());
-        BibEntry book = entries.getFirst();
-        assertEquals(StandardEntryType.Book, book.getType());
-        assertEquals("Marketing Automation with Mailchimp", book.getField(StandardField.TITLE).orElseThrow());
-        assertEquals("Expert Tips", book.getField(StandardField.SUBTITLE).orElseThrow());
-        assertEquals("Caraballo, Margarita J.", book.getField(StandardField.AUTHOR).orElseThrow());
-        assertEquals("Birmingham", book.getField(StandardField.ADDRESS).orElseThrow());
-        assertEquals("Packt Publishing", book.getField(StandardField.PUBLISHER).orElseThrow());
-        assertEquals("2023", book.getField(StandardField.YEAR).orElseThrow());
-        assertEquals("9781800567566", book.getField(StandardField.ISBN).orElseThrow());
-        assertEquals("10.1234/book.001", book.getField(StandardField.DOI).orElseThrow());
-        assertEquals("eng", book.getField(StandardField.LANGUAGE).orElseThrow());
-        assertEquals("A guide to marketing automation.", book.getField(StandardField.ABSTRACT).orElseThrow());
-        assertEquals("https://example.org/book", book.getField(StandardField.URL).orElseThrow());
+        BibEntry expectedBook = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "Marketing Automation with Mailchimp")
+                .withField(StandardField.SUBTITLE, "Expert Tips")
+                .withField(StandardField.AUTHOR, "Caraballo, Margarita J.")
+                .withField(StandardField.ADDRESS, "Birmingham")
+                .withField(StandardField.PUBLISHER, "Packt Publishing")
+                .withField(StandardField.YEAR, "2023")
+                .withField(StandardField.ISBN, "9781800567566")
+                .withField(StandardField.DOI, "10.1234/book.001")
+                .withField(StandardField.LANGUAGE, "eng")
+                .withField(StandardField.ABSTRACT, "A guide to marketing automation.")
+                .withField(StandardField.URL, "https://example.org/book");
+
+        assertEquals(List.of(expectedBook), entries);
     }
 
     @Test
     void importsOfficialArticleFixture() throws Exception {
         Path file = Path.of(BibframeImporterTest.class.getResource("/org/jabref/logic/importer/bibframe/article.rdf").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(1, entries.size());
-        BibEntry article = entries.getFirst();
-        assertEquals(StandardEntryType.Article, article.getType());
-        assertEquals("Article 22 of the African Charter", article.getField(StandardField.TITLE).orElseThrow());
-        assertEquals("Bello, Emmanuel G.", article.getField(StandardField.AUTHOR).orElseThrow());
-        assertEquals("Journal of African Law", article.getField(StandardField.JOURNAL).orElseThrow());
-        assertEquals("0021-8553", article.getField(StandardField.ISSN).orElseThrow());
-        assertEquals("447-473", article.getField(StandardField.PAGES).orElseThrow());
-        assertEquals("1992", article.getField(StandardField.YEAR).orElseThrow());
-        assertEquals("10.1234/article.001", article.getField(StandardField.DOI).orElseThrow());
+        BibEntry expectedArticle = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Article 22 of the African Charter")
+                .withField(StandardField.AUTHOR, "Bello, Emmanuel G.")
+                .withField(StandardField.JOURNAL, "Journal of African Law")
+                .withField(StandardField.ISSN, "0021-8553")
+                .withField(StandardField.PAGES, "447-473")
+                .withField(StandardField.YEAR, "1992")
+                .withField(StandardField.DOI, "10.1234/article.001");
+
+        assertEquals(List.of(expectedArticle), entries);
     }
 
     @Test
@@ -86,9 +86,10 @@ class BibframeImporterTest {
                 """;
 
         assertTrue(importer.isRecognizedFormat(xml));
-        assertEquals(List.of("First work", "Second work"), importer.importDatabase(xml).getDatabase().getEntries().stream()
-                                                                   .map(entry -> entry.getField(StandardField.TITLE).orElseThrow())
-                                                                   .toList());
+        assertEquals(List.of(
+                             new BibEntry().withField(StandardField.TITLE, "First work"),
+                             new BibEntry().withField(StandardField.TITLE, "Second work")),
+                     importer.importDatabase(xml).getDatabase().getEntries());
     }
 
     @Test

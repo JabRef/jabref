@@ -44,13 +44,7 @@ class BibframeExporterTest {
             exporter.export(new BibDatabaseContext(), output, List.of(original));
             BibEntry restored = importer.importDatabase(output).getDatabase().getEntries().getFirst();
 
-            assertEquals(original.getType(), restored.getType());
-            for (StandardField field : List.of(StandardField.TITLE, StandardField.SUBTITLE, StandardField.AUTHOR,
-                    StandardField.ADDRESS, StandardField.PUBLISHER, StandardField.YEAR, StandardField.ISBN,
-                    StandardField.ISSN, StandardField.DOI, StandardField.LANGUAGE, StandardField.ABSTRACT,
-                    StandardField.URL, StandardField.JOURNAL, StandardField.PAGES)) {
-                assertEquals(original.getField(field), restored.getField(field), field.getName());
-            }
+            assertEquals(original, restored);
 
             Path reexported = directory.resolve(name + "-reexported.rdf");
             exporter.export(new BibDatabaseContext(), reexported, List.of(restored));
@@ -102,9 +96,7 @@ class BibframeExporterTest {
         exporter.export(new BibDatabaseContext(), output, List.of(article));
         BibEntry restored = importer.importDatabase(output).getDatabase().getEntries().getFirst();
 
-        assertEquals(StandardEntryType.Article, restored.getType());
-        assertEquals(article.getField(StandardField.JOURNAL), restored.getField(StandardField.JOURNAL));
-        assertEquals(article.getField(StandardField.PAGES), restored.getField(StandardField.PAGES));
+        assertEquals(article, restored);
     }
 
     @Test
@@ -117,7 +109,7 @@ class BibframeExporterTest {
         exporter.export(new BibDatabaseContext(), output, List.of(article));
         BibEntry restored = importer.importDatabase(output).getDatabase().getEntries().getFirst();
 
-        assertEquals(article.getField(StandardField.ISSN), restored.getField(StandardField.ISSN));
+        assertEquals(article, restored);
     }
 
     @Test
@@ -153,7 +145,7 @@ class BibframeExporterTest {
                 default ->
                         "English, Japanese";
             };
-            assertEquals(expected, restored.getField(StandardField.LANGUAGE).orElseThrow());
+            assertEquals(book.withField(StandardField.LANGUAGE, expected), restored);
             assertFalse(xml.contains("/languages/English"));
             assertFalse(xml.contains("/languages/Deutsch"));
         }
@@ -183,10 +175,7 @@ class BibframeExporterTest {
         }
         assertNotEquals(((Element) document.getElementsByTagName("bf:Work").item(0)).getAttribute("rdf:about"),
                 ((Element) document.getElementsByTagName("bf:Work").item(1)).getAttribute("rdf:about"));
-        assertEquals(2, importer.importDatabase(output).getDatabase().getEntryCount());
-        assertEquals(List.of("A < B & \"C\"", "Second book"), importer.importDatabase(output).getDatabase().getEntries().stream()
-                                                                      .map(entry -> entry.getField(StandardField.TITLE).orElseThrow())
-                                                                      .toList());
+        assertEquals(List.of(first, second), importer.importDatabase(output).getDatabase().getEntries());
         assertFalse(Files.readString(output).contains("first-key"));
     }
 
