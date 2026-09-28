@@ -707,6 +707,10 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* MainTable */
 
+.main-table:wrap-text .table-cell {
+    -fx-wrap-text: true;
+}
+
 .main-table .column-icon {
     -fx-alignment: baseline-center;
     -fx-padding: 0;

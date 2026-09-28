@@ -169,7 +169,7 @@ public class GroupTreeView extends BorderPane {
         addSubgroupColumn.setResizable(false);
 
         groupTree = new TreeTableView<>();
-        groupTree.fixedCellSizeProperty().bind(preferences.getWorkspacePreferences().virtualizedCellSizeProperty());
+        groupTree.fixedCellSizeProperty().bind(preferences.getWorkspacePreferences().cellSizeProperty());
 
         groupTree.setId("group-tree");
         groupTree.getStyleClass().add("group-tree");
@@ -391,7 +391,7 @@ public class GroupTreeView extends BorderPane {
         text.getStyleClass().setAll("text");
 
         node.getChildren().add(text);
-        node.maxWidthProperty().bind(preferences.getWorkspacePreferences().virtualizedCellSizeProperty());
+        node.maxWidthProperty().bind(preferences.getWorkspacePreferences().cellSizeProperty());
         return node;
     }
 
