@@ -121,7 +121,7 @@ application {
         "-XX:+UseStringDeduplication"
 
         // Default garbage collector (G1) is sufficient
-        // More informaiton: https://learn.microsoft.com/en-us/azure/developer/java/containers/overview#understand-jvm-default-ergonomics
+        // More information: https://learn.microsoft.com/en-us/azure/developer/java/containers/overview#understand-jvm-default-ergonomics
         // "-XX:+UseZGC", "-XX:+ZUncommit"
         // "-XX:+UseG1GC"
     )
@@ -285,7 +285,7 @@ embeddedPostgresBinaryByJpackageTask.forEach { (taskName, binary) ->
         // Include the platform-specific Postgres binary module in the jlink runtime image.
         addModules.add(binary.moduleName)
         // Resolve the module when the packaged launcher starts so the binary resource is discoverable.
-        // add will siply replace the existing args!
+        // add will simply replace the existing args!
         javaOptions.set(application.applicationDefaultJvmArgs + "--add-modules=${binary.moduleName}")
         addModules.addAll(sharedJpackageImageModules)
     }
