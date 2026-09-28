@@ -268,7 +268,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         LibraryBaseline scannedBaseline = baseline;
         int generation = ++scanGeneration;
         if (scannedBaseline != null && isSynchronizing()) {
-            // [impl->req~ux.external-library-changes.synchronize~1]
+            // [impl->req~ux.external-library-changes.automatic-merge~1]
             BackgroundTask.wrap(() -> scanner.scanForChanges(() -> awaitStableLibraryFile(generation)))
                           .onSuccess(changes -> changes.ifPresent(scanned -> onScannedForSynchronization(generation, scanner, scannedBaseline, scanned)))
                           .onFailure(e -> forgetDiskState("Error while synchronizing with the library file", e))
