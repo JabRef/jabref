@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where JabRef closed when a client of the integrated language server disconnected. [#17303](https://github.com/JabRef/jabref/pull/17303)
+- We fixed an issue where the Hayagriva YAML export wrote braced author names, such as company names, as invalid YAML. [#17316](https://github.com/JabRef/jabref/issues/17316)
 
 ## [6.0-beta.1] - 2026-09-21
 
