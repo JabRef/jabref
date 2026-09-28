@@ -358,7 +358,7 @@ class ChangeTriageTest {
         root.addSubgroup(new ExplicitGroup("Group", GroupHierarchyType.INDEPENDENT, ','));
         diskContext.getMetaData().setGroups(root);
         ChangeTriage.Triage first = triage();
-        MetadataChange metadataChange = assertInstanceOf(MetadataChange.class, first.bothSides().get(0));
+        MetadataChange metadataChange = assertInstanceOf(MetadataChange.class, first.bothSides().getFirst());
         assertInstanceOf(GroupChange.class, first.bothSides().get(1));
         metadataChange.accept();
         metadataChange.applyChange(new CompoundEdit("test"));
