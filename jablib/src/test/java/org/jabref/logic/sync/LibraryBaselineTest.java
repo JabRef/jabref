@@ -255,7 +255,7 @@ class LibraryBaselineTest {
     }
 
     @Test
-    void entryRenamedToAnotherEntrysKeyIsFoundByContent() {
+    void entryRenamedToAnotherEntryKeyIsFoundByContent() {
         BibEntry other = new BibEntry(StandardEntryType.Book).withCitationKey("Other").withField(StandardField.TITLE, "Other");
         baseline = LibraryBaseline.of(new BibDatabaseContext(new BibDatabase(List.of(local, other))), PATTERNS);
         remote.setCitationKey("Other");
