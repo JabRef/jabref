@@ -17,6 +17,7 @@ class DoiCleanupTest {
     @ParameterizedTest
     @MethodSource
     void changeDoi(BibEntry expected, BibEntry doiInfoField) {
+        // [utest->req~import.doi-from-other-fields~1]
         DoiCleanup cleanUp = new DoiCleanup();
         cleanUp.cleanup(doiInfoField);
 

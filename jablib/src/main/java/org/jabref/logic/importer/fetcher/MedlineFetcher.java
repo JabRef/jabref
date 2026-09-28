@@ -150,7 +150,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        // [impl->req~import.medline.doi-normalization~1]
+        // [impl->req~import.doi-from-other-fields~1]
         new DoiCleanup().cleanup(entry);
 
         new FieldFormatterCleanup(new UnknownField("journal-abbreviation"), new ClearFormatter()).cleanup(entry);

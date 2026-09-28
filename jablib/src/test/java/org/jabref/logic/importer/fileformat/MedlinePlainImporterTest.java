@@ -141,7 +141,6 @@ class MedlinePlainImporterTest {
             https://doi.org/10.1145/2594455, 10.1145/2594455
             """)
     void mapsArticleDoiToStandardDoi(String articleDoi, String expectedDoi) throws IOException {
-        // [utest->req~import.medline.doi-normalization~1]
         String medline = """
                 PMID-12345678
                 AID - %s [doi]
@@ -164,7 +163,6 @@ class MedlinePlainImporterTest {
             10.1145/2594455 [doi], Journal. 2026;5:67. doi: 10.4103/2277-9175.180636., 10.1145/2594455
             """)
     void mapsDoiFromLocationIdOrSourceToStandardDoi(String locationId, String source, String expectedDoi) throws IOException {
-        // [utest->req~import.medline.doi-normalization~1]
         String medline = """
                 PMID-12345678
                 LID - %s

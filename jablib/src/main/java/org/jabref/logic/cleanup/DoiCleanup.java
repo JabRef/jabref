@@ -71,6 +71,7 @@ public class DoiCleanup implements CleanupJob {
                     });
              });
 
+        // [impl->req~import.doi-from-other-fields~1]
         for (Field field : FIELDS) {
             entry.getField(field)
                  .flatMap(DOI::parse) // covers a full DOI only
@@ -89,7 +90,8 @@ public class DoiCleanup implements CleanupJob {
                                .flatMap(Optional::stream)
                                .flatMap(value -> DOI.findInText(value).stream())
                                .findFirst()
-                               .ifPresent(doi -> entry.setField(StandardField.DOI, doi.asString()).ifPresent(changes::add));
+                               .flatMap(doi -> entry.setField(StandardField.DOI, doi.asString()))
+                               .ifPresent(changes::add);
         }
 
         return changes;
