@@ -28,16 +28,18 @@ public class LspLinkHandler {
     private final LspParserHandler parserHandler;
     private final FilePreferences preferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final DefinitionProviderFactory definitionProviderFactory;
 
     public LspLinkHandler(LspClientHandler clientHandler, LspParserHandler parserHandler, FilePreferences preferences, ImportFormatPreferences importFormatPreferences) {
         this.clientHandler = clientHandler;
         this.parserHandler = parserHandler;
         this.preferences = preferences;
         this.importFormatPreferences = importFormatPreferences;
+        this.definitionProviderFactory = new DefinitionProviderFactory(preferences, parserHandler);
     }
 
     public CompletableFuture<@Nullable Hover> provideHover(String languageId, String content, Position position) {
-        Optional<Hover> hover = DefinitionProviderFactory.getDefinitionProvider(preferences, parserHandler, languageId)
+        Optional<Hover> hover = definitionProviderFactory.getDefinitionProvider(languageId)
                                                          .flatMap(provider -> provider.provideHover(content, position));
         // LSP requires `null` if there is nothing to show
         return CompletableFuture.completedFuture(hover.orElse(null));
@@ -57,7 +59,7 @@ public class LspLinkHandler {
         }
 
         List<Location> locations = List.of();
-        Optional<DefinitionProvider> provider = DefinitionProviderFactory.getDefinitionProvider(preferences, parserHandler, languageId);
+        Optional<DefinitionProvider> provider = definitionProviderFactory.getDefinitionProvider(languageId);
         if (provider.isPresent()) {
             locations = provider.get().provideDefinition(uri, content, position);
         }
@@ -70,7 +72,7 @@ public class LspLinkHandler {
             return CompletableFuture.completedFuture(List.of());
         }
         List<DocumentLink> documentLinks = List.of();
-        Optional<DefinitionProvider> provider = DefinitionProviderFactory.getDefinitionProvider(preferences, parserHandler, languageId);
+        Optional<DefinitionProvider> provider = definitionProviderFactory.getDefinitionProvider(languageId);
         if (provider.isPresent()) {
             documentLinks = provider.get().provideDocumentLinks(fileUri, content);
         }

@@ -168,4 +168,20 @@ class MarkdownDefinitionProviderTest {
         parserHandler.loadBibliographiesFromFrontMatter("untitled:Untitled-1", MARKDOWN, importFormatPreferences);
         assertTrue(parserHandler.getParserResultForUri("untitled:Untitled-1").isEmpty());
     }
+
+    @Test
+    void providersAreNotSharedAcrossConnections() {
+        new DefinitionProviderFactory(mock(FilePreferences.class), new LspParserHandler()).getDefinitionProvider("markdown");
+        DefinitionProvider secondConnection = new DefinitionProviderFactory(mock(FilePreferences.class), parserHandler).getDefinitionProvider("markdown").orElseThrow();
+
+        int column = "Starting literature: [@Cor".length();
+        assertTrue(secondConnection.provideHover(MARKDOWN, new Position(4, column)).isPresent());
+    }
+
+    @Test
+    void deletedBibliographyIsDropped() throws IOException {
+        Files.delete(tempDir.resolve("Chocolate.bib"));
+        parserHandler.loadBibliographiesFromFrontMatter(tempDir.resolve("topics.md").toUri().toString(), MARKDOWN, importFormatPreferences);
+        assertTrue(parserHandler.searchForEntryByCitationKey("Corti_2009").isEmpty());
+    }
 }

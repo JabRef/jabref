@@ -73,6 +73,7 @@ public class LspParserHandler {
         try {
             parse(path, Files.readString(path, BibtexImporter.getEncoding(path)), importFormatPreferences);
         } catch (IOException | JabRefException e) {
+            parserResults.remove(path);
             LOGGER.debug("Could not load bibliography {}", path, e);
         }
     }
