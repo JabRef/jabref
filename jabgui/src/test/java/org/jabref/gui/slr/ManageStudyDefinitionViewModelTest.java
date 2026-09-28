@@ -304,6 +304,23 @@ class ManageStudyDefinitionViewModelTest {
         assertEquals(Map.of(), builtStudy.getQueries().getLast().getCatalogSpecific());
     }
 
+    @Test
+    void buildStudyDoesNotChangeLoadedQueries(@TempDir Path tempDir) {
+        ManageStudyDefinitionViewModel viewModel = getViewModelWithMixedNativeQueries(tempDir);
+        StudyCatalogItem catalog = viewModel.getCatalogs().stream()
+                                            .filter(item -> "ACM Portal".equals(item.getName()))
+                                            .findFirst()
+                                            .orElseThrow();
+
+        catalog.setNativeQuery("ti:New");
+        viewModel.buildStudy();
+        catalog.setNativeQuery("ti:First");
+        Study builtStudy = viewModel.buildStudy();
+
+        assertEquals(Map.of("ACM Portal", "ti:First"), builtStudy.getQueries().getFirst().getCatalogSpecific());
+        assertEquals(Map.of("ACM Portal", "ti:Second"), builtStudy.getQueries().getLast().getCatalogSpecific());
+    }
+
     private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
         List<StudyCatalog> catalogs = List.of(
                 new StudyCatalog("ACM Portal", true));

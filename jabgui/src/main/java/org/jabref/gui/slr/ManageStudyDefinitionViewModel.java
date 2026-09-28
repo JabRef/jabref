@@ -286,39 +286,36 @@ public class ManageStudyDefinitionViewModel {
 
     /// Builds a [Study] from the current UI state without persisting it.
     public Study buildStudy() {
-        applyNativeQueryOverrides();
         return new Study(
                 authors,
                 title.getValueSafe(),
                 researchQuestions,
-                queries.stream().toList(),
+                buildQueries(),
                 catalogs.stream()
                         .filter(StudyCatalogItem::isEnabled)
                         .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason()))
                         .toList());
     }
 
-    private void applyNativeQueryOverrides() {
+    /// Returns copies of the queries with the edited native queries applied
+    private List<StudyQuery> buildQueries() {
         // Keep differing per-query overrides unless the user edited the cell
         List<StudyCatalogItem> catalogsToApply = catalogs.stream()
                                                          .filter(StudyCatalogItem::isEnabled)
                                                          .filter(catalog -> !catalog.getNativeQuery().equals(mixedNativeQueries.get(catalog.getName())))
                                                          .toList();
-        for (StudyQuery query : queries) {
-            Map<String, String> original = query.getCatalogSpecific();
-            Map<String, String> updated = new LinkedHashMap<>(original);
+        return queries.stream().map(query -> {
+            Map<String, String> catalogSpecific = new LinkedHashMap<>(query.getCatalogSpecific());
             for (StudyCatalogItem catalog : catalogsToApply) {
-                String name = catalog.getName();
-                updated.keySet().removeIf(key -> key.equalsIgnoreCase(name));
-                String nativeQuery = catalog.getNativeQuery();
-                if (StringUtil.isNotBlank(nativeQuery)) {
-                    updated.put(name, nativeQuery);
+                catalogSpecific.keySet().removeIf(key -> key.equalsIgnoreCase(catalog.getName()));
+                if (StringUtil.isNotBlank(catalog.getNativeQuery())) {
+                    catalogSpecific.put(catalog.getName(), catalog.getNativeQuery());
                 }
             }
-            if (!updated.equals(original)) {
-                query.setCatalogSpecific(updated);
-            }
-        }
+            StudyQuery copy = new StudyQuery(query.getQuery());
+            copy.setCatalogSpecific(catalogSpecific);
+            return copy;
+        }).toList();
     }
 
     public Property<String> titleProperty() {
