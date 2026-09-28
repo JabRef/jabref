@@ -407,7 +407,7 @@ class DatabaseChangeMonitorTest {
 
         assertEquals(List.of("a", "b", "c"), database.getEntries().stream().map(entry -> entry.getCitationKey().orElseThrow()).sorted().toList());
         // Relative to the library file, what came from a copy is an unsaved addition, so the baseline does not hold it
-        BibEntry fromCopy = database.getEntries().stream().filter(entry -> entry.getCitationKey().orElseThrow().equals("b")).findFirst().orElseThrow();
+        BibEntry fromCopy = database.getEntries().stream().filter(entry -> "b".equals(entry.getCitationKey().orElseThrow())).findFirst().orElseThrow();
         assertFalse(monitor.getBaseline().hasEntry(fromCopy.getId()));
     }
 
