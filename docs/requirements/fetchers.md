@@ -3,6 +3,14 @@ parent: Requirements
 ---
 # Fetchers
 
+## Retrieve PubPeer comment summaries by DOI
+`req~fetchers.pubpeer-feedback~1`
+
+The backend retrieves PubPeer comment counts, discussion links, commenters, and last comment times for bibliographic entries with a valid DOI.
+It normalizes and deduplicates DOI values and queries sequential batches of at most 40 identifiers.
+Missing feedback is distinct from request or response failures, which are reported to the caller.
+The lookup does not modify entries and does not retrieve individual comment bodies.
+
 ## Respect provider request limits
 `req~fetchers.rate-limiting~1`
 
