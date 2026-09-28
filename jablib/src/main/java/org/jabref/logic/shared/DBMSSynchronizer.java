@@ -629,17 +629,17 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 && (lastAppliedLocalMetaDataRevision == currentLocalRevision)) {
             return;
         }
-        // Groups that never reached the shared database (e.g., their write failed) are not a remote deletion
-        boolean groupTreeWasShared = containsGroupTree(lastSharedMetaData);
-        lastSharedMetaData = sharedMetaData;
         try {
             metaData.setEventPropagation(false);
             new MetaDataParser(fileMonitor).parse(metaData, sharedMetaData, keywordSeparator, userAndHost);
-            if (groupTreeWasShared
+            // Groups that never reached the shared database (e.g., their write failed) are not a remote deletion
+            if (containsGroupTree(lastSharedMetaData)
                     && !containsGroupTree(sharedMetaData)
                     && metaData.getGroups().isPresent()) {
                 metaData.clearGroups();
             }
+            // Only once applied: a snapshot that failed to parse must not hide an earlier shared group tree
+            lastSharedMetaData = sharedMetaData;
             lastAppliedRemoteMetaData = Map.copyOf(sharedMetaData);
             lastAppliedLocalMetaDataRevision = currentLocalRevision;
             hasAppliedRemoteMetaData = true;
