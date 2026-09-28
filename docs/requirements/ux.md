@@ -40,6 +40,14 @@ This provides immediate keyboard interaction capabilities (such as Ctrl+V for pa
 
 Needs: impl
 
+## Center selected entry in main table
+`req~maintable.center-selected~1`
+
+The main table provides an explicit action that scrolls the currently selected entry to the vertical center of the visible rows.
+Near the beginning or end of the table, the entry is placed as close to the center as the available rows allow.
+
+Needs: impl
+
 ## Main table column headers are user-friendly
 `req~maintable.column-headers.user-friendly~1`
 

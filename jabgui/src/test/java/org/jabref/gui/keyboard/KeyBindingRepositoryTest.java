@@ -3,6 +3,7 @@ package org.jabref.gui.keyboard;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -10,6 +11,17 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class KeyBindingRepositoryTest {
+    @Test
+    void missingBindingsAreAddedWithDefaults() {
+        KeyBindingRepository repository = new KeyBindingRepository(
+                List.of(KeyBinding.MERGE_ENTRIES.getConstant()),
+                List.of(""));
+
+        assertEquals("", repository.get(KeyBinding.MERGE_ENTRIES).orElseThrow());
+        assertEquals(KeyBinding.CENTER_SELECTED_ENTRY.getDefaultKeyBinding(),
+                repository.get(KeyBinding.CENTER_SELECTED_ENTRY).orElseThrow());
+    }
+
     private static Stream<Arguments> provideTestData() {
         return Stream.of(
                 // Correctly mapped

@@ -45,6 +45,10 @@ public class KeyBindingRepository {
                 put(bindNames.get(i), bindings.get(i));
             }
         }
+
+        for (KeyBinding keyBinding : KeyBinding.values()) {
+            this.bindings.putIfAbsent(keyBinding, keyBinding.getDefaultKeyBinding());
+        }
     }
 
     /// Check if the given keyCombination equals the given keyEvent
