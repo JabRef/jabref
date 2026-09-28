@@ -19,7 +19,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We excluded the `file` field from the consistency check, because it is not expected to be present in all entries. [#17309](https://github.com/JabRef/jabref/issues/17309)
+- We removed the `file` field from the consistency check, because it is not expected to be present in all entries. [#17309](https://github.com/JabRef/jabref/issues/17309)
 
 ### Fixed
 

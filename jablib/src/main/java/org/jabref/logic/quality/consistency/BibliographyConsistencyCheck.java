@@ -136,7 +136,9 @@ public class BibliographyConsistencyCheck {
                                                                     .findFirst();
 
             Set<OrFields> requiredFields = typeDefOpt.map(typeDef ->
-                    new HashSet<>(typeDef.getRequiredFields())
+                    typeDef.getRequiredFields().stream()
+                           .filter(orFields -> !filterExcludedFields(orFields.getFields()).isEmpty())
+                           .collect(Collectors.toCollection(HashSet::new))
             ).orElse(new HashSet<>());
 
             Set<BibEntry> entries = entryTypeToEntriesMap.get(entryType);
