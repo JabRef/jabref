@@ -494,7 +494,7 @@ public class BibtexParser implements Parser {
         BibtexString bibtexString = parseString();
         try {
             database.addString(bibtexString);
-        } catch (KeyCollisionException ex) {
+        } catch (KeyCollisionException _) {
             parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), Localization.lang("Duplicate string name: '%0'", bibtexString.getName()));
         }
     }
@@ -1096,7 +1096,7 @@ public class BibtexParser implements Parser {
             boolean isCurlyBracket = peek == '}';
             boolean isRoundBracket = peek == ')';
             return isCurlyBracket || isRoundBracket;
-        } catch (IOException e) {
+        } catch (IOException _) {
             return false;
         }
     }

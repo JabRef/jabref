@@ -82,7 +82,7 @@ public class AiSummaryView extends StackPane {
         noSupportedFileTypesPane.managedProperty().bind(noSupportedFileTypesPane.visibleProperty());
         summaryShowing.managedProperty().bind(summaryShowing.visibleProperty());
 
-        // [pp->feat~ai.summarization.entries~1]
+        // [impl->req~ai.summarization.entries.privacy-policy~1]
         privacyNotice.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.AI_TURNED_OFF));
         restartNeededPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.RESTART_NEEDED));
         processingPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.PROCESSING));

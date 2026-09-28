@@ -235,6 +235,9 @@
                                             <TableColumn
                                                     fx:id="catalogReasonColumn"
                                                     text="%Catalog Reason"/>
+                                            <TableColumn
+                                                    fx:id="catalogNativeQueryColumn"
+                                                    text="%Native query"/>
                                         </columns>
                                         <columnResizePolicy>
                                             <TableView

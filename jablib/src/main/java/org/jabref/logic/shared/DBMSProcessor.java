@@ -191,7 +191,7 @@ public class DBMSProcessor {
             try {
                 // replace semicolon so we can parse it
                 VERSION_DB_STRUCT_DEFAULT = Integer.parseInt(metadata.get(MetaData.VERSION_DB_STRUCT).replace(";", ""));
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException _) {
                 LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] is not an Integer.");
             }
         } else {

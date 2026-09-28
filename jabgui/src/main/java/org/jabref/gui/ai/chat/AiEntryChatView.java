@@ -39,7 +39,7 @@ public class AiEntryChatView extends StackPane {
     }
 
     private void setupBindings() {
-        // [pp->feat~ai.chatting.entries~1]
+        // [impl->req~ai.chatting.entries.privacy-policy~1]
         privacyNotice.managedProperty().bind(privacyNotice.visibleProperty());
         aiChatView.managedProperty().bind(aiChatView.visibleProperty());
 
