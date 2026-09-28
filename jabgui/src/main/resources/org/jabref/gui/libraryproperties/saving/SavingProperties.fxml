@@ -21,9 +21,9 @@
     <Label styleClass="h4,padding-top-12" text="%Save actions"/>
     <FieldFormatterCleanupsPanel fx:id="fieldFormatterCleanupsPanel" />
 
-    <Label styleClass="h4,padding-top-12" text="%Synchronization with the library file"/>
+    <Label styleClass="h4,padding-top-12" text="%External changes"/>
     <HBox spacing="8.0" alignment="CENTER_LEFT">
-        <Label text="%Merge external changes of the file into the library without asking"/>
+        <Label text="%Automatically merge external changes"/>
         <ComboBox fx:id="synchronizeWithFile"/>
     </HBox>
 
