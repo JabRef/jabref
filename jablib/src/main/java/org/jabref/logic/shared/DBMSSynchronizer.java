@@ -403,6 +403,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         return dbmsProcessor.getSharedMetaData();
     }
 
+    @VisibleForTesting
+    void writeSharedMetaDataToDatabase(Map<String, String> serializedMetaData) throws SQLException {
+        dbmsProcessor.setSharedMetaData(serializedMetaData);
+    }
+
     private void pullMetaDataFromDatabase() {
         if (!connected.get()) {
             return;
@@ -559,7 +564,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private boolean writeSharedMetaData(Map<String, String> serializedMetaData) {
         return writeOrRecord("Could not write metadata to the shared database",
                 () -> {
-                    dbmsProcessor.setSharedMetaData(serializedMetaData);
+                    writeSharedMetaDataToDatabase(serializedMetaData);
                     lastSharedMetaData = serializedMetaData;
                 },
                 () -> offlineChanges.recordMetaData(serializedMetaData, lastSharedMetaData));
@@ -622,12 +627,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 && (lastAppliedLocalMetaDataRevision == currentLocalRevision)) {
             return;
         }
+        // Groups that never reached the shared database (e.g., their write failed) are not a remote deletion
+        boolean groupTreeWasShared = containsGroupTree(lastSharedMetaData);
         lastSharedMetaData = sharedMetaData;
         try {
             metaData.setEventPropagation(false);
             new MetaDataParser(fileMonitor).parse(metaData, sharedMetaData, keywordSeparator, userAndHost);
-            if (!sharedMetaData.containsKey(MetaData.GROUPSTREE)
-                    && !sharedMetaData.containsKey(MetaData.GROUPSTREE_LEGACY)
+            if (groupTreeWasShared
+                    && !containsGroupTree(sharedMetaData)
                     && metaData.getGroups().isPresent()) {
                 metaData.clearGroups();
             }
@@ -639,6 +646,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         } finally {
             metaData.setEventPropagation(true);
         }
+    }
+
+    private static boolean containsGroupTree(Map<String, String> serializedMetaData) {
+        return serializedMetaData.containsKey(MetaData.GROUPSTREE)
+                || serializedMetaData.containsKey(MetaData.GROUPSTREE_LEGACY);
     }
 
     /// Applies the [MetaData] on all local and shared BibEntries.

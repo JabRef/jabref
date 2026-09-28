@@ -432,6 +432,54 @@ class DBMSSynchronizerTest {
     }
 
     @Test
+    void remoteSnapshotWithoutGroupsKeepsGroupsWhoseWriteFailed() throws Exception {
+        BlockingQueue<Runnable> pendingDatabaseTasks = new LinkedBlockingQueue<>();
+        BibDatabaseContext remoteContext = new BibDatabaseContext();
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        DBMSSynchronizer remoteSynchronizer = new DBMSSynchronizer(
+                remoteContext,
+                ',',
+                fieldPreferences,
+                pattern,
+                new DummyFileUpdateMonitor(),
+                "UserAndHost",
+                new VirtualThreadTaskExecutor(),
+                Runnable::run,
+                pendingDatabaseTasks::add,
+                offlineChangesDirectory) {
+            @Override
+            void writeSharedMetaDataToDatabase(Map<String, String> serializedMetaData) throws SQLException {
+                throw new SQLException("Simulated write failure on a live connection");
+            }
+        };
+        remoteContext.getMetaData().registerListener(remoteSynchronizer);
+        remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+
+        try {
+            GroupTreeNode groupRoot = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+            groupRoot.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+            remoteContext.getMetaData().setGroups(groupRoot);
+            Runnable failingLocalWrite = pendingDatabaseTasks.poll(5, TimeUnit.SECONDS);
+            assertNotNull(failingLocalWrite);
+            failingLocalWrite.run();
+
+            Map<String, String> changedSnapshot = new HashMap<>(dbmsProcessor.getSharedMetaData());
+            changedSnapshot.put(MetaData.DATABASE_TYPE, "biblatex;");
+            dbmsProcessor.setSharedMetaData(changedSnapshot);
+            remoteSynchronizer.handleRemoteMetaDataChange();
+            Runnable remotePull = pendingDatabaseTasks.poll(5, TimeUnit.SECONDS);
+            assertNotNull(remotePull);
+            remotePull.run();
+
+            assertEquals(Optional.of(BibDatabaseMode.BIBLATEX), remoteContext.getMetaData().getMode());
+            assertEquals(Optional.of(groupRoot), remoteContext.getMetaData().getGroups());
+        } finally {
+            remoteSynchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
     void entriesRemovedEventListener() throws SQLException {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
