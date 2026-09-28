@@ -46,6 +46,7 @@ public class BibliographyConsistencyCheck {
             StandardField.SORTNAME,
             StandardField.TYPE,
             StandardField.XREF,
+            StandardField.FILE,
 
             // JabRef-specific
             StandardField.GROUPS,

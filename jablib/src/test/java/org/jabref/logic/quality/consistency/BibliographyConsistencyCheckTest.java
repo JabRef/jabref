@@ -409,6 +409,7 @@ class BibliographyConsistencyCheckTest {
         BibEntry a = new BibEntry(StandardEntryType.Misc, "a")
                 .withField(StandardField.COMMENT, "note")
                 .withField(StandardField.PDF, "file.pdf")
+                .withField(StandardField.FILE, "test.pdf")
                 .withField(new UserSpecificCommentField("XYZ"), "foo")
                 .withField(SpecialField.PRIORITY, "high");
         BibEntry b = new BibEntry(StandardEntryType.Misc, "b")
