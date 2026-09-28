@@ -22,6 +22,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
@@ -124,10 +125,13 @@ public final class LibraryBaseline {
     }
 
     /// Lookup tables over the baseline entries for disk entries without in-memory counterpart. Built once per pass
-    /// over a set of changes, so that each lookup is O(1) instead of a scan over the library.
+    /// over a set of changes, so that each lookup is O(1) instead of a scan over the library; the in-memory entries
+    /// must not change during the pass.
     public final class Lookup {
         private final Map<String, List<Map.Entry<String, EntrySnapshot>>> byKey = new HashMap<>();
         private final Map<EntrySnapshot, List<Map.Entry<String, EntrySnapshot>>> byContentExceptKey = new HashMap<>();
+        /// The baseline entries gone from memory, the same for every disk entry of a pass; collected on first use
+        private @Nullable List<String> goneFromMemory;
 
         private Lookup() {
             for (Map.Entry<String, EntrySnapshot> entry : entriesById.entrySet()) {
@@ -156,8 +160,10 @@ public final class LibraryBaseline {
             }
             // Neither key nor content match: an entry deleted in memory may still be the origin, with key and a
             // field changed on disk; then the deletion and the change need a review
-            List<String> goneFromMemory = entriesById.keySet().stream().filter(id -> !existsInMemory.test(id)).toList();
-            return closestOf(goneFromMemory, remote).isPresent() ? Side.BOTH : Side.DISK;
+            if (goneFromMemory == null) {
+                goneFromMemory = entriesById.keySet().stream().filter(id -> !existsInMemory.test(id)).toList();
+            }
+            return !goneFromMemory.isEmpty() && closestOf(goneFromMemory, remote).isPresent() ? Side.BOTH : Side.DISK;
         }
 
         /// Identical content under the same key is the entry itself; identical content under another key is the entry
@@ -304,6 +310,65 @@ public final class LibraryBaseline {
             return Side.BOTH;
         }
         return remoteChanged ? Side.DISK : Side.MEMORY;
+    }
+
+    // Advancing the baseline after a scan or a review: an item whose disk version was applied, or judged and declined,
+    // has the disk version as its ancestor from then on. What memory still holds differently is an unsaved edit, not
+    // an external change.
+
+    /// A baseline to advance item by item, leaving this one as it is.
+    public LibraryBaseline copy() {
+        return new LibraryBaseline(new HashMap<>(entriesById), new HashMap<>(metaData), preamble, new HashMap<>(strings), citationKeyPatterns);
+    }
+
+    /// The disk version of the entry with the given in-memory id becomes its ancestor.
+    public void recordEntry(String entryId, BibEntry disk) {
+        entriesById.put(entryId, EntrySnapshot.of(disk));
+    }
+
+    /// The entry is gone from disk.
+    public void forgetEntry(String entryId) {
+        entriesById.remove(entryId);
+    }
+
+    /// The disk metadata becomes the ancestor, except for the groups, which are judged on their own.
+    public void recordMetaData(MetaData disk) {
+        record(serialize(disk, citationKeyPatterns), key -> !isGroupKey(key));
+    }
+
+    /// The given group tree, as found on disk, becomes the ancestor of the groups; `null` when disk has no groups.
+    public void recordGroups(@Nullable GroupTreeNode diskRoot) {
+        MetaData groupsOnly = new MetaData();
+        if (diskRoot != null) {
+            groupsOnly.setGroups(diskRoot);
+        }
+        record(serialize(groupsOnly, citationKeyPatterns), LibraryBaseline::isGroupKey);
+    }
+
+    private void record(Map<String, String> serialized, Predicate<String> keys) {
+        metaData.keySet().removeIf(keys);
+        serialized.forEach((key, value) -> {
+            if (keys.test(key)) {
+                metaData.put(key, value);
+            }
+        });
+    }
+
+    private static boolean isGroupKey(String key) {
+        return MetaData.GROUPSTREE.equals(key) || MetaData.GROUPSTREE_LEGACY.equals(key);
+    }
+
+    public void recordPreamble(@Nullable String disk) {
+        preamble = disk;
+    }
+
+    /// @param content the string's content on disk, `null` when the string does not exist on disk
+    public void recordString(String name, @Nullable String content) {
+        if (content == null) {
+            strings.remove(name);
+        } else {
+            strings.put(name, content);
+        }
     }
 
     // Carrying over items from a previous baseline: an external change that was not applied must be seen against the

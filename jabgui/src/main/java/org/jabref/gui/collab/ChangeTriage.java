@@ -21,6 +21,7 @@ import org.jabref.gui.collab.stringadd.BibTexStringAdd;
 import org.jabref.gui.collab.stringchange.BibTexStringChange;
 import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
 import org.jabref.gui.collab.stringrename.BibTexStringRename;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.sync.LibraryBaseline;
 import org.jabref.logic.sync.LibraryBaseline.Side;
 import org.jabref.model.database.BibDatabaseContext;
@@ -45,10 +46,11 @@ public final class ChangeTriage {
 
     /// Outcome of comparing external changes against the baseline.
     ///
-    /// @param diskOnly   changes to items untouched in memory; already accepted, to be applied without asking
-    /// @param bothSides  changes to items that were modified in memory as well, in a way that cannot be merged automatically; need a review
-    /// @param memoryOnly not external changes at all: differences caused by unsaved in-memory edits; to be dropped
-    public record Triage(List<DatabaseChange> diskOnly, List<DatabaseChange> bothSides, List<DatabaseChange> memoryOnly) {
+    /// @param diskOnly    changes to items untouched in memory; already accepted, to be applied without asking
+    /// @param bothSides   changes to items that were modified in memory as well, in a way that cannot be merged automatically; need a review
+    /// @param memoryOnly  not external changes at all: differences caused by unsaved in-memory edits; to be dropped
+    /// @param diskEntries the disk version of every entry changed in `diskOnly`, by in-memory entry id: its ancestor once the change is applied, which for a merged entry is not what memory holds then
+    public record Triage(List<DatabaseChange> diskOnly, List<DatabaseChange> bothSides, List<DatabaseChange> memoryOnly, Map<String, BibEntry> diskEntries) {
     }
 
     private ChangeTriage() {
@@ -56,7 +58,7 @@ public final class ChangeTriage {
 
     /// Entries modified on both sides in different fields are merged field by field into a new, accepted [EntryChange].
     public static Triage triage(LibraryBaseline baseline, List<DatabaseChange> changes, BibDatabaseContext local, @Nullable DatabaseChangeResolverFactory resolverFactory) {
-        Triage triage = new Triage(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        Triage triage = new Triage(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new HashMap<>());
         // A group change is always accompanied by the metadata change it is part of, which precedes it in the list
         Side metaDataSide = Side.BOTH;
         LibraryBaseline.Lookup lookup = baseline.lookup();
@@ -73,6 +75,9 @@ public final class ChangeTriage {
                         BibEntryMerge merge = mergeEntry(baseline, entryChange, local, resolverFactory);
                         change = merge.change();
                         entrySide = merge.side();
+                    }
+                    if (entrySide == Side.DISK) {
+                        triage.diskEntries().put(entryChange.getOldEntry().getId(), entryChange.getNewEntry());
                     }
                     yield entrySide;
                 }
@@ -143,6 +148,58 @@ public final class ChangeTriage {
                 }
             }
         }
+    }
+
+    /// After a review, every judged item has the disk version as its ancestor, accepted or declined: accepted, memory
+    /// holds it too (or, merged by hand, holds more, which is an unsaved edit from then on); declined, memory keeps its
+    /// own version, an unsaved edit as well, which is not reported again. Items the review did not cover keep the
+    /// ancestor they had.
+    ///
+    /// @param scanned  the changes as scanned, whose entry changes hold the disk version; a merge by hand replaces such a change by one holding the result
+    /// @param resolved the changes as judged
+    public static void advance(LibraryBaseline baseline, List<DatabaseChange> scanned, List<DatabaseChange> resolved) {
+        Map<String, BibEntry> diskEntries = new HashMap<>();
+        for (DatabaseChange change : scanned) {
+            if (change instanceof EntryChange entryChange) {
+                diskEntries.put(entryChange.getOldEntry().getId(), entryChange.getNewEntry());
+            }
+        }
+        for (DatabaseChange change : resolved) {
+            switch (change) {
+                case EntryChange entryChange -> {
+                    String id = entryChange.getOldEntry().getId();
+                    baseline.recordEntry(id, diskEntries.getOrDefault(id, entryChange.getNewEntry()));
+                }
+                case EntryAdd entryAdd ->
+                        baseline.recordEntry(entryAdd.getAddedEntry().getId(), entryAdd.getAddedEntry());
+                case EntryDelete entryDelete ->
+                        baseline.forgetEntry(entryDelete.getDeletedEntry().getId());
+                case MetadataChange metadataChange ->
+                        baseline.recordMetaData(metadataChange.getMetaDataDiff().getNewMetaData());
+                case GroupChange groupChange ->
+                        baseline.recordGroups(groupChange.getGroupDiff().getNewGroupRoot());
+                case PreambleChange preambleChange ->
+                        baseline.recordPreamble(preambleChange.getPreambleDiff().getNewPreamble());
+                case BibTexStringAdd stringAdd ->
+                        baseline.recordString(stringAdd.getAddedString().getName(), stringAdd.getAddedString().getContent());
+                case BibTexStringDelete stringDelete ->
+                        baseline.recordString(stringDelete.getDeletedString().getName(), null);
+                case BibTexStringChange stringChange ->
+                        baseline.recordString(stringChange.getOldString().getName(), stringChange.getNewString().getContent());
+                case BibTexStringRename stringRename -> {
+                    baseline.recordString(stringRename.getOldString().getName(), null);
+                    baseline.recordString(stringRename.getNewString().getName(), stringRename.getNewString().getContent());
+                }
+            }
+        }
+    }
+
+    /// Whether scanned changes show the library and its file to be the same apart from the synchronization setting,
+    /// which is never synchronized and turns up as a metadata change without a visible difference.
+    public static boolean matchesFile(List<DatabaseChange> changes, GlobalCitationKeyPatterns citationKeyPatterns) {
+        return changes.stream().allMatch(change -> change instanceof MetadataChange metadataChange
+                && metadataChange.getMetaDataDiff().getDifferences(citationKeyPatterns).isEmpty()
+                && metadataChange.getMetaDataDiff().getGroupDifferences().isEmpty());
     }
 
     /// Applying a metadata change installs the parsed metadata as a whole, so the settings that are never synchronized
