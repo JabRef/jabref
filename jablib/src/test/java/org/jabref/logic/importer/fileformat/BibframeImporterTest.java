@@ -87,9 +87,9 @@ class BibframeImporterTest {
 
         assertTrue(importer.isRecognizedFormat(xml));
         assertEquals(List.of(
-                             new BibEntry().withField(StandardField.TITLE, "First work"),
-                             new BibEntry().withField(StandardField.TITLE, "Second work")),
-                     importer.importDatabase(xml).getDatabase().getEntries());
+                        new BibEntry().withField(StandardField.TITLE, "First work"),
+                        new BibEntry().withField(StandardField.TITLE, "Second work")),
+                importer.importDatabase(xml).getDatabase().getEntries());
     }
 
     @Test
