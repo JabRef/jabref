@@ -582,7 +582,7 @@ public class GroupDialogViewModel {
         return keywordSearchTermEmptyValidator.getValidationStatus();
     }
 
-    public ValidationStatus texGroupFilePathValidatonStatus() {
+    public ValidationStatus texGroupFilePathValidationStatus() {
         return texGroupFilePathValidator.getValidationStatus();
     }
 
