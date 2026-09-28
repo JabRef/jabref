@@ -380,6 +380,7 @@ public class MarcXmlParser implements Parser {
     private void putHostItem(BibEntry bibEntry, Element datafield, Optional<Character> hostItemBibliographicLevel) {
         String hostTitle = getSubfield("t", datafield);
         String hostIssn = getSubfield("x", datafield);
+        // An ISSN still identifies a serial host when a source omits the bibliographic level.
         boolean serialHost = hostItemBibliographicLevel.filter(level -> level == 's').isPresent()
                 || (hostItemBibliographicLevel.isEmpty() && StringUtil.isNotBlank(hostIssn));
         if (serialHost) {

@@ -143,9 +143,9 @@ class BibframeConverterIntegrationTest {
             assertEquals(original.getField(StandardField.ABSTRACT), finalEntry.getField(StandardField.ABSTRACT));
         } else {
             assertEquals(original.getField(StandardField.PAGES), finalEntry.getField(StandardField.PAGES));
-            // bibframe2marc emits MARC 773 without $7; MarcXmlParser consequently cannot infer Article or journal.
-            assertEquals(StandardEntryType.Misc, finalEntry.getType());
-            assertEquals(Optional.empty(), finalEntry.getField(StandardField.JOURNAL));
+            // The reverse converter omits $7; MarcXmlParser identifies the serial host from its ISSN.
+            assertEquals(StandardEntryType.Article, finalEntry.getType());
+            assertEquals(original.getField(StandardField.JOURNAL), finalEntry.getField(StandardField.JOURNAL));
         }
     }
 
