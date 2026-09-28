@@ -107,7 +107,12 @@ class HayagrivaRoundTripTest {
                         .withCitationKey("commented")
                         .withField(StandardField.TITLE, "An entry carrying comments")
                         .withField(StandardField.COMMENT, "A shared comment")
-                        .withField(new UserSpecificCommentField("koppor"), "A per-user comment")));
+                        .withField(new UserSpecificCommentField("koppor"), "A per-user comment")),
+                // https://github.com/JabRef/jabref/issues/17316
+                Arguments.of(new BibEntry(StandardEntryType.Misc)
+                        .withCitationKey("corporate")
+                        .withField(StandardField.TITLE, "Lorem Ipsum")
+                        .withField(StandardField.AUTHOR, "{Some company} and Müller, Hans")));
     }
 
     @ParameterizedTest
@@ -117,7 +122,7 @@ class HayagrivaRoundTripTest {
     }
 
     /// The upstream `basic.yml` fixture uses constructs JabRef normalizes on first import (e.g.
-    /// corporate author names, `serial` numbers becoming `issue`), so the guarantee starts after
+    /// `serial` numbers becoming `issue`), so the guarantee starts after
     /// one import/export cycle: from then on, further cycles must be the identity.
     @Test
     void basicFixtureIsStableAfterFirstCycle() throws IOException, URISyntaxException {

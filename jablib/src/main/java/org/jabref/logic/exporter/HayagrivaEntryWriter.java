@@ -201,7 +201,8 @@ public class HayagrivaEntryWriter {
 
     private JsonNode personList(String bibtexPersons) {
         ArrayNode names = MAPPER.createArrayNode();
-        AuthorList.parse(bibtexPersons).getAuthors()
+        // LaTeX-free: protecting braces such as `{Some company}` would read as a YAML flow mapping
+        AuthorList.parse(bibtexPersons).latexFree().getAuthors()
                   .forEach(author -> names.add(author.getFamilyGiven(false)));
         return names;
     }
