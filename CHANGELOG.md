@@ -20,7 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
 
 ### Changed
-- The context window size for AI models unknown to JabRef (e.g., local models) now defaults to 64k tokens instead of 8k. [#PR]
+- The context window size for AI models unknown to JabRef (e.g., local models) now defaults to 64k tokens instead of 8k. [#TODO]
 
 ### Fixed
 
