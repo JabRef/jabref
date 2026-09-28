@@ -50,4 +50,11 @@ A file that parses with warnings is not affected: it still opens, and its warnin
 
 Needs: impl, utest
 
+## Infer DOIs from other fields
+`req~import.doi-from-other-fields~1`
+
+If an entry's `doi` field is empty and another field contains a DOI, JabRef makes a best-effort attempt to identify that DOI and store it in the `doi` field.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
