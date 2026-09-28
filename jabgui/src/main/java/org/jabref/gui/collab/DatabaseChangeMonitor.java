@@ -405,7 +405,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         List<DatabaseChange> unresolved = new ArrayList<>(triage.bothSides());
         unresolved.addAll(triage.memoryOnly());
         if (!triage.diskOnly().isEmpty()) {
-            applyResolvedChanges(triage.diskOnly(), unresolved.isEmpty() && !libraryTab.isModified());
+            applyResolvedChanges(triage.diskOnly(), unresolved.isEmpty());
             dialogService.notify(Localization.lang("Merged %0 change(s) from the library file", String.valueOf(triage.diskOnly().size())));
         }
         synchronized (database) {
@@ -439,14 +439,17 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     /// Applies the accepted external changes and updates the library's dirty state.
     ///
     /// @param resolvedChanges          the externally resolved changes to apply to the in-memory database
-    /// @param resolvedChangesMatchDisk `true` if the accepted result now matches the file on disk, so the library can be marked clean; `false` if the resolved result differs from disk and still needs saving
+    /// @param resolvedChangesMatchDisk `true` if the accepted result now matches the file on disk for the resolved items, so the library can be marked clean unless it was modified elsewhere; `false` if the resolved result differs from disk and still needs saving
     void applyResolvedChanges(List<DatabaseChange> resolvedChanges, boolean resolvedChangesMatchDisk) {
+        // Decided before applying: the changes cover the differences to the file only, an unsaved edit elsewhere
+        // (not an external change, so never part of them) keeps the library modified
+        boolean matchesDisk = resolvedChangesMatchDisk && !libraryTab.isModified();
         undoManager.addEdit(Localization.lang("Merged external changes"), edit ->
                 resolvedChanges.stream()
                                .filter(DatabaseChange::isAccepted)
                                .forEach(change -> change.applyChange(edit)));
 
-        if (resolvedChangesMatchDisk) {
+        if (matchesDisk) {
             libraryTab.resetChangedProperties();
         } else {
             // Nothing on the stack describes a denied change - denying one records nothing - but the

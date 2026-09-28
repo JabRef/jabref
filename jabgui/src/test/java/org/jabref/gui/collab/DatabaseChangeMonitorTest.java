@@ -309,6 +309,33 @@ class DatabaseChangeMonitorTest {
     }
 
     @Test
+    void applyResolvedChangesKeepsTheLibraryModifiedWhenItHasUnsavedEditsElsewhere() {
+        BibEntry oldEntry = new BibEntry().withCitationKey("Key")
+                                          .withField(StandardField.TITLE, "Old title");
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(oldEntry)));
+        EntryChange diskChange = new EntryChange(oldEntry, new BibEntry(oldEntry).withField(StandardField.TITLE, "Disk title"), databaseContext);
+        diskChange.accept();
+
+        JabRefUndoManager undoManager = new JabRefUndoManager();
+        LibraryTab libraryTab = mock(LibraryTab.class);
+        when(libraryTab.isModified()).thenReturn(true);
+        DatabaseChangeMonitor monitor = new DatabaseChangeMonitor(
+                databaseContext,
+                mock(FileUpdateMonitor.class),
+                mock(TaskExecutor.class),
+                mock(DialogService.class),
+                mock(GuiPreferences.class),
+                undoManager,
+                mock(StateManager.class),
+                libraryTab);
+
+        monitor.applyResolvedChanges(List.of(diskChange), true);
+
+        assertTrue(undoManager.hasChanged());
+        verify(libraryTab, never()).resetChangedProperties();
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void notifyExternalChangesReplacesPreviousNotification(@TempDir Path tempDir) throws Exception {
         Path monitoredPath = tempDir.resolve("library.bib");
