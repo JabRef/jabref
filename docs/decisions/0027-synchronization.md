@@ -37,7 +37,7 @@ Thus, there are additions needed to handle the local synchronization.
 
 Moreover, the optimistic offline lock does not say how a set of data is synchronized.
 
-Both shortcomings are resolved by our algotihm.
+Both shortcomings are resolved by our algorithm.
 This algorithm is described at [Remote JabDrive storage](../code-howtos/remote-storage-jabdrive.md).
 
 ### Algorithm based on "optimistic offline lock"
