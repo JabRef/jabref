@@ -23,6 +23,7 @@ public class CiteDrivePreferences {
     ///
     /// - Refresh token (long-lived, confidential). -- could be unavailable; therefore "Optional"
     /// - Access token (short-lived) - not stored here
+    private final BooleanProperty enabled;
     private final ObjectProperty<RefreshToken> refreshToken;
     private final BooleanProperty persistRefreshToken;
 
@@ -31,10 +32,12 @@ public class CiteDrivePreferences {
     /// CiteDrive web app, where the user completes an import
     private final StringProperty appBaseUrl;
 
-    public CiteDrivePreferences(@Nullable RefreshToken refreshToken,
+    public CiteDrivePreferences(boolean enabled,
+                                @Nullable RefreshToken refreshToken,
                                 boolean persistRefreshToken,
                                 String apiBaseUrl,
                                 String appBaseUrl) {
+        this.enabled = new SimpleBooleanProperty(enabled);
         this.refreshToken = new SimpleObjectProperty<>(refreshToken);
         this.persistRefreshToken = new SimpleBooleanProperty(persistRefreshToken);
         this.apiBaseUrl = new SimpleStringProperty(apiBaseUrl);
@@ -44,6 +47,7 @@ public class CiteDrivePreferences {
     // Creates object with default preference values
     private CiteDrivePreferences() {
         this(
+                false, // CiteDrive is opt-in
                 null,  // no refresh token
                 true, // store in keychain
                 "https://api-dev.citedrive.com/",
@@ -56,10 +60,23 @@ public class CiteDrivePreferences {
     }
 
     public void setAll(CiteDrivePreferences preferences) {
+        this.enabled.set(preferences.isEnabled());
         this.refreshToken.set(preferences.getRefreshToken());
         this.persistRefreshToken.set(preferences.shouldPersistRefreshToken());
         this.apiBaseUrl.set(preferences.getApiBaseUrl());
         this.appBaseUrl.set(preferences.getAppBaseUrl());
+    }
+
+    public boolean isEnabled() {
+        return enabled.get();
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled.set(enabled);
+    }
+
+    public BooleanProperty enabledProperty() {
+        return enabled;
     }
 
     public String getApiBaseUrl() {

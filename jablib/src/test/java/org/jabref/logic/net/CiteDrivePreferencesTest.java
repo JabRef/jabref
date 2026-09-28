@@ -10,7 +10,7 @@ class CiteDrivePreferencesTest {
 
     @Test
     void endpointsFollowBaseUrls() {
-        CiteDrivePreferences preferences = new CiteDrivePreferences(null, true, "https://api.example.com/", "https://app.example.com/");
+        CiteDrivePreferences preferences = new CiteDrivePreferences(true, null, true, "https://api.example.com/", "https://app.example.com/");
 
         assertEquals(URI.create("https://api.example.com/jabref/login/"), preferences.getAuthorizationEndpoint());
         assertEquals(URI.create("https://api.example.com/o/token/"), preferences.getTokenEndpoint());

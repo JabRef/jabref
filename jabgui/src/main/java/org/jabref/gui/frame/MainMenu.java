@@ -203,9 +203,7 @@ public class MainMenu extends MenuBar {
                         new SeparatorMenuItem(),
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
-                factory.createSubMenu(StandardActions.CITE_DRIVE,
-                        factory.createMenuItem(StandardActions.CITE_DRIVE_PUSH, new CiteDrivePushAction(dialogService, stateManager, preferences, oAuthSessionRegistry)),
-                        factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, preferences, oAuthSessionRegistry))),
+                citeDriveMenu(factory),
                 factory.createSubMenu(StandardActions.REMOTE_DB,
                         factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService))),
                 // endregion
@@ -446,5 +444,14 @@ public class MainMenu extends MenuBar {
         );
 
         return sendMenu;
+    }
+
+    /// CiteDrive is opt-in: without it the menu is not shown at all
+    private Menu citeDriveMenu(ActionFactory factory) {
+        Menu citeDrive = factory.createSubMenu(StandardActions.CITE_DRIVE,
+                factory.createMenuItem(StandardActions.CITE_DRIVE_PUSH, new CiteDrivePushAction(dialogService, stateManager, preferences, oAuthSessionRegistry)),
+                factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, preferences, oAuthSessionRegistry)));
+        citeDrive.visibleProperty().bind(preferences.getCiteDrivePreferences().enabledProperty());
+        return citeDrive;
     }
 }

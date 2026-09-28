@@ -19,6 +19,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ExternalStoragesTabViewModel implements PreferenceTabViewModel {
 
+    private final BooleanProperty citeDriveEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty rememberCiteDriveLoginProperty = new SimpleBooleanProperty();
     private final StringProperty citeDriveApiBaseUrlProperty = new SimpleStringProperty("");
     private final StringProperty citeDriveAppBaseUrlProperty = new SimpleStringProperty("");
@@ -47,6 +48,7 @@ public class ExternalStoragesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        citeDriveEnabledProperty.setValue(citeDrivePreferences.isEnabled());
         rememberCiteDriveLoginProperty.setValue(citeDrivePreferences.shouldPersistRefreshToken());
         citeDriveApiBaseUrlProperty.setValue(citeDrivePreferences.getApiBaseUrl());
         citeDriveAppBaseUrlProperty.setValue(citeDrivePreferences.getAppBaseUrl());
@@ -54,6 +56,7 @@ public class ExternalStoragesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        citeDrivePreferences.setEnabled(citeDriveEnabledProperty.getValue());
         citeDrivePreferences.setPersistRefreshToken(rememberCiteDriveLoginProperty.getValue());
         citeDrivePreferences.setApiBaseUrl(citeDriveApiBaseUrlProperty.getValue().trim());
         citeDrivePreferences.setAppBaseUrl(citeDriveAppBaseUrlProperty.getValue().trim());
@@ -62,6 +65,10 @@ public class ExternalStoragesTabViewModel implements PreferenceTabViewModel {
     @Override
     public boolean validateSettings() {
         return apiBaseUrlValidator.getValidationStatus().isValid() && appBaseUrlValidator.getValidationStatus().isValid();
+    }
+
+    public BooleanProperty citeDriveEnabledProperty() {
+        return citeDriveEnabledProperty;
     }
 
     public BooleanProperty rememberCiteDriveLoginProperty() {
