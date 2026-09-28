@@ -1,0 +1,142 @@
+# Spell checking with https://github.com/crate-ci/typos
+[files]
+extend-exclude = [
+  # Submodules and data files
+  "jablib/src/main/abbrv.jabref.org/",
+  "jablib/src/main/resources/csl-styles/",
+  "jablib/src/main/resources/csl-locales/",
+  "jabgui/src/main/themes.jabref.org/",
+  "jablib/src/main/resources/ltwa/",
+  "jablib/src/main/resources/icore/",
+  "*.terms",
+  "reachability-metadata.json",
+  # Translations are maintained at Crowdin
+  "JabRef_*.properties",
+  "**/src/test/resources/",
+  "*.bib",
+  # Third-party files
+  "*.bst",
+  "*.xsl",
+  "harvard.readme",
+  "jablib/src/main/resources/xslt/mathml_latex/README",
+  "jablib/src/main/resources/resource/layout/din1505/README.txt",
+  "org.citationstyles.*.txt",
+  # Keys defined by Eclipse
+  "config/*Code Style*",
+  # Diagrams (SVG generated from BPMN)
+  "docs/images/",
+]
+
+[default.extend-words]
+# BibTeX field name
+annote = "annote"
+# "and" separators in BibTeX author lists
+ands = "ands"
+# .sav backup file extension
+sav = "sav"
+# Spelling used by external APIs (LibreOffice UNO, JAX-RS, xmpbox)
+removeable = "removeable"
+writeable = "writeable"
+prefered = "prefered"
+unparseable = "unparseable"
+# Real words
+afterwords = "afterwords"
+bigrading = "bigrading"
+# Ordinals, abbreviations, field codes and variable names
+nd = "nd"
+edn = "edn"
+thes = "thes"
+rin = "rin"
+ein = "ein"
+ot = "ot"
+pn = "pn"
+thm = "thm"
+fre = "fre"
+curren = "curren"
+ket = "ket"
+mis = "mis"
+ser = "ser"
+serie = "serie"
+ofr = "ofr"
+ois = "ois"
+# Names in test data
+aache = "aache"
+aks = "aks"
+alue = "alue"
+ba = "ba"
+bui = "bui"
+malins = "malins"
+ned = "ned"
+noe = "noe"
+ome = "ome"
+ove = "ove"
+rech = "rech"
+thi = "thi"
+tung = "tung"
+vas = "vas"
+wich = "wich"
+wil = "wil"
+# Word fragments in test data
+allo = "allo"
+caf = "caf"
+ded = "ded"
+fo = "fo"
+hel = "hel"
+ine = "ine"
+lene = "lene"
+lik = "lik"
+lso = "lso"
+mananger = "mananger"
+metada = "metada"
+nto = "nto"
+ower = "ower"
+pagent = "pagent"
+perfor = "perfor"
+plas = "plas"
+potatoe = "potatoe"
+pplication = "pplication"
+prining = "prining"
+quantit = "quantit"
+rela = "rela"
+sur = "sur"
+tme = "tme"
+ue = "ue"
+urrent = "urrent"
+wrapp = "wrapp"
+# Non-English test data
+abstrakt = "abstrakt"
+als = "als"
+apostroph = "apostroph"
+archiv = "archiv"
+commentaires = "commentaires"
+commun = "commun"
+dito = "dito"
+exemple = "exemple"
+funktional = "funktional"
+ges = "ges"
+informe = "informe"
+ist = "ist"
+mesure = "mesure"
+nam = "nam"
+oder = "oder"
+philosophiae = "philosophiae"
+plattform = "plattform"
+problemas = "problemas"
+"prozeß" = "prozeß"
+publikation = "publikation"
+sais = "sais"
+sie = "sie"
+varios = "varios"
+varius = "varius"
+vor = "vor"
+januar = "januar"
+februar = "februar"
+juni = "juni"
+juli = "juli"
+oktober = "oktober"
+dezember = "dezember"
+titel = "titel"
+
+[default.extend-identifiers]
+# Former command line parameter, mentioned in CHANGELOG.md
+embeddBibfileInPdf = "embeddBibfileInPdf"

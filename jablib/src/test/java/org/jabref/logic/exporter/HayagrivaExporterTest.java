@@ -72,6 +72,23 @@ class HayagrivaExporterTest {
         assertEquals(expected, export(List.of(entry), tempDir));
     }
 
+    /// https://github.com/JabRef/jabref/issues/17316
+    @Test
+    void exportsCorporateAndLatexAuthorsWithoutBraces(@TempDir Path tempDir) throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "{Some company} and M{\\\"u}ller, Hans");
+
+        List<String> expected = List.of(
+                "test:",
+                "  type: article",
+                "  author:",
+                "  - Some company",
+                "  - \"Müller, Hans\"");
+
+        assertEquals(expected, export(List.of(entry), tempDir));
+    }
+
     @Test
     void unmappedTypeExportsAsLowercaseMisc(@TempDir Path tempDir) throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Dataset)
