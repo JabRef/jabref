@@ -20,6 +20,8 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Approve PR
+        # jabref-machine cannot approve its own PRs (ports); port-to-other-branch.yml approves those
+        if: github.event.pull_request.user.login != 'jabref-machine'
         # Guard: automerge.yml (running for a push made just before the label was added)
         # queries labels live and may approve concurrently — skip if an un-dismissed
         # approval by jabref-machine already exists.
