@@ -206,7 +206,7 @@ public class JabRefGUI extends Application {
 
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
-        HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+        HeadlessExecutorService.INSTANCE.executeInterruptibleTask(fileUpdateMonitor, "FileUpdateMonitor");
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
 
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
