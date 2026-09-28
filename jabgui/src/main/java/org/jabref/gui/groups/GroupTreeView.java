@@ -318,7 +318,7 @@ public class GroupTreeView extends BorderPane {
                 .withContextMenu(this::createContextMenuForGroup)
                 .withEventFilter(MouseEvent.MOUSE_PRESSED, (_, event) -> {
                     if (((MouseEvent) event).getButton() == MouseButton.SECONDARY && !stateManager.getSelectedEntries().isEmpty()) {
-                        // Prevent right-click to select group whe we have selected entries
+                        // Prevent right-click to select group when we have selected entries
                         event.consume();
                     } else if (event.getTarget() instanceof StackPane pane) {
                         if (pane.getStyleClass().contains("arrow") || pane.getStyleClass().contains("tree-disclosure-node")) {

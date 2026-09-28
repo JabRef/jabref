@@ -6,7 +6,7 @@ parent: Requirements
 ## Live propagation of changes
 `req~shared-database.live-propagation~1`
 
-Changes made by one client — entry modifications, groups, and library settings — appear in all other connected clients without any manual action.
+Changes made by one client — entry modifications, groups, and library settings — appear in all other connected clients without any manual action. This includes deleting the entire group tree.
 
 Needs: impl, utest
 

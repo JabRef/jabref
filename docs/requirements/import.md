@@ -3,6 +3,15 @@ parent: Requirements
 ---
 # Import
 
+## Import MARC21-XML bibliographic records
+`req~import.marc21-xml~1`
+
+JabRef supports importing MARC21 bibliographic records encoded as [MARCXML](https://www.loc.gov/standards/marcxml/) and maps recognised fields according to the [MARC 21 Format for Bibliographic Data](https://www.loc.gov/marc/bibliographic/) and the [DNB MARC21 export format](https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21.html).
+
+An importer should prefer proper fulltext links (e.g. Volltext) for PDFs over other content links.
+
+Needs: impl, utest
+
 ## Normalize imported BibTeX keyword delimiters
 `req~import.bibtex.keywords.normalize-delimiters~1`
 
@@ -38,6 +47,13 @@ When a library file cannot be read or parsed at all, JabRef names the file and t
 No library tab is left behind for such a file. The tab that was opened to hold the loading library would otherwise stay as an empty, untitled library, which the user could save over the file that had just failed to load.
 
 A file that parses with warnings is not affected: it still opens, and its warnings are reported separately.
+
+Needs: impl, utest
+
+## Infer DOIs from other fields
+`req~import.doi-from-other-fields~1`
+
+If an entry's `doi` field is empty and another field contains a DOI, JabRef makes a best-effort attempt to identify that DOI and store it in the `doi` field.
 
 Needs: impl, utest
 
