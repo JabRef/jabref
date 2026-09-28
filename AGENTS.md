@@ -405,8 +405,10 @@ Quick check of core library:
 JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT) to trace requirements to implementation and tests.
 Requirements capture what JabRef should do as a structured representation of issues and features, enabling bidirectional traceability.
 
-For a new feature or significant bug fix, **at minimum add the requirement** to the appropriate `docs/requirements/<area>.md` file. Full tracing (`Needs: impl` + implementation comments) is encouraged but can be skipped if the effort is disproportionate.
-Prefer writing more small, granular requirements over a single large one.
+For a new feature or significant bug fix, add the requirement to the appropriate `docs/requirements/<area>.md` file.
+Link the issue the requirement originates from.
+Respect INVEST criteria. Prefer high-level requirements over overly detailed ones.
+Add tracing (`Needs: impl` + implementation comments).
 
 ### Requirement types and ID format
 
