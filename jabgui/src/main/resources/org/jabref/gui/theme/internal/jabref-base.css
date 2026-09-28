@@ -152,33 +152,32 @@
 /* Here we set ikonli as well, as it is used GemsFX, but we have our own wrapper. */
 .ikonli-font-icon,
 .glyph-icon {
-    -fx-font-size: 1.25em !important;
+    -fx-font-size: 1.25em;
     -fx-bounds-type: logical_vertical_center;
     -fx-fill: -fx-text-base-color;
     -fx-icon-color: -fx-text-base-color;
 }
 
-.quick-settings-button .glyph-icon,
 .quick-settings-button .glyph-icon {
-    -fx-font-size: 1.25em !important;
+    -fx-font-size: 1.25em;
     -fx-icon-color: -color-accent;
     -fx-fill: -color-accent;
 }
 
 .search-field-icon {
-    -fx-font-size: 1.75em !important;
+    -fx-font-size: 1.75em;
     -fx-icon-color: -fx-text-base-color;
 }
 
 .mainToolbar .glyph-icon {
-    -fx-font-size: 1.75em !important;
+    -fx-font-size: 1.75em;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
     -fx-icon-color: -color-accent;
 }
 
 .sidePaneComponentHeader .glyph-icon {
-    -fx-font-size: 1.0em !important;
+    -fx-font-size: 1.0em;
     -fx-fill: -color-accent;
     -fx-text-fill: -color-accent;
     -fx-icon-color: -color-accent;
@@ -188,18 +187,18 @@
 .error-console .exception .glyph-icon,
 .error-console .output .glyph-icon,
 .error-console .log .glyph-icon {
-    -fx-font-size: 1.75em !important;
+    -fx-font-size: 1.75em;
 }
 
 .walkthrough-quit-button .glyph-icon {
-    -fx-font-size: 2em !important;
+    -fx-font-size: 2em;
     -fx-fill: -color-fg-emphasis;
     -fx-text-fill: -color-fg-emphasis;
     -fx-icon-color: -color-fg-emphasis;
 }
 
 .walkthrough-info-container .glyph-icon {
-    -fx-font-size: 2em !important;;
+    -fx-font-size: 2em;;
     -fx-icon-color: -color-accent;
 }
 
@@ -292,7 +291,6 @@
 
 .table-cell .glyph-icon,
 .tree-table-cell .glyph-icon {
-    -fx-cell-size: 4.0em;
     -fx-padding: 0.5em 1em 0.5em 1em;
     -fx-fill: -fx-text-background-color;
     -fx-text-fill: -fx-text-background-color;
@@ -996,7 +994,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: transparent;
 }
 
-.entry-editor .field-remove-button .glyph-icon,
 .entry-editor .field-remove-button .glyph-icon {
     -fx-fill: -color-fg-subtle;
     -fx-text-fill: -color-fg-subtle;
@@ -1459,7 +1456,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -color-fg-emphasis;
 }
 
-.detected-application .glyph-icon,
 .detected-application .glyph-icon {
     -fx-icon-color: -color-accent;
     -fx-fill: -color-accent;
