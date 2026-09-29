@@ -9,8 +9,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.importer.fileformat.BibframeImporter;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -122,6 +124,19 @@ class BibframeExporterTest {
         BibEntry restored = importer.importDatabase(output).getDatabase().getEntries().getFirst();
 
         assertEquals(article, restored);
+    }
+
+    @Test
+    void linkedPdfAndSupplementaryUrlSurviveExportAndImport(@TempDir Path directory) throws SaveException, IOException {
+        BibEntry book = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "Library book")
+                .withField(StandardField.URL, "https://example.org/description")
+                .withFiles(List.of(new LinkedFile("Full text", "https://example.org/book.pdf", StandardFileType.PDF)));
+        Path output = directory.resolve("book.rdf");
+
+        exporter.export(new BibDatabaseContext(), output, List.of(book));
+
+        assertEquals(List.of(book), importer.importDatabase(output).getDatabase().getEntries());
     }
 
     @Test

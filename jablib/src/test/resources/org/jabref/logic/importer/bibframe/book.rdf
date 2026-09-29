@@ -76,13 +76,36 @@
         <bf:mainTitle>Marketing Automation with Mailchimp Expert Tips</bf:mainTitle>
       </bf:Title>
     </bf:title>
+    <bf:relation>
+      <bf:Relation>
+        <bf:relationship>
+          <bf:Relationship rdf:about="http://id.loc.gov/vocabulary/relationship/series">
+            <rdfs:label>series</rdfs:label>
+          </bf:Relationship>
+        </bf:relationship>
+        <bf:associatedResource>
+          <bf:Series>
+            <bf:status>
+              <bf:Status rdf:about="http://id.loc.gov/vocabulary/mstatus/t">
+                <rdfs:label>transcribed</rdfs:label>
+              </bf:Status>
+            </bf:status>
+            <bf:title>
+              <bf:Title>
+                <bf:mainTitle>Practical computing</bf:mainTitle>
+              </bf:Title>
+            </bf:title>
+          </bf:Series>
+        </bf:associatedResource>
+      </bf:Relation>
+    </bf:relation>
     <bf:summary>
       <bf:Summary>
         <rdfs:label>A guide to marketing automation.</rdfs:label>
       </bf:Summary>
     </bf:summary>
     <bf:hasInstance>
-      <bf:Instance rdf:about="https://example.org/jabref/book-001#Instance856-11">
+      <bf:Instance rdf:about="https://example.org/jabref/book-001#Instance856-14">
         <rdf:type rdf:resource="http://id.loc.gov/ontologies/bibframe/Electronic"/>
         <bf:title>
           <bf:Title>
@@ -138,6 +161,12 @@
         <bf:subtitle>Expert Tips</bf:subtitle>
       </bf:Title>
     </bf:title>
+    <bf:editionStatement>2nd ed.</bf:editionStatement>
+    <bf:extent>
+      <bf:Extent>
+        <rdfs:label>240 pages</rdfs:label>
+      </bf:Extent>
+    </bf:extent>
     <bf:electronicLocator rdf:resource="https://example.org/book"/>
     <bf:instanceOf rdf:resource="https://example.org/jabref/book-001#Work"/>
   </bf:Instance>

@@ -24,6 +24,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -45,7 +46,8 @@ public class BibframeExporter extends Exporter {
     private static final List<StandardField> EXPORTED_FIELDS = List.of(StandardField.TITLE, StandardField.SUBTITLE,
             StandardField.AUTHOR, StandardField.EDITOR, StandardField.LANGUAGE, StandardField.ABSTRACT,
             StandardField.ADDRESS, StandardField.PUBLISHER, StandardField.ISBN, StandardField.ISSN,
-            StandardField.DOI, StandardField.URL);
+            StandardField.DOI, StandardField.URL, StandardField.EDITION, StandardField.SERIES,
+            StandardField.PAGETOTAL);
     private static final Map<String, String> MARC_LANGUAGE_ALIASES = Map.ofEntries(
             Map.entry("deu", "ger"), Map.entry("fra", "fre"), Map.entry("nld", "dut"),
             Map.entry("zho", "chi"), Map.entry("ces", "cze"), Map.entry("ell", "gre"),
@@ -99,6 +101,11 @@ public class BibframeExporter extends Exporter {
         appendCanonical(content, "type", entry.getType().getName());
         EXPORTED_FIELDS.forEach(field -> entry.getField(field)
                                               .ifPresent(value -> appendCanonical(content, field.getName(), value)));
+        entry.getFiles().stream().filter(file -> isOnlineUrl(file.getLink())).forEach(file -> {
+            appendCanonical(content, "file", file.getLink());
+            appendCanonical(content, "fileDescription", file.getDescription());
+            appendCanonical(content, "fileType", file.getFileType());
+        });
         entry.getField(StandardField.YEAR).or(() -> entry.getField(StandardField.DATE))
              .ifPresent(value -> appendCanonical(content, "publicationDate", value));
         if (entry.getType() == StandardEntryType.Article) {
@@ -113,6 +120,8 @@ public class BibframeExporter extends Exporter {
     }
 
     private static void writeEntry(XMLStreamWriter writer, BibEntry entry, String workUri, String instanceUri) throws XMLStreamException {
+        List<LinkedFile> onlineFiles = entry.getFiles().stream()
+                                            .filter(file -> isOnlineUrl(file.getLink())).toList();
         start(writer, "bf", "Work", BF);
         attribute(writer, "rdf", RDF, "about", workUri);
         resource(writer, "rdf", "type", RDF, "rdf", RDF, BF + "Text");
@@ -125,6 +134,9 @@ public class BibframeExporter extends Exporter {
         writeLanguage(writer, entry.getField(StandardField.LANGUAGE));
         writeSummary(writer, entry.getField(StandardField.ABSTRACT));
         writeHost(writer, entry);
+        for (int index = 0; index < onlineFiles.size(); index++) {
+            resource(writer, "bf", "hasInstance", BF, "rdf", RDF, instanceUri + "-File-" + index);
+        }
         resource(writer, "bf", "hasInstance", BF, "rdf", RDF, instanceUri);
         writer.writeEndElement();
 
@@ -136,6 +148,15 @@ public class BibframeExporter extends Exporter {
         }
         writeTitle(writer, entry);
         writePublication(writer, entry);
+        optionalLiteral(writer, "bf", "editionStatement", BF, entry.getField(StandardField.EDITION));
+        optionalLiteral(writer, "bf", "seriesStatement", BF, entry.getField(StandardField.SERIES));
+        if (entry.getField(StandardField.PAGETOTAL).isPresent()) {
+            start(writer, "bf", "extent", BF);
+            start(writer, "bf", "Extent", BF);
+            literal(writer, "rdfs", "label", RDFS, entry.getField(StandardField.PAGETOTAL).orElseThrow() + " pages");
+            writer.writeEndElement();
+            writer.writeEndElement();
+        }
         writeIdentifier(writer, entry, StandardField.ISBN, "Isbn");
         writeIdentifier(writer, entry, StandardField.DOI, "Doi");
         if (entry.getType() != StandardEntryType.Article || entry.getField(StandardField.JOURNAL).isEmpty()) {
@@ -147,6 +168,8 @@ public class BibframeExporter extends Exporter {
         }
         resource(writer, "bf", "instanceOf", BF, "rdf", RDF, workUri);
         writer.writeEndElement();
+
+        writeLinkedFiles(writer, onlineFiles, workUri, instanceUri);
     }
 
     private static void writeLanguage(XMLStreamWriter writer, Optional<String> language) throws XMLStreamException {
@@ -200,7 +223,11 @@ public class BibframeExporter extends Exporter {
         if (entry.getField(field).isEmpty()) {
             return;
         }
-        for (var author : AuthorList.parse(entry.getField(field).orElseThrow()).getAuthors()) {
+        String nameField = entry.getField(field).orElseThrow();
+        var authors = AuthorList.parse(nameField).getAuthors();
+        List<String> names = authors.size() == 1 ? List.of(nameField)
+                : authors.stream().map(author -> author.getFamilyGiven(false)).toList();
+        for (String name : names) {
             start(writer, "bf", "contribution", BF);
             start(writer, "bf", "Contribution", BF);
             if (field == StandardField.AUTHOR) {
@@ -209,7 +236,7 @@ public class BibframeExporter extends Exporter {
             start(writer, "bf", "agent", BF);
             start(writer, "bf", "Agent", BF);
             resource(writer, "rdf", "type", RDF, "rdf", RDF, BF + "Person");
-            literal(writer, "rdfs", "label", RDFS, author.getFamilyGiven(false));
+            literal(writer, "rdfs", "label", RDFS, name);
             writer.writeEndElement();
             writer.writeEndElement();
             start(writer, "bf", "role", BF);
@@ -295,6 +322,32 @@ public class BibframeExporter extends Exporter {
         writer.writeEndElement();
         writer.writeEndElement();
         writer.writeEndElement();
+    }
+
+    private static void writeLinkedFiles(XMLStreamWriter writer, List<LinkedFile> onlineFiles, String workUri, String instanceUri) throws XMLStreamException {
+        for (int index = 0; index < onlineFiles.size(); index++) {
+            LinkedFile file = onlineFiles.get(index);
+            start(writer, "bf", "Instance", BF);
+            attribute(writer, "rdf", RDF, "about", instanceUri + "-File-" + index);
+            resource(writer, "rdf", "type", RDF, "rdf", RDF, BFLC + "SecondaryInstance");
+            resource(writer, "bf", "media", BF, "rdf", RDF, "http://id.loc.gov/vocabulary/mediaTypes/c");
+            String title = file.getDescription().isBlank() && StandardFileType.PDF.getName().equals(file.getFileType())
+                    ? "Volltext" : file.getDescription();
+            if (!title.isBlank()) {
+                start(writer, "bf", "title", BF);
+                start(writer, "bf", "Title", BF);
+                literal(writer, "bf", "mainTitle", BF, title);
+                writer.writeEndElement();
+                writer.writeEndElement();
+            }
+            resource(writer, "bf", "electronicLocator", BF, "rdf", RDF, file.getLink());
+            resource(writer, "bf", "instanceOf", BF, "rdf", RDF, workUri);
+            writer.writeEndElement();
+        }
+    }
+
+    private static boolean isOnlineUrl(String uri) {
+        return uri.startsWith("https://") || uri.startsWith("http://");
     }
 
     private static void start(XMLStreamWriter writer, String prefix, String localName, String namespace) throws XMLStreamException {
