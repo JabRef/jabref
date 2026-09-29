@@ -8,7 +8,7 @@ grand_parent: Requirements
 
 This feature represents the AI chat, which can be a chat with an entry or a group.
 
-Needs: impl
+Needs: req, impl
 
 ## General AI chat requirements
 
@@ -45,16 +45,20 @@ Needs: impl, guard, utest
 ### User can see ingestion status in AI chat
 `feat~ai.chat.ingestion-status~1`
 
-Rationale: User needs to know if the context files are fully indexed/embedded.
+User needs to know if the context files are fully indexed/embedded.
 
 Needs: impl
 
-### User can see current AI model in AI chat
+### AI chat must display current AI model
 `req~ai.chat.model-visibility~1`
 
 Provides transparency regarding which LLM is generating the text.
 
 Needs: impl
+
+Covers:
+
+- feat~ai.chatting~1
 
 ### User can cancel AI response generation in AI chat
 `feat~ai.chat.cancel-generation~1`
@@ -91,12 +95,16 @@ User can modify the AI behavior by changing the system prompt to better suit the
 
 Needs: impl
 
-### Response engine must be used in AI chat
+### AI chat must use a response engine for query context
 `req~ai.chat.uses-response-engine~1`
 
 This requirement ensures that the AI has context to answer a question.
 
 Needs: impl
+
+Covers:
+
+- feat~ai.chatting~1
 
 ### JSON answers are highlighted in AI chat
 `feat~ai.chat.json-highlighting~1`
@@ -121,7 +129,16 @@ Needs: impl, utest
 
 Specific requirements for chatting with a single bibliography entry.
 
-Needs: impl, pp
+Needs: req, impl
+
+### A privacy policy banner must be shown when user uses entry chat for the first time
+`req~ai.chatting.entries.privacy-policy~1`
+
+Needs: impl
+
+Covers:
+
+- feat~ai.chatting.entries~1
 
 ### User can hide AI chat tab
 `feat~ai.chat.entries.hide-tab~1`
@@ -130,19 +147,32 @@ User can declutter their interface if they do not use AI features.
 
 Needs: impl
 
-### AI entry chat is persisted
+### Entry AI chat history must be persisted across sessions
 `req~ai.chat.entries.history-storage~1`
 
 History must be persisted per entry, so the user can resume the conversation later.
 
 Needs: dsn, model, impl, utest
 
+Covers:
+
+- feat~ai.chatting.entries~1
+
 ## AI chat with groups
 `feat~ai.chatting.groups~1`
 
 Specific requirements for chatting with a collection/group of entries simultaneously.
 
-Needs: impl, pp
+Needs: req, impl
+
+### A privacy policy banner must be shown when user uses group chat for the first time
+`req~ai.chatting.groups.privacy-policy~1`
+
+Needs: impl
+
+Covers:
+
+- feat~ai.chatting.groups~1
 
 ### User can hide group AI chat context menu entry
 `feat~ai.chat.groups.hide-context-menu~1`
@@ -151,18 +181,26 @@ User can customize the context menu to remove "Chat with group" if they do not u
 
 Needs: impl
 
-### AI group chat is persisted
+### Group AI chat history must be persisted across sessions
 `req~ai.chat.groups.history-storage~1`
 
 History must be persisted per group, so the conversation context is preserved across sessions.
 
 Needs: dsn, model, impl, utest
 
-### Library and group names are displayed in AI group chat dialog title
+Covers:
+
+- feat~ai.chatting.groups~1
+
+### AI group chat dialog title must display library and group names
 `req~ai.chat.groups.display-names~1`
 
 Essential for user orientation, ensuring that users can distinguish between different AI chats of a group that has the same name in different libraries.
 
 Needs: impl
+
+Covers:
+
+- feat~ai.chatting.groups~1
 
 <!-- markdownlint-disable-file MD022 -->
