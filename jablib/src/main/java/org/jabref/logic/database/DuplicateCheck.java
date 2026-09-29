@@ -89,6 +89,9 @@ public class DuplicateCheck {
     }
 
     private static boolean haveDifferentEntryType(final BibEntry one, final BibEntry two) {
+        if (one.getType().equals(StandardEntryType.Misc) || two.getType().equals(StandardEntryType.Misc)) {
+            return false;
+        }
         return !one.getType().equals(two.getType());
     }
 
@@ -256,7 +259,7 @@ public class DuplicateCheck {
         }
 
         totalCount++;
-        if (!haveDifferentEntryType(one, two)) {
+        if (one.getType().equals(two.getType())) {
             score++;
         }
 
