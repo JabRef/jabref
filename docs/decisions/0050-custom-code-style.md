@@ -79,7 +79,7 @@ Example:
 * Good, because the subject is "always" in the first thing in the line.
 * Good, because it also formats the imports
 * Neutral, because optimized for code review (because of the 80 characters width):
-  Favors short lines (80 characters); the reading is more top-to-buttom; screens are typically wider.
+  Favors short lines (80 characters); the reading is more top-to-bottom; screens are typically wider.
 * Bad, because [prettier-action cannot be used](https://github.com/creyD/prettier_action/issues/149)
 * Bad, because [has line breaks at single variables](https://github.com/jhipster/prettier-java/issues/777)
 * Bad, because not supported by the formatter tool [jbang-fmt](https://github.com/jbangdev/jbang-fmt).
