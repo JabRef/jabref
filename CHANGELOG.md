@@ -21,6 +21,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We moved the JabRef version display in the Welcome tab onto the "Download development version" line to save space. [#17160](https://github.com/JabRef/jabref/issues/17160)
+
 ### Fixed
 
 - We fixed an issue where Backspace could not be registered as a keyboard shortcut. [#17241](https://github.com/JabRef/jabref/issues/17241)
@@ -34,11 +36,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed menu items not showing why they are disabled when a menu was opened for the first time. [#17200](https://github.com/JabRef/jabref/pull/17200)
 - We fixed an issue where entries of type Misc were penalized too strictly during duplicate detection. [#16578](https://github.com/JabRef/jabref/issues/16578)
 - We fixed an issue where the "Simple HTML" export separated author initials with spaces. [#17306](https://github.com/JabRef/jabref/pull/17306)
+- We fixed an issue where the Hayagriva YAML export wrote braced author names, such as company names, as invalid YAML. [#17316](https://github.com/JabRef/jabref/issues/17316)
 - We fixed an issue where "Community forum" in the Help menu opened the donation page instead of the forum. [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We fixed an issue where saving an SLR study overwrote different per-query native queries. [#17307](https://github.com/JabRef/jabref/pull/17307)
 - We fixed missing DOIs when importing MEDLINE records and cleaning existing MEDLINE entries. [#17173](https://github.com/JabRef/jabref/issues/17173)
 
 ### Removed
+
+- We removed the "Waiting for AI reply..." notification; the AI chat already shows a progress indicator. [#17145](https://github.com/JabRef/jabref/pull/17145)
 
 ## [6.0-beta.1] - 2026-09-21
 
