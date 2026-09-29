@@ -50,7 +50,7 @@ public class ModsExportFormatFilesTest {
 
     public static Stream<String> fileNames() throws URISyntaxException, IOException {
         resourceDir = Path.of(ModsExportFormatFilesTest.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
-        LOGGER.debug("Mods export resouce dir {}", resourceDir);
+        LOGGER.debug("Mods export resource dir {}", resourceDir);
 
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
