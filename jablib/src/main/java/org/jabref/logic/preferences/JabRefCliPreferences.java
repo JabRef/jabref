@@ -257,7 +257,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
     public static final String CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
-    public static final String NAME_FORMATER_KEY = "nameFormatterNames";
+    public static final String NAME_FORMATTER_KEY = "nameFormatterNames";
 
     /// The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for
     /// OO/LO installation, used to detect location on Win/macOS when using manual
@@ -312,7 +312,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String FILES_FULLTEXT_INDEX = "fulltextIndexLinkedFiles";
     private static final String FILES_WORKING_DIRECTORY = "workingDirectory";
 
-    // FixMe: Missplaced
+    // FixMe: Misplaced
     private static final String BACKUP_ENABLED = "createBackup";
     private static final String BACKUP_DIRECTORY = "backupDirectory";
 
@@ -2323,10 +2323,10 @@ public class JabRefCliPreferences implements CliPreferences {
         NameFormatterPreferences defaultValues = NameFormatterPreferences.getDefault();
 
         nameFormatterPreferences = new NameFormatterPreferences(
-                convertStringToList(get(NAME_FORMATER_KEY, convertListToString(defaultValues.getNameFormatterKey()))),
+                convertStringToList(get(NAME_FORMATTER_KEY, convertListToString(defaultValues.getNameFormatterKey()))),
                 convertStringToList(get(NAME_FORMATTER_VALUE, convertListToString(defaultValues.getNameFormatterValue()))));
 
-        bindCustomList(nameFormatterPreferences.getNameFormatterKey(), NAME_FORMATER_KEY, defaultValues.getNameFormatterKey(),
+        bindCustomList(nameFormatterPreferences.getNameFormatterKey(), NAME_FORMATTER_KEY, defaultValues.getNameFormatterKey(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindCustomList(nameFormatterPreferences.getNameFormatterValue(), NAME_FORMATTER_VALUE, defaultValues.getNameFormatterValue(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
