@@ -746,7 +746,7 @@ public class OOBibBase {
     ///
     /// @param entries            The entries to cite.
     /// @param citationType       Indicates whether it is an in-text citation, a citation in parentheses or an invisible citation.
-    /// @param jStyle             Indicates citation formating in JStyle
+    /// @param jStyle             Indicates citation formatting in JStyle
     /// @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
     /// @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
     /// @param pageInfo           A single page-info for these entries. Attributed to the last entry.
@@ -1077,7 +1077,7 @@ public class OOBibBase {
     /// Helper method for guiActionUpdateDocument, refreshes a JStyle bibliography.
     ///
     /// @param databases        Must have at least one.
-    /// @param jStyle           Indicates citation formating in JStyle.
+    /// @param jStyle           Indicates citation formatting in JStyle.
     /// @param doc              Text document.
     /// @param frontend,fcursor Used to synchronize document.
     /// @param errorTitle       Error message for user.
