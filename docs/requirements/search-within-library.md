@@ -16,7 +16,7 @@ They can also open up a popup to search across all libraries.
 Indirectly, the requirements are listed at <https://docs.jabref.org/finding-sorting-and-cleaning-entries/search>.
 This page tries to collect issues from users as requirements to enable better tracing in the code.
 
-## Search for the name of the first authors
+## Search syntax must support quick search by first author name
 `req~jabgui.search.syntax.author-first-name~1`
 
 Issue: [#10490](https://github.com/JabRef/jabref/issues/10490)
@@ -42,7 +42,7 @@ It is possible by regular expressions, but the user asked for "quickly".
 > Currently, no implementation is linked
 {: .prompt-note}
 
-## Search for citation key
+## Search syntax must support quick search by citation key
 `req~jabgui.search.syntax.citation-key~1`
 
 Issue: [#10490](https://github.com/JabRef/jabref/issues/10490)
@@ -52,14 +52,14 @@ Enable to quickly search for a citation key.
 > Currently, no implementation is linked
 {: .prompt-note}
 
-## Full-text search without Postgres
+## Full-text search must search linked files without Postgres backend
 `req~jabgui.search.fulltext.lucene-without-postgres~1`
 
 When linked-file full-text indexing is enabled, users must be able to search the contents of linked files without enabling the experimental Postgres search backend.
 
 Needs: impl, utest
 
-## Case-sensitive full-text search
+## Full-text search must apply case-sensitive operators to linked files
 `req~jabgui.search.fulltext.case-sensitive~1`
 
 Issue: [#13048](https://github.com/JabRef/jabref/issues/13048)
@@ -69,7 +69,7 @@ Searching for `any ==! SEE` must not match a file that only contains `See`.
 
 Needs: impl, utest
 
-## Full-text search survives a query only Lucene rejects
+## Full-text search must preserve metadata results when Lucene query fails
 `req~jabgui.search.fulltext.lenient-query-parsing~1`
 
 Issue: [#9482](https://github.com/JabRef/jabref/issues/9482)

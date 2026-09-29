@@ -206,7 +206,7 @@ public class JabRefGUI extends Application {
 
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
-        HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+        HeadlessExecutorService.INSTANCE.executeInterruptibleTask(fileUpdateMonitor, "FileUpdateMonitor");
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
 
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
@@ -391,7 +391,7 @@ public class JabRefGUI extends Application {
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
-        mainStage.getIcons().addAll(IconTheme.getLogoSet());
+        IconTheme.applyLogo(mainStage);
         mainStage.setScene(scene);
         mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
