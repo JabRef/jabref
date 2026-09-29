@@ -113,6 +113,18 @@ class BibframeExporterTest {
     }
 
     @Test
+    void articleWithoutHostFieldsRetainsType(@TempDir Path directory) throws SaveException, IOException {
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "An article");
+        Path output = directory.resolve("article.rdf");
+
+        exporter.export(new BibDatabaseContext(), output, List.of(article));
+        BibEntry restored = importer.importDatabase(output).getDatabase().getEntries().getFirst();
+
+        assertEquals(article, restored);
+    }
+
+    @Test
     void publicationYearIsAlsoExportedAsStructuredEdtfDate(@TempDir Path directory) throws SaveException, IOException {
         BibEntry book = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "A book")

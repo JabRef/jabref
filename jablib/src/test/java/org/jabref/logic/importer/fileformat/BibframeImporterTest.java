@@ -54,7 +54,8 @@ class BibframeImporterTest {
                 .withField(StandardField.ISSN, "0021-8553")
                 .withField(StandardField.PAGES, "447-473")
                 .withField(StandardField.YEAR, "1992")
-                .withField(StandardField.DOI, "10.1234/article.001");
+                .withField(StandardField.DOI, "10.1234/article.001")
+                .withField(StandardField.LANGUAGE, "eng");
 
         assertEquals(List.of(expectedArticle), entries);
     }

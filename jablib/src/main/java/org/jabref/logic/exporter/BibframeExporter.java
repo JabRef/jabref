@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Exports the Work and Instance subset of BIBFRAME 2.0 as striped RDF/XML.
+/// See the [BIBFRAME ontology](https://github.com/lcnetdev/bibframe-ontology/blob/main/bibframe.rdf).
 // [impl->req~export.bibframe.rdfxml~1]
 @NullMarked
 public class BibframeExporter extends Exporter {
@@ -100,7 +101,7 @@ public class BibframeExporter extends Exporter {
                                               .ifPresent(value -> appendCanonical(content, field.getName(), value)));
         entry.getField(StandardField.YEAR).or(() -> entry.getField(StandardField.DATE))
              .ifPresent(value -> appendCanonical(content, "publicationDate", value));
-        if (entry.getType() == StandardEntryType.Article && entry.getField(StandardField.JOURNAL).isPresent()) {
+        if (entry.getType() == StandardEntryType.Article) {
             entry.getField(StandardField.JOURNAL).ifPresent(value -> appendCanonical(content, "journal", value));
             entry.getField(StandardField.PAGES).ifPresent(value -> appendCanonical(content, "pages", value));
         }
@@ -266,7 +267,7 @@ public class BibframeExporter extends Exporter {
     }
 
     private static void writeHost(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
-        if (entry.getType() != StandardEntryType.Article || entry.getField(StandardField.JOURNAL).isEmpty()) {
+        if (entry.getType() != StandardEntryType.Article) {
             return;
         }
         start(writer, "bf", "relation", BF);
@@ -275,11 +276,13 @@ public class BibframeExporter extends Exporter {
         start(writer, "bf", "associatedResource", BF);
         start(writer, "bf", "Work", BF);
         resource(writer, "rdf", "type", RDF, "rdf", RDF, BF + "Serial");
-        start(writer, "bf", "title", BF);
-        start(writer, "bf", "Title", BF);
-        literal(writer, "bf", "mainTitle", BF, entry.getField(StandardField.JOURNAL).orElseThrow());
-        writer.writeEndElement();
-        writer.writeEndElement();
+        if (entry.getField(StandardField.JOURNAL).isPresent()) {
+            start(writer, "bf", "title", BF);
+            start(writer, "bf", "Title", BF);
+            literal(writer, "bf", "mainTitle", BF, entry.getField(StandardField.JOURNAL).orElseThrow());
+            writer.writeEndElement();
+            writer.writeEndElement();
+        }
         writeIdentifier(writer, entry, StandardField.ISSN, "Issn");
         if (entry.getField(StandardField.PAGES).isPresent()) {
             start(writer, "bf", "hasInstance", BF);

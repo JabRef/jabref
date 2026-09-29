@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Imports a bounded BIBFRAME 2.0 Work and Instance mapping from striped RDF/XML.
+/// See the [BIBFRAME ontology](https://github.com/lcnetdev/bibframe-ontology/blob/main/bibframe.rdf).
 // [impl->req~import.bibliographic.xml-formats~1]
 @NullMarked
 public class BibframeImporter extends Importer {
@@ -167,8 +168,7 @@ public class BibframeImporter extends Importer {
     }
 
     private static BibEntry readEntry(XmlNode instance, Optional<XmlNode> work, Map<String, XmlNode> resources) {
-        BibEntry entry = new BibEntry(work.map(element -> hasJournalHost(element, resources)
-                                                          ? StandardEntryType.Article : StandardEntryType.Book).orElse(StandardEntryType.Misc));
+        BibEntry entry = new BibEntry(work.map(element -> inferEntryType(element, resources)).orElse(StandardEntryType.Misc));
 
         Optional<XmlNode> title = object(first(instance, BF, "title"), resources)
                 .or(() -> work.flatMap(element -> object(first(element, BF, "title"), resources)));
@@ -226,9 +226,24 @@ public class BibframeImporter extends Importer {
                                              .anyMatch(host -> isSerialHost(host, resources));
     }
 
+    private static StandardEntryType inferEntryType(XmlNode work, Map<String, XmlNode> resources) {
+        // An article can also be a Monograph in BIBFRAME; its serial host takes precedence.
+        if (hasJournalHost(work, resources)) {
+            return StandardEntryType.Article;
+        }
+        if (hasType(work, "Monograph")) {
+            return StandardEntryType.Book;
+        }
+        return StandardEntryType.Misc;
+    }
+
     private static boolean isSerialHost(XmlNode host, Map<String, XmlNode> resources) {
-        return hasIdentifier(host, "Issn", resources) || children(host, RDF, "type").stream()
-                                                                                    .anyMatch(type -> (BF + "Serial").equals(type.getAttributeNS(RDF, "resource")));
+        return hasIdentifier(host, "Issn", resources) || hasType(host, "Serial");
+    }
+
+    private static boolean hasType(XmlNode resource, String localName) {
+        return is(resource, BF, localName) || children(resource, RDF, "type").stream()
+                                                                             .anyMatch(type -> (BF + localName).equals(type.getAttributeNS(RDF, "resource")));
     }
 
     private static boolean isPartOf(XmlNode relation) {

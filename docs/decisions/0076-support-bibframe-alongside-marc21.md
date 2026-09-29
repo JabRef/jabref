@@ -36,6 +36,11 @@ JabRef exchange bibliographic data with systems adopting BIBFRAME without
 removing access to the substantial MARC 21 data still in use. The initial
 BIBFRAME mapping is deliberately bounded to supported JabRef entry types and
 fields; it is not a promise to preserve every BIBFRAME graph or MARC 21 field.
+The current type mapping identifies a serial host as `Article`, otherwise
+maps a `bf:Monograph` Work to `Book`, and uses `Misc` when neither signal is
+present. Exported articles retain a serial host marker even if the journal
+name is missing. The [BIBFRAME ontology](https://github.com/lcnetdev/bibframe-ontology/blob/main/bibframe.rdf)
+defines other Work subclasses, such as `bf:Dataset`, that are not mapped yet.
 The RDF/XML parser strategy is recorded in
 [ADR 0075](0075-use-stax-for-bounded-bibframe-rdfxml.md).
 
