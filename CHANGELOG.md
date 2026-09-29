@@ -9,10 +9,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
-### Fixed
-
-- We fixed an issue where generating an AI summary with an online linked file crashed silently and left the AI summary blank. [#17203](https://github.com/JabRef/jabref/issues/17203)
-
 ### Added
 
 - We added a dark appearance variant of the macOS application icon. [#17290](https://github.com/JabRef/jabref/issues/17290)
@@ -29,6 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where generating an AI summary with an online linked file crashed silently and left the AI summary blank. [#17203](https://github.com/JabRef/jabref/issues/17203)
 - We fixed an issue where Backspace could not be registered as a keyboard shortcut. [#17241](https://github.com/JabRef/jabref/issues/17241)
 - We re-enabled the [Grobid](https://github.com/grobidOrg/grobid) citation fetcher again. It is now reachable via https. [#16668](https://github.com/JabRef/jabref/issues/16668)
 - We fixed an issue where the AI chat lost its scroll position when switching back to an entry. [#17172](https://github.com/JabRef/jabref/pull/17172)
