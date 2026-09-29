@@ -42,6 +42,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
@@ -391,7 +392,7 @@ public class GroupTreeView extends BorderPane {
         text.getStyleClass().setAll("text");
 
         node.getChildren().add(text);
-        node.maxWidthProperty().bind(preferences.getWorkspacePreferences().cellSizeProperty());
+        node.setMaxHeight(Region.USE_PREF_SIZE);
         return node;
     }
 
