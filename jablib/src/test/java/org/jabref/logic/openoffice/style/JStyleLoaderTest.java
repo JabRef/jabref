@@ -94,14 +94,14 @@ class JStyleLoaderTest {
     }
 
     @Test
-    void initalizeWithOneExternalFile() {
+    void initializeWithOneExternalFile() {
         when(preferences.getExternalJStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
     }
 
     @Test
-    void initalizeWithIncorrectExternalFile() {
+    void initializeWithIncorrectExternalFile() {
         preferences.setExternalJStyles(List.of("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
@@ -109,7 +109,7 @@ class JStyleLoaderTest {
     }
 
     @Test
-    void initalizeWithOneExternalFileRemoveStyle() {
+    void initializeWithOneExternalFileRemoveStyle() {
         when(preferences.getExternalJStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
@@ -128,7 +128,7 @@ class JStyleLoaderTest {
     }
 
     @Test
-    void initalizeWithOneExternalFileRemoveStyleUpdatesPreferences() {
+    void initializeWithOneExternalFileRemoveStyleUpdatesPreferences() {
         when(preferences.getExternalJStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);

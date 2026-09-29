@@ -252,8 +252,8 @@ jobs:
       - name: yamllint
         run: pipx run yamllint==1.38.0 --strict .
 
-  textlint:
-    name: Textlint
+  spelling:
+    name: Spellling
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
@@ -270,6 +270,8 @@ jobs:
         run: npm ci
       - name: textlint
         run: npm run textlint
+      - name: typos
+        run: pipx run typos==1.50.3
 
   madr:
     name: MADR ADRs

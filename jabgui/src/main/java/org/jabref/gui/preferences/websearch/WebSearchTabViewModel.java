@@ -129,7 +129,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     }
 
     private void setupPlainCitationParsers() {
-        // [pp->feat~ai.citation-parsing~1]
+        // [impl->req~ai.citation-parsing.privacy-policy~1]
         if (!refAiEnabled.get()) {
             plainCitationParsers.remove(PlainCitationParserChoice.LLM);
         }

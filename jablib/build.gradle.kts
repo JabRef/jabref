@@ -152,7 +152,7 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
 var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
     group = "JabRef"
     description = "Generates a catalog of all available citation styles"
-    // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
+    // The JBang gradle plugin doesn't handle parallelization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateJournalListMV)
     val generatorScript = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java")
     script = '"' + generatorScript.asFile.absolutePath + '"'
@@ -167,7 +167,7 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     group = "JabRef"
     description = "Converts the LTWA CSV file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
-    // The JBang gradle plugin doesn't handle parallization well - thus we enforce sequential execution
+    // The JBang gradle plugin doesn't handle parallelization well - thus we enforce sequential execution
     mustRunAfter(taskGenerateCitationStyleCatalog)
     script = '"' + rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath + '"'
 
