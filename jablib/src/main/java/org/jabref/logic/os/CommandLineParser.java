@@ -72,6 +72,6 @@ public class CommandLineParser {
             return false;
         }
         char character = commandLine.charAt(index);
-        return character == '\'' || character == '"' || character == '\\' || Character.isWhitespace(character);
+        return character == '\'' || character == '"' || Character.isWhitespace(character);
     }
 }

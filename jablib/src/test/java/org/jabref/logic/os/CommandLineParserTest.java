@@ -42,6 +42,31 @@ class CommandLineParserTest {
 
                 Arguments.of(
                         List.of("C:\\Program Files\\ConEmu\\ConEmu64.exe", "/single", "/dir", "C:\\My Dir"),
+                        "\"C:\\Program Files\\ConEmu\\ConEmu64.exe\" /single /dir \"%DIR\"",
+                        "C:\\My Dir"),
+
+                Arguments.of(
+                        List.of("gnome-terminal", "--working-directory=/home/user/My Library"),
+                        "gnome-terminal --working-directory='%DIR'",
+                        "/home/user/My Library"),
+
+                Arguments.of(
+                        List.of("open", "-a", "Terminal", "/Users/user/My Library"),
+                        "open -a Terminal \"%DIR\"",
+                        "/Users/user/My Library"),
+
+                Arguments.of(
+                        List.of("explorer.exe", "\\\\server\\share"),
+                        "explorer.exe \"\\\\server\\share\"",
+                        "/home/user/dir"),
+
+                Arguments.of(
+                        List.of("explorer.exe", "\\\\server\\share"),
+                        "explorer.exe \\\\server\\share",
+                        "/home/user/dir"),
+
+                Arguments.of(
+                        List.of("C:\\Program Files\\ConEmu\\ConEmu64.exe", "/single", "/dir", "C:\\My Dir"),
                         "\"C:\\Program Files\\ConEmu\\ConEmu64.exe\" /single /dir \"%DIR%\"",
                         "C:\\My Dir"),
 
@@ -53,6 +78,11 @@ class CommandLineParserTest {
                 Arguments.of(
                         List.of("cmd", "", "", "arg"),
                         "cmd \"\" '' arg",
+                        "/home/user/dir"),
+
+                Arguments.of(
+                        List.of("cmd", "arg", ""),
+                        "cmd arg \"\"",
                         "/home/user/dir"),
 
                 Arguments.of(
