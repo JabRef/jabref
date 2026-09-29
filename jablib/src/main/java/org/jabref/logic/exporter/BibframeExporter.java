@@ -226,7 +226,7 @@ public class BibframeExporter extends Exporter {
         String nameField = entry.getField(field).orElseThrow();
         var authors = AuthorList.parse(nameField).getAuthors();
         List<String> names = authors.size() == 1 ? List.of(nameField)
-                : authors.stream().map(author -> author.getFamilyGiven(false)).toList();
+                                                 : authors.stream().map(author -> author.getFamilyGiven(false)).toList();
         for (String name : names) {
             start(writer, "bf", "contribution", BF);
             start(writer, "bf", "Contribution", BF);
@@ -332,7 +332,7 @@ public class BibframeExporter extends Exporter {
             resource(writer, "rdf", "type", RDF, "rdf", RDF, BFLC + "SecondaryInstance");
             resource(writer, "bf", "media", BF, "rdf", RDF, "http://id.loc.gov/vocabulary/mediaTypes/c");
             String title = file.getDescription().isBlank() && StandardFileType.PDF.getName().equals(file.getFileType())
-                    ? "Volltext" : file.getDescription();
+                           ? "Volltext" : file.getDescription();
             if (!title.isBlank()) {
                 start(writer, "bf", "title", BF);
                 start(writer, "bf", "Title", BF);

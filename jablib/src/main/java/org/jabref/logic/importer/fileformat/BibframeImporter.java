@@ -302,22 +302,22 @@ public class BibframeImporter extends Importer {
 
     private static void readLinkedFiles(BibEntry entry, XmlNode work, XmlNode primaryInstance, Map<String, XmlNode> resources) {
         List<LinkedFile> files = children(work, BF, "hasInstance").stream()
-                .map(property -> object(Optional.of(property), resources))
-                .flatMap(Optional::stream)
-                .filter(instance -> instance != primaryInstance && (isSecondaryInstance(instance)
-                        || object(first(instance, BF, "title"), resources)
-                                .flatMap(title -> value(title, BF, "mainTitle"))
-                                .filter("Volltext"::equals).isPresent()))
-                .map(instance -> locator(instance, resources).map(uri -> {
-                    String title = object(first(instance, BF, "title"), resources)
-                            .flatMap(element -> value(element, BF, "mainTitle")).orElse("");
-                    String description = "Volltext".equals(title) ? "" : title;
-                    String fileType = "Volltext".equals(title) || uri.toLowerCase(Locale.ROOT).endsWith(".pdf")
-                            ? StandardFileType.PDF.getName() : "";
-                    return new LinkedFile(description, uri, fileType);
-                }))
-                .flatMap(Optional::stream)
-                .toList();
+                                                                  .map(property -> object(Optional.of(property), resources))
+                                                                  .flatMap(Optional::stream)
+                                                                  .filter(instance -> instance != primaryInstance && (isSecondaryInstance(instance)
+                                                                          || object(first(instance, BF, "title"), resources)
+                                                                          .flatMap(title -> value(title, BF, "mainTitle"))
+                                                                          .filter("Volltext"::equals).isPresent()))
+                                                                  .map(instance -> locator(instance, resources).map(uri -> {
+                                                                      String title = object(first(instance, BF, "title"), resources)
+                                                                              .flatMap(element -> value(element, BF, "mainTitle")).orElse("");
+                                                                      String description = "Volltext".equals(title) ? "" : title;
+                                                                      String fileType = "Volltext".equals(title) || uri.toLowerCase(Locale.ROOT).endsWith(".pdf")
+                                                                                        ? StandardFileType.PDF.getName() : "";
+                                                                      return new LinkedFile(description, uri, fileType);
+                                                                  }))
+                                                                  .flatMap(Optional::stream)
+                                                                  .toList();
         if (!files.isEmpty()) {
             entry.withFiles(files);
         }
@@ -325,7 +325,7 @@ public class BibframeImporter extends Importer {
 
     private static boolean isSecondaryInstance(XmlNode instance) {
         return children(instance, RDF, "type").stream()
-                .anyMatch(type -> (BFLC + "SecondaryInstance").equals(type.getAttributeNS(RDF, "resource")));
+                                              .anyMatch(type -> (BFLC + "SecondaryInstance").equals(type.getAttributeNS(RDF, "resource")));
     }
 
     private static void readContributions(BibEntry entry, XmlNode work, Map<String, XmlNode> resources) {
@@ -375,17 +375,17 @@ public class BibframeImporter extends Importer {
     private static Optional<String> locator(XmlNode resource, Map<String, XmlNode> resources) {
         Optional<XmlNode> property = first(resource, BF, "electronicLocator")
                 .or(() -> children(resource, BF, "supplementaryContent").stream()
-                        .map(content -> object(Optional.of(content), resources))
-                        .flatMap(Optional::stream)
-                        .map(content -> first(content, BF, "electronicLocator"))
-                        .flatMap(Optional::stream).findFirst());
+                                                                        .map(content -> object(Optional.of(content), resources))
+                                                                        .flatMap(Optional::stream)
+                                                                        .map(content -> first(content, BF, "electronicLocator"))
+                                                                        .flatMap(Optional::stream).findFirst());
         return property.flatMap(element -> {
             String uri = element.getAttributeNS(RDF, "resource");
             if (!uri.isBlank()) {
                 return Optional.of(uri);
             }
             return object(Optional.of(element), resources).flatMap(locatorNode -> value(locatorNode, RDF, "value"))
-                    .or(() -> Optional.of(element.getTextContent().trim()).filter(text -> !text.isBlank()));
+                                                          .or(() -> Optional.of(element.getTextContent().trim()).filter(text -> !text.isBlank()));
         });
     }
 
