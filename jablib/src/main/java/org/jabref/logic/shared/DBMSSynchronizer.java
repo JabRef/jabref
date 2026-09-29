@@ -20,6 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -124,6 +125,13 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     // Buffered micro-edits; set from EventBus dispatch threads, taken by the database worker
     private final AtomicReference<BibEntry> entryWithPendingChanges = new AtomicReference<>();
     private final ReentrantLock pullLock = new ReentrantLock();
+    // Metadata notifications arrive once per changed key. Keep one worker scheduled while retaining
+    // the fact that another notification arrived during its current read.
+    private final AtomicBoolean metadataPullScheduled = new AtomicBoolean();
+    private final AtomicBoolean metadataPullRequested = new AtomicBoolean();
+    // A fetched snapshot cannot replace a newer local edit or a local write still in the queue.
+    private final AtomicLong localMetaDataRevision = new AtomicLong();
+    private final AtomicLong handledLocalMetaDataRevision = new AtomicLong();
     // Cleared when the connection is found dead; set again by the reconnect loop
     private final AtomicBoolean connected = new AtomicBoolean(true);
     private volatile boolean closed;
@@ -133,6 +141,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final Set<Integer> sharedIdsInConflict = ConcurrentHashMap.newKeySet();
     // The shared metadata as last pulled or written: the merge base for metadata recorded offline
     private volatile Map<String, String> lastSharedMetaData = Map.of();
+    // Only model-thread applications count here; local writes also change lastSharedMetaData.
+    private Map<String, String> lastAppliedRemoteMetaData = Map.of();
+    private long lastAppliedLocalMetaDataRevision;
+    private boolean hasAppliedRemoteMetaData;
     private final String userAndHost;
     private final Executor remoteUpdateExecutor;
     private final Executor syncExecutor;
@@ -268,7 +280,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
         Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(event.getMetaData(), globalCiteKeyPattern);
-        syncExecutor.execute(() -> writeSharedMetaData(serializedMetaData));
+        long revision = localMetaDataRevision.incrementAndGet();
+        syncExecutor.execute(() -> {
+            try {
+                writeSharedMetaData(serializedMetaData);
+            } finally {
+                handledLocalMetaDataRevision.set(revision);
+            }
+        });
         // Other clients are notified through the upsert_metadata function (see DBMSProcessor.setUp)
         ifNotPullingAlready(this::doApplyMetaData);
     }
@@ -291,10 +310,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         dbmsProcessor.startNotificationListener(this);
         // Synchronously on the caller's thread: the library is not shown before this returns
+        long localRevisionAtRead = localMetaDataRevision.get();
         Map<String, String> sharedMetaData = dbmsProcessor.getSharedMetaData();
         RemoteChanges remoteChanges = fetchRemoteChanges();
         withPullLock(() -> {
-            applyRemoteMetaData(sharedMetaData);
+            applyRemoteMetaData(sharedMetaData, localRevisionAtRead);
             applyRemoteChanges(remoteChanges);
         });
         // Changes recorded by an earlier session that lost its connection
@@ -322,7 +342,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Schedules a metadata update received from another shared-database client.
     public void handleRemoteMetaDataChange() {
-        pullMetaData();
+        pullMetaDataFromNotification();
     }
 
     /// Brings the local entries up to date with the shared database: fetches on the database
@@ -349,20 +369,57 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     private void pullMetaData() {
-        syncExecutor.execute(() -> {
-            if (!connected.get()) {
-                return;
-            }
-            Map<String, String> sharedMetaData;
-            try {
-                sharedMetaData = dbmsProcessor.getSharedMetaData();
-            } catch (SQLException e) {
-                LOGGER.error("Could not fetch metadata from the shared database", e);
-                checkCurrentConnection();
-                return;
-            }
-            remoteUpdateExecutor.execute(() -> withPullLock(() -> applyRemoteMetaData(sharedMetaData)));
-        });
+        syncExecutor.execute(this::pullMetaDataFromDatabase);
+    }
+
+    private void pullMetaDataFromNotification() {
+        metadataPullRequested.set(true);
+        scheduleMetadataPull();
+    }
+
+    private void scheduleMetadataPull() {
+        if (!metadataPullScheduled.compareAndSet(false, true)) {
+            return;
+        }
+        try {
+            syncExecutor.execute(() -> {
+                metadataPullRequested.set(false);
+                try {
+                    pullMetaDataFromDatabase();
+                } finally {
+                    metadataPullScheduled.set(false);
+                    // A notification may have arrived while this read was active. Schedule its
+                    // follow-up separately so metadata pulls do not monopolize the database worker.
+                    if (metadataPullRequested.get()) {
+                        scheduleMetadataPull();
+                    }
+                }
+            });
+        } catch (RuntimeException e) {
+            metadataPullScheduled.set(false);
+            throw e;
+        }
+    }
+
+    @VisibleForTesting
+    Map<String, String> readSharedMetaData() throws SQLException {
+        return dbmsProcessor.getSharedMetaData();
+    }
+
+    private void pullMetaDataFromDatabase() {
+        if (!connected.get()) {
+            return;
+        }
+        long localRevisionAtRead = localMetaDataRevision.get();
+        Map<String, String> sharedMetaData;
+        try {
+            sharedMetaData = readSharedMetaData();
+        } catch (SQLException e) {
+            LOGGER.error("Could not fetch metadata from the shared database", e);
+            checkCurrentConnection();
+            return;
+        }
+        remoteUpdateExecutor.execute(() -> withPullLock(() -> applyRemoteMetaData(sharedMetaData, localRevisionAtRead)));
     }
 
     /// Database worker. Transfers only what differs: the id/version mapping plus the entries
@@ -557,11 +614,29 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /// Model thread
-    private void applyRemoteMetaData(Map<String, String> sharedMetaData) {
+    private void applyRemoteMetaData(Map<String, String> sharedMetaData, long localRevisionAtRead) {
+        long currentLocalRevision = localMetaDataRevision.get();
+        if ((localRevisionAtRead != currentLocalRevision) || (handledLocalMetaDataRevision.get() != currentLocalRevision)) {
+            pullMetaDataFromNotification();
+            return;
+        }
+        if (hasAppliedRemoteMetaData
+                && sharedMetaData.equals(lastAppliedRemoteMetaData)
+                && (lastAppliedLocalMetaDataRevision == currentLocalRevision)) {
+            return;
+        }
         lastSharedMetaData = sharedMetaData;
         try {
             metaData.setEventPropagation(false);
             new MetaDataParser(fileMonitor).parse(metaData, sharedMetaData, keywordSeparator, userAndHost);
+            if (!sharedMetaData.containsKey(MetaData.GROUPSTREE)
+                    && !sharedMetaData.containsKey(MetaData.GROUPSTREE_LEGACY)
+                    && metaData.getGroups().isPresent()) {
+                metaData.clearGroups();
+            }
+            lastAppliedRemoteMetaData = Map.copyOf(sharedMetaData);
+            lastAppliedLocalMetaDataRevision = currentLocalRevision;
+            hasAppliedRemoteMetaData = true;
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         } finally {
