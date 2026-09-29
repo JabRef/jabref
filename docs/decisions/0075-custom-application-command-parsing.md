@@ -90,6 +90,7 @@ Pass the directory as an environment variable and run `/bin/sh -c` on Linux/macO
 ### Require one argument per line
 
 Each line is one argument, with no quote delimiters. For the examples above:
+
 * Linux: `gnome-terminal`, then `--working-directory=%DIR`.
 * macOS: `open`, `-a`, `Terminal`, then `%DIR`, each on its own line.
 * Windows: `C:\Program Files\ConEmu\ConEmu64.exe`, `/single`, `/dir`, then `%DIR`, each on its own line.
