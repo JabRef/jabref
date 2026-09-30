@@ -26,8 +26,8 @@ Rules run once each, in `RuleSet` order, and must be idempotent.
 The asking is `LintSettings` in the library's `MetaData`, next to its Save Actions:
 
 ```java
-databaseContext.getMetaData().setLintSettings(new LintSettings(Map.of(
-        "surrounding-whitespace", RuleMode.FIX)));
+databaseContext.getMetaData().setFormatting(
+        LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
 
 BibDatabaseWriter writer = new BibDatabaseWriter(...);
 writer.writeDatabase(databaseContext);
@@ -36,7 +36,10 @@ List<Finding> findings = writer.getFindings();
 
 The writer resolves the settings into a rule set itself, with `RuleSet.forLibrary`, which carries the library's own Save Actions into the run, and `RuleSet.asConfiguredBy`, which lets each rule go as far as the library allows.
 
-`LintSettings` holds one `RuleMode` per rule id, and a rule runs only where the library names it:
+`setFormatting` is what the library says about itself, and it is what is written back to the file.
+A command that only wants different rules for one run calls `overrideLintSettings` instead, so that `jabkit fix --disable lower-case` does not leave the library configured that way, and so that formatting a library does not hand it a configuration it never had.
+
+`LintSettings` holds one `RuleMode` per `RuleSelector` — a rule, on one field or on every field it looks at — and a rule runs only where the library names it:
 
 | Mode    | What the rule does                                      |
 |---------|---------------------------------------------------------|
@@ -46,7 +49,9 @@ The writer resolves the settings into a rule set itself, with `RuleSet.forLibrar
 
 So a library can have three rules report and three others repair, in one place per rule.
 A library that carries no settings has nothing done to it, which is how every library written before this reads.
-A checked rule is wrapped by `CheckOnlyRule`, which takes the `Fix` off its findings, so the run then handles them the way it already handles a rule that knows no repair: `jabkit fix` says them out loud instead of letting them pass unseen in the output.
+Naming a field narrows an entry to that field, and the more specific entry wins, so a library can have a rule repair everywhere and only report on its titles.
+A selector naming `all` or `all-text-fields` is about every field the rule visits, since a Save Action may be configured with those while its findings name the concrete fields it went through.
+A rule is wrapped in `ConfiguredRule`, which settles per finding how far the rule goes there — taking the `Fix` off a checked one, so the run handles it the way it already handles a rule that knows no repair: `jabkit fix` says it out loud instead of letting it pass unseen in the output.
 This is also where the value a rule takes will go, once rules take any — it belongs to the entry that configures the rule, not to a list beside it.
 
 An id naming no rule of this JabFix is passed over rather than rejected, so that a library configured by a newer JabFix still saves with an older one; an id a user typed is held against the rules instead, which is what makes `jabkit fix --disable typo` a usage error.
@@ -57,8 +62,32 @@ What a repair changed is reported as a `FieldChange`, the same way a Save Action
 A library that carries no settings is saved the way it always was; carrying them at all is what asks for anything to be done, so there is no flag to switch off.
 Layout is normalized by `BibDatabaseWriter` either way, so a library JabFix has already formatted produces no diff.
 
-`LintSettings` are not written to the `.bib` file yet — `jabkit fix` sets them on the library it has just read.
-Storing them in a `jabref-meta` entry is the next step.
+## Where the settings are stored
+
+In the library, as a `formatting` block of the embedded JSON metadata:
+
+```bibtex
+@Comment{jabref-meta-0.1.0
+{
+  "formatting" : {
+    "rules" : {
+      "surrounding-whitespace" : "fix",
+      "title:lower-case" : "check"
+    }
+  }
+}
+}
+```
+
+A key is `rule-id`, or `field:rule-id` for one field; the rule id is what stands after the last colon, since a rule id never contains one while a BibTeX field name may.
+The comma lists and `/regex/` items the magic comments above an entry accept are not read here yet, and a key that looks like one is not read at all rather than read as a field name containing a comma.
+A mode is spelled in lower case, and only in lower case.
+
+What this JabFix cannot read — a selector spelled some other way, a mode it does not know, or something standing beside the rules — is written back as it came, so a library configured by a newer JabFix is handed back with what it arrived with.
+The `rules` key exists so that something which is not a rule can join it later, such as a named set of them; the decision is ADR-0075.
+
+`@Comment{jabref-meta-0.1.0 ...}` is the single embedded JSON object of <https://github.com/JabRef/jabref/issues/10371>.
+A `jabref-meta:` item could not hold this: its separator is the same `;` a Save Action uses inside its own value, so nothing that nests fits.
 
 ## Switching rules off for one entry
 
@@ -111,7 +140,8 @@ Still missing:
 - built-in rules beyond whitespace,
 - library-level rules (`Rule#scan` sees one entry),
 - context for rules (file directories, abbreviation list, key patterns), which citation key generation and journal abbreviation need before they can become rules,
-- configuration beyond the command line and the comments above an entry, including rule parameters and where the settings are stored,
+- rule parameters, so that a rule can take a value and not only a mode,
+- replacing the `saveActions` item, which still decides which Save Actions exist,
 - GUI integration: `BibDatabaseWriter` reads the settings, but no GUI save writes them yet,
 - leaving out metadata JabRef only inferred (the database type); writing it back changes libraries that are otherwise clean.
 

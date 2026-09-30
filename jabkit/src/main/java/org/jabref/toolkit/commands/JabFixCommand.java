@@ -96,7 +96,7 @@ class JabFixCommand implements Callable<Integer> {
         // rules there are needs the library, since its own Save Actions are rules of this run and
         // the options cover them like any other. These are the rules of this run and not of the
         // library, so they override what it says rather than becoming what it says.
-        databaseContext.getMetaData().overrideLintSettings(new LintSettings(selectedModes(databaseContext)));
+        databaseContext.getMetaData().overrideLintSettings(configuredBy(databaseContext));
 
         try {
             // Only the parsed library in memory is changed here; nothing reaches disk unless
@@ -125,38 +125,39 @@ class JabFixCommand implements Callable<Integer> {
         }
     }
 
-    /// How far each rule of the run goes.
+    /// What this run applies: what the library asks for, with the options laid over it.
     ///
-    /// A rule runs only where it is named. Naming none, this command names every rule the library
-    /// has -- its own Save Actions and the rules JabFix ships with -- and lets each repair, which
-    /// is what makes a bare `jabkit fix` format a library. `--enable` names them instead, and then
-    /// they are the only ones that run.
+    /// A library that says what it wants done to it is taken at its word, down to the fields it
+    /// names. One that says nothing has every rule it has -- its own Save Actions and the rules
+    /// JabFix ships with -- named and left repairing, which is what makes a bare `jabkit fix`
+    /// format a library nobody has configured.
     ///
-    /// `--check-only` leaves a rule reporting what it finds without repairing it, and names it too:
-    /// a rule `--enable` left out still runs if `--check-only` asks for it. `--disable` takes one
-    /// out of the run whatever else named it.
+    /// `--enable` names the rules of the run itself, and then they are the only ones that run,
+    /// whatever the library says. `--check-only` leaves a rule reporting what it finds without
+    /// repairing it, and names it too, so a rule `--enable` left out still runs if `--check-only`
+    /// asks for it; `--disable` takes one out of the run whatever else named it. All three are
+    /// about the rule wherever it looks: an option typed for one run outranks what the library says
+    /// about one of its fields.
     ///
     /// A misspelled id is a usage error, not something to pass over: leaving it unreported would let
     /// the user believe a rule had been switched off while it kept running. A library's own settings
     /// are treated more leniently -- see [RuleSet#asConfiguredBy].
-    private SequencedMap<RuleSelector, RuleMode> selectedModes(BibDatabaseContext databaseContext) throws CliException {
+    private LintSettings configuredBy(BibDatabaseContext databaseContext) throws CliException {
         RuleSet rules = RuleSet.forLibrary(databaseContext, jabKit.cliPreferences.getFieldPreferences());
         try {
             rules.rejectUnknown(Stream.of(enabledRules, checkOnlyRules, disabledRules)
                                       .flatMap(List::stream)
                                       .toList());
 
-            // The command line names rules, not fields, so every selector it builds covers every
-            // field the rule looks at.
-            SequencedMap<RuleSelector, RuleMode> modes = new LinkedHashMap<>();
-            (enabledRules.isEmpty() ? rules.ids() : enabledRules)
-                    .forEach(ruleId -> modes.put(RuleSelector.of(ruleId), RuleMode.FIX));
-            checkOnlyRules.forEach(ruleId -> modes.put(RuleSelector.of(ruleId), RuleMode.CHECK));
+            LintSettings applied = enabledRules.isEmpty()
+                    ? databaseContext.getMetaData().getFormatting().orElseGet(() -> everyRuleRepairing(rules))
+                    : namedRepairing(enabledRules);
+
             // A rule named by several options is switched off: the strictest of them wins, and
             // saying so in the one place that reads them all keeps it from being a question
             // anywhere else.
-            disabledRules.forEach(ruleId -> modes.put(RuleSelector.of(ruleId), RuleMode.OFF));
-            return modes;
+            return applied.overriddenBy(modesFor(checkOnlyRules, RuleMode.CHECK))
+                          .overriddenBy(modesFor(disabledRules, RuleMode.OFF));
         } catch (UnknownRuleException e) {
             LOGGER.debug("Rejecting unknown rule id", e);
             throw new CliException(e.getMessage(),
@@ -165,6 +166,26 @@ class JabFixCommand implements Callable<Integer> {
                             String.join(", ", e.getKnownIds())),
                     CommandLine.ExitCode.USAGE);
         }
+    }
+
+    /// Every rule the library has, each repairing what it finds: what a library that has never been
+    /// configured is formatted by.
+    private static LintSettings everyRuleRepairing(RuleSet rules) {
+        return namedRepairing(rules.ids());
+    }
+
+    /// The command line names rules and not fields, so every selector it builds covers every field
+    /// the rule looks at.
+    private static LintSettings namedRepairing(List<String> ruleIds) {
+        SequencedMap<RuleSelector, RuleMode> modes = new LinkedHashMap<>();
+        ruleIds.forEach(ruleId -> modes.put(RuleSelector.of(ruleId), RuleMode.FIX));
+        return new LintSettings(modes);
+    }
+
+    private static SequencedMap<String, RuleMode> modesFor(List<String> ruleIds, RuleMode mode) {
+        SequencedMap<String, RuleMode> modes = new LinkedHashMap<>();
+        ruleIds.forEach(ruleId -> modes.put(ruleId, mode));
+        return modes;
     }
 
     /// What a save of the library produces: the text, and what the rules reported while producing it.

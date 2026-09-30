@@ -60,6 +60,22 @@ public record LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes,
         return new LintSettings(extended, unreadRules, unreadKeys);
     }
 
+    /// The same settings, with each of these rules taking the given mode wherever it looks.
+    ///
+    /// Every selector naming one of them gives way, the field-scoped ones included: something that
+    /// says how far a rule goes in this run outranks what the library says about one of its fields,
+    /// and leaving the field-scoped entry standing would let it win, since it is the more specific.
+    public LintSettings overriddenBy(SequencedMap<String, RuleMode> modesByRuleId) {
+        SequencedMap<RuleSelector, RuleMode> overridden = new LinkedHashMap<>();
+        ruleModes.forEach((selector, mode) -> {
+            if (!modesByRuleId.containsKey(selector.ruleId())) {
+                overridden.put(selector, mode);
+            }
+        });
+        modesByRuleId.forEach((ruleId, mode) -> overridden.put(RuleSelector.of(ruleId), mode));
+        return new LintSettings(overridden, unreadRules, unreadKeys);
+    }
+
     /// Whether there is nothing here at all -- no mode, and nothing kept for a newer JabFix. Such a
     /// configuration is not written, so a library does not gain an empty block by being opened.
     public boolean isEmpty() {

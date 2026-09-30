@@ -2,6 +2,7 @@ package org.jabref.model.metadata;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.model.entry.field.InternalField;
@@ -118,6 +119,31 @@ class LintSettingsTest {
 
         assertEquals(RuleMode.OFF, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
         assertEquals(RuleMode.FIX, settings.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
+    }
+
+    /// Otherwise the field-scoped entry would win, being the more specific, and an option given for
+    /// one run would not reach the field the library named.
+    @Test
+    void anOverrideAlsoGivesWayFromAFieldScopedEntry() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
+                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK);
+
+        LintSettings overridden = settings.overriddenBy(
+                new LinkedHashMap<>(Map.of("lower-case", RuleMode.OFF)));
+
+        assertEquals(RuleMode.OFF, overridden.modeOf("lower-case", Optional.of(StandardField.TITLE)));
+        assertEquals(RuleMode.OFF, overridden.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
+    }
+
+    @Test
+    void anOverrideLeavesEveryOtherRuleAlone() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
+                                           .and(RuleSelector.of("upper-case"), RuleMode.CHECK);
+
+        LintSettings overridden = settings.overriddenBy(
+                new LinkedHashMap<>(Map.of("lower-case", RuleMode.OFF)));
+
+        assertEquals(RuleMode.CHECK, overridden.modeOf("upper-case", Optional.of(StandardField.TITLE)));
     }
 
     /// So that saving does not reshuffle a configuration somebody edited by hand.

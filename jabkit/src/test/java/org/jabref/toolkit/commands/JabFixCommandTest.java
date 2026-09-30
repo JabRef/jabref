@@ -14,6 +14,7 @@ import org.junit.jupiter.api.io.TempDir;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +39,50 @@ class JabFixCommandTest extends AbstractJabKitTest {
     }
 
     /// Naming one rule leaves the rest of them out, so the whitespace around the author survives.
+    /// The library says `surrounding-whitespace` only reports, and names no other rule, so the
+    /// whitespace around the author survives and is said out loud instead.
+    @Test
+    void theLibrarysFormattingBlockConfiguresTheRun() {
+        assertEquals(CommandLine.ExitCode.OK,
+                commandLine.executeToLog("fix", getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("author = { Knuth, Donald E. },"), formatted);
+        String reported = commandLine.getErrorOutput();
+        assertTrue(reported.contains("[surrounding-whitespace]"), reported);
+    }
+
+    /// An option typed for one run outranks what the library says.
+    @Test
+    void disableBeatsTheLibrarysFormattingBlock() {
+        assertEquals(CommandLine.ExitCode.OK,
+                commandLine.executeToLog("fix", "--disable", "surrounding-whitespace",
+                        getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
+
+        String reported = commandLine.getErrorOutput();
+        assertFalse(reported.contains("[surrounding-whitespace]"), reported);
+    }
+
+    @Test
+    void enableBeatsTheLibrarysFormattingBlock() {
+        assertEquals(CommandLine.ExitCode.OK,
+                commandLine.executeToLog("fix", "--enable", "surrounding-whitespace",
+                        getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("author = {Knuth, Donald E.},"), formatted);
+    }
+
+    /// The rules of a run are not what the library says about itself, so formatting one must not
+    /// leave a configuration behind in a library that never had one.
+    @Test
+    void formattingALibraryDoesNotGiveItAFormattingBlock() {
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", inputFile));
+
+        String formatted = commandLine.getStandardOutput();
+        assertFalse(formatted.contains("jabref-meta-0.1.0"), formatted);
+    }
+
     @Test
     void enableNamesTheOnlyRulesThatRun() {
         assertEquals(CommandLine.ExitCode.OK,
