@@ -105,6 +105,7 @@ One that states nothing has every rule it has applied, each repairing what it fi
 `--enable` names the rules of the run itself, and then they are the only ones that run; `--disable` switches rules off by id and `--check-only` leaves a rule reporting without repairing.
 All three are about the rule wherever it looks, so an option given for one run outranks what the library says about one of its fields, and none of them changes what the library says about itself.
 An id that names no rule is a usage error.
+`--migrate-save-actions` moves the library's save actions into its stored configuration and drops the old metadata item, leaving what the save applies unchanged.
 
 Needs: impl
 

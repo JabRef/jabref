@@ -17,6 +17,7 @@ import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.lint.SaveActionsMigration;
 import org.jabref.logic.lint.rule.Finding;
 import org.jabref.logic.lint.rule.RuleSet;
 import org.jabref.logic.lint.rule.UnknownRuleException;
@@ -63,6 +64,11 @@ class JabFixCommand implements Callable<Integer> {
     @Option(names = {"--check"}, description = "Report what is wrong without writing anything.")
     private boolean checkOnly;
 
+    @Option(names = {"--migrate-save-actions"},
+            description = "Move the library's save actions into its formatting configuration and drop the old entry. "
+                    + "Together with --in-place this rewrites the library's metadata; without it, the result only goes to standard output.")
+    private boolean migrateSaveActions;
+
     @Option(names = {"--enable"}, split = ",", paramLabel = "RULE",
             description = "Rule to apply, which then are the only ones applied. Repeatable, and accepts a comma-separated list. Without it, every rule the library has is applied. The available rules are listed below.")
     private List<String> enabledRules = List.of();
@@ -92,6 +98,11 @@ class JabFixCommand implements Callable<Integer> {
         ParserResult parserResult = ImportService.importBibTexFile(inputFile, jabKit.cliPreferences, quiet);
 
         BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
+        if (migrateSaveActions) {
+            // Before the rules of the run are worked out, so that this run already applies what the
+            // migrated library asks for rather than what it asked for a moment ago.
+            SaveActionsMigration.migrate(databaseContext.getMetaData());
+        }
         // Asking the library to apply the rules is all it takes; the writer builds them. Which
         // rules there are needs the library, since its own Save Actions are rules of this run and
         // the options cover them like any other. These are the rules of this run and not of the

@@ -84,6 +84,10 @@ The comma lists and `/regex/` items the magic comments above an entry accept are
 A mode is spelled in lower case, and only in lower case.
 
 What this JabFix cannot read — a selector spelled some other way, a mode it does not know, or something standing beside the rules — is written back as it came, so a library configured by a newer JabFix is handed back with what it arrived with.
+
+Where a library states its Save Actions is whichever it still has: the `saveActions` item while it has one, and this block once the item is gone.
+They are not read at once, so `title:lower-case` says how far an existing Save Action goes while the item is there, and says that there is such a Save Action once it is not.
+`SaveActionsMigration` is what moves them across.
 The `rules` key exists so that something which is not a rule can join it later, such as a named set of them; the decision is ADR-0075.
 
 `@Comment{jabref-meta-0.1.0 ...}` is the single embedded JSON object of <https://github.com/JabRef/jabref/issues/10371>.
@@ -110,7 +114,10 @@ A comment that switches nothing off is reported by `magic-comment`, because the 
 
 ## The CLI
 
-`jabkit fix [--check | --in-place] [--enable RULE,...] [--disable RULE,...] [--check-only RULE,...] FILE`.
+`jabkit fix [--check | --in-place] [--enable RULE,...] [--disable RULE,...] [--check-only RULE,...] [--migrate-save-actions] FILE`.
+
+The library's own configuration is what the run applies; a library that has none has every rule it has applied, each repairing what it finds.
+`--migrate-save-actions` moves the library's Save Actions into that configuration and drops the `saveActions` item, which is what a graphical interface will do once it can configure the block.
 
 Findings are written one per line, in the `file:line:column:citationKey[:field]: message [rule-id]` format the `check` commands use, so an editor or a CI log scraper can jump to the place at fault.
 Where that place is comes from the `ParserResult` of the file the library was read from, through `ErrorFormat`, which the integrity and consistency checks report through as well.
@@ -141,7 +148,7 @@ Still missing:
 - library-level rules (`Rule#scan` sees one entry),
 - context for rules (file directories, abbreviation list, key patterns), which citation key generation and journal abbreviation need before they can become rules,
 - rule parameters, so that a rule can take a value and not only a mode,
-- replacing the `saveActions` item, which still decides which Save Actions exist,
+- a graphical way to configure the block, which is what would migrate the `saveActions` item in passing,
 - GUI integration: `BibDatabaseWriter` reads the settings, but no GUI save writes them yet,
 - leaving out metadata JabRef only inferred (the database type); writing it back changes libraries that are otherwise clean.
 

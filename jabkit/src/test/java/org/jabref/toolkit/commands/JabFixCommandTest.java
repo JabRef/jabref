@@ -39,6 +39,33 @@ class JabFixCommandTest extends AbstractJabKitTest {
     }
 
     /// Naming one rule leaves the rest of them out, so the whitespace around the author survives.
+    /// The save action goes on being applied, and the library now states it in the one place that
+    /// says what is done to it.
+    @Test
+    void migrateSaveActionsMovesThemIntoTheFormattingConfiguration() {
+        assertEquals(CommandLine.ExitCode.OK,
+                commandLine.executeToLog("fix", "--migrate-save-actions",
+                        getClassResourceAsFullyQualifiedString("jabfix-save-actions.bib")));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("title = {some title},"), formatted);
+        assertTrue(formatted.contains("\"title:lower-case\" : \"fix\""), formatted);
+        assertFalse(formatted.contains("saveActions"), formatted);
+    }
+
+    /// Without the option the library keeps its save actions item, so opening it changes nothing.
+    @Test
+    void aLibraryKeepsItsSaveActionsItemUntilItIsMigrated() {
+        assertEquals(CommandLine.ExitCode.OK,
+                commandLine.executeToLog("fix",
+                        getClassResourceAsFullyQualifiedString("jabfix-save-actions.bib")));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("title = {some title},"), formatted);
+        assertTrue(formatted.contains("saveActions"), formatted);
+        assertFalse(formatted.contains("jabref-meta-0.1.0"), formatted);
+    }
+
     /// The library says `surrounding-whitespace` only reports, and names no other rule, so the
     /// whitespace around the author survives and is said out loud instead.
     @Test

@@ -52,6 +52,7 @@ Needs: impl, utest
 
 A library may ask, in its metadata, for lint rules to be applied when it is saved. The save then applies them to its entries and reports what each rule found, instead of applying the library's Save Actions and its whitespace cleanup itself.
 The rules are the library's own Save Actions together with the ones JabFix ships with.
+Where the library states its Save Actions is whichever place it still has: its `saveActions` metadata item while it has one, and its lint metadata once that item is gone, so that migrating the one into the other leaves a save applying exactly what it applied before.
 A rule runs only where the library names it, and the library says per rule how far it goes: reporting only, or reporting and repairing. A rule that only reports leaves the value as it is, and its findings say that they carry no repair.
 An id naming no rule of this JabRef is passed over, so that a library configured by a newer version still saves.
 The rules are then the only thing that changes an entry: no citation key is generated and no journal abbreviated either, because nothing may be changed that no rule reported.
