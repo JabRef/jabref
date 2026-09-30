@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -170,11 +169,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     @SuppressWarnings({"FieldCanBeLocal"})
     private Subscription dividerPositionSubscription;
 
-    /// Everything this tab listens to on the [StateManager], which outlives every library. Without
-    /// dropping these in [#onClosed], a closed tab stays reachable from a listener list for the rest
-    /// of the session, and with it its table model, its context and all its entries.
-    /// Verified by [org.jabref.gui.LibraryTabRetentionTest].
-    private final List<Subscription> stateManagerSubscriptions = new ArrayList<>();
+    private final Subscription activeDatabaseSubscription;
+    private final ListChangeListener<BibDatabaseContext> openDatabasesListener = _ -> updateTabTitle(changedProperty.getValue());
+    private boolean titleListenersRegistered;
 
     /// Set by [#onClosed], so listener registrations still queued behind it are skipped instead of
     /// registering after the cleanup already ran.
@@ -326,11 +323,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         setOnCloseRequest(this::onCloseRequest);
         setOnClosed(this::onClosed);
 
-        stateManagerSubscriptions.add(EasyBind.listen(stateManager.activeDatabaseProperty(), (_, _, _) -> {
+        activeDatabaseSubscription = EasyBind.listen(stateManager.activeDatabaseProperty(), (_, _, _) -> {
             if (preferences.getSearchPreferences().isFulltext()) {
                 mainTable.getTableModel().refreshSearchMatches();
             }
-        }));
+        });
     }
 
     private void initializeComponentsAndListeners(boolean isDummyContext) {
@@ -383,10 +380,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
             // [impl->req~logic.undo.modified-marker-derived~1]
             changedProperty.bind(journal().hasChangedProperty());
-            EasyBind.subscribe(changedProperty, this::updateTabTitle);
-            ListChangeListener<BibDatabaseContext> openDatabasesListener = _ -> updateTabTitle(changedProperty.getValue());
-            stateManager.getOpenDatabases().addListener(openDatabasesListener);
-            stateManagerSubscriptions.add(() -> stateManager.getOpenDatabases().removeListener(openDatabasesListener));
+            if (!titleListenersRegistered) {
+                EasyBind.subscribe(changedProperty, this::updateTabTitle);
+                stateManager.getOpenDatabases().addListener(openDatabasesListener);
+                titleListenersRegistered = true;
+            }
         });
     }
 
@@ -995,8 +993,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             coarseChangeFilter.unregisterListener(autoRenameFileOnEntryChange);
         }
 
-        stateManagerSubscriptions.forEach(Subscription::unsubscribe);
-        stateManagerSubscriptions.clear();
+        activeDatabaseSubscription.unsubscribe();
+        stateManager.getOpenDatabases().removeListener(openDatabasesListener);
 
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
