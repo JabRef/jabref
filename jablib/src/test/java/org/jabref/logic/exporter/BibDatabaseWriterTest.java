@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -57,6 +56,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.RuleMode;
+import org.jabref.model.metadata.RuleSelector;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -1033,7 +1033,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
+        metaData.setLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1049,7 +1049,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.OFF)));
+        metaData.setLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1065,7 +1065,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.CHECK)));
+        metaData.setLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.CHECK));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1081,7 +1081,7 @@ class BibDatabaseWriterTest {
                 new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
         database.insertEntry(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE"));
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.CHECK)));
+        metaData.setLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.CHECK));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals(List.of(false),
@@ -1100,10 +1100,9 @@ class BibDatabaseWriterTest {
                 .withField(StandardField.AUTHOR, " Doe, Jane ");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of(
-                "lower-case", RuleMode.CHECK,
-                "upper-case", RuleMode.FIX,
-                "surrounding-whitespace", RuleMode.OFF)));
+        metaData.setLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.CHECK)
+                                             .and(RuleSelector.of("upper-case"), RuleMode.FIX)
+                                             .and(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1118,9 +1117,8 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, " Doe, Jane ");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of(
-                "rule-of-a-newer-jabfix", RuleMode.CHECK,
-                "surrounding-whitespace", RuleMode.FIX)));
+        metaData.setLintSettings(LintSettings.of(RuleSelector.of("rule-of-a-newer-jabfix"), RuleMode.CHECK)
+                                             .and(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("Doe, Jane", entry.getField(StandardField.AUTHOR).orElseThrow());
@@ -1138,7 +1136,7 @@ class BibDatabaseWriterTest {
         BibEntry other = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "ANOTHER TITLE");
         database.insertEntries(exempt, other);
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
+        metaData.setLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", exempt.getField(StandardField.TITLE).orElseThrow());
@@ -1153,7 +1151,7 @@ class BibDatabaseWriterTest {
                 new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
         database.insertEntry(new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE"));
 
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
+        metaData.setLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals(List.of("some title"),
@@ -1172,7 +1170,7 @@ class BibDatabaseWriterTest {
             scheduledMutations.incrementAndGet();
             mutation.run();
         });
-        metaData.setLintSettings(new LintSettings(Map.of("lower-case", RuleMode.FIX)));
+        metaData.setLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals(1, scheduledMutations.get());
@@ -1187,7 +1185,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Doe, Jane");
         database.insertEntry(entry);
 
-        metaData.setLintSettings(new LintSettings(Map.of("surrounding-whitespace", RuleMode.FIX)));
+        metaData.setLintSettings(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals(Optional.empty(), entry.getCitationKey());

@@ -97,21 +97,19 @@ public class RuleSet {
         }
     }
 
-    /// The rules of this set the library asks for, each as far as it lets them go: a rule it does
-    /// not name is dropped, and one it wants checked only reports what it finds, without repairing.
+    /// The rules of this set the library lets run, each as far as it lets it go on each field: a
+    /// rule it switches off everywhere is dropped, and where it wants one checked only, the repair
+    /// is taken off what that rule finds there.
     ///
-    /// An id naming no rule of this set is passed over. The settings may have been written by a
-    /// JabFix that knows a rule this one does not, and such a library still has to save.
+    /// How far a rule goes cannot be settled once for the whole rule, since the library says it per
+    /// field, so each kept rule is wrapped in one that settles it per finding.
+    ///
+    /// A selector naming no rule of this set is passed over. The settings may have been written by
+    /// a JabFix that knows a rule this one does not, and such a library still has to save.
     public RuleSet asConfiguredBy(LintSettings settings) {
         return new RuleSet(rules.stream()
-                                .flatMap(rule -> switch (settings.modeOf(rule.id())) {
-                                    case OFF ->
-                                            Stream.<Rule>empty();
-                                    case CHECK ->
-                                            Stream.<Rule>of(new CheckOnlyRule(rule));
-                                    case FIX ->
-                                            Stream.of(rule);
-                                })
+                                .filter(rule -> settings.runs(rule.id()))
+                                .<Rule>map(rule -> new ConfiguredRule(rule, settings))
                                 .toList());
     }
 

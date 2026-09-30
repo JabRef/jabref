@@ -6,9 +6,9 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.SequencedMap;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
@@ -24,6 +24,7 @@ import org.jabref.logic.util.ErrorFormat;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.RuleMode;
+import org.jabref.model.metadata.RuleSelector;
 import org.jabref.toolkit.exception.CliException;
 import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ImportService;
@@ -137,21 +138,23 @@ class JabFixCommand implements Callable<Integer> {
     /// A misspelled id is a usage error, not something to pass over: leaving it unreported would let
     /// the user believe a rule had been switched off while it kept running. A library's own settings
     /// are treated more leniently -- see [RuleSet#asConfiguredBy].
-    private Map<String, RuleMode> selectedModes(BibDatabaseContext databaseContext) throws CliException {
+    private SequencedMap<RuleSelector, RuleMode> selectedModes(BibDatabaseContext databaseContext) throws CliException {
         RuleSet rules = RuleSet.forLibrary(databaseContext, jabKit.cliPreferences.getFieldPreferences());
         try {
             rules.rejectUnknown(Stream.of(enabledRules, checkOnlyRules, disabledRules)
                                       .flatMap(List::stream)
                                       .toList());
 
-            Map<String, RuleMode> modes = new HashMap<>();
+            // The command line names rules, not fields, so every selector it builds covers every
+            // field the rule looks at.
+            SequencedMap<RuleSelector, RuleMode> modes = new LinkedHashMap<>();
             (enabledRules.isEmpty() ? rules.ids() : enabledRules)
-                    .forEach(ruleId -> modes.put(ruleId, RuleMode.FIX));
-            checkOnlyRules.forEach(ruleId -> modes.put(ruleId, RuleMode.CHECK));
+                    .forEach(ruleId -> modes.put(RuleSelector.of(ruleId), RuleMode.FIX));
+            checkOnlyRules.forEach(ruleId -> modes.put(RuleSelector.of(ruleId), RuleMode.CHECK));
             // A rule named by several options is switched off: the strictest of them wins, and
             // saying so in the one place that reads them all keeps it from being a question
             // anywhere else.
-            disabledRules.forEach(ruleId -> modes.put(ruleId, RuleMode.OFF));
+            disabledRules.forEach(ruleId -> modes.put(RuleSelector.of(ruleId), RuleMode.OFF));
             return modes;
         } catch (UnknownRuleException e) {
             LOGGER.debug("Rejecting unknown rule id", e);

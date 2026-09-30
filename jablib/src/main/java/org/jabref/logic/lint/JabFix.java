@@ -48,6 +48,10 @@ public class JabFix {
     /// repairs are applied, so a suppressed finding is neither reported nor repaired. A rule that
     /// is switched off for one field only still runs on the rest of the entry.
     ///
+    /// What the library itself switches off is already settled by then: the [RuleSet] this engine
+    /// was given has been configured, and the two are deliberately separate -- the library says
+    /// what is done to it, an entry's comments say where that does not apply.
+    ///
     /// A [MagicCommentRule] runs ahead of the rule set, since a comment that names no rule of this
     /// run switches nothing off and would otherwise go unnoticed.
     ///

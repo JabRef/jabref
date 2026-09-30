@@ -1,7 +1,7 @@
 package org.jabref.logic.lint.rule;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -9,6 +9,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.RuleMode;
+import org.jabref.model.metadata.RuleSelector;
 
 import org.junit.jupiter.api.Test;
 
@@ -78,7 +79,7 @@ class RuleSetTest {
 
     @Test
     void asConfiguredByKeepsOnlyTheRulesTheLibraryNames() {
-        LintSettings settings = new LintSettings(Map.of("repeated-whitespace", RuleMode.FIX));
+        LintSettings settings = LintSettings.of(RuleSelector.of("repeated-whitespace"), RuleMode.FIX);
 
         assertEquals(List.of("repeated-whitespace"),
                 RuleSet.all(FIELD_PREFERENCES).asConfiguredBy(settings).ids());
@@ -87,9 +88,8 @@ class RuleSetTest {
     /// Saying it out loud is the same as not naming the rule at all.
     @Test
     void asConfiguredByDropsARuleTheLibrarySwitchedOff() {
-        LintSettings settings = new LintSettings(Map.of(
-                "surrounding-whitespace", RuleMode.OFF,
-                "repeated-whitespace", RuleMode.FIX));
+        LintSettings settings = LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF)
+                                            .and(RuleSelector.of("repeated-whitespace"), RuleMode.FIX);
 
         assertEquals(List.of("repeated-whitespace"),
                 RuleSet.all(FIELD_PREFERENCES).asConfiguredBy(settings).ids());
@@ -98,7 +98,7 @@ class RuleSetTest {
     /// A checked rule stays in the run under its own id -- it only stops repairing.
     @Test
     void asConfiguredByKeepsACheckedRuleButTakesItsRepairAway() {
-        LintSettings settings = new LintSettings(Map.of("surrounding-whitespace", RuleMode.CHECK));
+        LintSettings settings = LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.CHECK);
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, " A Title ");
 
         List<Finding> findings = RuleSet.all(FIELD_PREFERENCES).asConfiguredBy(settings).rules().getFirst().scan(entry);
@@ -110,7 +110,7 @@ class RuleSetTest {
     /// A rule repairs where the library asks it to, which is what it does not do on its own.
     @Test
     void asConfiguredByLeavesTheRepairOfARuleTheLibraryWantsFixed() {
-        LintSettings settings = new LintSettings(Map.of("surrounding-whitespace", RuleMode.FIX));
+        LintSettings settings = LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX);
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, " A Title ");
 
         List<Finding> findings = RuleSet.all(FIELD_PREFERENCES).asConfiguredBy(settings)
@@ -122,15 +122,16 @@ class RuleSetTest {
     /// A library that names nothing has nothing done to it.
     @Test
     void asConfiguredByRunsNoRuleTheLibraryDoesNotName() {
-        assertEquals(List.of(), RuleSet.all(FIELD_PREFERENCES).asConfiguredBy(new LintSettings(Map.of())).ids());
+        assertEquals(List.of(), RuleSet.all(FIELD_PREFERENCES)
+                                       .asConfiguredBy(new LintSettings(new LinkedHashMap<>()))
+                                       .ids());
     }
 
     /// The settings may have been written by a JabFix that knows a rule this one does not.
     @Test
     void asConfiguredByPassesOverAnIdThatNamesNoRule() {
-        LintSettings settings = new LintSettings(Map.of(
-                "rule-of-a-newer-jabfix", RuleMode.FIX,
-                "surrounding-whitespace", RuleMode.FIX));
+        LintSettings settings = LintSettings.of(RuleSelector.of("rule-of-a-newer-jabfix"), RuleMode.FIX)
+                                            .and(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX);
 
         assertEquals(List.of("surrounding-whitespace"),
                 RuleSet.all(FIELD_PREFERENCES).asConfiguredBy(settings).ids());

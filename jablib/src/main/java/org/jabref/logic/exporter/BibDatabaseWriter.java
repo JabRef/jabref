@@ -162,7 +162,8 @@ public class BibDatabaseWriter {
     }
 
     /// Applies the rules the library asks for: of its own Save Actions and the rules JabFix ships
-    /// with, the ones it names, each going as far as it says -- reported only, or repaired.
+    /// with, the ones it names, each going as far as it says on the field in question -- reported
+    /// only, or repaired.
     private List<FieldChange> applyRules(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries, LintSettings settings) {
         RuleSet rules = RuleSet.forLibrary(bibDatabaseContext, fieldPreferences)
                                .asConfiguredBy(settings);
