@@ -47,6 +47,27 @@ class MetaDataTest {
         assertEquals(Optional.of("test-ai-library-id"), metaData.getAiLibraryId());
     }
 
+    /// Otherwise `jabkit fix --disable lower-case` would leave the library configured that way, and
+    /// a run of the command would write a configuration into a library that never had one.
+    @Test
+    void anOverrideDecidesWhatASaveAppliesWithoutChangingWhatTheLibrarySays() {
+        LintSettings ofTheLibrary = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX);
+        LintSettings ofThisRun = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF);
+        metaData.setFormatting(ofTheLibrary);
+
+        metaData.overrideLintSettings(ofThisRun);
+
+        assertEquals(Optional.of(ofThisRun), metaData.getLintSettings());
+        assertEquals(Optional.of(ofTheLibrary), metaData.getFormatting());
+    }
+
+    @Test
+    void aLibraryOverriddenForOneSaveGoesOnSayingNothingOfItsOwn() {
+        metaData.overrideLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
+
+        assertEquals(Optional.empty(), metaData.getFormatting());
+    }
+
     /// The group panel writes its tree back after every operation, usually handing back the node
     /// already installed. Subscribing again each time would make one later edit post an event per
     /// operation performed - and the panel rebuild itself from inside its own rebuild.

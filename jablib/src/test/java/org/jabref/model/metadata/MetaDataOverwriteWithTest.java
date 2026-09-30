@@ -39,8 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class MetaDataOverwriteWithTest {
 
     /// Not contents: the listeners registered on an instance, the binding derived from the group
-    /// root, and whether this instance posts at all.
-    private static final Set<String> NOT_COPIED = Set.of("eventBus", "groupsRootBinding", "isEventPropagationEnabled");
+    /// root, whether this instance posts at all, and what overrides the library's formatting for
+    /// one save, which belongs to that save and not to the library.
+    private static final Set<String> NOT_COPIED =
+            Set.of("eventBus", "groupsRootBinding", "isEventPropagationEnabled", "lintSettingsOverride");
 
     @Test
     void overwriteWithCopiesEveryField() throws IllegalAccessException {
@@ -83,7 +85,7 @@ class MetaDataOverwriteWithTest {
         metaData.setCiteKeyPattern(new CitationKeyPattern("[auth]", CitationKeyPattern.Category.AUTHOR_RELATED),
                 Map.of(StandardEntryType.Article, new CitationKeyPattern("[auth][year]", CitationKeyPattern.Category.AUTHOR_RELATED)));
         metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of()));
-        metaData.setLintSettings(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.CHECK));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.CHECK));
         metaData.setMode(BibDatabaseMode.BIBLATEX);
         metaData.setLibraryAbbreviationType(AbbreviationType.DOTLESS);
         metaData.setKeywordSeparator(';');

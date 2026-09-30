@@ -94,8 +94,9 @@ class JabFixCommand implements Callable<Integer> {
         BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
         // Asking the library to apply the rules is all it takes; the writer builds them. Which
         // rules there are needs the library, since its own Save Actions are rules of this run and
-        // the options cover them like any other.
-        databaseContext.getMetaData().setLintSettings(new LintSettings(selectedModes(databaseContext)));
+        // the options cover them like any other. These are the rules of this run and not of the
+        // library, so they override what it says rather than becoming what it says.
+        databaseContext.getMetaData().overrideLintSettings(new LintSettings(selectedModes(databaseContext)));
 
         try {
             // Only the parsed library in memory is changed here; nothing reaches disk unless
