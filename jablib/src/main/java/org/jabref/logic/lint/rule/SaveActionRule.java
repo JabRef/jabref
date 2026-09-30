@@ -1,6 +1,5 @@
 package org.jabref.logic.lint.rule;
 
-import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.cleanup.CleanupJob;
@@ -30,10 +29,14 @@ public class SaveActionRule extends CleanupRule {
     ///
     /// Which fields the Save Action covers is its own business and is left out of the id, so that
     /// the same formatter on several fields is one rule to switch off. A single field is narrowed
-    /// down where every other rule is too, by `field:rule` in a magic comment (see [Suppressions]).
+    /// down where every other rule is too, by `field:rule` -- in a magic comment above an entry
+    /// (see [Suppressions]), or in the library's formatting configuration.
+    ///
+    /// [SaveActionIds] is where this is decided, since the way back from an id to the formatter
+    /// cannot be had by reversing it.
     @Override
     public String id() {
-        return saveAction.getFormatter().getKey().replace('_', '-').toLowerCase(Locale.ROOT);
+        return SaveActionIds.idOf(saveAction.getFormatter());
     }
 
     @Override
