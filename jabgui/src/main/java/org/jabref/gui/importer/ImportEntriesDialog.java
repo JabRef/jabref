@@ -317,7 +317,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         btn.disableProperty().bind(booleanBind);
 
         // [impl->req~import.dialog.download-linked-files~1]
-        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldImportDialogDownloadLinkedFiles());
+        downloadLinkedOnlineFiles.setSelected(viewModel.shouldDownloadLinkedFiles());
 
         setResultConverter(button -> {
             if (button == importButton) {
@@ -345,6 +345,11 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
             return false;
         });
+    }
+
+    public void useWebSearchDownloadPreference() {
+        viewModel.useWebSearchDownloadPreference();
+        downloadLinkedOnlineFiles.setSelected(viewModel.shouldDownloadLinkedFiles());
     }
 
     private void setupPaginationBindings() {
