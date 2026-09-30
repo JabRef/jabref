@@ -131,6 +131,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     private static final String CONFIRM_DELETE = "confirmDelete";
     private static final String CONFIRM_HIDE_TAB_BAR = "confirmHideTabBar";
+    private static final String WRAP_MAIN_TABLE_TEXT = "wrapMainTableText";
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
     // endregion
 
@@ -709,6 +710,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints()),
                 getBoolean(CONFIRM_DELETE, defaultValues.shouldConfirmDelete()),
                 getBoolean(CONFIRM_HIDE_TAB_BAR, defaultValues.shouldHideTabBar()),
+                getBoolean(WRAP_MAIN_TABLE_TEXT, defaultValues.shouldWrapMainTableText()),
                 getStringList(SELECTED_SLR_CATALOGS));
 
         bindCustom(workspacePreferences.languageProperty(), LANGUAGE, defaultValues.getLanguage(),
@@ -734,6 +736,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindBoolean(workspacePreferences.showAdvancedHintsProperty(), SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints());
         bindBoolean(workspacePreferences.confirmDeleteProperty(), CONFIRM_DELETE, defaultValues.shouldConfirmDelete());
         bindBoolean(workspacePreferences.hideTabBarProperty(), CONFIRM_HIDE_TAB_BAR, defaultValues.shouldHideTabBar());
+        bindBoolean(workspacePreferences.wrapMainTableTextProperty(), WRAP_MAIN_TABLE_TEXT, defaultValues.shouldWrapMainTableText());
         bindCustomList(workspacePreferences.getSelectedSlrCatalogs(), SELECTED_SLR_CATALOGS, defaultValues.getSelectedSlrCatalogs(),
                 boundList -> putStringList(SELECTED_SLR_CATALOGS, boundList),
                 () -> getStringList(SELECTED_SLR_CATALOGS));
