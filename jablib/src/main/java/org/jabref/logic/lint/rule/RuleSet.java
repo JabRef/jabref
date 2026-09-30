@@ -3,6 +3,7 @@ package org.jabref.logic.lint.rule;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -11,8 +12,11 @@ import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.lint.rules.RepeatedWhitespaceRule;
 import org.jabref.logic.lint.rules.SurroundingWhitespaceRule;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.RuleMode;
+import org.jabref.model.metadata.RuleSelector;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -47,20 +51,67 @@ public class RuleSet {
     ///
     /// Save Actions the library switched off contribute no rule, just as they change nothing on save.
     ///
+    /// Where the library states them is what it still has: its `saveActions` item while it has one,
+    /// and its formatting configuration once that item is gone. A library keeps the item until
+    /// something migrates it, so nothing about an existing library changes by being opened.
+    ///
+    /// The two are not read at once, which is what keeps one entry from meaning two things. While
+    /// the item is there, `title:lower-case` in the configuration says how far the Save Action goes
+    /// on the title; once it is gone, the same entry is what says there is such a Save Action at
+    /// all. That shift happens exactly at the migration, and only there.
+    ///
     /// @param fieldPreferences tells the whitespace rules which fields hold text that may be wrapped
     public static RuleSet forLibrary(BibDatabaseContext databaseContext, FieldPreferences fieldPreferences) {
         MetaData metaData = databaseContext.getMetaData();
         List<FieldFormatterCleanup> saveActions =
                 metaData.getSaveActions()
-                        .filter(FieldFormatterCleanupActions::isEnabled)
-                        .map(actions -> metaData.getKeywordSeparator()
-                                                .map(actions::getConfiguredActions)
-                                                .orElseGet(actions::getConfiguredActions))
-                        .orElse(List.of());
+                        .map(actions -> configured(metaData, actions))
+                        .orElseGet(() -> statedInFormatting(metaData));
 
         return new RuleSet(Stream.concat(
                 saveActions.stream().map(SaveActionRule::new),
                 all(fieldPreferences).rules().stream()).toList());
+    }
+
+    /// What the library's `saveActions` item says, which is nothing where the item says they are
+    /// switched off.
+    private static List<FieldFormatterCleanup> configured(MetaData metaData, FieldFormatterCleanupActions actions) {
+        if (!actions.isEnabled()) {
+            return List.of();
+        }
+        return withKeywordSeparatorOf(metaData, actions);
+    }
+
+    /// What the library states in its formatting configuration: one Save Action per entry naming a
+    /// formatter, on the field the entry names, or on every field where it names none.
+    ///
+    /// An entry switched off states no Save Action rather than a switched-off one, so that a
+    /// `saveActions` item that was switched off migrates to entries saying so and comes back as the
+    /// same nothing.
+    private static List<FieldFormatterCleanup> statedInFormatting(MetaData metaData) {
+        List<FieldFormatterCleanup> stated =
+                metaData.getFormatting()
+                        .map(settings -> settings.ruleModes().entrySet().stream()
+                                                 .filter(named -> named.getValue() != RuleMode.OFF)
+                                                 .flatMap(named -> asSaveAction(named.getKey()).stream())
+                                                 .toList())
+                        .orElse(List.of());
+
+        // Through JabRef's own configuration step, so that a formatter needing the library's
+        // keyword separator is given it, exactly as one from the `saveActions` item would be.
+        return withKeywordSeparatorOf(metaData, new FieldFormatterCleanupActions(true, stated));
+    }
+
+    private static Optional<FieldFormatterCleanup> asSaveAction(RuleSelector selector) {
+        return SaveActionIds.formatterFor(selector.ruleId())
+                            .map(formatter -> new FieldFormatterCleanup(
+                                    selector.field().orElse(InternalField.INTERNAL_ALL_FIELD), formatter));
+    }
+
+    private static List<FieldFormatterCleanup> withKeywordSeparatorOf(MetaData metaData, FieldFormatterCleanupActions actions) {
+        return metaData.getKeywordSeparator()
+                       .map(actions::getConfiguredActions)
+                       .orElseGet(actions::getConfiguredActions);
     }
 
     /// Exactly the given rules, in the given order. An empty set reformats without applying any
