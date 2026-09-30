@@ -18,6 +18,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -50,6 +51,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -125,9 +127,13 @@ class LibraryTabRetentionTest {
                 if (selected instanceof LibraryTab libraryTab) {
                     stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                     stateManager.activeTabProperty().set(Optional.of(libraryTab));
+                    // The frame also binds the normal search result count to the selected library's table.
+                    stateManager.searchResultSize(SearchType.NORMAL_SEARCH).bind(libraryTab.resultSizeProperty());
                 } else {
                     stateManager.setActiveDatabase(null);
                     stateManager.activeTabProperty().set(Optional.empty());
+                    stateManager.searchResultSize(SearchType.NORMAL_SEARCH).unbind();
+                    stateManager.searchResultSize(SearchType.NORMAL_SEARCH).set(0);
                 }
             });
         });
@@ -210,6 +216,21 @@ class LibraryTabRetentionTest {
 
         JMemoryBuddy.memoryTest(checker -> {
             checker.assertCollectable(tab[0]);
+            tab[0] = null;
+        });
+    }
+
+    @Test
+    void closingLastTabReleasesSearchResultBinding() {
+        setUpTabPane();
+
+        @Nullable LibraryTab[] tab = {openTab()};
+        closeTab(tab[0]);
+        releaseMocks();
+
+        assertEquals(0, stateManager.searchResultSize(SearchType.NORMAL_SEARCH).get());
+        JMemoryBuddy.memoryTest(checker -> {
+            checker.assertCollectable(tab[0].getBibDatabaseContext());
             tab[0] = null;
         });
     }
