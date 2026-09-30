@@ -51,6 +51,15 @@ public class MetaData {
     public static final String ENTRYTYPE_FLAG_V2 = "jabref-entrytype-v2: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
     public static final String SAVE_ACTIONS = "saveActions";
+
+    /// What the library asks JabFix to do, inside the embedded JSON metadata. Named after what it
+    /// asks for and not after what does it, so that the name survives the component being renamed.
+    public static final String FORMATTING = "formatting";
+
+    /// The rules inside that block. They are one key of it rather than the block itself, so that
+    /// something which is not a rule can stand beside them later -- a named set of them, say --
+    /// without a reader having to know which keys are rule ids and which are not.
+    public static final String FORMATTING_RULES = "rules";
     public static final String LIBRARY_ABBREVIATION_TYPE = "libraryAbbreviationType";
     public static final String KEYWORD_SEPARATOR = "keywordSeparator";
     public static final String PREFIX_KEYPATTERN = "keypattern_";

@@ -4,6 +4,9 @@ parent: Decision Records
 status: "accepted"
 ---
 # Per-rule modes in the formatting configuration
+`adr~per-rule-modes-in-the-formatting-configuration~1`
+
+Needs: utest
 
 ## Context and Problem Statement
 
@@ -176,3 +179,5 @@ What a library says about itself and what one run of a command asks for are kept
 The block is stored in the embedded JSON metadata comment, `@Comment{jabref-meta-0.1.0 ...}`, which <https://github.com/JabRef/jabref/issues/10371> settles on and which a `jabref-meta:` item could not hold: its separator is the same `;` a save action uses inside its own value, so nothing that nests fits.
 
 Prior art: ESLint configures a rule as `"semi": "error"` or `"semi": ["error", "always"]`, and markdownlint as `"MD013": false` or `"MD013": {"line_length": 120}`. Both start from the short form and open into the long one exactly when a rule takes something beyond its severity.
+
+<!-- markdownlint-disable-file MD022 -->

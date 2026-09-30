@@ -23,14 +23,28 @@ import org.jspecify.annotations.NullMarked;
 /// One entry per selector is also where the values a rule takes will go, once rules take any: they
 /// belong to the rule they configure, not to a list beside it.
 ///
-/// @param ruleModes how far each named selector goes. The order is the one the library wrote them
-///                  in, so that saving does not reshuffle a configuration somebody edited by hand.
-///                  A [RuleSelector] naming no rule of this JabFix is passed over rather than rejected,
-///                  so that a library configured by a newer JabFix still saves with an older one.
+/// @param ruleModes   how far each named selector goes. The order is the one the library wrote them
+///                    in, so that saving does not reshuffle a configuration somebody edited by hand.
+///                    A [RuleSelector] naming no rule of this JabFix is passed over rather than
+///                    rejected, so that a library configured by a newer JabFix still saves here.
+/// @param unreadRules the entries of the configuration this JabFix could not read -- a selector
+///                    spelled in a way it does not accept, or a mode it does not know -- by key,
+///                    each as the JSON text of its value. They are written back as they came.
+/// @param unreadKeys  what stood beside the rules in the block and is not a rule at all, such as a
+///                    named set of rules a newer JabFix understands, kept the same way
 @NullMarked
-public record LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes) {
+public record LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes,
+                           SequencedMap<String, String> unreadRules,
+                           SequencedMap<String, String> unreadKeys) {
     public LintSettings {
         ruleModes = Collections.unmodifiableSequencedMap(new LinkedHashMap<>(ruleModes));
+        unreadRules = Collections.unmodifiableSequencedMap(new LinkedHashMap<>(unreadRules));
+        unreadKeys = Collections.unmodifiableSequencedMap(new LinkedHashMap<>(unreadKeys));
+    }
+
+    /// Settings of modes alone, which is what everything but the reader of a file has.
+    public LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes) {
+        this(ruleModes, new LinkedHashMap<>(), new LinkedHashMap<>());
     }
 
     /// Settings naming one selector, to be extended with [#and].
@@ -43,7 +57,13 @@ public record LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes) {
     public LintSettings and(RuleSelector selector, RuleMode mode) {
         SequencedMap<RuleSelector, RuleMode> extended = new LinkedHashMap<>(ruleModes);
         extended.put(selector, mode);
-        return new LintSettings(extended);
+        return new LintSettings(extended, unreadRules, unreadKeys);
+    }
+
+    /// Whether there is nothing here at all -- no mode, and nothing kept for a newer JabFix. Such a
+    /// configuration is not written, so a library does not gain an empty block by being opened.
+    public boolean isEmpty() {
+        return ruleModes.isEmpty() && unreadRules.isEmpty() && unreadKeys.isEmpty();
     }
 
     /// How far the rule goes on that field. The most specific selector wins: one naming the field

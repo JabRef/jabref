@@ -19,6 +19,7 @@ public class MetaDataDiff {
         CONTENT_SELECTOR,
         DEFAULT_KEY_PATTERN,
         ENCODING,
+        FORMATTING,
         LIBRARY_SPECIFIC_FILE_DIRECTORY,
         GROUPS,
         KEY_PATTERNS,
@@ -112,6 +113,7 @@ public class MetaDataDiff {
         addToListIfDiff(changes, DifferenceType.MODE, originalMetaData.getMode(), newMetaData.getMode());
         addToListIfDiff(changes, DifferenceType.LIBRARY_SPECIFIC_FILE_DIRECTORY, originalMetaData.getLibrarySpecificFileDirectory(), newMetaData.getLibrarySpecificFileDirectory());
         addToListIfDiff(changes, DifferenceType.CONTENT_SELECTOR, originalMetaData.getContentSelectors(), newMetaData.getContentSelectors());
+        addToListIfDiff(changes, DifferenceType.FORMATTING, originalMetaData.getFormatting(), newMetaData.getFormatting());
         return changes;
     }
 

@@ -90,6 +90,8 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
                     Localization.lang("Library encoding");
             case SAVE_SORT_ORDER ->
                     Localization.lang("Save sort order");
+            case FORMATTING ->
+                    Localization.lang("Formatting rules");
             case KEY_PATTERNS ->
                     Localization.lang("Key patterns");
             case USER_FILE_DIRECTORY ->

@@ -2,6 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.util.Optional;
 
+import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.NullMarked;
@@ -46,10 +47,32 @@ public class JsonMetaDataSerializer {
         // this JabRef knows cannot push it out of the order the file had.
         metaData.getUnknownJsonMetaData().forEach((key, json) -> asNode(key, json).ifPresent(node -> root.set(key, node)));
 
+        metaData.getFormatting()
+                .filter(settings -> !settings.isEmpty())
+                .ifPresent(settings -> root.set(MetaData.FORMATTING, formatting(settings)));
+
         if (root.isEmpty()) {
             return Optional.empty();
         }
         return Optional.of(MAPPER.writer().with(PRINTER).writeValueAsString(root));
+    }
+
+    /// What the library asks JabFix to do, as the `formatting` block.
+    ///
+    /// The modes this JabFix read are written first, in the order it read them, and what it could
+    /// not read follows. A configuration somebody edited by hand therefore keeps its order, except
+    /// that an entry of a newer JabFix moves to the end of its group -- which beats dropping it.
+    static ObjectNode formatting(LintSettings settings) {
+        ObjectNode rules = MAPPER.createObjectNode();
+        settings.ruleModes().forEach((selector, mode) -> rules.put(selector.asKey(), mode.asKey()));
+        settings.unreadRules().forEach((key, json) -> asNode(key, json).ifPresent(node -> rules.set(key, node)));
+
+        ObjectNode block = MAPPER.createObjectNode();
+        if (!rules.isEmpty()) {
+            block.set(MetaData.FORMATTING_RULES, rules);
+        }
+        settings.unreadKeys().forEach((key, json) -> asNode(key, json).ifPresent(node -> block.set(key, node)));
+        return block;
     }
 
     /// Text this JabRef put aside itself, so it parsed once already; a failure here would mean the

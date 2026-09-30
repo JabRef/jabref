@@ -912,6 +912,71 @@ class BibDatabaseWriterTest {
                 """.replace("\n", OS.NEWLINE), stringWriter.toString());
     }
 
+    @Test
+    void writeFormattingBlock() throws IOException {
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX)
+                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK));
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "formatting" : {
+                    "rules" : {
+                      "surrounding-whitespace" : "fix",
+                      "title:lower-case" : "check"
+                    }
+                  }
+                }
+                }
+                """.replace("\n", OS.NEWLINE), stringWriter.toString());
+    }
+
+    // [utest->adr~per-rule-modes-in-the-formatting-configuration~1]
+    @Test
+    void aFormattingBlockSurvivesARoundTrip() throws IOException {
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX)
+                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK)
+                                           .and(RuleSelector.of("repeated-whitespace"), RuleMode.OFF));
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+        ParserResult read = new BibtexParser(importFormatPreferences).parse(Reader.of(stringWriter.toString()));
+
+        assertEquals(metaData.getFormatting(), read.getMetaData().getFormatting());
+    }
+
+    /// A library configured by a newer JabFix still saves here, and is handed back with what it
+    /// arrived with rather than with the parts this version happens to understand.
+    // [utest->adr~per-rule-modes-in-the-formatting-configuration~1]
+    @Test
+    void whatANewerJabFixConfiguredSurvivesARoundTrip() throws IOException {
+        ParserResult written = new BibtexParser(importFormatPreferences).parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "formatting" : {
+                    "rules" : {
+                      "surrounding-whitespace" : "fix",
+                      "rule-of-a-newer-jabfix" : "fix",
+                      "title:lower-case" : "warn",
+                      "author,editor:lower-case" : "fix",
+                      "line-length" : {"mode" : "check", "max" : 120}
+                    },
+                    "ruleset" : "recommended"
+                  },
+                  "somethingElse" : [1, 2]
+                }
+                }
+                """));
+
+        BibDatabaseContext context = new BibDatabaseContext(written.getDatabase(), written.getMetaData());
+        databaseWriter.writePartOfDatabase(context, List.of());
+        ParserResult read = new BibtexParser(importFormatPreferences).parse(Reader.of(stringWriter.toString()));
+
+        assertEquals(written.getMetaData().getFormatting(), read.getMetaData().getFormatting());
+        assertEquals(written.getMetaData().getUnknownJsonMetaData(), read.getMetaData().getUnknownJsonMetaData());
+    }
+
     /// A library that keeps nothing that way is written exactly as it was before the comment
     /// existed, which is what every other test in this class goes on asserting.
     @Test
