@@ -893,6 +893,37 @@ class BibDatabaseWriterTest {
                 stringWriter.toString());
     }
 
+    /// The whole point of the embedded JSON: a library written by a newer JabRef is handed back
+    /// with what it arrived with, rather than with the parts this one happens to understand.
+    @Test
+    void writeJsonMetaDataOfANewerJabRef() throws IOException {
+        metaData.putUnknownJsonMetaDataItem("somethingElse", "{\"a\":[1,2]}");
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "somethingElse" : {
+                    "a" : [ 1, 2 ]
+                  }
+                }
+                }
+                """.replace("\n", OS.NEWLINE), stringWriter.toString());
+    }
+
+    /// A library that keeps nothing that way is written exactly as it was before the comment
+    /// existed, which is what every other test in this class goes on asserting.
+    @Test
+    void writeNoJsonMetaDataCommentForALibraryThatHasNone() throws IOException {
+        metaData.setAiLibraryId("test-ai-library-id");
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: aiLibraryId:test-ai-library-id;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
     @Test
     void writeFileDirectories() throws IOException {
         metaData.setLibrarySpecificFileDirectory("\\Literature\\");

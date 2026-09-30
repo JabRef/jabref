@@ -36,6 +36,7 @@ import org.jabref.logic.importer.KeywordImportNormalizer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.util.JsonMetaDataParser;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
@@ -69,6 +70,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import tools.jackson.databind.JsonNode;
 
 import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_QUOTE_CHAR;
 import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYPE_SUFFIX;
@@ -119,6 +121,7 @@ public class BibtexParser implements Parser {
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
     private final Map<String, String> parsedBibDeskGroups;
+    private Optional<JsonNode> jsonMetaData = Optional.empty();
 
     private GroupTreeNode bibDeskGroupTreeNode;
 
@@ -314,6 +317,9 @@ public class BibtexParser implements Parser {
                         }
                 );
             }
+            // After the `jabref-meta:` items, so that what a library says about itself in the newer
+            // form is what holds where it says it in both.
+            jsonMetaData.ifPresent(root -> JsonMetaDataParser.parse(metaData, root));
             parserResult.setMetaData(metaData);
         } catch (ParseException exception) {
             parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), exception);
@@ -403,6 +409,22 @@ public class BibtexParser implements Parser {
 
                 // meta comments are always re-written by JabRef and not stored in the file
                 dumpTextReadSoFarToString();
+            }
+        } else if (comment.startsWith(MetaData.META_FLAG_V1)) {
+            try {
+                JsonNode read = JsonMetaDataParser.read(comment.substring(MetaData.META_FLAG_V1.length()));
+                if (jsonMetaData.isPresent()) {
+                    LOGGER.warn("Found a second JSON metadata comment; the later one is the one that counts");
+                }
+                jsonMetaData = Optional.of(read);
+
+                // Like the meta comments above: JabRef writes this back itself, so the text is not
+                // kept. Only a comment that was read is dropped -- one that was not keeps its text,
+                // since a missing comma is no reason to delete what somebody wrote.
+                dumpTextReadSoFarToString();
+            } catch (ParseException e) {
+                LOGGER.warn("Keeping an unreadable JSON metadata comment as it stands", e);
+                parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), e);
             }
         } else if (comment.startsWith(MetaData.ENTRYTYPE_FLAG_V2) || comment.startsWith(MetaData.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a

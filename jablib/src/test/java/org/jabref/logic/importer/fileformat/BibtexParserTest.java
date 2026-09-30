@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -178,6 +179,41 @@ class BibtexParserTest {
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Ed von Test");
         assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parseReadsJsonMetaDataComment() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "somethingElse": {"a": [1, 2]}
+                }
+                }
+                """));
+
+        assertEquals(Map.of("somethingElse", "{\"a\":[1,2]}"),
+                result.getMetaData().getUnknownJsonMetaData());
+    }
+
+    /// A missing comma is no reason to delete what somebody wrote, so the comment stays in the file
+    /// as text -- which is to say, it reaches the entry after it as a comment of that entry.
+    @Test
+    void parseKeepsAnUnreadableJsonMetaDataCommentAsText() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {
+                  "somethingElse":
+                }
+                }
+                @Article{test,
+                  author = {Ed von Test},
+                }
+                """));
+
+        assertTrue(result.hasWarnings(), "an unreadable comment has to be reported");
+        assertEquals(Map.of(), result.getMetaData().getUnknownJsonMetaData());
+        assertTrue(result.getDatabase().getEntries().getFirst().getUserComments().contains("jabref-meta-0.1.0"),
+                result.getDatabase().getEntries().getFirst().getUserComments());
     }
 
     @Test

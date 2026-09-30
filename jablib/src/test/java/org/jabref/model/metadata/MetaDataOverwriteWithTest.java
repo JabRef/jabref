@@ -99,6 +99,7 @@ class MetaDataOverwriteWithTest {
         metaData.setEncoding(StandardCharsets.ISO_8859_1);
         metaData.setEncodingExplicitlySupplied(true);
         metaData.putUnknownMetaDataItem("unknown", List.of("value"));
+        metaData.putUnknownJsonMetaDataItem("unknownJson", "{\"a\":1}");
         metaData.setBlgFilePath("user-host", Path.of("/tmp/library.blg"));
         return metaData;
     }

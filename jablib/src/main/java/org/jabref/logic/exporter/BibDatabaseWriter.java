@@ -353,6 +353,24 @@ public class BibDatabaseWriter {
         for (Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
             writeMetaDataItem(metaItem);
         }
+
+        writeMetaDataJson(metaData);
+    }
+
+    /// Writes the metadata that is kept as one embedded JSON object, after the `jabref-meta:` items
+    /// and only where there is any, so that a library which has never had such a comment is written
+    /// exactly as it was before.
+    protected void writeMetaDataJson(@NonNull MetaData metaData) throws IOException {
+        Optional<String> json = JsonMetaDataSerializer.serialize(metaData);
+        if (json.isEmpty()) {
+            return;
+        }
+
+        // Line breaks of the writer's own kind: BibWriter translates them to the library's.
+        bibWriter.write(COMMENT_PREFIX + "{" + MetaData.META_FLAG_V1 + "\n");
+        bibWriter.write(json.get());
+        bibWriter.writeLine("\n}");
+        bibWriter.finishBlock();
     }
 
     protected void writeMetaDataItem(Map.Entry<String, String> metaItem) throws IOException {

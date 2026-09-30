@@ -4,10 +4,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedMap;
 import java.util.SortedSet;
 
 import javafx.beans.property.ObjectProperty;
@@ -40,6 +42,11 @@ import org.jspecify.annotations.Nullable;
 public class MetaData {
 
     public static final String META_FLAG = "jabref-meta: ";
+
+    /// Opens the `@Comment` that holds everything JabRef stores as one embedded JSON object, rather
+    /// than as one `jabref-meta:` item per setting. The version is the format's, not JabRef's: a
+    /// reader knows from it what the object may contain.
+    public static final String META_FLAG_V1 = "jabref-meta-0.1.0";
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     public static final String ENTRYTYPE_FLAG_V2 = "jabref-entrytype-v2: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
@@ -95,6 +102,7 @@ public class MetaData {
     private final ContentSelectors contentSelectors = new ContentSelectors();
 
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
+    private final SequencedMap<String, String> unknownJsonMetaData = new LinkedHashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
     @Nullable private String versionDBStructure;
@@ -481,6 +489,8 @@ public class MetaData {
         blgFilePathMap.putAll(other.blgFilePathMap);
         unknownMetaData.clear();
         unknownMetaData.putAll(other.unknownMetaData);
+        unknownJsonMetaData.clear();
+        unknownJsonMetaData.putAll(other.unknownJsonMetaData);
 
         contentSelectors.setAll(other.contentSelectors.getContentSelectors());
 
@@ -589,6 +599,20 @@ public class MetaData {
 
     public void putUnknownMetaDataItem(@NonNull String key, @NonNull List<String> value) {
         unknownMetaData.put(key, value);
+    }
+
+    /// What the embedded JSON metadata said that this JabRef does not model, by key, each as the
+    /// JSON text of its value, in the order the file had them.
+    ///
+    /// A library written by a newer JabRef is opened, saved and handed back with everything it
+    /// arrived with, rather than with the parts this one happens to understand. This is the same
+    /// promise [#getUnknownMetaData()] makes for the `jabref-meta:` items, kept the same way.
+    public SequencedMap<String, String> getUnknownJsonMetaData() {
+        return Collections.unmodifiableSequencedMap(unknownJsonMetaData);
+    }
+
+    public void putUnknownJsonMetaDataItem(@NonNull String key, @NonNull String json) {
+        unknownJsonMetaData.put(key, json);
     }
 
     @Override
