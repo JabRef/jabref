@@ -647,4 +647,20 @@ public class DuplicateCheckTest {
         assertEquals(Optional.empty(),
                 duplicateChecker.containsDuplicate(List.of(), simpleArticle, BibDatabaseMode.BIBTEX));
     }
+
+    @Test
+    void duplicateDetectionWithMiscAndDifferentType() {
+        BibEntry miscEntry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Albert Einstein")
+                .withField(StandardField.TITLE, "Relativity")
+                .withField(StandardField.YEAR, "1916");
+
+        BibEntry techReportEntry = new BibEntry(StandardEntryType.TechReport)
+                .withField(StandardField.AUTHOR, "Albert Einstein")
+                .withField(StandardField.TITLE, "Relativity")
+                .withField(StandardField.YEAR, "1916");
+
+        assertTrue(duplicateChecker.isDuplicate(miscEntry, techReportEntry, BibDatabaseMode.BIBTEX));
+        assertTrue(duplicateChecker.isDuplicate(techReportEntry, miscEntry, BibDatabaseMode.BIBTEX));
+    }
 }
