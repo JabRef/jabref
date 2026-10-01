@@ -700,6 +700,7 @@ We want to have a look that matches our icons in the tool-bar */
     visibility: visible;
     -fx-icon-color: -color-fg-subtle;
     -fx-fill: -color-fg-subtle;
+    -fx-opacity: 0.4;
 }
 
 .main-table .table-row-cell:drag-over-center,
