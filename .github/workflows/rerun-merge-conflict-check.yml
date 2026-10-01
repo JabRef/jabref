@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  # Ensure updates for stacked PRs
   schedule:
     - cron: "0 3 * * *"
   pull_request:
@@ -12,7 +13,6 @@ on:
       - '.github/workflows/rerun-merge-conflict-check.yml'
   workflow_dispatch:
 
-# Pushes to main come in bursts; one pass over all PRs after the last push suffices
 concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
@@ -39,7 +39,6 @@ jobs:
           set -x
           workflow_name="On PR opened/updated"
 
-          # Without --limit, gh returns only the 30 newest PRs
           gh pr list --state open --limit 1000 --json number --jq '.[] | "\(.number)"' |
           while read pr; do
             echo "Triggering '$workflow_name' for PR #$pr"
