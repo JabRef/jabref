@@ -28,6 +28,19 @@ class ExternalStoragesTabViewModelTest {
     }
 
     @Test
+    void resetBringsBackTheDefaultAddresses() {
+        viewModel.setValues();
+        viewModel.citeDriveApiBaseUrlProperty().set("https://api.example.com/");
+        viewModel.citeDriveAppBaseUrlProperty().set("https://app.example.com/");
+
+        viewModel.resetCiteDriveAddresses();
+
+        CiteDrivePreferences defaults = CiteDrivePreferences.getDefault();
+        assertEquals(defaults.getApiBaseUrl(), viewModel.citeDriveApiBaseUrlProperty().get());
+        assertEquals(defaults.getAppBaseUrl(), viewModel.citeDriveAppBaseUrlProperty().get());
+    }
+
+    @Test
     void addressThatIsNoUrlIsRejected() {
         viewModel.setValues();
         assertTrue(viewModel.validateSettings());

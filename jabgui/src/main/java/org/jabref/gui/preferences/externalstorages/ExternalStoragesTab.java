@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.externalstorages;
 
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.logic.l10n.Localization;
 
@@ -28,7 +29,8 @@ public class ExternalStoragesTab extends AbstractPreferenceTabView<ExternalStora
                                         .stringField(Localization.lang("Server address"), viewModel.citeDriveApiBaseUrlProperty(),
                                                 field -> field.validate(viewModel.apiBaseUrlValidationStatus()))
                                         .stringField(Localization.lang("Web address"), viewModel.citeDriveAppBaseUrlProperty(),
-                                                field -> field.validate(viewModel.appBaseUrlValidationStatus())),
+                                                field -> field.validate(viewModel.appBaseUrlValidationStatus()))
+                                        .button(Localization.lang("Reset to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetCiteDriveAddresses),
                                 settingsGroup -> settingsGroup.disableWhen(viewModel.citeDriveEnabledProperty().not())))
                 .build());
     }

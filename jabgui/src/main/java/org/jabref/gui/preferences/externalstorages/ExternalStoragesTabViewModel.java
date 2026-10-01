@@ -67,6 +67,13 @@ public class ExternalStoragesTabViewModel implements PreferenceTabViewModel {
         return apiBaseUrlValidator.getValidationStatus().isValid() && appBaseUrlValidator.getValidationStatus().isValid();
     }
 
+    /// Back to JabRef's own CiteDrive addresses
+    public void resetCiteDriveAddresses() {
+        CiteDrivePreferences defaults = CiteDrivePreferences.getDefault();
+        citeDriveApiBaseUrlProperty.setValue(defaults.getApiBaseUrl());
+        citeDriveAppBaseUrlProperty.setValue(defaults.getAppBaseUrl());
+    }
+
     public BooleanProperty citeDriveEnabledProperty() {
         return citeDriveEnabledProperty;
     }
