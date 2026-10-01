@@ -83,6 +83,7 @@ One can also add [callouts](https://just-the-docs.github.io/just-the-docs-tests/
 
 Comment on the issue you want to work at with `/assign-me`.
 GitHub will then automatically assign you.
+Issues labeled `status: needs-triage` cannot be self-assigned until a maintainer has triaged them.
 
 Before you do so, read the complete issue and its discussion.
 Some issues state a prerequisite - typically another pull request that has to be merged first.

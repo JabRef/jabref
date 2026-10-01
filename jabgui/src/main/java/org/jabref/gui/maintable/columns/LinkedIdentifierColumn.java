@@ -59,7 +59,7 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
                 .withTooltip(this::createIdentifierTooltip)
                 .withMenu(this::createIdentifierMenu)
                 .withOnMouseClickedEvent((_, linkedFiles) -> event -> {
-                    // If we only have one identifer, open directly
+                    // If we only have one identifier, open directly
                     if ((linkedFiles.size() == 1) && (event.getButton() == MouseButton.PRIMARY)) {
                         new OpenUrlAction(dialogService, stateManager, preferences).execute();
                     }
