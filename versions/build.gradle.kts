@@ -166,5 +166,5 @@ dependencies.constraints {
     api("tech.units:indriya:2.2.4")
     api("tools.maran:svg:1.0.0")
     api("tools.maran:svg-materialdesign:1.0.0")
-    api("tools.maran:svgnode:2.0.0")
+    api("tools.maran:svgnode:2.0.1")
 }
