@@ -29,8 +29,8 @@ One can also test without a JDK installed.
 See [How to try any JabRef pull request](https://blog.jabref.org/2025/05/31/run-pr/).
 
 [ghq](https://github.com/x-motemen/ghq) keeps many repository clones organized by host and owner.
-Set its root once (e.g., `git config --global ghq.root <path to your workspace>`; on Windows, install with `winget install -e --id x-motemen.ghq`.
-Then, `ghq get JabRef/jabref` clones JabRef including its submodules into `C:\git-repositories\github.com\JabRef\jabref`.
+Set its root once (e.g., `git config --global ghq.root <path to your workspace>`; on Windows use `C:\git-repositories\` as path , install with `winget install -e --id x-motemen.ghq`.
+Then, `ghq get JabRef/jabref` clones JabRef including its submodules into `<ghq root path>\github.com\JabRef\jabref`.
 Continue with the `git remote` commands from [the setup guide](../getting-into-the-code/guidelines-for-setting-up-a-local-workspace/pre-03-code.md) there.
 
 ## Drawing diagrams
