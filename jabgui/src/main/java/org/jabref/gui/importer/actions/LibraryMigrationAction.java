@@ -2,6 +2,7 @@ package org.jabref.gui.importer.actions;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,11 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
         performColumn.setMinWidth(Region.USE_PREF_SIZE);
         table.getColumnConstraints().addAll(descriptionColumn, performColumn);
         table.addRow(0, headerLabel(Localization.lang("Migration")), headerLabel(Localization.lang("Perform")));
-        for (PostOpenMigration migration : getOfferedMigrations(parserResult, preferences)) {
+        // The conversions the user can decide on come first
+        List<PostOpenMigration> migrations = getOfferedMigrations(parserResult, preferences).stream()
+                                                                                            .sorted(Comparator.comparing(migration -> !migration.isOptional()))
+                                                                                            .toList();
+        for (PostOpenMigration migration : migrations) {
             Label description = wrappingLabel(migration.getDescription());
             Node perform;
             if (!migration.isMigrationNecessary(parserResult)) {
