@@ -1163,13 +1163,46 @@ class CitationKeyGeneratorTest {
             "Alexander Artemenko and others, 2019, Artemenko2019",
 
             // Transliteration
-            "Надежда Карпенко, 2025, Karpenko2025"
+            "Надежда Карпенко, 2025, Karpenko2025",
+            "万征 and 姚仰平 and 孟达, 2016, wanzheng2016"
     })
     void generateKeyWithSpecialCases(String author, String year, String expected) {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, author)
                 .withField(StandardField.YEAR, year);
         assertEquals(expected, generateKey(entry, "[auth][year]"));
+    }
+
+    /// Pinyin keys can be produced by configuration alone
+    @ParameterizedTest
+    @CsvSource(quoteCharacter = '"', textBlock = """
+            "万征 and 姚仰平 and 孟达", "WanZheng2016"
+            "王, 小明", "WangXiao2016"
+            "小明 王", "WangXiao2016"
+            "欧阳小明", "OuYangXiaoMing2016"
+            "欧阳, 小明", "OuYangXiao2016"
+            "欧阳,小明", "OuYangXiao2016"
+            """)
+    void generateKeyForChineseAuthorWithPinyin(String author, String expected) {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, author)
+                .withField(StandardField.YEAR, "2016");
+        assertEquals(expected, generateKey(entry, "[auth:transliterate:camel][authForeIni:transliterate:camel][year]"));
+    }
+
+    @ParameterizedTest
+    @CsvSource(quoteCharacter = '"', textBlock = """
+            "万, 征", "WanZ2016"
+            "王, 小明", "WangX2016"
+            "小明 王", "WangX2016"
+            "欧阳, 小明", "OuYangX2016"
+            "司马, 相如", "SiMaX2016"
+            """)
+    void generateKeyForChineseAuthorWithPinyinInitial(String author, String expected) {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, author)
+                .withField(StandardField.YEAR, "2016");
+        assertEquals(expected, generateKey(entry, "[auth:transliterate:camel][authForeIni:transliterate:truncate1:upper][year]"));
     }
 }
 
