@@ -109,7 +109,7 @@ dependencies.constraints {
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.1")
-    api("org.apache.commons:commons-lang3:3.20.0")
+    api("org.apache.commons:commons-lang3:3.21.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.4")
     api("org.apache.httpcomponents.client5:httpclient5:5.6.4")
