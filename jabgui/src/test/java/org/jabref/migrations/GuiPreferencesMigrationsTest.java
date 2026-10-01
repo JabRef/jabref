@@ -65,7 +65,7 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void arbitraryBibtexkeyPattern() {
-        String arbitraryPattern = "[anyUserPrividedString]";
+        String arbitraryPattern = "[anyUserProvidedString]";
 
         when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(arbitraryPattern);
 

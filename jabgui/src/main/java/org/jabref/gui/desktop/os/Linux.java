@@ -200,7 +200,7 @@ public class Linux extends NativeDesktop {
             String documentsDirectory = strings.getFirst();
             Path documentsPath = Path.of(documentsDirectory);
             if (!Files.exists(documentsPath)) {
-                LoggerFactory.getLogger(Linux.class).error("xdg-user-dir returned non-existant directory {}", documentsDirectory);
+                LoggerFactory.getLogger(Linux.class).error("xdg-user-dir returned non-existent directory {}", documentsDirectory);
                 return Directories.getUserDirectory();
             }
             LoggerFactory.getLogger(Linux.class).debug("Got documents path {}", documentsPath);
