@@ -253,7 +253,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         tabContainer.addTab(newTab, true);
     }
 
-    /// Visible for testing: the post-open migrations are wired here.
     @VisibleForTesting
     ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
         Path fileToLoad = file.toAbsolutePath();
@@ -279,11 +278,6 @@ public class OpenDatabaseAction extends SimpleCommand {
                         fileUpdateMonitor);
             }
 
-            // Legacy library content (explicit group memberships, markings, special fields in `keywords`) is converted here.
-            // This used to live in OpenDatabase#loadDatabase, which every caller went through, and was lost when jabgui and jablib
-            // were split (https://github.com/JabRef/jabref/pull/12990) - the migrations stayed in jabgui, the call did not move with them.
-            // Running it here also covers a restored backup of a legacy library. The import and CLI paths still do not migrate;
-            // that difference between opening and importing is tracked at https://github.com/JabRef/jabref/issues/8298.
             // [impl->req~import.bibtex.legacy-migrations~1]
             PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(
                     parserResult,
