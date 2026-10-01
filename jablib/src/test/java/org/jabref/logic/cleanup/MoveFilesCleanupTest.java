@@ -81,7 +81,7 @@ class MoveFilesCleanupTest {
     }
 
     @Test
-    void movesFileWithMulitpleLinked() {
+    void movesFileWithMultipleLinked() {
         LinkedFile fileField = new LinkedFile("", fileBefore.toAbsolutePath(), "");
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(Arrays.asList(
                 new LinkedFile("", Path.of(""), ""),

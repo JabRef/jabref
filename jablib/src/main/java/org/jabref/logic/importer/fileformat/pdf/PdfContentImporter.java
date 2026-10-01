@@ -536,7 +536,7 @@ public class PdfContentImporter extends PdfImporter {
                 int edslength = "(Eds.)".length();
                 int posWithEditor = pos + edslength + 2; // +2 because of ":" after (Eds.) and the subsequent space
                 if (posWithEditor > curString.length()) {
-                    curString = curString.substring(posWithEditor - 2); // we don't have any spaces after Eds so we substract the 2
+                    curString = curString.substring(posWithEditor - 2); // we don't have any spaces after Eds so we subtract the 2
                 } else {
                     curString = curString.substring(posWithEditor);
                 }
