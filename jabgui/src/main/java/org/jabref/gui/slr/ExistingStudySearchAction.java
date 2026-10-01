@@ -130,7 +130,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
                           LOGGER.error("Error during persistence of crawling results.");
                           dialogService.showErrorDialogAndWait(Localization.lang("Error during persistence of crawling results."), e);
                       })
-                      .onSuccess(unused -> {
+                      .onSuccess(_ -> {
                           dialogService.notify(Localization.lang("Finished Searching"));
                           openDatabaseActionSupplier.get().openFile(Path.of(this.studyDirectory.toString(), Crawler.FILENAME_STUDY_RESULT_BIB));
                       })

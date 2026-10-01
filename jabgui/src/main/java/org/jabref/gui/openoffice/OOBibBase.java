@@ -281,7 +281,7 @@ public class OOBibBase {
         if (result.isError()) {
             LOGGER.warn(result.getError());
         }
-        return result.mapError(detail -> new OOError(errorTitle, messageOnFailureToObtain));
+        return result.mapError(_ -> new OOError(errorTitle, messageOnFailureToObtain));
     }
 
     private static OOVoidResult<OOError> checkRangeOverlaps(XTextDocument doc, OOFrontend frontend) {
@@ -746,7 +746,7 @@ public class OOBibBase {
     ///
     /// @param entries            The entries to cite.
     /// @param citationType       Indicates whether it is an in-text citation, a citation in parentheses or an invisible citation.
-    /// @param jStyle             Indicates citation formating in JStyle
+    /// @param jStyle             Indicates citation formatting in JStyle
     /// @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
     /// @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
     /// @param pageInfo           A single page-info for these entries. Attributed to the last entry.
@@ -796,7 +796,7 @@ public class OOBibBase {
                 try {
                     bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
                     return OOVoidResult.ok();
-                } catch (MissingStyleDefinedCitationLabelException e) {
+                } catch (MissingStyleDefinedCitationLabelException _) {
                     return OOVoidResult.error(OOError.bstStyleDoesNotDefineCitationFormat());
                 } catch (CreationException | com.sun.star.uno.Exception e) {
                     return OOVoidResult.error(OOError.fromMisc(e));
@@ -1077,7 +1077,7 @@ public class OOBibBase {
     /// Helper method for guiActionUpdateDocument, refreshes a JStyle bibliography.
     ///
     /// @param databases        Must have at least one.
-    /// @param jStyle           Indicates citation formating in JStyle.
+    /// @param jStyle           Indicates citation formatting in JStyle.
     /// @param doc              Text document.
     /// @param frontend,fcursor Used to synchronize document.
     /// @param errorTitle       Error message for user.
@@ -1151,7 +1151,7 @@ public class OOBibBase {
             try {
                 bstUpdateBibliography.rebuildBstBibliography(
                         doc, bstCitationOOAdapter, bstStyle, citedEntries, bibDatabaseContext);
-            } catch (MissingStyleDefinedCitationLabelException e) {
+            } catch (MissingStyleDefinedCitationLabelException _) {
                 return OOVoidResult.error(OOError.bstStyleDoesNotDefineCitationFormat());
             } catch (IOException | InterruptedException | com.sun.star.uno.Exception | CreationException e) {
                 LOGGER.error("Could not update BST bibliography", e);

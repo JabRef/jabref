@@ -10,6 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 
 import javafx.collections.FXCollections;
@@ -33,10 +41,15 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.DatabaseTest;
 
+import com.google.common.eventbus.Subscribe;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -97,6 +110,7 @@ class DBMSSynchronizerTest {
 
     @AfterEach
     void closeDbmsConnection() throws Exception {
+        dbmsSynchronizer.closeSharedDatabase();
         connectorTest.close();
     }
 
@@ -210,6 +224,214 @@ class DBMSSynchronizerTest {
     }
 
     @Test
+    void metadataNotificationsAreCoalesced() throws Exception {
+        List<Runnable> pendingDatabaseTasks = new ArrayList<>();
+        BibDatabase remoteDatabase = new BibDatabase();
+        BibDatabaseContext remoteContext = new BibDatabaseContext(remoteDatabase);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        DBMSSynchronizer remoteSynchronizer = new DBMSSynchronizer(
+                remoteContext,
+                ',',
+                fieldPreferences,
+                pattern,
+                new DummyFileUpdateMonitor(),
+                "UserAndHost",
+                new VirtualThreadTaskExecutor(),
+                Runnable::run,
+                pendingDatabaseTasks::add,
+                offlineChangesDirectory);
+        remoteDatabase.registerListener(remoteSynchronizer);
+        remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+
+        try {
+            remoteSynchronizer.handleRemoteMetaDataChange();
+            remoteSynchronizer.handleRemoteMetaDataChange();
+
+            assertEquals(1, pendingDatabaseTasks.size());
+
+            pendingDatabaseTasks.getFirst().run();
+            remoteSynchronizer.handleRemoteMetaDataChange();
+
+            assertEquals(2, pendingDatabaseTasks.size());
+        } finally {
+            remoteSynchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
+    void metadataNotificationDuringReadSchedulesFollowUp() throws Exception {
+        CountDownLatch firstMetadataReadFinished = new CountDownLatch(1);
+        CountDownLatch allowFirstMetadataReadToReturn = new CountDownLatch(1);
+        CountDownLatch secondMetadataReadFinished = new CountDownLatch(1);
+        AtomicInteger metadataReadCount = new AtomicInteger();
+        AtomicInteger groupApplicationCount = new AtomicInteger();
+        BlockingQueue<Runnable> pendingDatabaseTasks = new LinkedBlockingQueue<>();
+        BibDatabase remoteDatabase = new BibDatabase();
+        BibDatabaseContext remoteContext = new BibDatabaseContext(remoteDatabase);
+        GroupTreeNode groupRoot = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        groupRoot.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        MetaData groupMetaData = new MetaData();
+        groupMetaData.setGroups(groupRoot);
+        Map<String, String> groupSnapshot = MetaDataSerializer.getSerializedStringMap(groupMetaData, pattern);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+
+        try (ExecutorService taskExecutor = Executors.newVirtualThreadPerTaskExecutor()) {
+            DBMSSynchronizer remoteSynchronizer = new DBMSSynchronizer(
+                    remoteContext,
+                    ',',
+                    fieldPreferences,
+                    pattern,
+                    new DummyFileUpdateMonitor(),
+                    "UserAndHost",
+                    new VirtualThreadTaskExecutor(),
+                    Runnable::run,
+                    pendingDatabaseTasks::add,
+                    offlineChangesDirectory) {
+                @Override
+                Map<String, String> readSharedMetaData() throws SQLException {
+                    if (metadataReadCount.incrementAndGet() == 1) {
+                        firstMetadataReadFinished.countDown();
+                        try {
+                            if (!allowFirstMetadataReadToReturn.await(5, TimeUnit.SECONDS)) {
+                                throw new SQLException("Timed out waiting to resume the first metadata read");
+                            }
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            throw new SQLException("Interrupted while holding the first metadata read", e);
+                        }
+                    } else {
+                        secondMetadataReadFinished.countDown();
+                    }
+                    return groupSnapshot;
+                }
+            };
+            remoteDatabase.registerListener(remoteSynchronizer);
+            remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+            remoteContext.getMetaData().registerListener(new Object() {
+                @Subscribe
+                public void onGroupUpdated(GroupUpdatedEvent event) {
+                    groupApplicationCount.incrementAndGet();
+                }
+            });
+
+            try {
+                remoteSynchronizer.handleRemoteMetaDataChange();
+                Runnable firstDatabaseTask = pendingDatabaseTasks.poll(5, TimeUnit.SECONDS);
+                assertNotNull(firstDatabaseTask);
+                Future<?> firstRead = taskExecutor.submit(firstDatabaseTask);
+                assertTrue(firstMetadataReadFinished.await(5, TimeUnit.SECONDS));
+
+                remoteSynchronizer.handleRemoteMetaDataChange();
+                allowFirstMetadataReadToReturn.countDown();
+
+                firstRead.get(5, TimeUnit.SECONDS);
+                assertEquals(1, pendingDatabaseTasks.size());
+                Runnable secondDatabaseTask = pendingDatabaseTasks.poll(5, TimeUnit.SECONDS);
+                assertNotNull(secondDatabaseTask);
+                taskExecutor.submit(secondDatabaseTask).get(5, TimeUnit.SECONDS);
+                assertTrue(secondMetadataReadFinished.await(5, TimeUnit.SECONDS));
+                assertEquals(2, metadataReadCount.get());
+                assertEquals(Optional.of(groupRoot), remoteContext.getMetaData().getGroups());
+                assertEquals(1, groupApplicationCount.get());
+            } finally {
+                allowFirstMetadataReadToReturn.countDown();
+                remoteSynchronizer.closeSharedDatabase();
+            }
+        }
+    }
+
+    @Test
+    void remoteGroupDeletionIsAppliedAfterLocalGroupWrite() throws Exception {
+        BlockingQueue<Runnable> pendingDatabaseTasks = new LinkedBlockingQueue<>();
+        BibDatabaseContext remoteContext = new BibDatabaseContext();
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        DBMSSynchronizer remoteSynchronizer = new DBMSSynchronizer(
+                remoteContext,
+                ',',
+                fieldPreferences,
+                pattern,
+                new DummyFileUpdateMonitor(),
+                "UserAndHost",
+                new VirtualThreadTaskExecutor(),
+                Runnable::run,
+                pendingDatabaseTasks::add,
+                offlineChangesDirectory);
+        remoteContext.getMetaData().registerListener(remoteSynchronizer);
+        remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+
+        try {
+            Map<String, String> initialSnapshot = dbmsProcessor.getSharedMetaData();
+            GroupTreeNode groupRoot = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+            groupRoot.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+            remoteContext.getMetaData().setGroups(groupRoot);
+            String expectedGroupTree = MetaDataSerializer.getSerializedStringMap(remoteContext.getMetaData(), pattern).get(MetaData.GROUPSTREE);
+            assertNotNull(expectedGroupTree);
+
+            Runnable localWrite = pendingDatabaseTasks.poll(5, TimeUnit.SECONDS);
+            assertNotNull(localWrite);
+            localWrite.run();
+            assertEquals(expectedGroupTree, dbmsProcessor.getSharedMetaData().get(MetaData.GROUPSTREE));
+
+            dbmsProcessor.setSharedMetaData(initialSnapshot);
+            remoteSynchronizer.handleRemoteMetaDataChange();
+            Runnable remotePull = pendingDatabaseTasks.poll(5, TimeUnit.SECONDS);
+            assertNotNull(remotePull);
+            remotePull.run();
+
+            assertEquals(Optional.empty(), remoteContext.getMetaData().getGroups());
+        } finally {
+            remoteSynchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
+    void remoteSnapshotReadBeforeLocalGroupCreationDoesNotClearTheGroup() throws Exception {
+        BlockingQueue<Runnable> pendingModelUpdates = new LinkedBlockingQueue<>();
+        BibDatabaseContext remoteContext = new BibDatabaseContext();
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        DBMSSynchronizer remoteSynchronizer = new DBMSSynchronizer(
+                remoteContext,
+                ',',
+                fieldPreferences,
+                pattern,
+                new DummyFileUpdateMonitor(),
+                "UserAndHost",
+                new VirtualThreadTaskExecutor(),
+                pendingModelUpdates::add,
+                Runnable::run,
+                offlineChangesDirectory);
+        remoteContext.getMetaData().registerListener(remoteSynchronizer);
+        remoteSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+
+        try {
+            Map<String, String> changedSnapshot = new HashMap<>(dbmsProcessor.getSharedMetaData());
+            changedSnapshot.put(MetaData.DATABASE_TYPE, "biblatex;");
+            dbmsProcessor.setSharedMetaData(changedSnapshot);
+            remoteSynchronizer.handleRemoteMetaDataChange();
+            Runnable staleModelUpdate = pendingModelUpdates.poll(5, TimeUnit.SECONDS);
+            assertNotNull(staleModelUpdate);
+
+            GroupTreeNode groupRoot = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+            groupRoot.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+            remoteContext.getMetaData().setGroups(groupRoot);
+            String expectedGroupTree = MetaDataSerializer.getSerializedStringMap(remoteContext.getMetaData(), pattern).get(MetaData.GROUPSTREE);
+            assertNotNull(expectedGroupTree);
+
+            staleModelUpdate.run();
+            assertEquals(Optional.of(groupRoot), remoteContext.getMetaData().getGroups());
+
+            remoteContext.getMetaData().setMode(BibDatabaseMode.BIBTEX);
+            assertEquals(expectedGroupTree, dbmsProcessor.getSharedMetaData().get(MetaData.GROUPSTREE));
+        } finally {
+            remoteSynchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
     void entriesRemovedEventListener() throws SQLException {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
@@ -239,8 +461,11 @@ class DBMSSynchronizerTest {
         testMetaData.setMode(BibDatabaseMode.BIBTEX);
 
         Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData, pattern);
+        // A metadata notification can apply the database-owned schema version before this assertion.
+        // It is not part of the local metadata change tested here.
+        expectedMap.remove(MetaData.VERSION_DB_STRUCT);
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
-        actualMap.remove("VersionDBStructure");
+        actualMap.remove(MetaData.VERSION_DB_STRUCT);
 
         assertEquals(expectedMap, actualMap);
     }

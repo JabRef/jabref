@@ -24,7 +24,7 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     private StringProperty ellipsisString;
 
     private final ObservableList<Node> allChildren = FXCollections.observableArrayList();
-    private final ChangeListener<Number> sizeChangeListener = (observableValue, number, t1) -> adjustText();
+    private final ChangeListener<Number> sizeChangeListener = (_, _, _) -> adjustText();
     private final ListChangeListener<Node> listChangeListener = this::adjustChildren;
 
     private final String fullText;
@@ -39,8 +39,8 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
 
         this.comparisonString = comparisonString;
         this.diffMode = diffMode;
-        comparisonString.addListener((obs, oldValue, newValue) -> highlightDiff());
-        diffMode.addListener((obs, oldValue, newValue) -> highlightDiff());
+        comparisonString.addListener((_, _, _) -> highlightDiff());
+        diffMode.addListener((_, _, _) -> highlightDiff());
         highlightDiff();
     }
 

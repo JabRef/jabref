@@ -35,8 +35,8 @@ public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
                 .build();
 
         Button browse = new Button(Localization.lang("Browse"));
-        browse.setOnAction(event -> this.dialogService.showFileSaveDialog(fileDialogConfiguration)
-                                                      .ifPresent(file -> newFile.setText(file.toAbsolutePath().toString())));
+        browse.setOnAction(_ -> this.dialogService.showFileSaveDialog(fileDialogConfiguration)
+                                                  .ifPresent(file -> newFile.setText(file.toAbsolutePath().toString())));
 
         TextField newDescription = new TextField();
         VBox container = new VBox(10,

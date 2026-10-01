@@ -94,7 +94,7 @@ public class AiChatView extends StackPane {
         chatHistoryScrollPane.setRenderer(this::renderChatMessage);
         chatHistoryScrollPane.setAutoScrollToBottom(true);
 
-        // [pp->feat~ai.ingestion.trigger-on-demand~1]
+        // [impl->req~ai.ingestion.trigger-on-demand.privacy-policy~1]
         privacyNotice.managedProperty().bind(privacyNotice.visibleProperty());
         restartNeededPane.managedProperty().bind(restartNeededPane.visibleProperty());
         noFilesErrorPane.managedProperty().bind(noFilesErrorPane.visibleProperty());
@@ -133,7 +133,7 @@ public class AiChatView extends StackPane {
 
     private static String formatNoticeText(ChatModel model) {
         String modelName = AiNamingUtils.getDisplayName(model.getAiProvider()) + " " + model.getName();
-        return Localization.lang("Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided", modelName);
+        return Localization.lang("Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided.", modelName);
     }
 
     private void setupFollowUpQuestions() {
