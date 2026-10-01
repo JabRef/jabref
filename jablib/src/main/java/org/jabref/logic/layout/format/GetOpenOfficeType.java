@@ -49,7 +49,7 @@ public class GetOpenOfficeType implements LayoutFormatter {
         if ("Unpublished".equalsIgnoreCase(fieldText)) {
             return "14";
         }
-        // Default, Miscelaneous
+        // Default, Miscellaneous
         return "10";
     }
 }

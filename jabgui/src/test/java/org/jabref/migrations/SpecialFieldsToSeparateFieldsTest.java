@@ -30,7 +30,7 @@ class SpecialFieldsToSeparateFieldsTest {
     }
 
     @Test
-    void noKewordToMigrate() {
+    void noKeywordToMigrate() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
                                        .withField(StandardField.KEYWORDS, "tdd");
         BibEntry expected = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
