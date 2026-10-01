@@ -99,7 +99,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         xmlInputFactory = XMLInputFactory.newInstance();
 
         // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-        // not suported by aalto-xml
+        // not supported by aalto-xml
         // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         // required for reading Unicode characters such as &#xf6;
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
@@ -193,7 +193,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                             parseUrls(reader, entry);
                     case "dates" ->
                             parseDates(reader, entry);
-                    // TODO: Left for future work -- test files need to be adpated
+                    // TODO: Left for future work -- test files need to be adapted
                     // case "accession-num" -> {
                     //    String accessionNumber = parseElementContent(reader, "accession-num");
                     //    entry.setField(new UnknownField("accession-num"), accessionNumber);

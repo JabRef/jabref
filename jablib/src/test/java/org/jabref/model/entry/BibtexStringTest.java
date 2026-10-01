@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class BibtexStringTest {
 
     @Test
-    void initalizationWorksCorrectly() {
+    void initializationWorksCorrectly() {
         // Instantiate
         BibtexString bs = new BibtexString("AAA", "An alternative action");
         assertEquals("AAA", bs.getName());
