@@ -7,11 +7,11 @@ import java.util.Set;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.testutils.JavaFxExtension;
-
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
@@ -104,7 +104,7 @@ class LibraryMigrationActionTest {
         BibEntry marked = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
         BibEntry prioritized = new BibEntry().withField(StandardField.KEYWORDS, "prio1");
         ParserResult parserResult = parserResultNeedingAllMigrations(marked, prioritized);
-        answerDialog(true, 1);
+        answerDialog(true, 0);
 
         new LibraryMigrationAction().performAction(parserResult, dialogService, preferences);
 
@@ -131,6 +131,23 @@ class LibraryMigrationActionTest {
         assertTrue(parserResult.getChangedOnMigration());
     }
 
+    @Test
+    void mandatoryMigrationAloneOffersNoChoice() {
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        ParserResult parserResult = new ParserResult(Set.of(new BibEntry()));
+        parserResult.getMetaData().setGroupsInLegacyFormat(true);
+        when(dialogService.showCustomDialogAndWait(anyString(), any(DialogPane.class), any(ButtonType[].class))).thenAnswer(invocation -> {
+            // title, pane and a single button
+            assertEquals(3, invocation.getArguments().length);
+            return Optional.empty();
+        });
+
+        new LibraryMigrationAction().performAction(parserResult, dialogService, preferences);
+
+        assertFalse(parserResult.getMetaData().isGroupsInLegacyFormat());
+        assertEquals(List.of(), parserResult.getMetaData().getSkippedMigrations());
+    }
+
     private ParserResult parserResultNeedingAllMigrations(BibEntry... entries) {
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ParserResult parserResult = new ParserResult(Set.of(entries));
@@ -138,15 +155,17 @@ class LibraryMigrationActionTest {
         return parserResult;
     }
 
-    /// Simulates the user: deselects the check box at `deselectedIndex` (order: legacy groups, markings, special fields), then closes the dialog
+    /// Simulates the user: deselects the check box at `deselectedIndex` (order: markings, special fields; the legacy groups conversion has none), then closes the dialog
     private void answerDialog(boolean migrate, int deselectedIndex) {
         when(dialogService.showCustomDialogAndWait(anyString(), any(DialogPane.class), any(ButtonType[].class))).thenAnswer(invocation -> {
             DialogPane pane = invocation.getArgument(1);
             List<CheckBox> checkBoxes = ((VBox) pane.getContent()).getChildren().stream()
+                                                                  .filter(GridPane.class::isInstance)
+                                                                  .flatMap(table -> ((GridPane) table).getChildren().stream())
                                                                   .filter(CheckBox.class::isInstance)
                                                                   .map(CheckBox.class::cast)
                                                                   .toList();
-            assertEquals(3, checkBoxes.size());
+            assertEquals(2, checkBoxes.size());
             if (deselectedIndex >= 0) {
                 checkBoxes.get(deselectedIndex).setSelected(false);
             }
