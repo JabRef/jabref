@@ -226,6 +226,26 @@ class InMemoryChatHistoryCacheTest {
     }
 
     @Test
+    void failedWriteIsRolledBackSoAnotherChatCannotCommitIt() {
+        BibEntry first = new BibEntry().withCitationKey("First2024");
+        BibEntry second = new BibEntry().withCitationKey("Second2024");
+        databaseContext.getDatabase().insertEntries(first, second);
+        ChatIdentifier firstId = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "First2024");
+
+        var firstHistory = cache.getForEntry(databaseContext, first);
+        firstHistory.add(ChatMessage.userMessage("kept"));
+
+        fakeRepository.failing = true;
+        firstHistory.add(ChatMessage.userMessage("lost in storage"));
+        fakeRepository.failing = false;
+
+        // A different chat commits the shared store; the half-written first chat must not ride along
+        cache.getForEntry(databaseContext, second).add(ChatMessage.userMessage("unrelated"));
+
+        assertEquals(List.of("kept"), fakeRepository.getAllMessages(firstId).stream().map(ChatMessage::content).toList());
+    }
+
+    @Test
     void deletedDuplicateDoesNotOverwriteTheSurvivingChat() {
         ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Twin2024");
         BibEntry survivor = new BibEntry().withCitationKey("Twin2024");
@@ -289,6 +309,7 @@ class InMemoryChatHistoryCacheTest {
     private static class FakeChatHistoryRepository implements ChatHistoryRepository {
 
         private final Map<String, List<ChatMessage>> store = new HashMap<>();
+        private Map<String, List<ChatMessage>> committed = new HashMap<>();
         private int commits;
         private boolean failing;
 
@@ -332,6 +353,19 @@ class InMemoryChatHistoryCacheTest {
         @Override
         public void commit() {
             commits++;
+            committed = deepCopy(store);
+        }
+
+        @Override
+        public void rollback() {
+            store.clear();
+            store.putAll(deepCopy(committed));
+        }
+
+        private static Map<String, List<ChatMessage>> deepCopy(Map<String, List<ChatMessage>> source) {
+            Map<String, List<ChatMessage>> copy = new HashMap<>();
+            source.forEach((key, messages) -> copy.put(key, new ArrayList<>(messages)));
+            return copy;
         }
     }
 }

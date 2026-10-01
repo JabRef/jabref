@@ -166,19 +166,20 @@ public class InMemoryChatHistoryCache {
             return;
         }
 
-        previousIdentifier.filter(previous -> !previous.equals(currentIdentifier)).ifPresent(previous -> {
-            repository.clear(previous);
-            LOGGER.debug("Cleared old chat history for {} {}", entityType, previous.chatName());
-        });
-
-        // A storage failure must not abort the chat operation that triggered this write: the history stays
-        // in memory and the next change (or close()) retries the whole list.
+        // A storage failure must not abort the chat operation that triggered this write: the half-written
+        // state is rolled back, the history stays in memory and the next change (or close()) retries it.
         try {
+            previousIdentifier.filter(previous -> !previous.equals(currentIdentifier)).ifPresent(previous -> {
+                repository.clear(previous);
+                LOGGER.debug("Cleared old chat history for {} {}", entityType, previous.chatName());
+            });
+
             repository.clear(currentIdentifier);
             chatHistory.forEach(message -> repository.addMessage(currentIdentifier, message));
             repository.commit();
         } catch (RuntimeException e) {
             LOGGER.error("Unable to store chat history for {} {}", entityType, currentIdentifier.chatName(), e);
+            repository.rollback();
             return;
         }
         persistedAt.put(chatHistory, currentIdentifier);
