@@ -87,6 +87,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/SimpleJsonFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CAYWEntry.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CitationPropertiesPopup.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/IconThemeHelper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchDialog.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchField.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchResultContainer.java
