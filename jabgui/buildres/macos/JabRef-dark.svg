@@ -1,6 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <rect x="100" y="100" width="824" height="824" rx="195" fill="#202b4b" />
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2d2d2d" />
+      <stop offset="100%" stop-color="#0c0c0c" />
+    </linearGradient>
+  </defs>
+  <rect x="100" y="100" width="824" height="824" rx="195" fill="url(#bg)" />
   <g transform="translate(227 223) scale(2.7804878)">
     <g transform="translate(4.464505,-1.0189586)">
       <path d="M 169.701,159.59 C 165.76,106.354 90.925,87.102 90.754,88.131 c -0.138,6.655 -0.277,13.309 -0.415,19.964 17.786,3.616 61.666,20.094 79.362,51.495" transform="translate(-76.976,-71.492991)" fill="#c4d0f0" />
