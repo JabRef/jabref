@@ -33,6 +33,7 @@ testModuleInfo {
     requires("org.junit.jupiter.params")
     requires("org.mockito")
 
+    // Reachability assertions (JMemoryBuddy)
     requires("de.sandec.jmemorybuddy")
 
     requires("com.tngtech.archunit")
