@@ -97,7 +97,7 @@ public class DuplicateSearch extends SimpleCommand {
 
         duplicateCountObservable.addListener((_, _, newValue) -> UiTaskExecutor.runAndWaitInJavaFXThread(() -> duplicateTotal.set(newValue)));
 
-        duplicateSearchTask = HeadlessExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
+        duplicateSearchTask = HeadlessExecutorService.INSTANCE.executeInterruptibleTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(taskExecutor);

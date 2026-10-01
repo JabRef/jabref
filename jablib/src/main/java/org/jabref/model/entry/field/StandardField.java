@@ -149,7 +149,7 @@ public enum StandardField implements Field {
     ICORERANKING("icore"),
     OWNER("owner"),
 
-    // Timestamp-realted
+    // Timestamp-related
     CREATIONDATE("creationdate", FieldProperty.DATE),
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE),
     TIMESTAMP("timestamp", FieldProperty.DATE);
