@@ -55,7 +55,7 @@ public class DuplicateSearch extends SimpleCommand {
     private final StateManager stateManager;
 
     private final GuiPreferences preferences;
-    private final BibEntryTypesManager entryTypesManager;
+    private final DuplicateCheck duplicateCheck;
     private final TaskExecutor taskExecutor;
 
     // For "apply to all entries" functionality.
@@ -72,7 +72,7 @@ public class DuplicateSearch extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
-        this.entryTypesManager = entryTypesManager;
+        this.duplicateCheck = new DuplicateCheck(entryTypesManager);
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(stateManager));
@@ -104,8 +104,6 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
-        final DuplicateCheck duplicateCheck = new DuplicateCheck(entryTypesManager);
-
         for (int i = 0; i < (entries.size() - 1); i++) {
             for (int j = i + 1; j < entries.size(); j++) {
                 if (duplicateSearchCancelled.get() || Thread.interrupted()) {
