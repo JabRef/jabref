@@ -176,9 +176,6 @@ public class OpenDatabaseActionTest {
         verify(dialogService, never()).showErrorDialogAndWait(anyString(), anyString());
     }
 
-    /// Legacy group memberships are stored inside the group tree instead of the entries' `groups` field.
-    /// [org.jabref.migrations.ConvertLegacyExplicitGroups] converts them, and this test pins that it runs on open
-    /// (it stopped running when jabgui and jablib were split, https://github.com/JabRef/jabref/pull/12990).
     // [utest->req~import.bibtex.legacy-migrations~1]
     @Test
     void loadDatabaseMigratesLegacyExplicitGroups(@TempDir Path tempDir) throws Exception {
