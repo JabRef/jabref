@@ -1,10 +1,10 @@
 {
   "bomFormat" : "CycloneDX",
   "specVersion" : "1.6",
-  "serialNumber" : "urn:uuid:d12530bf-59f6-4c77-b768-23f90826f040",
+  "serialNumber" : "urn:uuid:d16e4d89-9aeb-433f-8b1b-ec3aec7cc86d",
   "version" : 1,
   "metadata" : {
-    "timestamp" : "2026-09-09T17:54:53Z",
+    "timestamp" : "2026-09-21T17:27:21Z",
     "tools" : {
       "components" : [
         {
@@ -26,7 +26,7 @@
       "externalReferences" : [
         {
           "type" : "build-system",
-          "url" : "https://github.com/JabRef/jabref/actions/runs/34385509426"
+          "url" : "https://github.com/JabRef/jabref/actions/runs/35631749322"
         },
         {
           "type" : "vcs",
@@ -92,7 +92,7 @@
       "externalReferences" : [
         {
           "type" : "build-system",
-          "url" : "https://github.com/JabRef/jabref/actions/runs/34385509426"
+          "url" : "https://github.com/JabRef/jabref/actions/runs/35631749322"
         },
         {
           "type" : "vcs",
@@ -117,43 +117,43 @@
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/ai.djl.huggingface/tokenizers@0.37.0?type=jar",
+      "bom-ref" : "pkg:maven/ai.djl.huggingface/tokenizers@0.38.0?type=jar",
       "group" : "ai.djl.huggingface",
       "name" : "tokenizers",
-      "version" : "0.37.0",
+      "version" : "0.38.0",
       "description" : "Deep Java Library (DJL) NLP utilities for Huggingface tokenizers",
       "hashes" : [
         {
           "alg" : "MD5",
-          "content" : "1572ef240d905d6cb0b1a453abdf12ad"
+          "content" : "4015d9a531c0b0e6a035b64122ab1b0a"
         },
         {
           "alg" : "SHA-1",
-          "content" : "332045b1db909bbfb1d387e3e13c2c04600e3e07"
+          "content" : "875d8c48f05165a17498215747974cde2de728bd"
         },
         {
           "alg" : "SHA-256",
-          "content" : "7dbdd849c3c8008f6b8909df4fc65c816a6e5a173d75f4c213e8d6e25700b0e8"
+          "content" : "aab48c4db87ffb724d6037940aaba1d0b3d3b1de45156d7d9efc818f92f7a521"
         },
         {
           "alg" : "SHA-512",
-          "content" : "2d13b9938ef44b08ac416e83e558263c3aa842ea95e95ed913544c293178f71dcded18fa60db7eec02a2a424dee037b9deaa7510f18a10d9e546696576be2902"
+          "content" : "faee99ec90854f8e29539d535005ccc99a4409d9a666a3ba285766c08c93301051984b563945c6c8757a5197c02556b8c2f24edb0b78d4d73991458417efdfa6"
         },
         {
           "alg" : "SHA3-256",
-          "content" : "7f4c954f0f1180d00319a94ee56bb02f9b510f75111fda87f80858123c4427a5"
+          "content" : "d1efc883dd5f50e45582105cec280489c6d96ddd042c63ff246c3f79fe23ef82"
         },
         {
           "alg" : "SHA3-512",
-          "content" : "b5d224d235718f44905bd17ac492244b6975d967538916887bdf15e4c98e1ca3d802e4f340ab614a64386048c86c927fd8acb9a59c66096808d2c4c6bb10cbbd"
+          "content" : "19e382ea4da3f7d645563d144e72185ccc849c7eeee607652a091833f07b4178b7961d8d28f70d4aba27aea3e375f74e882fd9e995d0636b58b93489a8152ac2"
         },
         {
           "alg" : "SHA-384",
-          "content" : "a4ed22c7953b101b5e0c52d7d27feae83dfd9dd77b016a984e3265f762ca053d5fd76c905656071b6030acf99e1e5286"
+          "content" : "5d5f4174a22e2f6c6ae7240d730f1148aaae76e45cf71e6710789c4e5a3dd54a4a5cad653fe7bc3602086af91fb27660"
         },
         {
           "alg" : "SHA3-384",
-          "content" : "05cfb7eec5287a020958a5ec90cec3ebc2e393383c4e71e4f1aeec4dde1cf3e63403f7d561f8e4f6f15e55a6071d8f57"
+          "content" : "f64ab3c8bcbbae11d88d4bf06a7bf46601b73de94a309811abd768348597888a5b04a79b366a0c91e928d52fbd366061"
         }
       ],
       "licenses" : [
@@ -163,7 +163,7 @@
           }
         }
       ],
-      "purl" : "pkg:maven/ai.djl.huggingface/tokenizers@0.37.0?type=jar",
+      "purl" : "pkg:maven/ai.djl.huggingface/tokenizers@0.38.0?type=jar",
       "modified" : false,
       "externalReferences" : [
         {
@@ -180,43 +180,43 @@
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/ai.djl.pytorch/pytorch-engine@0.37.0?type=jar",
+      "bom-ref" : "pkg:maven/ai.djl.pytorch/pytorch-engine@0.38.0?type=jar",
       "group" : "ai.djl.pytorch",
       "name" : "pytorch-engine",
-      "version" : "0.37.0",
+      "version" : "0.38.0",
       "description" : "Deep Java Library (DJL) Engine Adapter for PyTorch",
       "hashes" : [
         {
           "alg" : "MD5",
-          "content" : "23b1d1f85c45eada96f707a41d7b7e36"
+          "content" : "01e3676e5c806d315ab5d226bb5822a9"
         },
         {
           "alg" : "SHA-1",
-          "content" : "8361ec786df8d04e6229510788478982c154cd8b"
+          "content" : "f05d74386d0fa925cba579595374b90ba40171a0"
         },
         {
           "alg" : "SHA-256",
-          "content" : "e4ae439c6f7b80acacbb6fc95d4686fbda705b1155c9c5bce678d946ddc69ac2"
+          "content" : "327801b3b90e1b0179cd7266eeb1b484834f7090c4d5003a8331b944bf8aac77"
         },
         {
           "alg" : "SHA-512",
-          "content" : "935875bff7ff5082560f7f97c5a4efac8d34ede4ef1a7ef1feae2dad09c4c539dbbf8fbc9de8ff05c27d7b1374415e6d73fef3f90679eab7df0995e665381c70"
+          "content" : "509d94afadc86db35fd4b330582dfcc7935016b8a171362a81dfa6a21c311749c5f6725114d8a9ce73c8d1f5c8c27614ff088dff42cbcac3cc8f5998026ee48b"
         },
         {
           "alg" : "SHA3-256",
-          "content" : "479268d8054ec8a5436b28bb5439b0fcf298827a09bedc618b5581460e1f7605"
+          "content" : "e53e194fc912afcd18dcea3d399f585133124b31b3f43c9e411b6b1fad200864"
         },
         {
           "alg" : "SHA3-512",
-          "content" : "a21ff75a23f51a84c3905a4a7658e6e62225937a65291c6328e6484d747de2fabee5142fae23d98b873b78c27793eca3f976640c832f08312a7a5bd43d4bba7d"
+          "content" : "ada85253dc76ea7461d68ce4dc5486349165e97137fe72b4d1a940e9f62da1e959bcff3bb356da1fe6d4f17d77ca59c489ff4339c96cd1e0a2c797940855eae5"
         },
         {
           "alg" : "SHA-384",
-          "content" : "c90378f0b23072a13f8659543bd8b362c8e9b6522dc9220f22d71d964a9333c5fdd965f384288da523d8dd55ba24edac"
+          "content" : "e18f7c0c38bac8dd443d9da8c57a9e59a43fa4dad9bbefba4df66f661a5a62766c34047a3121d5ffb28a793b81497a9d"
         },
         {
           "alg" : "SHA3-384",
-          "content" : "49aa2cab567af598df8982bd36ee6449d1eac84662ece5d8344d0a3d30eaad1020797102bb26bb0d96ab1d06db1af9ac"
+          "content" : "a4b6943e1c2517efb6777b30efa94948c07e5f4eb4b0e552fdb41366d0ff2c8f8f13bcc828a2c2bc088597f49f80a1b7"
         }
       ],
       "licenses" : [
@@ -226,7 +226,7 @@
           }
         }
       ],
-      "purl" : "pkg:maven/ai.djl.pytorch/pytorch-engine@0.37.0?type=jar",
+      "purl" : "pkg:maven/ai.djl.pytorch/pytorch-engine@0.38.0?type=jar",
       "modified" : false,
       "externalReferences" : [
         {
@@ -243,43 +243,43 @@
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/ai.djl.pytorch/pytorch-model-zoo@0.37.0?type=jar",
+      "bom-ref" : "pkg:maven/ai.djl.pytorch/pytorch-model-zoo@0.38.0?type=jar",
       "group" : "ai.djl.pytorch",
       "name" : "pytorch-model-zoo",
-      "version" : "0.37.0",
+      "version" : "0.38.0",
       "description" : "Deep Java Library (DJL) model zoo for PyTorch",
       "hashes" : [
         {
           "alg" : "MD5",
-          "content" : "9561ed397b19df88c89bb7c6e4f73794"
+          "content" : "98b1599e2dfb56e4f05ca8cbb73b621c"
         },
         {
           "alg" : "SHA-1",
-          "content" : "b2fb396415e68bc8cc8c1e1301e558d866f09976"
+          "content" : "434a6ddd6991f89cca8f34bc4b786bf8b5a90008"
         },
         {
           "alg" : "SHA-256",
-          "content" : "06656be87884d423ed6e548d6f76fead42ec1f9ad9156f5300cff48ddce9a030"
+          "content" : "315ad71dab4738ddd122f6b723d38f7c5fc00e93d0dc9baa445d83ab0f3a592c"
         },
         {
           "alg" : "SHA-512",
-          "content" : "95be83d1eb3a8f1f123d07620e9b14563d02936dc4ac953cef1e90005f3cac8a5fd136d2ee03424c1bf98c174cae69ebb3275b32aac5db0a98b61a55562d9f8a"
+          "content" : "4ff26e98d3e4df249586e06a647aa8c35bd2a6b8d32762685e18763237e48aee403c374d52fa088d447b47d643310a243ea6817b572066ffda6fd8b7e335fac4"
         },
         {
           "alg" : "SHA3-256",
-          "content" : "d85d4a4f6793b412e02238f78813b0766d903e46dbbe774f7dfba4c49b77ba10"
+          "content" : "308b7d63677ae51fbcb0fe8d9d7de4d30a2c5c8d968f779f6724705b57b4f9f5"
         },
         {
           "alg" : "SHA3-512",
-          "content" : "63de21931bd1a6c74f877d8f69b0457216a235feafac2a415506bcc52d9eda8ce37daf20744942b8ff96d37d9f2091edd5039707620b38e33c45d001a5924e58"
+          "content" : "38bdbc12c78853d397e550a8732fe8cdb7d6de8185f6ca6bc5226ad2de0e30d065d5c31f40233735988c82604e85a8b1e02c97c412227f44a9b4e84effde1d1b"
         },
         {
           "alg" : "SHA-384",
-          "content" : "ca48250cd554fc9232e10b0c490d24576f08e7c94b69b8e45948c61e19aea9312d8292924bad6f54e9b9d7a91dbef059"
+          "content" : "299a9ba0adfcc064ea2dde199ded401972789b65ae39e667e48dee2e10e7206ac1479b0a0f15b9617b4de61a1bdfe440"
         },
         {
           "alg" : "SHA3-384",
-          "content" : "d61884d49b4cd460bb5ff6698418ac3753418162366b9c630510033000c71364e7a60c6fde9f94be308e938a46c38e62"
+          "content" : "4bb1032f08c6764c66441f015f204ab88ebca17bc28756d44508443b5bf6b7f15156452dc6d02f9c18146a0eff4dd0e3"
         }
       ],
       "licenses" : [
@@ -289,7 +289,7 @@
           }
         }
       ],
-      "purl" : "pkg:maven/ai.djl.pytorch/pytorch-model-zoo@0.37.0?type=jar",
+      "purl" : "pkg:maven/ai.djl.pytorch/pytorch-model-zoo@0.38.0?type=jar",
       "modified" : false,
       "externalReferences" : [
         {
@@ -306,43 +306,43 @@
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/ai.djl/api@0.37.0?type=jar",
+      "bom-ref" : "pkg:maven/ai.djl/api@0.38.0?type=jar",
       "group" : "ai.djl",
       "name" : "api",
-      "version" : "0.37.0",
+      "version" : "0.38.0",
       "description" : "Deep Java Library - api",
       "hashes" : [
         {
           "alg" : "MD5",
-          "content" : "e9594d8bc8256a7cd54cdac82c7aeabf"
+          "content" : "0864990898d41fb8db92a1a5f6d6a33e"
         },
         {
           "alg" : "SHA-1",
-          "content" : "b0f26eef62e2a7e0dfd39f1ad64611587e19c802"
+          "content" : "2bc351e12a0d2da3cdf74a775ee5f170c8df38b9"
         },
         {
           "alg" : "SHA-256",
-          "content" : "3b57eb8ff74abb38785b2cecb0bfea328e0827312c9945911e217ec33b15b025"
+          "content" : "5a99d57d675e68febd471ca814a81180dc2be7a05d66a1b6b0eb676416a9d6bc"
         },
         {
           "alg" : "SHA-512",
-          "content" : "b58548cd15ca4ee34017233f766c457cb2851d18c102c331bc59a0cc9c40b143583ffcf9a84edba7a968f85f6b1ddca631c01218089a31ff0803c5482832f7f3"
+          "content" : "7a0b4275104bbccaaebca7a99b4df6ec1abc8369b91b04629f85b89609faf789faa7877432a9554c96b545eb8e1fa8893b093dbd1bc6ffc01dc7bf1e72d8b72b"
         },
         {
           "alg" : "SHA3-256",
-          "content" : "7c3614cb5bbd4ef0036c8aff2a7e7a707cfef79ca4b30d7c53fcdb01c01cc792"
+          "content" : "1d1d55a89c3cbb99cff85c5771fab3d0eebc56009745f1e6670c4cb76d2152ab"
         },
         {
           "alg" : "SHA3-512",
-          "content" : "43db5d2b07f838b25e43599e7250a3ca76e2ce771e2d5ca3dc9bb210661b574b37b42c83773373462c9680dd46974ee3e0cbc3ad626512b3821c86dcada59980"
+          "content" : "a675cd49f22dc206b4a7d9a94ec2522ffde0ade1c3dfb3c9f1b9177d6e52280532d73bd6e3f7e399fbd3fd3e8864c635d014e35ee3d2853caddb847daefb0d27"
         },
         {
           "alg" : "SHA-384",
-          "content" : "75c6e598ffee0c97f9a0e6b4369c08ecc80cb9b906b299063e31f5c54268bc62daac38d059e2d666b21827c8b1efcc99"
+          "content" : "a4ebc6b9e2f18ac5ef3d0cd0f6b397864785e284728c40dad163415a14b81b62b931828e6186fb8e27228baac693beef"
         },
         {
           "alg" : "SHA3-384",
-          "content" : "ffe6b6beb579efbc1a91b584941f7b4f28f198dd09378d0bff63671e507915fdc809d5bb1b1da52d8aabc453c3bab10f"
+          "content" : "1265459f00961795154894acb0e372494be6edfb8fcac80398ac63898efd4494e5fa4504e1b53a29ac847c1df5f40ea0"
         }
       ],
       "licenses" : [
@@ -352,7 +352,7 @@
           }
         }
       ],
-      "purl" : "pkg:maven/ai.djl/api@0.37.0?type=jar",
+      "purl" : "pkg:maven/ai.djl/api@0.38.0?type=jar",
       "modified" : false,
       "externalReferences" : [
         {
@@ -369,10 +369,10 @@
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/ai.djl/bom@0.37.0?type=pom",
+      "bom-ref" : "pkg:maven/ai.djl/bom@0.38.0?type=pom",
       "group" : "ai.djl",
       "name" : "bom",
-      "version" : "0.37.0",
+      "version" : "0.38.0",
       "description" : "Deep Java Library (DJL) Bill of Materials (BOM)",
       "licenses" : [
         {
@@ -381,7 +381,7 @@
           }
         }
       ],
-      "purl" : "pkg:maven/ai.djl/bom@0.37.0?type=pom",
+      "purl" : "pkg:maven/ai.djl/bom@0.38.0?type=pom",
       "modified" : false,
       "externalReferences" : [
         {
@@ -4046,35 +4046,35 @@
       "hashes" : [
         {
           "alg" : "MD5",
-          "content" : "e30ed842c0ce6260835a755295a9c87b"
+          "content" : "3be16ac8db9a8ea8dae22e8cfb524f95"
         },
         {
           "alg" : "SHA-1",
-          "content" : "a7db774c56be114f9aef5df44404d8047ef6bec4"
+          "content" : "1156cfae07df2f43d0f806736d3fc0c3abc43fa8"
         },
         {
           "alg" : "SHA-256",
-          "content" : "c884e22f5a40abbb4ab3dfc2dd9e6e69ff89e04d9f9295d6ec7085b6301e0245"
+          "content" : "e5c385f4e61f8e757078afceb811b1194e3d7444ab11b5691885300212d01038"
         },
         {
           "alg" : "SHA-512",
-          "content" : "6b2967e2209e1563b4ab991b984509cc2eabdb4c998b76efcb51024db0c3d227f41bf3ea8e392e05ef9373f0cbb8498a5933376983c3391ad4ce3835960484c2"
+          "content" : "73dac33123beb5028c6564c6742c1ce507f73503a0d6763be0a20a37b09da02fcb34515173862852b7c7cc626cf00a97f4e54c2fa404b286472daca60b48d9a8"
         },
         {
           "alg" : "SHA3-256",
-          "content" : "bcd707a20e9180fe91f1fcfeedf14485e41c7455007062fb77ca6b317a95bd15"
+          "content" : "2252fd9e303b026133cc7d43818d1cc0927629670709bf9f1a00a12a109f2a92"
         },
         {
           "alg" : "SHA3-512",
-          "content" : "c47225b7e9f58fa44219fecbbd750dec53e724b0dd48c9e84278d0a7ff2d6aae38029e89e9b01a9bbd3c9f55826b7dcd6ac02c81bab2142285f0060dd4fd6843"
+          "content" : "a3f8d803cfca9404320c11f7e0be6cb8e2732cd982270f3f5df75dcfc4ca857639cd13d09c2059dced109694f7382db1ec9cc39dbc3d027fa05b6a54ea9b5b05"
         },
         {
           "alg" : "SHA-384",
-          "content" : "d88b8b48d70209fa3c6af78aa2c08e1d585939429413afcbf66dcb1f080371711063bd263278eadeafc98eefae9b70c4"
+          "content" : "a9fc45b6508ab04a0555a119959554d39021c0a7b3fd82b3dde0eb97867ebbb7f4304e6c20b8fe0fcc9b7c0f522a8c0a"
         },
         {
           "alg" : "SHA3-384",
-          "content" : "dc50137595b490b704d5ec3dd70ae25d9bc4afa55223b9722c246081c91044af938b449200aa939399dffdf2435eb22a"
+          "content" : "c489f48aade8e6900cb850dc899a54b96833432480c8e61429bd590e02cf2820fe59efd963044072057c0b7f2827a87d"
         }
       ],
       "licenses" : [
@@ -5595,43 +5595,43 @@
     },
     {
       "type" : "library",
-      "bom-ref" : "pkg:maven/net.bytebuddy/byte-buddy@1.18.13?type=jar",
+      "bom-ref" : "pkg:maven/net.bytebuddy/byte-buddy@1.18.14?type=jar",
       "group" : "net.bytebuddy",
       "name" : "byte-buddy",
-      "version" : "1.18.13",
+      "version" : "1.18.14",
       "description" : "Byte Buddy is a Java library for creating Java classes at run time. This artifact is a build of Byte Buddy with all ASM dependencies repackaged into its own name space.",
       "hashes" : [
         {
           "alg" : "MD5",
-          "content" : "cdc93784981a74d6400be220967b34d5"
+          "content" : "d350069f3f87e8c66fa782ff91669b33"
         },
         {
           "alg" : "SHA-1",
-          "content" : "09ed17e54e9e2f0dfa885c7b6fb9df5fde539643"
+          "content" : "e26b6f5163f36a5ef91f84eea1befae54e11eb76"
         },
         {
           "alg" : "SHA-256",
-          "content" : "aa0013fbcb7e8086f4775f3dcb69a6c6833f7fd9023fe027d2d0241834cc51d5"
+          "content" : "b7f2b2f111c6ddc09d3d9718ca5895dde16217bb4e5f2d2a6eb571f274909a82"
         },
         {
           "alg" : "SHA-512",
-          "content" : "c9072bebf51c20f18334674ea5c64dd8fabfde1cbb2e9fd9d5d7fbb1d68d20ad0e271f4acf6539068838fdacf502db9ae18bd77c5a01b79484a3b7400507d083"
+          "content" : "252f57ee0a99f81a6795484e4712966de9f0b7229a3bf8e818cf20a8ff3de6b3745f91ad6a85421696a14e6d528f6d25fa2b0550e37500c5907be3781c6504e2"
         },
         {
           "alg" : "SHA3-256",
-          "content" : "1639b080f87db87f7b5d7b64514488a7c88da77bd9ca6ff333d256a1837205d4"
+          "content" : "4143f0cefbcda015e38ceaacb07bd29f608f6bbcddac717d5ac88526b1e7fadd"
         },
         {
           "alg" : "SHA3-512",
-          "content" : "1f22c4d2dc9ef0b48c872e8ecd5c197bbfc19713d78ae80824709a8c2fdcc26c57ae852a23d500daaa90b82c10429d9fa4d519b8cef0956ee6883907a465125a"
+          "content" : "1ac6fe1074144c070c49f29d413e37a460538f978530fbf642eba8d69c0f3af7d785bb65b7fd77adb85ded095fa3a512be1f9d122718fc1bf8929dbd31ecd742"
         },
         {
           "alg" : "SHA-384",
-          "content" : "fbcfcc8f2500f866e34c59bf367430000c891356b2d91b26c01d9d855b67071dec6710bcb0b2180d887d5fddad538032"
+          "content" : "076deee62acf162293938fdd6772477d9017156649810239f2c910d591dd79102383a3edffa21e567a920e5900808f8a"
         },
         {
           "alg" : "SHA3-384",
-          "content" : "b685ba29b04d969dd6925fea4ceefb3d96e3aaf11615e596c080f638aef5ed177eb0c55772b743066299dd60b78c31fc"
+          "content" : "e015d142598754d2209157e230ed54ce769a118881df6a3fc767ddf95070336862e84d1f4abe57d3818fcf95ce52016b"
         }
       ],
       "licenses" : [
@@ -5641,7 +5641,7 @@
           }
         }
       ],
-      "purl" : "pkg:maven/net.bytebuddy/byte-buddy@1.18.13?type=jar",
+      "purl" : "pkg:maven/net.bytebuddy/byte-buddy@1.18.14?type=jar",
       "modified" : false,
       "properties" : [
         {
@@ -9459,7 +9459,7 @@
       "externalReferences" : [
         {
           "type" : "build-system",
-          "url" : "https://github.com/JabRef/jabref/actions/runs/34385509426"
+          "url" : "https://github.com/JabRef/jabref/actions/runs/35631749322"
         },
         {
           "type" : "vcs",
@@ -9478,7 +9478,7 @@
       "externalReferences" : [
         {
           "type" : "build-system",
-          "url" : "https://github.com/JabRef/jabref/actions/runs/34385509426"
+          "url" : "https://github.com/JabRef/jabref/actions/runs/35631749322"
         },
         {
           "type" : "vcs",
@@ -9497,7 +9497,7 @@
       "externalReferences" : [
         {
           "type" : "build-system",
-          "url" : "https://github.com/JabRef/jabref/actions/runs/34385509426"
+          "url" : "https://github.com/JabRef/jabref/actions/runs/35631749322"
         },
         {
           "type" : "vcs",
@@ -9706,7 +9706,7 @@
       "externalReferences" : [
         {
           "type" : "build-system",
-          "url" : "https://github.com/JabRef/jabref/actions/runs/34385509426"
+          "url" : "https://github.com/JabRef/jabref/actions/runs/35631749322"
         },
         {
           "type" : "vcs",
@@ -12665,6 +12665,140 @@
     },
     {
       "type" : "library",
+      "bom-ref" : "pkg:maven/tools.maran/svg-materialdesign@1.0.0?type=jar",
+      "group" : "tools.maran",
+      "name" : "svg-materialdesign",
+      "version" : "1.0.0",
+      "description" : "Collection of all Material Design SVG paths.",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "66d3b5a2641b0e73a2683290432880ac"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "42d476ce6ce3f0d3522569a42a7abe49c38dfc2d"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "f8cad040fad717963903b449d006441fccaafe4a6e2bec2d7319f082721c7ae8"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "e64f1aa4adbd055e76b5c79fe98ed282c820059571ac9408c412999f2e364f4248852bb16425ba08f5d40552b1fab062ebb37e23aff360544616f3dfd4a4396b"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "2bd363ab647e3f35efe952b536ad5522bb6420c8702c5ba89cffa0ef1bd844e8"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "f76e13b1b5517d93b2b99307ab3c40245787f9548e40e71c3c0caddd39d43f12ad86cebf0d72a3cb5cb68339b35e0734c5887e09f49a895fd78335519ebdbefc"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "48b3d1e1164c6c74c6e728c70a8f27c71b787923ac640d9813c2d66241463cfcddeb9c46f4236e2a5d7d5ee075d2a0c3"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "9d00f254490f24b7d450c42168ec07ac27cdf1fd6a1f454bad8ccfce5b54544763011799364c8998d1009cf978dd8ca0"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "MIT",
+            "url" : "https://opensource.org/license/mit/"
+          }
+        },
+        {
+          "license" : {
+            "id" : "Apache-2.0",
+            "url" : "https://www.apache.org/licenses/LICENSE-2.0"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/tools.maran/svg-materialdesign@1.0.0?type=jar",
+      "modified" : false,
+      "externalReferences" : [
+        {
+          "type" : "vcs",
+          "url" : "https://github.com/Maran23/svg-materialdesign"
+        }
+      ],
+      "properties" : [
+        {
+          "name" : "cdx:maven:package:test",
+          "value" : "false"
+        }
+      ]
+    },
+    {
+      "type" : "library",
+      "bom-ref" : "pkg:maven/tools.maran/svg@1.0.0?type=jar",
+      "group" : "tools.maran",
+      "name" : "svg",
+      "version" : "1.0.0",
+      "description" : "SVG contract as simple interface for concrete SVG implementations.",
+      "hashes" : [
+        {
+          "alg" : "MD5",
+          "content" : "be13859b6543eaa887462c973dc54eca"
+        },
+        {
+          "alg" : "SHA-1",
+          "content" : "11b057da59bb843e1690cc42b0eb8af154be6032"
+        },
+        {
+          "alg" : "SHA-256",
+          "content" : "c7d275b41125c26f9f0bdb6352b7bd31fdcdaf19adb215d0951fc944829d3d27"
+        },
+        {
+          "alg" : "SHA-512",
+          "content" : "b50d88aa57d2e95484d537b10a0c0d1b7720f386d873e44bbab813684ccdbd3b59f03f147421c755e545953eae6b4978dc966a89cefe8e4bb7d3a2af7f174e0e"
+        },
+        {
+          "alg" : "SHA3-256",
+          "content" : "cd110cd2670c5552c7227757e42f55b0f72891059d63ce5dc43bcf186c26255f"
+        },
+        {
+          "alg" : "SHA3-512",
+          "content" : "ef76ad2560abc73d19a777e40e306670bb446a433eaa300282f38f4ba41e20a2055b83de54b3fe9933778bc84e1abb55a5e799080f7f03df04313f85fe9d0a0a"
+        },
+        {
+          "alg" : "SHA-384",
+          "content" : "e78271505ce8edf3bcac4a6b9605c863040454e151487f07e0c72b721c34c1c240d4b297ad701be620aea0cae02e5cf5"
+        },
+        {
+          "alg" : "SHA3-384",
+          "content" : "e146709438aef8ffcebe4814bfc5fa56469863202607478634f0bc1eb7adcef6a28f6e56497cd530fca4885e704d0d2e"
+        }
+      ],
+      "licenses" : [
+        {
+          "license" : {
+            "id" : "MIT",
+            "url" : "https://opensource.org/license/mit/"
+          }
+        }
+      ],
+      "purl" : "pkg:maven/tools.maran/svg@1.0.0?type=jar",
+      "modified" : false,
+      "externalReferences" : [
+        {
+          "type" : "vcs",
+          "url" : "https://github.com/Maran23/svg"
+        }
+      ],
+      "properties" : [
+        {
+          "name" : "cdx:maven:package:test",
+          "value" : "false"
+        }
+      ]
+    },
+    {
+      "type" : "library",
       "bom-ref" : "pkg:maven/tools.maran/svgnode@2.0.0?type=jar",
       "group" : "tools.maran",
       "name" : "svgnode",
@@ -12738,7 +12872,7 @@
       "externalReferences" : [
         {
           "type" : "build-system",
-          "url" : "https://github.com/JabRef/jabref/actions/runs/34385509426"
+          "url" : "https://github.com/JabRef/jabref/actions/runs/35631749322"
         },
         {
           "type" : "vcs",
@@ -12752,9 +12886,9 @@
       "ref" : "pkg:maven/JabRef/jablib@unspecified?project_path=%3Ajablib",
       "dependsOn" : [
         "pkg:maven/JabRef/versions@unspecified?project_path=%3Aversions",
-        "pkg:maven/ai.djl.huggingface/tokenizers@0.37.0?type=jar",
-        "pkg:maven/ai.djl.pytorch/pytorch-model-zoo@0.37.0?type=jar",
-        "pkg:maven/ai.djl/api@0.37.0?type=jar",
+        "pkg:maven/ai.djl.huggingface/tokenizers@0.38.0?type=jar",
+        "pkg:maven/ai.djl.pytorch/pytorch-model-zoo@0.38.0?type=jar",
+        "pkg:maven/ai.djl/api@0.38.0?type=jar",
         "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.22?type=jar",
         "pkg:maven/com.fasterxml/aalto-xml@1.4.0?type=jar",
         "pkg:maven/com.github.ben-manes.caffeine/caffeine@3.2.4?type=jar",
@@ -12879,7 +13013,7 @@
     {
       "ref" : "pkg:maven/JabRef/versions@unspecified?project_path=%3Aversions",
       "dependsOn" : [
-        "pkg:maven/ai.djl/bom@0.37.0?type=pom",
+        "pkg:maven/ai.djl/bom@0.38.0?type=pom",
         "pkg:maven/dev.langchain4j/langchain4j-bom@1.20.0?type=pom",
         "pkg:maven/io.zonky.test.postgres/embedded-postgres-binaries-bom@18.6.0?type=pom",
         "pkg:maven/org.glassfish.grizzly/grizzly-bom@5.0.2?type=pom",
@@ -12889,25 +13023,25 @@
       ]
     },
     {
-      "ref" : "pkg:maven/ai.djl.huggingface/tokenizers@0.37.0?type=jar",
+      "ref" : "pkg:maven/ai.djl.huggingface/tokenizers@0.38.0?type=jar",
       "dependsOn" : [
-        "pkg:maven/ai.djl/api@0.37.0?type=jar"
+        "pkg:maven/ai.djl/api@0.38.0?type=jar"
       ]
     },
     {
-      "ref" : "pkg:maven/ai.djl.pytorch/pytorch-engine@0.37.0?type=jar",
+      "ref" : "pkg:maven/ai.djl.pytorch/pytorch-engine@0.38.0?type=jar",
       "dependsOn" : [
-        "pkg:maven/ai.djl/api@0.37.0?type=jar"
+        "pkg:maven/ai.djl/api@0.38.0?type=jar"
       ]
     },
     {
-      "ref" : "pkg:maven/ai.djl.pytorch/pytorch-model-zoo@0.37.0?type=jar",
+      "ref" : "pkg:maven/ai.djl.pytorch/pytorch-model-zoo@0.38.0?type=jar",
       "dependsOn" : [
-        "pkg:maven/ai.djl.pytorch/pytorch-engine@0.37.0?type=jar"
+        "pkg:maven/ai.djl.pytorch/pytorch-engine@0.38.0?type=jar"
       ]
     },
     {
-      "ref" : "pkg:maven/ai.djl/api@0.37.0?type=jar",
+      "ref" : "pkg:maven/ai.djl/api@0.38.0?type=jar",
       "dependsOn" : [
         "pkg:maven/com.google.code.gson/gson@2.13.2?type=jar",
         "pkg:maven/net.java.dev.jna/jna@5.19.1?type=jar",
@@ -12916,7 +13050,7 @@
       ]
     },
     {
-      "ref" : "pkg:maven/ai.djl/bom@0.37.0?type=pom",
+      "ref" : "pkg:maven/ai.djl/bom@0.38.0?type=pom",
       "dependsOn" : [ ]
     },
     {
@@ -13488,7 +13622,7 @@
       "dependsOn" : [ ]
     },
     {
-      "ref" : "pkg:maven/net.bytebuddy/byte-buddy@1.18.13?type=jar",
+      "ref" : "pkg:maven/net.bytebuddy/byte-buddy@1.18.14?type=jar",
       "dependsOn" : [ ]
     },
     {
@@ -13990,6 +14124,8 @@
         "pkg:maven/org.tinylog/tinylog-impl@2.8.0?type=jar",
         "pkg:maven/tools.jackson.core/jackson-core@3.2.2?type=jar",
         "pkg:maven/tools.jackson.core/jackson-databind@3.2.2?type=jar",
+        "pkg:maven/tools.maran/svg-materialdesign@1.0.0?type=jar",
+        "pkg:maven/tools.maran/svg@1.0.0?type=jar",
         "pkg:maven/tools.maran/svgnode@2.0.0?type=jar"
       ]
     },
@@ -14094,7 +14230,7 @@
       "ref" : "pkg:maven/org.mockito/mockito-core@5.23.0?type=jar",
       "dependsOn" : [
         "pkg:maven/net.bytebuddy/byte-buddy-agent@1.17.7?type=jar",
-        "pkg:maven/net.bytebuddy/byte-buddy@1.18.13?type=jar",
+        "pkg:maven/net.bytebuddy/byte-buddy@1.18.14?type=jar",
         "pkg:maven/org.objenesis/objenesis@3.3?type=jar"
       ]
     },
@@ -14247,6 +14383,16 @@
     },
     {
       "ref" : "pkg:maven/tools.jackson/jackson-bom@3.2.2?type=pom",
+      "dependsOn" : [ ]
+    },
+    {
+      "ref" : "pkg:maven/tools.maran/svg-materialdesign@1.0.0?type=jar",
+      "dependsOn" : [
+        "pkg:maven/tools.maran/svg@1.0.0?type=jar"
+      ]
+    },
+    {
+      "ref" : "pkg:maven/tools.maran/svg@1.0.0?type=jar",
       "dependsOn" : [ ]
     },
     {
