@@ -93,7 +93,7 @@
 
     <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
 
-    <!-- LineLength not in place as PreviewerViewer and RelatedArticlesTab have line length with more than 500 charachters -->
+    <!-- LineLength not in place as PreviewerViewer and RelatedArticlesTab have line length with more than 500 characters -->
 
     <module name="TreeWalker">
         <!-- Checks for Javadoc comments: https://checkstyle.org/config_javadoc.html -->
