@@ -104,7 +104,7 @@ class LibraryMigrationActionTest {
         BibEntry marked = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
         BibEntry prioritized = new BibEntry().withField(StandardField.KEYWORDS, "prio1");
         ParserResult parserResult = parserResultNeedingAllMigrations(marked, prioritized);
-        answerDialog(true, 0);
+        answerDialog(true, 2, 0);
 
         new LibraryMigrationAction().performAction(parserResult, dialogService, preferences);
 
@@ -120,7 +120,7 @@ class LibraryMigrationActionTest {
         BibEntry marked = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
         BibEntry prioritized = new BibEntry().withField(StandardField.KEYWORDS, "prio1");
         ParserResult parserResult = parserResultNeedingAllMigrations(marked, prioritized);
-        answerDialog(false, -1);
+        answerDialog(false, 2, -1);
 
         new LibraryMigrationAction().performAction(parserResult, dialogService, preferences);
 
@@ -129,6 +129,19 @@ class LibraryMigrationActionTest {
         assertEquals(Optional.of("prio1"), prioritized.getField(StandardField.KEYWORDS));
         assertEquals(List.of("markings", "specialFieldsInKeywords"), parserResult.getMetaData().getSkippedMigrations());
         assertTrue(parserResult.getChangedOnMigration());
+    }
+
+    @Test
+    void unnecessaryMigrationHasNoCheckBoxAndIsNotRemembered() {
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        BibEntry marked = new BibEntry().withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
+        ParserResult parserResult = new ParserResult(Set.of(marked));
+        answerDialog(true, 1, -1);
+
+        new LibraryMigrationAction().performAction(parserResult, dialogService, preferences);
+
+        assertFalse(marked.hasField(InternalField.MARKED_INTERNAL));
+        assertEquals(List.of(), parserResult.getMetaData().getSkippedMigrations());
     }
 
     @Test
@@ -156,7 +169,7 @@ class LibraryMigrationActionTest {
     }
 
     /// Simulates the user: deselects the check box at `deselectedIndex` (order: markings, special fields; the legacy groups conversion has none), then closes the dialog
-    private void answerDialog(boolean migrate, int deselectedIndex) {
+    private void answerDialog(boolean migrate, int expectedCheckBoxes, int deselectedIndex) {
         when(dialogService.showCustomDialogAndWait(anyString(), any(DialogPane.class), any(ButtonType[].class))).thenAnswer(invocation -> {
             DialogPane pane = invocation.getArgument(1);
             List<CheckBox> checkBoxes = ((VBox) pane.getContent()).getChildren().stream()
@@ -165,7 +178,7 @@ class LibraryMigrationActionTest {
                                                                   .filter(CheckBox.class::isInstance)
                                                                   .map(CheckBox.class::cast)
                                                                   .toList();
-            assertEquals(2, checkBoxes.size());
+            assertEquals(expectedCheckBoxes, checkBoxes.size());
             if (deselectedIndex >= 0) {
                 checkBoxes.get(deselectedIndex).setSelected(false);
             }

@@ -45,8 +45,10 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
     /// [impl->req~import.legacy-library-migration~1]
     @Override
     public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
-        List<PostOpenMigration> migrations = getNecessaryMigrations(parserResult, preferences);
-        List<PostOpenMigration> mandatoryMigrations = migrations.stream().filter(migration -> !migration.isOptional()).toList();
+        List<PostOpenMigration> migrations = getOfferedMigrations(parserResult, preferences);
+        List<PostOpenMigration> mandatoryMigrations = migrations.stream()
+                                                                .filter(migration -> !migration.isOptional() && migration.isMigrationNecessary(parserResult))
+                                                                .toList();
         List<PostOpenMigration> optionalMigrations = migrations.stream().filter(PostOpenMigration::isOptional).toList();
         Map<PostOpenMigration, CheckBox> checkBoxes = new LinkedHashMap<>();
 
@@ -68,13 +70,24 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
             table.getColumnConstraints().addAll(descriptionColumn, performColumn);
             table.addRow(0, headerLabel(Localization.lang("Migration")), headerLabel(Localization.lang("Perform")));
             for (PostOpenMigration migration : optionalMigrations) {
-                CheckBox checkBox = new CheckBox();
-                checkBox.setSelected(true);
-                checkBox.setAccessibleText(migration.getDescription());
-                checkBoxes.put(migration, checkBox);
-                table.addRow(table.getRowCount(), wrappingLabel(migration.getDescription()), checkBox);
+                Label description = wrappingLabel(migration.getDescription());
+                if (migration.isMigrationNecessary(parserResult)) {
+                    CheckBox checkBox = new CheckBox();
+                    checkBox.setSelected(true);
+                    checkBox.setAccessibleText(migration.getDescription());
+                    checkBoxes.put(migration, checkBox);
+                    table.addRow(table.getRowCount(), description, checkBox);
+                } else {
+                    // Listed nevertheless, so the user sees that the library was checked for this format
+                    Label notApplicable = new Label(Localization.lang("(n/a)"));
+                    description.getStyleClass().add("text-muted");
+                    notApplicable.getStyleClass().add("text-muted");
+                    table.addRow(table.getRowCount(), description, notApplicable);
+                }
             }
             content.getChildren().add(table);
+        }
+        if (!checkBoxes.isEmpty()) {
             content.getChildren().add(wrappingLabel(Localization.lang("Deselected conversions are remembered in the library and not offered again.")));
         }
         DialogPane dialogPane = new DialogPane();
@@ -105,6 +118,13 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
     }
 
     static List<PostOpenMigration> getNecessaryMigrations(ParserResult parserResult, CliPreferences preferences) {
+        return getOfferedMigrations(parserResult, preferences).stream()
+                                                              .filter(migration -> migration.isMigrationNecessary(parserResult))
+                                                              .toList();
+    }
+
+    /// All migrations except the ones the user declined for this library
+    private static List<PostOpenMigration> getOfferedMigrations(ParserResult parserResult, CliPreferences preferences) {
         Character keywordSeparator = parserResult.getDatabaseContext().getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator());
         List<String> skippedMigrations = parserResult.getMetaData().getSkippedMigrations();
         return Stream.of(
@@ -113,7 +133,6 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
                              new SpecialFieldsToSeparateFields(keywordSeparator))
                      // A stored skip never silences a mandatory conversion: without it, saving would lose data
                      .filter(migration -> !migration.isOptional() || !skippedMigrations.contains(migration.getId()))
-                     .filter(migration -> migration.isMigrationNecessary(parserResult))
                      .toList();
     }
 
