@@ -28,7 +28,7 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.38.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.20.1"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.20.2"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
@@ -133,9 +133,9 @@ dependencies.constraints {
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent:7.8.0.202609011348-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
-    api("org.glassfish.hk2:hk2-api:4.0.2")
-    api("org.glassfish.hk2:hk2-locator:4.0.2")
-    api("org.glassfish.hk2:hk2-utils:4.0.2")
+    api("org.glassfish.hk2:hk2-api:4.0.3")
+    api("org.glassfish.hk2:hk2-locator:4.0.3")
+    api("org.glassfish.hk2:hk2-utils:4.0.3")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.4.Final")
