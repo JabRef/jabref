@@ -62,7 +62,7 @@ class AbbreviationCheckerTest {
     }
 
     @Test
-    void checkEntryWorksForLaTeXFieldStilContainingIllegalChars() {
+    void checkEntryWorksForLaTeXFieldStillContainingIllegalChars() {
         entry.setField(StandardField.BOOKTITLE, "Proceedings of the 5\\({}^{\\mbox{th}}\\) Central-European Workshop on Services and their Composition, Rostock, Germany, February 21-22, 2013");
         assertEquals(List.of(), checker.check(entry));
     }

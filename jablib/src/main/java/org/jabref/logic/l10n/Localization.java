@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 ///
 /// The access to this is given by the functions [#lang(String, Object...)] and
 /// that developers should use whenever they use strings for the e.g. GUI that need to be translatable.
-@AllowedToUseStandardStreams("Needs to have acess to System.err because it's called very early before our loggers")
+@AllowedToUseStandardStreams("Needs to have access to System.err because it's called very early before our loggers")
 public class Localization {
     static final String RESOURCE_PREFIX = "l10n/JabRef";
     private static Locale locale;

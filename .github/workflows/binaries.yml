@@ -961,14 +961,14 @@ jobs:
           ARCH: ${{ matrix.arch }}
           ARCHIVE: ${{ matrix.archive }}
         run: |
-          jq --arg arch "$ARCH" --arg archive "$ARCHIVE" '
+          flatpak-builder --show-manifest flatpak/org.jabref.jabref.yaml | jq --arg arch "$ARCH" --arg archive "$ARCHIVE" '
             .modules[0].sources |= map(
               if .["only-arches"] == [$arch]
               then del(.url, .sha256) + {"path": $archive}
               else .
               end
             )
-          ' flatpak/org.jabref.jabref.json > flatpak/org.jabref.jabref.ci.json
+          ' > flatpak/org.jabref.jabref.ci.json
 
       - name: Build and upload Flatpak
         uses: flatpak/flatpak-github-actions/flatpak-builder@79327416609af08178ad73b352877e51450790b3 # v6

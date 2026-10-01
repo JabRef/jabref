@@ -35,7 +35,7 @@ Thus, we ensure that all of JabRef's code follows the same code style.
 Binaries are created using [gradle](https://gradle.org).
 In case of an internal pull request, they are uploaded to <https://builds.jabref.org>.
 These binaries are created without any checks to have them available as quickly as possible, even if the localization or some fetchers are broken.
-You can fnd the deployment workflow runs at: <https://github.com/JabRef/jabref/actions?workflow=Deployment>.
+You can find the deployment workflow runs at: <https://github.com/JabRef/jabref/actions?workflow=Deployment>.
 
 ## Branches
 
