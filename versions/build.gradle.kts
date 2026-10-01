@@ -82,6 +82,7 @@ dependencies.constraints {
     api("commons-logging:commons-logging:1.4.0")
     api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
+    api("de.sandec:JMemoryBuddy:0.5.1")
     api("de.saxsys:mvvmfx:1.8.0")
     api("de.undercouch:citeproc-java:3.5.2")
     api("info.debatty:java-string-similarity:2.0.0")
@@ -166,5 +167,5 @@ dependencies.constraints {
     api("tech.units:indriya:2.2.4")
     api("tools.maran:svg:1.0.0")
     api("tools.maran:svg-materialdesign:1.0.0")
-    api("tools.maran:svgnode:2.0.0")
+    api("tools.maran:svgnode:2.0.1")
 }

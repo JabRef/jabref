@@ -56,8 +56,14 @@ def add_logo(root, source, color):
 
 def dark_artwork(source, destination):
     root = ET.Element(f"{SVG}svg", {"width": "1024", "height": "1024", "viewBox": "0 0 1024 1024"})
+    defs = ET.SubElement(root, f"{SVG}defs")
+    gradient = ET.SubElement(defs, f"{SVG}linearGradient", {
+        "id": "bg", "x1": "0", "y1": "0", "x2": "0", "y2": "1",
+    })
+    ET.SubElement(gradient, f"{SVG}stop", {"offset": "0%", "stop-color": "#2d2d2d"})
+    ET.SubElement(gradient, f"{SVG}stop", {"offset": "100%", "stop-color": "#0c0c0c"})
     ET.SubElement(root, f"{SVG}rect", {
-        "x": "100", "y": "100", "width": "824", "height": "824", "rx": "195", "fill": "#202b4b",
+        "x": "100", "y": "100", "width": "824", "height": "824", "rx": "195", "fill": "url(#bg)",
     })
     add_logo(root, source, "#c4d0f0")
     ET.indent(root, space="  ")
