@@ -8,7 +8,10 @@
     {
       "appearance": "dark",
       "value": {
-        "solid": "srgb:0.125490,0.168627,0.294118,1"
+        "linear-gradient": [
+          "gray:0.192,1",
+          "gray:0.078,1"
+        ]
       }
     }
   ],
