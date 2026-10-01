@@ -72,6 +72,11 @@ public interface StateManager extends SrvStateManager {
 
     void setSearchContext(BibDatabaseContext database, SearchContext searchContext);
 
+    /// Drops the [SearchContext] of a library that is closing. It holds the search backends and the
+    /// factories that build them, and those capture the tab that created it, so leaving the
+    /// registration behind keeps the whole closed library alive.
+    void removeSearchContext(BibDatabaseContext database);
+
     void setSelectedEntries(List<BibEntry> newSelectedEntries);
 
     void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups);

@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ReplaceTabsBySpaceFormaterTest {
+class ReplaceTabsBySpaceFormatterTest {
 
-    private ReplaceTabsBySpaceFormater formatter;
+    private ReplaceTabsBySpaceFormatter formatter;
 
     @BeforeEach
     void setUp() {
-        formatter = new ReplaceTabsBySpaceFormater();
+        formatter = new ReplaceTabsBySpaceFormatter();
     }
 
     @Test
