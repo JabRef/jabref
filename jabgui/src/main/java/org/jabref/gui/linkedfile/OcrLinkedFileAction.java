@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
@@ -88,25 +89,15 @@ public class OcrLinkedFileAction extends SimpleCommand {
                     }
                 }
                 case OcrResult.Failure failure -> {
-                    String failureReason = failure.reason().getMessage(ocrEngine.getName(),
+                    String failureReason = failure.reason().getMessage(
+                            ocrEngine.getName(),
                             preferences.getOcrPreferences().getOcrEnginePath());
 
-                    String detailedMessage = failureReason;
-                    if (!failure.command().isEmpty()) {
-                        detailedMessage += "\n\n"
-                                + Localization.lang("Command")
-                                + ":\n"
-                                + String.join(" ", failure.command());
-                    }
+                    String detailedMessage = buildFailureMessage(failureReason, failure);
 
-                    if (!failure.output().isBlank()) {
-                        detailedMessage += "\n\n"
-                                + Localization.lang("Output")
-                                + ":\n"
-                                + failure.output();
-                    }
-
-                    dialogService.showErrorDialogAndWait(Localization.lang("OCR failed"), detailedMessage);
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("OCR failed"),
+                            detailedMessage);
                 }
             }
         });
@@ -115,6 +106,35 @@ public class OcrLinkedFileAction extends SimpleCommand {
             dialogService.notify(Localization.lang("OCR failed. See the logs for the details"));
         });
         taskExecutor.execute(ocrTask);
+    }
+
+    static String buildFailureMessage(String failureReason, OcrResult.Failure failure) {
+        String detailedMessage = failureReason;
+
+        if (!failure.command().isEmpty()) {
+            detailedMessage += "\n\n"
+                    + Localization.lang(
+                    "Command\n%0",
+                    formatCommand(failure.command()));
+        }
+
+        if (!failure.output().isBlank()) {
+            detailedMessage += "\n\n"
+                    + Localization.lang(
+                    "Output\n%0",
+                    failure.output());
+        }
+
+        return detailedMessage;
+    }
+
+    static String formatCommand(List<String> command) {
+        return command.stream()
+                      .map(argument -> "\""
+                              + argument.replace("\\", "\\\\")
+                                        .replace("\"", "\\\"")
+                              + "\"")
+                      .collect(Collectors.joining(System.lineSeparator()));
     }
 
     private class OcredFileSuccessNotification extends Notifications.FileNotification {

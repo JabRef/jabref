@@ -17,6 +17,13 @@ public sealed interface OcrResult {
     ///
     /// Contains the failure reason and diagnostic information from the OCR process.
     record Failure(OcrFailureReason reason, List<String> command, String output) implements OcrResult {
+        public Failure {
+            command = List.copyOf(command);
+        }
+
+        public Failure(OcrFailureReason reason) {
+            this(reason, List.of(), "");
+        }
     }
 
     /// Checks if this result is success.
