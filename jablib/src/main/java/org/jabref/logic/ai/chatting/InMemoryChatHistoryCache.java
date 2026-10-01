@@ -121,19 +121,22 @@ public class InMemoryChatHistoryCache {
         LOGGER.debug("Flushing {} entry chats and {} group chats to repository",
                 entryChats.size(), groupChats.size());
 
-        entryChats.forEach((entry, cached) -> flushEntryChat(entry, cached.databaseContext(), cached.chatHistory()));
-        groupChats.forEach((group, cached) -> flushGroupChat(group, cached.databaseContext(), cached.chatHistory()));
-
-        entryChats.values().forEach(cached -> cached.chatHistory().removeListener(cached.writeThrough()));
-        groupChats.values().forEach(cached -> cached.chatHistory().removeListener(cached.writeThrough()));
-        closed = true;
+        try {
+            entryChats.forEach((entry, cached) -> flushEntryChat(entry, cached.databaseContext(), cached.chatHistory()));
+            groupChats.forEach((group, cached) -> flushGroupChat(group, cached.databaseContext(), cached.chatHistory()));
+        } finally {
+            entryChats.values().forEach(cached -> cached.chatHistory().removeListener(cached.writeThrough()));
+            groupChats.values().forEach(cached -> cached.chatHistory().removeListener(cached.writeThrough()));
+            closed = true;
+        }
 
         LOGGER.debug("Finished flushing chat histories to repository");
     }
 
     private synchronized void flushEntryChat(BibEntry entry, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
         ChatIdentifier.from(databaseContext, entry).ifPresent(identifier ->
-                flushChat(databaseContext.getDatabase().getEntries().contains(entry), identifier, chatHistory, "entry"));
+                // Identity, not equals: two equal duplicates must not keep each other's chat alive
+                flushChat(databaseContext.getDatabase().getEntries().stream().anyMatch(inDatabase -> inDatabase == entry), identifier, chatHistory, "entry"));
     }
 
     private synchronized void flushGroupChat(GroupTreeNode group, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
@@ -168,9 +171,16 @@ public class InMemoryChatHistoryCache {
             LOGGER.debug("Cleared old chat history for {} {}", entityType, previous.chatName());
         });
 
-        repository.clear(currentIdentifier);
-        chatHistory.forEach(message -> repository.addMessage(currentIdentifier, message));
-        repository.commit();
+        // A storage failure must not abort the chat operation that triggered this write: the history stays
+        // in memory and the next change (or close()) retries the whole list.
+        try {
+            repository.clear(currentIdentifier);
+            chatHistory.forEach(message -> repository.addMessage(currentIdentifier, message));
+            repository.commit();
+        } catch (RuntimeException e) {
+            LOGGER.error("Unable to store chat history for {} {}", entityType, currentIdentifier.chatName(), e);
+            return;
+        }
         persistedAt.put(chatHistory, currentIdentifier);
 
         LOGGER.debug("Flushed chat history for {} {} ({} messages)", entityType, currentIdentifier.chatName(), chatHistory.size());
