@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import javafx.geometry.HPos;
+import javafx.scene.Node;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -32,8 +33,8 @@ import org.jspecify.annotations.NullMarked;
 
 /// Offers the conversion of libraries written by older JabRef versions to the current data format.
 ///
-/// Every [PostOpenMigration] that would change the library is listed, so the user sees what JabRef is about
-/// to rewrite. Conversions whose old format is still written get a check box to keep the old data.
+/// The [PostOpenMigration]s are listed in a table, so the user sees what JabRef is about to rewrite.
+/// Conversions whose old format is still written get a check box to keep the old data.
 @NullMarked
 public class LibraryMigrationAction implements GUIPostOpenAction {
 
@@ -45,47 +46,45 @@ public class LibraryMigrationAction implements GUIPostOpenAction {
     /// [impl->req~import.legacy-library-migration~1]
     @Override
     public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
-        List<PostOpenMigration> migrations = getOfferedMigrations(parserResult, preferences);
-        List<PostOpenMigration> mandatoryMigrations = migrations.stream()
-                                                                .filter(migration -> !migration.isOptional() && migration.isMigrationNecessary(parserResult))
-                                                                .toList();
-        List<PostOpenMigration> optionalMigrations = migrations.stream().filter(PostOpenMigration::isOptional).toList();
+        List<PostOpenMigration> mandatoryMigrations = new ArrayList<>();
         Map<PostOpenMigration, CheckBox> checkBoxes = new LinkedHashMap<>();
+
+        GridPane table = new GridPane(10, 10);
+        ColumnConstraints descriptionColumn = new ColumnConstraints();
+        descriptionColumn.setHgrow(Priority.ALWAYS);
+        ColumnConstraints performColumn = new ColumnConstraints();
+        performColumn.setHalignment(HPos.CENTER);
+        // Otherwise the long descriptions squeeze the column and its header wraps letter by letter
+        performColumn.setMinWidth(Region.USE_PREF_SIZE);
+        table.getColumnConstraints().addAll(descriptionColumn, performColumn);
+        table.addRow(0, headerLabel(Localization.lang("Migration")), headerLabel(Localization.lang("Perform")));
+        for (PostOpenMigration migration : getOfferedMigrations(parserResult, preferences)) {
+            Label description = wrappingLabel(migration.getDescription());
+            Node perform;
+            if (!migration.isMigrationNecessary(parserResult)) {
+                // Listed nevertheless, so the user sees that the library was checked for this format
+                perform = new Label(Localization.lang("(n/a)"));
+                description.getStyleClass().add("text-muted");
+                perform.getStyleClass().add("text-muted");
+            } else if (migration.isOptional()) {
+                CheckBox checkBox = new CheckBox();
+                checkBox.setSelected(true);
+                checkBox.setAccessibleText(migration.getDescription());
+                checkBoxes.put(migration, checkBox);
+                perform = checkBox;
+            } else {
+                mandatoryMigrations.add(migration);
+                perform = new Label(Localization.lang("always"));
+            }
+            table.addRow(table.getRowCount(), description, perform);
+        }
 
         VBox content = new VBox(10);
         content.setPrefWidth(600);
         content.getChildren().add(wrappingLabel(Localization.lang("This library uses data formats of older JabRef versions.")));
+        content.getChildren().add(table);
         if (!mandatoryMigrations.isEmpty()) {
-            content.getChildren().add(headerLabel(Localization.lang("Always performed, because JabRef no longer writes the old format")));
-            mandatoryMigrations.forEach(migration -> content.getChildren().add(wrappingLabel(migration.getDescription())));
-        }
-        if (!optionalMigrations.isEmpty()) {
-            GridPane table = new GridPane(10, 10);
-            ColumnConstraints descriptionColumn = new ColumnConstraints();
-            descriptionColumn.setHgrow(Priority.ALWAYS);
-            ColumnConstraints performColumn = new ColumnConstraints();
-            performColumn.setHalignment(HPos.CENTER);
-            // Otherwise the long descriptions squeeze the column and its header wraps letter by letter
-            performColumn.setMinWidth(Region.USE_PREF_SIZE);
-            table.getColumnConstraints().addAll(descriptionColumn, performColumn);
-            table.addRow(0, headerLabel(Localization.lang("Migration")), headerLabel(Localization.lang("Perform")));
-            for (PostOpenMigration migration : optionalMigrations) {
-                Label description = wrappingLabel(migration.getDescription());
-                if (migration.isMigrationNecessary(parserResult)) {
-                    CheckBox checkBox = new CheckBox();
-                    checkBox.setSelected(true);
-                    checkBox.setAccessibleText(migration.getDescription());
-                    checkBoxes.put(migration, checkBox);
-                    table.addRow(table.getRowCount(), description, checkBox);
-                } else {
-                    // Listed nevertheless, so the user sees that the library was checked for this format
-                    Label notApplicable = new Label(Localization.lang("(n/a)"));
-                    description.getStyleClass().add("text-muted");
-                    notApplicable.getStyleClass().add("text-muted");
-                    table.addRow(table.getRowCount(), description, notApplicable);
-                }
-            }
-            content.getChildren().add(table);
+            content.getChildren().add(wrappingLabel(Localization.lang("Conversions marked with 'always' cannot be skipped, because JabRef no longer writes the old format.")));
         }
         if (!checkBoxes.isEmpty()) {
             content.getChildren().add(wrappingLabel(Localization.lang("Deselected conversions are remembered in the library and not offered again.")));

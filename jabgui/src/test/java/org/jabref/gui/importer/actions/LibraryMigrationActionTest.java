@@ -168,7 +168,7 @@ class LibraryMigrationActionTest {
         return parserResult;
     }
 
-    /// Simulates the user: deselects the check box at `deselectedIndex` (order: markings, special fields; the legacy groups conversion has none), then closes the dialog
+    /// Simulates the user: deselects the check box at `deselectedIndex` (order: markings, special fields; the legacy groups conversion is marked "always" instead), then closes the dialog
     private void answerDialog(boolean migrate, int expectedCheckBoxes, int deselectedIndex) {
         when(dialogService.showCustomDialogAndWait(anyString(), any(DialogPane.class), any(ButtonType[].class))).thenAnswer(invocation -> {
             DialogPane pane = invocation.getArgument(1);
