@@ -124,8 +124,8 @@ public enum StandardActions implements Action {
     EDIT_EXISTING_STUDY(Localization.lang("Manage study definition")),
 
     OPEN_DATABASE_FOLDER(Localization.lang("Reveal in file explorer")),
-    OPEN_FOLDER(Localization.lang("Open folder(s)"), Localization.lang("Open folder"), IconTheme.JabRefIcons.FOLDER, KeyBinding.OPEN_FOLDER),
-    OPEN_FILE(Localization.lang("Open file(s)"), Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
+    OPEN_FOLDER(Localization.lang("Open folder(s)"), IconTheme.JabRefIcons.FOLDER, KeyBinding.OPEN_FOLDER),
+    OPEN_FILE(Localization.lang("Open file(s)"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     OPEN_CONSOLE(Localization.lang("Open terminal here"), Localization.lang("Open terminal here"), IconTheme.JabRefIcons.CONSOLE, KeyBinding.OPEN_CONSOLE),
     SORT_TABS_ALPHABETICALLY(Localization.lang("Sort tabs alphabetically")),
     COPY_LINKED_FILES(Localization.lang("Copy linked file(s) to folder...")),
@@ -202,6 +202,7 @@ public enum StandardActions implements Action {
     OPEN_CHANGELOG(Localization.lang("View change log"), Localization.lang("See what has been changed in the JabRef versions")),
     OPEN_GITHUB("GitHub", Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB),
     DONATE(Localization.lang("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE),
+    CONTRIBUTE(Localization.lang("Contribute to JabRef"), Localization.lang("Contribute to JabRef"), IconTheme.JabRefIcons.CONTRIBUTE),
     OPEN_FORUM(Localization.lang("Community forum"), Localization.lang("Community forum"), IconTheme.JabRefIcons.FORUM),
     ERROR_CONSOLE(Localization.lang("View event log"), Localization.lang("Display all error messages")),
     SEARCH_FOR_UPDATES(Localization.lang("Check for updates")),
