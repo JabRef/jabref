@@ -20,7 +20,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
     public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository) {
         this(action, keyBindingRepository);
 
-        setEventHandler(event -> command.execute());
+        setEventHandler(_ -> command.execute());
 
         disabledProperty().bind(command.executableProperty().not());
 

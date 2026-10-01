@@ -285,7 +285,7 @@ public abstract class NativeDesktop {
     ///
     /// @param url the URL to open
     public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
-        openBrowser(url, externalApplicationsPreferences, e -> {
+        openBrowser(url, externalApplicationsPreferences, _ -> {
             // Terminal failure is already logged where it is caught
         });
     }

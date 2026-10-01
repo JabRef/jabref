@@ -56,7 +56,7 @@ public class SidePane extends VBox {
                 clipBoardManager,
                 gitHandlerRegistry);
 
-        stateManager.getVisibleSidePaneComponents().addListener((ListChangeListener<SidePaneType>) c -> updateView());
+        stateManager.getVisibleSidePaneComponents().addListener((ListChangeListener<SidePaneType>) _ -> updateView());
         updateView();
     }
 

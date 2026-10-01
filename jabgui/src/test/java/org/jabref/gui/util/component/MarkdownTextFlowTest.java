@@ -204,6 +204,61 @@ class MarkdownTextFlowTest extends JavaFxTest {
     }
 
     @Test
+    void doubleClickSelectsWord() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setPlainText("hello world");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        JavaFxExtension.invokeAndWait(() -> {
+            Bounds bounds = firstTextBounds(textFlow);
+            Robot robot = new Robot();
+            robot.mouseMove(bounds.getMinX() + 3, bounds.getMinY() + (bounds.getHeight() / 2));
+            robot.mouseClick(MouseButton.PRIMARY);
+            robot.mouseClick(MouseButton.PRIMARY);
+        });
+        interact(() -> {
+            assertTrue(textFlow.isSelectionActive());
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("hello", clipBoardManager.stringContent.get());
+    }
+
+    @Test
+    void doubleClickAfterHyperlinkSelectsClickedWord() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdown("[link](https://example.com) hello world");
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.applyCss();
+            textFlow.autosize();
+            textFlow.layout();
+        });
+        JavaFxExtension.invokeAndWait(() -> {
+            Node lastText = textFlow.getChildren().getLast();
+            Bounds bounds = lastText.localToScreen(lastText.getBoundsInLocal());
+            Robot robot = new Robot();
+            robot.mouseMove(bounds.getMaxX() - 3, bounds.getMinY() + (bounds.getHeight() / 2));
+            robot.mouseClick(MouseButton.PRIMARY);
+            robot.mouseClick(MouseButton.PRIMARY);
+        });
+        interact(() -> {
+            assertTrue(textFlow.isSelectionActive());
+            textFlow.copySelectedText();
+        });
+
+        assertEquals("world", clipBoardManager.stringContent.get());
+    }
+
+    @Test
     void hyperlinkHandlerDefaultsToNonNull() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
@@ -224,6 +279,31 @@ class MarkdownTextFlowTest extends JavaFxTest {
             Hyperlink hyperlink = (Hyperlink) textFlow.getChildren().getFirst();
             hyperlink.fire();
         });
+
+        assertEquals("https://example.com", clickedUrl.get());
+    }
+
+    @Test
+    void mouseClickOnHyperlinkInvokesCustomHandler() {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+        AtomicReference<String> clickedUrl = new AtomicReference<>();
+
+        interact(() -> {
+            textFlow.setHyperlinkHandler(clickedUrl::set);
+            textFlow.setMarkdown("[link](https://example.com)");
+            rootPane.applyCss();
+            rootPane.layout();
+        });
+        awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            Hyperlink hyperlink = (Hyperlink) textFlow.getChildren().getFirst();
+            Bounds bounds = hyperlink.localToScreen(hyperlink.getBoundsInLocal());
+            Robot robot = new Robot();
+            robot.mouseMove(bounds.getCenterX(), bounds.getCenterY());
+            robot.mouseClick(MouseButton.PRIMARY);
+        });
+        awaitEvents();
 
         assertEquals("https://example.com", clickedUrl.get());
     }
