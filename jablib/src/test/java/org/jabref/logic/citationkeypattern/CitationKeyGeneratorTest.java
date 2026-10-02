@@ -1,5 +1,6 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -1203,6 +1204,43 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.AUTHOR, author)
                 .withField(StandardField.YEAR, "2016");
         assertEquals(expected, generateKey(entry, "[auth:transliterate:camel][authForeIni:transliterate:truncate1:upper][year]"));
+    }
+
+    /// 王 and 汪 are different surnames that both transliterate to "Wang"
+    @Test
+    void addingEntryWithCollidingPinyinKeepsExistingKey() {
+        BibEntry existingWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "王, 小明")
+                .withField(StandardField.YEAR, "2020")
+                .withCitationKey("Wang2020");
+        BibEntry addedWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "汪, 小明")
+                .withField(StandardField.YEAR, "2020");
+        BibDatabase database = new BibDatabase(List.of(existingWang, addedWang));
+
+        addedWang.setCitationKey(generateKey(addedWang, "[auth:transliterate:camel][year]", database));
+
+        assertEquals(List.of(Optional.of("Wang2020"), Optional.of("Wang2020a")),
+                List.of(existingWang.getCitationKey(), addedWang.getCitationKey()));
+    }
+
+    @Test
+    void regeneratingKeysWithCollidingPinyinKeepsExistingKeysWhenSuffixedEntryComesFirst() {
+        BibEntry firstWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "王, 小明")
+                .withField(StandardField.YEAR, "2020")
+                .withCitationKey("Wang2020");
+        BibEntry secondWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "汪, 小明")
+                .withField(StandardField.YEAR, "2020")
+                .withCitationKey("Wang2020a");
+        BibDatabase database = new BibDatabase(List.of(firstWang, secondWang));
+
+        List.of(secondWang, firstWang).forEach(entry ->
+                entry.setCitationKey(generateKey(entry, "[auth:transliterate:camel][year]", database)));
+
+        assertEquals(List.of(Optional.of("Wang2020"), Optional.of("Wang2020a")),
+                List.of(firstWang.getCitationKey(), secondWang.getCitationKey()));
     }
 }
 
