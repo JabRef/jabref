@@ -82,7 +82,7 @@ dependencies.constraints {
     api("commons-logging:commons-logging:1.4.0")
     api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
-    api("de.sandec:JMemoryBuddy:0.5.5")
+    api("one.jpro:jmemorybuddy:0.6.0")
     api("de.saxsys:mvvmfx:1.8.0")
     api("de.undercouch:citeproc-java:3.5.2")
     api("info.debatty:java-string-similarity:2.0.0")
