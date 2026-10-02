@@ -32,7 +32,7 @@ dependencies {
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
-    api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
+    api(platform("org.glassfish.jersey:jersey-bom:4.0.3"))
     api(platform("tools.jackson:jackson-bom:3.2.3"))
 }
 
