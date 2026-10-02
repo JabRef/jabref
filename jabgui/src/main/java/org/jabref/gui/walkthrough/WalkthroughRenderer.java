@@ -61,7 +61,7 @@ public class WalkthroughRenderer {
 
         StackPane titleContainer = new StackPane();
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
-        titleFlow.getStyleClass().addAll("walkthrough-title", "h2");
+        titleFlow.getStyleClass().add("walkthrough-title");
         titleFlow.setMarkdown(step.title());
         titleContainer.getChildren().add(titleFlow);
 
