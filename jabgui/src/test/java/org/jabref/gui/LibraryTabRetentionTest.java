@@ -41,7 +41,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
-import de.sandec.jmemorybuddy.JMemoryBuddy;
+import one.jpro.jmemorybuddy.JMemoryBuddy;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
