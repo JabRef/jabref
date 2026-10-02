@@ -163,7 +163,7 @@ public class GroupTreeView extends BorderPane {
         expansionNodeColumn.setResizable(false);
 
         addSubgroupColumn = new TreeTableColumn<>();
-        addSubgroupColumn.getStyleClass().addAll("addSubgroupColumn", "padding-0");
+        addSubgroupColumn.getStyleClass().add("addSubgroupColumn");
         addSubgroupColumn.setMinWidth(ADD_SUBGROUP_COL_WIDTH);
         addSubgroupColumn.setMaxWidth(ADD_SUBGROUP_COL_WIDTH);
         addSubgroupColumn.setPrefWidth(ADD_SUBGROUP_COL_WIDTH);
