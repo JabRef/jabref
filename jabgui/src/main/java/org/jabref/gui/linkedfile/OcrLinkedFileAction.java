@@ -97,7 +97,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
         ocrTask.onFailure(exception -> {
             LOGGER.error("Unexpected error during OCR", exception);
             dialogService.notify(Localization.lang("OCR failed. See the logs for the details"));
-        });
+        }).showsFailureToUser();
         taskExecutor.execute(ocrTask);
     }
 
