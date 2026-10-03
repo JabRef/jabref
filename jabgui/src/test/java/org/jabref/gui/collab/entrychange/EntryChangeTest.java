@@ -38,6 +38,7 @@ class EntryChangeTest {
         databaseContext = new BibDatabaseContext(new BibDatabase(List.of(localEntry)));
     }
 
+    // [utest->req~ux.external-library-changes.entry-in-place~1]
     @Test
     void applyingKeepsTheEntryInstance() {
         new EntryChange(localEntry, diskEntry, databaseContext).applyChange(new CompoundEdit("Merge"));
@@ -54,6 +55,7 @@ class EntryChangeTest {
         assertTrue(localEntry.hasChanged());
     }
 
+    // [utest->req~ux.external-library-changes.entry-in-place~1]
     @Test
     void undoingRestoresTheLocalContentAndChangedFlag() {
         BibEntry original = new BibEntry(localEntry);

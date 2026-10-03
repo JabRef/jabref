@@ -42,6 +42,7 @@ public final class EntryChange extends DatabaseChange {
 
     /// Changes the entry in place rather than replacing it, so it keeps its identity: table position, selection, and
     /// an open entry editor stay as they are.
+    // [impl->req~ux.external-library-changes.entry-in-place~1]
     @Override
     public void applyChange(CompoundEdit undoEdit) {
         // First in the compound, so that undo restores it after the field edits have marked the entry changed again
