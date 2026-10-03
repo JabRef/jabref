@@ -214,8 +214,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         configureButton.graphicProperty().bind(
                 item.useCustomApiKeyProperty().map(value ->
                         value
-                               ? IconTheme.JabRefIcons.SUCCESS.getGraphicNode()
-                               : IconTheme.JabRefIcons.MAKE_KEY.getGraphicNode()
+                        ? IconTheme.JabRefIcons.SUCCESS.getGraphicNode()
+                        : IconTheme.JabRefIcons.MAKE_KEY.getGraphicNode()
                 )
         );
 
