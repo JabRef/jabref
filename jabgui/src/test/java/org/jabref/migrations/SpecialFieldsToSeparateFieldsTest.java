@@ -14,6 +14,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SpecialFieldsToSeparateFieldsTest {
 
@@ -45,6 +47,33 @@ class SpecialFieldsToSeparateFieldsTest {
                                        .withField(StandardField.KEYWORDS, "asdf, asdf, asdf");
         BibEntry expected = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
                                           .withField(StandardField.KEYWORDS, "asdf, asdf, asdf");
+
+        new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
+
+        assertEquals(expected, entry);
+    }
+
+    @Test
+    void plainEnglishKeywordsDoNotTriggerMigration() {
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "read, printed, relevant");
+
+        assertFalse(new SpecialFieldsToSeparateFields(',').isMigrationNecessary(new ParserResult(List.of(entry))));
+    }
+
+    @Test
+    void legacyPriorityKeywordTriggersMigration() {
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "tdd, prio1");
+
+        assertTrue(new SpecialFieldsToSeparateFields(',').isMigrationNecessary(new ParserResult(List.of(entry))));
+    }
+
+    @Test
+    void conflictingSpecialFieldValueIsKept() {
+        BibEntry entry = new BibEntry().withField(SpecialField.PRIORITY, "prio3")
+                                       .withField(StandardField.KEYWORDS, "prio1, rank2");
+        BibEntry expected = new BibEntry().withField(SpecialField.PRIORITY, "prio3")
+                                          .withField(SpecialField.RANKING, "rank2")
+                                          .withField(StandardField.KEYWORDS, "prio1");
 
         new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 
