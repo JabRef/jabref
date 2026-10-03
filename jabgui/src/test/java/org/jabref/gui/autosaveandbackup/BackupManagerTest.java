@@ -19,7 +19,10 @@ import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
@@ -238,5 +241,39 @@ class BackupManagerTest {
         // we only know the first backup path because the second one is created on shutdown
         // due to timing issues we cannot test that reliable
         assertEquals(fullBackupPath.get(), files.getFirst());
+    }
+
+    @Test
+        // [utest->req~jabgui.autosaveandbackup.backup-listens~1]
+    void minorFieldChangeStillTriggersABackup(@TempDir Path customDir) throws IOException {
+        Path backupDir = customDir.resolve("subBackupDir");
+        Files.createDirectories(backupDir);
+
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.setDatabasePath(customDir.resolve("Bibfile.bib"));
+
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
+        when(filePreferences.shouldCreateBackup()).thenReturn(true);
+
+        BackupManager manager = BackupManager.start(
+                mock(LibraryTab.class),
+                databaseContext,
+                mock(CoarseChangeFilter.class),
+                mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
+                preferences);
+
+        // A single typed character: the CoarseChangeFilter marks this as a minor change
+        FieldChangedEvent keystroke = new FieldChangedEvent(new BibEntry(), StandardField.DOI, "10.1", "10.10");
+        keystroke.setFiltered(true);
+        manager.listen(keystroke);
+
+        Path backupPath = manager.determineBackupPathForNewBackup(backupDir).orElseThrow();
+        manager.performBackup(backupPath);
+        BackupManager.shutdown(databaseContext, backupDir, false);
+
+        assertTrue(Files.exists(backupPath));
     }
 }
