@@ -13,7 +13,8 @@ class JabRefGuiPreferencesTest {
     private static Stream<Arguments> provideTestData() {
         return Stream.of(
                 Arguments.of(List.of("A", "B", "C", "D"), "A;B;C;D"),
-                Arguments.of(List.of("A", "B", "C", ""), "A;B;C;")
+                Arguments.of(List.of("A", "B", "C", ""), "A;B;C;"),
+                Arguments.of(List.of("Key;WithDelimiter", "", "C:\\Users\\x.bib"), "Key\\;WithDelimiter;;C:\\\\Users\\\\x.bib")
         );
     }
 
