@@ -43,6 +43,7 @@ public class BaseDialog<T> extends Dialog<T> {
         setResizable(true);
     }
 
+    /// [impl->req~ux.dialogs.close-key-binding~1]
     public static boolean closeOnKeyBindingMatch(KeyEvent event, Dialog<?> dialog) {
         KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
         if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
@@ -70,9 +71,20 @@ public class BaseDialog<T> extends Dialog<T> {
         dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyEvent);
     }
 
+    /// Heavy-weight dialogs such as the PDF viewer override this to keep their state on a stray "Close dialog" key.
+    protected boolean closesOnCloseKeyBinding() {
+        return true;
+    }
+
     private void handleKeyEvent(KeyEvent event) {
-        boolean closed = closeOnKeyBindingMatch(event, this);
-        if (closed) {
+        if (!closesOnCloseKeyBinding()) {
+            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+            // Escape is consumed as well: JavaFX's own stage handler closes a dialog with a cancel button on an unconsumed Escape
+            if (event.getCode() == KeyCode.ESCAPE || keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                event.consume();
+                return;
+            }
+        } else if (closeOnKeyBindingMatch(event, this)) {
             return;
         }
 
