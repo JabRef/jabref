@@ -6,7 +6,6 @@ import java.util.TreeMap;
 
 import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTask;
 import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTaskRequest;
-import org.jabref.logic.ai.util.TrackedBackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
@@ -54,7 +53,8 @@ public class SummarizationTaskAggregator {
             return startNewTask(request, showToUser);
         }
 
-        if (task.get().getStatus() == TrackedBackgroundTask.Status.CANCELLED && request.regenerate()) {
+        // A cancelled task ends as ERROR without running onFinished, so it stays in the map
+        if (task.get().getStatus().isFinished() && request.regenerate()) {
             tasks.remove(request.fullEntry().entry());
             return startNewTask(request, showToUser);
         }
@@ -65,7 +65,8 @@ public class SummarizationTaskAggregator {
     private synchronized GenerateSummaryTask startNewTask(GenerateSummaryTaskRequest request, boolean showToUser) {
         GenerateSummaryTask task = new GenerateSummaryTask(request, showToUser);
 
-        task.onFinished(() -> tasks.remove(request.fullEntry().entry()));
+        // Only remove this task: a regeneration may have replaced it in the meantime
+        task.onFinished(() -> tasks.remove(request.fullEntry().entry(), task));
 
         task.onSuccess(result -> inMemoryCache.put(request.fullEntry(), result));
 
