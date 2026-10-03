@@ -106,6 +106,13 @@ Covers:
 
 - feat~ai.chatting~1
 
+### JSON answers are highlighted in AI chat
+`feat~ai.chat.json-highlighting~1`
+
+An answer that starts or ends with a JSON document, or contains one inside a fenced code block, shows that JSON as a monospaced code block, indented and with syntax highlighting, instead of flowed text. An explanation before or after the JSON is rendered as Markdown.
+
+Needs: impl, utest
+
 ### User can jump to entry PDF from citation links in AI chat
 `feat~ai.chat.jump-to-entry-pdf~1`
 
