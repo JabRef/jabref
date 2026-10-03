@@ -2,6 +2,7 @@ package org.jabref.gui.git;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -11,7 +12,10 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.eclipse.jgit.api.Git;
@@ -28,6 +32,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,7 +59,7 @@ class GitCommitDialogViewModelTest {
                 dialogService,
                 new CurrentThreadTaskExecutor(),
                 gitHandlerRegistry,
-                mock(ImportFormatPreferences.class),
+                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 new DummyFileUpdateMonitor());
     }
 
@@ -89,5 +94,46 @@ class GitCommitDialogViewModelTest {
         verify(dialogService).showErrorDialogAndWait(
                 Localization.lang("Git commit failed"),
                 Localization.lang("The Git repository is locked. Close other Git, JabRef, or IDE processes and try again."));
+    }
+
+    @Test
+    void generateCommitMessageReportsAddedEntries() {
+        BibEntry entry = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "Test Entry");
+
+        BibDatabaseContext headDatabase = new BibDatabaseContext(new BibDatabase());
+
+        BibDatabaseContext workingTreeDatabase = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+
+        GitCommitDialogViewModel.DiffDatabases diff = new GitCommitDialogViewModel.DiffDatabases(headDatabase, workingTreeDatabase);
+
+        assertEquals("Add 1 entry", viewModel.generateCommitMessage(diff));
+    }
+
+    @Test
+    void generateCommitMessageReportsDeletedEntries() {
+        BibEntry entry = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "Test Entry");
+
+        BibDatabaseContext headDatabase = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+
+        BibDatabaseContext workingTreeDatabase = new BibDatabaseContext(new BibDatabase());
+
+        GitCommitDialogViewModel.DiffDatabases diff = new GitCommitDialogViewModel.DiffDatabases(headDatabase, workingTreeDatabase);
+
+        assertEquals("Delete 1 entry", viewModel.generateCommitMessage(diff));
+    }
+
+    @Test
+    void generateCommitMessageReportsModifiedEntries() {
+        BibEntry headEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "Old Title").withCitationKey("key");
+
+        BibEntry workingTreeEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "New Title").withCitationKey("key");
+
+        BibDatabaseContext headDatabase = new BibDatabaseContext(new BibDatabase(List.of(headEntry)));
+
+        BibDatabaseContext workingTreeDatabase = new BibDatabaseContext(new BibDatabase(List.of(workingTreeEntry)));
+
+        GitCommitDialogViewModel.DiffDatabases diff = new GitCommitDialogViewModel.DiffDatabases(headDatabase, workingTreeDatabase);
+
+        assertEquals("Modify 1 entry", viewModel.generateCommitMessage(diff));
     }
 }
