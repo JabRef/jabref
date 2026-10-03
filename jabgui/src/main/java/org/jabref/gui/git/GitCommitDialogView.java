@@ -3,6 +3,7 @@ package org.jabref.gui.git;
 import java.util.List;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
@@ -26,6 +27,7 @@ import jakarta.inject.Inject;
 public class GitCommitDialogView extends BaseDialog<Void> {
 
     @FXML private TextArea commitMessage;
+    @FXML private ButtonType showDiffButton;
     @FXML private ButtonType commitButton;
     @FXML private ButtonType commitAndPushButton;
 
@@ -44,6 +46,10 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+        getDialogPane().lookupButton(showDiffButton).addEventFilter(ActionEvent.ACTION, event -> {
+            event.consume();
+            showDiff();
+        });
     }
 
     @FXML

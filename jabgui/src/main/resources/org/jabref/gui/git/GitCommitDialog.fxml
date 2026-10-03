@@ -19,11 +19,6 @@
             <padding>
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
-
-            <HBox alignment="CENTER_RIGHT">
-                <Button fx:id="showDiffButton" text="%Show diff" onAction="#showDiff"/>
-            </HBox>
-
             <TextArea fx:id="commitMessage"
                       prefRowCount="6"
                       wrapText="true"
@@ -31,6 +26,7 @@
         </VBox>
     </content>
     <buttonTypes>
+        <ButtonType fx:id="showDiffButton" text="%Show diff" buttonData="LEFT"/>
         <ButtonType fx:id="commitButton" text="%Commit" buttonData="OK_DONE"/>
         <ButtonType fx:id="commitAndPushButton" text="%Commit and push" buttonData="APPLY"/>
         <ButtonType fx:constant="CANCEL"/>
