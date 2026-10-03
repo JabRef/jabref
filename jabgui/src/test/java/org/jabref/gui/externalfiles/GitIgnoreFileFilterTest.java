@@ -62,4 +62,32 @@ class GitIgnoreFileFilterTest {
         GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
         assertFalse(gitIgnoreFileFilter.accept(subDir.resolve("test.png")));
     }
+
+    @Test
+    void gitIgnoreOutsideRepositoryIsIgnored(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), "*");
+        Path subDir = Files.createDirectory(dir.resolve("mine"));
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(subDir);
+        assertTrue(gitIgnoreFileFilter.accept(subDir.resolve("paper.pdf")));
+        assertFalse(gitIgnoreFileFilter.accept(subDir.resolve(".gitignore")));
+    }
+
+    @Test
+    void gitIgnoreInParentRepositoryIsApplied(@TempDir Path dir) throws IOException {
+        Files.createDirectory(dir.resolve(".git"));
+        Files.writeString(dir.resolve(".gitignore"), "*");
+        Path subDir = Files.createDirectory(dir.resolve("mine"));
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(subDir);
+        assertFalse(gitIgnoreFileFilter.accept(subDir.resolve("paper.pdf")));
+    }
+
+    @Test
+    void gitIgnoreAboveRepositoryRootIsIgnored(@TempDir Path dir) throws IOException {
+        Files.writeString(dir.resolve(".gitignore"), "*");
+        Path repository = Files.createDirectory(dir.resolve("repository"));
+        Files.writeString(repository.resolve(".git"), "gitdir: ../elsewhere");
+        Path subDir = Files.createDirectory(repository.resolve("mine"));
+        GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(subDir);
+        assertTrue(gitIgnoreFileFilter.accept(subDir.resolve("paper.pdf")));
+    }
 }
