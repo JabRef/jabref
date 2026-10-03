@@ -23,6 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We moved the JabRef version display in the Welcome tab onto the "Download development version" line to save space. [#17160](https://github.com/JabRef/jabref/issues/17160)
 - The context window size for AI models unknown to JabRef (e.g., local models) now defaults to 64k tokens instead of 8k. [#17326](https://github.com/JabRef/jabref/pull/17326)
+- We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
 
 ### Fixed
 
@@ -46,6 +47,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the DOI lookup button lost its progress indicator after switching to another entry and back. [#17223](https://github.com/JabRef/jabref/pull/17223)
 - We fixed an issue where double-clicking a word in an AI chat message did not select it. [#17174](https://github.com/JabRef/jabref/pull/17174)
 - We fixed the entry counts in the groups panel being misaligned with the group names. [#17253](https://github.com/JabRef/jabref/issues/17253)
+- We fixed an issue where saving the "Custom entry types" preferences removed custom fields from the non-wrapped fields. [#17121](https://github.com/JabRef/jabref/pull/17121)
 
 ### Removed
 
