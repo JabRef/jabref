@@ -60,6 +60,13 @@ Covers:
 
 - feat~ai.chatting~1
 
+### AI responses render Markdown tables
+`req~ai.chat.markdown-tables~1`
+
+LLMs often answer comparisons as Markdown tables; showing raw pipes makes them hard to read.
+
+Needs: impl, utest
+
 ### User can cancel AI response generation in AI chat
 `feat~ai.chat.cancel-generation~1`
 
