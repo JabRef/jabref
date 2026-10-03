@@ -1,6 +1,7 @@
 package org.jabref.gui.importer.fetcher;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.css.PseudoClass;
@@ -25,6 +26,7 @@ import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.SearchableComboBox;
@@ -62,7 +64,7 @@ public class WebSearchPaneView extends VBox {
     /// Allows triggering search on pressing enter
     private void enableEnterToTriggerSearch(TextField query) {
         query.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER && !StringUtil.isBlank(query.getText())) {
                 viewModel.search();
             }
         });
@@ -122,7 +124,11 @@ public class WebSearchPaneView extends VBox {
         search.setDefaultButton(false);
         search.setOnAction(_ -> viewModel.search());
         search.setMaxWidth(Double.MAX_VALUE);
-        search.disableProperty().bind(importerEnabled.not());
+        BooleanBinding queryBlank = Bindings.createBooleanBinding(
+                () -> StringUtil.isBlank(viewModel.getQuery()),
+                viewModel.queryProperty()
+        );
+        search.disableProperty().bind(importerEnabled.not().or(queryBlank));
         return search;
     }
 
