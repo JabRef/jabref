@@ -95,7 +95,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                         .checkbox(Localization.lang("Show confirmation dialog when deleting entries"), viewModel.confirmDeleteProperty())
                         .checkbox(Localization.lang("Ask whether to include cross-references when copying to another library"), viewModel.shouldAskForIncludingCrossReferences())
                         .checkbox(Localization.lang("Hide tab bar when single library is present"), viewModel.confirmHideTabBarProperty())
-                        .checkbox(Localization.lang("Do not show donation prompt again"), viewModel.donationNeverShowProperty())
                         .checkbox(Localization.lang("Experimental search (Postgres)"), viewModel.usePostgresSearchProperty()))
 
                 .section(Localization.lang("Single instance"), singleInstance -> singleInstance
