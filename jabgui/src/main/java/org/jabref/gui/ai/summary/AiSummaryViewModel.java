@@ -32,6 +32,7 @@ import org.jabref.logic.util.ObservablesHelper;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.ai.summarization.AiSummary;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.Nullable;
@@ -42,6 +43,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
         RESTART_NEEDED,
         NO_FILES,
         NO_SUPPORTED_FILE_TYPES,
+        NO_LOCAL_FILE,
         PROCESSING,
         DONE,
         ERROR_WHILE_GENERATING,
@@ -105,10 +107,18 @@ public class AiSummaryViewModel extends AbstractViewModel {
                              .map(List::isEmpty)
                 ),
 
+                Map.entry(State.NO_LOCAL_FILE,
+                        entry.map(FullBibEntry::entry)
+                             .map(BibEntry::getFiles)
+                             .map(l -> l.stream()
+                                        .allMatch(LinkedFile::isOnlineLink))
+                ),
+
                 Map.entry(State.NO_SUPPORTED_FILE_TYPES,
                         entry.map(FullBibEntry::entry)
                              .map(BibEntry::getFiles)
                              .map(l -> l.stream()
+                                        .filter(f -> !f.isOnlineLink())
                                         .map(f -> Path.of(f.getLink()))
                                         .noneMatch(UniversalContentParser::isSupportedFileType))
                 ),

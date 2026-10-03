@@ -9,7 +9,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.AiPrivacyNoticeView;
 import org.jabref.gui.ai.statuspane.UniversalStatusPaneView;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.ExceptionsUtil;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.ChatModel;
@@ -30,6 +29,7 @@ public class AiSummaryView extends StackPane {
     @FXML private UniversalStatusPaneView cancelledPane;
 
     @FXML private UniversalStatusPaneView noFilesPane;
+    @FXML private UniversalStatusPaneView noLocalFilePane;
     @FXML private UniversalStatusPaneView noSupportedFileTypesPane;
 
     @FXML private AiSummaryShowingView summaryShowing;
@@ -62,7 +62,7 @@ public class AiSummaryView extends StackPane {
     }
 
     private void setupBindings() {
-        errorPane.textAreaContentProperty().bind(viewModel.errorProperty().map(ExceptionsUtil::generateExceptionMessage));
+        errorPane.textAreaContentProperty().bind(viewModel.errorProperty().map(Throwable::getMessage));
 
         summaryShowing.summaryProperty().bind(viewModel.summaryProperty());
         summaryShowing.entryProperty().bind(viewModel.entryProperty());
@@ -78,6 +78,7 @@ public class AiSummaryView extends StackPane {
         errorPane.managedProperty().bind(errorPane.visibleProperty());
         cancelledPane.managedProperty().bind(cancelledPane.visibleProperty());
         noFilesPane.managedProperty().bind(noFilesPane.visibleProperty());
+        noLocalFilePane.managedProperty().bind(noLocalFilePane.visibleProperty());
         noSupportedFileTypesPane.managedProperty().bind(noSupportedFileTypesPane.visibleProperty());
         summaryShowing.managedProperty().bind(summaryShowing.visibleProperty());
 
@@ -88,6 +89,7 @@ public class AiSummaryView extends StackPane {
         errorPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.ERROR_WHILE_GENERATING));
         cancelledPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.CANCELLED));
         noFilesPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.NO_FILES));
+        noLocalFilePane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.NO_LOCAL_FILE));
         noSupportedFileTypesPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.NO_SUPPORTED_FILE_TYPES));
         summaryShowing.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.DONE));
     }

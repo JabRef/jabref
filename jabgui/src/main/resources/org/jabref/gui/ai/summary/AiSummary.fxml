@@ -54,6 +54,11 @@
             description="%Please attach at least one PDF file to enable summarization of PDF file(s)."/>
 
     <UniversalStatusPaneView
+            fx:id="noLocalFilePane"
+            title="%Unable to generate summary"
+            description="%This file is only linked online. Download it locally to generate summary."/>
+
+    <UniversalStatusPaneView
             fx:id="noSupportedFileTypesPane"
             title="%Unable to generate summary"
             description="%Only PDF files are supported."/>
