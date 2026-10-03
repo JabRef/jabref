@@ -46,6 +46,8 @@ class BibChangeTest {
                 new UndoableFieldChange(entry, StandardField.YEAR, null, "1905"),
                 new UndoableFieldChange(entry, StandardField.YEAR, "1905", null),
                 new UndoableChangeType(entry, StandardEntryType.Article, StandardEntryType.Book),
+                UndoableChangedFlag.marking(entry),
+                new UndoableCommentsChange(entry, "", "% note"),
                 new UndoableInsertEntries(database, entry),
                 new UndoableRemoveEntries(database, entry),
                 new UndoablePreambleChange(database, null, "preamble"),
@@ -440,5 +442,44 @@ class BibChangeTest {
         UndoableFieldChange onSecond = new UndoableFieldChange(entry(), StandardField.AUTHOR, "Einstein", "Bohr");
 
         assertNotEquals(onFirst, onSecond);
+    }
+
+    @Test
+    void undoingACommentsChangePutsTheCommentsBack() {
+        BibEntry entry = entry().withUserComments("% before");
+        UndoableCommentsChange change = new UndoableCommentsChange(entry, "% before", "% after");
+
+        change.apply();
+        assertEquals("% after", entry.getUserComments());
+
+        change.inverted().apply();
+        assertEquals("% before", entry.getUserComments());
+    }
+
+    @Test
+    void theUnchangedMarkIsNotRestoredOverALaterEdit() {
+        BibEntry entry = entry();
+        entry.setChanged(false);
+        UndoableChangedFlag marking = UndoableChangedFlag.marking(entry);
+        assertTrue(marking.apply().complete());
+        entry.setField(StandardField.TITLE, "Edited later");
+
+        ApplyResult result = marking.inverted().apply();
+
+        assertFalse(result.complete());
+        assertTrue(entry.hasChanged());
+    }
+
+    @Test
+    void theUnchangedMarkIsRestoredWithTheContent() {
+        BibEntry entry = entry();
+        entry.setChanged(false);
+        UndoableChangedFlag marking = UndoableChangedFlag.marking(entry);
+        marking.apply();
+        entry.setField(StandardField.TITLE, "Edited later");
+        entry.setField(StandardField.TITLE, "Relativity");
+
+        assertTrue(marking.inverted().apply().complete());
+        assertFalse(entry.hasChanged());
     }
 }
