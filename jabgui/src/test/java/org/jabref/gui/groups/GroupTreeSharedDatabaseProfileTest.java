@@ -185,7 +185,7 @@ class GroupTreeSharedDatabaseProfileTest {
 
         GuiPreferences preferences = mock(GuiPreferences.class);
         when(preferences.getLibraryPreferences()).thenReturn(new LibraryPreferences(
-                context.getMode(), false, false, false, "Imported entries"));
+                context.getMode(), false, false, false, false, "Imported entries"));
         when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(
                 EnumSet.noneOf(GroupViewMode.class), true, true, false,
                 GroupHierarchyType.INDEPENDENT, false));

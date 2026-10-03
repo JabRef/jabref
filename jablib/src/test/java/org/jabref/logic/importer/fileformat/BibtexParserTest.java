@@ -1916,6 +1916,14 @@ class BibtexParserTest {
     }
 
     @Test
+    void integrationTestSynchronizeWithFile() throws IOException {
+        ParserResult result = parser
+                .parse(Reader.of("@comment{jabref-meta: synchronizeWithFile:false;}"));
+
+        assertEquals(Optional.of(false), result.getMetaData().getSynchronizeWithFile());
+    }
+
+    @Test
     void integrationTestGitAutoPull() throws IOException {
         ParserResult result = parser
                 .parse(Reader.of("@comment{jabref-meta: gitAutoPull:true;}"));
