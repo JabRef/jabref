@@ -57,14 +57,6 @@ public class UnlinkedFilesWizard {
                 }
             });
         }
-        Platform.runLater(() -> {
-            if (page1.getScene() != null && page1.getScene().getWindow() instanceof javafx.stage.Stage stage) {
-                stage.setResizable(true);
-                stage.setWidth(650);
-                stage.setHeight(550);
-                IconTheme.applyLogo(stage);
-            }
-        });
 
         Optional<ButtonType> result = dialogService.showCustomDialogAndWait(wizard.getDialog());
         page2.shutdown();
