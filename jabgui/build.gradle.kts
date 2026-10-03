@@ -33,6 +33,9 @@ testModuleInfo {
     requires("org.junit.jupiter.params")
     requires("org.mockito")
 
+    // Reachability assertions (JMemoryBuddy)
+    requires("one.jpro.jmemorybuddy")
+
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
 
@@ -322,7 +325,7 @@ tasks.test {
 
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
-        "--enable-native-access=javafx.graphics,com.sun.jna"
+        "--enable-native-access=javafx.graphics,com.sun.jna,org.apache.lucene.core"
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"
