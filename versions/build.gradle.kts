@@ -32,7 +32,7 @@ dependencies {
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
-    api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
+    api(platform("org.glassfish.jersey:jersey-bom:4.0.3"))
     api(platform("tools.jackson:jackson-bom:3.2.3"))
 }
 
@@ -82,7 +82,7 @@ dependencies.constraints {
     api("commons-logging:commons-logging:1.4.0")
     api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
-    api("de.sandec:JMemoryBuddy:0.5.1")
+    api("one.jpro:jmemorybuddy:0.6.0")
     api("de.saxsys:mvvmfx:1.8.0")
     api("de.undercouch:citeproc-java:3.5.2")
     api("info.debatty:java-string-similarity:2.0.0")
