@@ -53,7 +53,7 @@ public class ExternalApplicationsPreferences {
                 OS.WINDOWS,                                                                  // shouldAutoOpenEmailAttachmentsFolder
                 Set.copyOf(ExternalFileTypes.getDefaultExternalFileTypes()),                 // externalFileTypes
                 false,                                                                       // useCustomTerminal
-                OS.WINDOWS ? "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\""
+                OS.WINDOWS ? "\"C:\\Program Files\\ConEmu\\ConEmu64.exe\" /single /dir \"%DIR\""
                            : "",                                                             // customTerminalCommand
                 false,                                                                       // useCustomFileBrowser
                 OS.WINDOWS ? "explorer.exe /select, \"%DIR\""
