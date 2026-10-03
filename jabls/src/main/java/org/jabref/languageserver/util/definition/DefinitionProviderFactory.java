@@ -1,18 +1,26 @@
 package org.jabref.languageserver.util.definition;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jabref.languageserver.util.LspParserHandler;
 import org.jabref.logic.FilePreferences;
 
+/// One factory per client connection: a provider holds the [LspParserHandler] of its connection
 public class DefinitionProviderFactory {
 
-    private static final Map<String, DefinitionProvider> PROVIDER_MAP = new HashMap<>();
+    private final Map<String, DefinitionProvider> providers = new ConcurrentHashMap<>();
+    private final FilePreferences preferences;
+    private final LspParserHandler parserHandler;
 
-    public static Optional<DefinitionProvider> getDefinitionProvider(FilePreferences preferences, LspParserHandler parserHandler, String languageId) {
-        return Optional.ofNullable(PROVIDER_MAP.computeIfAbsent(languageId.toLowerCase(), key -> switch (key) {
+    public DefinitionProviderFactory(FilePreferences preferences, LspParserHandler parserHandler) {
+        this.preferences = preferences;
+        this.parserHandler = parserHandler;
+    }
+
+    public Optional<DefinitionProvider> getDefinitionProvider(String languageId) {
+        return Optional.ofNullable(providers.computeIfAbsent(languageId.toLowerCase(), key -> switch (key) {
             case "markdown" ->
                     new MarkdownDefinitionProvider(parserHandler);
             case "latex" ->
