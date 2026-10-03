@@ -1750,3 +1750,15 @@ We want to have a look that matches our icons in the tool-bar */
 .flashing-danger {
     -fx-background-color: -color-danger;
 }
+
+.wizard-pane > .header-panel > .graphic-container,
+.wizard-pane:no-header > * > .graphic-container {
+    visibility: hidden;
+    -fx-min-width: 0;
+    -fx-max-width: 0;
+    -fx-pref-width: 0;
+    -fx-min-height: 0;
+    -fx-max-height: 0;
+    -fx-pref-height: 0;
+    -fx-padding: 0;
+}
