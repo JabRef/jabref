@@ -8,11 +8,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
@@ -73,6 +75,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -229,6 +232,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         }));
 
+        // Enlarging the entry editor shrinks the table; keep the edited entry visible as the lowest row instead of hiding it
+        heightProperty().addListener((_, oldHeight, newHeight) -> {
+            if (newHeight.doubleValue() < oldHeight.doubleValue()) {
+                Platform.runLater(this::scrollFirstSelectedIntoView);
+            }
+        });
+
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
         // The default comparator of the SortedList does not consider the insertion index of entries that are equal according to the comparator.
@@ -351,6 +361,32 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 });
                 scrollTo(indices.getFirst());
             }
+        }
+    }
+
+    /// Resizing keeps the flow's fractional position, which moves rows out at either edge. Scrolls minimally, so the entry shown in the
+    /// entry editor (the first selected one) stays visible; a row pushed below the viewport ends up as the lowest visible row.
+    private void scrollFirstSelectedIntoView() {
+        scrollFirstSelectedIntoView((VirtualFlow<?>) lookup(".virtual-flow"));
+    }
+
+    private <T extends IndexedCell<?>> void scrollFirstSelectedIntoView(@Nullable VirtualFlow<T> flow) {
+        // Checked when the queued callback runs, so closing the editor in between leaves the table alone
+        if (flow == null || !stateManager.getEditorShowing().get() || getSelectionModel().isEmpty()) {
+            return;
+        }
+        int index = getSelectionModel().getSelectedIndices().getFirst();
+        T cell = flow.getVisibleCell(index);
+        if (cell != null) {
+            flow.scrollTo(cell);
+            return;
+        }
+        T last = flow.getLastVisibleCell();
+        flow.scrollTo(index);
+        if (last != null && index > last.getIndex()) {
+            // A row far below is not laid out and scrollTo(int) puts it at the top; lay out and push it down to the lowest row
+            flow.layout();
+            flow.scrollToBottom(flow.getVisibleCell(index));
         }
     }
 
