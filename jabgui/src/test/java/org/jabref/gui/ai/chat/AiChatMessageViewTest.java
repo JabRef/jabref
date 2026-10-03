@@ -71,6 +71,14 @@ class AiChatMessageViewTest extends JavaFxTest {
         return viewRef.get();
     }
 
+    // [utest->feat~ai.chat.regenerate-response~1]
+    @Test
+    void userMessageCanBeRetried() {
+        AiChatMessageViewModel viewModel = new AiChatMessageViewModel(clipBoardManager);
+        viewModel.chatMessageProperty().set(ChatMessage.userMessage("question"));
+        assertTrue(viewModel.showRegenerateProperty().get());
+    }
+
     @Test
     void markdownTextFlowHasCustomHyperlinkHandlerConfigured() {
         AiChatMessageView view = createView();
