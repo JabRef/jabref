@@ -106,7 +106,7 @@ The enclosing dialog must remain open.
 
 When an external change to an entry is accepted, the entry in the open library keeps its identity, so an open entry editor shows the accepted content and the main table keeps its selection.
 Undoing the change restores the previous content.
-Origin: https://github.com/JabRef/jabref/issues/8901
+Origin: <https://github.com/JabRef/jabref/issues/8901>
 
 Needs: impl, utest
 
