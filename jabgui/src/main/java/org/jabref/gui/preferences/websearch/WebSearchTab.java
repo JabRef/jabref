@@ -14,12 +14,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
 import org.jabref.gui.util.component.HelpButton;
@@ -201,15 +203,27 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
             helpButton.setVisible(false);
         }
 
-        Label apiKeyStatus = new Label(Localization.lang("API key configured"));
-        apiKeyStatus.visibleProperty().bind(item.apiKeyProperty().isNotEmpty());
+        Tooltip configureTooltip = new Tooltip();
+        configureTooltip.textProperty().bind(
+                Bindings.when(item.useCustomApiKeyProperty())
+                        .then(Localization.lang("Edit API key"))
+                        .otherwise(Localization.lang("Configure API key")));
 
-        Button configureButton = new Button(Localization.lang("Configure API key"));
-        configureButton.getStyleClass().addAll("configure-button", "padding-4");
+        Button configureButton = new Button();
+        configureButton.getStyleClass().add("icon-button");
+        configureButton.graphicProperty().bind(
+                item.useCustomApiKeyProperty().map(value ->
+                        value
+                               ? IconTheme.JabRefIcons.SUCCESS.getGraphicNode()
+                               : IconTheme.JabRefIcons.MAKE_KEY.getGraphicNode()
+                )
+        );
+
         configureButton.setOnAction(_ -> showApiKeyDialog(item));
         configureButton.setVisible(item.isCustomizable());
+        Tooltip.install(configureButton, configureTooltip);
 
-        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton, apiKeyStatus);
+        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
         return container;
     }
 
