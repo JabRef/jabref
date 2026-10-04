@@ -81,16 +81,16 @@
                             <Tooltip text="%Dynamically group entries by searching a field for a keyword"/>
                         </tooltip>
                     </RadioButton>
-                    <RadioButton fx:id="searchRadioButton" toggleGroup="$type" wrapText="true"
-                                 text="%Free search expression">
-                        <tooltip>
-                            <Tooltip text="%Dynamically group entries by a free-form search expression"/>
-                        </tooltip>
-                    </RadioButton>
                     <RadioButton fx:id="autoRadioButton" toggleGroup="$type" wrapText="true"
                                  text="%Specified keywords">
                         <tooltip>
                             <Tooltip text="%Automatically create groups"/>
+                        </tooltip>
+                    </RadioButton>
+                    <RadioButton fx:id="searchRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Free search expression">
+                        <tooltip>
+                            <Tooltip text="%Dynamically group entries by a free-form search expression"/>
                         </tooltip>
                     </RadioButton>
                     <RadioButton fx:id="texRadioButton" toggleGroup="$type" wrapText="true"
