@@ -123,13 +123,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         updateSearch();
     }
 
+    // [impl->req~jabgui.search.fulltext.entry-editor-results~1]
     private void updateSearch() {
         content.getChildren().clear();
         Optional.ofNullable(entry)
                 .flatMap(selectedEntry -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
-                        .flatMap(searchQuery -> stateManager.activeTabProperty().get()
-                                .flatMap(tab -> tab.searchResultsProperty().get())
-                                .map(results -> new SearchDisplay(selectedEntry, searchQuery, results))))
+                                                      .flatMap(searchQuery -> stateManager.activeTabProperty().get()
+                                                                                          .flatMap(tab -> tab.searchResultsProperty().get())
+                                                                                          .map(results -> new SearchDisplay(selectedEntry, searchQuery, results))))
                 .ifPresent(display -> renderResults(display.entry(), display.query(), display.results()));
     }
 

@@ -110,8 +110,10 @@ public class MainTableDataModel {
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
+    // [impl->req~jabgui.search.fulltext.entry-editor-results~1]
     private void updateSearchMatches(Optional<SearchQuery> query) {
         long updateSequence = searchUpdateSequence.incrementAndGet();
+        // Index updates may start a search off the FX thread; an older queued clear must not erase newer results.
         UiTaskExecutor.runNowOrInJavaFXThread(() -> {
             if (updateSequence == searchUpdateSequence.get()) {
                 searchResults.set(Optional.empty());
@@ -127,6 +129,7 @@ public class MainTableDataModel {
                           if (updateSequence != searchUpdateSequence.get()) {
                               return;
                           }
+                          // The editor consumes detailed hits, while the table needs derived match flags on each row.
                           searchResults.set(results);
                           results.ifPresentOrElse(this::setSearchMatches, this::clearSearchMatches);
                           FilteredListProxy.refilterListReflection(entriesFiltered);
