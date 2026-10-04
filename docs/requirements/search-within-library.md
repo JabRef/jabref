@@ -59,7 +59,28 @@ When linked-file full-text indexing is enabled, users must be able to search the
 
 Needs: impl, utest
 
+<<<<<<< HEAD
 ## Full-text search survives a query only Lucene rejects
+=======
+## Full-text search results must reflect the active library in the entry editor
+`req~jabgui.search.fulltext.entry-editor-results~1`
+
+After a linked-file search completes, the selected entry's matching file text and page links appear in the entry editor for the active library. Switching libraries must not show results from the previous library. [PR #17367](https://github.com/JabRef/jabref/pull/17367)
+
+Needs: impl, utest
+
+## Full-text search must apply case-sensitive operators to linked files
+`req~jabgui.search.fulltext.case-sensitive~1`
+
+Issue: [#13048](https://github.com/JabRef/jabref/issues/13048)
+
+The case-sensitive operators of the search syntax (`=!`, `==!`, `=~!`) must also apply to the contents and annotations of linked files.
+Searching for `any ==! SEE` must not match a file that only contains `See`.
+
+Needs: impl, utest
+
+## Full-text search must preserve metadata results when Lucene query fails
+>>>>>>> 091e8897bc (Restore full-text results in the entry editor (#17367))
 `req~jabgui.search.fulltext.lenient-query-parsing~1`
 
 Issue: [#9482](https://github.com/JabRef/jabref/issues/9482)
