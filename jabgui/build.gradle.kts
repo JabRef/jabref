@@ -424,16 +424,24 @@ sourceSets["main"].resources.srcDir(generateThemePreviews)
 // StaticFX (https://github.com/HebiRobotics/jfx-static-feature): jfx-static-libs ships generated metadata
 // covering all of JavaFX plus static archives of its natives; jfx-static-feature (activated via its own
 // native-image.properties) links those archives into the image. Kept off the JVM module path on purpose.
-val nativeImageOnly by configurations.creating
+val nativeImageOnly = configurations.create("nativeImageOnly")
 dependencies {
-    nativeImageOnly("us.hebi.graalvm:jfx-static-libs:26.0.2-1")
+    nativeImageOnly("us.hebi.graalvm:jfx-static-libs:27-1")
     nativeImageOnly("us.hebi.graalvm:jfx-static-feature:1.0")
+}
+
+// Native-image-only sources (GraalVM Features, e.g. JabRefViewsFeature). Compiled against the GraalVM SDK and
+// put on the native-image classpath only; the JVM application never sees them.
+val nativeImageFeatures = sourceSets.create("nativeImageFeatures")
+dependencies {
+    "nativeImageFeaturesCompileOnly"("org.graalvm.sdk:nativeimage:25.3.4.1")
 }
 
 graalvmNative {
     binaries {
         named("main") {
-            classpath(nativeImageOnly)
+            classpath(nativeImageOnly, nativeImageFeatures.output)
+            buildArgs.add("--features=org.jabref.nativeimage.JabRefViewsFeature")
             imageName.set("jabref")
             mainClass.set("org.jabref.Launcher")
             resources {
