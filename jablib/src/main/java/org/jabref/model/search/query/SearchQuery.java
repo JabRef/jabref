@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchBaseVisitor;
@@ -38,7 +39,11 @@ public class SearchQuery {
         this.searchExpression = searchExpression;
         this.searchFlags = searchFlags;
         try {
-            this.context = getStartContext(searchExpression);
+            String normalizedExpression = DOI.parse(searchExpression.trim())
+                    .map(DOI::asString)
+                    .orElse(searchExpression);
+
+            this.context = getStartContext(normalizedExpression);
             isValidExpression = containsOnlyValidRegularExpressions(context, searchFlags);
         } catch (ParseCancellationException e) {
             // We use getCause here as the real exception is nested and this avoids that the stack trace get too large
