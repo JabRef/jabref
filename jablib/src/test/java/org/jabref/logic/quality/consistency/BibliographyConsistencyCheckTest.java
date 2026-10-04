@@ -576,30 +576,23 @@ class BibliographyConsistencyCheckTest {
 
     @Test
     void fileFieldIsExcludedFromConsistencyCheck() {
-        BibEntry entry1 = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("entry1")
-                .withField(StandardField.AUTHOR, "Author Name")
-                .withField(StandardField.TITLE, "Test Title")
-                .withField(StandardField.JOURNAL, "Test Journal")
-                .withField(StandardField.YEAR, "2026")
-                .withField(StandardField.FILE, "path/to/file1.pdf");
+        BibEntry entryWithFile = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("TestKey1")
+                .withField(StandardField.AUTHOR, "Test Author")
+                .withField(StandardField.FILE, ":test.pdf:PDF");
 
-        BibEntry entry2 = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "Author Name")
-                .withField(StandardField.TITLE, "Test Title")
-                .withField(StandardField.JOURNAL, "Test Journal")
-                .withField(StandardField.YEAR, "2026")
-                .withField(StandardField.FILE, "path/to/file2.pdf");
+        BibEntry entryWithoutFile = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("TestKey2")
+                .withField(StandardField.AUTHOR, "Test Author");
 
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry1, entry2)));
-        context.setMode(BibDatabaseMode.BIBTEX); // Explicitly set mode to BIBTEX
+        BibDatabase bibDatabase = new BibDatabase(List.of(entryWithFile, entryWithoutFile));
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
-        BibliographyConsistencyCheck check = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = check.check(context, entryTypesManager, (_, _) -> {});
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
+        });
 
-        // Since entries differ only by the file field (which is excluded) and all required fields are met, the result map should be empty
-        assertTrue(result.entryTypeToResultMap().isEmpty());
+        BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of());
+        assertEquals(expected, result, "The file field should be excluded from the consistency check");
     }
 
 }
