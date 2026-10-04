@@ -405,101 +405,48 @@ Quick check of core library:
 JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT) to trace requirements to implementation and tests.
 Requirements capture what JabRef should do as a structured representation of issues and features, enabling bidirectional traceability.
 
-For a new feature or significant bug fix, add the requirement to the appropriate `docs/requirements/<area>.md` file.
-Link the issue the requirement originates from.
-Respect INVEST criteria. Prefer high-level requirements over overly detailed ones.
-Add tracing (`Needs: impl` + implementation comments).
+Read and use the [`openfasttrace`](https://github.com/itsallcode/openfasttrace-ai-skills/blob/main/skills/openfasttrace/SKILL.md) skill.
 
-### Requirement types and ID format
+In JabRef we use OFT this way:
 
-Format: `<type>~<area>.<name>~<revision>`
-
-- Paths are hierarchical and separated by `.`; words in names use hyphens (`kebab-case`).
-- Revision starts at `1` and is incremented when the requirement changes significantly.
-- Artifact types used:
-  - `feat`: User-facing capability or broad feature ("User can verb").
-  - `req`: Specific constraint, nuance, cross-cutting requirement, or bug fix the system must satisfy ("Subject must verb").
-  - `impl`: Code implementation.
-  - `utest`: Unit test.
-  - `adr`: Architectural Decision Record.
-
-### How to write requirements
-
-#### Title rules
-
-- **Grammar matches the tag**:
+- The requirements are put in `docs/requirements/<area>.md`.
+- The requirements are grouped by areas: `docs/requirements/ui.md`, `docs/requirements/git.md`, etc.
+- Title style:
   - `req~` → **"Subject must verb"** (e.g., `## GitHub personal access token push access must be verifiable before sharing`).
   - `feat~` → **"User can verb"** (e.g., `## User can share library via GitHub`).
-- **Subject first**: Put the subject first, followed by the modal verb.
-- **Strict modal verb for `req~`**: Always use **must** — never "should", "needs to", or "is required to". Use one modal verb only.
-- **Avoid nominalizations**: Write "must be verified" instead of "verification".
-- **Avoid system-as-narrator phrasing**: Do not write "allows the user to" or "offers to"; state directly what must happen or what the user can do.
-- **One item, one requirement**: If a title needs "and", split it into two separate requirements.
-- **The title carries the full normative statement**: Anyone reading only the heading should understand the complete requirement constraint.
+  - Avoid nominalizations: Write "must be verified" instead of "verification".
+  - One item, one requirement: If a title needs "and", split it into two separate requirements.
+  - The title carries the full normative statement: Anyone reading only the heading should understand the complete requirement constraint.
+- Use the description only for details that the title cannot carry:
+  - Triggering condition.
+  - Edge cases and boundary behavior.
+  - Brief rationale (if needed).
+  - Relevant GitHub issue link or context.
 
-#### Description rules
+Artifact types used:
 
-Use the description only for details that the title cannot carry:
+- `feat`: User-facing capability or broad feature ("User can verb").
+- `req`: Specific constraint, nuance, cross-cutting requirement, or bug fix the system must satisfy ("Subject must verb").
+- `impl`: Code implementation.
+- `utest`: Unit test.
+- `adr`: Architectural Decision Record.
 
-- Triggering condition.
-- Edge cases and boundary behavior.
-- Brief rationale (if needed).
-- Relevant GitHub issue link or context.
-- **Do not repeat** the subject and verb from the title.
-- **Do not smuggle** secondary requirements into the description.
-- **Do not write marketing copy**.
+Additional guidelines:
 
-#### Draft status
+- Link the issue the requirement originates from (if there is).
+- Respect INVEST criteria. Prefer high-level requirements over overly detailed ones.
+- For ideas or planned requirements not yet implemented, mark them as draft so they are preserved without failing coverage checks:
+  ```markdown
+  Status: draft
+  ```
 
-For ideas or planned requirements not yet implemented, mark them as draft so they are preserved without failing coverage checks:
-
-```markdown
-Status: draft
-```
-
-### Syntax and placement
-
-Requirements belong in `docs/requirements/<area>.md` (grouped by feature domain, or in cross-cutting files like `ux.md`).
-
-- The identifier must be placed on the line immediately below the Markdown heading with **no empty line**.
-- Add `<!-- markdownlint-disable-file MD022 -->` at the end of the file.
-- Specify coverage needs at the end of the requirement: `Needs: impl` (and optionally `utest`).
-
-### Example
-
-```markdown
-## GitHub personal access token push access must be verifiable before sharing
-`req~git.share.personal-access-token-verification~1`
-
-Verification happens in the GitHub sharing dialog before the library is shared.
-
-Needs: impl
-```
-
-### Linking implementations and tests
-
-Link requirements to the **most specific code location possible** (method or statement level rather than class level, unless multiple components are involved).
-
-- In Java, place comments **before annotations**:
-
-```java
-// [impl->req~git.share.personal-access-token-verification~1]
-@Override
-public void checkAccess() {
-    ...
-}
-```
-
-- In tests: `// [utest->req~...~1]`
-- In Markdown / ADRs: `<!-- [impl->adr~...~1] -->`
-
-### Checking coverage
+Checking coverage:
 
 ```bash
 ./gradlew traceRequirements   # output: build/reports/tracing.txt
 ```
 
-See `docs/requirements/` for existing requirements and [docs/code-howtos/requirements.md](docs/code-howtos/requirements.md) for full guidance.
+See `docs/requirements/` for existing requirements and [docs/code-howtos/requirements.md](docs/code-howtos/requirements.md) for full guidance. Also refer to the `openfasttrace` skill.
 
 ---
 
