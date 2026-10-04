@@ -61,6 +61,7 @@ import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
@@ -384,7 +385,12 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
+        String searchText = this.searchField.getText();
+        searchText = DOI.parse(searchText.trim())
+                        .map(DOI::asString)
+                        .orElse(searchText);
+
+        SearchQuery searchQuery = new SearchQuery(searchText, searchPreferences.getSearchFlags());
         illegalSearch.set(!searchQuery.isValid());
         stateManager.activeSearchQuery(searchType).set(Optional.of(searchQuery));
     }
