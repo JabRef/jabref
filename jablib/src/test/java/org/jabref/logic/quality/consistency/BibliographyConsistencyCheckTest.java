@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BibliographyConsistencyCheckTest {
 
@@ -572,4 +573,33 @@ class BibliographyConsistencyCheckTest {
         ));
         assertEquals(expectedResult, actualResult);
     }
+
+    @Test
+    void fileFieldIsExcludedFromConsistencyCheck() {
+        BibEntry entry1 = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("entry1")
+                .withField(StandardField.AUTHOR, "Author Name")
+                .withField(StandardField.TITLE, "Test Title")
+                .withField(StandardField.JOURNAL, "Test Journal")
+                .withField(StandardField.YEAR, "2026")
+                .withField(StandardField.FILE, "path/to/file1.pdf");
+
+        BibEntry entry2 = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("entry2")
+                .withField(StandardField.AUTHOR, "Author Name")
+                .withField(StandardField.TITLE, "Test Title")
+                .withField(StandardField.JOURNAL, "Test Journal")
+                .withField(StandardField.YEAR, "2026")
+                .withField(StandardField.FILE, "path/to/file2.pdf");
+
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry1, entry2)));
+        context.setMode(BibDatabaseMode.BIBTEX); // Explicitly set mode to BIBTEX
+
+        BibliographyConsistencyCheck check = new BibliographyConsistencyCheck();
+        BibliographyConsistencyCheck.Result result = check.check(context, entryTypesManager, (_, _) -> {});
+
+        // Since entries differ only by the file field (which is excluded) and all required fields are met, the result map should be empty
+        assertTrue(result.entryTypeToResultMap().isEmpty());
+    }
+
 }

@@ -63,6 +63,7 @@ public class BibliographyConsistencyCheck {
                      .filter(field -> !StandardField.AUTOMATIC_FIELDS.contains(field))
                      .filter(field -> !(field instanceof SpecialField))
                      .filter(field -> !(field instanceof UserSpecificCommentField))
+                     .filter(field -> !(field instanceof InternalField))
                      .collect(Collectors.toSet());
     }
 
