@@ -3,9 +3,7 @@ package org.jabref.gui.git;
 import java.util.List;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 
@@ -15,6 +13,7 @@ import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
@@ -48,11 +47,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-        Button showDiffButton = (Button) getDialogPane().lookupButton(showDiffButtonType);
-        showDiffButton.addEventFilter(ActionEvent.ACTION, event -> {
-            event.consume();
-            showDiff();
-        });
+        ControlHelper.setAction(showDiffButtonType, getDialogPane(), _ -> showDiff());
     }
 
     @FXML
