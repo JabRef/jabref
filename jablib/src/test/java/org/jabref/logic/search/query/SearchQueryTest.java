@@ -61,25 +61,25 @@ public class SearchQueryTest {
         assertTrue(new SearchQuery(searchExpression).isValid());
     }
 
+    // [utest->req~search.doi-link-normalization~1]
     @Test
-    public void testDoiNormalization() {
-        // [utest->req~search.doi-link-normalization~1]
+    void doiNormalization() {
         SearchQuery query = new SearchQuery("https://doi.org/10.1000/182");
         assertEquals("10.1000/182<EOF>", query.getContext().getText());
         assertEquals("https://doi.org/10.1000/182", query.getSearchExpression());
         assertEquals("10.1000/182", query.getNormalizedSearchExpression());
     }
 
+    // [utest->req~search.doi-link-normalization~1]
     @Test
-    public void testDoiLikeImplicitAndNotNormalized() {
-        // [utest->req~search.doi-link-normalization~1]
+    void doiLikeImplicitAndNotNormalized() {
         SearchQuery query = new SearchQuery("10.1000/foo bar");
         assertEquals("10.1000/foo bar", query.getNormalizedSearchExpression());
     }
 
+    // [utest->req~search.doi-link-normalization~1]
     @Test
-    public void testDoiNotNormalizedInRegexMode() {
-        // [utest->req~search.doi-link-normalization~1]
+    void doiNotNormalizedInRegexMode() {
         SearchQuery query = new SearchQuery("https://doi.org/10.1000/foo\\.", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         assertEquals("https://doi.org/10.1000/foo\\.", query.getNormalizedSearchExpression());
     }
