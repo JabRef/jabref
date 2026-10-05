@@ -282,7 +282,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         Label label = new Label();
         label.graphicProperty().bind(linkedFile.typeIconProperty());
         label.textProperty().bind(linkedFile.linkProperty());
-        label.getStyleClass().setAll("file-row-text");
+        label.getStyleClass().add("file-row-text");
         label.textOverrunProperty().setValue(OverrunStyle.LEADING_ELLIPSIS);
         EasyBind.subscribe(linkedFile.isAutomaticallyFoundProperty(), found -> label.pseudoClassStateChanged(opacity, found));
 
