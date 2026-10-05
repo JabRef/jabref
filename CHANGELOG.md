@@ -8,7 +8,6 @@ In case there is no issue present, the pull request implementing the feature is 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
-- we fixed an issue where the entry preview showed no vertical scrollbar , so long previews (e.g. ,with an abstract) where cut off. [#17359 (https://github.com/JabRef/jabref/issues/17359)] 
 
 ### Added
 
@@ -132,6 +131,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added connection URL pasting to the shared database login dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We added a Dnb Fetcher that uses SRU interface and wired to ISBN Fetcher. [#17070](https://github.com/JabRef/jabref/pull/17070)
 - We added read-only access to shared SQL libraries in `jabkit`: every input file argument accepts a PostgreSQL URL. [#12948](https://github.com/JabRef/jabref/issues/12948)
+- we fixed an issue where the entry preview showed no vertical scrollbar , so long previews (e.g. ,with an abstract) where cut off. [#17359 (https://github.com/JabRef/jabref/issues/17359)] 
+
 
 ### Changed
 
