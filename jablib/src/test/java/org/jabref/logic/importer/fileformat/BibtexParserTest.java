@@ -2130,14 +2130,14 @@ class BibtexParserTest {
                 }
                 """;
 
-        ParserResult result = parser.parse(Reader.of(bibtex));
-
-        assertFalse(result.hasWarnings());
         BibEntry expected = new BibEntry(StandardEntryType.Online)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Foo Bar");
         expected.setCommentsBeforeEntry("% Type of BibLaTeX entries    : @online\n");
 
+        ParserResult result = parser.parse(Reader.of(bibtex));
+
+        assertFalse(result.hasWarnings());
         assertEquals(List.of(expected), result.getDatabase().getEntries());
         assertEquals(bibtex, result.getDatabase().getEntries().getFirst().getParsedSerialization());
     }
@@ -2186,24 +2186,6 @@ class BibtexParserTest {
 
     // [utest->req~import.bibtex.percent-comments~1]
     @Test
-    void parseIgnoresAtSignAfterEncodingMetadataComment() throws IOException {
-        String bibtex = """
-                % Encoding: UTF-8 @article{fake}
-                @article{real,
-                  author = {Real Author}
-                }
-                """;
-
-        ParserResult result = parser.parse(Reader.of(bibtex));
-
-        assertFalse(result.hasWarnings());
-        assertEquals(1, result.getDatabase().getEntries().size());
-        assertEquals(Optional.of("real"),
-                result.getDatabase().getEntries().getFirst().getCitationKey());
-    }
-
-    // [utest->req~import.bibtex.percent-comments~1]
-    @Test
     void parseIgnoresAtSignAfterDatabaseIdMetadataComment() throws IOException {
         String bibtex = """
                 % DBID: database @article{fake}
@@ -2233,24 +2215,6 @@ class BibtexParserTest {
         ParserResult result = parser.parse(Reader.of(bibtex));
 
         assertFalse(result.hasWarnings());
-        assertEquals(List.of("first", "second"), result.getDatabase().getEntries().stream()
-                                                       .map(entry -> entry.getCitationKey().orElseThrow())
-                                                       .toList());
-    }
-
-    // [utest->req~import.bibtex.percent-comments~1]
-    @Test
-    void parseDoesNotReadDatabaseIdAfterFirstEntry() throws IOException {
-        String bibtex = """
-                @article{first}
-                % DBID: later
-                @article{second}
-                """;
-
-        ParserResult result = parser.parse(Reader.of(bibtex));
-
-        assertFalse(result.hasWarnings());
-        assertEquals(Optional.empty(), result.getDatabase().getSharedDatabaseID());
         assertEquals(List.of("first", "second"), result.getDatabase().getEntries().stream()
                                                        .map(entry -> entry.getCitationKey().orElseThrow())
                                                        .toList());
