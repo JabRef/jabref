@@ -79,4 +79,13 @@ A query that only Lucene rejects must leave the metadata results untouched and s
 
 Needs: impl, utest
 
+## Search must normalize full DOI links to plain DOI identifiers
+`req~search.doi-link-normalization~1`
+
+Issue: [#17348](https://github.com/JabRef/jabref/issues/17348)
+
+When the entire search expression is a DOI URL (starting with `http`, `https`, `doi.org/`, or `doi:`), the search must extract the plain DOI identifier and use it for matching. The original URL must be preserved as the visible search expression. Normalization must not apply to regex searches or multi-term queries.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
