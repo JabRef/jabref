@@ -3,7 +3,9 @@ package org.jabref.gui.git;
 import java.util.List;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 
@@ -22,8 +24,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
-import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
 
 public class GitCommitDialogView extends BaseDialog<Void> {
 
@@ -55,7 +55,6 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         });
     }
 
-
     @FXML
     private void initialize() {
         setTitle(Localization.lang("Git commit"));
@@ -69,9 +68,6 @@ public class GitCommitDialogView extends BaseDialog<Void> {
 
         commitMessage.textProperty().bindBidirectional(viewModel.commitMessageProperty());
         commitMessage.setPromptText(Localization.lang("Enter commit message here"));
-        
-       
-
         this.setResultConverter(button -> {
             if (button != ButtonType.CANCEL) {
                 if (button == commitAndPushButton) {
