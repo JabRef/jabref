@@ -11,6 +11,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -22,6 +24,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FilteredListProxy;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -55,6 +58,7 @@ public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter = new SimpleObjectProperty<>();
+    private final ReadOnlyObjectWrapper<Optional<SearchResults>> searchResults = new ReadOnlyObjectWrapper<>(Optional.empty());
     private final GroupsPreferences groupsPreferences;
     private final SearchPreferences searchPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
@@ -106,8 +110,15 @@ public class MainTableDataModel {
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
+    // [impl->req~jabgui.search.fulltext.entry-editor-results~1]
     private void updateSearchMatches(Optional<SearchQuery> query) {
         long updateSequence = searchUpdateSequence.incrementAndGet();
+        // Index updates may start a search off the FX thread; an older queued clear must not erase newer results.
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            if (updateSequence == searchUpdateSequence.get()) {
+                searchResults.set(Optional.empty());
+            }
+        });
         Optional<SearchQuery> querySnapshot = query.map(searchQuery -> new SearchQuery(
                 searchQuery.getSearchExpression(),
                 EnumSet.copyOf(searchQuery.getSearchFlags())));
@@ -118,12 +129,15 @@ public class MainTableDataModel {
                           if (updateSequence != searchUpdateSequence.get()) {
                               return;
                           }
-                          results.ifPresentOrElse(
-                                  this::setSearchMatches,
-                                  this::clearSearchMatches
-                          );
+                          // The editor consumes detailed hits, while the table needs derived match flags on each row.
+                          searchResults.set(results);
+                          results.ifPresentOrElse(this::setSearchMatches, this::clearSearchMatches);
                           FilteredListProxy.refilterListReflection(entriesFiltered);
                       }).executeWith(taskExecutor);
+    }
+
+    public ReadOnlyObjectProperty<Optional<SearchResults>> searchResultsProperty() {
+        return searchResults.getReadOnlyProperty();
     }
 
     /// Refresh the current search
