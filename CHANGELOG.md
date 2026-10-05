@@ -47,6 +47,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the DOI lookup button lost its progress indicator after switching to another entry and back. [#17223](https://github.com/JabRef/jabref/pull/17223)
 - We fixed an issue where double-clicking a word in an AI chat message did not select it. [#17174](https://github.com/JabRef/jabref/pull/17174)
 - We fixed the entry counts in the groups panel being misaligned with the group names. [#17253](https://github.com/JabRef/jabref/issues/17253)
+- We fixed an issue where long entry previews were cut off without a vertical scrollbar. [#17359](https://github.com/JabRef/jabref/issues/17359)
+
 
 ### Removed
 
@@ -131,8 +133,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added connection URL pasting to the shared database login dialog. [#16800](https://github.com/JabRef/jabref/pull/16800)
 - We added a Dnb Fetcher that uses SRU interface and wired to ISBN Fetcher. [#17070](https://github.com/JabRef/jabref/pull/17070)
 - We added read-only access to shared SQL libraries in `jabkit`: every input file argument accepts a PostgreSQL URL. [#12948](https://github.com/JabRef/jabref/issues/12948)
-- we fixed an issue where the entry preview showed no vertical scrollbar , so long previews (e.g. ,with an abstract) where cut off. [#17359 (https://github.com/JabRef/jabref/issues/17359)] 
-
 
 ### Changed
 
