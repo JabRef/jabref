@@ -191,4 +191,11 @@ The groups walkthrough must open its bundled example library, display the Groups
 
 Needs: impl
 
+### Creating a new explicit group can reuse the current selection
+`req~ux.groups.create-explicit-from-selection~1`
+
+When a user creates a new explicit group, JabRef should allow reusing the currently selected entries for that group and should keep the newly created group selected afterwards.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
