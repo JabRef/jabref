@@ -48,6 +48,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         mainTable.setOnContextMenuRequested(event -> {
             // Display the menu if header is clicked, otherwise, remove from display.
             if (show && isColumnHeaderTarget(event.getTarget())) {
+                constructItems();
                 this.show(mainTable, event.getScreenX(), event.getScreenY());
             } else if (this.isShowing()) {
                 this.hide();

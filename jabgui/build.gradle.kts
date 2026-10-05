@@ -33,10 +33,15 @@ testModuleInfo {
     requires("org.junit.jupiter.params")
     requires("org.mockito")
 
+    // Reachability assertions (JMemoryBuddy)
+    requires("one.jpro.jmemorybuddy")
+
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
 
     runtimeOnly("com.tngtech.archunit.junit5.engine")
+
+    requires("org.apache.lucene.core")
 }
 
 tasks.named<Test>("test") {
@@ -68,8 +73,7 @@ val useLibericaJdkFullJvmArgs = if (useLibericaJdkFull) listOf(
     "--add-opens", "javafx.controls/javafx.scene.control=org.jabref,ALL-UNNAMED",
     "--add-opens", "javafx.controls/javafx.scene.control.cell=org.jabref,ALL-UNNAMED",
     "--add-opens", "javafx.controls/javafx.scene.control.skin=org.jabref,ALL-UNNAMED",
-    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED",
-    "--add-opens", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED"
+    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED"
 ) else emptyList()
 
 // Compile-time counterpart of the JavaFX --add-exports above. When JavaFX is patched Maven jars, those
@@ -122,7 +126,7 @@ application {
         "-XX:+UseStringDeduplication"
 
         // Default garbage collector (G1) is sufficient
-        // More informaiton: https://learn.microsoft.com/en-us/azure/developer/java/containers/overview#understand-jvm-default-ergonomics
+        // More information: https://learn.microsoft.com/en-us/azure/developer/java/containers/overview#understand-jvm-default-ergonomics
         // "-XX:+UseZGC", "-XX:+ZUncommit"
         // "-XX:+UseG1GC"
     )
@@ -158,6 +162,8 @@ val embeddedPostgresDependencyByTarget = mapOf(
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     verbose = true
+    // The packaging plugin appends the target OS directory to this path.
+    jpackageResources = layout.projectDirectory.dir("buildres")
 
     applicationName = "JabRef"
     applicationDescription = "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX."
@@ -168,7 +174,6 @@ javaModulePackaging {
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
-        jpackageResources = layout.projectDirectory.dir("buildres").dir("windows")
         appImageOptions.addAll(
             // Generic options, but different for each target
             "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
@@ -206,7 +211,6 @@ javaModulePackaging {
         })
     }
     targetsWithOs("linux") {
-        jpackageResources = layout.projectDirectory.dir("buildres").dir("linux")
         appImageOptions.addAll(
             // Generic options, but different for each target
             "--icon", "$projectDir/buildres/linux/JabRef.png",
@@ -238,22 +242,15 @@ javaModulePackaging {
         })
     }
     targetsWithOs("macos") {
-        jpackageResources = layout.projectDirectory.dir("buildres").dir("macos")
-        appImageOptions.addAll(
-            // Generic options, but different for each target
-            "--icon", "$projectDir/buildres/macos/JabRef.icns",
-        )
         options.addAll(
             // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
 
-            // Generic options, but different for each target
-            "--icon", "$projectDir/buildres/macos/JabRef.icns",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
             "--resource-dir", layout.projectDirectory.dir("buildres").dir("macos").asFile.absolutePath,
 
             // Target-speccific options
-            "--mac-package-identifier", "JabRef",
+            "--mac-package-identifier", "org.jabref",
             "--mac-package-name", "JabRef"
         )
         if (providers.environmentVariable("OSXCERT").map { it == "true" }.orNull ?: false) {
@@ -293,7 +290,7 @@ embeddedPostgresBinaryByJpackageTask.forEach { (taskName, binary) ->
         // Include the platform-specific Postgres binary module in the jlink runtime image.
         addModules.add(binary.moduleName)
         // Resolve the module when the packaged launcher starts so the binary resource is discoverable.
-        // add will siply replace the existing args!
+        // add will simply replace the existing args!
         javaOptions.set(application.applicationDefaultJvmArgs + "--add-modules=${binary.moduleName}")
         addModules.addAll(sharedJpackageImageModules)
     }
@@ -330,7 +327,7 @@ tasks.test {
 
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
-        "--enable-native-access=javafx.graphics,com.sun.jna"
+        "--enable-native-access=javafx.graphics,com.sun.jna,org.apache.lucene.core"
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"

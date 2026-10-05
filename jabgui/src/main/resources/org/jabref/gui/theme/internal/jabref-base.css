@@ -1144,20 +1144,21 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .group-tree .numberColumn {
-    -fx-alignment: top-right;
+    -fx-alignment: center-right;
     -fx-padding: 0.35em 0.2em 0.25em 0em;
 }
 
 .group-tree .numberColumn > .hits {
     -fx-background: -color-badge-bg;
     -fx-background-color: -color-badge-bg;
-    -fx-padding: 0.25em;
+    -fx-padding: 0.15em 0.35em;
     -fx-background-insets: 0;
     -fx-background-radius: 0.25em;
 }
 
 .group-tree .numberColumn > .hits .text {
     -fx-fill: -color-fg-emphasis;
+    -fx-font-size: 0.9em;
 }
 
 .group-tree .expansionNodeColumn {
@@ -1731,7 +1732,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .bibtex-code-area .bibtex-keyword {
-    -fx-fill: -color-info !important;
+    -fx-fill: -color-bibtex-keyword !important;
 }
 
 .bibtex-code-area .bibtex-field {
