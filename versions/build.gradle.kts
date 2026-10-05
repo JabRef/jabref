@@ -17,7 +17,7 @@ val javafxDefault = "27"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
-val lucene = "10.5.1"
+val lucene = "10.5.2"
 
 val pdfbox = "3.0.8"
 
@@ -28,11 +28,11 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.38.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.20.1"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.21.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
-    api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
-    api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
+    api(platform("org.glassfish.grizzly:grizzly-bom:5.0.3"))
+    api(platform("org.glassfish.jersey:jersey-bom:4.0.3"))
     api(platform("tools.jackson:jackson-bom:3.2.3"))
 }
 
@@ -62,7 +62,7 @@ dependencies.constraints {
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.google.errorprone:error_prone_core:2.50.0")
-    api("com.google.guava:guava:33.7.1-jre")
+    api("com.google.guava:guava:33.7.2-jre")
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
@@ -82,6 +82,7 @@ dependencies.constraints {
     api("commons-logging:commons-logging:1.4.0")
     api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
+    api("one.jpro:jmemorybuddy:0.6.0")
     api("de.saxsys:mvvmfx:1.8.0")
     api("de.undercouch:citeproc-java:3.5.2")
     api("info.debatty:java-string-similarity:2.0.0")
@@ -109,7 +110,7 @@ dependencies.constraints {
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.1")
-    api("org.apache.commons:commons-lang3:3.20.0")
+    api("org.apache.commons:commons-lang3:3.21.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.4")
     api("org.apache.httpcomponents.client5:httpclient5:5.6.4")
@@ -130,9 +131,9 @@ dependencies.constraints {
     api("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent:7.8.0.202609011348-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
-    api("org.glassfish.hk2:hk2-api:4.0.2")
-    api("org.glassfish.hk2:hk2-locator:4.0.2")
-    api("org.glassfish.hk2:hk2-utils:4.0.2")
+    api("org.glassfish.hk2:hk2-api:4.0.3")
+    api("org.glassfish.hk2:hk2-locator:4.0.3")
+    api("org.glassfish.hk2:hk2-utils:4.0.3")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.4.Final")
@@ -166,5 +167,5 @@ dependencies.constraints {
     api("tech.units:indriya:2.2.4")
     api("tools.maran:svg:1.0.0")
     api("tools.maran:svg-materialdesign:1.0.0")
-    api("tools.maran:svgnode:2.0.0")
+    api("tools.maran:svgnode:2.0.1")
 }
