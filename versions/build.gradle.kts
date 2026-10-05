@@ -17,7 +17,7 @@ val javafxDefault = "27"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
-val lucene = "10.5.1"
+val lucene = "10.5.2"
 
 val pdfbox = "3.0.8"
 
