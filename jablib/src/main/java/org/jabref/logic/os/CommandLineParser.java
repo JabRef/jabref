@@ -17,6 +17,7 @@ public class CommandLineParser {
     private CommandLineParser() {
     }
 
+    // [impl->adr~custom-application-command-parsing~1]
     public static List<String> toArguments(String commandLine, String directory) {
         String replacement = Matcher.quoteReplacement(directory);
         return splitCommandLine(commandLine).stream()
