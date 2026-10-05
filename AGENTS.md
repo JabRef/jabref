@@ -405,6 +405,8 @@ Quick check of core library:
 JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT) to trace requirements to implementation and tests.
 Requirements capture what JabRef should do as a structured representation of issues and features, enabling bidirectional traceability.
 
+For a new feature or significant bug fix, add the requirement to the appropriate `docs/requirements/<area>.md` file.
+
 Read and use the [`openfasttrace`](https://github.com/itsallcode/openfasttrace-ai-skills/blob/main/skills/openfasttrace/SKILL.md) skill.
 
 In JabRef we use OFT this way:
@@ -435,10 +437,7 @@ Additional guidelines:
 
 - Link the issue the requirement originates from (if there is).
 - Respect INVEST criteria. Prefer high-level requirements over overly detailed ones.
-- For ideas or planned requirements not yet implemented, mark them as draft so they are preserved without failing coverage checks:
-  ```markdown
-  Status: draft
-  ```
+- For ideas or planned requirements not yet implemented, mark them as draft so they are preserved without failing coverage checks: `Status: draft`.
 
 Checking coverage:
 
