@@ -117,7 +117,7 @@ public class CiteDrivePreferences {
 
     /// Web page where the user picks which of the pushed entries to import into a CiteDrive project
     public URI getImportPage() {
-        return URLUtil.createUri(getAppBaseUrl()).resolve("jabref/push/");
+        return URLUtil.createUri(getAppBaseUrl()).resolve("jabref/import/");
     }
 
     public final @Nullable RefreshToken getRefreshToken() {
