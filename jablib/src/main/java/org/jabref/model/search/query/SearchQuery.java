@@ -47,7 +47,7 @@ public class SearchQuery {
                 String trimmed = searchExpression.trim();
                 String lower = trimmed.toLowerCase(Locale.ROOT);
                 if (!trimmed.contains(" ") && (lower.startsWith("http://") || lower.startsWith("https://")
-                    || lower.startsWith("doi.org/") || lower.startsWith("doi:"))) {
+                        || lower.startsWith("doi.org/") || lower.startsWith("doi:"))) {
                     normalizedExpression = DOI.parse(trimmed)
                                               .map(DOI::asString)
                                               .orElse(searchExpression);
