@@ -47,6 +47,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the DOI lookup button lost its progress indicator after switching to another entry and back. [#17223](https://github.com/JabRef/jabref/pull/17223)
 - We fixed an issue where double-clicking a word in an AI chat message did not select it. [#17174](https://github.com/JabRef/jabref/pull/17174)
 - We fixed the entry counts in the groups panel being misaligned with the group names. [#17253](https://github.com/JabRef/jabref/issues/17253)
+- We moved the "Show diff" button of the Git commit dialog into the bottom button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
 
 ### Removed
 
@@ -2381,7 +2382,5 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [5.1]: https://github.com/JabRef/jabref/compare/v5.0...v5.1
 [5.0]: https://github.com/JabRef/jabref/compare/v5.0-beta...v5.0
 [5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-alpha...v5.0-beta
-[5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alph
-
-We moved the "Show diff" button of the Git commit dialog into the bottom button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
+[5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
 <!-- markdownlint-disable-file MD024 MD033 MD053 -->
