@@ -448,6 +448,8 @@ graalvmNative {
                 includedPatterns.add(".*\\.fxml$")
                 includedPatterns.add(".*\\.css$")
                 includedPatterns.add("build\\.properties")
+                // Theme previews (generateThemePreviews); ThemePreviewView hides itself when they are missing
+                includedPatterns.add("org/jabref/gui/theme/preview/.*\\.png$")
             }
         }
     }

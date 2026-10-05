@@ -2,6 +2,126 @@
   "resources": [
     {
       "glob": "org/controlsfx/dialog/*.png"
+    },
+    {
+      "bundle": "arc-progress-indicator"
+    },
+    {
+      "bundle": "avatar-view"
+    },
+    {
+      "bundle": "before-after-view"
+    },
+    {
+      "bundle": "calendar-view"
+    },
+    {
+      "bundle": "chip-view"
+    },
+    {
+      "bundle": "chips-view-container"
+    },
+    {
+      "bundle": "date-range-picker"
+    },
+    {
+      "bundle": "date-range-view"
+    },
+    {
+      "bundle": "day-of-week-picker"
+    },
+    {
+      "bundle": "dialog-pane"
+    },
+    {
+      "bundle": "drawer-stack-pane"
+    },
+    {
+      "bundle": "duration-picker"
+    },
+    {
+      "bundle": "email-field"
+    },
+    {
+      "bundle": "enhanced-label"
+    },
+    {
+      "bundle": "filter-view"
+    },
+    {
+      "bundle": "grid-table-column"
+    },
+    {
+      "bundle": "grid-table-view"
+    },
+    {
+      "bundle": "info-center-view"
+    },
+    {
+      "bundle": "inner-list-view"
+    },
+    {
+      "bundle": "item-paging-control"
+    },
+    {
+      "bundle": "multi-column-list-view"
+    },
+    {
+      "bundle": "notification-view"
+    },
+    {
+      "bundle": "paging-control"
+    },
+    {
+      "bundle": "photo-view"
+    },
+    {
+      "bundle": "pop-over"
+    },
+    {
+      "bundle": "recent-files"
+    },
+    {
+      "bundle": "screens-view"
+    },
+    {
+      "bundle": "search-field"
+    },
+    {
+      "bundle": "search-text-field"
+    },
+    {
+      "bundle": "segmented-bar"
+    },
+    {
+      "bundle": "selection-box"
+    },
+    {
+      "bundle": "simple-filter-view"
+    },
+    {
+      "bundle": "skeleton"
+    },
+    {
+      "bundle": "text-view"
+    },
+    {
+      "bundle": "time-picker"
+    },
+    {
+      "bundle": "time-range-picker"
+    },
+    {
+      "bundle": "tree-node-view"
+    },
+    {
+      "bundle": "year-month-picker"
+    },
+    {
+      "bundle": "year-month-view"
+    },
+    {
+      "bundle": "year-view"
     }
   ]
 }
