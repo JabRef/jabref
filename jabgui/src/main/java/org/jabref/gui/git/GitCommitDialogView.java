@@ -22,12 +22,16 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
 
 public class GitCommitDialogView extends BaseDialog<Void> {
 
     @FXML private TextArea commitMessage;
     @FXML private ButtonType commitButton;
     @FXML private ButtonType commitAndPushButton;
+    @FXML private ButtonType showDiffButtonType;
+
 
     private GitCommitDialogViewModel viewModel;
 
@@ -44,7 +48,13 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+        Button showDiffButton = (Button) getDialogPane().lookupButton(showDiffButtonType);
+        showDiffButton.addEventFilter(ActionEvent.ACTION, event -> {
+            event.consume();
+            showDiff();
+        });
     }
+
 
     @FXML
     private void initialize() {
@@ -59,6 +69,8 @@ public class GitCommitDialogView extends BaseDialog<Void> {
 
         commitMessage.textProperty().bindBidirectional(viewModel.commitMessageProperty());
         commitMessage.setPromptText(Localization.lang("Enter commit message here"));
+        
+       
 
         this.setResultConverter(button -> {
             if (button != ButtonType.CANCEL) {
