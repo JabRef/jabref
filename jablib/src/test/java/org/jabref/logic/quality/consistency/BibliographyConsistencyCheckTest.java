@@ -588,11 +588,10 @@ class BibliographyConsistencyCheckTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(entryWithFile, entryWithoutFile));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (entry, message) -> {
         });
 
         BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of());
         assertEquals(expected, result, "The file field should be excluded from the consistency check");
     }
-
 }
