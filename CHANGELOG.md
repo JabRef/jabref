@@ -2381,5 +2381,7 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [5.1]: https://github.com/JabRef/jabref/compare/v5.0...v5.1
 [5.0]: https://github.com/JabRef/jabref/compare/v5.0-beta...v5.0
 [5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-alpha...v5.0-beta
-[5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
+[5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alph
+
+We moved the "Show diff" button of the Git commit dialog into the bottom button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
 <!-- markdownlint-disable-file MD024 MD033 MD053 -->
