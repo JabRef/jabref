@@ -8,6 +8,7 @@ In case there is no issue present, the pull request implementing the feature is 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+- we fixed an issue where the entry preview showed no vertical scrollbar , so long previews (e.g. ,with an abstract) where cut off. [#17359 (https://github.com/JabRef/jabref/issues/17359)] 
 
 ### Added
 

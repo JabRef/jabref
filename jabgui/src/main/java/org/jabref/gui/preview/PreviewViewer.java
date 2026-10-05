@@ -90,7 +90,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         getStyleClass().add("preview-viewer");
         setFitToWidth(true);
-        setFitToHeight(true);
+        // setFitToHeight(false);
         // Surrounding layouts (preview panel, dialogs) rely on a stable preferred size,
         // not on the content-dependent one of the rendered nodes
         setPrefSize(800, 600);
