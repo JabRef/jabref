@@ -91,6 +91,8 @@ graalvmNative {
             }
             imageName.set("jabkit")
             mainClass.set("org.jabref.toolkit.JabKitLauncher")
+            // English only (the JVM version follows the language set in the preferences)
+            buildArgs.add("-H:IncludeLocales=en")
         }
     }
 }

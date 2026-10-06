@@ -12,7 +12,7 @@ graalvmNative {
                 "--no-fallback",
                 "-march=compatibility",
                 "-H:+ReportExceptionStackTraces",
-                "-H:IncludeLocales=en",
+                // Locales (-H:IncludeLocales) are chosen per application: the CLIs ship English only, jabgui all UI languages
                 "--enable-all-security-services",
                 "--enable-native-access=ALL-UNNAMED",
                 "--enable-url-protocols=http,https",
