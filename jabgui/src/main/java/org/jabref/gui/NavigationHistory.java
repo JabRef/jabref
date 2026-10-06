@@ -39,7 +39,9 @@ public class NavigationHistory {
     /// @return An Optional containing the previous BibEntry, or an empty Optional if there's no history to go back to.
     public Optional<BibEntry> back() {
         if (canGoBack()) {
-            nextEntries.add(currentEntry);
+            if (currentEntry != null) {
+                nextEntries.add(currentEntry);
+            }
             currentEntry = previousEntries.removeLast();
             return Optional.of(currentEntry);
         }
@@ -52,7 +54,9 @@ public class NavigationHistory {
     /// @return An Optional containing the next BibEntry, or an empty Optional if there is no "forward" history.
     public Optional<BibEntry> forward() {
         if (canGoForward()) {
-            previousEntries.add(currentEntry);
+            if (currentEntry != null) {
+                previousEntries.add(currentEntry);
+            }
             currentEntry = nextEntries.removeLast();
             return Optional.of(currentEntry);
         }
@@ -65,5 +69,18 @@ public class NavigationHistory {
 
     public boolean canGoForward() {
         return !nextEntries.isEmpty();
+    }
+
+    /// Removes deleted entries from the navigation history so that back and forward skip them.
+    public void removeEntries(List<BibEntry> removedEntries) {
+        previousEntries.removeIf(entry -> isRemoved(entry, removedEntries));
+        nextEntries.removeIf(entry -> isRemoved(entry, removedEntries));
+        if (currentEntry != null && isRemoved(currentEntry, removedEntries)) {
+            currentEntry = null;
+        }
+    }
+
+    private static boolean isRemoved(BibEntry entry, List<BibEntry> removedEntries) {
+        return removedEntries.stream().anyMatch(removed -> removed == entry);
     }
 }
