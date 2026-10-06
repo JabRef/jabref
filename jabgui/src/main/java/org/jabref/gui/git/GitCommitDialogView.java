@@ -31,7 +31,6 @@ public class GitCommitDialogView extends BaseDialog<Void> {
     @FXML private ButtonType commitAndPushButton;
     @FXML private ButtonType showDiffButtonType;
 
-
     private GitCommitDialogViewModel viewModel;
 
     @Inject private StateManager stateManager;
@@ -63,6 +62,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
 
         commitMessage.textProperty().bindBidirectional(viewModel.commitMessageProperty());
         commitMessage.setPromptText(Localization.lang("Enter commit message here"));
+
         this.setResultConverter(button -> {
             if (button != ButtonType.CANCEL) {
                 if (button == commitAndPushButton) {
