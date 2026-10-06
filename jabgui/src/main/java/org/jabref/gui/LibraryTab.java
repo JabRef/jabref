@@ -16,6 +16,8 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -111,6 +113,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchResults;
 import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -180,6 +183,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private ListProperty<GroupTreeNode> selectedGroupsProperty;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
+    private final ReadOnlyObjectWrapper<Optional<SearchResults>> searchResults = new ReadOnlyObjectWrapper<>(Optional.empty());
     private final IntegerProperty resultSize = new SimpleIntegerProperty(0);
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
@@ -348,6 +352,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getSearchContext(), selectedGroupsProperty(), searchQueryProperty, resultSizeProperty());
+        searchResults.unbind();
+        searchResults.bind(tableModel.searchResultsProperty());
 
         new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferences.getFilePreferences());
@@ -1000,6 +1006,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             tableModel.unbind();
         }
 
+        searchResults.unbind();
+
         if (autoRenameFileOnEntryChange != null) {
             coarseChangeFilter.unregisterListener(autoRenameFileOnEntryChange);
         }
@@ -1063,6 +1071,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     public OptionalObjectProperty<SearchQuery> searchQueryProperty() {
         return searchQueryProperty;
+    }
+
+    public ReadOnlyObjectProperty<Optional<SearchResults>> searchResultsProperty() {
+        return searchResults.getReadOnlyProperty();
     }
 
     public IntegerProperty resultSizeProperty() {
