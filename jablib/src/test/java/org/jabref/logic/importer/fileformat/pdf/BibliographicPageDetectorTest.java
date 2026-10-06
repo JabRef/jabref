@@ -3,12 +3,14 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.util.List;
 import java.util.Optional;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 class BibliographicPageDetectorTest {
 
     private static final String UKRAINIAN_IMPRINT_PAGE = """
