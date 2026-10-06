@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -145,6 +146,7 @@ class MainTableDataModelTest {
         // First search matches Alice only.
         searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
 
+        assertEquals(Set.of(bibEntryA.getId()), model.searchResultsProperty().get().orElseThrow().getMatchedEntries());
         assertTrue(vmA.isMatchedBySearch());
         assertFalse(vmB.isMatchedBySearch());
         assertTrue(vmA.isVisibleBySearch());
@@ -273,6 +275,7 @@ class MainTableDataModelTest {
             assertFalse(quantumViewModel.isMatchedBySearch());
             assertTrue(organicViewModel.isMatchedBySearch());
             assertEquals(1, resultSize.get());
+            assertEquals(Set.of(organicEntry.getId()), model.searchResultsProperty().get().orElseThrow().getMatchedEntries());
 
             allowFirstSearchToFinish.complete(null);
             submittedTasks.getFirst().get(5, TimeUnit.SECONDS);
@@ -280,6 +283,7 @@ class MainTableDataModelTest {
             assertFalse(quantumViewModel.isMatchedBySearch());
             assertTrue(organicViewModel.isMatchedBySearch());
             assertEquals(1, resultSize.get());
+            assertEquals(Set.of(organicEntry.getId()), model.searchResultsProperty().get().orElseThrow().getMatchedEntries());
         } finally {
             allowFirstSearchToFinish.complete(null);
             executorService.shutdownNow();
