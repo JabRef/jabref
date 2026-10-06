@@ -5,10 +5,12 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 class NavigationHistoryTest {
 
     @Test
@@ -26,5 +28,22 @@ class NavigationHistoryTest {
 
         assertEquals(Optional.of(richard), history.back());
         assertEquals(Optional.of(tokede), history.back());
+    }
+
+    @Test
+    void forwardSkipsDeletedEntry() {
+        NavigationHistory history = new NavigationHistory();
+        BibEntry first = new BibEntry().withCitationKey("First");
+        BibEntry second = new BibEntry().withCitationKey("Second");
+        BibEntry third = new BibEntry().withCitationKey("Third");
+
+        history.add(first);
+        history.add(second);
+        history.add(third);
+        history.back();
+        history.back();
+        history.removeEntries(List.of(second));
+
+        assertEquals(Optional.of(third), history.forward());
     }
 }
