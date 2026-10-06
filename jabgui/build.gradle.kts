@@ -442,6 +442,9 @@ graalvmNative {
         named("main") {
             classpath(nativeImageOnly, nativeImageFeatures.output)
             buildArgs.add("--features=org.jabref.nativeimage.JabRefViewsFeature")
+            // JabRef's UI languages (keep in sync with org.jabref.logic.l10n.Language); the CLIs ship English only.
+            // -H:+IncludeAllLocales would add ~84 MB for locales JabRef has no translations for.
+            buildArgs.add("-H:IncludeLocales=ar,da,de,el,en,es,fa,fi,fr,id,it,ja,ko,nl,no,pl,pt,pt-BR,ru,sv,tl,tr,uk,vi,zh-CN,zh-TW")
             imageName.set("jabref")
             mainClass.set("org.jabref.Launcher")
             resources {

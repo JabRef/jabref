@@ -4,6 +4,9 @@
       "glob": "org/controlsfx/dialog/*.png"
     },
     {
+      "bundle": "l10n/JabRef"
+    },
+    {
       "bundle": "arc-progress-indicator"
     },
     {
