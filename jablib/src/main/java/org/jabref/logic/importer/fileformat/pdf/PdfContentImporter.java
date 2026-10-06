@@ -205,6 +205,10 @@ public class PdfContentImporter extends PdfImporter {
 
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException {
+        return importPaperContent(document);
+    }
+
+    private ParserResult importPaperContent(PDDocument document) throws IOException {
         List<BibEntry> result = new ArrayList<>(1);
         String firstPageContents = PdfUtils.getFirstPageContents(document);
         Optional<String> titleByFontSize = extractTitleFromDocument(document);
