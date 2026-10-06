@@ -81,6 +81,6 @@ public class NavigationHistory {
     }
 
     private static boolean isRemoved(BibEntry entry, List<BibEntry> removedEntries) {
-        return removedEntries.stream().anyMatch(removed -> removed == entry);
+        return removedEntries.stream().anyMatch(removed -> removed.getId().equals(entry.getId()));
     }
 }
