@@ -680,7 +680,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     /// Keeps the navigation history in sync with the library, so that back and forward skip deleted entries.
     @Subscribe
     public void listen(EntriesRemovedEvent event) {
-        UiTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> {
             navigationHistory.removeEntries(event.getBibEntries());
             updateNavigationState();
         });
