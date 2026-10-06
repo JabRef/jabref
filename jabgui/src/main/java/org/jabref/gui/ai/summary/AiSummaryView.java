@@ -1,5 +1,7 @@
 package org.jabref.gui.ai.summary;
 
+import java.util.Objects;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
@@ -62,7 +64,7 @@ public class AiSummaryView extends StackPane {
     }
 
     private void setupBindings() {
-        errorPane.textAreaContentProperty().bind(viewModel.errorProperty().map(Throwable::getMessage));
+        errorPane.textAreaContentProperty().bind(viewModel.errorProperty().map(e -> Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName())));
 
         summaryShowing.summaryProperty().bind(viewModel.summaryProperty());
         summaryShowing.entryProperty().bind(viewModel.entryProperty());
