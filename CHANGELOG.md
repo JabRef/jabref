@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added tooltips with action descriptions to menu items. [#9615](https://github.com/JabRef/jabref/issues/9615)
 - We added "Contribute to JabRef" to the Help menu, linking to [contribute.jabref.org](https://contribute.jabref.org). [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
+- We added a warning when assigning a keyboard shortcut that is already in use, with the option to replace it. [#17240](https://github.com/JabRef/jabref/issues/17240)
 
 ### Changed
 

@@ -132,7 +132,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         return dialogService.showCustomButtonDialogAndWait(
                                     Alert.AlertType.WARNING,
                                     Localization.lang("Shortcut already in use"),
-                                    Localization.lang("The shortcut %0 is already used by %1. Do you want to replace it?",
+                                    Localization.lang("The shortcut %0 is already used by '%1'. Do you want to replace it?",
                                             combination, conflictingKeyBinding.getLocalization()),
                                     replaceButtonType,
                                     ButtonType.CANCEL)
