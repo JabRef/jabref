@@ -42,6 +42,9 @@ final class BibliographicPageDetector {
             "\\A\\s*(references|bibliography|literature|works cited|література|литература|список .*(джерел|літератури|литературы))\\s*$",
             FLAGS | Pattern.MULTILINE);
 
+    private BibliographicPageDetector() {
+    }
+
     /// Returns the text of the page that is most likely the book's bibliographic page.
     ///
     /// @param pageTexts the text of each candidate page; on equal scores the earlier page wins
