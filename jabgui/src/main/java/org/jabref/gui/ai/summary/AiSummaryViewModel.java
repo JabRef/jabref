@@ -88,7 +88,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
         setupListeners();
     }
 
-    static boolean hasOnlineLink(List<LinkedFile> files) {
+    static boolean hasOnlyOnlineLinks(List<LinkedFile> files) {
         return !files.isEmpty() && files.stream().allMatch(LinkedFile::isOnlineLink);
     }
 
@@ -114,7 +114,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
                 Map.entry(State.NO_LOCAL_FILE,
                         entry.map(FullBibEntry::entry)
                              .map(BibEntry::getFiles)
-                             .map(AiSummaryViewModel::hasOnlineLink)
+                             .map(AiSummaryViewModel::hasOnlyOnlineLinks)
                 ),
 
                 Map.entry(State.NO_SUPPORTED_FILE_TYPES,
