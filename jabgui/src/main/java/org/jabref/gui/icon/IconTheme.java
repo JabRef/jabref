@@ -248,6 +248,7 @@ public class IconTheme {
         READ_STATUS_SKIMMED(Color.ORANGE, MaterialDesignE.EYE),
         READ_STATUS(MaterialDesignE.EYE),
         RELEVANCE(MaterialDesignS.STAR_CIRCLE),
+        RELEVANT(Color.rgb(255, 179, 0), MaterialDesignS.STAR_CIRCLE),
         MERGE_ENTRIES(MaterialDesignC.COMPARE),
         CONNECT_OPEN_OFFICE(MaterialDesignO.OPEN_IN_APP),
         PLAIN_TEXT_IMPORT_TODO(MaterialDesignC.CHECKBOX_BLANK_CIRCLE_OUTLINE),
