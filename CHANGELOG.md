@@ -47,7 +47,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the DOI lookup button lost its progress indicator after switching to another entry and back. [#17223](https://github.com/JabRef/jabref/pull/17223)
 - We fixed an issue where double-clicking a word in an AI chat message did not select it. [#17174](https://github.com/JabRef/jabref/pull/17174)
 - We fixed the entry counts in the groups panel being misaligned with the group names. [#17253](https://github.com/JabRef/jabref/issues/17253)
-- We fixed an issue where the database consistency check flagged the `file` field and internal metadata fields. [#17325](https://github.com/JabRef/jabref/pull/17325)
 
 ### Removed
 
@@ -405,6 +404,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Improved responsiveness and user interface of refresh button in Citation Relations tab. [#12247](https://github.com/JabRef/jabref/issues/12247)
 - We improved MeSH term parsing in Medline/PubMed importers to split compound terms into individual heading/qualifier pairs. [#12532](https://github.com/JabRef/jabref/issues/12532)
 - JabRef keeps the field `review` in BibTeX files. [#15609](https://github.com/JabRef/jabref/pull/15609)
+- We removed the `file` field from the consistency check, because it is not expected to be present in all entries. [#17309](https://github.com/JabRef/jabref/issues/17309)
 
 ### Fixed
 
