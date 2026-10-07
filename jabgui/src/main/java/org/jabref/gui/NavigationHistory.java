@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -73,14 +75,11 @@ public class NavigationHistory {
 
     /// Removes deleted entries from the navigation history so that back and forward skip them.
     public void removeEntries(List<BibEntry> removedEntries) {
-        previousEntries.removeIf(entry -> isRemoved(entry, removedEntries));
-        nextEntries.removeIf(entry -> isRemoved(entry, removedEntries));
-        if (currentEntry != null && isRemoved(currentEntry, removedEntries)) {
+        Set<String> removedIds = removedEntries.stream().map(BibEntry::getId).collect(Collectors.toSet());
+        previousEntries.removeIf(entry -> removedIds.contains(entry.getId()));
+        nextEntries.removeIf(entry -> removedIds.contains(entry.getId()));
+        if (currentEntry != null && removedIds.contains(currentEntry.getId())) {
             currentEntry = null;
         }
-    }
-
-    private static boolean isRemoved(BibEntry entry, List<BibEntry> removedEntries) {
-        return removedEntries.stream().anyMatch(removed -> removed.getId().equals(entry.getId()));
     }
 }
