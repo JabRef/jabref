@@ -33,15 +33,30 @@ public class TextInputKeyBindings {
                         focusedTextField.nextWord();
                         event.consume();
                     }
-                    case EDITOR_BEGINNING,
-                         EDITOR_UP,
-                         EDITOR_BEGINNING_DOC -> {
+                    case EDITOR_BEGINNING -> {
+                        int pos = focusedTextField.getCaretPosition();
+                        String text = focusedTextField.getText();
+                        int lineStart = text.lastIndexOf('\n', pos - 1) + 1;
+                        focusedTextField.positionCaret(lineStart);
+                        event.consume();
+                    }
+                    case EDITOR_UP,
+                        EDITOR_BEGINNING_DOC -> {
                         focusedTextField.home();
                         event.consume();
                     }
-                    case EDITOR_END,
-                         EDITOR_DOWN,
-                         EDITOR_END_DOC -> {
+                    case EDITOR_END -> {
+                        int pos = focusedTextField.getCaretPosition();
+                        String text = focusedTextField.getText();
+                        int lineEnd = text.indexOf('\n', pos);
+                        if (lineEnd == -1) {
+                            lineEnd = text.length();
+                        }
+                        focusedTextField.positionCaret(lineEnd);
+                        event.consume();
+                    }
+                    case EDITOR_DOWN,
+                        EDITOR_END_DOC -> {
                         focusedTextField.end();
                         event.consume();
                     }
@@ -71,10 +86,18 @@ public class TextInputKeyBindings {
                     }
                     case EDITOR_KILL_LINE -> {
                         int pos = focusedTextField.getCaretPosition();
-                        focusedTextField.setText(focusedTextField.getText(0, pos));
+                        String text = focusedTextField.getText();
+                        int lineEnd = text.indexOf('\n', pos);
+
+                        if (lineEnd == -1) {
+                            lineEnd = text.length();
+                        }
+
+                        focusedTextField.deleteText(pos, lineEnd);
                         focusedTextField.positionCaret(pos);
                         event.consume();
                     }
+
                     case EDITOR_KILL_WORD -> {
                         int pos = focusedTextField.getCaretPosition();
                         String text = focusedTextField.getText(0, focusedTextField.getText().length());
