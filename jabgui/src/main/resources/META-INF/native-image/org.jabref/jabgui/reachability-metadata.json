@@ -89,12 +89,7 @@
     {
       "type": "sun.awt.AWTAutoShutdown",
       "jniAccessible": true,
-      "methods": [
-        {
-          "name": "notifyToolkitThreadFree",
-          "parameterTypes": []
-        }
-      ]
+      "allDeclaredMethods": true
     },
     {
       "type": "org.jabref.gui.clipboard.JabRefClipboardData",

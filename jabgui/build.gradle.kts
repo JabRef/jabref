@@ -421,14 +421,8 @@ val generateThemePreviews = tasks.register("generateThemePreviews") {
 sourceSets["main"].resources.srcDir(generateThemePreviews)
 // endregion
 
-// GraalVM Native Image (GSoC bootstrap). JavaFX must come from the JDK (Liberica NIK Full):
-// build with -PuseLibericaJdkFull=true and JAVA_HOME pointing at a *.fx-nik toolchain.
-// Common buildArgs (--no-fallback, -march=compatibility, etc.) come from
-// org.jabref.gradle.feature.nativecompile; transitive jablib/jabls/jabsrv modules already
-// ship their own META-INF/native-image metadata, which the builder picks up automatically.
-// StaticFX (https://github.com/HebiRobotics/jfx-static-feature): jfx-static-libs ships generated metadata
-// covering all of JavaFX plus static archives of its natives; jfx-static-feature (activated via its own
-// native-image.properties) links those archives into the image. Kept off the JVM module path on purpose.
+// StaticFX (https://github.com/HebiRobotics/jfx-static-feature): JavaFX metadata, static libraries and Feature.
+// Only on the native-image classpath, so the JVM module path stays unchanged.
 val nativeImageOnly = configurations.create("nativeImageOnly")
 dependencies {
     nativeImageOnly("us.hebi.graalvm:jfx-static-libs:27-1")
