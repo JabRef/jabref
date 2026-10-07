@@ -23,6 +23,11 @@ version = providers.gradleProperty("projVersion")
     .orElse("100.0.0")
     .get()
 
+mainModuleInfo {
+    // Generates the picocli reflection metadata for GuiCommandLine (native image), as in jabkit and jabls-cli
+    annotationProcessor("info.picocli.codegen")
+}
+
 testModuleInfo {
     requires("org.jabref.testsupport")
 

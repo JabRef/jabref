@@ -1,7 +1,120 @@
 {
+  "reflection": [
+    {
+      "type": "org.tinylog.configuration.PropertiesConfigurationLoader",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.core.TinylogLoggingProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.slf4j.TinylogSlf4jServiceProvider"
+    },
+    {
+      "type": "org.jabref.gui.logging.GuiWriter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.util.Map"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.writers.ConsoleWriter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.util.Map"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.writers.RollingFileWriter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.util.Map"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.policies.StartupPolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.throwable.StripThrowableFilter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.awt.event.InputEvent",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "getButtonDownMasks",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.awt.AWTAutoShutdown",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "notifyToolkitThreadFree",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.gui.clipboard.JabRefClipboardData",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    }
+  ],
   "resources": [
     {
       "glob": "org/controlsfx/dialog/*.png"
+    },
+    {
+      "glob": "org/controlsfx/control/*.png"
+    },
+    {
+      "glob": "citation-style-catalog.json"
+    },
+    {
+      "glob": "csl-styles/*.csl"
     },
     {
       "bundle": "l10n/JabRef"
@@ -125,6 +238,30 @@
     },
     {
       "bundle": "year-view"
+    },
+    {
+      "glob": "META-INF/services/org.tinylog.*"
+    },
+    {
+      "glob": "fonts/*.ttf"
+    },
+    {
+      "glob": "META-INF/resources/*/*/fonts/*.ttf"
+    },
+    {
+      "bundle": "controlsfx"
+    },
+    {
+      "bundle": "sun.awt.resources.awt"
+    },
+    {
+      "bundle": "sun.awt.resources.awtosx"
+    },
+    {
+      "glob": "images/Icons.properties"
+    },
+    {
+      "glob": "images/external/*.png"
     }
   ]
 }

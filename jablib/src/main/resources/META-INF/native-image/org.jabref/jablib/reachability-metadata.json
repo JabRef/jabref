@@ -322,6 +322,75 @@
     },
     {
       "type": "tools.jackson.databind.ser.Serializers[]"
+    },
+    {
+      "type": "com.vladsch.flexmark.util.ast.TextContainer$Flags"
+    },
+    {
+      "type": "com.vladsch.flexmark.util.sequence.BasedOptionsHolder$Options"
+    },
+    {
+      "type": "com.vladsch.flexmark.util.sequence.LineAppendable$Options"
+    },
+    {
+      "type": "com.vladsch.flexmark.util.sequence.builder.ISegmentBuilder$Options"
+    },
+    {
+      "type": "ai.djl.pytorch.jni.JniUtils",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "logger"
+        }
+      ]
+    },
+    {
+      "type": "ai.djl.engine.EngineException",
+      "jniAccessible": true
+    },
+    {
+      "type": "org.jabref.logic.importer.fetcher.citation.semanticscholar.AuthorResponse",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "unsafeAllocated": true
+    },
+    {
+      "type": "org.jabref.logic.importer.fetcher.citation.semanticscholar.CitationDataItem",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "unsafeAllocated": true
+    },
+    {
+      "type": "org.jabref.logic.importer.fetcher.citation.semanticscholar.CitationsResponse",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "unsafeAllocated": true
+    },
+    {
+      "type": "org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "unsafeAllocated": true
+    },
+    {
+      "type": "org.jabref.logic.importer.fetcher.citation.semanticscholar.ReferenceDataItem",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "unsafeAllocated": true
+    },
+    {
+      "type": "org.jabref.logic.importer.fetcher.citation.semanticscholar.ReferencesResponse",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "unsafeAllocated": true
+    },
+    {
+      "type": "java.time.LocalDateTime",
+      "serializable": true
+    },
+    {
+      "type": "java.time.Ser",
+      "serializable": true
     }
   ],
   "resources": [
@@ -377,6 +446,18 @@
     {
       "module": "jkeychain",
       "glob": "osxkeychain.so"
+    },
+    {
+      "glob": "pytorch-engine.properties"
+    },
+    {
+      "glob": "ai/djl/engine/api.properties"
+    },
+    {
+      "glob": "resource/layout/**"
+    },
+    {
+      "glob": "csl-locales/locales-*.xml"
     }
   ],
   "bundles": [
@@ -386,5 +467,21 @@
     {
       "name": "uk/ac/ed/ph/snuggletex/core-error-messages"
     }
-  ]
+  ],
+  "foreign": {
+    "downcalls": [
+      {
+        "returnType": "jint",
+        "parameterTypes": [
+          "void*",
+          "jlong",
+          "jint"
+        ]
+      },
+      {
+        "returnType": "jint",
+        "parameterTypes": []
+      }
+    ]
+  }
 }
