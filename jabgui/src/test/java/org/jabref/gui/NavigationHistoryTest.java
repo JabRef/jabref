@@ -46,4 +46,28 @@ class NavigationHistoryTest {
 
         assertEquals(Optional.of(third), history.forward());
     }
+
+    @Test
+    void backAndForwardSkipsMultipleDeletedEntries() {
+        NavigationHistory history = new NavigationHistory();
+        BibEntry first = new BibEntry().withCitationKey("First");
+        BibEntry second = new BibEntry().withCitationKey("Second");
+        BibEntry third = new BibEntry().withCitationKey("Third");
+        BibEntry fourth = new BibEntry().withCitationKey("Fourth");
+        BibEntry fifth = new BibEntry().withCitationKey("Fifth");
+
+        history.add(first);
+        history.add(second);
+        history.add(third);
+        history.add(fourth);
+        history.add(fifth);
+        history.back();
+        history.back();
+        // current: Third, back: First and Second, forward: Fourth and Fifth
+        history.removeEntries(List.of(second, fourth));
+
+        assertEquals(Optional.of(first), history.back());
+        assertEquals(Optional.of(third), history.forward());
+        assertEquals(Optional.of(fifth), history.forward());
+    }
 }
