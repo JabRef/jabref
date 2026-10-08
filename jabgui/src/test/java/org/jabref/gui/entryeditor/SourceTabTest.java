@@ -77,6 +77,7 @@ class SourceTabTest {
             when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
             keyBindingRepository = new KeyBindingRepository(List.of(), List.of());
             keyBindingRepository.put(KeyBinding.SAVE_LIBRARY, "Ctrl+S");
+            keyBindingRepository.put(KeyBinding.COPY, "Ctrl+C");
             ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
             when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
             fieldPreferences = mock(FieldPreferences.class);
@@ -328,5 +329,35 @@ class SourceTabTest {
 
         assertEquals(Optional.of("Edited first entry"), firstEntry.getField(StandardField.TITLE));
         assertEquals(Optional.of("Second entry"), secondEntry.getField(StandardField.TITLE));
+    }
+
+    @Test
+    void copyCopiesSyntaxHighlightedHtmlAndPlainText() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Test Title");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(entry);
+            sourceTab.notifyAboutFocus(entry);
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            sourceArea.requestFocus();
+            sourceArea.selectAll();
+            
+            // Trigger copy
+            Event.fireEvent(sourceArea, new KeyEvent(KeyEvent.KEY_PRESSED, "c", "C", KeyCode.C, false, true, false, false));
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+            assertTrue(clipboard.hasString(), "Clipboard should contain plain text");
+            assertTrue(clipboard.hasHtml(), "Clipboard should contain HTML");
+            assertTrue(clipboard.getHtml().contains("<span style=\"color:"), "HTML should contain styling");
+        });
     }
 }

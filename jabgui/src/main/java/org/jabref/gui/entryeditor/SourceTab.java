@@ -22,6 +22,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -144,6 +145,14 @@ public class SourceTab extends EntryEditorTab {
 
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
+                if (binding == org.jabref.gui.keyboard.KeyBinding.COPY) {
+                    copySelectedTextWithSyntaxHighlighting();
+                    event.consume();
+                }
+            });
+        });
 
         BibTeXHighlighter bibTeXHighlighter = new BibTeXHighlighter(stateManager, bibTeXSyntaxHighlighter);
         bibTeXHighlighter.setFieldPositionsProvider(() -> fieldPositions != null ? fieldPositions : Map.of());
@@ -351,6 +360,58 @@ public class SourceTab extends EntryEditorTab {
         });
     }
 
+    private void copySelectedTextWithSyntaxHighlighting() {
+        String selectedText = codeArea.getSelectedText();
+        if (selectedText == null || selectedText.isEmpty()) {
+            return;
+        }
+
+        List<io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXHighlightRegion> regions = bibTeXSyntaxHighlighter.computeHighlightRegions(selectedText);
+
+        StringBuilder htmlBuilder = new StringBuilder();
+        htmlBuilder.append("<pre style=\"font-family: monospace;\">");
+        
+        int cursor = 0;
+        for (io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXHighlightRegion region : regions) {
+            if (region.start() > cursor) {
+                htmlBuilder.append(escapeHtml(selectedText.substring(cursor, region.start())));
+            }
+            String color = getColorForCategory(region.category());
+            htmlBuilder.append("<span style=\"color: ").append(color).append(";\">");
+            htmlBuilder.append(escapeHtml(selectedText.substring(region.start(), region.end())));
+            htmlBuilder.append("</span>");
+            cursor = region.end();
+        }
+        if (cursor < selectedText.length()) {
+            htmlBuilder.append(escapeHtml(selectedText.substring(cursor)));
+        }
+        htmlBuilder.append("</pre>");
+
+        ClipBoardManager clipBoardManager = new ClipBoardManager(stateManager);
+        clipBoardManager.setHtmlContent(htmlBuilder.toString(), selectedText);
+    }
+
+    private String getColorForCategory(io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXTokenCategory category) {
+        switch (category.name()) {
+            case "KEYWORD": return "#0000FF";
+            case "STRING": return "#008000";
+            case "NUMBER": return "#0000FF";
+            case "COMMENT": return "#808080";
+            case "CITE_KEY": return "#000000; font-weight: bold";
+            case "FIELD_NAME": return "#000080";
+            case "MACRO": return "#2B91AF";
+            default: return "#000000";
+        }
+    }
+
+    private String escapeHtml(String text) {
+        return text.replace("&", "&amp;")
+                   .replace("<", "&lt;")
+                   .replace(">", "&gt;")
+                   .replace("\"", "&quot;")
+                   .replace("'", "&#39;");
+    }
+
     private class EditAction extends SimpleCommand {
 
         private final StandardActions command;
@@ -363,7 +424,7 @@ public class SourceTab extends EntryEditorTab {
         public void execute() {
             switch (command) {
                 case COPY ->
-                        codeArea.copy();
+                        copySelectedTextWithSyntaxHighlighting();
                 case CUT ->
                         codeArea.cut();
                 case PASTE ->
