@@ -387,21 +387,31 @@ public class SourceTab extends EntryEditorTab {
         }
         String selectedText = fullText.substring(start, end);
 
-        List<io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXHighlightRegion> regions = bibTeXSyntaxHighlighter.computeHighlightRegions(selectedText);
+        List<io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXHighlightRegion> regions = bibTeXSyntaxHighlighter.computeHighlightRegions(fullText);
 
         StringBuilder htmlBuilder = new StringBuilder();
         htmlBuilder.append("<pre style=\"font-family: monospace;\">");
         
         int cursor = 0;
         for (io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXHighlightRegion region : regions) {
-            if (region.start() > cursor) {
-                htmlBuilder.append(escapeHtml(selectedText.substring(cursor, region.start())));
+            if (region.end() <= start) {
+                continue;
+            }
+            if (region.start() >= end) {
+                break;
+            }
+
+            int localStart = Math.max(region.start() - start, 0);
+            int localEnd = Math.min(region.end() - start, selectedText.length());
+
+            if (localStart > cursor) {
+                htmlBuilder.append(escapeHtml(selectedText.substring(cursor, localStart)));
             }
             String style = getStyleForCategory(region.category());
             htmlBuilder.append("<span style=\"").append(style).append("\">");
-            htmlBuilder.append(escapeHtml(selectedText.substring(region.start(), region.end())));
+            htmlBuilder.append(escapeHtml(selectedText.substring(localStart, localEnd)));
             htmlBuilder.append("</span>");
-            cursor = region.end();
+            cursor = localEnd;
         }
         if (cursor < selectedText.length()) {
             htmlBuilder.append(escapeHtml(selectedText.substring(cursor)));

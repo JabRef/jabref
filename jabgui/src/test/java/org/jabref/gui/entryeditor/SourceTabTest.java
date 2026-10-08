@@ -36,7 +36,6 @@ import org.jabref.support.DisabledOnCIServer;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.CodeArea;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -349,8 +348,7 @@ class SourceTabTest {
             CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
             sourceArea.requestFocus();
             sourceArea.selectAll();
-            
-            // Trigger copy
+
             Event.fireEvent(sourceArea, new KeyEvent(KeyEvent.KEY_PRESSED, "c", "C", KeyCode.C, false, true, false, false));
         });
         JavaFxExtension.awaitEvents();
@@ -386,8 +384,7 @@ class SourceTabTest {
             CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
             sourceArea.requestFocus();
             sourceArea.selectAll();
-            
-            // Trigger copy
+
             Event.fireEvent(sourceArea, new KeyEvent(KeyEvent.KEY_PRESSED, "c", "C", KeyCode.C, false, true, false, false));
         });
         JavaFxExtension.awaitEvents();
@@ -410,8 +407,7 @@ class SourceTabTest {
             CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
             sourceArea.requestFocus();
             sourceArea.selectAll();
-            
-            // Trigger copy again
+
             Event.fireEvent(sourceArea, new KeyEvent(KeyEvent.KEY_PRESSED, "c", "C", KeyCode.C, false, true, false, false));
         });
         JavaFxExtension.awaitEvents();
@@ -424,5 +420,60 @@ class SourceTabTest {
             assertTrue(secondCopyHtml.contains("<span style=\"color:"), "HTML should contain styling");
             clipboard.clear();
         });
+    }
+
+    @Test
+    @DisabledOnCIServer("Depends on https://bugs.openjdk.org/browse/JDK-8391883 ")
+    void copyCopiesSyntaxHighlightedHtmlForPartialSelection() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("testKey")
+                .withField(StandardField.TITLE, "Test Title");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(entry);
+            sourceTab.notifyAboutFocus(entry);
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            sourceArea.requestFocus();
+            // Select "testKey" from inside the bibtex text.
+            // The generated source will look something like:
+            // @Article{testKey,
+            //   title = {Test Title},
+            // }
+            String text = sourceArea.getText();
+            int start = text.indexOf("testKey");
+            int end = start + 4; // Select "test"
+            sourceArea.select(offsetToTextPos(sourceArea, start), offsetToTextPos(sourceArea, end));
+
+            Event.fireEvent(sourceArea, new KeyEvent(KeyEvent.KEY_PRESSED, "c", "C", KeyCode.C, false, true, false, false));
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+            assertTrue(clipboard.hasString(), "Clipboard should contain plain text");
+            assertTrue(clipboard.hasHtml(), "Clipboard should contain HTML");
+            assertTrue(clipboard.getHtml().contains("<span style=\"color:"), "HTML should contain styling for partial token");
+            assertTrue(clipboard.getHtml().contains("test"), "HTML should contain the copied text");
+            clipboard.clear();
+        });
+    }
+
+    private jfx.incubator.scene.control.richtext.TextPos offsetToTextPos(CodeArea codeArea, int offset) {
+        int remaining = offset;
+        int paragraphCount = codeArea.getParagraphCount();
+        for (int i = 0; i < paragraphCount; i++) {
+            String line = codeArea.getPlainText(i);
+            int lineLength = line.length();
+            if (remaining <= lineLength) {
+                return jfx.incubator.scene.control.richtext.TextPos.ofLeading(i, remaining);
+            }
+            remaining -= lineLength + 1; // +1 for the line separator
+        }
+        return codeArea.getDocumentEnd();
     }
 }
