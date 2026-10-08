@@ -31,7 +31,6 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -54,6 +53,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.bibtexhighlighter.BibTeXCodeArea;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
@@ -94,9 +94,8 @@ import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import org.controlsfx.control.CheckListView;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +112,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
     private final DuplicateCheck duplicateCheck;
     private final BibEntryTypesManager entryTypesManager;
+    private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
     private final StateManager stateManager;
 
     private final ProgressIndicator progressIndicator;
@@ -131,9 +131,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
                                 BibEntryTypesManager bibEntryTypesManager,
-                                SearchCitationsRelationsService searchCitationsRelationsService) {
+                                SearchCitationsRelationsService searchCitationsRelationsService,
+                                BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
@@ -716,30 +718,24 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void showEntrySourceDialog(BibEntry entry) {
-        CodeArea ca = new CodeArea();
-        ca.getStyleClass().add("source-preview-code-area");
+        BibTeXCodeArea codeArea = new BibTeXCodeArea(stateManager, bibTeXSyntaxHighlighter);
+        codeArea.getStyleClass().add("source-preview-code-area");
         try {
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
-            ca.appendText(getSourceString(entry, mode, preferences.getFieldPreferences(), this.entryTypesManager));
+            codeArea.appendText(getSourceString(entry, mode, preferences.getFieldPreferences(), this.entryTypesManager));
         } catch (IOException e) {
             LOGGER.warn("Incorrect entry, could not load source:", e);
             return;
         }
 
-        ca.setWrapText(true);
-        ca.setPadding(new Insets(0, 10, 0, 10));
-        ca.showParagraphAtTop(0);
-
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setContent(new VirtualizedScrollPane<>(ca));
+        codeArea.setPadding(new Insets(0, 10, 0, 10));
+        codeArea.moveDocumentStart();
 
         DialogPane dialogPane = new DialogPane();
         dialogPane.setPrefSize(800, 400);
-        dialogPane.setContent(scrollPane);
-        String title = Localization.lang("Show BibTeX source");
+        dialogPane.setContent(codeArea);
+        String title = Localization.lang("BibTeX source");
 
         dialogService.showCustomDialogAndWait(title, dialogPane, ButtonType.OK);
     }

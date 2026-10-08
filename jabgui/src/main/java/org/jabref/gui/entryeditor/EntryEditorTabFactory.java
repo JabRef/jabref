@@ -143,7 +143,8 @@ public class EntryEditorTabFactory {
                             preferences,
                             taskExecutor,
                             bibEntryTypesManager,
-                            searchCitationsRelationsService);
+                            searchCitationsRelationsService,
+                            bibTeXSyntaxHighlighter);
             case SOURCE ->
                     new SourceTab(
                             preferences.getFieldPreferences(),
