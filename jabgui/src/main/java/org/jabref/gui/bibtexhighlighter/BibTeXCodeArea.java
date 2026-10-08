@@ -15,6 +15,9 @@ import jfx.incubator.scene.control.richtext.SyntaxDecorator;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
+/// A [CodeArea] displaying BibTeX source with syntax highlighting.
+///
+/// Shared by all places showing the BibTeX source of an entry, so that they look the same.
 public class BibTeXCodeArea extends CodeArea {
 
     private final BibTeXHighlighter highlighter;
@@ -26,12 +29,13 @@ public class BibTeXCodeArea extends CodeArea {
         setWrapText(true);
         getStyleClass().add("bibtex-code-area");
 
+        /// The color scheme of a dialog is set when it is shown, after the text was already rendered
         sceneProperty().subscribe(scene -> {
-                colorSchemeSubscription.unsubscribe();
-                colorSchemeSubscription = scene == null 
-                                        ? Subscription.EMPTY 
-                                        : scene.getPreferences().colorSchemeProperty().subscribe(_ -> refreshHighlighting());
-                });
+            colorSchemeSubscription.unsubscribe();
+            colorSchemeSubscription = scene == null
+                                      ? Subscription.EMPTY
+                                      : scene.getPreferences().colorSchemeProperty().subscribe(_ -> refreshHighlighting());
+        });
     }
 
     /// See [BibTeXHighlighter#setFieldPositionsProvider(Supplier)].
@@ -39,6 +43,7 @@ public class BibTeXCodeArea extends CodeArea {
         highlighter.setFieldPositionsProvider(fieldPositionsProvider);
     }
 
+    /// Renders the text again, so that it picks up the current colors of the theme.
     public void refreshHighlighting() {
         SyntaxDecorator decorator = getSyntaxDecorator();
         setSyntaxDecorator(null);
