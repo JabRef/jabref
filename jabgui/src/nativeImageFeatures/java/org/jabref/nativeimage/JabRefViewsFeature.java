@@ -250,7 +250,9 @@ public class JabRefViewsFeature implements Feature {
 
     /// A member signature refers to a class missing from the class path; the class stays (partly) unregistered.
     private static void warnIncomplete(Class<?> type, LinkageError e) {
-        System.out.println("[JabRefViewsFeature] WARNING: could not register all members of " + type.getName() + ": " + e);
+        System.out.println("[JabRefViewsFeature] WARNING: could not register all members of " + type.getName()
+                + ", reflective access to it may fail at run time");
+        e.printStackTrace(System.out);
     }
 
     private static void log(String kind, Class<?> type) {
