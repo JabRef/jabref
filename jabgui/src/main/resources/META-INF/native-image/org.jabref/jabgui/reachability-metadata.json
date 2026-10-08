@@ -257,6 +257,12 @@
     },
     {
       "glob": "images/external/*.png"
+    },
+    {
+      "glob": "Chocolate.bib"
+    },
+    {
+      "glob": "SearchExamples.bib"
     }
   ]
 }
