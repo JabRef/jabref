@@ -17,7 +17,7 @@ val javafxDefault = "27"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
-val lucene = "10.5.1"
+val lucene = "10.5.2"
 
 val pdfbox = "3.0.8"
 
@@ -28,11 +28,11 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.38.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.20.2"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.21.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
-    api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
-    api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
+    api(platform("org.glassfish.grizzly:grizzly-bom:5.0.3"))
+    api(platform("org.glassfish.jersey:jersey-bom:4.0.3"))
     api(platform("tools.jackson:jackson-bom:3.2.3"))
 }
 
@@ -82,14 +82,14 @@ dependencies.constraints {
     api("commons-logging:commons-logging:1.4.0")
     api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
-    api("de.sandec:JMemoryBuddy:0.5.1")
+    api("one.jpro:jmemorybuddy:0.6.0")
     api("de.saxsys:mvvmfx:1.8.0")
     api("de.undercouch:citeproc-java:3.5.2")
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:4.8.196")
+    api("io.github.classgraph:classgraph:4.8.197")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
@@ -158,9 +158,9 @@ dependencies.constraints {
     api("org.postgresql:postgresql:42.7.13")
     api("org.slf4j:jul-to-slf4j:2.0.20")
     api("org.slf4j:slf4j-api:2.0.20")
-    api("org.tinylog:slf4j-tinylog:2.8.0")
-    api("org.tinylog:tinylog-api:2.8.0")
-    api("org.tinylog:tinylog-impl:2.8.0")
+    api("org.tinylog:slf4j-tinylog:2.8.1")
+    api("org.tinylog:tinylog-api:2.8.1")
+    api("org.tinylog:tinylog-impl:2.8.1")
     api("org.xmlunit:xmlunit-core:2.14.0")
     api("org.xmlunit:xmlunit-matchers:2.14.0")
     api("org.yaml:snakeyaml:2.7")
