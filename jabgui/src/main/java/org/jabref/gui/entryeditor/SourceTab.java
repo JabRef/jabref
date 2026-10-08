@@ -429,7 +429,7 @@ public class SourceTab extends EntryEditorTab {
         StringBuilder styleBuilder = new StringBuilder();
         Paint fill = dummyText.getFill();
         if (fill instanceof Color color) {
-            String hex = String.format("#%02X%02X%02X",
+            String hex = "#%02X%02X%02X".formatted(
                     (int) (color.getRed() * 255),
                     (int) (color.getGreen() * 255),
                     (int) (color.getBlue() * 255));
