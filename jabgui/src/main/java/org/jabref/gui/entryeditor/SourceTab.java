@@ -436,7 +436,7 @@ public class SourceTab extends EntryEditorTab {
             styleBuilder.append("color: ").append(hex).append("; ");
         }
         Font font = dummyText.getFont();
-        if (font != null && (font.getStyle().contains("Bold") || font.getFamily().toLowerCase().contains("bold"))) {
+        if (font != null && (font.getName().toLowerCase().contains("bold") || font.getFamily().toLowerCase().contains("bold"))) {
             styleBuilder.append("font-weight: bold; ");
         }
         cssResolutionGroup.getChildren().clear();
