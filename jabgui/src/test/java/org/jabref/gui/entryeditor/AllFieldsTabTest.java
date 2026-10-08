@@ -57,7 +57,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
-import de.sandec.jmemorybuddy.JMemoryBuddy;
+import one.jpro.jmemorybuddy.JMemoryBuddy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
