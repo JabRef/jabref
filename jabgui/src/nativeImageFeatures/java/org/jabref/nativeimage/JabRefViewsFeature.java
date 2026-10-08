@@ -9,7 +9,9 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -21,27 +23,17 @@ import java.util.zip.ZipFile;
 
 import org.graalvm.nativeimage.hosted.Feature;
 import org.graalvm.nativeimage.hosted.RuntimeReflection;
+import org.jspecify.annotations.NullMarked;
 
-/// Registers JabRef's JavaFX views for reflection in the native image.
+/// Registers JabRef's views for reflection in the native image. JavaFX itself is covered by StaticFX.
 ///
-/// JavaFX and afterburner look up a lot of classes by name or reflectively:
+/// FXML and CSS name classes as strings (`fx:controller`, `<?import ...?>`, `-fx-skin`, ...), so every FXML and
+/// CSS file below `org/jabref/` is read and the classes it names are registered. This also covers classes that no
+/// Java code references, e.g. `DialogPaneWithoutButtonBar`, which only `AboutDialog.fxml` uses. JabRef's views have
+/// no common base class, so all reachable `org.jabref` subtypes of `Node` and `Dialog` are registered as well.
 ///
-/// - `FXMLLoader` loads the classes named in `fx:controller` and `<?import ...?>`, injects `@FXML` fields and
-///   methods, and converts attribute values such as `halignment="LEFT"` via the `valueOf(String)` of enum
-///   parameters of setters and constructors (`<ButtonType buttonData="OK_DONE"/>`).
-/// - Binding expressions such as `${controller.viewModel.inProgress}` are evaluated reflectively, so the type a
-///   controller returns for `viewModel` needs its public methods registered.
-/// - The CSS engine loads skins named in `-fx-skin`.
-/// - afterburner sets `@Inject` fields and creates instances of their types that are not registered yet.
-///
-/// To cover this, every FXML and CSS file below `org/jabref/` on the class path is read, and the classes it
-/// names are registered. This also covers classes that no Java code references (e.g. `DialogPaneWithoutButtonBar`,
-/// only used in `AboutDialog.fxml`) and third-party controls (ControlsFX, GemsFX, ...). In addition, every
-/// reachable `org.jabref` subtype of `javafx.scene.Node` or `javafx.scene.control.Dialog` is registered:
-/// JabRef's views share no common base class, but each extends one of these two.
-///
-/// JavaFX itself is covered by StaticFX (jfx-static-libs and jfx-static-feature).
 /// Build with `-Djabref.nativeimage.logViews=true` to print every registered class.
+@NullMarked
 public class JabRefViewsFeature implements Feature {
 
     private static final List<String> BASE_CLASSES = List.of("javafx.scene.Node", "javafx.scene.control.Dialog");
@@ -95,15 +87,13 @@ public class JabRefViewsFeature implements Feature {
     private void registerNamedClasses(FeatureAccess access, String content, Pattern pattern) {
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
-            Class<?> type = findClass(access, matcher.group(1));
-            if (type == null) {
-                continue;
-            }
-            if (type.getName().startsWith("org.jabref.")) {
-                registerView(type);
-            } else {
-                registerPublicApi(type);
-            }
+            findClass(access, matcher.group(1)).ifPresent(type -> {
+                if (type.getName().startsWith("org.jabref.")) {
+                    registerView(type);
+                } else {
+                    registerPublicApi(type);
+                }
+            });
         }
     }
 
@@ -113,9 +103,12 @@ public class JabRefViewsFeature implements Feature {
         if (!controllerName.find()) {
             return;
         }
-        Class<?> controller = findClass(access, controllerName.group(1));
-        Matcher expression = FXML_CONTROLLER_EXPRESSION.matcher(fxml);
-        while (controller != null && expression.find()) {
+        findClass(access, controllerName.group(1))
+                .ifPresent(controller -> registerViewModels(controller, FXML_CONTROLLER_EXPRESSION.matcher(fxml)));
+    }
+
+    private void registerViewModels(Class<?> controller, Matcher expression) {
+        while (expression.find()) {
             String property = expression.group(1);
             String capitalized = Character.toUpperCase(property.charAt(0)) + property.substring(1);
             for (Method method : controller.getMethods()) {
@@ -199,20 +192,27 @@ public class JabRefViewsFeature implements Feature {
     }
 
     /// Resolves names like FXMLLoader does: `a.b.Outer.Inner` is tried as `a.b.Outer$Inner` as well.
-    private static Class<?> findClass(FeatureAccess access, String name) {
-        String candidate = name;
-        while (true) {
-            Class<?> type = access.findClassByName(candidate);
-            if (type != null) {
-                return type;
-            }
-            int lastDot = candidate.lastIndexOf('.');
-            if (lastDot < 0) {
-                System.out.println("[JabRefViewsFeature] WARNING: class referenced from FXML/CSS not found: " + name);
-                return null;
-            }
-            candidate = candidate.substring(0, lastDot) + "$" + candidate.substring(lastDot + 1);
+    private static Optional<Class<?>> findClass(FeatureAccess access, String name) {
+        Optional<Class<?>> type = nestedClassCandidates(name).stream()
+                                                             // findClassByName returns null for unknown names
+                                                             .<Class<?>>flatMap(candidate -> Stream.ofNullable(access.findClassByName(candidate)))
+                                                             .findFirst();
+        if (type.isEmpty()) {
+            System.out.println("[JabRefViewsFeature] WARNING: class referenced from FXML/CSS not found: " + name);
         }
+        return type;
+    }
+
+    /// `a.b.Outer.Inner` yields `a.b.Outer.Inner`, `a.b.Outer$Inner`, `a.b$Outer$Inner`, ...
+    private static List<String> nestedClassCandidates(String name) {
+        List<String> candidates = new ArrayList<>();
+        String candidate = name;
+        candidates.add(candidate);
+        for (int lastDot = candidate.lastIndexOf('.'); lastDot >= 0; lastDot = candidate.lastIndexOf('.')) {
+            candidate = candidate.substring(0, lastDot) + "$" + candidate.substring(lastDot + 1);
+            candidates.add(candidate);
+        }
+        return candidates;
     }
 
     /// Calls the consumer with the name and content of every FXML and CSS file below [#RESOURCE_ROOT].

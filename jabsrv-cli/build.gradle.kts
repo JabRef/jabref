@@ -63,7 +63,6 @@ graalvmNative {
         named("main") {
             imageName.set("jabsrv")
             mainClass.set("org.jabref.http.server.cli.ServerCli")
-            // English only (the JVM version follows the language set in the preferences)
             buildArgs.add("-H:IncludeLocales=en")
         }
     }

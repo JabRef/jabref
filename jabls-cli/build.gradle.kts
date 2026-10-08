@@ -35,7 +35,6 @@ tasks.test {
 graalvmNative {
     binaries {
         named("main") {
-            // English only (the JVM version follows the language set in the preferences)
             buildArgs.add("-H:IncludeLocales=en")
         }
     }

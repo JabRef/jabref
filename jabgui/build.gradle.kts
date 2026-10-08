@@ -429,11 +429,10 @@ dependencies {
     nativeImageOnly("us.hebi.graalvm:jfx-static-feature:1.0")
 }
 
-// Native-image-only sources (GraalVM Features, e.g. JabRefViewsFeature). Compiled against the GraalVM SDK and
-// put on the native-image classpath only; the JVM application never sees them.
 val nativeImageFeatures = sourceSets.create("nativeImageFeatures")
 dependencies {
     "nativeImageFeaturesCompileOnly"("org.graalvm.sdk:nativeimage:25.3.4.1")
+    "nativeImageFeaturesCompileOnly"("org.jspecify:jspecify:1.0.1")
 }
 
 graalvmNative {
@@ -441,7 +440,7 @@ graalvmNative {
         named("main") {
             classpath(nativeImageOnly, nativeImageFeatures.output)
             buildArgs.add("--features=org.jabref.nativeimage.JabRefViewsFeature")
-            // JabRef's UI languages (keep in sync with org.jabref.logic.l10n.Language); the CLIs ship English only.
+            // Keep in sync with org.jabref.logic.l10n.Language
             // -H:+IncludeAllLocales would add ~84 MB for locales JabRef has no translations for.
             buildArgs.add("-H:IncludeLocales=ar,da,de,el,en,es,fa,fi,fr,id,it,ja,ko,nl,no,pl,pt,pt-BR,ru,sv,tl,tr,uk,vi,zh-CN,zh-TW")
             imageName.set("jabref")
@@ -450,7 +449,6 @@ graalvmNative {
                 includedPatterns.add(".*\\.fxml$")
                 includedPatterns.add(".*\\.css$")
                 includedPatterns.add("build\\.properties")
-                // Theme previews (generateThemePreviews); ThemePreviewView hides itself when they are missing
                 includedPatterns.add("org/jabref/gui/theme/preview/.*\\.png$")
             }
         }
