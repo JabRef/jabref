@@ -374,10 +374,18 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void copySelectedTextWithSyntaxHighlighting() {
-        String selectedText = codeArea.getSelectedText();
-        if (selectedText == null || selectedText.isEmpty()) {
+        jfx.incubator.scene.control.richtext.SelectionSegment selection = codeArea.getSelection();
+        if (selection == null || selection.isCollapsed()) {
             return;
         }
+        
+        int start = selection.getMin().charIndex();
+        int end = selection.getMax().charIndex();
+        String fullText = codeArea.getText();
+        if (start < 0 || end > fullText.length() || start >= end) {
+            return;
+        }
+        String selectedText = fullText.substring(start, end);
 
         List<io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXHighlightRegion> regions = bibTeXSyntaxHighlighter.computeHighlightRegions(selectedText);
 

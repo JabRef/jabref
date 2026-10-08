@@ -36,6 +36,7 @@ import org.jabref.support.DisabledOnCIServer;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jfx.incubator.scene.control.richtext.CodeArea;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -184,7 +185,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
             assertTrue(sourceArea.getText().contains("title = {Short title}"));
             assertFalse(sourceArea.getText().contains("publisher = {Publisher}"));
         });
@@ -203,7 +204,7 @@ class SourceTabTest {
             sourceTab.currentEntryProperty().set(secondEntry);
             sourceTab.notifyAboutFocus(secondEntry);
 
-            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
             sourceArea.clear();
             sourceArea.appendText("Unsaved source for the second entry");
 
@@ -226,7 +227,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
             String editedSource = sourceArea.getText().replace("First entry", "Edited first entry");
             sourceArea.clear();
             sourceArea.appendText(editedSource);
@@ -254,7 +255,7 @@ class SourceTabTest {
             sourceTab.notifyAboutFocus(secondEntry);
             secondEntry.setField(StandardField.AUTHOR, "Author");
 
-            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
             assertTrue(sourceArea.getText().contains("author = {Author}"));
             assertTrue(sourceArea.getText().contains("title  = {Same title}"));
         });
@@ -279,7 +280,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
             sourceArea.requestFocus();
             assertTrue(sourceArea.isFocused());
             sourceArea.clear();
@@ -317,7 +318,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
             String editedSource = sourceArea.getText().replace("First entry", "Edited first entry");
             sourceArea.clear();
             sourceArea.appendText(editedSource);
@@ -332,6 +333,7 @@ class SourceTabTest {
     }
 
     @Test
+    @DisabledOnCIServer("Depends on https://bugs.openjdk.org/browse/JDK-8391883 ")
     void copyCopiesSyntaxHighlightedHtmlAndPlainText() {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "Test Title");
@@ -344,7 +346,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) sourceTab.getContent();
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
             sourceArea.requestFocus();
             sourceArea.selectAll();
             
@@ -358,6 +360,69 @@ class SourceTabTest {
             assertTrue(clipboard.hasString(), "Clipboard should contain plain text");
             assertTrue(clipboard.hasHtml(), "Clipboard should contain HTML");
             assertTrue(clipboard.getHtml().contains("<span style=\"color:"), "HTML should contain styling");
+        });
+    }
+
+    @Test
+    @DisabledOnCIServer("Depends on https://bugs.openjdk.org/browse/JDK-8391883 ")
+    void copyCopiesSyntaxHighlightedHtmlWithThemeSwitch() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("testKey")
+                .withField(StandardField.TITLE, "Test Title");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            pane.getSelectionModel().select(sourceTab);
+            sourceTab.currentEntryProperty().set(entry);
+            sourceTab.notifyAboutFocus(entry);
+
+            // Apply JabRef theme initially
+            scene.getStylesheets().setAll(
+                    SourceTabTest.class.getResource("/org/jabref/gui/theme/themes.jabref.org/jabref-theme.css").toExternalForm(),
+                    SourceTabTest.class.getResource("/org/jabref/gui/theme/internal/jabref-base.css").toExternalForm());
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            sourceArea.requestFocus();
+            sourceArea.selectAll();
+            
+            // Trigger copy
+            Event.fireEvent(sourceArea, new KeyEvent(KeyEvent.KEY_PRESSED, "c", "C", KeyCode.C, false, true, false, false));
+        });
+        JavaFxExtension.awaitEvents();
+
+        final String[] firstCopyHtml = new String[1];
+        JavaFxExtension.invokeAndWait(() -> {
+            javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+            firstCopyHtml[0] = clipboard.getHtml();
+            clipboard.clear();
+            
+            // Switch to a non-default theme, like NORD
+            scene.getStylesheets().setAll(
+                    SourceTabTest.class.getResource("/org/jabref/gui/theme/themes.jabref.org/jabref-theme.css").toExternalForm(),
+                    SourceTabTest.class.getResource("/org/jabref/gui/theme/themes.jabref.org/nord.css").toExternalForm(),
+                    SourceTabTest.class.getResource("/org/jabref/gui/theme/internal/jabref-base.css").toExternalForm());
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            sourceArea.requestFocus();
+            sourceArea.selectAll();
+            
+            // Trigger copy again
+            Event.fireEvent(sourceArea, new KeyEvent(KeyEvent.KEY_PRESSED, "c", "C", KeyCode.C, false, true, false, false));
+        });
+        JavaFxExtension.awaitEvents();
+
+        JavaFxExtension.invokeAndWait(() -> {
+            javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+            String secondCopyHtml = clipboard.getHtml();
+            
+            org.junit.jupiter.api.Assertions.assertNotEquals(firstCopyHtml[0], secondCopyHtml, "Copied HTML should change when the theme changes");
+            assertTrue(secondCopyHtml.contains("<span style=\"color:"), "HTML should contain styling");
+            clipboard.clear();
         });
     }
 }
