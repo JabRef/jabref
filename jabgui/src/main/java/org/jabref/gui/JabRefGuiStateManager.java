@@ -172,17 +172,17 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     @Override
     @NullMarked
     public void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups) {
-        selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
+        selectedGroups.computeIfAbsent(context.getUid(), _ -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
     }
 
     @Override
     public ObservableList<GroupTreeNode> getSelectedGroups(BibDatabaseContext context) {
-        return selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList());
+        return selectedGroups.computeIfAbsent(context.getUid(), _ -> FXCollections.observableArrayList());
     }
 
     @Override
     public void clearSelectedGroups(BibDatabaseContext context) {
-        selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).clear();
+        selectedGroups.computeIfAbsent(context.getUid(), _ -> FXCollections.observableArrayList()).clear();
     }
 
     @Override
@@ -298,7 +298,7 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
 
     @Override
     public void setAiChatWindowForGroup(BibDatabaseContext context, String groupName, AiGroupChatWindow aiGroupChatWindow) {
-        groupAiChatWindows.computeIfAbsent(context.getUid(), k -> new HashMap<>())
+        groupAiChatWindows.computeIfAbsent(context.getUid(), _ -> new HashMap<>())
                           .put(groupName, aiGroupChatWindow);
     }
 

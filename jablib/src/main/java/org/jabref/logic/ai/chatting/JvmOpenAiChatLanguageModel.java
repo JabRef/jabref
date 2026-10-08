@@ -1,7 +1,11 @@
 package org.jabref.logic.ai.chatting;
 
+import java.io.UncheckedIOException;
 import java.net.http.HttpClient;
 import java.util.List;
+
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.l10n.Localization;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -26,11 +30,13 @@ public class JvmOpenAiChatLanguageModel implements ChatModel {
     private final String modelName;
     private final double temperature;
 
+    private final String baseUrl;
     private final ChatClient chatClient;
 
     public JvmOpenAiChatLanguageModel(String apiKey, String modelName, double temperature, String baseUrl, HttpClient httpClient) {
         this.modelName = modelName;
         this.temperature = temperature;
+        this.baseUrl = baseUrl;
 
         OpenAI openAI = OpenAI
                 .newBuilder(apiKey)
@@ -67,7 +73,21 @@ public class JvmOpenAiChatLanguageModel implements ChatModel {
                 .messages(messages)
                 .build();
 
-        ChatCompletion chatCompletion = chatClient.createChatCompletion(request);
+        ChatCompletion chatCompletion;
+        try {
+            chatCompletion = chatClient.createChatCompletion(request);
+        } catch (UncheckedIOException e) {
+            // jvm-openai wraps connection failures without any message (e.g., "java.net.ConnectException"), so name the URL and the root cause
+            Throwable rootCause = e;
+            while (rootCause.getCause() != null) {
+                rootCause = rootCause.getCause();
+            }
+            String reason = rootCause.getMessage() == null ? rootCause.getClass().getSimpleName() : rootCause.getMessage();
+            // [impl->req~ai.llms.base-url-redacted~1]
+            String redactedUrl = FetcherException.getRedactedUrl(baseUrl);
+            LOGGER.debug("Could not connect to {}", redactedUrl, e);
+            throw new UncheckedIOException(Localization.lang("Could not connect to %0.\n\n%1", redactedUrl, reason), e.getCause());
+        }
         Usage usage = chatCompletion.usage();
         List<ChatCompletion.Choice> choices = chatCompletion.choices();
 

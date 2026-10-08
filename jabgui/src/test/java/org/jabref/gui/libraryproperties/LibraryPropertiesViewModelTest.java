@@ -90,7 +90,7 @@ class LibraryPropertiesViewModelTest {
     void whatATabRecordsJoinsTheSameStep() {
         viewModel(
                 new SettingTab(metaData -> metaData.setMode(BibDatabaseMode.BIBLATEX)),
-                new SettingTab(metaData -> undoManager.applyEdit(
+                new SettingTab(_ -> undoManager.applyEdit(
                         new UndoablePreambleChange(databaseContext.getDatabase(), null, "preamble"))))
                 .storeAllSettings();
 

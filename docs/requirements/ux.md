@@ -174,4 +174,18 @@ Every library tab carries an icon: one for a BibTeX library, one for a BibLaTeX 
 
 Needs: impl, utest
 
+## Preferences walkthroughs open their settings dialog directly
+`req~ux.walkthrough.preferences-direct~1`
+
+Walkthroughs that require preferences must open the preferences dialog directly, so they can start regardless of the platform menu presentation.
+
+Needs: impl
+
+## Groups walkthroughs make required controls and entries available
+`req~ux.walkthrough.groups-preparation~1`
+
+The groups walkthrough must open its bundled example library, display the Groups pane, and clear the current search before guiding the user.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

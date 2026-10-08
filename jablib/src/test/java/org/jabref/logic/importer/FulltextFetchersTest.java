@@ -33,7 +33,7 @@ class FulltextFetchersTest {
     @Test
     void acceptPdfUrls() throws MalformedURLException {
         URL pdfUrl = URLUtil.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
-        FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
+        FulltextFetcherWithTrustLevel finder = _ -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
     }
@@ -41,7 +41,7 @@ class FulltextFetchersTest {
     @Test
     void rejectNonPdfUrls() throws MalformedURLException {
         URL pdfUrl = URLUtil.create("https://github.com/JabRef/jabref/blob/master/README.md");
-        FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
+        FulltextFetcherWithTrustLevel finder = _ -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
         assertEquals(Optional.empty(), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
@@ -50,7 +50,7 @@ class FulltextFetchersTest {
     @Test
     void noTrustLevel() throws MalformedURLException {
         URL pdfUrl = URLUtil.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
-        FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
+        FulltextFetcherWithTrustLevel finder = _ -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
