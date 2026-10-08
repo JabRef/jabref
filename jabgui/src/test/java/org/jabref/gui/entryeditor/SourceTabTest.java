@@ -394,7 +394,6 @@ class SourceTabTest {
             javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
             firstCopyHtml[0] = clipboard.getHtml();
             clipboard.clear();
-            
             // Switch to a non-default theme, like NORD
             scene.getStylesheets().setAll(
                     SourceTabTest.class.getResource("/org/jabref/gui/theme/themes.jabref.org/jabref-theme.css").toExternalForm(),
@@ -415,7 +414,6 @@ class SourceTabTest {
         JavaFxExtension.invokeAndWait(() -> {
             javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
             String secondCopyHtml = clipboard.getHtml();
-            
             org.junit.jupiter.api.Assertions.assertNotEquals(firstCopyHtml[0], secondCopyHtml, "Copied HTML should change when the theme changes");
             assertTrue(secondCopyHtml.contains("<span style=\"color:"), "HTML should contain styling");
             clipboard.clear();

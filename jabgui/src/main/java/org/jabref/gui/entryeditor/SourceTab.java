@@ -378,7 +378,6 @@ public class SourceTab extends EntryEditorTab {
         if (selection == null || selection.isCollapsed()) {
             return;
         }
-        
         int start = selection.getMin().charIndex();
         int end = selection.getMax().charIndex();
         String fullText = codeArea.getText();
@@ -391,7 +390,6 @@ public class SourceTab extends EntryEditorTab {
 
         StringBuilder htmlBuilder = new StringBuilder();
         htmlBuilder.append("<pre style=\"font-family: monospace;\">");
-        
         int cursor = 0;
         for (io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXHighlightRegion region : regions) {
             if (region.end() <= start) {
@@ -428,9 +426,7 @@ public class SourceTab extends EntryEditorTab {
         dummyText.getStyleClass().setAll(styleClass);
         cssResolutionGroup.getChildren().setAll(dummyText);
         cssResolutionGroup.applyCss();
-        
         StringBuilder styleBuilder = new StringBuilder();
-        
         Paint fill = dummyText.getFill();
         if (fill instanceof Color color) {
             String hex = String.format("#%02X%02X%02X",
@@ -439,12 +435,10 @@ public class SourceTab extends EntryEditorTab {
                     (int) (color.getBlue() * 255));
             styleBuilder.append("color: ").append(hex).append("; ");
         }
-        
         Font font = dummyText.getFont();
         if (font != null && (font.getStyle().contains("Bold") || font.getFamily().toLowerCase().contains("bold"))) {
             styleBuilder.append("font-weight: bold; ");
         }
-        
         cssResolutionGroup.getChildren().clear();
         return styleBuilder.toString();
     }
