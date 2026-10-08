@@ -184,7 +184,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().getFirst();
             assertTrue(sourceArea.getText().contains("title = {Short title}"));
             assertFalse(sourceArea.getText().contains("publisher = {Publisher}"));
         });
@@ -203,7 +203,7 @@ class SourceTabTest {
             sourceTab.currentEntryProperty().set(secondEntry);
             sourceTab.notifyAboutFocus(secondEntry);
 
-            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().getFirst();
             sourceArea.clear();
             sourceArea.appendText("Unsaved source for the second entry");
 
@@ -226,7 +226,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().getFirst();
             String editedSource = sourceArea.getText().replace("First entry", "Edited first entry");
             sourceArea.clear();
             sourceArea.appendText(editedSource);
@@ -254,7 +254,7 @@ class SourceTabTest {
             sourceTab.notifyAboutFocus(secondEntry);
             secondEntry.setField(StandardField.AUTHOR, "Author");
 
-            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().getFirst();
             assertTrue(sourceArea.getText().contains("author = {Author}"));
             assertTrue(sourceArea.getText().contains("title  = {Same title}"));
         });
@@ -279,7 +279,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().getFirst();
             sourceArea.requestFocus();
             assertTrue(sourceArea.isFocused());
             sourceArea.clear();
@@ -317,7 +317,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().getFirst();
             String editedSource = sourceArea.getText().replace("First entry", "Edited first entry");
             sourceArea.clear();
             sourceArea.appendText(editedSource);
@@ -345,7 +345,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().getFirst();
             sourceArea.requestFocus();
             sourceArea.selectAll();
 
@@ -381,7 +381,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().getFirst();
             sourceArea.requestFocus();
             sourceArea.selectAll();
 
@@ -403,7 +403,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().getFirst();
             sourceArea.requestFocus();
             sourceArea.selectAll();
 
@@ -435,7 +435,7 @@ class SourceTabTest {
         JavaFxExtension.awaitEvents();
 
         JavaFxExtension.invokeAndWait(() -> {
-            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().get(0);
+            CodeArea sourceArea = (CodeArea) ((javafx.scene.layout.StackPane) sourceTab.getContent()).getChildren().getFirst();
             sourceArea.requestFocus();
             // Select "testKey" from inside the bibtex text.
             // The generated source will look something like:
