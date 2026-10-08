@@ -425,14 +425,15 @@ sourceSets["main"].resources.srcDir(generateThemePreviews)
 // Only on the native-image classpath, so the JVM module path stays unchanged.
 val nativeImageOnly = configurations.create("nativeImageOnly")
 dependencies {
-    nativeImageOnly("us.hebi.graalvm:jfx-static-libs:27-1")
-    nativeImageOnly("us.hebi.graalvm:jfx-static-feature:1.0")
+    nativeImageOnly(platform(project(":versions")))
+    nativeImageOnly("us.hebi.graalvm:jfx-static-libs")
+    nativeImageOnly("us.hebi.graalvm:jfx-static-feature")
 }
 
 val nativeImageFeatures = sourceSets.create("nativeImageFeatures")
 dependencies {
-    "nativeImageFeaturesCompileOnly"("org.graalvm.sdk:nativeimage:25.3.4.1")
-    "nativeImageFeaturesCompileOnly"("org.jspecify:jspecify:1.0.1")
+    "nativeImageFeaturesCompileOnly"("org.graalvm.sdk:nativeimage")
+    "nativeImageFeaturesCompileOnly"("org.jspecify:jspecify")
 }
 
 graalvmNative {
