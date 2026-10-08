@@ -88,10 +88,6 @@ public class AiSummaryViewModel extends AbstractViewModel {
         setupListeners();
     }
 
-    static boolean hasOnlyOnlineLinks(List<LinkedFile> files) {
-        return !files.isEmpty() && files.stream().allMatch(LinkedFile::isOnlineLink);
-    }
-
     private void setupBindings() {
         BindingsHelper.bindEnum(
                 state,
@@ -114,7 +110,8 @@ public class AiSummaryViewModel extends AbstractViewModel {
                 Map.entry(State.NO_LOCAL_FILE,
                         entry.map(FullBibEntry::entry)
                              .map(BibEntry::getFiles)
-                             .map(AiSummaryViewModel::hasOnlyOnlineLinks)
+                             .map(l -> l.stream()
+                                        .allMatch(LinkedFile::isOnlineLink))
                 ),
 
                 Map.entry(State.NO_SUPPORTED_FILE_TYPES,
