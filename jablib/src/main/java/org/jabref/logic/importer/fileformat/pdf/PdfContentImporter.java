@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.util.IsbnExtractor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.PdfUtils;
@@ -24,6 +25,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -37,7 +39,8 @@ import org.jspecify.annotations.Nullable;
 
 import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 
-/// Parses data of the first page of the PDF and creates a BibTeX entry.
+/// Parses book information page and creates a BibTeX entry from validated ISBN.
+/// If no page qualifies, falls back to parsing research paper information from the first page of the PDF and creates a BibTeX entry.
 ///
 /// Currently, Springer, and IEEE formats are supported.
 ///
@@ -205,7 +208,19 @@ public class PdfContentImporter extends PdfImporter {
 
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException {
-        return importPaperContent(document);
+        List<String> pageTexts = PdfPageScanner.scanPages(document);
+        Optional<String> bibliographicPages = BibliographicPageDetector.findBibliographicPage(pageTexts);
+        if (bibliographicPages.isEmpty()){
+            return importPaperContent(document);
+        }
+        List<ISBN> isbns = new IsbnExtractor().extract(bibliographicPages.orElseThrow());
+        // If ISBN is missing or ambiguous, do not create entry.
+        if(isbns.size() != 1){
+            return new ParserResult();
+        }
+        BibEntry bookEntry = new BibEntry(StandardEntryType.Book)
+                                .withField(StandardField.ISBN, isbns.getFirst().asString());
+        return new ParserResult(List.of(bookEntry));
     }
 
     private ParserResult importPaperContent(PDDocument document) throws IOException {
