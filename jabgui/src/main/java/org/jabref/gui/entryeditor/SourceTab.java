@@ -12,9 +12,15 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -22,6 +28,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
+import org.jabref.gui.bibtexhighlighter.BibTeXStyleClass;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
@@ -79,6 +86,7 @@ public class SourceTab extends EntryEditorTab {
     private CodeArea codeArea;
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
+    private final Group cssResolutionGroup = new Group();
 
     public SourceTab(
             FieldPreferences fieldPreferences,
@@ -178,7 +186,12 @@ public class SourceTab extends EntryEditorTab {
             }
         });
 
-        this.setContent(codeArea);
+        StackPane tabContent = new StackPane();
+        cssResolutionGroup.setManaged(false);
+        cssResolutionGroup.setVisible(false);
+        cssResolutionGroup.getStyleClass().add("bibtex-code-area");
+        tabContent.getChildren().setAll(codeArea, cssResolutionGroup);
+        this.setContent(tabContent);
     }
 
     private void updateCodeArea() {
@@ -376,8 +389,8 @@ public class SourceTab extends EntryEditorTab {
             if (region.start() > cursor) {
                 htmlBuilder.append(escapeHtml(selectedText.substring(cursor, region.start())));
             }
-            String color = getColorForCategory(region.category());
-            htmlBuilder.append("<span style=\"color: ").append(color).append(";\">");
+            String style = getStyleForCategory(region.category());
+            htmlBuilder.append("<span style=\"").append(style).append("\">");
             htmlBuilder.append(escapeHtml(selectedText.substring(region.start(), region.end())));
             htmlBuilder.append("</span>");
             cursor = region.end();
@@ -391,17 +404,31 @@ public class SourceTab extends EntryEditorTab {
         clipBoardManager.setHtmlContent(htmlBuilder.toString(), selectedText);
     }
 
-    private String getColorForCategory(io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXTokenCategory category) {
-        switch (category.name()) {
-            case "KEYWORD": return "#0000FF";
-            case "STRING": return "#008000";
-            case "NUMBER": return "#0000FF";
-            case "COMMENT": return "#808080";
-            case "CITE_KEY": return "#000000; font-weight: bold";
-            case "FIELD_NAME": return "#000080";
-            case "MACRO": return "#2B91AF";
-            default: return "#000000";
+    private String getStyleForCategory(io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXTokenCategory category) {
+        String styleClass = BibTeXStyleClass.valueOf(category.name()).getStyleClass();
+        Text dummyText = new Text("dummy");
+        dummyText.getStyleClass().setAll(styleClass);
+        cssResolutionGroup.getChildren().setAll(dummyText);
+        cssResolutionGroup.applyCss();
+        
+        StringBuilder styleBuilder = new StringBuilder();
+        
+        Paint fill = dummyText.getFill();
+        if (fill instanceof Color color) {
+            String hex = String.format("#%02X%02X%02X",
+                    (int) (color.getRed() * 255),
+                    (int) (color.getGreen() * 255),
+                    (int) (color.getBlue() * 255));
+            styleBuilder.append("color: ").append(hex).append("; ");
         }
+        
+        Font font = dummyText.getFont();
+        if (font != null && (font.getStyle().contains("Bold") || font.getFamily().toLowerCase().contains("bold"))) {
+            styleBuilder.append("font-weight: bold; ");
+        }
+        
+        cssResolutionGroup.getChildren().clear();
+        return styleBuilder.toString();
     }
 
     private String escapeHtml(String text) {
