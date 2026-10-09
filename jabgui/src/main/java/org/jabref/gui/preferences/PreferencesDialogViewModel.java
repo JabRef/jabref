@@ -25,6 +25,7 @@ import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
 import org.jabref.gui.preferences.export.ExportTab;
 import org.jabref.gui.preferences.external.ExternalTab;
 import org.jabref.gui.preferences.externalfiletypes.ExternalFileTypesTab;
+import org.jabref.gui.preferences.externalstorages.ExternalStoragesTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.git.GitTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
@@ -98,6 +99,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new CustomImporterTab(),
                 new CustomExporterTab(),
                 new NetworkTab(),
+                new ExternalStoragesTab(),
                 new GitTab()
         );
     }

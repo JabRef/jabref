@@ -22,6 +22,7 @@ import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.ocr.OcrPreferences;
@@ -80,6 +81,8 @@ public interface CliPreferences {
     RemotePreferences getRemotePreferences();
 
     ProxyPreferences getProxyPreferences();
+
+    CiteDrivePreferences getCiteDrivePreferences();
 
     SSLPreferences getSSLPreferences();
 
