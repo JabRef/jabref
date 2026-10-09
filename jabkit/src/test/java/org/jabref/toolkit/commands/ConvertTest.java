@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 class ConvertTest extends AbstractJabKitTest {
 
+    // [utest->req~jabkit.cli.convert-bibtex-context~1]
     @ParameterizedTest
     @ValueSource(strings = {"converted.bib", "input.bib"})
     void bibtexConversionPreservesStringsAndPreamble(String outputFileName, @TempDir Path tempDir) throws IOException {
@@ -44,6 +45,7 @@ class ConvertTest extends AbstractJabKitTest {
         assertStringsAndPreamblePreserved(Files.readString(output));
     }
 
+    // [utest->req~jabkit.cli.convert-bibtex-context~1]
     @Test
     void bibtexConversionToStdoutPreservesStringsAndPreamble() throws IOException {
         Path input = getClassResourceAsPath("strings-and-preamble.bib");

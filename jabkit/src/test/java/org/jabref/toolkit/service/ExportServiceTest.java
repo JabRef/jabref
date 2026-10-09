@@ -3,6 +3,7 @@ package org.jabref.toolkit.service;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,15 +30,18 @@ import static org.mockito.Mockito.when;
 
 class ExportServiceTest extends AbstractJabKitTest {
 
+    // [utest->req~jabkit.cli.convert-bibtex-context~1]
     @ParameterizedTest
-    @ValueSource(ints = {0, 1})
-    void bibtexExportPreservesContextAndEntrySelection(int selectedEntryCount, @TempDir Path tempDir) throws Exception {
+    @CsvSource({"0, false", "1, false", "2, false", "0, true", "1, true", "2, true"})
+    void bibtexExportPreservesContextAndEntrySelection(int selectedEntryCount, boolean shared, @TempDir Path tempDir) throws Exception {
         Path source = getClassResourceAsPath("/org/jabref/toolkit/commands/strings-and-preamble.bib");
         BibDatabase database = ImportService.importBibTexFile(source, preferences, true).getDatabase();
         BibEntry selected = database.getEntries().getFirst();
         BibEntry excluded = ImportService.importBibTexFile(getClassResourceAsPath("origin.bib"), preferences, true)
                                          .getDatabase().getEntries().getFirst();
         database.insertEntry(excluded);
+        Optional<String> sharedDatabaseId = shared ? Optional.of("source-library") : Optional.empty();
+        sharedDatabaseId.ifPresent(database::setSharedDatabaseID);
         List<BibEntry> entries = database.getEntries().subList(0, selectedEntryCount);
         Path output = tempDir.resolve("selected.bib");
 
@@ -50,6 +53,27 @@ class ExportServiceTest extends AbstractJabKitTest {
         assertEquals(database.getPreamble(), actual.getPreamble());
         assertEquals("Journal of Reproducible Tests", actual.getStringByName("journalname").orElseThrow().getContent());
         assertEquals(List.of(selected, excluded), database.getEntries());
+        Optional<String> expectedSharedDatabaseId = selectedEntryCount == database.getEntryCount() ? sharedDatabaseId : Optional.empty();
+        assertEquals(expectedSharedDatabaseId, actual.getSharedDatabaseID());
+        assertEquals(sharedDatabaseId, database.getSharedDatabaseID());
+    }
+
+    // [utest->req~jabkit.cli.convert-bibtex-context~1]
+    @Test
+    void saveDatabaseContextPreservesSharedDatabaseId(@TempDir Path tempDir) throws Exception {
+        Path source = getClassResourceAsPath("/org/jabref/toolkit/commands/strings-and-preamble.bib");
+        BibDatabaseContext context = ImportService.importBibTexFile(source, preferences, true).getDatabaseContext();
+        context.getDatabase().setSharedDatabaseID("source-library");
+        Path output = tempDir.resolve("saved.bib");
+
+        new ExportService(preferences, true).saveDatabaseContext(context, output);
+
+        BibDatabase actual = ImportService.importBibTexFile(output, preferences, true).getDatabase();
+        assertEquals(Optional.of("source-library"), actual.getSharedDatabaseID());
+        assertEquals(context.getDatabase().getEntries(), actual.getEntries());
+        assertEquals(context.getDatabase().getPreamble(), actual.getPreamble());
+        assertEquals("Journal of Reproducible Tests", actual.getStringByName("journalname").orElseThrow().getContent());
+        assertEquals(Optional.of("source-library"), context.getDatabase().getSharedDatabaseID());
     }
 
     @BeforeEach

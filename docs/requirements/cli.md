@@ -88,7 +88,7 @@ References to those strings continue to resolve to their original values after c
 
 Source: <https://github.com/JabRef/jabref/issues/17409>
 
-Needs: impl
+Needs: impl, utest
 
 ## JabKit check commands must support GitHub Actions output format
 `req~jabkit.cli.check-github-actions-output~1`
