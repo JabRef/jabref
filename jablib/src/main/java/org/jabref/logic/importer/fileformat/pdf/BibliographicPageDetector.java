@@ -15,6 +15,8 @@ import org.jspecify.annotations.NullMarked;
 ///
 /// Reference lists and publisher catalogues show several signals too, but they describe other books.
 /// They are recognised by a reference-list heading or by printing more ISBNs than one book has editions.
+/// Conference articles with abstract and keywords headings plus an ACM conference citation are excluded:
+/// their ISBN can identify the proceedings rather than the article itself.
 @NullMarked
 final class BibliographicPageDetector {
 
@@ -42,6 +44,12 @@ final class BibliographicPageDetector {
             "\\A\\s*(references|bibliography|literature|works cited|література|литература|список .*(джерел|літератури|литературы))\\s*$",
             FLAGS | Pattern.MULTILINE);
 
+    private static final Pattern ABSTRACT_HEADING = Pattern.compile("^\\h*abstract\\h*$", FLAGS | Pattern.MULTILINE);
+    private static final Pattern KEYWORDS_HEADING = Pattern.compile("^\\h*keywords\\h*$", FLAGS | Pattern.MULTILINE);
+    private static final Pattern ACM_CONFERENCE_CITATION = Pattern.compile(
+            "^\\h*ACM\\h+Reference\\h+Format\\h*:[\\s\\S]*?\\bIn\\s+[^.]*\\b(conference|proceedings)\\b",
+            FLAGS | Pattern.MULTILINE);
+
     private BibliographicPageDetector() {
     }
 
@@ -56,11 +64,20 @@ final class BibliographicPageDetector {
     }
 
     private static int score(String pageText) {
-        if (REFERENCE_LIST_HEADING.matcher(pageText).find() || ISBN.matcher(pageText).results().count() > MAX_ISBNS) {
+        if (REFERENCE_LIST_HEADING.matcher(pageText).find()
+                || ISBN.matcher(pageText).results().count() > MAX_ISBNS
+                || isConferenceArticle(pageText)) {
             return 0;
         }
         return (int) SIGNALS.stream()
                             .filter(signal -> signal.matcher(pageText).find())
                             .count();
+    }
+
+    // [impl->req~import.pdf.conference-article-exclusion~1]
+    private static boolean isConferenceArticle(String pageText) {
+        return ABSTRACT_HEADING.matcher(pageText).find()
+                && KEYWORDS_HEADING.matcher(pageText).find()
+                && ACM_CONFERENCE_CITATION.matcher(pageText).find();
     }
 }

@@ -1,14 +1,22 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.util.PdfUtils;
+
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @NullMarked
 class BibliographicPageDetectorTest {
@@ -30,6 +38,55 @@ class BibliographicPageDetectorTest {
             ISBN 978-3-16-148410-0
             Printed in the United States of America
             """;
+
+    private static final String CONFERENCE_ARTICLE = """
+            ABSTRACT
+            We evaluate a software engineering approach.
+            KEYWORDS
+            software engineering
+            ACM Reference Format:
+            Example Author. 2024. Example article.
+            In International Conference on Software Engineering.
+            Copyright 2024. ISBN 979-8-4007-0217-4
+            """;
+
+    // [utest->req~import.pdf.conference-article-exclusion~1]
+    @Test
+    void rejectsConferenceArticleWithProceedingsIsbn() {
+        assertEquals(Optional.empty(), BibliographicPageDetector.findBibliographicPage(List.of(CONFERENCE_ARTICLE)));
+    }
+
+    @Test
+    void rejectsKeimFirstPage() throws IOException, URISyntaxException {
+        var resource = BibliographicPageDetectorTest.class.getResource("/pdfs/PdfContentImporter/Keim2024.pdf");
+        assertNotNull(resource);
+        try (PDDocument document = Loader.loadPDF(Path.of(resource.toURI()).toFile())) {
+            assertEquals(Optional.empty(), BibliographicPageDetector.findBibliographicPage(List.of(PdfUtils.getPageContents(document, 1))));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ABSTRACT", "KEYWORDS", "ACM Reference Format:", "International Conference"})
+    void doesNotExcludeCandidateWithIncompleteArticleEvidence(String missingEvidence) {
+        String page = CONFERENCE_ARTICLE.replace(missingEvidence, "Other information");
+        assertEquals(Optional.of(page), BibliographicPageDetector.findBibliographicPage(List.of(page)));
+    }
+
+    @Test
+    void acceptsBookWithConferenceAndDoi() {
+        String page = ENGLISH_COPYRIGHT_PAGE + """
+                Proceedings of the International Conference on Software Engineering.
+                https://doi.org/10.1145/3597503.3639130
+                """;
+        assertEquals(Optional.of(page), BibliographicPageDetector.findBibliographicPage(List.of(page)));
+    }
+
+    @Test
+    void selectsImprintInsteadOfConferenceArticleWithMoreSignals() {
+        String article = CONFERENCE_ARTICLE + ENGLISH_COPYRIGHT_PAGE + "Published by ACM";
+        assertEquals(Optional.of(ENGLISH_COPYRIGHT_PAGE),
+                BibliographicPageDetector.findBibliographicPage(List.of(article, ENGLISH_COPYRIGHT_PAGE)));
+    }
 
     @Test
     void acceptsUkrainianImprintPage() {
