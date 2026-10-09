@@ -50,7 +50,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the DOI lookup button lost its progress indicator after switching to another entry and back. [#17223](https://github.com/JabRef/jabref/pull/17223)
 - We fixed an issue where double-clicking a word in an AI chat message did not select it. [#17174](https://github.com/JabRef/jabref/pull/17174)
 - We fixed the entry counts in the groups panel being misaligned with the group names. [#17253](https://github.com/JabRef/jabref/issues/17253)
+- We fixed an issue where unmarked entries looked marked as relevant when hovering over them in the entry table. [#16881](https://github.com/JabRef/jabref/issues/16881)
 - We fixed an issue where long entry previews were cut off without a vertical scrollbar. [#17359](https://github.com/JabRef/jabref/issues/17359)
+- We fixed an issue where linked files in the entry editor were not updated immediately upon addition or removal. [#16067](https://github.com/JabRef/jabref/issues/16067)
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 
 ### Removed
