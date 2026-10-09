@@ -30,6 +30,15 @@ Rationale: The preview is not shown automatically on hover because a large float
 
 Needs: impl
 
+## Citations tab BibTeX source window must highlight BibTeX syntax
+`req~entry-editor.citations.source-highlighting~1`
+
+Applies to the window opened with the BibTeX source button of a citation entry in the "Citations" tab.
+It uses the same highlighting as the source tab of the entry editor.
+See <https://github.com/JabRef/jabref/issues/17355>.
+
+Needs: impl
+
 ## Main tab must display fields in single scrollable list
 `req~entry-editor.main-tab.single-list~1`
 
