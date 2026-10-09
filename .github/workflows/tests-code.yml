@@ -58,20 +58,20 @@ jobs:
           show-progress: 'false'
       - id: changed-non-workflow-non-markdown-files
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files_ignore: |
             .github/workflows/**
             **/*.md
       - id: changed-requirements-docs
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             docs/requirements/**/*.md
       - id: changed-tests-code-workflow
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             .github/workflows/tests-code.yml
@@ -510,7 +510,7 @@ jobs:
           show-progress: 'false'
       - name: Detect changed windows-related classes
         id: changed-windows-related-files
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
