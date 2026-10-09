@@ -155,7 +155,7 @@ dependencies.constraints {
     api("org.libreoffice:unoloader:26.2.2")
     api("org.mockito:mockito-core:5.24.0")
     api("org.ow2.asm:asm:9.10.1")
-    api("org.postgresql:postgresql:42.7.13")
+    api("org.postgresql:postgresql:42.7.14")
     api("org.slf4j:jul-to-slf4j:2.0.20")
     api("org.slf4j:slf4j-api:2.0.20")
     api("org.tinylog:slf4j-tinylog:2.8.1")
