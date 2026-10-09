@@ -163,7 +163,7 @@ jobs:
       - name: Cherry-pick into a port PR
         if: steps.target.outputs.exists == 'true'
         id: port
-        uses: korthout/backport-action@2e830a1d0b8269505846ddd407a70876913ad1f8 # v4.6.0
+        uses: korthout/backport-action@8560fb503c275d433c56f05a2f64850093baa9f7 # v4.7.0
         with:
           # A PAT, so that CI runs on the port PR; the PR and its comment are authored by jabref-machine
           github_token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
