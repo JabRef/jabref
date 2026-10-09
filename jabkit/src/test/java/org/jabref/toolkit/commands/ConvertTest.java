@@ -1,6 +1,7 @@
 package org.jabref.toolkit.commands;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -8,12 +9,17 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.toolkit.exception.CliExceptionHandler;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,6 +28,47 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 class ConvertTest extends AbstractJabKitTest {
+
+    @ParameterizedTest
+    @ValueSource(strings = {"converted.bib", "input.bib"})
+    void bibtexConversionPreservesStringsAndPreamble(String outputFileName, @TempDir Path tempDir) throws IOException {
+        Path input = tempDir.resolve("input.bib");
+        Files.copy(getClassResourceAsPath("strings-and-preamble.bib"), input);
+        Path output = tempDir.resolve(outputFileName);
+
+        int exitCode = commandLine.executeToLog("convert", "--porcelain",
+                "--input=" + input, "--input-format=bibtex",
+                "--output-format=bibtex", "--output=" + output);
+
+        assertEquals(0, exitCode);
+        assertStringsAndPreamblePreserved(Files.readString(output));
+    }
+
+    @Test
+    void bibtexConversionToStdoutPreservesStringsAndPreamble() throws IOException {
+        Path input = getClassResourceAsPath("strings-and-preamble.bib");
+
+        int exitCode = commandLine.executeToLog("convert", "--porcelain",
+                "--input=" + input, "--input-format=bibtex", "--output-format=bibtex");
+
+        assertEquals(0, exitCode);
+        assertStringsAndPreamblePreserved(commandLine.getStandardOutput());
+    }
+
+    private void assertStringsAndPreamblePreserved(String output) throws IOException {
+        BibDatabase expected = new BibtexParser(preferences.getImportFormatPreferences())
+                .parse(Reader.of(Files.readString(getClassResourceAsPath("strings-and-preamble.bib"))))
+                .getDatabase();
+        BibDatabase actual = new BibtexParser(preferences.getImportFormatPreferences())
+                .parse(Reader.of(output)).getDatabase();
+
+        assertEquals(expected.getPreamble(), actual.getPreamble());
+        assertEquals(expected.getStringByName("journalname").orElseThrow().getContent(),
+                actual.getStringByName("journalname").orElseThrow().getContent());
+        assertEquals(expected.getEntries(), actual.getEntries());
+        assertEquals("Journal of Reproducible Tests",
+                actual.resolveForStrings(actual.getEntries().getFirst().getField(StandardField.JOURNAL).orElseThrow()));
+    }
 
     @Test
     void simpleOutputTest(@TempDir Path tempDir) throws IOException {
