@@ -87,4 +87,13 @@ The definition the user accepts is the one from the library file, and it replace
 
 Needs: impl, utest
 
+## PDF book detection must exclude conference article pages with grouped article evidence
+`req~import.pdf.conference-article-exclusion~1`
+
+For the book-import work in https://github.com/JabRef/jabref/issues/12874, an abstract heading, a keywords heading, and an ACM reference-format citation identifying a contribution to a conference or proceedings together disqualify that page as a book imprint candidate. An ISBN on such a page can belong to the proceedings.
+
+The individual terms are insufficient for exclusion. This rule recognizes a specific article format, not all research papers.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

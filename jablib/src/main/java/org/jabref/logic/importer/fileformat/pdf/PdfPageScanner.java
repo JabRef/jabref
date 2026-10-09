@@ -13,8 +13,8 @@ import org.jspecify.annotations.NullMarked;
 final class PdfPageScanner {
 
     private static final double PAGE_SCAN_PERCENTAGE = 0.05;
-    private static final int MIN_PAGES_PER_END = 3; //even if 5% is only 1 scan at least 3 
-    private static final int MAX_PAGES_PER_END = 10; //scan at most 10 
+    private static final int MIN_PAGES_PER_END = 3; // even if 5% is only 1 scan at least 3
+    private static final int MAX_PAGES_PER_END = 10; // scan at most 10
 
     private PdfPageScanner() {
     }

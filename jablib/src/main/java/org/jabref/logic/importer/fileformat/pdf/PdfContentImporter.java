@@ -210,16 +210,18 @@ public class PdfContentImporter extends PdfImporter {
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException {
         List<String> pageTexts = PdfPageScanner.scanPages(document);
         Optional<String> bibliographicPages = BibliographicPageDetector.findBibliographicPage(pageTexts);
-        if (bibliographicPages.isEmpty()){
+        if (bibliographicPages.isEmpty()) {
             return importPaperContent(document);
         }
         List<ISBN> isbns = new IsbnExtractor().extract(bibliographicPages.orElseThrow());
-        // If ISBN is missing or ambiguous, do not create entry.
-        if(isbns.size() != 1){
+        if (isbns.isEmpty()) {
+            return importPaperContent(document);
+        }
+        if (isbns.size() > 1) {
             return new ParserResult();
         }
         BibEntry bookEntry = new BibEntry(StandardEntryType.Book)
-                                .withField(StandardField.ISBN, isbns.getFirst().asString());
+                .withField(StandardField.ISBN, isbns.getFirst().asString());
         return new ParserResult(List.of(bookEntry));
     }
 
