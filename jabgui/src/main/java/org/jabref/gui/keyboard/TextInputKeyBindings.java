@@ -56,7 +56,7 @@ public class TextInputKeyBindings {
                         event.consume();
                     }
                     case EDITOR_DOWN,
-                        EDITOR_END_DOC -> {
+                         EDITOR_END_DOC -> {
                         focusedTextField.end();
                         event.consume();
                     }
