@@ -2,7 +2,6 @@ package org.jabref.gui.search;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.SelectionMode;
@@ -127,28 +126,25 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     }
 
     private void setupCopyActionBindingHandler(SearchResultsTable resultsTable) {
-        resultsTable.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
+        resultsTable.addEventFilter(KeyEvent.KEY_PRESSED, event ->
+                preferences.getKeyBindingRepository().mapToKeyBinding(event)
+                           .filter(KeyBinding.COPY::equals)
+                           .ifPresent(_ -> {
+                               List<BibEntryTableViewModel> selected = resultsTable.getSelectionModel().getSelectedItems();
+                               if (!selected.isEmpty()) {
+                                   BibDatabaseContext ctx = selected.getFirst().getBibDatabaseContext();
+                                   List<BibEntry> entries = selected.stream().map(BibEntryTableViewModel::getEntry).toList();
+                                   List<BibtexString> strings = ctx.getDatabase().getUsedStrings(entries);
 
-            if (keyBinding.isPresent()) {
-                if (keyBinding.get() == KeyBinding.COPY) {
-                    List<BibEntryTableViewModel> selected = resultsTable.getSelectionModel().getSelectedItems();
-                    if (!selected.isEmpty()) {
-                        BibDatabaseContext ctx = selected.getFirst().getBibDatabaseContext();
-                        List<BibEntry> entries = selected.stream().map(BibEntryTableViewModel::getEntry).toList();
-                        List<BibtexString> strings = ctx.getDatabase().getUsedStrings(entries);
-
-                        try {
-                            clipBoardManager.setContent(TransferMode.COPY, ctx, entries, entryTypesManager, strings);
-                            dialogService.notify(Localization.lang("Copied %0 entry(s)", entries.size()));
-                        } catch (IOException ex) {
-                            LOGGER.error("Error while copying the selected entry to clipboard", ex);
-                        }
-                    }
-                    event.consume();
-                }
-            }
-        });
+                                   try {
+                                       clipBoardManager.setContent(TransferMode.COPY, ctx, entries, entryTypesManager, strings);
+                                       dialogService.notify(Localization.lang("Copied %0 entry(s)", entries.size()));
+                                   } catch (IOException ex) {
+                                       LOGGER.error("Error while copying the selected entry to clipboard", ex);
+                                   }
+                                   event.consume();
+                               }
+                           }));
     }
 
     private void setupTableDoubleClickHandler(SearchResultsTable resultsTable, Stage stage) {
