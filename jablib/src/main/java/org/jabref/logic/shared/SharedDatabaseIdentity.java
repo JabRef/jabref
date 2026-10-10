@@ -11,8 +11,8 @@ public record SharedDatabaseIdentity(DBMSType type, String host, int port, Strin
     public static SharedDatabaseIdentity from(DatabaseConnectionProperties properties) {
         if (properties.isUseExpertMode()) {
             return DBMSConnectionUrl.parse(properties.getJdbcUrl())
-                                     .map(url -> new SharedDatabaseIdentity(url.type(), normalizeHost(url.host()), url.port(), url.database()))
-                                     .orElseGet(() -> fromFields(properties));
+                                    .map(url -> new SharedDatabaseIdentity(url.type(), normalizeHost(url.host()), url.port(), url.database()))
+                                    .orElseGet(() -> fromFields(properties));
         }
         return fromFields(properties);
     }
