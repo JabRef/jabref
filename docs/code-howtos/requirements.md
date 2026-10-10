@@ -242,7 +242,7 @@ It is better to write more small requirements than one large one. This makes cov
 
 OFT also allows for a more sophisticated specification workflows: one can separate the specification into layers with different responsible people (managers would write an unrefined, broad requirement for a feature, software architects would detail the architecture of the feature, and developers would add new detailed requirements).
 As a result, there is a long chain of requirements. However, because JabRef is not maintained by a lot of people, we chose a simplified workflow: our requirements are typically directly implemented in the code.
-Additionnaly, the requirement can take a `Covers:` keyword linking a specific `req` to a broader `feat`.
+Additionally, the requirement can take a `Covers:` keyword linking a specific `req` to a broader `feat`.
 
 - [General reading on traceability](https://www.sodiuswillert.com/en/blog/implementing-requirements-traceability-in-systems-software-engineering)
 - [OFT User guide](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide/user_guide.md)
