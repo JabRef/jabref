@@ -1735,6 +1735,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-family: 'JetBrains Mono';
 }
 
+.bibtex-code-area Text,
+.bibtex-code-area .text {
+    -fx-fill: -color-fg-default;
+}
+
 .bibtex-code-area .bibtex-keyword {
     -fx-fill: -color-bibtex-keyword !important;
 }
