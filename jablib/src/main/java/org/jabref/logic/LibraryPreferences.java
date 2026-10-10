@@ -16,6 +16,7 @@ public class LibraryPreferences {
     private final BooleanProperty alwaysReformatOnSave;
     private final BooleanProperty autoSave;
     private final BooleanProperty synchronizeWithFile;
+    private final BooleanProperty mergeConflictedCopies;
     private final BooleanProperty addImportedEntries;
     private final StringProperty addImportedEntriesGroupName;
 
@@ -23,12 +24,14 @@ public class LibraryPreferences {
                               boolean alwaysReformatOnSave,
                               boolean autoSave,
                               boolean synchronizeWithFile,
+                              boolean mergeConflictedCopies,
                               boolean addImportedEntries,
                               String addImportedEntriesGroupName) {
         this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.autoSave = new SimpleBooleanProperty(autoSave);
         this.synchronizeWithFile = new SimpleBooleanProperty(synchronizeWithFile);
+        this.mergeConflictedCopies = new SimpleBooleanProperty(mergeConflictedCopies);
         this.addImportedEntries = new SimpleBooleanProperty(addImportedEntries);
         this.addImportedEntriesGroupName = new SimpleStringProperty(addImportedEntriesGroupName);
     }
@@ -39,6 +42,7 @@ public class LibraryPreferences {
                 false,                                // alwaysReformatOnSave
                 false,                                // autoSave
                 false,                                // synchronizeWithFile
+                false,                                // mergeConflictedCopies
                 false,                                // addImportedEntries
                 Localization.lang("Imported entries") // addImportedEntriesGroupName
         );
@@ -95,6 +99,19 @@ public class LibraryPreferences {
 
     public void setSynchronizeWithFile(boolean synchronizeWithFile) {
         this.synchronizeWithFile.set(synchronizeWithFile);
+    }
+
+    /// The default for libraries that do not decide it themselves (see `MetaData.getMergeConflictedCopies`)
+    public boolean shouldMergeConflictedCopies() {
+        return mergeConflictedCopies.get();
+    }
+
+    public BooleanProperty mergeConflictedCopiesProperty() {
+        return mergeConflictedCopies;
+    }
+
+    public void setMergeConflictedCopies(boolean mergeConflictedCopies) {
+        this.mergeConflictedCopies.set(mergeConflictedCopies);
     }
 
     public boolean shouldAddImportedEntries() {
