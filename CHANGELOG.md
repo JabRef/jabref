@@ -56,7 +56,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where linked files in the entry editor were not updated immediately upon addition or removal. [#16067](https://github.com/JabRef/jabref/issues/16067)
 - We fixed an issue where the Semantic Scholar API key was ignored when fetching citations and references. [#17291](https://github.com/JabRef/jabref/issues/17291)
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
-- We fixed an issue where the AI summary tab was blank for entries with only online linked files. [#17203](https://github.com/JabRef/jabref/issues/17203)
+- We fixed an issue where the AI summary tab was blank for entries with files stored remotely. [#17203](https://github.com/JabRef/jabref/issues/17203)
 
 ### Removed
 
