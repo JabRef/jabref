@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.chatting;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.function.BooleanSupplier;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.ai.chatting.repositories.ChatHistoryRepository;
@@ -40,6 +42,9 @@ public class InMemoryChatHistoryCache {
     private record ChatSnapshot(ChatIdentifier identifier, List<ChatMessage> messages, String entityType, BooleanSupplier canPersist) {
     }
 
+    private record PendingChat(ChatIdentifier identifier, String entityType, BooleanSupplier canPersist) {
+    }
+
     private record CachedEntryChat(
             BibDatabaseContext databaseContext,
             ObservableList<ChatMessage> chatHistory,
@@ -63,7 +68,8 @@ public class InMemoryChatHistoryCache {
     /// Where each chat history currently lives in the repository (loaded from there or written there).
     /// Absent: the chat was never persisted, so an empty history must not overwrite stored data.
     private final Map<ObservableList<ChatMessage>, ChatIdentifier> persistedAt = new IdentityHashMap<>();
-    private final Map<ObservableList<ChatMessage>, ChatSnapshot> pending = new IdentityHashMap<>();
+    private final Map<ObservableList<ChatMessage>, List<ChatMessage>> writerHistories = new IdentityHashMap<>();
+    private final Map<ObservableList<ChatMessage>, PendingChat> pending = new IdentityHashMap<>();
 
     private final ChatHistoryRepository repository;
     private final ScheduledThreadPoolExecutor writer = new ScheduledThreadPoolExecutor(1);
@@ -93,7 +99,7 @@ public class InMemoryChatHistoryCache {
         openEntryChats.add(entry);
         return entryChats.computeIfAbsent(entry, _ -> {
             ObservableList<ChatMessage> chatHistory = load(ChatIdentifier.from(databaseContext, entry), entry.getCitationKey().orElse("<no key>"));
-            ListChangeListener<ChatMessage> writeThrough = _ -> queueEntryChat(entry, databaseContext, chatHistory);
+            ListChangeListener<ChatMessage> writeThrough = change -> queueEntryChat(entry, databaseContext, chatHistory, change);
             chatHistory.addListener(writeThrough);
             return new CachedEntryChat(databaseContext, chatHistory, writeThrough);
         }).chatHistory();
@@ -109,7 +115,7 @@ public class InMemoryChatHistoryCache {
     public synchronized ObservableList<ChatMessage> getForGroup(BibDatabaseContext databaseContext, GroupTreeNode group) {
         return groupChats.computeIfAbsent(group, _ -> {
             ObservableList<ChatMessage> chatHistory = load(ChatIdentifier.from(databaseContext, group), group.getName());
-            ListChangeListener<ChatMessage> writeThrough = _ -> queueGroupChat(group, databaseContext, chatHistory);
+            ListChangeListener<ChatMessage> writeThrough = change -> queueGroupChat(group, databaseContext, chatHistory, change);
             chatHistory.addListener(writeThrough);
             return new CachedGroupChat(databaseContext, group, chatHistory, writeThrough);
         }).chatHistory();
@@ -118,13 +124,16 @@ public class InMemoryChatHistoryCache {
     private ObservableList<ChatMessage> load(Optional<ChatIdentifier> identifier, String name) {
         if (identifier.isEmpty()) {
             LOGGER.debug("Created new in-memory chat history for {} (no valid identifier)", name);
-            return FXCollections.observableArrayList();
+            ObservableList<ChatMessage> chatHistory = FXCollections.observableArrayList();
+            writerHistories.put(chatHistory, new ArrayList<>());
+            return chatHistory;
         }
         List<ChatMessage> messages;
         synchronized (repository) {
             messages = repository.getAllMessages(identifier.get());
         }
         ObservableList<ChatMessage> chatHistory = FXCollections.observableArrayList(messages);
+        writerHistories.put(chatHistory, new ArrayList<>(messages));
         persistedAt.put(chatHistory, identifier.get());
         LOGGER.debug("Loaded chat history for {} from repository ({} messages)", name, chatHistory.size());
         return chatHistory;
@@ -152,11 +161,12 @@ public class InMemoryChatHistoryCache {
     private void forget(ObservableList<ChatMessage> chatHistory, ListChangeListener<ChatMessage> writeThrough) {
         chatHistory.removeListener(writeThrough);
         pending.remove(chatHistory);
+        writerHistories.remove(chatHistory);
         persistedAt.remove(chatHistory);
     }
 
     public void close() {
-        Map<ObservableList<ChatMessage>, ChatSnapshot> finalSnapshots;
+        Map<ObservableList<ChatMessage>, PendingChat> finalPending;
         synchronized (this) {
             if (closed) {
                 return;
@@ -169,12 +179,12 @@ public class InMemoryChatHistoryCache {
             groupChats.forEach((group, cached) -> captureGroupChat(group, cached.databaseContext(), cached.chatHistory()));
             entryChats.values().forEach(cached -> cached.chatHistory().removeListener(cached.writeThrough()));
             groupChats.values().forEach(cached -> cached.chatHistory().removeListener(cached.writeThrough()));
-            finalSnapshots = new IdentityHashMap<>(pending);
+            finalPending = new IdentityHashMap<>(pending);
             pending.clear();
         }
         LOGGER.debug("Flushing {} entry chats and {} group chats to repository",
                 entryChats.size(), groupChats.size());
-        var finalSave = writer.submit(() -> saveSnapshots(finalSnapshots));
+        var finalSave = writer.submit(() -> saveSnapshots(snapshotPending(finalPending)));
         boolean interrupted = false;
         try {
             while (true) {
@@ -197,7 +207,13 @@ public class InMemoryChatHistoryCache {
         LOGGER.debug("Finished flushing chat histories to repository");
     }
 
-    private synchronized void queueEntryChat(BibEntry entry, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
+    private synchronized void queueEntryChat(
+            BibEntry entry,
+            BibDatabaseContext databaseContext,
+            ObservableList<ChatMessage> chatHistory,
+            Change<? extends ChatMessage> change
+    ) {
+        applyChange(chatHistory, change);
         captureEntryChat(entry, databaseContext, chatHistory);
         scheduleSave();
     }
@@ -220,7 +236,13 @@ public class InMemoryChatHistoryCache {
                 && databaseContext.getDatabase().getEntryById(entry.getId()).filter(inDatabase -> inDatabase == entry).isPresent();
     }
 
-    private synchronized void queueGroupChat(GroupTreeNode group, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
+    private synchronized void queueGroupChat(
+            GroupTreeNode group,
+            BibDatabaseContext databaseContext,
+            ObservableList<ChatMessage> chatHistory,
+            Change<? extends ChatMessage> change
+    ) {
+        applyChange(chatHistory, change);
         captureGroupChat(group, databaseContext, chatHistory);
         scheduleSave();
     }
@@ -236,7 +258,7 @@ public class InMemoryChatHistoryCache {
 
     private void captureChat(BooleanSupplier canPersist, ChatIdentifier identifier, ObservableList<ChatMessage> chatHistory, String entityType) {
         if (canPersist.getAsBoolean()) {
-            pending.put(chatHistory, new ChatSnapshot(identifier, List.copyOf(chatHistory), entityType, canPersist));
+            pending.put(chatHistory, new PendingChat(identifier, entityType, canPersist));
         } else {
             pending.remove(chatHistory);
         }
@@ -253,10 +275,48 @@ public class InMemoryChatHistoryCache {
         Map<ObservableList<ChatMessage>, ChatSnapshot> snapshots;
         synchronized (this) {
             scheduledSave = null;
-            snapshots = new IdentityHashMap<>(pending);
+            Map<ObservableList<ChatMessage>, PendingChat> pendingToSave = new IdentityHashMap<>(pending);
             pending.clear();
+            snapshots = snapshotPending(pendingToSave);
         }
         saveSnapshots(snapshots);
+    }
+
+    private synchronized Map<ObservableList<ChatMessage>, ChatSnapshot> snapshotPending(
+            Map<ObservableList<ChatMessage>, PendingChat> pendingChats
+    ) {
+        Map<ObservableList<ChatMessage>, ChatSnapshot> snapshots = new IdentityHashMap<>();
+        pendingChats.forEach((chatHistory, pendingChat) ->
+                snapshots.put(chatHistory, new ChatSnapshot(
+                        pendingChat.identifier(),
+                        List.copyOf(writerHistories.getOrDefault(chatHistory, List.of())),
+                        pendingChat.entityType(),
+                        pendingChat.canPersist())));
+        return snapshots;
+    }
+
+    private void applyChange(ObservableList<ChatMessage> chatHistory, Change<? extends ChatMessage> change) {
+        List<ChatMessage> writerHistory = writerHistories.get(chatHistory);
+        while (change.next()) {
+            int from = change.getFrom();
+            int to = change.getTo();
+            if (change.wasPermutated()) {
+                List<ChatMessage> original = new ArrayList<>(writerHistory.subList(from, to));
+                List<ChatMessage> reordered = new ArrayList<>(original);
+                for (int index = from; index < to; index++) {
+                    reordered.set(change.getPermutation(index) - from, original.get(index - from));
+                }
+                writerHistory.subList(from, to).clear();
+                writerHistory.addAll(from, reordered);
+            } else {
+                if (change.wasRemoved()) {
+                    writerHistory.subList(from, from + change.getRemovedSize()).clear();
+                }
+                if (change.wasAdded()) {
+                    writerHistory.addAll(from, change.getAddedSubList());
+                }
+            }
+        }
     }
 
     private void saveSnapshots(Map<ObservableList<ChatMessage>, ChatSnapshot> snapshots) {

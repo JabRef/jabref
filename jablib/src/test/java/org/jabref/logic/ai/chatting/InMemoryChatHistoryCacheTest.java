@@ -2,6 +2,7 @@ package org.jabref.logic.ai.chatting;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,6 +190,22 @@ class InMemoryChatHistoryCacheTest {
         assertEquals(1, fakeRepository.commits);
         assertEquals(List.of("first", "second"), fakeRepository.getAllMessages(
                 new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Coalesced2024")).stream().map(ChatMessage::content).toList());
+    }
+
+    @Test
+    void batchedReplacementAndPermutationArePersisted() {
+        BibEntry entry = new BibEntry().withCitationKey("Batched2024");
+        databaseContext.getDatabase().insertEntry(entry);
+        var history = cache.getForEntry(databaseContext, entry);
+        ChatMessage first = ChatMessage.userMessage(Instant.ofEpochMilli(1000), "first");
+        ChatMessage second = ChatMessage.userMessage(Instant.ofEpochMilli(2000), "second");
+
+        history.setAll(first, second);
+        history.sort(Comparator.comparing(ChatMessage::content).reversed());
+        cache.close();
+
+        assertEquals(List.of("second", "first"), fakeRepository.getAllMessages(
+                new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Batched2024")).stream().map(ChatMessage::content).toList());
     }
 
     @Test
