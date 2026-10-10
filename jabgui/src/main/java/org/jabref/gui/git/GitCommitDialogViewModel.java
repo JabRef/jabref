@@ -2,6 +2,8 @@ package org.jabref.gui.git;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -13,6 +15,8 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
+import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.diff.GitDiffChecker;
@@ -135,9 +139,61 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         return pushTo(repository, committedNow);
     }
 
-    private String commitMessageOrDefault() {
+    String generateCommitMessage(DiffDatabases diff) {
+        BibDatabaseDiff databaseDiff = BibDatabaseDiff.compare(
+                diff.headDatabase(),
+                diff.workingTreeDatabase()
+        );
+
+        int added = 0;
+        int deleted = 0;
+        int modified = 0;
+
+        for (BibEntryDiff entryDiff : databaseDiff.getEntryDifferences()) {
+            if (entryDiff.originalEntry() == null) {
+                added++;
+            } else if (entryDiff.newEntry() == null) {
+                deleted++;
+            } else {
+                modified++;
+            }
+        }
+
+        List<String> changes = new ArrayList<>();
+
+        if (added > 0) {
+            String addedText = added == 1
+                               ? Localization.lang("Add %0 entry", String.valueOf(added))
+                               : Localization.lang("Add %0 entries", String.valueOf(added));
+            changes.add(addedText);
+        }
+
+        if (deleted > 0) {
+            String deletedText = deleted == 1
+                                 ? Localization.lang("Delete %0 entry", String.valueOf(deleted))
+                                 : Localization.lang("Delete %0 entries", String.valueOf(deleted));
+            changes.add(deletedText);
+        }
+
+        if (modified > 0) {
+            String modifiedText = modified == 1
+                                  ? Localization.lang("Modify %0 entry", String.valueOf(modified))
+                                  : Localization.lang("Modify %0 entries", String.valueOf(modified));
+            changes.add(modifiedText);
+        }
+
+        return String.join(", ", changes);
+    }
+
+    private String commitMessageOrDefault() throws JabRefException, IOException {
         String message = commitMessage.get();
-        return StringUtil.isBlank(message) ? Localization.lang("Update references") : message;
+
+        if (StringUtil.isBlank(message)) {
+            DiffDatabases diff = computeDiffDatabases();
+            return generateCommitMessage(diff);
+        }
+
+        return message;
     }
 
     public BackgroundTask<DiffDatabases> diffTask() {
@@ -188,7 +244,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         }
     }
 
-    private boolean commitCurrent(ResolvedRepository repository) throws GitAPIException, IOException {
+    private boolean commitCurrent(ResolvedRepository repository) throws JabRefException, GitAPIException, IOException {
         return repository.gitHandler().createCommitOnCurrentBranch(commitMessageOrDefault(), amend.get());
     }
 
