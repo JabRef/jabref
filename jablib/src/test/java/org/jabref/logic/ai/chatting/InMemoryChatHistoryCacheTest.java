@@ -241,6 +241,34 @@ class InMemoryChatHistoryCacheTest {
     }
 
     @Test
+    void pendingSnapshotIsDiscardedWhenEntryChatCloses() throws InterruptedException {
+        BibEntry entry = new BibEntry().withCitationKey("PendingClosed2024");
+        databaseContext.getDatabase().insertEntry(entry);
+
+        var history = cache.getForEntry(databaseContext, entry);
+        history.add(ChatMessage.userMessage("not persisted"));
+        cache.closeEntryChat(entry);
+        cache.close();
+
+        assertEquals(List.of(), fakeRepository.getAllMessages(
+                new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "PendingClosed2024")));
+    }
+
+    @Test
+    void deletedEntryIsNotPersistedByDelayedSave() {
+        cache = new InMemoryChatHistoryCache(fakeRepository, 250);
+        BibEntry entry = new BibEntry().withCitationKey("Deleted2024");
+        databaseContext.getDatabase().insertEntry(entry);
+
+        cache.getForEntry(databaseContext, entry).add(ChatMessage.userMessage("not persisted"));
+        databaseContext.getDatabase().removeEntry(entry);
+        cache.close();
+
+        assertEquals(List.of(), fakeRepository.getAllMessages(
+                new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Deleted2024")));
+    }
+
+    @Test
     void clearingChatThatBecameValidAfterLoadIsPersisted() throws InterruptedException {
         ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Late2024");
         BibEntry entry = new BibEntry().withCitationKey("Late2024");

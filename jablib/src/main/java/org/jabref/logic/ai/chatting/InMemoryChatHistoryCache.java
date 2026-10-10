@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -36,7 +37,7 @@ public class InMemoryChatHistoryCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryChatHistoryCache.class);
     private static final int SAVE_DELAY_MILLIS = 1_000;
 
-    private record ChatSnapshot(ChatIdentifier identifier, List<ChatMessage> messages, String entityType) {
+    private record ChatSnapshot(ChatIdentifier identifier, List<ChatMessage> messages, String entityType, BooleanSupplier canPersist) {
     }
 
     private record CachedEntryChat(
@@ -139,6 +140,7 @@ public class InMemoryChatHistoryCache {
     /// Marks an entry chat as closed while retaining its cached history for a later reload.
     public synchronized void closeEntryChat(BibEntry entry) {
         openEntryChats.remove(entry);
+        Optional.ofNullable(entryChats.get(entry)).ifPresent(cached -> pending.remove(cached.chatHistory()));
     }
 
     /// Removes the cached chat history for a group.
@@ -206,7 +208,16 @@ public class InMemoryChatHistoryCache {
         }
         ChatIdentifier.from(databaseContext, entry).ifPresent(identifier ->
                 // Identity, not equals: two equal duplicates must not keep each other's chat alive
-                captureChat(databaseContext.getDatabase().getEntryById(entry.getId()).filter(inDatabase -> inDatabase == entry).isPresent(), identifier, chatHistory, "entry"));
+                captureChat(
+                        () -> isEntryChatPersistable(entry, databaseContext),
+                        identifier,
+                        chatHistory,
+                        "entry"));
+    }
+
+    private synchronized boolean isEntryChatPersistable(BibEntry entry, BibDatabaseContext databaseContext) {
+        return openEntryChats.contains(entry)
+                && databaseContext.getDatabase().getEntryById(entry.getId()).filter(inDatabase -> inDatabase == entry).isPresent();
     }
 
     private synchronized void queueGroupChat(GroupTreeNode group, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
@@ -216,12 +227,16 @@ public class InMemoryChatHistoryCache {
 
     private void captureGroupChat(GroupTreeNode group, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
         ChatIdentifier.from(databaseContext, group).ifPresent(identifier ->
-                captureChat(databaseContext.getMetaData().getGroups().map(g -> g.containsGroup(group.getGroup())).orElse(false), identifier, chatHistory, "group"));
+                captureChat(
+                        () -> databaseContext.getMetaData().getGroups().map(g -> g.containsGroup(group.getGroup())).orElse(false),
+                        identifier,
+                        chatHistory,
+                        "group"));
     }
 
-    private void captureChat(boolean entityExists, ChatIdentifier identifier, ObservableList<ChatMessage> chatHistory, String entityType) {
-        if (entityExists) {
-            pending.put(chatHistory, new ChatSnapshot(identifier, List.copyOf(chatHistory), entityType));
+    private void captureChat(BooleanSupplier canPersist, ChatIdentifier identifier, ObservableList<ChatMessage> chatHistory, String entityType) {
+        if (canPersist.getAsBoolean()) {
+            pending.put(chatHistory, new ChatSnapshot(identifier, List.copyOf(chatHistory), entityType, canPersist));
         } else {
             pending.remove(chatHistory);
         }
@@ -249,6 +264,9 @@ public class InMemoryChatHistoryCache {
     }
 
     private void saveChat(ObservableList<ChatMessage> chatHistory, ChatSnapshot snapshot) {
+        if (!snapshot.canPersist().getAsBoolean()) {
+            return;
+        }
         Optional<ChatIdentifier> previousIdentifier;
         synchronized (this) {
             previousIdentifier = Optional.ofNullable(persistedAt.get(chatHistory));
