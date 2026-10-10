@@ -663,6 +663,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(miscEntry, techReportEntry, BibDatabaseMode.BIBTEX));
         assertTrue(duplicateChecker.isDuplicate(techReportEntry, miscEntry, BibDatabaseMode.BIBTEX));
     }
+
     @Test
     void articleAndMiscWithSameContentAreDuplicatesInBiblatexMode() {
         BibEntry article = new BibEntry(StandardEntryType.Article)
