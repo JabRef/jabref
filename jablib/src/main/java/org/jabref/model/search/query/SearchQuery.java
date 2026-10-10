@@ -1,10 +1,12 @@
 package org.jabref.model.search.query;
 
 import java.util.EnumSet;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchBaseVisitor;
@@ -25,6 +27,7 @@ public class SearchQuery {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchQuery.class);
 
     private final String searchExpression;
+    private String normalizedSearchExpression = "";
     private final EnumSet<SearchFlags> searchFlags;
     private SearchParser.StartContext context;
     private boolean isValidExpression;
@@ -38,18 +41,37 @@ public class SearchQuery {
         this.searchExpression = searchExpression;
         this.searchFlags = searchFlags;
         try {
-            this.context = getStartContext(searchExpression);
+            // [impl->req~search.doi-link-normalization~1]
+            String normalizedExpression = searchExpression;
+            if (!searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
+                String trimmed = searchExpression.trim();
+                String lower = trimmed.toLowerCase(Locale.ROOT);
+                if (!trimmed.contains(" ") && (lower.startsWith("http://") || lower.startsWith("https://")
+                        || lower.startsWith("doi.org/") || lower.startsWith("doi:"))) {
+                    normalizedExpression = DOI.parse(trimmed)
+                                              .map(DOI::asString)
+                                              .orElse(searchExpression);
+                }
+            }
+
+            this.context = getStartContext(normalizedExpression);
+            this.normalizedSearchExpression = normalizedExpression;
             isValidExpression = containsOnlyValidRegularExpressions(context, searchFlags);
         } catch (ParseCancellationException e) {
             // We use getCause here as the real exception is nested and this avoids that the stack trace get too large
             // and we don't see the root cause
             LOGGER.debug("Search query Parsing error", e.getCause());
+            this.normalizedSearchExpression = searchExpression;
             isValidExpression = false;
         }
     }
 
     public String getSearchExpression() {
         return searchExpression;
+    }
+
+    public String getNormalizedSearchExpression() {
+        return normalizedSearchExpression;
     }
 
     public SearchResults getSearchResults() {
