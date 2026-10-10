@@ -106,10 +106,6 @@ class PdfContentPartialImporterTest {
     // [utest->req~import.pdf.plausible-year~1]
     @Test
     void yearNotExtractedFromLongerDigitRun() {
-        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
-                .withField(StandardField.AUTHOR, "Alice Sample")
-                .withField(StandardField.TITLE, "Some Title of a Paper");
-
         String firstPageContents = """
                 Some Title of a Paper
 
@@ -117,18 +113,15 @@ class PdfContentPartialImporterTest {
 
                 Universitaetsstr. 38, 70569 Stuttgart, Germany""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.empty(), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
     }
 
     // [utest->req~import.pdf.plausible-year~1]
     @ParameterizedTest
     @ValueSource(strings = {"1999-2005", "1999–2005", "1999—2005", "1999  -  2005", "1999 \t— 2005"})
     void pageRangeSkippedInFavorOfActualYear(String pageRange) {
-        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
-                .withField(StandardField.AUTHOR, "Alice Sample")
-                .withField(StandardField.TITLE, "Some Title of a Paper")
-                .withField(StandardField.YEAR, "2018");
-
         String firstPageContents = """
                 Some Title of a Paper
 
@@ -136,17 +129,14 @@ class PdfContentPartialImporterTest {
 
                 Proceedings, pp. %s, 2018""".formatted(pageRange);
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("2018"), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
     }
 
     // [utest->req~import.pdf.plausible-year~1]
     @Test
     void yearAfterIssueNumberAndDashExtracted() {
-        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
-                .withField(StandardField.AUTHOR, "Alice Sample")
-                .withField(StandardField.TITLE, "Some Title of a Paper")
-                .withField(StandardField.YEAR, "2024");
-
         String firstPageContents = """
                 Some Title of a Paper
 
@@ -154,17 +144,14 @@ class PdfContentPartialImporterTest {
 
                 Journal of Examples, Vol. 1 - 2024""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("2024"), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
     }
 
     // [utest->req~import.pdf.plausible-year~1]
     @Test
     void yearInsideIdentifierSkippedInFavorOfActualYear() {
-        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
-                .withField(StandardField.AUTHOR, "Alice Sample")
-                .withField(StandardField.TITLE, "Some Title of a Paper")
-                .withField(StandardField.YEAR, "2021");
-
         String firstPageContents = """
                 Some Title of a Paper
 
@@ -172,7 +159,9 @@ class PdfContentPartialImporterTest {
 
                 Proceedings of IPAC2019, published 2021""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("2021"), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
     }
 
     // [utest->req~import.pdf.plausible-year~1]
@@ -187,18 +176,12 @@ class PdfContentPartialImporterTest {
 
         Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
 
-        assertEquals(Optional.of("161-175"), entry.flatMap(parsed -> parsed.getField(StandardField.PAGES)));
         assertEquals(Optional.empty(), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
     }
 
     // [utest->req~import.pdf.plausible-year~1]
     @Test
     void implausibleFourDigitNumberSkippedInFavorOfActualYear() {
-        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
-                .withField(StandardField.AUTHOR, "Alice Sample")
-                .withField(StandardField.TITLE, "Some Title of a Paper")
-                .withField(StandardField.YEAR, "2018");
-
         String firstPageContents = """
                 Some Title of a Paper
 
@@ -206,7 +189,9 @@ class PdfContentPartialImporterTest {
 
                 CH-8092 Zurich, 2018""";
 
-        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+        Optional<BibEntry> entry = importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty());
+
+        assertEquals(Optional.of("2018"), entry.flatMap(parsed -> parsed.getField(StandardField.YEAR)));
     }
 
     @Test

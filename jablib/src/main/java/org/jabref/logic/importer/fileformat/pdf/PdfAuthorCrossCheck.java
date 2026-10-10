@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.jabref.logic.util.PdfUtils;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -20,7 +22,6 @@ import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -54,30 +55,24 @@ class PdfAuthorCrossCheck {
     /// author candidates against what the document itself prints. Returns an empty string on failure.
     static String extractLeadingPagesText(PDDocument document) {
         try {
-            PDFTextStripper stripper = new PDFTextStripper();
-            stripper.setEndPage(Math.min(2, document.getNumberOfPages()));
-            return stripper.getText(document);
+            StringJoiner pages = new StringJoiner("\n");
+            for (int page = 1; page <= Math.min(2, document.getNumberOfPages()); page++) {
+                pages.add(PdfUtils.getPageContents(document, page));
+            }
+            return pages.toString();
         } catch (IOException e) {
             LOGGER.debug("Could not extract text for the author plausibility check", e);
             return "";
         }
     }
 
-    /// Office suites store the account name of whoever produced the file as "Author" in the document
-    /// information dictionary. Via the XMP/docinfo candidate, this person — usually not an author of the
-    /// work at all — would win the merge in [PdfMergeMetadataImporter] against author lists extracted from
-    /// the document itself.
-    ///
-    /// Since scholarly works print their authors on the leading pages, an author list is trusted only if at
-    /// least one of its family names occurs in the text of those pages. This applies only when the merged
-    /// author comes from a non-bibliographic candidate (no citation key, no known entry type): fetched
-    /// metadata and metadata previously written by JabRef are kept even when the PDF text does not contain
-    /// the author (e.g. slides or reports). An unconfirmed creator value is replaced by the best-confirmed
-    /// candidate value. If no candidate is confirmed, a single person is dropped entirely: a wrong author is
-    /// worse than none.
+    /// Replaces an unconfirmed creator-style author with the best author list confirmed by the PDF's leading
+    /// pages. Bibliographic metadata and authors without extractable page text are preserved.
     ///
     /// [impl->req~import.pdf.author-confirmed-by-text~1]
     static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, Set<BibEntry> citedWorks, @Nullable String leadingPagesText) {
+        // Office suites put the exporting account in document properties, where it can win the first-value
+        // merge. Citation keys and known entry types identify bibliographic metadata worth preserving.
         if (StringUtil.isBlank(leadingPagesText)) {
             return;
         }
@@ -97,7 +92,7 @@ class PdfAuthorCrossCheck {
                       .map(author -> new ScoredAuthor(author, countFamilyNamesInText(author, documentWords)))
                       .filter(scored -> scored.confirmedNames() > 0)
                       // keeps the earlier (= higher-priority) candidate unless a later one is strictly better
-                      .reduce((first, second) -> second.confirmedNames() > first.confirmedNames() ? second : first)
+                      .max((first, second) -> Integer.compare(first.confirmedNames(), second.confirmedNames()))
                       .ifPresentOrElse(
                               scored -> entry.setField(StandardField.AUTHOR, scored.value()),
                               () -> {
@@ -108,10 +103,10 @@ class PdfAuthorCrossCheck {
         });
     }
 
-    /// @param citedWorks candidates describing works the PDF cites (e.g. from its reference list), compared by identity;
-    ///                   their type says nothing about the imported document
+    /// @param citedWorks entries from the PDF's reference list; their entry types describe cited works
     private static boolean authorSourceLooksBibliographic(List<BibEntry> candidates, Set<BibEntry> citedWorks) {
-        // The merge is first-wins, thus the merged value stems from the first candidate carrying an author
+        // The first author-bearing candidate supplied the merged author. Identity distinguishes an actual
+        // reference-list entry from another candidate with identical fields.
         return candidates.stream()
                          .filter(candidate -> candidate.hasField(StandardField.AUTHOR))
                          .findFirst()
@@ -189,7 +184,7 @@ class PdfAuthorCrossCheck {
 
         boolean containsWords(String phrase) {
             String words = toWordSequence(normalizeForComparison(LatexToUnicodeAdapter.format(phrase)).toLowerCase(Locale.ROOT)).strip();
-            return !words.isEmpty() && lowerCase.contains(" " + words + " ");
+            return !words.isBlank() && lowerCase.contains(" " + words + " ");
         }
 
         /// A capitalized name must occur capitalized or in capitals, so that a family name such as "May" or
@@ -197,7 +192,7 @@ class PdfAuthorCrossCheck {
         boolean containsName(String name) {
             // Metadata may encode accents as LaTeX ("B{\\\"o}hm"), the PDF text prints them ("Böhm")
             String words = toWordSequence(normalizeForComparison(LatexToUnicodeAdapter.format(name))).strip();
-            if (words.isEmpty() || !Character.isUpperCase(words.codePointAt(0))) {
+            if (words.isBlank() || !Character.isUpperCase(words.codePointAt(0))) {
                 return containsWords(name);
             }
             int firstLength = Character.charCount(words.codePointAt(0));
