@@ -1,5 +1,7 @@
 package org.jabref.gui.ai.chat;
 
+import java.util.Optional;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -14,6 +16,7 @@ import org.jabref.logic.ai.chatting.InMemoryChatHistoryCache;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.identifiers.FullBibEntry;
+import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -27,6 +30,7 @@ public class AiEntryChatViewModel extends AbstractViewModel {
 
     private final AiPreferences aiPreferences;
     private final InMemoryChatHistoryCache chatHistoryCache;
+    private Optional<BibEntry> activeEntry = Optional.empty();
 
     public AiEntryChatViewModel(
             AiPreferences aiPreferences,
@@ -58,6 +62,9 @@ public class AiEntryChatViewModel extends AbstractViewModel {
         observableEntries.add(identifier);
         entries.set(observableEntries);
 
+        activeEntry.filter(entry -> entry != identifier.entry()).ifPresent(chatHistoryCache::closeEntryChat);
+        activeEntry = Optional.of(identifier.entry());
+
         chatHistory.set(chatHistoryCache.getForEntry(
                 identifier.databaseContext(),
                 identifier.entry()
@@ -78,5 +85,10 @@ public class AiEntryChatViewModel extends AbstractViewModel {
 
     public ListProperty<ChatMessage> chatHistoryProperty() {
         return chatHistory;
+    }
+
+    public void dispose() {
+        activeEntry.ifPresent(chatHistoryCache::closeEntryChat);
+        activeEntry = Optional.empty();
     }
 }

@@ -5,6 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.jabref.logic.ai.chatting.repositories.ChatHistoryRepository;
 import org.jabref.logic.ai.chatting.util.ChatHistoryUtils;
@@ -18,6 +24,7 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,12 +45,17 @@ class InMemoryChatHistoryCacheTest {
     @BeforeEach
     void setUp() {
         fakeRepository = new FakeChatHistoryRepository();
-        cache = new InMemoryChatHistoryCache(fakeRepository);
+        cache = new InMemoryChatHistoryCache(fakeRepository, 30);
 
         MetaData metaData = new MetaData();
         metaData.setAiLibraryId(LIBRARY_ID);
         BibDatabase database = new BibDatabase();
         databaseContext = new BibDatabaseContext(database, metaData);
+    }
+
+    @AfterEach
+    void tearDown() {
+        cache.close();
     }
 
     @Test
@@ -97,18 +109,20 @@ class InMemoryChatHistoryCacheTest {
     }
 
     @Test
-    void addedMessageIsPersistedBeforeClose() {
+    void addedMessageIsPersistedBeforeClose() throws InterruptedException {
         BibEntry entry = new BibEntry().withCitationKey("Write2024");
         databaseContext.getDatabase().insertEntry(entry);
 
         cache.getForEntry(databaseContext, entry).add(ChatMessage.userMessage("written through"));
+
+        assertTrue(fakeRepository.awaitCommit());
 
         ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Write2024");
         assertEquals(List.of("written through"), fakeRepository.getAllMessages(id).stream().map(ChatMessage::content).toList());
     }
 
     @Test
-    void deleteAndRegenerateArePersisted() {
+    void deleteAndRegenerateArePersisted() throws InterruptedException {
         BibEntry entry = new BibEntry().withCitationKey("Edit2024");
         databaseContext.getDatabase().insertEntry(entry);
         ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Edit2024");
@@ -120,9 +134,11 @@ class InMemoryChatHistoryCacheTest {
         history.addAll(first, second, third);
 
         ChatHistoryUtils.delete(history, third.id());
+        assertTrue(fakeRepository.awaitCommit());
         assertEquals(List.of("first", "second"), fakeRepository.getAllMessages(id).stream().map(ChatMessage::content).toList());
 
         ChatHistoryUtils.regenerate(history, second.id());
+        assertTrue(fakeRepository.awaitCommit());
         assertEquals(List.of("first"), fakeRepository.getAllMessages(id).stream().map(ChatMessage::content).toList());
     }
 
@@ -146,17 +162,86 @@ class InMemoryChatHistoryCacheTest {
     }
 
     @Test
-    void addedMessageIsCommitted() {
+    void addedMessageIsCommitted() throws InterruptedException {
         BibEntry entry = new BibEntry().withCitationKey("Commit2024");
         databaseContext.getDatabase().insertEntry(entry);
 
         cache.getForEntry(databaseContext, entry).add(ChatMessage.userMessage("durable"));
 
+        assertTrue(fakeRepository.awaitCommit());
         assertEquals(1, fakeRepository.commits);
     }
 
     @Test
-    void clearingChatThatBecameValidAfterLoadIsPersisted() {
+    void rapidChangesAreCommittedTogether() throws InterruptedException {
+        cache.close();
+        cache = new InMemoryChatHistoryCache(fakeRepository, 250);
+
+        BibEntry entry = new BibEntry().withCitationKey("Coalesced2024");
+        databaseContext.getDatabase().insertEntry(entry);
+        var history = cache.getForEntry(databaseContext, entry);
+
+        history.add(ChatMessage.userMessage("first"));
+        history.add(ChatMessage.userMessage("second"));
+
+        assertEquals(0, fakeRepository.commits);
+        assertTrue(fakeRepository.awaitCommit());
+        assertEquals(1, fakeRepository.commits);
+        assertEquals(List.of("first", "second"), fakeRepository.getAllMessages(
+                new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Coalesced2024")).stream().map(ChatMessage::content).toList());
+    }
+
+    @Test
+    void changingChatDoesNotWaitForStorage() throws InterruptedException, ExecutionException, TimeoutException {
+        BibEntry entry = new BibEntry().withCitationKey("Background2024");
+        databaseContext.getDatabase().insertEntry(entry);
+        var history = cache.getForEntry(databaseContext, entry);
+        fakeRepository.blockCommits = true;
+
+        try {
+            CompletableFuture.runAsync(() -> history.add(ChatMessage.userMessage("background")))
+                             .get(3, TimeUnit.SECONDS);
+            assertTrue(fakeRepository.commitStarted.await(3, TimeUnit.SECONDS));
+            assertEquals(0, fakeRepository.commits);
+        } finally {
+            fakeRepository.blockCommits = false;
+            fakeRepository.commitPermit.release();
+        }
+
+        assertTrue(fakeRepository.awaitCommit());
+    }
+
+    @Test
+    void persistedHistoryIsLoadedAgainAfterRemovalFromCache() throws InterruptedException {
+        BibEntry entry = new BibEntry().withCitationKey("Reload2024");
+        databaseContext.getDatabase().insertEntry(entry);
+
+        cache.getForEntry(databaseContext, entry).add(ChatMessage.userMessage("stored"));
+        assertTrue(fakeRepository.awaitCommit());
+
+        cache.removeEntry(entry);
+
+        assertEquals(List.of("stored"), cache.getForEntry(databaseContext, entry).stream().map(ChatMessage::content).toList());
+    }
+
+    @Test
+    void closedEntryChatIsNotCapturedOnClose() {
+        BibEntry entry = new BibEntry().withCitationKey("Closed2024");
+        databaseContext.getDatabase().insertEntry(entry);
+
+        var history = cache.getForEntry(databaseContext, entry);
+        cache.closeEntryChat(entry);
+        history.add(ChatMessage.userMessage("not persisted"));
+
+        assertEquals(0, fakeRepository.commits);
+        cache.close();
+
+        assertEquals(List.of(), fakeRepository.getAllMessages(
+                new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Closed2024")));
+    }
+
+    @Test
+    void clearingChatThatBecameValidAfterLoadIsPersisted() throws InterruptedException {
         ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Late2024");
         BibEntry entry = new BibEntry().withCitationKey("Late2024");
         BibEntry duplicate = new BibEntry().withCitationKey("Late2024");
@@ -166,9 +251,11 @@ class InMemoryChatHistoryCacheTest {
         databaseContext.getDatabase().removeEntry(duplicate);
 
         history.add(ChatMessage.userMessage("late"));
+        assertTrue(fakeRepository.awaitCommit());
         assertEquals(1, fakeRepository.getAllMessages(id).size());
 
         history.clear();
+        assertTrue(fakeRepository.awaitCommit());
         assertTrue(fakeRepository.getAllMessages(id).isEmpty());
     }
 
@@ -183,6 +270,8 @@ class InMemoryChatHistoryCacheTest {
         history.add(ChatMessage.userMessage("second"));
         entry.setCitationKey("C");
         history.add(ChatMessage.userMessage("third"));
+
+        cache.close();
 
         assertEquals(List.of(), fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "A")));
         assertEquals(List.of(), fakeRepository.getAllMessages(new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "B")));
@@ -207,7 +296,7 @@ class InMemoryChatHistoryCacheTest {
     }
 
     @Test
-    void storageFailureKeepsHistoryAndRetriesOnNextChange() {
+    void storageFailureKeepsHistoryAndRetriesOnNextChange() throws InterruptedException {
         BibEntry entry = new BibEntry().withCitationKey("Failing2024");
         databaseContext.getDatabase().insertEntry(entry);
         ChatIdentifier id = new ChatIdentifier(LIBRARY_ID, ChatType.WITH_ENTRY, "Failing2024");
@@ -216,17 +305,21 @@ class InMemoryChatHistoryCacheTest {
         fakeRepository.failing = true;
         history.add(ChatMessage.userMessage("first"));
 
+        assertTrue(fakeRepository.awaitFailedAttempt());
+
         assertEquals(List.of("first"), history.stream().map(ChatMessage::content).toList());
         assertEquals(List.of(), fakeRepository.getAllMessages(id));
 
         fakeRepository.failing = false;
         history.add(ChatMessage.userMessage("second"));
 
+        assertTrue(fakeRepository.awaitCommit());
+
         assertEquals(List.of("first", "second"), fakeRepository.getAllMessages(id).stream().map(ChatMessage::content).toList());
     }
 
     @Test
-    void failedWriteIsRolledBackSoAnotherChatCannotCommitIt() {
+    void failedWriteIsRolledBackSoAnotherChatCannotCommitIt() throws InterruptedException {
         BibEntry first = new BibEntry().withCitationKey("First2024");
         BibEntry second = new BibEntry().withCitationKey("Second2024");
         databaseContext.getDatabase().insertEntries(first, second);
@@ -235,12 +328,17 @@ class InMemoryChatHistoryCacheTest {
         var firstHistory = cache.getForEntry(databaseContext, first);
         firstHistory.add(ChatMessage.userMessage("kept"));
 
+        assertTrue(fakeRepository.awaitCommit());
+
         fakeRepository.failing = true;
         firstHistory.add(ChatMessage.userMessage("lost in storage"));
+        assertTrue(fakeRepository.awaitFailedAttempt());
         fakeRepository.failing = false;
 
         // A different chat commits the shared store; the half-written first chat must not ride along
         cache.getForEntry(databaseContext, second).add(ChatMessage.userMessage("unrelated"));
+
+        assertTrue(fakeRepository.awaitCommit());
 
         assertEquals(List.of("kept"), fakeRepository.getAllMessages(firstId).stream().map(ChatMessage::content).toList());
     }
@@ -262,12 +360,14 @@ class InMemoryChatHistoryCacheTest {
     }
 
     @Test
-    void messagesAfterEntryRemovalAreNotPersisted() {
+    void messagesAfterEntryRemovalAreNotPersisted() throws InterruptedException {
         BibEntry entry = new BibEntry().withCitationKey("Deleted2024");
         databaseContext.getDatabase().insertEntry(entry);
 
         var history = cache.getForEntry(databaseContext, entry);
         history.add(ChatMessage.userMessage("persisted"));
+
+        assertTrue(fakeRepository.awaitCommit());
 
         databaseContext.getDatabase().removeEntry(entry);
         history.add(ChatMessage.userMessage("should not be persisted"));
@@ -311,7 +411,24 @@ class InMemoryChatHistoryCacheTest {
         private final Map<String, List<ChatMessage>> store = new HashMap<>();
         private Map<String, List<ChatMessage>> committed = new HashMap<>();
         private int commits;
-        private boolean failing;
+        private volatile boolean failing;
+        private volatile boolean blockCommits;
+        private CountDownLatch commitLatch = new CountDownLatch(1);
+        private final CountDownLatch commitStarted = new CountDownLatch(1);
+        private CountDownLatch failedAttemptLatch = new CountDownLatch(1);
+        private final Semaphore commitPermit = new Semaphore(0);
+
+        private boolean awaitCommit() throws InterruptedException {
+            boolean committed = commitLatch.await(3, TimeUnit.SECONDS);
+            commitLatch = new CountDownLatch(1);
+            return committed;
+        }
+
+        private boolean awaitFailedAttempt() throws InterruptedException {
+            boolean attempted = failedAttemptLatch.await(3, TimeUnit.SECONDS);
+            failedAttemptLatch = new CountDownLatch(1);
+            return attempted;
+        }
 
         private String key(ChatIdentifier id) {
             return id.libraryId() + "/" + id.chatType() + "/" + id.chatName();
@@ -320,6 +437,7 @@ class InMemoryChatHistoryCacheTest {
         @Override
         public void addMessage(ChatIdentifier chatIdentifier, ChatMessage chatMessage) {
             if (failing) {
+                failedAttemptLatch.countDown();
                 throw new IllegalStateException("storage is unavailable");
             }
             store.computeIfAbsent(key(chatIdentifier), _ -> new ArrayList<>()).add(chatMessage);
@@ -352,8 +470,13 @@ class InMemoryChatHistoryCacheTest {
 
         @Override
         public void commit() {
+            if (blockCommits) {
+                commitStarted.countDown();
+                commitPermit.acquireUninterruptibly();
+            }
             commits++;
             committed = deepCopy(store);
+            commitLatch.countDown();
         }
 
         @Override

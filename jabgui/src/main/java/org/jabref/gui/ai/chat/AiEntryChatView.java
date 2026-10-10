@@ -53,4 +53,8 @@ public class AiEntryChatView extends StackPane {
     public ObjectProperty<FullBibEntry> selectedEntryProperty() {
         return viewModel.selectedEntryProperty();
     }
+
+    public void dispose() {
+        viewModel.dispose();
+    }
 }

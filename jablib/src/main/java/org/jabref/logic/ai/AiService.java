@@ -187,11 +187,13 @@ public class AiService implements AutoCloseable {
     }
 
     private void migrateDatabase(BibDatabaseContext context) {
-        ChatHistoryMigrationV1.migrate(
-                context,
-                mvStoreChatHistoryRepository,
-                notificationService
-        );
+        synchronized (mvStoreChatHistoryRepository) {
+            ChatHistoryMigrationV1.migrate(
+                    context,
+                    mvStoreChatHistoryRepository,
+                    notificationService
+            );
+        }
 
         SummariesMigrationV1.migrate(
                 context,

@@ -2,8 +2,14 @@ package org.jabref.logic.ai.chatting;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -16,15 +22,22 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// An in-memory storage layer for chat history with [BibEntry]. This allows to have an AI chat even if the entry does not have a citation key or it is not unique.
 ///
-/// Every change of a chat is written through to the on-disk storage ([ChatHistoryRepository]) as soon as the
-/// chat has a valid [ChatIdentifier]; [#close()] flushes once more as a safety net.
+/// Changed chats are saved to [ChatHistoryRepository] after a short delay.
+/// [#close()] flushes any outstanding changes.
+@NullMarked
 public class InMemoryChatHistoryCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryChatHistoryCache.class);
+    private static final int SAVE_DELAY_MILLIS = 1_000;
+
+    private record ChatSnapshot(ChatIdentifier identifier, List<ChatMessage> messages, String entityType) {
+    }
 
     private record CachedEntryChat(
             BibDatabaseContext databaseContext,
@@ -44,30 +57,42 @@ public class InMemoryChatHistoryCache {
     // IdentityHashMap: compares keys by reference (==), NOT by equals()/hashCode().
     private final Map<BibEntry, CachedEntryChat> entryChats = Collections.synchronizedMap(new IdentityHashMap<>());
     private final Map<GroupTreeNode, CachedGroupChat> groupChats = Collections.synchronizedMap(new IdentityHashMap<>());
+    private final Set<BibEntry> openEntryChats = Collections.newSetFromMap(new IdentityHashMap<>());
 
     /// Where each chat history currently lives in the repository (loaded from there or written there).
     /// Absent: the chat was never persisted, so an empty history must not overwrite stored data.
     private final Map<ObservableList<ChatMessage>, ChatIdentifier> persistedAt = new IdentityHashMap<>();
+    private final Map<ObservableList<ChatMessage>, ChatSnapshot> pending = new IdentityHashMap<>();
 
     private final ChatHistoryRepository repository;
+    private final ScheduledThreadPoolExecutor writer = new ScheduledThreadPoolExecutor(1);
+    private final int saveDelayMillis;
+    private @Nullable ScheduledFuture<?> scheduledSave;
 
     private boolean closed;
 
     public InMemoryChatHistoryCache(ChatHistoryRepository repository) {
+        this(repository, SAVE_DELAY_MILLIS);
+    }
+
+    InMemoryChatHistoryCache(ChatHistoryRepository repository, int saveDelayMillis) {
         this.repository = repository;
+        this.saveDelayMillis = saveDelayMillis;
+        writer.setRemoveOnCancelPolicy(true);
     }
 
     /// Returns the chat history for `entry`. If none exists in RAM, loads from repository
     /// and caches it. The returned [ObservableList] is the primary working storage - mutations
-    /// are written through to the repository.
+    /// are saved to the repository after a short delay.
     ///
     /// @param databaseContext the database context for the entry (needed for persistence)
     /// @param entry           the entry to get chat history for
     /// @return the live, mutable chat history
     public synchronized ObservableList<ChatMessage> getForEntry(BibDatabaseContext databaseContext, BibEntry entry) {
+        openEntryChats.add(entry);
         return entryChats.computeIfAbsent(entry, _ -> {
             ObservableList<ChatMessage> chatHistory = load(ChatIdentifier.from(databaseContext, entry), entry.getCitationKey().orElse("<no key>"));
-            ListChangeListener<ChatMessage> writeThrough = _ -> flushEntryChat(entry, databaseContext, chatHistory);
+            ListChangeListener<ChatMessage> writeThrough = _ -> queueEntryChat(entry, databaseContext, chatHistory);
             chatHistory.addListener(writeThrough);
             return new CachedEntryChat(databaseContext, chatHistory, writeThrough);
         }).chatHistory();
@@ -75,7 +100,7 @@ public class InMemoryChatHistoryCache {
 
     /// Returns the chat history for `group`. If none exists in RAM, loads from repository
     /// and caches it. The returned [ObservableList] is the primary working storage - mutations
-    /// are written through to the repository.
+    /// are saved to the repository after a short delay.
     ///
     /// @param databaseContext the database context for the group (needed for persistence)
     /// @param group           the group to get chat history for
@@ -83,7 +108,7 @@ public class InMemoryChatHistoryCache {
     public synchronized ObservableList<ChatMessage> getForGroup(BibDatabaseContext databaseContext, GroupTreeNode group) {
         return groupChats.computeIfAbsent(group, _ -> {
             ObservableList<ChatMessage> chatHistory = load(ChatIdentifier.from(databaseContext, group), group.getName());
-            ListChangeListener<ChatMessage> writeThrough = _ -> flushGroupChat(group, databaseContext, chatHistory);
+            ListChangeListener<ChatMessage> writeThrough = _ -> queueGroupChat(group, databaseContext, chatHistory);
             chatHistory.addListener(writeThrough);
             return new CachedGroupChat(databaseContext, group, chatHistory, writeThrough);
         }).chatHistory();
@@ -94,7 +119,11 @@ public class InMemoryChatHistoryCache {
             LOGGER.debug("Created new in-memory chat history for {} (no valid identifier)", name);
             return FXCollections.observableArrayList();
         }
-        ObservableList<ChatMessage> chatHistory = FXCollections.observableArrayList(repository.getAllMessages(identifier.get()));
+        List<ChatMessage> messages;
+        synchronized (repository) {
+            messages = repository.getAllMessages(identifier.get());
+        }
+        ObservableList<ChatMessage> chatHistory = FXCollections.observableArrayList(messages);
         persistedAt.put(chatHistory, identifier.get());
         LOGGER.debug("Loaded chat history for {} from repository ({} messages)", name, chatHistory.size());
         return chatHistory;
@@ -103,7 +132,13 @@ public class InMemoryChatHistoryCache {
     /// Removes the cached chat history for an entry.
     /// The chat history is NOT persisted before removal - it's simply discarded from RAM.
     public synchronized void removeEntry(BibEntry entry) {
+        openEntryChats.remove(entry);
         Optional.ofNullable(entryChats.remove(entry)).ifPresent(cached -> forget(cached.chatHistory(), cached.writeThrough()));
+    }
+
+    /// Marks an entry chat as closed while retaining its cached history for a later reload.
+    public synchronized void closeEntryChat(BibEntry entry) {
+        openEntryChats.remove(entry);
     }
 
     /// Removes the cached chat history for a group.
@@ -114,76 +149,132 @@ public class InMemoryChatHistoryCache {
 
     private void forget(ObservableList<ChatMessage> chatHistory, ListChangeListener<ChatMessage> writeThrough) {
         chatHistory.removeListener(writeThrough);
+        pending.remove(chatHistory);
         persistedAt.remove(chatHistory);
     }
 
-    public synchronized void close() {
-        LOGGER.debug("Flushing {} entry chats and {} group chats to repository",
-                entryChats.size(), groupChats.size());
-
-        try {
-            entryChats.forEach((entry, cached) -> flushEntryChat(entry, cached.databaseContext(), cached.chatHistory()));
-            groupChats.forEach((group, cached) -> flushGroupChat(group, cached.databaseContext(), cached.chatHistory()));
-        } finally {
+    public void close() {
+        Map<ObservableList<ChatMessage>, ChatSnapshot> finalSnapshots;
+        synchronized (this) {
+            if (closed) {
+                return;
+            }
+            closed = true;
+            if (scheduledSave != null) {
+                scheduledSave.cancel(false);
+            }
+            entryChats.forEach((entry, cached) -> captureEntryChat(entry, cached.databaseContext(), cached.chatHistory()));
+            groupChats.forEach((group, cached) -> captureGroupChat(group, cached.databaseContext(), cached.chatHistory()));
             entryChats.values().forEach(cached -> cached.chatHistory().removeListener(cached.writeThrough()));
             groupChats.values().forEach(cached -> cached.chatHistory().removeListener(cached.writeThrough()));
-            closed = true;
+            finalSnapshots = new IdentityHashMap<>(pending);
+            pending.clear();
         }
-
+        LOGGER.debug("Flushing {} entry chats and {} group chats to repository",
+                entryChats.size(), groupChats.size());
+        var finalSave = writer.submit(() -> saveSnapshots(finalSnapshots));
+        boolean interrupted = false;
+        try {
+            while (true) {
+                try {
+                    finalSave.get();
+                    break;
+                } catch (InterruptedException e) {
+                    interrupted = true;
+                    LOGGER.debug("Waiting for chat history flush after interruption", e);
+                }
+            }
+        } catch (ExecutionException e) {
+            LOGGER.error("Unable to flush chat histories", e);
+        } finally {
+            writer.shutdown();
+            if (interrupted) {
+                Thread.currentThread().interrupt();
+            }
+        }
         LOGGER.debug("Finished flushing chat histories to repository");
     }
 
-    private synchronized void flushEntryChat(BibEntry entry, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
+    private synchronized void queueEntryChat(BibEntry entry, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
+        captureEntryChat(entry, databaseContext, chatHistory);
+        scheduleSave();
+    }
+
+    private void captureEntryChat(BibEntry entry, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
+        if (!openEntryChats.contains(entry)) {
+            return;
+        }
         ChatIdentifier.from(databaseContext, entry).ifPresent(identifier ->
                 // Identity, not equals: two equal duplicates must not keep each other's chat alive
-                flushChat(databaseContext.getDatabase().getEntries().stream().anyMatch(inDatabase -> inDatabase == entry), identifier, chatHistory, "entry"));
+                captureChat(databaseContext.getDatabase().getEntryById(entry.getId()).filter(inDatabase -> inDatabase == entry).isPresent(), identifier, chatHistory, "entry"));
     }
 
-    private synchronized void flushGroupChat(GroupTreeNode group, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
+    private synchronized void queueGroupChat(GroupTreeNode group, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
+        captureGroupChat(group, databaseContext, chatHistory);
+        scheduleSave();
+    }
+
+    private void captureGroupChat(GroupTreeNode group, BibDatabaseContext databaseContext, ObservableList<ChatMessage> chatHistory) {
         ChatIdentifier.from(databaseContext, group).ifPresent(identifier ->
-                flushChat(databaseContext.getMetaData().getGroups().map(g -> g.containsGroup(group.getGroup())).orElse(false), identifier, chatHistory, "group"));
+                captureChat(databaseContext.getMetaData().getGroups().map(g -> g.containsGroup(group.getGroup())).orElse(false), identifier, chatHistory, "group"));
     }
 
-    /// Generic flush logic for both entry and group chats
-    private void flushChat(
-            boolean entityExists,
-            ChatIdentifier currentIdentifier,
-            ObservableList<ChatMessage> chatHistory,
-            String entityType
-    ) {
-        // Algorithm:
-        // 1. After close() or if the entity was deleted from the database, the chat history must not be saved.
-        // 2. An empty chat that was never persisted (identifier invalid at load time) must not wipe stored history.
-        // 3. If the chat lives under another identifier (name/key changed): clear that location first.
-        // 4. Write to the current location and remember it.
+    private void captureChat(boolean entityExists, ChatIdentifier identifier, ObservableList<ChatMessage> chatHistory, String entityType) {
+        if (entityExists) {
+            pending.put(chatHistory, new ChatSnapshot(identifier, List.copyOf(chatHistory), entityType));
+        } else {
+            pending.remove(chatHistory);
+        }
+    }
 
-        if (closed || !entityExists) {
+    private void scheduleSave() {
+        if (closed || pending.isEmpty() || scheduledSave != null) {
+            return;
+        }
+        scheduledSave = writer.schedule(this::savePending, saveDelayMillis, TimeUnit.MILLISECONDS);
+    }
+
+    private void savePending() {
+        Map<ObservableList<ChatMessage>, ChatSnapshot> snapshots;
+        synchronized (this) {
+            scheduledSave = null;
+            snapshots = new IdentityHashMap<>(pending);
+            pending.clear();
+        }
+        saveSnapshots(snapshots);
+    }
+
+    private void saveSnapshots(Map<ObservableList<ChatMessage>, ChatSnapshot> snapshots) {
+        snapshots.forEach(this::saveChat);
+    }
+
+    private void saveChat(ObservableList<ChatMessage> chatHistory, ChatSnapshot snapshot) {
+        Optional<ChatIdentifier> previousIdentifier;
+        synchronized (this) {
+            previousIdentifier = Optional.ofNullable(persistedAt.get(chatHistory));
+        }
+        if (previousIdentifier.isEmpty() && snapshot.messages().isEmpty()) {
             return;
         }
 
-        Optional<ChatIdentifier> previousIdentifier = Optional.ofNullable(persistedAt.get(chatHistory));
-        if (previousIdentifier.isEmpty() && chatHistory.isEmpty()) {
-            return;
+        synchronized (repository) {
+            try {
+                previousIdentifier.filter(previous -> !previous.equals(snapshot.identifier())).ifPresent(repository::clear);
+                repository.clear(snapshot.identifier());
+                snapshot.messages().forEach(message -> repository.addMessage(snapshot.identifier(), message));
+                repository.commit();
+            } catch (RuntimeException e) {
+                LOGGER.error("Unable to store chat history for {} {}", snapshot.entityType(), snapshot.identifier().chatName(), e);
+                repository.rollback();
+                return;
+            }
         }
-
-        // A storage failure must not abort the chat operation that triggered this write: the half-written
-        // state is rolled back, the history stays in memory and the next change (or close()) retries it.
-        try {
-            previousIdentifier.filter(previous -> !previous.equals(currentIdentifier)).ifPresent(previous -> {
-                repository.clear(previous);
-                LOGGER.debug("Cleared old chat history for {} {}", entityType, previous.chatName());
-            });
-
-            repository.clear(currentIdentifier);
-            chatHistory.forEach(message -> repository.addMessage(currentIdentifier, message));
-            repository.commit();
-        } catch (RuntimeException e) {
-            LOGGER.error("Unable to store chat history for {} {}", entityType, currentIdentifier.chatName(), e);
-            repository.rollback();
-            return;
+        synchronized (this) {
+            if (entryChats.values().stream().anyMatch(cached -> cached.chatHistory() == chatHistory) ||
+                    groupChats.values().stream().anyMatch(cached -> cached.chatHistory() == chatHistory)) {
+                persistedAt.put(chatHistory, snapshot.identifier());
+            }
         }
-        persistedAt.put(chatHistory, currentIdentifier);
-
-        LOGGER.debug("Flushed chat history for {} {} ({} messages)", entityType, currentIdentifier.chatName(), chatHistory.size());
+        LOGGER.debug("Flushed chat history for {} {} ({} messages)", snapshot.entityType(), snapshot.identifier().chatName(), snapshot.messages().size());
     }
 }
