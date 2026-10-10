@@ -264,6 +264,13 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 gitHandlerRegistry,
                 (tab, _) -> handleSharedDatabaseConnectionSuccess(tab, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath),
                 exception -> showConnectionFailure(exception, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
+        Optional<LibraryTab> alreadyReserved = SharedDatabaseUIManager.reserveTab(tabContainer, connectionProperties, libraryTab);
+        if (alreadyReserved.isPresent()) {
+            dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
+                    Localization.lang("You are already connected to a database using entered connection details."));
+            tabContainer.showLibraryTab(alreadyReserved.get());
+            return;
+        }
         tabContainer.addTab(libraryTab, true);
         libraryTab.startDataLoadingTask();
     }

@@ -1016,7 +1016,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (loadedContext.getLocation() != DatabaseLocation.SHARED) {
             return false;
         }
-        Optional<LibraryTab> alreadyOpen = SharedDatabaseUIManager.findOpenTab(tabContainer, loadedContext.getDBMSSynchronizer().getConnectionProperties());
+        Optional<LibraryTab> alreadyOpen = SharedDatabaseUIManager.findOpenTab(
+                tabContainer,
+                loadedContext.getDBMSSynchronizer().getConnectionProperties(),
+                Optional.of(this));
         alreadyOpen.ifPresent(other -> {
             LOGGER.info("Shared database {} is already open in another tab, dropping the second connection", loadedContext.getDBMSSynchronizer().getDBName());
             BackgroundTask.wrap(() -> closeSharedDatabase(loadedContext)).executeWith(taskExecutor);
