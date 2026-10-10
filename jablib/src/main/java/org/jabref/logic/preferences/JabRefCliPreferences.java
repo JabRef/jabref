@@ -124,7 +124,6 @@ import org.jabref.model.search.SearchFlags;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
 import org.jspecify.annotations.NonNull;
@@ -332,6 +331,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String LAST_FOCUSED = "lastFocused";
     private static final String LAST_SHARED_DATABASES = "lastSharedDatabases";
     private static final String RECENT_DATABASES = "recentDatabases";
+    private static final String LAST_SELECTED_ENTRIES = "lastSelectedEntries";
     // endregion
 
     // region ProxyPreferences
@@ -566,7 +566,26 @@ public class JabRefCliPreferences implements CliPreferences {
             return new ArrayList<>();
         }
 
-        return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
+        // Inverse of [#convertListToString]: a backslash escapes the next character, so delimiters and backslashes
+        // inside an element survive the round trip.
+        List<String> result = new ArrayList<>();
+        StringBuilder element = new StringBuilder();
+        boolean escaped = false;
+        for (char c : toConvert.toCharArray()) {
+            if (escaped) {
+                element.append(c);
+                escaped = false;
+            } else if (c == '\\') {
+                escaped = true;
+            } else if (c == STRINGLIST_DELIMITER) {
+                result.add(element.toString());
+                element.setLength(0);
+            } else {
+                element.append(c);
+            }
+        }
+        result.add(element.toString());
+        return result;
     }
     // endregion
 
@@ -2059,15 +2078,23 @@ public class JabRefCliPreferences implements CliPreferences {
 
         lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
                 getStringList(LAST_EDITED).stream().map(Path::of).toList(),
+                getStringList(LAST_SELECTED_ENTRIES),
                 getPath(LAST_FOCUSED, defaultValues.getLastFocusedFile()),
                 getStringList(LAST_SHARED_DATABASES),
                 FileHistory.of(getStringList(RECENT_DATABASES).stream().map(Path::of).toList()));
 
         bindPathList(lastFilesOpenedPreferences.getLastFilesOpened(), LAST_EDITED, defaultValues.getLastFilesOpened());
+        bindCustomList(lastFilesOpenedPreferences.getLastSelectedEntries(), LAST_SELECTED_ENTRIES, defaultValues.getLastSelectedEntries(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindPathList(lastFilesOpenedPreferences.getFileHistory(), RECENT_DATABASES, defaultValues.getFileHistory());
         bindPath(lastFilesOpenedPreferences.lastFocusedFileProperty(), LAST_FOCUSED, defaultValues.getLastFocusedFile());
         bindCustomList(lastFilesOpenedPreferences.getLastSharedDatabasesOpened(), LAST_SHARED_DATABASES, defaultValues.getLastSharedDatabasesOpened(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+
+        // The file history is the only preference a user expects to survive a crash: it changes on opening or saving a
+        // library, which are rare enough that writing the whole store through is cheap. Without this, a kill (task
+        // manager, power loss) before the next scheduled sync loses the just-opened library from "Recent libraries".
+        lastFilesOpenedPreferences.getFileHistory().addListener((ListChangeListener<Path>) _ -> flush());
 
         return lastFilesOpenedPreferences;
     }

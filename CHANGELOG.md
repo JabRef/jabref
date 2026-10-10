@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added tooltips with action descriptions to menu items. [#9615](https://github.com/JabRef/jabref/issues/9615)
 - We added "Contribute to JabRef" to the Help menu, linking to [contribute.jabref.org](https://contribute.jabref.org). [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
+- We added restoring of the library tab and entry that were selected when JabRef was closed. [#16911](https://github.com/JabRef/jabref/pull/16911)
 
 ### Changed
 
@@ -59,6 +60,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the Semantic Scholar API key was ignored when fetching citations and references. [#17291](https://github.com/JabRef/jabref/issues/17291)
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 - We fixed an issue where the AI chat tab still said "Unable to chat" after attaching a file. [#17157](https://github.com/JabRef/jabref/pull/17157)
+- We fixed an issue where libraries opened or saved shortly before JabRef was killed were missing from recent libraries. [#16911](https://github.com/JabRef/jabref/pull/16911)
 
 ### Removed
 
