@@ -14,7 +14,7 @@ describes a transition path for MARC 21, with published
 [MARC 21-to-BIBFRAME conversion specifications](https://www.loc.gov/bibframe/mtbf/)
 and [BIBFRAME-to-MARC 21 specifications](https://www.loc.gov/bibframe/bftm/index.html).
 The [German National Library has a BIBFRAME project](https://www.dnb.de/DE/Professionell/ProjekteKooperationen/Projekte/BIBFRAME/bibframe_node.html),
-and its [standards guidance](https://wiki.dnb.de/spaces/DINIAGKIM/pages/330012514/MARC%2BEmpfehlung%2B3.1)
+and its [MARC 21 documentation](https://www.dnb.de/EN/marc21)
 describes replacement of MARC 21 as a longer-term prospect, not a completed
 change. JabRef must handle both formats during this transition.
 
