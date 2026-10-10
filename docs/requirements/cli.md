@@ -79,6 +79,17 @@ contains only the exported data.
 
 Needs: impl
 
+## JabKit BibTeX conversion must preserve library context
+`req~jabkit.cli.convert-bibtex-context~1`
+
+This includes the library's string definitions and preamble when writing to a file,
+standard output, or the input file itself.
+References to those strings continue to resolve to their original values after conversion.
+
+Source: <https://github.com/JabRef/jabref/issues/17409>
+
+Needs: impl, utest
+
 ## JabKit check commands must support GitHub Actions output format
 `req~jabkit.cli.check-github-actions-output~1`
 

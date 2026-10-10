@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -66,7 +67,8 @@ public class ExportService {
         return new Exporter("bibtex", "BibTex", StandardFileType.BIBTEX_DB) {
             @Override
             public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
-                internalSaveDatabaseContext(new BibDatabaseContext(new BibDatabase(entries)), file);
+                // [impl->req~jabkit.cli.convert-bibtex-context~1]
+                internalSaveDatabaseContext(databaseContext, file, entries);
             }
         };
     }
@@ -128,6 +130,14 @@ public class ExportService {
             BibDatabaseContext bibDatabaseContext,
             Path outputFile) throws IOException {
 
+        internalSaveDatabaseContext(bibDatabaseContext, outputFile, bibDatabaseContext.getDatabase().getEntries());
+    }
+
+    private void internalSaveDatabaseContext(
+            BibDatabaseContext bibDatabaseContext,
+            Path outputFile,
+            List<BibEntry> entries) throws IOException {
+
         if (!FileUtil.isBibFile(outputFile)) {
             printOut(Localization.lang("Invalid output file type provided."));
         }
@@ -140,8 +150,17 @@ public class ExportService {
                     saveConfiguration,
                     cliPreferences.getFieldPreferences(),
                     cliPreferences.getCitationKeyPatternPreferences(),
-                    entryTypesManager);
-            databaseWriter.writeDatabase(bibDatabaseContext);
+                    entryTypesManager) {
+                @Override
+                protected void writeDatabaseID(String sharedDatabaseID) throws IOException {
+                    // Partial exports must not reconnect to the source shared library.
+                    BibDatabase database = bibDatabaseContext.getDatabase();
+                    if (entries.size() == database.getEntryCount() && Set.copyOf(entries).containsAll(database.getEntries())) {
+                        super.writeDatabaseID(sharedDatabaseID);
+                    }
+                }
+            };
+            databaseWriter.writePartOfDatabase(bibDatabaseContext, entries.stream().filter(entry -> !entry.isEmpty()).toList());
 
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {
