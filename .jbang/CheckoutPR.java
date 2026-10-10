@@ -20,7 +20,7 @@ import org.kohsuke.github.PagedIterator;
 //JAVA 21+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
-//DEPS org.kohsuke:github-api:2.0-rc.6
+//DEPS org.kohsuke:github-api:2.0-rc.7
 //DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.8.0.202609011348-r
 
 public class CheckoutPR {
