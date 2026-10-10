@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,21 +46,29 @@ import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 /// please see [RuleBasedBibliographyPdfImporter].
 ///
 /// If several PDF importers should be tried, use [PdfMergeMetadataImporter].
+@NullMarked
 public class PdfContentImporter extends PdfImporter {
 
-    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
+    // Lookarounds keep the pattern from matching inside longer digit runs or identifiers such as postal codes,
+    // URL path segments or "IPAC2019",
+    // and from matching either end of a four-digit range such as the page range "pp. 1999-2005"
+    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("(?<![\\p{L}\\d])(?<!\\d{4}\\h{0,5}[-–—]\\h{0,5})\\d{4}(?![\\p{L}\\d])(?!\\h*[-–—]\\h*\\d{4}(?!\\d))");
+    // The importer targets first pages of Springer/IEEE-style papers, i.e. 20th century or later. A lower bound
+    // would admit ISSN halves ("ISSN 1631-0705") and page ranges ("pp. 1523-1540") printed on the same page.
+    private static final int MINIMUM_PLAUSIBLE_YEAR = 1900;
+    private static final Pattern FOUR_DIGITS = Pattern.compile("\\d{4}");
 
     private static final int ARXIV_PREFIX_LENGTH = "arxiv:".length();
 
     // input lines into several lines
-    private String[] lines;
+    private String[] lines = new String[0];
 
     // current index in lines
     private int lineIndex;
 
-    private String curString;
+    private String curString = "";
 
-    private String year;
+    private @Nullable String year;
 
     /// Removes all non-letter characters at the end
     ///
@@ -252,7 +261,7 @@ public class PdfContentImporter extends PdfImporter {
             return Math.abs(Xgap) > XspaceThreshold && Math.abs(Ygap) > YspaceThreshold;
         }
 
-        private boolean isUnwantedText(TextPosition previousTextPosition, TextPosition textPosition,
+        private boolean isUnwantedText(@Nullable TextPosition previousTextPosition, @Nullable TextPosition textPosition,
                                        Map<Float, TextPosition> lastPositionMap, float fontSize) {
             // This indicates that the text is at the start of the line, so it is needed.
             if (textPosition == null || previousTextPosition == null) {
@@ -543,7 +552,10 @@ public class PdfContentImporter extends PdfImporter {
                     pages = springerSplit[2].substring(4);
 
                     if (springerSplit[3].length() >= 4) {
-                        year = springerSplit[3].substring(0, 4);
+                        String springerYear = springerSplit[3].substring(0, 4);
+                        if (isPlausibleYear(springerYear)) {
+                            year = springerYear;
+                        }
                     }
                 }
             } else {
@@ -636,7 +648,7 @@ public class PdfContentImporter extends PdfImporter {
         return DOI.findInText(curString).map(DOI::asString).orElse(null);
     }
 
-    private String getArXivId(String arXivId) {
+    private @Nullable String getArXivId(@Nullable String arXivId) {
         if (arXivId != null) {
             return arXivId;
         }
@@ -654,15 +666,30 @@ public class PdfContentImporter extends PdfImporter {
     }
 
     /// Extract the year out of curString (if it is not yet defined)
+    ///
+    /// [impl->req~import.pdf.plausible-year~1]
     private void extractYear() {
         if (year != null) {
             return;
         }
 
         Matcher m = YEAR_EXTRACT_PATTERN.matcher(curString);
-        if (m.find()) {
-            year = curString.substring(m.start(), m.end());
+        while (m.find()) {
+            if (isPlausibleYear(m.group())) {
+                year = m.group();
+                return;
+            }
         }
+    }
+
+    /// [impl->req~import.pdf.plausible-year~1]
+    private static boolean isPlausibleYear(String candidate) {
+        if (!FOUR_DIGITS.matcher(candidate).matches()) {
+            return false;
+        }
+        int value = Integer.parseInt(candidate);
+        // The upper bound tolerates in-press works dated slightly ahead of the current year
+        return (value >= MINIMUM_PLAUSIBLE_YEAR) && (value <= Year.now().getValue() + 2);
     }
 
     /// PDFTextStripper normally does NOT produce multiple empty lines
