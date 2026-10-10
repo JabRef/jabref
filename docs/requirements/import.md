@@ -55,4 +55,15 @@ If an entry's `doi` field is empty and another field contains a DOI, JabRef make
 
 Needs: impl, utest
 
+## Remember the import dialog's download choice
+`req~import.dialog.download-linked-files~1`
+
+The import dialog remembers whether to download referenced files, including after restarting JabRef.
+Confirming an import saves the choice and applies it to that import; canceling leaves the saved choice unchanged.
+The choice is independent of the automatic download setting in Preferences > Web search and is only shown in the import dialog.
+Dialogs opened by JabRef's Web search, including identifier searches, use the Web search preference instead and do not change the saved import choice.
+On upgrade, the existing web search setting initializes the dialog preference once, preserving the previous default for existing users.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
