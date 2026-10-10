@@ -1679,6 +1679,12 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -color-accent, -color-button-pressed;
 }
 
+.info-center-view .donation-notification .dismiss-forever-link {
+    -fx-text-fill: -color-fg-muted;
+    -fx-font-size: 0.85em;
+    -fx-padding: 0;
+}
+
 /* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
    LinkedFilesEditor binds the ListView pref/max height to this fixed cell size. */
 .linked-files-list {

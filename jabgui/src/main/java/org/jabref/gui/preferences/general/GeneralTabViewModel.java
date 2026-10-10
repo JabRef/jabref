@@ -83,7 +83,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldAskForIncludingCrossReferencesProperty = new SimpleBooleanProperty();
     private final BooleanProperty hideTabBarProperty = new SimpleBooleanProperty();
-    private final BooleanProperty donationNeverShowProperty = new SimpleBooleanProperty();
 
     private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
     private final ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty = new SimpleObjectProperty<>();
@@ -231,7 +230,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
         shouldAskForIncludingCrossReferencesProperty.setValue(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences());
         hideTabBarProperty.setValue(workspacePreferences.shouldHideTabBar());
-        donationNeverShowProperty.setValue(preferences.getDonationPreferences().isNeverShowAgain());
 
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(libraryPreferences.getDefaultBibDatabaseMode());
@@ -282,7 +280,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
         preferences.getCopyToPreferences().setShouldAskForIncludingCrossReferences(shouldAskForIncludingCrossReferencesProperty.getValue());
         workspacePreferences.setHideTabBar(confirmHideTabBarProperty().getValue());
-        preferences.getDonationPreferences().setNeverShowAgain(donationNeverShowProperty.getValue());
 
         libraryPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
 
@@ -472,10 +469,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty confirmHideTabBarProperty() {
         return this.hideTabBarProperty;
-    }
-
-    public BooleanProperty donationNeverShowProperty() {
-        return this.donationNeverShowProperty;
     }
 
     public ListProperty<BibDatabaseMode> biblatexModeListProperty() {
