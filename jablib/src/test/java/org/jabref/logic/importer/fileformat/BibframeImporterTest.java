@@ -34,7 +34,7 @@ class BibframeImporterTest {
                 .withField(StandardField.SUBTITLE, "Expert Tips")
                 .withField(StandardField.AUTHOR, "Caraballo, Margarita J.")
                 .withField(StandardField.ADDRESS, "Birmingham")
-                .withField(StandardField.PUBLISHER, "Packt Publishing")
+                .withField(StandardField.PUBLISHER, "Packt Publishing") // spellchecker:disable-line
                 .withField(StandardField.EDITION, "2nd ed.")
                 .withField(StandardField.PAGETOTAL, "240")
                 .withField(StandardField.SERIES, "Practical computing")

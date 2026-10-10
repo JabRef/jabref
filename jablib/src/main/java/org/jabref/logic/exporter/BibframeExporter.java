@@ -55,7 +55,7 @@ public class BibframeExporter extends Exporter {
             Map.entry("eus", "baq"), Map.entry("isl", "ice"), Map.entry("mkd", "mac"),
             Map.entry("mri", "mao"), Map.entry("msa", "may"), Map.entry("mya", "bur"),
             Map.entry("fas", "per"), Map.entry("sqi", "alb"), Map.entry("bod", "tib"),
-            Map.entry("cym", "wel"), Map.entry("kat", "geo"));
+            Map.entry("cym", "wel"), Map.entry("kat", "geo")); // spellchecker:disable-line
 
     public BibframeExporter() {
         super("bibframe", "BIBFRAME 2.0 RDF/XML", StandardFileType.RDF);

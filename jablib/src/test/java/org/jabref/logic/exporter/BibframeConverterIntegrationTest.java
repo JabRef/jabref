@@ -214,7 +214,7 @@ class BibframeConverterIntegrationTest {
                 .withField(StandardField.SUBTITLE, "Expert Tips.")
                 .withField(StandardField.AUTHOR, "Caraballo, Margarita J.")
                 .withField(StandardField.ADDRESS, "Birmingham :")
-                .withField(StandardField.PUBLISHER, "{Packt Publishing,}")
+                .withField(StandardField.PUBLISHER, "{Packt Publishing,}") // spellchecker:disable-line
                 .withField(StandardField.YEAR, "2023")
                 .withField(StandardField.ISBN, "9781800567566")
                 .withField(StandardField.DOI, "10.1234/book.001")
