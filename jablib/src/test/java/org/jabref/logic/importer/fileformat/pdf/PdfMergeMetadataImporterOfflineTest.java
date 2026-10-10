@@ -152,6 +152,7 @@ class PdfMergeMetadataImporterOfflineTest {
     @ParameterizedTest
     @CsvSource(delimiter = '|', textBlock = """
             山田 太郎 and 佐藤 花子       | 山田 太郎, 佐藤 花子, Example University
+            أحمد حسن                    | أحمد حسن, Example University
             Ahmad bin Hassan            | Ahmad bin Hassan, Example University
             """)
     void unconfirmedAuthorIsReplacedByInternationalByline(String byline, String leadingPagesText) {

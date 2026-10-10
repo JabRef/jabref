@@ -92,6 +92,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     /// 2. Run [PdfImporter]s, and store extracted candidates in the list.
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
+        // [impl->adr~track-pdf-reference-list-provenance~1]
         // BibEntry equality is by content, but provenance belongs to the instance
         Set<BibEntry> citedWorks = Collections.newSetFromMap(new IdentityHashMap<>());
         List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document, citedWorks);
@@ -179,16 +180,11 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return FILENAME_TITLE_PATTERN.matcher(title.trim()).matches();
     }
 
-    /// Merges all candidate entries — the results of the individual [PdfImporter]s plus any online fetches —
-    /// into a single entry. Candidates earlier in the list take precedence on conflicting fields, so
-    /// higher-priority importers must come first.
-    ///
-    /// Beyond the plain field merge this also: replaces a filename-like title with the first candidate title
-    /// that does not look like a filename; cross-checks the merged author against the PDF text (see
-    /// [PdfAuthorCrossCheck]); and keeps only online (URL) file links.
+    /// Merges PDF metadata candidates in priority order, replaces filename-like titles, checks the author
+    /// against the PDF text, and retains only online file links.
     ///
     /// @param candidates       candidate entries ordered by descending priority
-    /// @param leadingPagesText plain text of the PDF's leading pages (as produced by [PdfAuthorCrossCheck]), used only to validate the merged author; `null` or empty when the text could not be extracted, in which case the author is left untouched
+    /// @param leadingPagesText text of the PDF's leading pages; `null` or empty leaves the author unchanged
     @VisibleForTesting
     static BibEntry mergeCandidates(List<BibEntry> candidates, @Nullable String leadingPagesText) {
         return mergeCandidates(candidates, Set.of(), leadingPagesText);
