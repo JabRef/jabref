@@ -32,6 +32,14 @@ tasks.test {
     maxParallelForks = 1
 }
 
+graalvmNative {
+    binaries {
+        named("main") {
+            buildArgs.add("-H:IncludeLocales=en")
+        }
+    }
+}
+
 tasks.named<JavaExec>("run") {
     // "assert" statements in the code should activated when running using gradle
     enableAssertions = true
