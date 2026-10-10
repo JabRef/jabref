@@ -28,7 +28,7 @@ extra["jbangVersion"] = jbang
 
 dependencies {
     api(platform("ai.djl:bom:0.38.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.21.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.22.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.3"))
@@ -144,7 +144,7 @@ dependencies.constraints {
     api("org.jabref:latex-conv:0.1.0")
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.20")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.21")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.23.2")
     api("org.jspecify:jspecify:1.0.1")
@@ -155,7 +155,7 @@ dependencies.constraints {
     api("org.libreoffice:unoloader:26.2.2")
     api("org.mockito:mockito-core:5.24.0")
     api("org.ow2.asm:asm:9.10.1")
-    api("org.postgresql:postgresql:42.7.13")
+    api("org.postgresql:postgresql:42.7.14")
     api("org.slf4j:jul-to-slf4j:2.0.20")
     api("org.slf4j:slf4j-api:2.0.20")
     api("org.tinylog:slf4j-tinylog:2.8.1")

@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -13,6 +14,7 @@ import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Disabled;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -49,5 +52,29 @@ class LinkedFilesEditorViewModelTest {
         viewModel.fetchFulltext();
 
         assertTrue(Files.exists(tempDir.resolve("test.pdf")));
+    }
+
+    @Test
+    void entryFileChangeShouldSynchronizeWithViewModelFiles() {
+        BibEntry entry = new BibEntry();
+
+        viewModel = new LinkedFilesEditorViewModel(
+                StandardField.FILE,
+                new EmptySuggestionProvider(),
+                mock(DialogService.class),
+                bibDatabaseContext,
+                new CurrentThreadTaskExecutor(),
+                mock(FieldCheckers.class),
+                preferences,
+                undoManager
+        );
+        viewModel.bindToEntry(entry);
+
+        assertTrue(viewModel.getFiles().isEmpty(), "Initial files list should be empty");
+
+        LinkedFile newFile = new LinkedFile("description", Path.of("test.pdf"), "PDF");
+        entry.setFiles(List.of(newFile));
+
+        assertEquals(1, viewModel.getFiles().size(), "ViewModel files should update reactively when entry files are updated");
     }
 }
