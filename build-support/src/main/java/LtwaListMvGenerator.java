@@ -10,8 +10,8 @@
 //DEPS org.jspecify:jspecify:1.0.1
 // Keep this version in sync with versions/build.gradle.kts.
 //DEPS org.openjfx:javafx-base:27
-//DEPS org.slf4j:slf4j-api:2.0.18
-//DEPS org.slf4j:slf4j-simple:2.0.18
+//DEPS org.slf4j:slf4j-api:2.0.20
+//DEPS org.slf4j:slf4j-simple:2.0.20
 
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/Abbreviation.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationFormat.java
