@@ -210,6 +210,11 @@ public class AiService implements AutoCloseable {
         return inMemoryChatHistoryCache;
     }
 
+    /// Releases chat cache retention for a closed library while outstanding writes finish.
+    public void releaseLibrary(BibDatabaseContext context) {
+        inMemoryChatHistoryCache.releaseLibrary(context);
+    }
+
     public ChatModel getCurrentChatModel() {
         return currentChatModel.get();
     }

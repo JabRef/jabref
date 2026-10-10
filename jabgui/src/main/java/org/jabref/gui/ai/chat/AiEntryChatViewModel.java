@@ -5,6 +5,8 @@ import java.util.Optional;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -12,16 +14,25 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.chatting.InMemoryChatHistoryCache;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.identifiers.FullBibEntry;
-import org.jabref.model.entry.BibEntry;
 
-import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class AiEntryChatViewModel extends AbstractViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiEntryChatViewModel.class);
+
     private final BooleanProperty enabled = new SimpleBooleanProperty();
+    private final ReadOnlyBooleanWrapper historyLoaded = new ReadOnlyBooleanWrapper();
     private final ObjectProperty<FullBibEntry> selectedEntry = new SimpleObjectProperty<>();
     private final ListProperty<FullBibEntry> entries = new SimpleListProperty<>(FXCollections.observableArrayList(
             entryIdentifier -> entryIdentifier.entry().getObservables()
@@ -30,7 +41,8 @@ public class AiEntryChatViewModel extends AbstractViewModel {
 
     private final AiPreferences aiPreferences;
     private final InMemoryChatHistoryCache chatHistoryCache;
-    private Optional<BibEntry> activeEntry = Optional.empty();
+    private final Subscription selectionSubscription;
+    private long loadGeneration;
 
     public AiEntryChatViewModel(
             AiPreferences aiPreferences,
@@ -40,35 +52,44 @@ public class AiEntryChatViewModel extends AbstractViewModel {
         this.chatHistoryCache = chatHistoryCache;
 
         setupBindings();
-        setupListeners();
+        selectionSubscription = BindingsHelper.listen(() -> load(selectedEntry.get()), selectedEntry, enabled);
     }
 
     private void setupBindings() {
         enabled.bind(aiPreferences.aiFeaturesEnabledCurrentlyProperty());
     }
 
-    private void setupListeners() {
-        EasyBind.subscribe(selectedEntry, this::load);
-    }
-
-    private void load(FullBibEntry identifier) {
-        if (identifier == null || !enabled.get()) {
+    private void load(@Nullable FullBibEntry identifier) {
+        long generation = ++loadGeneration;
+        historyLoaded.set(false);
+        chatHistory.set(FXCollections.observableArrayList());
+        entries.set(FXCollections.observableArrayList(entryIdentifier -> entryIdentifier.entry().getObservables()));
+        if (!enabled.get()) {
             return;
         }
 
+        Optional.ofNullable(identifier).ifPresent(entry -> loadEntry(entry, generation));
+    }
+
+    private void loadEntry(FullBibEntry identifier, long generation) {
         ObservableList<FullBibEntry> observableEntries = FXCollections.observableArrayList(
                 entryIdentifier -> entryIdentifier.entry().getObservables()
         );
         observableEntries.add(identifier);
         entries.set(observableEntries);
 
-        activeEntry.filter(entry -> entry != identifier.entry()).ifPresent(chatHistoryCache::closeEntryChat);
-        activeEntry = Optional.of(identifier.entry());
-
-        chatHistory.set(chatHistoryCache.getForEntry(
-                identifier.databaseContext(),
-                identifier.entry()
-        ));
+        chatHistoryCache.getForEntryAsync(identifier.databaseContext(), identifier.entry())
+                        .whenComplete((history, failure) -> UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+                            if (generation != loadGeneration) {
+                                return;
+                            }
+                            Optional.ofNullable(failure).ifPresentOrElse(
+                                    error -> LOGGER.error("Unable to load entry chat", error),
+                                    () -> {
+                                        chatHistory.set(history);
+                                        historyLoaded.set(true);
+                                    });
+                        }));
     }
 
     public ObjectProperty<FullBibEntry> selectedEntryProperty() {
@@ -77,6 +98,10 @@ public class AiEntryChatViewModel extends AbstractViewModel {
 
     public BooleanProperty enabledProperty() {
         return enabled;
+    }
+
+    public ReadOnlyBooleanProperty historyLoadedProperty() {
+        return historyLoaded.getReadOnlyProperty();
     }
 
     public ListProperty<FullBibEntry> entriesProperty() {
@@ -88,7 +113,10 @@ public class AiEntryChatViewModel extends AbstractViewModel {
     }
 
     public void dispose() {
-        activeEntry.ifPresent(chatHistoryCache::closeEntryChat);
-        activeEntry = Optional.empty();
+        loadGeneration++;
+        selectionSubscription.unsubscribe();
+        historyLoaded.set(false);
+        chatHistory.set(FXCollections.observableArrayList());
+        entries.set(FXCollections.observableArrayList(entryIdentifier -> entryIdentifier.entry().getObservables()));
     }
 }
