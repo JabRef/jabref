@@ -25,7 +25,7 @@
 
 // from jabsrv
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.22
-//DEPS com.github.ben-manes.caffeine:caffeine:3.2.4
+//DEPS com.github.ben-manes.caffeine:caffeine:3.3.0
 //DEPS com.google.guava:guava:33.6.0-jre
 //DEPS com.konghq:unirest-modules-gson:4.10.1
 //DEPS de.undercouch:citeproc-java:3.5.2
@@ -38,23 +38,23 @@
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.1
 //DEPS org.bouncycastle:bcprov-jdk18on:1.84
 //DEPS org.postgresql:postgresql:42.7.14
-//DEPS org.slf4j:slf4j-api:2.0.18
-//DEPS org.slf4j:jul-to-slf4j:2.0.18
+//DEPS org.slf4j:slf4j-api:2.0.20
+//DEPS org.slf4j:jul-to-slf4j:2.0.20
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
 //DEPS org.glassfish.grizzly:grizzly-framework:5.0.3
 //DEPS org.glassfish.grizzly:grizzly-http-server:5.0.3
 //DEPS org.glassfish.hk2:hk2-api:4.0.3
 //DEPS org.glassfish.hk2:hk2-locator:4.0.3
-//DEPS org.glassfish.hk2:hk2-utils:4.0.1
-//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.2
-//DEPS org.glassfish.jersey.core:jersey-server:4.0.2
-//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.2
-//DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
+//DEPS org.glassfish.hk2:hk2-utils:4.0.3
+//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.3
+//DEPS org.glassfish.jersey.core:jersey-server:4.0.3
+//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.3
+//DEPS org.hibernate.validator:hibernate-validator:9.1.4.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS tools.jackson.core:jackson-core:3.2.0
-//DEPS tools.jackson.core:jackson-databind:3.2.0
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.0
+//DEPS tools.jackson.core:jackson-core:3.2.3
+//DEPS tools.jackson.core:jackson-databind:3.2.3
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.3
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
