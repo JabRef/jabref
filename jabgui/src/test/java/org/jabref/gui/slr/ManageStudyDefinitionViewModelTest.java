@@ -251,8 +251,7 @@ class ManageStudyDefinitionViewModelTest {
 
         Study builtStudy = viewModel.buildStudy();
 
-        assertEquals(Map.of("ACM Portal", "ti:First"), builtStudy.getQueries().getFirst().getCatalogSpecific());
-        assertEquals(Map.of("ACM Portal", "ti:Second"), builtStudy.getQueries().getLast().getCatalogSpecific());
+        assertEquals(List.of(Map.of("ACM Portal", "ti:First"), Map.of("ACM Portal", "ti:Second")), getCatalogSpecifics(builtStudy));
     }
 
     @Test
@@ -266,9 +265,7 @@ class ManageStudyDefinitionViewModelTest {
                  .setNativeQuery("ti:New");
 
         Study builtStudy = viewModel.buildStudy();
-        for (StudyQuery query : builtStudy.getQueries()) {
-            assertEquals(Map.of("ACM Portal", "ti:New"), query.getCatalogSpecific());
-        }
+        assertEquals(List.of(Map.of("ACM Portal", "ti:New"), Map.of("ACM Portal", "ti:New")), getCatalogSpecifics(builtStudy));
     }
 
     @Test
@@ -283,9 +280,7 @@ class ManageStudyDefinitionViewModelTest {
         viewModel.addQuery("Q2");
 
         Study builtStudy = viewModel.buildStudy();
-        for (StudyQuery studyQuery : builtStudy.getQueries()) {
-            assertEquals(Map.of("ACM Portal", "ti:Test"), studyQuery.getCatalogSpecific());
-        }
+        assertEquals(List.of(Map.of("ACM Portal", "ti:Test"), Map.of("ACM Portal", "ti:Test")), getCatalogSpecifics(builtStudy));
     }
 
     @Test
@@ -300,8 +295,7 @@ class ManageStudyDefinitionViewModelTest {
 
         Study builtStudy = viewModel.buildStudy();
 
-        assertEquals(Map.of("ACM Portal", "ti:Test"), builtStudy.getQueries().getFirst().getCatalogSpecific());
-        assertEquals(Map.of(), builtStudy.getQueries().getLast().getCatalogSpecific());
+        assertEquals(List.of(Map.of("ACM Portal", "ti:Test"), Map.of()), getCatalogSpecifics(builtStudy));
     }
 
     @Test
@@ -317,8 +311,7 @@ class ManageStudyDefinitionViewModelTest {
         catalog.setNativeQuery("ti:First");
         Study builtStudy = viewModel.buildStudy();
 
-        assertEquals(Map.of("ACM Portal", "ti:First"), builtStudy.getQueries().getFirst().getCatalogSpecific());
-        assertEquals(Map.of("ACM Portal", "ti:Second"), builtStudy.getQueries().getLast().getCatalogSpecific());
+        assertEquals(List.of(Map.of("ACM Portal", "ti:First"), Map.of("ACM Portal", "ti:Second")), getCatalogSpecifics(builtStudy));
     }
 
     private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
@@ -350,5 +343,11 @@ class ManageStudyDefinitionViewModelTest {
         Study study = new Study(List.of("Name"), "title", List.of("RQ1"), List.of(query1, query2), catalogs);
         return new ManageStudyDefinitionViewModel(
                 study, tempDir, importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
+    }
+
+    private static List<Map<String, String>> getCatalogSpecifics(Study study) {
+        return study.getQueries().stream()
+                    .map(StudyQuery::getCatalogSpecific)
+                    .toList();
     }
 }
