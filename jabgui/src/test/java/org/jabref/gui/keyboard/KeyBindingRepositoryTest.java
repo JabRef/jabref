@@ -1,8 +1,12 @@
 package org.jabref.gui.keyboard;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import javafx.scene.input.KeyCombination;
+
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,5 +37,41 @@ class KeyBindingRepositoryTest {
 
         assertEquals(keyBindingRepository.get(bindNames.getFirst()), bindings.getFirst());
         assertEquals(keyBindingRepository.get(bindNames.get(1)), bindings.get(1));
+    }
+
+    @Test
+    void findsConflictingBinding() {
+        KeyBindingRepository repo = new KeyBindingRepository(
+                List.of(KeyBinding.MERGE_ENTRIES.getConstant(), KeyBinding.PASTE.getConstant()),
+                List.of("alt+2", "shift+3"));
+
+        Optional<KeyBinding> conflict = repo.findConflictingKeyBinding(
+                KeyBinding.PASTE, KeyCombination.valueOf("alt+2"));
+
+        assertEquals(Optional.of(KeyBinding.MERGE_ENTRIES), conflict);
+    }
+
+    @Test
+    void ignoresBindingItself() {
+        KeyBindingRepository repo = new KeyBindingRepository(
+                List.of(KeyBinding.MERGE_ENTRIES.getConstant(), KeyBinding.PASTE.getConstant()),
+                List.of("alt+2", "shift+3"));
+
+        Optional<KeyBinding> conflict = repo.findConflictingKeyBinding(
+                KeyBinding.MERGE_ENTRIES, KeyCombination.valueOf("alt+2"));
+
+        assertEquals(Optional.empty(), conflict);
+    }
+
+    @Test
+    void returnsEmptyForFreeCombination() {
+        KeyBindingRepository repo = new KeyBindingRepository(
+                List.of(KeyBinding.MERGE_ENTRIES.getConstant(), KeyBinding.PASTE.getConstant()),
+                List.of("alt+2", "shift+3"));
+
+        Optional<KeyBinding> conflict = repo.findConflictingKeyBinding(
+                KeyBinding.PASTE, KeyCombination.valueOf("alt+8"));
+
+        assertEquals(Optional.empty(), conflict);
     }
 }
