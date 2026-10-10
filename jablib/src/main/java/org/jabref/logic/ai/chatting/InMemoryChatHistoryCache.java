@@ -120,8 +120,8 @@ public class InMemoryChatHistoryCache {
             synchronized (InMemoryChatHistoryCache.this) {
                 revision++;
                 event.getBibEntries().forEach(entry -> Optional.ofNullable(entryChats.getIfPresent(entry))
-                        .filter(cached -> cached.context == context)
-                        .ifPresent(_ -> removeEntry(entry)));
+                                                               .filter(cached -> cached.context == context)
+                                                               .ifPresent(_ -> removeEntry(entry)));
             }
         }
 
@@ -175,9 +175,9 @@ public class InMemoryChatHistoryCache {
         this.repository = repository;
         this.saveDelayMillis = saveDelayMillis;
         retainedChats = Caffeine.newBuilder()
-                               .maximumWeight(maxRetainedMessages)
-                               .weigher((CachedChat chat, CachedChat _) -> chat.weight)
-                               .build();
+                                .maximumWeight(maxRetainedMessages)
+                                .weigher((CachedChat chat, CachedChat _) -> chat.weight)
+                                .build();
         writer.setRemoveOnCancelPolicy(true);
     }
 
@@ -202,10 +202,10 @@ public class InMemoryChatHistoryCache {
         }
         libraryListeners.computeIfAbsent(databaseContext, LibraryListener::new);
         CachedChat cached = entryChats.asMap().compute(entry, (_, existing) -> Optional.ofNullable(existing)
-                .filter(chat -> !chat.removed)
-                .orElseGet(() -> createChat(databaseContext, ChatType.WITH_ENTRY,
-                        () -> ChatIdentifier.from(databaseContext, entry),
-                        () -> databaseContext.getDatabase().getEntryById(entry.getId()).filter(inDatabase -> inDatabase == entry).isPresent())));
+                                                                                       .filter(chat -> !chat.removed)
+                                                                                       .orElseGet(() -> createChat(databaseContext, ChatType.WITH_ENTRY,
+                                                                                               () -> ChatIdentifier.from(databaseContext, entry),
+                                                                                               () -> databaseContext.getDatabase().getEntryById(entry.getId()).filter(inDatabase -> inDatabase == entry).isPresent())));
         retainChat(cached);
         return cached.loaded.copy();
     }
@@ -231,10 +231,10 @@ public class InMemoryChatHistoryCache {
         }
         libraryListeners.computeIfAbsent(databaseContext, LibraryListener::new);
         CachedChat cached = groupChats.asMap().compute(group, (_, existing) -> Optional.ofNullable(existing)
-                .filter(chat -> !chat.removed)
-                .orElseGet(() -> createChat(databaseContext, ChatType.WITH_GROUP,
-                        () -> ChatIdentifier.from(databaseContext, group),
-                        () -> databaseContext.getMetaData().getGroups().map(root -> root.containsGroup(group.getGroup())).orElse(false))));
+                                                                                       .filter(chat -> !chat.removed)
+                                                                                       .orElseGet(() -> createChat(databaseContext, ChatType.WITH_GROUP,
+                                                                                               () -> ChatIdentifier.from(databaseContext, group),
+                                                                                               () -> databaseContext.getMetaData().getGroups().map(root -> root.containsGroup(group.getGroup())).orElse(false))));
         retainChat(cached);
         return cached.loaded.copy();
     }
@@ -442,8 +442,8 @@ public class InMemoryChatHistoryCache {
                 }
             }
             List<ChatMessage> added = change.wasUpdated()
-                                     ? List.copyOf(change.getList().subList(from, change.getTo()))
-                                     : change.wasAdded() ? List.copyOf(change.getAddedSubList()) : List.of();
+                                      ? List.copyOf(change.getList().subList(from, change.getTo()))
+                                      : change.wasAdded() ? List.copyOf(change.getAddedSubList()) : List.of();
             int removedSize = change.wasUpdated() ? change.getTo() - from : change.getRemovedSize();
             changes.add(new ChatChange(from, removedSize, added, permutation));
         }

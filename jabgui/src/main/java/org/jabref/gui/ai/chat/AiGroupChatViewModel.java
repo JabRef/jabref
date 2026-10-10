@@ -68,7 +68,7 @@ public class AiGroupChatViewModel extends AbstractViewModel {
         }
 
         Optional.ofNullable(groupNode.get()).ifPresent(group -> Optional.ofNullable(databaseContext.get())
-                .ifPresent(context -> loadGroupChat(context, group, generation)));
+                                                                        .ifPresent(context -> loadGroupChat(context, group, generation)));
     }
 
     private void loadGroupChat(BibDatabaseContext context, GroupNodeViewModel group, long generation) {
