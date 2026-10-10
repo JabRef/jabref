@@ -1,0 +1,48 @@
+package org.jabref.gui.sidepane;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.frame.SidePanePreferences;
+
+import org.jspecify.annotations.NullMarked;
+
+/// Hides the whole side pane, remembering which components were visible so it can be
+/// restored later in the same session. Unlike [TogglePaneAction], this acts on the
+/// entire pane rather than a single [SidePaneType].
+@NullMarked
+public class ToggleSidePaneAction extends SimpleCommand {
+    private final StateManager stateManager;
+    private final SidePanePreferences sidePanePreferences;
+
+    // Session-only memory of what was visible before the pane was hidden.
+    private List<SidePaneType> lastVisibleComponents = List.of();
+
+    public ToggleSidePaneAction(StateManager stateManager, SidePanePreferences sidePanePreferences) {
+        this.stateManager = stateManager;
+        this.sidePanePreferences = sidePanePreferences;
+    }
+
+    @Override
+    public void execute() {
+        // [impl->req~ux.side-pane.toggle-preserves-sections~1]
+        List<SidePaneType> visibleComponents = stateManager.getVisibleSidePaneComponents();
+
+        if (!visibleComponents.isEmpty()) {
+            // Hide: remember what was open, then clear it
+            lastVisibleComponents = new ArrayList<>(visibleComponents);
+            visibleComponents.clear();
+        } else if (!lastVisibleComponents.isEmpty()) {
+            // Restore exactly what was open before
+            visibleComponents.addAll(lastVisibleComponents);
+            visibleComponents.sort(new SidePaneViewModel.PreferredIndexSort(sidePanePreferences));
+        } else {
+            // Nothing was hidden this session (e.g. pane was already empty at startup) -
+            // fall back to the user's configured default panes.
+            visibleComponents.addAll(sidePanePreferences.visiblePanes());
+            visibleComponents.sort(new SidePaneViewModel.PreferredIndexSort(sidePanePreferences));
+        }
+    }
+}
