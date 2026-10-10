@@ -101,6 +101,15 @@ Needs: impl
 When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
 The enclosing dialog must remain open.
 
+## Accepted external entry change must update the existing entry in place
+`req~ux.external-library-changes.entry-in-place~1`
+
+When an external change to an entry is accepted, the entry in the open library keeps its identity, so an open entry editor shows the accepted content and the main table keeps its selection.
+Undoing the change restores the previous content.
+Origin: <https://github.com/JabRef/jabref/issues/8901>
+
+Needs: impl, utest
+
 ## Library save must maintain filesystem change detection after completion
 `req~ux.external-library-changes.after-save~1`
 
