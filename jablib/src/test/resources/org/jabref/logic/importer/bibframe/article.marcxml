@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns="http://www.loc.gov/MARC21/slim">
+    <leader>00000naa a2200000 a 4500</leader>
+    <controlfield tag="001">article-001</controlfield>
+    <controlfield tag="008">230526s1992    xx            000 0 eng d</controlfield>
+    <datafield tag="024" ind1="7" ind2=" ">
+        <subfield code="a">10.1234/article.001</subfield>
+        <subfield code="2">doi</subfield>
+    </datafield>
+    <datafield tag="041" ind1="0" ind2=" ">
+        <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+        <subfield code="a">Bello, Emmanuel G.</subfield>
+        <subfield code="4">aut</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+        <subfield code="a">Article 22 of the African Charter</subfield>
+    </datafield>
+    <datafield tag="264" ind1=" " ind2="1">
+        <subfield code="c">1992</subfield>
+    </datafield>
+    <datafield tag="773" ind1="0" ind2="8">
+        <subfield code="7">|||s</subfield>
+        <subfield code="t">Journal of African Law</subfield>
+        <subfield code="x">0021-8553</subfield>
+        <subfield code="g">pages:447-473</subfield>
+    </datafield>
+</record>

@@ -13,6 +13,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.importer.fileformat.BibframeImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CffImporter;
@@ -23,6 +24,7 @@ import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
 import org.jabref.logic.importer.fileformat.HayagrivaImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
+import org.jabref.logic.importer.fileformat.MarcXmlImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
@@ -76,11 +78,13 @@ public class ImportFormatReader {
     }
 
     public void reset() {
+        importers.add(new BibframeImporter());
         importers.add(new CopacImporter());
         importers.add(new EndnoteImporter(citationKeyPatternPreferences));
         importers.add(new EndnoteXmlImporter(importFormatPreferences));
         importers.add(new InspecImporter());
         importers.add(new IsiImporter());
+        importers.add(new MarcXmlImporter());
         importers.add(new MedlineImporter());
         importers.add(new MedlinePlainImporter(importFormatPreferences));
         importers.add(new ModsImporter(importFormatPreferences));
