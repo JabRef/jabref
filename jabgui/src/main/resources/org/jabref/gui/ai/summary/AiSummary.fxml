@@ -56,7 +56,7 @@
     <UniversalStatusPaneView
             fx:id="noLocalFilePane"
             title="%Unable to generate summary"
-            description="%This file is only linked online. Download it locally to generate summary."/>
+            description="%The linked file seems to be stored remotely. Download the file to your local device and re-link it to be able to generate a summary."/>
 
     <UniversalStatusPaneView
             fx:id="noSupportedFileTypesPane"
