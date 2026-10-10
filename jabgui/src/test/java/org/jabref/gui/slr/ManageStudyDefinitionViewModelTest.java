@@ -245,6 +245,75 @@ class ManageStudyDefinitionViewModelTest {
         assertEquals("ti:First", nativeQuery);
     }
 
+    @Test
+    void untouchedMixedNativeQueriesArePreserved(@TempDir Path tempDir) {
+        ManageStudyDefinitionViewModel viewModel = getViewModelWithMixedNativeQueries(tempDir);
+
+        Study builtStudy = viewModel.buildStudy();
+
+        assertEquals(List.of(Map.of("ACM Portal", "ti:First"), Map.of("ACM Portal", "ti:Second")), getCatalogSpecifics(builtStudy));
+    }
+
+    @Test
+    void editedMixedNativeQueryIsAppliedToEveryQuery(@TempDir Path tempDir) {
+        ManageStudyDefinitionViewModel viewModel = getViewModelWithMixedNativeQueries(tempDir);
+
+        viewModel.getCatalogs().stream()
+                 .filter(item -> "ACM Portal".equals(item.getName()))
+                 .findFirst()
+                 .orElseThrow()
+                 .setNativeQuery("ti:New");
+
+        Study builtStudy = viewModel.buildStudy();
+        assertEquals(List.of(Map.of("ACM Portal", "ti:New"), Map.of("ACM Portal", "ti:New")), getCatalogSpecifics(builtStudy));
+    }
+
+    @Test
+    void uniformNativeQueryIsAppliedToAddedQuery(@TempDir Path tempDir) {
+        StudyQuery query = new StudyQuery("Q1");
+        query.getCatalogSpecific().put("ACM Portal", "ti:Test");
+        List<StudyCatalog> catalogs = List.of(new StudyCatalog("ACM Portal", true));
+        Study study = new Study(List.of("Name"), "title", List.of("RQ1"), List.of(query), catalogs);
+        ManageStudyDefinitionViewModel viewModel = new ManageStudyDefinitionViewModel(
+                study, tempDir, importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
+
+        viewModel.addQuery("Q2");
+
+        Study builtStudy = viewModel.buildStudy();
+        assertEquals(List.of(Map.of("ACM Portal", "ti:Test"), Map.of("ACM Portal", "ti:Test")), getCatalogSpecifics(builtStudy));
+    }
+
+    @Test
+    void untouchedNativeQueryIsNotAddedToQueryWithoutOverride(@TempDir Path tempDir) {
+        StudyQuery query1 = new StudyQuery("Q1");
+        query1.getCatalogSpecific().put("ACM Portal", "ti:Test");
+        StudyQuery query2 = new StudyQuery("Q2");
+        List<StudyCatalog> catalogs = List.of(new StudyCatalog("ACM Portal", true));
+        Study study = new Study(List.of("Name"), "title", List.of("RQ1"), List.of(query1, query2), catalogs);
+        ManageStudyDefinitionViewModel viewModel = new ManageStudyDefinitionViewModel(
+                study, tempDir, importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
+
+        Study builtStudy = viewModel.buildStudy();
+
+        assertEquals(List.of(Map.of("ACM Portal", "ti:Test"), Map.of()), getCatalogSpecifics(builtStudy));
+    }
+
+    @Test
+    void buildStudyDoesNotChangeLoadedQueries(@TempDir Path tempDir) {
+        ManageStudyDefinitionViewModel viewModel = getViewModelWithMixedNativeQueries(tempDir);
+        StudyCatalogItem catalog = viewModel.getCatalogs().stream()
+                                            .filter(item -> "ACM Portal".equals(item.getName()))
+                                            .findFirst()
+                                            .orElseThrow();
+
+        catalog.setNativeQuery("ti:New");
+        viewModel.buildStudy();
+        catalog.setNativeQuery("ti:First");
+        Study builtStudy = viewModel.buildStudy();
+
+        assertEquals(List.of(Map.of("ACM Portal", "ti:First"), Map.of("ACM Portal", "ti:Second")), getCatalogSpecifics(builtStudy));
+    }
+
     private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
         List<StudyCatalog> catalogs = List.of(
                 new StudyCatalog("ACM Portal", true));
@@ -263,5 +332,22 @@ class ManageStudyDefinitionViewModelTest {
                 workspacePreferences,
                 gitPreferences,
                 dialogService);
+    }
+
+    private ManageStudyDefinitionViewModel getViewModelWithMixedNativeQueries(Path tempDir) {
+        StudyQuery query1 = new StudyQuery("Q1");
+        query1.getCatalogSpecific().put("ACM Portal", "ti:First");
+        StudyQuery query2 = new StudyQuery("Q2");
+        query2.getCatalogSpecific().put("ACM Portal", "ti:Second");
+        List<StudyCatalog> catalogs = List.of(new StudyCatalog("ACM Portal", true));
+        Study study = new Study(List.of("Name"), "title", List.of("RQ1"), List.of(query1, query2), catalogs);
+        return new ManageStudyDefinitionViewModel(
+                study, tempDir, importFormatPreferences, importerPreferences, workspacePreferences, gitPreferences, dialogService);
+    }
+
+    private static List<Map<String, String>> getCatalogSpecifics(Study study) {
+        return study.getQueries().stream()
+                    .map(StudyQuery::getCatalogSpecific)
+                    .toList();
     }
 }
