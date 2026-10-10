@@ -152,20 +152,20 @@ jobs:
           show-progress: 'false'
       - id: changed-non-workflow-files
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files_ignore: |
             .github/workflows/**
             **/*.md
       - id: changed-binaries-workflow
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             .github/workflows/binaries.yml
       - id: changed-binaries-resource-markdown
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             jabgui/buildres/**/*.md
@@ -961,14 +961,14 @@ jobs:
           ARCH: ${{ matrix.arch }}
           ARCHIVE: ${{ matrix.archive }}
         run: |
-          jq --arg arch "$ARCH" --arg archive "$ARCHIVE" '
+          flatpak-builder --show-manifest flatpak/org.jabref.jabref.yaml | jq --arg arch "$ARCH" --arg archive "$ARCHIVE" '
             .modules[0].sources |= map(
               if .["only-arches"] == [$arch]
               then del(.url, .sha256) + {"path": $archive}
               else .
               end
             )
-          ' flatpak/org.jabref.jabref.json > flatpak/org.jabref.jabref.ci.json
+          ' > flatpak/org.jabref.jabref.ci.json
 
       - name: Build and upload Flatpak
         uses: flatpak/flatpak-github-actions/flatpak-builder@79327416609af08178ad73b352877e51450790b3 # v6
@@ -1050,7 +1050,7 @@ jobs:
       # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
       - name: Set up Liberica NIK (native-image with AWT support)
         if: needs.conditions.outputs.should-build == 'true'
-        uses: graalvm/setup-graalvm@0426e2e191540e8514dff98dc52a5f5146a2a276 # v1
+        uses: graalvm/setup-graalvm@27b360dbb857524eaf0b4c4cef364d38e5b4f173 # v1
         with:
           distribution: 'liberica'
           java-package: ${{ matrix.javaPackage }}

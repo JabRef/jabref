@@ -6,7 +6,7 @@ import java.nio.file.Path;
 //JAVA 21+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
-//DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.7.0.202606012155-r
+//DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.8.0.202609011348-r
 
 public class CloneJabRef {
     static void main(String[] args) throws Exception {

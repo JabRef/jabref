@@ -58,20 +58,20 @@ jobs:
           show-progress: 'false'
       - id: changed-non-workflow-non-markdown-files
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files_ignore: |
             .github/workflows/**
             **/*.md
       - id: changed-requirements-docs
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             docs/requirements/**/*.md
       - id: changed-tests-code-workflow
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             .github/workflows/tests-code.yml
@@ -252,8 +252,8 @@ jobs:
       - name: yamllint
         run: pipx run yamllint==1.38.0 --strict .
 
-  textlint:
-    name: Textlint
+  spelling:
+    name: Spellling
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
@@ -270,6 +270,8 @@ jobs:
         run: npm ci
       - name: textlint
         run: npm run textlint
+      - name: typos
+        run: pipx run typos==1.50.3
 
   madr:
     name: MADR ADRs
@@ -508,7 +510,7 @@ jobs:
           show-progress: 'false'
       - name: Detect changed windows-related classes
         id: changed-windows-related-files
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
@@ -689,7 +691,7 @@ jobs:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
-      - uses: codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4 # v7
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -722,7 +724,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           show-progress: 'false'
-      - uses: gradle/actions/wrapper-validation@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+      - uses: gradle/actions/wrapper-validation@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
 
   # Guards against a committer (e.g. a dependabot wrapper bump) baking CRLF into
   # the committed gradlew.bat blob. .gitattributes stores it as LF and smudges it
