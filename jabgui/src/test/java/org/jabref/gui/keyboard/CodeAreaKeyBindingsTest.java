@@ -1,8 +1,11 @@
 package org.jabref.gui.keyboard;
 
+import java.util.Optional;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.testutils.JavaFxExtension;
 
 import jfx.incubator.scene.control.richtext.CodeArea;
@@ -14,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(JavaFxExtension.class)
 class CodeAreaKeyBindingsTest {
@@ -192,5 +196,36 @@ class CodeAreaKeyBindingsTest {
 
         verifyNoInteractions(codeArea);
         assertFalse(event.isConsumed());
+    }
+
+    @Test
+    void copyKeyBindingCallsCopyWithSyntaxHighlightingWhenDecoratorIsBibTeXHighlighter() {
+        CodeArea codeArea = mock(CodeArea.class);
+        BibTeXHighlighter highlighter = mock(BibTeXHighlighter.class);
+        when(codeArea.getSyntaxDecorator()).thenReturn(highlighter);
+
+        KeyBindingRepository keyBindingRepository = mock(KeyBindingRepository.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.C, false, false, false, true);
+        when(keyBindingRepository.mapToKeyBinding(event)).thenReturn(Optional.of(KeyBinding.COPY));
+
+        CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository);
+
+        verify(highlighter).copyWithSyntaxHighlighting(codeArea);
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void copyKeyBindingCallsCodeAreaCopyWhenDecoratorIsNotBibTeXHighlighter() {
+        CodeArea codeArea = mock(CodeArea.class);
+        when(codeArea.getSyntaxDecorator()).thenReturn(null);
+
+        KeyBindingRepository keyBindingRepository = mock(KeyBindingRepository.class);
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.C, false, false, false, true);
+        when(keyBindingRepository.mapToKeyBinding(event)).thenReturn(Optional.of(KeyBinding.COPY));
+
+        CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository);
+
+        verify(codeArea).copy();
+        assertTrue(event.isConsumed());
     }
 }

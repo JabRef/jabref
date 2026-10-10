@@ -6,15 +6,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+
 import org.jabref.gui.StateManager;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.search.SearchType;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.Range;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXHighlightRegion;
+import jfx.incubator.scene.control.richtext.CodeArea;
 import jfx.incubator.scene.control.richtext.SyntaxDecorator;
 import jfx.incubator.scene.control.richtext.TextPos;
 import jfx.incubator.scene.control.richtext.model.CodeTextModel;
@@ -64,6 +69,36 @@ public class BibTeXHighlighter implements SyntaxDecorator {
     /// @param fieldPositionsProvider supplier providing a mapping of fields to their global ranges
     public void setFieldPositionsProvider(Supplier<Map<Field, Range>> fieldPositionsProvider) {
         this.fieldPositionsProvider = fieldPositionsProvider;
+    }
+
+    /// Returns the underlying Veneer syntax highlighter.
+    public BibTeXSyntaxHighlighter getSyntaxHighlighter() {
+        return syntaxHighlighter;
+    }
+
+    /// Copies the selected text in the given [CodeArea] to the system clipboard, preserving
+    /// plain text for code/text editors and augmenting it with rich HTML syntax highlighting
+    /// for external applications like LibreOffice Writer, Microsoft Word, and Google Docs.
+    ///
+    /// @param codeArea the code area from which to copy
+    // [impl->req~entry-editor.source-tab.copy-syntax-highlighting~1]
+    public void copyWithSyntaxHighlighting(CodeArea codeArea) {
+        if (!codeArea.hasNonEmptySelection()) {
+            return;
+        }
+
+        codeArea.copy();
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        if (clipboard.hasString()) {
+            String plainText = clipboard.getString();
+            if (StringUtil.isNotBlank(plainText)) {
+                String html = BibTeXSyntaxHtmlExporter.toHtml(plainText, syntaxHighlighter);
+                ClipboardContent content = new ClipboardContent();
+                content.putString(plainText);
+                content.putHtml(html);
+                clipboard.setContent(content);
+            }
+        }
     }
 
     /// Builds the styled paragraph for a single line of the model, applying both BibTeX syntax
