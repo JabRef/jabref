@@ -56,6 +56,8 @@ public class OpenDatabaseAction extends SimpleCommand {
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = List.of(
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),
+            // Warn that group memberships stored in the pre-3.4 format are lost
+            new LegacyGroupMembershipWarningAction(),
             // Migrate search groups fielded terms to use the new operators (RegEx, case sensitive)
             new SearchGroupsMigrationAction()
     );
