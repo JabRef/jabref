@@ -302,6 +302,8 @@ public class JabRefCliPreferences implements CliPreferences {
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
+    private static final String DECLINED_CUSTOM_ENTRY_TYPES = "declinedCustomEntryTypes";
+
     // region (Linked)FilePreferences
     private static final String FILES_MAIN_DIRECTORY = "fileDirectory";
     private static final String FILES_STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
@@ -1082,6 +1084,7 @@ public class JabRefCliPreferences implements CliPreferences {
     @Override
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
+        removeDeclinedCustomEntryTypes();
         clearCitationKeyPatterns();
         clearTruststoreFromCustomCertificates();
         clearCustomFetcherKeys();
@@ -1139,15 +1142,29 @@ public class JabRefCliPreferences implements CliPreferences {
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences()));
     }
 
-    private static void importPreferencesToBackingStore(Path path) throws JabRefException {
+    private void importPreferencesToBackingStore(Path path) throws JabRefException {
         LOGGER.debug("Importing preferences {}", path.toAbsolutePath());
+        // Importing merges into the current preferences, but the declined decisions must come from the imported file only.
+        // They are restored if the file cannot be imported.
+        Set<String> declinedBeforeImport = getDeclinedCustomEntryTypes();
+        removeDeclinedCustomEntryTypes();
         try (InputStream is = Files.newInputStream(path)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
+            removeDeclinedCustomEntryTypes();
+            addDeclinedCustomEntryTypes(declinedBeforeImport);
             throw new JabRefException(
                     "Could not import preferences",
                     Localization.lang("Could not import preferences"),
                     ex);
+        }
+    }
+
+    private void removeDeclinedCustomEntryTypes() {
+        try {
+            PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
+        } catch (BackingStoreException e) {
+            LOGGER.info("Clearing declined custom entry types failed.", e);
         }
     }
 
@@ -1322,6 +1339,28 @@ public class JabRefCliPreferences implements CliPreferences {
             prefsNodev2.flush();
         } catch (BackingStoreException e) {
             LOGGER.info("Updating stored custom entry types failed.", e);
+        }
+    }
+
+    @Override
+    public Set<String> getDeclinedCustomEntryTypes() {
+        try {
+            return Set.of(PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).keys());
+        } catch (BackingStoreException e) {
+            LOGGER.info("Reading declined custom entry types failed.", e);
+            return Set.of();
+        }
+    }
+
+    /// Stores each fingerprint as a key without a value: a key is limited to 80 characters, a value to 8192.
+    @Override
+    public void addDeclinedCustomEntryTypes(Collection<String> declinedEntryTypes) {
+        Preferences node = PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES);
+        declinedEntryTypes.forEach(declined -> node.put(declined, ""));
+        try {
+            node.flush();
+        } catch (BackingStoreException e) {
+            LOGGER.info("Storing declined custom entry types failed.", e);
         }
     }
 
