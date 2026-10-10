@@ -59,6 +59,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.InsertUtil;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -226,6 +227,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
             if (closeContext) {
                 closeSharedDatabase(loadedContext);
+                return;
+            }
+            if (tab.dropIfAlreadyOpen(loadedContext)) {
                 return;
             }
             tab.setDatabaseContext(loadedContext);
@@ -450,6 +454,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             tabContainer.closeTab(this);
             loading.set(false);
             dataLoadingTask = null;
+            return;
+        }
+
+        if (dropIfAlreadyOpen(result.getDatabaseContext())) {
             return;
         }
 
@@ -1015,6 +1023,29 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
+    }
+
+    /// Decided here, on the JavaFX thread, once the connection is established: checks before connecting cannot see
+    /// concurrent connection attempts. A duplicate closes this tab and shows the tab already connected instead.
+    /// The redundant connection is closed in the background, as shutting down its synchronizer may block.
+    // [impl->req~shared-database.single-tab~1]
+    private boolean dropIfAlreadyOpen(BibDatabaseContext loadedContext) {
+        if (loadedContext.getLocation() != DatabaseLocation.SHARED) {
+            return false;
+        }
+        Optional<LibraryTab> alreadyOpen = SharedDatabaseUIManager.findOpenTab(
+                tabContainer,
+                loadedContext.getDBMSSynchronizer().getConnectionProperties(),
+                Optional.of(this));
+        alreadyOpen.ifPresent(other -> {
+            LOGGER.info("Shared database {} is already open in another tab, dropping the second connection", loadedContext.getDBMSSynchronizer().getDBName());
+            BackgroundTask.wrap(() -> closeSharedDatabase(loadedContext)).executeWith(taskExecutor);
+            loading.set(false);
+            dataLoadingTask = null;
+            tabContainer.closeTab(this);
+            tabContainer.showLibraryTab(other);
+        });
+        return alreadyOpen.isPresent();
     }
 
     private static void closeSharedDatabase(BibDatabaseContext bibDatabaseContext) {
