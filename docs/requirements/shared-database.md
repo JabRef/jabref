@@ -87,4 +87,11 @@ A shared database that is still connected when JabRef closes is reconnected on t
 
 Needs: impl
 
+## A failed connection can be retried
+`req~shared-database.reconnect-retry~1`
+
+If connecting fails, on startup or from the connection dialog, the database is shown as a tab carrying the error and a retry button instead of an error dialog. A remembered database stays remembered when JabRef is closed while that tab is open.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

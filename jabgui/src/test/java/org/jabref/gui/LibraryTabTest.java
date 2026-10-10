@@ -1,5 +1,9 @@
 package org.jabref.gui;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -54,5 +58,21 @@ class LibraryTabTest {
         verify(connectedContext).convertToLocalDatabase();
         verify(synchronizer).closeSharedDatabase();
         verify(connectedContext).clearDBMSSynchronizer();
+    }
+
+    @Test
+    void failureAfterCancellationDoesNotReachTheFailureHandler() {
+        List<Exception> handledFailures = new ArrayList<>();
+        LibraryTab.SharedDatabaseLoadingCallbacks callbacks = new LibraryTab.SharedDatabaseLoadingCallbacks(
+                mock(LibraryTab.class),
+                (_, _) -> {
+                },
+                handledFailures::add);
+        LibraryTab.SharedDatabaseLoadingTask task = new LibraryTab.SharedDatabaseLoadingTask(() -> mock(BibDatabaseContext.class), callbacks);
+
+        task.cancel();
+        callbacks.onDatabaseLoadingFailed(new SQLException("Connection refused"));
+
+        assertEquals(List.of(), handledFailures);
     }
 }
