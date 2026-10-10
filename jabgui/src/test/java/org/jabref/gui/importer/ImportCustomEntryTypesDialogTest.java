@@ -1,5 +1,8 @@
 package org.jabref.gui.importer;
 
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,8 +14,15 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.importer.actions.CheckForNewEntryTypesAction;
+import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.logic.LibraryPreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.CustomEntryTypeDecision;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.l10n.Language;
@@ -29,6 +39,8 @@ import org.controlsfx.control.CheckListView;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,6 +49,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 /// Drives the dialog itself, so that the wiring between the check lists and the view model is covered, too.
 @NullMarked
@@ -104,6 +118,50 @@ class ImportCustomEntryTypesDialogTest extends JavaFxTest {
         verify(preferences).storeCustomEntryTypesRepository(entryTypesManager);
         assertFalse(entryTypesManager.isDifferentCustomOrModifiedType(AUDIO_FROM_FILE, MODE));
         assertFalse(entryTypesManager.isDifferentCustomOrModifiedType(MANUSCRIPT_FROM_FILE, MODE));
+    }
+
+    @Test
+    void reopeningLibraryAfterImportDoesNotShowCustomEntryTypesDialog(@TempDir Path tempDir) throws Exception {
+        Path library = tempDir.resolve("custom-entry-types.bib");
+        Files.writeString(library, """
+                @Manuscript{example,
+                  library = {Archive},
+                }
+
+                @Comment{jabref-meta: databaseType:biblatex;}
+
+                @Comment{jabref-entrytype: audio: req[author;date;publisher;title] opt[url;urldate]}
+
+                @Comment{jabref-entrytype: manuscript: req[library;location;shelfmark] opt[origin;scribe]}
+                """);
+        when(preferences.getLibraryPreferences()).thenReturn(LibraryPreferences.getDefault());
+
+        BibtexParser parser = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        ParserResult firstOpen;
+        try (Reader reader = Files.newBufferedReader(library)) {
+            firstOpen = parser.parse(reader);
+        }
+
+        DialogService dialogService = mock(DialogService.class);
+        CheckForNewEntryTypesAction action = new CheckForNewEntryTypesAction();
+        assertEquals(2, firstOpen.getEntryTypes().size());
+        assertTrue(action.isActionNecessary(firstOpen, dialogService, preferences));
+
+        interact(() -> {
+            dialog = new ImportCustomEntryTypesDialog(MODE, List.copyOf(firstOpen.getEntryTypes()));
+            unknownTypes().getCheckModel().checkAll();
+            differentCustomizations().getCheckModel().checkAll();
+            buttonOf(ButtonType.OK).fire();
+        });
+        verify(preferences).storeCustomEntryTypesRepository(entryTypesManager);
+
+        ParserResult secondOpen;
+        try (Reader reader = Files.newBufferedReader(library)) {
+            secondOpen = parser.parse(reader);
+        }
+        assertFalse(action.isActionNecessary(secondOpen, dialogService, preferences));
+        OpenDatabaseAction.performPostOpenActions(secondOpen, dialogService, preferences);
+        verifyNoInteractions(dialogService);
     }
 
     @Test

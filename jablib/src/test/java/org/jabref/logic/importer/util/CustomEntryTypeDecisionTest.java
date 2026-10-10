@@ -64,6 +64,15 @@ class CustomEntryTypeDecisionTest {
     }
 
     @Test
+    void changedCustomFieldPropertyChangesTheFingerprint() {
+        BibEntryType externalField = parse("jabref-entrytype-v2: person: req[name] opt[orcid|EXTERNAL]");
+        BibEntryType verbatimField = parse("jabref-entrytype-v2: person: req[name] opt[orcid|VERBATIM]");
+
+        assertNotEquals(CustomEntryTypeDecision.fingerprint(externalField, Optional.empty(), MODE),
+                CustomEntryTypeDecision.fingerprint(verbatimField, Optional.empty(), MODE));
+    }
+
+    @Test
     void differentStoredDefinitionChangesTheFingerprint() {
         BibEntryType inFile = parse("jabref-entrytype: audio: req[author] opt[url]");
 

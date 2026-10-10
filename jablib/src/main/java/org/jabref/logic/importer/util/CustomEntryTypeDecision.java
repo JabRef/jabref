@@ -2,14 +2,17 @@ package org.jabref.logic.importer.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.OrFields;
 
 import com.google.common.hash.Hashing;
 import org.jspecify.annotations.NullMarked;
@@ -29,23 +32,25 @@ public class CustomEntryTypeDecision {
         return Hashing.sha256().hashString(decision, StandardCharsets.UTF_8).toString();
     }
 
-    /// Canonical form of what [org.jabref.model.entry.types.EntryTypeFactory#nameAndFieldsAreEqual(BibEntryType, BibEntryType)]
-    /// compares: the field collections are sets, so their order must not change the signature
+    /// Serialize the definition after ordering its field sets. The v2 format preserves custom field properties,
+    /// but does not encode whether an optional field is important or detailed.
     private static String signature(BibEntryType entryType) {
-        String required = entryType.getRequiredFields().stream()
-                                   .map(orFields -> sortedNames(orFields.getFields()))
-                                   .sorted()
-                                   .collect(Collectors.joining(";"));
-        return entryType.getType().getName().toLowerCase(Locale.ROOT)
-                + " req[" + required + "]"
-                + " opt[" + sortedNames(entryType.getOptionalFields().stream().map(BibField::field).toList()) + "]"
-                + " detail[" + sortedNames(entryType.getDetailOptionalFields()) + "]";
+        Collection<OrFields> required = entryType.getRequiredFields().stream()
+                                                 .map(orFields -> new OrFields(sortedFields(orFields.getFields())))
+                                                 .sorted(Comparator.comparing(FieldFactory::serializeOrFieldsV2, String.CASE_INSENSITIVE_ORDER))
+                                                 .toList();
+        Collection<BibField> allFields = entryType.getAllBibFields().stream()
+                                                  .sorted(Comparator.comparing(field -> field.field().getName(), String.CASE_INSENSITIVE_ORDER))
+                                                  .toList();
+        BibEntryType orderedType = new BibEntryType(entryType.getType(), allFields, required);
+        String serialized = MetaDataSerializer.serializeCustomEntryTypesV2(orderedType);
+        String detailedFields = FieldFactory.serializeFieldsListV2(sortedFields(entryType.getDetailOptionalFields()));
+        return (serialized + " detail[" + detailedFields + "]").toLowerCase(Locale.ROOT);
     }
 
-    private static String sortedNames(Collection<Field> fields) {
+    private static Collection<Field> sortedFields(Collection<Field> fields) {
         return fields.stream()
-                     .map(field -> field.getName().toLowerCase(Locale.ROOT))
-                     .sorted()
-                     .collect(Collectors.joining("/"));
+                     .sorted(Comparator.comparing(Field::getName, String.CASE_INSENSITIVE_ORDER))
+                     .toList();
     }
 }
