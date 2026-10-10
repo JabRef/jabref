@@ -7,7 +7,6 @@ import org.jspecify.annotations.NullMarked;
 // [impl->req~shared-database.single-tab~1]
 @NullMarked
 public record SharedDatabaseIdentity(DBMSType type, String host, int port, String database) {
-
     public static SharedDatabaseIdentity from(DatabaseConnectionProperties properties) {
         if (properties.isUseExpertMode()) {
             return DBMSConnectionUrl.parse(properties.getJdbcUrl())
