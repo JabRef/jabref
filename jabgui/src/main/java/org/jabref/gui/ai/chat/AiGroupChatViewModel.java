@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.groups.GroupNodeViewModel;
@@ -27,7 +28,9 @@ public class AiGroupChatViewModel extends AbstractViewModel {
     private final ObjectProperty<GroupNodeViewModel> groupNode = new SimpleObjectProperty<>();
     private final ObjectProperty<BibDatabaseContext> databaseContext = new SimpleObjectProperty<>();
 
-    private final ListProperty<FullBibEntry> entries = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<FullBibEntry> entries = new SimpleListProperty<>(FXCollections.observableArrayList(
+            identifier -> identifier.entry().getObservables()
+    ));
     private final ListProperty<ChatMessage> chatHistory = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final AiPreferences aiPreferences;
@@ -55,7 +58,11 @@ public class AiGroupChatViewModel extends AbstractViewModel {
         List<BibEntry> matchedEntries = group.getGroupNode().findMatches(context.getDatabase());
         List<FullBibEntry> matchedEntryIdentifiers = FullBibEntry.fromSeveral(context, matchedEntries);
 
-        entries.set(FXCollections.observableArrayList(matchedEntryIdentifiers));
+        ObservableList<FullBibEntry> observableEntries = FXCollections.observableArrayList(
+                identifier -> identifier.entry().getObservables()
+        );
+        observableEntries.addAll(matchedEntryIdentifiers);
+        entries.set(observableEntries);
 
         chatHistory.set(chatHistoryCache.getForGroup(
                 context,
