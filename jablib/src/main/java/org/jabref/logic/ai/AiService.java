@@ -43,11 +43,15 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// The main class for the AI functionality.
 /// Holds all the AI components: LLM and embedding model, chat history and embedding cache.
 public class AiService implements AutoCloseable {
     public static final String VERSION = "2";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
 
     private static final String CHAT_HISTORY_FILE_NAME = "chat-histories.mv";
     private static final String EMBEDDINGS_FILE_NAME = "embeddings.mv";
@@ -261,22 +265,28 @@ public class AiService implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        // Close listeners
-        generateSummaryAiDatabaseListener.close();
-        generateEmbeddingsAiDatabaseListener.close();
+    public void close() {
+        // Each step is isolated so that one failure cannot skip the flush of the others
+        closeQuietly(generateSummaryAiDatabaseListener);
+        closeQuietly(generateEmbeddingsAiDatabaseListener);
 
         // Flush caches to repositories (chat history handles smart transfers)
-        inMemoryChatHistoryCache.close();
-        inMemorySummaryCache.close();
+        closeQuietly(inMemoryChatHistoryCache::close);
+        closeQuietly(inMemorySummaryCache::close);
 
-        // Close embedding model cache
-        embeddingModelCache.close();
+        closeQuietly(embeddingModelCache);
 
-        // Close repositories
-        mvStoreSummariesRepository.close();
-        mvStoreChatHistoryRepository.close();
-        mvStoreEmbeddingStore.close();
-        mvStoreIngestedDocumentsRepository.close();
+        closeQuietly(mvStoreSummariesRepository);
+        closeQuietly(mvStoreChatHistoryRepository);
+        closeQuietly(mvStoreEmbeddingStore);
+        closeQuietly(mvStoreIngestedDocumentsRepository);
+    }
+
+    private static void closeQuietly(AutoCloseable closeable) {
+        try {
+            closeable.close();
+        } catch (Exception e) {
+            LOGGER.error("Error while closing {}", closeable, e);
+        }
     }
 }
