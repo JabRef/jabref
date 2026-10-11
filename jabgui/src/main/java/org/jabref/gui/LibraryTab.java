@@ -59,6 +59,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.InsertUtil;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -226,6 +227,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
             if (closeContext) {
                 closeSharedDatabase(loadedContext);
+                return;
+            }
+            if (tab.dropIfAlreadyOpen(loadedContext)) {
                 return;
             }
             tab.setDatabaseContext(loadedContext);
@@ -453,6 +457,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
+        if (dropIfAlreadyOpen(result.getDatabaseContext())) {
+            return;
+        }
+
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);
         setDatabaseContext(result.getDatabaseContext());
         if (result.getChangedOnMigration()) {
@@ -675,6 +683,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (event instanceof MetaDataChangedEvent) {
             updateTabTitle(changedProperty.get());
         }
+    }
+
+    /// Keeps the navigation history in sync with the library, so that back and forward skip deleted entries.
+    @Subscribe
+    public void listen(EntriesRemovedEvent event) {
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            navigationHistory.removeEntries(event.getBibEntries());
+            updateNavigationState();
+        });
     }
 
     /// Returns a collection of suggestion providers, which are populated from the current library.
@@ -1006,6 +1023,29 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
+    }
+
+    /// Decided here, on the JavaFX thread, once the connection is established: checks before connecting cannot see
+    /// concurrent connection attempts. A duplicate closes this tab and shows the tab already connected instead.
+    /// The redundant connection is closed in the background, as shutting down its synchronizer may block.
+    // [impl->req~shared-database.single-tab~1]
+    private boolean dropIfAlreadyOpen(BibDatabaseContext loadedContext) {
+        if (loadedContext.getLocation() != DatabaseLocation.SHARED) {
+            return false;
+        }
+        Optional<LibraryTab> alreadyOpen = SharedDatabaseUIManager.findOpenTab(
+                tabContainer,
+                loadedContext.getDBMSSynchronizer().getConnectionProperties(),
+                Optional.of(this));
+        alreadyOpen.ifPresent(other -> {
+            LOGGER.info("Shared database {} is already open in another tab, dropping the second connection", loadedContext.getDBMSSynchronizer().getDBName());
+            BackgroundTask.wrap(() -> closeSharedDatabase(loadedContext)).executeWith(taskExecutor);
+            loading.set(false);
+            dataLoadingTask = null;
+            tabContainer.closeTab(this);
+            tabContainer.showLibraryTab(other);
+        });
+        return alreadyOpen.isPresent();
     }
 
     private static void closeSharedDatabase(BibDatabaseContext bibDatabaseContext) {
