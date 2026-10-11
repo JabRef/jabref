@@ -35,9 +35,7 @@ import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
 import org.jabref.logic.shared.DBMSConnectionUrl;
 import org.jabref.logic.shared.DBMSType;
-import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -213,13 +211,26 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     }
 
     private void openSharedDatabase(DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
-        if (isSharedDatabaseAlreadyPresent(connectionProperties)) {
+        SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
+                tabContainer,
+                dialogService,
+                preferences,
+                aiService,
+                stateManager,
+                entryTypesManager,
+                fileUpdateMonitor,
+                clipBoardManager,
+                taskExecutor,
+                gitHandlerRegistry);
+        SharedDatabaseUIManager.findOpenTab(tabContainer, connectionProperties).ifPresentOrElse(alreadyOpen -> {
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
                     Localization.lang("You are already connected to a database using entered connection details."));
+            tabContainer.showLibraryTab(alreadyOpen);
             onConnected.run();
-            return;
-        }
+        }, () -> connect(manager, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
+    }
 
+    private void connect(SharedDatabaseUIManager manager, DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
         if (shouldAutosave) {
             Path localFilePath = Path.of(autosavePath);
 
@@ -235,18 +246,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         }
 
         onConnected.run();
-
-        SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
-                tabContainer,
-                dialogService,
-                preferences,
-                aiService,
-                stateManager,
-                entryTypesManager,
-                fileUpdateMonitor,
-                clipBoardManager,
-                taskExecutor,
-                gitHandlerRegistry);
 
         BibDatabaseContext dummyContext = manager.createDummyContext(connectionProperties);
 
@@ -265,6 +264,13 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 gitHandlerRegistry,
                 (tab, _) -> handleSharedDatabaseConnectionSuccess(tab, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath),
                 exception -> showConnectionFailure(exception, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
+        Optional<LibraryTab> alreadyReserved = SharedDatabaseUIManager.reserveTab(tabContainer, connectionProperties, libraryTab);
+        if (alreadyReserved.isPresent()) {
+            dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
+                    Localization.lang("You are already connected to a database using entered connection details."));
+            tabContainer.showLibraryTab(alreadyReserved.get());
+            return;
+        }
         tabContainer.addTab(libraryTab, true);
         libraryTab.startDataLoadingTask();
     }
@@ -368,23 +374,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         sharedDatabaseFolder.ifPresent(folder::set);
         autosave.set(sharedDatabaseAutosave);
-    }
-
-    /// A database still loading counts as present too: a second attempt would open and load the same remote library
-    /// twice. Its synchronizer has no connection properties yet, only the database name.
-    private boolean isSharedDatabaseAlreadyPresent(DBMSConnectionProperties connectionProperties) {
-        List<LibraryTab> libraryTabs = tabContainer.getLibraryTabs();
-        return libraryTabs.stream().anyMatch(panel -> {
-            BibDatabaseContext context = panel.getBibDatabaseContext();
-            if (context.getLocation() != DatabaseLocation.SHARED) {
-                return false;
-            }
-            DatabaseSynchronizer synchronizer = context.getDBMSSynchronizer();
-            if (panel.isLoading()) {
-                return connectionProperties.getDatabase().equals(synchronizer.getDBName());
-            }
-            return connectionProperties.equals(synchronizer.getConnectionProperties());
-        });
     }
 
     public void showSaveDbToFileDialog() {

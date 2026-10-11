@@ -425,8 +425,11 @@
     -fx-background-color: -color-selection-inactive, -color-overlay-hover;
 }
 
-.linked-files-list .list-cell:auto-found:filled:selected {
-    -fx-background-color: -color-selection;
+.linked-files-list > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.linked-files-list:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background-color: -color-bg-secondary, -color-selection;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px;
 }
 
 /* Sidepane */
