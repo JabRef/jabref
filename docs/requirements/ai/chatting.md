@@ -60,10 +60,11 @@ Covers:
 
 - feat~ai.chatting~1
 
-### AI responses render Markdown tables
+### AI responses must render Markdown tables with aligned columns
 `req~ai.chat.markdown-tables~1`
 
 LLMs often answer comparisons as Markdown tables; showing raw pipes makes them hard to read.
+Long cell content wraps within its column at the available chat or summary width.
 
 Needs: impl, utest
 
