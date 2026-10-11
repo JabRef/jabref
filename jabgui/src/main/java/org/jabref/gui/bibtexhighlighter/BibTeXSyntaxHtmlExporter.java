@@ -21,7 +21,7 @@ public final class BibTeXSyntaxHtmlExporter {
 
     /// Converts the given BibTeX code to an HTML document with syntax highlighting inline styles.
     ///
-    /// @param bibtexCode the BibTeX source text to format
+    /// @param bibtexCode        the BibTeX source text to format
     /// @param syntaxHighlighter the syntax highlighter to compute token regions
     /// @return a formatted HTML document string with inline syntax styles
     // [impl->req~entry-editor.source-tab.copy-syntax-highlighting~1]

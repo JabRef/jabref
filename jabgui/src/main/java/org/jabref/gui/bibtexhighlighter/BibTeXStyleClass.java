@@ -41,14 +41,22 @@ public enum BibTeXStyleClass {
     /// @return inline CSS style string, e.g. `"color: #0033b3; font-weight: bold;"`
     public String getInlineCss() {
         return switch (this) {
-            case KEYWORD -> "color: #0033b3; font-weight: bold;";
-            case CITE_KEY -> "color: #177534; font-weight: bold;";
-            case FIELD_NAME -> "color: #b05a00;";
-            case STRING -> "color: #067d17;";
-            case NUMBER -> "color: #1750eb;";
-            case COMMENT -> "color: #8c8c8c; font-style: italic;";
-            case MACRO -> "color: #871094;";
-            case DEFAULT -> "";
+            case KEYWORD ->
+                    "color: #0033b3; font-weight: bold;";
+            case CITE_KEY ->
+                    "color: #177534; font-weight: bold;";
+            case FIELD_NAME ->
+                    "color: #b05a00;";
+            case STRING ->
+                    "color: #067d17;";
+            case NUMBER ->
+                    "color: #1750eb;";
+            case COMMENT ->
+                    "color: #8c8c8c; font-style: italic;";
+            case MACRO ->
+                    "color: #871094;";
+            case DEFAULT ->
+                    "";
         };
     }
 

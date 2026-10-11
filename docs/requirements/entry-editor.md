@@ -126,7 +126,7 @@ Needs: impl
 `req~entry-editor.source-tab.copy-syntax-highlighting~1`
 
 When copying BibTeX source from the Source tab, the clipboard must contain both plain text and syntax-highlighted HTML with inline styling so external rich-text applications preserve formatting.
-Originates from https://github.com/JabRef/jabref/issues/17392
+Originates from <https://github.com/JabRef/jabref/issues/17392>
 
 Needs: impl, utest
 
