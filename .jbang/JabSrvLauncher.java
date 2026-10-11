@@ -36,7 +36,7 @@
 //DEPS net.harawata:appdirs:1.5.0
 //DEPS org.apache.commons:commons-lang3:3.21.0
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.1
-//DEPS org.bouncycastle:bcprov-jdk18on:1.84
+//DEPS org.bouncycastle:bcprov-jdk18on:1.86
 //DEPS org.postgresql:postgresql:42.7.14
 //DEPS org.slf4j:slf4j-api:2.0.20
 //DEPS org.slf4j:jul-to-slf4j:2.0.20
