@@ -50,6 +50,7 @@ public class JabRefViewsFeature implements Feature {
     private final Set<Class<?>> fxmlImports = ConcurrentHashMap.newKeySet();
     private final Set<Class<?>> enums = ConcurrentHashMap.newKeySet();
     private final Set<Class<?>> injected = ConcurrentHashMap.newKeySet();
+    private final Set<String> missingClasses = ConcurrentHashMap.newKeySet();
     private int fxmlFiles;
     private int cssFiles;
 
@@ -182,22 +183,23 @@ public class JabRefViewsFeature implements Feature {
                 continue;
             }
             RuntimeReflection.register(type);
-            try {
-                RuntimeReflection.register(type.getDeclaredConstructor());
-            } catch (NoSuchMethodException _) {
-                // No no-arg constructor: afterburner can only use an instance registered beforehand
-            }
+            // Without a no-arg constructor, afterburner can only use an instance registered beforehand
+            Stream.of(type.getDeclaredConstructors())
+                  .filter(constructor -> constructor.getParameterCount() == 0)
+                  .findFirst()
+                  .ifPresent(RuntimeReflection::register);
             log("@Inject field type", type);
         }
     }
 
     /// Resolves names like FXMLLoader does: `a.b.Outer.Inner` is tried as `a.b.Outer$Inner` as well.
-    private static Optional<Class<?>> findClass(FeatureAccess access, String name) {
+    private Optional<Class<?>> findClass(FeatureAccess access, String name) {
         Optional<Class<?>> type = nestedClassCandidates(name).stream()
                                                              // findClassByName returns null for unknown names
                                                              .<Class<?>>flatMap(candidate -> Stream.ofNullable(access.findClassByName(candidate)))
                                                              .findFirst();
-        if (type.isEmpty()) {
+        // An FXML file is scanned more than once, so report each missing class only once
+        if (type.isEmpty() && missingClasses.add(name)) {
             System.out.println("[JabRefViewsFeature] WARNING: class referenced from FXML/CSS not found: " + name);
         }
         return type;
