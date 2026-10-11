@@ -91,7 +91,6 @@ graalvmNative {
             }
             imageName.set("jabkit")
             mainClass.set("org.jabref.toolkit.JabKitLauncher")
-            buildArgs.add("-H:IncludeLocales=en")
         }
     }
 }

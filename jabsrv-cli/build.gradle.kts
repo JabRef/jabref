@@ -63,7 +63,6 @@ graalvmNative {
         named("main") {
             imageName.set("jabsrv")
             mainClass.set("org.jabref.http.server.cli.ServerCli")
-            buildArgs.add("-H:IncludeLocales=en")
         }
     }
 }

@@ -24,7 +24,6 @@ version = providers.gradleProperty("projVersion")
     .get()
 
 mainModuleInfo {
-    // Generates the picocli reflection metadata for GuiCommandLine (native image), as in jabkit and jabls-cli
     annotationProcessor("info.picocli.codegen")
 }
 
@@ -443,9 +442,6 @@ graalvmNative {
         named("main") {
             classpath(nativeImageOnly, nativeImageFeatures.output)
             buildArgs.add("--features=org.jabref.nativeimage.JabRefViewsFeature")
-            // Keep in sync with org.jabref.logic.l10n.Language
-            // -H:+IncludeAllLocales would add ~84 MB for locales JabRef has no translations for.
-            buildArgs.add("-H:IncludeLocales=ar,da,de,el,en,es,fa,fi,fr,id,it,ja,ko,nl,no,pl,pt,pt-BR,ru,sv,tl,tr,uk,vi,zh-CN,zh-TW")
             imageName.set("jabref")
             mainClass.set("org.jabref.Launcher")
             resources {

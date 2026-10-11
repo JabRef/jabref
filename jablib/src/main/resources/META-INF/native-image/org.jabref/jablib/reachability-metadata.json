@@ -473,6 +473,9 @@
     },
     {
       "glob": "resource/openoffice/**"
+    },
+    {
+      "bundle": "l10n/JabRef"
     }
   ],
   "bundles": [
