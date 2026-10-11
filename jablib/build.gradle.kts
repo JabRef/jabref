@@ -26,7 +26,7 @@ plugins {
     id("dev.jbang") version "0.4.0" apply false
 
     id("net.ltgt.errorprone") version "5.1.1"
-    id("net.ltgt.nullaway") version "3.2.0"
+    id("net.ltgt.nullaway") version "3.3.0"
 }
 
 val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost(
