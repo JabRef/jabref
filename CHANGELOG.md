@@ -21,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We improved OCR failure messages to show the executed command and diagnostic output. [#16679](https://github.com/JabRef/jabref/issues/16679)
 - We moved the JabRef version display in the Welcome tab onto the "Download development version" line to save space. [#17160](https://github.com/JabRef/jabref/issues/17160)
 
 ### Fixed
