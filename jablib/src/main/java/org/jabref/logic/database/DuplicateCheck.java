@@ -89,6 +89,7 @@ public class DuplicateCheck {
                                         .orElse(false));
     }
 
+    // [impl->req~duplicate-detection.compatible-entry-types~1]
     private static boolean haveDifferentEntryType(final BibEntry one, final BibEntry two) {
         if (one.getType().equals(StandardEntryType.Misc) || two.getType().equals(StandardEntryType.Misc)) {
             return false;
@@ -118,6 +119,7 @@ public class DuplicateCheck {
                         (compareSingleField(StandardField.PAGES, one, two) == NOT_EQUAL));
     }
 
+    // [impl->req~duplicate-detection.conflicting-parent-books~1]
     private static boolean haveDifferentParentBooks(final BibEntry one, final BibEntry two) {
         return !one.getType().equals(two.getType())
                 && SIMILAR_ENTRY_TYPES.contains(one.getType())
@@ -303,6 +305,7 @@ public class DuplicateCheck {
     /// Checks if the two entries represent the same publication.
     public boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
         // Checks DOI and other identifiers
+        // [impl->req~duplicate-detection.conflicting-parent-books~1]
         if (haveSameIdentifier(one, two)) {
             return true;
         }
@@ -327,6 +330,7 @@ public class DuplicateCheck {
             return true;
         }
 
+        // [impl->req~duplicate-detection.compatible-entry-types~1]
         Optional<BibEntryType> firstType = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
         if (firstType.map(type -> isDuplicateForType(type, one, two))
                      .orElseGet(() -> compareAllFields(one, two))) {

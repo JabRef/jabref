@@ -112,6 +112,7 @@ public class DuplicateCheckTest {
         assertFalse(duplicateChecker.isDuplicate(inCollection, inProceedings, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-detection.compatible-entry-types~1]
     @Test
     void similarEntryTypesAreComparedUsingBothTypes() {
         BibEntry inProceedings = new BibEntry(StandardEntryType.InProceedings)
@@ -150,6 +151,7 @@ public class DuplicateCheckTest {
                                                                       .map(mode -> Arguments.of(first, second, mode))));
     }
 
+    // [utest->req~duplicate-detection.conflicting-parent-books~1]
     @ParameterizedTest
     @MethodSource("compatibleEntryTypes")
     void compatibleTypesWithDifferentParentBooksAreNotDuplicates(StandardEntryType first, StandardEntryType second, BibDatabaseMode mode) {
@@ -167,6 +169,7 @@ public class DuplicateCheckTest {
         }
     }
 
+    // [utest->req~duplicate-detection.conflicting-parent-books~1]
     @ParameterizedTest
     @MethodSource("compatibleEntryTypes")
     void compatibleTypesWithMissingParentBookCanBeDuplicates(StandardEntryType first, StandardEntryType second, BibDatabaseMode mode) {
@@ -179,6 +182,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(two, one, mode));
     }
 
+    // [utest->req~duplicate-detection.conflicting-parent-books~1]
     @ParameterizedTest
     @MethodSource("compatibleEntryTypes")
     void compatibleTypesWithNormalizedParentBookTitlesAreDuplicates(StandardEntryType first, StandardEntryType second, BibDatabaseMode mode) {
@@ -191,6 +195,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(two, one, mode));
     }
 
+    // [utest->req~duplicate-detection.compatible-entry-types~1]
     @ParameterizedTest
     @MethodSource("compatibleEntryTypes")
     void compatibleTypesWithSamePublicationAreDuplicates(StandardEntryType first, StandardEntryType second, BibDatabaseMode mode) {
@@ -249,6 +254,7 @@ public class DuplicateCheckTest {
         }
     }
 
+    // [utest->req~duplicate-detection.conflicting-parent-books~1]
     @ParameterizedTest
     @MethodSource("compatibleEntryTypes")
     void compatibleTypesWithMatchingDoiOverrideDifferentMetadata(StandardEntryType first, StandardEntryType second, BibDatabaseMode mode) {
