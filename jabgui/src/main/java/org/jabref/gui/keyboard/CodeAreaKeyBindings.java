@@ -22,11 +22,7 @@ public class CodeAreaKeyBindings {
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
             switch (binding) {
                 case COPY -> {
-                    if (codeArea.getSyntaxDecorator() instanceof BibTeXHighlighter highlighter) {
-                        highlighter.copyWithSyntaxHighlighting(codeArea);
-                    } else {
-                        codeArea.copy();
-                    }
+                    BibTeXHighlighter.copySource(codeArea);
                     event.consume();
                 }
                 case EDITOR_DELETE -> {
