@@ -60,15 +60,16 @@ public enum BibTeXStyleClass {
         };
     }
 
-    /// Safely resolves a category name to a [BibTeXStyleClass], falling back to [DEFAULT] if unknown.
+    /// Resolves a category name to a [BibTeXStyleClass], falling back to [DEFAULT] if unknown.
     ///
     /// @param name the name of the token category
     /// @return the corresponding style class or DEFAULT
     public static BibTeXStyleClass fromCategoryName(String name) {
-        try {
-            return BibTeXStyleClass.valueOf(name);
-        } catch (IllegalArgumentException _) {
-            return DEFAULT;
+        for (BibTeXStyleClass style : values()) {
+            if (style.name().equals(name)) {
+                return style;
+            }
         }
+        return DEFAULT;
     }
 }
