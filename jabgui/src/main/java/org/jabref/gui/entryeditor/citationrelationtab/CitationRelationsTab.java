@@ -717,6 +717,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private void showEntrySourceDialog(BibEntry entry) {
         CodeArea ca = new CodeArea();
+        ca.getStyleClass().add("source-preview-code-area");
         try {
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);

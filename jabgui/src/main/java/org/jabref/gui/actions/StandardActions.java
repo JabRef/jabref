@@ -77,7 +77,7 @@ public enum StandardActions implements Action {
     READ(Localization.lang("Set read status to read"), IconTheme.JabRefIcons.READ_STATUS_READ, KeyBinding.READ),
     SKIMMED(Localization.lang("Set read status to skimmed"), IconTheme.JabRefIcons.READ_STATUS_SKIMMED, KeyBinding.SKIMMED),
     RELEVANCE(Localization.lang("Relevance"), IconTheme.JabRefIcons.RELEVANCE),
-    RELEVANT(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANCE),
+    RELEVANT(Localization.lang("Toggle relevance"), IconTheme.JabRefIcons.RELEVANT),
     NEW_LIBRARY(Localization.lang("New empty library"), IconTheme.JabRefIcons.NEW),
     OPEN_LIBRARY(Localization.lang("Open library..."), IconTheme.JabRefIcons.OPEN, KeyBinding.OPEN_LIBRARY),
     MERGE_LIBRARY(Localization.lang("Merge..."), IconTheme.JabRefIcons.MERGE_ENTRIES),

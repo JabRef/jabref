@@ -1,7 +1,10 @@
 package org.jabref.gui.shared;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.WeakHashMap;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
@@ -23,8 +26,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSSynchronizer;
+import org.jabref.logic.shared.DatabaseConnectionProperties;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.DatabaseSynchronizer;
+import org.jabref.logic.shared.SharedDatabaseIdentity;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.ConnectionRestoredEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
@@ -43,6 +49,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.google.common.eventbus.Subscribe;
 
 public class SharedDatabaseUIManager {
+
+    private static final Map<LibraryTabContainer, Map<SharedDatabaseIdentity, LibraryTab>> RESERVED_TABS = new WeakHashMap<>();
 
     private final LibraryTabContainer tabContainer;
     private DatabaseSynchronizer dbmsSynchronizer;
@@ -169,6 +177,46 @@ public class SharedDatabaseUIManager {
         dbmsSynchronizer.registerListener(this);
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));
         return bibDatabaseContext;
+    }
+
+    /// The tab already connected to the database `connectionProperties` points at, if any.
+    /// Tabs still connecting are skipped: they only know their database after connecting.
+    // [impl->req~shared-database.single-tab~1]
+    public static Optional<LibraryTab> findOpenTab(LibraryTabContainer tabContainer, DatabaseConnectionProperties connectionProperties) {
+        return findOpenTab(tabContainer, connectionProperties, Optional.empty());
+    }
+
+    public static Optional<LibraryTab> findOpenTab(LibraryTabContainer tabContainer,
+                                                   DatabaseConnectionProperties connectionProperties,
+                                                   Optional<LibraryTab> excludedTab) {
+        SharedDatabaseIdentity identity = SharedDatabaseIdentity.from(connectionProperties);
+        synchronized (RESERVED_TABS) {
+            Map<SharedDatabaseIdentity, LibraryTab> tabs = RESERVED_TABS.computeIfAbsent(tabContainer, _ -> new HashMap<>());
+            LibraryTab reservedTab = tabs.get(identity);
+            if (reservedTab != null && !excludedTab.equals(Optional.of(reservedTab)) && tabContainer.getLibraryTabs().contains(reservedTab)) {
+                return Optional.of(reservedTab);
+            }
+            tabs.remove(identity);
+        }
+        return tabContainer.getLibraryTabs().stream()
+                           .filter(tab -> excludedTab.map(excluded -> tab != excluded).orElse(true))
+                           .filter(tab -> !tab.getLoading().get())
+                           .filter(tab -> tab.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED)
+                           .filter(tab -> DBMSConnectionProperties.isSameDatabase(connectionProperties, tab.getBibDatabaseContext().getDBMSSynchronizer().getConnectionProperties()))
+                           .findFirst();
+    }
+
+    public static Optional<LibraryTab> reserveTab(LibraryTabContainer tabContainer, DBMSConnectionProperties connectionProperties, LibraryTab tab) {
+        SharedDatabaseIdentity identity = SharedDatabaseIdentity.from(connectionProperties);
+        synchronized (RESERVED_TABS) {
+            Map<SharedDatabaseIdentity, LibraryTab> tabs = RESERVED_TABS.computeIfAbsent(tabContainer, _ -> new HashMap<>());
+            LibraryTab existing = tabs.get(identity);
+            if (existing != null && tabContainer.getLibraryTabs().contains(existing)) {
+                return Optional.of(existing);
+            }
+            tabs.put(identity, tab);
+            return Optional.empty();
+        }
     }
 
     /// Shows a database returned by [#connect(DBMSConnectionProperties)] in a new tab. JavaFX thread only.

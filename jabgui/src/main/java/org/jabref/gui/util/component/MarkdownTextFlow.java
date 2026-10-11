@@ -195,8 +195,10 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 continue;
             }
 
+            // Layout indices count an embedded hyperlink as a single character, see SelectableTextFlow#getTextFlowContent()
+            int segmentLength = fxNode instanceof Hyperlink ? 1 : renderedText.length();
             int segmentStart = currentPos;
-            int segmentEnd = currentPos + renderedText.length();
+            int segmentEnd = currentPos + segmentLength;
 
             if (segmentEnd <= selStart || segmentStart >= selEnd) {
                 currentPos = segmentEnd;
@@ -210,7 +212,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 int startInSegment = overlapStart - segmentStart;
                 int endInSegment = overlapEnd - segmentStart;
 
-                if (startInSegment == 0 && endInSegment == renderedText.length()) {
+                if (startInSegment == 0 && endInSegment == segmentLength) {
                     result.add(markdownText);
                 } else {
                     String partialText = renderedText.substring(startInSegment, endInSegment);
