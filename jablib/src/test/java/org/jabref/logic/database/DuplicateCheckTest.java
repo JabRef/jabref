@@ -152,6 +152,47 @@ public class DuplicateCheckTest {
 
     @ParameterizedTest
     @MethodSource("compatibleEntryTypes")
+    void compatibleTypesWithDifferentParentBooksAreNotDuplicates(StandardEntryType first, StandardEntryType second, BibDatabaseMode mode) {
+        for (String isbn : List.of("", "978-1-4684-8585-1")) {
+            BibEntry one = getSimpleInCollection()
+                    .withField(StandardField.DATE, "2004")
+                    .withField(StandardField.PAGES, "1--20")
+                    .withField(StandardField.ISBN, isbn);
+            one.setType(first);
+            BibEntry two = new BibEntry(one).withField(StandardField.BOOKTITLE, "Statistical Mechanics");
+            two.setType(second);
+
+            assertFalse(duplicateChecker.isDuplicate(one, two, mode));
+            assertFalse(duplicateChecker.isDuplicate(two, one, mode));
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("compatibleEntryTypes")
+    void compatibleTypesWithMissingParentBookCanBeDuplicates(StandardEntryType first, StandardEntryType second, BibDatabaseMode mode) {
+        BibEntry one = getSimpleInCollection().withField(StandardField.DATE, "2004");
+        one.setType(first);
+        BibEntry two = new BibEntry(one).withField(StandardField.BOOKTITLE, "");
+        two.setType(second);
+
+        assertTrue(duplicateChecker.isDuplicate(one, two, mode));
+        assertTrue(duplicateChecker.isDuplicate(two, one, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("compatibleEntryTypes")
+    void compatibleTypesWithNormalizedParentBookTitlesAreDuplicates(StandardEntryType first, StandardEntryType second, BibDatabaseMode mode) {
+        BibEntry one = getSimpleInCollection().withField(StandardField.DATE, "2004");
+        one.setType(first);
+        BibEntry two = new BibEntry(one).withField(StandardField.BOOKTITLE, "the oxford handbook of innovation");
+        two.setType(second);
+
+        assertTrue(duplicateChecker.isDuplicate(one, two, mode));
+        assertTrue(duplicateChecker.isDuplicate(two, one, mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("compatibleEntryTypes")
     void compatibleTypesWithSamePublicationAreDuplicates(StandardEntryType first, StandardEntryType second, BibDatabaseMode mode) {
         BibEntry one = getSimpleInCollection().withField(StandardField.DATE, "2004");
         one.setType(first);
@@ -214,10 +255,12 @@ public class DuplicateCheckTest {
         BibEntry one = new BibEntry(first)
                 .withField(StandardField.TITLE, "Performance on a Signal")
                 .withField(StandardField.EDITION, "1")
+                .withField(StandardField.BOOKTITLE, "The Oxford Handbook of Innovation")
                 .withField(StandardField.DOI, "10.1016/j.is.2004.02.002");
         BibEntry two = new BibEntry(second)
                 .withField(StandardField.TITLE, "Rest in Treatment")
                 .withField(StandardField.EDITION, "2")
+                .withField(StandardField.BOOKTITLE, "Statistical Mechanics")
                 .withField(StandardField.DOI, "10.1016/J.IS.2004.02.002");
 
         assertTrue(duplicateChecker.isDuplicate(one, two, mode));
@@ -232,9 +275,9 @@ public class DuplicateCheckTest {
 
         assertTrue(duplicateChecker.isDuplicate(one, two, mode));
         assertTrue(duplicateChecker.isDuplicate(two, one, mode));
-        two.setField(StandardField.TITLE, "Rest in Treatment");
-        assertFalse(duplicateChecker.isDuplicate(one, two, mode));
-        assertFalse(duplicateChecker.isDuplicate(two, one, mode));
+        BibEntry differentTitle = new BibEntry(one).withField(StandardField.TITLE, "Rest in Treatment");
+        assertFalse(duplicateChecker.isDuplicate(one, differentTitle, mode));
+        assertFalse(duplicateChecker.isDuplicate(differentTitle, one, mode));
     }
 
     @ParameterizedTest
@@ -276,9 +319,9 @@ public class DuplicateCheckTest {
     void sameTypeIsbnShortcutIsPreserved(BibDatabaseMode mode) {
         for (StandardEntryType type : List.of(StandardEntryType.Book, StandardEntryType.InProceedings)) {
             BibEntry one = new BibEntry(type).withField(StandardField.TITLE, "Performance on a Signal")
-                                            .withField(StandardField.ISBN, "978-1-4684-8585-1");
+                                             .withField(StandardField.ISBN, "978-1-4684-8585-1");
             BibEntry two = new BibEntry(type).withField(StandardField.TITLE, "Rest in Treatment")
-                                            .withField(StandardField.ISBN, "978-1-4684-8585-1");
+                                             .withField(StandardField.ISBN, "978-1-4684-8585-1");
 
             assertTrue(duplicateChecker.isDuplicate(one, two, mode));
             assertTrue(duplicateChecker.isDuplicate(two, one, mode));

@@ -118,6 +118,13 @@ public class DuplicateCheck {
                         (compareSingleField(StandardField.PAGES, one, two) == NOT_EQUAL));
     }
 
+    private static boolean haveDifferentParentBooks(final BibEntry one, final BibEntry two) {
+        return !one.getType().equals(two.getType())
+                && SIMILAR_ENTRY_TYPES.contains(one.getType())
+                && SIMILAR_ENTRY_TYPES.contains(two.getType())
+                && compareSingleField(StandardField.BOOKTITLE, one, two) == NOT_EQUAL;
+    }
+
     private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
         final Set<OrFields> requiredFields = type.getRequiredFields();
         return requiredFields.isEmpty()
@@ -302,7 +309,8 @@ public class DuplicateCheck {
 
         if (haveDifferentEntryType(one, two) ||
                 haveDifferentEditions(one, two) ||
-                haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
+                haveDifferentChaptersOrPagesOfTheSameBook(one, two) ||
+                haveDifferentParentBooks(one, two)) {
             return false;
         }
 
