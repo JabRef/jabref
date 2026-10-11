@@ -135,6 +135,15 @@ Covers:
 - feat~ai.llms~1
 ```
 
+## Traceability chains
+
+In JabRef, we use these traceability chains:
+
+- `feat` --> `impl`/`utest`
+- `req` --> `impl`/`utest`
+- `feat` --> `req` --> `impl`/`utest`
+- `adr` --> `impl`/`utest`
+
 ## Conventions used in JabRef
 
 For requirement IDs, we follow the OFT standard artifact types, with the addition of `adr`. For the main part, we separate the path with `.`, and separate words with a hyphen, as in the example above.

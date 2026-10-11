@@ -423,6 +423,15 @@ Format: `<type>~<area>.<name>~<revision>`
   - `utest`: Unit test.
   - `adr`: Architectural Decision Record.
 
+### Traceability chains
+
+In JabRef, we use these traceability chains:
+
+- `feat` --> `impl`/`utest`
+- `req` --> `impl`/`utest`
+- `feat` --> `req` --> `impl`/`utest`
+- `adr` --> `impl`/`utest`
+
 ### How to write requirements
 
 #### Title rules
