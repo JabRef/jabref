@@ -67,7 +67,7 @@ public enum BibTeXStyleClass {
     public static BibTeXStyleClass fromCategoryName(String name) {
         try {
             return BibTeXStyleClass.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return DEFAULT;
         }
     }
