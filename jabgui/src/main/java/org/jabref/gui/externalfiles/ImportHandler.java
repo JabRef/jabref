@@ -349,7 +349,6 @@ public class ImportHandler {
     }
 
     record AutoDetectionImportOutcome(List<BibEntry> entriesToAdd, boolean success, String message) {
-
     }
     /// Cleans up the given entries and adds them to the library.
     ///
