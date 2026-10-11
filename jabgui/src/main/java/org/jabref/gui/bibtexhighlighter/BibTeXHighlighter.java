@@ -76,6 +76,14 @@ public class BibTeXHighlighter implements SyntaxDecorator {
         return syntaxHighlighter;
     }
 
+    public static void copySource(CodeArea codeArea) {
+        if (codeArea.getSyntaxDecorator() instanceof BibTeXHighlighter highlighter) {
+            highlighter.copyWithSyntaxHighlighting(codeArea);
+        } else {
+            codeArea.copy();
+        }
+    }
+
     /// Copies the selected text in the given [CodeArea] to the system clipboard, preserving
     /// plain text for code/text editors and augmenting it with rich HTML syntax highlighting
     /// for external applications like LibreOffice Writer, Microsoft Word, and Google Docs.
