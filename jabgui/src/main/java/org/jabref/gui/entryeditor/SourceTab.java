@@ -363,11 +363,7 @@ public class SourceTab extends EntryEditorTab {
         public void execute() {
             switch (command) {
                 case COPY -> {
-                    if (codeArea.getSyntaxDecorator() instanceof BibTeXHighlighter highlighter) {
-                        highlighter.copyWithSyntaxHighlighting(codeArea);
-                    } else {
-                        codeArea.copy();
-                    }
+                    BibTeXHighlighter.copySource(codeArea);
                 }
                 case CUT ->
                         codeArea.cut();
