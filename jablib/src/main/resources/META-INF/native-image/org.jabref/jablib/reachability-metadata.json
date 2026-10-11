@@ -458,6 +458,18 @@
     },
     {
       "glob": "csl-locales/locales-*.xml"
+    },
+    {
+      "glob": "ssl/truststore.jks"
+    },
+    {
+      "glob": "icore/ICORE2023.csv"
+    },
+    {
+      "glob": "resource/ods/**"
+    },
+    {
+      "glob": "resource/openoffice/**"
     }
   ],
   "bundles": [
