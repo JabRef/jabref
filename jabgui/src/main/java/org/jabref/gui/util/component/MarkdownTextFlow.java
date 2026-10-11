@@ -614,14 +614,22 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             StackPane pane = renderTableContent(cell, grid);
             MarkdownTextFlow flow = grid.cells.getLast();
             flow.setTextAlignment(switch (cell.getAlignment()) {
-                case RIGHT -> TextAlignment.RIGHT;
-                case CENTER -> TextAlignment.CENTER;
-                case null, default -> TextAlignment.LEFT;
+                case RIGHT ->
+                        TextAlignment.RIGHT;
+                case CENTER ->
+                        TextAlignment.CENTER;
+                case null,
+                     default ->
+                        TextAlignment.LEFT;
             });
             flow.getStyleClass().add(switch (cell.getAlignment()) {
-                case RIGHT -> "markdown-table-cell-right";
-                case CENTER -> "markdown-table-cell-center";
-                case null, default -> "markdown-table-cell-left";
+                case RIGHT ->
+                        "markdown-table-cell-right";
+                case CENTER ->
+                        "markdown-table-cell-center";
+                case null,
+                     default ->
+                        "markdown-table-cell-left";
             });
             if (cell.isHeader()) {
                 pane.getStyleClass().add("bold");
