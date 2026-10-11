@@ -77,6 +77,11 @@ requirementTracing {
             "adr"
         )
 
+    filterWantedStatuses =
+        setOf(
+            "approved"
+        )
+
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer
 }
 
