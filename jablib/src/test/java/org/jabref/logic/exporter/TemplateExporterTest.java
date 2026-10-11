@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -78,7 +79,7 @@ class TemplateExporterTest {
         if (existingOutput) {
             assertArrayEquals(ORIGINAL_CONTENT, Files.readAllBytes(output));
         }
-        try (var files = Files.list(outputDirectory)) {
+        try (Stream<Path> files = Files.list(outputDirectory)) {
             assertEquals(existingOutput ? List.of(output) : List.of(), files.toList());
         }
     }
@@ -99,7 +100,7 @@ class TemplateExporterTest {
         if (existingOutput) {
             assertArrayEquals(ORIGINAL_CONTENT, Files.readAllBytes(output));
         }
-        try (var files = Files.list(outputDirectory)) {
+        try (Stream<Path> files = Files.list(outputDirectory)) {
             assertEquals(existingOutput ? List.of(output) : List.of(), files.toList());
         }
     }
@@ -124,7 +125,7 @@ class TemplateExporterTest {
         exporter.export(databaseContext, output, entries);
 
         assertEquals(optionalLayouts ? "Header\nExported title\nFooter\n" : "Exported title\n", Files.readString(output));
-        try (var files = Files.list(outputDirectory)) {
+        try (Stream<Path> files = Files.list(outputDirectory)) {
             assertEquals(List.of(output), files.toList());
         }
     }
