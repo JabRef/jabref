@@ -2,6 +2,9 @@ package org.jabref.gui.importer.fetcher;
 
 import java.util.concurrent.Callable;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -50,11 +53,17 @@ public class WebSearchPaneViewModel {
     private final StateManager stateManager;
 
     private final Validator searchQueryValidator;
+    private final BooleanBinding searchEnabled;
 
     public WebSearchPaneViewModel(GuiPreferences preferences, DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+
+        BooleanProperty importEnabled = preferences.getImporterPreferences().importerEnabledProperty();
+        searchEnabled = Bindings.createBooleanBinding(
+                () -> importEnabled.get() && !StringUtil.isBlank(getQuery()),
+                importEnabled, query);
 
         fetchers.setAll(WebFetchers.getSearchBasedFetchers(
                 preferences.getImportFormatPreferences(),
@@ -142,6 +151,10 @@ public class WebSearchPaneViewModel {
 
     public StringProperty queryProperty() {
         return query;
+    }
+
+    public BooleanBinding searchEnabledProperty() {
+        return searchEnabled;
     }
 
     public void search() {
