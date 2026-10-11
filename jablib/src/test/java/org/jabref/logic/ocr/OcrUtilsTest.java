@@ -1,5 +1,7 @@
 package org.jabref.logic.ocr;
 
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +14,14 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 @NullMarked
 class OcrUtilsTest {
     @Test
-    void nonZeroExitPreservesCommandAndOutput() {
+    void nonZeroExitPreservesCommandAndOutput() throws URISyntaxException {
         String javaExecutable = ProcessHandle.current().info().command().orElseThrow();
-        String classPath = System.getProperty("java.class.path");
+        String classPath = Path.of(
+                FailingProcess.class.getProtectionDomain()
+                                    .getCodeSource()
+                                    .getLocation()
+                                    .toURI()
+        ).toString();
         ArrayList<String> command = new ArrayList<>(List.of(javaExecutable, "-cp", classPath, FailingProcess.class.getName()));
 
         OcrResult result = OcrUtils.performOcr(command, "Test OCR");
