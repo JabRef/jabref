@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
 import javafx.scene.input.TransferMode;
@@ -150,21 +149,13 @@ public class ImportHandler {
             return true;
         }
 
-        AtomicBoolean optOutSelected = new AtomicBoolean(false);
-
-        boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(
+        return dialogService.showConfirmationDialogWithOptOutAndWait(
                 Localization.lang("Import BibTeX file"),
                 Localization.lang("Are you sure you want to import entries from the dropped BibTeX file(s) into the current library?"),
                 Localization.lang("Import"),
                 Localization.lang("Do not import"),
                 Localization.lang("Do not ask again"),
-                optOutSelected::set);
-
-        if (confirmed && optOutSelected.get()) {
-            preferences.getImporterPreferences().setWarnAboutBibFileImport(false);
-        }
-
-        return confirmed;
+                optOut -> preferences.getImporterPreferences().setWarnAboutBibFileImport(!optOut));
     }
 
     /// Checks whether the given file should be imported as bibliographic entries rather than attached as a file to an existing entry.
@@ -358,8 +349,8 @@ public class ImportHandler {
     }
 
     record AutoDetectionImportOutcome(List<BibEntry> entriesToAdd, boolean success, String message) {
-    }
 
+    }
     /// Cleans up the given entries and adds them to the library.
     ///
     /// Actions include generating a citation key if configured

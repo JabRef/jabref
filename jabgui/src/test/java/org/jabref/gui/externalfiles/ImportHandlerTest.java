@@ -373,7 +373,7 @@ class ImportHandlerTest {
     }
 
     @Test
-    void confirmBibFileImportDoesNotUpdatePreferenceWhenOptOutSelectedAndCancelled() {
+    void confirmBibFileImportUpdatesPreferenceWhenOptOutSelectedAndCancelled() {
         ImporterPreferences importerPreferences = preferences.getImporterPreferences();
         when(importerPreferences.shouldWarnAboutBibFileImport()).thenReturn(true);
 
@@ -388,8 +388,7 @@ class ImportHandlerTest {
 
         assertFalse(importHandler.confirmBibFileImportIfNecessary(files));
 
-        verify(importerPreferences, never())
-                .setWarnAboutBibFileImport(anyBoolean());
+        verify(importerPreferences).setWarnAboutBibFileImport(false);
     }
 
     @Test
