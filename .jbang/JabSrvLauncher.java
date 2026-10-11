@@ -41,7 +41,7 @@
 //DEPS org.slf4j:slf4j-api:2.0.20
 //DEPS org.slf4j:jul-to-slf4j:2.0.20
 //DEPS org.tinylog:slf4j-tinylog:2.8.1
-//DEPS org.tinylog:tinylog-impl:2.7.0
+//DEPS org.tinylog:tinylog-impl:2.8.1
 //DEPS org.glassfish.grizzly:grizzly-framework:5.0.3
 //DEPS org.glassfish.grizzly:grizzly-http-server:5.0.3
 //DEPS org.glassfish.hk2:hk2-api:4.0.3
