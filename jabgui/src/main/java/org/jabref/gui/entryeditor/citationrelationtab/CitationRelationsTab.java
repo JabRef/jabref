@@ -720,7 +720,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     // [impl->req~entry-editor.citations.source-highlighting~1]
     private void showEntrySourceDialog(BibEntry entry) {
         BibTeXCodeArea codeArea = new BibTeXCodeArea(stateManager, bibTeXSyntaxHighlighter);
-        codeArea.getStyleClass().add("source-preview-code-area");
         try {
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
