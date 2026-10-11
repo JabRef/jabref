@@ -36,6 +36,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class JabRefViewsFeature implements Feature {
 
+    private static final List<String> AFTERBURNER_ROOT_CLASSES = List.of("org.jabref.gui.externalfiles.UnlinkedFilesWizard");
     private static final List<String> BASE_CLASSES = List.of("javafx.scene.Node", "javafx.scene.control.Dialog");
     private static final Set<String> INJECT_ANNOTATIONS = Set.of("jakarta.inject.Inject", "javax.inject.Inject");
     private static final boolean LOG_VIEWS = Boolean.getBoolean("jabref.nativeimage.logViews");
@@ -68,6 +69,9 @@ public class JabRefViewsFeature implements Feature {
                     registerNamedClasses(access, content, CSS_SKIN);
                 }
             });
+        }
+        for (String rootClass : AFTERBURNER_ROOT_CLASSES) {
+            findClass(access, rootClass).ifPresent(this::registerView);
         }
         for (String baseClass : BASE_CLASSES) {
             access.registerSubtypeReachabilityHandler((_, type) -> {
@@ -200,7 +204,7 @@ public class JabRefViewsFeature implements Feature {
                                                              .findFirst();
         // An FXML file is scanned more than once, so report each missing class only once
         if (type.isEmpty() && missingClasses.add(name)) {
-            System.out.println("[JabRefViewsFeature] WARNING: class referenced from FXML/CSS not found: " + name);
+            System.out.println("[JabRefViewsFeature] WARNING: class referenced for reflection not found: " + name);
         }
         return type;
     }
