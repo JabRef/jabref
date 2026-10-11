@@ -94,4 +94,11 @@ Every shared database that was connected to is stored and offered in the login d
 
 Needs: impl
 
+## A database is open in one tab only
+`req~shared-database.single-tab~1`
+
+A shared database identified by its DBMS type, normalized host, port, and database name is never opened in a second tab, whichever way the connection is entered (form fields, JDBC URL, a library file carrying its id, or a remembered connection at startup). Instead, the tab that is already connected or connecting is shown.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
