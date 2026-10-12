@@ -77,6 +77,12 @@ requirementTracing {
             "adr"
         )
 
+    filterWantedStatuses =
+        setOf(
+            // Requirements without `Status` field are treated as `approved`.
+            "approved"
+        )
+
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer
 }
 
