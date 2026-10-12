@@ -13,6 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -23,6 +24,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
     private final List<BibEntryType> customEntryTypes;
 
     @Inject private CliPreferences preferences;
+    @Inject private BibEntryTypesManager entryTypesManager;
     @FXML private VBox boxDifferentCustomization;
 
     @FXML private CheckListView<BibEntryType> unknownEntryTypesCheckList;
@@ -44,7 +46,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
                 viewModel.importBibEntryTypes(
                         unknownEntryTypesCheckList.getCheckModel().getCheckedItems(),
                         differentCustomizationCheckList.getCheckModel().getCheckedItems().stream()
-                                                       .map(BibEntryTypePrefsAndFileViewModel::customTypeFromPreferences)
+                                                       .map(BibEntryTypePrefsAndFileViewModel::customTypeFromFile)
                                                        .toList());
             }
             return null;
@@ -55,7 +57,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes, preferences);
+        viewModel = new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes, preferences, entryTypesManager);
         boxDifferentCustomization.visibleProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         boxDifferentCustomization.managedProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         unknownEntryTypesCheckList.setItems(viewModel.newTypes());

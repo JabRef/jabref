@@ -1,18 +1,22 @@
 package org.jabref.gui.importer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.importer.util.CustomEntryTypeDecision;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,24 +26,38 @@ public class ImportCustomEntryTypesDialogViewModel {
 
     private final BibDatabaseMode mode;
     private final CliPreferences preferences;
+    private final BibEntryTypesManager entryTypesManager;
 
     private final ObservableList<BibEntryType> newTypes = FXCollections.observableArrayList();
     private final ObservableList<BibEntryTypePrefsAndFileViewModel> differentCustomizationTypes = FXCollections.observableArrayList();
 
-    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode, List<BibEntryType> entryTypes, CliPreferences preferences) {
+    /// The decision each offered type from the file stands for, see [CustomEntryTypeDecision]
+    private final Map<BibEntryType, String> offeredDecisions = new HashMap<>();
+
+    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode,
+                                                 List<BibEntryType> entryTypes,
+                                                 CliPreferences preferences,
+                                                 BibEntryTypesManager entryTypesManager) {
         this.mode = mode;
         this.preferences = preferences;
+        this.entryTypesManager = entryTypesManager;
 
-        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
+        Set<String> declinedDecisions = preferences.getDeclinedCustomEntryTypes();
         for (BibEntryType customType : entryTypes) {
             Optional<BibEntryType> currentlyStoredType = entryTypesManager.enrich(customType.getType(), mode);
+            String decision = CustomEntryTypeDecision.fingerprint(customType, currentlyStoredType, mode);
+            if (declinedDecisions.contains(decision)) {
+                continue;
+            }
             if (currentlyStoredType.isEmpty()) {
                 newTypes.add(customType);
+                offeredDecisions.put(customType, decision);
             } else {
                 if (!EntryTypeFactory.nameAndFieldsAreEqual(customType, currentlyStoredType.get())) {
                     LOGGER.info("currently stored type:    {}", currentlyStoredType.get());
                     LOGGER.info("type provided by library: {}", customType);
                     differentCustomizationTypes.add(new BibEntryTypePrefsAndFileViewModel(currentlyStoredType.get(), customType));
+                    offeredDecisions.put(customType, decision);
                 }
             }
         }
@@ -53,14 +71,28 @@ public class ImportCustomEntryTypesDialogViewModel {
         return this.differentCustomizationTypes;
     }
 
+    /// Stores the entry types the user selected in the entry types manager and in the preferences,
+    /// and remembers the ones left unchecked as declined.
+    ///
+    /// Both lists hold the definition **from the file**: for the different customizations, the stored
+    /// customization is overwritten - otherwise the dialog would be shown again at the next start.
+    /// See <https://github.com/JabRef/jabref/issues/9930>.
+    ///
+    /// [impl->req~import.entry-types.offered-once~1]
     public void importBibEntryTypes(List<BibEntryType> checkedUnknownEntryTypes, List<BibEntryType> checkedDifferentEntryTypes) {
-        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-        if (!checkedUnknownEntryTypes.isEmpty()) {
-            checkedUnknownEntryTypes.forEach(type -> entryTypesManager.addCustomOrModifiedType(type, mode));
-            preferences.storeCustomEntryTypesRepository(entryTypesManager);
+        List<BibEntryType> typesToImport = new ArrayList<>(checkedUnknownEntryTypes);
+        typesToImport.addAll(checkedDifferentEntryTypes);
+
+        List<String> declined = offeredDecisions.entrySet().stream()
+                                                .filter(offered -> !typesToImport.contains(offered.getKey()))
+                                                .map(Map.Entry::getValue)
+                                                .toList();
+        if (!declined.isEmpty()) {
+            preferences.addDeclinedCustomEntryTypes(declined);
         }
-        if (!checkedDifferentEntryTypes.isEmpty()) {
-            checkedUnknownEntryTypes.forEach(type -> entryTypesManager.addCustomOrModifiedType(type, mode));
+
+        if (!typesToImport.isEmpty()) {
+            typesToImport.forEach(type -> entryTypesManager.addCustomOrModifiedType(type, mode));
             preferences.storeCustomEntryTypesRepository(entryTypesManager);
         }
     }
