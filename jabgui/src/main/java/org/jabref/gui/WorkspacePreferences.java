@@ -42,6 +42,7 @@ public class WorkspacePreferences {
     private final ObservableList<String> selectedSlrCatalogs;
 
     private final DoubleBinding cellSize;
+    private final DoubleBinding tableCellSize;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -70,6 +71,7 @@ public class WorkspacePreferences {
         this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
 
         cellSize = createCellSizeBinding();
+        tableCellSize = createTableCellSizeBinding();
     }
 
     /// Creates Object with default values
@@ -102,11 +104,17 @@ public class WorkspacePreferences {
             } else {
                 cellSize = DEF_FONT_SIZE * 2d;
             }
-            if (wrapMainTableText.get()) {
-                cellSize *= 2;
-            }
             return cellSize;
-        }, shouldOverrideDefaultFontSize, mainFontSize, wrapMainTableText);
+        }, shouldOverrideDefaultFontSize, mainFontSize);
+    }
+
+    private @NonNull DoubleBinding createTableCellSizeBinding() {
+        return Bindings.createDoubleBinding(() -> {
+            if (wrapMainTableText.get()) {
+                return cellSize.get() * 2;
+            }
+            return cellSize.get();
+        }, cellSize, wrapMainTableText);
     }
 
     public void setAll(WorkspacePreferences preferences) {
@@ -261,6 +269,10 @@ public class WorkspacePreferences {
 
     public void setCustomTheme(Optional<StyleSheet> customTheme) {
         this.customTheme.set(customTheme);
+    }
+
+    public DoubleBinding tableCellSizeProperty() {
+        return tableCellSize;
     }
 
     public DoubleBinding cellSizeProperty() {
