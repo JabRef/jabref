@@ -79,6 +79,7 @@ requirementTracing {
 
     filterWantedStatuses =
         setOf(
+            // Requirements without `Status` field are treated as `approved`.
             "approved"
         )
 
