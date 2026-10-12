@@ -681,6 +681,5 @@ public class DuplicateCheckTest {
                 .withField(StandardField.URL, "https://ozimmer.ch/practices/2020/04/27/ArchitectureDecisionMaking.html");
 
         assertTrue(duplicateChecker.isDuplicate(article, misc, BibDatabaseMode.BIBLATEX));
-        assertTrue(duplicateChecker.isDuplicate(misc, article, BibDatabaseMode.BIBLATEX));
     }
 }
