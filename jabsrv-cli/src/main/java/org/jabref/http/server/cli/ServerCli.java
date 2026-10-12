@@ -48,8 +48,10 @@ public class ServerCli implements Callable<Void> {
 
     @Override
     public Void call() throws InterruptedException, IOException {
+        JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
+
         // The server serves the last opened files (see org.jabref.http.server.resources.LibraryResource.getLibraryPath)
-        final List<Path> filesToServe = new ArrayList<>(JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened());
+        final List<Path> filesToServe = new ArrayList<>(preferences.getLastFilesOpenedPreferences().getLastFilesOpened());
 
         // Additionally, files can be provided as args
         if (files != null) {
@@ -72,8 +74,9 @@ public class ServerCli implements Callable<Void> {
             return null;
         }
 
-        // TODO: Fix parameter
-        Server server = new Server(JabRefCliPreferences.getInstance(), new OAuthSessionRegistry());
+        // A standalone jabsrv never starts a CiteDrive login (that needs the GUI), so no login can be pending:
+        // the callback endpoint answers every callback with "login could not be completed"
+        Server server = new Server(preferences, new OAuthSessionRegistry());
         HttpServer httpServer = server.run(filesToServe, uri);
 
         // Keep the http server running until user kills the process (e.g., presses Ctrl+C)

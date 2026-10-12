@@ -1720,7 +1720,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private @Nullable RefreshToken parseCiteDriveToken(@Nullable String json) {
-        if (json == null || json.isBlank()) {
+        if (StringUtil.isBlank(json)) {
             return null;
         }
 

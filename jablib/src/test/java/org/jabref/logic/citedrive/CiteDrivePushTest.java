@@ -38,6 +38,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/// Guards what leaves the machine: the request body is plain BibTeX regardless of the user's export settings.
+/// JabRef's metadata (here: the library-specific file directory) must not be uploaded, and the token has to arrive as a bearer header.
+///
+/// [utest->req~citedrive.push~1]
 class CiteDrivePushTest {
 
     @Test
