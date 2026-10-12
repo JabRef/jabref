@@ -143,24 +143,26 @@ class MainTableDataModelTest {
         BibEntryTableViewModel vmA = model.getViewModelByCitationKey("A").orElseThrow();
         BibEntryTableViewModel vmB = model.getViewModelByCitationKey("B").orElseThrow();
 
-        // First search matches Alice only.
-        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
+        JavaFxExtension.invokeAndWait(() -> {
+            // First search matches Alice only.
+            searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Alice")));
 
-        assertEquals(Set.of(bibEntryA.getId()), model.searchResultsProperty().get().orElseThrow().getMatchedEntries());
-        assertTrue(vmA.isMatchedBySearch());
-        assertFalse(vmB.isMatchedBySearch());
-        assertTrue(vmA.isVisibleBySearch());
-        assertFalse(vmB.isVisibleBySearch());
-        assertEquals(1, resultSize.get());
+            assertEquals(Set.of(bibEntryA.getId()), model.searchResultsProperty().get().orElseThrow().getMatchedEntries());
+            assertTrue(vmA.isMatchedBySearch());
+            assertFalse(vmB.isMatchedBySearch());
+            assertTrue(vmA.isVisibleBySearch());
+            assertFalse(vmB.isVisibleBySearch());
+            assertEquals(1, resultSize.get());
 
-        // Second search matches no entries. The old Alice result should not remain visible.
-        searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Charlie")));
+            // Second search matches no entries. The old Alice result should not remain visible.
+            searchQueryProperty.setValue(Optional.of(new SearchQuery("author=Charlie")));
 
-        assertFalse(vmA.isMatchedBySearch());
-        assertFalse(vmB.isMatchedBySearch());
-        assertFalse(vmA.isVisibleBySearch());
-        assertFalse(vmB.isVisibleBySearch());
-        assertEquals(0, resultSize.get());
+            assertFalse(vmA.isMatchedBySearch());
+            assertFalse(vmB.isMatchedBySearch());
+            assertFalse(vmA.isVisibleBySearch());
+            assertFalse(vmB.isVisibleBySearch());
+            assertEquals(0, resultSize.get());
+        });
     }
 
     @Test
