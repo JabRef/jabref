@@ -10,7 +10,8 @@ public class PerformLoadDatabaseMigrations {
 
     public static void performLoadDatabaseMigrations(ParserResult parserResult,
                                                      Character keywordSeparator) {
-        performLoadDatabaseMigrations(parserResult, keywordSeparator, () -> { });
+        performLoadDatabaseMigrations(parserResult, keywordSeparator, () -> {
+        });
     }
 
     /// Run before attaching the parsed library to GUI listeners.
@@ -25,8 +26,8 @@ public class PerformLoadDatabaseMigrations {
         );
 
         List<PostOpenMigration> necessaryMigrations = postOpenMigrations.stream()
-                                                                      .filter(migration -> migration.isMigrationNecessary(parserResult))
-                                                                      .toList();
+                                                                        .filter(migration -> migration.isMigrationNecessary(parserResult))
+                                                                        .toList();
         if (necessaryMigrations.isEmpty()) {
             return;
         }

@@ -56,10 +56,10 @@ class PerformLoadDatabaseMigrationsTest {
     @Test
     void migrationBatchesChangesAndRestoresEntryObservation() {
         List<BibEntry> entries = IntStream.range(0, 1000)
-                                         .mapToObj(index -> new BibEntry().withCitationKey("Entry" + index)
-                                                                         .withField(InternalField.MARKED_INTERNAL, "[Owner:6]")
-                                                                         .withField(StandardField.KEYWORDS, "topic, printed"))
-                                         .toList();
+                                          .mapToObj(index -> new BibEntry().withCitationKey("Entry" + index)
+                                                                           .withField(InternalField.MARKED_INTERNAL, "[Owner:6]")
+                                                                           .withField(StandardField.KEYWORDS, "topic, printed"))
+                                          .toList();
         ParserResult result = new ParserResult(entries);
         List<Integer> updateSizes = new ArrayList<>();
         result.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> {
@@ -88,8 +88,8 @@ class PerformLoadDatabaseMigrationsTest {
     void migrationPreservesCitationLinksAndRebuildsReferenceIndex() {
         BibEntry parent = new BibEntry().withCitationKey("Parent");
         BibEntry child = new BibEntry().withCitationKey("Child")
-                                     .withField(StandardField.CROSSREF, "Parent")
-                                     .withField(InternalField.MARKED_INTERNAL, "[Owner:6]");
+                                       .withField(StandardField.CROSSREF, "Parent")
+                                       .withField(InternalField.MARKED_INTERNAL, "[Owner:6]");
         ParserResult result = new ParserResult(List.of(parent, child));
 
         PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(result, ',');
@@ -107,7 +107,7 @@ class PerformLoadDatabaseMigrationsTest {
     @Test
     void modernLibraryDoesNotTriggerMigrationOrListChanges() {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "research, topic")
-                                     .withField(StandardField.GROUPS, "Current group");
+                                       .withField(StandardField.GROUPS, "Current group");
         ParserResult result = new ParserResult(List.of(entry));
         result.getMetaData().setGroups(GroupTreeNode.fromGroup(new ExplicitGroup("Current group", GroupHierarchyType.INDEPENDENT, ',')));
         List<Integer> changes = new ArrayList<>();
@@ -130,9 +130,9 @@ class PerformLoadDatabaseMigrationsTest {
     @Test
     void savedAndReopenedLibraryDoesNotNeedAnotherMigration() throws IOException {
         BibEntry entry = new BibEntry().withCitationKey("Entry")
-                                     .withField(StandardField.GROUPS, "Existing")
-                                     .withField(StandardField.KEYWORDS, "topic; printed; prio1")
-                                     .withField(InternalField.MARKED_INTERNAL, "[Owner:6]");
+                                       .withField(StandardField.GROUPS, "Existing")
+                                       .withField(StandardField.KEYWORDS, "topic; printed; prio1")
+                                       .withField(InternalField.MARKED_INTERNAL, "[Owner:6]");
         ParserResult result = new ParserResult(List.of(entry));
         result.getMetaData().setKeywordSeparator(';');
         GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
