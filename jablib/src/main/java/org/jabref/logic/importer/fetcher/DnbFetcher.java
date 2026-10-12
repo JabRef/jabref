@@ -46,7 +46,7 @@ public class DnbFetcher extends AbstractIsbnFetcher implements PagedSearchBasedP
     }
 
     @Override
-    // [impl->req~fetchers.dnb-search~1]
+    // [impl->feat~fetchers.dnb-search~1]
     public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         return buildSearchUrl(rawQuery, pageNumber);
     }

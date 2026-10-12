@@ -29,6 +29,8 @@ public class SummarizationTaskAggregator {
 
     private final TreeMap<BibEntry, GenerateSummaryTask> tasks =
             new TreeMap<>(Comparator.comparing(BibEntry::getId));
+    private final TreeMap<BibEntry, GenerateSummaryTask> latestTasks =
+            new TreeMap<>(Comparator.comparing(BibEntry::getId));
 
     public SummarizationTaskAggregator(TaskExecutor taskExecutor, InMemorySummaryCache inMemoryCache) {
         this.taskExecutor = taskExecutor;
@@ -54,7 +56,8 @@ public class SummarizationTaskAggregator {
             return startNewTask(request, showToUser);
         }
 
-        if (task.get().getStatus() == TrackedBackgroundTask.Status.CANCELLED && request.regenerate()) {
+        // A cancelled task ends as ERROR without running onFinished, so it stays in the map
+        if (task.get().getStatus().isFinished() && request.regenerate()) {
             tasks.remove(request.fullEntry().entry());
             return startNewTask(request, showToUser);
         }
@@ -65,11 +68,27 @@ public class SummarizationTaskAggregator {
     private synchronized GenerateSummaryTask startNewTask(GenerateSummaryTaskRequest request, boolean showToUser) {
         GenerateSummaryTask task = new GenerateSummaryTask(request, showToUser);
 
-        task.onFinished(() -> tasks.remove(request.fullEntry().entry()));
+        // Only remove this task: a regeneration may have replaced it in the meantime
+        task.onFinished(() -> {
+            synchronized (this) {
+                tasks.remove(request.fullEntry().entry(), task);
+                if (task.getStatus() != TrackedBackgroundTask.Status.SUCCESS) {
+                    latestTasks.remove(request.fullEntry().entry(), task);
+                }
+            }
+        });
 
-        task.onSuccess(result -> inMemoryCache.put(request.fullEntry(), result));
+        task.onSuccess(result -> {
+            synchronized (this) {
+                if (latestTasks.get(request.fullEntry().entry()) == task) {
+                    inMemoryCache.put(request.fullEntry(), result);
+                    latestTasks.remove(request.fullEntry().entry(), task);
+                }
+            }
+        });
 
         tasks.put(request.fullEntry().entry(), task);
+        latestTasks.put(request.fullEntry().entry(), task);
 
         taskExecutor.execute(task);
         return task;

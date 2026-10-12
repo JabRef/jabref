@@ -109,6 +109,12 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
         return type.getUrl(host, port, database);
     }
 
+    /// Whether both point at the same data: same DBMS, server, and database - regardless of whether the connection
+    /// was entered as form fields or as a JDBC URL, and of password or SSL settings. [#equals(Object)] tells those apart.
+    public static boolean isSameDatabase(DatabaseConnectionProperties first, DatabaseConnectionProperties second) {
+        return SharedDatabaseIdentity.from(first).equals(SharedDatabaseIdentity.from(second));
+    }
+
     /// Returns username, password and ssl as Properties Object
     ///
     /// @return Properties with values for user, password and ssl

@@ -402,41 +402,59 @@ Quick check of core library:
 
 ## Requirements tracing (OpenFastTrace)
 
-JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) to trace requirements to implementation and tests.
+JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT) to trace requirements to implementation and tests.
+Requirements capture what JabRef should do as a structured representation of issues and features, enabling bidirectional traceability.
 
 For a new feature or significant bug fix, add the requirement to the appropriate `docs/requirements/<area>.md` file.
-Link the issue the requirement originates from.
-Respect INVEST criteria. Prefer high-level requirements over overly detailed ones.
-Add tracing (`Needs: impl` + implementation comments).
 
-**Defining a requirement** in `docs/requirements/<area>.md`:
+Read and use the [`openfasttrace`](https://github.com/itsallcode/openfasttrace-ai-skills/blob/main/skills/openfasttrace/SKILL.md) skill.
 
-```markdown
-### Example
-`req~ai.example~1`
+In JabRef we use OFT this way:
 
-Description of the requirement.
-```
+- The requirements are put in `docs/requirements/<area>.md`.
+- The requirements are grouped by areas: `docs/requirements/ui.md`, `docs/requirements/git.md`, etc.
+- Title style:
+  - `req~` → **"Subject must verb"** (e.g., `## GitHub personal access token push access must be verifiable before sharing`).
+  - `feat~` → **"User can verb"** (e.g., `## User can share library via GitHub`).
+  - Avoid nominalizations: Write "must be verified" instead of "verification".
+  - One item, one requirement: If a title needs "and", split it into two separate requirements.
+  - The title carries the full normative statement: Anyone reading only the heading should understand the complete requirement constraint.
+- Use the description only for details that the title cannot carry:
+  - Triggering condition.
+  - Edge cases and boundary behavior.
+  - Brief rationale (if needed).
+  - Relevant GitHub issue link or context.
 
-The identifier must follow the heading with no blank line between them. Add `<!-- markdownlint-disable-file MD022 -->` at the end of the file.
+Artifact types used:
 
-Linking an implementation to a requirement (full trace):
+- `feat`: User-facing capability or broad feature ("User can verb").
+- `req`: Specific constraint, nuance, cross-cutting requirement, or bug fix the system must satisfy ("Subject must verb").
+- `impl`: Code implementation.
+- `utest`: Unit test.
+- `adr`: Architectural Decision Record.
 
-```markdown
-Needs: impl
-```
+### Traceability chains
 
-```java
-// [impl->req~ai.example~1]
-```
+In JabRef, we use these traceability chains:
 
-**Checking coverage:**
+- `feat` --> `impl`/`utest`
+- `req` --> `impl`/`utest`
+- `feat` --> `req` --> `impl`/`utest`
+- `adr` --> `impl`/`utest`
+
+Additional guidelines:
+
+- Link the issue the requirement originates from (if there is).
+- Respect INVEST criteria. Prefer high-level requirements over overly detailed ones.
+- For ideas or planned requirements not yet implemented, mark them as draft so they are preserved without failing coverage checks: `Status: draft`.
+
+Checking coverage:
 
 ```bash
-./gradlew traceRequirements   # output: build/tracing.txt
+./gradlew traceRequirements   # output: build/reports/tracing.txt
 ```
 
-See `docs/requirements/` for existing requirements and `docs/requirements/index.md` for full guidance.
+See `docs/requirements/` for existing requirements and [docs/code-howtos/requirements.md](docs/code-howtos/requirements.md) for full guidance. Also refer to the `openfasttrace` skill.
 
 ---
 
