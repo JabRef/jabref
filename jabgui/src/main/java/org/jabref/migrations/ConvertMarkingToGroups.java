@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javafx.collections.ObservableList;
-
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -35,8 +33,13 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
     }
 
     @Override
-    public void performMigration(@NonNull ParserResult parserResult) {
-        ObservableList<BibEntry> entries = parserResult.getDatabase().getEntries();
+    public boolean isMigrationNecessary(ParserResult parserResult) {
+        return parserResult.getDatabase().getEntries().stream()
+                           .anyMatch(entry -> entry.getField(InternalField.MARKED_INTERNAL).isPresent());
+    }
+
+    @Override
+    public void performMigration(@NonNull ParserResult parserResult, List<BibEntry> entries) {
         Multimap<String, BibEntry> markings = getMarkingWithEntries(entries);
         if (!markings.isEmpty()) {
             GroupTreeNode markingRoot = GroupTreeNode.fromGroup(

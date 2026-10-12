@@ -177,6 +177,7 @@ public class OpenDatabaseActionTest {
     }
 
     // [utest->req~import.bibtex.legacy-migrations~1]
+    // [utest->req~import.bibtex.legacy-migrations.announcement~1]
     @Test
     void loadDatabaseMigratesLegacyExplicitGroups(@TempDir Path tempDir) throws Exception {
         Path library = tempDir.resolve("legacy-groups.bib");
@@ -203,5 +204,28 @@ public class OpenDatabaseActionTest {
 
         BibEntry entry = parserResult.getDatabase().getEntries().getFirst();
         assertEquals(Optional.of("TestGroup"), entry.getField(StandardField.GROUPS));
+        assertTrue(parserResult.getChangedOnMigration());
+        verify(dialogService).notify(Localization.lang("Migrating library '%0' to the current version", library.toAbsolutePath().toString()));
+    }
+
+    @Test
+    void loadModernDatabaseDoesNotShowMigrationNotification(@TempDir Path tempDir) throws Exception {
+        Path library = tempDir.resolve("modern.bib");
+        Files.writeString(library, """
+                @Article{Entry1,
+                  title = {Modern library},
+                  keywords = {research},
+                  groups = {Current group},
+                }
+                """);
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(filePreferences.getBackupDirectory()).thenReturn(tempDir.resolve("backups"));
+        when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
+        when(guiPreferences.getImportFormatPreferences()).thenReturn(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+
+        ParserResult result = openDatabaseAction.loadDatabase(library);
+
+        assertFalse(result.getChangedOnMigration());
+        verify(dialogService, never()).notify(Localization.lang("Migrating library '%0' to the current version", library.toAbsolutePath().toString()));
     }
 }

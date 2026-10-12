@@ -281,7 +281,9 @@ public class OpenDatabaseAction extends SimpleCommand {
             // [impl->req~import.bibtex.legacy-migrations~1]
             PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(
                     parserResult,
-                    parserResult.getDatabaseContext().getKeywordSeparator(preferences.getImportFormatPreferences().bibEntryPreferences().getKeywordSeparator()));
+                    parserResult.getDatabaseContext().getKeywordSeparator(preferences.getImportFormatPreferences().bibEntryPreferences().getKeywordSeparator()),
+                    // [impl->req~import.bibtex.legacy-migrations.announcement~1]
+                    () -> dialogService.notify(Localization.lang("Migrating library '%0' to the current version", fileToLoad.toString())));
         } catch (IOException e) {
             parserResult = ParserResult.fromError(e);
             LOGGER.error("Error opening file '{}'", fileToLoad, e);

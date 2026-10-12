@@ -63,6 +63,21 @@ The keyword separator used for splitting is the library's own, falling back to t
 
 Needs: impl, utest
 
+## Libraries without legacy content must skip legacy migration
+`req~import.bibtex.legacy-migrations.only-when-needed~1`
+
+After conversion and saving, reopening the library does not convert entries or rebuild the entries list again.
+Legacy content is identified by group membership keys, entry markings, and special field values in keywords, including in mixed-format libraries.
+
+Needs: impl, utest
+
+## Legacy library migration must announce conversion
+`req~import.bibtex.legacy-migrations.announcement~1`
+
+When legacy content is detected during opening, a localized notification names the library before conversion starts.
+
+Needs: impl, utest
+
 ## Custom entry types of a library are only offered once
 `req~import.entry-types.offered-once~1`
 
