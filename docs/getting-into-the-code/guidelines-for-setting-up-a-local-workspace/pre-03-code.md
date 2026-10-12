@@ -67,6 +67,10 @@ git fetch --all
 >
 > Note that putting the JabRef repository directly on `C:\` or any other drive letter on Windows causes compile errors (**negative example**: `C:\jabref`).
 
+{: .note }
+> JabRef's build output currently stays below the Windows [path limit of 260 characters](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry).
+> If you use a deeper base folder and hit that limit, enable long paths in Windows as described there and run `git config --global core.longpaths true`.
+
 #### Exclude the workspace from Windows Defender
 
 Windows Defender's real-time protection scans every file the build touches.

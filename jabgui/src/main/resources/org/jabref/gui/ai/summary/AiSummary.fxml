@@ -45,7 +45,7 @@
             button1Text="%Regenerate"
             onButton1Click="#regenerate"
             showButton2="true"
-            button2Text="%Cancel"
+            button2Text="%Regenerate with custom parameters"
             onButton2Click="#regenerateCustom"/>
 
     <UniversalStatusPaneView
