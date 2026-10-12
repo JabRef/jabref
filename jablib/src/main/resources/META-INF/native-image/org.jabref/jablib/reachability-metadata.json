@@ -345,6 +345,9 @@
       "glob": "protectedterms/months_weekdays.terms"
     },
     {
+      "glob": "resource/layout/**"
+    },
+    {
       "condition": {
         "typeReached": "org.jabref.logic.ai.preferences.AiDefaultTemplates"
       },
