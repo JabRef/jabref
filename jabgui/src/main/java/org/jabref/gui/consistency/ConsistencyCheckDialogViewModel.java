@@ -111,8 +111,8 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         @Override
         protected void writeBibEntry(BibEntry bibEntry, EntryTypeReport entryTypeReport) {
             List<String> message = getFindingsAsList(bibEntry, entryTypeReport).stream()
-                                                                                .map(cell -> cell.replaceAll("\\s+", " "))
-                                                                                .toList();
+                                                                               .map(cell -> cell.replaceAll("\\s+", " "))
+                                                                               .toList();
             tableData.add(new ConsistencyMessage(message, bibEntry));
         }
 
