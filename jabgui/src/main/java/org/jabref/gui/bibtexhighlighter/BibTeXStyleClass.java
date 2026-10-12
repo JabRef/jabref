@@ -35,41 +35,4 @@ public enum BibTeXStyleClass {
     public String getStyleClass() {
         return styleClass;
     }
-
-    /// Returns inline CSS styles corresponding to this style class for rich text / HTML clipboard export.
-    ///
-    /// @return inline CSS style string, e.g. `"color: #0033b3; font-weight: bold;"`
-    public String getInlineCss() {
-        return switch (this) {
-            case KEYWORD ->
-                    "color: #0033b3; font-weight: bold;";
-            case CITE_KEY ->
-                    "color: #177534; font-weight: bold;";
-            case FIELD_NAME ->
-                    "color: #b05a00;";
-            case STRING ->
-                    "color: #067d17;";
-            case NUMBER ->
-                    "color: #1750eb;";
-            case COMMENT ->
-                    "color: #8c8c8c; font-style: italic;";
-            case MACRO ->
-                    "color: #871094;";
-            case DEFAULT ->
-                    "";
-        };
-    }
-
-    /// Resolves a category name to a [BibTeXStyleClass], falling back to [DEFAULT] if unknown.
-    ///
-    /// @param name the name of the token category
-    /// @return the corresponding style class or DEFAULT
-    public static BibTeXStyleClass fromCategoryName(String name) {
-        for (BibTeXStyleClass style : values()) {
-            if (style.name().equals(name)) {
-                return style;
-            }
-        }
-        return DEFAULT;
-    }
 }

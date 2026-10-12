@@ -1,5 +1,6 @@
 package org.jabref.gui.bibtexhighlighter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,9 +11,9 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.search.SearchType;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.Range;
@@ -23,8 +24,12 @@ import jfx.incubator.scene.control.richtext.CodeArea;
 import jfx.incubator.scene.control.richtext.SyntaxDecorator;
 import jfx.incubator.scene.control.richtext.TextPos;
 import jfx.incubator.scene.control.richtext.model.CodeTextModel;
+import jfx.incubator.scene.control.richtext.model.HtmlExportFormatHandler;
 import jfx.incubator.scene.control.richtext.model.RichParagraph;
+import jfx.incubator.scene.control.richtext.skin.RichTextAreaSkin;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// [SyntaxDecorator] that applies BibTeX syntax highlighting and search-term highlighting
 /// to the `CodeArea` used in [org.jabref.gui.entryeditor.SourceTab].
@@ -44,6 +49,8 @@ import org.jspecify.annotations.NullMarked;
 /// be long-lived, one per `CodeArea`, rather than recreated per paragraph.
 @NullMarked
 public class BibTeXHighlighter implements SyntaxDecorator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibTeXHighlighter.class);
 
     private final StateManager stateManager;
     private final BibTeXSyntaxHighlighter syntaxHighlighter;
@@ -71,11 +78,7 @@ public class BibTeXHighlighter implements SyntaxDecorator {
         this.fieldPositionsProvider = fieldPositionsProvider;
     }
 
-    /// Returns the underlying Veneer syntax highlighter.
-    public BibTeXSyntaxHighlighter getSyntaxHighlighter() {
-        return syntaxHighlighter;
-    }
-
+    /// Copies source with syntax styling when supported by the editor.
     public static void copySource(CodeArea codeArea) {
         if (codeArea.getSyntaxDecorator() instanceof BibTeXHighlighter highlighter) {
             highlighter.copyWithSyntaxHighlighting(codeArea);
@@ -97,14 +100,21 @@ public class BibTeXHighlighter implements SyntaxDecorator {
 
         codeArea.copy();
         Clipboard clipboard = Clipboard.getSystemClipboard();
-        if (clipboard.hasString()) {
-            String plainText = clipboard.getString();
-            if (StringUtil.isNotBlank(plainText)) {
-                String html = BibTeXSyntaxHtmlExporter.toHtml(plainText, syntaxHighlighter);
+        if (clipboard.hasString() && codeArea.getSkin() instanceof RichTextAreaSkin skin) {
+            try {
+                // Export the decorated model so partial tokens and active theme styles match the editor.
+                String html = (String) HtmlExportFormatHandler.getInstance().copy(
+                        codeArea.getModel(), skin.getStyleResolver(),
+                        codeArea.getSelection().getMin(), codeArea.getSelection().getMax());
                 ClipboardContent content = new ClipboardContent();
-                content.putString(plainText);
+                for (var format : clipboard.getContentTypes()) {
+                    content.put(format, clipboard.getContent(format));
+                }
                 content.putHtml(html);
+                content.put(ClipBoardManager.BIBTEX_SOURCE, clipboard.getString());
                 clipboard.setContent(content);
+            } catch (IOException exception) {
+                LOGGER.warn("Could not copy syntax-highlighted BibTeX source", exception);
             }
         }
     }
