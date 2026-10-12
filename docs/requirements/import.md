@@ -37,7 +37,48 @@ When a library file cannot be read or parsed at all, JabRef names the file and t
 
 No library tab is left behind for such a file. The tab that was opened to hold the loading library would otherwise stay as an empty, untitled library, which the user could save over the file that had just failed to load.
 
+<<<<<<< HEAD
 A file that parses with warnings is not affected: it still opens, and its warnings are reported separately.
+=======
+Needs: impl, utest
+
+## Infer DOIs from other fields
+`req~import.doi-from-other-fields~1`
+
+If an entry's `doi` field is empty and another field contains a DOI, JabRef makes a best-effort attempt to identify that DOI and store it in the `doi` field.
+
+Needs: impl, utest
+
+## Legacy libraries are migrated when opened
+`req~import.bibtex.legacy-migrations~1`
+
+Opening a library written by JabRef 2.x/3.x converts its legacy content to the current representation: explicit group memberships stored inside the group tree move to the entries' `groups` field, `__markedentry` markings become groups, and special field values stored in `keywords` move to their own fields.
+The keyword separator used for splitting is the library's own, falling back to the configured one.
+
+Needs: impl, utest
+
+## Libraries without legacy content must skip legacy migration
+`req~import.bibtex.legacy-migrations.only-when-needed~1`
+
+After conversion and saving, reopening the library does not convert entries or rebuild the entries list again.
+Legacy content is identified by group membership keys, entry markings, and special field values in keywords, including in mixed-format libraries.
+
+Needs: impl, utest
+
+## Legacy library migration must announce conversion
+`req~import.bibtex.legacy-migrations.announcement~1`
+
+When legacy content is detected during opening, a localized notification names the library before conversion starts.
+
+Needs: impl, utest
+
+## Custom entry types of a library are only offered once
+`req~import.entry-types.offered-once~1`
+
+When a library declares entry types that differ from the ones stored in the preferences, JabRef offers to store them. This holds both for entry types JabRef does not know and for customizations of entry types JabRef ships.
+
+The definition the user accepts is the one from the library file, and it replaces the stored one. Entry types the user leaves unchecked when confirming the dialog are remembered as declined. Opening the same library again therefore offers nothing, unless the definition in the library or the stored one has changed since. Cancelling the dialog decides nothing, so the entry types are offered again.
+>>>>>>> 60a531dfb2 (Run post-open migrations again when a library is opened (#17019))
 
 Needs: impl, utest
 
