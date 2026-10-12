@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -54,9 +55,33 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
         assertEquals("""
-                entry type,citation key,Pages,Publisher
-                Article,first,o,-
-                Article,second,-,?
+                entry type,citation key,Journal,Pages,Publisher,Title,Year
+                Article,first,-,o,-,-,-
+                Article,second,-,-,?,-,-
+                """, Files.readString(csvFile).replace("\r\n", "\n"));
+    }
+
+    @Test
+    void entriesMissingOnlyRequiredFieldsShowTheseFields(@TempDir Path tempDir) throws IOException {
+        BibEntry first = new BibEntry(StandardEntryType.Article, "first")
+                .withField(StandardField.AUTHOR, "Author One");
+        BibEntry second = new BibEntry(StandardEntryType.Article, "second")
+                .withField(StandardField.AUTHOR, "Author Two");
+        BibDatabase database = new BibDatabase(List.of(first, second));
+        BibDatabaseContext bibContext = new BibDatabaseContext(database);
+        bibContext.setMode(BibDatabaseMode.BIBTEX);
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
+        });
+
+        Path csvFile = tempDir.resolve("entriesMissingOnlyRequiredFieldsShowTheseFields-result.csv");
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
+             BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, true, entryTypesManager, bibContext.getMode())) {
+            csvWriter.writeFindings();
+        }
+        assertEquals("""
+                entry type,citation key,Journal,Title,Year
+                Article,first,-,-,-
+                Article,second,-,-,-
                 """, Files.readString(csvFile).replace("\r\n", "\n"));
     }
 
@@ -86,9 +111,9 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         }
 
         assertEquals("""
-                entry type,citation key,custom,Pages,Title
-                Article,first,?,o,x
-                Article,second,-,-,-
+                entry type,citation key,custom,Journal,Pages,Title,Year
+                Article,first,?,-,o,x,-
+                Article,second,-,-,-,-,-
                 """, Files.readString(csvFile).replace("\r\n", "\n"));
     }
 
@@ -131,12 +156,12 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
         assertEquals("""
-                entry type,citation key,Location,Pages,Publisher
-                Article,first,-,o,-
-                Article,second,-,-,?
-                InProceedings,fifth,-,-,-
-                InProceedings,fourth,-,-,o
-                InProceedings,third,?,o,-
+                entry type,citation key,Booktitle,Journal,Location,Pages,Publisher,Title,Year
+                Article,first,-,-,-,o,-,-,-
+                Article,second,-,-,-,-,?,-,-
+                InProceedings,fifth,-,-,-,-,-,-,x
+                InProceedings,fourth,-,-,-,-,o,-,x
+                InProceedings,third,-,-,?,o,-,-,x
                 """, Files.readString(csvFile).replace("\r\n", "\n"));
     }
 

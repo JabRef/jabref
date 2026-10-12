@@ -57,10 +57,10 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         assertEquals("""
                 Field Presence Consistency Check Result
 
-                | entry type | citation key | Pages | Publisher |
-                | ---------- | ------------ | ----- | --------- |
-                | Article    | first        | o     | -         |
-                | Article    | second       | -     | ?         |
+                | entry type | citation key | Journal | Pages | Publisher | Title | Year |
+                | ---------- | ------------ | ------- | ----- | --------- | ----- | ---- |
+                | Article    | first        | -       | o     | -         | -     | -    |
+                | Article    | second       | -       | -     | ?         | -     | -    |
 
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
@@ -68,6 +68,31 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | o      | optional field is present |
                 | ?      | unknown field is present  |
                 | -      | field is absent           |
+                """, Files.readString(txtFile).replace("\r\n", "\n"));
+    }
+
+    @Test
+    void entriesMissingOnlyRequiredFieldsShowTheseFields(@TempDir Path tempDir) throws IOException {
+        BibEntry first = new BibEntry(StandardEntryType.Article, "first")
+                .withField(StandardField.AUTHOR, "Author One");
+        BibEntry second = new BibEntry(StandardEntryType.Article, "second")
+                .withField(StandardField.AUTHOR, "Author Two");
+        BibDatabase database = new BibDatabase(List.of(first, second));
+        BibDatabaseContext bibContext = new BibDatabaseContext(database);
+        bibContext.setMode(BibDatabaseMode.BIBTEX);
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, new BibEntryTypesManager(), (_, _) -> {
+        });
+
+        Path txtFile = tempDir.resolve("entriesMissingOnlyRequiredFieldsShowTheseFields-result.txt");
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
+             BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true, new BibEntryTypesManager(), bibContext.getMode())) {
+            txtWriter.writeFindings();
+        }
+        assertEquals("""
+                | entry type | citation key | Journal | Title | Year |
+                | ---------- | ------------ | ------- | ----- | ---- |
+                | Article    | first        | -       | -     | -    |
+                | Article    | second       | -       | -     | -    |
                 """, Files.readString(txtFile).replace("\r\n", "\n"));
     }
 
@@ -103,10 +128,10 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         assertEquals("""
                 Field Presence Consistency Check Result
 
-                | entry type | citation key | Date |
-                | ---------- | ------------ | ---- |
-                | Online     | withDate     | x    |
-                | Online     | withoutDate  | -    |
+                | entry type | citation key | Author | Date | Editor | Title | URL |
+                | ---------- | ------------ | ------ | ---- | ------ | ----- | --- |
+                | Online     | withDate     | -      | x    | -      | -     | -   |
+                | Online     | withoutDate  | -      | -    | -      | -     | -   |
 
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
@@ -144,10 +169,10 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         assertEquals("""
                 Field Presence Consistency Check Result
 
-                | entry type | citation key | custom | Pages | Title |
-                | ---------- | ------------ | ------ | ----- | ----- |
-                | Article    | first        | ?      | o     | x     |
-                | Article    | second       | -      | -     | -     |
+                | entry type | citation key | custom | Journal | Pages | Title | Year |
+                | ---------- | ------------ | ------ | ------- | ----- | ----- | ---- |
+                | Article    | first        | ?      | -       | o     | x     | -    |
+                | Article    | second       | -      | -       | -     | -     | -    |
 
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
@@ -184,10 +209,10 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         assertEquals("""
                 Field Presence Consistency Check Result
 
-                | entry type | citation key        | custom | Pages | Title |
-                | ---------- | ------------------- | ------ | ----- | ----- |
-                | Article    | first-very-long-key | ?      | o     | x     |
-                | Article    | second              | -      | -     | -     |
+                | entry type | citation key        | custom | Journal | Pages | Title | Year |
+                | ---------- | ------------------- | ------ | ------- | ----- | ----- | ---- |
+                | Article    | first-very-long-key | ?      | -       | o     | x     | -    |
+                | Article    | second              | -      | -       | -     | -     | -    |
 
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
@@ -241,14 +266,14 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         assertEquals("""
                 Field Presence Consistency Check Result
 
-                | entry type    | citation key | Location | Pages | Publisher |
-                | ------------- | ------------ | -------- | ----- | --------- |
-                | Article       | first        | -        | o     | -         |
-                | Article       | second       | -        | -     | ?         |
-                | InProceedings | fifth        | o        | -     | -         |
-                | InProceedings | fourth       | -        | -     | o         |
-                | InProceedings | sixth        | -        | -     | -         |
-                | InProceedings | third        | o        | o     | -         |
+                | entry type    | citation key | Booktitle | Date | Journaltitle | Location | Pages | Publisher | Title |
+                | ------------- | ------------ | --------- | ---- | ------------ | -------- | ----- | --------- | ----- |
+                | Article       | first        | -         | -    | -            | -        | o     | -         | -     |
+                | Article       | second       | -         | -    | -            | -        | -     | ?         | -     |
+                | InProceedings | fifth        | -         | -    | -            | o        | -     | -         | -     |
+                | InProceedings | fourth       | -         | -    | -            | -        | -     | o         | -     |
+                | InProceedings | sixth        | -         | -    | -            | -        | -     | -         | -     |
+                | InProceedings | third        | -         | -    | -            | o        | o     | -         | -     |
 
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
