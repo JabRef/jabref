@@ -46,25 +46,25 @@ public class BibliographyConsistencyCheckResultGitHubActionsWriter extends Bibli
         String keyPrefix = citationKey.isEmpty() ? "" : citationKey + ": ";
         List<OrFields> missingRequiredFields = entryTypeReport.getMissingRequiredFields(bibEntry);
         for (OrFields missingRequiredField : missingRequiredFields) {
-            String fieldName = FieldFactory.serializeOrFields(missingRequiredField);
-            write(parserResult.getCompleteEntryIndicator(bibEntry), citationKey, fieldName,
-                    "%srequired field '%s' is missing".formatted(keyPrefix, fieldName));
+            write(parserResult.getCompleteEntryIndicator(bibEntry), citationKey, missingRequiredField,
+                    "%srequired field '%s' is missing".formatted(keyPrefix, FieldFactory.serializeOrFields(missingRequiredField)));
         }
         for (Field field : entryTypeReport.differingFields()) {
             Optional<String> value = bibEntry.getField(field);
             if (value.isPresent()) {
                 if (!entryTypeReport.requiredFields().contains(field) && !entryTypeReport.optionalFields().contains(field)) {
-                    write(parserResult.getFieldRange(bibEntry, field), citationKey, field.getName(),
+                    write(parserResult.getFieldRange(bibEntry, field), citationKey, new OrFields(field),
                             "%sunknown field '%s' for entry type %s".formatted(keyPrefix, field.getName(), entryType));
                 }
             } else if (missingRequiredFields.stream().noneMatch(orFields -> orFields.contains(field))) {
-                write(parserResult.getCompleteEntryIndicator(bibEntry), citationKey, field.getName(),
+                write(parserResult.getCompleteEntryIndicator(bibEntry), citationKey, new OrFields(field),
                         "%sfield '%s' is absent but used by other entries of entry type %s".formatted(keyPrefix, field.getName(), entryType));
             }
         }
     }
 
-    private void write(ParserResult.Range range, String citationKey, String fieldName, String message) throws IOException {
+    private void write(ParserResult.Range range, String citationKey, OrFields fields, String message) throws IOException {
+        String fieldName = FieldFactory.serializeOrFields(fields);
         String title = citationKey.isEmpty() ? fieldName : citationKey + ":" + fieldName;
         writer.append("::error file=%s,line=%d,col=%d,title=%s::%s%n".formatted(
                 GitHubActionsEscape.property(inputFile.toString()),
