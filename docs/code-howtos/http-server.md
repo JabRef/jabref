@@ -74,6 +74,15 @@ The library name `current` denotes the currently focussed library in JabRef.
 ./gradlew :jabsrv-cli:run --args="../jablib/src/test/resources/testbib/complex.bib"
 ```
 
+## Logging in to CiteDrive without the GUI
+
+`jabsrv --citedrive-login` prints the CiteDrive login address, waits for the browser to come back to `/callback`, stores the refresh token in the system keyring, and exits.
+JabRef's HTTP server port from the preferences has to be the port `jabsrv` listens on, since CiteDrive redirects the browser there.
+
+```shell
+./gradlew :jabsrv-cli:run --args="--citedrive-login"
+```
+
 ## Developing with IntelliJ
 
 IntelliJ Ultimate offers a Markdown-based http-client. You need to open the file `jabsrv/src/test/rest-api.http`.
