@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -62,6 +61,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.SharedDatabaseSessionService;
@@ -656,9 +656,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 .ifPresent(this::removeSharedDatabaseErrorTabsFor);
     }
 
+    /// Matches by database, not by `equals`: a retry entered in expert mode or with other SSL settings still targets
+    /// the database the placeholder stands for.
     private void removeSharedDatabaseErrorTabsFor(DatabaseConnectionProperties connectionProperties) {
         tabbedPane.getTabs().removeIf(tab -> (tab instanceof SharedDatabaseErrorTab errorTab)
-                && errorTab.getConnectionProperties().equals(connectionProperties));
+                && DBMSConnectionProperties.isSameDatabase(errorTab.getConnectionProperties(), connectionProperties));
     }
 
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
@@ -838,7 +840,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         Optional<SharedDatabaseErrorTab> remembered = tabbedPane.getTabs().stream()
                                                                 .filter(SharedDatabaseErrorTab.class::isInstance)
                                                                 .map(SharedDatabaseErrorTab.class::cast)
-                                                                .filter(existing -> existing.getConnectionProperties().equals(errorTab.getConnectionProperties()))
+                                                                .filter(existing -> DBMSConnectionProperties.isSameDatabase(existing.getConnectionProperties(), errorTab.getConnectionProperties()))
                                                                 .filter(existing -> existing.getSharedDatabaseId().isPresent())
                                                                 .findFirst();
         if (remembered.isPresent()) {
@@ -853,14 +855,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     @Override
     public List<String> getUnconnectedSharedDatabaseIds() {
-        Stream<String> failed = tabbedPane.getTabs().stream()
-                                          .filter(SharedDatabaseErrorTab.class::isInstance)
-                                          .flatMap(tab -> ((SharedDatabaseErrorTab) tab).getSharedDatabaseId().stream());
-        // A remembered database still reconnecting has no connection to persist, but must not be forgotten either
-        Stream<String> loading = getLibraryTabs().stream()
-                                                 .filter(LibraryTab::isLoading)
-                                                 .flatMap(tab -> tab.getBibDatabaseContext().getDatabase().getSharedDatabaseID().stream());
-        return Stream.concat(failed, loading).toList();
+        return tabbedPane.getTabs().stream()
+                         .filter(SharedDatabaseErrorTab.class::isInstance)
+                         .flatMap(tab -> ((SharedDatabaseErrorTab) tab).getSharedDatabaseId().stream())
+                         .toList();
     }
 
     @Override

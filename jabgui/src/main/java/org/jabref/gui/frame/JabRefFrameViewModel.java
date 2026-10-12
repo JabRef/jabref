@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -122,7 +123,7 @@ public class JabRefFrameViewModel {
     private static SequencedMap<String, DatabaseConnectionProperties> collectSharedDatabases(List<LibraryTab> tabs) {
         SequencedMap<String, DatabaseConnectionProperties> sharedDatabases = new LinkedHashMap<>();
         tabs.stream()
-            // A tab still loading has no connection yet, so there is nothing to persist for it
+            // A tab still loading has no connection yet, so there is nothing to persist for it (its id is kept separately)
             .filter(tab -> !tab.isLoading())
             .map(LibraryTab::getBibDatabaseContext)
             .filter(context -> context.getLocation() == DatabaseLocation.SHARED && context.getDatabasePath().isEmpty())
@@ -131,6 +132,14 @@ public class JabRefFrameViewModel {
                 sharedDatabases.put(id, context.getDBMSSynchronizer().getConnectionProperties());
             });
         return sharedDatabases;
+    }
+
+    /// A remembered shared database still reconnecting has no connection to persist, but must not be forgotten either
+    private static List<String> collectLoadingSharedDatabaseIds(List<LibraryTab> tabs) {
+        return tabs.stream()
+                   .filter(LibraryTab::isLoading)
+                   .flatMap(tab -> tab.getBibDatabaseContext().getDatabase().getSharedDatabaseID().stream())
+                   .toList();
     }
 
     /// Quit JabRef
@@ -162,6 +171,7 @@ public class JabRefFrameViewModel {
                                         .map(Path::toAbsolutePath)
                                         .orElse(null);
         SequencedMap<String, DatabaseConnectionProperties> sharedDatabases = collectSharedDatabases(tabContainer.getLibraryTabs());
+        List<String> loadingSharedDatabaseIds = collectLoadingSharedDatabaseIds(tabContainer.getLibraryTabs());
         List<String> unconnectedSharedDatabaseIds = tabContainer.getUnconnectedSharedDatabaseIds();
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
@@ -170,9 +180,10 @@ public class JabRefFrameViewModel {
         }
 
         new SharedDatabaseSessionService().persistConnections(sharedDatabases);
-        // Shared databases that failed to reconnect have no tab, but their connection settings are still stored and
-        // must stay in the list so that the next start tries them again.
-        List<String> sharedDatabaseIds = Stream.concat(sharedDatabases.keySet().stream(), unconnectedSharedDatabaseIds.stream())
+        // Shared databases still loading or failed to reconnect have no library tab, but their connection settings are
+        // still stored and must stay in the list so that the next start tries them again.
+        List<String> sharedDatabaseIds = Stream.of(sharedDatabases.keySet(), loadingSharedDatabaseIds, unconnectedSharedDatabaseIds)
+                                               .flatMap(Collection::stream)
                                                .distinct()
                                                .toList();
         storeLastOpenedFiles(openedLibraries, focusedLibraries, sharedDatabaseIds); // store only if successfully having closed the libraries

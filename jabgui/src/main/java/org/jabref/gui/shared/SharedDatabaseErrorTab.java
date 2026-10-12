@@ -16,6 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionUrl;
 
+import com.google.common.base.Throwables;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -99,9 +100,11 @@ public class SharedDatabaseErrorTab extends Tab {
         return connectionProperties;
     }
 
+    /// The driver's own message is generic ("The connection attempt failed."); the reason is at the end of the cause chain
     public void showError(Throwable exception) {
         this.error = exception;
-        message.setText(Optional.ofNullable(exception.getMessage()).orElseGet(exception::toString));
+        Throwable rootCause = Throwables.getRootCause(exception);
+        message.setText(Optional.ofNullable(rootCause.getLocalizedMessage()).orElseGet(rootCause::toString));
     }
 
     public Optional<Throwable> getError() {

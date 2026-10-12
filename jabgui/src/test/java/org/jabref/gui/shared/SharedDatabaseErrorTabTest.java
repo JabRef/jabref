@@ -1,5 +1,6 @@
 package org.jabref.gui.shared;
 
+import java.net.ConnectException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +51,13 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
     @Test
     void tabIsNamedAfterTheDatabaseAndShowsTheError() {
         assertEquals("Literature", tab.getText());
+        assertEquals("Connection refused", message().getText());
+    }
+
+    @Test
+    void messageShowsTheRootCauseOfAWrappedError() {
+        interact(() -> tab.showError(new SQLException("The connection attempt failed.", new ConnectException("Connection refused"))));
+
         assertEquals("Connection refused", message().getText());
     }
 

@@ -43,7 +43,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.google.common.base.Throwables;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -322,8 +321,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         SharedDatabaseErrorTab errorTab = new SharedDatabaseErrorTab(null, connectionProperties);
         // The tab goes only once the attempt really starts: `openSharedDatabase` can still bail out before that
         errorTab.setRetryAction(() -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, errorTab::close));
-        // The driver's own message is generic ("The connection attempt failed."); the reason is at the end of the cause chain
-        errorTab.showError(Throwables.getRootCause(exception));
+        errorTab.showError(exception);
         tabContainer.showSharedDatabaseErrorTab(errorTab);
     }
 
