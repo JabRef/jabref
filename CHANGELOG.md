@@ -54,7 +54,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed missing DOIs when importing MEDLINE records and cleaning existing MEDLINE entries. [#17173](https://github.com/JabRef/jabref/issues/17173)
 - We fixed an issue where the DOI lookup button lost its progress indicator after switching to another entry and back. [#17223](https://github.com/JabRef/jabref/pull/17223)
 - We fixed an issue where double-clicking a word in an AI chat message did not select it. [#17174](https://github.com/JabRef/jabref/pull/17174)
-- We fixed `jabkit check consistency` omitting missing required fields and reporting absent fields of other entry types. [#17454](https://github.com/JabRef/jabref/pull/17454)
+- We fixed consistency checks omitting missing required fields and reporting absent fields of other entry types. [#17454](https://github.com/JabRef/jabref/pull/17454)
 - We fixed the entry counts in the groups panel being misaligned with the group names. [#17253](https://github.com/JabRef/jabref/issues/17253)
 - We fixed an issue where unmarked entries looked marked as relevant when hovering over them in the entry table. [#16881](https://github.com/JabRef/jabref/issues/16881)
 - We fixed an issue where long entry previews were cut off without a vertical scrollbar. [#17359](https://github.com/JabRef/jabref/issues/17359)
