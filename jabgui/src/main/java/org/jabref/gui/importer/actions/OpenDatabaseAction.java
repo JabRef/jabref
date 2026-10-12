@@ -38,6 +38,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.migrations.PerformLoadDatabaseMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -276,6 +277,13 @@ public class OpenDatabaseAction extends SimpleCommand {
                         preferences.getImportFormatPreferences(),
                         fileUpdateMonitor);
             }
+
+            // [impl->req~import.bibtex.legacy-migrations~1]
+            PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(
+                    parserResult,
+                    parserResult.getDatabaseContext().getKeywordSeparator(preferences.getImportFormatPreferences().bibEntryPreferences().getKeywordSeparator()),
+                    // [impl->req~import.bibtex.legacy-migrations.announcement~1]
+                    () -> dialogService.notify(Localization.lang("Migrating library '%0' to the current version", fileToLoad.toString())));
         } catch (IOException e) {
             parserResult = ParserResult.fromError(e);
             LOGGER.error("Error opening file '{}'", fileToLoad, e);

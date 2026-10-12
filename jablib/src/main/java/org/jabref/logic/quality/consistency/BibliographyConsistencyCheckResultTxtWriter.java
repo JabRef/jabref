@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,6 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck.EntryTy
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
 
 /// Outputs the findings as plain text.
@@ -93,8 +91,8 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
     }
 
     @Override
-    protected void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) throws IOException {
-        List<String> theRecord = getFindingsAsList(bibEntry, entryType, requiredFields, optionalFields);
+    protected void writeBibEntry(BibEntry bibEntry, EntryTypeReport entryTypeReport) throws IOException {
+        List<String> theRecord = getFindingsAsList(bibEntry, entryTypeReport);
         outputRow(theRecord);
     }
 
