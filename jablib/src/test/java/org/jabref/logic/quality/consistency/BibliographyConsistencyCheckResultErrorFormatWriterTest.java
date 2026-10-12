@@ -20,7 +20,6 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @ResourceLock("Localization.lang")
@@ -48,13 +47,13 @@ class BibliographyConsistencyCheckResultErrorFormatWriterTest {
                 }
                 """);
 
-        List<String> lines = writeFindings(bibFile);
-        assertEquals(3, lines.size(), "Expected one line per deviating field, but got: " + lines);
-        // The `pages` field is present in `first` but absent in `second`; `publisher` is an
+        // `pages` is present in `first` but absent in `second`; `publisher` is an
         // unknown field present in `second` and absent in `first`.
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith(":first:publisher: field is absent but used by other entries of entry type Article")), lines.toString());
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith(":second:pages: field is absent but used by other entries of entry type Article")), lines.toString());
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith(":second:publisher: unknown field for entry type Article")), lines.toString());
+        assertEquals(List.of(
+                bibFile + ":1:0:first:publisher: field is absent but used by other entries of entry type Article",
+                bibFile + ":8:0:second:pages: field is absent but used by other entries of entry type Article",
+                bibFile + ":13:3:second:publisher: unknown field for entry type Article"
+        ), writeFindings(bibFile));
     }
 
     @Test
@@ -73,12 +72,12 @@ class BibliographyConsistencyCheckResultErrorFormatWriterTest {
                 """);
 
         assertEquals(List.of(
-                "3:0:first:journal: required field 'journal' is missing",
-                "3:0:first:title: required field 'title' is missing",
-                "3:0:first:year: required field 'year' is missing",
-                "7:0:second:journal: required field 'journal' is missing",
-                "7:0:second:title: required field 'title' is missing",
-                "7:0:second:year: required field 'year' is missing"
+                bibFile + ":3:0:first:journal: required field 'journal' is missing",
+                bibFile + ":3:0:first:title: required field 'title' is missing",
+                bibFile + ":3:0:first:year: required field 'year' is missing",
+                bibFile + ":7:0:second:journal: required field 'journal' is missing",
+                bibFile + ":7:0:second:title: required field 'title' is missing",
+                bibFile + ":7:0:second:year: required field 'year' is missing"
         ), writeFindings(bibFile));
     }
 
@@ -117,14 +116,13 @@ class BibliographyConsistencyCheckResultErrorFormatWriterTest {
 
         // Fields differing within Misc must not be reported for the Article entries and vice versa
         assertEquals(List.of(
-                "3:0:articleWithNumber:pages: field is absent but used by other entries of entry type Article",
-                "11:0:articleWithPages:number: field is absent but used by other entries of entry type Article",
-                "19:0:miscWithHowPublished:note: field is absent but used by other entries of entry type Misc",
-                "24:0:miscWithNote:howpublished: field is absent but used by other entries of entry type Misc"
+                bibFile + ":3:0:articleWithNumber:pages: field is absent but used by other entries of entry type Article",
+                bibFile + ":11:0:articleWithPages:number: field is absent but used by other entries of entry type Article",
+                bibFile + ":19:0:miscWithHowPublished:note: field is absent but used by other entries of entry type Misc",
+                bibFile + ":24:0:miscWithNote:howpublished: field is absent but used by other entries of entry type Misc"
         ), writeFindings(bibFile));
     }
 
-    /// Returns the written lines without the leading file name
     private List<String> writeFindings(Path bibFile) throws IOException {
         ParserResult parserResult = importer.importDatabase(bibFile);
         BibDatabaseContext bibContext = parserResult.getDatabaseContext();
@@ -140,10 +138,6 @@ class BibliographyConsistencyCheckResultErrorFormatWriterTest {
             errorFormatWriter.writeFindings();
         }
 
-        String filePrefix = bibFile + ":";
-        List<String> lines = Files.readString(errorFormatFile).replace("\r\n", "\n").lines().toList();
-        // Every line follows the `file:line:column:citationKey:field: message` shape.
-        assertTrue(lines.stream().allMatch(line -> line.startsWith(filePrefix)), lines.toString());
-        return lines.stream().map(line -> line.substring(filePrefix.length())).toList();
+        return Files.readString(errorFormatFile).replace("\r\n", "\n").lines().toList();
     }
 }

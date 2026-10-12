@@ -10,6 +10,7 @@ import java.util.List;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.util.GitHubActionsEscape;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @ResourceLock("Localization.lang")
@@ -48,18 +48,14 @@ class BibliographyConsistencyCheckResultGitHubActionsWriterTest {
                 }
                 """);
 
-        List<String> lines = writeFindings(bibFile);
-        assertEquals(3, lines.size(), "Expected one annotation per deviating field, but got: " + lines);
-        // Every line starts with the GitHub Actions error workflow command.
-        assertTrue(lines.stream().allMatch(line -> line.startsWith("::error file=")), lines.toString());
-        // Each annotation carries line, column, title (citation key + field), and the message.
-        assertTrue(lines.stream().allMatch(line -> line.contains(",line=") && line.contains(",col=") && line.contains(",title=")), lines.toString());
         // The message embeds the citation key and field name so the plain log line is self-describing.
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith("::first: field 'publisher' is absent but used by other entries of entry type Article")), lines.toString());
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith("::second: field 'pages' is absent but used by other entries of entry type Article")), lines.toString());
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith("::second: unknown field 'publisher' for entry type Article")), lines.toString());
-        // Windows drive-letter colon and the ":" between citation key and field name must be URL-encoded inside properties.
-        assertTrue(lines.stream().noneMatch(line -> line.matches(".*title=[^:]+:[^:]+::.*")), "title must not contain raw ':' separator: " + lines);
+        // The ":" in the file name (Windows drive letter) and between citation key and field name in the title are URL-encoded.
+        String file = GitHubActionsEscape.property(bibFile.toString());
+        assertEquals(List.of(
+                "::error file=" + file + ",line=1,col=0,title=first%3Apublisher::first: field 'publisher' is absent but used by other entries of entry type Article",
+                "::error file=" + file + ",line=8,col=0,title=second%3Apages::second: field 'pages' is absent but used by other entries of entry type Article",
+                "::error file=" + file + ",line=13,col=3,title=second%3Apublisher::second: unknown field 'publisher' for entry type Article"
+        ), writeFindings(bibFile));
     }
 
     @Test
@@ -77,17 +73,15 @@ class BibliographyConsistencyCheckResultGitHubActionsWriterTest {
                 }
                 """);
 
-        List<String> messages = writeFindings(bibFile).stream()
-                                                      .map(line -> line.substring(line.indexOf("::", 2) + 2))
-                                                      .toList();
+        String file = GitHubActionsEscape.property(bibFile.toString());
         assertEquals(List.of(
-                "first: required field 'journal' is missing",
-                "first: required field 'title' is missing",
-                "first: required field 'year' is missing",
-                "second: required field 'journal' is missing",
-                "second: required field 'title' is missing",
-                "second: required field 'year' is missing"
-        ), messages);
+                "::error file=" + file + ",line=3,col=0,title=first%3Ajournal::first: required field 'journal' is missing",
+                "::error file=" + file + ",line=3,col=0,title=first%3Atitle::first: required field 'title' is missing",
+                "::error file=" + file + ",line=3,col=0,title=first%3Ayear::first: required field 'year' is missing",
+                "::error file=" + file + ",line=7,col=0,title=second%3Ajournal::second: required field 'journal' is missing",
+                "::error file=" + file + ",line=7,col=0,title=second%3Atitle::second: required field 'title' is missing",
+                "::error file=" + file + ",line=7,col=0,title=second%3Ayear::second: required field 'year' is missing"
+        ), writeFindings(bibFile));
     }
 
     @Test
@@ -124,15 +118,13 @@ class BibliographyConsistencyCheckResultGitHubActionsWriterTest {
                 """);
 
         // Fields differing within Misc must not be reported for the Article entries and vice versa
-        List<String> messages = writeFindings(bibFile).stream()
-                                                      .map(line -> line.substring(line.indexOf("::", 2) + 2))
-                                                      .toList();
+        String file = GitHubActionsEscape.property(bibFile.toString());
         assertEquals(List.of(
-                "articleWithNumber: field 'pages' is absent but used by other entries of entry type Article",
-                "articleWithPages: field 'number' is absent but used by other entries of entry type Article",
-                "miscWithHowPublished: field 'note' is absent but used by other entries of entry type Misc",
-                "miscWithNote: field 'howpublished' is absent but used by other entries of entry type Misc"
-        ), messages);
+                "::error file=" + file + ",line=3,col=0,title=articleWithNumber%3Apages::articleWithNumber: field 'pages' is absent but used by other entries of entry type Article",
+                "::error file=" + file + ",line=11,col=0,title=articleWithPages%3Anumber::articleWithPages: field 'number' is absent but used by other entries of entry type Article",
+                "::error file=" + file + ",line=19,col=0,title=miscWithHowPublished%3Anote::miscWithHowPublished: field 'note' is absent but used by other entries of entry type Misc",
+                "::error file=" + file + ",line=24,col=0,title=miscWithNote%3Ahowpublished::miscWithNote: field 'howpublished' is absent but used by other entries of entry type Misc"
+        ), writeFindings(bibFile));
     }
 
     private List<String> writeFindings(Path bibFile) throws IOException {
