@@ -86,6 +86,35 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
     }
 
     @Test
+    void requiredFieldSatisfiedByAliasIsShownAsPresent(@TempDir Path tempDir) throws IOException {
+        // In BibLaTeX, `date` is required for articles and `year` is its alias
+        BibEntry withYear = new BibEntry(StandardEntryType.Article, "withYear")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "Title")
+                .withField(StandardField.JOURNALTITLE, "Journal")
+                .withField(StandardField.YEAR, "2024");
+        BibEntry withoutDate = new BibEntry(StandardEntryType.Article, "withoutDate")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "Title")
+                .withField(StandardField.JOURNALTITLE, "Journal");
+        BibDatabaseContext bibContext = new BibDatabaseContext(new BibDatabase(List.of(withYear, withoutDate)));
+        bibContext.setMode(BibDatabaseMode.BIBLATEX);
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, entryTypesManager, (_, _) -> {
+        });
+
+        Path csvFile = tempDir.resolve("requiredFieldSatisfiedByAliasIsShownAsPresent-result.csv");
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
+             BibliographyConsistencyCheckResultCsvWriter csvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, true, entryTypesManager, bibContext.getMode())) {
+            csvWriter.writeFindings();
+        }
+        assertEquals("""
+                entry type,citation key,Date,Year
+                Article,withYear,x,?
+                Article,withoutDate,-,-
+                """, Files.readString(csvFile).replace("\r\n", "\n"));
+    }
+
+    @Test
     void checkDifferentOutputSymbols(@TempDir Path tempDir) throws IOException {
         UnknownField customField = new UnknownField("custom");
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")

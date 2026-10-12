@@ -127,16 +127,18 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
         List<String> results = new ArrayList<>(columnCount + 2);
         results.add(entryTypeReport.displayName());
         results.add(bibEntry.getCitationKey().orElse(""));
-        allReportedFields.forEach(field -> results.add(
-                bibEntry.getField(field).map(_ -> {
-                    if (requiredFields.contains(field)) {
-                        return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-                    } else if (optionalFields.contains(field)) {
-                        return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-                    } else {
-                        return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-                    }
-                }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)));
+        allReportedFields.forEach(field -> {
+            if (requiredFields.contains(field)) {
+                // Aliases satisfy required fields, consistent with [BibliographyConsistencyCheck#isMissing]
+                results.add(bibEntry.getFieldOrAlias(field)
+                                    .map(_ -> REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)
+                                    .orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY));
+            } else {
+                results.add(bibEntry.getField(field)
+                                    .map(_ -> optionalFields.contains(field) ? OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY : UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)
+                                    .orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY));
+            }
+        });
         return results;
     }
 

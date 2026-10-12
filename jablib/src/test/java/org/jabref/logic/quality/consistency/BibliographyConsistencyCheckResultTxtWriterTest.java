@@ -97,6 +97,36 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     }
 
     @Test
+    void requiredFieldSatisfiedByAliasIsShownAsPresent(@TempDir Path tempDir) throws IOException {
+        // In BibLaTeX, `date` is required for articles and `year` is its alias
+        BibEntry withYear = new BibEntry(StandardEntryType.Article, "withYear")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "Title")
+                .withField(StandardField.JOURNALTITLE, "Journal")
+                .withField(StandardField.YEAR, "2024");
+        BibEntry withoutDate = new BibEntry(StandardEntryType.Article, "withoutDate")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "Title")
+                .withField(StandardField.JOURNALTITLE, "Journal");
+        BibDatabaseContext bibContext = new BibDatabaseContext(new BibDatabase(List.of(withYear, withoutDate)));
+        bibContext.setMode(BibDatabaseMode.BIBLATEX);
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, new BibEntryTypesManager(), (_, _) -> {
+        });
+
+        Path txtFile = tempDir.resolve("requiredFieldSatisfiedByAliasIsShownAsPresent-result.txt");
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
+             BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true, new BibEntryTypesManager(), bibContext.getMode())) {
+            txtWriter.writeFindings();
+        }
+        assertEquals("""
+                | entry type | citation key | Date | Year |
+                | ---------- | ------------ | ---- | ---- |
+                | Article    | withYear     | x    | ?    |
+                | Article    | withoutDate  | -    | -    |
+                """, Files.readString(txtFile).replace("\r\n", "\n"));
+    }
+
+    @Test
     void entriesMissingRequiredFieldsAreReported(@TempDir Path tempDir) throws Exception {
         BibEntry withDate = new BibEntry(StandardEntryType.Online)
                 .withCitationKey("withDate")
@@ -270,10 +300,10 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | ------------- | ------------ | --------- | ---- | ------------ | -------- | ----- | --------- | ----- |
                 | Article       | first        | -         | -    | -            | -        | o     | -         | -     |
                 | Article       | second       | -         | -    | -            | -        | -     | ?         | -     |
-                | InProceedings | fifth        | -         | -    | -            | o        | -     | -         | -     |
-                | InProceedings | fourth       | -         | -    | -            | -        | -     | o         | -     |
-                | InProceedings | sixth        | -         | -    | -            | -        | -     | -         | -     |
-                | InProceedings | third        | -         | -    | -            | o        | o     | -         | -     |
+                | InProceedings | fifth        | -         | x    | -            | o        | -     | -         | -     |
+                | InProceedings | fourth       | -         | x    | -            | -        | -     | o         | -     |
+                | InProceedings | sixth        | -         | x    | -            | -        | -     | -         | -     |
+                | InProceedings | third        | -         | x    | -            | o        | o     | -         | -     |
 
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |

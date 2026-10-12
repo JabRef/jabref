@@ -77,7 +77,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, result);
+        viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, libraryTab.getBibDatabaseContext().getMode(), result);
 
         entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());
         entryTypeCombo.valueProperty().bindBidirectional(viewModel.selectedEntryTypeProperty());
