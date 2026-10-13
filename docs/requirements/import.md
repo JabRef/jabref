@@ -55,4 +55,36 @@ If an entry's `doi` field is empty and another field contains a DOI, JabRef make
 
 Needs: impl, utest
 
+## Legacy libraries are migrated when opened
+`req~import.bibtex.legacy-migrations~1`
+
+Opening a library written by JabRef 2.x/3.x converts its legacy content to the current representation: explicit group memberships stored inside the group tree move to the entries' `groups` field, `__markedentry` markings become groups, and special field values stored in `keywords` move to their own fields.
+The keyword separator used for splitting is the library's own, falling back to the configured one.
+
+Needs: impl, utest
+
+## Libraries without legacy content must skip legacy migration
+`req~import.bibtex.legacy-migrations.only-when-needed~1`
+
+After conversion and saving, reopening the library does not convert entries or rebuild the entries list again.
+Legacy content is identified by group membership keys, entry markings, and special field values in keywords, including in mixed-format libraries.
+
+Needs: impl, utest
+
+## Legacy library migration must announce conversion
+`req~import.bibtex.legacy-migrations.announcement~1`
+
+When legacy content is detected during opening, a localized notification names the library before conversion starts.
+
+Needs: impl, utest
+
+## Custom entry types of a library are only offered once
+`req~import.entry-types.offered-once~1`
+
+When a library declares entry types that differ from the ones stored in the preferences, JabRef offers to store them. This holds both for entry types JabRef does not know and for customizations of entry types JabRef ships.
+
+The definition the user accepts is the one from the library file, and it replaces the stored one. Entry types the user leaves unchecked when confirming the dialog are remembered as declined. Opening the same library again therefore offers nothing, unless the definition in the library or the stored one has changed since. Cancelling the dialog decides nothing, so the entry types are offered again.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
