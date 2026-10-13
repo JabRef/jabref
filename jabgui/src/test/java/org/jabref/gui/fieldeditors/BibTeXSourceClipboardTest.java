@@ -104,7 +104,10 @@ class BibTeXSourceClipboardTest extends JavaFxTest {
             assertEquals("rawal2", clipboard.getString());
             var html = Jsoup.parse(clipboard.getHtml());
             assertEquals("rawal2", html.body().text());
-            assertTrue(html.select("[style]").stream().anyMatch(element -> element.attr("style").contains(color)));
+            assertEquals(List.of("rawal2"), html.select("[style]").stream()
+                                               .filter(element -> element.attr("style").contains(color))
+                                               .map(org.jsoup.nodes.Element::text)
+                                               .toList());
         });
     }
 
@@ -114,7 +117,7 @@ class BibTeXSourceClipboardTest extends JavaFxTest {
             source.selectAll();
             BibTeXHighlighter.copySource(source);
             assertTrue(clipboard.hasHtml());
-            assertTrue(ClipBoardManager.hasBibtexSource());
+            assertEquals(source.getText(), clipboard.getContent(ClipBoardManager.BIBTEX_SOURCE));
             markdown.getTextInput().paste();
             assertEquals(source.getText(), markdown.getTextInput().getText());
         });
@@ -129,6 +132,32 @@ class BibTeXSourceClipboardTest extends JavaFxTest {
             clipboard.setContent(content);
             markdown.getTextInput().paste();
             assertEquals("**Bold**", markdown.getTextInput().getText().strip());
+        });
+    }
+
+    @Test
+    void staleSourceMarkerDoesNotPreventExternalHtmlConversion() {
+        interact(() -> {
+            ClipboardContent content = new ClipboardContent();
+            content.putString("Bold");
+            content.putHtml("<strong>Bold</strong>");
+            content.put(ClipBoardManager.BIBTEX_SOURCE, SOURCE);
+            clipboard.setContent(content);
+            markdown.getTextInput().paste();
+            assertEquals("**Bold**", markdown.getTextInput().getText().strip());
+        });
+    }
+
+    @Test
+    void multilineUnicodeSourceRetainsTextInHtmlAndMarkdown() {
+        interact(() -> {
+            source.setText("@Article{Müller,\n  title = {Résumé & 日本語},\n}");
+            source.selectAll();
+            BibTeXHighlighter.copySource(source);
+            assertEquals(source.getText(), clipboard.getString());
+            assertEquals("@Article{Müller, title = {Résumé & 日本語}, }", Jsoup.parse(clipboard.getHtml()).body().text());
+            markdown.getTextInput().paste();
+            assertEquals(source.getText(), markdown.getTextInput().getText());
         });
     }
 
