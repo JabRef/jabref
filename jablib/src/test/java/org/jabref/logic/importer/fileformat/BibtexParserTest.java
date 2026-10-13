@@ -2181,6 +2181,8 @@ class BibtexParserTest {
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
+    /// Parsing a `@preamble`, `@string`, or `@comment` block also consumes the line break ending it.
+    /// The next line must nevertheless be recognized as an (indented) percent comment, so that the entry marker inside it is ignored.
     @ParameterizedTest
     @ValueSource(strings = {"@preamble{\"text\"}", "@string{journal = {Journal}}", "@comment{comment}"})
     void parseIgnoresIndentedPercentCommentAfterBlock(String block) throws IOException {
@@ -2195,25 +2197,6 @@ class BibtexParserTest {
         assertEquals(List.of("real"), result.getDatabase().getEntries().stream()
                                             .map(entry -> entry.getCitationKey().orElseThrow())
                                             .toList());
-    }
-
-    // [utest->req~import.bibtex.percent-comments~1]
-    @Test
-    void parseIgnoresAtSignAfterDatabaseIdMetadataComment() throws IOException {
-        String bibtex = """
-                % DBID: database @article{fake}
-                @article{real,
-                  author = {Real Author}
-                }
-                """;
-
-        ParserResult result = parser.parse(Reader.of(bibtex));
-
-        assertFalse(result.hasWarnings());
-        assertEquals(Optional.of("database"), result.getDatabase().getSharedDatabaseID());
-        assertEquals(1, result.getDatabase().getEntries().size());
-        assertEquals(Optional.of("real"),
-                result.getDatabase().getEntries().getFirst().getCitationKey());
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
@@ -2234,10 +2217,38 @@ class BibtexParserTest {
     }
 
     // [utest->req~import.bibtex.percent-comments~1]
+    /// A percent comment without content must end at its line break, so that the entry on the next line is still read.
+    ///
+    /// The comments are written with Java escape sequences (e.g., `\n`), so that the CSV parser cannot normalize their line breaks.
     @ParameterizedTest
-    @ValueSource(strings = {"%\n", "  %\n", "%   \n", "%\t\n", "%\r\n", "%   \r\n", "%\r", "%\n%\t\n",
-            "% Encoding:\n", "% Encoding: \t\r\n", "% DBID:\n", "% DBID: \t\r\n"})
-    void parsePreservesEntryAfterBlankPercentComment(String comment) throws IOException {
+    @CsvSource(textBlock = """
+            # Empty comment
+            '%\\n'
+            # Indented empty comment
+            '  %\\n'
+            # Comment consisting of trailing spaces only
+            '%   \\n'
+            # Comment consisting of a tab only
+            '%\\t\\n'
+            # Windows line ending
+            '%\\r\\n'
+            # Trailing spaces before a Windows line ending
+            '%   \\r\\n'
+            # Classic Mac line ending
+            '%\\r'
+            # Two consecutive empty comments
+            '%\\n%\\t\\n'
+            # Encoding declaration without an encoding name
+            '% Encoding:\\n'
+            # Encoding declaration followed by whitespace only
+            '% Encoding: \\t\\r\\n'
+            # Shared database ID declaration without an ID
+            '% DBID:\\n'
+            # Shared database ID declaration followed by whitespace only
+            '% DBID: \\t\\r\\n'
+            """)
+    void parsePreservesEntryAfterBlankPercentComment(String escapedComment) throws IOException {
+        String comment = escapedComment.translateEscapes();
         String entry = "@article{real, author = {Real Author}}";
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("real")

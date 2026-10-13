@@ -105,7 +105,8 @@ public class BibtexParser implements Parser {
     private PushbackReader pushbackReader;
     private BibDatabase database;
     private Set<BibEntryType> entryTypes;
-    // Kept across block parsing because skipOneNewline can consume the next line's boundary.
+    /// `true` while only whitespace has been read on the current line between entries.
+    /// Kept as a field because [#skipOneNewline()] consumes the line break ending a block, so the next scan starts at the beginning of a line.
     private boolean atLineStart;
 
     /// Names of the entry types read from a [MetaData#ENTRYTYPE_FLAG_V2] comment, so that a legacy definition
@@ -231,8 +232,6 @@ public class BibtexParser implements Parser {
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
-    // [impl->req~import.bibtex.percent-comments~1]
-
     /// Scans leading library comments for a shared SQL database ID and skips legacy encoding declarations.
     /// Stops before the first BibTeX block, leaving its `@` marker for [#parseFileContent()].
     private void parseDatabaseID() throws IOException {
@@ -257,7 +256,6 @@ public class BibtexParser implements Parser {
                     skipWhitespaceOnLine();
                     database.setSharedDatabaseID(parseTextToken().trim());
                     skipUntilEndOfLine();
-                    atLineStart = true;
                     continue;
                 } else if (SaveConfiguration.ENCODING_PREFIX.trim().equals(label)) {
                     skipWhitespaceOnLine();
@@ -265,21 +263,25 @@ public class BibtexParser implements Parser {
 
                     if (peek() != '@') {
                         skipUntilEndOfLine();
-                        atLineStart = true;
                         continue;
                     }
                 } else if (atLineStart) {
+                    // [impl->req~import.bibtex.percent-comments~1]
                     skipUntilEndOfLine();
-                    atLineStart = true;
                     continue;
                 }
             }
 
-            if ((c == '\n') || (c == '\r')) {
-                atLineStart = true;
-            } else if (!Character.isWhitespace(c)) {
-                atLineStart = false;
-            }
+            trackLineStart(c);
+        }
+    }
+
+    /// Updates [#atLineStart] for a character read between entries.
+    private void trackLineStart(int character) {
+        if ((character == '\n') || (character == '\r')) {
+            atLineStart = true;
+        } else if (!Character.isWhitespace((char) character)) {
+            atLineStart = false;
         }
     }
 
@@ -300,7 +302,9 @@ public class BibtexParser implements Parser {
     }
 
     /// Skips the remainder of a percent comment, including its first line-break character.
+    /// Afterwards, the next character read is at the beginning of a line.
     private void skipUntilEndOfLine() throws IOException {
+        atLineStart = true;
         while (!eof) {
             int character = read();
 
@@ -1322,9 +1326,16 @@ public class BibtexParser implements Parser {
         }
     }
 
-    // [impl->req~import.bibtex.percent-comments~1]
-
     /// Finds the next delimiter outside an entry, skipping lines whose first non-whitespace character is `%`.
+    ///
+    /// This method is only called between entries. Text there is ignored by BibTeX and has no escape mechanism, so `%` is only treated as a comment start at the beginning of a line:
+    ///
+    /// - A `%` later on a line (e.g., `100% of entries @article{...}`) does not hide the entry marker following it.
+    /// - `\%` at the beginning of a line is not a comment, because its first non-whitespace character is `\`.
+    ///
+    /// Escapes inside entries are handled separately: [#isEscapeSymbol(char)] keeps `\{` from opening a group in [#parseBracketedFieldContent(boolean)],
+    /// and that method also tolerates a trailing `\}` in file paths (https://github.com/JabRef/jabref/issues/9668).
+    /// A `%` inside a field value (e.g., in a URL) never reaches this method and is kept as content.
     ///
     /// @return whether the delimiter was found before the end of the file
     private boolean consumeUncritically(char expected) throws IOException {
@@ -1337,8 +1348,8 @@ public class BibtexParser implements Parser {
             }
 
             if ((character == '%') && atLineStart) {
+                // [impl->req~import.bibtex.percent-comments~1]
                 skipUntilEndOfLine();
-                atLineStart = true;
                 continue;
             }
 
@@ -1347,11 +1358,7 @@ public class BibtexParser implements Parser {
                 return true;
             }
 
-            if ((character == '\n') || (character == '\r')) {
-                atLineStart = true;
-            } else if (!Character.isWhitespace((char) character)) {
-                atLineStart = false;
-            }
+            trackLineStart(character);
         }
 
         return false;
