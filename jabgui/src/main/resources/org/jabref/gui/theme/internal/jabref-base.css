@@ -1776,9 +1776,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0;
 }
 
-/* Wizard: the dark theme's -color-bg-primary is pure black, which made the header bar and the PDF preview area black. Use the dialog surface color instead. */
+/* Wizard: the root's -fx-background resolves to the pure black -color-bg-primary in
+   the dark scheme, which painted the header bar and the PDF preview black. */
 .wizard-pane {
-    -color-bg-primary: -color-bg-secondary;
+    -fx-background: -color-bg-secondary;
 }
 
 /* Wizard checkboxes: draw the focus ring on the box itself and center the box */
