@@ -2180,9 +2180,9 @@ class BibtexParserTest {
                 result.getDatabase().getEntries().get(1).getCitationKey());
     }
 
-    // [utest->req~import.bibtex.percent-comments~1]
     /// Parsing a `@preamble`, `@string`, or `@comment` block also consumes the line break ending it.
     /// The next line must nevertheless be recognized as an (indented) percent comment, so that the entry marker inside it is ignored.
+    // [utest->req~import.bibtex.percent-comments~1]
     @ParameterizedTest
     @ValueSource(strings = {"@preamble{\"text\"}", "@string{journal = {Journal}}", "@comment{comment}"})
     void parseIgnoresIndentedPercentCommentAfterBlock(String block) throws IOException {
@@ -2216,10 +2216,10 @@ class BibtexParserTest {
                                                        .toList());
     }
 
-    // [utest->req~import.bibtex.percent-comments~1]
     /// A percent comment without content must end at its line break, so that the entry on the next line is still read.
     ///
     /// The comments are written with Java escape sequences (e.g., `\n`), so that the CSV parser cannot normalize their line breaks.
+    // [utest->req~import.bibtex.percent-comments~1]
     @ParameterizedTest
     @CsvSource(textBlock = """
             # Empty comment
