@@ -107,6 +107,10 @@ public class BibtexParser implements Parser {
     private Set<BibEntryType> entryTypes;
     // Kept across block parsing because skipOneNewline can consume the next line's boundary.
     private boolean atLineStart;
+
+    /// Names of the entry types read from a [MetaData#ENTRYTYPE_FLAG_V2] comment, so that a legacy definition
+    /// of the same name found later in the file does not overwrite the richer one.
+    private Set<String> v2EntryTypeNames;
     private boolean eof;
 
     private int line = 1;
@@ -223,6 +227,7 @@ public class BibtexParser implements Parser {
         database = new BibDatabase();
         database.setNewLineSeparator(newLineSeparator);
         entryTypes = new HashSet<>(); // To store custom entry types parsed.
+        v2EntryTypeNames = new HashSet<>();
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
@@ -475,10 +480,20 @@ public class BibtexParser implements Parser {
             Optional<BibEntryType> typ = MetaDataParser.parseCustomEntryType(comment);
             if (typ.isPresent()) {
                 BibEntryType entryType = typ.get();
-                if (comment.startsWith(MetaData.ENTRYTYPE_FLAG_V2)) {
-                    entryTypes.removeIf(existingEntryType -> existingEntryType.getType().getName().equalsIgnoreCase(entryType.getType().getName()));
+                String entryTypeName = entryType.getType().getName();
+                boolean isV2 = comment.startsWith(MetaData.ENTRYTYPE_FLAG_V2);
+                // A file must not hold two definitions of one entry type: only one of them could ever be stored,
+                // so the other one would be offered again at every start - see
+                // <https://github.com/JabRef/jabref/issues/9930>. The last definition wins, except that the richer
+                // v2 format always wins over the legacy one (JabRef writes the v2 comment first).
+                boolean supersededByV2 = !isV2 && v2EntryTypeNames.stream().anyMatch(name -> name.equalsIgnoreCase(entryTypeName));
+                if (!supersededByV2) {
+                    if (isV2) {
+                        v2EntryTypeNames.add(entryTypeName);
+                    }
+                    entryTypes.removeIf(existingEntryType -> existingEntryType.getType().getName().equalsIgnoreCase(entryTypeName));
+                    entryTypes.add(entryType);
                 }
-                entryTypes.add(entryType);
             } else {
                 parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), Localization.lang("Ill-formed entrytype comment in BIB file") + ": " + comment);
             }
