@@ -88,6 +88,43 @@ When a user activates a large library, automatic group construction and group-co
 
 Needs: impl
 
+## Consistency reports must be prepared outside JavaFX application thread
+`req~ux.consistency.report-background~1`
+
+Report preparation includes computing the table columns and field-presence symbols before the dialog is shown.
+
+Needs: impl, utest
+
+## Consistency exports must run outside JavaFX application thread
+`req~ux.consistency.export-background~1`
+
+The user chooses a destination in the GUI before the TXT or CSV report is written in the background.
+
+Needs: impl, utest
+
+## Consistency exports must preserve results shown in dialog
+`req~ux.consistency.export-snapshot~1`
+
+Entry edits or entry-type customizations after the check must not change an exported report.
+
+Needs: impl, utest
+
+## Consistency dialog actions must navigate to original library entries
+`req~ux.consistency.entry-navigation~1`
+
+The dialog uses snapshots to prepare its report without replacing the entries selected for editing.
+
+Needs: impl, utest
+
+## Consistency dialog must display fields missing from every entry
+`req~ux.consistency.missing-field-columns~1`
+
+Reported columns remain visible even when all entries of the selected type have the same field-presence symbol.
+
+Context: [Consistency-check output fixes](https://github.com/JabRef/jabref/pull/17454).
+
+Needs: impl, utest
+
 ## Group creation must allow populating new explicit group from selection
 `req~ux.groups.create-explicit-from-selection~1`
 
