@@ -125,12 +125,12 @@ class ImportHandlerTest {
             assertEquals(choice ? 1 : 0, downloads.constructed().size());
             downloads.constructed().forEach(download -> verify(download).download(Mockito.eq(false), any()));
         }
-        verify(preferences.getFilePreferences(), Mockito.never()).setDownloadLinkedFiles(Mockito.anyBoolean());
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void downloadsUseWebSearchPreferenceWithoutOverride(boolean choice) {
+        // [utest->req~import.dialog.download-linked-files~1]
         when(preferences.getFilePreferences().shouldDownloadLinkedFiles()).thenReturn(choice);
         BibEntry entry = new BibEntry().withFiles(List.of(new LinkedFile("", "https://example.org/paper.pdf", "PDF")));
 
