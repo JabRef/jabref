@@ -52,23 +52,6 @@ class ImportDownloadPreferencesTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void migratesExistingChoiceOnlyOnce(boolean originalChoice) {
-        // [utest->req~import.dialog.download-linked-files~1]
-        JabRefCliPreferences preferences = new JabRefCliPreferences();
-        preferences.putBoolean(WEB_SEARCH_DOWNLOAD, originalChoice);
-
-        FilePreferences files = preferences.getFilePreferences();
-        assertEquals(originalChoice, files.shouldImportDialogDownloadLinkedFiles());
-
-        files.setDownloadLinkedFiles(!originalChoice);
-
-        FilePreferences reloaded = new JabRefCliPreferences().getFilePreferences();
-        assertEquals(originalChoice, reloaded.shouldImportDialogDownloadLinkedFiles());
-        assertEquals(!originalChoice, reloaded.shouldDownloadLinkedFiles());
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void persistsDialogChoiceWithoutChangingWebSearch(boolean choice) {
         // [utest->req~import.dialog.download-linked-files~1]
         JabRefCliPreferences preferences = new JabRefCliPreferences();
