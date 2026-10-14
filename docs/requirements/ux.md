@@ -228,4 +228,10 @@ The groups walkthrough must open its bundled example library, display the Groups
 
 Needs: impl
 
+## Main table must sort numeric fields by numeric value
+`req~maintable.numeric-field-sorting~1`
+
+The main table sorts numeric fields, including day, dayfiled, chapter, part, and citation count, by numeric value in both ascending and descending order.
+Identifiers and formatted values without the numeric field property retain string sorting.
+
 <!-- markdownlint-disable-file MD022 -->

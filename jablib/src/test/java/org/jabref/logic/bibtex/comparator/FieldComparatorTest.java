@@ -1,5 +1,6 @@
 package org.jabref.logic.bibtex.comparator;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
@@ -11,11 +12,42 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FieldComparatorTest {
+    @ParameterizedTest
+    @EnumSource(value = StandardField.class, names = {"CHAPTER", "CITATIONCOUNT", "DAY", "DAYFILED", "PART"})
+    void sortNumericFieldsAscending(StandardField field) {
+        List<BibEntry> entries = Stream.of("25", "2", "10", "1", "3")
+                                       .map(value -> new BibEntry().withField(field, value))
+                                       .toList();
+
+        List<String> sortedValues = entries.stream()
+                                          .sorted(new FieldComparator(field))
+                                          .map(entry -> entry.getField(field).orElseThrow())
+                                          .toList();
+
+        assertEquals(List.of("1", "2", "3", "10", "25"), sortedValues);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = StandardField.class, names = {"CHAPTER", "CITATIONCOUNT", "DAY", "DAYFILED", "PART"})
+    void sortNumericFieldsDescending(StandardField field) {
+        List<BibEntry> entries = Stream.of("25", "2", "10", "1", "3")
+                                       .map(value -> new BibEntry().withField(field, value))
+                                       .toList();
+
+        List<String> sortedValues = entries.stream()
+                                          .sorted(new FieldComparator(new OrFields(field), true))
+                                          .map(entry -> entry.getField(field).orElseThrow())
+                                          .toList();
+
+        assertEquals(List.of("25", "10", "3", "2", "1"), sortedValues);
+    }
+
     @Test
     void compareMonthFieldIdentity() {
         FieldComparator comparator = new FieldComparator(StandardField.MONTH);
