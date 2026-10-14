@@ -54,6 +54,15 @@ public class PdfDocumentViewer extends StackPane {
         return highlightText;
     }
 
+    /// Fits the whole page into the window instead of filling the width and scrolling.
+    ///
+    /// Opening a page at its top leaves anything in its lower half outside the viewport, so a
+    /// caller that jumps to a position on the page asks for this view to make that position
+    /// visible. The user can switch back with the viewer's own toolbar toggle.
+    public void showFullPage() {
+        pdfView.setShowAll(true);
+    }
+
     public void show(Path document) {
         if (document != null) {
             pdfView.setVisible(false);

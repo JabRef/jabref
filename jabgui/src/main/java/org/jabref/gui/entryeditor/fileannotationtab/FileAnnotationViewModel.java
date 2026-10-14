@@ -57,6 +57,11 @@ public class FileAnnotationViewModel {
         return page.get();
     }
 
+    /// @return the 1-based page the annotation sits on
+    public int getPageNumber() {
+        return annotation.getPage();
+    }
+
     public String getDate() {
         return date.get();
     }

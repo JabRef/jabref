@@ -33,6 +33,14 @@
                 <HBox spacing="4">
                     <Label fx:id="author"/>
                     <Pane HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="openAtAnnotationButton" onAction="#openAtAnnotation" styleClass="icon-button">
+                        <graphic>
+                            <JabRefIconView glyph="PDF_FILE"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%Open at annotation"/>
+                        </tooltip>
+                    </Button>
                     <Button onAction="#copy" styleClass="icon-button">
                         <graphic>
                             <JabRefIconView glyph="COPY"/>
