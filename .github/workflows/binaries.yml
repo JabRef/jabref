@@ -951,7 +951,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Download portable JabRef
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: flatpak-source (${{ matrix.displayName }})
           path: flatpak
@@ -996,7 +996,7 @@ jobs:
     name: Upload ${{ matrix.displayName }} Flatpak to builds.jabref.org
     steps:
       - name: Download Flatpak bundle
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: Flatpak bundle (${{ matrix.arch }})
           path: flatpak
@@ -1227,7 +1227,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: JabRef-${{ matrix.os }}-tbn
       - name: Notarize dmg
@@ -1267,7 +1267,7 @@ jobs:
     runs-on: macos-15
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: jabkit-native-macos-15-tbn
           path: jabkit/build/native-dist
