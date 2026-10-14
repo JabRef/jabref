@@ -23,7 +23,7 @@ val pdfbox = "3.0.8"
 
 // Pinned instead of the dev.jbang plugin default "latest": a PATH miss would otherwise fetch
 // https://www.jbang.dev/releases/latest/download/version.txt (10 s timeout, no retries).
-val jbang = "0.141.0"
+val jbang = "0.142.0"
 extra["jbangVersion"] = jbang
 
 dependencies {
@@ -51,7 +51,7 @@ dependencies.constraints {
 
     api("com.dlsc.gemsfx:gemsfx:4.5.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
-    api("com.dlsc.pdfviewfx:pdfviewfx:3.5.0")
+    api("com.dlsc.pdfviewfx:pdfviewfx:3.6.0")
     api("com.fasterxml:aalto-xml:1.4.0")
     api("com.github.ben-manes.caffeine:caffeine:3.3.0")
     api("com.github.javakeyring:java-keyring:1.0.4")
@@ -88,7 +88,7 @@ dependencies.constraints {
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:4.8.197")
+    api("io.github.classgraph:classgraph:4.8.198")
     api("io.github.java-diff-utils:java-diff-utils:4.17")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
@@ -112,7 +112,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-lang3:3.21.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.4")
-    api("org.apache.httpcomponents.client5:httpclient5:5.6.4")
+    api("org.apache.httpcomponents.client5:httpclient5:5.6.5")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.26.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
@@ -155,7 +155,7 @@ dependencies.constraints {
     api("org.libreoffice:libreoffice:26.2.2")
     api("org.libreoffice:unoloader:26.2.2")
     api("org.mockito:mockito-core:5.24.0")
-    api("org.ow2.asm:asm:9.10.1")
+    api("org.ow2.asm:asm:9.11")
     api("org.postgresql:postgresql:42.7.14")
     api("org.slf4j:jul-to-slf4j:2.0.20")
     api("org.slf4j:slf4j-api:2.0.20")

@@ -1,6 +1,5 @@
 package org.jabref.gui.consistency;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -50,34 +49,35 @@ public class ConsistencyCheckAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        Task<BibliographyConsistencyCheck.Result> task = new Task<>() {
+        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+        if (databaseContext.isEmpty()) {
+            LOGGER.debug("Consistency check invoked with no library opened.");
+            dialogService.notify(Localization.lang("No library open"));
+            return;
+        }
+        BibDatabaseContext bibContext = databaseContext.orElseThrow();
+        LibraryTab libraryTab = tabSupplier.get();
+        Task<ConsistencyCheckDialogViewModel> task = new Task<>() {
             @Override
-            public BibliographyConsistencyCheck.Result call() {
-                Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
-                if (databaseContext.isEmpty()) {
-                    LOGGER.debug("Consistency check invoked with no library opened.");
-                    dialogService.notify(Localization.lang("No library open"));
-                    return new BibliographyConsistencyCheck.Result(Map.of());
-                }
-
-                BibDatabaseContext bibContext = databaseContext.get();
-
+            public ConsistencyCheckDialogViewModel call() {
                 BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-                return consistencyCheck.check(bibContext, entryTypesManager, (count, total) ->
+                BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibContext, entryTypesManager, (count, total) ->
                         UiTaskExecutor.runInJavaFXThread(() -> {
                             updateProgress(count, total);
                             updateMessage(Localization.lang("%0/%1 entry types", count + 1, total));
                         }));
+                // [impl->req~ux.consistency.report-background~1]
+                return new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, bibContext.getMode(), result, taskExecutor);
             }
         };
 
         task.setOnFailed(_ -> dialogService.showErrorDialogAndWait(Localization.lang("Consistency check failed."), task.getException()));
         task.setOnSucceeded(_ -> {
-            if (task.getValue().entryTypeToResultMap().isEmpty()) {
+            if (task.getValue().getTableData().isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
                 dialogService.showCustomDialogAndWait(
-                        new ConsistencyCheckDialog(tabSupplier.get(), dialogService, preferences, entryTypesManager, task.getValue()));
+                        new ConsistencyCheckDialog(libraryTab, dialogService, task.getValue()));
             }
         });
         taskExecutor.execute(task);
