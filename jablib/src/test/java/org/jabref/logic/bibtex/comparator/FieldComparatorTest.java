@@ -26,9 +26,9 @@ class FieldComparatorTest {
                                        .toList();
 
         List<String> sortedValues = entries.stream()
-                                          .sorted(new FieldComparator(field))
-                                          .map(entry -> entry.getField(field).orElseThrow())
-                                          .toList();
+                                           .sorted(new FieldComparator(field))
+                                           .map(entry -> entry.getField(field).orElseThrow())
+                                           .toList();
 
         assertEquals(List.of("1", "2", "3", "10", "25"), sortedValues);
     }
@@ -41,9 +41,9 @@ class FieldComparatorTest {
                                        .toList();
 
         List<String> sortedValues = entries.stream()
-                                          .sorted(new FieldComparator(new OrFields(field), true))
-                                          .map(entry -> entry.getField(field).orElseThrow())
-                                          .toList();
+                                           .sorted(new FieldComparator(new OrFields(field), true))
+                                           .map(entry -> entry.getField(field).orElseThrow())
+                                           .toList();
 
         assertEquals(List.of("25", "10", "3", "2", "1"), sortedValues);
     }
