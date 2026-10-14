@@ -46,6 +46,18 @@ class FieldColumnTest {
     }
 
     @ParameterizedTest
+    @EnumSource(value = StandardField.class, names = {"CHAPTER", "PART"})
+    void sortFormattedDivisionValuesAsStrings(StandardField field) {
+        FieldColumn column = new FieldColumn(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, field.getName()), mock(MainTableTooltip.class));
+
+        List<String> sortedValues = List.of("IV", "1.2", "II", "1.10", "I").stream()
+                                        .sorted(column.getComparator())
+                                        .toList();
+
+        assertEquals(List.of("1.10", "1.2", "I", "II", "IV"), sortedValues);
+    }
+
+    @ParameterizedTest
     @EnumSource(value = StandardField.class, names = {"DOI", "EID", "EPRINT", "ISBN", "ISRN", "ISSN", "ISSUE", "MR_NUMBER", "PAGES", "REPORTNO", "REVISION", "TITLE", "VERSION", "YEARDIVISION", "ZBL_NUMBER"})
     void sortNonnumericFieldsAsStrings(StandardField field) {
         FieldColumn column = new FieldColumn(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, field.getName()), mock(MainTableTooltip.class));
