@@ -62,11 +62,20 @@ public class SearchQueryTest {
     }
 
     // [utest->req~search.doi-link-normalization~1]
-    @Test
-    void doiNormalization() {
-        SearchQuery query = new SearchQuery("https://doi.org/10.1000/182");
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "https://doi.org/10.1000/182",
+            "http://doi.org/10.1000/182",
+            "https://dx.doi.org/10.1000/182",
+            "http://dx.doi.org/10.1000/182",
+            "doi.org/10.1000/182",
+            "doi:10.1000/182",
+            "https://doi.org/10.1000/182 "
+    })
+    void doiNormalization(String searchExpression) {
+        SearchQuery query = new SearchQuery(searchExpression);
         assertEquals("10.1000/182<EOF>", query.getContext().getText());
-        assertEquals("https://doi.org/10.1000/182", query.getSearchExpression());
+        assertEquals(searchExpression, query.getSearchExpression());
         assertEquals("10.1000/182", query.getNormalizedSearchExpression());
     }
 

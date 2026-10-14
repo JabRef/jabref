@@ -84,7 +84,7 @@ Needs: impl, utest
 
 Issue: [#17348](https://github.com/JabRef/jabref/issues/17348)
 
-When the entire search expression is a DOI URL (starting with `http`, `https`, `doi.org/`, or `doi:`), the search must extract the plain DOI identifier and use it for matching. The original URL must be preserved as the visible search expression. Normalization must not apply to regex searches or multi-term queries.
+When the entire search expression is a DOI URL (starting with `http`, `https`, `doi.org/`, or `doi:`), the search must extract the plain DOI identifier and use it for matching. The normalized identifier matches entries with clean DOIs as well as entries storing full HTTP links. The original URL must be preserved as the visible search expression. Normalization must not apply to regular expression searches (to prevent parsing from altering regex syntax or stripping escape characters) or multi-term queries.
 
 Needs: impl, utest
 

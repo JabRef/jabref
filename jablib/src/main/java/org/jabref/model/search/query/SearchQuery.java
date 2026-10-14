@@ -40,22 +40,10 @@ public class SearchQuery {
     public SearchQuery(@NonNull String searchExpression, EnumSet<SearchFlags> searchFlags) {
         this.searchExpression = searchExpression;
         this.searchFlags = searchFlags;
+        String resolved = normalizeDoi(searchExpression, searchFlags);
         try {
-            // [impl->req~search.doi-link-normalization~1]
-            String normalizedExpression = searchExpression;
-            if (!searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
-                String trimmed = searchExpression.trim();
-                String lower = trimmed.toLowerCase(Locale.ROOT);
-                if (!trimmed.contains(" ") && (lower.startsWith("http://") || lower.startsWith("https://")
-                        || lower.startsWith("doi.org/") || lower.startsWith("doi:"))) {
-                    normalizedExpression = DOI.parse(trimmed)
-                                              .map(DOI::asString)
-                                              .orElse(searchExpression);
-                }
-            }
-
-            this.context = getStartContext(normalizedExpression);
-            this.normalizedSearchExpression = normalizedExpression;
+            this.context = getStartContext(resolved);
+            this.normalizedSearchExpression = resolved;
             isValidExpression = containsOnlyValidRegularExpressions(context, searchFlags);
         } catch (ParseCancellationException e) {
             // We use getCause here as the real exception is nested and this avoids that the stack trace get too large
@@ -66,10 +54,13 @@ public class SearchQuery {
         }
     }
 
+    /// Returns the original, user-facing search expression.
     public String getSearchExpression() {
         return searchExpression;
     }
 
+    /// Returns the normalized search expression used for parsing and matching
+    /// (e.g., with full DOI links normalized to plain DOI identifiers).
     public String getNormalizedSearchExpression() {
         return normalizedSearchExpression;
     }
@@ -129,6 +120,25 @@ public class SearchQuery {
 
     private static boolean containsOnlyValidRegularExpressions(SearchParser.StartContext context, EnumSet<SearchFlags> searchFlags) {
         return new SearchRegularExpressionValidator(searchFlags).visit(context);
+    }
+
+    // [impl->req~search.doi-link-normalization~1]
+    /// Normalizes full DOI URLs to plain DOI identifiers (e.g., "https://doi.org/10.1000/182" -> "10.1000/182").
+    /// Normalizing to the plain DOI allows matching both entries storing clean DOIs and entries retaining
+    /// full HTTP links (since the plain DOI is a substring of the full URL).
+    /// Regex mode is skipped because `DOI.parse` strips backslashes and special characters, mutating regex syntax.
+    private static String normalizeDoi(String searchExpression, EnumSet<SearchFlags> searchFlags) {
+        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION) || searchExpression.trim().contains(" ")) {
+            return searchExpression;
+        }
+        String lowerCased = searchExpression.trim().toLowerCase(Locale.ROOT);
+        if (lowerCased.startsWith("http://") || lowerCased.startsWith("https://")
+                || lowerCased.startsWith("doi.org/") || lowerCased.startsWith("doi:")) {
+            return DOI.parse(searchExpression.trim())
+                      .map(DOI::asString)
+                      .orElse(searchExpression);
+        }
+        return searchExpression;
     }
 
     /// Unescapes search value based on the Search grammar rules.
