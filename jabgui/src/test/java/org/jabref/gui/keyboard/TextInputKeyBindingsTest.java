@@ -1,4 +1,3 @@
-
 package org.jabref.gui.keyboard;
 
 import java.util.Optional;
@@ -14,6 +13,7 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.testutils.JavaFxExtension;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@NullMarked
 @ExtendWith(JavaFxExtension.class)
 class TextInputKeyBindingsTest {
 
@@ -35,20 +36,20 @@ class TextInputKeyBindingsTest {
         ReadOnlyObjectWrapper<Node> focusOwner = new ReadOnlyObjectWrapper<>(control);
 
         when(scene.focusOwnerProperty())
-                                        .thenReturn(focusOwner.getReadOnlyProperty());
+                .thenReturn(focusOwner.getReadOnlyProperty());
 
         when(repository.mapToKeyBinding(any(KeyEvent.class)))
-                                                             .thenReturn(Optional.of(binding));
+                .thenReturn(Optional.of(binding));
 
         KeyEvent event = new KeyEvent(
-                                      KeyEvent.KEY_PRESSED,
-                                      "",
-                                      "",
-                                      KeyCode.A,
-                                      false,
-                                      true,
-                                      false,
-                                      false);
+                KeyEvent.KEY_PRESSED,
+                "",
+                "",
+                KeyCode.A,
+                false,
+                true,
+                false,
+                false);
 
         TextInputKeyBindings.call(scene, event, repository);
 
@@ -105,8 +106,8 @@ class TextInputKeyBindingsTest {
         applyBinding(area, KeyBinding.EDITOR_KILL_LINE);
 
         assertEquals(
-                     "First line\nSecon\nThird line",
-                     area.getText());
+                "First line\nSecon\nThird line",
+                area.getText());
         assertEquals(16, area.getCaretPosition());
     }
 
@@ -118,8 +119,8 @@ class TextInputKeyBindingsTest {
         applyBinding(area, KeyBinding.EDITOR_KILL_LINE);
 
         assertEquals(
-                     "First line\nSecond lineThird line",
-                     area.getText());
+                "First line\nSecond lineThird line",
+                area.getText());
     }
 
     @Test
