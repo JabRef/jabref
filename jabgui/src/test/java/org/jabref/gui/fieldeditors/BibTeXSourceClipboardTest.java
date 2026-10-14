@@ -105,9 +105,9 @@ class BibTeXSourceClipboardTest extends JavaFxTest {
             var html = Jsoup.parse(clipboard.getHtml());
             assertEquals("rawal2", html.body().text());
             assertEquals(List.of("rawal2"), html.select("[style]").stream()
-                                               .filter(element -> element.attr("style").contains(color))
-                                               .map(org.jsoup.nodes.Element::text)
-                                               .toList());
+                                                .filter(element -> element.attr("style").contains(color))
+                                                .map(org.jsoup.nodes.Element::text)
+                                                .toList());
         });
     }
 
