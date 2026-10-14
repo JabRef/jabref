@@ -131,10 +131,12 @@ public class SearchQuery {
         if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION) || searchExpression.trim().contains(" ")) {
             return searchExpression;
         }
-        String lowerCased = searchExpression.trim().toLowerCase(Locale.ROOT);
+        String trimmed = searchExpression.trim();
+        String lowerCased = trimmed.toLowerCase(Locale.ROOT);
         if (lowerCased.startsWith("http://") || lowerCased.startsWith("https://")
                 || lowerCased.startsWith("doi.org/") || lowerCased.startsWith("doi:")) {
-            return DOI.parse(searchExpression.trim())
+            String toParse = lowerCased.startsWith("doi.org/") ? "https://" + trimmed : trimmed;
+            return DOI.parse(toParse)
                       .map(DOI::asString)
                       .orElse(searchExpression);
         }

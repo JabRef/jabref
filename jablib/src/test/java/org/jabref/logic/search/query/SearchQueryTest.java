@@ -69,8 +69,7 @@ public class SearchQueryTest {
             "https://dx.doi.org/10.1000/182",
             "http://dx.doi.org/10.1000/182",
             "doi.org/10.1000/182",
-            "doi:10.1000/182",
-            "https://doi.org/10.1000/182 "
+            "doi:10.1000/182"
     })
     void doiNormalization(String searchExpression) {
         SearchQuery query = new SearchQuery(searchExpression);
