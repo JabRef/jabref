@@ -33,8 +33,8 @@ public enum StandardField implements Field {
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     CITES("cites", FieldProperty.MULTIPLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
-    DAY("day"),
-    DAYFILED("dayfiled"),
+    DAY("day", FieldProperty.NUMERIC),
+    DAYFILED("dayfiled", FieldProperty.NUMERIC),
     DOI("doi", FieldProperty.VERBATIM, FieldProperty.IDENTIFIER),
     EDITION("edition", FieldProperty.NUMERIC),
     EDITOR("editor", FieldProperty.PERSON_NAMES),
@@ -144,7 +144,7 @@ public enum StandardField implements Field {
 
     // region: JabRef-specific fields
 
-    CITATIONCOUNT("citationcount"),
+    CITATIONCOUNT("citationcount", FieldProperty.NUMERIC),
     GROUPS("groups"),
     ICORERANKING("icore"),
     OWNER("owner"),
