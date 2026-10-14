@@ -12,6 +12,7 @@ CLAUDE.md
 !.claude/hooks/
 memory/*
 
+.cursor/
 .cursorrules
 
 .gemini
@@ -20,6 +21,8 @@ GEMINI.md
 .github/code-review-graph.instruction.md
 
 .kiro
+
+.omc
 
 .opencode.json
 
