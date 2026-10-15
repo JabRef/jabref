@@ -25,21 +25,29 @@ import org.graalvm.nativeimage.hosted.Feature;
 import org.graalvm.nativeimage.hosted.RuntimeReflection;
 import org.jspecify.annotations.NullMarked;
 
-/// Registers JabRef's views for reflection in the native image. JavaFX itself is covered by StaticFX.
+/// Registers the classes that JabRef accesses reflectively in a native image.
 ///
-/// FXML and CSS name classes as strings (`fx:controller`, `<?import ...?>`, `-fx-skin`, ...), so every FXML and
-/// CSS file below `org/jabref/` is read and the classes it names are registered. This also covers classes that no
-/// Java code references, e.g. `DialogPaneWithoutButtonBar`, which only `AboutDialog.fxml` uses. JabRef's views have
-/// no common base class, so all reachable `org.jabref` subtypes of `Node` and `Dialog` are registered as well.
+/// Native Image cannot automatically discover classes that are named only in FXML/CSS or instantiated
+/// reflectively by Afterburner. Before analysis, this feature:
+///
+/// 1. Scans FXML and CSS resources and registers the classes referenced by controllers, imports,
+///    controller expressions, and skins.
+/// 2. Registers Afterburner entry points that are neither referenced by FXML/CSS nor subclasses of
+///    JavaFX `Node` or `Dialog`, such as `UnlinkedFilesWizard`.
+/// 3. Installs reachability handlers that register reachable JabRef subclasses of JavaFX `Node` and `Dialog`.
+///
+/// Registering a JabRef class includes its declared constructors, fields, methods, enum parameter types,
+/// and the types of its `@Inject` fields. JavaFX itself is covered by StaticFX.
 ///
 /// Build with `-Djabref.nativeimage.logViews=true` to print every registered class.
 @NullMarked
 public class JabRefViewsFeature implements Feature {
 
-    private static final List<String> AFTERBURNER_ROOT_CLASSES = List.of("org.jabref.gui.externalfiles.UnlinkedFilesWizard");
-    private static final List<String> BASE_CLASSES = List.of("javafx.scene.Node", "javafx.scene.control.Dialog");
-    private static final Set<String> INJECT_ANNOTATIONS = Set.of("jakarta.inject.Inject", "javax.inject.Inject");
-    private static final boolean LOG_VIEWS = Boolean.getBoolean("jabref.nativeimage.logViews");
+    /// Classes created reflectively by Afterburner that cannot be discovered through FXML/CSS or JavaFX inheritance.
+    private static final List<String> AFTERBURNER_ROOT_CLASS_NAMES = List.of("org.jabref.gui.externalfiles.UnlinkedFilesWizard");
+    private static final List<String> BASE_CLASS_NAMES = List.of("javafx.scene.Node", "javafx.scene.control.Dialog");
+    private static final Set<String> INJECT_ANNOTATION_NAMES = Set.of("jakarta.inject.Inject", "javax.inject.Inject");
+    private static final boolean LOG_REGISTRATIONS = Boolean.getBoolean("jabref.nativeimage.logViews");
 
     private static final String RESOURCE_ROOT = "org/jabref/";
     private static final Pattern FXML_CONTROLLER = Pattern.compile("fx:controller=\"([\\w.$]+)\"");
@@ -47,10 +55,10 @@ public class JabRefViewsFeature implements Feature {
     private static final Pattern FXML_CONTROLLER_EXPRESSION = Pattern.compile("\\$\\{!?controller\\.(\\w+)\\.");
     private static final Pattern CSS_SKIN = Pattern.compile("-fx-skin\\s*:\\s*[\"']([\\w.$]+)[\"']");
 
-    private final Set<Class<?>> views = ConcurrentHashMap.newKeySet();
-    private final Set<Class<?>> fxmlImports = ConcurrentHashMap.newKeySet();
+    private final Set<Class<?>> jabRefClasses = ConcurrentHashMap.newKeySet();
+    private final Set<Class<?>> publicApiClasses = ConcurrentHashMap.newKeySet();
     private final Set<Class<?>> enums = ConcurrentHashMap.newKeySet();
-    private final Set<Class<?>> injected = ConcurrentHashMap.newKeySet();
+    private final Set<Class<?>> injectedTypes = ConcurrentHashMap.newKeySet();
     private final Set<String> missingClasses = ConcurrentHashMap.newKeySet();
     private int fxmlFiles;
     private int cssFiles;
@@ -61,73 +69,76 @@ public class JabRefViewsFeature implements Feature {
             forEachResource(entry, (name, content) -> {
                 if (name.endsWith(".fxml")) {
                     fxmlFiles++;
-                    registerNamedClasses(access, content, FXML_CONTROLLER);
-                    registerNamedClasses(access, content, FXML_IMPORT);
+                    registerClassesNamedInResource(access, content, FXML_CONTROLLER);
+                    registerClassesNamedInResource(access, content, FXML_IMPORT);
                     registerControllerExpressions(access, content);
                 } else if (name.endsWith(".css")) {
                     cssFiles++;
-                    registerNamedClasses(access, content, CSS_SKIN);
+                    registerClassesNamedInResource(access, content, CSS_SKIN);
                 }
             });
         }
-        for (String rootClass : AFTERBURNER_ROOT_CLASSES) {
-            findClass(access, rootClass).ifPresent(this::registerView);
+        for (String rootClassName : AFTERBURNER_ROOT_CLASS_NAMES) {
+            findClassByName(access, rootClassName).ifPresent(this::registerJabRefClass);
         }
-        for (String baseClass : BASE_CLASSES) {
+        for (String baseClassName : BASE_CLASS_NAMES) {
             access.registerSubtypeReachabilityHandler((_, type) -> {
                 if (type.getName().startsWith("org.jabref.")) {
-                    registerView(type);
+                    registerJabRefClass(type);
                 }
-            }, access.findClassByName(baseClass));
+            }, access.findClassByName(baseClassName));
         }
     }
 
     @Override
     public void afterAnalysis(AfterAnalysisAccess access) {
         System.out.println("[JabRefViewsFeature] read " + fxmlFiles + " FXML and " + cssFiles + " CSS files, registered "
-                + views.size() + " org.jabref view classes, " + fxmlImports.size() + " other classes named in FXML/CSS, "
-                + enums.size() + " enums used as parameters and " + injected.size() + " @Inject field types");
+                + jabRefClasses.size() + " JabRef classes, " + publicApiClasses.size() + " other classes named in FXML/CSS, "
+                + enums.size() + " enums used as parameters and " + injectedTypes.size() + " @Inject field types");
     }
 
-    private void registerNamedClasses(FeatureAccess access, String content, Pattern pattern) {
+    private void registerClassesNamedInResource(FeatureAccess access, String content, Pattern pattern) {
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
-            findClass(access, matcher.group(1)).ifPresent(type -> {
+            findClassByName(access, matcher.group(1)).ifPresent(type -> {
                 if (type.getName().startsWith("org.jabref.")) {
-                    registerView(type);
+                    registerJabRefClass(type);
                 } else {
-                    registerPublicApi(type);
+                    registerPublicMembers(type);
                 }
             });
         }
     }
 
-    /// For `${controller.viewModel.x}`, registers the public API of the type `controller.getViewModel()` returns.
+    /// Makes properties used by FXML controller expressions available for reflection.
+    ///
+    /// For example, `${controller.viewModel.x}` requires reflective access to the public members of the type returned
+    /// by `controller.getViewModel()`.
     private void registerControllerExpressions(FeatureAccess access, String fxml) {
         Matcher controllerName = FXML_CONTROLLER.matcher(fxml);
         if (!controllerName.find()) {
             return;
         }
-        findClass(access, controllerName.group(1))
-                .ifPresent(controller -> registerViewModels(controller, FXML_CONTROLLER_EXPRESSION.matcher(fxml)));
+        findClassByName(access, controllerName.group(1))
+                .ifPresent(controller -> registerControllerExpressionTypes(controller, FXML_CONTROLLER_EXPRESSION.matcher(fxml)));
     }
 
-    private void registerViewModels(Class<?> controller, Matcher expression) {
-        while (expression.find()) {
-            String property = expression.group(1);
-            String capitalized = Character.toUpperCase(property.charAt(0)) + property.substring(1);
+    private void registerControllerExpressionTypes(Class<?> controller, Matcher expressions) {
+        while (expressions.find()) {
+            String controllerProperty = expressions.group(1);
+            String capitalizedProperty = Character.toUpperCase(controllerProperty.charAt(0)) + controllerProperty.substring(1);
             for (Method method : controller.getMethods()) {
                 if (method.getParameterCount() == 0
-                        && (method.getName().equals("get" + capitalized) || method.getName().equals("is" + capitalized))) {
-                    registerPublicApi(method.getReturnType());
+                        && (method.getName().equals("get" + capitalizedProperty) || method.getName().equals("is" + capitalizedProperty))) {
+                    registerPublicMembers(method.getReturnType());
                 }
             }
         }
     }
 
-    /// JabRef's own classes: `@FXML`/`@Inject` members are usually private, so register all declared ones.
-    private void registerView(Class<?> type) {
-        if (!views.add(type)) {
+    /// Registers all members of a JabRef class because FXML and Afterburner may access private members reflectively.
+    private void registerJabRefClass(Class<?> type) {
+        if (!jabRefClasses.add(type)) {
             return;
         }
         try {
@@ -138,16 +149,17 @@ public class JabRefViewsFeature implements Feature {
             registerEnumParameters(type.getDeclaredConstructors());
             registerEnumParameters(type.getDeclaredMethods());
             registerInjectedTypes(type.getDeclaredFields());
-            log("view", type);
+            log("JabRef class", type);
         } catch (LinkageError e) {
             warnIncomplete(type, e);
         }
     }
 
-    /// Other classes named in FXML/CSS: FXMLLoader uses public constructors, setters, getters, static property
-    /// setters (`GridPane.setRowIndex`) and public constants (`fx:constant`).
-    private void registerPublicApi(Class<?> type) {
-        if (!fxmlImports.add(type)) {
+    /// Registers the public members of a non-JabRef class referenced by FXML or CSS.
+    ///
+    /// FXMLLoader may use its public constructors, properties, static property setters, and constants.
+    private void registerPublicMembers(Class<?> type) {
+        if (!publicApiClasses.add(type)) {
             return;
         }
         try {
@@ -163,7 +175,7 @@ public class JabRefViewsFeature implements Feature {
         }
     }
 
-    /// Attribute values in FXML are converted by calling the parameter type's `valueOf(String)` reflectively.
+    /// Registers enum parameter types because FXMLLoader converts text attributes with `valueOf(String)`.
     private void registerEnumParameters(Executable[] executables) {
         for (Executable executable : executables) {
             for (Class<?> parameter : executable.getParameterTypes()) {
@@ -176,18 +188,19 @@ public class JabRefViewsFeature implements Feature {
         }
     }
 
-    /// afterburner instantiates the type of an `@Inject` field via its no-arg constructor unless an instance was
-    /// registered with `Injector.setModelOrService` before.
+    /// Registers types used by `@Inject` fields and their no-argument constructors when available.
+    ///
+    /// Afterburner needs the constructor when it creates the dependency itself. Dependencies supplied through
+    /// `Injector.setModelOrService` do not need one.
     private void registerInjectedTypes(Field[] fields) {
         for (Field field : fields) {
             boolean isInjected = Stream.of(field.getDeclaredAnnotations())
-                                       .anyMatch(annotation -> INJECT_ANNOTATIONS.contains(annotation.annotationType().getName()));
+                                       .anyMatch(annotation -> INJECT_ANNOTATION_NAMES.contains(annotation.annotationType().getName()));
             Class<?> type = field.getType();
-            if (!isInjected || !injected.add(type)) {
+            if (!isInjected || !injectedTypes.add(type)) {
                 continue;
             }
             RuntimeReflection.register(type);
-            // Without a no-arg constructor, afterburner can only use an instance registered beforehand
             Stream.of(type.getDeclaredConstructors())
                   .filter(constructor -> constructor.getParameterCount() == 0)
                   .findFirst()
@@ -196,20 +209,22 @@ public class JabRefViewsFeature implements Feature {
         }
     }
 
-    /// Resolves names like FXMLLoader does: `a.b.Outer.Inner` is tried as `a.b.Outer$Inner` as well.
-    private Optional<Class<?>> findClass(FeatureAccess access, String name) {
+    /// Finds a top-level or nested class using the naming forms accepted by FXMLLoader.
+    private Optional<Class<?>> findClassByName(FeatureAccess access, String name) {
         Optional<Class<?>> type = nestedClassCandidates(name).stream()
                                                              // findClassByName returns null for unknown names
                                                              .<Class<?>>flatMap(candidate -> Stream.ofNullable(access.findClassByName(candidate)))
                                                              .findFirst();
-        // An FXML file is scanned more than once, so report each missing class only once
+        // Resources can appear in more than one classpath entry, so report each missing class only once
         if (type.isEmpty() && missingClasses.add(name)) {
             System.out.println("[JabRefViewsFeature] WARNING: class referenced for reflection not found: " + name);
         }
         return type;
     }
 
-    /// `a.b.Outer.Inner` yields `a.b.Outer.Inner`, `a.b.Outer$Inner`, `a.b$Outer$Inner`, ...
+    /// Returns possible binary names for a nested class.
+    ///
+    /// For example, `a.b.Outer.Inner` also produces `a.b.Outer$Inner`.
     private static List<String> nestedClassCandidates(String name) {
         List<String> candidates = new ArrayList<>();
         String candidate = name;
@@ -221,7 +236,8 @@ public class JabRefViewsFeature implements Feature {
         return candidates;
     }
 
-    /// Calls the consumer with the name and content of every FXML and CSS file below [#RESOURCE_ROOT].
+    /// Reads every JabRef FXML and CSS resource from a classpath directory or JAR and passes its name and content
+    /// to the consumer.
     private static void forEachResource(Path classPathEntry, BiConsumer<String, String> consumer) {
         try {
             if (Files.isDirectory(classPathEntry)) {
@@ -254,7 +270,8 @@ public class JabRefViewsFeature implements Feature {
         return name.endsWith(".fxml") || name.endsWith(".css");
     }
 
-    /// A member signature refers to a class missing from the class path; the class stays (partly) unregistered.
+    /// Reports that a class was only partially registered because one of its member signatures references a class
+    /// missing from the build classpath.
     private static void warnIncomplete(Class<?> type, LinkageError e) {
         System.out.println("[JabRefViewsFeature] WARNING: could not register all members of " + type.getName()
                 + ", reflective access to it may fail at run time");
@@ -262,7 +279,7 @@ public class JabRefViewsFeature implements Feature {
     }
 
     private static void log(String kind, Class<?> type) {
-        if (LOG_VIEWS) {
+        if (LOG_REGISTRATIONS) {
             System.out.println("[JabRefViewsFeature] " + kind + ": " + type.getName());
         }
     }
