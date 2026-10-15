@@ -3,6 +3,7 @@ package org.jabref.logic.externalfiles;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.externalfiles.PdfLocationResolver.PageSpan;
 import org.jabref.logic.externalfiles.PdfLocationResolver.PdfLocation;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
@@ -250,6 +251,19 @@ class PdfLocationResolverTest {
         PdfLocation location = PdfLocationResolver.resolve(paper, databaseOf(paper)).orElseThrow();
 
         assertEquals(Optional.of(expectedPage), location.page());
+    }
+
+    @Test
+    void pageSpanUsesTheFirstRangeAndTheFileOwnersOffset() {
+        BibEntry paper = paper("186--206");
+        BibEntry proceedings = proceedings().withField(PdfLocationResolver.PAGE_OFFSET, "14");
+
+        assertEquals(Optional.of(new PageSpan(200, 220)), PdfLocationResolver.pdfPageSpan(paper, proceedings));
+    }
+
+    @Test
+    void pageSpanIsEmptyWhenPagesContinueWithoutAnEnd() {
+        assertEquals(Optional.empty(), PdfLocationResolver.pdfPageSpan(paper("43+"), proceedings()));
     }
 
     @Test

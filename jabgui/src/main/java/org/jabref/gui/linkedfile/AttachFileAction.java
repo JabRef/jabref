@@ -13,6 +13,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -26,17 +27,20 @@ public class AttachFileAction extends SimpleCommand {
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
+    private final TaskExecutor taskExecutor;
 
     public AttachFileAction(LibraryTab libraryTab,
                             DialogService dialogService,
                             StateManager stateManager,
                             FilePreferences filePreferences,
-                            ExternalApplicationsPreferences externalApplicationsPreferences) {
+                            ExternalApplicationsPreferences externalApplicationsPreferences,
+                            TaskExecutor taskExecutor) {
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
@@ -87,6 +91,9 @@ public class AttachFileAction extends SimpleCommand {
                              fieldChange.ifPresent(change -> {
                                  libraryTab.getUndoManager().addEdit(new UndoableFieldChange(change));
                              });
+                             new AttachedPdfSplitter(databaseContext, dialogService, filePreferences, taskExecutor, libraryTab.getUndoManager())
+                                     .split(newFile, entry, paper -> entry.addFile(paper).ifPresent(change ->
+                                             libraryTab.getUndoManager().addEdit(new UndoableFieldChange(change))));
                          });
         });
     }
