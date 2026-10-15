@@ -21,7 +21,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public record RuleSelector(Optional<Field> field, String ruleId) {
     /// What a selector may not contain yet -- see [#parse].
-    private static final Pattern NOT_READ_YET = Pattern.compile("[,/\\s]");
+    private static final Pattern NOT_READ_YET = Pattern.compile("[,/|\\s]");
 
     /// The rule wherever it looks.
     public static RuleSelector of(String ruleId) {
@@ -69,6 +69,10 @@ public record RuleSelector(Optional<Field> field, String ruleId) {
     /// may be accepted here too one day. Until they are, a key that looks like one is not read at
     /// all, rather than read as a field name that happens to contain a comma -- so that it cannot
     /// quietly mean one thing now and another later.
+    ///
+    /// A `|` is not read either: [FieldFactory#parseField] takes what follows it for the properties
+    /// of a field and fails on anything else, and an alternative of fields is a list by another
+    /// name.
     public static Optional<RuleSelector> parse(String key) {
         if (key.isBlank() || NOT_READ_YET.matcher(key).find()) {
             return Optional.empty();

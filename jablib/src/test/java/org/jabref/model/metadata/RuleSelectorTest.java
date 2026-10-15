@@ -47,6 +47,13 @@ class RuleSelectorTest {
         assertEquals(Optional.empty(), RuleSelector.parse(key));
     }
 
+    /// A field name containing `|` is one the field factory fails on, rather than one it reads.
+    @ParameterizedTest
+    @ValueSource(strings = {"title|booktitle:lower-case", "title|VERBATIM:lower-case", "title|:lower-case"})
+    void aFieldNameWithAPipeIsNotRead(String key) {
+        assertEquals(Optional.empty(), RuleSelector.parse(key));
+    }
+
     static Stream<Arguments> roundTrips() {
         return Stream.of(
                 Arguments.of(RuleSelector.of("lower-case")),

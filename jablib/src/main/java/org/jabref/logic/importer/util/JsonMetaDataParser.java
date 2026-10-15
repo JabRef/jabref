@@ -15,6 +15,7 @@ import org.jspecify.annotations.NullMarked;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /// Reads the metadata JabRef keeps as one embedded JSON object. Writing it is
 /// [org.jabref.logic.exporter.JsonMetaDataSerializer].
@@ -34,17 +35,17 @@ public class JsonMetaDataParser {
     /// is no reason to delete what somebody wrote.
     ///
     /// @throws ParseException if the comment does not hold one JSON object
-    public static JsonNode read(String json) throws ParseException {
+    public static ObjectNode read(String json) throws ParseException {
         JsonNode root;
         try {
             root = MAPPER.readTree(json);
         } catch (JacksonException e) {
             throw new ParseException("Ill-formed JSON metadata comment in BIB file", e);
         }
-        if (!root.isObject()) {
+        if (!(root instanceof ObjectNode object)) {
             throw new ParseException("The JSON metadata comment in the BIB file does not hold an object");
         }
-        return root;
+        return object;
     }
 
     /// Reads what `root` says into `metaData`.

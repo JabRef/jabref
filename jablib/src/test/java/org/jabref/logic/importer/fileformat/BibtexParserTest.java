@@ -38,6 +38,7 @@ import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.model.TreeNode;
 import org.jabref.model.database.BibDatabase;
@@ -193,6 +194,38 @@ class BibtexParserTest {
 
         assertEquals(Map.of("somethingElse", "{\"a\":[1,2]}"),
                 result.getMetaData().getUnknownJsonMetaData());
+    }
+
+    /// Both comments are dropped from the text, so a key only the earlier one states has to survive
+    /// in what is read -- and the user has to learn that one of them lost where both state a key.
+    @Test
+    void parseMergesASecondJsonMetaDataCommentIntoTheFirst() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {"onlyEarlier": 1, "both": 1}
+                }
+                @Comment{jabref-meta-0.1.0
+                {"both": 2, "onlyLater": 2}
+                }
+                """));
+
+        assertEquals(Map.of("onlyEarlier", "1", "both", "2", "onlyLater", "2"),
+                result.getMetaData().getUnknownJsonMetaData());
+        assertEquals(List.of(Localization.lang("More than one JSON metadata comment in BIB file. Where they state the same setting, the later one is kept.")),
+                result.warnings());
+    }
+
+    @Test
+    void parseForgetsTheJsonMetaDataOfAnEarlierCall() throws IOException {
+        parser.parse(Reader.of("""
+                @Comment{jabref-meta-0.1.0
+                {"somethingElse": 1}
+                }
+                """));
+
+        ParserResult result = parser.parse(Reader.of("@article{test,author={Ed von Test}}"));
+
+        assertEquals(Map.of(), result.getMetaData().getUnknownJsonMetaData());
     }
 
     /// A missing comma is no reason to delete what somebody wrote, so the comment stays in the file

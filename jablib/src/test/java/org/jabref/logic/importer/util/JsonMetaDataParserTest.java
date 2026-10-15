@@ -37,6 +37,19 @@ class JsonMetaDataParserTest {
         assertEquals(List.of("zeta", "alpha"), List.copyOf(metaData.getUnknownJsonMetaData().keySet()));
     }
 
+    /// A key this JabFix does not read is kept for the JabFix that wrote it, rather than failing the
+    /// whole library.
+    @Test
+    void aRuleKeyWithAPipeIsKeptAsAnUnreadRule() throws ParseException {
+        MetaData metaData = new MetaData();
+
+        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("""
+                {"formatting": {"rules": {"title|booktitle:lower-case": "fix"}}}"""));
+
+        assertEquals(Map.of("title|booktitle:lower-case", "\"fix\""),
+                metaData.getFormatting().orElseThrow().unreadRules());
+    }
+
     /// The caller keeps the text of a comment it could not read, so saying so is the whole job.
     @ParameterizedTest
     @ValueSource(strings = {"{\"a\": }", "{", "", "[1, 2]", "\"a string\"", "12"})
