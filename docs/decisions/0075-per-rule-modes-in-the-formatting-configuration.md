@@ -14,7 +14,7 @@ JabFix applies rules when a library is saved, and a rule runs only where the lib
 
 The configuration is therefore a list of what to run, not a list of what to suppress. That is the opposite of how most linters read, where a shipped set is on and the configuration switches parts of it off, and it is what makes the shape a question worth settling before anything is written to a file.
 
-Nothing of this reaches the `.bib` file yet. The plan is to store it in the library's metadata as JSON, next to the Save Actions it already carries (<https://github.com/MikaNeumann/jabref-jabfix/issues/1>, and <https://github.com/JabRef/jabref/issues/10371> for turning `jabref-meta` into JSON as a whole).
+The configuration is stored in the library's metadata as JSON, next to the Save Actions it already carries (<https://github.com/MikaNeumann/jabref-jabfix/issues/1>, and <https://github.com/JabRef/jabref/issues/10371> for turning `jabref-meta` into JSON as a whole).
 
 Rules will also take values. `surrounding-whitespace` needs none, but a future rule will want a maximum length, a preferred page-range separator, or a list of fields to skip. Whatever shape the configuration takes now has to hold those without being rebuilt.
 

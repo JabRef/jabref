@@ -118,6 +118,7 @@ A comment that switches nothing off is reported by `magic-comment`, because the 
 
 The library's own configuration is what the run applies; a library that has none has every rule it has applied, each repairing what it finds.
 `--migrate-save-actions` moves the library's Save Actions into that configuration and drops the `saveActions` item, which is what a graphical interface will do once it can configure the block.
+The run after the move applies what the run before it did: a library without a configuration is given every rule it was formatted by in writing, the ones JabFix ships with included, so a rule a later JabFix ships with does not run on it until the library names it.
 
 Findings are written one per line, in the `file:line:column:citationKey[:field]: message [rule-id]` format the `check` commands use, so an editor or a CI log scraper can jump to the place at fault.
 Where that place is comes from the `ParserResult` of the file the library was read from, through `ErrorFormat`, which the integrity and consistency checks report through as well.
@@ -149,7 +150,7 @@ Still missing:
 - context for rules (file directories, abbreviation list, key patterns), which citation key generation and journal abbreviation need before they can become rules,
 - rule parameters, so that a rule can take a value and not only a mode,
 - a graphical way to configure the block, which is what would migrate the `saveActions` item in passing,
-- GUI integration: `BibDatabaseWriter` reads the settings, but no GUI save writes them yet,
+- GUI integration: a save reads the block and writes it back, but nothing in the GUI edits it; a library that has one is saved without citation key generation and journal abbreviation, Library Properties writes a `saveActions` item back into a migrated library, and a shared database does not synchronize the block,
 - leaving out metadata JabRef only inferred (the database type); writing it back changes libraries that are otherwise clean.
 
 ## Consolidation into JabFix

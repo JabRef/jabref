@@ -38,7 +38,6 @@ class JabFixCommandTest extends AbstractJabKitTest {
         assertTrue(formatted.contains("author = {Knuth, Donald E.},"), formatted);
     }
 
-    /// Naming one rule leaves the rest of them out, so the whitespace around the author survives.
     /// The save action goes on being applied, and the library now states it in the one place that
     /// says what is done to it -- next to the rules JabFix ships with, which it was formatted by
     /// before and goes on being formatted by.
@@ -124,6 +123,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
         assertFalse(formatted.contains("jabref-meta-0.1.0"), formatted);
     }
 
+    /// Naming one rule leaves the rest of them out, so the whitespace around the author survives.
     @Test
     void enableNamesTheOnlyRulesThatRun() {
         assertEquals(CommandLine.ExitCode.OK,
