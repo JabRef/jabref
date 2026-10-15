@@ -15,7 +15,7 @@ not additional bibliographic fields, and are not needed for the pinned converter
 fixtures. A general RDF parser library was considered;
 the bounded striped subset and the official reverse converter's input shape
 allow this implementation to use the existing XML stack without another runtime
-dependency. The importer uses StAX to read XML and resolves the supported
+dependency. The importer uses StAX to build an in-memory XML tree and resolves the supported
 resource links from its parsed descriptions.
 
 | JabRef field             | BIBFRAME path                                                                                       | Owner                         |
@@ -33,6 +33,9 @@ resource links from its parsed descriptions.
 | Linked online file       | `bf:hasInstance/bf:Instance/bf:electronicLocator` on a secondary Instance                           | Work secondary Instance       |
 | Journal, pages           | `bf:relation` with `partof` host Work typed `bf:Serial`; host Instance `bf:part`                    | Work relation                 |
 
+The `pages:` prefix in `bf:part` follows the pinned converter's article output.
+Other BIBFRAME readers may not interpret it as a page range.
+
 A Work with a serial host becomes an Article; the host is identified by
 `bf:Serial` type or an ISSN. Other linked Works become Books.
 A host title alone is not enough to identify a journal. Recognized single-language
@@ -46,7 +49,8 @@ and Instance URIs. Citation keys are excluded. Identical entries in one export
 receive numbered suffixes so their resources remain separate. ISBN, ISSN, and
 DOI values are preserved as bibliographic identifiers.
 HTTP(S) linked files use secondary Instances. Their titles become file descriptions;
-the `Volltext` title from the pinned converter denotes a PDF link. Local file paths
+an absent title leaves the description empty. A `.pdf` locator identifies a PDF link;
+otherwise the file type remains unspecified. Local file paths
 stay in JabRef; they are not exported as BIBFRAME locators.
 
 The fixture commands and pinned official converter commits are recorded beside

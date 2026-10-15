@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 /// Run with MARC2BIBFRAME2_DIR and BIBFRAME2MARC_DIR set to the pinned source checkouts.
 // [utest->req~export.bibframe.rdfxml~1]
 @NullMarked
-@Tag("converter")
+@Tag("ConverterTest")
 class BibframeConverterIntegrationTest {
     private static final String FORWARD_COMMIT = "ed9abb038214474e8fc8ba4035d01c42fe0246de";
     private static final String REVERSE_COMMIT = "36a96c813437ac714e8c9479b2f7be56dc78671d";

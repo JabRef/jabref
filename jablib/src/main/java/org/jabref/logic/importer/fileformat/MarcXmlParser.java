@@ -142,7 +142,8 @@ public class MarcXmlParser implements Parser {
                 putElectronicLocation(bibEntry, datafield);
             } else if ("966".equals(tag)) {
                 putDoi(bibEntry, datafield);
-            } else if (Integer.parseInt(tag) >= 546 && Integer.parseInt(tag) <= 599) {
+            } else if (tag.length() == 3 && tag.chars().allMatch(Character::isDigit)
+                    && tag.compareTo("546") >= 0 && tag.compareTo("599") <= 0) {
                 // Notes
                 // FixMe: Some notes seem to have tags lower than 546
                 putNotes(bibEntry, datafield);

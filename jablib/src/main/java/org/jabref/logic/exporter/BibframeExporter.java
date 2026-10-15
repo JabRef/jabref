@@ -22,11 +22,13 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -43,6 +45,7 @@ public class BibframeExporter extends Exporter {
     private static final String BF = "http://id.loc.gov/ontologies/bibframe/";
     private static final String BFLC = "http://id.loc.gov/ontologies/bflc/";
     private static final String RESOURCE_BASE = "https://jabref.org/bibframe/sha256/";
+    private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
     private static final List<StandardField> EXPORTED_FIELDS = List.of(StandardField.TITLE, StandardField.SUBTITLE,
             StandardField.AUTHOR, StandardField.EDITOR, StandardField.LANGUAGE, StandardField.ABSTRACT,
             StandardField.ADDRESS, StandardField.PUBLISHER, StandardField.ISBN, StandardField.ISSN,
@@ -64,10 +67,10 @@ public class BibframeExporter extends Exporter {
     @Override
     public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws SaveException {
         try (Writer output = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
-            if (entries.isEmpty()) {
-                return;
+            XMLStreamWriter writer;
+            synchronized (XML_OUTPUT_FACTORY) {
+                writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(output);
             }
-            XMLStreamWriter writer = XMLOutputFactory.newFactory().createXMLStreamWriter(output);
             try {
                 writer.writeStartDocument("UTF-8", "1.0");
                 start(writer, "rdf", "RDF", RDF);
@@ -131,8 +134,8 @@ public class BibframeExporter extends Exporter {
         writeContributors(writer, entry, StandardField.AUTHOR, "aut");
         writeContributors(writer, entry, StandardField.EDITOR, "edt");
         writeTitle(writer, entry);
-        writeLanguage(writer, entry.getField(StandardField.LANGUAGE));
-        writeSummary(writer, entry.getField(StandardField.ABSTRACT));
+        writeLanguage(writer, entry);
+        writeSummary(writer, entry);
         writeHost(writer, entry);
         for (int index = 0; index < onlineFiles.size(); index++) {
             resource(writer, "bf", "hasInstance", BF, "rdf", RDF, instanceUri + "-File-" + index);
@@ -142,18 +145,22 @@ public class BibframeExporter extends Exporter {
 
         start(writer, "bf", "Instance", BF);
         attribute(writer, "rdf", RDF, "about", instanceUri);
-        resource(writer, "bf", "issuance", BF, "rdf", RDF, "http://id.loc.gov/vocabulary/issuance/mono");
-        if (entry.getField(StandardField.URL).isPresent()) {
+        if (entry.getType() == StandardEntryType.Book) {
+            resource(writer, "bf", "issuance", BF, "rdf", RDF, "http://id.loc.gov/vocabulary/issuance/mono");
+        }
+        String url = entry.getField(StandardField.URL).orElse("");
+        if (!url.isBlank()) {
             resource(writer, "bf", "media", BF, "rdf", RDF, "http://id.loc.gov/vocabulary/mediaTypes/c");
         }
         writeTitle(writer, entry);
         writePublication(writer, entry);
-        optionalLiteral(writer, "bf", "editionStatement", BF, entry.getField(StandardField.EDITION));
-        optionalLiteral(writer, "bf", "seriesStatement", BF, entry.getField(StandardField.SERIES));
-        if (entry.getField(StandardField.PAGETOTAL).isPresent()) {
+        optionalLiteral(writer, "bf", "editionStatement", BF, entry, StandardField.EDITION);
+        optionalLiteral(writer, "bf", "seriesStatement", BF, entry, StandardField.SERIES);
+        String pageTotal = entry.getField(StandardField.PAGETOTAL).orElse("");
+        if (!pageTotal.isBlank()) {
             start(writer, "bf", "extent", BF);
             start(writer, "bf", "Extent", BF);
-            literal(writer, "rdfs", "label", RDFS, entry.getField(StandardField.PAGETOTAL).orElseThrow() + " pages");
+            literal(writer, "rdfs", "label", RDFS, pageTotal + " pages");
             writer.writeEndElement();
             writer.writeEndElement();
         }
@@ -162,9 +169,8 @@ public class BibframeExporter extends Exporter {
         if (entry.getType() != StandardEntryType.Article || entry.getField(StandardField.JOURNAL).isEmpty()) {
             writeIdentifier(writer, entry, StandardField.ISSN, "Issn");
         }
-        Optional<String> url = entry.getField(StandardField.URL);
-        if (url.isPresent()) {
-            resource(writer, "bf", "electronicLocator", BF, "rdf", RDF, url.orElseThrow());
+        if (!url.isBlank()) {
+            resource(writer, "bf", "electronicLocator", BF, "rdf", RDF, url);
         }
         resource(writer, "bf", "instanceOf", BF, "rdf", RDF, workUri);
         writer.writeEndElement();
@@ -172,19 +178,20 @@ public class BibframeExporter extends Exporter {
         writeLinkedFiles(writer, onlineFiles, workUri, instanceUri);
     }
 
-    private static void writeLanguage(XMLStreamWriter writer, Optional<String> language) throws XMLStreamException {
-        if (language.isEmpty()) {
+    private static void writeLanguage(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
+        String language = entry.getField(StandardField.LANGUAGE).orElse("");
+        if (language.isBlank()) {
             return;
         }
-        Optional<String> code = languageCode(language.orElseThrow());
-        if (code.isPresent()) {
+        String code = languageCode(language).orElse("");
+        if (!code.isBlank()) {
             resource(writer, "bf", "language", BF, "rdf", RDF,
-                    "http://id.loc.gov/vocabulary/languages/" + code.orElseThrow());
+                    "http://id.loc.gov/vocabulary/languages/" + code);
             return;
         }
         start(writer, "bf", "language", BF);
         start(writer, "bf", "Language", BF);
-        literal(writer, "rdfs", "label", RDFS, language.orElseThrow());
+        literal(writer, "rdfs", "label", RDFS, language);
         writer.writeEndElement();
         writer.writeEndElement();
     }
@@ -207,26 +214,28 @@ public class BibframeExporter extends Exporter {
     }
 
     private static void writeTitle(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
-        Optional<String> title = entry.getField(StandardField.TITLE);
-        if (title.isEmpty()) {
+        String title = entry.getField(StandardField.TITLE).orElse("");
+        if (title.isBlank()) {
             return;
         }
         start(writer, "bf", "title", BF);
         start(writer, "bf", "Title", BF);
-        literal(writer, "bf", "mainTitle", BF, title.orElseThrow());
-        optionalLiteral(writer, "bf", "subtitle", BF, entry.getField(StandardField.SUBTITLE));
+        literal(writer, "bf", "mainTitle", BF, title);
+        optionalLiteral(writer, "bf", "subtitle", BF, entry, StandardField.SUBTITLE);
         writer.writeEndElement();
         writer.writeEndElement();
     }
 
     private static void writeContributors(XMLStreamWriter writer, BibEntry entry, StandardField field, String role) throws XMLStreamException {
-        if (entry.getField(field).isEmpty()) {
+        String nameField = entry.getField(field).orElse("");
+        if (nameField.isBlank()) {
             return;
         }
-        String nameField = entry.getField(field).orElseThrow();
         var authors = AuthorList.parse(nameField).getAuthors();
-        List<String> names = authors.size() == 1 ? List.of(nameField)
-                                                 : authors.stream().map(author -> author.getFamilyGiven(false)).toList();
+        // AuthorList drops the trailing hyphen from open-ended authority dates such as "1963-".
+        List<String> names = authors.size() == 1 && nameField.endsWith("-")
+                             ? List.of(Author.FORMATTER.format(nameField))
+                             : authors.stream().map(author -> author.getFamilyGiven(false)).toList();
         for (String name : names) {
             start(writer, "bf", "contribution", BF);
             start(writer, "bf", "Contribution", BF);
@@ -249,33 +258,36 @@ public class BibframeExporter extends Exporter {
         }
     }
 
-    private static void writeSummary(XMLStreamWriter writer, Optional<String> abstractText) throws XMLStreamException {
-        if (abstractText.isPresent()) {
+    private static void writeSummary(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
+        String abstractText = entry.getField(StandardField.ABSTRACT).orElse("");
+        if (!abstractText.isBlank()) {
             start(writer, "bf", "summary", BF);
             start(writer, "bf", "Summary", BF);
-            literal(writer, "rdfs", "label", RDFS, abstractText.orElseThrow());
+            literal(writer, "rdfs", "label", RDFS, abstractText);
             writer.writeEndElement();
             writer.writeEndElement();
         }
     }
 
     private static void writePublication(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
-        Optional<String> place = entry.getField(StandardField.ADDRESS);
-        Optional<String> publisher = entry.getField(StandardField.PUBLISHER);
-        Optional<String> date = entry.getField(StandardField.YEAR).or(() -> entry.getField(StandardField.DATE));
-        if (place.isEmpty() && publisher.isEmpty() && date.isEmpty()) {
+        String place = entry.getField(StandardField.ADDRESS).orElse("");
+        String publisher = entry.getField(StandardField.PUBLISHER).orElse("");
+        String date = entry.getField(StandardField.YEAR).or(() -> entry.getField(StandardField.DATE)).orElse("");
+        if (place.isBlank() && publisher.isBlank() && date.isBlank()) {
             return;
         }
         start(writer, "bf", "provisionActivity", BF);
         start(writer, "bf", "ProvisionActivity", BF);
         resource(writer, "rdf", "type", RDF, "rdf", RDF, BF + "Publication");
-        optionalLiteral(writer, "bflc", "simplePlace", BFLC, place);
-        optionalLiteral(writer, "bflc", "simpleAgent", BFLC, publisher);
-        optionalLiteral(writer, "bflc", "simpleDate", BFLC, date);
-        if (date.filter(value -> value.length() == 4 && value.chars().allMatch(Character::isDigit)).isPresent()) {
+        optionalLiteral(writer, "bflc", "simplePlace", BFLC, entry, StandardField.ADDRESS);
+        optionalLiteral(writer, "bflc", "simpleAgent", BFLC, entry, StandardField.PUBLISHER);
+        if (!date.isBlank()) {
+            literal(writer, "bflc", "simpleDate", BFLC, date);
+        }
+        if (date.length() == 4 && date.chars().allMatch(Character::isDigit)) {
             start(writer, "bf", "date", BF);
             attribute(writer, "rdf", RDF, "datatype", "http://id.loc.gov/datatypes/edtf");
-            writer.writeCharacters(date.orElseThrow());
+            writer.writeCharacters(date);
             writer.writeEndElement();
         }
         writer.writeEndElement();
@@ -283,12 +295,13 @@ public class BibframeExporter extends Exporter {
     }
 
     private static void writeIdentifier(XMLStreamWriter writer, BibEntry entry, StandardField field, String type) throws XMLStreamException {
-        if (entry.getField(field).isEmpty()) {
+        String value = entry.getField(field).orElse("");
+        if (value.isBlank()) {
             return;
         }
         start(writer, "bf", "identifiedBy", BF);
         start(writer, "bf", type, BF);
-        literal(writer, "rdf", "value", RDF, entry.getField(field).orElseThrow());
+        literal(writer, "rdf", "value", RDF, value);
         writer.writeEndElement();
         writer.writeEndElement();
     }
@@ -303,18 +316,20 @@ public class BibframeExporter extends Exporter {
         start(writer, "bf", "associatedResource", BF);
         start(writer, "bf", "Work", BF);
         resource(writer, "rdf", "type", RDF, "rdf", RDF, BF + "Serial");
-        if (entry.getField(StandardField.JOURNAL).isPresent()) {
+        String journal = entry.getField(StandardField.JOURNAL).orElse("");
+        if (!journal.isBlank()) {
             start(writer, "bf", "title", BF);
             start(writer, "bf", "Title", BF);
-            literal(writer, "bf", "mainTitle", BF, entry.getField(StandardField.JOURNAL).orElseThrow());
+            literal(writer, "bf", "mainTitle", BF, journal);
             writer.writeEndElement();
             writer.writeEndElement();
         }
         writeIdentifier(writer, entry, StandardField.ISSN, "Issn");
-        if (entry.getField(StandardField.PAGES).isPresent()) {
+        String pages = entry.getField(StandardField.PAGES).orElse("");
+        if (!pages.isBlank()) {
             start(writer, "bf", "hasInstance", BF);
             start(writer, "bf", "Instance", BF);
-            literal(writer, "bf", "part", BF, "pages:" + entry.getField(StandardField.PAGES).orElseThrow());
+            literal(writer, "bf", "part", BF, "pages:" + pages);
             writer.writeEndElement();
             writer.writeEndElement();
         }
@@ -331,8 +346,7 @@ public class BibframeExporter extends Exporter {
             attribute(writer, "rdf", RDF, "about", instanceUri + "-File-" + index);
             resource(writer, "rdf", "type", RDF, "rdf", RDF, BFLC + "SecondaryInstance");
             resource(writer, "bf", "media", BF, "rdf", RDF, "http://id.loc.gov/vocabulary/mediaTypes/c");
-            String title = file.getDescription().isBlank() && StandardFileType.PDF.getName().equals(file.getFileType())
-                           ? "Volltext" : file.getDescription();
+            String title = file.getDescription();
             if (!title.isBlank()) {
                 start(writer, "bf", "title", BF);
                 start(writer, "bf", "Title", BF);
@@ -356,14 +370,15 @@ public class BibframeExporter extends Exporter {
 
     private static void literal(XMLStreamWriter writer, String prefix, String localName, String namespace, String value) throws XMLStreamException {
         start(writer, prefix, localName, namespace);
-        writer.writeCharacters(value);
+        writer.writeCharacters(LatexToUnicodeAdapter.format(value));
         writer.writeEndElement();
     }
 
     private static void optionalLiteral(XMLStreamWriter writer, String prefix, String localName, String namespace,
-                                        Optional<String> value) throws XMLStreamException {
-        if (value.isPresent()) {
-            literal(writer, prefix, localName, namespace, value.orElseThrow());
+                                        BibEntry entry, StandardField field) throws XMLStreamException {
+        String value = entry.getField(field).orElse("");
+        if (!value.isBlank()) {
+            literal(writer, prefix, localName, namespace, value);
         }
     }
 

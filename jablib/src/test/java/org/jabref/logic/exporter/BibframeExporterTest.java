@@ -140,6 +140,35 @@ class BibframeExporterTest {
     }
 
     @Test
+    void unnamedPdfDoesNotAcquireLibrarySpecificTitle(@TempDir Path directory) throws SaveException, IOException {
+        BibEntry book = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "A book")
+                .withFiles(List.of(new LinkedFile("", "https://example.org/book.pdf", StandardFileType.PDF)));
+        Path output = directory.resolve("book.rdf");
+
+        exporter.export(new BibDatabaseContext(), output, List.of(book));
+
+        assertFalse(Files.readString(output).contains("Volltext"));
+        assertEquals(List.of(book), importer.importDatabase(output).getDatabase().getEntries());
+    }
+
+    @Test
+    void convertsLatexTextAndFormatsSingleContributor(@TempDir Path directory) throws SaveException, IOException {
+        BibEntry book = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "{IEEE} f{\\\"u}r alle")
+                .withField(StandardField.AUTHOR, "{Muster}, Anna");
+        Path output = directory.resolve("book.rdf");
+
+        exporter.export(new BibDatabaseContext(), output, List.of(book));
+
+        String xml = Files.readString(output);
+        assertTrue(xml.contains("IEEE für alle"));
+        assertTrue(xml.contains("Muster, Anna"));
+        assertFalse(xml.contains("{\\\"u}"));
+        assertFalse(xml.contains("{Muster}"));
+    }
+
+    @Test
     void publicationYearIsAlsoExportedAsStructuredEdtfDate(@TempDir Path directory) throws SaveException, IOException {
         BibEntry book = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "A book")
@@ -207,11 +236,13 @@ class BibframeExporterTest {
     }
 
     @Test
-    void emptyInputWritesEmptyFile(@TempDir Path directory) throws SaveException, IOException {
+    void emptyInputWritesValidRdf(@TempDir Path directory) throws SaveException, IOException, ParserConfigurationException, SAXException {
         Path output = directory.resolve("empty.rdf");
 
         exporter.export(new BibDatabaseContext(), output, List.of());
 
-        assertEquals("", Files.readString(output));
+        Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(output.toFile());
+        assertEquals("rdf:RDF", document.getDocumentElement().getTagName());
+        assertEquals(0, importer.importDatabase(output).getDatabase().getEntryCount());
     }
 }

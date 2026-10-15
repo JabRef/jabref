@@ -3,7 +3,7 @@ nav_order: 75
 parent: Decision Records
 ---
 
-# Use StAX for bounded BIBFRAME RDF/XML import
+# Use StAX with an in-memory tree for BIBFRAME RDF/XML import
 
 ## Context and Problem Statement
 
@@ -22,11 +22,12 @@ later in the document. How should this initial importer parse them?
 
 Chosen option: "Use the existing StAX XML stack and resolve the supported resource links", because it supports the documented subset without adding a runtime dependency.
 
-The importer builds a small description graph for the documented subset. This
+The importer builds an in-memory XML tree for the documented subset. This
 supports forward resource references and alternate namespace prefixes. It
 rejects DTDs and external entities. General RDF/XML features, such as
 arbitrary blank-node identifiers and property attributes, remain outside the
-import contract. Supporting them would require more parsing logic or a general
+import contract. The mapping is limited, but document size is not bounded by this parser.
+Supporting those features would require more parsing logic or a general
 RDF parser.
 These are alternate ways to serialize RDF relationships and values, not
 additional bibliographic fields. The pinned converter fixtures use child

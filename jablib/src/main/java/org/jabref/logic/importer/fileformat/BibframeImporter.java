@@ -34,7 +34,7 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Imports a bounded BIBFRAME 2.0 Work and Instance mapping from striped RDF/XML.
+/// Imports the supported BIBFRAME 2.0 Work and Instance mapping from striped RDF/XML.
 /// See the [BIBFRAME ontology](https://github.com/lcnetdev/bibframe-ontology/blob/main/bibframe.rdf).
 // [impl->req~import.bibliographic.xml-formats~1]
 @NullMarked
@@ -45,6 +45,7 @@ public class BibframeImporter extends Importer {
     private static final String BF = "http://id.loc.gov/ontologies/bibframe/";
     private static final String BFLC = "http://id.loc.gov/ontologies/bflc/";
     private static final Pattern PAGE_EXTENT = Pattern.compile("(\\d+)\\s*(?:pages\\b|p\\.)", Pattern.CASE_INSENSITIVE);
+    private static final XMLInputFactory XML_INPUT_FACTORY = createInputFactory();
 
     @Override
     public String getId() {
@@ -95,15 +96,21 @@ public class BibframeImporter extends Importer {
         }
     }
 
-    private static XmlNode parse(Reader input) throws XMLStreamException {
+    private static XMLInputFactory createInputFactory() {
         XMLInputFactory factory = XMLInputFactory.newFactory();
         factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         factory.setXMLResolver((_, _, _, _) -> {
             throw new XMLStreamException("External entities are not allowed in BIBFRAME RDF/XML");
         });
+        return factory;
+    }
 
-        XMLStreamReader reader = factory.createXMLStreamReader(input);
+    private static XmlNode parse(Reader input) throws XMLStreamException {
+        XMLStreamReader reader;
+        synchronized (XML_INPUT_FACTORY) {
+            reader = XML_INPUT_FACTORY.createXMLStreamReader(input);
+        }
         try {
             Deque<XmlNode> stack = new ArrayDeque<>();
             Optional<XmlNode> root = Optional.empty();
@@ -159,11 +166,16 @@ public class BibframeImporter extends Importer {
     }
 
     private static void indexResources(XmlNode element, Map<String, XmlNode> resources) {
-        String uri = element.getAttributeNS(RDF, "about");
-        if (!uri.isEmpty()) {
-            resources.put(uri, element);
+        Deque<XmlNode> pending = new ArrayDeque<>();
+        pending.push(element);
+        while (!pending.isEmpty()) {
+            XmlNode current = pending.pop();
+            String uri = current.getAttributeNS(RDF, "about");
+            if (!uri.isEmpty()) {
+                resources.put(uri, current);
+            }
+            current.children.forEach(pending::push);
         }
-        element.children.forEach(child -> indexResources(child, resources));
     }
 
     private static boolean linksTo(XmlNode work, XmlNode instance) {
@@ -304,17 +316,14 @@ public class BibframeImporter extends Importer {
         List<LinkedFile> files = children(work, BF, "hasInstance").stream()
                                                                   .map(property -> object(Optional.of(property), resources))
                                                                   .flatMap(Optional::stream)
-                                                                  .filter(instance -> instance != primaryInstance && (isSecondaryInstance(instance)
-                                                                          || object(first(instance, BF, "title"), resources)
-                                                                          .flatMap(title -> value(title, BF, "mainTitle"))
-                                                                          .filter("Volltext"::equals).isPresent()))
+                                                                  .filter(instance -> instance != primaryInstance
+                                                                          && (isSecondaryInstance(instance) || hasType(instance, "Electronic")))
                                                                   .map(instance -> locator(instance, resources).map(uri -> {
                                                                       String title = object(first(instance, BF, "title"), resources)
                                                                               .flatMap(element -> value(element, BF, "mainTitle")).orElse("");
-                                                                      String description = "Volltext".equals(title) ? "" : title;
-                                                                      String fileType = "Volltext".equals(title) || uri.toLowerCase(Locale.ROOT).endsWith(".pdf")
+                                                                      String fileType = uri.toLowerCase(Locale.ROOT).endsWith(".pdf")
                                                                                         ? StandardFileType.PDF.getName() : "";
-                                                                      return new LinkedFile(description, uri, fileType);
+                                                                      return new LinkedFile(title, uri, fileType);
                                                                   }))
                                                                   .flatMap(Optional::stream)
                                                                   .toList();

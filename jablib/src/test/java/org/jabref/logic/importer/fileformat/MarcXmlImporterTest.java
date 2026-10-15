@@ -126,15 +126,24 @@ class MarcXmlImporterTest {
     }
 
     @Test
-    void malformedDatafieldTagsReturnInvalidResult() throws IOException {
+    void malformedDatafieldTagsDoNotDiscardValidFields() throws IOException {
         for (String attribute : List.of("tag=\"abc\"", "")) {
-            String xml = RECORD.replace("tag=\"245\"", attribute);
+            String xml = RECORD.replace("</marc:record>", "<marc:datafield " + attribute
+                    + "><marc:subfield code=\"a\">Ignored</marc:subfield></marc:datafield></marc:record>");
 
             ParserResult result = importer.importDatabase(xml);
 
-            assertTrue(result.isInvalid());
-            assertEquals(0, result.getDatabase().getEntryCount());
+            assertFalse(result.isInvalid());
+            assertEquals("A standalone book", result.getDatabase().getEntries().getFirst().getField(StandardField.TITLE).orElseThrow());
         }
+    }
+
+    @Test
+    void doesNotRecognizeUnqualifiedRecordWithoutMarcNamespace() throws IOException {
+        String xml = RECORD.replace(" xmlns:marc=\"http://www.loc.gov/MARC21/slim\"", "")
+                           .replace("marc:", "");
+
+        assertFalse(importer.isRecognizedFormat(xml));
     }
 
     @Test

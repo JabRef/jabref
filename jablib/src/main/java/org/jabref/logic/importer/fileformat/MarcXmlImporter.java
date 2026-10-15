@@ -22,7 +22,6 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.util.strings.StringUtil;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -79,7 +78,7 @@ public class MarcXmlImporter extends Importer {
             }
             return new ParserResult(new MarcXmlParser().parseEntries(
                     new ByteArrayInputStream(scanResult.sruXml().getBytes(StandardCharsets.UTF_8))));
-        } catch (ParseException | XMLStreamException | NumberFormatException e) {
+        } catch (ParseException | XMLStreamException e) {
             LOGGER.debug("Could not parse MARCXML", e);
             return ParserResult.fromError(e);
         }
@@ -136,7 +135,7 @@ public class MarcXmlImporter extends Importer {
 
     private boolean isRecordStart(XMLStreamReader reader, List<String> path) {
         String namespace = reader.getNamespaceURI();
-        if (!"record".equals(reader.getLocalName()) || !(MARC_NAMESPACE.equals(namespace) || StringUtil.isBlank(namespace))) {
+        if (!"record".equals(reader.getLocalName()) || !MARC_NAMESPACE.equals(namespace)) {
             return false;
         }
         if (path.size() == 1 || path.size() == 2 && "collection".equals(path.getFirst())) {
@@ -203,9 +202,9 @@ public class MarcXmlImporter extends Importer {
     }
 
     private void writeAttribute(XMLStreamReader reader, XMLStreamWriter writer, String name) throws XMLStreamException {
-        Optional<String> value = Optional.ofNullable(reader.getAttributeValue(null, name));
-        if (value.isPresent()) {
-            writer.writeAttribute(name, value.orElseThrow());
+        String value = Optional.ofNullable(reader.getAttributeValue(null, name)).orElse("");
+        if (!value.isEmpty()) {
+            writer.writeAttribute(name, value);
         }
     }
 

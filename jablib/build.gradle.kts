@@ -323,7 +323,7 @@ tasks.test {
     systemProperty("prism.order", "sw")
 
     useJUnitPlatform {
-        excludeTags("DatabaseTest", "ExternalServicesTest")
+        excludeTags("DatabaseTest", "ExternalServicesTest", "ConverterTest")
     }
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
@@ -375,12 +375,12 @@ tasks.register<Test>("databaseTest") {
 }
 
 tasks.register<Test>("converterTest") {
-    description = "BibFrame converter test"
+    description = "BIBFRAME converter test"
     group = LifecycleBasePlugin.VERIFICATION_GROUP
     testClassesDirs = testSourceSet.output.classesDirs
     classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
-        includeTags("converter")
+        includeTags("ConverterTest")
     }
     maxParallelForks = 1
 }

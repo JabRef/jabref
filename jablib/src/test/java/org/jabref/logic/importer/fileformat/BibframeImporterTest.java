@@ -44,7 +44,7 @@ class BibframeImporterTest {
                 .withField(StandardField.LANGUAGE, "eng")
                 .withField(StandardField.ABSTRACT, "A guide to marketing automation.")
                 .withField(StandardField.URL, "https://example.org/book")
-                .withFiles(List.of(new LinkedFile("", "https://example.org/book", StandardFileType.PDF)));
+                .withFiles(List.of(new LinkedFile("Volltext", "https://example.org/book", "")));
 
         assertEquals(List.of(expectedBook), entries);
     }
