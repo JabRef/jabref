@@ -30,6 +30,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
+import org.jabref.gui.linkedfile.AttachedPdfSplitter;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.bibtex.FileFieldWriter;
@@ -162,13 +163,24 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void addNewLinkedFile(LinkedFile linkedFile) {
-        files.add(new LinkedFileViewModel(
+        files.add(toViewModel(linkedFile));
+        linkedFile.findIn(databaseContext, preferences.getFilePreferences())
+                  .ifPresent(this::splitAttachedPdf);
+    }
+
+    private void splitAttachedPdf(Path pdf) {
+        new AttachedPdfSplitter(databaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
+                .split(pdf, entry, paper -> files.add(toViewModel(paper)));
+    }
+
+    private LinkedFileViewModel toViewModel(LinkedFile linkedFile) {
+        return new LinkedFileViewModel(
                 linkedFile,
                 entry,
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences));
+                preferences);
     }
 
     /// For the linked-file context menu, whose actions record into this library's journal.
