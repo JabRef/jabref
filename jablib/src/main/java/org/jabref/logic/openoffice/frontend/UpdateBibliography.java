@@ -101,11 +101,18 @@ public class UpdateBibliography {
             CreationException,
             IllegalArgumentException,
             NoDocumentException,
-            WrappedTargetException, IOException {
+            WrappedTargetException {
 
         XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
 
         XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange);
+
+        /*
+        System.out.println("CitedReferences = " + citedReferences.toString());
+        for (var e : citedReferences.values()) {
+            System.out.println(e.getBibEntry());
+        }
+        */
 
         // emit the title of the bibliography
         OOTextIntoOO.removeDirectFormatting(cursor);

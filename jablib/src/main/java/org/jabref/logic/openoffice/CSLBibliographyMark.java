@@ -137,6 +137,13 @@ public final class CSLBibliographyMark {
         });
         XTextCursor cursor = sectionRange.getText().createTextCursorByRange(sectionRange);
 
+        LOGGER.debug("Reference mark format {}", referenceMarkFormat);
+
+        LOGGER.debug("Citation style: {}", citationStyle);
+        for (var e : entries) {
+            LOGGER.debug("Entry: {}", e.toString());
+        }
+
         switch (referenceMarkFormat) {
             case JABREF_ONLY ->
                     cslCitationOOAdapter.insertJabRefBibliography(cursor, citationStyle, entries, selectedDatabases);

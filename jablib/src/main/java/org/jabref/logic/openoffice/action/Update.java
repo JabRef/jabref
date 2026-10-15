@@ -46,8 +46,15 @@ public class Update {
 
         final boolean useLockControllers = true;
 
+        LOGGER.debug("Updating document");
+
         frontend.imposeGlobalOrder(doc, fcursor);
         OOProcess.produceCitationMarkers(frontend.citationGroups, databases, style);
+
+        // By this point citations are sorted in the bibliography
+        for (var e : frontend.citationGroups.getBibliography().get().values()) {
+            // LOGGER.debug("citation bibentry: {}", e.getBibEntry());
+        }
 
         try {
             if (useLockControllers) {

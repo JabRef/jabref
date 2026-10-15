@@ -43,6 +43,7 @@ public class OOProcess {
         if (style.getMultiCiteChronological()) {
             return OOProcess.YEAR_AUTHOR_TITLE_COMPARATOR;
         } else {
+            System.out.println("Author-year-title comparator returned");
             return OOProcess.AUTHOR_YEAR_TITLE_COMPARATOR;
         }
     }
@@ -63,7 +64,9 @@ public class OOProcess {
         } else if (style.isNumberEntries()) {
             OOProcessNumericMarkers.produceCitationMarkers(citationGroups, style);
         } else {
+            System.out.println("Author-year markers used");
             OOProcessAuthorYearMarkers.produceCitationMarkers(citationGroups, style);
         }
+        System.out.println("Done with citation markers");
     }
 }

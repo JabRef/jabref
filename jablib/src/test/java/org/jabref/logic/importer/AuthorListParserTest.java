@@ -37,6 +37,7 @@ class AuthorListParserTest {
                 Arguments.of("{\\OE}rjan Umlauts", new Author("{\\OE}rjan", "{\\OE}.", null, "Umlauts", null)),
                 Arguments.of("{Company Name, LLC}", new Author("", "", null, "{Company Name, LLC}", null)),
                 Arguments.of("{Society of Automotive Engineers}", new Author("", "", null, "{Society of Automotive Engineers}", null)),
+                Arguments.of("{Society of automotive engineers}", new Author("", "", null, "{Society of automotive engineers}", null)),
 
                 // Demonstrate the "von" part parsing of a non-braced name
                 Arguments.of("Society of Automotive Engineers", new Author("Society", "S.", "of", "Automotive Engineers", null))
