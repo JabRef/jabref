@@ -155,14 +155,14 @@ class BibframeExporterTest {
     @Test
     void convertsLatexTextAndFormatsSingleContributor(@TempDir Path directory) throws SaveException, IOException {
         BibEntry book = new BibEntry(StandardEntryType.Book)
-                .withField(StandardField.TITLE, "{IEEE} f{\\\"u}r alle")
+                .withField(StandardField.TITLE, "{IEEE} f{\\\"u}r alle") // spellchecker:disable-line
                 .withField(StandardField.AUTHOR, "{Muster}, Anna");
         Path output = directory.resolve("book.rdf");
 
         exporter.export(new BibDatabaseContext(), output, List.of(book));
 
         String xml = Files.readString(output);
-        assertTrue(xml.contains("IEEE für alle"));
+        assertTrue(xml.contains("IEEE für alle")); // spellchecker:disable-line
         assertTrue(xml.contains("Muster, Anna"));
         assertFalse(xml.contains("{\\\"u}"));
         assertFalse(xml.contains("{Muster}"));
