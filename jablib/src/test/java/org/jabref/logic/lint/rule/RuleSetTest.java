@@ -2,6 +2,7 @@ package org.jabref.logic.lint.rule;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -9,6 +10,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.LintSettings;
@@ -167,6 +169,56 @@ class RuleSetTest {
 
         assertEquals(List.of("surrounding-whitespace", "repeated-whitespace"),
                 RuleSet.forLibrary(databaseContext, FIELD_PREFERENCES).ids());
+    }
+
+    /// `title:lower-case` next to `lower-case` says how far the one Save Action goes on the title; a
+    /// second Save Action on the title would report the same thing twice.
+    @Test
+    void forLibraryStatesOneSaveActionWhereAFieldEntryOnlyNarrowsItsMode() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK);
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        databaseContext.getMetaData().setFormatting(settings);
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "A Title");
+
+        List<Finding> findings = scan(RuleSet.forLibrary(databaseContext, FIELD_PREFERENCES).asConfiguredBy(settings), entry);
+
+        assertEquals(List.of(Optional.of(StandardField.TITLE)), findings.stream().map(Finding::field).toList());
+        assertEquals(List.of(false), findings.stream().map(Finding::isFixable).toList());
+    }
+
+    /// Every text field is not every field: a field that holds no text needs a Save Action of its own.
+    @Test
+    void forLibraryKeepsASaveActionOnAFieldTheBroaderOneDoesNotVisit() {
+        LintSettings settings = LintSettings.of(RuleSelector.on(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, "lower-case"), RuleMode.FIX)
+                                            .and(RuleSelector.on(StandardField.DOI, "lower-case"), RuleMode.FIX);
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        databaseContext.getMetaData().setFormatting(settings);
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "A Title")
+                .withField(StandardField.DOI, "10.1000/ABC");
+
+        List<Finding> findings = scan(RuleSet.forLibrary(databaseContext, FIELD_PREFERENCES).asConfiguredBy(settings), entry);
+
+        assertEquals(List.of(Optional.of(StandardField.TITLE), Optional.of(StandardField.DOI)),
+                findings.stream().map(Finding::field).toList());
+    }
+
+    @Test
+    void forLibraryStatesOneSaveActionWhereEveryFieldCoversEveryTextField() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        databaseContext.getMetaData().setFormatting(
+                LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
+                            .and(RuleSelector.on(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, "lower-case"), RuleMode.CHECK));
+
+        assertEquals(List.of("lower-case", "surrounding-whitespace", "repeated-whitespace"),
+                RuleSet.forLibrary(databaseContext, FIELD_PREFERENCES).ids());
+    }
+
+    private static List<Finding> scan(RuleSet rules, BibEntry entry) {
+        return rules.rules().stream()
+                    .flatMap(rule -> rule.scan(entry).stream())
+                    .toList();
     }
 
     /// An entry naming a rule JabFix ships with is not a Save Action, so nothing is built from it.

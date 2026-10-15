@@ -12,6 +12,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.lint.rules.RepeatedWhitespaceRule;
 import org.jabref.logic.lint.rules.SurroundingWhitespaceRule;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.MetaData;
@@ -82,20 +83,30 @@ public class RuleSet {
         return withKeywordSeparatorOf(metaData, actions);
     }
 
-    /// What the library states in its formatting configuration: one Save Action per entry naming a
-    /// formatter, on the field the entry names, or on every field where it names none.
+    /// What the library states in its formatting configuration: the Save Actions its entries naming
+    /// a formatter add up to, each on the field the entry names, or on every field where it names
+    /// none.
+    ///
+    /// An entry about a field that a broader entry of the same formatter already visits states no
+    /// Save Action of its own: `lower-case` together with `title:lower-case` is one Save Action on
+    /// every field that only reports on the title, not a second one on the title that would report
+    /// the same thing twice. The broader one takes the place of the first entry it covers.
     ///
     /// An entry switched off states no Save Action rather than a switched-off one, so that a
     /// `saveActions` item that was switched off migrates to entries saying so and comes back as the
     /// same nothing.
     private static List<FieldFormatterCleanup> statedInFormatting(MetaData metaData) {
-        List<FieldFormatterCleanup> stated =
+        List<FieldFormatterCleanup> named =
                 metaData.getFormatting()
                         .map(settings -> settings.ruleModes().entrySet().stream()
-                                                 .filter(named -> named.getValue() != RuleMode.OFF)
-                                                 .flatMap(named -> asSaveAction(named.getKey()).stream())
+                                                 .filter(entry -> entry.getValue() != RuleMode.OFF)
+                                                 .flatMap(entry -> asSaveAction(entry.getKey()).stream())
                                                  .toList())
                         .orElse(List.of());
+        List<FieldFormatterCleanup> stated = named.stream()
+                                                  .map(saveAction -> broadestCovering(saveAction, named))
+                                                  .distinct()
+                                                  .toList();
 
         // Through JabRef's own configuration step, so that a formatter needing the library's
         // keyword separator is given it, exactly as one from the `saveActions` item would be.
@@ -106,6 +117,39 @@ public class RuleSet {
         return SaveActionIds.formatterFor(selector.ruleId())
                             .map(formatter -> new FieldFormatterCleanup(
                                     selector.field().orElse(InternalField.INTERNAL_ALL_FIELD), formatter));
+    }
+
+    /// The broadest of the named Save Actions with the same formatter that formats everything
+    /// `saveAction` does -- which is `saveAction` itself where no other one does.
+    private static FieldFormatterCleanup broadestCovering(FieldFormatterCleanup saveAction, List<FieldFormatterCleanup> named) {
+        return named.stream()
+                    .filter(other -> other.getFormatter().equals(saveAction.getFormatter()))
+                    .filter(other -> covers(other, saveAction.getField()))
+                    .reduce(saveAction, (broadest, other) -> breadthOf(other.getField()) < breadthOf(broadest.getField()) ? other : broadest);
+    }
+
+    /// Whether `saveAction` formats every field that one on `field` would. The two markers for a
+    /// class of fields are not fields an entry has, so they are compared by how much they cover.
+    private static boolean covers(FieldFormatterCleanup saveAction, Field field) {
+        if (isMarker(field)) {
+            return breadthOf(saveAction.getField()) <= breadthOf(field);
+        }
+        return saveAction.visits(field);
+    }
+
+    private static boolean isMarker(Field field) {
+        return (field == InternalField.INTERNAL_ALL_FIELD) || (field == InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
+    }
+
+    /// How few fields a Save Action on `field` visits, broadest first.
+    private static int breadthOf(Field field) {
+        if (field == InternalField.INTERNAL_ALL_FIELD) {
+            return 0;
+        }
+        if (field == InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD) {
+            return 1;
+        }
+        return 2;
     }
 
     private static List<FieldFormatterCleanup> withKeywordSeparatorOf(MetaData metaData, FieldFormatterCleanupActions actions) {
