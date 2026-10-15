@@ -1,5 +1,6 @@
 package org.jabref.model.metadata;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -45,6 +46,14 @@ public record LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes,
     /// Settings of modes alone, which is what everything but the reader of a file has.
     public LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes) {
         this(ruleModes, new LinkedHashMap<>(), new LinkedHashMap<>());
+    }
+
+    /// Settings naming each of these rules, repairing wherever it looks: what a library that says
+    /// nothing is formatted by.
+    public static LintSettings repairing(Collection<String> ruleIds) {
+        SequencedMap<RuleSelector, RuleMode> modes = new LinkedHashMap<>();
+        ruleIds.forEach(ruleId -> modes.put(RuleSelector.of(ruleId), RuleMode.FIX));
+        return new LintSettings(modes);
     }
 
     /// Settings naming one selector, to be extended with [#and].

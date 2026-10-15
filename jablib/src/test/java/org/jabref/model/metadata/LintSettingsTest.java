@@ -30,6 +30,13 @@ class LintSettingsTest {
         assertEquals(RuleMode.FIX, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
     }
 
+    @Test
+    void repairingNamesEachRuleRepairingOnEveryField() {
+        assertEquals(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
+                                 .and(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX),
+                LintSettings.repairing(List.of("lower-case", "surrounding-whitespace")));
+    }
+
     /// The point of naming a field: repair everywhere, report on one field alone.
     @Test
     void aSelectorNamingTheFieldBeatsOneNamingNone() {

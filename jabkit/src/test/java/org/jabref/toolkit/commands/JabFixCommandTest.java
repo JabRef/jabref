@@ -40,7 +40,8 @@ class JabFixCommandTest extends AbstractJabKitTest {
 
     /// Naming one rule leaves the rest of them out, so the whitespace around the author survives.
     /// The save action goes on being applied, and the library now states it in the one place that
-    /// says what is done to it.
+    /// says what is done to it -- next to the rules JabFix ships with, which it was formatted by
+    /// before and goes on being formatted by.
     @Test
     void migrateSaveActionsMovesThemIntoTheFormattingConfiguration() {
         assertEquals(CommandLine.ExitCode.OK,
@@ -48,9 +49,22 @@ class JabFixCommandTest extends AbstractJabKitTest {
                         getClassResourceAsFullyQualifiedString("jabfix-save-actions.bib")));
 
         String formatted = commandLine.getStandardOutput();
-        assertTrue(formatted.contains("title = {some title},"), formatted);
+        assertTrue(formatted.contains("title  = {some title},"), formatted);
+        assertTrue(formatted.contains("author = {Knuth, Donald E.},"), formatted);
         assertTrue(formatted.contains("\"title:lower-case\" : \"fix\""), formatted);
+        assertTrue(formatted.contains("\"surrounding-whitespace\" : \"fix\""), formatted);
         assertFalse(formatted.contains("saveActions"), formatted);
+    }
+
+    /// A library with no save actions has nothing to move, so it is formatted like any library that
+    /// says nothing and is not given a configuration.
+    @Test
+    void migrateSaveActionsLeavesALibraryWithoutThemAsItWas() {
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--migrate-save-actions", inputFile));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("author = {Knuth, Donald E.},"), formatted);
+        assertFalse(formatted.contains("jabref-meta-0.1.0"), formatted);
     }
 
     /// Without the option the library keeps its save actions item, so opening it changes nothing.
@@ -61,7 +75,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
                         getClassResourceAsFullyQualifiedString("jabfix-save-actions.bib")));
 
         String formatted = commandLine.getStandardOutput();
-        assertTrue(formatted.contains("title = {some title},"), formatted);
+        assertTrue(formatted.contains("title  = {some title},"), formatted);
         assertTrue(formatted.contains("saveActions"), formatted);
         assertFalse(formatted.contains("jabref-meta-0.1.0"), formatted);
     }

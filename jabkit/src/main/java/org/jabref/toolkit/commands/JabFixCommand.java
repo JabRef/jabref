@@ -25,7 +25,6 @@ import org.jabref.logic.util.ErrorFormat;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.LintSettings;
 import org.jabref.model.metadata.RuleMode;
-import org.jabref.model.metadata.RuleSelector;
 import org.jabref.toolkit.exception.CliException;
 import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ImportService;
@@ -101,7 +100,7 @@ class JabFixCommand implements Callable<Integer> {
         if (migrateSaveActions) {
             // Before the rules of the run are worked out, so that this run already applies what the
             // migrated library asks for rather than what it asked for a moment ago.
-            SaveActionsMigration.migrate(databaseContext.getMetaData());
+            SaveActionsMigration.migrate(databaseContext, jabKit.cliPreferences.getFieldPreferences());
         }
         // Asking the library to apply the rules is all it takes; the writer builds them. Which
         // rules there are needs the library, since its own Save Actions are rules of this run and
@@ -160,9 +159,11 @@ class JabFixCommand implements Callable<Integer> {
                                       .flatMap(List::stream)
                                       .toList());
 
+            // The command line names rules and not fields, so every selector it builds covers every
+            // field the rule looks at.
             LintSettings applied = enabledRules.isEmpty()
-                    ? databaseContext.getMetaData().getFormatting().orElseGet(() -> everyRuleRepairing(rules))
-                    : namedRepairing(enabledRules);
+                    ? databaseContext.getMetaData().getFormatting().orElseGet(() -> LintSettings.repairing(rules.ids()))
+                    : LintSettings.repairing(enabledRules);
 
             // A rule named by several options is switched off: the strictest of them wins, and
             // saying so in the one place that reads them all keeps it from being a question
@@ -177,20 +178,6 @@ class JabFixCommand implements Callable<Integer> {
                             String.join(", ", e.getKnownIds())),
                     CommandLine.ExitCode.USAGE);
         }
-    }
-
-    /// Every rule the library has, each repairing what it finds: what a library that has never been
-    /// configured is formatted by.
-    private static LintSettings everyRuleRepairing(RuleSet rules) {
-        return namedRepairing(rules.ids());
-    }
-
-    /// The command line names rules and not fields, so every selector it builds covers every field
-    /// the rule looks at.
-    private static LintSettings namedRepairing(List<String> ruleIds) {
-        SequencedMap<RuleSelector, RuleMode> modes = new LinkedHashMap<>();
-        ruleIds.forEach(ruleId -> modes.put(RuleSelector.of(ruleId), RuleMode.FIX));
-        return new LintSettings(modes);
     }
 
     private static SequencedMap<String, RuleMode> modesFor(List<String> ruleIds, RuleMode mode) {
