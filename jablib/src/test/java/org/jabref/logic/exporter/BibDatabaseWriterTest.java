@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -975,6 +976,18 @@ class BibDatabaseWriterTest {
 
         assertEquals(written.getMetaData().getFormatting(), read.getMetaData().getFormatting());
         assertEquals(written.getMetaData().getUnknownJsonMetaData(), read.getMetaData().getUnknownJsonMetaData());
+    }
+
+    /// The comment ends where its braces balance, so a brace inside a key or a value must not be
+    /// read back as one of the comment's own -- an escaped one that came in included.
+    @Test
+    void bracesInsideTheJsonMetaDataSurviveARoundTrip() throws IOException {
+        metaData.putUnknownJsonMetaDataItem("pattern{", "\"} {\\\\}\\u007d\"");
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+        ParserResult read = new BibtexParser(importFormatPreferences).parse(Reader.of(stringWriter.toString()));
+
+        assertEquals(Map.of("pattern{", "\"} {\\\\}}\""), read.getMetaData().getUnknownJsonMetaData());
     }
 
     /// A library that keeps nothing that way is written exactly as it was before the comment
