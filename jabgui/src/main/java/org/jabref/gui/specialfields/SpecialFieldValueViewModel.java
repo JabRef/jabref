@@ -26,7 +26,7 @@ public class SpecialFieldValueViewModel {
     public Optional<JabRefIcon> getIcon() {
         // Only the table shows the marked state in color; menus use the neutral icon of the action
         if (value == SpecialFieldValue.RELEVANT) {
-            return Optional.of(IconTheme.JabRefIcons.RELEVANT);
+            return Optional.of(IconTheme.JabRefIcons.RELEVANT_COLORED);
         }
         return getAction().getIcon();
     }
@@ -105,7 +105,7 @@ public class SpecialFieldValueViewModel {
             case SKIMMED ->
                     StandardActions.SKIMMED;
             case RELEVANT ->
-                    StandardActions.RELEVANT;
+                    StandardActions.TOGGLE_RELEVANCE;
         };
     }
 }
