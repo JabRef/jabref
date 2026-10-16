@@ -1086,7 +1086,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return 0; // fallback if stored position is no longer valid
         }
     }
-    
+
     public List<CustomizedPreviewStyle> getCustomizedPreviewStyle(List<CustomizedPreviewStyle> defaults) {
         PreferencesMigrations.upgradeLegacyCustomPreviewStyle(this);
 
