@@ -66,7 +66,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private TabPane availableTabPane;
     private Tab cslTab;
     private Tab customizedTab;
-    private Tab previousTab;
     private Button toRightButton;
     private Button toLeftButton;
     private Button sortUpButton;
@@ -104,7 +103,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
                 .checkbox(Localization.lang("Show preview as a tab in entry editor"), viewModel.showAsExtraTabProperty())
                 .checkbox(Localization.lang("Show preview in entry table tooltip"), viewModel.showPreviewInEntryTableTooltip())
                 .checkbox(Localization.lang("Download cover images"), viewModel.shouldDownloadCoversProperty())
-                .button(Localization.lang("Add BST file"), this::selectBstFile)
                 .custom(dualListRegion, lists -> lists
                         .validate(viewModel.chosenListValidationStatus(), chosenListView))
                 .custom(editorRegion)
@@ -133,7 +131,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         customizedListView = layoutListView();
         this.cslTab = new Tab(Localization.lang("CSL"), cslListView);
         cslTab.setClosable(false);
-        previousTab = cslTab;
 
         addCustomizedStyleNameField = new TextField();
         addCustomizedStyleNameField.setPromptText(Localization.lang("Type new preview style name..."));
@@ -310,7 +307,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
                             } else {
                                 viewModel.availableSelectionModelProperty().setValue(customizedListView.getSelectionModel());
                             }
-                            previousTab = newTab;
                             focusRightButtonBinding();
                         });
         new ViewModelListCellFactory<PreviewLayout>()
@@ -354,11 +350,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         chosenListView.setOnDragDetected(this::dragDetectedInChosen);
         chosenListView.setOnDragDropped(event -> dragDropped(viewModel.chosenListProperty(), event));
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
-        chosenListView.setOnMouseClicked(event -> {
-            viewModel.chosenSelectionModelProperty()
-                     .setValue(chosenListView.getSelectionModel());
-            mouseClickedChosen(event);
-        });
+        chosenListView.setOnMouseClicked(this::mouseClickedChosen);
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
@@ -487,11 +479,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     }
 
     public void toRightButtonAction() {
-        if (previousTab == cslTab) {
-            viewModel.addToChosen(viewModel.cslListProperty());
-        } else {
-            viewModel.addToChosen(viewModel.customizedListProperty());
-        }
+        viewModel.addToChosen();
         focusChosenOnLastRoutedLayout();
     }
 
@@ -519,11 +507,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
 
     private void mouseClickedAvailable(MouseEvent event) {
         if (event.getClickCount() == 2) {
-            if (previousTab == cslTab) {
-                viewModel.addToChosen(viewModel.cslListProperty());
-            } else {
-                viewModel.addToChosen(viewModel.customizedListProperty());
-            }
+            viewModel.addToChosen();
             focusChosenOnLastRoutedLayout();
             event.consume();
         }
@@ -532,6 +516,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private void mouseClickedChosen(MouseEvent event) {
         if (event.getClickCount() == 2) {
             viewModel.removeFromChosen();
+            viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
             focusAvailableOnLastRoutedLayout();
             event.consume();
         }
@@ -645,7 +630,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
                 cancelRename();
                 if (item != null) {
                     viewModel.availableSelectionModelProperty().getValue().select(item);
-                    viewModel.renameSelectedStyle(newName);
+                    viewModel.renameStyle(newName, item);
                     listView.refresh();
                 }
             }

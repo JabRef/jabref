@@ -1,15 +1,28 @@
 package org.jabref.gui.preview;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javafx.collections.FXCollections;
 import javafx.scene.input.ClipboardContent;
 
+import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ClipboardContentGeneratorTest {
 
@@ -148,6 +161,30 @@ class ClipboardContentGeneratorTest {
         String actual = markdown.getString();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void generateCopiesSelectedTextBasedPreviewLayout() throws IOException {
+        LayoutFormatterPreferences formatterPreferences = mock(LayoutFormatterPreferences.class);
+        JournalAbbreviationRepository journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
+        NameFormatterPreferences nameFormatterPreferences = mock(NameFormatterPreferences.class);
+        when(formatterPreferences.getNameFormatterPreferences()).thenReturn(nameFormatterPreferences);
+        when(nameFormatterPreferences.getNameFormatterKey()).thenReturn(FXCollections.observableArrayList(new ArrayList<>()));
+        TextBasedPreviewLayout first = TextBasedPreviewLayout.of("id1", "name1", "style1", formatterPreferences, journalAbbreviationRepository);
+        TextBasedPreviewLayout second = TextBasedPreviewLayout.of("id2", "name2", "style2", formatterPreferences, journalAbbreviationRepository);
+
+        int selectedPosition = 0;
+        List<PreviewLayout> previewLayoutList = new ArrayList<>(List.of(first, second));
+
+        PreviewPreferences preferences = new PreviewPreferences(previewLayoutList, selectedPosition, List.of(), false, false, List.of(), false);
+        ClipboardContentGenerator clipboardContentGenerator = new ClipboardContentGenerator(preferences, formatterPreferences, journalAbbreviationRepository);
+        ClipboardContent content = clipboardContentGenerator.generate(List.of(new BibEntry()), CitationStyleOutputFormat.HTML, new BibDatabaseContext());
+        assertEquals("style1", content.getString());
+
+        selectedPosition = 1;
+        preferences.setLayoutCyclePosition(selectedPosition);
+        content = clipboardContentGenerator.generate(List.of(new BibEntry()), CitationStyleOutputFormat.HTML, new BibDatabaseContext());
+        assertEquals("style2", content.getString());
     }
 }
 

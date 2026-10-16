@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -128,9 +127,10 @@ class PreviewStyleMigrationTest {
         // Simulate an application restart against the same backing store.
         JabRefGuiPreferences secondLoadPreferences = new JabRefGuiPreferences();
         PreviewPreferences secondLoad = secondLoadPreferences.getPreviewPreferences();
+
+        // The emptied list falls back to the default style (fixed id NAME), not to the legacy text
+        assertEquals(PreviewPreferences.getDefault().getCustomizedPreviewStyles(), secondLoad.getCustomizedPreviewStyles());
         assertEquals(1, secondLoad.getCustomizedPreviewStyles().size());
-        assertNotEquals(TextBasedPreviewLayout.NAME, secondLoad.getCustomizedPreviewStyles().getFirst().id());
-        assertEquals(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, secondLoad.getCustomizedPreviewStyles().getFirst().name());
         assertTrue(secondLoad.getCustomizedPreviewStyles().stream()
                              .noneMatch(style -> legacyText.replace("__NEWLINE__", "\n").equals(style.text())));
     }
@@ -141,9 +141,7 @@ class PreviewStyleMigrationTest {
         PreviewPreferences result = preferences.getPreviewPreferences();
 
         assertEquals(1, result.getCustomizedPreviewStyles().size());
-        assertNotEquals(TextBasedPreviewLayout.NAME, result.getCustomizedPreviewStyles().getFirst().id());
-        assertEquals(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, result.getCustomizedPreviewStyles().getFirst().name());
-        assertEquals(TextBasedPreviewLayout.DEFAULT, result.getCustomizedPreviewStyles().getFirst().text());
+        assertEquals(PreviewPreferences.getDefault().getCustomizedPreviewStyles(), result.getCustomizedPreviewStyles());
         assertTrue(preferences.getBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, false));
     }
 

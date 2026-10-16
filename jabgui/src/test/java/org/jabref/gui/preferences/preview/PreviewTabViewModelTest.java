@@ -284,7 +284,7 @@ class PreviewTabViewModelTest {
         viewModel.availableSelectionModelProperty().setValue(selectionModel);
 
         // simulate moving layout to 'selected' chosen list
-        viewModel.addToChosen(viewModel.cslListProperty());
+        viewModel.addToChosen();
 
         // movement validation
         assertFalse(viewModel.cslListProperty().contains(cslLayout));
@@ -464,7 +464,7 @@ class PreviewTabViewModelTest {
         viewModel.availableSelectionModelProperty().setValue(selectionModel);
         assertEquals(1, viewModel.customizedListProperty().size());
 
-        viewModel.removeCustomizedStyle();
+        viewModel.removeCustomizedStyle(textBasedPreviewLayout);
 
         assertEquals(0, viewModel.customizedListProperty().size());
         assertFalse(viewModel.customizedListProperty().contains(textBasedPreviewLayout));
@@ -487,7 +487,7 @@ class PreviewTabViewModelTest {
         selectionModel.select(cslLayout);
         viewModel.availableSelectionModelProperty().setValue(selectionModel);
 
-        viewModel.removeCustomizedStyle();  // not removed, style is not a custom layout (TextBasedPreviewLayout)
+        viewModel.removeCustomizedStyle(cslLayout);  // not removed, style is not a custom layout (TextBasedPreviewLayout)
 
         assertTrue(viewModel.cslListProperty().contains(cslLayout));
         assertEquals(viewModel.availableSelectionModelProperty().getValue().getSelectedItem(), cslLayout);
@@ -510,7 +510,7 @@ class PreviewTabViewModelTest {
     }
 
     @Test
-    void renameSelectedStyleSuccess() {
+    void renameStyleSuccess() {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         // add new custom layout
@@ -519,7 +519,7 @@ class PreviewTabViewModelTest {
         viewModel.customizedListProperty().add(textBasedPreviewLayout);
         viewModel.setPreviewLayout(textBasedPreviewLayout);
 
-        viewModel.renameSelectedStyle(NAME2);
+        viewModel.renameStyle(NAME2, textBasedPreviewLayout);
 
         assertEquals(ID1, textBasedPreviewLayout.getId());
         assertEquals(NAME2, textBasedPreviewLayout.getDisplayName());
@@ -527,7 +527,7 @@ class PreviewTabViewModelTest {
     }
 
     @Test
-    void renameSelectedStyleFailsOnDuplicateNameInCustomizedList() {
+    void renameStyleFailsOnDuplicateNameInCustomizedList() {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         // add new custom layout
@@ -538,7 +538,7 @@ class PreviewTabViewModelTest {
         viewModel.customizedListProperty().addAll(existing, textBasedPreviewLayout);
         viewModel.setPreviewLayout(textBasedPreviewLayout);
 
-        viewModel.renameSelectedStyle(NAME1);   // can't rename to existing name
+        viewModel.renameStyle(NAME1, textBasedPreviewLayout);   // can't rename to existing name
 
         assertEquals(ID2, textBasedPreviewLayout.getId());
         assertEquals(NAME2, textBasedPreviewLayout.getDisplayName());
@@ -546,7 +546,7 @@ class PreviewTabViewModelTest {
     }
 
     @Test
-    void renameSelectedStyleFailsOnDuplicateNameInChosenList() {
+    void renameStyleFailsOnDuplicateNameInChosenList() {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         TextBasedPreviewLayout chosenLayout = TextBasedPreviewLayout.of(ID1, NAME1, TEXT1,
@@ -558,7 +558,7 @@ class PreviewTabViewModelTest {
         viewModel.customizedListProperty().add(layoutBeingRenamed);
         viewModel.setPreviewLayout(layoutBeingRenamed);
 
-        viewModel.renameSelectedStyle(NAME1);
+        viewModel.renameStyle(NAME1, layoutBeingRenamed);
 
         assertEquals(ID2, layoutBeingRenamed.getId());
         assertEquals(NAME2, layoutBeingRenamed.getDisplayName());
@@ -566,7 +566,7 @@ class PreviewTabViewModelTest {
     }
 
     @Test
-    void renameSelectedStyleFailsOnDuplicateNameInCslList() {
+    void renameStyleFailsOnDuplicateNameInCslList() {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         // adds layout to CSL List
@@ -582,7 +582,7 @@ class PreviewTabViewModelTest {
         viewModel.customizedListProperty().add(layoutBeingRenamed);
         viewModel.setPreviewLayout(layoutBeingRenamed);
 
-        viewModel.renameSelectedStyle(TEST_TITLE);
+        viewModel.renameStyle(TEST_TITLE, layoutBeingRenamed);
 
         assertEquals(ID2, layoutBeingRenamed.getId());
         assertEquals(NAME2, layoutBeingRenamed.getDisplayName());
@@ -590,38 +590,17 @@ class PreviewTabViewModelTest {
     }
 
     @Test
-    void renameSelectedStyleFailsOnBlankLayoutNameAndTextFiledUnchanged() {
+    void renameStyleFailsOnBlankLayoutNameAndTextFiledUnchanged() {
         PreviewTabViewModel viewModel = setUpViewModel();
 
         TextBasedPreviewLayout textBasedPreviewLayout = TextBasedPreviewLayout.of(ID1, NAME1, TEXT1,
                 layoutFormatterPreferences, abbreviationRepository);
         viewModel.customizedListProperty().add(textBasedPreviewLayout);
         viewModel.setPreviewLayout(textBasedPreviewLayout);
-        viewModel.styleNameProperty().set(NAME1);
 
-        viewModel.renameSelectedStyle("   ");
+        viewModel.renameStyle("   ", textBasedPreviewLayout);
         assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
-        viewModel.renameSelectedStyle("");
-        assertEquals(NAME1, viewModel.styleNameProperty().getValue());
-        assertEquals(ID1, textBasedPreviewLayout.getId());
-        assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
-        assertEquals(TEXT1, textBasedPreviewLayout.getText());
-    }
-
-    @Test
-    void renameSelectedStyleFailsOnBlankLayoutNameAndTextFiledUnchanged222() {
-        PreviewTabViewModel viewModel = setUpViewModel();
-
-        TextBasedPreviewLayout textBasedPreviewLayout = TextBasedPreviewLayout.of(ID1, NAME1, TEXT1,
-                layoutFormatterPreferences, abbreviationRepository);
-        viewModel.customizedListProperty().add(textBasedPreviewLayout);
-        viewModel.setPreviewLayout(textBasedPreviewLayout);
-        viewModel.styleNameProperty().set(NAME1);
-
-        viewModel.renameSelectedStyle("   ");
-        assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
-        viewModel.renameSelectedStyle("");
-        assertEquals(NAME1, viewModel.styleNameProperty().getValue());
+        viewModel.renameStyle("", textBasedPreviewLayout);
         assertEquals(ID1, textBasedPreviewLayout.getId());
         assertEquals(NAME1, textBasedPreviewLayout.getDisplayName());
         assertEquals(TEXT1, textBasedPreviewLayout.getText());

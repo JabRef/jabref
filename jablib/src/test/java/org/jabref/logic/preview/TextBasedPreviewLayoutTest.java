@@ -22,18 +22,11 @@ class TextBasedPreviewLayoutTest {
     private final String TEXT2 = "<b>text2</b>";
 
     @Test
-    void fourArgConstructorGeneratesId() {
-        TextBasedPreviewLayout layout = TextBasedPreviewLayout.of(
-                NAME1, TEXT1, layoutFormatterPreferences, abbreviationRepository);
-        assertNotNull(layout.getId());
-        assertEquals(NAME1, layout.getName());
-        assertEquals(TEXT1, layout.getText());
-    }
-
-    @Test
-    void uniqueIDsFourArgConstructor() {
-        TextBasedPreviewLayout first = TextBasedPreviewLayout.of(NAME1, TEXT1, layoutFormatterPreferences, abbreviationRepository);
-        TextBasedPreviewLayout second = TextBasedPreviewLayout.of(NAME2, TEXT2, layoutFormatterPreferences, abbreviationRepository);
+    void compareTextBasedPreviewLayoutForUniqueIDs() {
+        CustomizedPreviewStyle style1 = new CustomizedPreviewStyle(NAME1, TEXT1);
+        CustomizedPreviewStyle style2 = new CustomizedPreviewStyle(NAME2, TEXT2);
+        TextBasedPreviewLayout first = TextBasedPreviewLayout.of(style1.id(), style1.name(), style1.text(), layoutFormatterPreferences, abbreviationRepository);
+        TextBasedPreviewLayout second = TextBasedPreviewLayout.of(style2.id(), style2.name(), style2.text(), layoutFormatterPreferences, abbreviationRepository);
         assertNotEquals(first.getId(), second.getId());
         assertEquals(NAME1, first.getName());
         assertEquals(NAME2, second.getName());
@@ -42,23 +35,7 @@ class TextBasedPreviewLayoutTest {
     }
 
     @Test
-    void fiveArgConstructorAssignsGivenId() {
-        TextBasedPreviewLayout layout = TextBasedPreviewLayout.of(TEST_ID, NAME1, TEXT1,
-                layoutFormatterPreferences, abbreviationRepository);
-        assertEquals(TEST_ID, layout.getId());
-    }
-
-    @Test
-    void ofFactoryFourArgGeneratesId() {
-        TextBasedPreviewLayout layout = TextBasedPreviewLayout.of(NAME1, TEXT1,
-                layoutFormatterPreferences, abbreviationRepository);
-        assertNotNull(layout.getId());
-        assertEquals(NAME1, layout.getName());
-        assertEquals(TEXT1, layout.getText());
-    }
-
-    @Test
-    void ofFactoryFiveArgAssignsId() {
+    void ofFactoryAssignArgId() {
         TextBasedPreviewLayout layout = TextBasedPreviewLayout.of(TEST_ID, NAME1, TEXT1,
                 layoutFormatterPreferences, abbreviationRepository);
         assertEquals(TEST_ID, layout.getId());

@@ -51,27 +51,6 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     private LayoutFormatterPreferences layoutFormatterPreferences;
     private JournalAbbreviationRepository abbreviationRepository;
 
-    public TextBasedPreviewLayout(@NonNull String text,
-                                  @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
-                                  @NonNull JournalAbbreviationRepository abbreviationRepository) {
-        this.layoutFormatterPreferences = layoutFormatterPreferences;
-        this.abbreviationRepository = abbreviationRepository;
-        this.name = NAME;
-        this.id = CUID.randomCUID2(CUID_LENGTH).toString();
-        setText(text);
-    }
-
-    public TextBasedPreviewLayout(@NonNull String name,
-                                  @NonNull String text,
-                                  @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
-                                  @NonNull JournalAbbreviationRepository abbreviationRepository) {
-        this.name = name;
-        this.layoutFormatterPreferences = layoutFormatterPreferences;
-        this.abbreviationRepository = abbreviationRepository;
-        this.id = CUID.randomCUID2(CUID_LENGTH).toString();
-        setText(text);
-    }
-
     public TextBasedPreviewLayout(@NonNull String id,
                                   @NonNull String name,
                                   @NonNull String text,
@@ -125,36 +104,16 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     }
 
     public String getId() {
-        return this.id.isBlank() ? CUID.randomCUID2(CUID_LENGTH).toString() : this.id;
+        return this.id;
     }
 
     public String getShortTitle() {
-        return NAME;
+        return name;
     }
 
     @Override
     public String getDisplayName() {
         return this.name.isBlank() ? Localization.lang("Customized preview style") : this.name;
-    }
-
-    public static TextBasedPreviewLayout of(@NonNull String style,
-                                            @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
-                                            @NonNull JournalAbbreviationRepository abbreviationRepository) {
-        return new TextBasedPreviewLayout(
-                style,
-                layoutFormatterPreferences,
-                abbreviationRepository);
-    }
-
-    public static TextBasedPreviewLayout of(@NonNull String name,
-                                            @NonNull String style,
-                                            @NonNull LayoutFormatterPreferences preferences,
-                                            @NonNull JournalAbbreviationRepository repository) {
-        return new TextBasedPreviewLayout(
-                name,
-                style,
-                preferences,
-                repository);
     }
 
     public static TextBasedPreviewLayout of(@NonNull String id,

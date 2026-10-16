@@ -21,6 +21,11 @@ import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 public class PreviewPreferences {
+    private static final CustomizedPreviewStyle DEFAULT_STYLE = new CustomizedPreviewStyle(
+            TextBasedPreviewLayout.NAME,
+            TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME,
+            TextBasedPreviewLayout.DEFAULT.replace("__NEWLINE__", "\n"));
+
     private final ObservableList<PreviewLayout> layoutCycle;
     private final IntegerProperty layoutCyclePosition;
     private final ObservableList<CustomizedPreviewStyle> customizedPreviewStyles;
@@ -50,7 +55,7 @@ public class PreviewPreferences {
         this(
                 List.of(),  // Layout cycle - empty by default, see JabRefPreferences::getPreviewPreferencesFromBackingStore
                 0,          // Layout cycle position
-                List.of(new CustomizedPreviewStyle(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, TextBasedPreviewLayout.DEFAULT)),   // default custom style
+                List.of(DEFAULT_STYLE),   // default custom style
                 false,      // Show preview as an extra tab
                 false,      // Show the preview entry table tooltip
                 List.of(),  // BST-Paths
@@ -105,13 +110,11 @@ public class PreviewPreferences {
         if (layoutCycle.isEmpty()
                 || layoutCyclePosition.getValue() < 0
                 || layoutCyclePosition.getValue() >= layoutCycle.size()) {
-            String fallbackText = customizedPreviewStyles.isEmpty()
-                                  ? TextBasedPreviewLayout.DEFAULT
-                                  : customizedPreviewStyles.getFirst().text();
-            return TextBasedPreviewLayout.of(
-                    fallbackText,
-                    LayoutFormatterPreferences.getDefault(),
-                    new JournalAbbreviationRepository());
+            CustomizedPreviewStyle fallback = customizedPreviewStyles.isEmpty()
+                                              ? new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)
+                                              : customizedPreviewStyles.getFirst();
+            return TextBasedPreviewLayout.of(fallback.id(), fallback.name(), fallback.text(),
+                    LayoutFormatterPreferences.getDefault(), new JournalAbbreviationRepository());
         } else {
             return layoutCycle.get(layoutCyclePosition.getValue());
         }

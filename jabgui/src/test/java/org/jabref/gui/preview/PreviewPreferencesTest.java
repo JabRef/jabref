@@ -40,12 +40,13 @@ class PreviewPreferencesTest {
         PreviewPreferences preferences = PreviewPreferences.getDefault();
         ObservableList<CustomizedPreviewStyle> customizedPreviewStyles = preferences.getCustomizedPreviewStyles();
         assertEquals(1, customizedPreviewStyles.size());
-        assertEquals(TextBasedPreviewLayout.DEFAULT, customizedPreviewStyles.getFirst().text());
+        assertEquals(TextBasedPreviewLayout.NAME, customizedPreviewStyles.getFirst().id());
+        assertEquals(TextBasedPreviewLayout.DEFAULT.replace("__NEWLINE__", "\n"), customizedPreviewStyles.getFirst().text());
         assertEquals(TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, customizedPreviewStyles.getFirst().name());
     }
 
     @Test
-    void getSelectedReturnFirstCustomizedStyleWhenEmptyLayoutCycle() {
+    void getSelectedReturnFirstStyleWhenEmptyLayoutCycle() {
         PreviewPreferences preferences = new PreviewPreferences(
                 List.of(),
                 0,
@@ -56,15 +57,14 @@ class PreviewPreferencesTest {
                 false);
         PreviewLayout previewLayout = preferences.getSelectedPreviewLayout();
         assertInstanceOf(TextBasedPreviewLayout.class, previewLayout);
-        ObservableList<CustomizedPreviewStyle> customizedPreviewStyles = preferences.getCustomizedPreviewStyles();
-        assertEquals(1, customizedPreviewStyles.size());
-        assertEquals(ID1, customizedPreviewStyles.getFirst().id());
-        assertEquals(NAME1, customizedPreviewStyles.getFirst().name());
-        assertEquals(TEXT1, customizedPreviewStyles.getFirst().text());
+        TextBasedPreviewLayout textBasedPreviewLayout = (TextBasedPreviewLayout) previewLayout;
+        assertEquals(ID1, textBasedPreviewLayout.getId());
+        assertEquals(NAME1, textBasedPreviewLayout.getName());
+        assertEquals(TEXT1, textBasedPreviewLayout.getText());
     }
 
     @Test
-    void getSelectedReturnFirstPreviewWhenLayoutCyclePopulated() {
+    void getLayoutCycleReturnFirstPreviewWhenLayoutCyclePopulated() {
         PreviewPreferences preferences = new PreviewPreferences(
                 List.of(new CitationStylePreviewLayout(
                         new CitationStyle(TEST_FILEPATH,
@@ -94,5 +94,14 @@ class PreviewPreferencesTest {
         assertEquals(TEST_TITLE, citationStyle.getTitle());
         assertEquals(TEST_SHORT_TITLE, citationStyle.getShortTitle());
         assertEquals(TEST_SOURCE, citationStyle.getSource());
+    }
+
+    @Test
+    void defaultCustomizedStyleIsStableAcrossInstances() {
+        ObservableList<CustomizedPreviewStyle> defaultStyle1 = PreviewPreferences.getDefault().getCustomizedPreviewStyles();
+        ObservableList<CustomizedPreviewStyle> defaultStyle2 = PreviewPreferences.getDefault().getCustomizedPreviewStyles();
+        // new default styles should have same ID, not new unique ids.
+        assertEquals(defaultStyle1.getFirst().id(), defaultStyle2.getFirst().id());
+        assertEquals(defaultStyle1, defaultStyle2);
     }
 }
