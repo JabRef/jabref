@@ -1,12 +1,17 @@
 package org.jabref.gui.bibtexhighlighter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.search.SearchType;
 import org.jabref.model.entry.field.Field;
@@ -15,11 +20,16 @@ import org.jabref.model.util.Range;
 
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter.BibTeXHighlightRegion;
+import jfx.incubator.scene.control.richtext.CodeArea;
 import jfx.incubator.scene.control.richtext.SyntaxDecorator;
 import jfx.incubator.scene.control.richtext.TextPos;
 import jfx.incubator.scene.control.richtext.model.CodeTextModel;
+import jfx.incubator.scene.control.richtext.model.HtmlExportFormatHandler;
 import jfx.incubator.scene.control.richtext.model.RichParagraph;
+import jfx.incubator.scene.control.richtext.skin.RichTextAreaSkin;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// [SyntaxDecorator] that applies BibTeX syntax highlighting and search-term highlighting
 /// to the `CodeArea` used in [org.jabref.gui.entryeditor.SourceTab].
@@ -39,6 +49,8 @@ import org.jspecify.annotations.NullMarked;
 /// be long-lived, one per `CodeArea`, rather than recreated per paragraph.
 @NullMarked
 public class BibTeXHighlighter implements SyntaxDecorator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibTeXHighlighter.class);
 
     private final StateManager stateManager;
     private final BibTeXSyntaxHighlighter syntaxHighlighter;
@@ -64,6 +76,47 @@ public class BibTeXHighlighter implements SyntaxDecorator {
     /// @param fieldPositionsProvider supplier providing a mapping of fields to their global ranges
     public void setFieldPositionsProvider(Supplier<Map<Field, Range>> fieldPositionsProvider) {
         this.fieldPositionsProvider = fieldPositionsProvider;
+    }
+
+    /// Copies source with syntax styling when supported by the editor.
+    public static void copySource(CodeArea codeArea) {
+        if (codeArea.getSyntaxDecorator() instanceof BibTeXHighlighter highlighter) {
+            highlighter.copyWithSyntaxHighlighting(codeArea);
+        } else {
+            codeArea.copy();
+        }
+    }
+
+    /// Copies the selected text in the given [CodeArea] to the system clipboard, preserving
+    /// plain text for code/text editors and augmenting it with rich HTML syntax highlighting
+    /// for external applications like LibreOffice Writer, Microsoft Word, and Google Docs.
+    ///
+    /// @param codeArea the code area from which to copy
+    // [impl->req~entry-editor.source-tab.copy-syntax-highlighting~1]
+    public void copyWithSyntaxHighlighting(CodeArea codeArea) {
+        if (!codeArea.hasNonEmptySelection()) {
+            return;
+        }
+
+        codeArea.copy();
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        if (clipboard.hasString() && codeArea.getSkin() instanceof RichTextAreaSkin skin) {
+            try {
+                // Export the decorated model so partial tokens and active theme styles match the editor.
+                String html = (String) HtmlExportFormatHandler.getInstance().copy(
+                        codeArea.getModel(), skin.getStyleResolver(),
+                        codeArea.getSelection().getMin(), codeArea.getSelection().getMax());
+                ClipboardContent content = new ClipboardContent();
+                for (var format : clipboard.getContentTypes()) {
+                    content.put(format, clipboard.getContent(format));
+                }
+                content.putHtml(html);
+                content.put(ClipBoardManager.BIBTEX_SOURCE, clipboard.getString());
+                clipboard.setContent(content);
+            } catch (IOException exception) {
+                LOGGER.warn("Could not copy syntax-highlighted BibTeX source", exception);
+            }
+        }
     }
 
     /// Builds the styled paragraph for a single line of the model, applying both BibTeX syntax

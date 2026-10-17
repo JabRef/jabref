@@ -38,6 +38,9 @@ import org.slf4j.LoggerFactory;
 
 @AllowedToUseAwt("Requires java.awt.datatransfer.Clipboard")
 public class ClipBoardManager {
+    /// Identifies source copies whose plain text must be preserved by internal editors.
+    public static final DataFormat BIBTEX_SOURCE = new DataFormat("application/x-jabref-bibtex-source");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
 
     private static final DataFormat DATAFORMAT_JABREF_DATA = new DataFormat(MediaTypes.APPLICATION_JABREF_DATA);
@@ -95,6 +98,11 @@ public class ClipBoardManager {
                        .map(String.class::cast)
                        .map(JabRefClipboardData::fromJson)
                        .flatMap(data -> data.toTransferInformation(stateManager));
+    }
+
+    /// Whether the clipboard contains a syntax-highlighted source selection.
+    public static boolean hasBibtexSource() {
+        return clipboard.hasString() && clipboard.getString().equals(clipboard.getContent(BIBTEX_SOURCE));
     }
 
     public static String getHtmlContents() {
