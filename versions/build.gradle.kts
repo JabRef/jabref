@@ -136,6 +136,7 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-locator:4.0.3")
     api("org.glassfish.hk2:hk2-utils:4.0.3")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
+    api("org.graalvm.sdk:nativeimage:25.3.4.1")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.5.Final")
     api("org.hisp.dhis:json-tree:1.9.5")
@@ -169,4 +170,7 @@ dependencies.constraints {
     api("tools.maran:svg:1.0.0")
     api("tools.maran:svg-materialdesign:1.0.0")
     api("tools.maran:svgnode:2.0.1")
+    // jfx-static-libs must match the JavaFX version above
+    api("us.hebi.graalvm:jfx-static-feature:1.0")
+    api("us.hebi.graalvm:jfx-static-libs:27-1")
 }
