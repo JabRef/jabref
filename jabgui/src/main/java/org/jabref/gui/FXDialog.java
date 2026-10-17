@@ -76,8 +76,7 @@ public class FXDialog extends Alert {
     }
 
     private void setDialogIcon(Image image) {
-        Stage fxDialogWindow = getDialogWindow();
-        fxDialogWindow.getIcons().add(image);
+        IconTheme.applyLogo(this, image);
     }
 
     private Stage getDialogWindow() {

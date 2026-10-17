@@ -6,7 +6,7 @@ Only one library is provided, which contains 4 entries 3 of them have automatica
 
 The test case shows that the "Search for unlinked local files" dialog can now show the user the entries that the files can be linked to.
 
-## Steps to run the test case:
+## Steps to run the test case
 
 - open library `issue-13689/issue-13689.bib`
 - click `Lookup - Search for unlinked local files`

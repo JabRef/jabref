@@ -94,7 +94,7 @@ public class AiChatView extends StackPane {
         chatHistoryScrollPane.setRenderer(this::renderChatMessage);
         chatHistoryScrollPane.setAutoScrollToBottom(true);
 
-        // [pp->feat~ai.ingestion.trigger-on-demand~1]
+        // [impl->req~ai.ingestion.trigger-on-demand.privacy-policy~1]
         privacyNotice.managedProperty().bind(privacyNotice.visibleProperty());
         restartNeededPane.managedProperty().bind(restartNeededPane.visibleProperty());
         noFilesErrorPane.managedProperty().bind(noFilesErrorPane.visibleProperty());
