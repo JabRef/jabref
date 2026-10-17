@@ -37,6 +37,16 @@ class DefaultTexParserTest {
         assertEquals(expectedParserResult, latexParserResult);
     }
 
+    @Test
+    void matchCiteOnWindowsLineEndings() {
+        Path path = Path.of("");
+        LatexParserResult expectedParserResult = new LatexParserResult(path);
+        expectedParserResult.addKey(DARWIN, path, 1, 6, 16, "\\cite{Darwin1888}");
+        expectedParserResult.addKey(EINSTEIN, path, 2, 6, 18, "\\cite{Einstein1920}");
+
+        assertEquals(expectedParserResult, new DefaultLatexParser().parse("\\cite{Darwin1888}\r\n\\cite{Einstein1920}"));
+    }
+
     @ParameterizedTest
     @CsvSource(
             textBlock = """
