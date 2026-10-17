@@ -101,6 +101,7 @@ public class BibtexParser implements Parser {
     /// Git writes conflict markers as seven characters at the start of a line, but a botched merge can produce longer runs (https://github.com/JabRef/jabref/issues/9167).
     private static final int CONFLICT_MARKER_LENGTH = 7;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
+    private final Deque<Character> unreadCharacters = new ArrayDeque<>();
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
     private BibDatabase database;
@@ -176,8 +177,8 @@ public class BibtexParser implements Parser {
     ///
     /// Handling of encoding is done at [BibtexImporter]
     public ParserResult parse(@NonNull Reader in) throws IOException {
-        // Recovery may unread both the citation-key token and the following lookahead.
-        pushbackReader = new PushbackReader(in, 2 * BibtexParser.LOOKAHEAD);
+        pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
+        unreadCharacters.clear();
 
         String newLineSeparator = determineNewLineSeparator();
 
@@ -677,7 +678,7 @@ public class BibtexParser implements Parser {
     }
 
     private int read() throws IOException {
-        int character = pushbackReader.read();
+        int character = unreadCharacters.isEmpty() ? pushbackReader.read() : unreadCharacters.pop();
 
         if (!isEOFCharacter(character)) {
             pureTextFromFile.offerLast((char) character);
@@ -711,14 +712,14 @@ public class BibtexParser implements Parser {
         }
     }
 
-    private void unread(int character) throws IOException {
+    private void unread(int character) {
         if (character == '\n') {
             line--;
             column = highestColumns.pop();
         } else {
             column--;
         }
-        pushbackReader.unread(character);
+        unreadCharacters.push((char) character);
         if (pureTextFromFile.getLast() == character) {
             pureTextFromFile.pollLast();
         }
@@ -766,8 +767,10 @@ public class BibtexParser implements Parser {
         int keyStartColumn = column;
         String key = parseKey();
 
-        ParserResult.Range keyRange = new ParserResult.Range(keyStartLine, keyStartColumn, line, column);
-        parserResult.getFieldRanges().computeIfAbsent(result, _ -> new HashMap<>()).put(InternalField.KEY_FIELD, keyRange);
+        if (!key.isEmpty()) {
+            ParserResult.Range keyRange = new ParserResult.Range(keyStartLine, keyStartColumn, line, column);
+            parserResult.getFieldRanges().computeIfAbsent(result, _ -> new HashMap<>()).put(InternalField.KEY_FIELD, keyRange);
+        }
 
         result.setCitationKey(key);
         skipWhitespace();
@@ -1016,9 +1019,7 @@ public class BibtexParser implements Parser {
     }
 
     /// pushes buffer back into input
-    ///
-    /// @throws IOException can be thrown if buffer is bigger than LOOKAHEAD
-    private void unreadBuffer(StringBuilder stringBuilder) throws IOException {
+    private void unreadBuffer(StringBuilder stringBuilder) {
         for (int i = stringBuilder.length() - 1; i >= 0; --i) {
             unread(stringBuilder.charAt(i));
         }
@@ -1041,13 +1042,13 @@ public class BibtexParser implements Parser {
                     || (character == ':') || ("#{}~,=\uFFFD".indexOf(character) == -1))) {
                 token.append((char) character);
             } else {
-                if (Character.isWhitespace((char) character)) {
-                    if (isEqualsSignNext()) {
-                        // A field assignment before any comma means that the citation key is missing.
-                        unread(character);
-                        unreadBuffer(token);
-                        return "";
-                    }
+                if ((character == '=') || (Character.isWhitespace((char) character) && isEqualsSignNext())) {
+                    // A field assignment before any comma means that the citation key is missing.
+                    unread(character);
+                    unreadBuffer(token);
+                    parserResult.addWarning(new ParserResult.Range(line, column), Localization.lang("empty citation key"));
+                    return "";
+                } else if (Character.isWhitespace((char) character)) {
                     // We have encountered white space instead of the comma at
                     // the end of
                     // the key. Possibly the comma is missing, so we try to
@@ -1057,10 +1058,6 @@ public class BibtexParser implements Parser {
                 } else if ((character == ',') || (character == '}')) {
                     unread(character);
                     return token.toString();
-                } else if (character == '=') {
-                    unread(character);
-                    unreadBuffer(token);
-                    return "";
                 } else {
                     throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
                             + "allowed in citation keys.");
@@ -1069,10 +1066,11 @@ public class BibtexParser implements Parser {
         }
     }
 
+    /// Distinguishes a missing-key field assignment from a citation key without consuming input.
     private boolean isEqualsSignNext() throws IOException {
         StringBuilder whitespace = new StringBuilder();
         int character = peek();
-        while (Character.isWhitespace((char) character) && (whitespace.length() < LOOKAHEAD - 1)) {
+        while (Character.isWhitespace((char) character)) {
             whitespace.append((char) read());
             character = peek();
         }
