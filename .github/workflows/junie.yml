@@ -30,6 +30,6 @@ jobs:
 
       - name: Run Junie
         id: junie
-        uses: JetBrains/junie-github-action@915822cc3611663c8d6ebbcf04c362fb95e8b34f # v1.7.17
+        uses: JetBrains/junie-github-action@e80674f1534684678e52266b40fe9751352bc1ff # v1.7.18
         with:
           junie_api_key: ${{ secrets.JUNIE_API_KEY }}
