@@ -598,7 +598,6 @@ public class BibEntry {
     public Optional<FieldChange> setField(@NonNull Field field,
                                           @Nullable String value,
                                           @NonNull EntriesEventSource eventSource) {
-        System.out.printf("Setting field %s value %s\n", field, value);
         if (StringUtil.isNullOrEmpty(value)) {
             return clearField(field);
         }
