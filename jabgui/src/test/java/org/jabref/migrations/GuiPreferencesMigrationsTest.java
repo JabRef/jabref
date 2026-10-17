@@ -10,6 +10,7 @@ import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
@@ -21,6 +22,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -32,6 +34,8 @@ class GuiPreferencesMigrationsTest {
 
     private JabRefGuiPreferences preferences;
 
+    private JabRefCliPreferences jabRefCliPreferences;
+
     private final String[] oldStylePatterns = new String[] {"\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
     private final String[] newStylePatterns = new String[] {"[citationkey]",
@@ -41,6 +45,7 @@ class GuiPreferencesMigrationsTest {
     void setUp() {
         preferences = mock(JabRefGuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         Injector.setModelOrService(CliPreferences.class, preferences);
+        jabRefCliPreferences = mock(JabRefCliPreferences.class);
     }
 
     @Test
@@ -478,5 +483,58 @@ class GuiPreferencesMigrationsTest {
         PreferencesMigrations.upgradeKeyBindingsToJavaFX(preferences);
 
         verify(preferences).putStringList(JabRefGuiPreferences.BINDINGS, List.of("ctrl+A"));
+    }
+
+    @Test
+    void upgradeLegacyCustomPreviewStyleLegacyMigrationIsVerified() {
+        when(jabRefCliPreferences.get(JabRefGuiPreferences.PREVIEW_STYLE, "")).thenReturn("\\myText__NEWLINE__");
+
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(jabRefCliPreferences);
+
+        verify(jabRefCliPreferences).put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_ID + "0", TextBasedPreviewLayout.NAME);
+        verify(jabRefCliPreferences).put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_NAME + "0", TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME);
+        verify(jabRefCliPreferences).put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_TEXT + "0", "\\myText__NEWLINE__");
+        verify(jabRefCliPreferences).putBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, true);
+    }
+
+    @Test
+    void upgradeLegacyCustomPreviewStyleNewlinesInTheLegacyStyleAreStoredEncoded() {
+        when(jabRefCliPreferences.get(JabRefGuiPreferences.PREVIEW_STYLE, "")).thenReturn("someLegacyText\n");
+
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(jabRefCliPreferences);
+        verify(jabRefCliPreferences).put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_TEXT + "0", "someLegacyText__NEWLINE__");
+    }
+
+    @Test
+    void upgradeLegacyCustomPreviewStyleIsDefault() {
+        when(jabRefCliPreferences.get(JabRefGuiPreferences.PREVIEW_STYLE, "")).thenReturn(TextBasedPreviewLayout.DEFAULT);
+
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(jabRefCliPreferences);
+        verify(jabRefCliPreferences).putBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, true);
+        verify(jabRefCliPreferences, never()).put(anyString(), anyString());
+    }
+
+    @Test
+    void upgradeLegacyCustomPreviewStyleLegacyTextIsBlank() {
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(jabRefCliPreferences);
+        verify(jabRefCliPreferences).putBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, true);
+        verify(jabRefCliPreferences, never()).put(anyString(), anyString());
+    }
+
+    @Test
+    void upgradeLegacyCustomPreviewStyleExistingStyleEarlyExit() {
+        when(jabRefCliPreferences.hasKey(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_ID + "0")).thenReturn(true);
+
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(jabRefCliPreferences);
+        verify(jabRefCliPreferences, never()).put(anyString(), anyString());
+        verify(jabRefCliPreferences, never()).putBoolean(anyString(), anyBoolean());
+    }
+
+    @Test
+    void upgradeLegacyCustomPreviewStyleAlreadyMigratedEarlyExit() {
+        when(jabRefCliPreferences.getBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, false)).thenReturn(true);
+
+        PreferencesMigrations.upgradeLegacyCustomPreviewStyle(jabRefCliPreferences);
+        verify(jabRefCliPreferences, never()).put(anyString(), anyString());
     }
 }
