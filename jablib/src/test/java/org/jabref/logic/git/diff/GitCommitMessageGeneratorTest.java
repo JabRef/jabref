@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GitCommitMessageGeneratorTest {
+
     @Test
     void unchangedLibraryGeneratesNoMessage() {
         Optional<String> message = generate(
@@ -34,6 +35,7 @@ public class GitCommitMessageGeneratorTest {
         assertEquals(Optional.of("Add 3 entries"), message);
     }
 
+    // [utest->req~git.commit.generated-message~1]
     @Test
     void addedAndModifiedEntriesAreSummarized() {
         Optional<String> message = generate(
@@ -68,6 +70,7 @@ public class GitCommitMessageGeneratorTest {
         assertEquals(Optional.of("Delete 2 entries"), message);
     }
 
+    // [utest->req~git.commit.generated-message~1]
     @Test
     void singleChangedFieldIsNamed() {
         Optional<String> message = generate(
@@ -95,6 +98,7 @@ public class GitCommitMessageGeneratorTest {
         assertEquals(Optional.of("Modify groups of Smith2024"), message);
     }
 
+    // [utest->req~git.commit.generated-message~1]
     @Test
     void changedPreambleAloneGeneratesNoMessage() {
         BibDatabase workingTreeDatabase = new BibDatabase(List.of(article("Smith2024", "Smith", "Git basics")));

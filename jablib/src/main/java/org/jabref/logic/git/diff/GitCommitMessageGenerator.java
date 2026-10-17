@@ -30,6 +30,9 @@ public final class GitCommitMessageGenerator {
     private GitCommitMessageGenerator() {
     }
 
+    // [impl->req~git.commit.generated-message~1]
+    // [impl->adr~english-only-git-commit-messages~1]
+
     /// Compare two libraries
     ///  If there is exactly one difference, try the specific bonus message
     ///  Otherwise, do the count of added, deleted, modified entries
