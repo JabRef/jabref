@@ -68,6 +68,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where legacy group memberships, markings, and special fields were no longer migrated when opening a library. [#17019](https://github.com/JabRef/jabref/pull/17019)
 - We fixed an issue where saving an SLR study overwrote different per-query native queries. [#17307](https://github.com/JabRef/jabref/pull/17307)
 - We fixed an issue where AI chats were lost when JabRef did not quit regularly. [#17177](https://github.com/JabRef/jabref/pull/17177)
+- We fixed the "Field will be created" hint staying visible although the "Jump to field" dialog suggested an existing field. [#17060](https://github.com/JabRef/jabref/issues/17060)
 
 ### Removed
 
