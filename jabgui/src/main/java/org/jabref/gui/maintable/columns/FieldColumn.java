@@ -39,10 +39,10 @@ public class FieldColumn extends MainTableColumn<String> {
         if (fields.hasExactlyOne()) {
             // comparator can't parse more than one value
             Field field = fields.getFields().stream().collect(MoreCollectors.onlyElement());
-
-            if ((field instanceof UnknownField) || field.isNumeric()) {
+            if ((field instanceof UnknownField) || field.isNumeric() || field.getName().equalsIgnoreCase("citationcount")) {
                 this.setComparator(new NumericFieldComparator());
             }
+        }
         }
 
         this.setSortable(true);
