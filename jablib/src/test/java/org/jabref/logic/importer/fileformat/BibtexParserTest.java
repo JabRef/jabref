@@ -229,6 +229,46 @@ class BibtexParserTest {
         assertEquals(List.of(expected), result.getDatabase().getEntries());
     }
 
+    // [utest->req~import.bibtex.key-leading-whitespace~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"", " \t", "\n", "\r", "\r\n", "\n\n", "\r\n\r\n"})
+    void parseRecognizesCitationKeyAfterLeadingWhitespace(String whitespace) throws IOException {
+        ParserResult result = parser.parse(Reader.of("@inproceedings{" + whitespace + "somebody2023,\ntitle={...}\n}"));
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("somebody2023")
+                .withField(StandardField.TITLE, "...");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+        assertEquals(List.of(), result.warnings());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "@article{author={Ed von Test},title={Test}}",
+            "@article{\nauthor = {Ed von Test},title={Test}}",
+            "@article{\r\ntitle={Test},author={Ed von Test}}",
+            "@article{\n\ntitle\t= {Test},author={Ed von Test}}",
+            "@article{\r\nauthor\r\n= {Ed von Test},title={Test}}"
+    })
+    void parsePreservesFirstFieldWhenCitationKeyAndCommaAreMissing(String entry) throws IOException {
+        ParserResult result = parser.parse(Reader.of(entry));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Ed von Test")
+                .withField(StandardField.TITLE, "Test");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
+    void parsePreservesFirstFieldWithWhitespaceAtLookaheadLimit() throws IOException {
+        ParserResult result = parser.parse(Reader.of("@article{\nauthor" + " ".repeat(1024) + "={Ed von Test},title={Test}}"));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Ed von Test")
+                .withField(StandardField.TITLE, "Test");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
     @Test
     void parseRecognizesEntryWithUnknownType() throws IOException {
         ParserResult result = parser

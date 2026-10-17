@@ -176,7 +176,8 @@ public class BibtexParser implements Parser {
     ///
     /// Handling of encoding is done at [BibtexImporter]
     public ParserResult parse(@NonNull Reader in) throws IOException {
-        pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
+        // Recovery may unread both the citation-key token and the following lookahead.
+        pushbackReader = new PushbackReader(in, 2 * BibtexParser.LOOKAHEAD);
 
         String newLineSeparator = determineNewLineSeparator();
 
@@ -759,10 +760,8 @@ public class BibtexParser implements Parser {
 
         skipWhitespace();
         consume('{', '(');
-        int character = peek();
-        if ((character != '\n') && (character != '\r')) {
-            skipWhitespace();
-        }
+        // [impl->req~import.bibtex.key-leading-whitespace~1]
+        skipWhitespace();
         int keyStartLine = line;
         int keyStartColumn = column;
         String key = parseKey();
@@ -774,7 +773,7 @@ public class BibtexParser implements Parser {
         skipWhitespace();
 
         while (true) {
-            character = peek();
+            int character = peek();
             if ((character == '}') || (character == ')')) {
                 break;
             }
@@ -1043,6 +1042,12 @@ public class BibtexParser implements Parser {
                 token.append((char) character);
             } else {
                 if (Character.isWhitespace((char) character)) {
+                    if (isEqualsSignNext()) {
+                        // A field assignment before any comma means that the citation key is missing.
+                        unread(character);
+                        unreadBuffer(token);
+                        return "";
+                    }
                     // We have encountered white space instead of the comma at
                     // the end of
                     // the key. Possibly the comma is missing, so we try to
@@ -1053,15 +1058,26 @@ public class BibtexParser implements Parser {
                     unread(character);
                     return token.toString();
                 } else if (character == '=') {
-                    // If we find a '=' sign, it is either an error, or
-                    // the entry lacked a comma signifying the end of the key.
-                    return token.toString();
+                    unread(character);
+                    unreadBuffer(token);
+                    return "";
                 } else {
                     throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
                             + "allowed in citation keys.");
                 }
             }
         }
+    }
+
+    private boolean isEqualsSignNext() throws IOException {
+        StringBuilder whitespace = new StringBuilder();
+        int character = peek();
+        while (Character.isWhitespace((char) character) && (whitespace.length() < LOOKAHEAD - 1)) {
+            whitespace.append((char) read());
+            character = peek();
+        }
+        unreadBuffer(whitespace);
+        return character == '=';
     }
 
     private String parseBracketedText() throws IOException {
