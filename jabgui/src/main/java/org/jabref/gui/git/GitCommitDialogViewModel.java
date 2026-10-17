@@ -15,6 +15,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.GitSyncService;
+import org.jabref.logic.git.diff.GitCommitMessageGenerator;
 import org.jabref.logic.git.diff.GitDiffChecker;
 import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.status.GitStatusChecker;
@@ -274,6 +275,30 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         private static String causeMessage(Throwable cause) {
             String message = cause.getLocalizedMessage();
             return message != null ? message : Localization.lang("Git push failed");
+        }
+    }
+    // [impl->req~git.commit.generated-message~1]
+
+    /// Fill the generated commit message to message box
+    /// only if the box is still blank
+    public void prefillGeneratedCommitMessage() {
+        BackgroundTask.wrap(this::generateCommitMessage)
+                      .onSuccess(generatedMessage -> generatedMessage.ifPresent(this::setCommitMessageIfBlank))
+                      .onFailure(exception -> LOGGER.debug("Could not generate a commit message", exception))
+                      .executeWith(taskExecutor);
+    }
+
+    private Optional<String> generateCommitMessage() throws JabRefException, IOException {
+        DiffDatabases diffDatabases = computeDiffDatabases();
+        return GitCommitMessageGenerator.generate(diffDatabases.headDatabase(), diffDatabases.workingTreeDatabase());
+    }
+
+    ///  This can be affected by user fast commit
+    /// when they open the commit and type their own messages
+    /// faster that the generator so there is no automatic generated message
+    private void setCommitMessageIfBlank(String message) {
+        if (StringUtil.isBlank(commitMessage.get())) {
+            commitMessage.set(message);
         }
     }
 }
