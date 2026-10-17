@@ -15,10 +15,6 @@ import org.jabref.model.entry.field.InternalField;
 
 import org.jspecify.annotations.NullMarked;
 
-/**
- *
- */
-
 /// This class is to generate a commit message that summarizes how the library has
 /// changed since the last commit
 /// Only entry changes are described. If only the group tree,
@@ -31,7 +27,6 @@ public final class GitCommitMessageGenerator {
     }
 
     // [impl->req~git.commit.generated-message~1]
-    // [impl->adr~english-only-git-commit-messages~1]
 
     /// Compare two libraries
     ///  If there is exactly one difference, try the specific bonus message
@@ -96,7 +91,7 @@ public final class GitCommitMessageGenerator {
             return Optional.empty();
         }
         Field field = changedFields.getFirst();
-        if (InternalField.KEY_FIELD.equals(field)) {
+        if (InternalField.KEY_FIELD == field) {
             return citationKeyMessage(original, changed);
         }
         return changed.getCitationKey()
