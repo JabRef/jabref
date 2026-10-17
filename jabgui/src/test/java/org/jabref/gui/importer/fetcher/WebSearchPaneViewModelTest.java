@@ -1,19 +1,26 @@
 package org.jabref.gui.importer.fetcher;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.when;
 
 class WebSearchPaneViewModelTest {
 
+    private final BooleanProperty importerEnabled = new SimpleBooleanProperty(true);
     private GuiPreferences preferences;
     private DialogService dialogService;
     private StateManager stateManager;
@@ -22,6 +29,7 @@ class WebSearchPaneViewModelTest {
     @BeforeEach
     void setUp() {
         preferences = Mockito.mock(GuiPreferences.class, RETURNS_DEEP_STUBS);
+        when(preferences.getImporterPreferences().importerEnabledProperty()).thenReturn(importerEnabled);
         dialogService = Mockito.mock(DialogService.class);
         stateManager = Mockito.mock(StateManager.class);
 
@@ -99,5 +107,30 @@ class WebSearchPaneViewModelTest {
     void canExtractArXivIdFromQueryText() {
         viewModel.queryProperty().setValue("this query contains an ArXiv identifier 2110.02957");
         assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    void searchIsDisabledForBlankQuery(String query) {
+        viewModel.queryProperty().setValue(query);
+        assertFalse(viewModel.searchEnabledProperty().get());
+    }
+
+    @Test
+    void searchIsDisabledWhenImporterGetsDisabled() {
+        viewModel.queryProperty().setValue("machine learning");
+        assertTrue(viewModel.searchEnabledProperty().get());
+
+        importerEnabled.set(false);
+        assertFalse(viewModel.searchEnabledProperty().get());
+    }
+
+    @Test
+    void searchEnablementFollowsQuery() {
+        viewModel.queryProperty().setValue("machine learning");
+        assertTrue(viewModel.searchEnabledProperty().get());
+
+        viewModel.queryProperty().setValue("");
+        assertFalse(viewModel.searchEnabledProperty().get());
     }
 }
