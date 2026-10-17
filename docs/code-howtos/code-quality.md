@@ -18,6 +18,15 @@ JabRef has three code style checkers in place:
 
 In case a check fails, [the CI](https://github.com/JabRef/jabref/blob/main/.github/workflows/tests.yml#L24C6-L24C6) automatically adds a comment on the pull request.
 
+## Spelling checks
+
+CI runs `typos` on the source tree. Reproduce a spelling failure locally with `pipx run typos==1.50.3`.
+Fix actual misspellings. For a valid word that the checker flags on a Java line, add `// spellchecker:disable-line` to that line only, for example a foreign-language test value:
+
+```java
+assertEquals("für alle", title); // spellchecker:disable-line
+```
+
 ## Monitoring
 
 We monitor the general source code quality at three places:
