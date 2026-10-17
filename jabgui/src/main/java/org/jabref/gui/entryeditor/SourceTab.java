@@ -21,7 +21,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
+import org.jabref.gui.bibtexhighlighter.BibTeXCodeArea;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -52,7 +52,6 @@ import com.tobiasdiez.easybind.Subscription;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
-import jfx.incubator.scene.control.richtext.CodeArea;
 import jfx.incubator.scene.control.richtext.SyntaxDecorator;
 import jfx.incubator.scene.control.richtext.TextPos;
 import org.slf4j.Logger;
@@ -75,7 +74,7 @@ public class SourceTab extends EntryEditorTab {
     private final KeyBindingRepository keyBindingRepository;
     private final StateManager stateManager;
     private Map<Field, Range> fieldPositions;
-    private CodeArea codeArea;
+    private BibTeXCodeArea codeArea;
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
@@ -131,8 +130,8 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void setupSourceEditor() {
-        codeArea = new CodeArea();
-        codeArea.setWrapText(true);
+        codeArea = new BibTeXCodeArea(stateManager, bibTeXSyntaxHighlighter);
+        codeArea.setFieldPositionsProvider(() -> fieldPositions != null ? fieldPositions : Map.of());
         codeArea.setOnInputMethodTextChanged(event -> {
             String committed = event.getCommitted();
             if (!committed.isEmpty()) {
@@ -140,14 +139,9 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.getModel().replace(null, caretPos, caretPos, committed);
             }
         });
-        codeArea.getStyleClass().addAll("bibtex-code-area");
 
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
-
-        BibTeXHighlighter bibTeXHighlighter = new BibTeXHighlighter(stateManager, bibTeXSyntaxHighlighter);
-        bibTeXHighlighter.setFieldPositionsProvider(() -> fieldPositions != null ? fieldPositions : Map.of());
-        codeArea.setSyntaxDecorator(bibTeXHighlighter);
 
         ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
