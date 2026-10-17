@@ -143,18 +143,16 @@ public class KeyBindingRepository {
         return Optional.of(KeyCombination.valueOf(binding));
     }
 
-    /// Finds keyBinding that already uses the given combination of keys
+    /// Finds all other key bindings that already use the key combination of the given key event
     ///
-    /// @param keyBinding  the binding to be changed
-    /// @param combination the new key combination
-    /// @return conflicting key binding if it exists, else empty
-    public Optional<KeyBinding> findConflictingKeyBinding(KeyBinding keyBinding, KeyCombination combination) {
+    /// @param keyBinding the binding to be changed
+    /// @param keyEvent   the key event the new shortcut is created from
+    /// @return the conflicting key bindings, empty if there are none
+    public List<KeyBinding> findConflictingKeyBindings(KeyBinding keyBinding, KeyEvent keyEvent) {
         return bindings.keySet().stream()
                        .filter(other -> other != keyBinding)
-                       .filter(other -> getKeyCombination(other)
-                               .filter(combination::equals)
-                               .isPresent())
-                       .findFirst();
+                       .filter(other -> checkKeyCombinationEquality(other, keyEvent))
+                       .toList();
     }
 
     /// Check if the given KeyBinding equals the given keyEvent

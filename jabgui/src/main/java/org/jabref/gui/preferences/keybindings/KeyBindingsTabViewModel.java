@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.keybindings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -12,7 +13,6 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
@@ -108,32 +108,35 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         }
 
         if (selectedEntry.setNewBinding(event)) {
-            Optional<KeyBinding> conflict = keyBindingRepository.findConflictingKeyBinding(selectedEntry.getKeyBinding(),
-                    KeyCombination.valueOf(selectedEntry.getBinding()));
+            List<KeyBinding> conflicts = keyBindingRepository.findConflictingKeyBindings(
+                    selectedEntry.getKeyBinding(), event);
 
-            if (conflict.isPresent()) {
-                if (!confirmReplace(selectedEntry.getBinding(), conflict.get())) {
+            if (!conflicts.isEmpty()) {
+                if (!confirmReplace(selectedEntry.getBinding(), conflicts)) {
                     setValues();
                     return;
                 }
-                keyBindingRepository.put(conflict.get(), "");
+                conflicts.forEach(conflict -> keyBindingRepository.put(conflict, ""));
             }
 
             keyBindingRepository.put(selectedEntry.getKeyBinding(), selectedEntry.getBinding());
 
-            if (conflict.isPresent()) {
+            if (!conflicts.isEmpty()) {
                 setValues();
             }
         }
     }
 
-    private boolean confirmReplace(String combination, KeyBinding conflictingKeyBinding) {
+    private boolean confirmReplace(String combination, List<KeyBinding> conflictingKeyBindings) {
+        String names = conflictingKeyBindings.stream()
+                                             .map(KeyBinding::getLocalization)
+                                             .collect(Collectors.joining(", "));
         ButtonType replaceButtonType = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OK_DONE);
         return dialogService.showCustomButtonDialogAndWait(
                                     Alert.AlertType.WARNING,
                                     Localization.lang("Shortcut already in use"),
                                     Localization.lang("The shortcut %0 is already used by '%1'. Do you want to replace it?",
-                                            combination, conflictingKeyBinding.getLocalization()),
+                                            combination, names),
                                     replaceButtonType,
                                     ButtonType.CANCEL)
                             .filter(response -> response == replaceButtonType)
