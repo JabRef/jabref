@@ -6,14 +6,13 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.SequencedCollection;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -28,29 +27,32 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.types.EntryType;
 
-import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialogViewModel.class);
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     private final BibliographyConsistencyCheck.Result result;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
+    private final BibDatabaseMode bibDatabaseMode;
+    private final TaskExecutor taskExecutor;
 
     private final List<Field> allReportedFields;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
@@ -59,25 +61,40 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     public ConsistencyCheckDialogViewModel(DialogService dialogService,
                                            GuiPreferences preferences,
                                            BibEntryTypesManager entryTypesManager,
-                                           BibliographyConsistencyCheck.Result result) {
+                                           BibDatabaseMode bibDatabaseMode,
+                                           BibliographyConsistencyCheck.Result result,
+                                           TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.entryTypesManager = entryTypesManager;
-        this.result = result;
+        this.entryTypesManager = new BibEntryTypesManager();
+        this.entryTypesManager.addCustomOrModifiedTypes(List.copyOf(entryTypesManager.getAllCustomizedTypes(bibDatabaseMode)), bibDatabaseMode);
+        this.bibDatabaseMode = bibDatabaseMode;
+        this.taskExecutor = taskExecutor;
+        Map<BibEntry, BibEntry> originalEntries = new IdentityHashMap<>();
+        this.result = snapshotResult(result, originalEntries);
 
-        this.allReportedFields = result.entryTypeToResultMap().values().stream()
-                                       .flatMap(entryTypeResult -> entryTypeResult.fields().stream())
-                                       .sorted(Comparator.comparing(Field::getName))
-                                       .distinct()
-                                       .toList();
-
-        result.entryTypeToResultMap().entrySet().stream()
-              .sorted(Comparator.comparing(entry -> entry.getKey().getName()))
-              .forEach(Unchecked.consumer(this::writeMapEntry));
+        try (TableDataWriter tableDataWriter = new TableDataWriter(originalEntries)) {
+            this.allReportedFields = tableDataWriter.getAllReportedFields();
+            tableDataWriter.writeFindings();
+        }
     }
 
     public StringProperty selectedEntryTypeProperty() {
         return selectedEntryType;
+    }
+
+    // [impl->req~ux.consistency.export-snapshot~1]
+    private BibliographyConsistencyCheck.Result snapshotResult(BibliographyConsistencyCheck.Result result, Map<BibEntry, BibEntry> originalEntries) {
+        Map<EntryType, BibliographyConsistencyCheck.EntryTypeResult> snapshotResults = new LinkedHashMap<>();
+        result.entryTypeToResultMap().forEach((entryType, entryTypeResult) -> {
+            List<BibEntry> snapshots = entryTypeResult.sortedEntries().stream().map(entry -> {
+                BibEntry snapshot = new BibEntry(entry);
+                originalEntries.put(snapshot, entry);
+                return snapshot;
+            }).toList();
+            snapshotResults.put(entryType, new BibliographyConsistencyCheck.EntryTypeResult(Set.copyOf(entryTypeResult.fields()), snapshots));
+        });
+        return new BibliographyConsistencyCheck.Result(snapshotResults);
     }
 
     public List<String> getEntryTypes() {
@@ -98,58 +115,43 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         return result;
     }
 
-    private void writeMapEntry(Map.Entry<EntryType, BibliographyConsistencyCheck.EntryTypeResult> mapEntry) {
-        BibDatabaseMode bibDatabaseMode = BibDatabaseMode.BIBTEX;
-        String entryType = mapEntry.getKey().getDisplayName();
+    /// Fills [#tableData] using the same columns and cell symbols as the TXT and CSV exports
+    private class TableDataWriter extends BibliographyConsistencyCheckResultWriter {
 
-        Optional<BibEntryType> bibEntryType = this.entryTypesManager.enrich(mapEntry.getKey(), bibDatabaseMode);
-        Set<Field> requiredFields = bibEntryType
-                .map(BibEntryType::getRequiredFields)
-                .stream()
-                .flatMap(Collection::stream)
-                .flatMap(orFields -> orFields.getFields().stream())
-                .collect(Collectors.toSet());
-        Set<Field> optionalFields = bibEntryType
-                .map(BibEntryType::getOptionalFields)
-                .stream()
-                .flatMap(Collection::stream)
-                .map(BibField::field)
-                .collect(Collectors.toSet());
+        private final Map<BibEntry, BibEntry> originalEntries;
 
-        BibliographyConsistencyCheck.EntryTypeResult entries = mapEntry.getValue();
-        SequencedCollection<BibEntry> bibEntries = entries.sortedEntries();
-
-        bibEntries.forEach(Unchecked.consumer(bibEntry ->
-                writeBibEntry(bibEntry, entryType, requiredFields, optionalFields)
-        ));
-    }
-
-    private void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
-        List<String> theRecord = getFindingsAsList(bibEntry, entryType, requiredFields, optionalFields);
-        List<String> message = new ArrayList<>();
-        for (String s : theRecord) {
-            String modifiedString = s.replaceAll("\\s+", " ");
-            message.add(modifiedString);
+        TableDataWriter(Map<BibEntry, BibEntry> originalEntries) {
+            super(ConsistencyCheckDialogViewModel.this.result, Writer.nullWriter(), true,
+                    ConsistencyCheckDialogViewModel.this.entryTypesManager, ConsistencyCheckDialogViewModel.this.bibDatabaseMode);
+            this.originalEntries = originalEntries;
         }
-        tableData.add(new ConsistencyMessage(message, bibEntry));
-    }
 
-    private List<String> getFindingsAsList(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
-        List<String> result = new ArrayList<>(allReportedFields.size() + 2);
-        result.add(entryType);
-        result.add(bibEntry.getCitationKey().orElse(""));
-        allReportedFields.forEach(field ->
-                result.add(bibEntry.getField(field).map(_ -> {
-                    if (requiredFields.contains(field)) {
-                        return ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
-                    } else if (optionalFields.contains(field)) {
-                        return ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
-                    } else {
-                        return ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
-                    }
-                }).orElse(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText()))
-        );
-        return result;
+        List<Field> getAllReportedFields() {
+            return allReportedFields;
+        }
+
+        @Override
+        public void writeFindings() {
+            try {
+                super.writeFindings();
+            } catch (IOException e) {
+                // writeBibEntry does not perform any I/O
+                LOGGER.error("Could not collect consistency check findings", e);
+            }
+        }
+
+        @Override
+        protected void writeBibEntry(BibEntry bibEntry, EntryTypeReport entryTypeReport) {
+            List<String> message = getFindingsAsList(bibEntry, entryTypeReport).stream()
+                                                                               .map(cell -> WHITESPACE.matcher(cell).replaceAll(" "))
+                                                                               .toList();
+            // [impl->req~ux.consistency.entry-navigation~1]
+            tableData.add(new ConsistencyMessage(message, originalEntries.getOrDefault(bibEntry, bibEntry)));
+        }
+
+        @Override
+        public void close() {
+        }
     }
 
     protected void startExportAsTxt() {
@@ -164,13 +166,15 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
             return;
         }
 
-        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(exportPath.get()));
-             BibliographyConsistencyCheckResultTxtWriter bibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true)) {
-            bibliographyConsistencyCheckResultTxtWriter.writeFindings();
-        } catch (IOException e) {
-            LOGGER.error(Localization.lang("Problem when exporting file"), e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Failed to export file."));
-        }
+        Path path = exportPath.orElseThrow();
+        // [impl->req~ux.consistency.export-background~1]
+        BackgroundTask.wrap(() -> {
+            try (Writer writer = new OutputStreamWriter(Files.newOutputStream(path));
+                 BibliographyConsistencyCheckResultTxtWriter resultWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true, entryTypesManager, bibDatabaseMode)) {
+                resultWriter.writeFindings();
+            }
+            return path;
+        }).onFailure(this::showExportError).executeWith(taskExecutor);
     }
 
     protected void startExportAsCsv() {
@@ -185,12 +189,19 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
             return;
         }
 
-        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(exportPath.get()));
-             BibliographyConsistencyCheckResultCsvWriter bibliographyConsistencyCheckResultCsvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, true)) {
-            bibliographyConsistencyCheckResultCsvWriter.writeFindings();
-        } catch (IOException e) {
-            LOGGER.error(Localization.lang("Problem when exporting file"), e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Failed to export file."));
-        }
+        Path path = exportPath.orElseThrow();
+        // [impl->req~ux.consistency.export-background~1]
+        BackgroundTask.wrap(() -> {
+            try (Writer writer = new OutputStreamWriter(Files.newOutputStream(path));
+                 BibliographyConsistencyCheckResultCsvWriter resultWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, true, entryTypesManager, bibDatabaseMode)) {
+                resultWriter.writeFindings();
+            }
+            return path;
+        }).onFailure(this::showExportError).executeWith(taskExecutor);
+    }
+
+    private void showExportError(Exception exception) {
+        LOGGER.error("Problem when exporting file", exception);
+        dialogService.showErrorDialogAndWait(Localization.lang("Failed to export file."));
     }
 }
