@@ -16,7 +16,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
+import javafx.event.EventTarget;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
@@ -36,6 +38,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.ai.chat.AiChatView;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -336,6 +339,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
+    private static boolean isInAiChat(EventTarget target) {
+        for (Node node = target instanceof Node targetNode ? targetNode : null; node != null; node = node.getParent()) {
+            if (node instanceof AiChatView) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void initKeyBindings() {
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
@@ -358,7 +370,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         event.consume();
                         break;
                     case SEARCH:
-                        globalSearchBar.requestFocus();
+                        // The AI chat has its own find bar
+                        if (!isInAiChat(event.getTarget())) {
+                            globalSearchBar.requestFocus();
+                        }
                         break;
                     case OPEN_GLOBAL_SEARCH_DIALOG:
                         globalSearchBar.openGlobalSearchDialog();
