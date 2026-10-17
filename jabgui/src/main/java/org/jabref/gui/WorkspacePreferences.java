@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -19,7 +21,12 @@ import org.jabref.gui.theme.ThemePreset;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.util.OptionalObjectProperty;
 
+import org.jspecify.annotations.NonNull;
+
 public class WorkspacePreferences {
+
+    private static final int DEF_FONT_SIZE = 9;
+
     private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
@@ -31,7 +38,11 @@ public class WorkspacePreferences {
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty confirmDelete;
     private final BooleanProperty confirmHideTabBar;
+    private final BooleanProperty wrapMainTableText;
     private final ObservableList<String> selectedSlrCatalogs;
+
+    private final DoubleBinding cellSize;
+    private final DoubleBinding tableCellSize;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -43,6 +54,7 @@ public class WorkspacePreferences {
                                 boolean showAdvancedHints,
                                 boolean confirmDelete,
                                 boolean confirmHideTabBar,
+                                boolean wrapMainTableText,
                                 List<String> selectedSlrCatalogs) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
@@ -55,7 +67,11 @@ public class WorkspacePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
         this.confirmHideTabBar = new SimpleBooleanProperty(confirmHideTabBar);
+        this.wrapMainTableText = new SimpleBooleanProperty(wrapMainTableText);
         this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
+
+        cellSize = createCellSizeBinding();
+        tableCellSize = createTableCellSizeBinding();
     }
 
     /// Creates Object with default values
@@ -63,7 +79,7 @@ public class WorkspacePreferences {
         this(
                 Language.getLanguageFor(Locale.getDefault().getLanguage()), // Default language
                 false,                                                      // Default font size override
-                9,                                                          // Default font size
+                DEF_FONT_SIZE,                                              // Default font size
                 ThemePreset.JABREF,                                         // Default theme
                 ThemeColorScheme.FOLLOW_SYSTEM,                             // Default color scheme is follow system
                 null,                                                       // Custom theme
@@ -71,12 +87,34 @@ public class WorkspacePreferences {
                 true,                                                       // Default show advanced hints
                 true,                                                       // Default confirm delete
                 true,                                                       // Default confirm hide tab bar
+                true,                                                       // Default wrap main table text
                 List.of()                                                   // Default selected SLR catalogs
         );
     }
 
     public static WorkspacePreferences getDefault() {
         return new WorkspacePreferences();
+    }
+
+    private @NonNull DoubleBinding createCellSizeBinding() {
+        return Bindings.createDoubleBinding(() -> {
+            double cellSize;
+            if (shouldOverrideDefaultFontSize.get()) {
+                cellSize = mainFontSize.get() * 2d;
+            } else {
+                cellSize = DEF_FONT_SIZE * 2d;
+            }
+            return cellSize;
+        }, shouldOverrideDefaultFontSize, mainFontSize);
+    }
+
+    private @NonNull DoubleBinding createTableCellSizeBinding() {
+        return Bindings.createDoubleBinding(() -> {
+            if (wrapMainTableText.get()) {
+                return cellSize.get() * 2;
+            }
+            return cellSize.get();
+        }, cellSize, wrapMainTableText);
     }
 
     public void setAll(WorkspacePreferences preferences) {
@@ -89,6 +127,7 @@ public class WorkspacePreferences {
         this.showAdvancedHints.set(preferences.shouldShowAdvancedHints());
         this.confirmDelete.set(preferences.shouldConfirmDelete());
         this.confirmHideTabBar.set(preferences.shouldHideTabBar());
+        this.wrapMainTableText.set(preferences.shouldWrapMainTableText());
         this.selectedSlrCatalogs.setAll(preferences.getSelectedSlrCatalogs());
     }
 
@@ -200,6 +239,18 @@ public class WorkspacePreferences {
         this.confirmHideTabBar.set(hideTabBar);
     }
 
+    public boolean shouldWrapMainTableText() {
+        return wrapMainTableText.get();
+    }
+
+    public BooleanProperty wrapMainTableTextProperty() {
+        return wrapMainTableText;
+    }
+
+    public void setWrapMainTableText(boolean wrapMainTableText) {
+        this.wrapMainTableText.set(wrapMainTableText);
+    }
+
     public ObservableList<String> getSelectedSlrCatalogs() {
         return selectedSlrCatalogs;
     }
@@ -218,5 +269,13 @@ public class WorkspacePreferences {
 
     public void setCustomTheme(Optional<StyleSheet> customTheme) {
         this.customTheme.set(customTheme);
+    }
+
+    public DoubleBinding tableCellSizeProperty() {
+        return tableCellSize;
+    }
+
+    public DoubleBinding cellSizeProperty() {
+        return cellSize;
     }
 }
