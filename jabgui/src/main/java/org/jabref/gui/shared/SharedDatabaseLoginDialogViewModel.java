@@ -43,7 +43,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.google.common.base.Throwables;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -315,21 +314,15 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             result.filter(ButtonType.OK::equals).ifPresent(_ -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
             return;
         }
-        // The driver's own message is generic ("The connection attempt failed."); the reason is at the end of the cause chain
-        String reason = Optional.ofNullable(Throwables.getRootCause(exception).getLocalizedMessage()).orElse(exception.toString());
-        dialogService.showErrorDialogAndWait(
-                Localization.lang("Connection error"),
-                Localization.lang("Could not connect to %0.\n\n%1", connectionEndpoint(connectionProperties), reason),
-                exception);
-    }
-
-    private String connectionEndpoint(DBMSConnectionProperties connectionProperties) {
-        if (!connectionProperties.isUseExpertMode()) {
-            return connectionProperties.getHost() + ":" + connectionProperties.getPort();
-        }
-        return DBMSConnectionUrl.parse(connectionProperties.getJdbcUrl())
-                                .map(url -> url.host() + ":" + url.port())
-                                .orElse(connectionProperties.getJdbcUrl());
+        // [impl->req~shared-database.reconnect-retry~1]
+        // The failed loading tab has already closed itself; an error tab with a retry takes its place instead of a dialog.
+        // The database is not remembered yet (no id), so closing the tab simply forgets the attempt.
+        LOGGER.error("Could not connect to shared database {}", connectionProperties.getDatabase(), exception);
+        SharedDatabaseErrorTab errorTab = new SharedDatabaseErrorTab(null, connectionProperties);
+        // The tab goes only once the attempt really starts: `openSharedDatabase` can still bail out before that
+        errorTab.setRetryAction(() -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, errorTab::close));
+        errorTab.showError(exception);
+        tabContainer.showSharedDatabaseErrorTab(errorTab);
     }
 
     private void setPreferences(DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath) {
