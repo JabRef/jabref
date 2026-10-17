@@ -43,8 +43,6 @@ class GitCommitDialogViewModelTest {
     private GitHandlerRegistry gitHandlerRegistry;
     private GitCommitDialogViewModel viewModel;
 
-    /// Deep stubs so when parsing .bib files in diffTask()
-    /// can read the keyword separator and avoid NullPointerException
     @BeforeEach
     void setUp() {
         dialogService = mock(DialogService.class);
@@ -52,6 +50,7 @@ class GitCommitDialogViewModelTest {
         GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(gitPreferences.getPat()).thenReturn("");
         gitHandlerRegistry = new GitHandlerRegistry(gitPreferences);
+        // Deep stubs so when parsing .bib files in diffTask() can read the keyword separator and avoid NullPointerException
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         viewModel = new GitCommitDialogViewModel(
