@@ -119,3 +119,5 @@ JabRef development is powered by YourKit Java Profiler
 [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.svg)](https://www.yourkit.com/java/profiler/)
 
 <!-- markdownlint-disable-file MD060 -->
+
+<!-- Contribution by mahilsaily306-max for Kestra Hacktoberfest 2026 -->
