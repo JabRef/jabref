@@ -145,11 +145,14 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
         fieldPropertyCheckComboBox.setPrefWidth(180.0);
 
+        addNewField.setMaxHeight(Double.MAX_VALUE);
+        fieldPropertyCheckComboBox.setMaxHeight(Double.MAX_VALUE);
+
         addNewFieldButton.setPrefWidth(100.0);
         addNewFieldButton.setOnAction(_ -> addNewField());
 
         HBox addFieldRow = new HBox(GAP, addNewField, fieldPropertyCheckComboBox, addNewFieldButton);
-        addFieldRow.setAlignment(Pos.BASELINE_CENTER);
+        addFieldRow.setAlignment(Pos.CENTER_LEFT);
 
         Button resetButton = new Button(Localization.lang("Reset to default"));
         resetButton.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
@@ -159,7 +162,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         HBox bottomRow = new HBox(GAP, new VBox(4, addFieldRow), spacer, resetButton);
-        bottomRow.setAlignment(Pos.BASELINE_LEFT);
+        bottomRow.setAlignment(Pos.CENTER_LEFT);
 
         VBox column = new VBox(GAP, header, fields, bottomRow);
         HBox.setHgrow(column, Priority.ALWAYS);
