@@ -2,8 +2,10 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -15,6 +17,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImportFormatReader.ImportResult;
@@ -403,6 +406,40 @@ class ImportHandlerTest {
 
         journal.undo();
         assertEquals(List.of(existing), database.getEntries(), "the replaced entry could not be restored");
+    }
+
+    /// An imported entry may carry a key from its source that is already taken in the library.
+    /// With "Generate new key on import" (the default setting), the imported entry gets a free key and the existing key stays.
+    @Test
+    void importedEntryWithTakenKeyGetsNewKeyAndExistingKeyStays() {
+        BibEntry existingWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "汪, 小明")
+                .withField(StandardField.YEAR, "2020")
+                .withCitationKey("Wang2020");
+        BibEntry importedWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "王, 大明")
+                .withField(StandardField.YEAR, "2020")
+                .withCitationKey("Wang2020");
+        BibDatabase database = new BibDatabase(List.of(existingWang));
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        when(preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()).thenReturn(true);
+        GlobalCitationKeyPatterns keyPatterns = GlobalCitationKeyPatterns.fromPattern("[auth:transliterate:camel][year]");
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
+                keyPatterns,
+                new SimpleObjectProperty<>(',')));
+
+        handlerFor(databaseContext, new JabRefUndoManager()).importCleanedEntries(null, List.of(importedWang));
+
+        assertEquals(List.of(Optional.of("Wang2020"), Optional.of("Wang2020a")),
+                List.of(existingWang.getCitationKey(), importedWang.getCitationKey()));
     }
 
     private ImportHandler handlerFor(BibDatabaseContext databaseContext, JabRefUndoManager journal) {

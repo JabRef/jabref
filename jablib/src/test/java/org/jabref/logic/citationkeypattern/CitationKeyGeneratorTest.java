@@ -1,5 +1,6 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -1163,13 +1164,83 @@ class CitationKeyGeneratorTest {
             "Alexander Artemenko and others, 2019, Artemenko2019",
 
             // Transliteration
-            "Надежда Карпенко, 2025, Karpenko2025"
+            "Надежда Карпенко, 2025, Karpenko2025",
+            "万征 and 姚仰平 and 孟达, 2016, wanzheng2016"
     })
     void generateKeyWithSpecialCases(String author, String year, String expected) {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, author)
                 .withField(StandardField.YEAR, year);
         assertEquals(expected, generateKey(entry, "[auth][year]"));
+    }
+
+    /// Pinyin keys can be produced by configuration alone
+    @ParameterizedTest
+    @CsvSource(quoteCharacter = '"', textBlock = """
+            "万征 and 姚仰平 and 孟达", "WanZheng2016"
+            "王, 小明", "WangXiao2016"
+            "小明 王", "WangXiao2016"
+            "欧阳小明", "OuYangXiaoMing2016"
+            "欧阳, 小明", "OuYangXiao2016"
+            "欧阳,小明", "OuYangXiao2016"
+            """)
+    void generateKeyForChineseAuthorWithPinyin(String author, String expected) {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, author)
+                .withField(StandardField.YEAR, "2016");
+        assertEquals(expected, generateKey(entry, "[auth:transliterate:camel][authForeIni:transliterate:camel][year]"));
+    }
+
+    @ParameterizedTest
+    @CsvSource(quoteCharacter = '"', textBlock = """
+            "万, 征", "WanZ2016"
+            "王, 小明", "WangX2016"
+            "小明 王", "WangX2016"
+            "欧阳, 小明", "OuYangX2016"
+            "司马, 相如", "SiMaX2016"
+            """)
+    void generateKeyForChineseAuthorWithPinyinInitial(String author, String expected) {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, author)
+                .withField(StandardField.YEAR, "2016");
+        assertEquals(expected, generateKey(entry, "[auth:transliterate:camel][authForeIni:transliterate:truncate1:upper][year]"));
+    }
+
+    /// 王 and 汪 are different surnames that both transliterate to "Wang"
+    @Test
+    void addingEntryWithCollidingPinyinKeepsExistingKey() {
+        BibEntry existingWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "王, 小明")
+                .withField(StandardField.YEAR, "2020")
+                .withCitationKey("Wang2020");
+        BibEntry addedWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "汪, 小明")
+                .withField(StandardField.YEAR, "2020");
+        BibDatabase database = new BibDatabase(List.of(existingWang, addedWang));
+
+        addedWang.setCitationKey(generateKey(addedWang, "[auth:transliterate:camel][year]", database));
+
+        assertEquals(List.of(Optional.of("Wang2020"), Optional.of("Wang2020a")),
+                List.of(existingWang.getCitationKey(), addedWang.getCitationKey()));
+    }
+
+    @Test
+    void regeneratingKeysWithCollidingPinyinKeepsExistingKeysWhenSuffixedEntryComesFirst() {
+        BibEntry firstWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "王, 小明")
+                .withField(StandardField.YEAR, "2020")
+                .withCitationKey("Wang2020");
+        BibEntry secondWang = new BibEntry()
+                .withField(StandardField.AUTHOR, "汪, 小明")
+                .withField(StandardField.YEAR, "2020")
+                .withCitationKey("Wang2020a");
+        BibDatabase database = new BibDatabase(List.of(firstWang, secondWang));
+
+        List.of(secondWang, firstWang).forEach(entry ->
+                entry.setCitationKey(generateKey(entry, "[auth:transliterate:camel][year]", database)));
+
+        assertEquals(List.of(Optional.of("Wang2020"), Optional.of("Wang2020a")),
+                List.of(firstWang.getCitationKey(), secondWang.getCitationKey()));
     }
 }
 
