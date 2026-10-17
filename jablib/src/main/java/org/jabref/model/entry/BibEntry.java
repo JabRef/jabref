@@ -465,10 +465,6 @@ public class BibEntry {
         if (InternalField.KEY_FIELD == field) {
             // the key field should not be converted
             return getCitationKey();
-        } else if (field == StandardField.AUTHOR) {
-            // the author must be returned in the "raw" way to preserve intended tokenisation
-            // (with { and } as entered by the user) so that sorting works on nontrivially tokenised author lists
-            return getAuthor();
         } else if (InternalField.TYPE_HEADER == field) {
             return Optional.of(type.get().getDisplayName());
         } else if (latexFreeFields.containsKey(field)) {
