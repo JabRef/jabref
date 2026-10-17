@@ -10,3 +10,8 @@ This list uses the TOC functionality of the [Just the Docs Jekyll template](http
 For new ADRs, please use [adr-template.md](adr-template.md) as basis.
 More information on MADR is available at <https://adr.github.io/madr/>.
 General information about architectural decision records is available at <https://adr.github.io/>.
+
+## PDF import decisions
+
+* [Track reference-list provenance in PDF metadata merging](0075-track-reference-list-provenance-in-pdf-metadata-merge.md)
+* [Use conservative text evidence for PDF authors](0076-use-conservative-text-evidence-for-pdf-authors.md)
