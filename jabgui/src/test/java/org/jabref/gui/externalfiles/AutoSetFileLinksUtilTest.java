@@ -181,6 +181,28 @@ class AutoSetFileLinksUtilTest {
         assertEquals(expected, Set.copyOf(matchedFiles));
     }
 
+    /// Issue #15084: auto-link must also work if no external file types are configured
+    @Test
+    void autoLinkBrokenLinkedFileWithoutConfiguredExternalFileTypes(@TempDir Path root) throws Exception {
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of(root));
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet());
+
+        Path subdir = root.resolve("subdir");
+        Files.createDirectory(subdir);
+        Files.createFile(subdir.resolve("minimal.pdf"));
+
+        BibEntry entryA = new BibEntry(StandardEntryType.Misc);
+        entryA.setCitationKey("minimal");
+        entryA.addFile(new LinkedFile("", "minimal.pdf", "PDF"));
+
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext,
+                externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        util.linkAssociatedFiles(List.of(entryA), onLinkedFilesUpdated);
+
+        List<LinkedFile> expect = List.of(new LinkedFile("", Path.of("subdir/minimal.pdf"), "PDF"));
+        assertEquals(expect, entryA.getFiles());
+    }
+
     /// [utest->req~logic.externalfiles.file-transfer.auto-link~1]
     @Nested
     @DisplayName("linkAssociatedFiles")

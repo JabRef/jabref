@@ -160,7 +160,7 @@ public class AutoSetFileLinksUtil {
             if (isBrokenLinkedFile(linkedFile)
                     && files.containsKey(fileName)
                     && extension.isPresent()
-                    && extension.get().equalsIgnoreCase(files.get(fileName).getFileType())
+                    && extension.get().equalsIgnoreCase(FileUtil.getFileExtension(files.get(fileName).getLink()).orElse(""))
             ) {
                 linkedFile.setLink(files.get(fileName).getLink());
                 updated.add(linkedFile);
@@ -255,9 +255,11 @@ public class AutoSetFileLinksUtil {
     }
 
     private List<String> getConfiguredExtensions() {
-        return externalApplicationsPreferences
-                .getExternalFileTypes()
-                .stream().map(ExternalFileType::getExtension).toList();
+        Collection<ExternalFileType> fileTypes = externalApplicationsPreferences.getExternalFileTypes();
+        if (fileTypes.isEmpty()) {
+            fileTypes = ExternalFileTypes.getDefaultExternalFileTypes();
+        }
+        return fileTypes.stream().map(ExternalFileType::getExtension).toList();
     }
 
     private String checkAndGetFileType(Path associatedFile) {
