@@ -362,9 +362,8 @@ public class SourceTab extends EntryEditorTab {
         @Override
         public void execute() {
             switch (command) {
-                case COPY -> {
-                    BibTeXHighlighter.copySource(codeArea);
-                }
+                case COPY ->
+                        BibTeXHighlighter.copySource(codeArea);
                 case CUT ->
                         codeArea.cut();
                 case PASTE ->
