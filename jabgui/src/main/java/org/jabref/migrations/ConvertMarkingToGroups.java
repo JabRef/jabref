@@ -7,8 +7,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javafx.collections.ObservableList;
-
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -28,20 +26,31 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
 
     private static final Pattern MARKING_PATTERN = Pattern.compile("\\[(.*):(\\d+)\\]");
 
+    private final Character keywordSeparator;
+
+    public ConvertMarkingToGroups(Character keywordSeparator) {
+        this.keywordSeparator = keywordSeparator;
+    }
+
     @Override
-    public void performMigration(@NonNull ParserResult parserResult) {
-        ObservableList<BibEntry> entries = parserResult.getDatabase().getEntries();
+    public boolean isMigrationNecessary(ParserResult parserResult) {
+        return parserResult.getDatabase().getEntries().stream()
+                           .anyMatch(entry -> entry.getField(InternalField.MARKED_INTERNAL).isPresent());
+    }
+
+    @Override
+    public void performMigration(@NonNull ParserResult parserResult, List<BibEntry> entries) {
         Multimap<String, BibEntry> markings = getMarkingWithEntries(entries);
         if (!markings.isEmpty()) {
             GroupTreeNode markingRoot = GroupTreeNode.fromGroup(
-                    new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, ','));
+                    new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, keywordSeparator));
 
             for (Map.Entry<String, Collection<BibEntry>> marking : markings.asMap().entrySet()) {
                 String markingName = marking.getKey();
                 Collection<BibEntry> markingMatchedEntries = marking.getValue();
 
                 GroupTreeNode markingGroup = markingRoot.addSubgroup(
-                        new ExplicitGroup(markingName, GroupHierarchyType.INCLUDING, ','));
+                        new ExplicitGroup(markingName, GroupHierarchyType.INCLUDING, keywordSeparator));
                 markingGroup.addEntriesToGroup(markingMatchedEntries);
             }
 
@@ -67,7 +76,7 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
             }
 
             Matcher matcher = MARKING_PATTERN.matcher(marking.get());
-            if (matcher.find()) {
+            if (matcher.matches()) {
                 String owner = matcher.group(1);
                 String number = matcher.group(2);
                 markings.put(owner + ":" + number, entry);

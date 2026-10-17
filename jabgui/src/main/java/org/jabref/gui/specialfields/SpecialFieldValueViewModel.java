@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.SpecialFieldValue;
@@ -23,6 +24,10 @@ public class SpecialFieldValueViewModel {
     }
 
     public Optional<JabRefIcon> getIcon() {
+        // Only the table shows the marked state in color; menus use the neutral icon of the action
+        if (value == SpecialFieldValue.RELEVANT) {
+            return Optional.of(IconTheme.JabRefIcons.RELEVANT_COLORED);
+        }
         return getAction().getIcon();
     }
 
@@ -100,7 +105,7 @@ public class SpecialFieldValueViewModel {
             case SKIMMED ->
                     StandardActions.SKIMMED;
             case RELEVANT ->
-                    StandardActions.RELEVANT;
+                    StandardActions.TOGGLE_RELEVANCE;
         };
     }
 }
