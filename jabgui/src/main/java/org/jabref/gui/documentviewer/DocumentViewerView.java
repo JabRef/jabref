@@ -146,6 +146,12 @@ public class DocumentViewerView extends BaseDialog<Void> {
         viewModel.showPage(pageNumber);
     }
 
+    /// Fits the whole page into the window, so that something in its lower half is visible without
+    /// scrolling.
+    public void showFullPage() {
+        viewer.showFullPage();
+    }
+
     public void highlightText(String text) {
         viewModel.highlightText(text);
     }
