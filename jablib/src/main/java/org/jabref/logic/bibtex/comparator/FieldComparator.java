@@ -86,7 +86,6 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
-        // System.out.println("Field comparator of type " + determineFieldType() + " comparing " + e1 + " and " + e2);
         String f1;
         String f2;
 
@@ -117,7 +116,6 @@ public class FieldComparator implements Comparator<BibEntry> {
         if (fieldType == FieldType.NAME) {
             f1 = AuthorList.fixAuthorForAlphabetization(f1);
             f2 = AuthorList.fixAuthorForAlphabetization(f2);
-            System.out.printf("Name comparator comparing %s and %s", f1, f2);
         } else if (fieldType == FieldType.YEAR) {
             int f1year;
             try {
@@ -179,10 +177,6 @@ public class FieldComparator implements Comparator<BibEntry> {
 
         String ours = f1.toLowerCase(Locale.ENGLISH);
         String theirs = f2.toLowerCase(Locale.ENGLISH);
-        if (fieldType == FieldType.NAME) {
-            int outcome = COLLATOR.compare(ours, theirs) * multiplier;
-            System.out.printf(" with result %d\n", outcome);
-        }
         return COLLATOR.compare(ours, theirs) * multiplier;
     }
 }

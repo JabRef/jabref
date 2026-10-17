@@ -282,7 +282,6 @@ public class Author {
         while ((!res.isEmpty()) && (res.charAt(0) == '{')) {
             res.deleteCharAt(0);
         }
-        System.out.printf("Raw author: %s, alphabetized: %s\n", this.toString(), res.toString());
         return res.toString();
     }
 

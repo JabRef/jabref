@@ -52,8 +52,6 @@ public class CSLAdapter {
         CSL cslInstance = getCslInstance(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
 
-        System.out.println("bibEntries: " + bibEntries.toString());
-
         return cslInstance.makeBibliography();
     }
 

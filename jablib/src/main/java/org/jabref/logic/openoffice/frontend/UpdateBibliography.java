@@ -107,13 +107,6 @@ public class UpdateBibliography {
 
         XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange);
 
-        /*
-        System.out.println("CitedReferences = " + citedReferences.toString());
-        for (var e : citedReferences.values()) {
-            System.out.println(e.getBibEntry());
-        }
-        */
-
         // emit the title of the bibliography
         OOTextIntoOO.removeDirectFormatting(cursor);
         OOText bibliographyText = OOFormatBibliography.formatBibliography(frontend.citationGroups,

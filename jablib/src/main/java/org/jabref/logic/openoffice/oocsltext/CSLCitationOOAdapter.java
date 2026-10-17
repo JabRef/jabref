@@ -197,9 +197,6 @@ public class CSLCitationOOAdapter {
 
         List<BibEntry> bibliographyEntries = prepareBibliographyEntries(selectedStyle, entries, selectedDatabases);
 
-        LOGGER.debug("Prepared bibliography entries: {}", bibliographyEntries);
-        LOGGER.debug("Original order (no extra sorts)");
-
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
         OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), openOfficePreferences.getCslBibliographyBodyFormat());
@@ -231,7 +228,6 @@ public class CSLCitationOOAdapter {
         updateAllCitationsWithNewStyle(selectedStyle, citationType, selectedDatabases);
         markManager.readAndUpdateExistingMarks();
 
-        LOGGER.debug("isNumeric {} | hasBibSortOrder {}", isNumericStyle, hasBibliographySortOrder);
         List<BibEntry> bibliographyEntries = new ArrayList<>(entries);
         if (isNumericStyle && hasBibliographySortOrder) {
             Map<String, Integer> citationKeyToNumber = computeBibliographyOrderedCitationNumbers(selectedStyle, selectedDatabases);
@@ -269,8 +265,6 @@ public class CSLCitationOOAdapter {
                 HTML_OUTPUT_FORMAT,
                 currentEntryContext,
                 bibEntryTypesManager);
-
-        LOGGER.debug("Bibliography entries text: {}", bibliographyEntriesText);
 
         for (String bibliographyEntry : bibliographyEntriesText) {
             String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);

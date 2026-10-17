@@ -229,7 +229,6 @@ public class AuthorList implements Iterable<Author> {
     ///
     /// @see AuthorList#getForAlphabetization
     public static String fixAuthorForAlphabetization(String authors) {
-        System.out.printf("Fixing %s, result %s\n", authors, AuthorList.parse(authors).getForAlphabetization());
         return AuthorList.parse(authors).getForAlphabetization();
     }
 

@@ -1108,7 +1108,6 @@ public class OOBibBase {
                     unresolvedKeys.getFirst());
             dialogService.showErrorDialogAndWait(errorTitle, msg);
         }
-        LOGGER.debug("JStyle bibliography updated");
         return OOVoidResult.ok();
     }
 

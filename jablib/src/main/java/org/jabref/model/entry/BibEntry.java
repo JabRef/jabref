@@ -402,11 +402,6 @@ public class BibEntry {
                        .filter(StringUtil::isNotBlank);
     }
 
-    public Optional<String> getAuthor() {
-        return Optional.ofNullable(fields.get(StandardField.AUTHOR))
-                       .filter(StringUtil::isNotBlank);
-    }
-
     public boolean hasCitationKey() {
         return getCitationKey().isPresent();
     }
