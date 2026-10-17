@@ -72,6 +72,7 @@ import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.sidepane.ToggleSidePaneAction;
 import org.jabref.gui.slr.EditExistingStudyAction;
 import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
@@ -357,6 +358,7 @@ public class MainMenu extends MenuBar {
                 factory.createCheckMenuItem(webSearchPane.getToggleAction(), sidePane.getToggleCommandFor(webSearchPane), sidePane.paneVisibleBinding(webSearchPane)),
                 factory.createCheckMenuItem(groupsPane.getToggleAction(), sidePane.getToggleCommandFor(groupsPane), sidePane.paneVisibleBinding(groupsPane)),
                 factory.createCheckMenuItem(openOfficePane.getToggleAction(), sidePane.getToggleCommandFor(openOfficePane), sidePane.paneVisibleBinding(openOfficePane)),
+                factory.createMenuItem(StandardActions.TOGGLE_SIDE_PANE, new ToggleSidePaneAction(stateManager, preferences.getSidePanePreferences())),
 
                 new SeparatorMenuItem(),
 
