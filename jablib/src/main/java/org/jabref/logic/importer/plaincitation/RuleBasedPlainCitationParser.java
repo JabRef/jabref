@@ -1,15 +1,15 @@
 package org.jabref.logic.importer.plaincitation;
 
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
@@ -25,9 +25,22 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String YEAR_TAG = "[year_tag]";
     private static final String PAGES_TAG = "[pages_tag]";
 
+    private static final String AUTHORS_GROUP = "AUTHORS";
+    private static final String FIRSTNAME_GROUP = "FIRSTNAME";
+    private static final String FROM_GROUP = "FROM";
     private static final String INITIALS_GROUP = "INITIALS";
     private static final String LASTNAME_GROUP = "LASTNAME";
+    private static final String PAGE_GROUP = "PAGE";
+    private static final String TITLE_GROUP = "TITLE";
+    private static final String TO_GROUP = "TO";
     private static final String YEAR_GROUP = "YEAR";
+
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
+
+    /// `doi:`, `urn:doi:` or a `doi.org` link directly in front of a DOI
+    private static final Pattern DOI_PREFIX_AT_END_PATTERN = Pattern.compile(
+            "(?:https?://(?:dx\\.)?doi\\.org/|urn:doi:\\s*|doi:\\s*)$",
+            Pattern.CASE_INSENSITIVE);
 
     private static final Pattern URL_PATTERN = Pattern.compile(
             "(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)" +
@@ -64,9 +77,6 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Punctuation and year tokens in front of the title (for example the `. ` in `(1993). Title`).
     private static final Pattern LEADING_NOISE_PATTERN = Pattern.compile(
             "^(?:[\\s.,;:&()\\-]|" + Pattern.quote(YEAR_TAG) + ")+");
-
-    private static final String FIRSTNAME_GROUP = "FIRSTNAME";
-    private static final String AUTHORS_GROUP = "AUTHORS";
 
     private static final String NAME_PARTICLE_REGEX = "(?:de|der|den|van|von|di|da|del|dos|du|la|le|ten|ter)";
 
@@ -119,22 +129,35 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final Pattern FULL_NAME_PATTERN = Pattern.compile(
             "^(?<" + FIRSTNAME_GROUP + ">.+?)\\s+" + LASTNAME_REGEX + "$");
 
+    /// Initials without periods (`Smith JK.`) look like a family name in capitals
+    private static final Pattern INITIALS_WITHOUT_PERIODS_PATTERN = Pattern.compile("\\p{Lu}{1,3}");
+
+    /// A hyphen with surrounding whitespace, as in `W. -P.`
+    private static final Pattern SPACED_HYPHEN_PATTERN = Pattern.compile("\\s*-\\s*");
+
     /// A page range such as `127-136`, `90–97` (en dash) or `pp. 62-68`. The range must not be glued to a word
     /// or to another number, so that report numbers such as `rr-02-92` are not taken as pages.
     private static final Pattern PAGES_RANGE_PATTERN = Pattern.compile(
-            "(?:\\b(?:pages?|pp?)\\.?\\s*)?(?<![\\p{L}\\d\\-])(?<FROM>\\d+)\\s*[-‐‑‒–—]+\\s*(?<TO>\\d+)",
+            "(?:\\b(?:pages?|pp?)\\.?\\s*)?(?<![\\p{L}\\d\\-])(?<" + FROM_GROUP + ">\\d+)\\s*[-‐‑‒–—]+\\s*(?<" + TO_GROUP + ">\\d+)",
             Pattern.CASE_INSENSITIVE);
 
     /// A single page that is explicitly marked as such: `p. 5`, `page 5`
     private static final Pattern PAGES_SINGLE_PATTERN = Pattern.compile(
-            "\\b(?:pages?|pp?)\\.?\\s*(?<PAGE>\\d+)",
+            "\\b(?:pages?|pp?)\\.?\\s*(?<" + PAGE_GROUP + ">\\d+)",
             Pattern.CASE_INSENSITIVE);
 
     /// End of a sentence: a period (or `?`/`!`) after a word of at least three letters or digits (`... of 2020.`),
     /// followed by a capital letter. Single letters (initials, `U.S.`) do not end the title.
     private static final Pattern TITLE_END_PATTERN = Pattern.compile("(?<=[\\p{L}\\d]{3})[.?!]\\s+(?=\\p{Lu})");
 
-    private static final Pattern QUOTED_TITLE_PATTERN = Pattern.compile("^[\"“](?<TITLE>[^\"”]+)[\"”]");
+    private static final Pattern QUOTED_TITLE_PATTERN = Pattern.compile("^[\"“](?<" + TITLE_GROUP + ">[^\"”]+)[\"”]");
+
+    private static final Pattern LEADING_FIELD_PUNCTUATION_PATTERN = Pattern.compile("^[\\s,;:.\"“”]+");
+
+    private static final Pattern TRAILING_FIELD_PUNCTUATION_PATTERN = Pattern.compile("[\\s,;:.\"“”]+$");
+
+    /// Same as [#TRAILING_FIELD_PUNCTUATION_PATTERN], but keeps a trailing period
+    private static final Pattern TRAILING_FIELD_PUNCTUATION_WITHOUT_PERIOD_PATTERN = Pattern.compile("[\\s,;:\"“”]+$");
 
     private static final Pattern LEADING_VENUE_NOISE_PATTERN = Pattern.compile("^[\\s,.;:]*(?:In\\s+)?");
 
@@ -190,22 +213,16 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     ///                         nothing is lost, and so that no internal placeholder token ends up there.
     private Optional<BibEntry> generateEntity(String originalCitation) {
         EntryType type = isArticle ? StandardEntryType.Article : StandardEntryType.Book;
-        BibEntry extractedEntity = new BibEntry(type);
-        setIfNotEmpty(extractedEntity, StandardField.AUTHOR, String.join(" and ", authors));
-        setIfNotEmpty(extractedEntity, StandardField.URL, String.join(", ", urls));
-        setIfNotEmpty(extractedEntity, StandardField.YEAR, year);
-        setIfNotEmpty(extractedEntity, StandardField.PAGES, pages);
-        setIfNotEmpty(extractedEntity, StandardField.TITLE, title);
-        setIfNotEmpty(extractedEntity, StandardField.DOI, doi);
-        setIfNotEmpty(extractedEntity, isArticle ? StandardField.JOURNAL : StandardField.PUBLISHER, journalOrPublisher);
-        extractedEntity.setField(StandardField.COMMENT, originalCitation);
-        return Optional.of(extractedEntity);
-    }
-
-    private static void setIfNotEmpty(BibEntry entry, Field field, String value) {
-        if (!value.isEmpty()) {
-            entry.setField(field, value);
-        }
+        // An empty value does not create the field (see BibEntry#setField), so missing data yields no empty field
+        return Optional.of(new BibEntry(type)
+                .withField(StandardField.AUTHOR, String.join(" and ", authors))
+                .withField(StandardField.URL, String.join(", ", urls))
+                .withField(StandardField.YEAR, year)
+                .withField(StandardField.PAGES, pages)
+                .withField(StandardField.TITLE, title)
+                .withField(StandardField.DOI, doi)
+                .withField(isArticle ? StandardField.JOURNAL : StandardField.PUBLISHER, journalOrPublisher)
+                .withField(StandardField.COMMENT, originalCitation));
     }
 
     private String findUrls(String input) {
@@ -231,27 +248,30 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// @param input raw citation text
     /// @return the input with the DOI stripped, or the original input if no DOI was found
     private String findDoi(String input) {
-        Optional<DOI> found = DOI.findInText(input);
-        if (found.isEmpty()) {
-            return input;
-        }
-        doi = found.get().asString();
+        return DOI.findInText(input)
+                  .map(found -> {
+                      doi = found.asString();
+                      return removeDoi(input);
+                  })
+                  .orElse(input);
+    }
 
-        // Remove exactly the DOI and its prefix. DOI.replaceInText removed a neighbouring URL, too.
-        Matcher matcher = Pattern.compile(
-                "(?:https?://(?:dx\\.)?doi\\.org/|urn:doi:\\s*|doi:\\s*)?" + Pattern.quote(doi),
-                Pattern.CASE_INSENSITIVE).matcher(input);
-        // Only whitespace is collapsed here. fixSpaces would insert spaces into a URL that is still in the text
-        // ("https://x.org" -> "https: //x. org"), so no URL could be found afterwards.
-        if (matcher.find()) {
-            return collapseWhitespace(input.substring(0, matcher.start()) + " " + input.substring(matcher.end()));
+    /// Removes exactly [#doi] and its prefix. `DOI.replaceInText` would remove a neighbouring URL, too.
+    ///
+    /// Only whitespace is collapsed here. [#fixSpaces] would insert spaces into a URL that is still in the text
+    /// (`https://x.org` -> `https: //x. org`), so no URL could be found afterwards.
+    private String removeDoi(String input) {
+        int doiStart = input.toLowerCase(Locale.ROOT).indexOf(doi.toLowerCase(Locale.ROOT));
+        if (doiStart == -1) {
+            // The DOI is written differently than its canonical form (for example percent-encoded)
+            return collapseWhitespace(DOI.replaceInText(input, ""));
         }
-        // The DOI is written differently than its canonical form (for example percent-encoded)
-        return collapseWhitespace(DOI.replaceInText(input, ""));
+        String beforeDoi = DOI_PREFIX_AT_END_PATTERN.matcher(input.substring(0, doiStart)).replaceFirst("");
+        return collapseWhitespace(beforeDoi + " " + input.substring(doiStart + doi.length()));
     }
 
     private static String collapseWhitespace(String input) {
-        return input.replaceAll("\\s+", " ").strip();
+        return WHITESPACE_PATTERN.matcher(input).replaceAll(" ").strip();
     }
 
     /// Finds the publication year. A year in parentheses (`(1993)`, `(1991a)`) is preferred. Otherwise, the last
@@ -290,7 +310,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     private static boolean isValidYear(String candidate) {
         int value = Integer.parseInt(candidate);
-        return (value > 1700) && (value <= Calendar.getInstance().get(Calendar.YEAR));
+        return (value > 1700) && (value <= Year.now().getValue());
     }
 
     private String findAuthors(String input) {
@@ -315,12 +335,12 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         List<String> fullNameAuthors = new ArrayList<>();
         for (String name : FULL_NAME_SEPARATOR_PATTERN.split(blockMatcher.group(AUTHORS_GROUP))) {
             Matcher nameMatcher = FULL_NAME_PATTERN.matcher(name.strip());
-            // Initials without periods ("Smith JK.") look like a last name in capitals: this is not a full name
-            if (!nameMatcher.matches() || nameMatcher.group(LASTNAME_GROUP).matches("\\p{Lu}{1,3}")) {
+            if (!nameMatcher.matches()
+                    || INITIALS_WITHOUT_PERIODS_PATTERN.matcher(nameMatcher.group(LASTNAME_GROUP)).matches()) {
                 return input;
             }
-            fullNameAuthors.add(nameMatcher.group(LASTNAME_GROUP).replaceAll("\\s+", " ")
-                    + ", " + nameMatcher.group(FIRSTNAME_GROUP).replaceAll("\\s+", " "));
+            fullNameAuthors.add(collapseWhitespace(nameMatcher.group(LASTNAME_GROUP))
+                    + ", " + collapseWhitespace(nameMatcher.group(FIRSTNAME_GROUP)));
         }
 
         authors.addAll(fullNameAuthors);
@@ -351,10 +371,9 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     }
 
     private String generateAuthor(String lastName, String initials) {
-        String normalizedLastName = lastName.replaceAll("\\s+", " ");
         // fixSpaces turns "W.-P." into "W. -P." - undo that
-        String normalizedInitials = initials.replaceAll("\\s*-\\s*", "-").replaceAll("\\s+", " ").trim();
-        return normalizedLastName + ", " + normalizedInitials;
+        String normalizedInitials = collapseWhitespace(SPACED_HYPHEN_PATTERN.matcher(initials).replaceAll("-"));
+        return collapseWhitespace(lastName) + ", " + normalizedInitials;
     }
 
     /// Finds the pages. A range (`127-136`, `90–97`, `pp. 62-68`) is preferred, the last one wins because volume
@@ -371,7 +390,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         while (rangeMatcher.find()) {
             start = rangeMatcher.start();
             end = rangeMatcher.end();
-            foundPages = rangeMatcher.group("FROM") + "--" + rangeMatcher.group("TO");
+            foundPages = rangeMatcher.group(FROM_GROUP) + "--" + rangeMatcher.group(TO_GROUP);
         }
 
         if (start == -1) {
@@ -379,7 +398,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             if (singleMatcher.find()) {
                 start = singleMatcher.start();
                 end = singleMatcher.end();
-                foundPages = singleMatcher.group("PAGE");
+                foundPages = singleMatcher.group(PAGE_GROUP);
             }
         }
 
@@ -419,7 +438,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         Matcher titleEndMatcher = TITLE_END_PATTERN.matcher(remainder);
         int delimiterIndex = remainder.lastIndexOf("//");
         if (quotedTitleMatcher.find()) {
-            titlePart = quotedTitleMatcher.group("TITLE");
+            titlePart = quotedTitleMatcher.group(TITLE_GROUP);
             venuePart = remainder.substring(quotedTitleMatcher.end());
         } else if (delimiterIndex != -1) {
             titlePart = remainder.substring(0, delimiterIndex);
@@ -478,11 +497,12 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     /// Removes placeholder tokens, surplus whitespace, and punctuation at the borders of a title or venue.
     private static String cleanField(String value, boolean stripTrailingPeriod) {
-        String cleaned = TAG_PATTERN.matcher(value).replaceAll(" ")
-                                    .replaceAll("\\s+", " ")
-                                    .strip();
-        String trailing = stripTrailingPeriod ? "[\\s,;:.\"“”]+$" : "[\\s,;:\"“”]+$";
-        return cleaned.replaceAll("^[\\s,;:.\"“”]+", "").replaceAll(trailing, "");
+        String cleaned = collapseWhitespace(TAG_PATTERN.matcher(value).replaceAll(" "));
+        String withoutLeading = LEADING_FIELD_PUNCTUATION_PATTERN.matcher(cleaned).replaceFirst("");
+        Pattern trailing = stripTrailingPeriod
+                           ? TRAILING_FIELD_PUNCTUATION_PATTERN
+                           : TRAILING_FIELD_PUNCTUATION_WITHOUT_PERIOD_PATTERN;
+        return trailing.matcher(withoutLeading).replaceFirst("");
     }
 
     private static boolean containsLetterOrDigit(String input) {

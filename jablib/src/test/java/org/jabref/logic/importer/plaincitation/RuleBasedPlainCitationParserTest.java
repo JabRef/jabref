@@ -24,7 +24,7 @@ class RuleBasedPlainCitationParserTest {
 
     private static final String IEEE_ARTICLE = "J. Smith, M. Tan, D. Lee, and A. Wong, \"Improving AI systems,\" Journal of Computer Science, vol. 12, no. 2, pp. 45-60, 2024, doi: 10.1234/example.";
     private static final String APA_ARTICLE = "Smith, J., Tan, M., Lee, D., & Wong, A. (2024). Improving AI systems. Journal of Computer Science, 12(2), 45-60.";
-    private static final String GOST_ARTICLE = "Ivanov, I. I. Title of the paper // Journal Name. 2015. P. 10-20.";
+    private static final String DOUBLE_SLASH_ARTICLE = "Ivanov, I. I. Title of the paper // Journal Name. 2015. P. 10-20.";
     private static final String BOOK = "Smith, J. Some book. Springer, Berlin, 2010.";
 
     private RuleBasedPlainCitationParser parser;
@@ -87,7 +87,7 @@ class RuleBasedPlainCitationParserTest {
     /// A citation with both a DOI and a URL must keep both. Both orders are tested: DOI before URL, and URL before DOI.
     @ParameterizedTest
     @ValueSource(strings = {"Smith, J. A title. Journal, 2020. doi:10.1000/xyz123 https://example.com/page",
-                            "Smith, J. A title. Journal, 2020. https://example.com/page doi:10.1000/xyz123"})
+            "Smith, J. A title. Journal, 2020. https://example.com/page doi:10.1000/xyz123"})
     void findsDoiAndUrlInSameCitation(String citation) throws FetcherException {
         Optional<BibEntry> entry = parser.parsePlainCitation(citation);
         assertEquals(List.of(Optional.of("10.1000/xyz123"), Optional.of("https://example.com/page")),
@@ -100,7 +100,7 @@ class RuleBasedPlainCitationParserTest {
     /// Every scheme the URL pattern accepts (`http`, `https`, `ftp`, a bare `www.`) is kept whole, including query strings.
     @ParameterizedTest
     @ValueSource(strings = {"https://example.com/page", "http://example.com", "www.example.com/page", "ftp://files.example.com/data.zip",
-                            "https://example.com/page?id=123", "https://example.com/search?id=123&lang=en"})
+            "https://example.com/page?id=123", "https://example.com/search?id=123&lang=en"})
     void findsUrl(String url) throws FetcherException {
         assertEquals(Optional.of(url), parseField("Smith, J. A title. Journal, 2020. " + url, StandardField.URL));
     }
@@ -135,7 +135,7 @@ class RuleBasedPlainCitationParserTest {
     /// Both author patterns, surname first and initials first, produce the BibTeX form `Last, I.`.
     @ParameterizedTest
     @ValueSource(strings = {"Smith, J. A title. Journal, 2020.",
-                            "J. Smith. A title. Journal, 2020."})
+            "J. Smith. A title. Journal, 2020."})
     void normalizesBothAuthorFormats(String citation) throws FetcherException {
         assertEquals(Optional.of("Smith, J."), parseField(citation, StandardField.AUTHOR));
     }
@@ -284,7 +284,7 @@ class RuleBasedPlainCitationParserTest {
         return Stream.of(
                 Arguments.of("Improving AI: A survey", "Journal of AI", "Smith, J. Improving AI: A survey. Journal of AI, 2020."),
                 Arguments.of("Is AI safe?", "Journal of AI", "Smith, J. Is AI safe? Journal of AI, 2020."),
-                Arguments.of("A title", "J. Comput. Sci.", "Smith, J. A title. J. Comput. Sci., 2020."),
+                Arguments.of("A title", "J. Comp. Sci.", "Smith, J. A title. J. Comp. Sci., 2020."),
                 Arguments.of("A journal of my travels", "Travel Review", "Smith, J. A journal of my travels. Travel Review, 2020."),
                 Arguments.of("Proceedings of the past", "History Review", "Smith, J. Proceedings of the past. History Review, 2020."));
     }
@@ -349,8 +349,8 @@ class RuleBasedPlainCitationParserTest {
     /// The pages pattern must skip volume and issue numbers (`vol. 12`, `vol. 12, no. 2`, APA `12(2)`).
     @ParameterizedTest
     @ValueSource(strings = {"Smith, J. A title. Journal, vol. 12, pp. 45-60, 2020.",
-                            "Smith, J. A title. Journal, vol. 12, no. 2, pp. 45-60, 2020.",
-                            "Smith, J. (2020). A title. Journal, 12(2), 45-60."})
+            "Smith, J. A title. Journal, vol. 12, no. 2, pp. 45-60, 2020.",
+            "Smith, J. (2020). A title. Journal, 12(2), 45-60."})
     void volumeAndIssueAreNotTakenAsPages(String citation) throws FetcherException {
         assertEquals(Optional.of("45--60"), parseField(citation, StandardField.PAGES));
     }
@@ -372,7 +372,7 @@ class RuleBasedPlainCitationParserTest {
 
     // Full citation
 
-    /// Complete citations in IEEE, APA and GOST style, and one book: every field and the entry type must match.
+    /// Complete citations in IEEE, APA and double-slash style, and one book: every field and the entry type must match.
     /// The comment field holds the original citation. Its content is not part of the parsing
     /// contract, so it is cleared before comparing.
     static Stream<Arguments> parsesFullCitation() {
@@ -402,14 +402,14 @@ class RuleBasedPlainCitationParserTest {
                                 .withField(StandardField.YEAR, "2020")
                                 .withField(StandardField.DOI, "10.1000/xyz123"),
                         "Smith, J. A title. Some Journal, 2020. doi:10.1000/xyz123"),
-                Arguments.of("GOST article",
+                Arguments.of("double-slash article",
                         new BibEntry(StandardEntryType.Article)
                                 .withField(StandardField.AUTHOR, "Ivanov, I. I.")
                                 .withField(StandardField.TITLE, "Title of the paper")
                                 .withField(StandardField.JOURNAL, "Journal Name")
                                 .withField(StandardField.YEAR, "2015")
                                 .withField(StandardField.PAGES, "10--20"),
-                        GOST_ARTICLE),
+                        DOUBLE_SLASH_ARTICLE),
                 Arguments.of("book",
                         new BibEntry(StandardEntryType.Book)
                                 .withField(StandardField.AUTHOR, "Smith, J.")
