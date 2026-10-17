@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
@@ -107,8 +108,36 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         }
 
         if (selectedEntry.setNewBinding(event)) {
+            Optional<KeyBinding> conflict = keyBindingRepository.findConflictingKeyBinding(selectedEntry.getKeyBinding(),
+                    KeyCombination.valueOf(selectedEntry.getBinding()));
+
+            if (conflict.isPresent()) {
+                if (!confirmReplace(selectedEntry.getBinding(), conflict.get())) {
+                    setValues();
+                    return;
+                }
+                keyBindingRepository.put(conflict.get(), "");
+            }
+
             keyBindingRepository.put(selectedEntry.getKeyBinding(), selectedEntry.getBinding());
+
+            if (conflict.isPresent()) {
+                setValues();
+            }
         }
+    }
+
+    private boolean confirmReplace(String combination, KeyBinding conflictingKeyBinding) {
+        ButtonType replaceButtonType = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OK_DONE);
+        return dialogService.showCustomButtonDialogAndWait(
+                                    Alert.AlertType.WARNING,
+                                    Localization.lang("Shortcut already in use"),
+                                    Localization.lang("The shortcut %0 is already used by '%1'. Do you want to replace it?",
+                                            combination, conflictingKeyBinding.getLocalization()),
+                                    replaceButtonType,
+                                    ButtonType.CANCEL)
+                            .filter(response -> response == replaceButtonType)
+                            .isPresent();
     }
 
     @Override
