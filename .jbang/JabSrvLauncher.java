@@ -25,7 +25,7 @@
 
 // from jabsrv
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.22
-//DEPS com.github.ben-manes.caffeine:caffeine:3.3.0
+//DEPS com.github.ben-manes.caffeine:caffeine:3.3.1
 //DEPS com.google.guava:guava:33.7.2-jre
 //DEPS com.konghq:unirest-modules-gson:4.10.1
 //DEPS de.undercouch:citeproc-java:3.5.2
@@ -50,7 +50,7 @@
 //DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.3
 //DEPS org.glassfish.jersey.core:jersey-server:4.0.3
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.3
-//DEPS org.hibernate.validator:hibernate-validator:9.1.4.Final
+//DEPS org.hibernate.validator:hibernate-validator:9.1.5.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS tools.jackson.core:jackson-core:3.2.3
 //DEPS tools.jackson.core:jackson-databind:3.2.3
