@@ -3,6 +3,7 @@ package org.jabref.gui.slr;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +61,8 @@ public class ManageStudyDefinitionViewModel {
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
     private final ObservableList<StudyQuery> queries = FXCollections.observableArrayList();
+    /// Catalogs with different overrides per query at load, mapped to the shown value
+    private final Map<String, String> mixedNativeQueries = new HashMap<>();
 
     // Observe changes to each item's enabledProperty so bindings re-evaluate when catalogs are toggled
     private final ObservableList<StudyCatalogItem> catalogs = FXCollections.observableArrayList(
@@ -134,7 +137,7 @@ public class ManageStudyDefinitionViewModel {
                                        StudyCatalog savedCatalog = catalogsByName.get(name);
                                        boolean enabled = savedCatalog != null && savedCatalog.isEnabled();
                                        String reason = savedCatalog != null ? savedCatalog.getReason() : "";
-                                       String nativeQuery = findNativeQueryForCatalog(name);
+                                       String nativeQuery = loadNativeQuery(name);
                                        return new StudyCatalogItem(name, enabled, reason, nativeQuery);
                                    })
                                    .toList());
@@ -146,14 +149,20 @@ public class ManageStudyDefinitionViewModel {
         initializeValidationBindings();
     }
 
-    private String findNativeQueryForCatalog(String catalogName) {
-        return queries.stream()
-                      .flatMap(query -> query.getCatalogSpecific().entrySet().stream())
-                      .filter(entry -> entry.getKey().equalsIgnoreCase(catalogName))
-                      .map(Map.Entry::getValue)
-                      .filter(StringUtil::isNotBlank)
-                      .findFirst()
-                      .orElse("");
+    /// Returns the native query to show for the catalog and records it if the queries differ.
+    private String loadNativeQuery(String catalogName) {
+        List<String> nativeQueries = queries.stream()
+                                            .map(query -> query.getCatalogOverride(catalogName).orElse(""))
+                                            .distinct()
+                                            .toList();
+        String nativeQuery = nativeQueries.stream()
+                                          .filter(StringUtil::isNotBlank)
+                                          .findFirst()
+                                          .orElse("");
+        if (nativeQueries.size() > 1) {
+            mixedNativeQueries.put(catalogName, nativeQuery);
+        }
+        return nativeQuery;
     }
 
     private void initializeValidationBindings() {
@@ -277,37 +286,36 @@ public class ManageStudyDefinitionViewModel {
 
     /// Builds a [Study] from the current UI state without persisting it.
     public Study buildStudy() {
-        applyNativeQueryOverrides();
         return new Study(
                 authors,
                 title.getValueSafe(),
                 researchQuestions,
-                queries.stream().toList(),
+                buildQueries(),
                 catalogs.stream()
                         .filter(StudyCatalogItem::isEnabled)
                         .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason()))
                         .toList());
     }
 
-    private void applyNativeQueryOverrides() {
-        List<StudyCatalogItem> enabledCatalogs = catalogs.stream()
+    /// Returns copies of the queries with the edited native queries applied
+    private List<StudyQuery> buildQueries() {
+        // Keep differing per-query overrides unless the user edited the cell
+        List<StudyCatalogItem> catalogsToApply = catalogs.stream()
                                                          .filter(StudyCatalogItem::isEnabled)
+                                                         .filter(catalog -> !catalog.getNativeQuery().equals(mixedNativeQueries.get(catalog.getName())))
                                                          .toList();
-        for (StudyQuery query : queries) {
-            Map<String, String> original = query.getCatalogSpecific();
-            Map<String, String> updated = new LinkedHashMap<>(original);
-            for (StudyCatalogItem catalog : enabledCatalogs) {
-                String name = catalog.getName();
-                updated.keySet().removeIf(key -> key.equalsIgnoreCase(name));
-                String nativeQuery = catalog.getNativeQuery();
-                if (StringUtil.isNotBlank(nativeQuery)) {
-                    updated.put(name, nativeQuery);
+        return queries.stream().map(query -> {
+            Map<String, String> catalogSpecific = new LinkedHashMap<>(query.getCatalogSpecific());
+            for (StudyCatalogItem catalog : catalogsToApply) {
+                catalogSpecific.keySet().removeIf(key -> key.equalsIgnoreCase(catalog.getName()));
+                if (StringUtil.isNotBlank(catalog.getNativeQuery())) {
+                    catalogSpecific.put(catalog.getName(), catalog.getNativeQuery());
                 }
             }
-            if (!updated.equals(original)) {
-                query.setCatalogSpecific(updated);
-            }
-        }
+            StudyQuery copy = new StudyQuery(query.getQuery());
+            copy.setCatalogSpecific(catalogSpecific);
+            return copy;
+        }).toList();
     }
 
     public Property<String> titleProperty() {
