@@ -20,6 +20,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Contribute to JabRef" to the Help menu, linking to [contribute.jabref.org](https://contribute.jabref.org). [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
+- We now focus the citation key field when a newly added entry opens in the entry editor. [#16929](https://github.com/JabRef/jabref/pull/16929)
+- We added creating a new entry by double-clicking the empty space below the last row of the entry table. [#16929](https://github.com/JabRef/jabref/pull/16929)
 
 ### Changed
 
