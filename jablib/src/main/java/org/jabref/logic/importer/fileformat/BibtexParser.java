@@ -105,6 +105,9 @@ public class BibtexParser implements Parser {
     private PushbackReader pushbackReader;
     private BibDatabase database;
     private Set<BibEntryType> entryTypes;
+    /// `true` while only whitespace has been read on the current line between entries.
+    /// Kept as a field because [#skipOneNewline()] consumes the line break ending a block, so the next scan starts at the beginning of a line.
+    private boolean atLineStart;
 
     /// Names of the entry types read from a [MetaData#ENTRYTYPE_FLAG_V2] comment, so that a legacy definition
     /// of the same name found later in the file does not overwrite the richer one.
@@ -221,6 +224,7 @@ public class BibtexParser implements Parser {
     }
 
     private void initializeParserResult(String newLineSeparator) {
+        atLineStart = true;
         database = new BibDatabase();
         database.setNewLineSeparator(newLineSeparator);
         entryTypes = new HashSet<>(); // To store custom entry types parsed.
@@ -228,22 +232,89 @@ public class BibtexParser implements Parser {
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
+    /// Scans leading library comments for a shared SQL database ID and skips legacy encoding declarations.
+    /// Stops before the first BibTeX block, leaving its `@` marker for [#parseFileContent()].
     private void parseDatabaseID() throws IOException {
         while (!eof) {
-            skipWhitespace();
-            char c = (char) read();
+            int character = read();
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return;
+            }
+
+            char c = (char) character;
+            if (c == '@') {
+                unread(c);
+                return;
+            }
 
             if (c == '%') {
-                skipWhitespace();
+                skipWhitespaceOnLine();
                 String label = parseTextToken().trim();
 
                 if (BibDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {
-                    skipWhitespace();
+                    skipWhitespaceOnLine();
                     database.setSharedDatabaseID(parseTextToken().trim());
+                    skipUntilEndOfLine();
+                    continue;
+                } else if (SaveConfiguration.ENCODING_PREFIX.trim().equals(label)) {
+                    skipWhitespaceOnLine();
+                    parseTextToken();
+
+                    if (peek() != '@') {
+                        skipUntilEndOfLine();
+                        continue;
+                    }
+                } else if (atLineStart) {
+                    // [impl->req~import.bibtex.percent-comments~1]
+                    skipUntilEndOfLine();
+                    continue;
                 }
-            } else if (c == '@') {
-                unread(c);
-                break;
+            }
+
+            trackLineStart(c);
+        }
+    }
+
+    /// Updates [#atLineStart] for a character read between entries.
+    private void trackLineStart(int character) {
+        if ((character == '\n') || (character == '\r')) {
+            atLineStart = true;
+        } else if (!Character.isWhitespace((char) character)) {
+            atLineStart = false;
+        }
+    }
+
+    /// Skips whitespace on the current line without consuming the line break or the next entry.
+    private void skipWhitespaceOnLine() throws IOException {
+        while (!eof) {
+            int character = read();
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return;
+            }
+
+            if (!Character.isWhitespace((char) character) || (character == '\n') || (character == '\r')) {
+                unread(character);
+                return;
+            }
+        }
+    }
+
+    /// Skips the remainder of a percent comment, including its first line-break character.
+    /// Afterwards, the next character read is at the beginning of a line.
+    private void skipUntilEndOfLine() throws IOException {
+        atLineStart = true;
+        while (!eof) {
+            int character = read();
+
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return;
+            }
+
+            if ((character == '\n') || (character == '\r')) {
+                return;
             }
         }
     }
@@ -278,8 +349,6 @@ public class BibtexParser implements Parser {
                     // Not a comment, preamble, or string. Thus, it is an entry
                         parseAndAddEntry(entryType);
             }
-
-            skipWhitespace();
         }
 
         int startLine = line;
@@ -623,9 +692,11 @@ public class BibtexParser implements Parser {
         skipSpace();
         if (peek() == '\r') {
             read();
+            atLineStart = true;
         }
         if (peek() == '\n') {
             read();
+            atLineStart = true;
         }
     }
 
@@ -1255,20 +1326,42 @@ public class BibtexParser implements Parser {
         }
     }
 
+    /// Finds the next delimiter outside an entry, skipping lines whose first non-whitespace character is `%`.
+    ///
+    /// This method is only called between entries. Text there is ignored by BibTeX and has no escape mechanism, so `%` is only treated as a comment start at the beginning of a line:
+    ///
+    /// - A `%` later on a line (e.g., `100% of entries @article{...}`) does not hide the entry marker following it.
+    /// - `\%` at the beginning of a line is not a comment, because its first non-whitespace character is `\`.
+    ///
+    /// Escapes inside entries are handled separately: [#isEscapeSymbol(char)] keeps `\{` from opening a group in [#parseBracketedFieldContent(boolean)],
+    /// and that method also tolerates a trailing `\}` in file paths (https://github.com/JabRef/jabref/issues/9668).
+    /// A `%` inside a field value (e.g., in a URL) never reaches this method and is kept as content.
+    ///
+    /// @return whether the delimiter was found before the end of the file
     private boolean consumeUncritically(char expected) throws IOException {
-        int character;
-        // @formatter:off
-        do {
-            // @formatter:on
-            character = read();
-        } while ((character != expected) && (character != -1) && (character != 65535));
+        while (!eof) {
+            int character = read();
 
-        if (isEOFCharacter(character)) {
-            eof = true;
+            if (isEOFCharacter(character)) {
+                eof = true;
+                return false;
+            }
+
+            if ((character == '%') && atLineStart) {
+                // [impl->req~import.bibtex.percent-comments~1]
+                skipUntilEndOfLine();
+                continue;
+            }
+
+            if (character == expected) {
+                atLineStart = false;
+                return true;
+            }
+
+            trackLineStart(character);
         }
 
-        // Return true if we actually found the character we were looking for:
-        return character == expected;
+        return false;
     }
 
     private void consume(char firstOption, char secondOption) throws IOException {
