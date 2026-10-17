@@ -108,6 +108,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
         }
 
         if (selectedEntry.setNewBinding(event)) {
+            // [impl->req~ux.keybindings.duplicate-warning~1]
             List<KeyBinding> conflicts = keyBindingRepository.findConflictingKeyBindings(
                     selectedEntry.getKeyBinding(), event);
 

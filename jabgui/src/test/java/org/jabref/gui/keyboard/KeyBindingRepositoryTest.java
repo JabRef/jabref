@@ -44,6 +44,7 @@ class KeyBindingRepositoryTest {
         assertEquals(keyBindingRepository.get(bindNames.get(1)), bindings.get(1));
     }
 
+    // [utest->req~ux.keybindings.duplicate-warning~1]
     @Test
     void findsConflictingBinding() {
         KeyBindingRepository repo = new KeyBindingRepository(
@@ -56,6 +57,7 @@ class KeyBindingRepositoryTest {
         assertEquals(List.of(KeyBinding.MERGE_ENTRIES), conflicts);
     }
 
+    // [utest->req~ux.keybindings.duplicate-warning~1]
     @Test
     void ignoresBindingItself() {
         KeyBindingRepository repo = new KeyBindingRepository(
@@ -68,6 +70,7 @@ class KeyBindingRepositoryTest {
         assertEquals(List.of(), conflicts);
     }
 
+    // [utest->req~ux.keybindings.duplicate-warning~1]
     @Test
     void returnsEmptyForFreeCombination() {
         KeyBindingRepository repo = new KeyBindingRepository(
@@ -80,6 +83,7 @@ class KeyBindingRepositoryTest {
         assertEquals(List.of(), conflicts);
     }
 
+    // [utest->req~ux.keybindings.duplicate-warning~1]
     @Test
     void findsAllBindingsSharingTheCombination() {
         KeyBindingRepository repo = new KeyBindingRepository(
@@ -92,6 +96,7 @@ class KeyBindingRepositoryTest {
         assertEquals(Set.of(KeyBinding.MERGE_ENTRIES, KeyBinding.NEW_TECHREPORT), Set.copyOf(conflicts));
     }
 
+    // [utest->req~ux.keybindings.duplicate-warning~1]
     @Test
     void findsBindingsSharingEscape() {
         KeyBindingRepository repo = new KeyBindingRepository(

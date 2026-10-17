@@ -149,6 +149,7 @@ public class KeyBindingRepository {
     /// @param keyEvent   the key event the new shortcut is created from
     /// @return the conflicting key bindings, empty if there are none
     public List<KeyBinding> findConflictingKeyBindings(KeyBinding keyBinding, KeyEvent keyEvent) {
+        // [impl->req~ux.keybindings.duplicate-warning~1]
         return bindings.keySet().stream()
                        .filter(other -> other != keyBinding)
                        .filter(other -> checkKeyCombinationEquality(other, keyEvent))
