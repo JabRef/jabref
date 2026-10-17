@@ -19,7 +19,7 @@ class PersonNameStringConverterTest {
 
     @BeforeEach
     void setUp() {
-        // set up auhtor's name
+        // set up author's name
         author = new Author("Joseph M.", "J. M.", "", "Reagle", "Jr.");
     }
 

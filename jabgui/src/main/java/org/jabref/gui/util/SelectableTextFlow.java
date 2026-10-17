@@ -1,5 +1,7 @@
 package org.jabref.gui.util;
 
+import java.text.BreakIterator;
+
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -9,7 +11,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -19,8 +20,13 @@ import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
 
 public class SelectableTextFlow extends TextFlow {
-    @Nullable private HitInfo startHit;
-    @Nullable private HitInfo endHit;
+    /// Unicode "OBJECT REPLACEMENT CHARACTER". JavaFX's [TextFlow] puts it in place of every child that is not a [Text]
+    /// (e.g. a [Hyperlink]), so such a child counts as exactly one character in [TextFlow#getHitInfo(Point2D)] indices.
+    private static final char OBJECT_REPLACEMENT_CHARACTER = '\uFFFC';
+
+    /// Insertion indices into [#getTextFlowContent()]; -1 when there is no selection.
+    private int selectionStart = -1;
+    private int selectionEnd = -1;
     @Nullable private Path selectionPath;
 
     private final Pane parentPane;
@@ -67,38 +73,42 @@ public class SelectableTextFlow extends TextFlow {
         if (getChildren().isEmpty()) {
             return;
         }
-        startHit = hitTest(new Point2D(0, 0));
-        endHit = hitTest(new Point2D(getLayoutBounds().getWidth(), getLayoutBounds().getHeight()));
+        selectionStart = 0;
+        selectionEnd = getTextFlowContent().length();
         updateSelectionHighlight();
     }
 
     public void clearSelection() {
-        startHit = null;
-        endHit = null;
+        selectionStart = -1;
+        selectionEnd = -1;
         removeHighlight();
     }
 
     public boolean isSelectionActive() {
-        return startHit != null && endHit != null && startHit.getInsertionIndex() != endHit.getInsertionIndex();
+        return selectionStart >= 0 && selectionEnd >= 0 && selectionStart != selectionEnd;
     }
 
     /// Returns the start index of the selection. Assumes that the selection is active.
     public int getSelectionStartIndex() {
         assert isSelectionActive();
-        return Math.min(startHit.getInsertionIndex(), endHit.getInsertionIndex());
+        return Math.min(selectionStart, selectionEnd);
     }
 
     /// Returns the end index of the selection. Assumes that the selection is active.
     public int getSelectionEndIndex() {
         assert isSelectionActive();
-        return Math.max(startHit.getInsertionIndex(), endHit.getInsertionIndex());
+        return Math.max(selectionStart, selectionEnd);
     }
 
-    private String getTextFlowContent() {
+    /// The text in the index space of [TextFlow#getHitInfo(Point2D)] and [TextFlow#getRangeShape(int, int, boolean)]:
+    /// every embedded non-[Text] child occupies one [#OBJECT_REPLACEMENT_CHARACTER] there.
+    protected String getTextFlowContent() {
         StringBuilder sb = new StringBuilder();
         for (Node node : getChildren()) {
             if (node instanceof Text text) {
                 sb.append(text.getText());
+            } else {
+                sb.append(OBJECT_REPLACEMENT_CHARACTER);
             }
         }
         return sb.toString();
@@ -111,7 +121,7 @@ public class SelectableTextFlow extends TextFlow {
             return;
         }
 
-        PathElement[] elements = rangeShape(getSelectionStartIndex(), getSelectionEndIndex());
+        PathElement[] elements = getRangeShape(getSelectionStartIndex(), getSelectionEndIndex(), false);
 
         Path path = new Path();
         path.getElements().addAll(elements);
@@ -127,7 +137,7 @@ public class SelectableTextFlow extends TextFlow {
     }
 
     private void onMousePressed(MouseEvent event) {
-        if (isInHyperlink(event)) {
+        if (isInInteractiveContent(event)) {
             clearSelection();
             return;
         }
@@ -136,8 +146,8 @@ public class SelectableTextFlow extends TextFlow {
         event.consume();
         requestFocus();
 
-        startHit = hitTest(new Point2D(event.getX(), event.getY()));
-        endHit = startHit;
+        selectionStart = getHitInfo(new Point2D(event.getX(), event.getY())).getInsertionIndex();
+        selectionEnd = selectionStart;
         isDragging = false;
         justFinishedDrag = false;
 
@@ -145,12 +155,12 @@ public class SelectableTextFlow extends TextFlow {
     }
 
     private void onMouseDragged(MouseEvent event) {
-        if (startHit == null) {
+        if (selectionStart < 0) {
             return;
         }
         event.consume();
         isDragging = true;
-        endHit = hitTest(new Point2D(event.getX(), event.getY()));
+        selectionEnd = getHitInfo(new Point2D(event.getX(), event.getY())).getInsertionIndex();
         updateSelectionHighlight();
     }
 
@@ -169,23 +179,40 @@ public class SelectableTextFlow extends TextFlow {
             return;
         }
 
-        if (isInHyperlink(event)) {
+        if (isInInteractiveContent(event)) {
             clearSelection();
             return;
         }
 
         event.consume();
+        if (event.getClickCount() == 2) {
+            selectWordAt(getHitInfo(new Point2D(event.getX(), event.getY())).getCharIndex());
+            return;
+        }
+
         removeHighlight();
     }
 
-    private boolean isInHyperlink(MouseEvent event) {
+    private void selectWordAt(int charIndex) {
+        String text = getTextFlowContent();
+        if (charIndex < 0 || charIndex >= text.length()) {
+            return;
+        }
+        BreakIterator words = BreakIterator.getWordInstance();
+        words.setText(text);
+        selectionEnd = words.following(charIndex);
+        selectionStart = words.previous();
+        updateSelectionHighlight();
+    }
+
+    private boolean isInInteractiveContent(MouseEvent event) {
         if (!(event.getTarget() instanceof Node eventTarget)) {
             return false;
         }
 
         Node currentNode = eventTarget;
         while (currentNode != null && currentNode != this) {
-            if (currentNode instanceof Hyperlink) {
+            if (currentNode instanceof Hyperlink || currentNode instanceof SelectableTextFlow) {
                 return true;
             }
             currentNode = currentNode.getParent();

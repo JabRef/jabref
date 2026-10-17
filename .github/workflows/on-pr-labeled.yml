@@ -20,6 +20,8 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Approve PR
+        # jabref-machine cannot approve its own PRs (ports); port-to-other-branch.yml approves those
+        if: github.event.pull_request.user.login != 'jabref-machine'
         # Guard: automerge.yml (running for a push made just before the label was added)
         # queries labels live and may approve concurrently — skip if an un-dismissed
         # approval by jabref-machine already exists.
@@ -51,7 +53,7 @@ jobs:
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: pr_number
           path: pr_number.txt

@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.text.PDFTextStripper;
 
-public class InterruptablePDFTextStripper extends PDFTextStripper {
-    public InterruptablePDFTextStripper() {
+public class InterruptiblePDFTextStripper extends PDFTextStripper {
+    public InterruptiblePDFTextStripper() {
         super();
     }
 

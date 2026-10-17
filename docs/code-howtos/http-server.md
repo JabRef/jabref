@@ -84,7 +84,7 @@ In case you want to debug on Windows, you need to choose "WSL" as the target for
 ## Get SSL Working
 
 When interacting with the [Microsoft Word AddIn](https://github.com/JabRef/JabRef-Word-Addin), a SSL-based connection is required.
-[The Word-AddIn is currentely under development](https://github.com/JabRef/JabRef-Word-Addin/pull/568).
+[The Word-AddIn is currently under development](https://github.com/JabRef/JabRef-Word-Addin/pull/568).
 
 (Based on <https://stackoverflow.com/a/57511038/873282>)
 

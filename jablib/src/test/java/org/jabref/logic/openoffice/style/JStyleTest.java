@@ -881,7 +881,7 @@ class JStyleTest {
         }
 
         // With pageInfo: different entries with identical non-null pageInfo: not joined.
-        // XY [2000a,b,c; p1] whould be confusing.
+        // XY [2000a,b,c; p1] would be confusing.
         if (true) {
             List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
             CitationMarkerEntry cm1 =

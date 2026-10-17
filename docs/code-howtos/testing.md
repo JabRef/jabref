@@ -27,9 +27,9 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
 * _Bug fixing:_ write a test case covering the bug and then fix it, leaving the test as a security that the bug will never reappear.
 * Do not catch exceptions in tests, instead use the `assertThrows(Exception.class, () -> doSomethingThrowsEx())` feature of [junit-jupiter](https://junit.org/junit5/docs/current/user-guide/) to the test method.
 
-### Use `@ParamterizedTests`
+### Use `@ParameterizedTest`
 
-If possible, use `@ParamterizedTests`.
+If possible, use `@ParameterizedTest`.
 Read more at <https://mikemybytes.com/2021/10/19/parameterize-like-a-pro-with-junit-5-csvsource/>.
 
 Example for a nicely formatted `@CsvSource`
@@ -48,6 +48,25 @@ void convertsToUpperCamelCase(String input, String expected) {
     Assertions.assertEquals(expected, converted);
 }
 ```
+
+## Legacy library migration profiling
+
+Generate a deterministic 100,000-entry migration fixture from the repository root:
+
+```sh
+python3 scripts/bib-file-generator_legacy.py
+```
+
+The script creates `generated-large-legacy-library.bib` and refuses to overwrite an existing file.
+Use `--entries`, `--separator`, and `--output` for smaller fixtures or libraries with a semicolon keyword separator.
+The fixture contains large and overlapping explicit groups, nested hierarchy modes, duplicate and missing citation keys, markings, and special field values stored in keywords.
+It also includes keyword, regular-expression, search, automatic, and legacy smart groups.
+
+Measure parsing separately from `PerformLoadDatabaseMigrations` with a JVM flight recording.
+Migration runs before GUI attachment: only conversions with remaining legacy content run, using temporarily detached entries and a single citation-key index.
+Entries are reinserted in a batch to restore observation and database indices, and the library is marked modified so the converted representation can be saved.
+A localized notification announces migration when legacy content is found.
+Save and reopen the fixture to verify that no conversion runs again; the content checks still run to detect legacy data in mixed-format libraries.
 
 ## Coverage
 

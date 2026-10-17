@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.pdf.InterruptablePDFTextStripper;
+import org.jabref.logic.pdf.InterruptiblePDFTextStripper;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -25,7 +25,7 @@ public class PdfContentParser implements FileContentParser {
             int numberOfPages = document.getNumberOfPages();
             List<String> pages = new ArrayList<>(numberOfPages);
 
-            InterruptablePDFTextStripper stripper = new InterruptablePDFTextStripper();
+            InterruptiblePDFTextStripper stripper = new InterruptiblePDFTextStripper();
             for (int page = 1; page <= numberOfPages; page++) {
                 if (Thread.currentThread().isInterrupted()) {
                     return List.of();

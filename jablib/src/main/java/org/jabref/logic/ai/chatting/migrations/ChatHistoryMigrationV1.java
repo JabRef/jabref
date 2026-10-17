@@ -82,7 +82,7 @@ public final class ChatHistoryMigrationV1 {
         }
 
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-            LOGGER.warn("Cannot migrate chat history: database path is not set");
+            // Version 1 stored AI data by .bib path. Libraries without a path (shared SQL, unsaved) have nothing to migrate.
             return;
         }
 

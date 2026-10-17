@@ -40,7 +40,7 @@ public class AuthorListTest {
     private static final AuthorList THREE_AUTHORS_WITH_LATEX = AuthorList.of(MUHAMMAD_ALKHWARIZMI,
             CORRADO_BOHM, KURT_GODEL);
     private static final AuthorList ONE_INSTITUTION_WITH_LATEX = AuthorList.of(BANU_MOSA);
-    private static final AuthorList ONE_INSTITUTION_WITH_STARTING_PARANTHESIS = AuthorList.of(
+    private static final AuthorList ONE_INSTITUTION_WITH_STARTING_PARENTHESIS = AuthorList.of(
             new Author(
                     null, null, null, "{{\\L{}}ukasz Micha\\l{}}", null));
     private static final AuthorList TWO_INSTITUTIONS_WITH_LATEX = AuthorList.of(BANU_MOSA, BANU_MOSA);
@@ -79,7 +79,7 @@ public class AuthorListTest {
             # LaTeX-free Unicode mixed authors from LaTeX
             MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     , The Banū Mūsā brothers and Böhm
             # LaTeX-free one institution with parenthesis at start
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   , Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARENTHESIS   , Łukasz Michał
             """)
     void getAsNatbibLatexFree(String authorListName, String expected) {
         AuthorList authorList = getAuthorListByName(authorListName);
@@ -150,7 +150,7 @@ public class AuthorListTest {
             # Unicode mixed authors from LaTeX abbreviate
             MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; true  ; false ; The Banū Mūsā brothers and C. Böhm
             # One institution with parenthesis at start abbreviate
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; true  ; false ; Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARENTHESIS   ; true  ; false ; Łukasz Michał
             # Empty author string for empty input
             EMPTY_AUTHOR                                ; false ; false ; ''
             # Unicode one author name from LaTeX
@@ -166,7 +166,7 @@ public class AuthorListTest {
             # Unicode mixed authors from LaTeX
             MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; false ; false ; The Banū Mūsā brothers and Corrado Böhm
             # One institution with parenthesis at start
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; false ; false ; Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARENTHESIS   ; false ; false ; Łukasz Michał
             """)
     void getAsFirstLastNamesLatexFree(String authorListName, boolean abbreviate, boolean oxford, String expected) {
         AuthorList authorList = getAuthorListByName(authorListName);
@@ -216,7 +216,7 @@ public class AuthorListTest {
             # Unicode mixed authors from LaTeX abbreviate
             MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; true  ; false ; The Banū Mūsā brothers and Böhm, C.
             # One institution with parenthesis at start abbreviate
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; true  ; false ; Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARENTHESIS   ; true  ; false ; Łukasz Michał
             # Empty author string for empty input
             EMPTY_AUTHOR                                ; false ; false ; ''
             # Unicode one author name from LaTeX
@@ -232,7 +232,7 @@ public class AuthorListTest {
             # Unicode mixed authors from LaTeX
             MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; false ; false ; The Banū Mūsā brothers and Böhm, Corrado
             # One institution with parenthesis at start
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; false ; false ; Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARENTHESIS   ; false ; false ; Łukasz Michał
             # Empty author string for empty input abbreviate Oxford comma
             EMPTY_AUTHOR                                ; true  ; true  ; ''
             # Unicode one author name from LaTeX abbreviate Oxford comma
@@ -248,7 +248,7 @@ public class AuthorListTest {
             # Unicode mixed authors from LaTeX abbreviate Oxford comma
             MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; true  ; true  ; The Banū Mūsā brothers and Böhm, C.
             # One institution with parenthesis at start abbreviate Oxford comma
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; true  ; true  ; Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARENTHESIS   ; true  ; true  ; Łukasz Michał
             # Empty author string for empty input Oxford comma
             EMPTY_AUTHOR                                ; false ; true  ; ''
             # Unicode one author name from LaTeX Oxford comma
@@ -264,7 +264,7 @@ public class AuthorListTest {
             # Unicode mixed authors from LaTeX Oxford comma
             MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; false ; true  ; The Banū Mūsā brothers and Böhm, Corrado
             # One institution with parenthesis at start Oxford comma
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; false ; true  ; Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARENTHESIS   ; false ; true  ; Łukasz Michał
             """)
     void getAsLastFirstNamesLatexFree(String authorListName, boolean abbreviate, boolean oxford, String expected) {
         AuthorList authorList = getAuthorListByName(authorListName);
@@ -330,7 +330,7 @@ public class AuthorListTest {
             # Unicode mixed authors from LaTeX
             MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX     ; false ; The Banū Mūsā brothers and Böhm
             # One institution with parenthesis at start
-            ONE_INSTITUTION_WITH_STARTING_PARANTHESIS   ; false ; Łukasz Michał
+            ONE_INSTITUTION_WITH_STARTING_PARENTHESIS   ; false ; Łukasz Michał
             """)
     void getAsLastNamesLatexFree(String authorListName, boolean oxfordComma, String expected) {
         AuthorList authorList = getAuthorListByName(authorListName);
@@ -903,8 +903,8 @@ public class AuthorListTest {
                 return TWO_INSTITUTIONS_WITH_LATEX;
             case "MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX":
                 return MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX;
-            case "ONE_INSTITUTION_WITH_STARTING_PARANTHESIS":
-                return ONE_INSTITUTION_WITH_STARTING_PARANTHESIS;
+            case "ONE_INSTITUTION_WITH_STARTING_PARENTHESIS":
+                return ONE_INSTITUTION_WITH_STARTING_PARENTHESIS;
             default:
                 throw new IllegalArgumentException("Unknown author list: " + name);
         }

@@ -43,9 +43,9 @@ public class MSBibConverter {
         // Duplicate: also added as BookTitle
         entry.getFieldLatexFree(StandardField.BOOKTITLE).ifPresent(booktitle -> result.conferenceName = booktitle);
         entry.getFieldLatexFree(StandardField.PAGES).ifPresent(pages -> result.pages = new PageNumbers(pages));
-        entry.getFieldLatexFree(new UnknownField(MSBIB_PREFIX + "accessed")).ifPresent(accesed -> result.dateAccessed = accesed);
+        entry.getFieldLatexFree(new UnknownField(MSBIB_PREFIX + "accessed")).ifPresent(accessed -> result.dateAccessed = accessed);
 
-        entry.getFieldLatexFree(StandardField.URLDATE).ifPresent(acessed -> result.dateAccessed = acessed);
+        entry.getFieldLatexFree(StandardField.URLDATE).ifPresent(accessed -> result.dateAccessed = accessed);
 
         // TODO: currently this can never happen
         if ("SoundRecording".equals(msBibType)) {

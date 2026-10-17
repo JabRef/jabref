@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.logic.ai.chatting.InMemoryChatHistoryCache;
@@ -19,7 +20,9 @@ import com.tobiasdiez.easybind.EasyBind;
 public class AiEntryChatViewModel extends AbstractViewModel {
     private final BooleanProperty enabled = new SimpleBooleanProperty();
     private final ObjectProperty<FullBibEntry> selectedEntry = new SimpleObjectProperty<>();
-    private final ListProperty<FullBibEntry> entries = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<FullBibEntry> entries = new SimpleListProperty<>(FXCollections.observableArrayList(
+            entryIdentifier -> entryIdentifier.entry().getObservables()
+    ));
     private final ListProperty<ChatMessage> chatHistory = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final AiPreferences aiPreferences;
@@ -49,7 +52,11 @@ public class AiEntryChatViewModel extends AbstractViewModel {
             return;
         }
 
-        entries.set(FXCollections.observableArrayList(identifier));
+        ObservableList<FullBibEntry> observableEntries = FXCollections.observableArrayList(
+                entryIdentifier -> entryIdentifier.entry().getObservables()
+        );
+        observableEntries.add(identifier);
+        entries.set(observableEntries);
 
         chatHistory.set(chatHistoryCache.getForEntry(
                 identifier.databaseContext(),
