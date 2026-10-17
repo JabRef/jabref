@@ -23,6 +23,14 @@ Delimiter characters that are part of a keyword remain part of that keyword and 
 
 Needs: impl, utest
 
+## BibTeX importer must accept whitespace before citation keys
+`req~import.bibtex.key-leading-whitespace~1`
+
+This includes LF, CRLF, and multiple line breaks immediately after the entry's opening brace.
+Origin: <https://github.com/JabRef/jabref/issues/9622>
+
+Needs: impl, utest
+
 ## Library must maintain imported entries sorted by internal id
 `req~import.entries.sorted-by-id~1`
 

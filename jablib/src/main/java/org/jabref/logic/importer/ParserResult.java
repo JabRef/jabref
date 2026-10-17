@@ -192,7 +192,7 @@ public class ParserResult {
         Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Map.of());
 
         if (rangeMap.isEmpty()) {
-            return Range.NULL_RANGE;
+            return getCompleteEntryIndicator(entry);
         }
 
         Range range = rangeMap.get(field);

@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -227,6 +228,128 @@ class BibtexParserTest {
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Ed von Test");
         assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    // [utest->req~import.bibtex.key-leading-whitespace~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"", " \t", "\n", "\r", "\r\n", "\n\n", "\r\n\r\n"})
+    void parseRecognizesCitationKeyAfterLeadingWhitespace(String whitespace) throws IOException {
+        ParserResult result = parser.parse(Reader.of("@inproceedings{" + whitespace + "somebody2023,\ntitle={...}\n}"));
+        BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("somebody2023")
+                .withField(StandardField.TITLE, "...");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+        assertEquals(List.of(), result.warnings());
+    }
+
+    // [utest->req~import.bibtex.key-leading-whitespace~1]
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "@article{author={Ed von Test},title={Test}}",
+            "@article{\nauthor = {Ed von Test},title={Test}}",
+            "@article{\r\ntitle={Test},author={Ed von Test}}",
+            "@article{\n\ntitle\t= {Test},author={Ed von Test}}",
+            "@article{\r\nauthor\r\n= {Ed von Test},title={Test}}"
+    })
+    void parsePreservesFirstFieldWhenCitationKeyAndCommaAreMissing(String entry) throws IOException {
+        ParserResult result = parser.parse(Reader.of(entry));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Ed von Test")
+                .withField(StandardField.TITLE, "Test");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+        assertEquals(List.of("empty citation key"), result.warnings());
+    }
+
+    // [utest->req~import.bibtex.key-leading-whitespace~1]
+    @Test
+    void parsePreservesFirstFieldWithWhitespaceAtLookaheadLimit() throws IOException {
+        ParserResult result = parser.parse(Reader.of("@article{\nauthor" + " ".repeat(1024) + "={Ed von Test},title={Test}}"));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Ed von Test")
+                .withField(StandardField.TITLE, "Test");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+        assertEquals(List.of("empty citation key"), result.warnings());
+    }
+
+    // [utest->req~import.bibtex.key-leading-whitespace~1]
+    @ParameterizedTest
+    @ValueSource(strings = {" ", "\t", "\r\n", "\n \t"})
+    void parsePreservesFirstFieldWithWhitespaceBeyondLookaheadLimit(String whitespace) throws IOException {
+        String entry = "@article{\nauthor" + whitespace.repeat(1025) + "={Ed von Test},title={Test}}";
+        String followingEntry = "@article{next,title={Next entry}}";
+        ParserResult result = parser.parse(Reader.of(entry + followingEntry));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Ed von Test")
+                .withField(StandardField.TITLE, "Test");
+        BibEntry expectedFollowingEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("next")
+                .withField(StandardField.TITLE, "Next entry");
+
+        assertEquals(List.of(expected, expectedFollowingEntry), result.getDatabase().getEntries());
+        assertEquals(entry, result.getDatabase().getEntries().getFirst().getParsedSerialization());
+        assertEquals(followingEntry, result.getDatabase().getEntries().get(1).getParsedSerialization());
+        assertEquals(List.of("empty citation key"), result.warnings());
+    }
+
+    // [utest->req~import.bibtex.key-leading-whitespace~1]
+    @ParameterizedTest
+    @CsvSource({"2047, 0", "2048, 0", "8192, 0", "2048, 4096"})
+    void parsePreservesLongFirstFieldWhenCitationKeyAndCommaAreMissing(int fieldNameLength, int whitespaceLength) throws IOException {
+        String fieldName = "x".repeat(fieldNameLength);
+        String entry = "@article{\n" + fieldName + " ".repeat(whitespaceLength) + "={Value},title={Test}}";
+        ParserResult result = parser.parse(Reader.of(entry));
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(new UnknownField(fieldName), "Value")
+                .withField(StandardField.TITLE, "Test");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+        assertEquals(entry, result.getDatabase().getEntries().getFirst().getParsedSerialization());
+        assertEquals(new ParserResult.Range(2, 1, 2, fieldNameLength + whitespaceLength + 9),
+                result.getFieldRange(result.getDatabase().getEntries().getFirst(), new UnknownField(fieldName)));
+        assertEquals(List.of("empty citation key"), result.warnings());
+    }
+
+    // [utest->req~import.bibtex.key-leading-whitespace~1]
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "@article{\nauthor={Ed von Test},title={Test}}",
+            "@article{,\nauthor={Ed von Test},title={Test}}"
+    })
+    void parseUsesWholeEntryRangeWhenCitationKeyIsMissing(String entry) throws IOException {
+        ParserResult result = parser.parse(Reader.of(entry));
+        BibEntry parsedEntry = result.getDatabase().getEntries().getFirst();
+
+        assertEquals(Set.of(StandardField.AUTHOR, StandardField.TITLE), result.getFieldRanges().getOrDefault(parsedEntry, Map.of()).keySet());
+        assertEquals(result.getArticleRanges().get(parsedEntry), result.getCompleteEntryIndicator(parsedEntry));
+        assertEquals(result.getArticleRanges().get(parsedEntry), result.getFieldRange(parsedEntry, InternalField.KEY_FIELD));
+        assertEquals(1, result.getCompleteEntryIndicator(parsedEntry).startLine());
+    }
+
+    // [utest->req~import.bibtex.key-leading-whitespace~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"@article{\n}", "@article{,\n}"})
+    void parseUsesWholeEntryRangeWhenCitationKeyAndFieldsAreMissing(String entry) throws IOException {
+        ParserResult result = parser.parse(Reader.of(entry));
+        BibEntry parsedEntry = result.getDatabase().getEntries().getFirst();
+
+        assertEquals(List.of(new BibEntry(StandardEntryType.Article)), result.getDatabase().getEntries());
+        assertEquals(result.getArticleRanges().get(parsedEntry), result.getFieldRange(parsedEntry, InternalField.KEY_FIELD));
+        assertEquals(1, result.getFieldRange(parsedEntry, InternalField.KEY_FIELD).startLine());
+        assertEquals(List.of(), result.warnings());
+    }
+
+    // [utest->req~import.bibtex.key-leading-whitespace~1]
+    @Test
+    void parseStoresCitationKeyRangeAfterLeadingWhitespace() throws IOException {
+        ParserResult result = parser.parse(Reader.of("@article{\nkey,title={Test}}"));
+        BibEntry parsedEntry = result.getDatabase().getEntries().getFirst();
+
+        assertEquals(new ParserResult.Range(2, 1, 2, 4), result.getFieldRange(parsedEntry, InternalField.KEY_FIELD));
+        assertEquals(new ParserResult.Range(2, 0, 2, 4), result.getCompleteEntryIndicator(parsedEntry));
+        assertEquals(List.of(), result.warnings());
     }
 
     @Test
