@@ -20,10 +20,8 @@ class BibEntryTrimLeftTest {
 
         entry.trimLeft();
 
-        // Current implementation uses String.trim(), which removes leading and trailing whitespace.
-        // The important bit to test here is that leading whitespace is gone.
-        assertEquals("Some serialization", entry.getParsedSerialization());
-        assertEquals("% a comment", entry.getUserComments());
+        assertEquals("Some serialization  \n\t  ", entry.getParsedSerialization());
+        assertEquals("% a comment   \n", entry.getUserComments());
     }
 
     @Test
