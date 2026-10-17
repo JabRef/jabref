@@ -1,0 +1,474 @@
+package org.jabref.logic.importer.plaincitation;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class RuleBasedPlainCitationParserTest {
+
+    private static final String IEEE_ARTICLE = "J. Smith, M. Tan, D. Lee, and A. Wong, \"Improving AI systems,\" Journal of Computer Science, vol. 12, no. 2, pp. 45-60, 2024, doi: 10.1234/example.";
+    private static final String APA_ARTICLE = "Smith, J., Tan, M., Lee, D., & Wong, A. (2024). Improving AI systems. Journal of Computer Science, 12(2), 45-60.";
+    private static final String DOUBLE_SLASH_ARTICLE = "Ivanov, I. I. Title of the paper // Journal Name. 2015. P. 10-20.";
+    private static final String BOOK = "Smith, J. Some book. Springer, Berlin, 2010.";
+
+    private RuleBasedPlainCitationParser parser;
+
+    @BeforeEach
+    void setUp() {
+        parser = new RuleBasedPlainCitationParser();
+    }
+
+    private Optional<String> parseField(String citation, Field field) throws FetcherException {
+        return parser.parsePlainCitation(citation).flatMap(entry -> entry.getField(field));
+    }
+
+    // DOI
+
+    /// A DOI is found with a `doi:` or `DOI:` prefix and as a `doi.org` link. Punctuation right after it
+    /// (`.`, `,`, `;`) is not part of it, and of two DOIs only the first is kept.
+    static Stream<Arguments> findsDoi() {
+        return Stream.of(
+                Arguments.of("10.1000/xyz123", "Smith, J. A title. Some Journal, 2020. doi:10.1000/xyz123"),
+                Arguments.of("10.1000/xyz123", "Smith, J. A title. Journal, 2020. https://doi.org/10.1000/xyz123"),
+                Arguments.of("10.1000/first", "Smith, J. A title. Journal, 2020. doi:10.1000/first doi:10.1000/second"),
+                Arguments.of("10.1000/XYZ123", "Smith, J. A title. Journal, 2020. DOI: 10.1000/XYZ123"),
+                Arguments.of("10.1000/xyz123", "Smith, J. A title. Journal, 2020. https://doi.org/10.1000/xyz123."),
+                Arguments.of("10.1000/xyz123", "Smith, J. A title. Journal, doi:10.1000/xyz123, 2020."),
+                Arguments.of("10.1000/xyz123", "Smith, J. A title. Journal, 2020. doi:10.1000/xyz123; accessed online."));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void findsDoi(String expectedDoi, String citation) throws FetcherException {
+        assertEquals(Optional.of(expectedDoi), parseField(citation, StandardField.DOI));
+    }
+
+    /// No DOI must mean no doi field at all, not an empty one.
+    @Test
+    void citationWithoutDoiHasNoDoiField() throws FetcherException {
+        assertEquals(Optional.empty(), parseField("Smith, J. A title. Journal, 2020.", StandardField.DOI));
+    }
+
+    /// DOI extraction runs before URL extraction, so a `doi.org` link ends up only in the doi field.
+    /// Both fields are checked, so the link must not get lost either.
+    @Test
+    void doiLinkIsStoredAsDoiNotUrl() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. A title. Journal, 2020. https://doi.org/10.1000/xyz123");
+        assertEquals(List.of(Optional.of("10.1000/xyz123"), Optional.empty()),
+                List.of(entry.flatMap(e -> e.getField(StandardField.DOI)),
+                        entry.flatMap(e -> e.getField(StandardField.URL))));
+    }
+
+    /// The DOI is removed before year and pages extraction, so its digits must not become the year or pages.
+    @Test
+    void digitsInDoiAreNotTakenAsYearOrPages() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. A title. Journal, 2021. doi:10.1109/ICSE.2019.00012");
+        assertEquals(List.of(Optional.of("2021"), Optional.empty()),
+                List.of(entry.flatMap(e -> e.getField(StandardField.YEAR)),
+                        entry.flatMap(e -> e.getField(StandardField.PAGES))));
+    }
+
+    /// A citation with both a DOI and a URL must keep both. Both orders are tested: DOI before URL, and URL before DOI.
+    @ParameterizedTest
+    @ValueSource(strings = {"Smith, J. A title. Journal, 2020. doi:10.1000/xyz123 https://example.com/page",
+            "Smith, J. A title. Journal, 2020. https://example.com/page doi:10.1000/xyz123"})
+    void findsDoiAndUrlInSameCitation(String citation) throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation(citation);
+        assertEquals(List.of(Optional.of("10.1000/xyz123"), Optional.of("https://example.com/page")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.DOI)),
+                        entry.flatMap(e -> e.getField(StandardField.URL))));
+    }
+
+    // URL
+
+    /// Every scheme the URL pattern accepts (`http`, `https`, `ftp`, a bare `www.`) is kept whole, including query strings.
+    @ParameterizedTest
+    @ValueSource(strings = {"https://example.com/page", "http://example.com", "www.example.com/page", "ftp://files.example.com/data.zip",
+            "https://example.com/page?id=123", "https://example.com/search?id=123&lang=en"})
+    void findsUrl(String url) throws FetcherException {
+        assertEquals(Optional.of(url), parseField("Smith, J. A title. Journal, 2020. " + url, StandardField.URL));
+    }
+
+    /// No URL must mean no url field at all, not an empty one.
+    @Test
+    void citationWithoutUrlHasNoUrlField() throws FetcherException {
+        assertEquals(Optional.empty(), parseField("Smith, J. A title. Journal, 2020.", StandardField.URL));
+    }
+
+    /// Citations end with a period; it belongs to the sentence, not to the URL.
+    @Test
+    void urlDoesNotIncludeSentencePeriod() throws FetcherException {
+        assertEquals(Optional.of("https://example.com/page"), parseField("Smith, J. A title. Journal, 2020. https://example.com/page.", StandardField.URL));
+    }
+
+    /// The url field holds one value, so several URLs are joined with `, `.
+    @Test
+    void joinsMultipleUrls() throws FetcherException {
+        assertEquals(Optional.of("https://a.example.com, https://b.example.com"),
+                parseField("Smith, J. A title. Journal, 2020. https://a.example.com https://b.example.com", StandardField.URL));
+    }
+
+    /// URLs are removed before year extraction, so a year inside a URL must not become the year.
+    @Test
+    void yearInUrlIsNotTakenAsYear() throws FetcherException {
+        assertEquals(Optional.of("2021"), parseField("Smith, J. A title. Journal, 2021. https://example.com/2019/paper", StandardField.YEAR));
+    }
+
+    // Authors
+
+    /// Both author patterns, surname first and initials first, produce the BibTeX form `Last, I.`.
+    @ParameterizedTest
+    @ValueSource(strings = {"Smith, J. A title. Journal, 2020.",
+            "J. Smith. A title. Journal, 2020."})
+    void normalizesBothAuthorFormats(String citation) throws FetcherException {
+        assertEquals(Optional.of("Smith, J."), parseField(citation, StandardField.AUTHOR));
+    }
+
+    /// The initials group allows up to three initials, and both must be kept.
+    @Test
+    void findsAuthorWithTwoInitials() throws FetcherException {
+        assertEquals(Optional.of("Smith, J. and Doe, A. B."),
+                parseField("Smith, J. and Doe, A. B. Deep learning for citations. Journal of AI, 2020.", StandardField.AUTHOR));
+    }
+
+    /// IEEE separates the last author with `and`, APA with `&`; neither separator may become part of a name.
+    @ParameterizedTest
+    @ValueSource(strings = {IEEE_ARTICLE, APA_ARTICLE})
+    void findsMultipleAuthorsWithInitials(String citation) throws FetcherException {
+        assertEquals(Optional.of("Smith, J. and Tan, M. and Lee, D. and Wong, A."), parseField(citation, StandardField.AUTHOR));
+    }
+
+    /// Without a final `and` or `&`, commas are the only separators between authors.
+    @Test
+    void findsAuthorsSeparatedOnlyByCommas() throws FetcherException {
+        assertEquals(Optional.of("Smith, J. and Tan, M. and Lee, D."),
+                parseField("Smith, J., Tan, M., Lee, D. A title. Journal, 2020.", StandardField.AUTHOR));
+    }
+
+    /// `\w` only matches ASCII letters by default, which cuts surnames with accented letters, hyphens or
+    /// apostrophes short. Hyphenated initials (`K.-K.`) must stay whole as well.
+    static Stream<Arguments> findsAuthorWithNonAsciiOrPunctuatedName() {
+        return Stream.of(
+                Arguments.of("Müller, K.", "Müller, K. A title. Journal, 2020."),
+                Arguments.of("García-López, M.", "García-López, M. A title. Journal, 2020."),
+                Arguments.of("O'Brien, P.", "O'Brien, P. A title. Journal, 2020."),
+                Arguments.of("Kemell, K.-K.", "K.-K. Kemell. A title. Journal, 2020."));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource
+    void findsAuthorWithNonAsciiOrPunctuatedName(String expectedAuthor, String citation) throws FetcherException {
+        assertEquals(Optional.of(expectedAuthor), parseField(citation, StandardField.AUTHOR));
+    }
+
+    /// Full first names, written first name first.
+    @Test
+    void findsMultipleAuthorsWithFullNames() throws FetcherException {
+        assertEquals(Optional.of("Smith, John and Tan, Mary and Lee, David and Wong, Alice"),
+                parseField("John Smith, Mary Tan, David Lee, and Alice Wong. Improving AI systems. Journal of Computer Science, 2024.", StandardField.AUTHOR));
+    }
+
+    /// A single author written with a full first name.
+    @Test
+    void findsSingleAuthorWithFullName() throws FetcherException {
+        assertEquals(Optional.of("Smith, John"), parseField("John Smith. A title. Journal, 2020.", StandardField.AUTHOR));
+    }
+
+    /// A particle such as `van` belongs to the surname, as in BibTeX's `von Last, First` form.
+    @Test
+    void keepsNameParticleWithSurname() throws FetcherException {
+        assertEquals(Optional.of("van Beethoven, Ludwig"), parseField("Ludwig van Beethoven. A title. Journal, 2020.", StandardField.AUTHOR));
+    }
+
+    /// `et al.` becomes BibTeX's `and others`, also when the period after `al` is missing.
+    static Stream<Arguments> convertsEtAlToOthers() {
+        return Stream.of(
+                Arguments.of("Smith, J. and others", "Smith, J., et al. Improving AI systems. Journal of Computer Science, 2024."),
+                Arguments.of("Smith, J. and others", "Smith, J. et al Improving AI systems. Journal of Computer Science, 2024."));
+    }
+
+    @ParameterizedTest(name = "{1}")
+    @MethodSource
+    void convertsEtAlToOthers(String expectedAuthor, String citation) throws FetcherException {
+        assertEquals(Optional.of(expectedAuthor), parseField(citation, StandardField.AUTHOR));
+    }
+
+    /// The author patterns are case-sensitive, so a lowercase word is never taken as initial:
+    /// `authors. Journal` must not be read as the author `Journal, s.`.
+    @Test
+    void lowercaseWordIsNotTakenAsInitial() throws FetcherException {
+        assertEquals(Optional.empty(), parseField("A title without authors. Journal, 2020.", StandardField.AUTHOR));
+    }
+
+    // Year
+
+    /// 1701 is the lowest year accepted.
+    @ParameterizedTest
+    @ValueSource(ints = {1701, 2020})
+    void acceptsYearInRange(int year) throws FetcherException {
+        assertEquals(Optional.of(String.valueOf(year)), parseField("Smith, J. A title. Journal, " + year + ".", StandardField.YEAR));
+    }
+
+    /// The current year is the highest year accepted. It is computed, so the test does not go stale.
+    @Test
+    void acceptsCurrentYear() throws FetcherException {
+        String currentYear = String.valueOf(LocalDate.now().getYear());
+        assertEquals(Optional.of(currentYear), parseField("Smith, J. A title. Journal, " + currentYear + ".", StandardField.YEAR));
+    }
+
+    /// The years just outside both ends of the accepted range.
+    static Stream<Integer> rejectsYearOutOfRange() {
+        return Stream.of(1700, LocalDate.now().getYear() + 1);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void rejectsYearOutOfRange(int year) throws FetcherException {
+        assertEquals(Optional.empty(), parseField("Smith, J. A title. Journal, " + year + ".", StandardField.YEAR));
+    }
+
+    /// Only the publication year is replaced by the placeholder, so a year in the title stays in the title.
+    @Test
+    void titleKeepsYearItMentions() throws FetcherException {
+        assertEquals(Optional.of("Review of 2020"), parseField("Smith, J. Review of 2020. Some Journal, 2020.", StandardField.TITLE));
+    }
+
+    /// Without parentheses, the last valid year wins: in most styles the publication year comes after the title.
+    @Test
+    void takesPublicationYearOverYearInTitle() throws FetcherException {
+        assertEquals(Optional.of("2021"), parseField("Smith, J. Lessons from 2019. Journal, 2021.", StandardField.YEAR));
+    }
+
+    /// In APA style the year comes first, in parentheses; a later year in the title must not replace it.
+    @Test
+    void findsYearInParenthesesBeforeTitle() throws FetcherException {
+        assertEquals(Optional.of("2021"), parseField("Smith, J. (2021). Lessons from 2019. Journal, 12, 45-60.", StandardField.YEAR));
+    }
+
+    /// A future year in the title is out of range, so the publication year after it is used.
+    @Test
+    void ignoresFutureYearInTitle() throws FetcherException {
+        assertEquals(Optional.of("2020"), parseField("Smith, J. Visions of 2050. Journal, 2020.", StandardField.YEAR));
+    }
+
+    /// For a year range, the start year is stored, and the end year must not end up in pages.
+    @Test
+    void takesStartOfYearRange() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. A title. Journal, 2019–2021.");
+        assertEquals(List.of(Optional.of("2019"), Optional.empty()),
+                List.of(entry.flatMap(e -> e.getField(StandardField.YEAR)),
+                        entry.flatMap(e -> e.getField(StandardField.PAGES))));
+    }
+
+    // Title and journal
+
+    /// The boundary between title and journal is found even when the title has a colon, a question mark,
+    /// or words like `journal` and `Proceedings`, and when the journal name is abbreviated with periods.
+    static Stream<Arguments> findsTitleAndJournal() {
+        return Stream.of(
+                Arguments.of("Improving AI: A survey", "Journal of AI", "Smith, J. Improving AI: A survey. Journal of AI, 2020."),
+                Arguments.of("Is AI safe?", "Journal of AI", "Smith, J. Is AI safe? Journal of AI, 2020."),
+                Arguments.of("A title", "J. Comp. Sci.", "Smith, J. A title. J. Comp. Sci., 2020."),
+                Arguments.of("A journal of my travels", "Travel Review", "Smith, J. A journal of my travels. Travel Review, 2020."),
+                Arguments.of("Proceedings of the past", "History Review", "Smith, J. Proceedings of the past. History Review, 2020."));
+    }
+
+    @ParameterizedTest(name = "{2}")
+    @MethodSource
+    void findsTitleAndJournal(String expectedTitle, String expectedJournal, String citation) throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation(citation);
+        assertEquals(List.of(Optional.of(expectedTitle), Optional.of(expectedJournal)),
+                List.of(entry.flatMap(e -> e.getField(StandardField.TITLE)),
+                        entry.flatMap(e -> e.getField(StandardField.JOURNAL))));
+    }
+
+    /// The journal is optional; without one, leftover text such as `[year_tag]` must not become the journal.
+    @Test
+    void citationWithoutJournalHasNoJournalField() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. A title. 2020.");
+        assertEquals(List.of(Optional.of("A title"), Optional.empty()),
+                List.of(entry.flatMap(e -> e.getField(StandardField.TITLE)),
+                        entry.flatMap(e -> e.getField(StandardField.JOURNAL))));
+    }
+
+    // Pages
+
+    /// The `p.`/`pp.` prefix is dropped. Hyphen, en dash and BibTeX `--` ranges and a single page are stored
+    /// with the BibTeX range separator `--` (a single page has no separator).
+    static Stream<Arguments> findsPages() {
+        return Stream.of(
+                Arguments.of("12--20", "12-20"),
+                Arguments.of("12--34", "p. 12-34"),
+                Arguments.of("12--34", "pp. 12-34"),
+                Arguments.of("12--34", "P. 12-34"),
+                Arguments.of("45--60", "45–60"),
+                Arguments.of("45--60", "pp. 45--60"),
+                Arguments.of("12", "p. 12"));
+    }
+
+    @ParameterizedTest(name = "{1}")
+    @MethodSource
+    void findsPages(String expectedPages, String writtenPages) throws FetcherException {
+        assertEquals(Optional.of(expectedPages), parseField("Smith, J. A title. Journal, 2020, " + writtenPages + ".", StandardField.PAGES));
+    }
+
+    /// Year extraction runs before page extraction, so the year does not end up in pages.
+    @Test
+    void yearIsNotTakenAsPages() throws FetcherException {
+        assertEquals(Optional.empty(), parseField("Smith, J. A title. Journal, 2020.", StandardField.PAGES));
+    }
+
+    /// A year rejected as out of range is still in the text when pages are extracted.
+    @Test
+    void rejectedYearIsNotTakenAsPages() throws FetcherException {
+        assertEquals(Optional.empty(), parseField("Smith, J. A title. Journal, 1700.", StandardField.PAGES));
+    }
+
+    /// Only one year is replaced, so a second year is still in the text when pages are extracted.
+    @Test
+    void secondYearIsNotTakenAsPages() throws FetcherException {
+        assertEquals(Optional.empty(), parseField("Smith, J. Lessons from 2019. Journal, 2021.", StandardField.PAGES));
+    }
+
+    /// The pages pattern must skip volume and issue numbers (`vol. 12`, `vol. 12, no. 2`, APA `12(2)`).
+    @ParameterizedTest
+    @ValueSource(strings = {"Smith, J. A title. Journal, vol. 12, pp. 45-60, 2020.",
+            "Smith, J. A title. Journal, vol. 12, no. 2, pp. 45-60, 2020.",
+            "Smith, J. (2020). A title. Journal, 12(2), 45-60."})
+    void volumeAndIssueAreNotTakenAsPages(String citation) throws FetcherException {
+        assertEquals(Optional.of("45--60"), parseField(citation, StandardField.PAGES));
+    }
+
+    /// A DOI right after the page range must not change it.
+    @Test
+    void findsPagesFollowedByDoi() throws FetcherException {
+        assertEquals(Optional.of("45--60"), parseField("Smith, J. A title. Journal, 2020, pp. 45-60. doi:10.1000/xyz123", StandardField.PAGES));
+    }
+
+    /// A page range of four-digit numbers (`1998-2005`) behind `pp.` stays in pages and is not taken as the year.
+    @Test
+    void pageRangeResemblingYearsIsNotTakenAsYear() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. A title. Journal, 2020, pp. 1998-2005.");
+        assertEquals(List.of(Optional.of("2020"), Optional.of("1998--2005")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.YEAR)),
+                        entry.flatMap(e -> e.getField(StandardField.PAGES))));
+    }
+
+    // Full citation
+
+    /// Complete citations in IEEE, APA and double-slash style, and one book: every field and the entry type must match.
+    /// The comment field holds the original citation. Its content is not part of the parsing
+    /// contract, so it is cleared before comparing.
+    static Stream<Arguments> parsesFullCitation() {
+        return Stream.of(
+                Arguments.of("IEEE article",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Smith, J. and Tan, M. and Lee, D. and Wong, A.")
+                                .withField(StandardField.TITLE, "Improving AI systems")
+                                .withField(StandardField.JOURNAL, "Journal of Computer Science")
+                                .withField(StandardField.YEAR, "2024")
+                                .withField(StandardField.PAGES, "45--60")
+                                .withField(StandardField.DOI, "10.1234/example"),
+                        IEEE_ARTICLE),
+                Arguments.of("APA article",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Smith, J. and Tan, M. and Lee, D. and Wong, A.")
+                                .withField(StandardField.TITLE, "Improving AI systems")
+                                .withField(StandardField.JOURNAL, "Journal of Computer Science")
+                                .withField(StandardField.YEAR, "2024")
+                                .withField(StandardField.PAGES, "45--60"),
+                        APA_ARTICLE),
+                Arguments.of("article with DOI",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Smith, J.")
+                                .withField(StandardField.TITLE, "A title")
+                                .withField(StandardField.JOURNAL, "Some Journal")
+                                .withField(StandardField.YEAR, "2020")
+                                .withField(StandardField.DOI, "10.1000/xyz123"),
+                        "Smith, J. A title. Some Journal, 2020. doi:10.1000/xyz123"),
+                Arguments.of("double-slash article",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Ivanov, I. I.")
+                                .withField(StandardField.TITLE, "Title of the paper")
+                                .withField(StandardField.JOURNAL, "Journal Name")
+                                .withField(StandardField.YEAR, "2015")
+                                .withField(StandardField.PAGES, "10--20"),
+                        DOUBLE_SLASH_ARTICLE),
+                Arguments.of("book",
+                        new BibEntry(StandardEntryType.Book)
+                                .withField(StandardField.AUTHOR, "Smith, J.")
+                                .withField(StandardField.TITLE, "Some book")
+                                .withField(StandardField.PUBLISHER, "Springer")
+                                .withField(StandardField.YEAR, "2010"),
+                        BOOK));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource
+    void parsesFullCitation(String name, BibEntry expected, String citation) throws FetcherException {
+        Optional<BibEntry> actual = parser.parsePlainCitation(citation);
+        actual.ifPresent(entry -> entry.clearField(StandardField.COMMENT));
+        assertEquals(Optional.of(expected), actual);
+    }
+
+    // Invalid input and state
+
+    /// Text without a citation gives no entry; otherwise an empty `@article` would be added to the library.
+    @ParameterizedTest
+    @ValueSource(strings = {"", "😋😋😋", "¦@#¦@#¦@#¦@°#¦@¦°¦@°"})
+    void returnsEmptyForTextWithoutCitation(String text) throws FetcherException {
+        assertEquals(Optional.empty(), parser.parsePlainCitation(text));
+    }
+
+    /// The parser keeps its results in fields between the extraction steps, so they must be reset for each call.
+    @Test
+    void stateIsResetBetweenCalls() throws FetcherException {
+        parser.parsePlainCitation("Smith, J. A title. Journal, 2020. doi:10.1000/xyz123");
+        parser.parsePlainCitation("Smith, J. A title. Journal, 2020. https://example.com/page");
+        Optional<BibEntry> third = parser.parsePlainCitation("Doe, A. Other title. Journal, 2019.");
+        assertEquals(List.of(Optional.empty(), Optional.empty()),
+                List.of(third.flatMap(entry -> entry.getField(StandardField.DOI)),
+                        third.flatMap(entry -> entry.getField(StandardField.URL))));
+    }
+
+    // Multiple citations
+
+    /// Citations are split at blank lines by [CitationSplitter], giving one entry per citation.
+    @Test
+    void parsesCitationsSeparatedByBlankLine() throws FetcherException {
+        List<BibEntry> entries = parser.parseMultiplePlainCitations(
+                "Smith, J. A title. Journal, 2020.\n\nDoe, A. Other title. Journal, 2019.");
+        assertEquals(List.of(Optional.of("2020"), Optional.of("2019")),
+                entries.stream().map(entry -> entry.getField(StandardField.YEAR)).toList());
+    }
+
+    /// A single line break, as in text copied from a PDF, does not split a citation.
+    @Test
+    void lineBreakInsideCitationDoesNotSplitIt() throws FetcherException {
+        List<BibEntry> entries = parser.parseMultiplePlainCitations("Smith, J. A title\nspanning two lines. Journal, 2020.");
+        assertEquals(List.of(Optional.of("2020")),
+                entries.stream().map(entry -> entry.getField(StandardField.YEAR)).toList());
+    }
+
+    /// Empty text gives an empty list, not a list with one empty entry.
+    @Test
+    void parsesNoCitationsFromEmptyText() throws FetcherException {
+        assertEquals(List.of(), parser.parseMultiplePlainCitations(""));
+    }
+}
