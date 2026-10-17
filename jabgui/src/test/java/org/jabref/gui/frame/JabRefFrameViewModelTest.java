@@ -22,10 +22,12 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.tobiasdiez.easybind.EasyBinding;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -125,5 +127,18 @@ class JabRefFrameViewModelTest extends JavaFxTest {
 
         // Then
         verify(dialogService).showCustomDialogAndWait(any());
+    }
+
+    @Test
+    void quittingSucceedsWhenAStepAfterClosingTheLibrariesFails() {
+        @SuppressWarnings("unchecked")
+        EasyBinding<Boolean> noTasksRunning = mock(EasyBinding.class);
+        when(noTasksRunning.getValue()).thenReturn(false);
+        when(stateManager.getAnyTasksThatWillNotBeRecoveredRunning()).thenReturn(noTasksRunning);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList());
+        when(tabContainer.closeTabs(any(), eq(false))).thenReturn(true);
+        when(preferences.getWorkspacePreferences()).thenThrow(new NoClassDefFoundError("org/jabref/logic/preferences/WorkspacePreferences"));
+
+        assertTrue(viewModel.close());
     }
 }
