@@ -57,6 +57,7 @@ public class DuplicateCheck {
     private static final Pattern PAGE_SEPARATOR_PATTERN = Pattern.compile("[\\p{Pd} ]+");
 
     private static final Set<StandardEntryType> STANDARD_ENTRY_TYPES = Set.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection);
+    private static final Set<StandardEntryType> SIMILAR_ENTRY_TYPES = Set.of(StandardEntryType.InBook, StandardEntryType.InCollection, StandardEntryType.InProceedings);
 
     static {
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.AUTHOR, 2.5);
@@ -88,11 +89,19 @@ public class DuplicateCheck {
                                         .orElse(false));
     }
 
+    // [impl->req~duplicate-detection.compatible-entry-types~1]
     private static boolean haveDifferentEntryType(final BibEntry one, final BibEntry two) {
         if (one.getType().equals(StandardEntryType.Misc) || two.getType().equals(StandardEntryType.Misc)) {
             return false;
         }
-        return !one.getType().equals(two.getType());
+
+        if (one.getType().equals(two.getType())) {
+            return false;
+        }
+
+        return !(one.getType() instanceof StandardEntryType oneType && two.getType() instanceof StandardEntryType twoType
+                && SIMILAR_ENTRY_TYPES.contains(oneType)
+                && SIMILAR_ENTRY_TYPES.contains(twoType));
     }
 
     private static boolean haveDifferentEditions(final BibEntry one, final BibEntry two) {
@@ -108,6 +117,14 @@ public class DuplicateCheck {
                 (compareSingleField(StandardField.TITLE, one, two) == EQUAL) &&
                 ((compareSingleField(StandardField.CHAPTER, one, two) == NOT_EQUAL) ||
                         (compareSingleField(StandardField.PAGES, one, two) == NOT_EQUAL));
+    }
+
+    // [impl->req~duplicate-detection.conflicting-parent-books~1]
+    private static boolean haveDifferentParentBooks(final BibEntry one, final BibEntry two) {
+        return !one.getType().equals(two.getType())
+                && SIMILAR_ENTRY_TYPES.contains(one.getType())
+                && SIMILAR_ENTRY_TYPES.contains(two.getType())
+                && compareSingleField(StandardField.BOOKTITLE, one, two) == NOT_EQUAL;
     }
 
     private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
@@ -288,46 +305,59 @@ public class DuplicateCheck {
     /// Checks if the two entries represent the same publication.
     public boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
         // Checks DOI and other identifiers
+        // [impl->req~duplicate-detection.conflicting-parent-books~1]
         if (haveSameIdentifier(one, two)) {
             return true;
         }
 
-        // TODO: Work on haveDifferentEntryType - InCollection and InProceedings could point to the same publication
         if (haveDifferentEntryType(one, two) ||
                 haveDifferentEditions(one, two) ||
-                haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
+                haveDifferentChaptersOrPagesOfTheSameBook(one, two) ||
+                haveDifferentParentBooks(one, two)) {
             return false;
         }
 
         // In case an ISBN is present, it is a strong indicator that the entries are equal.
-        // Only in InBook, InCollection, or Article the ISBN may be equal and the publication on different pages (and thus not equal)
+        // Both types must qualify: a contribution can share its ISBN with other publications in the same volume.
         Optional<ISBN> oneISBN = one.getISBN();
         Optional<ISBN> twoISBN = two.getISBN();
         if (oneISBN.isPresent() && twoISBN.isPresent()
                 && Objects.equals(oneISBN, twoISBN)
-                && one.getType() instanceof StandardEntryType standardEntry
-                && !STANDARD_ENTRY_TYPES.contains(standardEntry)) {
+                && one.getType() instanceof StandardEntryType oneType
+                && two.getType() instanceof StandardEntryType twoType
+                && !STANDARD_ENTRY_TYPES.contains(oneType)
+                && !STANDARD_ENTRY_TYPES.contains(twoType)) {
             return true;
         }
 
-        final Optional<BibEntryType> type = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
-        if (type.isPresent()) {
-            BibEntryType entryType = type.get();
-            final double[] reqCmpResult = compareRequiredFields(entryType, one, two);
-
-            if (isFarFromThreshold(reqCmpResult[0])) {
-                // Far from the threshold value, so we base our decision on the required fields only
-                return reqCmpResult[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
-            }
-
-            // Close to the threshold value, so we take a look at the optional fields, if any:
-            if (compareOptionalFields(type.get(), one, two, reqCmpResult)) {
-                return true;
-            }
+        // [impl->req~duplicate-detection.compatible-entry-types~1]
+        Optional<BibEntryType> firstType = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
+        if (firstType.map(type -> isDuplicateForType(type, one, two))
+                     .orElseGet(() -> compareAllFields(one, two))) {
+            return true;
         }
-        // if type is not present, so simply compare fields without any distinction between optional/required
-        // In case both required and optional fields are equal, we also use this fallback
-        return compareFieldSet(Sets.union(one.getFields(), two.getFields()), one, two)[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
+
+        if (!one.getType().equals(two.getType())) {
+            return entryTypesManager.enrich(two.getType(), bibDatabaseMode)
+                                    .map(type -> isDuplicateForType(type, one, two))
+                                    .orElseGet(() -> compareAllFields(one, two));
+        }
+        return false;
+    }
+
+    private static boolean isDuplicateForType(BibEntryType type, BibEntry one, BibEntry two) {
+        double[] reqCmpResult = compareRequiredFields(type, one, two);
+        if (isFarFromThreshold(reqCmpResult[0])) {
+            return reqCmpResult[0] >= DUPLICATE_THRESHOLD;
+        }
+        if (compareOptionalFields(type, one, two, reqCmpResult)) {
+            return true;
+        }
+        return compareAllFields(one, two);
+    }
+
+    private static boolean compareAllFields(BibEntry one, BibEntry two) {
+        return compareFieldSet(Sets.union(one.getFields(), two.getFields()), one, two)[0] >= DUPLICATE_THRESHOLD;
     }
 
     /// Goes through all entries in the given database, and if at least one of
