@@ -74,6 +74,7 @@ public class DuplicateCheck {
         this.entryTypesManager = entryTypesManager;
     }
 
+    // [impl->req~duplicate-check.same-identifier~1]
     private static boolean haveSameIdentifier(final BibEntry one, final BibEntry two) {
         return one.getFields().stream()
                   .filter(field -> field.getProperties().contains(FieldProperty.IDENTIFIER))
@@ -88,6 +89,7 @@ public class DuplicateCheck {
                                         .orElse(false));
     }
 
+    // [impl->req~duplicate-check.entry-type-compatibility~1]
     private static boolean haveDifferentEntryType(final BibEntry one, final BibEntry two) {
         if (one.getType().equals(StandardEntryType.Misc) || two.getType().equals(StandardEntryType.Misc)) {
             return false;
@@ -95,6 +97,7 @@ public class DuplicateCheck {
         return !one.getType().equals(two.getType());
     }
 
+    // [impl->req~duplicate-check.different-editions~1]
     private static boolean haveDifferentEditions(final BibEntry one, final BibEntry two) {
         final Optional<String> editionOne = one.getField(StandardField.EDITION);
         final Optional<String> editionTwo = two.getField(StandardField.EDITION);
@@ -103,6 +106,7 @@ public class DuplicateCheck {
                 !editionOne.get().equals(editionTwo.get());
     }
 
+    // [impl->req~duplicate-check.book-parts-different-chapters-or-pages~1]
     private static boolean haveDifferentChaptersOrPagesOfTheSameBook(final BibEntry one, final BibEntry two) {
         return (compareSingleField(StandardField.AUTHOR, one, two) == EQUAL) &&
                 (compareSingleField(StandardField.TITLE, one, two) == EQUAL) &&
@@ -162,6 +166,7 @@ public class DuplicateCheck {
         return new double[] {0.0, 0.0};
     }
 
+    // [impl->req~duplicate-check.field-normalization~1]
     private static int compareSingleField(final Field field, final BibEntry one, final BibEntry two) {
         final Optional<String> optionalStringOne = one.getFieldLatexFree(field);
         final Optional<String> optionalStringTwo = two.getFieldLatexFree(field);
@@ -299,6 +304,7 @@ public class DuplicateCheck {
             return false;
         }
 
+        // [impl->req~duplicate-check.isbn-matching~1]
         // In case an ISBN is present, it is a strong indicator that the entries are equal.
         // Only in InBook, InCollection, or Article the ISBN may be equal and the publication on different pages (and thus not equal)
         Optional<ISBN> oneISBN = one.getISBN();

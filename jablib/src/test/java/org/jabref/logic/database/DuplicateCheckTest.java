@@ -70,6 +70,7 @@ public class DuplicateCheckTest {
         duplicateChecker = new DuplicateCheck(new BibEntryTypesManager());
     }
 
+    // [utest->req~duplicate-check.field-normalization~1]
     @Test
     void duplicateDetectionWithSameAuthor() {
         BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bob");
@@ -78,6 +79,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.field-normalization~1]
     @Test
     void duplicateDetectionWithSameAuthorAndUmlauts() {
         BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bobä");
@@ -94,6 +96,7 @@ public class DuplicateCheckTest {
         assertFalse(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.entry-type-compatibility~1]
     @Test
     void duplicateDetectionWithDifferentTypes() {
         BibEntry one = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Billy Bob");
@@ -212,6 +215,7 @@ public class DuplicateCheckTest {
         assertFalse(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.field-normalization~1]
     @Test
     void duplicateDetectionWithSamePages() {
         BibEntry one = new BibEntry(StandardEntryType.Article)
@@ -345,6 +349,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.field-normalization~1]
     @Test
     void wordCorrelation() {
         String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea";
@@ -369,6 +374,7 @@ public class DuplicateCheckTest {
         assertFalse(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.same-identifier~1]
     @Test
     void twoUnrelatedEntriesWithEqualDoisAreDuplicates() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
@@ -377,6 +383,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.same-identifier~1]
     @Test
     void twoUnrelatedEntriesWithEqualPmidAreDuplicates() {
         simpleArticle.setField(StandardField.PMID, "12345678");
@@ -385,6 +392,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.same-identifier~1]
     @Test
     void twoUnrelatedEntriesWithEqualEprintAreDuplicates() {
         simpleArticle.setField(StandardField.EPRINT, "12345678");
@@ -393,6 +401,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.same-identifier~1]
     @Test
     void twoEntriesWithSameDoiButDifferentTypesAreDuplicates() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
@@ -402,6 +411,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.same-identifier~1]
     @Test
     void twoEntriesWithSameDoiButDifferentCasingAreDuplicates() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
@@ -410,6 +420,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.same-identifier~1]
     @Test
     void twoEntriesWithSameDoiButDifferentCasingAndDifferentTypesAreDuplicates() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
@@ -419,6 +430,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.same-identifier~1]
     @Test
     void twoEntriesWithDoiContainingUnderscoresAreNotEqual() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
@@ -430,6 +442,7 @@ public class DuplicateCheckTest {
         assertFalse(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.isbn-matching~1]
     @Test
     void twoEntriesWithSameISBNButDifferentTypesAreNotDuplicates() {
         simpleArticle.setField(StandardField.ISBN, "0-123456-47-9");
@@ -455,6 +468,7 @@ public class DuplicateCheckTest {
         );
     }
 
+    // [utest->req~duplicate-check.book-parts-different-chapters-or-pages~1]
     @ParameterizedTest
     @MethodSource
     private void twoEntriesWithDifferentSpecificFieldsAreNotDuplicates(final BibEntry cloneable,
@@ -466,6 +480,7 @@ public class DuplicateCheckTest {
         assertFalse(duplicateChecker.isDuplicate(entry1, entry2, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.book-parts-different-chapters-or-pages~1]
     @Test
     void inbookWithoutChapterCouldBeDuplicateOfInbookWithChapter() {
         final BibEntry inbook2 = new BibEntry(simpleInBook).withField(StandardField.CHAPTER, "");
@@ -473,6 +488,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(simpleInBook, inbook2, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.different-editions~1]
     @Test
     void twoBooksWithDifferentEditionsAreNotDuplicates() {
         BibEntry editionOne = new BibEntry(StandardEntryType.Book)
@@ -492,6 +508,7 @@ public class DuplicateCheckTest {
         assertFalse(duplicateChecker.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.different-editions~1]
     @Test
     void sameBooksWithMissingEditionAreDuplicates() {
         BibEntry editionOne = new BibEntry(StandardEntryType.Book)
@@ -509,6 +526,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.different-editions~1]
     @Test
     void sameBooksWithPartiallyMissingEditionAreDuplicates() {
         BibEntry editionOne = new BibEntry(StandardEntryType.Book)
@@ -527,6 +545,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.different-editions~1]
     @Test
     void sameBooksWithDifferentEditionsAreNotDuplicates() {
         BibEntry editionTwo = new BibEntry(StandardEntryType.Book)
@@ -553,6 +572,7 @@ public class DuplicateCheckTest {
         assertFalse(duplicateChecker.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.field-normalization~1]
     @Test
     void compareOfTwoEntriesWithSameContentAndLfEndingsReportsNoDifferences() {
         BibEntry entryOne = new BibEntry().withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
@@ -560,6 +580,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.field-normalization~1]
     @Test
     void compareOfTwoEntriesWithSameContentAndCrLfEndingsReportsNoDifferences() {
         BibEntry entryOne = new BibEntry().withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
@@ -567,6 +588,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.field-normalization~1]
     @Test
     void compareOfTwoEntriesWithSameContentAndMixedLineEndingsReportsNoDifferences() {
         BibEntry entryOne = new BibEntry().withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
@@ -575,6 +597,7 @@ public class DuplicateCheckTest {
     }
 
     /// Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundreds of different articles.
+    // [utest->req~duplicate-check.isbn-matching~1]
     @Test
     void differentArticlesFromTheSameBookAreNotDuplicates() {
         BibEntry entryOne = new BibEntry(StandardEntryType.Article)
@@ -604,6 +627,7 @@ public class DuplicateCheckTest {
         assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.isbn-matching~1]
     @Test
     void differentInbooksWithTheSameISBNAreNotDuplicates() {
         BibEntry entryOne = new BibEntry(StandardEntryType.InBook)
@@ -617,6 +641,7 @@ public class DuplicateCheckTest {
         assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.isbn-matching~1]
     @Test
     void differentInCollectionWithTheSameISBNAreNotDuplicates() {
         BibEntry entryOne = new BibEntry(StandardEntryType.InCollection)
@@ -648,6 +673,7 @@ public class DuplicateCheckTest {
                 duplicateChecker.containsDuplicate(List.of(), simpleArticle, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.entry-type-compatibility~1]
     @Test
     void duplicateDetectionWithMiscAndDifferentType() {
         BibEntry miscEntry = new BibEntry(StandardEntryType.Misc)
@@ -664,6 +690,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(techReportEntry, miscEntry, BibDatabaseMode.BIBTEX));
     }
 
+    // [utest->req~duplicate-check.entry-type-compatibility~1]
     @Test
     void articleAndMiscWithSameContentAreDuplicatesInBiblatexMode() {
         BibEntry article = new BibEntry(StandardEntryType.Article)
