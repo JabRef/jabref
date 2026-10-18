@@ -339,13 +339,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
-    private static boolean isInAiChat(EventTarget target) {
-        for (Node node = target instanceof Node targetNode ? targetNode : null; node != null; node = node.getParent()) {
-            if (node instanceof AiChatView) {
-                return true;
-            }
+    private static boolean isInSearchableAiChat(EventTarget target) {
+        if (target instanceof AiChatView chat) {
+            return chat.isFindAvailable();
         }
-        return false;
+        return target instanceof Node node
+                && Optional.ofNullable(node.getParent()).map(JabRefFrame::isInSearchableAiChat).orElse(false);
     }
 
     private void initKeyBindings() {
@@ -371,7 +370,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         break;
                     case SEARCH:
                         // The AI chat has its own find bar
-                        if (!isInAiChat(event.getTarget())) {
+                        if (!isInSearchableAiChat(event.getTarget())) {
                             globalSearchBar.requestFocus();
                         }
                         break;

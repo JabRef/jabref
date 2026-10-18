@@ -1,6 +1,7 @@
 package org.jabref.gui.ai.chat;
 
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
@@ -81,6 +82,7 @@ public class AiChatView extends StackPane {
 
     private final AiChatFindViewModel findViewModel = new AiChatFindViewModel();
     private boolean findRefreshPending;
+    private Optional<Node> focusBeforeFind = Optional.empty();
 
     public AiChatView() {
         ViewLoader.view(this)
@@ -108,7 +110,7 @@ public class AiChatView extends StackPane {
     }
 
     /// Ctrl+F inside the chat searches the chat messages instead of the library, see [org.jabref.gui.frame.JabRefFrame].
-    // [impl->feat~ai.chat.find~1]
+    // [impl->feat~ai.chat.find~2]
     private void setupFind() {
         findBar.managedProperty().bind(findBar.visibleProperty());
         findBar.visibleProperty().bind(findViewModel.visibleProperty());
@@ -116,29 +118,39 @@ public class AiChatView extends StackPane {
         findResultLabel.textProperty().bind(findViewModel.resultTextProperty());
 
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (preferences.getKeyBindingRepository().matches(event, KeyBinding.SEARCH)) {
+            if (isFindAvailable() && preferences.getKeyBindingRepository().matches(event, KeyBinding.SEARCH)) {
+                if (!findViewModel.visibleProperty().get()) {
+                    focusBeforeFind = Optional.ofNullable(getScene().getFocusOwner());
+                }
                 findViewModel.visibleProperty().set(true);
                 findField.requestFocus();
                 findField.selectAll();
                 event.consume();
+            } else if (findViewModel.visibleProperty().get()
+                    && preferences.getKeyBindingRepository().matches(event, KeyBinding.CLOSE)) {
+                closeFind();
+                event.consume();
             }
         });
         findField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER && !event.isControlDown() && !event.isMetaDown() && !event.isAltDown()) {
                 if (event.isShiftDown()) {
                     findPrevious();
                 } else {
                     findNext();
                 }
                 event.consume();
-            } else if (event.getCode() == KeyCode.ESCAPE) {
-                closeFind();
-                event.consume();
+            }
+        });
+
+        mainContainer.visibleProperty().addListener((_, _, visible) -> {
+            if (!visible) {
+                findViewModel.visibleProperty().set(false);
+                focusBeforeFind = Optional.empty();
             }
         });
 
         findViewModel.queryProperty().addListener((_, _, _) -> updateFind(true));
-        findViewModel.currentProperty().addListener((_, _, _) -> updateFind(true));
         findViewModel.visibleProperty().addListener((_, _, _) -> updateFind(false));
         // New or deleted messages are rendered after the list change, thus search them afterwards
         viewModel.chatHistoryProperty().addListener((ListChangeListener<ChatMessage>) _ -> {
@@ -168,7 +180,7 @@ public class AiChatView extends StackPane {
             total += flow.highlightOccurrences(query, current - total);
         }
         if (!findViewModel.setTotal(total)) {
-            // Resetting the current occurrence triggers another update
+            updateFind(scrollToCurrent);
             return;
         }
 
@@ -183,17 +195,36 @@ public class AiChatView extends StackPane {
     @FXML
     private void findNext() {
         findViewModel.next();
+        updateFind(true);
     }
 
     @FXML
     private void findPrevious() {
         findViewModel.previous();
+        updateFind(true);
     }
 
     @FXML
     private void closeFind() {
         findViewModel.visibleProperty().set(false);
-        chatHistoryScrollPane.requestFocus();
+        focusBeforeFind.filter(node -> node.getScene() == getScene() && isVisibleAndEnabled(node))
+                       .ifPresentOrElse(Node::requestFocus, () -> {
+                           if (isVisibleAndEnabled(userMessageTextArea)) {
+                               userMessageTextArea.requestFocus();
+                           } else {
+                               chatHistoryScrollPane.requestFocus();
+                           }
+                       });
+        focusBeforeFind = Optional.empty();
+    }
+
+    private static boolean isVisibleAndEnabled(Node node) {
+        return node.isVisible() && !node.isDisabled()
+                && Optional.ofNullable(node.getParent()).map(AiChatView::isVisibleAndEnabled).orElse(true);
+    }
+
+    public boolean isFindAvailable() {
+        return isVisibleAndEnabled(mainContainer);
     }
 
     private void setupBindings() {

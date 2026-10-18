@@ -126,10 +126,14 @@ The page is given as a `#page={page}` fragment, following the PDF Open Parameter
 Needs: impl, utest
 
 ### User can find text in AI chat messages
-`feat~ai.chat.find~1`
+`feat~ai.chat.find~2`
 
-Pressing <kbd>Ctrl</kbd> + <kbd>F</kbd> inside the AI chat opens a find bar at the top right of the chat instead of focusing the library search.
-All case-insensitive occurrences in the messages are highlighted; <kbd>Enter</kbd> and <kbd>Shift</kbd> + <kbd>Enter</kbd> move to the next and previous occurrence, <kbd>Esc</kbd> closes the bar.
+The configured search shortcut (by default <kbd>Ctrl</kbd> + <kbd>F</kbd>, or <kbd>Cmd</kbd> + <kbd>F</kbd> on macOS) inside an available AI chat opens a find bar at the top right instead of focusing the library search.
+When the chat shows a privacy, restart, or no-files notice, the shortcut continues to focus the library search.
+All case-insensitive occurrences in the messages, including hyperlink labels and table cells, are highlighted in reading order.
+<kbd>Enter</kbd> and <kbd>Shift</kbd> + <kbd>Enter</kbd> move to the next and previous occurrence.
+The configured close shortcut (by default <kbd>Esc</kbd>) closes the bar from anywhere inside the chat and restores the focus held before opening it.
+Highlights follow the active theme, appear behind the text, and distinguish the current occurrence with an outline.
 
 Needs: impl, utest
 

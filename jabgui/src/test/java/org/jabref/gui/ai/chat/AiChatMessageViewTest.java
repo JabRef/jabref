@@ -2,16 +2,21 @@ package org.jabref.gui.ai.chat;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.robot.Robot;
+import javafx.scene.shape.Path;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
@@ -26,8 +31,12 @@ import org.jabref.model.ai.chatting.ChatMessage;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -35,6 +44,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // [utest->feat~ai.chat.jump-to-entry-pdf~1]
+@ResourceLock("Localization.lang")
 class AiChatMessageViewTest extends JavaFxTest {
 
     private DialogService dialogService;
@@ -124,7 +134,7 @@ class AiChatMessageViewTest extends JavaFxTest {
         assertTrue(view.getMarkdownTextFlow().isSelectionActive());
     }
 
-    // [utest->feat~ai.chat.find~1]
+    // [utest->feat~ai.chat.find~2]
     @Test
     void highlightOccurrencesFindsAllCaseInsensitive() {
         AiChatMessageView view = createView();
@@ -138,5 +148,103 @@ class AiChatMessageViewTest extends JavaFxTest {
 
         assertEquals(3, count.get());
         assertTrue(view.getMarkdownTextFlow().getCurrentOccurrence().isPresent());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "[Chocolate](https://example.org)",
+            "Hot [choco](https://example.org)**late**",
+            """
+            | Flavor |
+            | --- |
+            | Chocolate |
+            """,
+            """
+            | Flavor |
+            | --- |
+            | [Chocolate](https://example.org) |
+            """
+    })
+    void highlightOccurrencesIncludesEmbeddedMarkdown(String markdown) {
+        AiChatMessageView view = createView();
+        interact(() -> {
+            view.setChatMessage(ChatMessage.aiMessage(markdown, List.of()));
+            rootPane.getChildren().setAll(view);
+            rootPane.applyCss();
+            rootPane.layout();
+
+            assertEquals(1, view.getMarkdownTextFlow().highlightOccurrences("chocolate", 0));
+            assertTrue(view.getMarkdownTextFlow().getCurrentOccurrence().isPresent());
+            assertEquals(0, view.getMarkdownTextFlow().highlightOccurrences("", 0));
+            assertEquals(Optional.empty(), view.getMarkdownTextFlow().getCurrentOccurrence());
+        });
+    }
+
+    @Test
+    void highlightOccurrencesFollowsReadingOrderAcrossTables() {
+        AiChatMessageView view = createView();
+        interact(() -> {
+            view.setChatMessage(ChatMessage.aiMessage("""
+                    Chocolate before
+
+                    | Flavor |
+                    | --- |
+                    | Chocolate inside |
+
+                    Chocolate after
+                    """, List.of()));
+            rootPane.getChildren().setAll(view);
+            rootPane.applyCss();
+            rootPane.layout();
+
+            assertEquals(3, view.getMarkdownTextFlow().highlightOccurrences("chocolate", 1));
+            Node current = view.getMarkdownTextFlow().getCurrentOccurrence().orElseThrow();
+            assertInstanceOf(GridPane.class, current.getParent().getParent());
+            assertEquals(3, view.getMarkdownTextFlow().highlightOccurrences("chocolate", 2));
+            assertEquals(view.getMarkdownTextFlow().getParent(), view.getMarkdownTextFlow().getCurrentOccurrence().orElseThrow().getParent());
+        });
+    }
+
+    @Test
+    void changingQueryWhileTextRewrapsDoesNotDuplicateHighlights() {
+        AiChatMessageView view = createView();
+        interact(() -> {
+            view.setChatMessage(ChatMessage.aiMessage("""
+                    Chocolate appears in plain text and **CHOCOLATE** in bold.
+
+                    Here is a [Chocolate citation](https://example.org/chocolate).
+
+                    | Flavor | Note |
+                    | --- | --- |
+                    | Chocolate | Table match |
+                    | [Chocolate source](https://example.org/source) | Link in table |
+
+                    The final chocolate occurrence is below the table.
+                    """, List.of()));
+            rootPane.getChildren().setAll(view);
+            rootPane.applyCss();
+            rootPane.layout();
+            var flow = view.getMarkdownTextFlow();
+            flow.highlightOccurrences("c", 0);
+            flow.getBoundsInParent();
+            Pane content = (Pane) flow.getParent();
+            AtomicBoolean moveOnRemoval = new AtomicBoolean(true);
+            content.getChildren().addListener((ListChangeListener<Node>) change -> {
+                while (change.next()) {
+                    if (change.wasRemoved() && moveOnRemoval.compareAndSet(true, false)) {
+                        flow.setTranslateX(1);
+                    }
+                }
+            });
+            for (int length = 1; length <= "chocolate".length(); length++) {
+                rootPane.resize(240 + (length % 2) * 100, 300);
+                view.getMarkdownTextFlow().highlightOccurrences("chocolate".substring(0, length), 0);
+                rootPane.applyCss();
+                rootPane.layout();
+            }
+            assertEquals(6, view.getMarkdownTextFlow().highlightOccurrences("chocolate", 0));
+            assertEquals(4L, content.getChildren().stream().filter(Path.class::isInstance).count());
+        });
+        awaitEvents();
     }
 }

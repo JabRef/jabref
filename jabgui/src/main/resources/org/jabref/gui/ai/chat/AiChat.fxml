@@ -88,7 +88,8 @@
                                promptText="%Search..."/>
                     <Label fx:id="findResultLabel"
                            styleClass="text-muted"/>
-                    <Button onAction="#findPrevious"
+                    <Button fx:id="findPreviousButton"
+                            onAction="#findPrevious"
                             styleClass="icon-button,narrow">
                         <graphic>
                             <JabRefIconView glyph="PREVIOUS_UP"/>
@@ -97,7 +98,8 @@
                             <Tooltip text="%Previous"/>
                         </tooltip>
                     </Button>
-                    <Button onAction="#findNext"
+                    <Button fx:id="findNextButton"
+                            onAction="#findNext"
                             styleClass="icon-button,narrow">
                         <graphic>
                             <JabRefIconView glyph="NEXT_DOWN"/>
@@ -106,7 +108,8 @@
                             <Tooltip text="%Next"/>
                         </tooltip>
                     </Button>
-                    <Button onAction="#closeFind"
+                    <Button fx:id="closeFindButton"
+                            onAction="#closeFind"
                             styleClass="icon-button,narrow">
                         <graphic>
                             <JabRefIconView glyph="CLOSE"/>

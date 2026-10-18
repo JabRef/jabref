@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-// [utest->feat~ai.chat.find~1]
+// [utest->feat~ai.chat.find~2]
 class AiChatFindViewModelTest {
 
     private AiChatFindViewModel viewModel;

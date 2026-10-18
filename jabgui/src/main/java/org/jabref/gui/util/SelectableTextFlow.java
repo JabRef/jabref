@@ -6,14 +6,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.text.Text;
@@ -22,11 +24,11 @@ import javafx.scene.text.TextFlow;
 import org.jabref.gui.clipboard.ClipBoardManager;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class SelectableTextFlow extends TextFlow {
-    private static final Color OCCURRENCE_COLOR = Color.GOLD.deriveColor(0, 1, 1, 0.4);
-    private static final Color CURRENT_OCCURRENCE_COLOR = Color.ORANGE.deriveColor(0, 1, 1, 0.7);
     private static final Pattern EMPTY_QUERY_PATTERN = Pattern.compile("");
 
     /// Unicode "OBJECT REPLACEMENT CHARACTER". JavaFX's [TextFlow] puts it in place of every child that is not a [Text]
@@ -43,6 +45,7 @@ public class SelectableTextFlow extends TextFlow {
     private String occurrenceQuery = "";
     private Pattern occurrencePattern = EMPTY_QUERY_PATTERN;
     private int currentOccurrence = -1;
+    private boolean occurrenceRefreshPending;
 
     private final Pane parentPane;
     private boolean isDragging = false;
@@ -68,8 +71,16 @@ public class SelectableTextFlow extends TextFlow {
 
         // Highlights are unmanaged snapshots of the text layout; redraw them when the text moves or rewraps.
         boundsInParentProperty().addListener(_ -> {
-            if (!occurrenceQuery.isEmpty()) {
-                highlightOccurrences(occurrenceQuery, currentOccurrence);
+            if (!occurrenceQuery.isEmpty() && !occurrenceRefreshPending) {
+                occurrenceRefreshPending = true;
+                // Computing range geometry can invalidate bounds inside a refresh; finish that refresh before redrawing.
+                Platform.runLater(() -> {
+                    try {
+                        highlightOccurrences(occurrenceQuery, currentOccurrence);
+                    } finally {
+                        occurrenceRefreshPending = false;
+                    }
+                });
             }
         });
     }
@@ -87,26 +98,75 @@ public class SelectableTextFlow extends TextFlow {
         occurrenceQuery = query;
         currentOccurrence = current;
         if (query.isEmpty()) {
+            getChildren().stream()
+                         .flatMap(SelectableTextFlow::embeddedTextFlows)
+                         .forEach(flow -> flow.highlightOccurrences("", -1));
             return 0;
         }
+        StringBuilder content = new StringBuilder();
+        List<Integer> layoutIndices = new ArrayList<>();
+        int layoutIndex = 0;
+        int total = 0;
+        for (Node child : getChildren()) {
+            if (child instanceof Text || child instanceof Hyperlink) {
+                String text = child instanceof Text textNode ? textNode.getText() : ((Hyperlink) child).getText();
+                content.append(text);
+                for (int index = 0; index < text.length(); index++) {
+                    // A link has many searchable characters but occupies one TextFlow layout index.
+                    layoutIndices.add(layoutIndex + (child instanceof Text ? index : 0));
+                }
+                layoutIndex += child instanceof Text ? text.length() : 1;
+            } else {
+                total += highlightText(content, layoutIndices, current - total);
+                content.setLength(0);
+                layoutIndices.clear();
+                for (SelectableTextFlow embedded : embeddedTextFlows(child).toList()) {
+                    total += embedded.highlightOccurrences(query, current - total);
+                }
+                layoutIndex++;
+            }
+        }
+        total += highlightText(content, layoutIndices, current - total);
+        parentPane.getChildren().addAll(occurrencePaths);
+        return total;
+    }
 
-        Matcher matcher = occurrencePattern.matcher(getTextFlowContent());
+    private int highlightText(StringBuilder content, List<Integer> layoutIndices, int current) {
+        int count = 0;
+        Matcher matcher = occurrencePattern.matcher(content);
         while (matcher.find()) {
-            boolean isCurrent = occurrencePaths.size() == current;
-            Path path = createHighlight(matcher.start(), matcher.end(), isCurrent ? CURRENT_OCCURRENCE_COLOR : OCCURRENCE_COLOR);
+            boolean isCurrent = count == current;
+            Path path = createHighlight(layoutIndices.get(matcher.start()), layoutIndices.get(matcher.end() - 1) + 1);
+            path.getStyleClass().add("text-search-highlight");
+            path.setViewOrder(2);
             path.setMouseTransparent(true);
             if (isCurrent) {
+                path.getStyleClass().add("current");
                 currentOccurrencePath = path;
             }
             occurrencePaths.add(path);
+            count++;
         }
-        parentPane.getChildren().addAll(occurrencePaths);
-        return occurrencePaths.size();
+        return count;
+    }
+
+    private static Stream<SelectableTextFlow> embeddedTextFlows(Node node) {
+        if (node instanceof SelectableTextFlow flow) {
+            return Stream.of(flow);
+        }
+        if (node instanceof Parent parent) {
+            return parent.getChildrenUnmodifiable().stream().flatMap(SelectableTextFlow::embeddedTextFlows);
+        }
+        return Stream.empty();
     }
 
     /// The highlight of the emphasized occurrence of the last [#highlightOccurrences(String, int)] call.
     public Optional<Node> getCurrentOccurrence() {
-        return Optional.ofNullable(currentOccurrencePath);
+        return Optional.<Node>ofNullable(currentOccurrencePath)
+                       .or(() -> getChildren().stream()
+                                              .flatMap(SelectableTextFlow::embeddedTextFlows)
+                                              .flatMap(flow -> flow.getCurrentOccurrence().stream())
+                                              .findFirst());
     }
 
     public void copySelectedText() {
@@ -178,7 +238,9 @@ public class SelectableTextFlow extends TextFlow {
             return;
         }
 
-        Path path = createHighlight(getSelectionStartIndex(), getSelectionEndIndex(), Color.LIGHTBLUE.deriveColor(0, 1, 1, 0.5));
+        Path path = createHighlight(getSelectionStartIndex(), getSelectionEndIndex());
+        path.getStyleClass().add("text-selection-highlight");
+        path.setViewOrder(1);
         path.setCursor(Cursor.TEXT);
         path.setOnMouseClicked(_ -> removeHighlight());
 
@@ -186,13 +248,11 @@ public class SelectableTextFlow extends TextFlow {
         selectionPath = path;
     }
 
-    private Path createHighlight(int start, int end, Color color) {
+    private Path createHighlight(int start, int end) {
         PathElement[] elements = getRangeShape(start, end, false);
 
         Path path = new Path();
         path.getElements().addAll(elements);
-        path.setFill(color);
-        path.setStroke(null);
         path.getTransforms().add(getLocalToParentTransform());
         path.setManaged(false);
         return path;
