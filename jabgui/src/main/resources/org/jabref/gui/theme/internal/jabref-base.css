@@ -425,8 +425,11 @@
     -fx-background-color: -color-selection-inactive, -color-overlay-hover;
 }
 
-.linked-files-list .list-cell:auto-found:filled:selected {
-    -fx-background-color: -color-selection;
+.linked-files-list > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.linked-files-list:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background-color: -color-bg-secondary, -color-selection;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px;
 }
 
 /* Sidepane */
@@ -1585,6 +1588,14 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-alignment: left;
 }
 
+.markdown-textflow.markdown-table-cell-center {
+    -fx-text-alignment: center;
+}
+
+.markdown-textflow.markdown-table-cell-right {
+    -fx-text-alignment: right;
+}
+
 .markdown-textflow > * {
     -fx-fill: -fx-text-base-color;
 }
@@ -1730,6 +1741,11 @@ We want to have a look that matches our icons in the tool-bar */
 
 .bibtex-code-area {
     -fx-font-family: 'JetBrains Mono';
+}
+
+.bibtex-code-area Text,
+.bibtex-code-area .text {
+    -fx-fill: -color-fg-default;
 }
 
 .bibtex-code-area .bibtex-keyword {
