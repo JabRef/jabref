@@ -61,7 +61,7 @@ Covers:
 ## Field comparison must normalize specialized fields before similarity matching
 `req~duplicate-check.field-normalization~1`
 
-Rationale: Formatting variations in author names, page range dashes, and journal abbreviations are normalized before comparison so formatting differences do not prevent duplicate detection.
+Rationale: Formatting variations in author names (comparing last names), page range dashes, and journal names (ignoring periods and casing) are normalized before comparison so minor formatting differences do not prevent duplicate detection.
 
 Needs: impl, utest
 
