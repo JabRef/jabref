@@ -22,7 +22,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.bibtexhighlighter.BibTeXCodeArea;
-import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -358,7 +357,7 @@ public class SourceTab extends EntryEditorTab {
         public void execute() {
             switch (command) {
                 case COPY ->
-                        BibTeXHighlighter.copySource(codeArea);
+                        codeArea.copy();
                 case CUT ->
                         codeArea.cut();
                 case PASTE ->

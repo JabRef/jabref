@@ -131,10 +131,10 @@ While a new selection is still settling, saving or leaving the Source tab writes
 
 Needs: impl
 
-## Source tab must preserve syntax highlighting when copying
+## Source tab must keep layout and syntax highlighting when copying
 `req~entry-editor.source-tab.copy-syntax-highlighting~1`
 
-When copying BibTeX source from the Source tab, the clipboard must contain both plain text and syntax-highlighted HTML with inline styling so external rich-text applications preserve formatting.
+When copying BibTeX source, the HTML on the clipboard must keep the source as one monospace preformatted block, so that rich-text applications such as LibreOffice Writer keep indentation, line breaks, alignment, and syntax colors.
 Originates from <https://github.com/JabRef/jabref/issues/17392>
 
 Needs: impl, utest

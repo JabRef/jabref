@@ -3,7 +3,6 @@ package org.jabref.gui.keyboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringManipulator;
 import org.jabref.model.util.ResultingStringState;
@@ -21,10 +20,6 @@ public class CodeAreaKeyBindings {
 
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
             switch (binding) {
-                case COPY -> {
-                    BibTeXHighlighter.copySource(codeArea);
-                    event.consume();
-                }
                 case EDITOR_DELETE -> {
                     codeArea.delete();
                     event.consume();

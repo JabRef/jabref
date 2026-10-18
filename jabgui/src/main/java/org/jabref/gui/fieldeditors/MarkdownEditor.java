@@ -49,7 +49,7 @@ public class MarkdownEditor extends SimpleEditor {
         return new EditorTextArea() {
             @Override
             public void paste() {
-                if (ClipBoardManager.hasHtml() && !ClipBoardManager.hasBibtexSource()) {
+                if (ClipBoardManager.hasHtml()) {
                     String htmlText = ClipBoardManager.getHtmlContents();
                     String mdText = flexmarkHtmlConverter.convert(htmlText);
                     super.replaceSelection(mdText);
