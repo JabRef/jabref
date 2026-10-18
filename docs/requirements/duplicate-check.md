@@ -12,6 +12,8 @@ Needs: req
 ## Entries with identical persistent identifiers must be considered duplicates
 `req~duplicate-check.same-identifier~1`
 
+This rule has the highest priority over the others listed below.
+
 Needs: impl, utest
 
 Covers:
