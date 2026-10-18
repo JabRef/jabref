@@ -67,8 +67,8 @@ class TextFlowHighlightThemeTest extends JavaFxTest {
                 Path current = (Path) flow.getCurrentOccurrence().orElseThrow();
                 Path selection = (Path) root.lookup(".text-selection-highlight");
                 Path other = (Path) root.lookupAll(".text-search-highlight").stream()
-                                         .filter(node -> !node.getStyleClass().contains("current"))
-                                         .findFirst().orElseThrow();
+                                        .filter(node -> !node.getStyleClass().contains("current"))
+                                        .findFirst().orElseThrow();
                 assertEquals(accent.getFill(), current.getStroke());
                 assertEquals(selection.getFill(), current.getFill());
                 assertNotEquals(other.getFill(), current.getFill());

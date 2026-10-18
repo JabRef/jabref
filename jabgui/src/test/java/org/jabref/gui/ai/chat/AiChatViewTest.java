@@ -56,7 +56,7 @@ import static org.mockito.Mockito.when;
 @NullMarked
 @Disabled("JavaFX HeadlessApplication does not implement character-key lookup required by KeyBindingRepository")
 @ResourceLock("Localization.lang")
-// [utest->feat~ai.chat.find~2]
+        // [utest->feat~ai.chat.find~2]
 class AiChatViewTest extends JavaFxTest {
     private AiChatView view;
     private KeyBindingRepository keyBindings;

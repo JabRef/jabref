@@ -155,15 +155,15 @@ class AiChatMessageViewTest extends JavaFxTest {
             "[Chocolate](https://example.org)",
             "Hot [choco](https://example.org)**late**",
             """
-            | Flavor |
-            | --- |
-            | Chocolate |
-            """,
+                    | Flavor |
+                    | --- |
+                    | Chocolate |
+                    """,
             """
-            | Flavor |
-            | --- |
-            | [Chocolate](https://example.org) |
-            """
+                    | Flavor |
+                    | --- |
+                    | [Chocolate](https://example.org) |
+                    """
     })
     void highlightOccurrencesIncludesEmbeddedMarkdown(String markdown) {
         AiChatMessageView view = createView();
