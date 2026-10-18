@@ -191,10 +191,6 @@ public class ParserResult {
     public Range getFieldRange(BibEntry entry, Field field) {
         Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Map.of());
 
-        if (rangeMap.isEmpty()) {
-            return getCompleteEntryIndicator(entry);
-        }
-
         Range range = rangeMap.get(field);
         if (range != null) {
             return range;

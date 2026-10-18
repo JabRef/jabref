@@ -31,6 +31,16 @@ Origin: <https://github.com/JabRef/jabref/issues/9622>
 
 Needs: impl, utest
 
+## BibTeX importer must recover entries missing their citation key
+`req~import.bibtex.missing-key-recovery~1`
+
+Recovery includes entries where both the key and its comma are omitted before the first field assignment.
+Fields are retained even with long custom field names or extensive whitespace before `=`.
+Recovered assignments produce a warning naming the line of the first field; diagnostics for a missing key refer to the complete entry.
+Context: <https://github.com/JabRef/jabref/pull/17496>
+
+Needs: impl, utest
+
 ## Library must maintain imported entries sorted by internal id
 `req~import.entries.sorted-by-id~1`
 
