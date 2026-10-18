@@ -348,12 +348,13 @@ class BibtexParserTest {
 
     // [utest->req~import.bibtex.missing-key-recovery~1]
     @ParameterizedTest
-    @ValueSource(strings = {"@article{\n}", "@article{,\n}"})
+    @ValueSource(strings = {"@article{\n}", "@article{,\n}", "@article(\n)", "@article(\r\n)", "@article(\n\n)", "@article()"})
     void parseUsesWholeEntryRangeWhenCitationKeyAndFieldsAreMissing(String entry) throws IOException {
         ParserResult result = parser.parse(Reader.of(entry));
-        BibEntry parsedEntry = result.getDatabase().getEntries().getFirst();
 
         assertEquals(List.of(new BibEntry(StandardEntryType.Article)), result.getDatabase().getEntries());
+        BibEntry parsedEntry = result.getDatabase().getEntries().getFirst();
+        assertEquals(entry, parsedEntry.getParsedSerialization());
         assertEquals(result.getArticleRanges().get(parsedEntry), result.getFieldRange(parsedEntry, InternalField.KEY_FIELD));
         assertEquals(1, result.getFieldRange(parsedEntry, InternalField.KEY_FIELD).startLine());
         assertEquals(List.of(), result.warnings());
@@ -398,6 +399,29 @@ class BibtexParserTest {
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Ed von Test");
         assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    // [utest->req~import.bibtex.missing-key-recovery~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"", "key"})
+    void parseRecognizesParenthesizedEntryBeforeFollowingEntry(String key) throws IOException {
+        ParserResult result = parser.parse(Reader.of("@article(\n" + key + ")\n@article{following,title={Control}}"));
+
+        assertEquals(List.of(
+                new BibEntry(StandardEntryType.Article).withCitationKey(key),
+                new BibEntry(StandardEntryType.Article).withCitationKey("following").withField(StandardField.TITLE, "Control")),
+                result.getDatabase().getEntries());
+        assertEquals(List.of(), result.warnings());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"key)", "key(with)parentheses"})
+    void parsePreservesParenthesesInBracedCitationKeys(String key) throws IOException {
+        ParserResult result = parser.parse(Reader.of("@article{" + key + ",title={Test}}"));
+
+        assertEquals(List.of(new BibEntry(StandardEntryType.Article).withCitationKey(key).withField(StandardField.TITLE, "Test")),
+                result.getDatabase().getEntries());
+        assertEquals(List.of(), result.warnings());
     }
 
     @Test

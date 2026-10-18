@@ -760,12 +760,13 @@ public class BibtexParser implements Parser {
         int articleStartColumn = column;
 
         skipWhitespace();
+        char closingBracket = peek() == '(' ? ')' : '}';
         consume('{', '(');
         // [impl->req~import.bibtex.key-leading-whitespace~1]
         skipWhitespace();
         int keyStartLine = line;
         int keyStartColumn = column;
-        String key = parseKey();
+        String key = parseKey(closingBracket);
 
         // [impl->req~import.bibtex.missing-key-recovery~1]
         if (!key.isEmpty()) {
@@ -1027,7 +1028,7 @@ public class BibtexParser implements Parser {
     }
 
     /// This method is used to parse the citation key of an entry.
-    private String parseKey() throws IOException {
+    private String parseKey(char closingBracket) throws IOException {
         StringBuilder token = new StringBuilder(20);
 
         while (true) {
@@ -1039,7 +1040,7 @@ public class BibtexParser implements Parser {
                 return token.toString();
             }
 
-            if (!Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
+            if ((character != closingBracket) && !Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
                     || (character == ':') || ("#{}~,=\uFFFD".indexOf(character) == -1))) {
                 token.append((char) character);
             } else {
@@ -1058,7 +1059,7 @@ public class BibtexParser implements Parser {
                     // return what we
                     // have found, as the key and try to restore the rest in fixKey().
                     return token + fixKey();
-                } else if ((character == ',') || (character == '}')) {
+                } else if ((character == ',') || (character == '}') || (character == closingBracket)) {
                     unread(character);
                     return token.toString();
                 } else {

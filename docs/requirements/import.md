@@ -35,6 +35,7 @@ Needs: impl, utest
 `req~import.bibtex.missing-key-recovery~1`
 
 Recovery includes entries where both the key and its comma are omitted before the first field assignment.
+Empty entries enclosed in braces or parentheses are retained, including an entry ending at the end of the file.
 Fields are retained even with long custom field names or extensive whitespace before `=`.
 Recovered assignments produce a warning naming the line of the first field; diagnostics for a missing key refer to the complete entry.
 Context: <https://github.com/JabRef/jabref/pull/17496>
