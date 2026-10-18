@@ -1,5 +1,6 @@
 package org.jabref.logic.bibtex.comparator;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
@@ -14,6 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FieldComparatorTest {
     @Test
@@ -260,5 +262,53 @@ class FieldComparatorTest {
                 .withField(StandardField.AUTHOR, "Mustermann, Max");
 
         assertEquals(1, comparator.compare(smaller, bigger));
+    }
+
+    @Test
+    void compareAuthorFieldWithBracedOrganisationNameAscending() {
+        FieldComparator comparator = new FieldComparator(new OrFields(StandardField.AUTHOR), false);
+        BibEntry organisation = new BibEntry()
+                .withField(StandardField.AUTHOR, "{The Geany contributors}");
+        BibEntry person = new BibEntry()
+                .withField(StandardField.AUTHOR, "Abbott, Anne");
+
+        assertTrue(comparator.compare(organisation, person) > 0);
+    }
+
+    @Test
+    void compareAuthorFieldWithBracedOrganisationNameDescending() {
+        FieldComparator comparator = new FieldComparator(new OrFields(StandardField.AUTHOR), true);
+        BibEntry organisation = new BibEntry()
+                .withField(StandardField.AUTHOR, "{The Geany contributors}");
+        BibEntry person = new BibEntry()
+                .withField(StandardField.AUTHOR, "Abbott, Anne");
+
+        assertTrue(comparator.compare(organisation, person) < 0);
+    }
+
+    @Test
+    void sortAuthorsWithBracedOrganisationNamesAlphabetically() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry smith = new BibEntry().withField(StandardField.AUTHOR, "Smith, John");
+        BibEntry geany = new BibEntry().withField(StandardField.AUTHOR, "{The Geany contributors}");
+        BibEntry abbott = new BibEntry().withField(StandardField.AUTHOR, "Abbott, Anne");
+        BibEntry linux = new BibEntry().withField(StandardField.AUTHOR, "{Linux Foundation}");
+
+        List<BibEntry> sorted = Stream.of(smith, geany, abbott, linux)
+                                      .sorted(comparator)
+                                      .toList();
+
+        assertEquals(List.of(abbott, linux, smith, geany), sorted);
+    }
+
+    @Test
+    void compareAuthorFieldKeepsBracesInMultipleAuthors() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry organisationAndPerson = new BibEntry()
+                .withField(StandardField.AUTHOR, "{The Geany contributors} and Smith, John");
+        BibEntry person = new BibEntry()
+                .withField(StandardField.AUTHOR, "Abbott, Anne");
+
+        assertEquals(1, Integer.signum(comparator.compare(organisationAndPerson, person)));
     }
 }
