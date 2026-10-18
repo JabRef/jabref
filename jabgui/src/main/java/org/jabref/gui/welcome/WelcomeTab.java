@@ -125,7 +125,7 @@ public class WelcomeTab extends Tab {
         initializeColumns();
 
         StackPane rootPane = new StackPane(main);
-        // Scrolls only when the window is lower than the content, so the community links at the bottom stay reachable.
+        // Scrolls only when the window is lower than the content.
         ScrollPane rootScrollPane = new ScrollPane(rootPane);
         rootScrollPane.setFitToWidth(true);
         rootScrollPane.setFitToHeight(true);
