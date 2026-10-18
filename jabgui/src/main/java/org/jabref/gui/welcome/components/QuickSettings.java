@@ -1,6 +1,8 @@
 package org.jabref.gui.welcome.components;
 
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -23,6 +25,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.controlsfx.control.ToggleSwitch;
 
 public class QuickSettings extends VBox {
+    private static final int MIN_VISIBLE_SETTINGS = 3;
+
     private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -122,6 +126,11 @@ public class QuickSettings extends VBox {
         scrollPane.setFitToWidth(true);
         scrollPane.getStyleClass().add("quick-settings-scroll-pane");
         scrollPane.setMaxHeight(Double.MAX_VALUE);
+        // Retain visibility of the first few items of QuickSettings, in case the height of the welcome tab exceeds the height of the window.
+        Node lastVisibleSetting = contentPane.getChildren().get(MIN_VISIBLE_SETTINGS - 1);
+        scrollPane.minViewportHeightProperty().bind(Bindings.createDoubleBinding(
+                () -> lastVisibleSetting.getBoundsInParent().getMaxY(),
+                lastVisibleSetting.boundsInParentProperty()));
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
         return scrollPane;
     }
