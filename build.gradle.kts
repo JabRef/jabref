@@ -3,7 +3,7 @@ plugins {
     id("org.jabref.gradle.feature.compile") // for openrewrite
     id("org.jabref.gradle.feature.requirementtracing")
     id("org.openrewrite.rewrite") version "7.39.0"
-    id("org.cyclonedx.bom") version "3.5.0"
+    id("org.cyclonedx.bom") version "3.5.1"
 }
 
 // OpenRewrite should rewrite all sources
@@ -75,6 +75,12 @@ requirementTracing {
             "feat",
             "req",
             "adr"
+        )
+
+    filterWantedStatuses =
+        setOf(
+            // Requirements without `Status` field are treated as `approved`.
+            "approved"
         )
 
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer

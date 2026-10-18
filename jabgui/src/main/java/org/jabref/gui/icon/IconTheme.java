@@ -248,7 +248,12 @@ public class IconTheme {
         READ_STATUS_SKIMMED(Color.ORANGE, MaterialDesignE.EYE),
         READ_STATUS(MaterialDesignE.EYE),
         RELEVANCE(MaterialDesignS.STAR_CIRCLE),
-        RELEVANT(Color.rgb(255, 179, 0), MaterialDesignS.STAR_CIRCLE),
+        // The golden color is used only to indicate that an entry is marked as relevant in the table;
+        // menus continue to use the neutral icon. This follows the discussion in
+        // https://github.com/JabRef/jabref/pull/17356, aiming for consistency with the colored Priority and Read Status icons.
+        // The amber shade is intended to remain visible in both light and dark themes,
+        // although its contrast against a white background may be limited.
+        RELEVANT_COLORED(Color.rgb(255, 179, 0), MaterialDesignS.STAR_CIRCLE),
         MERGE_ENTRIES(MaterialDesignC.COMPARE),
         CONNECT_OPEN_OFFICE(MaterialDesignO.OPEN_IN_APP),
         PLAIN_TEXT_IMPORT_TODO(MaterialDesignC.CHECKBOX_BLANK_CIRCLE_OUTLINE),
