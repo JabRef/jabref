@@ -134,7 +134,7 @@ Needs: impl
 ## Source tab must keep layout and syntax highlighting when copying
 `req~entry-editor.source-tab.copy-syntax-highlighting~1`
 
-When copying BibTeX source, the HTML on the clipboard must keep the source as one monospace preformatted block, so that rich-text applications such as LibreOffice Writer keep indentation, line breaks, alignment, and syntax colors.
+When copying BibTeX source, the HTML and RTF on the clipboard must keep the source in a monospace font with its line breaks, so that rich-text applications such as LibreOffice Writer, Microsoft Word, and Pages keep indentation, alignment, and syntax colors.
 Originates from <https://github.com/JabRef/jabref/issues/17392>
 
 Needs: impl, utest
