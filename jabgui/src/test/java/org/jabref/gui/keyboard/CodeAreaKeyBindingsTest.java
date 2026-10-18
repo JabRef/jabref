@@ -1,22 +1,57 @@
 package org.jabref.gui.keyboard;
 
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.testutils.JavaFxExtension;
 
 import jfx.incubator.scene.control.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.TextPos;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(JavaFxExtension.class)
 class CodeAreaKeyBindingsTest {
+
+    @ParameterizedTest
+    @MethodSource("killLineTestData")
+    void killLinePreservesFollowingLines(TextPos caretPosition, String expectedText) {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("First\nSecond\nThird");
+        codeArea.select(caretPosition);
+        KeyBindingRepository repository = mock(KeyBindingRepository.class);
+        when(repository.mapToKeyBinding(any(KeyEvent.class))).thenReturn(Optional.of(KeyBinding.EDITOR_KILL_LINE));
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.K, false, true, false, false);
+
+        CodeAreaKeyBindings.call(codeArea, event, repository);
+
+        assertEquals(expectedText, codeArea.getText());
+        assertEquals(caretPosition, codeArea.getCaretPosition());
+        assertTrue(event.isConsumed());
+    }
+
+    private static Stream<Arguments> killLineTestData() {
+        return Stream.of(
+                Arguments.of(TextPos.ofLeading(0, 3), "Fir\nSecond\nThird"),
+                Arguments.of(TextPos.ofLeading(0, 5), "FirstSecond\nThird"),
+                Arguments.of(TextPos.ofLeading(1, 0), "First\n\nThird"),
+                Arguments.of(TextPos.ofLeading(2, 5), "First\nSecond\nThird"));
+    }
 
     @Test
     void nonMacOsDoesNothing() {

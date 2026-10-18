@@ -1,6 +1,7 @@
 package org.jabref.gui.keyboard;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.Node;
@@ -16,6 +17,9 @@ import org.jabref.gui.testutils.JavaFxExtension;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,109 +61,50 @@ class TextInputKeyBindingsTest {
     }
 
     @Test
-    void beginningMovesToCurrentLineStart() {
-        TextArea area = new TextArea(MULTILINE_TEXT);
-        area.positionCaret(16);
-
-        applyBinding(area, KeyBinding.EDITOR_BEGINNING);
-
-        assertEquals(11, area.getCaretPosition());
-        assertEquals(MULTILINE_TEXT, area.getText());
-    }
-
-    @Test
-    void endMovesToCurrentLineEnd() {
-        TextArea area = new TextArea(MULTILINE_TEXT);
-        area.positionCaret(16);
-
-        applyBinding(area, KeyBinding.EDITOR_END);
-
-        assertEquals(22, area.getCaretPosition());
-        assertEquals(MULTILINE_TEXT, area.getText());
-    }
-
-    @Test
-    void beginningDocMovesToDocumentStart() {
-        TextArea area = new TextArea(MULTILINE_TEXT);
-        area.positionCaret(16);
-
-        applyBinding(area, KeyBinding.EDITOR_BEGINNING_DOC);
-
-        assertEquals(0, area.getCaretPosition());
-    }
-
-    @Test
-    void endDocMovesToDocumentEnd() {
-        TextArea area = new TextArea(MULTILINE_TEXT);
-        area.positionCaret(16);
-
-        applyBinding(area, KeyBinding.EDITOR_END_DOC);
-
-        assertEquals(MULTILINE_TEXT.length(), area.getCaretPosition());
-    }
-
-    @Test
-    void killLinePreservesFollowingLines() {
+    void killLineUsesSharedLineDeletion() {
         TextArea area = new TextArea(MULTILINE_TEXT);
         area.positionCaret(16);
 
         applyBinding(area, KeyBinding.EDITOR_KILL_LINE);
 
-        assertEquals(
-                "First line\nSecon\nThird line",
-                area.getText());
+        assertEquals("First line\nSecon\nThird line", area.getText());
         assertEquals(16, area.getCaretPosition());
     }
 
-    @Test
-    void killLineAtLineEndRemovesNewline() {
-        TextArea area = new TextArea(MULTILINE_TEXT);
-        area.positionCaret(22);
+    @ParameterizedTest
+    @MethodSource("navigationTestData")
+    void navigationRespectsLineAndDocumentBoundaries(boolean multiline, String text, int caretPosition, KeyBinding binding, int expectedPosition) {
+        TextInputControl control = multiline ? new TextArea(text) : new TextField(text);
+        control.positionCaret(caretPosition);
 
-        applyBinding(area, KeyBinding.EDITOR_KILL_LINE);
+        applyBinding(control, binding);
 
-        assertEquals(
-                "First line\nSecond lineThird line",
-                area.getText());
+        assertEquals(expectedPosition, control.getCaretPosition());
+        assertEquals(text, control.getText());
     }
 
-    @Test
-    void killLineAtDocumentEndDoesNothing() {
-        TextArea area = new TextArea(MULTILINE_TEXT);
-        area.positionCaret(MULTILINE_TEXT.length());
-
-        applyBinding(area, KeyBinding.EDITOR_KILL_LINE);
-
-        assertEquals(MULTILINE_TEXT, area.getText());
-    }
-
-    @Test
-    void beginningWorksInSingleLineTextField() {
-        TextField field = new TextField("Example text");
-        field.positionCaret(7);
-
-        applyBinding(field, KeyBinding.EDITOR_BEGINNING);
-
-        assertEquals(0, field.getCaretPosition());
-    }
-
-    @Test
-    void endWorksInSingleLineTextField() {
-        TextField field = new TextField("Example text");
-        field.positionCaret(3);
-
-        applyBinding(field, KeyBinding.EDITOR_END);
-
-        assertEquals(field.getLength(), field.getCaretPosition());
-    }
-
-    @Test
-    void killLineInSingleLineTextField() {
-        TextField field = new TextField("Example text");
-        field.positionCaret(7);
-
-        applyBinding(field, KeyBinding.EDITOR_KILL_LINE);
-
-        assertEquals("Example", field.getText());
+    private static Stream<Arguments> navigationTestData() {
+        return Stream.concat(Stream.of(true, false).flatMap(multiline -> Stream.of(
+                Arguments.of(multiline, "", 0, KeyBinding.EDITOR_BEGINNING, 0),
+                Arguments.of(multiline, "", 0, KeyBinding.EDITOR_END, 0),
+                Arguments.of(multiline, "", 0, KeyBinding.EDITOR_BEGINNING_DOC, 0),
+                Arguments.of(multiline, "", 0, KeyBinding.EDITOR_END_DOC, 0),
+                Arguments.of(multiline, "Example text", 7, KeyBinding.EDITOR_BEGINNING, 0),
+                Arguments.of(multiline, "Example text", 3, KeyBinding.EDITOR_END, 12))),
+                Stream.of(
+                        Arguments.of(true, MULTILINE_TEXT, 5, KeyBinding.EDITOR_BEGINNING, 0),
+                        Arguments.of(true, MULTILINE_TEXT, 5, KeyBinding.EDITOR_END, 10),
+                        Arguments.of(true, MULTILINE_TEXT, 10, KeyBinding.EDITOR_BEGINNING, 0),
+                        Arguments.of(true, MULTILINE_TEXT, 10, KeyBinding.EDITOR_END, 10),
+                        Arguments.of(true, MULTILINE_TEXT, 11, KeyBinding.EDITOR_BEGINNING, 11),
+                        Arguments.of(true, MULTILINE_TEXT, 11, KeyBinding.EDITOR_END, 22),
+                        Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_BEGINNING, 11),
+                        Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_END, 22),
+                        Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_BEGINNING_DOC, 0),
+                        Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_END_DOC, 33),
+                        Arguments.of(true, MULTILINE_TEXT, 28, KeyBinding.EDITOR_BEGINNING, 23),
+                        Arguments.of(true, MULTILINE_TEXT, 28, KeyBinding.EDITOR_END, 33),
+                        Arguments.of(true, "First\n", 6, KeyBinding.EDITOR_BEGINNING, 6),
+                        Arguments.of(true, "First\n", 6, KeyBinding.EDITOR_END, 6)));
     }
 }

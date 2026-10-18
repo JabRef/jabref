@@ -92,8 +92,9 @@ public class CodeAreaKeyBindings {
                 case EDITOR_KILL_LINE -> {
                     int pos = textPosToOffset(codeArea, codeArea.getCaretPosition());
                     String text = codeArea.getText();
-                    codeArea.setText(text.substring(0, pos));
-                    codeArea.select(offsetToTextPos(codeArea, pos));
+                    ResultingStringState res = StringManipulator.killLine(pos, text);
+                    codeArea.setText(res.text);
+                    codeArea.select(offsetToTextPos(codeArea, res.caretPosition));
                     event.consume();
                 }
                 case EDITOR_KILL_WORD -> {

@@ -1,7 +1,6 @@
 package org.jabref.gui.keyboard;
 
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 
@@ -34,47 +33,29 @@ public class TextInputKeyBindings {
                         focusedTextField.nextWord();
                         event.consume();
                     }
-
                     case EDITOR_BEGINNING -> {
-                        if (focusedTextField instanceof TextArea) {
-                            int caret = focusedTextField.getCaretPosition();
-                            String text = focusedTextField.getText();
-                            int lineStart = text.lastIndexOf('\n', caret - 1) + 1;
-                            focusedTextField.positionCaret(lineStart);
-                        } else {
-                            focusedTextField.home();
-                        }
+                        int caret = focusedTextField.getCaretPosition();
+                        String text = focusedTextField.getText(0, focusedTextField.getLength());
+                        focusedTextField.positionCaret(text.lastIndexOf('\n', caret - 1) + 1);
                         event.consume();
                     }
                     case EDITOR_END -> {
-                        if (focusedTextField instanceof TextArea) {
-                            int caret = focusedTextField.getCaretPosition();
-                            String text = focusedTextField.getText();
-                            int lineEnd = text.indexOf('\n', caret);
-                            int targetPosition = lineEnd == -1 ? text.length() : lineEnd;
-                            focusedTextField.positionCaret(targetPosition);
-                        } else {
-                            focusedTextField.end();
-                        }
+                        int caret = focusedTextField.getCaretPosition();
+                        String text = focusedTextField.getText(0, focusedTextField.getLength());
+                        int lineEnd = text.indexOf('\n', caret);
+                        focusedTextField.positionCaret(lineEnd == -1 ? text.length() : lineEnd);
                         event.consume();
                     }
-                    case EDITOR_BEGINNING_DOC -> {
-                        focusedTextField.positionCaret(0);
-                        event.consume();
-                    }
-                    case EDITOR_END_DOC -> {
-                        focusedTextField.positionCaret(focusedTextField.getLength());
-                        event.consume();
-                    }
-                    case EDITOR_UP -> {
+                    case EDITOR_UP,
+                         EDITOR_BEGINNING_DOC -> {
                         focusedTextField.home();
                         event.consume();
                     }
-                    case EDITOR_DOWN -> {
+                    case EDITOR_DOWN,
+                         EDITOR_END_DOC -> {
                         focusedTextField.end();
                         event.consume();
                     }
-
                     case EDITOR_CAPITALIZE -> {
                         int pos = focusedTextField.getCaretPosition();
                         String text = focusedTextField.getText(0, focusedTextField.getText().length());
@@ -99,29 +80,14 @@ public class TextInputKeyBindings {
                         focusedTextField.positionCaret(res.caretPosition);
                         event.consume();
                     }
-
                     case EDITOR_KILL_LINE -> {
-                        int caret = focusedTextField.getCaretPosition();
-                        String text = focusedTextField.getText();
-
-                        if (focusedTextField instanceof TextArea) {
-                            int lineEnd = text.indexOf('\n', caret);
-                            if (lineEnd == -1) {
-                                lineEnd = text.length();
-                            }
-
-                            if (caret < lineEnd) {
-                                focusedTextField.deleteText(caret, lineEnd);
-                            } else if (lineEnd < text.length()) {
-                                focusedTextField.deleteText(lineEnd, lineEnd + 1);
-                            }
-                        } else {
-                            focusedTextField.deleteText(caret, text.length());
-                        }
-
+                        int pos = focusedTextField.getCaretPosition();
+                        String text = focusedTextField.getText(0, focusedTextField.getLength());
+                        ResultingStringState res = StringManipulator.killLine(pos, text);
+                        focusedTextField.setText(res.text);
+                        focusedTextField.positionCaret(res.caretPosition);
                         event.consume();
                     }
-
                     case EDITOR_KILL_WORD -> {
                         int pos = focusedTextField.getCaretPosition();
                         String text = focusedTextField.getText(0, focusedTextField.getText().length());

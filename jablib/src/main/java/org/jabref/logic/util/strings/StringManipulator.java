@@ -136,6 +136,16 @@ public class StringManipulator {
         return setWordCase(text, caretPosition, LetterCase.LOWER);
     }
 
+    public static ResultingStringState killLine(int caretPosition, String text) {
+        int lineEnd = text.indexOf('\n', caretPosition);
+        if (lineEnd == -1) {
+            lineEnd = text.length();
+        } else if (lineEnd == caretPosition) {
+            lineEnd++;
+        }
+        return new ResultingStringState(caretPosition, text.substring(0, caretPosition) + text.substring(lineEnd));
+    }
+
     /// Remove the next word on the right side of the cursor.
     ///
     /// @param caretPosition The position of the cursor
