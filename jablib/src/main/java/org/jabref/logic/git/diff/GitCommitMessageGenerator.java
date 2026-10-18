@@ -26,13 +26,12 @@ public final class GitCommitMessageGenerator {
     private GitCommitMessageGenerator() {
     }
 
-    // [impl->req~git.commit.generated-message~1]
-    // [impl->adr~english-only-git-commit-messages~1]
-
+    /// [impl->req~git.commit.generated-message~1]
+    /// [impl->adr~english-only-git-commit-messages~1]
     /// Compare two libraries
-    ///  If there is exactly one difference, try the specific bonus message
-    ///  Otherwise, do the count of added, deleted, modified entries
-    ///  If nothing changed, return empty
+    /// If there is exactly one difference, try the specific bonus message
+    /// Otherwise, do the count of added, deleted, modified entries
+    /// If nothing changed, return empty.
     public static Optional<String> generate(BibDatabaseContext headDatabase, BibDatabaseContext workingTreeDatabase) {
         List<BibEntryDiff> entryDiffs = BibDatabaseDiff.compare(headDatabase, workingTreeDatabase).getEntryDifferences();
         Optional<String> singleFieldMessage = entryDiffs.size() == 1
@@ -75,10 +74,10 @@ public final class GitCommitMessageGenerator {
         return count == 1 ? "1 entry" : count + " entries";
     }
 
-    ///  Message for single field of single entry changed
-    ///  For example: Modify author of Smith2024
+    /// Message for single field of single entry changed
+    /// For example: Modify author of Smith2024
     private static Optional<String> singleFieldMessage(BibEntryDiff diff) {
-        ///  Check whether this is modification entry
+        // Check whether this is modification entry
         return Optional.ofNullable(diff.originalEntry())
                        .flatMap(original -> Optional.ofNullable(diff.newEntry())
                                                     .flatMap(changed -> singleFieldMessage(original, changed)));

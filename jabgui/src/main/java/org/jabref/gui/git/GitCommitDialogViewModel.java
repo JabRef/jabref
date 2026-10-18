@@ -277,6 +277,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             return message != null ? message : Localization.lang("Git push failed");
         }
     }
+
     // [impl->req~git.commit.generated-message~1]
 
     /// Fill the generated commit message to message box
@@ -293,9 +294,9 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         return GitCommitMessageGenerator.generate(diffDatabases.headDatabase(), diffDatabases.workingTreeDatabase());
     }
 
-    ///  This can be affected by user fast commit
-    /// when they open the commit and type their own messages
-    /// faster that the generator so there is no automatic generated message
+    /// This keep the user's message before the automatic
+    /// generating commit message process completes,
+    /// so their text is never overwritten
     private void setCommitMessageIfBlank(String message) {
         if (StringUtil.isBlank(commitMessage.get())) {
             commitMessage.set(message);
