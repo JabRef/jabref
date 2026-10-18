@@ -101,7 +101,7 @@ public class Walkthroughs extends VBox {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.getStyleClass().add("walkthroughs-scroll-pane");
         scrollPane.setMaxHeight(Double.MAX_VALUE);
-        // Keep the first walkthroughs visible when the welcome tab is too low and scrolls as a whole
+        // Retain visibility of the first few Walkthroughs, in case the height of the welcome tab exceeds the height of the window.
         Node lastVisibleButton = content.getChildren().get(MIN_VISIBLE_WALKTHROUGHS - 1);
         scrollPane.minViewportHeightProperty().bind(Bindings.createDoubleBinding(
                 () -> lastVisibleButton.getBoundsInParent().getMaxY(),
