@@ -74,7 +74,6 @@ public class DuplicateCheck {
         this.entryTypesManager = entryTypesManager;
     }
 
-    // [impl->req~duplicate-check.same-identifier~1]
     private static boolean haveSameIdentifier(final BibEntry one, final BibEntry two) {
         return one.getFields().stream()
                   .filter(field -> field.getProperties().contains(FieldProperty.IDENTIFIER))
@@ -89,7 +88,6 @@ public class DuplicateCheck {
                                         .orElse(false));
     }
 
-    // [impl->req~duplicate-check.entry-type-compatibility~1]
     private static boolean haveDifferentEntryType(final BibEntry one, final BibEntry two) {
         if (one.getType().equals(StandardEntryType.Misc) || two.getType().equals(StandardEntryType.Misc)) {
             return false;
@@ -97,7 +95,6 @@ public class DuplicateCheck {
         return !one.getType().equals(two.getType());
     }
 
-    // [impl->req~duplicate-check.different-editions~1]
     private static boolean haveDifferentEditions(final BibEntry one, final BibEntry two) {
         final Optional<String> editionOne = one.getField(StandardField.EDITION);
         final Optional<String> editionTwo = two.getField(StandardField.EDITION);
@@ -106,7 +103,6 @@ public class DuplicateCheck {
                 !editionOne.get().equals(editionTwo.get());
     }
 
-    // [impl->req~duplicate-check.book-parts-different-chapters-or-pages~1]
     private static boolean haveDifferentChaptersOrPagesOfTheSameBook(final BibEntry one, final BibEntry two) {
         return (compareSingleField(StandardField.AUTHOR, one, two) == EQUAL) &&
                 (compareSingleField(StandardField.TITLE, one, two) == EQUAL) &&
@@ -152,6 +148,7 @@ public class DuplicateCheck {
         for (final Field field : fields) {
             final double currentWeight = DuplicateCheck.FIELD_WEIGHTS.getOrDefault(field, 1.0);
             totalWeights += currentWeight;
+            // [impl->req~duplicate-check.field-normalization~1]
             int result = DuplicateCheck.compareSingleField(field, one, two);
             if (result == EQUAL) {
                 equalWeights += currentWeight;
@@ -166,7 +163,6 @@ public class DuplicateCheck {
         return new double[] {0.0, 0.0};
     }
 
-    // [impl->req~duplicate-check.field-normalization~1]
     private static int compareSingleField(final Field field, final BibEntry one, final BibEntry two) {
         final Optional<String> optionalStringOne = one.getFieldLatexFree(field);
         final Optional<String> optionalStringTwo = two.getFieldLatexFree(field);
@@ -293,13 +289,17 @@ public class DuplicateCheck {
     /// Checks if the two entries represent the same publication.
     public boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
         // Checks DOI and other identifiers
+        // [impl->req~duplicate-check.same-identifier~1]
         if (haveSameIdentifier(one, two)) {
             return true;
         }
 
         // TODO: Work on haveDifferentEntryType - InCollection and InProceedings could point to the same publication
+        // [impl->req~duplicate-check.entry-type-compatibility~1]
         if (haveDifferentEntryType(one, two) ||
+                // [impl->req~duplicate-check.different-editions~1]
                 haveDifferentEditions(one, two) ||
+                // [impl->req~duplicate-check.book-parts-different-chapters-or-pages~1]
                 haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
             return false;
         }
