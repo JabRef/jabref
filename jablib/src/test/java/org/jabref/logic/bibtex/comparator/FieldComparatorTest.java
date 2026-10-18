@@ -336,7 +336,7 @@ class FieldComparatorTest {
         FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
         BibEntry organisation = new BibEntry().withField(StandardField.AUTHOR, "{Ford Motor Company}");
         BibEntry person = new BibEntry().withField(StandardField.AUTHOR, "Ford Motor Company");
-        
+
         assertEquals(1, Integer.signum(comparator.compare(organisation, person)));
     }
 }
