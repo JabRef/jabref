@@ -408,8 +408,8 @@ class BibtexParserTest {
         ParserResult result = parser.parse(Reader.of("@article(\n" + key + ")\n@article{following,title={Control}}"));
 
         assertEquals(List.of(
-                new BibEntry(StandardEntryType.Article).withCitationKey(key),
-                new BibEntry(StandardEntryType.Article).withCitationKey("following").withField(StandardField.TITLE, "Control")),
+                        new BibEntry(StandardEntryType.Article).withCitationKey(key),
+                        new BibEntry(StandardEntryType.Article).withCitationKey("following").withField(StandardField.TITLE, "Control")),
                 result.getDatabase().getEntries());
         assertEquals(List.of(), result.warnings());
     }
