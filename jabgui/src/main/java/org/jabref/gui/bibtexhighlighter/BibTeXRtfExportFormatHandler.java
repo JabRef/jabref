@@ -112,7 +112,9 @@ public class BibTeXRtfExportFormatHandler extends DataFormatHandler {
     private static void appendEscaped(StringBuilder rtf, String text) {
         for (char c : text.toCharArray()) {
             switch (c) {
-                case '\\', '{', '}' ->
+                case '\\',
+                     '{',
+                     '}' ->
                         rtf.append('\\').append(c);
                 case '\t' ->
                         rtf.append("\\tab ");
