@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtex.comparator;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
@@ -310,5 +311,32 @@ class FieldComparatorTest {
                 .withField(StandardField.AUTHOR, "Abbott, Anne");
 
         assertEquals(1, Integer.signum(comparator.compare(organisationAndPerson, person)));
+    }
+
+    @Test
+    void compareTitleFieldIgnoresProtectiveBraces() {
+        FieldComparator comparator = new FieldComparator(StandardField.TITLE);
+        BibEntry braced = new BibEntry().withField(StandardField.TITLE, "{DNA} sequencing");
+        BibEntry plain = new BibEntry().withField(StandardField.TITLE, "DNA sequencing");
+
+        assertEquals(0, comparator.compare(braced, plain));
+    }
+
+    @Test
+    void compareTitleFieldDecodesLatexAccents() {
+        FieldComparator comparator = new FieldComparator(StandardField.TITLE);
+        BibEntry latex = new BibEntry().withField(StandardField.TITLE, "Kr{\\\"U}ger");
+        BibEntry unicode = new BibEntry().withField(StandardField.TITLE, "KrÜger");
+
+        assertEquals(0, comparator.compare(latex, unicode));
+    }
+
+    @Test
+    void compareBracedOrganisationWithUnbracedCounterpart() {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry organisation = new BibEntry().withField(StandardField.AUTHOR, "{Ford Motor Company}");
+        BibEntry person = new BibEntry().withField(StandardField.AUTHOR, "Ford Motor Company");
+        
+        assertEquals(1, Integer.signum(comparator.compare(organisation, person)));
     }
 }
