@@ -126,7 +126,7 @@ public class QuickSettings extends VBox {
         scrollPane.setFitToWidth(true);
         scrollPane.getStyleClass().add("quick-settings-scroll-pane");
         scrollPane.setMaxHeight(Double.MAX_VALUE);
-        // Keep the first settings visible when the welcome tab is too low and scrolls as a whole
+        // Retain visibility of the first few items of QuickSettings, in case the height of the welcome tab exceeds the height of the window.
         Node lastVisibleSetting = contentPane.getChildren().get(MIN_VISIBLE_SETTINGS - 1);
         scrollPane.minViewportHeightProperty().bind(Bindings.createDoubleBinding(
                 () -> lastVisibleSetting.getBoundsInParent().getMaxY(),
