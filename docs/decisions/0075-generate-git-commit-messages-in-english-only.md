@@ -34,7 +34,7 @@ So the question is: should these generated messages be localized, and if yes, ho
 
 ## Decision Outcome
 
-The chosen approach is to use "English-only messages", it is the only option that always gives grammatically correct output without adding a new dependency. Furthermore, commit messages are part of the shared repository history, not just one user's interface, and English is the usual convention for Git commit messages anyway.
+Chosen option: "English-only messages", because it is the only option that always gives grammatically correct output without adding a new dependency. Furthermore, commit messages are part of the shared repository history, not just one user's interface, and English is the usual convention for Git commit messages anyway.
 The generated message is only a suggestion, so users still free edit the messages before committing. This was agreed in the review of [PR #17205](https://github.com/JabRef/jabref/pull/17205).
 
 Because of this, `GitCommitMessageGenerator` builds the message using plain English strings and does not call `Localization.lang(...)`.
