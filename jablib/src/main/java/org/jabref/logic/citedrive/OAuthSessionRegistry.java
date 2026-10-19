@@ -32,15 +32,15 @@ public class OAuthSessionRegistry {
         TokenRequestKey key = new TokenRequestKey(preferences, revision);
         CompletableFuture<Optional<CiteDriveOAuthService.AuthorizedSession>> candidate = new CompletableFuture<>();
         CompletableFuture<Optional<CiteDriveOAuthService.AuthorizedSession>> shared = Optional.ofNullable(tokenRequests.putIfAbsent(key, candidate))
-                .orElseGet(() -> {
-                    CompletableFuture.completedFuture(true)
-                                     .thenCompose(_ -> request.get())
-                                     .whenComplete((session, failure) -> {
-                                         tokenRequests.remove(key, candidate);
-                                         Optional.ofNullable(failure).ifPresentOrElse(candidate::completeExceptionally, () -> candidate.complete(session));
-                                     });
-                    return candidate;
-                });
+                                                                                              .orElseGet(() -> {
+                                                                                                  CompletableFuture.completedFuture(true)
+                                                                                                                   .thenCompose(_ -> request.get())
+                                                                                                                   .whenComplete((session, failure) -> {
+                                                                                                                       tokenRequests.remove(key, candidate);
+                                                                                                                       Optional.ofNullable(failure).ifPresentOrElse(candidate::completeExceptionally, () -> candidate.complete(session));
+                                                                                                                   });
+                                                                                                  return candidate;
+                                                                                              });
         return shared.copy();
     }
 

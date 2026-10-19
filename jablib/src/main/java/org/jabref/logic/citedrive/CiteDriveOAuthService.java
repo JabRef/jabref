@@ -88,23 +88,23 @@ public class CiteDriveOAuthService {
 
     @VisibleForTesting
     CiteDriveOAuthService(RemotePreferences remotePreferences,
-                         CiteDrivePreferences citeDrivePreferences,
-                         OAuthSessionRegistry sessionRegistry,
-                         Consumer<URI> authorizationPageOpener,
-                         BooleanSupplier callbackServerEnabler,
-                         TokenRequestSender tokenRequestSender) {
+                          CiteDrivePreferences citeDrivePreferences,
+                          OAuthSessionRegistry sessionRegistry,
+                          Consumer<URI> authorizationPageOpener,
+                          BooleanSupplier callbackServerEnabler,
+                          TokenRequestSender tokenRequestSender) {
         this(remotePreferences, citeDrivePreferences, sessionRegistry, authorizationPageOpener, callbackServerEnabler,
                 citeDrivePreferences::getAuthorizationEndpoint, citeDrivePreferences::getTokenEndpoint, tokenRequestSender);
     }
 
     private CiteDriveOAuthService(RemotePreferences remotePreferences,
-                                 CiteDrivePreferences citeDrivePreferences,
-                                 OAuthSessionRegistry sessionRegistry,
-                                 Consumer<URI> authorizationPageOpener,
-                                 BooleanSupplier callbackServerEnabler,
-                                 Supplier<URI> authEndpoint,
-                                 Supplier<URI> tokenEndpoint,
-                                 TokenRequestSender tokenRequestSender) {
+                                  CiteDrivePreferences citeDrivePreferences,
+                                  OAuthSessionRegistry sessionRegistry,
+                                  Consumer<URI> authorizationPageOpener,
+                                  BooleanSupplier callbackServerEnabler,
+                                  Supplier<URI> authEndpoint,
+                                  Supplier<URI> tokenEndpoint,
+                                  TokenRequestSender tokenRequestSender) {
         this.remotePreferences = remotePreferences;
         this.citeDrivePreferences = citeDrivePreferences;
         this.sessionRegistry = sessionRegistry;
@@ -207,8 +207,8 @@ public class CiteDriveOAuthService {
                 cachedRefreshToken = Optional.ofNullable(citeDrivePreferences.getRefreshToken());
             }
             return cachedRefreshToken.map(refreshToken -> CompletableFuture.supplyAsync(() -> refreshToken(refreshToken, configuration))
-                    .thenCompose(session -> session.map(value -> CompletableFuture.completedFuture(Optional.of(value)))
-                                                   .orElseGet(() -> authorizeInteractive(configuration))))
+                                                                           .thenCompose(session -> session.map(value -> CompletableFuture.completedFuture(Optional.of(value)))
+                                                                                                          .orElseGet(() -> authorizeInteractive(configuration))))
                                      .orElseGet(() -> authorizeInteractive(configuration));
         });
     }

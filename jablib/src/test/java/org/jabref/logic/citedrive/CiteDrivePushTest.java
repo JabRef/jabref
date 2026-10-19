@@ -66,8 +66,8 @@ class CiteDrivePushTest {
     private static Stream<Arguments> batches() {
         Stream<Arguments> generated = Stream.of(2, 1_000).map(count -> Arguments.of(count, Optional.<Path>empty()));
         Stream<Arguments> fixture = Optional.ofNullable(System.getProperty("citedrive.batch.fixture"))
-                                           .stream()
-                                           .map(path -> Arguments.of(100_000, Optional.of(Path.of(path))));
+                                            .stream()
+                                            .map(path -> Arguments.of(100_000, Optional.of(Path.of(path))));
         return Stream.concat(generated, fixture);
     }
 
@@ -82,10 +82,10 @@ class CiteDrivePushTest {
         if (fixture.isEmpty()) {
             BibDatabase database = new BibDatabase();
             IntStream.range(0, count).mapToObj(index -> new BibEntry(StandardEntryType.Article)
-                    .withCitationKey("batch-" + index)
-                    .withField(StandardField.AUTHOR, "Müller, Jane")
-                    .withField(StandardField.TITLE, "Batch entry " + index)
-                    .withChanged(true))
+                             .withCitationKey("batch-" + index)
+                             .withField(StandardField.AUTHOR, "Müller, Jane")
+                             .withField(StandardField.TITLE, "Batch entry " + index)
+                             .withChanged(true))
                      .forEach(database::insertEntry);
             context = new BibDatabaseContext(database);
         } else {

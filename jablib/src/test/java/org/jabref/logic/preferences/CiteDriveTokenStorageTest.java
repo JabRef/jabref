@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @NullMarked
-// [utest->req~citedrive.credentials.server~1]
+        // [utest->req~citedrive.credentials.server~1]
 class CiteDriveTokenStorageTest {
 
     @Test
