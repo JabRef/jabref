@@ -30,4 +30,10 @@ class PasswordTest {
 
         assertEquals(charEncryptedPassword, stringEncryptedPassword);
     }
+
+    @Test
+    void decryptsLegacyCiphertext() throws GeneralSecurityException, UnsupportedEncodingException {
+        Password password = new Password("xvrYKSvZj1U33vnvKk6b/A==", "someKey");
+        assertEquals("Password", password.decrypt());
+    }
 }
