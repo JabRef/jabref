@@ -66,11 +66,9 @@ class CiteDriveOAuthTest {
         when(remotePreferences.getHttpServerUri()).thenReturn(URI.create("http://localhost:23119"));
         when(remotePreferences.shouldEnableHttpServer()).thenReturn(true);
 
-        CiteDrivePreferences citeDrivePreferences = mock(CiteDrivePreferences.class);
+        CiteDrivePreferences citeDrivePreferences = CiteDrivePreferences.getDefault();
 
         CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, uri -> NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), mock(DialogService.class), externalApplicationsPreferences), () -> true, URI.create("https://api-dev.citedrive.com/jabref/login/"), URI.create("https://api-dev.citedrive.com/o/token/"));
-        // When testing with https://github.com/navikt/mock-oauth2-server - docker run -p 8080:8080 -h localhost -it --rm ghcr.io/navikt/mock-oauth2-server
-        // Use URI.create("http://localhost:8080/default/authorize") and URI.create("http://localhost:8080/default/token") as endpoints
 
         Optional<AccessToken> actual = citeDriveOAuthService.authorizeInteractive().get();
         assertTrue(actual.isPresent());
@@ -88,7 +86,7 @@ class CiteDriveOAuthTest {
         when(remotePreferences.getHttpServerUri()).thenReturn(URI.create("http://localhost:23119"));
         when(remotePreferences.shouldEnableHttpServer()).thenReturn(true);
 
-        CiteDrivePreferences citeDrivePreferences = mock(CiteDrivePreferences.class);
+        CiteDrivePreferences citeDrivePreferences = CiteDrivePreferences.getDefault();
 
         CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, uri -> NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), mock(DialogService.class), externalApplicationsPreferences), () -> true, URI.create("https://api-dev.citedrive.com/jabref/login/"), URI.create("https://api-dev.citedrive.com/o/token/"));
 
@@ -131,7 +129,7 @@ class CiteDriveOAuthTest {
         when(remotePreferences.getHttpServerUri()).thenReturn(URI.create("http://localhost:23119"));
         when(remotePreferences.shouldEnableHttpServer()).thenReturn(true);
 
-        CiteDrivePreferences citeDrivePreferences = mock(CiteDrivePreferences.class);
+        CiteDrivePreferences citeDrivePreferences = CiteDrivePreferences.getDefault();
 
         CiteDriveOAuthService citeDriveOAuthService = new CiteDriveOAuthService(remotePreferences, citeDrivePreferences, OAUTH_SESSION_REGISTRY, uri -> NativeDesktop.openBrowserShowPopup(uri.toASCIIString(), mock(DialogService.class), externalApplicationsPreferences), () -> true, URI.create("https://api-dev.citedrive.com/jabref/login/"), URI.create("https://api-dev.citedrive.com/o/token/"));
 

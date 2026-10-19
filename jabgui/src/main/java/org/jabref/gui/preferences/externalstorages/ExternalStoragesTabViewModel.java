@@ -8,7 +8,6 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.CiteDrivePreferences;
-import org.jabref.logic.util.URLUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -39,11 +38,11 @@ public class ExternalStoragesTabViewModel implements PreferenceTabViewModel {
     private static Validator urlValidator(StringProperty url, String fieldName) {
         return new FunctionBasedValidator<>(
                 url,
-                URLUtil::isValidHttpUrl,
+                CiteDrivePreferences::isSecureUrl,
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("External storages"),
                         fieldName,
-                        Localization.lang("Please enter a valid URL"))));
+                        Localization.lang("Please enter a valid HTTPS URL"))));
     }
 
     @Override

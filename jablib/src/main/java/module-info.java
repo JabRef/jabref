@@ -5,8 +5,11 @@
 /// Entry points: [org.jabref.model.database.BibDatabaseContext] (an open library),
 /// [org.jabref.model.entry.BibEntry], [org.jabref.logic.importer.ImportFormatReader],
 /// [org.jabref.logic.exporter.ExporterFactory].
+/// CiteDrive authentication and uploads are coordinated by [org.jabref.logic.citedrive.CiteDriveOAuthService];
+/// its authorized sessions keep credentials bound to their upload address.
 ///
 /// @see <a href="https://devdocs.jabref.org/architecture-and-components.html">Architecture and components</a>
+/// @see <a href="https://devdocs.jabref.org/code-howtos/http-server.html#citedrive-authentication-security">CiteDrive authentication security</a>
 open module org.jabref.jablib {
     exports org.jabref.model;
     exports org.jabref.model.undo;

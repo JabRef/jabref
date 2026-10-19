@@ -10,6 +10,7 @@ import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
@@ -39,7 +40,10 @@ public class CiteDrivePush {
         return push(context, entries, accessToken, cliPreferences, notificationService, cliPreferences.getCiteDrivePreferences().getPushEndpoint());
     }
 
-    static boolean push(BibDatabaseContext context, List<BibEntry> entries, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService, URI pushEndpoint) throws IOException {
+    public static boolean push(BibDatabaseContext context, List<BibEntry> entries, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService, URI pushEndpoint) throws IOException {
+        if (!CiteDrivePreferences.isSecureUrl(pushEndpoint.toString())) {
+            throw new IOException(Localization.lang("Please enter a valid HTTPS URL"));
+        }
         StringWriter writer = new StringWriter();
         SelfContainedSaveConfiguration exportConfiguration = cliPreferences.getSelfContainedExportConfiguration();
         SelfContainedSaveConfiguration plainBibtex = new SelfContainedSaveConfiguration(

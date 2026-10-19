@@ -51,17 +51,18 @@ public class CiteDrivePushAction extends SimpleCommand {
                                          .toList();
 
         citeDriveOAuthService
-                .getAccessToken()
+                .getAuthorizedSession()
                 // Async: the token may arrive on the HTTP server thread; the push itself is network I/O
-                .thenAcceptAsync(accessTokenOpt -> {
-                    if (accessTokenOpt.isEmpty()) {
+                .thenAcceptAsync(sessionOpt -> {
+                    if (sessionOpt.isEmpty()) {
                         dialogService.notify(Localization.lang("CiteDrive push failed: could not obtain access token."));
                         return;
                     }
+                    CiteDriveOAuthService.AuthorizedSession session = sessionOpt.orElseThrow();
                     try {
-                        if (CiteDrivePush.push(database, entries, accessTokenOpt.get(), preferences, dialogService)) {
+                        if (CiteDrivePush.push(database, entries, session.accessToken(), preferences, dialogService, session.pushEndpoint())) {
                             // [impl->req~citedrive.push.import-page~1]
-                            UiTaskExecutor.runInJavaFXThread(() -> NativeDesktop.openBrowserShowPopup(preferences.getCiteDrivePreferences().getImportPage().toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences()));
+                            UiTaskExecutor.runInJavaFXThread(() -> NativeDesktop.openBrowserShowPopup(session.importPage().toASCIIString(), dialogService, preferences.getExternalApplicationsPreferences()));
                         }
                     } catch (IOException e) {
                         LOGGER.error("CiteDrive push failed", e);
