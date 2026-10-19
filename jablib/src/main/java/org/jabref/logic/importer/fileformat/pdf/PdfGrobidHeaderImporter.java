@@ -10,9 +10,11 @@ import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.jspecify.annotations.NullMarked;
 
 /// Extracts the metadata of the PDF itself (its header) using Grobid.
 /// [PdfGrobidImporter] extracts the works cited in the PDF's reference list instead.
+@NullMarked
 public class PdfGrobidHeaderImporter extends PdfImporter {
 
     private final GrobidService grobidService;

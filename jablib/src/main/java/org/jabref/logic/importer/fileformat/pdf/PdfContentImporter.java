@@ -547,12 +547,7 @@ public class PdfContentImporter extends PdfImporter {
 
                     pages = springerSplit[2].substring(4);
 
-                    if (springerSplit[3].length() >= 4) {
-                        String springerYear = springerSplit[3].substring(0, 4);
-                        if (isPlausibleYear(springerYear)) {
-                            year = springerYear;
-                        }
-                    }
+                    firstPlausibleYear(springerSplit[3]).ifPresent(springerYear -> year = springerYear);
                 }
             } else {
                 doi = getDoi(doi);
@@ -667,13 +662,19 @@ public class PdfContentImporter extends PdfImporter {
             return;
         }
 
-        Matcher m = YEAR_EXTRACT_PATTERN.matcher(curString);
+        firstPlausibleYear(curString).ifPresent(found -> year = found);
+    }
+
+    /// The first standalone four-digit number that is not part of a range and lies in the plausible year span
+    // [impl->req~import.pdf.plausible-year~1]
+    private static Optional<String> firstPlausibleYear(String text) {
+        Matcher m = YEAR_EXTRACT_PATTERN.matcher(text);
         while (m.find()) {
             if (isPlausibleYear(m.group())) {
-                year = m.group();
-                return;
+                return Optional.of(m.group());
             }
         }
+        return Optional.empty();
     }
 
     // [impl->req~import.pdf.plausible-year~1]

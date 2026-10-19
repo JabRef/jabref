@@ -167,6 +167,18 @@ class PdfMergeMetadataImporterOfflineTest {
     }
 
     @Test
+    void sentenceContainingConfirmedNameIsReplacedByPlausibleCandidate() {
+        BibEntry documentInformation = new BibEntry()
+                .withField(StandardField.AUTHOR, "Written by Alice Doe");
+        BibEntry content = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Doe, Alice");
+
+        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation, content), DOCUMENT_TEXT);
+
+        assertEquals(Optional.of("Doe, Alice"), merged.getField(StandardField.AUTHOR));
+    }
+
+    @Test
     void proseMisparsedAsAuthorListDoesNotReplaceUnconfirmedAuthor() {
         BibEntry documentInformation = new BibEntry()
                 .withField(StandardField.AUTHOR, "Void, Eve");

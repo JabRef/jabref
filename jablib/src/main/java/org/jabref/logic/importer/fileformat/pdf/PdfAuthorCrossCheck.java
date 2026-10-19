@@ -63,7 +63,8 @@ class PdfAuthorCrossCheck {
     // [impl->adr~conservative-pdf-author-evidence~1]
     private static void crossCheckMergedAuthor(BibEntry entry, String mergedAuthor, List<BibEntry> candidates,
                                                DocumentWords documentWords) {
-        if (isAuthorConfirmedByText(mergedAuthor, documentWords)) {
+        // A sentence mis-parsed as author ("Written by Alice Smith") is not confirmed by one of its names
+        if (looksLikeAuthorList(mergedAuthor) && isAuthorConfirmedByText(mergedAuthor, documentWords)) {
             return;
         }
 
