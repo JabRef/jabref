@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.IdentityHashMap;
+import java.util.Map;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -25,6 +26,8 @@ public final class EntryLookupsInProgress {
     public static final EntryLookupsInProgress FULLTEXT = new EntryLookupsInProgress();
 
     private final ObservableMap<BibEntry, Integer> running = FXCollections.observableMap(new IdentityHashMap<>());
+    private final Map<BibEntry, Integer> pendingFinished = new IdentityHashMap<>();
+    private boolean finishUpdateScheduled;
 
     EntryLookupsInProgress() {
     }
@@ -35,6 +38,33 @@ public final class EntryLookupsInProgress {
 
     public void finished(BibEntry entry) {
         running.computeIfPresent(entry, (_, count) -> count == 1 ? null : count - 1);
+    }
+
+    /// Queues a completion from a background thread and coalesces the JavaFX updates.
+    public void finishedLater(BibEntry entry) {
+        boolean scheduleUpdate;
+        synchronized (pendingFinished) {
+            pendingFinished.merge(entry, 1, Integer::sum);
+            scheduleUpdate = !finishUpdateScheduled;
+            finishUpdateScheduled = true;
+        }
+        if (scheduleUpdate) {
+            UiTaskExecutor.runInJavaFXThread(this::finishPending);
+        }
+    }
+
+    private void finishPending() {
+        Map<BibEntry, Integer> finishedNow;
+        synchronized (pendingFinished) {
+            finishedNow = new IdentityHashMap<>(pendingFinished);
+            pendingFinished.clear();
+            finishUpdateScheduled = false;
+        }
+        finishedNow.forEach((entry, count) -> {
+            for (int i = 0; i < count; i++) {
+                finished(entry);
+            }
+        });
     }
 
     public BooleanBinding inProgress(BibEntry entry) {
