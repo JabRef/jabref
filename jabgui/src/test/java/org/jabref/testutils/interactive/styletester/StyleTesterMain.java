@@ -22,7 +22,7 @@ public class StyleTesterMain extends Application {
     @Override
     public void start(Stage stage) throws JabRefException {
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
-        HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+        HeadlessExecutorService.INSTANCE.executeInterruptibleTask(fileUpdateMonitor, "FileUpdateMonitor");
         WorkspacePreferences workspacePreferences = WorkspacePreferences.getDefault();
         ThemeManager themeManager = new ThemeManager(workspacePreferences, fileUpdateMonitor);
 

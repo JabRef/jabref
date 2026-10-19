@@ -552,7 +552,7 @@ public class JabRefFrameViewModel {
         Set<String> keysToSelect = new HashSet<>(entryKeys);
         LibraryTab firstFoundTab = null;
         for (LibraryTab libraryTab : sortedTabs) {
-            List<BibEntry> entrysToSelectInCurrentTab = new ArrayList<>(keysToSelect.size());
+            List<BibEntry> entriesToSelectInCurrentTab = new ArrayList<>(keysToSelect.size());
             for (BibEntry entry : libraryTab.getDatabase()
                                             .getEntries()) {
                 Optional<String> citationKeyOptional = entry.getCitationKey();
@@ -568,9 +568,9 @@ public class JabRefFrameViewModel {
                 }
                 LOGGER.debug("Found entry {} in library tab {}", citationKey, libraryTab);
                 keysToSelect.remove(citationKey);
-                entrysToSelectInCurrentTab.add(entry);
+                entriesToSelectInCurrentTab.add(entry);
             }
-            libraryTab.clearAndSelect(entrysToSelectInCurrentTab);
+            libraryTab.clearAndSelect(entriesToSelectInCurrentTab);
         }
         LOGGER.trace("End of loop");
         if (firstFoundTab != null) {

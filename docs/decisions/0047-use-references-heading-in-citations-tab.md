@@ -17,7 +17,7 @@ Before July 2025, JabRef used "cites" and "cited by" as headings, but these were
 
 There is only one form of citation. Citation is always "backward", so there is nothing wrong with cites and cited by, except that sometimes you need a noun to refer to things that are cited or cited by, and there is only one word for that.
 It's "citations".
-That's a problem when you want to distinguishe between citations that mean cites and citations that mean cited by. Hence the use of forward and backward.
+That's a problem when you want to distinguish between citations that mean cites and citations that mean cited by. Hence the use of forward and backward.
 
 How to name the headings of these two areas?
 

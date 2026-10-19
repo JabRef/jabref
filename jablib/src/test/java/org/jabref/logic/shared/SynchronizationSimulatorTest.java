@@ -148,6 +148,27 @@ class SynchronizationSimulatorTest {
 
     // [utest->req~shared-database.live-propagation~1]
     @Test
+    void simulateLiveGroupTreeDeletionPropagation() throws Exception {
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+
+        clientContextA.getMetaData().clearGroups();
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isEmpty());
+        assertEquals(Optional.empty(), clientContextB.getMetaData().getGroups());
+
+        clientContextB.getMetaData().setMode(BibDatabaseMode.BIBLATEX);
+        waitUntil(() -> Optional.of(BibDatabaseMode.BIBLATEX).equals(clientContextA.getMetaData().getMode()));
+        assertEquals(Optional.empty(), clientContextA.getMetaData().getGroups());
+        assertEquals(Optional.empty(), clientContextB.getMetaData().getGroups());
+    }
+
+    // [utest->req~shared-database.live-propagation~1]
+    @Test
     void simulateLiveSubgroupAdditionPropagation() throws Exception {
         // A root without children is not serialized at all, so the initial tree needs one group
         GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));

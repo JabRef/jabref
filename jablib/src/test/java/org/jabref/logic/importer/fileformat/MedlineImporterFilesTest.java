@@ -52,7 +52,7 @@ class MedlineImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("malformedFileNames")
-    void importMalfomedFiles(String fileName) throws IOException {
+    void importMalformedFiles(String fileName) throws IOException {
         ImporterTestEngine.testImportMalformedFiles(new MedlineImporter(), fileName);
     }
 }

@@ -536,7 +536,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Type `title = covid OR title = pandemic`"))
                         .content(new TextBlock(Localization.lang("This query finds paper with title containing either COVID or pandemics in general.")),
-                                new InfoBlock(Localization.lang("`OR` can be satisified with either of the conditions being true.")))
+                                new InfoBlock(Localization.lang("`OR` can be satisfied with either of the conditions being true.")))
                         .resolver(searchFieldResolver)
                         .trigger(Trigger.onTextMatchesRegex("(?i)title\\s*=\\s*covid\\s+OR\\s+title\\s*=\\s*pandemic|title\\s*=\\s*pandemic\\s+OR\\s+title\\s*=\\s*covid"))
                         .position(TooltipPosition.BOTTOM)

@@ -64,7 +64,7 @@ class NumericFieldComparatorTest {
     }
 
     @Test
-    void compareNumericSignalWithoutNumberWithLenghtBiggerThanOne() {
+    void compareNumericSignalWithoutNumberWithLengthBiggerThanOne() {
         assertEquals(2, comparator.compare("- ", "+ "));
     }
 

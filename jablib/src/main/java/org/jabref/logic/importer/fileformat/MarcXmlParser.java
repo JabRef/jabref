@@ -26,6 +26,7 @@ import org.jabref.model.entry.Date;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.slf4j.Logger;
@@ -36,19 +37,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-/// A parser for the bavarian flavour (Bibliotheksverbund Bayern) of the marc xml standard
+/// A parser for the MARC21-XML standard, used by DNB and BVB
 ///
 /// See [Feldbeschreibung der Titeldaten bei der Deutschen Nationalbibliothek](https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html)
 ///
-/// For further information see
+/// For further information see:
 ///
-///   - https://www.bib-bvb.de/web/kkb-online/rda-felderverzeichnis-des-b3kat-aseq
-///   - https://www.loc.gov/marc/bibliographic/ for detailed documentation
-///   - for modifications in B3Kat https://www.bib-bvb.de/documents/10792/9f51a033-5ca1-42e2-b2d3-a75e7f1512d4
-///   - https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html
-///   - https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/AGV/marc21VereinbarungDatentauschTeil1.pdf?__blob=publicationFile&v=2
-///   - about multiple books in a series https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/marc21FormatumstiegAbbildungBegrenzterWerke2008.pdf?__blob=publicationFile&v=2>
-///
+/// - https://www.bib-bvb.de/web/kkb-online/rda-felderverzeichnis-des-b3kat-aseq
+/// - https://www.loc.gov/marc/bibliographic/ for detailed documentation
+/// - for modifications in B3Kat https://www.bib-bvb.de/documents/10792/9f51a033-5ca1-42e2-b2d3-a75e7f1512d4
+/// - https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html
+/// - https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/AGV/marc21VereinbarungDatentauschTeil1.pdf?__blob=publicationFile&v=2
+/// - about multiple books in a series https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/marc21FormatumstiegAbbildungBegrenzterWerke2008.pdf?__blob=publicationFile&v=2>
+// [impl->req~import.marc21-xml~1]
 public class MarcXmlParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MarcXmlParser.class);
     private static final String DISALLOW_DOCTYPE_DECLARATION = "http://apache.org/xml/features/disallow-doctype-decl";
@@ -102,12 +103,18 @@ public class MarcXmlParser implements Parser {
         BibEntry bibEntry = new BibEntry(BibEntry.DEFAULT_TYPE);
 
         List<Element> datafields = getChildren("datafield", element);
+        Optional<Character> hostItemBibliographicLevel = getHostItemBibliographicLevel(datafields);
+
         for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
             LOGGER.debug("tag: {}", tag);
 
             if ("020".equals(tag)) {
                 putIsbn(bibEntry, datafield);
+            } else if ("022".equals(tag)) {
+                putIssn(bibEntry, datafield);
+            } else if ("024".equals(tag)) {
+                putOtherStandardIdentifier(bibEntry, datafield);
             } else if ("100".equals(tag) || "700".equals(tag) || "710".equals(tag)) {
                 putPersonalName(bibEntry, datafield); // Author, Editor, Publisher
             } else if ("111".equals(tag)) {
@@ -130,7 +137,7 @@ public class MarcXmlParser implements Parser {
             } else if ("653".equals(tag)) {
                 putKeywords(bibEntry, datafield);
             } else if ("773".equals(tag)) {
-                putIssue(bibEntry, datafield);
+                putHostItem(bibEntry, datafield, hostItemBibliographicLevel);
             } else if ("856".equals(tag)) {
                 putElectronicLocation(bibEntry, datafield);
             } else if ("966".equals(tag)) {
@@ -153,20 +160,32 @@ public class MarcXmlParser implements Parser {
             return;
         }
 
-        int length = isbn.length();
-        if (length != 10 && length != 13) {
-            LOGGER.debug("Malformed ISBN received, length: {}", length);
+        Optional<ISBN> parsedIsbn = ISBN.parse(isbn);
+        if (parsedIsbn.isEmpty()) {
+            LOGGER.debug("Malformed ISBN received: {}", isbn);
             return;
         }
 
-        Optional<String> field = bibEntry.getField(StandardField.ISBN);
-        if (field.isPresent()) {
-            // Only overwrite the field, if it's ISBN13
-            if (field.get().length() == 13) {
-                bibEntry.setField(StandardField.ISBN, isbn);
-            }
-        } else {
-            bibEntry.setField(StandardField.ISBN, isbn);
+        ISBN validIsbn = parsedIsbn.get();
+        Optional<ISBN> existingIsbn = bibEntry.getField(StandardField.ISBN).flatMap(ISBN::parse);
+        if (existingIsbn.isEmpty() || (validIsbn.isIsbn13() && existingIsbn.get().isIsbn10())) {
+            bibEntry.setField(StandardField.ISBN, validIsbn.asString());
+        }
+    }
+
+    private void putIssn(BibEntry bibEntry, Element datafield) {
+        String issn = getSubfield("a", datafield);
+        if (StringUtil.isNotBlank(issn)) {
+            bibEntry.setField(StandardField.ISSN, issn);
+        }
+    }
+
+    private void putOtherStandardIdentifier(BibEntry bibEntry, Element datafield) {
+        String identifier = getSubfield("a", datafield);
+        String source = getSubfield("2", datafield);
+
+        if (StringUtil.isNotBlank(identifier) && "doi".equalsIgnoreCase(source)) {
+            bibEntry.setField(StandardField.DOI, identifier);
         }
     }
 
@@ -335,13 +354,10 @@ public class MarcXmlParser implements Parser {
     private void putSummary(BibEntry bibEntry, Element datafield) {
         String summary = getSubfield("a", datafield);
 
-        String ind1 = datafield.getAttribute("ind1");
-        if (StringUtil.isNotBlank(summary) && StringUtil.isNotBlank(ind1) && "3".equals(ind1)) { // Abstract
-            if (bibEntry.getField(StandardField.ABSTRACT).isPresent()) {
-                bibEntry.setField(StandardField.ABSTRACT, bibEntry.getField(StandardField.ABSTRACT).get().concat(summary));
-            } else {
-                bibEntry.setField(StandardField.ABSTRACT, summary);
-            }
+        if (StringUtil.isNotBlank(summary)) {
+            bibEntry.getField(StandardField.ABSTRACT).ifPresentOrElse(
+                    abstractValue -> bibEntry.setField(StandardField.ABSTRACT, abstractValue.concat(summary)),
+                    () -> bibEntry.setField(StandardField.ABSTRACT, summary));
         }
     }
 
@@ -358,8 +374,16 @@ public class MarcXmlParser implements Parser {
         }
     }
 
-    private void putIssue(BibEntry bibEntry, Element datafield) {
-        bibEntry.setType(StandardEntryType.Article);
+    private void putHostItem(BibEntry bibEntry, Element datafield, Optional<Character> hostItemBibliographicLevel) {
+        String hostTitle = getSubfield("t", datafield);
+        if (hostItemBibliographicLevel.filter(level -> level == 's').isPresent()) {
+            bibEntry.setType(StandardEntryType.Article);
+            if (StringUtil.isNotBlank(hostTitle)) {
+                bibEntry.setField(StandardField.JOURNAL, hostTitle);
+            }
+        } else if (hostItemBibliographicLevel.filter(level -> level == 'm').isPresent() && StringUtil.isNotBlank(hostTitle)) {
+            bibEntry.setField(StandardField.BOOKTITLE, hostTitle);
+        }
 
         List<String> issues = getSubfields("g", datafield);
 
@@ -389,6 +413,16 @@ public class MarcXmlParser implements Parser {
         }
     }
 
+    private Optional<Character> getHostItemBibliographicLevel(List<Element> datafields) {
+        return datafields.stream()
+                         .filter(datafield -> "773".equals(datafield.getAttribute("tag")))
+                         .map(datafield -> getSubfield("7", datafield))
+                         .filter(StringUtil::isNotBlank)
+                         .filter(controlSubfield -> controlSubfield.length() > 3)
+                         .map(controlSubfield -> controlSubfield.charAt(3))
+                         .findFirst();
+    }
+
     private void putDoi(BibEntry bibEntry, Element datafield) {
         String ind1 = datafield.getAttribute("ind1");
         String resource = getSubfield("u", datafield);
@@ -400,13 +434,10 @@ public class MarcXmlParser implements Parser {
     }
 
     private void putElectronicLocation(BibEntry bibEntry, Element datafield) {
-        // 856 - fulltext pdf url
-        String ind1 = datafield.getAttribute("ind1");
-        String ind2 = datafield.getAttribute("ind2");
+        String fulltext = getSubfield("3", datafield);
+        String resource = getSubfield("u", datafield);
 
-        if ("4".equals(ind1) && "0".equals(ind2)) {
-            String fulltext = getSubfield("3", datafield);
-            String resource = getSubfield("u", datafield);
+        if ("Volltext".equals(fulltext) && StringUtil.isNotBlank(resource)) {
             handleVolltext(bibEntry, fulltext, resource, StandardField.URL);
         }
     }

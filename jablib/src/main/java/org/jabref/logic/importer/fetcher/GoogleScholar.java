@@ -130,7 +130,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
 
         if (needsCaptcha(content)) {
             // TODO: Remove "null"
-            throw new FetcherException(queryURL, "Fetching from Google Scholar failed: Captacha hit." +
+            throw new FetcherException(queryURL, "Fetching from Google Scholar failed: Captcha hit." +
                     Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), null);
         }
 
@@ -204,7 +204,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
             }
         } catch (IOException e) {
             LOGGER.info("IOException for URL {}", uriBuilder);
-            // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
+            // if there are too much requests from the same IP address google is answering with a 503 and redirecting to a captcha challenge
             // The caught IOException looks for example like this:
             // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
             if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
