@@ -78,9 +78,9 @@ public class AiChatView extends StackPane {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
 
-    private AiChatViewModel viewModel;
-
     private final AiChatFindViewModel findViewModel = new AiChatFindViewModel();
+
+    private AiChatViewModel viewModel;
     private boolean findRefreshPending;
     private Optional<Node> focusBeforeFind = Optional.empty();
 
@@ -110,7 +110,7 @@ public class AiChatView extends StackPane {
     }
 
     /// Ctrl+F inside the chat searches the chat messages instead of the library, see [org.jabref.gui.frame.JabRefFrame].
-    // [impl->feat~ai.chat.find~2]
+    // [impl->req~ai.chat.find.open~1, req~ai.chat.find.close~1, req~ai.chat.find.navigation~1]
     private void setupFind() {
         findBar.managedProperty().bind(findBar.visibleProperty());
         findBar.visibleProperty().bind(findViewModel.visibleProperty());
@@ -152,19 +152,24 @@ public class AiChatView extends StackPane {
 
         findViewModel.queryProperty().addListener((_, _, _) -> updateFind(true));
         findViewModel.visibleProperty().addListener((_, _, _) -> updateFind(false));
-        // New or deleted messages are rendered after the list change, thus search them afterwards
-        viewModel.chatHistoryProperty().addListener((ListChangeListener<ChatMessage>) _ -> {
-            if (!findRefreshPending) {
-                findRefreshPending = true;
-                Platform.runLater(() -> {
-                    findRefreshPending = false;
-                    updateFind(false);
-                });
-            }
+        viewModel.chatHistoryProperty().addListener((ListChangeListener<ChatMessage>) _ -> scheduleFindRefresh());
+    }
+
+    private void scheduleFindRefresh() {
+        if (findRefreshPending) {
+            return;
+        }
+
+        // Wait for the message renderer's list listener, coalescing changes queued in the same turn.
+        findRefreshPending = true;
+        Platform.runLater(() -> {
+            findRefreshPending = false;
+            updateFind(false);
         });
     }
 
     /// Highlights all occurrences of the find query in the rendered messages and scrolls to the current one.
+    // [impl->req~ai.chat.find.matches~1]
     private void updateFind(boolean scrollToCurrent) {
         String query = findViewModel.getActiveQuery();
         int current = findViewModel.getCurrent();
@@ -204,6 +209,7 @@ public class AiChatView extends StackPane {
         updateFind(true);
     }
 
+    // [impl->req~ai.chat.find.restore-focus~1]
     @FXML
     private void closeFind() {
         findViewModel.visibleProperty().set(false);

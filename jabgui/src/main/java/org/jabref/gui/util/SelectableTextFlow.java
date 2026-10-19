@@ -87,11 +87,16 @@ public class SelectableTextFlow extends TextFlow {
 
     /// Highlights all case-insensitive occurrences of `query`; the `current`-th one is emphasized (none if out of range).
     ///
+    /// Search text and JavaFX layout use different indices: a hyperlink label contributes all its characters to the
+    /// search, but its node occupies only one layout position. We concatenate adjacent text and link labels so a match
+    /// can span formatting boundaries, recording the layout position of each searchable character in `layoutIndices`.
+    /// At other nodes, we search the accumulated text before descending into embedded flows (such as table cells),
+    /// preserving reading order. Each match is mapped back to a layout range and drawn as a path in the parent pane,
+    /// behind the text. The bounds listener redraws these paths when the text moves or wraps.
+    ///
     /// @return the number of occurrences
     public int highlightOccurrences(String query, int current) {
-        parentPane.getChildren().removeAll(occurrencePaths);
-        occurrencePaths.clear();
-        currentOccurrencePath = null;
+        clearOccurrenceHighlights();
         if (!query.equals(occurrenceQuery)) {
             occurrencePattern = Pattern.compile(Pattern.quote(query), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
         }
@@ -103,31 +108,52 @@ public class SelectableTextFlow extends TextFlow {
                          .forEach(flow -> flow.highlightOccurrences("", -1));
             return 0;
         }
+
+        int total = highlightChildren(query, current);
+        parentPane.getChildren().addAll(occurrencePaths);
+        return total;
+    }
+
+    private void clearOccurrenceHighlights() {
+        parentPane.getChildren().removeAll(occurrencePaths);
+        occurrencePaths.clear();
+        currentOccurrencePath = null;
+    }
+
+    private int highlightChildren(String query, int current) {
         StringBuilder content = new StringBuilder();
         List<Integer> layoutIndices = new ArrayList<>();
         int layoutIndex = 0;
         int total = 0;
         for (Node child : getChildren()) {
             if (child instanceof Text || child instanceof Hyperlink) {
-                String text = child instanceof Text textNode ? textNode.getText() : ((Hyperlink) child).getText();
-                content.append(text);
-                for (int index = 0; index < text.length(); index++) {
-                    // A link has many searchable characters but occupies one TextFlow layout index.
-                    layoutIndices.add(layoutIndex + (child instanceof Text ? index : 0));
-                }
-                layoutIndex += child instanceof Text ? text.length() : 1;
+                layoutIndex += appendSearchableText(child, content, layoutIndices, layoutIndex);
             } else {
                 total += highlightText(content, layoutIndices, current - total);
                 content.setLength(0);
                 layoutIndices.clear();
-                for (SelectableTextFlow embedded : embeddedTextFlows(child).toList()) {
-                    total += embedded.highlightOccurrences(query, current - total);
-                }
+                total += highlightEmbeddedFlows(child, query, current - total);
                 layoutIndex++;
             }
         }
-        total += highlightText(content, layoutIndices, current - total);
-        parentPane.getChildren().addAll(occurrencePaths);
+        return total + highlightText(content, layoutIndices, current - total);
+    }
+
+    /// Appends searchable characters and returns the number of layout positions occupied by the node.
+    private static int appendSearchableText(Node child, StringBuilder content, List<Integer> layoutIndices, int layoutIndex) {
+        String text = child instanceof Text textNode ? textNode.getText() : ((Hyperlink) child).getText();
+        content.append(text);
+        for (int index = 0; index < text.length(); index++) {
+            layoutIndices.add(layoutIndex + (child instanceof Text ? index : 0));
+        }
+        return child instanceof Text ? text.length() : 1;
+    }
+
+    private static int highlightEmbeddedFlows(Node node, String query, int current) {
+        int total = 0;
+        for (SelectableTextFlow embedded : embeddedTextFlows(node).toList()) {
+            total += embedded.highlightOccurrences(query, current - total);
+        }
         return total;
     }
 
@@ -135,19 +161,25 @@ public class SelectableTextFlow extends TextFlow {
         int count = 0;
         Matcher matcher = occurrencePattern.matcher(content);
         while (matcher.find()) {
-            boolean isCurrent = count == current;
-            Path path = createHighlight(layoutIndices.get(matcher.start()), layoutIndices.get(matcher.end() - 1) + 1);
-            path.getStyleClass().add("text-search-highlight");
-            path.setViewOrder(2);
-            path.setMouseTransparent(true);
-            if (isCurrent) {
-                path.getStyleClass().add("current");
-                currentOccurrencePath = path;
-            }
-            occurrencePaths.add(path);
+            addOccurrenceHighlight(layoutIndices.get(matcher.start()), layoutIndices.get(matcher.end() - 1) + 1, count == current);
             count++;
         }
         return count;
+    }
+
+    private void addOccurrenceHighlight(int start, int end, boolean isCurrent) {
+        Path path = createHighlight(start, end);
+        // [impl->req~ai.chat.find.highlight-theme~1]
+        path.getStyleClass().add("text-search-highlight");
+        // [impl->req~ai.chat.find.highlight-layer~1]
+        path.setViewOrder(2);
+        path.setMouseTransparent(true);
+        if (isCurrent) {
+            // [impl->req~ai.chat.find.current-outline~1]
+            path.getStyleClass().add("current");
+            currentOccurrencePath = path;
+        }
+        occurrencePaths.add(path);
     }
 
     private static Stream<SelectableTextFlow> embeddedTextFlows(Node node) {

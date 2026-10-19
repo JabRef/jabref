@@ -369,6 +369,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         event.consume();
                         break;
                     case SEARCH:
+                        // [impl->req~ai.chat.find.unavailable~1]
                         // The AI chat has its own find bar
                         if (!isInSearchableAiChat(event.getTarget())) {
                             globalSearchBar.requestFocus();

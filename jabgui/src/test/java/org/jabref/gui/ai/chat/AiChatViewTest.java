@@ -56,7 +56,6 @@ import static org.mockito.Mockito.when;
 @NullMarked
 @Disabled("JavaFX HeadlessApplication does not implement character-key lookup required by KeyBindingRepository")
 @ResourceLock("Localization.lang")
-// [utest->feat~ai.chat.find~2]
 class AiChatViewTest extends JavaFxTest {
     private AiChatView view;
     private KeyBindingRepository keyBindings;
@@ -102,6 +101,7 @@ class AiChatViewTest extends JavaFxTest {
         Event.fireEvent(composer, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.F, false, !OS.OS_X, false, OS.OS_X));
     }
 
+    // [utest->req~ai.chat.find.close~1]
     @ParameterizedTest
     @ValueSource(strings = {"findField", "findNextButton", "findPreviousButton", "chatHistoryScrollPane", "userMessageTextArea"})
     void escapeClosesFindFromAnywhereInChat(String focusTarget) {
@@ -114,6 +114,7 @@ class AiChatViewTest extends JavaFxTest {
         });
     }
 
+    // [utest->req~ai.chat.find.restore-focus~1]
     @Test
     void closingFindRestoresComposerAfterRepeatedSearchShortcut() {
         interact(() -> {
@@ -124,6 +125,7 @@ class AiChatViewTest extends JavaFxTest {
         });
     }
 
+    // [utest->req~ai.chat.find.open~1, req~ai.chat.find.close~1]
     @Test
     void findUsesConfiguredSearchAndCloseBindings() {
         interact(() -> {
@@ -138,6 +140,7 @@ class AiChatViewTest extends JavaFxTest {
         });
     }
 
+    // [utest->req~ai.chat.find.unavailable~1]
     @Test
     void unavailableChatLeavesSearchShortcutForGlobalHandler() {
         interact(() -> {
@@ -151,6 +154,7 @@ class AiChatViewTest extends JavaFxTest {
         });
     }
 
+    // [utest->req~ai.chat.find.open~1]
     @Test
     void searchShortcutFocusesAndSelectsExistingQuery() {
         interact(() -> {
@@ -164,6 +168,7 @@ class AiChatViewTest extends JavaFxTest {
         });
     }
 
+    // [utest->req~ai.chat.find.navigation~1]
     @Test
     void enterAndShiftEnterNavigateMatchesWithoutInvokingGlobalSearch() {
         interact(() -> view.chatHistoryProperty().add(ChatMessage.aiMessage("Chocolate, chocolate, chocolate", List.of())));

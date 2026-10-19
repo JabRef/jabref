@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-// [utest->feat~ai.chat.find~2]
 class AiChatFindViewModelTest {
 
     private AiChatFindViewModel viewModel;
@@ -24,6 +23,7 @@ class AiChatFindViewModelTest {
         assertEquals("1/3", viewModel.resultTextProperty().get());
     }
 
+    // [utest->req~ai.chat.find.navigation~1]
     @Test
     void nextWrapsAround() {
         viewModel.next();
@@ -32,10 +32,11 @@ class AiChatFindViewModelTest {
         assertEquals(0, viewModel.getCurrent());
     }
 
+    // [utest->req~ai.chat.find.navigation~1]
     @Test
     void previousWrapsAround() {
         viewModel.previous();
-        assertEquals("3/3", viewModel.resultTextProperty().get());
+        assertEquals(2, viewModel.getCurrent());
     }
 
     @Test
