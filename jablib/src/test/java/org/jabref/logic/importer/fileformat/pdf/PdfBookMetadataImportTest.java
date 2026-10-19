@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.util.IsbnExtractor;
 import org.jabref.logic.util.PdfUtils;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -112,9 +111,9 @@ public class PdfBookMetadataImportTest {
             assertEquals(Optional.of(PdfUtils.getPageContents(document, expectedPage)), bibliographicPage,
                     "The selected text must belong to the fixture's known physical imprint page");
 
-            List<String> actualIsbns = new IsbnExtractor().extract(bibliographicPage.orElseThrow()).stream()
-                                                          .map(ISBN::asString)
-                                                          .toList();
+            List<String> actualIsbns = ISBN.findAllInText(bibliographicPage.orElseThrow()).stream()
+                                           .map(ISBN::asString)
+                                           .toList();
             assertEquals(expectedIsbns, actualIsbns);
         }
     }
