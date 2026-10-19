@@ -294,9 +294,10 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         return GitCommitMessageGenerator.generate(diffDatabases.headDatabase(), diffDatabases.workingTreeDatabase());
     }
 
-    /// This keep the user's message before the automatic
-    /// generating commit message process completes,
-    /// so their text is never overwritten
+    /// Set the generated git commit messages
+    /// only if the user haven't typed their own text
+    /// so their text is never overwritten if they typed before generation,
+    /// and they can still edit that message
     private void setCommitMessageIfBlank(String message) {
         if (StringUtil.isBlank(commitMessage.get())) {
             commitMessage.set(message);
