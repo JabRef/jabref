@@ -67,7 +67,7 @@ class PdfAuthorCrossCheck {
     /// pages. Bibliographic metadata and authors without extractable page text are preserved.
     ///
     /// [impl->req~import.pdf.author-confirmed-by-text~1]
-    static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, Set<BibEntry> citedWorks, @Nullable String leadingPagesText) {
+    static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, @Nullable String leadingPagesText) {
         if (StringUtil.isBlank(leadingPagesText)) {
             return;
         }
@@ -77,7 +77,7 @@ class PdfAuthorCrossCheck {
             return;
         }
         entry.getField(StandardField.AUTHOR)
-             .ifPresent(mergedAuthor -> crossCheckMergedAuthor(entry, mergedAuthor, candidates, citedWorks, documentWords));
+             .ifPresent(mergedAuthor -> crossCheckMergedAuthor(entry, mergedAuthor, candidates, documentWords));
     }
 
     /// Preserves authors backed by bibliographic metadata or confirmed in the PDF text. Otherwise, selects
@@ -85,7 +85,7 @@ class PdfAuthorCrossCheck {
     /// The first author-bearing candidate identifies the merged author's source because merging keeps its value.
     // [impl->adr~conservative-pdf-author-evidence~1]
     private static void crossCheckMergedAuthor(BibEntry entry, String mergedAuthor, List<BibEntry> candidates,
-                                               Set<BibEntry> citedWorks, DocumentWords documentWords) {
+                                               DocumentWords documentWords) {
         if (isAuthorConfirmedByText(mergedAuthor, documentWords)) {
             return;
         }
@@ -99,10 +99,8 @@ class PdfAuthorCrossCheck {
             }
             if (!sourceFound) {
                 sourceFound = true;
-                // The first author-bearing candidate supplied the merged author. Identity distinguishes a
-                // reference-list entry from another candidate with identical fields.
-                if (!citedWorks.contains(candidate)
-                        && (candidate.getCitationKey().isPresent() || isKnownNonDefaultType(candidate.getType()))) {
+                // The first author-bearing candidate supplied the merged author
+                if (candidate.getCitationKey().isPresent() || isKnownNonDefaultType(candidate.getType())) {
                     return;
                 }
             }

@@ -1,5 +1,5 @@
 ---
-nav_order: 76
+nav_order: 75
 parent: Decision Records
 status: proposed
 date: 2026-10-10
@@ -32,7 +32,6 @@ The plausibility check uses capitalization for scripts with case and allows comm
 
 ## More Information
 
-* [ADR 75](0075-track-reference-list-provenance-in-pdf-metadata-merge.md) explains why cited works do not confer trust on their authors.
 * [PR 16247](https://github.com/JabRef/jabref/pull/16247) introduced the author cross-check.
 
 <!-- markdownlint-disable-file MD022 -->

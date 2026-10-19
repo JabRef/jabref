@@ -13,5 +13,4 @@ General information about architectural decision records is available at <https:
 
 ## PDF import decisions
 
-* [Track reference-list provenance in PDF metadata merging](0075-track-reference-list-provenance-in-pdf-metadata-merge.md)
-* [Use conservative text evidence for PDF authors](0076-use-conservative-text-evidence-for-pdf-authors.md)
+* [Use conservative text evidence for PDF authors](0075-use-conservative-text-evidence-for-pdf-authors.md)
