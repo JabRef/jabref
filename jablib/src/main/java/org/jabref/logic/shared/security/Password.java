@@ -17,7 +17,6 @@ import javax.crypto.spec.SecretKeySpec;
 public class Password {
 
     private final byte[] phrase;
-    private final Cipher cipher;
     private final SecretKeySpec secretKey;
     private final IvParameterSpec ivSpec;
 
@@ -29,7 +28,6 @@ public class Password {
 
     public Password(String phrase, String key) throws NoSuchAlgorithmException, NoSuchPaddingException {
         this.phrase = phrase.getBytes();
-        this.cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         this.secretKey = new SecretKeySpec(get128BitHash(key.getBytes()), "AES");
         this.ivSpec = new IvParameterSpec("ThisIsA128BitKey".getBytes());
     }
@@ -38,6 +36,7 @@ public class Password {
     ///
     /// @return Encrypted phrase/password
     public String encrypt() throws GeneralSecurityException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
         return new String(Base64.getEncoder().encode(cipher.doFinal(phrase)), StandardCharsets.UTF_8);
     }
@@ -46,6 +45,7 @@ public class Password {
     ///
     /// @return Decrypted phrase/password
     public String decrypt() throws GeneralSecurityException, UnsupportedEncodingException {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);
         return new String(cipher.doFinal(Base64.getDecoder().decode(phrase)), StandardCharsets.UTF_8);
     }
