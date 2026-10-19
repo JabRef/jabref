@@ -65,6 +65,14 @@ public class BibliographyConsistencyCheck {
                      .collect(Collectors.toSet());
     }
 
+    /// Returns whether none of the given (alternative) required fields is set in the entry.
+    ///
+    /// Aliases are taken into account. For instance, `year` satisfies a required `date`.
+    static boolean isMissing(OrFields requiredFields, BibEntry entry) {
+        return requiredFields.getFields().stream()
+                             .allMatch(field -> entry.getFieldOrAlias(field).isEmpty());
+    }
+
     /// Filters the given entries to those that violate consistency:
     ///
     /// - Fields not set (but set in other entries of the same type)
@@ -78,7 +86,7 @@ public class BibliographyConsistencyCheck {
                           // This removes entries that have all differing fields set (could be confusing to the user)
                           boolean hasDifferingFields = !Collections.disjoint(filterExcludedFields(entry.getFields()), differingFields);
                           boolean hasMissingRequiredFields = requiredFields.stream()
-                                                                           .anyMatch(orFields -> Collections.disjoint(orFields.getFields(), entry.getFields()));
+                                                                           .anyMatch(orFields -> isMissing(orFields, entry));
                           return hasDifferingFields || hasMissingRequiredFields;
                       })
                       .sorted(new FieldComparatorStack<>(List.of(
