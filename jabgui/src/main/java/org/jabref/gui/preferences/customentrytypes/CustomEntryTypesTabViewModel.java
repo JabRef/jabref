@@ -181,13 +181,13 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     private BibEntryType entryTypeWithoutMultiline(BibEntryType entryType) {
         List<BibField> fields = entryType.getAllBibFields().stream()
-                                        .map(field -> new BibField(fieldWithoutMultiline(field.field()), field.priority()))
-                                        .toList();
+                                         .map(field -> new BibField(fieldWithoutMultiline(field.field()), field.priority()))
+                                         .toList();
         List<OrFields> requiredFields = entryType.getRequiredFields().stream()
-                                                .map(fieldsToChooseFrom -> new OrFields(fieldsToChooseFrom.getFields().stream()
-                                                                                                         .map(this::fieldWithoutMultiline)
-                                                                                                         .toList()))
-                                                .toList();
+                                                 .map(fieldsToChooseFrom -> new OrFields(fieldsToChooseFrom.getFields().stream()
+                                                                                                           .map(this::fieldWithoutMultiline)
+                                                                                                           .toList()))
+                                                 .toList();
         return new BibEntryType(entryType.getType(), fields, requiredFields);
     }
 
