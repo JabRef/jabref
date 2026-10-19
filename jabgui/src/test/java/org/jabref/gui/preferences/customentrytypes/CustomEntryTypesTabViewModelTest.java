@@ -1,12 +1,14 @@
 package org.jabref.gui.preferences.customentrytypes;
 
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -21,8 +23,11 @@ import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ResourceLock("Localization.lang")
 class CustomEntryTypesTabViewModelTest {
 
     private BibEntryType online;
@@ -107,6 +113,68 @@ class CustomEntryTypesTabViewModelTest {
         model.storeSettings();
 
         assertEquals(List.of(), model.getRestartWarnings());
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            BIBTEX, REQUIRED
+            BIBTEX, OPTIONAL
+            BIBLATEX, REQUIRED
+            BIBLATEX, OPTIONAL
+            """)
+    void unchangedSaveWithCustomMultilineFieldHasNoRestartWarning(BibDatabaseMode mode, FieldViewModel.Mandatory mandatory) {
+        UnknownField field = new UnknownField("mycustomfield", FieldProperty.DATE);
+        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), List.of(field));
+        when(preferences.getFieldPreferences()).thenReturn(realFieldPreferences);
+        BibEntryTypeBuilder builder = new BibEntryTypeBuilder().withType(new UnknownEntryType("mytype"));
+        if (mandatory == FieldViewModel.Mandatory.REQUIRED) {
+            builder.withRequiredFields(field);
+        } else {
+            builder.withImportantFields(field);
+        }
+        entryTypesManager.update(builder.build(), mode);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(mode, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.storeSettings();
+
+        assertEquals(List.of(), model.getRestartWarnings());
+    }
+
+    @Test
+    void saveKeepsCustomMultilineFieldProperties() {
+        UnknownField field = new UnknownField("mycustomfield", FieldProperty.DATE, FieldProperty.MULTILINE_TEXT);
+        entryTypesManager.update(new BibEntryTypeBuilder().withType(new UnknownEntryType("mytype")).withRequiredFields(field).build(), BibDatabaseMode.BIBLATEX);
+        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), List.of());
+        when(preferences.getFieldPreferences()).thenReturn(realFieldPreferences);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.storeSettings();
+
+        assertEquals(Set.of(FieldProperty.DATE, FieldProperty.MULTILINE_TEXT), field.getProperties());
+        assertEquals(List.of(field), realFieldPreferences.getNonWrappableFields().stream().filter(field::equals).toList());
+        assertEquals(List.of(), model.getRestartWarnings());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void changedCustomMultilineFieldHasRestartWarning(boolean initiallyMultiline) {
+        UnknownField field = new UnknownField("mycustomfield", FieldProperty.DATE);
+        entryTypesManager.update(new BibEntryTypeBuilder().withType(new UnknownEntryType("mytype")).withRequiredFields(field).build(), BibDatabaseMode.BIBLATEX);
+        FieldPreferences realFieldPreferences = new FieldPreferences(true, List.of(), initiallyMultiline ? List.of(field) : List.of());
+        when(preferences.getFieldPreferences()).thenReturn(realFieldPreferences);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
+        model.setValues();
+
+        model.entryTypes().stream()
+             .filter(type -> "mytype".equals(type.entryType().getValue().getType().getName()))
+             .findFirst().orElseThrow()
+             .fields().getFirst()
+             .multilineProperty().set(!initiallyMultiline);
+        model.storeSettings();
+
+        assertEquals(List.of(Localization.lang("Entry types changed.")), model.getRestartWarnings());
     }
 
     @Test

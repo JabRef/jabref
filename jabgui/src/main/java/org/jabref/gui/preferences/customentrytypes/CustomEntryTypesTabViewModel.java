@@ -35,6 +35,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
@@ -173,8 +174,31 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     private Set<String> entryTypeDefinitions() {
         return entryTypesManager.getAllTypes(bibDatabaseMode).stream()
+                                .map(this::entryTypeWithoutMultiline)
                                 .map(MetaDataSerializer::serializeCustomEntryTypesV2)
                                 .collect(Collectors.toSet());
+    }
+
+    private BibEntryType entryTypeWithoutMultiline(BibEntryType entryType) {
+        List<BibField> fields = entryType.getAllBibFields().stream()
+                                        .map(field -> new BibField(fieldWithoutMultiline(field.field()), field.priority()))
+                                        .toList();
+        List<OrFields> requiredFields = entryType.getRequiredFields().stream()
+                                                .map(fieldsToChooseFrom -> new OrFields(fieldsToChooseFrom.getFields().stream()
+                                                                                                         .map(this::fieldWithoutMultiline)
+                                                                                                         .toList()))
+                                                .toList();
+        return new BibEntryType(entryType.getType(), fields, requiredFields);
+    }
+
+    private Field fieldWithoutMultiline(Field field) {
+        if (!(field instanceof UnknownField)) {
+            return field;
+        }
+        UnknownField copy = new UnknownField(field.getName());
+        copy.getProperties().addAll(field.getProperties());
+        copy.getProperties().remove(FieldProperty.MULTILINE_TEXT);
+        return copy;
     }
 
     /// Multiline fields not belonging to any entry type are left out: this tab does not show them.
