@@ -22,7 +22,7 @@ PDF document properties can name the account that exported a file rather than th
 
 ## Decision Outcome
 
-Proposed option: require a plausible name list and a family-name match. A confirmed merged author is kept; otherwise the candidate with the most confirmed family names wins. A lone unconfirmed author is removed if no candidate matches. Bibliographic metadata and PDFs without extractable text retain their author value.
+Chosen option: "Require a plausible name list and a family-name match in the leading-page text", because a byline confirms a name without requiring layout detection. A confirmed merged author is kept; otherwise the candidate with the most confirmed family names wins. A lone unconfirmed author is removed if no candidate matches. Bibliographic metadata and PDFs without extractable text retain their author value.
 
 The plausibility check uses capitalization for scripts with case and allows common lowercase name particles. Scripts without case, including Arabic and CJK, do not need entries in that particle list. This remains a heuristic: legitimate lowercase names and organization names can be rejected, while a name occurring outside a byline can produce a false match.
 
