@@ -51,7 +51,7 @@ public class PdfContentImporter extends PdfImporter {
 
     // Matches four-digit years separated from words and numbers, excluding ranges such as "1999-2005".
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("(?<![\\p{L}\\d])(?<!\\d{4}\\h{0,5}[-–—]\\h{0,5})\\d{4}(?![\\p{L}\\d])(?!\\h*[-–—]\\h*\\d{4}(?!\\d))");
-    private static final int MINIMUM_PLAUSIBLE_YEAR = 1900;
+    private static final int MINIMUM_PLAUSIBLE_YEAR = 1500;
     private static final Pattern FOUR_DIGITS = Pattern.compile("\\d{4}");
 
     private static final int ARXIV_PREFIX_LENGTH = "arxiv:".length();
