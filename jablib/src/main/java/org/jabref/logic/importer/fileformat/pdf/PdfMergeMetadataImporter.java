@@ -23,6 +23,7 @@ import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.PdfUtils;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -99,12 +100,22 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
         List<BibEntry> allCandidates = new ArrayList<>(fetchedCandidates);
         allCandidates.addAll(extractedCandidates);
-        BibEntry entry = mergeCandidates(allCandidates, PdfAuthorCrossCheck.extractLeadingPagesText(document));
+        BibEntry entry = mergeCandidates(allCandidates, extractLeadingPagesText(document));
 
         // We use the absolute path here as we do not know the context where this import will be used.
         // The caller is responsible for making the path relative if necessary.
         entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
         return new ParserResult(List.of(entry));
+    }
+
+    /// Text of the first two pages for the author cross-check; empty if the text cannot be extracted
+    private static String extractLeadingPagesText(PDDocument document) {
+        try {
+            return PdfUtils.getLeadingPagesContents(document, 2);
+        } catch (IOException e) {
+            LOGGER.debug("Could not extract text for the author plausibility check", e);
+            return "";
+        }
     }
 
     private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document) {

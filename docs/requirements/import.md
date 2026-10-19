@@ -58,9 +58,7 @@ Needs: impl, utest
 ## PDF import keeps only authors the document prints
 `req~import.pdf.author-confirmed-by-text~1`
 
-When importing a PDF, JabRef checks an author from document properties against the leading pages and favors a confirmed byline.
-If neither is confirmed, JabRef drops a single unconfirmed author from document properties.
-Bibliographic metadata and authors in PDFs without extractable text are preserved.
+When importing a PDF, JabRef keeps an author taken from document properties only if the PDF's leading pages confirm it; otherwise it prefers a confirmed byline or drops the author.
 
 Needs: impl, utest
 

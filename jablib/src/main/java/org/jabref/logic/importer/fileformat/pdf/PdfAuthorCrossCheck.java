@@ -1,17 +1,14 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
-import java.io.IOException;
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.jabref.logic.util.PdfUtils;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -21,19 +18,14 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// The "merged author" is the first author value chosen by [PdfMergeMetadataImporter].
 /// This class looks for its family names on the PDF's leading pages and may replace it with a later candidate
 /// whose family names appear there.
 @NullMarked
 class PdfAuthorCrossCheck {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PdfAuthorCrossCheck.class);
 
     private static final Pattern LEADING_AND_TRAILING_NON_LETTERS = Pattern.compile("^\\P{L}+|\\P{L}+$");
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
@@ -46,21 +38,6 @@ class PdfAuthorCrossCheck {
             "la", "le", "ten", "ter", "af", "av", "y", "e", "bin", "binti", "bint", "ibn", "al", "el");
 
     private PdfAuthorCrossCheck() {
-    }
-
-    /// Extracts text from the PDF's first two pages so [PdfMergeMetadataImporter] can check for family names
-    /// from entries returned by its PDF importers and online fetchers. Returns an empty string on failure.
-    static String extractLeadingPagesText(PDDocument document) {
-        try {
-            StringJoiner pages = new StringJoiner("\n");
-            for (int page = 1; page <= Math.min(2, document.getNumberOfPages()); page++) {
-                pages.add(PdfUtils.getPageContents(document, page));
-            }
-            return pages.toString();
-        } catch (IOException e) {
-            LOGGER.debug("Could not extract text for the author plausibility check", e);
-            return "";
-        }
     }
 
     /// Replaces an unconfirmed creator-style author with the best author list confirmed by the PDF's leading
@@ -157,7 +134,8 @@ class PdfAuthorCrossCheck {
         }
         // Fallback for author values AuthorList cannot split into proper persons (e.g. exotic separator
         // characters from broken XMP decoding). A single common word such as a given name also occurs in
-        // unrelated text, so at least two distinct words of the raw value must occur.
+        // unrelated text, so at least two distinct words of the raw value must occur. Single letters are
+        // initials ("A.", "J.") and are found in any text.
         long confirmedWords = Arrays.stream(NON_LETTERS.split(normalizeForComparison(LatexToUnicodeAdapter.format(authorField))))
                                     .filter(word -> word.length() >= 2 && !NAME_LIST_LOWERCASE_WORDS.contains(word.toLowerCase(Locale.ROOT)))
                                     .distinct()
@@ -174,11 +152,10 @@ class PdfAuthorCrossCheck {
                 .count();
     }
 
-    /// A trailing "et al." parses to [Author#OTHERS]. It is neither a person that could be confirmed (its family
-    /// name "others" is an ordinary word of prose) nor one that makes a creator-only author list look multi-person.
+    /// A trailing "et al." is neither a person that could be confirmed (its family name "others" is an ordinary
+    /// word of prose) nor one that makes a creator-only author list look multi-person.
     private static Stream<Author> namedAuthors(String authorField) {
-        return AuthorList.parse(authorField).getAuthors().stream()
-                         .filter(author -> !Author.OTHERS.equals(author));
+        return AuthorList.parse(authorField).getNamedAuthors().stream();
     }
 
     /// The leading-page text as normalized words separated and enclosed by single spaces, so that a whole-word
@@ -193,18 +170,17 @@ class PdfAuthorCrossCheck {
             return lowerCase.isBlank();
         }
 
-        boolean containsWords(String phrase) {
-            String words = toWordSequence(normalizeForComparison(LatexToUnicodeAdapter.format(phrase)).toLowerCase(Locale.ROOT)).strip();
-            return !words.isBlank() && lowerCase.contains(" " + words + " ");
-        }
-
         /// A capitalized name must occur capitalized or in capitals, so that a family name such as "May" or
-        /// "Young" is not confirmed by the ordinary word in prose.
+        /// "Young" is not confirmed by the ordinary word in prose. A name in a caseless script or in lowercase
+        /// is matched ignoring case.
         boolean containsName(String name) {
             // Metadata may encode accents as LaTeX ("B{\\\"o}hm"), the PDF text prints them ("Böhm")
             String words = toWordSequence(normalizeForComparison(LatexToUnicodeAdapter.format(name))).strip();
-            if (words.isBlank() || !Character.isUpperCase(words.codePointAt(0))) {
-                return containsWords(name);
+            if (words.isBlank()) {
+                return false;
+            }
+            if (!Character.isUpperCase(words.codePointAt(0))) {
+                return lowerCase.contains(" " + words.toLowerCase(Locale.ROOT) + " ");
             }
             int firstLength = Character.charCount(words.codePointAt(0));
             String capitalized = words.substring(0, firstLength) + words.substring(firstLength).toLowerCase(Locale.ROOT);

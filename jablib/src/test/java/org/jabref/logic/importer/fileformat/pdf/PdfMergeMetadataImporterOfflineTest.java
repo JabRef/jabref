@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fileformat.pdf;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,8 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.util.GrobidPreferences;
+import org.jabref.logic.util.PdfUtils;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -65,7 +68,7 @@ class PdfMergeMetadataImporterOfflineTest {
             van der Berg, Anna          | Anna van der Berg, Example University               | van der Berg, Anna
             May, John                   | John Doe wrote what may happen, Example University   |
             Connor, Eve                 | A study by Sean O'Connor, Example University         |
-            O’Connor, Sean              | A study by SEAN O'CONNOR, Example University         | O’Connor, Sean
+            O\u2019Connor, Sean         | A study by SEAN O'CONNOR, Example University         | O\u2019Connor, Sean
             """)
     void singleCreatorCandidateAuthorIsCrossCheckedAgainstText(String author, @Nullable String leadingPagesText, @Nullable String expectedAuthor) {
         BibEntry candidate = new BibEntry().withField(StandardField.AUTHOR, author);
@@ -251,9 +254,26 @@ class PdfMergeMetadataImporterOfflineTest {
 
         try (PDDocument document = Loader.loadPDF(file.toFile())) {
             BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation, content),
-                    PdfAuthorCrossCheck.extractLeadingPagesText(document));
+                    PdfUtils.getLeadingPagesContents(document, 2));
 
             assertEquals(content.getField(StandardField.AUTHOR), merged.getField(StandardField.AUTHOR));
+        }
+    }
+
+    /// arXiv's XMP joins the authors with U+2C20 and a byte order mark instead of " and "; the byline prints the
+    /// family names glued to affiliation markers ("Riccaa,∗"), so only the given names confirm the value
+    @Test
+    void realPdfXmpAuthorWithBrokenSeparatorsIsKept() throws IOException, URISyntaxException {
+        Path file = Path.of(PdfMergeMetadataImporterOfflineTest.class.getResource("/pdfs/test-arxivMetadata.pdf").toURI());
+        XmpPreferences xmpPreferences = mock(XmpPreferences.class, Answers.RETURNS_DEEP_STUBS);
+
+        try (PDDocument document = Loader.loadPDF(file.toFile())) {
+            List<BibEntry> candidates = new ArrayList<>(new PdfXmpImporter(xmpPreferences).importDatabase(file, document).getDatabase().getEntries());
+            candidates.addAll(new PdfContentImporter().importDatabase(file, document).getDatabase().getEntries());
+
+            BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(candidates, PdfUtils.getLeadingPagesContents(document, 2));
+
+            assertEquals(Optional.of("Filippo Ricca\u2C20\uFEFFAlessandro Marchetto\u2C20\uFEFFAndrea Stocco\u2C20"), merged.getField(StandardField.AUTHOR));
         }
     }
 }
