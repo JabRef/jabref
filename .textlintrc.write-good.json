@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "write-good": {
+      "tooWordy": false,
+      "whitelist": [
+        "only"
+      ]
+    }
+  }
+}
