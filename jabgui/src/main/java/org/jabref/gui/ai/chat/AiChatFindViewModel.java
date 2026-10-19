@@ -26,6 +26,7 @@ public class AiChatFindViewModel extends AbstractViewModel {
             visible, query, current, total);
 
     public AiChatFindViewModel() {
+        // Reset counter when the query is changed.
         query.addListener((_, _, _) -> current.set(0));
     }
 
