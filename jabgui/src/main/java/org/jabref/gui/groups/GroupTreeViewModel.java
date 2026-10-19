@@ -544,7 +544,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         aiChatWindow.groupNodeProperty().set(group);
 
         aiChatWindow.getDialogPane().getScene().getWindow().addEventHandler(
-                WindowEvent.WINDOW_CLOSE_REQUEST,
+                WindowEvent.WINDOW_HIDDEN,
                 _ -> stateManager.removeAiChatWindowForGroup(context, groupName)
         );
 
