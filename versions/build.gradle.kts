@@ -91,7 +91,7 @@ dependencies.constraints {
     api("info.picocli:picocli:4.7.7")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
     api("io.github.classgraph:classgraph:6.0.0")
-    api("io.github.java-diff-utils:java-diff-utils:4.17")
+    api("io.github.java-diff-utils:java-diff-utils:4.18")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
     api("io.github.thibaultmeyer:cuid:2.0.5")
