@@ -1,7 +1,6 @@
 package org.jabref.logic.bibtex.comparator;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;

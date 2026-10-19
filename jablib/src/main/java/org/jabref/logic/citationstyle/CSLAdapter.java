@@ -92,12 +92,7 @@ public class CSLAdapter {
     private CSL getCslInstance(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
         if (currentCslInstance == null || !Objects.equals(newStyle, currentStyle)) {
             // lang and forceLang are set to the default values of other CSL constructors
-            currentCslInstance = new CSL(
-                    dataProvider,
-                    new JabRefLocaleProvider(),
-                    new DefaultAbbreviationProvider(),
-                    newStyle,
-                    "en-US");
+            currentCslInstance = new CSL(dataProvider, new JabRefLocaleProvider(), new DefaultAbbreviationProvider(), newStyle, "en-US");
             currentStyle = newStyle;
             currentFormat = null; // To trigger the output format update below.
         }
