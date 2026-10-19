@@ -85,12 +85,12 @@ class TextInputKeyBindingsTest {
 
     private static Stream<Arguments> navigationTestData() {
         return Stream.concat(Stream.of(true, false).flatMap(multiline -> Stream.of(
-                Arguments.of(multiline, "", 0, KeyBinding.EDITOR_BEGINNING, 0),
-                Arguments.of(multiline, "", 0, KeyBinding.EDITOR_END, 0),
-                Arguments.of(multiline, "", 0, KeyBinding.EDITOR_BEGINNING_DOC, 0),
-                Arguments.of(multiline, "", 0, KeyBinding.EDITOR_END_DOC, 0),
-                Arguments.of(multiline, "Example text", 7, KeyBinding.EDITOR_BEGINNING, 0),
-                Arguments.of(multiline, "Example text", 3, KeyBinding.EDITOR_END, 12))),
+                        Arguments.of(multiline, "", 0, KeyBinding.EDITOR_BEGINNING, 0),
+                        Arguments.of(multiline, "", 0, KeyBinding.EDITOR_END, 0),
+                        Arguments.of(multiline, "", 0, KeyBinding.EDITOR_BEGINNING_DOC, 0),
+                        Arguments.of(multiline, "", 0, KeyBinding.EDITOR_END_DOC, 0),
+                        Arguments.of(multiline, "Example text", 7, KeyBinding.EDITOR_BEGINNING, 0),
+                        Arguments.of(multiline, "Example text", 3, KeyBinding.EDITOR_END, 12))),
                 Stream.of(
                         Arguments.of(true, MULTILINE_TEXT, 5, KeyBinding.EDITOR_BEGINNING, 0),
                         Arguments.of(true, MULTILINE_TEXT, 5, KeyBinding.EDITOR_END, 10),
