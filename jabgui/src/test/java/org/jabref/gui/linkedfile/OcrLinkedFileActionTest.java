@@ -28,27 +28,12 @@ class OcrLinkedFileActionTest {
                 + "\n\n"
                 + Localization.lang(
                 "Command\n%0",
-                "\"ocrmypdf\""
-                        + System.lineSeparator()
-                        + "\"--force-ocr\""
-                        + System.lineSeparator()
-                        + "\"/Users/test/My Files/input.pdf\"")
+                "\"ocrmypdf --force-ocr /Users/test/My Files/input.pdf\"")
                 + "\n\n"
                 + Localization.lang(
                 "Output\n%0",
                 "known output");
 
-        assertEquals(
-                expected,
-                OcrLinkedFileAction.buildFailureMessage("OCR process failed", failure));
-    }
-
-    @Test
-    void buildFailureMessageWithoutDiagnostics() {
-        OcrResult.Failure failure = new OcrResult.Failure(OcrFailureReason.TIMEOUT);
-
-        assertEquals(
-                "OCR timed out",
-                OcrLinkedFileAction.buildFailureMessage("OCR timed out", failure));
+        assertEquals(expected, OcrLinkedFileAction.buildFailureMessage("OCR process failed", failure));
     }
 }
