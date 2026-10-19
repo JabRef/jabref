@@ -113,16 +113,12 @@ public class OcrLinkedFileAction extends SimpleCommand {
 
         if (!failure.command().isEmpty()) {
             detailedMessage += "\n\n"
-                    + Localization.lang(
-                    "Command\n%0",
-                    formatCommand(failure.command()));
+                    + Localization.lang("Command\n%0", formatCommand(failure.command()));
         }
 
         if (!failure.output().isBlank()) {
             detailedMessage += "\n\n"
-                    + Localization.lang(
-                    "Output\n%0",
-                    failure.output());
+                    + Localization.lang("Output\n%0", failure.output());
         }
 
         return detailedMessage;
@@ -130,11 +126,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
 
     static String formatCommand(List<String> command) {
         return command.stream()
-                      .map(argument -> "\""
-                              + argument.replace("\\", "\\\\")
-                                        .replace("\"", "\\\"")
-                              + "\"")
-                      .collect(Collectors.joining(System.lineSeparator()));
+                      .collect(Collectors.joining(" ", "\"", "\""));
     }
 
     private class OcredFileSuccessNotification extends Notifications.FileNotification {
