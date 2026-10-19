@@ -56,8 +56,8 @@ public class DuplicateCheck {
     private static final Map<Field, Double> FIELD_WEIGHTS = new HashMap<>();
     private static final Pattern PAGE_SEPARATOR_PATTERN = Pattern.compile("[\\p{Pd} ]+");
 
-    private static final Set<StandardEntryType> STANDARD_ENTRY_TYPES = Set.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection);
-    private static final Set<StandardEntryType> SIMILAR_ENTRY_TYPES = Set.of(StandardEntryType.InBook, StandardEntryType.InCollection, StandardEntryType.InProceedings);
+    private static final Set<StandardEntryType> STANDARD_ENTRY_TYPES = Set.of(StandardEntryType.Article, StandardEntryType.Conference, StandardEntryType.InBook, StandardEntryType.InCollection, StandardEntryType.InProceedings);
+    private static final Set<StandardEntryType> SIMILAR_ENTRY_TYPES = Set.of(StandardEntryType.Conference, StandardEntryType.InBook, StandardEntryType.InCollection, StandardEntryType.InProceedings);
 
     static {
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.AUTHOR, 2.5);
@@ -89,19 +89,12 @@ public class DuplicateCheck {
                                         .orElse(false));
     }
 
-    // [impl->req~duplicate-detection.compatible-entry-types~1]
-    private static boolean haveDifferentEntryType(final BibEntry one, final BibEntry two) {
-        if (one.getType().equals(StandardEntryType.Misc) || two.getType().equals(StandardEntryType.Misc)) {
-            return false;
-        }
-
-        if (one.getType().equals(two.getType())) {
-            return false;
-        }
-
-        return !(one.getType() instanceof StandardEntryType oneType && two.getType() instanceof StandardEntryType twoType
-                && SIMILAR_ENTRY_TYPES.contains(oneType)
-                && SIMILAR_ENTRY_TYPES.contains(twoType));
+    // [impl->req~duplicate-detection.compatible-entry-types~2]
+    private static boolean areCompatibleTypes(final BibEntry one, final BibEntry two) {
+        return one.getType().equals(two.getType())
+                || one.getType().equals(StandardEntryType.Misc)
+                || two.getType().equals(StandardEntryType.Misc)
+                || (SIMILAR_ENTRY_TYPES.contains(one.getType()) && SIMILAR_ENTRY_TYPES.contains(two.getType()));
     }
 
     private static boolean haveDifferentEditions(final BibEntry one, final BibEntry two) {
@@ -117,14 +110,6 @@ public class DuplicateCheck {
                 (compareSingleField(StandardField.TITLE, one, two) == EQUAL) &&
                 ((compareSingleField(StandardField.CHAPTER, one, two) == NOT_EQUAL) ||
                         (compareSingleField(StandardField.PAGES, one, two) == NOT_EQUAL));
-    }
-
-    // [impl->req~duplicate-detection.conflicting-parent-books~1]
-    private static boolean haveDifferentParentBooks(final BibEntry one, final BibEntry two) {
-        return !one.getType().equals(two.getType())
-                && SIMILAR_ENTRY_TYPES.contains(one.getType())
-                && SIMILAR_ENTRY_TYPES.contains(two.getType())
-                && compareSingleField(StandardField.BOOKTITLE, one, two) == NOT_EQUAL;
     }
 
     private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
@@ -305,15 +290,13 @@ public class DuplicateCheck {
     /// Checks if the two entries represent the same publication.
     public boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
         // Checks DOI and other identifiers
-        // [impl->req~duplicate-detection.conflicting-parent-books~1]
         if (haveSameIdentifier(one, two)) {
             return true;
         }
 
-        if (haveDifferentEntryType(one, two) ||
+        if (!areCompatibleTypes(one, two) ||
                 haveDifferentEditions(one, two) ||
-                haveDifferentChaptersOrPagesOfTheSameBook(one, two) ||
-                haveDifferentParentBooks(one, two)) {
+                haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
             return false;
         }
 
@@ -330,19 +313,27 @@ public class DuplicateCheck {
             return true;
         }
 
-        // [impl->req~duplicate-detection.compatible-entry-types~1]
-        Optional<BibEntryType> firstType = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
-        if (firstType.map(type -> isDuplicateForType(type, one, two))
-                     .orElseGet(() -> compareAllFields(one, two))) {
-            return true;
+        // [impl->req~duplicate-detection.compatible-entry-types~2]
+        Optional<Boolean> comparison;
+        if (one.getType().equals(two.getType())) {
+            comparison = entryTypesManager.enrich(one.getType(), bibDatabaseMode)
+                                          .filter(type -> isDuplicateForType(type, one, two))
+                                          .map(_ -> true);
+        } else if (one.getType().equals(StandardEntryType.Misc)) {
+            comparison = entryTypesManager.enrich(two.getType(), bibDatabaseMode)
+                                          .filter(type -> isDuplicateForType(type, one, two))
+                                          .map(_ -> true);
+        } else if (two.getType().equals(StandardEntryType.Misc)) {
+            comparison = entryTypesManager.enrich(one.getType(), bibDatabaseMode)
+                                          .filter(type -> isDuplicateForType(type, one, two))
+                                          .map(_ -> true);
+        } else {
+            comparison = entryTypesManager.enrich(one.getType(), bibDatabaseMode)
+                                          .flatMap(firstType -> entryTypesManager.enrich(two.getType(), bibDatabaseMode)
+                                                                                    .map(secondType -> isDuplicateForType(firstType, one, two)
+                                                                                            && isDuplicateForType(secondType, one, two)));
         }
-
-        if (!one.getType().equals(two.getType())) {
-            return entryTypesManager.enrich(two.getType(), bibDatabaseMode)
-                                    .map(type -> isDuplicateForType(type, one, two))
-                                    .orElseGet(() -> compareAllFields(one, two));
-        }
-        return false;
+        return comparison.orElseGet(() -> compareAllFields(one, two));
     }
 
     private static boolean isDuplicateForType(BibEntryType type, BibEntry one, BibEntry two) {
@@ -350,10 +341,7 @@ public class DuplicateCheck {
         if (isFarFromThreshold(reqCmpResult[0])) {
             return reqCmpResult[0] >= DUPLICATE_THRESHOLD;
         }
-        if (compareOptionalFields(type, one, two, reqCmpResult)) {
-            return true;
-        }
-        return compareAllFields(one, two);
+        return compareOptionalFields(type, one, two, reqCmpResult);
     }
 
     private static boolean compareAllFields(BibEntry one, BibEntry two) {
