@@ -11,8 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -56,9 +54,7 @@ public class AiChatView extends StackPane {
     @FXML private Pane transparentPane;
     @FXML private ProgressIndicator loadingIndicator;
 
-    @FXML private HBox findBar;
-    @FXML private TextField findField;
-    @FXML private Label findResultLabel;
+    @FXML private AiChatFindBar findBar;
 
     @FXML private HBox followUpQuestionsArea;
     @FXML private SimpleListView<String> followUpQuestionsSimpleListView;
@@ -77,7 +73,7 @@ public class AiChatView extends StackPane {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
 
-    private final AiChatFindViewModel findViewModel = new AiChatFindViewModel();
+    private AiChatFindViewModel findViewModel;
 
     private AiChatViewModel viewModel;
     private Optional<Node> focusBeforeFind = Optional.empty();
@@ -110,10 +106,9 @@ public class AiChatView extends StackPane {
     /// Ctrl+F inside the chat searches the chat messages instead of the library, see [org.jabref.gui.frame.JabRefFrame].
     // [impl->req~ai.chat.find.open~1, req~ai.chat.find.close~1, req~ai.chat.find.navigation~1]
     private void setupFind() {
-        findBar.managedProperty().bind(findBar.visibleProperty());
-        findBar.visibleProperty().bind(findViewModel.visibleProperty());
-        findField.textProperty().bindBidirectional(findViewModel.queryProperty());
-        findResultLabel.textProperty().bind(findViewModel.resultTextProperty());
+        findViewModel = findBar.getViewModel();
+        findBar.setOnNavigate(() -> updateFind(true));
+        findBar.setOnClose(this::closeFind);
 
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (isFindAvailable() && preferences.getKeyBindingRepository().matches(event, KeyBinding.SEARCH)) {
@@ -121,8 +116,7 @@ public class AiChatView extends StackPane {
                     focusBeforeFind = Optional.ofNullable(getScene().getFocusOwner());
                 }
                 findViewModel.visibleProperty().set(true);
-                findField.requestFocus();
-                findField.selectAll();
+                findBar.focusQuery();
                 event.consume();
             } else if (findViewModel.visibleProperty().get()
                     && preferences.getKeyBindingRepository().matches(event, KeyBinding.CLOSE)) {
@@ -130,17 +124,6 @@ public class AiChatView extends StackPane {
                 event.consume();
             }
         });
-        findField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ENTER && !event.isControlDown() && !event.isMetaDown() && !event.isAltDown()) {
-                if (event.isShiftDown()) {
-                    findPrevious();
-                } else {
-                    findNext();
-                }
-                event.consume();
-            }
-        });
-
         mainContainer.visibleProperty().addListener((_, _, visible) -> {
             if (!visible) {
                 findViewModel.visibleProperty().set(false);
@@ -180,20 +163,7 @@ public class AiChatView extends StackPane {
         }
     }
 
-    @FXML
-    private void findNext() {
-        findViewModel.next();
-        updateFind(true);
-    }
-
-    @FXML
-    private void findPrevious() {
-        findViewModel.previous();
-        updateFind(true);
-    }
-
     // [impl->req~ai.chat.find.restore-focus~1]
-    @FXML
     private void closeFind() {
         findViewModel.visibleProperty().set(false);
         focusBeforeFind.filter(node -> node.getScene() == getScene() && isVisibleAndEnabled(node))

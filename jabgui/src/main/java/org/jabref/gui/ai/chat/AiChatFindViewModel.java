@@ -13,7 +13,7 @@ import org.jabref.gui.AbstractViewModel;
 
 import org.jspecify.annotations.NullMarked;
 
-/// State of the find bar of [AiChatView]: the query, whether the bar is shown, and which occurrence is the current one.
+/// State of [AiChatFindBar]: the query, whether the bar is shown, and which occurrence is the current one.
 /// The view reports the number of occurrences it highlighted via [#setTotal(int)].
 @NullMarked
 public class AiChatFindViewModel extends AbstractViewModel {
