@@ -1,4 +1,4 @@
-package org.jabref.http.server.command;
+package org.jabref.http.server.resources.command;
 
 import java.util.ArrayList;
 import java.util.List;
