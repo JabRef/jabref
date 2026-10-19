@@ -37,6 +37,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.ai.chat.AiChatView;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -340,13 +341,22 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     // [impl->req~ai.chat.find.unavailable~1]
     static void installSearchKeyBinding(Node root, KeyBindingRepository keyBindings, Runnable focusLibrarySearch) {
-        // Bubble after local search handlers have had the opportunity to consume the shortcut.
-        root.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+        root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (keyBindings.matches(event, KeyBinding.SEARCH)) {
+                if (event.getTarget() instanceof Node target && isChatSearchTarget(target)) {
+                    return;
+                }
                 focusLibrarySearch.run();
                 event.consume();
             }
         });
+    }
+
+    private static boolean isChatSearchTarget(Node node) {
+        if (node instanceof AiChatView chat) {
+            return chat.isFindAvailable();
+        }
+        return Optional.ofNullable(node.getParent()).map(JabRefFrame::isChatSearchTarget).orElse(false);
     }
 
     private void initKeyBindings() {
