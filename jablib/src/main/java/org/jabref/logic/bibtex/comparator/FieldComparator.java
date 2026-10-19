@@ -116,6 +116,8 @@ public class FieldComparator implements Comparator<BibEntry> {
 
         // Now we know that both f1 and f2 are != null
         if (fieldType == FieldType.NAME) {
+            // If the author is a single token enclosed in braces, the trailing braces are not
+            // trimmed, even though this technically may affect sorting.
             f1 = AuthorList.fixAuthorForAlphabetization(f1);
             f2 = AuthorList.fixAuthorForAlphabetization(f2);
         } else if (fieldType == FieldType.YEAR) {
