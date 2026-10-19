@@ -20,6 +20,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
@@ -34,6 +35,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
@@ -50,6 +52,10 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty newFieldToAdd = new SimpleStringProperty("");
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
+    /// State at dialog open, so that resets (which store immediately) also count as changes
+    private Set<String> storedEntryTypes;
+    private Set<Field> storedMultilineFields;
+    private Optional<String> restartWarning = Optional.empty();
 
     private final CliPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
@@ -72,6 +78,8 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
         this.bibDatabaseMode = mode;
 
         this.multiLineFields.addAll(preferences.getFieldPreferences().getNonWrappableFields());
+        this.storedEntryTypes = entryTypeDefinitions();
+        this.storedMultilineFields = multilineFieldsOfEntryTypes();
 
         entryTypeValidator = new FunctionBasedValidator<>(
                 entryTypeToAdd,
@@ -105,6 +113,8 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        // Collected across all entry types, applied to the non-wrappable fields preference after the loop
+        Set<Field> singleLineFields = new HashSet<>();
         Set<Field> multilineFields = new HashSet<>();
         for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
             List<FieldViewModel> allFields = typeViewModel.fields();
@@ -112,7 +122,10 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             BibEntryType type = typeViewModel.entryType().getValue();
             EntryType newPlainType = type.getType();
 
-            // Collect multilineFields for storage in preferences later
+            singleLineFields.addAll(allFields.stream()
+                                             .filter(model -> !model.isMultiline())
+                                             .map(model -> model.toField(newPlainType))
+                                             .toList());
             multilineFields.addAll(allFields.stream()
                                             .filter(FieldViewModel::isMultiline)
                                             .map(model -> model.toField(newPlainType))
@@ -135,8 +148,75 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, bibDatabaseMode);
         }
 
-        preferences.getFieldPreferences().setNonWrappableFields(multilineFields);
+        // Fields belonging to no entry type keep their state: this tab does not show them
+        Set<Field> nonWrappableFields = new HashSet<>(preferences.getFieldPreferences().getNonWrappableFields());
+        nonWrappableFields.removeAll(singleLineFields);
+        nonWrappableFields.addAll(multilineFields);
+        preferences.getFieldPreferences().setNonWrappableFields(nonWrappableFields);
         preferences.storeCustomEntryTypesRepository(entryTypesManager);
+
+        restartWarning = detectEntryTypesChanged();
+    }
+
+    /// Compares the definitions with the state at dialog open and re-bases them for the next save.
+    ///
+    /// The entry types are compared in their serialized form, because [BibEntryType#equals(Object)] compares fields by name
+    /// only - a changed field property would go unnoticed.
+    /// The multiline state is kept out of that form: it lives in the preferences, not in the entry type.
+    private Optional<String> detectEntryTypesChanged() {
+        Set<String> entryTypes = entryTypeDefinitions();
+        Set<Field> multilineFields = multilineFieldsOfEntryTypes();
+        boolean changed = !storedEntryTypes.equals(entryTypes) || !storedMultilineFields.equals(multilineFields);
+        storedEntryTypes = entryTypes;
+        storedMultilineFields = multilineFields;
+        return changed ? Optional.of(Localization.lang("Entry types changed.")) : Optional.empty();
+    }
+
+    private Set<String> entryTypeDefinitions() {
+        return entryTypesManager.getAllTypes(bibDatabaseMode).stream()
+                                .map(this::entryTypeWithoutMultiline)
+                                .map(MetaDataSerializer::serializeCustomEntryTypesV2)
+                                .collect(Collectors.toSet());
+    }
+
+    private BibEntryType entryTypeWithoutMultiline(BibEntryType entryType) {
+        List<BibField> fields = entryType.getAllBibFields().stream()
+                                         .map(field -> new BibField(fieldWithoutMultiline(field.field()), field.priority()))
+                                         .toList();
+        List<OrFields> requiredFields = entryType.getRequiredFields().stream()
+                                                 .map(fieldsToChooseFrom -> new OrFields(fieldsToChooseFrom.getFields().stream()
+                                                                                                           .map(this::fieldWithoutMultiline)
+                                                                                                           .toList()))
+                                                 .toList();
+        return new BibEntryType(entryType.getType(), fields, requiredFields);
+    }
+
+    private Field fieldWithoutMultiline(Field field) {
+        if (!(field instanceof UnknownField)) {
+            return field;
+        }
+        UnknownField copy = new UnknownField(field.getName());
+        copy.getProperties().addAll(field.getProperties());
+        copy.getProperties().remove(FieldProperty.MULTILINE_TEXT);
+        return copy;
+    }
+
+    /// Multiline fields not belonging to any entry type are left out: this tab does not show them.
+    ///
+    /// The non-wrappable fields preference itself cannot be compared: a field is also multiline when it carries
+    /// [FieldProperty#MULTILINE_TEXT] (e.g., `abstract`), and saving adds those to the preference - the first
+    /// unchanged save would thus look like a change.
+    private Set<Field> multilineFieldsOfEntryTypes() {
+        List<Field> nonWrappableFields = preferences.getFieldPreferences().getNonWrappableFields();
+        return entryTypesManager.getAllTypes(bibDatabaseMode).stream()
+                                .flatMap(type -> type.getAllFields().stream())
+                                .filter(field -> nonWrappableFields.contains(field) || field.getProperties().contains(FieldProperty.MULTILINE_TEXT))
+                                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<String> getRestartWarnings() {
+        return restartWarning.map(List::of).orElseGet(List::of);
     }
 
     public EntryTypeViewModel addNewCustomEntryType() {
