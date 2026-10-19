@@ -39,7 +39,6 @@ import org.jabref.model.entry.LinkedFile;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NullMarked;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -54,7 +53,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @NullMarked
-@Disabled("JavaFX HeadlessApplication does not implement character-key lookup required by KeyBindingRepository")
 @ResourceLock("Localization.lang")
 class AiChatViewTest extends JavaFxTest {
     private AiChatView view;
@@ -69,6 +67,12 @@ class AiChatViewTest extends JavaFxTest {
 
         GuiPreferences preferences = mock(GuiPreferences.class);
         keyBindings = new KeyBindingRepository(List.of(), List.of());
+        // Unrelated character bindings require native keyboard lookup, which headless JavaFX does not provide.
+        for (KeyBinding binding : KeyBinding.values()) {
+            keyBindings.put(binding, "");
+        }
+        keyBindings.put(KeyBinding.SEARCH, KeyBinding.SEARCH.getDefaultKeyBinding());
+        keyBindings.put(KeyBinding.CLOSE, KeyBinding.CLOSE.getDefaultKeyBinding());
         when(preferences.getAiPreferences()).thenReturn(aiPreferences);
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
         when(preferences.getKeyBindingRepository()).thenReturn(keyBindings);
@@ -185,6 +189,52 @@ class AiChatViewTest extends JavaFxTest {
             Event.fireEvent(field, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, true, false, false, false));
             assertEquals("1/3", result.getText());
             assertFalse(globalSearchRequested.get());
+        });
+    }
+
+    // [utest->req~ai.chat.find.matches~1]
+    @Test
+    void findUpdatesAfterMessagesAreRenderedOrRemoved() {
+        interact(() -> {
+            openFind();
+            ((TextField) view.lookup("#findField")).setText("chocolate");
+            Label result = (Label) view.lookup("#findResultLabel");
+            assertEquals("0/0", result.getText());
+
+            ChatMessage firstResponse = ChatMessage.aiMessage("Chocolate", List.of());
+            view.chatHistoryProperty().add(firstResponse);
+            assertEquals("1/1", result.getText());
+
+            view.chatHistoryProperty().add(ChatMessage.aiMessage("Chocolate and chocolate", List.of()));
+            assertEquals("1/3", result.getText());
+
+            view.chatHistoryProperty().remove(firstResponse);
+            assertEquals("1/2", result.getText());
+
+            view.chatHistoryProperty().setAll(ChatMessage.aiMessage("A different answer", List.of()));
+            assertEquals("0/0", result.getText());
+        });
+    }
+
+    // [utest->req~ai.chat.find.unavailable~1]
+    @Test
+    void hiddenAncestorMakesChatFindUnavailable() {
+        interact(() -> {
+            root.setVisible(false);
+            assertFalse(view.isFindAvailable());
+            root.setVisible(true);
+            assertTrue(view.isFindAvailable());
+        });
+    }
+
+    // [utest->req~ai.chat.find.restore-focus~1]
+    @Test
+    void closingFindFallsBackWhenPreviousFocusHasHiddenAncestor() {
+        interact(() -> {
+            openFind();
+            view.lookup("#userMessageTextArea").getParent().setVisible(false);
+            ((Button) view.lookup("#closeFindButton")).fire();
+            assertEquals(view.lookup("#chatHistoryScrollPane"), root.getScene().getFocusOwner());
         });
     }
 }

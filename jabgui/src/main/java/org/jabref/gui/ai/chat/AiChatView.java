@@ -3,7 +3,6 @@ package org.jabref.gui.ai.chat;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ListProperty;
 import javafx.collections.ListChangeListener;
@@ -81,7 +80,6 @@ public class AiChatView extends StackPane {
     private final AiChatFindViewModel findViewModel = new AiChatFindViewModel();
 
     private AiChatViewModel viewModel;
-    private boolean findRefreshPending;
     private Optional<Node> focusBeforeFind = Optional.empty();
 
     public AiChatView() {
@@ -152,20 +150,7 @@ public class AiChatView extends StackPane {
 
         findViewModel.queryProperty().addListener((_, _, _) -> updateFind(true));
         findViewModel.visibleProperty().addListener((_, _, _) -> updateFind(false));
-        viewModel.chatHistoryProperty().addListener((ListChangeListener<ChatMessage>) _ -> scheduleFindRefresh());
-    }
-
-    private void scheduleFindRefresh() {
-        if (findRefreshPending) {
-            return;
-        }
-
-        // Wait for the message renderer's list listener, coalescing changes queued in the same turn.
-        findRefreshPending = true;
-        Platform.runLater(() -> {
-            findRefreshPending = false;
-            updateFind(false);
-        });
+        chatHistoryScrollPane.getRenderedNodes().addListener((ListChangeListener<Node>) _ -> updateFind(false));
     }
 
     /// Highlights all occurrences of the find query in the rendered messages and scrolls to the current one.
@@ -173,12 +158,10 @@ public class AiChatView extends StackPane {
     private void updateFind(boolean scrollToCurrent) {
         String query = findViewModel.getActiveQuery();
         int current = findViewModel.getCurrent();
-        List<MarkdownTextFlow> flows = chatHistoryScrollPane.getContent() instanceof Pane content
-                                       ? content.getChildrenUnmodifiable().stream()
-                                                .filter(AiChatMessageView.class::isInstance)
-                                                .map(node -> ((AiChatMessageView) node).getMarkdownTextFlow())
-                                                .toList()
-                                       : List.of();
+        List<MarkdownTextFlow> flows = chatHistoryScrollPane.getRenderedNodes().stream()
+                                                            .filter(AiChatMessageView.class::isInstance)
+                                                            .map(node -> ((AiChatMessageView) node).getMarkdownTextFlow())
+                                                            .toList();
 
         int total = 0;
         for (MarkdownTextFlow flow : flows) {
@@ -224,6 +207,7 @@ public class AiChatView extends StackPane {
         focusBeforeFind = Optional.empty();
     }
 
+    /// A hidden ancestor makes requestFocus a no-op, so reject it before choosing the focus-restoration fallback.
     private static boolean isVisibleAndEnabled(Node node) {
         return node.isVisible() && !node.isDisabled()
                 && Optional.ofNullable(node.getParent()).map(AiChatView::isVisibleAndEnabled).orElse(true);

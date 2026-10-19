@@ -16,7 +16,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
-import javafx.event.EventTarget;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -38,13 +37,13 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.ai.chat.AiChatView;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
@@ -339,15 +338,19 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
-    private static boolean isInSearchableAiChat(EventTarget target) {
-        if (target instanceof AiChatView chat) {
-            return chat.isFindAvailable();
-        }
-        return target instanceof Node node
-                && Optional.ofNullable(node.getParent()).map(JabRefFrame::isInSearchableAiChat).orElse(false);
+    // [impl->req~ai.chat.find.unavailable~1]
+    static void installSearchKeyBinding(Node root, KeyBindingRepository keyBindings, Runnable focusLibrarySearch) {
+        // Bubble after local search handlers have had the opportunity to consume the shortcut.
+        root.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (keyBindings.matches(event, KeyBinding.SEARCH)) {
+                focusLibrarySearch.run();
+                event.consume();
+            }
+        });
     }
 
     private void initKeyBindings() {
+        installSearchKeyBinding(this, preferences.getKeyBindingRepository(), globalSearchBar::requestFocus);
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
@@ -367,13 +370,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case PREVIOUS_LIBRARY:
                         tabbedPane.getSelectionModel().selectPrevious();
                         event.consume();
-                        break;
-                    case SEARCH:
-                        // [impl->req~ai.chat.find.unavailable~1]
-                        // The AI chat has its own find bar
-                        if (!isInSearchableAiChat(event.getTarget())) {
-                            globalSearchBar.requestFocus();
-                        }
                         break;
                     case OPEN_GLOBAL_SEARCH_DIALOG:
                         globalSearchBar.openGlobalSearchDialog();
