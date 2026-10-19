@@ -270,8 +270,8 @@ public class Author {
     }
 
     /// Returns the name as "Last, Jr, F." omitting the von-part and removing starting braces.
-    /// TODO: if the author is a single token enclosed in braces, the trailing braces are not
-    /// TODO: trimmed, even though this technically may affect sorting.
+    /// If the author is a single token enclosed in braces, the trailing braces are not
+    /// trimmed, even though this technically may affect sorting.
     ///
     /// @return "Last, Jr, F." as described above or "" if all these parts are empty.
     public String getNameForAlphabetization() {
