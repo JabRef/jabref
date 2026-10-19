@@ -74,6 +74,33 @@ The library name `current` denotes the currently focussed library in JabRef.
 ./gradlew :jabsrv-cli:run --args="../jablib/src/test/resources/testbib/complex.bib"
 ```
 
+## Logging in to CiteDrive without the GUI
+
+`jabsrv --citedrive-login` prints the CiteDrive login address, waits for the browser to come back to `/callback`, stores the refresh token in the system keyring, and exits.
+JabRef's HTTP server port from the preferences has to be the port `jabsrv` listens on, since CiteDrive redirects the browser there.
+
+```shell
+./gradlew :jabsrv-cli:run --args="--citedrive-login"
+```
+
+### CiteDrive authentication security
+
+CiteDrive's API and web application addresses must use HTTPS; only the local browser callback uses HTTP.
+Each authentication operation captures its server settings, and uploads use the address associated with their access token.
+Changing the API address clears the login and prevents pending responses from restoring credentials for the previous configuration.
+The keyring stores the API address alongside the refresh token; existing tokens without that binding require another login.
+
+Concurrent token requests share one authentication operation to support refresh token rotation.
+Both token exchange and refresh use a ten-second connection timeout and a thirty-second read timeout, with redirects disabled.
+The code exchange runs asynchronously so that a slow token endpoint does not block the callback response.
+Temporary errors preserve the stored login; an HTTP 400 `invalid_grant` response starts another browser login.
+
+The current upload sends all entries from the active library in a single BibTeX request to `/jabref/push/`.
+Each upload therefore uses one request from the endpoint's current allowance of 100 requests per hour per user; the server's payload size limit is a separate constraint.
+`CiteDrivePushTest` verifies batches of two and one thousand entries by parsing the prepared request back into entries.
+Setting the test JVM system property `citedrive.batch.fixture` to a generated 100,000-entry library adds that fixture to the same check.
+The test records the payload size and preparation timings without contacting CiteDrive.
+
 ## Developing with IntelliJ
 
 IntelliJ Ultimate offers a Markdown-based http-client. You need to open the file `jabsrv/src/test/rest-api.http`.
