@@ -330,8 +330,8 @@ public class DuplicateCheck {
         } else {
             comparison = entryTypesManager.enrich(one.getType(), bibDatabaseMode)
                                           .flatMap(firstType -> entryTypesManager.enrich(two.getType(), bibDatabaseMode)
-                                                                                    .map(secondType -> isDuplicateForType(firstType, one, two)
-                                                                                            && isDuplicateForType(secondType, one, two)));
+                                                                                 .map(secondType -> isDuplicateForType(firstType, one, two)
+                                                                                         && isDuplicateForType(secondType, one, two)));
         }
         return comparison.orElseGet(() -> compareAllFields(one, two));
     }
