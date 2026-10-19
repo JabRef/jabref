@@ -52,9 +52,9 @@
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.3
 //DEPS org.hibernate.validator:hibernate-validator:9.1.5.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS tools.jackson.core:jackson-core:3.2.3
-//DEPS tools.jackson.core:jackson-databind:3.2.3
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.3
+//DEPS tools.jackson.core:jackson-core:3.2.4
+//DEPS tools.jackson.core:jackson-databind:3.2.4
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.4
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
