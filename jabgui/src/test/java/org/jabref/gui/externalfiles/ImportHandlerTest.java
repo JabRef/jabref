@@ -436,7 +436,7 @@ class ImportHandlerTest {
                 keyPatterns,
                 new SimpleObjectProperty<>(',')));
 
-        handlerFor(databaseContext, new JabRefUndoManager()).importCleanedEntries(null, List.of(importedWang));
+        handlerFor(databaseContext, new JabRefUndoManager()).importEntries(List.of(importedWang));
 
         assertEquals(List.of(Optional.of("Wang2020"), Optional.of("Wang2020a")),
                 List.of(existingWang.getCitationKey(), importedWang.getCitationKey()));
