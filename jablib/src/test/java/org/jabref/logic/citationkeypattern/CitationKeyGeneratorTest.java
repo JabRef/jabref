@@ -1206,7 +1206,7 @@ class CitationKeyGeneratorTest {
         assertEquals(expected, generateKey(entry, "[auth:transliterate:camel][authForeIni:transliterate:truncate1:upper][year]"));
     }
 
-    /// 王 and 汪 are different surnames that both transliterate to "Wang"
+    /// "王" and "汪" are different surnames that both transliterate to "Wang"
     @Test
     void addingEntryWithCollidingPinyinKeepsExistingKey() {
         BibEntry existingWang = new BibEntry()

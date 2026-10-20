@@ -40,8 +40,8 @@ class GenerateCitationKeyActionTest {
 
     private BibEntry remainingWang;
 
-    /// 王 and 汪 both transliterate to "Wang". After 王 is removed, the base key "Wang2020" is free again,
-    /// so regenerating 汪 would move it from "Wang2020a" to "Wang2020".
+    /// "王" and "汪" both transliterate to "Wang". After "王" is removed, the base key "Wang2020" is free again,
+    /// so regenerating "汪" would move it from "Wang2020a" to "Wang2020".
     @BeforeEach
     void setUp() {
         BibEntry removedWang = new BibEntry()
