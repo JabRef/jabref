@@ -998,31 +998,37 @@
       "allDeclaredMethods": true
     },
     {
-      "type": "org.jabref.http.server.command.CommandResource",
+      "type": "org.jabref.http.server.resources.command.CommandResource",
       "allDeclaredConstructors": true,
       "allDeclaredFields": true,
       "allDeclaredMethods": true
     },
     {
-      "type": "org.jabref.http.server.command.Command",
+      "type": "org.jabref.http.server.resources.command.Command",
       "allDeclaredConstructors": true,
       "allDeclaredFields": true,
       "allDeclaredMethods": true
     },
     {
-      "type": "org.jabref.http.server.command.FocusCommand",
+      "type": "org.jabref.http.server.resources.command.FocusCommand",
       "allDeclaredConstructors": true,
       "allDeclaredFields": true,
       "allDeclaredMethods": true
     },
     {
-      "type": "org.jabref.http.server.command.OpenLibrariesCommand",
+      "type": "org.jabref.http.server.resources.command.OpenLibrariesCommand",
       "allDeclaredConstructors": true,
       "allDeclaredFields": true,
       "allDeclaredMethods": true
     },
     {
-      "type": "org.jabref.http.server.command.SelectEntriesCommand",
+      "type": "org.jabref.http.server.resources.command.SelectEntriesCommand",
+      "allDeclaredConstructors": true,
+      "allDeclaredFields": true,
+      "allDeclaredMethods": true
+    },
+    {
+      "type": "org.jabref.http.server.resources.callback.CallbackResource",
       "allDeclaredConstructors": true,
       "allDeclaredFields": true,
       "allDeclaredMethods": true
