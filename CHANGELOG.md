@@ -15,23 +15,32 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added ARM64 Flatpak builds and nightly, beta, and stable channels. [#13349](https://github.com/JabRef/jabref/issues/13349)
 - We added ARM64 Flatpak builds, nightly, beta, and stable channels, and host editor integration. [#13349](https://github.com/JabRef/jabref/issues/13349)
 - We added `jabkit git merge-driver`, a Git merge driver that merges `.bib` files semantically. [#16838](https://github.com/JabRef/jabref/pull/16838)
+- We added Markdown table rendering to AI chat responses and AI summaries. [#17142](https://github.com/JabRef/jabref/pull/17142)
 - We added tooltips with action descriptions to menu items. [#9615](https://github.com/JabRef/jabref/issues/9615)
 - We added "Contribute to JabRef" to the Help menu, linking to [contribute.jabref.org](https://contribute.jabref.org). [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
+- We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
+- We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
 
 ### Changed
 
 - We moved the JabRef version display in the Welcome tab onto the "Download development version" line to save space. [#17160](https://github.com/JabRef/jabref/issues/17160)
 - The context window size for AI models unknown to JabRef (e.g., local models) now defaults to 64k tokens instead of 8k. [#17326](https://github.com/JabRef/jabref/pull/17326)
 - We now show which web search fetchers have a saved API key. [#16250](https://github.com/JabRef/jabref/issues/16250)
+- We improved the error message shown when Semantic Scholar restricts access to a paper's references. [#17291](https://github.com/JabRef/jabref/issues/17291)
+- We moved the "Show diff" button to the Git commit dialog's button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
+- We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
 
 ### Fixed
 
+- We fixed exports to RIS, CSV, HTML, and other template-based formats in native JabKit. [#17408](https://github.com/JabRef/jabref/issues/17408)
 - We fixed an issue where JabRef showed an "Executor has been shut down" error on Windows after resuming from suspend. [#17144](https://github.com/JabRef/jabref/pull/17144)
 - We fixed the BibTeX source dialog background in the Citation Relations tab for dark themes. [#13599](https://github.com/JabRef/jabref/issues/13599)
+- We fixed unreadable linked-file paths and indistinguishable selection backgrounds in the entry editor when using dark mode. [#17364](https://github.com/JabRef/jabref/issues/17364)
 - We fixed an issue where Backspace could not be registered as a keyboard shortcut. [#17241](https://github.com/JabRef/jabref/issues/17241)
 - We re-enabled the [Grobid](https://github.com/grobidOrg/grobid) citation fetcher again. It is now reachable via https. [#16668](https://github.com/JabRef/jabref/issues/16668)
 - We fixed an issue where the AI chat lost its scroll position when switching back to an entry. [#17172](https://github.com/JabRef/jabref/pull/17172)
+- We fixed an issue where the same shared database could be opened in a second tab. [#16967](https://github.com/JabRef/jabref/pull/16967)
 - We fixed DNB MARC imports to preserve abstracts, DOIs, ISBN-13s, ISSNs, parent journal titles, and full-text links. [#17217](https://github.com/JabRef/jabref/pull/17217)
 - We fixed an issue where pressing "+" in the "File" field with an automatically found file selected opened the "Add file link" dialog instead of linking the selected file. [#16938](https://github.com/JabRef/jabref/pull/16938)
 - We fixed an issue where closing a library did not free its memory, so a session that opened and closed several libraries kept all of them in memory. [#16948](https://github.com/JabRef/jabref/pull/16948)
@@ -49,9 +58,21 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed missing DOIs when importing MEDLINE records and cleaning existing MEDLINE entries. [#17173](https://github.com/JabRef/jabref/issues/17173)
 - We fixed an issue where the DOI lookup button lost its progress indicator after switching to another entry and back. [#17223](https://github.com/JabRef/jabref/pull/17223)
 - We fixed an issue where double-clicking a word in an AI chat message did not select it. [#17174](https://github.com/JabRef/jabref/pull/17174)
+- We fixed consistency checks omitting missing required fields and reporting absent fields of other entry types. [#17454](https://github.com/JabRef/jabref/pull/17454)
 - We fixed the entry counts in the groups panel being misaligned with the group names. [#17253](https://github.com/JabRef/jabref/issues/17253)
 - We fixed an issue where unmarked entries looked marked as relevant when hovering over them in the entry table. [#16881](https://github.com/JabRef/jabref/issues/16881)
 - We fixed an issue where long entry previews were cut off without a vertical scrollbar. [#17359](https://github.com/JabRef/jabref/issues/17359)
+- We fixed an issue where linked files in the entry editor were not updated immediately upon addition or removal. [#16067](https://github.com/JabRef/jabref/issues/16067)
+- We fixed an issue where the Semantic Scholar API key was ignored when fetching citations and references. [#17291](https://github.com/JabRef/jabref/issues/17291)
+- We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
+- We fixed an issue where JabRef asked to store a library's custom entry types at every start. [#9930](https://github.com/JabRef/jabref/issues/9930)
+- We fixed an issue where the AI chat tab still said "Unable to chat" after attaching a file. [#17157](https://github.com/JabRef/jabref/pull/17157)
+- We fixed an issue where the AI summary tab was blank for entries with only remote files. [#17203](https://github.com/JabRef/jabref/issues/17203)
+- We fixed an issue where legacy group memberships, markings, and special fields were no longer migrated when opening a library. [#17019](https://github.com/JabRef/jabref/pull/17019)
+- We fixed an issue where saving an SLR study overwrote different per-query native queries. [#17307](https://github.com/JabRef/jabref/pull/17307)
+- We fixed an issue where AI chats were lost when JabRef did not quit regularly. [#17177](https://github.com/JabRef/jabref/pull/17177)
+- We fixed an issue where the links at the bottom of the Welcome tab were cut off in small windows. [#17015](https://github.com/JabRef/jabref/issues/17015)
+- We fixed an issue where saving the "Custom entry types" preferences removed custom fields from the non-wrapped fields. [#17121](https://github.com/JabRef/jabref/pull/17121)
 
 ### Removed
 
@@ -97,6 +118,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the ability for LibreOffice BST citations to use style-defined labels. [forum#3764](https://discourse.jabref.org/t/feature-request-custom-citation-styles-from-bst/3764). [#16357](https://github.com/JabRef/jabref/issues/16357)
 - We added a new "Main" tab to the entry editor showing all fields of an entry in a single scrollable list, with one-click chips for adding optional fields and a free-form box for adding arbitrary fields. Identifiers, files and links, bibliometrics, comments, and meta fields (groups, owner, timestamps, special fields) live in collapsible sections — collapsed when empty — each offering chips for its unset fields; an open files and links section always shows the file editor. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
+- We added MARC21 XML and BIBFRAME exchange, preserving common fields and improving serial-article detection in existing fetchers. [#17292](https://github.com/JabRef/jabref/pull/17292)
 - We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)
 - We added the ability to view citation previews rendered using the selected style on hover in the "Citations" tab. [#15914](https://github.com/JabRef/jabref/pull/15914)
 - We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15929](https://github.com/JabRef/jabref/pull/15929)
