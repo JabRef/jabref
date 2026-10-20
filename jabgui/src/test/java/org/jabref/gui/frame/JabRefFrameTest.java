@@ -106,7 +106,8 @@ class JabRefFrameTest {
         StackPane root = new StackPane(target);
         List<String> handledBy = new ArrayList<>();
         target.addEventHandler(KeyEvent.KEY_PRESSED, _ -> handledBy.add("local"));
-        JabRefFrame.installSearchKeyBinding(root, searchKeyBindings(), () -> handledBy.add("library"));
+        root.addEventFilter(KeyEvent.KEY_PRESSED,
+                event -> JabRefFrame.handleSearchKeyBinding(event, searchKeyBindings(), () -> handledBy.add("library")));
 
         Event.fireEvent(target, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.F10, false, false, false, false));
 
@@ -128,7 +129,8 @@ class JabRefFrameTest {
             stage.setScene(new Scene(root, 700, 500));
             stage.show();
             List<String> handledBy = new ArrayList<>();
-            JabRefFrame.installSearchKeyBinding(root, keyBindings, () -> handledBy.add("library"));
+            root.addEventFilter(KeyEvent.KEY_PRESSED,
+                    event -> JabRefFrame.handleSearchKeyBinding(event, keyBindings, () -> handledBy.add("library")));
 
             Event.fireEvent(chat.lookup("#userMessageTextArea"), new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.F10, false, false, false, false));
 
@@ -141,7 +143,8 @@ class JabRefFrameTest {
     void unrelatedShortcutDoesNotFocusLibrarySearch() {
         StackPane root = new StackPane();
         List<String> handledBy = new ArrayList<>();
-        JabRefFrame.installSearchKeyBinding(root, searchKeyBindings(), () -> handledBy.add("library"));
+        root.addEventFilter(KeyEvent.KEY_PRESSED,
+                event -> JabRefFrame.handleSearchKeyBinding(event, searchKeyBindings(), () -> handledBy.add("library")));
 
         Event.fireEvent(root, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.F11, false, false, false, false));
 
@@ -199,7 +202,8 @@ class JabRefFrameTest {
             when(keyBindings.matches(any(KeyEvent.class), eq(KeyBinding.SEARCH)))
                     .thenAnswer(invocation -> ((KeyEvent) invocation.getArgument(0)).getCode() == KeyCode.SLASH);
             List<String> handledBy = new ArrayList<>();
-            JabRefFrame.installSearchKeyBinding(root, keyBindings, () -> handledBy.add("library"));
+            root.addEventFilter(KeyEvent.KEY_PRESSED,
+                    event -> JabRefFrame.handleSearchKeyBinding(event, keyBindings, () -> handledBy.add("library")));
 
             Event.fireEvent(target, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.SLASH, false, false, false, false));
 

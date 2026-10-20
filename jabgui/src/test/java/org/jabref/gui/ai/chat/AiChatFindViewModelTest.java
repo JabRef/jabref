@@ -1,5 +1,8 @@
 package org.jabref.gui.ai.chat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,23 +22,34 @@ class AiChatFindViewModelTest {
     }
 
     @Test
-    void resultTextShowsCurrentOfTotal() {
-        assertEquals("1/3", viewModel.resultTextProperty().get());
+    void viewModelExposesCurrentAndTotalMatches() {
+        assertEquals(0, viewModel.getCurrent());
+        assertEquals(3, viewModel.totalProperty().get());
     }
 
     // [utest->req~ai.chat.find.navigation~1]
     @Test
     void nextWrapsAround() {
+        List<Integer> navigatedMatches = new ArrayList<>();
+        viewModel.onNavigateProperty().set(_ -> navigatedMatches.add(viewModel.getCurrent()));
+
         viewModel.next();
         viewModel.next();
         viewModel.next();
+
+        assertEquals(List.of(1, 2, 0), navigatedMatches);
         assertEquals(0, viewModel.getCurrent());
     }
 
     // [utest->req~ai.chat.find.navigation~1]
     @Test
     void previousWrapsAround() {
+        List<Integer> navigatedMatches = new ArrayList<>();
+        viewModel.onNavigateProperty().set(_ -> navigatedMatches.add(viewModel.getCurrent()));
+
         viewModel.previous();
+
+        assertEquals(List.of(2), navigatedMatches);
         assertEquals(2, viewModel.getCurrent());
     }
 
@@ -57,12 +71,24 @@ class AiChatFindViewModelTest {
     void hiddenBarHasNoActiveQuery() {
         viewModel.visibleProperty().set(false);
         assertEquals("", viewModel.getActiveQuery());
-        assertEquals("", viewModel.resultTextProperty().get());
     }
 
     @Test
     void noOccurrencesShowsZero() {
         viewModel.setTotal(0);
-        assertEquals("0/0", viewModel.resultTextProperty().get());
+        assertEquals(0, viewModel.totalProperty().get());
+    }
+
+    @Test
+    void navigationWithoutOccurrencesDoesNotNotify() {
+        List<Integer> navigatedMatches = new ArrayList<>();
+        viewModel.onNavigateProperty().set(_ -> navigatedMatches.add(viewModel.getCurrent()));
+        viewModel.setTotal(0);
+
+        viewModel.next();
+        viewModel.previous();
+
+        assertEquals(List.of(), navigatedMatches);
+        assertEquals(0, viewModel.getCurrent());
     }
 }

@@ -1,15 +1,18 @@
 package org.jabref.gui.ai.chat;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.util.BindingsHelper;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -21,9 +24,8 @@ public class AiChatFindViewModel extends AbstractViewModel {
     private final StringProperty query = new SimpleStringProperty("");
     private final IntegerProperty current = new SimpleIntegerProperty(0);
     private final IntegerProperty total = new SimpleIntegerProperty(0);
-    private final StringBinding resultText = Bindings.createStringBinding(
-            () -> getActiveQuery().isEmpty() ? "" : (total.get() == 0 ? 0 : current.get() + 1) + "/" + total.get(),
-            visible, query, current, total);
+    private final ObjectProperty<EventHandler<ActionEvent>> onClose = new SimpleObjectProperty<>();
+    private final ObjectProperty<EventHandler<ActionEvent>> onNavigate = new SimpleObjectProperty<>();
 
     public AiChatFindViewModel() {
         // Reset counter when the query is changed.
@@ -48,15 +50,23 @@ public class AiChatFindViewModel extends AbstractViewModel {
     }
 
     public void next() {
-        if (total.get() > 0) {
-            current.set((current.get() + 1) % total.get());
+        if (total.get() == 0) {
+            return;
         }
+        current.set((current.get() + 1) % total.get());
+        BindingsHelper.handle(onNavigate);
     }
 
     public void previous() {
-        if (total.get() > 0) {
-            current.set((current.get() - 1 + total.get()) % total.get());
+        if (total.get() == 0) {
+            return;
         }
+        current.set((current.get() - 1 + total.get()) % total.get());
+        BindingsHelper.handle(onNavigate);
+    }
+
+    public void close() {
+        BindingsHelper.handle(onClose);
     }
 
     public BooleanProperty visibleProperty() {
@@ -71,11 +81,19 @@ public class AiChatFindViewModel extends AbstractViewModel {
         return current;
     }
 
+    public IntegerProperty totalProperty() {
+        return total;
+    }
+
     public int getCurrent() {
         return current.get();
     }
 
-    public StringBinding resultTextProperty() {
-        return resultText;
+    public ObjectProperty<EventHandler<ActionEvent>> onNavigateProperty() {
+        return onNavigate;
+    }
+
+    public ObjectProperty<EventHandler<ActionEvent>> onCloseProperty() {
+        return onClose;
     }
 }

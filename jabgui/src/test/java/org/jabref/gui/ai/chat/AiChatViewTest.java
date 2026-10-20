@@ -152,7 +152,7 @@ class AiChatViewTest extends JavaFxTest {
             AtomicBoolean globalSearchRequested = new AtomicBoolean();
             root.addEventHandler(KeyEvent.KEY_PRESSED, _ -> globalSearchRequested.set(true));
             Event.fireEvent(view, new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.F, false, !OS.OS_X, false, OS.OS_X));
-            assertFalse(view.isFindAvailable());
+            assertFalse(view.canHandleSearch());
             assertFalse(view.lookup("#findBar").isVisible());
             assertTrue(globalSearchRequested.get());
         });
@@ -221,9 +221,9 @@ class AiChatViewTest extends JavaFxTest {
     void hiddenAncestorMakesChatFindUnavailable() {
         interact(() -> {
             root.setVisible(false);
-            assertFalse(view.isFindAvailable());
+            assertFalse(view.canHandleSearch());
             root.setVisible(true);
-            assertTrue(view.isFindAvailable());
+            assertTrue(view.canHandleSearch());
         });
     }
 

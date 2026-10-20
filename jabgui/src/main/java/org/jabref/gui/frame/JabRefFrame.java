@@ -37,7 +37,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.ai.chat.AiChatView;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -45,6 +44,7 @@ import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.keyboard.SearchShortcutTarget;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
@@ -344,29 +344,34 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
+    /// The frame captures shortcuts before child views; a view that handles Search must receive it itself.
     // [impl->req~ai.chat.find.unavailable~1]
-    static void installSearchKeyBinding(Node root, KeyBindingRepository keyBindings, Runnable focusLibrarySearch) {
-        root.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (keyBindings.matches(event, KeyBinding.SEARCH)) {
-                if (event.getTarget() instanceof Node target && isChatSearchTarget(target)) {
-                    return;
-                }
-                focusLibrarySearch.run();
-                event.consume();
-            }
-        });
+    static boolean handleSearchKeyBinding(KeyEvent event, KeyBindingRepository keyBindings, Runnable focusLibrarySearch) {
+        if (!keyBindings.matches(event, KeyBinding.SEARCH)) {
+            return false;
+        }
+
+        if (event.getTarget() instanceof Node target && hasSearchShortcutTarget(target)) {
+            return true;
+        }
+        focusLibrarySearch.run();
+        event.consume();
+        return true;
     }
 
-    private static boolean isChatSearchTarget(Node node) {
-        if (node instanceof AiChatView chat) {
-            return chat.isFindAvailable();
+    private static boolean hasSearchShortcutTarget(Node node) {
+        if (node instanceof SearchShortcutTarget searchTarget) {
+            return searchTarget.canHandleSearch();
         }
-        return Optional.ofNullable(node.getParent()).map(JabRefFrame::isChatSearchTarget).orElse(false);
+        return Optional.ofNullable(node.getParent()).map(JabRefFrame::hasSearchShortcutTarget).orElse(false);
     }
 
     private void initKeyBindings() {
-        installSearchKeyBinding(this, preferences.getKeyBindingRepository(), globalSearchBar::requestFocus);
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            // Check search before the switch, which only sees the first matching key binding.
+            if (handleSearchKeyBinding(event, preferences.getKeyBindingRepository(), globalSearchBar::requestFocus)) {
+                return;
+            }
             Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {

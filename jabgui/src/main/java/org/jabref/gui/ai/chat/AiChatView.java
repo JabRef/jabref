@@ -21,6 +21,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.AiPrivacyNoticeView;
 import org.jabref.gui.ai.statuspane.UniversalStatusPaneView;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.SearchShortcutTarget;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ScrollUtils;
 import org.jabref.gui.util.component.HistoryTextArea;
@@ -43,7 +44,7 @@ import jakarta.inject.Inject;
 ///
 /// To set up this component, set or bind the [#entriesProperty()] and [#chatHistoryProperty()] properties.
 // [impl->feat~ai.chatting~1]
-public class AiChatView extends StackPane {
+public class AiChatView extends StackPane implements SearchShortcutTarget {
     @FXML private AiPrivacyNoticeView privacyNotice;
     @FXML private UniversalStatusPaneView restartNeededPane;
     @FXML private UniversalStatusPaneView noFilesErrorPane;
@@ -72,8 +73,6 @@ public class AiChatView extends StackPane {
     @Inject private AiService aiService;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-
-    private AiChatFindViewModel findViewModel;
 
     private AiChatViewModel viewModel;
     private Optional<Node> focusBeforeFind = Optional.empty();
@@ -106,19 +105,18 @@ public class AiChatView extends StackPane {
     /// Ctrl+F inside the chat searches the chat messages instead of the library, see [org.jabref.gui.frame.JabRefFrame].
     // [impl->req~ai.chat.find.open~1, req~ai.chat.find.close~1, req~ai.chat.find.navigation~1]
     private void setupFind() {
-        findViewModel = findBar.getViewModel();
-        findBar.setOnNavigate(() -> updateFind(true));
-        findBar.setOnClose(this::closeFind);
+        findBar.setOnNavigate(_ -> updateFind(true));
+        findBar.setOnClose(_ -> closeFind());
 
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (isFindAvailable() && preferences.getKeyBindingRepository().matches(event, KeyBinding.SEARCH)) {
-                if (!findViewModel.visibleProperty().get()) {
+            if (canHandleSearch() && preferences.getKeyBindingRepository().matches(event, KeyBinding.SEARCH)) {
+                if (!findBar.isVisible()) {
                     focusBeforeFind = Optional.ofNullable(getScene().getFocusOwner());
                 }
-                findViewModel.visibleProperty().set(true);
+                findBar.show();
                 findBar.focusQuery();
                 event.consume();
-            } else if (findViewModel.visibleProperty().get()
+            } else if (findBar.isVisible()
                     && preferences.getKeyBindingRepository().matches(event, KeyBinding.CLOSE)) {
                 closeFind();
                 event.consume();
@@ -126,21 +124,21 @@ public class AiChatView extends StackPane {
         });
         mainContainer.visibleProperty().addListener((_, _, visible) -> {
             if (!visible) {
-                findViewModel.visibleProperty().set(false);
+                findBar.hide();
                 focusBeforeFind = Optional.empty();
             }
         });
 
-        findViewModel.queryProperty().addListener((_, _, _) -> updateFind(true));
-        findViewModel.visibleProperty().addListener((_, _, _) -> updateFind(false));
+        findBar.queryProperty().addListener((_, _, _) -> updateFind(true));
+        findBar.visibleProperty().addListener((_, _, _) -> updateFind(false));
         chatHistoryScrollPane.getRenderedNodes().addListener((ListChangeListener<Node>) _ -> updateFind(false));
     }
 
     /// Highlights all occurrences of the find query in the rendered messages and scrolls to the current one.
     // [impl->req~ai.chat.find.matches~1]
     private void updateFind(boolean scrollToCurrent) {
-        String query = findViewModel.getActiveQuery();
-        int current = findViewModel.getCurrent();
+        String query = findBar.getActiveQuery();
+        int current = findBar.getCurrent();
         List<MarkdownTextFlow> flows = chatHistoryScrollPane.getRenderedNodes().stream()
                                                             .filter(AiChatMessageView.class::isInstance)
                                                             .map(node -> ((AiChatMessageView) node).getMarkdownTextFlow())
@@ -150,7 +148,7 @@ public class AiChatView extends StackPane {
         for (MarkdownTextFlow flow : flows) {
             total += flow.highlightOccurrences(query, current - total);
         }
-        if (!findViewModel.setTotal(total)) {
+        if (!findBar.setTotal(total)) {
             updateFind(scrollToCurrent);
             return;
         }
@@ -165,7 +163,7 @@ public class AiChatView extends StackPane {
 
     // [impl->req~ai.chat.find.restore-focus~1]
     private void closeFind() {
-        findViewModel.visibleProperty().set(false);
+        findBar.hide();
         focusBeforeFind.filter(node -> node.getScene() == getScene() && isVisibleAndEnabled(node))
                        .ifPresentOrElse(Node::requestFocus, () -> {
                            if (isVisibleAndEnabled(userMessageTextArea)) {
@@ -183,7 +181,8 @@ public class AiChatView extends StackPane {
                 && Optional.ofNullable(node.getParent()).map(AiChatView::isVisibleAndEnabled).orElse(true);
     }
 
-    public boolean isFindAvailable() {
+    @Override
+    public boolean canHandleSearch() {
         return isVisibleAndEnabled(mainContainer);
     }
 
