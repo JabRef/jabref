@@ -16,9 +16,12 @@ import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -67,6 +70,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -217,6 +222,83 @@ class AllFieldsTabTest {
             field.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
 
             assertSame(field, field.getScene().getFocusOwner());
+        });
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "MONTH, #jan#, #feb#",
+            "MONTH, #jan#, #jan#",
+            "LANGUAGE, german, english"
+    })
+    void enterInOptionFieldAcceptsValueAndFocusesFieldGrid(StandardField field, String initialValue, String acceptedValue) {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(field, initialValue);
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            ComboBox<?> comboBox = (ComboBox<?>) tab.editors.get(field).getNode().lookup(".combo-box");
+            comboBox.requestFocus();
+            comboBox.getEditor().setText(acceptedValue);
+            comboBox.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+            comboBox.fireEvent(new KeyEvent(KeyEvent.KEY_RELEASED, "", "", KeyCode.ENTER, false, false, false, false));
+
+            assertEquals(Optional.of(acceptedValue), entry.getField(field));
+            assertEquals(comboBox.getConverter().fromString(acceptedValue), comboBox.getValue());
+            assertSame(tab.gridPane, comboBox.getScene().getFocusOwner());
+        });
+    }
+
+    @Test
+    void selectingOptionDoesNotMoveFocus() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.MONTH, "#jan#");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            ComboBox<?> comboBox = (ComboBox<?>) tab.editors.get(StandardField.MONTH).getNode().lookup(".combo-box");
+            comboBox.requestFocus();
+            comboBox.getSelectionModel().select(1);
+
+            assertEquals(Optional.of("#feb#"), entry.getField(StandardField.MONTH));
+            assertSame(comboBox, comboBox.getScene().getFocusOwner());
+        });
+    }
+
+    @Test
+    void enterInOptionPopupSelectsSuggestionAndKeepsFocus() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.MONTH, "#jan#");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            ComboBox<?> comboBox = (ComboBox<?>) tab.editors.get(StandardField.MONTH).getNode().lookup(".combo-box");
+            comboBox.requestFocus();
+            comboBox.show();
+            ListView<?> options = (ListView<?>) ((ComboBoxListViewSkin<?>) comboBox.getSkin()).getPopupContent();
+            options.getSelectionModel().select(1);
+            options.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+            comboBox.fireEvent(new KeyEvent(KeyEvent.KEY_RELEASED, "", "", KeyCode.ENTER, false, false, false, false));
+
+            assertEquals(Optional.of("#feb#"), entry.getField(StandardField.MONTH));
+            assertFalse(comboBox.isShowing());
+            assertSame(comboBox, comboBox.getScene().getFocusOwner());
+        });
+    }
+
+    @Test
+    void consumedEnterDoesNotMoveFocusFromOptionField() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.MONTH, "#jan#");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            ComboBox<?> comboBox = (ComboBox<?>) tab.editors.get(StandardField.MONTH).getNode().lookup(".combo-box");
+            comboBox.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    event.consume();
+                }
+            });
+            comboBox.requestFocus();
+            comboBox.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+
+            assertSame(comboBox, comboBox.getScene().getFocusOwner());
         });
     }
 

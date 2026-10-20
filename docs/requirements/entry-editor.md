@@ -14,11 +14,11 @@ This holds within one library only: switching to a library tab without a selecte
 
 Needs: impl
 
-## Single-line entry fields must return focus to the editor when Enter accepts their value
+## Single-line entry fields must return focus to the editor when <kbd>Enter</kbd> accepts their value
 `req~entry-editor.accept-single-line-value~1`
 
 Applies to single-line text controls in the entry editor after their existing action handlers finish.
-An Enter key handled by an autocomplete popup continues to select its suggestion.
+An <kbd>Enter</kbd> key handled by an autocomplete popup continues to select its suggestion.
 
 See <https://github.com/JabRef/jabref/issues/17445>.
 
