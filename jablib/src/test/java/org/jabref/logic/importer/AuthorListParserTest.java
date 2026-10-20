@@ -38,7 +38,10 @@ class AuthorListParserTest {
                 Arguments.of("{Company Name, LLC}", new Author("", "", null, "{Company Name, LLC}", null)),
                 Arguments.of("{Society of Automotive Engineers}", new Author("", "", null, "{Society of Automotive Engineers}", null)),
                 // No tokenization within braces even with lowercase letters in the beginning of the words
-                Arguments.of("{Society of automotive engineers}", new Author("", "", null, "{Society of automotive engineers}", null)),
+                // (lowercase letters can be treated as starts of name prefixes, which changes how the author
+                // last name is parsed). This case checks that the parser prioritises {} as token boundaries and
+                // does not get sidetracked by the lowercase letters even in many words.
+                Arguments.of("{society of automotive engineers}", new Author("", "", null, "{society of automotive engineers}", null)),
 
                 // Demonstrate the "von" part parsing of a non-braced name
                 Arguments.of("Society of Automotive Engineers", new Author("Society", "S.", "of", "Automotive Engineers", null))
