@@ -270,6 +270,17 @@ jobs:
         run: npm ci
       - name: textlint
         run: npm run textlint
+      - name: textlint write-good (changed Markdown files)
+        if: github.event_name == 'pull_request'
+        run: |
+          # Report-only: the existing docs have thousands of findings, so only the Markdown files changed by the PR are checked and the step does not fail.
+          git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+          mapfile -t files < <(git diff --name-only --diff-filter=AM FETCH_HEAD HEAD -- '*.md' ':!CHANGELOG.md')
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No changed Markdown files."
+            exit 0
+          fi
+          npm run textlint:write-good -- "${files[@]}" | sed "s|${GITHUB_WORKSPACE}/||g" || true
       - name: typos
         run: pipx run typos==1.50.3
 
