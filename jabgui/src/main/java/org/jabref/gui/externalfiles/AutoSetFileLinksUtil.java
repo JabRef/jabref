@@ -254,21 +254,24 @@ public class AutoSetFileLinksUtil {
         return new LinkedFile("", relativeFilePath, strType);
     }
 
-    private List<String> getConfiguredExtensions() {
+    /// Falls back to the default file types if the user has not configured any, see #15084
+    private Collection<ExternalFileType> getFileTypes() {
         Collection<ExternalFileType> fileTypes = externalApplicationsPreferences.getExternalFileTypes();
         if (fileTypes.isEmpty()) {
-            fileTypes = ExternalFileTypes.getDefaultExternalFileTypes();
+            return ExternalFileTypes.getDefaultExternalFileTypes();
         }
-        return fileTypes.stream().map(ExternalFileType::getExtension).toList();
+        return fileTypes;
+    }
+
+    private List<String> getConfiguredExtensions() {
+        return getFileTypes().stream().map(ExternalFileType::getExtension).toList();
     }
 
     private String checkAndGetFileType(Path associatedFile) {
         return FileUtil.getFileExtension(associatedFile)
-                       .flatMap(extension ->
-                               ExternalFileTypes.getExternalFileTypeByExt(
-                                       extension,
-                                       externalApplicationsPreferences
-                               ))
+                       .flatMap(extension -> getFileTypes().stream()
+                                                           .filter(type -> type.getExtension().equalsIgnoreCase(extension))
+                                                           .findFirst())
                        .map(ExternalFileType::getName).orElse("");
     }
 
