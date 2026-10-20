@@ -9,7 +9,7 @@ parent: Decision Records
 
 The search box of the preferences dialog filters the tab list to the tabs matching the query and highlights the matching controls inside the selected tab. To do that, `PreferencesSearchHandler` needs, per tab, a set of *(searchable text, node to highlight)* pairs.
 
-There are two ways to obtain those pairs. The dialog can walk each tab's scene graph and read the text off whatever it finds, or each tab can declare its searchable texts as it builds itself. Since the preference tabs are assembled by `PreferencesFormBuilder`, the builder is in a position to declare them: it knows the caption it just placed and the control that caption belongs to.
+Those pairs can be obtained in two ways. The dialog can walk each tab's scene graph and read the text off whatever it finds, or each tab can declare its searchable texts as it builds itself. Since the preference tabs are assembled by `PreferencesFormBuilder`, the builder is in a position to declare them: it knows the caption it just placed and the control that caption belongs to.
 
 Declaring them has one structural gap, and the builder has two escape hatches through which it opens. `custom(Node)` takes a node the caller assembled, and `attach(Node)` takes a node the caller appends right after a control it placed. In both cases the builder does not know what text that node contains and can declare nothing for it. Text inside a hand-built row, a reused FXML panel, or a caption appended between two fields is then absent from the search — with no compile error, no failing test, and a dialog that looks correct. How should the dialog determine what its search can find?
 
@@ -36,7 +36,7 @@ Chosen option: "Registration plus an automatic scan of the subtree passed to an 
 Concretely:
 
 * Every builder method placing captioned content (`label`, `check`, `button`, `link`, `radio`, `field`, `caption`, `section`) registers the text together with the node it captions. `PreferencesTab#getSearchableElements()` exposes the result; `PreferencesSearchHandler` consumes it and does no traversal of its own.
-* `custom(Node)` walks the node it is handed and registers the text of every `Labeled` it finds, stopping the descent at a `Control` so that a control's own skin is not scanned. This uses public JavaFX API (`Parent#getChildrenUnmodifiable`, `Labeled#getText`); no reflection is involved.
+* `custom(Node)` walks the node it is handed and registers the text of every `Labeled` it finds, stopping the descent at a `Control` to avoid scanning a control's own skin. This uses public JavaFX API (`Parent#getChildrenUnmodifiable`, `Labeled#getText`); no reflection is involved.
 * `attach(Node)` is scanned the same way and for the same reason: an attachment the caller brought is as opaque to the builder as a custom node, only one level further down. The attachments the builder makes itself — a help button, a browse button, an inline value field — carry no text of their own, so the scan finds nothing to register for them.
 * `ElementBase#searchable(String...)` is the explicit fallback for text held by no `Labeled`, and for a node populated only after it was handed to an escape hatch.
 * `ComboBox` items and `TextField` contents are not matched. This is a deliberate narrowing.
