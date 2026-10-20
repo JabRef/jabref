@@ -28,9 +28,10 @@ public class ParserResult {
     private final Set<BibEntryType> entryTypes;
     private final Multimap<Range, String> warnings;
 
-    @NonNull private BibDatabase database;
-    private MetaData metaData;
-    @Nullable private Path file;
+    /// Handed out as is, so that everyone working on the result works on the same library. An undo journal is looked
+    /// up by its context: a change recorded while the library is still loading (e.g., an accepted backup change) has
+    /// to land in the journal of the tab that later shows the library.
+    private BibDatabaseContext databaseContext;
     private boolean invalid;
     private boolean changedOnMigration = false;
 
@@ -52,8 +53,7 @@ public class ParserResult {
     public ParserResult(@NonNull BibDatabase database,
                         @NonNull MetaData metaData,
                         @NonNull Set<BibEntryType> entryTypes) {
-        this.database = database;
-        this.metaData = metaData;
+        this.databaseContext = new BibDatabaseContext(database, metaData);
         this.entryTypes = entryTypes;
         this.warnings = MultimapBuilder.hashKeys().hashSetValues().build();
     }
@@ -78,15 +78,17 @@ public class ParserResult {
     }
 
     public @NonNull BibDatabase getDatabase() {
-        return database;
+        return databaseContext.getDatabase();
     }
 
     public MetaData getMetaData() {
-        return metaData;
+        return databaseContext.getMetaData();
     }
 
+    /// A context cannot exchange its metadata, so this starts a new context. Meant for the parser, which sets the
+    /// metadata before anyone asks for the context.
     public void setMetaData(MetaData md) {
-        this.metaData = md;
+        databaseContext = new BibDatabaseContext(databaseContext.getDatabase(), md, databaseContext.getDatabasePath().orElse(null));
     }
 
     @NonNull
@@ -95,11 +97,11 @@ public class ParserResult {
     }
 
     public Optional<Path> getPath() {
-        return Optional.ofNullable(file);
+        return databaseContext.getDatabasePath();
     }
 
     public void setPath(@Nullable Path path) {
-        file = path;
+        databaseContext.setDatabasePath(path);
     }
 
     /// Add a parser warning.
@@ -143,13 +145,11 @@ public class ParserResult {
     }
 
     public BibDatabaseContext getDatabaseContext() {
-        return new BibDatabaseContext(database, metaData, file);
+        return databaseContext;
     }
 
     public void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
-        database = bibDatabaseContext.getDatabase();
-        metaData = bibDatabaseContext.getMetaData();
-        file = bibDatabaseContext.getDatabasePath().orElse(null);
+        databaseContext = bibDatabaseContext;
     }
 
     public boolean isEmpty() {

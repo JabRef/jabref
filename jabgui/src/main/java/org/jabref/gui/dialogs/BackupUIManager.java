@@ -121,7 +121,8 @@ public class BackupUIManager {
                 if (allChangesResolved.orElse(false)) {
                     List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
                     // The library is still being opened, so no tab exists for it yet - the active tab (if any) belongs to another
-                    // library. Its change monitor is set up when the tab is created.
+                    // library. Its change monitor is set up when the tab is created. The tab installs this very context once
+                    // loading finished, so the merge lands in the journal that drives its modified marker and undo.
                     stateManager.getUndoManager(originalDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
                             resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
 
