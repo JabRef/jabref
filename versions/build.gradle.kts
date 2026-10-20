@@ -69,7 +69,7 @@ dependencies.constraints {
     api("com.konghq:unirest-java-core:4.10.2")
     api("com.konghq:unirest-modules-gson:4.10.2")
     api("com.nimbusds:oauth2-oidc-sdk:11.30.1")
-    api("com.nimbusds:nimbus-jose-jwt:10.6")
+    api("com.nimbusds:nimbus-jose-jwt:10.10")
     api("com.squareup.okhttp3:mockwebserver3:5.5.0")
     api("com.squareup.okhttp3:okhttp:5.5.0")
     api("com.squareup.okio:okio-jvm:3.18.2")
