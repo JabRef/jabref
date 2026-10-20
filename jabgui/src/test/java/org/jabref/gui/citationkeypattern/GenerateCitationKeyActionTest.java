@@ -83,7 +83,8 @@ class GenerateCitationKeyActionTest {
         JavaFxExtension.awaitEvents();
     }
 
-    /// Records current behaviour: confirming the overwrite renames the key, so a citation of "Wang2020a" breaks.
+    /// Records current behaviour, not intended behaviour: confirming the overwrite renames the key, so a citation of "Wang2020a" breaks.
+    /// A silently changing key is considered a bug (see https://github.com/JabRef/jabref/issues/9605).
     /// This is the contrast to the test with overwriting avoided, which keeps the key.
     @Test
     void regeneratingAfterCollidingEntryIsRemovedRenamesKeyWhenOverwriteIsConfirmed() {
