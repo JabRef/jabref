@@ -21,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
 - We added restoring of the library tab and entry that were selected when JabRef was closed. [#16911](https://github.com/JabRef/jabref/pull/16911)
+- We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
 
 ### Changed
 
@@ -119,6 +120,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the ability for LibreOffice BST citations to use style-defined labels. [forum#3764](https://discourse.jabref.org/t/feature-request-custom-citation-styles-from-bst/3764). [#16357](https://github.com/JabRef/jabref/issues/16357)
 - We added a new "Main" tab to the entry editor showing all fields of an entry in a single scrollable list, with one-click chips for adding optional fields and a free-form box for adding arbitrary fields. Identifiers, files and links, bibliometrics, comments, and meta fields (groups, owner, timestamps, special fields) live in collapsible sections — collapsed when empty — each offering chips for its unset fields; an open files and links section always shows the file editor. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
+- We added MARC21 XML and BIBFRAME exchange, preserving common fields and improving serial-article detection in existing fetchers. [#17292](https://github.com/JabRef/jabref/pull/17292)
 - We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)
 - We added the ability to view citation previews rendered using the selected style on hover in the "Citations" tab. [#15914](https://github.com/JabRef/jabref/pull/15914)
 - We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15929](https://github.com/JabRef/jabref/pull/15929)
