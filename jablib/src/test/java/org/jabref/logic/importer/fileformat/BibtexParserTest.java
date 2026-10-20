@@ -403,7 +403,7 @@ class BibtexParserTest {
 
     // [utest->req~import.bibtex.missing-key-recovery~1]
     @ParameterizedTest
-    @ValueSource(strings = {"", "key"})
+    @ValueSource(strings = {"", "key", "Smith(2000)", "Smith((2000))"})
     void parseRecognizesParenthesizedEntryBeforeFollowingEntry(String key) throws IOException {
         ParserResult result = parser.parse(Reader.of("@article(\n" + key + ")\n@article{following,title={Control}}"));
 
@@ -421,6 +421,36 @@ class BibtexParserTest {
 
         assertEquals(List.of(new BibEntry(StandardEntryType.Article).withCitationKey(key).withField(StandardField.TITLE, "Test")),
                 result.getDatabase().getEntries());
+        assertEquals(List.of(), result.warnings());
+    }
+
+    // [utest->req~import.bibtex.citation-key-parentheses~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"Smith(2000)", "Smith((2000))"})
+    void parsePreservesParenthesesInParenthesizedCitationKeys(String key) throws IOException {
+        String entry = "@article(" + key + ", title={x})";
+        ParserResult result = parser.parse(Reader.of(entry));
+
+        assertEquals(List.of(new BibEntry(StandardEntryType.Article).withCitationKey(key).withField(StandardField.TITLE, "x")),
+                result.getDatabase().getEntries());
+        assertEquals(entry, result.getDatabase().getEntries().getFirst().getParsedSerialization());
+        assertEquals(List.of(), result.warnings());
+    }
+
+    // [utest->req~import.bibtex.citation-key-parentheses~1]
+    @Test
+    void parsePreservesFollowingEntryAfterParenthesizedCitationKey() throws IOException {
+        String entry = "@article(Smith(2000), title={x})\n";
+        String followingEntry = "@article{following,title={Control}}";
+        ParserResult result = parser.parse(Reader.of(entry + followingEntry));
+
+        assertEquals(List.of(
+                        new BibEntry(StandardEntryType.Article).withCitationKey("Smith(2000)").withField(StandardField.TITLE, "x"),
+                        new BibEntry(StandardEntryType.Article).withCitationKey("following").withField(StandardField.TITLE, "Control")),
+                result.getDatabase().getEntries());
+        assertEquals(entry, result.getDatabase().getEntries().getFirst().getParsedSerialization());
+        assertEquals(followingEntry, result.getDatabase().getEntries().get(1).getParsedSerialization());
+        assertEquals("", result.getDatabase().getEntries().get(1).getUserComments());
         assertEquals(List.of(), result.warnings());
     }
 

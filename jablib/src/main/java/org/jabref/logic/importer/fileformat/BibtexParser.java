@@ -1030,6 +1030,7 @@ public class BibtexParser implements Parser {
     /// This method is used to parse the citation key of an entry.
     private String parseKey(char closingBracket) throws IOException {
         StringBuilder token = new StringBuilder(20);
+        int openParentheses = 0;
 
         while (true) {
             int character = read();
@@ -1040,9 +1041,17 @@ public class BibtexParser implements Parser {
                 return token.toString();
             }
 
-            if ((character != closingBracket) && !Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
+            // [impl->req~import.bibtex.citation-key-parentheses~1]
+            if (((character != closingBracket) || (openParentheses > 0)) && !Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
                     || (character == ':') || ("#{}~,=\uFFFD".indexOf(character) == -1))) {
                 token.append((char) character);
+                if (closingBracket == ')') {
+                    if (character == '(') {
+                        openParentheses++;
+                    } else if (character == ')') {
+                        openParentheses--;
+                    }
+                }
             } else {
                 if ((character == '=') || (Character.isWhitespace((char) character) && isEqualsSignNext())) {
                     // [impl->req~import.bibtex.missing-key-recovery~1]

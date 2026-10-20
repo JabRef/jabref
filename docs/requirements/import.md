@@ -42,6 +42,15 @@ Context: <https://github.com/JabRef/jabref/pull/17496>
 
 Needs: impl, utest
 
+## BibTeX importer must preserve balanced parentheses in citation keys
+`req~import.bibtex.citation-key-parentheses~1`
+
+This applies to entries enclosed in parentheses as well as braces.
+For `@article(Smith(2000), title={x})`, the citation key is `Smith(2000)` and the title is `x`.
+Context: <https://github.com/JabRef/jabref/pull/17496#discussion_r4308280956>
+
+Needs: impl, utest
+
 ## Library must maintain imported entries sorted by internal id
 `req~import.entries.sorted-by-id~1`
 
