@@ -22,6 +22,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -146,7 +147,9 @@ class AllFieldsTabTest {
         Injector.setModelOrService(DialogService.class, mock(DialogService.class));
         Injector.setModelOrService(StateManager.class, stateManager);
         Injector.setModelOrService(UndoManager.class, new JabRefUndoManager());
-        Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+        // Reset the static clipboards: another test may have left a cleared Mockito mock behind.
+        ClipBoardManager clipBoardManager = new ClipBoardManager(stateManager, mock(Clipboard.class), new java.awt.datatransfer.Clipboard("entry-editor-test"));
+        Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
         Injector.setModelOrService(KeyBindingRepository.class, new KeyBindingRepository());
         Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
         Injector.setModelOrService(JournalAbbreviationRepository.class, mock(JournalAbbreviationRepository.class));
@@ -219,6 +222,7 @@ class AllFieldsTabTest {
                 }
             });
             field.requestFocus();
+            field.selectAll();
             field.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
 
             assertSame(field, field.getScene().getFocusOwner());
