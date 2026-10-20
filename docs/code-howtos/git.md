@@ -68,7 +68,7 @@ However, JabRef is able to analyze the entries and determine that:
 
 * Entry a was modified only by Alice.
 * Entry b was modified only by Bob.
-* There is no conflict at the field level.
+* The changes do not conflict at the field level.
 * The order of entries in the file does not affect BibTeX semantics.
 
 Therefore, JabRef performs an automatic merge without requiring manual conflict resolution.
