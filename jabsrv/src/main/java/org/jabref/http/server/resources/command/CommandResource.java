@@ -1,4 +1,4 @@
-package org.jabref.http.server.command;
+package org.jabref.http.server.resources.command;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
