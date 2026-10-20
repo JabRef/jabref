@@ -175,7 +175,7 @@ class AllFieldsTabTest {
     @Test
     void enterInDateFieldPreservesItsCommitHandler() {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Corti2009")
-                                                               .withField(StandardField.DATE, "2009-03");
+                                                                .withField(StandardField.DATE, "2009-03");
 
         JavaFxExtension.invokeAndWait(() -> {
             showEntryEditor(entry);
@@ -192,7 +192,7 @@ class AllFieldsTabTest {
     @Test
     void enterInMultilineFieldInsertsNewlineAndKeepsFocus() {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Corti2009")
-                                                               .withField(StandardField.ABSTRACT, "First line");
+                                                                .withField(StandardField.ABSTRACT, "First line");
 
         JavaFxExtension.invokeAndWait(() -> {
             showEntryEditor(entry);
