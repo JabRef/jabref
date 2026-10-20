@@ -50,6 +50,7 @@ Source code alone does not prove a visual problem. Untested dialogs should not b
 ### Incomplete message-area borders at font size 16
 
 **Observed dialogs at font size 16:**
+
 - TeXstudio error: “This operation requires all selected entries to have citation keys defined.”
 - Rebuild fulltext search index.
 - Reset preferences.
@@ -72,6 +73,7 @@ Source code alone does not prove a visual problem. Untested dialogs should not b
 JabRef applies the selected font size to application windows through `ThemeManager`. The stylesheet defines font-size classes from 8 to 20, with 9 as the default.
 
 **Source files:**
+
 - `jabgui/src/main/java/org/jabref/gui/theme/ThemeManager.java`
 - `jabgui/src/main/resources/org/jabref/gui/theme/internal/jabref-base.css`
 
@@ -79,27 +81,27 @@ This confirms how the font preference is applied. It does not prove that every d
 
 ### Screenshots
 
-**TeXstudio error**
+#### TeXstudio error
 
 ![TeXstudio error dialog](screenshots/Texstudio-error.png)
 
-**Reset preferences**
+#### Reset preferences
 
 ![Reset preferences dialog](screenshots/reset-preferences.png)
 
-**Clear embeddings cache**
+#### Clear embeddings cache
 
 ![Clear embeddings cache dialog](screenshots/clear-embeddings-cache.png)
 
-**Rebuild fulltext search index**
+#### Rebuild fulltext search index
 
 ![Rebuild fulltext search index dialog](screenshots/rebuild-fulltext-search-index.png)
 
-**Redownload missing files**
+#### Redownload missing files
 
 ![Redownload missing files dialog](screenshots/redownload-missing-files.png)
 
-**Automatically set file links**
+#### Automatically set file links
 
 ![Automatically set file links dialog](screenshots/Automatic-set-file-links.png)
 
