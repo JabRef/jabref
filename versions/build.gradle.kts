@@ -33,7 +33,7 @@ dependencies {
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.3"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.3"))
-    api(platform("tools.jackson:jackson-bom:3.2.3"))
+    api(platform("tools.jackson:jackson-bom:3.2.4"))
 }
 
 dependencies.constraints {
@@ -66,10 +66,10 @@ dependencies.constraints {
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.10.1")
-    api("com.konghq:unirest-modules-gson:4.10.1")
+    api("com.konghq:unirest-java-core:4.10.2")
+    api("com.konghq:unirest-modules-gson:4.10.2")
     api("com.nimbusds:oauth2-oidc-sdk:11.30.1")
-    api("com.nimbusds:nimbus-jose-jwt:10.6")
+    api("com.nimbusds:nimbus-jose-jwt:10.10")
     api("com.squareup.okhttp3:mockwebserver3:5.5.0")
     api("com.squareup.okhttp3:okhttp:5.5.0")
     api("com.squareup.okio:okio-jvm:3.18.2")
