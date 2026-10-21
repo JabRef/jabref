@@ -117,6 +117,36 @@ class GitCommitDialogViewModelTest {
         assertEquals("My own message", viewModel.commitMessageProperty().get());
     }
 
+    // [utest->req~git.commit.generated-message~1]
+    @Test
+    void commitBeforePrefillFinishesUsesGeneratedMessage(@TempDir Path tempDir) throws Exception {
+        Path libraryFile = commitLibrary(tempDir, "@article{Smith2024, author={Smith}, title={Git basics}}\n");
+        Files.writeString(libraryFile, "@article{Smith2024, author={Smith, John}, title={Git basics}}\n");
+
+        viewModel.commit(() -> {
+        });
+
+        assertEquals("Modify author of Smith2024", lastCommitMessage(tempDir));
+    }
+
+    @Test
+    void commitKeepsMessageTypedByUser(@TempDir Path tempDir) throws Exception {
+        Path libraryFile = commitLibrary(tempDir, "@article{Smith2024, author={Smith}, title={Git basics}}\n");
+        Files.writeString(libraryFile, "@article{Smith2024, author={Smith, John}, title={Git basics}}\n");
+        viewModel.commitMessageProperty().set("My own message");
+
+        viewModel.commit(() -> {
+        });
+
+        assertEquals("My own message", lastCommitMessage(tempDir));
+    }
+
+    private String lastCommitMessage(Path tempDir) throws Exception {
+        try (Git git = Git.open(tempDir.resolve("repo").toFile())) {
+            return git.log().setMaxCount(1).call().iterator().next().getFullMessage();
+        }
+    }
+
     private Path commitLibrary(Path tempDir, String content) throws Exception {
         Path repoDir = tempDir.resolve("repo");
         Path libraryFile = repoDir.resolve("library.bib");

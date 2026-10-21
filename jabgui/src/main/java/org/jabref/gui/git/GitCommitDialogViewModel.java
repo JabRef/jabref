@@ -78,11 +78,12 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     }
 
     public void commit(Runnable onSuccess) {
-        commitAction(onSuccess, commitTask());
+        // On FX thread, read the message and the task below runs in the background
+        commitAction(onSuccess, commitTask(commitMessage.get()));
     }
 
     public void commitAndPush(Runnable onSuccess) {
-        commitAction(onSuccess, commitAndPushTask());
+        commitAction(onSuccess, commitAndPushTask(commitMessage.get()));
     }
 
     private void commitAction(Runnable onSuccess, BackgroundTask<CommitOutcome> task) {
@@ -104,15 +105,15 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
                 .executeWith(taskExecutor);
     }
 
-    private BackgroundTask<CommitOutcome> commitTask() {
+    private BackgroundTask<CommitOutcome> commitTask(String typedMessage) {
         return BackgroundTask.wrap(() -> {
-            doCommit();
+            doCommit(typedMessage);
             return CommitOutcome.COMMITTED;
         });
     }
 
-    private BackgroundTask<CommitOutcome> commitAndPushTask() {
-        return BackgroundTask.wrap(this::doCommitAndPush);
+    private BackgroundTask<CommitOutcome> commitAndPushTask(String typedMessage) {
+        return BackgroundTask.wrap(() -> doCommitAndPush(typedMessage));
     }
 
     private String messageFor(CommitOutcome outcome) {
@@ -128,11 +129,11 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         };
     }
 
-    private CommitOutcome doCommitAndPush() throws JabRefException, GitAPIException, IOException {
+    private CommitOutcome doCommitAndPush(String typedMessage) throws JabRefException, GitAPIException, IOException {
         ResolvedRepository repository = resolveRepository();
         // Unlike doCommit(), a missing commit here is not fatal: a previous attempt may already have
         // committed and only the push failed, so retrying should still try to push that commit.
-        boolean committedNow = commitCurrent(repository);
+        boolean committedNow = commitCurrent(repository, typedMessage);
         return pushTo(repository, committedNow);
     }
 
@@ -160,8 +161,8 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     public record DiffDatabases(BibDatabaseContext headDatabase, BibDatabaseContext workingTreeDatabase) {
     }
 
-    private void doCommit() throws JabRefException, GitAPIException, IOException {
-        commitOn(resolveRepository());
+    private void doCommit(String typedMessage) throws JabRefException, GitAPIException, IOException {
+        commitOn(resolveRepository(), typedMessage);
     }
 
     private ResolvedRepository resolveRepository() throws JabRefException {
@@ -182,15 +183,15 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         return new ResolvedRepository(dbContext, trackedFile.bibFilePath(), gitHandler);
     }
 
-    private void commitOn(ResolvedRepository repository) throws JabRefException, GitAPIException, IOException {
+    private void commitOn(ResolvedRepository repository, String typedMessage) throws JabRefException, GitAPIException, IOException {
         // TODO: Replace control-flow-by-exception with a proper control structure
-        if (!commitCurrent(repository)) {
+        if (!commitCurrent(repository, typedMessage)) {
             throw new JabRefException(Localization.lang("Nothing to commit."));
         }
     }
 
-    private boolean commitCurrent(ResolvedRepository repository) throws GitAPIException, IOException {
-        return repository.gitHandler().createCommitOnCurrentBranch(commitMessageOrDefault(), amend.get());
+    private boolean commitCurrent(ResolvedRepository repository, String typedMessage) throws GitAPIException, IOException {
+        return repository.gitHandler().createCommitOnCurrentBranch(resolveCommitMessage(typedMessage), amend.get());
     }
 
     private String localizedFailureMessage(Throwable throwable) {
@@ -275,6 +276,22 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         private static String causeMessage(Throwable cause) {
             String message = cause.getLocalizedMessage();
             return message != null ? message : Localization.lang("Git push failed");
+        }
+    }
+
+    /// Keep the message that users have typed.
+    /// If the message is box is still empty (User click commit before generated message)
+    /// ,generate the message here
+    private String resolveCommitMessage(String typedMessage) {
+        if (!StringUtil.isBlank(typedMessage)) {
+            return typedMessage;
+        }
+        try {
+            return generateCommitMessage()
+                    .orElse(Localization.lang("Update references"));
+        } catch (JabRefException | IOException e) {
+            LOGGER.debug("Could not generate a commit message", e);
+            return Localization.lang("Update references");
         }
     }
 
