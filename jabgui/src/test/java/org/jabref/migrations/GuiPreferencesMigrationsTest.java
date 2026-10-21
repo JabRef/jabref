@@ -268,16 +268,15 @@ class GuiPreferencesMigrationsTest {
 
         when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
         when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
-        when(preferences.getInternalPreferences().getUserHostInfo().getUserHostString()).thenReturn("user-host");
 
         try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
             keyringFactory.when(Keyring::create).thenReturn(keyring);
 
             PreferencesMigrations.moveApiKeysToKeyring(preferences);
 
-            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherA"), any());
-            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherB"), any());
-            verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherC"), any());
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherA"), eq("KeyA"));
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherB"), eq("KeyB"));
+            verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherC"), eq("KeyC"));
             verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
         }
     }
