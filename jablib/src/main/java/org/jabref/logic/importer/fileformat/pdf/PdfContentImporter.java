@@ -217,7 +217,9 @@ public class PdfContentImporter extends PdfImporter {
             return importPaperContent(document);
         }
         if (isbns.size() > 1) {
-            return new ParserResult();
+            ParserResult result = new ParserResult();
+            result.addWarning(Localization.lang("More than one ISBN found"));
+            return result;
         }
         BibEntry bookEntry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.ISBN, isbns.getFirst().asString());
