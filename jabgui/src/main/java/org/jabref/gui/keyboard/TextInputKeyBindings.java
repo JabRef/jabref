@@ -1,6 +1,7 @@
 package org.jabref.gui.keyboard;
 
 import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 
@@ -46,13 +47,19 @@ public class TextInputKeyBindings {
                         focusedTextField.positionCaret(lineEnd == -1 ? text.length() : lineEnd);
                         event.consume();
                     }
-                    case EDITOR_UP,
-                         EDITOR_BEGINNING_DOC -> {
+                    case EDITOR_UP -> {
+                        moveCaretUp(focusedTextField);
+                        event.consume();
+                    }
+                    case EDITOR_BEGINNING_DOC -> {
                         focusedTextField.home();
                         event.consume();
                     }
-                    case EDITOR_DOWN,
-                         EDITOR_END_DOC -> {
+                    case EDITOR_DOWN -> {
+                        moveCaretDown(focusedTextField);
+                        event.consume();
+                    }
+                    case EDITOR_END_DOC -> {
                         focusedTextField.end();
                         event.consume();
                     }
@@ -84,8 +91,7 @@ public class TextInputKeyBindings {
                         int pos = focusedTextField.getCaretPosition();
                         String text = focusedTextField.getText(0, focusedTextField.getLength());
                         ResultingStringState res = StringManipulator.killLine(pos, text);
-                        focusedTextField.setText(res.text);
-                        focusedTextField.positionCaret(res.caretPosition);
+                        focusedTextField.deleteText(pos, pos + text.length() - res.text.length());
                         event.consume();
                     }
                     case EDITOR_KILL_WORD -> {
@@ -108,5 +114,43 @@ public class TextInputKeyBindings {
                 }
             });
         }
+    }
+
+    private static void moveCaretUp(TextInputControl control) {
+        if (!(control instanceof TextArea)) {
+            control.home();
+            return;
+        }
+
+        int caret = control.getCaretPosition();
+        String text = control.getText();
+        int lineStart = text.lastIndexOf('\n', caret - 1) + 1;
+        if (lineStart == 0) {
+            control.positionCaret(0);
+            return;
+        }
+
+        int previousLineEnd = lineStart - 1;
+        int previousLineStart = text.lastIndexOf('\n', previousLineEnd - 1) + 1;
+        control.positionCaret(Math.min(previousLineStart + caret - lineStart, previousLineEnd));
+    }
+
+    private static void moveCaretDown(TextInputControl control) {
+        if (!(control instanceof TextArea)) {
+            control.end();
+            return;
+        }
+
+        int caret = control.getCaretPosition();
+        String text = control.getText();
+        int lineStart = text.lastIndexOf('\n', caret - 1) + 1;
+        int lineEnd = text.indexOf('\n', caret);
+        if (lineEnd == -1) {
+            control.positionCaret(text.length());
+            return;
+        }
+
+        int nextLineEnd = text.indexOf('\n', lineEnd + 1);
+        control.positionCaret(Math.min(lineEnd + 1 + caret - lineStart, nextLineEnd == -1 ? text.length() : nextLineEnd));
     }
 }

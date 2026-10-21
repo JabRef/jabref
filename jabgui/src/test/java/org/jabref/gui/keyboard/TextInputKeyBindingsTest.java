@@ -71,6 +71,19 @@ class TextInputKeyBindingsTest {
         assertEquals(16, area.getCaretPosition());
     }
 
+    @Test
+    void killLineCanBeUndoneInTextField() {
+        TextField field = new TextField("search query");
+        field.positionCaret(7);
+
+        applyBinding(field, KeyBinding.EDITOR_KILL_LINE);
+
+        assertEquals("search ", field.getText());
+        assertEquals(7, field.getCaretPosition());
+        field.undo();
+        assertEquals("search query", field.getText());
+    }
+
     @ParameterizedTest
     @MethodSource("navigationTestData")
     void navigationRespectsLineAndDocumentBoundaries(boolean multiline, String text, int caretPosition, KeyBinding binding, int expectedPosition) {
@@ -102,6 +115,12 @@ class TextInputKeyBindingsTest {
                         Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_END, 22),
                         Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_BEGINNING_DOC, 0),
                         Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_END_DOC, 33),
+                        Arguments.of(true, MULTILINE_TEXT, 28, KeyBinding.EDITOR_UP, 16),
+                        Arguments.of(true, MULTILINE_TEXT, 5, KeyBinding.EDITOR_UP, 0),
+                        Arguments.of(true, MULTILINE_TEXT, 5, KeyBinding.EDITOR_DOWN, 16),
+                        Arguments.of(true, MULTILINE_TEXT, 20, KeyBinding.EDITOR_DOWN, 32),
+                        Arguments.of(true, MULTILINE_TEXT, 28, KeyBinding.EDITOR_DOWN, 33),
+                        Arguments.of(true, "Long line\nx", 6, KeyBinding.EDITOR_DOWN, 11),
                         Arguments.of(true, MULTILINE_TEXT, 28, KeyBinding.EDITOR_BEGINNING, 23),
                         Arguments.of(true, MULTILINE_TEXT, 28, KeyBinding.EDITOR_END, 33),
                         Arguments.of(true, "First\n", 6, KeyBinding.EDITOR_BEGINNING, 6),
