@@ -1,10 +1,13 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
+import java.util.Optional;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveHyphenatedNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.pdf.AnnotationArea;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
@@ -57,9 +60,12 @@ public class FileAnnotationViewModel {
         return page.get();
     }
 
-    /// @return the 1-based page the annotation sits on
     public int getPageNumber() {
         return annotation.getPage();
+    }
+
+    public Optional<AnnotationArea> getArea() {
+        return annotation.getArea();
     }
 
     public String getDate() {

@@ -6,8 +6,6 @@ import java.util.Set;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Evince, which offers both `-i`/`--page-index` for the physical page and `-p`/`--page-label` for
-/// the printed label. Annotations carry the physical page, so `-i` is the matching option.
 @NullMarked
 public class EvincePdfReader extends AbstractExternalPdfReader {
 

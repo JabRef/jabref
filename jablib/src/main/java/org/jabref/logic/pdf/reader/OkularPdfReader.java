@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Okular, whose `-p` option takes a physical page number; page labels are not accepted.
 @NullMarked
 public class OkularPdfReader extends AbstractExternalPdfReader {
 

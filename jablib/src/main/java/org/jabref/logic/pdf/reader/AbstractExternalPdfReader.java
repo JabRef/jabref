@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Recognizes a reader by the name of its executable, with and without the Windows `.exe` suffix.
 @NullMarked
 public abstract class AbstractExternalPdfReader implements ExternalPdfReader {
 
@@ -21,6 +20,5 @@ public abstract class AbstractExternalPdfReader implements ExternalPdfReader {
                                    .anyMatch(candidate -> name.equals(candidate) || name.equals(candidate + ".exe"));
     }
 
-    /// Lower-case executable names of this reader, without the `.exe` suffix.
     protected abstract Set<String> getExecutableNames();
 }

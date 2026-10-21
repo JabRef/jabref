@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.model.pdf.AnnotationArea;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
@@ -67,6 +68,23 @@ class PdfAnnotationImporterTest {
 
         assertEquals(List.of(expected),
                 importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-popup.pdf")));
+    }
+
+    /// A sticky note carries no page text, so only its rectangle can position a viewer.
+    /// The fixture states `/MediaBox [0 0 595.276 841.89]` and
+    /// `/Rect [383.8842587459 702.2328263541 401.7425387459 719.6492580792]`, counted from the
+    /// bottom left, so y becomes 841.89 - 719.649.
+    @Test
+    void popupNoteAreaUsesTopLeftOrigin() {
+        final AnnotationArea area = importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-popup.pdf"))
+                                            .getFirst()
+                                            .getArea()
+                                            .orElseThrow();
+
+        assertEquals(383.884f, area.x(), 0.001f);
+        assertEquals(122.241f, area.y(), 0.001f);
+        assertEquals(17.858f, area.width(), 0.001f);
+        assertEquals(17.416f, area.height(), 0.001f);
     }
 
     @Test

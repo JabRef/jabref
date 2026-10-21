@@ -30,15 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Opens the PDF of the selected file annotation at the page that annotation was imported from.
-///
-/// Which viewer is used depends on what the user configured for the PDF file type:
-///
-/// - a reader known to [ExternalPdfReaders] is launched at the page
-/// - a reader JabRef does not know, and every reader on macOS, is launched without a position,
-///   because no page argument may be guessed, and the user is told why
-/// - with nothing configured JabRef cannot tell which reader the OS would pick, so its own
-///   document viewer opens at the page, fitting the whole page into the window so that an
-///   annotation in its lower half is visible
 @NullMarked
 public class OpenAnnotationAction extends SimpleCommand {
 
@@ -51,8 +42,6 @@ public class OpenAnnotationAction extends SimpleCommand {
     private final GuiPreferences preferences;
     private final DialogService dialogService;
 
-    /// Reused so that repeated clicks reuse one window instead of stacking a dialog per click,
-    /// as [FulltextSearchResultsTab] does for the same viewer.
     private @Nullable DocumentViewerView documentViewer;
 
     public OpenAnnotationAction(ObjectExpression<@Nullable Path> currentFile,
@@ -71,7 +60,6 @@ public class OpenAnnotationAction extends SimpleCommand {
         this.executable.bind(currentFile.isNotNull().and(currentAnnotation.isNotNull()));
     }
 
-    /// Does nothing when nothing is selected: a double-click reaches this even then.
     @Override
     public void execute() {
         Optional.ofNullable(currentFile.get()).ifPresent(pdfFile ->
@@ -91,8 +79,7 @@ public class OpenAnnotationAction extends SimpleCommand {
     }
 
     private void openInConfiguredApplication(Path executable, Path pdfFile, FileAnnotationViewModel annotation, ProcessBuilder processBuilder) {
-        // On macOS the arguments never reach the viewer: `open -a` drops them and neither Preview
-        // nor Acrobat can be told a page any other way.
+        // On macOS no reader can be told a page at all: `open -a` drops the arguments.
         Optional<ExternalPdfReader> reader = OS.OS_X ? Optional.empty() : ExternalPdfReaders.getReader(executable);
         LOGGER.debug("Configured PDF application '{}' matched reader {}", executable, reader.map(ExternalPdfReader::getDisplayName));
         reader.ifPresentOrElse(
@@ -102,8 +89,6 @@ public class OpenAnnotationAction extends SimpleCommand {
                 () -> openWithoutPage(pdfFile, executable));
     }
 
-    /// @return the application the user configured for the PDF file type, empty when the file is
-    ///         handed to the operating system instead
     private Optional<Path> getConfiguredApplication() {
         return ExternalFileTypes.getExternalFileTypeByExt("pdf", preferences.getExternalApplicationsPreferences())
                                 .map(ExternalFileType::getOpenWithApplication)
@@ -147,28 +132,27 @@ public class OpenAnnotationAction extends SimpleCommand {
 
     private void openInDocumentViewer(Path pdfFile, FileAnnotationViewModel annotation) {
         findLinkedFile(pdfFile).ifPresentOrElse(
-                linkedFile -> showDocumentViewer(linkedFile, annotation.getPageNumber()),
+                linkedFile -> showDocumentViewer(linkedFile, annotation),
                 () -> {
                     LOGGER.debug("No linked file of {} resolves to '{}'", entry, pdfFile);
                     dialogService.notify(Localization.lang("Could not find file '%0'.", pdfFile.toString()));
                 });
     }
 
-    private void showDocumentViewer(LinkedFile linkedFile, int page) {
+    private void showDocumentViewer(LinkedFile linkedFile, FileAnnotationViewModel annotation) {
         if (documentViewer == null) {
             documentViewer = new DocumentViewerView();
         }
         documentViewer.switchToFile(linkedFile);
-        // Without this the page opens at its top, which leaves an annotation in the lower half of
-        // the page outside the viewport.
-        documentViewer.showFullPage();
-        documentViewer.gotoPage(page);
         documentViewer.disableLiveMode();
+        // Shown before being targeted: the marker on the annotation fades out by animation, and
+        // that animation only runs once the window is up. Targeting it first leaves the marker on.
         dialogService.showCustomDialog(documentViewer);
+        annotation.getArea().ifPresentOrElse(
+                area -> documentViewer.gotoArea(annotation.getPageNumber(), area),
+                () -> documentViewer.gotoPage(annotation.getPageNumber()));
     }
 
-    /// The annotation tab works on paths already resolved against the library's file directories,
-    /// while the document viewer addresses its documents by [LinkedFile].
     private Optional<LinkedFile> findLinkedFile(Path pdfFile) {
         return stateManager.getActiveDatabase()
                            .flatMap(databaseContext -> entry.getFiles().stream()

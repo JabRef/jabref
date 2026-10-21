@@ -4,16 +4,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.pdf.AnnotationArea;
 
 import com.dlsc.pdfviewfx.PDFView;
 import com.tobiasdiez.easybind.EasyBind;
@@ -29,6 +32,8 @@ public class PdfDocumentViewer extends StackPane {
     private final IntegerProperty currentPage = new SimpleIntegerProperty(0);
     private final StringProperty highlightText = new SimpleStringProperty("");
     private final Label placeholderLabel;
+
+    private Optional<AnnotationArea> pendingArea = Optional.empty();
 
     public PdfDocumentViewer() {
         pdfView = new PDFView();
@@ -54,16 +59,26 @@ public class PdfDocumentViewer extends StackPane {
         return highlightText;
     }
 
-    /// Fits the whole page into the window instead of filling the width and scrolling.
-    ///
-    /// Opening a page at its top leaves anything in its lower half outside the viewport, so a
-    /// caller that jumps to a position on the page asks for this view to make that position
-    /// visible. The user can switch back with the viewer's own toolbar toggle.
-    public void showFullPage() {
-        pdfView.setShowAll(true);
+    public void centerOn(int pageIndex, AnnotationArea area) {
+        pendingArea = Optional.of(area);
+        currentPage.set(pageIndex);
+        centerOnPendingArea();
+    }
+
+    private void centerOnPendingArea() {
+        if (pdfView.getDocument() == null) {
+            return;
+        }
+        pendingArea.ifPresent(area -> pdfView.setSelectedSearchResult(new PDFView.SearchResult(
+                "", "", currentPage.get(), new Rectangle2D(area.x(), area.y(), area.width(), area.height()))));
+        pendingArea = Optional.empty();
     }
 
     public void show(Path document) {
+        // A marker belongs to the document it was placed in, and would otherwise keep floating
+        // over whatever is shown next.
+        pdfView.setSelectedSearchResult(null);
+
         if (document != null) {
             pdfView.setVisible(false);
             placeholderLabel.setText(Localization.lang("Loading PDF..."));
@@ -72,6 +87,7 @@ public class PdfDocumentViewer extends StackPane {
             try (InputStream inputStream = Files.newInputStream(document)) {
                 pdfView.load(inputStream);
                 pdfView.setPage(currentPage.get());
+                centerOnPendingArea();
                 pdfView.setVisible(true);
                 placeholderLabel.setVisible(false);
                 LOGGER.debug("Successfully loaded PDF document: {}", document);

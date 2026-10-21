@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Zathura, whose `-P` option opens the document at a page number counted from 1.
 @NullMarked
 public class ZathuraPdfReader extends AbstractExternalPdfReader {
 

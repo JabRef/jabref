@@ -119,15 +119,15 @@ Needs: impl
 
 Triggered from the "File annotations" tab, by the open button or by double-clicking an annotation.
 
-The page is the one the annotation was imported from. When the application configured for the PDF
-file type is a reader JabRef knows, that reader is launched at the page. When it is configured but
-unknown, or on macOS, where no command-line route to a page exists, the file opens without a
-position and the user is notified. With no application configured, JabRef cannot tell which reader
-the operating system would pick, so its own document viewer opens at the page, showing the whole
-page at once so that an annotation in its lower half is visible without scrolling.
+When the application configured for the PDF file type is a reader JabRef knows, that reader is
+launched at the annotation's page. When it is configured but unknown, or on macOS, where no
+command-line route to a page exists, the file opens without a position and the user is notified.
+With no application configured, JabRef cannot tell which reader the operating system would pick, so
+its own document viewer opens, marks the annotation and centers the viewport on it.
 
-Scrolling to the annotation's exact position within the page is not covered; no external reader is
-told more than a page number either.
+External readers are told the page only. They open a document with the page fitted into the window,
+and a viewport that already shows the whole page has nothing left to scroll, so a position within
+the page would only take effect after forcing a zoom level on the user.
 
 <https://github.com/JabRef/jabref/issues/16585>
 

@@ -6,12 +6,6 @@ import java.util.Set;
 
 import org.jspecify.annotations.NullMarked;
 
-/// SumatraPDF understands the Adobe `/A "page=N"` parameters only from version 3.5 on, so the
-/// native `-page` argument is used instead. `-reuse-instance` makes the jump reach an already open
-/// window regardless of the user's `ReuseInstance` setting, which is what turns a second click into
-/// a jump rather than a new window.
-///
-/// <https://www.sumatrapdfreader.org/docs/Command-line-arguments>
 @NullMarked
 public class SumatraPdfReader extends AbstractExternalPdfReader {
 
