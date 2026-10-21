@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.util.IsbnExtractor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.PdfUtils;
 import org.jabref.model.entry.BibEntry;
@@ -95,7 +96,7 @@ public class PdfBookMetadataImportTest {
         ParserResult result = importFixture("imprint-multiple-isbns.pdf");
 
         assertEquals(List.of(), result.getDatabase().getEntries());
-        assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+        assertEquals(List.of(), result.warnings());
     }
 
     @Test
@@ -112,9 +113,9 @@ public class PdfBookMetadataImportTest {
             assertEquals(Optional.of(PdfUtils.getPageContents(document, expectedPage)), bibliographicPage,
                     "The selected text must belong to the fixture's known physical imprint page");
 
-            List<String> actualIsbns = ISBN.findAllInText(bibliographicPage.orElseThrow()).stream()
-                                           .map(ISBN::asString)
-                                           .toList();
+            List<String> actualIsbns = new IsbnExtractor().extract(bibliographicPage.orElseThrow()).stream()
+                                                          .map(ISBN::asString)
+                                                          .toList();
             assertEquals(expectedIsbns, actualIsbns);
         }
     }
