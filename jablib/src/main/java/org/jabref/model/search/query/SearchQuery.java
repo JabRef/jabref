@@ -122,7 +122,7 @@ public class SearchQuery {
         return new SearchRegularExpressionValidator(searchFlags).visit(context);
     }
 
-    // [impl->req~search.doi-link-normalization~1]
+    /// [impl->req~search.doi-link-normalization~1]
     /// Normalizes full DOI URLs to plain DOI identifiers (e.g., "https://doi.org/10.1000/182" -> "10.1000/182").
     /// Normalizing to the plain DOI allows matching both entries storing clean DOIs and entries retaining
     /// full HTTP links (since the plain DOI is a substring of the full URL).
