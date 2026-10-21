@@ -623,7 +623,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public void removeSubgroups(GroupNodeViewModel group) {
         boolean confirmation = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remove subgroups"),
-                Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
+                Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()),
+                Localization.lang("Remove"));
         if (confirmation) {
             recordTreeChange(Localization.lang("Remove subgroups"), edit -> {
                 for (GroupNodeViewModel child : group.getChildren()) {
