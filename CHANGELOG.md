@@ -22,7 +22,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an action to open a PDF at the selected annotation. [#16585](https://github.com/JabRef/jabref/issues/16585)
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
 - We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
-- We added an action to open a PDF at the page of the selected annotation. [#16585](https://github.com/JabRef/jabref/issues/16585)
 
 ### Changed
 
