@@ -34,10 +34,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @NullMarked
@@ -181,6 +185,72 @@ class ShowDocumentViewerActionTest extends JavaFxTest {
             assertEquals(60, pdfControl(view).getDocument().getNumberOfPages());
             assertEquals(53, pdfControl(view).getPage());
         });
+    }
+
+    /// An entry without a PDF opens the PDF of its cross-referenced entry, at the entry's page plus the offset of the entry owning the PDF.
+    @Test
+    void executeOpensCrossrefPdfAtResolvedPageAfterConfirmation() throws IOException {
+        BibEntry paper = addProceedingsAndPaper(100);
+        when(dialogService.showConfirmationDialogAndWait(any(), any(), any(), any())).thenReturn(true);
+
+        interact(() -> {
+            selectedEntries.setAll(paper);
+            assertTrue(action.isExecutable());
+            action.execute();
+
+            PDFView pdf = pdfControl(openedViewer());
+            assertEquals(100, pdf.getDocument().getNumberOfPages());
+            assertEquals(61, pdf.getPage());
+        });
+    }
+
+    @Test
+    void executeDoesNotOpenCrossrefPdfWhenConfirmationIsDeclined() throws IOException {
+        BibEntry paper = addProceedingsAndPaper(100);
+        when(dialogService.showConfirmationDialogAndWait(any(), any(), any(), any())).thenReturn(false);
+
+        interact(() -> {
+            selectedEntries.setAll(paper);
+            action.execute();
+
+            assertEquals(Optional.empty(), shownViewer);
+        });
+    }
+
+    @Test
+    void executeDoesNotAskForConfirmationForOwnPdf() throws IOException {
+        BibEntry entry = createEntry(2);
+
+        interact(() -> {
+            selectedEntries.setAll(entry);
+            action.execute();
+
+            verify(dialogService, never()).showConfirmationDialogAndWait(any(), any(), any(), any());
+        });
+    }
+
+    @Test
+    void isNotExecutableWhenCrossrefEntryHasNoPdf() {
+        BibEntry proceedings = new BibEntry().withCitationKey("proceedings");
+        BibEntry paper = new BibEntry().withCitationKey("paper")
+                                       .withField(StandardField.CROSSREF, "proceedings");
+        databaseContext.getDatabase().insertEntries(proceedings, paper);
+
+        interact(() -> {
+            selectedEntries.setAll(paper);
+
+            assertFalse(action.isExecutable());
+        });
+    }
+
+    private BibEntry addProceedingsAndPaper(int pageCount) throws IOException {
+        BibEntry proceedings = createEntry(pageCount).withCitationKey("proceedings")
+                                                     .withField(PdfLocationResolver.PAGE_OFFSET, "8");
+        BibEntry paper = new BibEntry().withCitationKey("paper")
+                                       .withField(StandardField.CROSSREF, "proceedings")
+                                       .withField(StandardField.PAGES, "54--86");
+        databaseContext.getDatabase().insertEntries(proceedings, paper);
+        return paper;
     }
 
     private DocumentViewerView openedViewer() {

@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.gui.undo.GuiUndoManager;
+import org.jabref.logic.externalfiles.PdfLocationResolver;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -134,6 +135,17 @@ public class ActionHelper {
         }).orElseOpt(false);
 
         return BooleanExpression.booleanExpression(fileIsPresent);
+    }
+
+    public static BooleanExpression isCrossrefPdfPresentForSelectedEntry(StateManager stateManager) {
+        ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
+        Binding<Boolean> crossrefPdfIsPresent = EasyBind.valueAt(selectedEntries, 0).mapOpt(entry ->
+                stateManager.getActiveDatabase()
+                            .flatMap(database -> PdfLocationResolver.resolve(entry, database.getDatabase()))
+                            .filter(location -> location.fileOwner() != entry)
+                            .isPresent()).orElseOpt(false);
+
+        return BooleanExpression.booleanExpression(crossrefPdfIsPresent);
     }
 
     public static BooleanExpression isPdfFilePresentForSelectedEntry(StateManager stateManager, CliPreferences preferences) {
