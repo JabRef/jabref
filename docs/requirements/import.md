@@ -12,6 +12,13 @@ An importer should prefer proper fulltext links (e.g. Volltext) for PDFs over ot
 
 Needs: impl, utest
 
+## Import MARCXML files and BIBFRAME descriptions
+`req~import.bibliographic.xml-formats~1`
+
+JabRef imports standalone MARCXML records and collections as well as MARCXML in SRU responses. It also imports linked BIBFRAME 2.0 Work and Instance descriptions in RDF/XML, keeping multiple entries separate and rejecting external entities.
+
+Needs: impl, utest
+
 ## Importer must normalize imported BibTeX keyword delimiters
 `req~import.bibtex.keywords.normalize-delimiters~1`
 
@@ -52,6 +59,29 @@ Needs: impl, utest
 `req~import.doi-from-other-fields~1`
 
 If an entry's `doi` field is empty and another field contains a DOI, JabRef makes a best-effort attempt to identify that DOI and store it in the `doi` field.
+
+Needs: impl, utest
+
+## Legacy libraries are migrated when opened
+`req~import.bibtex.legacy-migrations~1`
+
+Opening a library written by JabRef 2.x/3.x converts its legacy content to the current representation: explicit group memberships stored inside the group tree move to the entries' `groups` field, `__markedentry` markings become groups, and special field values stored in `keywords` move to their own fields.
+The keyword separator used for splitting is the library's own, falling back to the configured one.
+
+Needs: impl, utest
+
+## Libraries without legacy content must skip legacy migration
+`req~import.bibtex.legacy-migrations.only-when-needed~1`
+
+After conversion and saving, reopening the library does not convert entries or rebuild the entries list again.
+Legacy content is identified by group membership keys, entry markings, and special field values in keywords, including in mixed-format libraries.
+
+Needs: impl, utest
+
+## Legacy library migration must announce conversion
+`req~import.bibtex.legacy-migrations.announcement~1`
+
+When legacy content is detected during opening, a localized notification names the library before conversion starts.
 
 Needs: impl, utest
 

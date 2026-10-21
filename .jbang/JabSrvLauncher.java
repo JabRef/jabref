@@ -25,9 +25,9 @@
 
 // from jabsrv
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.22
-//DEPS com.github.ben-manes.caffeine:caffeine:3.3.0
+//DEPS com.github.ben-manes.caffeine:caffeine:3.3.1
 //DEPS com.google.guava:guava:33.7.2-jre
-//DEPS com.konghq:unirest-modules-gson:4.10.1
+//DEPS com.konghq:unirest-modules-gson:4.10.2
 //DEPS de.undercouch:citeproc-java:3.5.2
 //DEPS info.picocli:picocli:4.7.7
 //DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
@@ -50,11 +50,13 @@
 //DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.3
 //DEPS org.glassfish.jersey.core:jersey-server:4.0.3
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.3
-//DEPS org.hibernate.validator:hibernate-validator:9.1.4.Final
+//DEPS org.hibernate.validator:hibernate-validator:9.1.5.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS tools.jackson.core:jackson-core:3.2.3
-//DEPS tools.jackson.core:jackson-databind:3.2.3
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.3
+//DEPS tools.jackson.core:jackson-core:3.2.4
+//DEPS tools.jackson.core:jackson-databind:3.2.4
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.4
+//DEPS com.nimbusds:oauth2-oidc-sdk:11.38.2
+//DEPS net.minidev:json-smart:2.6.0
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
@@ -92,11 +94,12 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchField.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchResultContainer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SelectedItemsContainer.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/Command.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/CommandResource.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/FocusCommand.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/OpenLibrariesCommand.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/callback/CallbackResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/Command.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/FocusCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/OpenLibrariesCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/CommandResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/CitationsResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesQueryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
@@ -114,6 +117,7 @@
 // new jablib sources not yet in the 6.0-SNAPSHOT artifact
 //SOURCES ../jablib/src/main/java/org/jabref/logic/importer/plaincitation/PlainCitationParserFactory.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/UiCommand.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/citedrive/OAuthSessionRegistry.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/LibrarySearcher.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/NoOpSearchBackend.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchBackend.java

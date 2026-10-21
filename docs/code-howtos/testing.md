@@ -49,6 +49,25 @@ void convertsToUpperCamelCase(String input, String expected) {
 }
 ```
 
+## Legacy library migration profiling
+
+Generate a deterministic 100,000-entry migration fixture from the repository root:
+
+```sh
+python3 scripts/bib-file-generator_legacy.py
+```
+
+The script creates `generated-large-legacy-library.bib` and refuses to overwrite an existing file.
+Use `--entries`, `--separator`, and `--output` for smaller fixtures or libraries with a semicolon keyword separator.
+The fixture contains large and overlapping explicit groups, nested hierarchy modes, duplicate and missing citation keys, markings, and special field values stored in keywords.
+It also includes keyword, regular-expression, search, automatic, and legacy smart groups.
+
+Measure parsing separately from `PerformLoadDatabaseMigrations` with a JVM flight recording.
+Migration runs before GUI attachment: only conversions with remaining legacy content run, using temporarily detached entries and a single citation-key index.
+Entries are reinserted in a batch to restore observation and database indices, and the library is marked modified so the converted representation can be saved.
+A localized notification announces migration when legacy content is found.
+Save and reopen the fixture to verify that no conversion runs again; the content checks still run to detect legacy data in mixed-format libraries.
+
 ## Coverage
 
 IntelliJ has build in test coverage reports. Choose "Run with coverage".
@@ -190,6 +209,33 @@ Fetcher tests can be run locally by executing the Gradle task `externalServicesT
 ```
 
 Alternatively, if one is using IntelliJ, this can also be done by double-clicking the `externalServicesTest` task under the `other` group in the Gradle Tool window (`JabRef > Tasks > other > externalServicesTest`).
+
+### Converter integration tests
+
+The BIBFRAME converter integration tests are marked with `@Tag("converter")`. They run the Library of Congress MARC-to-BIBFRAME and BIBFRAME-to-MARC converters, so `git`, `make`, and `xsltproc` must be available on `PATH`.
+
+If you do not already have the converter repositories, clone them next to the JabRef checkout. Run these commands from the JabRef checkout root:
+
+```shell
+git clone https://github.com/lcnetdev/marc2bibframe2.git ../marc2bibframe2
+git -C ../marc2bibframe2 checkout ed9abb038214474e8fc8ba4035d01c42fe0246de
+git clone https://github.com/lcnetdev/bibframe2marc.git ../bibframe2marc
+git -C ../bibframe2marc checkout 36a96c813437ac714e8c9479b2f7be56dc78671d
+```
+
+Run the task from the JabRef checkout root:
+
+```shell
+./gradlew :jablib:converterTest
+```
+
+To run only one test method, use Gradle's standard class and method filter:
+
+```shell
+./gradlew :jablib:test --tests "org.jabref.logic.exporter.BibframeConverterIntegrationTest.bookSurvivesConverterChain"
+```
+
+Gradle passes sibling checkout paths to all `jablib` test tasks as `MARC2BIBFRAME2_DIR` and `BIBFRAME2MARC_DIR`. The test verifies each checkout is at the pinned commit above. If a sibling checkout is missing, JUnit skips the tests that need it. If the repositories are elsewhere, set those environment variables to their paths before running Gradle.
 
 ### "No matching tests found"
 
