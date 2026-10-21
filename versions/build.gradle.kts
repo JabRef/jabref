@@ -33,7 +33,7 @@ dependencies {
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.3"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.3"))
-    api(platform("tools.jackson:jackson-bom:3.2.3"))
+    api(platform("tools.jackson:jackson-bom:3.2.4"))
 }
 
 dependencies.constraints {
@@ -66,8 +66,10 @@ dependencies.constraints {
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.10.1")
-    api("com.konghq:unirest-modules-gson:4.10.1")
+    api("com.konghq:unirest-java-core:4.10.2")
+    api("com.konghq:unirest-modules-gson:4.10.2")
+    api("com.nimbusds:oauth2-oidc-sdk:11.38.2")
+    api("com.nimbusds:nimbus-jose-jwt:10.10")
     api("com.squareup.okhttp3:mockwebserver3:5.5.0")
     api("com.squareup.okhttp3:okhttp:5.5.0")
     api("com.squareup.okio:okio-jvm:3.18.2")
@@ -108,6 +110,7 @@ dependencies.constraints {
     api("net.java.dev.jna:jna-platform:5.19.1")
     api("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")
     api("net.ltgt.nullaway:nullaway:2.3.0")
+    api("net.minidev:json-smart:2.6.0")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.1")

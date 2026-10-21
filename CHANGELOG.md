@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Contribute to JabRef" to the Help menu, linking to [contribute.jabref.org](https://contribute.jabref.org). [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
+- We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
 
 ### Changed
 
@@ -72,6 +73,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where AI chats were lost when JabRef did not quit regularly. [#17177](https://github.com/JabRef/jabref/pull/17177)
 - We fixed an issue where the links at the bottom of the Welcome tab were cut off in small windows. [#17015](https://github.com/JabRef/jabref/issues/17015)
 - We fixed an issue where saving the "Custom entry types" preferences removed custom fields from the non-wrapped fields. [#17121](https://github.com/JabRef/jabref/pull/17121)
+- We fixed an issue where "Automatically set file links" did not work when no external file types were configured. [#15084](https://github.com/JabRef/jabref/issues/15084)
 
 ### Removed
 
@@ -117,6 +119,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the ability for LibreOffice BST citations to use style-defined labels. [forum#3764](https://discourse.jabref.org/t/feature-request-custom-citation-styles-from-bst/3764). [#16357](https://github.com/JabRef/jabref/issues/16357)
 - We added a new "Main" tab to the entry editor showing all fields of an entry in a single scrollable list, with one-click chips for adding optional fields and a free-form box for adding arbitrary fields. Identifiers, files and links, bibliometrics, comments, and meta fields (groups, owner, timestamps, special fields) live in collapsible sections — collapsed when empty — each offering chips for its unset fields; an open files and links section always shows the file editor. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
+- We added MARC21 XML and BIBFRAME exchange, preserving common fields and improving serial-article detection in existing fetchers. [#17292](https://github.com/JabRef/jabref/pull/17292)
 - We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)
 - We added the ability to view citation previews rendered using the selected style on hover in the "Citations" tab. [#15914](https://github.com/JabRef/jabref/pull/15914)
 - We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15929](https://github.com/JabRef/jabref/pull/15929)
@@ -1387,7 +1390,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where it was no longer possible to connect to a shared mysql database due to an exception. [#9761](https://github.com/JabRef/jabref/issues/9761)
 - We fixed an issue where an exception was thrown for the user after <kbd>Ctrl</kbd>+<kbd>Z</kbd> command. [#9737](https://github.com/JabRef/jabref/issues/9737)
 - We fixed the citation key generation for [`[authors]`, `[authshort]`, `[authorsAlpha]`, `[authIniN]`, `[authEtAl]`, `[auth.etal]`](https://docs.jabref.org/setup/citationkeypatterns#special-field-markers) to handle `and others` properly. [JabRef/jabref-koppor#626](https://github.com/JabRef/jabref-koppor/issues/626)
-- We fixed the Save/save as file type shows BIBTEX_DB instead of "Bibtex library". [#9372](https://github.com/JabRef/jabref/issues/9372)
+- We fixed the Save/save as file type shows BIBTEX_DB instead of "BibTeX library". [#9372](https://github.com/JabRef/jabref/issues/9372)
 - We fixed the default main file directory for non-English Linux users. [#8010](https://github.com/JabRef/jabref/issues/8010)
 - We fixed an issue when overwriting the owner was disabled. [#9896](https://github.com/JabRef/jabref/pull/9896)
 - We fixed an issue regarding recording redundant prefixes in search history. [#9685](https://github.com/JabRef/jabref/issues/9685)
@@ -1603,7 +1606,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where removing several groups deletes only one of them. [#8390](https://github.com/JabRef/jabref/issues/8390)
 - We fixed an issue where the Sidepane (groups, web search and open office) width is not remembered after restarting JabRef. [#8907](https://github.com/JabRef/jabref/issues/8907)
 - We fixed a bug where switching between themes will cause an error/exception. [#8939](https://github.com/JabRef/jabref/pull/8939)
-- We fixed a bug where files that were deleted in the source bibtex file were kept in the index. [#8962](https://github.com/JabRef/jabref/pull/8962)
+- We fixed a bug where files that were deleted in the source BibTeX file were kept in the index. [#8962](https://github.com/JabRef/jabref/pull/8962)
 - We fixed "Error while sending to JabRef" when the browser extension interacts with JabRef. [JabRef/JabRef-Browser-Extension#479](https://github.com/JabRef/JabRef-Browser-Extension/issues/479)
 - We fixed a bug where updating group view mode (intersection or union) requires re-selecting groups to take effect. [#6998](https://github.com/JabRef/jabref/issues/6998)
 - We fixed a bug that prevented external group metadata changes from being merged. [#8873](https://github.com/JabRef/jabref/issues/8873)
@@ -1728,7 +1731,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The option "Fit table horizontally on screen" in the "Entry table" preferences is now disabled by default. [#8148](https://github.com/JabRef/jabref/pull/8148)
 - We improved the preferences and descriptions in the "Linked files" preferences tab. [#8148](https://github.com/JabRef/jabref/pull/8148)
 - We slightly changed the layout of the Journal tab in the preferences for ui consistency. [#7937](https://github.com/JabRef/jabref/pull/7937)
-- The JabRefHost on Windows now writes a temporary file and calls `-importToOpen` instead of passing the bibtex via `-importBibtex`. [#7374](https://github.com/JabRef/jabref/issues/7374). [JabRef/JabRef-Browser-Extension#274](https://github.com/JabRef/JabRef-Browser-Extension/issues/274)
+- The JabRefHost on Windows now writes a temporary file and calls `-importToOpen` instead of passing the BibTeX via `-importBibtex`. [#7374](https://github.com/JabRef/jabref/issues/7374). [JabRef/JabRef-Browser-Extension#274](https://github.com/JabRef/JabRef-Browser-Extension/issues/274)
 - We reordered some entries in the right-click menu of the main table. [#6099](https://github.com/JabRef/jabref/issues/6099)
 - We merged the barely used ImportSettingsTab and the CustomizationTab in the preferences into one single tab and moved the option to allow Integers in Edition Fields in Bibtex-Mode to the EntryEditor tab. [#7849](https://github.com/JabRef/jabref/pull/7849)
 - We moved the export order in the preferences from `File` to `Import and Export`. [#7935](https://github.com/JabRef/jabref/pull/7935)
@@ -1775,7 +1778,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where an exception would occur when clicking on a DOI link in the preview pane. [#7706](https://github.com/JabRef/jabref/issues/7706)
 - We fixed an issue where XMP and embedded BibTeX export would not work. [#8278](https://github.com/JabRef/jabref/issues/8278)
 - We fixed an issue where the XMP and embedded BibTeX import of a file containing multiple schemas failed. [#8278](https://github.com/JabRef/jabref/issues/8278)
-- We fixed an issue where writing embedded BibTeX import fails due to write protection or bibtex already being present. [#8332](https://github.com/JabRef/jabref/pull/8332)
+- We fixed an issue where writing embedded BibTeX import fails due to write protection or BibTeX already being present. [#8332](https://github.com/JabRef/jabref/pull/8332)
 - We fixed an issue where pdf-paths and the pdf-indexer could get out of sync. [#8182](https://github.com/JabRef/jabref/issues/8182)
 - We fixed an issue where Status-Logger error messages appeared during the startup of JabRef. [#5475](https://github.com/JabRef/jabref/issues/5475)
 
@@ -1813,8 +1816,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- The export to MS Office XML now exports the author field as `Inventor` if the bibtex entry type is `patent`. [#7830](https://github.com/JabRef/jabref/issues/7830)
-- We changed the EndNote importer to import the field `label` to the corresponding bibtex field `endnote-label` [forum#2734](https://discourse.jabref.org/t/importing-endnote-label-field-to-jabref-from-xml-file/2734)
+- The export to MS Office XML now exports the author field as `Inventor` if the BibTeX entry type is `patent`. [#7830](https://github.com/JabRef/jabref/issues/7830)
+- We changed the EndNote importer to import the field `label` to the corresponding BibTeX field `endnote-label` [forum#2734](https://discourse.jabref.org/t/importing-endnote-label-field-to-jabref-from-xml-file/2734)
 - The keywords added via "Manage content selectors" are now displayed in alphabetical order. [#3791](https://github.com/JabRef/jabref/issues/3791)
 - We improved the "Find unlinked files" dialog to show import results for each file. [#7209](https://github.com/JabRef/jabref/pull/7209)
 - The content of the field `timestamp` is migrated to `creationdate`. In case one configured "update timestamp", it is migrated to `modificationdate`. [JabRef/jabref-koppor#130](https://github.com/JabRef/jabref-koppor/issues/130)
@@ -1869,7 +1872,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the secondary sorting is not working for some special fields. [#7015](https://github.com/JabRef/jabref/issues/7015)
 - We fixed an issue where changing the font size makes the font size field too small. [#7085](https://github.com/JabRef/jabref/issues/7085)
 - We fixed an issue with TexGroups on Linux systems, where the modification of an aux-file did not trigger an auto-update for TexGroups. Furthermore, the detection of file modifications is now more reliable. [#7412](https://github.com/JabRef/jabref/pull/7412)
-- We fixed an issue where the Unicode to Latex formatter produced wrong results for characters with a codepoint higher than Character.MAX_VALUE. [#7387](https://github.com/JabRef/jabref/issues/7387)
+- We fixed an issue where the Unicode to LaTeX formatter produced wrong results for characters with a codepoint higher than Character.MAX_VALUE. [#7387](https://github.com/JabRef/jabref/issues/7387)
 - We fixed an issue where a non valid value as font size results in an uncaught exception. [#7415](https://github.com/JabRef/jabref/issues/7415)
 - We fixed an issue where "Merge citations" in the Openoffice/Libreoffice integration panel did not have a corresponding opposite. [#7454](https://github.com/JabRef/jabref/issues/7454)
 - We fixed an issue where drag and drop of bib files for opening resulted in uncaught exceptions. [#7464](https://github.com/JabRef/jabref/issues/7464)
@@ -1877,7 +1880,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where Content selector does not seem to work for custom fields. [#6819](https://github.com/JabRef/jabref/issues/6819)
 - We fixed an issue where font size of the preferences dialog does not update with the rest of the GUI. [#7416](https://github.com/JabRef/jabref/issues/7416)
 - We fixed an issue in which a linked online file consisting of a web page was saved as an invalid pdf file upon being downloaded. The user is now notified when downloading a linked file results in an HTML file. [#7452](https://github.com/JabRef/jabref/issues/7452)
-- We fixed an issue where opening BibTex file (doubleclick) from Folder with spaces not working. [#6487](https://github.com/JabRef/jabref/issues/6487)
+- We fixed an issue where opening BibTeX file (doubleclick) from Folder with spaces not working. [#6487](https://github.com/JabRef/jabref/issues/6487)
 - We fixed the header title in the Add Group/Subgroup Dialog box. [#4682](https://github.com/JabRef/jabref/issues/4682)
 - We fixed an issue with saving large `.bib` files. [#7265](https://github.com/JabRef/jabref/issues/7265)
 - We fixed an issue with very large page numbers. [#7590](https://github.com/JabRef/jabref/issues/7590)
@@ -2005,7 +2008,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We implemented an option to download fulltext files while importing. [#6381](https://github.com/JabRef/jabref/pull/6381)
 - We added a progress-indicator showing the average progress of background tasks to the toolbar. Clicking it reveals a pop-over with a list of running background tasks. [#6443](https://github.com/JabRef/jabref/pull/6443)
 - We fixed the bug when strike the delete key in the text field. [#6421](https://github.com/JabRef/jabref/issues/6421)
-- We added a BibTex key modifier for truncating strings. [#3915](https://github.com/JabRef/jabref/issues/3915)
+- We added a BibTeX key modifier for truncating strings. [#3915](https://github.com/JabRef/jabref/issues/3915)
 - We added support for jumping to target entry when typing letter/digit after sorting a column in maintable. [#6146](https://github.com/JabRef/jabref/issues/6146)
 - We added a new fetcher to enable users to search all available E-Libraries simultaneously. [JabRef/jabref-koppor#369](https://github.com/JabRef/jabref-koppor/issues/369)
 - We added the field "entrytype" to the export sort criteria. [#6531](https://github.com/JabRef/jabref/pull/6531)
@@ -2159,7 +2162,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Customized entry types are now serialized in alphabetical order in the bib file.
 - We added a new ADS fetcher to use the new ADS API. [#4949](https://github.com/JabRef/jabref/issues/4949)
 - We added support of the [X11 primary selection](https://unix.stackexchange.com/a/139193/18033). [#2389](https://github.com/JabRef/jabref/issues/2389)
-- We added support to switch between biblatex and bibtex library types. [#5550](https://github.com/JabRef/jabref/issues/5550)
+- We added support to switch between biblatex and BibTeX library types. [#5550](https://github.com/JabRef/jabref/issues/5550)
 - We changed the save action buttons to be easier to understand. [#5565](https://github.com/JabRef/jabref/issues/5565)
 - We made the columns for groups, files and uri in the main table reorderable and merged the clickable icon columns for uri, url, doi and eprint. [#5544](https://github.com/JabRef/jabref/pull/5544)
 - We reduced the number of write actions performed when autosave is enabled. [#5679](https://github.com/JabRef/jabref/issues/5679)
@@ -2206,7 +2209,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where multiple entries were allowed in the "crossref" field. [#5284](https://github.com/JabRef/jabref/issues/5284)
 - We fixed an issue where the merge dialog showed the wrong text colour in "Dark" mode. [#5516](https://github.com/JabRef/jabref/issues/5516)
 - We fixed visibility issues with the scrollbar and group selection highlight in "Dark" mode, and enabled "Dark" mode for the OpenOffice preview in the style selection window. [#5522](https://github.com/JabRef/jabref/issues/5522)
-- We fixed an issue where the author field was not correctly parsed during bibtex key-generation. [#5551](https://github.com/JabRef/jabref/issues/5551)
+- We fixed an issue where the author field was not correctly parsed during BibTeX key-generation. [#5551](https://github.com/JabRef/jabref/issues/5551)
 - We fixed an issue where notifications where shown during autosave. [#5555](https://github.com/JabRef/jabref/issues/5555)
 - We fixed an issue where the side pane was not remembering its position. [#5615](https://github.com/JabRef/jabref/issues/5615)
 - We fixed an issue where JabRef could not interact with [Oracle XE](https://www.oracle.com/de/database/technologies/appdev/xe.html) in the [shared SQL database setup](https://docs.jabref.org/collaborative-work/sqldatabase).
@@ -2275,7 +2278,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a description of how recommendations were chosen and better error handling to Related Articles tab
 - We added the ability to execute default action in dialog by using with <kbd>Ctrl</kbd> + <kbd>Enter</kbd> combination. [#4496](https://github.com/JabRef/jabref/issues/4496)
 - We grouped and reordered the Main Menu (File, Edit, Library, Quality, Tools, and View tabs & icons). [#4666](https://github.com/JabRef/jabref/issues/4666) [#4667](https://github.com/JabRef/jabref/issues/4667) [#4668](https://github.com/JabRef/jabref/issues/4668) [#4669](https://github.com/JabRef/jabref/issues/4669) [#4670](https://github.com/JabRef/jabref/issues/4670) [#4671](https://github.com/JabRef/jabref/issues/4671) [#4672](https://github.com/JabRef/jabref/issues/4672). [#4673](https://github.com/JabRef/jabref/issues/4673)
-- We added additional modifiers (capitalize, titlecase and sentencecase) to the Bibtex key generator. [#1506](https://github.com/JabRef/jabref/issues/1506)
+- We added additional modifiers (capitalize, titlecase and sentencecase) to the BibTeX key generator. [#1506](https://github.com/JabRef/jabref/issues/1506)
 - We have migrated from the mysql jdbc connector to the mariadb one for better authentication scheme support. [#4745](https://github.com/JabRef/jabref/issues/4745)
 - We grouped the toolbar icons and changed the Open Library and Copy icons. [#4584](https://github.com/JabRef/jabref/issues/4584)
 - We added a browse button next to the path text field for aux-based groups. [#4586](https://github.com/JabRef/jabref/issues/4586)
@@ -2293,7 +2296,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a context menu to the bib(la)tex-source-editor to copy'n'paste. [#5007](https://github.com/JabRef/jabref/pull/5007)
 - We added a tool that allows searching for citations in LaTeX files. It scans directories and shows which entries are used, how many times and where.
 - We added a 'LaTeX citations' tab to the entry editor, to search for citations to the active entry in the LaTeX file directory. It can be disabled in the preferences dialog.
-- We added an option in preferences to allow for integers in field "edition" when running database in bibtex mode. [#4680](https://github.com/JabRef/jabref/issues/4680)
+- We added an option in preferences to allow for integers in field "edition" when running database in BibTeX mode. [#4680](https://github.com/JabRef/jabref/issues/4680)
 - We added the ability to use negation in export filter layouts. [#5138](https://github.com/JabRef/jabref/pull/5138)
 - Focus on Name Area instead of 'OK' button whenever user presses 'Add subgroup'. [#6307](https://github.com/JabRef/jabref/issues/6307)
 - We changed the behavior of merging that the entry which has "smaller" bibkey will be selected. [#7395](https://github.com/JabRef/jabref/issues/7395)
@@ -2335,7 +2338,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the default entry preview style still contained the field `review`. The field `review` in the style is now replaced with comment to be consistent with the entry editor. [#4098](https://github.com/JabRef/jabref/issues/4098)
 - We fixed an issue where users were vulnerable to XXE attacks during parsing. [#4229](https://github.com/JabRef/jabref/issues/4229)
 - We fixed an issue where files added via the "Attach file" contextmenu of an entry were not made relative. [#4201](https://github.com/JabRef/jabref/issues/4201) and. [#4241](https://github.com/JabRef/jabref/issues/4241)
-- We fixed an issue where author list parser can't generate bibtex for Chinese author. [#4169](https://github.com/JabRef/jabref/issues/4169)
+- We fixed an issue where author list parser can't generate BibTeX for Chinese author. [#4169](https://github.com/JabRef/jabref/issues/4169)
 - We fixed an issue where the list of XMP Exclusion fields in the preferences was not be saved. [#4072](https://github.com/JabRef/jabref/issues/4072)
 - We fixed an issue where the ArXiv Fetcher did not support HTTP URLs. [JabRef/jabref-koppor#328](https://github.com/JabRef/jabref-koppor/issues/328)
 - We fixed an issue where only one PDF file could be imported. [#4422](https://github.com/JabRef/jabref/issues/4422)
