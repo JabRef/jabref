@@ -60,7 +60,7 @@ class PdfPageScannerTest {
             // but the minimum is 3 pages per end
             assertEquals(6, pages.size());
 
-            assertTrue(pages.getFirst().contains("Page 1"));
+            assertTrue(pages.get(0).contains("Page 1"));
             assertTrue(pages.get(1).contains("Page 2"));
             assertTrue(pages.get(2).contains("Page 3"));
 
