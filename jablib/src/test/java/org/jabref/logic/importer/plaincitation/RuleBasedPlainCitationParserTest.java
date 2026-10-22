@@ -11,6 +11,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +21,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 class RuleBasedPlainCitationParserTest {
 
     private static final String IEEE_ARTICLE = "J. Smith, M. Tan, D. Lee, and A. Wong, \"Improving AI systems,\" Journal of Computer Science, vol. 12, no. 2, pp. 45-60, 2024, doi: 10.1234/example.";
