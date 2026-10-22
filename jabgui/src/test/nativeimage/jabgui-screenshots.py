@@ -62,7 +62,8 @@ def open_about(screen: Screen) -> None:
     # No shortcut and no mnemonic for About: open the Help menu by its text (OCR).
     # About JabRef is the last entry; Up selects the last entry of an opened menu.
     # OCR reads "About JabRef" in the dropdown on CI, but existsText does not match the two words there.
-    menu_bar = Region(0, 0, screen.getW(), 40)
+    # Title bar plus menu bar
+    menu_bar = Region(0, 0, screen.getW(), 70)
     click_text(screen, menu_bar, "Help")
     time.sleep(1)
     screen.type(Key.UP)

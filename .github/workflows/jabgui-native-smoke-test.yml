@@ -38,8 +38,14 @@ concurrency:
 
 jobs:
   native-smoke-test:
-    runs-on: ubuntu-22.04
-    name: ubuntu-22.04 JabGui native smoke test
+    strategy:
+      fail-fast: false
+      matrix:
+        # No macos-15: the jabgui image needs ~8 GB; with the 6 GB native-image gets there,
+        # the build did not finish within the timeout
+        os: ['ubuntu-22.04']
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} JabGui native smoke test
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -62,37 +68,46 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # StaticFX links JavaFX statically, so native-image needs the GTK/X11/GL development libraries.
-      # xvfb and imagemagick are for running the binary and taking a screenshot.
-      - name: Install JavaFX link libraries, Xvfb and ImageMagick
+      # xvfb, openbox and imagemagick run the binary on a virtual display with a window manager
+      # (title bars, maximized main window) and take screenshots.
+      - name: Install JavaFX link libraries, Xvfb, Openbox and ImageMagick
         uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
-          packages: libgtk-3-dev libxtst-dev libxxf86vm-dev libgl-dev xvfb imagemagick
+          packages: libgtk-3-dev libxtst-dev libxxf86vm-dev libgl-dev xvfb openbox imagemagick
           version: 1.0
 
       - name: Build JabGui native binary
         run: gradle :jabgui:nativeCompile
 
-      - name: Run JabGui native smoke test
+      - name: Prepare smoke test
+        run: |
+          # The test library lives outside the uploaded folders
+          mkdir -p "$RUNNER_TEMP/smoke" "$RUNNER_TEMP/jabref-home" "$RUNNER_TEMP/testlib"
+          cp jablib/src/test/resources/testbib/complex.bib "$RUNNER_TEMP/testlib/complex.bib"
+
+      # Fresh HOME: first launch, no preferences, no keyring
+      - name: Start JabGui and take a screenshot
         run: |
           out="$RUNNER_TEMP/smoke"
-          mkdir -p "$out" "$RUNNER_TEMP/jabref-home"
-          cp jablib/src/test/resources/testbib/complex.bib "$out/complex.bib"
-          log="$out/jabref.log"
-
-          # Fresh HOME: first launch, no preferences, no keyring
           HOME="$RUNNER_TEMP/jabref-home" xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" \
             bash -c '
-              "$0" -Dprism.order=sw "$1" > "$2" 2>&1 &
+              openbox --config-file "$3" &
+              sleep 2
+              "$0" -Dprism.order=sw "$2" > "$1/jabref.log" 2>&1 &
               pid=$!
               sleep 60
-              import -window root "$3"
+              import -window root "$1/screenshot.png"
               if ! kill -0 "$pid" 2>/dev/null; then
                 echo "JabRef exited before the screenshot"
                 exit 1
               fi
               kill "$pid"; sleep 5; kill -9 "$pid" 2>/dev/null || true
-            ' "$GITHUB_WORKSPACE/jabgui/build/native/nativeCompile/jabref" "$out/complex.bib" "$log" "$out/screenshot.png"
+            ' "$GITHUB_WORKSPACE/jabgui/build/native/nativeCompile/jabref" "$out" "$RUNNER_TEMP/testlib/complex.bib" \
+              "$GITHUB_WORKSPACE/jabgui/src/test/nativeimage/openbox-rc.xml"
 
+      - name: Check JabGui log
+        run: |
+          log="$RUNNER_TEMP/smoke/jabref.log"
           cat "$log"
           grep -q "Starting JabRef" "$log" || { echo "JabRef did not start"; exit 1; }
           if grep -E "^ERROR:|NoClassDefFoundError|NoSuchMethodError|UnsatisfiedLinkError|MissingReflectionRegistrationError|MissingJNIRegistrationError|MissingResourceRegistrationError|Fatal error" "$log"; then
@@ -115,10 +130,11 @@ jobs:
         run: |
           out="$RUNNER_TEMP/screenshots"
           mkdir -p "$out" "$RUNNER_TEMP/jabref-home-screenshots"
-          cp jablib/src/test/resources/testbib/complex.bib "$out/complex.bib"
 
           xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" \
             bash -c '
+              openbox --config-file "$5" &
+              sleep 2
               HOME="$4" "$0" -Dprism.order=sw "$1" > "$2/jabref.log" 2>&1 &
               pid=$!
               sleep 60
@@ -126,8 +142,9 @@ jobs:
               status=$?
               kill "$pid"; sleep 5; kill -9 "$pid" 2>/dev/null || true
               exit $status
-            ' "$GITHUB_WORKSPACE/jabgui/build/native/nativeCompile/jabref" "$out/complex.bib" "$out" \
-              "$GITHUB_WORKSPACE/jabgui/src/test/nativeimage/jabgui-screenshots.py" "$RUNNER_TEMP/jabref-home-screenshots"
+            ' "$GITHUB_WORKSPACE/jabgui/build/native/nativeCompile/jabref" "$RUNNER_TEMP/testlib/complex.bib" "$out" \
+              "$GITHUB_WORKSPACE/jabgui/src/test/nativeimage/jabgui-screenshots.py" "$RUNNER_TEMP/jabref-home-screenshots" \
+              "$GITHUB_WORKSPACE/jabgui/src/test/nativeimage/openbox-rc.xml"
 
       - name: Upload screenshots
         if: always()
@@ -137,11 +154,11 @@ jobs:
           path: ${{ runner.temp }}/screenshots/
           if-no-files-found: warn
 
-      - name: Upload screenshot and log
+      - name: Upload smoke test screenshot and log
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: jabgui-native-smoke-test
+          name: jabgui-native-smoke-test-${{ matrix.os }}
           path: ${{ runner.temp }}/smoke/
           if-no-files-found: warn
 
@@ -149,6 +166,6 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload-as-artifact }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: jabgui-native-linux
+          name: jabgui-native-${{ matrix.os }}
           path: jabgui/build/native/nativeCompile/
           if-no-files-found: error
