@@ -38,7 +38,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     /// `doi:`, `urn:doi:` or a `doi.org` link directly in front of a DOI
     private static final Pattern DOI_PREFIX_AT_END_PATTERN = Pattern.compile(
-            "(?:https?://(?:dx\\.)?doi\\.org/|urn:doi:\\s*|doi:\\s*)$",
+            "(?:(?:https?://(?:(?:dx|www)\\.)?|www\\.)doi\\.org/|urn:doi:\\s*|doi:\\s*)$",
             Pattern.CASE_INSENSITIVE);
 
     /// An unfinished URL at the end of a text: a DOI directly behind it is part of that URL's path
@@ -119,7 +119,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     /// `Firstname [Middle] Lastname`, as in `Marc Shapiro and Susan Horwitz.`: the complete authors block, which has to
     /// end with a period. This pattern is the most ambiguous one, because a title such as `Machine Learning.` looks
-    /// the same. Thus, it is only used if neither of the patterns above found an author.
+    /// the same. Thus, it is only used if neither of the patterns above found an author and a separate title
+    /// boundary follows the authors block.
     private static final String FULL_NAME_REGEX =
             NAME_WORD_REGEX + "(?:\\s+(?:\\p{Lu}\\.|" + NAME_PARTICLE_REGEX + "|" + NAME_WORD_REGEX + ")){1,3}";
 
@@ -153,8 +154,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             Pattern.CASE_INSENSITIVE);
 
     /// End of a sentence: a period (or `?`/`!`) after a word of at least three letters or digits (`... of 2020.`),
-    /// followed by a capital letter. Single letters (initials, `U.S.`) do not end the title.
-    private static final Pattern TITLE_END_PATTERN = Pattern.compile("(?<=[\\p{L}\\d]{3})[.?!]\\s+(?=\\p{Lu})");
+    /// followed by a capital letter, optionally after the extracted year and its punctuation.
+    /// Single letters (initials, `U.S.`) do not end the title.
+    private static final Pattern TITLE_END_PATTERN = Pattern.compile(
+            "(?<=[\\p{L}\\d]{3})[.?!]\\s+(?:" + Pattern.quote(YEAR_TAG) + "[\\s.,;:]*)?(?=\\p{Lu})");
 
     private static final Pattern QUOTED_TITLE_PATTERN = Pattern.compile("^[\"“](?<" + TITLE_GROUP + ">[^\"”]+)[\"”]");
 
@@ -385,6 +388,13 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             return input;
         }
 
+        String remainder = input.substring(blockMatcher.end()).stripLeading();
+        if (!TITLE_END_PATTERN.matcher(remainder).find()
+                && !QUOTED_TITLE_PATTERN.matcher(remainder).find()
+                && !remainder.contains("//")) {
+            return input;
+        }
+
         List<String> fullNameAuthors = new ArrayList<>();
         for (String name : FULL_NAME_SEPARATOR_PATTERN.split(blockMatcher.group(AUTHORS_GROUP))) {
             Matcher nameMatcher = FULL_NAME_PATTERN.matcher(name.strip());
@@ -397,7 +407,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         }
 
         authors.addAll(fullNameAuthors);
-        return fixSpaces(AUTHOR_TAG + " " + input.substring(blockMatcher.end()));
+        return fixSpaces(AUTHOR_TAG + " " + remainder);
     }
 
     private String generateAuthor(String lastName, String initials) {

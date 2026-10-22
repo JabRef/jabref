@@ -69,9 +69,11 @@ class RuleBasedPlainCitationParserTest {
 
     /// DOI extraction runs before URL extraction, so a `doi.org` link ends up only in the doi field.
     /// Both fields are checked, so the link must not get lost either.
-    @Test
-    void doiLinkIsStoredAsDoiNotUrl() throws FetcherException {
-        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. A title. Journal, 2020. https://doi.org/10.1000/xyz123");
+    @ParameterizedTest
+    @ValueSource(strings = {"https://doi.org/", "http://dx.doi.org/", "https://dx.doi.org/",
+            "www.doi.org/", "http://www.doi.org/", "https://www.doi.org/"})
+    void doiLinkIsStoredAsDoiNotUrl(String resolver) throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. A title. Journal, 2020. " + resolver + "10.1000/xyz123");
         assertEquals(List.of(Optional.of("10.1000/xyz123"), Optional.empty()),
                 List.of(entry.flatMap(e -> e.getField(StandardField.DOI)),
                         entry.flatMap(e -> e.getField(StandardField.URL))));
@@ -223,6 +225,24 @@ class RuleBasedPlainCitationParserTest {
         assertEquals(Optional.of("Smith, John"), parseField("John Smith. A title. Journal, 2020.", StandardField.AUTHOR));
     }
 
+    @Test
+    void capitalizedTitleIsNotTakenAsFullNameAuthor() throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Machine Learning")
+                .withField(StandardField.JOURNAL, "Nature")
+                .withField(StandardField.YEAR, "2020");
+        Optional<BibEntry> actual = parser.parsePlainCitation("Machine Learning. Nature, 2020.");
+        actual.ifPresent(entry -> entry.clearField(StandardField.COMMENT));
+        assertEquals(Optional.of(expected), actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"John Smith. \"Machine Learning.\" Nature, 2020.",
+            "John Smith. Machine Learning // Nature, 2020."})
+    void findsFullNameAuthorBeforeExplicitTitleBoundary(String citation) throws FetcherException {
+        assertEquals(Optional.of("Smith, John"), parseField(citation, StandardField.AUTHOR));
+    }
+
     /// A particle such as `van` belongs to the surname, as in BibTeX's `von Last, First` form.
     @Test
     void keepsNameParticleWithSurname() throws FetcherException {
@@ -310,6 +330,19 @@ class RuleBasedPlainCitationParserTest {
     }
 
     // Title and journal
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Title. 2020. Journal Name", "Title. 2020, Journal Name",
+            "Title. 2020; Journal Name", "Title. 2020 Journal Name"})
+    void yearBetweenTitleAndJournalPreservesBoundary(String citation) throws FetcherException {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Title")
+                .withField(StandardField.JOURNAL, "Journal Name")
+                .withField(StandardField.YEAR, "2020");
+        Optional<BibEntry> actual = parser.parsePlainCitation(citation);
+        actual.ifPresent(entry -> entry.clearField(StandardField.COMMENT));
+        assertEquals(Optional.of(expected), actual);
+    }
 
     /// The boundary between title and journal is found even when the title has a colon, a question mark,
     /// or words like `journal` and `Proceedings`, and when the journal name is abbreviated with periods.
