@@ -158,7 +158,43 @@
       ]
     },
     {
+      "type": "com.github.javakeyring.internal.freedesktop.FreedesktopKeyringBackend",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.github.javakeyring.internal.kde.KWalletBackend",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "com.github.javakeyring.internal.osx.ModernOsxKeychainBackend",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.github.javakeyring.internal.osx.OsxKeychainBackend",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.github.javakeyring.internal.windows.WinCredentialStoreBackend",
       "methods": [
         {
           "name": "<init>",
