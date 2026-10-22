@@ -15,11 +15,13 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.pdf.reader.ExternalPdfReader;
 import org.jabref.logic.pdf.reader.ExternalPdfReaders;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
@@ -41,8 +43,6 @@ public class OpenAnnotationAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
-
-    private @Nullable DocumentViewerView documentViewer;
 
     public OpenAnnotationAction(ObjectExpression<@Nullable Path> currentFile,
                                 ObjectExpression<@Nullable FileAnnotationViewModel> currentAnnotation,
@@ -90,9 +90,10 @@ public class OpenAnnotationAction extends SimpleCommand {
     }
 
     private Optional<Path> getConfiguredApplication() {
-        return ExternalFileTypes.getExternalFileTypeByExt("pdf", preferences.getExternalApplicationsPreferences())
+        return ExternalFileTypes.getExternalFileTypeByExt(StandardExternalFileType.PDF.getExtension(),
+                                        preferences.getExternalApplicationsPreferences())
                                 .map(ExternalFileType::getOpenWithApplication)
-                                .filter(application -> !application.isBlank())
+                                .filter(StringUtil::isNotBlank)
                                 .flatMap(OpenAnnotationAction::toPath);
     }
 
@@ -107,6 +108,9 @@ public class OpenAnnotationAction extends SimpleCommand {
 
     private void openExternally(List<String> commandLine, ProcessBuilder processBuilder) {
         processBuilder.command(commandLine);
+        // Readers write Qt/GTK warnings to stderr and would block once an unread pipe fills up.
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        processBuilder.redirectError(ProcessBuilder.Redirect.DISCARD);
         try {
             processBuilder.start();
         } catch (IOException e) {
@@ -119,7 +123,9 @@ public class OpenAnnotationAction extends SimpleCommand {
 
     private void openWithoutPage(Path pdfFile, Path executable) {
         try {
-            NativeDesktop.get().openFileWithApplication(pdfFile.toString(), executable.toString());
+            NativeDesktop.get().openFile(pdfFile.toString(),
+                    StandardExternalFileType.PDF.getExtension(),
+                    preferences.getExternalApplicationsPreferences());
         } catch (IOException e) {
             LOGGER.warn("Could not open '{}' with '{}'", pdfFile, executable, e);
             dialogService.showErrorDialogAndWait(
@@ -140,17 +146,16 @@ public class OpenAnnotationAction extends SimpleCommand {
     }
 
     private void showDocumentViewer(LinkedFile linkedFile, FileAnnotationViewModel annotation) {
-        if (documentViewer == null) {
-            documentViewer = new DocumentViewerView();
-        }
-        documentViewer.switchToFile(linkedFile);
-        documentViewer.disableLiveMode();
+        DocumentViewerView viewer = new DocumentViewerView();
+
+        viewer.switchToFile(linkedFile);
+        viewer.disableLiveMode();
         // Shown before being targeted: the marker on the annotation fades out by animation, and
         // that animation only runs once the window is up. Targeting it first leaves the marker on.
-        dialogService.showCustomDialog(documentViewer);
+        dialogService.showCustomDialog(viewer);
         annotation.getArea().ifPresentOrElse(
-                area -> documentViewer.gotoArea(annotation.getPageNumber(), area),
-                () -> documentViewer.gotoPage(annotation.getPageNumber()));
+                area -> viewer.gotoArea(annotation.getPageNumber(), area),
+                () -> viewer.gotoPage(annotation.getPageNumber()));
     }
 
     private Optional<LinkedFile> findLinkedFile(Path pdfFile) {

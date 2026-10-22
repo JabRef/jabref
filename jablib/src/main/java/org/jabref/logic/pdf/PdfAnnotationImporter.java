@@ -84,15 +84,22 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         return true;
     }
 
-    /// PDF user space counts from the bottom left, the viewer places markers from the top left,
-    /// so the y axis is flipped. Same conversion as in [TextExtractor].
+    /// PDF user space counts from the bottom left and the viewer places markers from the top left,
+    /// so the y axis is flipped against the box that gets rendered: the crop box, which falls back
+    /// to the media box when a page declares none. A rotated page is rendered turned, which swaps
+    /// the axes, so no area is reported for one and navigation falls back to the page alone.
     private Optional<AnnotationArea> extractArea(PDPage page, PDAnnotation annotation) {
-        PDRectangle rectangle = annotation.getRectangle();
-        if (rectangle == null) {
+        if (page.getRotation() != 0) {
             return Optional.empty();
         }
-        float topLeftY = page.getMediaBox().getHeight() - rectangle.getUpperRightY();
-        return Optional.of(new AnnotationArea(rectangle.getLowerLeftX(), topLeftY, rectangle.getWidth(), rectangle.getHeight()));
+
+        PDRectangle renderedBox = page.getCropBox();
+        return Optional.ofNullable(annotation.getRectangle())
+                       .map(rectangle -> new AnnotationArea(
+                               rectangle.getLowerLeftX() - renderedBox.getLowerLeftX(),
+                               renderedBox.getUpperRightY() - rectangle.getUpperRightY(),
+                               rectangle.getWidth(),
+                               rectangle.getHeight()));
     }
 
     private FileAnnotation createMarkedAnnotations(int pageIndex, PDPage page, PDAnnotation annotation) {

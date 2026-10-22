@@ -1,5 +1,6 @@
 package org.jabref.logic.pdf;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,11 +10,23 @@ import org.jabref.model.pdf.AnnotationArea;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationText;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PdfAnnotationImporterTest {
+
+    private static final PDRectangle MEDIA_BOX = new PDRectangle(0, 0, 595, 842);
+
+    /// Lower left (20, 30), upper right (575, 812): a page whose rendered area is inset on all sides.
+    private static final PDRectangle CROP_BOX = new PDRectangle(20, 30, 555, 782);
+
+    private static final PDRectangle ANNOTATION_RECTANGLE = new PDRectangle(100, 700, 20, 20);
 
     private final AnnotationImporter importer = new PdfAnnotationImporter();
 
@@ -71,9 +84,9 @@ class PdfAnnotationImporterTest {
     }
 
     /// A sticky note carries no page text, so only its rectangle can position a viewer.
-    /// The fixture states `/MediaBox [0 0 595.276 841.89]` and
-    /// `/Rect [383.8842587459 702.2328263541 401.7425387459 719.6492580792]`, counted from the
-    /// bottom left, so y becomes 841.89 - 719.649.
+    /// The fixture declares no crop box, leaving `/MediaBox [0 0 595.276 841.89]` as the rendered
+    /// box, and `/Rect [383.8842587459 702.2328263541 401.7425387459 719.6492580792]` counted from
+    /// the bottom left, so y becomes 841.89 - 719.649.
     @Test
     void popupNoteAreaUsesTopLeftOrigin() {
         final AnnotationArea area = importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-popup.pdf"))
@@ -85,6 +98,39 @@ class PdfAnnotationImporterTest {
         assertEquals(122.241f, area.y(), 0.001f);
         assertEquals(17.858f, area.width(), 0.001f);
         assertEquals(17.416f, area.height(), 0.001f);
+    }
+
+    @Test
+    void areaIsRelativeToCropBoxInsteadOfMediaBox(@TempDir Path tempDir) throws IOException {
+        Path file = writeSinglePageWithStickyNote(tempDir, CROP_BOX, 0);
+
+        assertEquals(Optional.of(new AnnotationArea(80f, 92f, 20f, 20f)),
+                importer.importAnnotations(file).getFirst().getArea());
+    }
+
+    @Test
+    void rotatedPageReportsNoArea(@TempDir Path tempDir) throws IOException {
+        Path file = writeSinglePageWithStickyNote(tempDir, MEDIA_BOX, 90);
+
+        assertEquals(Optional.empty(), importer.importAnnotations(file).getFirst().getArea());
+    }
+
+    private static Path writeSinglePageWithStickyNote(Path directory, PDRectangle cropBox, int rotation) throws IOException {
+        Path file = directory.resolve("annotated.pdf");
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage(MEDIA_BOX);
+            page.setCropBox(cropBox);
+            page.setRotation(rotation);
+
+            PDAnnotationText stickyNote = new PDAnnotationText();
+            stickyNote.setRectangle(ANNOTATION_RECTANGLE);
+            stickyNote.setContents("a sticky note");
+            page.getAnnotations().add(stickyNote);
+
+            document.addPage(page);
+            document.save(file.toFile());
+        }
+        return file;
     }
 
     @Test

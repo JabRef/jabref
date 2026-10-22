@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -33,8 +32,6 @@ public class PdfDocumentViewer extends StackPane {
     private final StringProperty highlightText = new SimpleStringProperty("");
     private final Label placeholderLabel;
 
-    private Optional<AnnotationArea> pendingArea = Optional.empty();
-
     public PdfDocumentViewer() {
         pdfView = new PDFView();
 
@@ -59,19 +56,11 @@ public class PdfDocumentViewer extends StackPane {
         return highlightText;
     }
 
+    /// Call once the document is shown, so the marker belongs to the page being rendered.
     public void centerOn(int pageIndex, AnnotationArea area) {
-        pendingArea = Optional.of(area);
         currentPage.set(pageIndex);
-        centerOnPendingArea();
-    }
-
-    private void centerOnPendingArea() {
-        if (pdfView.getDocument() == null) {
-            return;
-        }
-        pendingArea.ifPresent(area -> pdfView.setSelectedSearchResult(new PDFView.SearchResult(
-                "", "", currentPage.get(), new Rectangle2D(area.x(), area.y(), area.width(), area.height()))));
-        pendingArea = Optional.empty();
+        pdfView.setSelectedSearchResult(new PDFView.SearchResult(
+                "", "", pageIndex, new Rectangle2D(area.x(), area.y(), area.width(), area.height())));
     }
 
     public void show(Path document) {
@@ -87,7 +76,6 @@ public class PdfDocumentViewer extends StackPane {
             try (InputStream inputStream = Files.newInputStream(document)) {
                 pdfView.load(inputStream);
                 pdfView.setPage(currentPage.get());
-                centerOnPendingArea();
                 pdfView.setVisible(true);
                 placeholderLabel.setVisible(false);
                 LOGGER.debug("Successfully loaded PDF document: {}", document);
