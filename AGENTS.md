@@ -256,7 +256,7 @@ Both comments must not be added.
    Note: This rule is not applied for logging. Logging strings should stay in English. I.e., LOGGER.error(\"...\") should contain English text.
 - All labels and texts in the UI should be sentence case (and not title case)
 - Avoid exclamation marks at the end of a sentence. They are more for screaming. Use a dot to end the sentence.
-- Use "BibTeX" as spelling for bibtex in Java strings. In variable names "Bibtex" should be used.
+- Use "BibTeX" as spelling for `bibtex` in Java strings. In variable names, `Bibtex` should be used.
 - New strings should be consistent to other strings. They should also be grouped semantically together.
 - Existing strings should be reused instead of introducing slightly different strings.
 - User dialogs should have proper button labels: NOT yes/no/cancel, but indicating the action which happens when pressing the button
