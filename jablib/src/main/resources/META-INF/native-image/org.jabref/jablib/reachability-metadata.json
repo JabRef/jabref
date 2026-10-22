@@ -425,6 +425,30 @@
     {
       "type": "com.sun.jna.platform.win32.WinDef$HWND",
       "allPublicConstructors": true
+    },
+    {
+      "type": {
+        "proxy": [
+          "com.github.javakeyring.internal.windows.Advapi32"
+        ]
+      }
+    },
+    {
+      "type": {
+        "proxy": [
+          "com.github.javakeyring.internal.windows.Kernel32"
+        ]
+      }
+    },
+    {
+      "type": "com.github.javakeyring.internal.windows.CREDENTIAL",
+      "allDeclaredFields": true,
+      "allPublicConstructors": true
+    },
+    {
+      "type": "com.sun.jna.platform.win32.WinBase$FILETIME",
+      "allDeclaredFields": true,
+      "allPublicConstructors": true
     }
   ],
   "resources": [
