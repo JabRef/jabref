@@ -159,7 +159,7 @@ public class WelcomeTab extends Tab {
         VBox rightColumn = createRightColumn();
         GridPane.setHgrow(rightColumn, Priority.ALWAYS);
 
-        WalkthroughUtils.DebouncedRunnable updater = WalkthroughUtils.debounced(() -> updateColumnsLayout(grid, leftColumn, rightColumn, grid.getWidth()));
+        WalkthroughUtils.DebouncedRunnable updater = WalkthroughUtils.debounced(() -> updateColumnsLayout(grid, leftColumn, rightColumn, grid.getWidth(), grid.getHeight()));
 
         grid.localToSceneTransformProperty().addListener(_ -> updater.run());
         grid.layoutBoundsProperty().addListener(_ -> updater.run());
@@ -199,27 +199,95 @@ public class WelcomeTab extends Tab {
     private void updateColumnsLayout(@NonNull GridPane grid,
                                      @NonNull VBox leftColumn,
                                      @NonNull VBox rightColumn,
-                                     double availableWidth) {
+                                     double availableWidth,
+                                     double availableHeight) {
         grid.getChildren().clear();
         grid.getColumnConstraints().clear();
 
+        double baseFontSize = workspacePreferences.getMainFontSize();
+
+        double baseUnit = 24 * workspacePreferences.getMainFontSize();
+        Node startBox = null;
+        Node recentBox = null;
+        Node quicksettingsBox = null;
+        Node walkthroughsBox = null;
+        if (leftColumn.getChildren().size() >= 2 && rightColumn.getChildren().size() >= 2) {
+            startBox = leftColumn.getChildren().get(0);
+            recentBox = leftColumn.getChildren().get(1);
+            quicksettingsBox = rightColumn.getChildren().get(0);
+            walkthroughsBox = rightColumn.getChildren().get(1);
+
+            grid.getProperties().put("startBox", startBox);
+            grid.getProperties().put("recentBox", recentBox);
+            grid.getProperties().put("quicksettingsBox", quicksettingsBox);
+            grid.getProperties().put("walkthroughsBox", walkthroughsBox);
+        } else {
+
+            startBox = (Node) grid.getProperties().get("startBox");
+            recentBox = (Node) grid.getProperties().get("recentBox");
+            quicksettingsBox = (Node) grid.getProperties().get("quicksettingsBox");
+            walkthroughsBox = (Node) grid.getProperties().get("walkthroughsBox");
+        }
+
+        if (startBox == null || recentBox == null || quicksettingsBox == null || walkthroughsBox == null) {
+            return;
+        }
+
         boolean scrollNeeded = false;
-        double threshold = 48 * workspacePreferences.getMainFontSize();
-        if (availableWidth < threshold) {
+        double widthThreshold = 48 * baseFontSize;
+        double heightThreshold = 30 * baseFontSize;
+        if (availableWidth < widthThreshold || (availableHeight > 0 && availableHeight < heightThreshold)) {
             grid.getStyleClass().add("compact");
             ColumnConstraints single = new ColumnConstraints();
             single.setPercentWidth(100);
             grid.getColumnConstraints().add(single);
+            ((Region) startBox).setPrefWidth(Region.USE_COMPUTED_SIZE);
+            ((Region) recentBox).setPrefWidth(Region.USE_COMPUTED_SIZE);
+            ((Region) quicksettingsBox).setPrefWidth(Region.USE_COMPUTED_SIZE);
+            ((Region) walkthroughsBox).setPrefWidth(Region.USE_COMPUTED_SIZE);
+
+            ((Region) startBox).setMaxWidth(Region.USE_COMPUTED_SIZE);
+            ((Region) recentBox).setMaxWidth(Region.USE_COMPUTED_SIZE);
+            ((Region) quicksettingsBox).setMaxWidth(Region.USE_COMPUTED_SIZE);
+            ((Region) walkthroughsBox).setMaxWidth(Region.USE_COMPUTED_SIZE);
+            leftColumn.getChildren().clear();
+            rightColumn.getChildren().clear();
+            leftColumn.getChildren().addAll(startBox, recentBox);
+            rightColumn.getChildren().addAll(quicksettingsBox, walkthroughsBox);
             grid.add(leftColumn, 0, 0);
             grid.add(rightColumn, 0, 1);
             scrollNeeded = true;
         } else {
             grid.getStyleClass().remove("compact");
-            ColumnConstraints half = new ColumnConstraints();
-            half.setPercentWidth(50);
-            grid.getColumnConstraints().addAll(half, half);
-            grid.add(leftColumn, 0, 0);
-            grid.add(rightColumn, 1, 0);
+            ColumnConstraints fullWidth = new ColumnConstraints();
+            fullWidth.setPercentWidth(100);
+            grid.getColumnConstraints().add(fullWidth);
+
+            FlowPane flowWrapper = new FlowPane();
+            flowWrapper.setHgap(32);
+            flowWrapper.setVgap(24);
+
+            flowWrapper.setPrefWrapLength(availableWidth);
+            flowWrapper.setMaxWidth(Double.MAX_VALUE);
+            flowWrapper.getStyleClass().addAll("align-top-left");
+
+            leftColumn.getChildren().clear();
+            rightColumn.getChildren().clear();
+
+            double smallLayoutUnit = 20 * baseFontSize;
+            ((Region) startBox).setPrefWidth(smallLayoutUnit);
+            ((Region) recentBox).setPrefWidth(smallLayoutUnit);
+            ((Region) startBox).setMaxWidth(smallLayoutUnit);
+            ((Region) recentBox).setMaxWidth(smallLayoutUnit);
+
+            double wideLayoutUnit = 32 * baseFontSize;
+            ((Region) quicksettingsBox).setPrefWidth(wideLayoutUnit);
+            ((Region) walkthroughsBox).setPrefWidth(wideLayoutUnit);
+            ((Region) quicksettingsBox).setMaxWidth(wideLayoutUnit);
+            ((Region) walkthroughsBox).setMaxWidth(wideLayoutUnit);
+
+            flowWrapper.getChildren().addAll(startBox, recentBox, quicksettingsBox, walkthroughsBox);
+            grid.add(flowWrapper, 0, 0);
         }
 
         if (!scrollNeeded) {
