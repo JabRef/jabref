@@ -22,7 +22,7 @@ public class Password {
     private final SecretKeySpec secretKey;
     private final IvParameterSpec ivSpec;
 
-    /// @param phrase Phrase which should be encrypted or decrypted
+    /// @param phrase Phrase which should be decrypted
     /// @param key    Key which is used to improve symmetric encryption
     public Password(char[] phrase, String key) throws NoSuchAlgorithmException, NoSuchPaddingException {
         this(new String(phrase), key);
@@ -34,7 +34,7 @@ public class Password {
         this.ivSpec = new IvParameterSpec("ThisIsA128BitKey".getBytes());
     }
 
-    /// Decrypts the set phrase/password which was encrypted via [Password#encrypt()].
+    /// Decrypts the set phrase/password, which was encrypted by an older JabRef version.
     ///
     /// @return Decrypted phrase/password
     public String decrypt() throws GeneralSecurityException, UnsupportedEncodingException {
