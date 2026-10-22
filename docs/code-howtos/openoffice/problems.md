@@ -23,7 +23,7 @@ grand_parent: Code Howtos
       * name generation and parsing for properties storing pageInfo values
       * in-memory representation
         * JabRef 5.2 does not collect pageInfo values, accesses only when needed.\
-          So it would be change to code accessing them.
+          Thus, the code accessing them would have to change.
         * The proposed representation does collect, to allow separation of getting from the document and processing
       * insertion of pageInfo into citation markers: JabRef 5.2 injects a single pageInfo before the closing parenthesis, now we need to handle several values
       * `[click:Manage citations]` should work on citations, not citation groups.
