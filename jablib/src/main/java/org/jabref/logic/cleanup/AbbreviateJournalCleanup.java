@@ -19,13 +19,20 @@ import org.jspecify.annotations.NullMarked;
 /// Abbreviates journal field
 @NullMarked
 public class AbbreviateJournalCleanup implements CleanupJob {
-    private final BibDatabase database;
+    private final Optional<BibDatabase> database;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final AbbreviationType abbreviationType;
     private final boolean useFJournalField;
 
     public AbbreviateJournalCleanup(BibDatabase database, JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType, boolean useFJournalField) {
-        this.database = database;
+        this.database = Optional.of(database);
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.abbreviationType = abbreviationType;
+        this.useFJournalField = useFJournalField;
+    }
+
+    public AbbreviateJournalCleanup(JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType, boolean useFJournalField) {
+        this.database = Optional.empty();
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.abbreviationType = abbreviationType;
         this.useFJournalField = useFJournalField;
@@ -46,7 +53,7 @@ public class AbbreviateJournalCleanup implements CleanupJob {
         }
 
         String origText = entry.getField(fieldName).orElse("");
-        String text = database.resolveForStrings(origText);
+        String text = database.map(db -> db.resolveForStrings(origText)).orElse(origText);
 
         Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
 
