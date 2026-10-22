@@ -20,6 +20,7 @@ import javafx.collections.ObservableSet;
 
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import org.jabref.logic.importer.fetcher.BibSonomyFetcher;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
@@ -109,6 +110,7 @@ public class ImporterPreferences {
 
         return Map.of(
                 AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey,
+                BibSonomyFetcher.FETCHER_NAME, getDefaultBibSonomyCredentials(buildInfo),
                 BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey,
                 CrossRef.FETCHER_NAME, buildInfo.crossRefEmail,
                 Scopus.FETCHER_NAME, buildInfo.scopusApiKey,
@@ -118,6 +120,14 @@ public class ImporterPreferences {
                 SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey,
                 WileyFetcher.FETCHER_NAME, buildInfo.wileyTdmApiKey
         );
+    }
+
+    /// BibSonomy needs a username and an API key; the single key slot holds both as `username:apikey`
+    private static String getDefaultBibSonomyCredentials(BuildInfo buildInfo) {
+        if (StringUtil.isBlank(buildInfo.bibSonomyUsername) || StringUtil.isBlank(buildInfo.bibSonomyApiKey)) {
+            return "";
+        }
+        return buildInfo.bibSonomyUsername + ":" + buildInfo.bibSonomyApiKey;
     }
 
     public boolean areImporterEnabled() {
