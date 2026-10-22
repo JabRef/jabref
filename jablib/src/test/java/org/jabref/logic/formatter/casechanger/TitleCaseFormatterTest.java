@@ -37,6 +37,8 @@ class TitleCaseFormatterTest {
                         "AN UPPER FIRST WITH {A}ND WITHOUT {C}URLY {b}rackets"),
                 Arguments.of("{b}rackets {b}rac{K}ets Brack{E}ts",
                         "{b}RaCKeTS {b}RaC{K}eTS bRaCK{E}ts"),
+                Arguments.of("Economic Systems as Networks",
+                        "economic systems as networks"),
                 Arguments.of("Two Experiences Designing for Effective Security",
                         "Two experiences designing for effective security"),
                 Arguments.of("Bibliographic Software. A Comparison.",

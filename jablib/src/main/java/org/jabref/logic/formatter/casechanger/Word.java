@@ -33,7 +33,7 @@ public final class Word {
         smallerWords.addAll(Arrays.asList("a", "an", "the"));
 
         // Prepositions
-        smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
+        smallerWords.addAll(Arrays.asList("above", "about", "across", "against", "along", "among", "around", "as", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "except", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "since", "to", "toward", "through", "under", "until", "up", "upon", "with", "within", "without"));
 
         // Conjunctions used as part of all case capitalisation to check if it is a small word or not
         smallerWords.addAll(CONJUNCTIONS);

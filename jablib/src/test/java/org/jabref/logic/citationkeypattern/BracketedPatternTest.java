@@ -679,6 +679,7 @@ class BracketedPatternTest {
     @ParameterizedTest
     @CsvSource({
             "'Very', 'A very short title'",
+            "'Systems', 'As Systems Networks',
             "'V', 'V'",
             "'V', 'A v'"
     })
@@ -696,6 +697,7 @@ class BracketedPatternTest {
             "'Short Title', 'Short title'",
             "'Title', 'A title'",
             "'Title', 'A Title'"
+            "'Economic Systems Networks', 'Economic Systems as Networks',
     })
     void expandBracketsShortTitleModifier(String expectedCitationKey, String title) {
         BibEntry bibEntry = new BibEntry()
