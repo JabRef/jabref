@@ -56,7 +56,7 @@ public class AiChatMessageView extends HBox {
     @Inject private GuiPreferences preferences;
 
     // Tooltip for the whole component.
-    private Tooltip tooltip = new Tooltip();
+    private final Tooltip tooltip = new Tooltip();
     private MarkdownTextFlow markdownTextFlow;
 
     private AiChatMessageViewModel viewModel;

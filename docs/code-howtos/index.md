@@ -114,7 +114,7 @@ org.jabref.logic.util.io.FileUtil.relativize(java.nio.file.Path, org.jabref.mode
 
 * `@comment{jabref-meta: fileDirectory:<directory>`
 * “fileDirectory” is determined by Globals.pref.get(“userFileDir”) (which defaults to “fileDirectory”
-* There is also “fileDirectory-\<username>”, which is determined by Globals.prefs.get(“userFileDirIndividual”)
+* “fileDirectory-\<username>” is determined by Globals.prefs.get(“userFileDirIndividual”)
 * Used at DatabasePropertiesDialog
 
 ## How to work with Preferences
