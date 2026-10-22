@@ -1,5 +1,13 @@
+import org.gradlex.javamodule.dependencies.dsl.GradleOnlyDirectives
+
 plugins {
+    id("java")
+    id("org.gradlex.java-module-dependencies")
     id("org.graalvm.buildtools.native")
+}
+
+extensions.configure<GradleOnlyDirectives>("mainModuleInfo") {
+    annotationProcessor("info.picocli.codegen")
 }
 
 graalvmNative {

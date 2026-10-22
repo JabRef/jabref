@@ -23,10 +23,6 @@ version = providers.gradleProperty("projVersion")
     .orElse("100.0.0")
     .get()
 
-mainModuleInfo {
-    annotationProcessor("info.picocli.codegen")
-}
-
 testModuleInfo {
     requires("org.jabref.testsupport")
 
