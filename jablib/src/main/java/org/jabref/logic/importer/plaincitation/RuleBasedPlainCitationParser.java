@@ -4,7 +4,6 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,6 +39,12 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// `doi:`, `urn:doi:` or a `doi.org` link directly in front of a DOI
     private static final Pattern DOI_PREFIX_AT_END_PATTERN = Pattern.compile(
             "(?:https?://(?:dx\\.)?doi\\.org/|urn:doi:\\s*|doi:\\s*)$",
+            Pattern.CASE_INSENSITIVE);
+
+    /// An unfinished URL at the end of a text: a DOI directly behind it is part of that URL's path
+    /// (`https://publisher.example.com/10.1000/xyz123`) and not a standalone DOI.
+    private static final Pattern URL_BEFORE_DOI_PATTERN = Pattern.compile(
+            "(?:(?:https?|ftps?)://|www\\.)\\S*$",
             Pattern.CASE_INSENSITIVE);
 
     private static final Pattern URL_PATTERN = Pattern.compile(
@@ -96,15 +101,16 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Separators between two authors: `,`, `.`, `&` and `and`
     private static final String AUTHOR_SEPARATOR_REGEX = "(?:\\s*(?:and\\b|&|,|\\.))*\\s*";
 
-    /// `Lastname, I. J.`. `\G` anchors every match to the end of the previous one (or to the start of the input).
-    /// Thus, only the authors block at the very beginning of the citation is matched,
+    /// `Lastname, I. J.`. It is applied with [Matcher#lookingAt()] at the end of the previous author (or at the start
+    /// of the input). Thus, only the authors block at the very beginning of the citation is matched,
     /// and never something in the title, journal, or publisher.
     private static final Pattern LASTNAME_FIRST_AUTHOR_PATTERN = Pattern.compile(
-            "\\G\\s*" + LASTNAME_REGEX + ",\\s*" + INITIALS_REGEX + AUTHOR_SEPARATOR_REGEX);
+            "\\s*" + LASTNAME_REGEX + ",\\s*" + INITIALS_REGEX + AUTHOR_SEPARATOR_REGEX);
 
-    /// `I. J. Lastname`. Anchored with `\G` in the same way.
+    /// `I. J. Lastname`. Applied with [Matcher#lookingAt()] in the same way. Both author patterns are tried at every
+    /// position of the authors block, so the two name orders can be mixed (`Smith, J. and A. Doe`).
     private static final Pattern INITIALS_FIRST_AUTHOR_PATTERN = Pattern.compile(
-            "\\G\\s*" + INITIALS_REGEX + LASTNAME_REGEX + AUTHOR_SEPARATOR_REGEX);
+            "\\s*" + INITIALS_REGEX + LASTNAME_REGEX + AUTHOR_SEPARATOR_REGEX);
 
     /// `et al.` (the period is optional) directly behind the last author. BibTeX writes it as `and others`.
     private static final Pattern ET_AL_PATTERN = Pattern.compile(
@@ -256,18 +262,40 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
                   .orElse(input);
     }
 
-    /// Removes exactly [#doi] and its prefix. `DOI.replaceInText` would remove a neighbouring URL, too.
+    /// Removes exactly one occurrence of [#doi] and its prefix. `DOI.replaceInText` would remove a neighbouring URL, too.
+    ///
+    /// The occurrences are searched case-insensitively in `input` itself, not in a lowercased copy: lowercasing can
+    /// change the length of a text (`İ` becomes two chars), which would shift all offsets behind it.
+    ///
+    /// An occurrence that is part of another URL (`https://publisher.example.com/10.1000/xyz123`) is skipped, because
+    /// removing it would truncate that URL. A DOI with a prefix (`doi:`, `doi.org/`) or standing alone is removed.
     ///
     /// Only whitespace is collapsed here. [#fixSpaces] would insert spaces into a URL that is still in the text
     /// (`https://x.org` -> `https: //x. org`), so no URL could be found afterwards.
     private String removeDoi(String input) {
-        int doiStart = input.toLowerCase(Locale.ROOT).indexOf(doi.toLowerCase(Locale.ROOT));
-        if (doiStart == -1) {
-            // The DOI is written differently than its canonical form (for example percent-encoded)
-            return collapseWhitespace(DOI.replaceInText(input, ""));
+        Matcher doiMatcher = Pattern.compile(Pattern.quote(doi), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)
+                                    .matcher(input);
+        boolean found = false;
+        while (doiMatcher.find()) {
+            found = true;
+            String beforeDoi = input.substring(0, doiMatcher.start());
+            String afterDoi = input.substring(doiMatcher.end());
+
+            // Checked first: a doi.org link also looks like the beginning of a URL
+            Matcher prefixMatcher = DOI_PREFIX_AT_END_PATTERN.matcher(beforeDoi);
+            if (prefixMatcher.find()) {
+                return collapseWhitespace(prefixMatcher.replaceFirst("") + " " + afterDoi);
+            }
+            if (!URL_BEFORE_DOI_PATTERN.matcher(beforeDoi).find()) {
+                return collapseWhitespace(beforeDoi + " " + afterDoi);
+            }
         }
-        String beforeDoi = DOI_PREFIX_AT_END_PATTERN.matcher(input.substring(0, doiStart)).replaceFirst("");
-        return collapseWhitespace(beforeDoi + " " + input.substring(doiStart + doi.length()));
+        if (found) {
+            // The DOI only occurs inside other URLs. They stay whole, and findUrls takes them.
+            return input;
+        }
+        // The DOI is written differently than its canonical form (for example percent-encoded)
+        return collapseWhitespace(DOI.replaceInText(input, ""));
     }
 
     private static String collapseWhitespace(String input) {
@@ -313,15 +341,40 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         return (value > 1700) && (value <= Year.now().getValue());
     }
 
+    /// Replaces the authors block at the beginning of `input` by [#AUTHOR_TAG]. Both name orders may be mixed
+    /// (`Smith, J. and A. Doe`); `et al.` becomes `others`.
     private String findAuthors(String input) {
-        String result = findAuthorsByPattern(input, LASTNAME_FIRST_AUTHOR_PATTERN);
-        if (authors.isEmpty()) {
-            result = findAuthorsByPattern(input, INITIALS_FIRST_AUTHOR_PATTERN);
+        Matcher lastNameFirstMatcher = LASTNAME_FIRST_AUTHOR_PATTERN.matcher(input);
+        Matcher initialsFirstMatcher = INITIALS_FIRST_AUTHOR_PATTERN.matcher(input);
+
+        int authorsEnd = 0;
+        while (true) {
+            lastNameFirstMatcher.region(authorsEnd, input.length());
+            initialsFirstMatcher.region(authorsEnd, input.length());
+
+            Matcher authorMatcher;
+            if (lastNameFirstMatcher.lookingAt()) {
+                authorMatcher = lastNameFirstMatcher;
+            } else if (initialsFirstMatcher.lookingAt()) {
+                authorMatcher = initialsFirstMatcher;
+            } else {
+                break;
+            }
+            authors.add(generateAuthor(authorMatcher.group(LASTNAME_GROUP), authorMatcher.group(INITIALS_GROUP)));
+            authorsEnd = authorMatcher.end();
         }
+
         if (authors.isEmpty()) {
-            result = findFullNameAuthors(input);
+            return findFullNameAuthors(input);
         }
-        return result;
+
+        String rest = input.substring(authorsEnd);
+        Matcher etAlMatcher = ET_AL_PATTERN.matcher(rest);
+        if (etAlMatcher.find()) {
+            authors.add("others");
+            rest = rest.substring(etAlMatcher.end());
+        }
+        return fixSpaces(AUTHOR_TAG + " " + rest);
     }
 
     /// Finds authors with full first names (`Marc Shapiro and Susan Horwitz.`) at the beginning of `input`.
@@ -345,29 +398,6 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
         authors.addAll(fullNameAuthors);
         return fixSpaces(AUTHOR_TAG + " " + input.substring(blockMatcher.end()));
-    }
-
-    /// Collects the consecutive authors at the beginning of `input` and replaces the whole authors block by one
-    /// [#AUTHOR_TAG]. An `et al.` behind the last author becomes the BibTeX author `others`.
-    /// Returns `input` unchanged if `pattern` does not match at the beginning.
-    private String findAuthorsByPattern(String input, Pattern pattern) {
-        Matcher matcher = pattern.matcher(input);
-        int authorsEnd = 0;
-        while (matcher.find()) {
-            authors.add(generateAuthor(matcher.group(LASTNAME_GROUP), matcher.group(INITIALS_GROUP)));
-            authorsEnd = matcher.end();
-        }
-        if (authors.isEmpty()) {
-            return input;
-        }
-
-        String rest = input.substring(authorsEnd);
-        Matcher etAlMatcher = ET_AL_PATTERN.matcher(rest);
-        if (etAlMatcher.find()) {
-            authors.add("others");
-            rest = rest.substring(etAlMatcher.end());
-        }
-        return fixSpaces(AUTHOR_TAG + " " + rest);
     }
 
     private String generateAuthor(String lastName, String initials) {

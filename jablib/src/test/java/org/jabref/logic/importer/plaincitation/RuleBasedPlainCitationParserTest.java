@@ -95,6 +95,27 @@ class RuleBasedPlainCitationParserTest {
                         entry.flatMap(e -> e.getField(StandardField.URL))));
     }
 
+    /// A DOI inside a publisher URL belongs to that URL: removing it would truncate the URL.
+    /// The explicit `doi:` reference is the one that is removed.
+    @Test
+    void doiInsidePublisherUrlKeepsUrlIntact() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation(
+                "Smith, J. A title. Journal, 2020. https://publisher.example.com/10.1000/xyz123 doi:10.1000/xyz123");
+        assertEquals(List.of(Optional.of("10.1000/xyz123"), Optional.of("https://publisher.example.com/10.1000/xyz123")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.DOI)),
+                        entry.flatMap(e -> e.getField(StandardField.URL))));
+    }
+
+    /// Lowercasing `İ` makes the text longer (it becomes two chars), which must not shift the offsets
+    /// used to cut the DOI out of the original text.
+    @Test
+    void turkishCapitalIBeforeDoiDoesNotShiftRemoval() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("İnönü, E. A title. doi:10.1000/xyz123 Journal, 2020.");
+        assertEquals(List.of(Optional.of("10.1000/xyz123"), Optional.of("Journal")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.DOI)),
+                        entry.flatMap(e -> e.getField(StandardField.JOURNAL))));
+    }
+
     // URL
 
     /// Every scheme the URL pattern accepts (`http`, `https`, `ftp`, a bare `www.`) is kept whole, including query strings.
@@ -159,6 +180,16 @@ class RuleBasedPlainCitationParserTest {
     void findsAuthorsSeparatedOnlyByCommas() throws FetcherException {
         assertEquals(Optional.of("Smith, J. and Tan, M. and Lee, D."),
                 parseField("Smith, J., Tan, M., Lee, D. A title. Journal, 2020.", StandardField.AUTHOR));
+    }
+
+    /// An authors block may mix both name orders. Neither pattern may end the block, and the second author
+    /// must not be left in the text from which the title is inferred.
+    @Test
+    void findsMixedAuthorFormats() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. and A. Doe, Title. Journal, 2020.");
+        assertEquals(List.of(Optional.of("Smith, J. and Doe, A."), Optional.of("Title")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.AUTHOR)),
+                        entry.flatMap(e -> e.getField(StandardField.TITLE))));
     }
 
     /// `\w` only matches ASCII letters by default, which cuts surnames with accented letters, hyphens or
