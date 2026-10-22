@@ -107,41 +107,59 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
+        if (keyBindingRepository.checkKeyCombinationEquality(selectedEntry.getKeyBinding(), event)) {
+            return;
+        }
+
+        String previousBinding = selectedEntry.getBinding();
         if (selectedEntry.setNewBinding(event)) {
             // [impl->req~ux.keybindings.duplicate-warning~1]
             List<KeyBinding> conflicts = keyBindingRepository.findConflictingKeyBindings(
                     selectedEntry.getKeyBinding(), event);
 
             if (!conflicts.isEmpty()) {
-                if (!confirmReplace(selectedEntry.getBinding(), conflicts)) {
-                    setValues();
+                ButtonBar.ButtonData choice = askForResolution(selectedEntry.shownBindingProperty().get(), conflicts);
+                if (choice == ButtonBar.ButtonData.OK_DONE) {
+                    conflicts.forEach(this::clearBinding);
+                } else if (choice != ButtonBar.ButtonData.OTHER) {
+                    selectedEntry.setBinding(previousBinding);
                     return;
                 }
-                conflicts.forEach(conflict -> keyBindingRepository.put(conflict, ""));
             }
 
             keyBindingRepository.put(selectedEntry.getKeyBinding(), selectedEntry.getBinding());
-
-            if (!conflicts.isEmpty()) {
-                setValues();
-            }
         }
     }
 
-    private boolean confirmReplace(String combination, List<KeyBinding> conflictingKeyBindings) {
+    private ButtonBar.ButtonData askForResolution(String combination, List<KeyBinding> conflictingKeyBindings) {
         String names = conflictingKeyBindings.stream()
                                              .map(KeyBinding::getLocalization)
                                              .collect(Collectors.joining(", "));
-        ButtonType replaceButtonType = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType replace = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OK_DONE);
+        ButtonType keepBoth = new ButtonType(Localization.lang("Keep both"), ButtonBar.ButtonData.OTHER);
+        ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
         return dialogService.showCustomButtonDialogAndWait(
                                     Alert.AlertType.WARNING,
                                     Localization.lang("Shortcut already in use"),
-                                    Localization.lang("The shortcut %0 is already used by '%1'. Do you want to replace it?",
+                                    Localization.lang("The shortcut %0 is already used by '%1'. Replace it or keep both?",
                                             combination, names),
-                                    replaceButtonType,
-                                    ButtonType.CANCEL)
-                            .filter(response -> response == replaceButtonType)
-                            .isPresent();
+                                    replace, keepBoth, cancel)
+                            .map(ButtonType::getButtonData)
+                            .orElse(ButtonBar.ButtonData.CANCEL_CLOSE);
+    }
+
+    private void clearBinding(KeyBinding keyBinding) {
+        findRow(keyBinding).ifPresentOrElse(
+                KeyBindingViewModel::clear,
+                () -> keyBindingRepository.put(keyBinding, ""));
+    }
+
+    private Optional<KeyBindingViewModel> findRow(KeyBinding keyBinding) {
+        return Optional.ofNullable(rootKeyBinding.get()).stream()
+                       .flatMap(root -> root.getChildren().stream())
+                       .flatMap(category -> category.getChildren().stream())
+                       .filter(row -> row.getKeyBinding() == keyBinding)
+                       .findFirst();
     }
 
     @Override
