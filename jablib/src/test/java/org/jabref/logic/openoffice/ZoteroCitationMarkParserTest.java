@@ -105,6 +105,63 @@ class ZoteroCitationMarkParserTest {
         assertEquals(Optional.of("Smith2020"), entry.getCitationKey());
     }
 
+    @Test
+    void parseCslCitationJsonForImportLeavesZoteroItemWithoutCitationKey() {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImport(JOURNAL_ARTICLE_CSL_JSON);
+        BibEntry entry = entries.getFirst();
+
+        assertEquals(Optional.empty(), entry.getCitationKey());
+    }
+
+    @Test
+    void parseCslCitationJsonForImportKeepsJabRefUriCitationKey() {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImport("""
+                {
+                  "citationItems": [
+                    {
+                      "id": 587,
+                      "uris": [
+                        "http://zotero.org/users/123/items/ABCD1234",
+                        "http://www.jabref.org/Smith2020"
+                      ],
+                      "itemData": {
+                        "type": "article-journal",
+                        "title": "Reference mark compatibility"
+                      }
+                    }
+                  ]
+                }
+                """);
+        BibEntry entry = entries.getFirst();
+
+        assertEquals(Optional.of("Smith2020"), entry.getCitationKey());
+    }
+
+    @Test
+    void parseCslCitationJsonForImportKeepsCitationKeyOfItemData() {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImport("""
+                {
+                  "citationItems": [
+                    {
+                      "id": 587,
+                      "uris": [
+                        "http://zotero.org/users/123/items/ABCD1234"
+                      ],
+                      "itemData": {
+                        "id": 587,
+                        "type": "article-journal",
+                        "citation-key": "Doe2026",
+                        "title": "Reference mark compatibility"
+                      }
+                    }
+                  ]
+                }
+                """);
+        BibEntry entry = entries.getFirst();
+
+        assertEquals(Optional.of("Doe2026"), entry.getCitationKey());
+    }
+
     @ParameterizedTest
     @MethodSource
     void parseJournalArticleField(StandardField field, String expectedValue) {

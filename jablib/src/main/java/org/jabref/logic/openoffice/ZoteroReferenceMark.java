@@ -260,6 +260,25 @@ public record ZoteroReferenceMark(
     }
 
     static Optional<String> getCitationKey(ZoteroCitationData.CitationItemData citationItem) {
+        Optional<String> explicitCitationKey = getExplicitCitationKey(citationItem);
+        if (explicitCitationKey.isPresent()) {
+            return explicitCitationKey;
+        }
+
+        if (citationItem.itemData != null && !StringUtil.isBlank(citationItem.itemData.id)) {
+            return Optional.of(normalizeZoteroItemId(citationItem.itemData.id));
+        }
+
+        if (!StringUtil.isBlank(citationItem.id)) {
+            return Optional.of(normalizeZoteroItemId(citationItem.id));
+        }
+
+        return Optional.empty();
+    }
+
+    /// Returns the citation key that the citation item names itself: the key in its JabRef URI, else its `citation-key`.
+    /// Unlike [#getCitationKey(ZoteroCitationData.CitationItemData)], this does not fall back to a placeholder derived from the Zotero item id.
+    static Optional<String> getExplicitCitationKey(ZoteroCitationData.CitationItemData citationItem) {
         for (String uri : Optional.of(citationItem.uris).orElse(List.of())) {
             String citationKey = getCitationKeyFromJabRefUri(uri);
             if (!StringUtil.isBlank(citationKey)) {
@@ -269,14 +288,6 @@ public record ZoteroReferenceMark(
 
         if (citationItem.itemData != null && !StringUtil.isBlank(citationItem.itemData.citationKey)) {
             return Optional.of(citationItem.itemData.citationKey);
-        }
-
-        if (citationItem.itemData != null && !StringUtil.isBlank(citationItem.itemData.id)) {
-            return Optional.of(normalizeZoteroItemId(citationItem.itemData.id));
-        }
-
-        if (!StringUtil.isBlank(citationItem.id)) {
-            return Optional.of(normalizeZoteroItemId(citationItem.id));
         }
 
         return Optional.empty();
