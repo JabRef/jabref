@@ -308,6 +308,7 @@ public class WebFetchers {
         Set<CustomizableKeyFetcher> fetchers = Set.of(
                 new AstrophysicsDataSystem(importFormatPreferences, importerPreferences),
                 new BaseSearchFetcher(importerPreferences),
+                new BibSonomyFetcher(importFormatPreferences, importerPreferences),
                 new BiodiversityLibrary(importerPreferences),
                 new CrossRef(importerPreferences),
                 new IEEE(importFormatPreferences, importerPreferences),
