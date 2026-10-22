@@ -149,7 +149,7 @@ jobs:
           repository: 'rmuller/Convert2MarkdownJavadoc'
           path: 'Convert2MarkdownJavadoc'
       - name: Setup JDK
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
         with:
           java-version: '24'
           distribution: 'corretto'
@@ -270,6 +270,17 @@ jobs:
         run: npm ci
       - name: textlint
         run: npm run textlint
+      - name: textlint write-good (changed Markdown files)
+        if: github.event_name == 'pull_request'
+        run: |
+          # Report-only: the existing docs have thousands of findings, so only the Markdown files changed by the PR are checked and the step does not fail.
+          git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+          mapfile -t files < <(git diff --name-only --diff-filter=AM FETCH_HEAD HEAD -- '*.md' ':!CHANGELOG.md')
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No changed Markdown files."
+            exit 0
+          fi
+          npm run textlint:write-good -- "${files[@]}" | sed "s|${GITHUB_WORKSPACE}/||g" || true
       - name: typos
         run: pipx run typos==1.50.3
 
@@ -301,7 +312,7 @@ jobs:
       - name: Resolve //DEPS into the cached directory
         # JBang resolves script dependencies into ~/.m2, which is not cached here.
         run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
-      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
         with:
           distribution: 'corretto'
           java-version: '25'
@@ -638,7 +649,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
         with:
           java-version: 25
           distribution: 'corretto'

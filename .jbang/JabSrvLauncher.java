@@ -55,7 +55,7 @@
 //DEPS tools.jackson.core:jackson-core:3.2.4
 //DEPS tools.jackson.core:jackson-databind:3.2.4
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.4
-//DEPS com.nimbusds:oauth2-oidc-sdk:11.30.1
+//DEPS com.nimbusds:oauth2-oidc-sdk:11.38.2
 //DEPS net.minidev:json-smart:2.6.0
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
