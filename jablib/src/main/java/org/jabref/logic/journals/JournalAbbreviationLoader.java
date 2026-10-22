@@ -109,7 +109,7 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new AbbreviationPreferences(List.of(), true, false, false));
+        return loadRepository(new AbbreviationPreferences(List.of(), true, false, false, true, AbbreviationType.DEFAULT));
     }
 
     private static class AsyncJournalAbbreviationRepository extends JournalAbbreviationRepository {

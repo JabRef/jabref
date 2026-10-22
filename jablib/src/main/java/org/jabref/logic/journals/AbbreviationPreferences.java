@@ -3,7 +3,9 @@ package org.jabref.logic.journals;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -13,15 +15,22 @@ public class AbbreviationPreferences {
     private final BooleanProperty useFJournalField;
     private final BooleanProperty shouldEnableMscKeywordDescriptions;
     private final BooleanProperty convertJournalOnFetch;
+    private final BooleanProperty abbreviateOnFetch;
+    private final ObjectProperty<AbbreviationType> abbreviationTypeOnFetch;
 
     public AbbreviationPreferences(List<String> externalJournalLists,
                                    boolean useFJournalField,
                                    boolean shouldEnableMscKeywordDescriptions,
-                                   boolean convertJournalOnFetch) {
+                                   boolean convertJournalOnFetch,
+                                   boolean abbreviateOnFetch,
+                                   AbbreviationType abbreviationTypeOnFetch
+    ) {
         this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
         this.shouldEnableMscKeywordDescriptions = new SimpleBooleanProperty(shouldEnableMscKeywordDescriptions);
         this.convertJournalOnFetch = new SimpleBooleanProperty(convertJournalOnFetch);
+        this.abbreviateOnFetch = new SimpleBooleanProperty(abbreviateOnFetch);
+        this.abbreviationTypeOnFetch = new SimpleObjectProperty<>(abbreviationTypeOnFetch);
     }
 
     private AbbreviationPreferences() {
@@ -29,7 +38,9 @@ public class AbbreviationPreferences {
                 List.of(), // externalJournalLists
                 true,      // useFJournalField
                 false,      // Enable MSC codes as Keyword
-                false      // dont edit journal title by default
+                false,      // dont edit journal title by default
+                true,      // abbreviate is on
+                AbbreviationType.DEFAULT // use the default option
         );
     }
 
@@ -80,5 +91,29 @@ public class AbbreviationPreferences {
 
     public void setConvertJournalOnFetch(boolean value) {
         this.convertJournalOnFetch.set(value);
+    }
+
+    public BooleanProperty getAbbreviateOnFetch() {
+        return abbreviateOnFetch;
+    }
+
+    public boolean shouldAbbreviateOnFetch() {
+        return abbreviateOnFetch.get();
+    }
+
+    public void setAbbreviateOnFetch(boolean value) {
+        this.abbreviateOnFetch.set(value);
+    }
+
+    public ObjectProperty<AbbreviationType> getAbbreviationTypeOnFetch() {
+        return abbreviationTypeOnFetch;
+    }
+
+    public AbbreviationType useAbbreviationTypeOnFetch() {
+        return abbreviationTypeOnFetch.get();
+    }
+
+    public void setAbbreviationTypeOnFetch(AbbreviationType value) {
+        this.abbreviationTypeOnFetch.set(value);
     }
 }

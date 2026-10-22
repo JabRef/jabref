@@ -17,6 +17,7 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -47,7 +48,11 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final SimpleBooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty useFJournal = new SimpleBooleanProperty(true);
-    private final SimpleBooleanProperty convertJournalOnFetch = new SimpleBooleanProperty();
+    private final SimpleBooleanProperty convertJournalOnFetch = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty abbreviateOnFetch = new SimpleBooleanProperty(true);
+    private final SimpleBooleanProperty unAbbreviateOnFetch = new SimpleBooleanProperty(false);
+    private final SimpleObjectProperty<AbbreviationType> abbreviationTypeOnFetch = new SimpleObjectProperty<>(AbbreviationType.DEFAULT);
+    private final SimpleListProperty<AbbreviationType> abbreviationTypes = new SimpleListProperty<>(FXCollections.observableArrayList(AbbreviationType.values()));
 
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -114,6 +119,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
         useFJournal.set(abbreviationsPreferences.shouldUseFJournalField());
         convertJournalOnFetch.set(abbreviationsPreferences.shouldConvertJournalOnFetch());
+        abbreviateOnFetch.set(abbreviationsPreferences.shouldAbbreviateOnFetch());
+        unAbbreviateOnFetch.set(!abbreviationsPreferences.shouldAbbreviateOnFetch());
+        abbreviationTypeOnFetch.set(abbreviationsPreferences.useAbbreviationTypeOnFetch());
     }
 
     /// Read all saved file paths and read their abbreviations.
@@ -314,6 +322,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     abbreviationsPreferences.setExternalJournalLists(journalStringList);
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
                     abbreviationsPreferences.setConvertJournalOnFetch(convertJournalOnFetch.get());
+                    abbreviationsPreferences.setAbbreviateOnFetch(abbreviateOnFetch.get());
+                    abbreviationsPreferences.setAbbreviationTypeOnFetch(abbreviationTypeOnFetch.get());
 
                     if (shouldWriteLists) {
                         saveJournalAbbreviationFiles();
@@ -369,5 +379,21 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     public SimpleBooleanProperty convertJournalOnFetchProperty() {
         return convertJournalOnFetch;
+    }
+
+    public SimpleBooleanProperty abbreviateOnFetchProperty() {
+        return abbreviateOnFetch;
+    }
+
+    public SimpleBooleanProperty unAbbreviateOnFetchProperty() {
+        return unAbbreviateOnFetch;
+    }
+
+    public SimpleObjectProperty<AbbreviationType> abbreviationTypeOnFetchProperty() {
+        return abbreviationTypeOnFetch;
+    }
+
+    public SimpleListProperty<AbbreviationType> abbreviationTypesProperty() {
+        return abbreviationTypes;
     }
 }
