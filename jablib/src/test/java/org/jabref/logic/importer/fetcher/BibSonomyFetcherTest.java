@@ -6,6 +6,7 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
@@ -15,6 +16,7 @@ import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -29,10 +31,12 @@ class BibSonomyFetcherTest {
 
     @BeforeEach
     void setUp() {
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey(BibSonomyFetcher.FETCHER_NAME)).thenReturn(Optional.of(buildInfo.bibSonomyApiKey));
-        fetcher = new BibSonomyFetcher(importerPreferences, buildInfo.bibSonomyUsername);
+        when(importerPreferences.getApiKey(BibSonomyFetcher.FETCHER_NAME)).thenReturn(Optional.of(buildInfo.bibSonomyUsername + ":" + buildInfo.bibSonomyApiKey));
+        fetcher = new BibSonomyFetcher(importFormatPreferences, importerPreferences);
     }
 
     @Test
