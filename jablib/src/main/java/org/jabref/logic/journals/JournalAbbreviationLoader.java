@@ -22,13 +22,11 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-///
 /// This class loads abbreviations from a CSV file and stores them into a MV file ([#readAbbreviationsFromCsvFile(Path)]).
 /// It can also create an [JournalAbbreviationRepository] based on an MV file ([#loadRepository(AbbreviationPreferences)]).
 ///
 ///
 /// Abbreviations are available at <a href="https://github.com/JabRef/abbrv.jabref.org/">https://github.com/JabRef/abbrv.jabref.org/</a>.
-///
 public class JournalAbbreviationLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
@@ -111,7 +109,7 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new AbbreviationPreferences(List.of(), true, false));
+        return loadRepository(new AbbreviationPreferences(List.of(), true, false, false));
     }
 
     private static class AsyncJournalAbbreviationRepository extends JournalAbbreviationRepository {

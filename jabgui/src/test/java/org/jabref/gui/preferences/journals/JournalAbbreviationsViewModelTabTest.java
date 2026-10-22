@@ -63,6 +63,7 @@ class JournalAbbreviationsViewModelTabTest {
     private Path tempFolder;
     private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
     private DialogService dialogService;
+    private AbbreviationPreferences abbreviationPreferences;
 
     static class TestAbbreviation extends Abbreviation {
 
@@ -174,7 +175,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws IOException {
-        AbbreviationPreferences abbreviationPreferences = mock(AbbreviationPreferences.class);
+        abbreviationPreferences = mock(AbbreviationPreferences.class);
 
         dialogService = mock(DialogService.class);
         this.tempFolder = tempFolder;
@@ -507,6 +508,41 @@ class JournalAbbreviationsViewModelTabTest {
 
         actual = Files.readAllLines(testFile3, StandardCharsets.UTF_8);
         assertEquals(testData.finalContentsOfFile3, actual);
+    }
+
+    @Test
+    void setValuesLoadsJournalConversionOptionWithoutChangingFJournal() {
+        when(abbreviationPreferences.getExternalJournalLists())
+                .thenReturn(FXCollections.<String>observableArrayList());
+        when(abbreviationPreferences.shouldConvertJournalOnFetch()).thenReturn(true);
+        when(abbreviationPreferences.shouldUseFJournalField()).thenReturn(false);
+
+        viewModel.setValues();
+
+        assertTrue(viewModel.convertJournalOnFetchProperty().get());
+        assertFalse(viewModel.useFJournalProperty().get());
+    }
+
+    @Test
+    void storeSettingsStoresJournalConversionWithoutChangingFJournal() {
+        AbbreviationPreferences preferences = AbbreviationPreferences.getDefault();
+        preferences.setConvertJournalOnFetch(false);
+        preferences.setUseFJournalField(true);
+
+        JournalAbbreviationsTabViewModel savingViewModel =
+                new JournalAbbreviationsTabViewModel(
+                        preferences,
+                        dialogService,
+                        new CurrentThreadTaskExecutor(),
+                        repository);
+
+        savingViewModel.convertJournalOnFetchProperty().set(true);
+        savingViewModel.useFJournalProperty().set(true);
+
+        savingViewModel.storeSettings();
+
+        assertTrue(preferences.shouldConvertJournalOnFetch());
+        assertTrue(preferences.shouldUseFJournalField());
     }
 
     /// Select the last abbreviation in the list of abbreviations

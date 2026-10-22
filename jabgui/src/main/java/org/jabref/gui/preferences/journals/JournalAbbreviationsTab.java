@@ -69,6 +69,9 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 .custom(buildAbbreviationsEditor())
                 .custom(buildAddAbbreviationRow())
                 .checkbox(Localization.lang("Use the field FJournal to store the full journal name for (un)abbreviations in the entry"), viewModel.useFJournalProperty())
+                .checkbox(
+                        Localization.lang("Convert journal titles in fetched entries"),
+                        viewModel.convertJournalOnFetchProperty())
                 .build());
     }
 

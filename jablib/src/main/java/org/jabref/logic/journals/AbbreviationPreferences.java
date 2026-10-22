@@ -12,20 +12,24 @@ public class AbbreviationPreferences {
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
     private final BooleanProperty shouldEnableMscKeywordDescriptions;
+    private final BooleanProperty convertJournalOnFetch;
 
     public AbbreviationPreferences(List<String> externalJournalLists,
                                    boolean useFJournalField,
-                                   boolean shouldEnableMscKeywordDescriptions) {
+                                   boolean shouldEnableMscKeywordDescriptions,
+                                   boolean convertJournalOnFetch) {
         this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
         this.shouldEnableMscKeywordDescriptions = new SimpleBooleanProperty(shouldEnableMscKeywordDescriptions);
+        this.convertJournalOnFetch = new SimpleBooleanProperty(convertJournalOnFetch);
     }
 
     private AbbreviationPreferences() {
         this(
                 List.of(), // externalJournalLists
                 true,      // useFJournalField
-                false      // Enable MSC codes as Keyword
+                false,      // Enable MSC codes as Keyword
+                false      // dont edit journal title by default
         );
     }
 
@@ -64,5 +68,17 @@ public class AbbreviationPreferences {
 
     public BooleanProperty shouldEnableMscKeywordDescriptionsProperty() {
         return shouldEnableMscKeywordDescriptions;
+    }
+
+    public BooleanProperty convertJournalOnFetchProperty() {
+        return convertJournalOnFetch;
+    }
+
+    public boolean shouldConvertJournalOnFetch() {
+        return convertJournalOnFetch.get();
+    }
+
+    public void setConvertJournalOnFetch(boolean value) {
+        this.convertJournalOnFetch.set(value);
     }
 }

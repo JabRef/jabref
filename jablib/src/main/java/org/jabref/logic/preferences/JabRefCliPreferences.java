@@ -353,6 +353,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
     private static final String ENABLE_MSC_KEYWORD_DESCRIPTIONS = "enableMscKeywordDescriptions";
+    private static final String CONVERT_JOURNAL_ON_FETCH = "shouldConvertJournalOnFetch";
 
     // Protected terms
     private static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
@@ -1188,14 +1189,15 @@ public class JabRefCliPreferences implements CliPreferences {
         abbreviationPreferences = new AbbreviationPreferences(
                 convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaultValues.getExternalJournalLists()))),
                 getBoolean(USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get()),
-                getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions())
+                getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions()),
+                getBoolean(CONVERT_JOURNAL_ON_FETCH, defaultValues.shouldConvertJournalOnFetch())
         );
 
         bindCustomList(abbreviationPreferences.getExternalJournalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalJournalLists(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindBoolean(abbreviationPreferences.useFJournalFieldProperty(), USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get());
         bindBoolean(abbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(), ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions());
-
+        bindBoolean(abbreviationPreferences.convertJournalOnFetchProperty(), CONVERT_JOURNAL_ON_FETCH, defaultValues.shouldConvertJournalOnFetch());
         return abbreviationPreferences;
     }
     // endregion

@@ -37,7 +37,7 @@ class AbbreviationsTest {
     @Test
     void backgroundLoadedRepositoryReturnsBuiltInAbbreviations() {
         JournalAbbreviationRepository backgroundLoadedRepository = JournalAbbreviationLoader.loadRepositoryInBackground(
-                new AbbreviationPreferences(java.util.List.of(), true, false),
+                new AbbreviationPreferences(java.util.List.of(), true, false, false),
                 new CurrentThreadTaskExecutor()
         );
 
@@ -50,7 +50,7 @@ class AbbreviationsTest {
         RecordingTaskExecutor taskExecutor = new RecordingTaskExecutor();
 
         JournalAbbreviationRepository backgroundLoadedRepository = JournalAbbreviationLoader.loadRepositoryInBackground(
-                new AbbreviationPreferences(java.util.List.of(), true, false),
+                new AbbreviationPreferences(java.util.List.of(), true, false, false),
                 taskExecutor
         );
 
