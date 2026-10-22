@@ -22,7 +22,7 @@ public enum HelpFile {
     // The help page covers both OO and LO.
     OPENOFFICE_LIBREOFFICE("cite/openofficeintegration"),
     FETCHER_ACM("collect/import-using-online-bibliographic-database#acm-portal"),
-    FETCHER_BIBSONOMY_SCRAPER(""),
+    FETCHER_BIBSONOMY("collect/import-using-online-bibliographic-database#bibsonomy"),
     FETCHER_BIODIVERSITY_HERITAGE_LIBRARY("collect/import-using-online-bibliographic-database#bibliotheksverbund-bayern-bvb"),
     FETCHER_COLLECTION_OF_COMPUTER_SCIENCE_BIBLIOGRAPHIES("collect/import-using-online-bibliographic-database#collection-of-computer-science-bibliographies-ccsb"),
     FETCHER_CROSSREF("collect/import-using-online-bibliographic-database#crossref-unpaywalll"),
