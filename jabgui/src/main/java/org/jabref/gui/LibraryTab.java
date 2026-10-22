@@ -16,6 +16,8 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -57,6 +59,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.gui.util.InsertUtil;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -111,6 +114,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.event.MetaDataChangeSource;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchResults;
 import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -180,6 +184,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private ListProperty<GroupTreeNode> selectedGroupsProperty;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
+    private final ReadOnlyObjectWrapper<Optional<SearchResults>> searchResults = new ReadOnlyObjectWrapper<>(Optional.empty());
     private final IntegerProperty resultSize = new SimpleIntegerProperty(0);
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
@@ -222,6 +227,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
             if (closeContext) {
                 closeSharedDatabase(loadedContext);
+                return;
+            }
+            if (tab.dropIfAlreadyOpen(loadedContext)) {
                 return;
             }
             tab.setDatabaseContext(loadedContext);
@@ -341,6 +349,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getSearchContext(), selectedGroupsProperty(), searchQueryProperty, resultSizeProperty());
+        searchResults.unbind();
+        searchResults.bind(tableModel.searchResultsProperty());
 
         new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferences.getFilePreferences());
@@ -444,6 +454,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             tabContainer.closeTab(this);
             loading.set(false);
             dataLoadingTask = null;
+            return;
+        }
+
+        if (dropIfAlreadyOpen(result.getDatabaseContext())) {
             return;
         }
 
@@ -669,6 +683,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (event instanceof MetaDataChangedEvent) {
             updateTabTitle(changedProperty.get());
         }
+    }
+
+    /// Keeps the navigation history in sync with the library, so that back and forward skip deleted entries.
+    @Subscribe
+    public void listen(EntriesRemovedEvent event) {
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            navigationHistory.removeEntries(event.getBibEntries());
+            updateNavigationState();
+        });
     }
 
     /// Returns a collection of suggestion providers, which are populated from the current library.
@@ -963,6 +986,17 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         stateManager.removeUndoManager(bibDatabaseContext);
 
         try {
+            stateManager.closeAiChatWindows(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when closing AI chat windows", e);
+        }
+        try {
+            aiService.releaseLibrary(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when releasing AI chat histories", e);
+        }
+
+        try {
             AutosaveManager.shutdown(bibDatabaseContext);
         } catch (Throwable e) {
             LOGGER.error("Problem when shutting down autosave manager", e);
@@ -989,6 +1023,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             tableModel.unbind();
         }
 
+        searchResults.unbind();
+
         if (autoRenameFileOnEntryChange != null) {
             coarseChangeFilter.unregisterListener(autoRenameFileOnEntryChange);
         }
@@ -998,6 +1034,29 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
+    }
+
+    /// Decided here, on the JavaFX thread, once the connection is established: checks before connecting cannot see
+    /// concurrent connection attempts. A duplicate closes this tab and shows the tab already connected instead.
+    /// The redundant connection is closed in the background, as shutting down its synchronizer may block.
+    // [impl->req~shared-database.single-tab~1]
+    private boolean dropIfAlreadyOpen(BibDatabaseContext loadedContext) {
+        if (loadedContext.getLocation() != DatabaseLocation.SHARED) {
+            return false;
+        }
+        Optional<LibraryTab> alreadyOpen = SharedDatabaseUIManager.findOpenTab(
+                tabContainer,
+                loadedContext.getDBMSSynchronizer().getConnectionProperties(),
+                Optional.of(this));
+        alreadyOpen.ifPresent(other -> {
+            LOGGER.info("Shared database {} is already open in another tab, dropping the second connection", loadedContext.getDBMSSynchronizer().getDBName());
+            BackgroundTask.wrap(() -> closeSharedDatabase(loadedContext)).executeWith(taskExecutor);
+            loading.set(false);
+            dataLoadingTask = null;
+            tabContainer.closeTab(this);
+            tabContainer.showLibraryTab(other);
+        });
+        return alreadyOpen.isPresent();
     }
 
     private static void closeSharedDatabase(BibDatabaseContext bibDatabaseContext) {
@@ -1052,6 +1111,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     public OptionalObjectProperty<SearchQuery> searchQueryProperty() {
         return searchQueryProperty;
+    }
+
+    public ReadOnlyObjectProperty<Optional<SearchResults>> searchResultsProperty() {
+        return searchResults.getReadOnlyProperty();
     }
 
     public IntegerProperty resultSizeProperty() {

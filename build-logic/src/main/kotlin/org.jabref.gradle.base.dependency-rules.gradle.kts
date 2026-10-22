@@ -186,6 +186,31 @@ extraJavaModuleInfo {
         uses("kong.unirest.core.json.JsonEngine")
     }
     module("com.konghq:unirest-modules-gson", "unirest.modules.gson")
+
+    // region nimbusdl
+    // required by nimbusdl
+    module("com.github.stephenc.jcip:jcip-annotations", "jcip.annotations") {
+        exportAllPackages()
+    }
+    module("net.minidev:json-smart", "json.smart") {
+        exportAllPackages()
+    }
+    module("com.nimbusds:content-type", "nimbusds.contenttype") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    knownModule("com.nimbusds:nimbus-jose-jwt", "com.nimbusds.jose.jwt")
+    module("com.nimbusds:lang-tag", "nimbusds.langtag") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("com.nimbusds:oauth2-oidc-sdk", "nimbusds.oauth2.oidc.sdk") {
+        overrideModuleName()
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    // endregion
+
     module("com.squareup.okhttp3:mockwebserver3", "mockwebserver3") {
         preserveExisting()
     }
@@ -221,12 +246,6 @@ extraJavaModuleInfo {
     module("de.rototor.jeuclid:jeuclid-core", "jeuclid.core")
     module("de.rototor.snuggletex:snuggletex-core", "snuggletex.core")
     module("de.rototor.snuggletex:snuggletex-jeuclid", "snuggletex.jeuclid")
-    module("de.sandec:JMemoryBuddy", "de.sandec.jmemorybuddy") {
-        exportAllPackages()
-        // The heap dump written when a reachability assertion fails goes through ManagementFactory
-        requires("java.management")
-        requires("jdk.management")
-    }
     module("de.swiesend:secret-service", "secret.service")
     module("de.undercouch:citeproc-java", "citeproc.java") {
         exportAllPackages()

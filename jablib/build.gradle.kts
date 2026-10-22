@@ -26,7 +26,7 @@ plugins {
     id("dev.jbang") version "0.4.0" apply false
 
     id("net.ltgt.errorprone") version "5.1.1"
-    id("net.ltgt.nullaway") version "3.2.0"
+    id("net.ltgt.nullaway") version "3.3.0"
 }
 
 val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost(
@@ -323,7 +323,7 @@ tasks.test {
     systemProperty("prism.order", "sw")
 
     useJUnitPlatform {
-        excludeTags("DatabaseTest", "ExternalServicesTest")
+        excludeTags("DatabaseTest", "ExternalServicesTest", "ConverterTest")
     }
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
@@ -341,6 +341,18 @@ jmh {
 }
 
 val testSourceSet = sourceSets.test.get()
+val converterCheckouts = mapOf(
+    "MARC2BIBFRAME2_DIR" to layout.projectDirectory.dir("../../marc2bibframe2").asFile,
+    "BIBFRAME2MARC_DIR" to layout.projectDirectory.dir("../../bibframe2marc").asFile
+)
+
+tasks.withType<Test>().configureEach {
+    converterCheckouts.forEach { (variable, directory) ->
+        if (System.getenv(variable).isNullOrBlank() && directory.isDirectory) {
+            environment(variable, directory.absolutePath)
+        }
+    }
+}
 
 tasks.register<Test>("externalServicesTest") {
     group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -358,6 +370,17 @@ tasks.register<Test>("databaseTest") {
     classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("DatabaseTest")
+    }
+    maxParallelForks = 1
+}
+
+tasks.register<Test>("converterTest") {
+    description = "BIBFRAME converter test"
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
+    useJUnitPlatform {
+        includeTags("ConverterTest")
     }
     maxParallelForks = 1
 }

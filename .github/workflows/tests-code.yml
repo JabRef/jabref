@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: pr_number
           path: pr_number.txt
@@ -58,20 +58,20 @@ jobs:
           show-progress: 'false'
       - id: changed-non-workflow-non-markdown-files
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files_ignore: |
             .github/workflows/**
             **/*.md
       - id: changed-requirements-docs
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             docs/requirements/**/*.md
       - id: changed-tests-code-workflow
         if: github.event_name == 'pull_request'
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             .github/workflows/tests-code.yml
@@ -149,7 +149,7 @@ jobs:
           repository: 'rmuller/Convert2MarkdownJavadoc'
           path: 'Convert2MarkdownJavadoc'
       - name: Setup JDK
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
         with:
           java-version: '24'
           distribution: 'corretto'
@@ -262,7 +262,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: Set up Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 24
           cache: npm
@@ -270,6 +270,17 @@ jobs:
         run: npm ci
       - name: textlint
         run: npm run textlint
+      - name: textlint write-good (changed Markdown files)
+        if: github.event_name == 'pull_request'
+        run: |
+          # Report-only: the existing docs have thousands of findings, so only the Markdown files changed by the PR are checked and the step does not fail.
+          git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+          mapfile -t files < <(git diff --name-only --diff-filter=AM FETCH_HEAD HEAD -- '*.md' ':!CHANGELOG.md')
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No changed Markdown files."
+            exit 0
+          fi
+          npm run textlint:write-good -- "${files[@]}" | sed "s|${GITHUB_WORKSPACE}/||g" || true
       - name: typos
         run: pipx run typos==1.50.3
 
@@ -301,7 +312,7 @@ jobs:
       - name: Resolve //DEPS into the cached directory
         # JBang resolves script dependencies into ~/.m2, which is not cached here.
         run: echo "JBANG_REPO=$HOME/.jbang/repository" >> "$GITHUB_ENV"
-      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
         with:
           distribution: 'corretto'
           java-version: '25'
@@ -510,7 +521,7 @@ jobs:
           show-progress: 'false'
       - name: Detect changed windows-related classes
         id: changed-windows-related-files
-        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: |
             jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
@@ -638,7 +649,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
         with:
           java-version: 25
           distribution: 'corretto'
