@@ -13,14 +13,16 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-/// [Password] contains methods which are useful to encrypt and decrypt passwords using symmetric algorithms.
+/// [Password] only decrypts legacy values (values encrypted by older JabRef versions) so that they can be migrated.
+/// The fixed IV is kept to retain compatibility with existing ciphertexts.
+/// Not to be used to encrypt new values.
 public class Password {
 
     private final byte[] phrase;
     private final SecretKeySpec secretKey;
     private final IvParameterSpec ivSpec;
 
-    /// @param phrase Phrase which should be encrypted or decrypted
+    /// @param phrase Phrase which should be decrypted
     /// @param key    Key which is used to improve symmetric encryption
     public Password(char[] phrase, String key) throws NoSuchAlgorithmException, NoSuchPaddingException {
         this(new String(phrase), key);
@@ -32,16 +34,7 @@ public class Password {
         this.ivSpec = new IvParameterSpec("ThisIsA128BitKey".getBytes());
     }
 
-    /// Encrypts the set phrase/password with a symmetric encryption algorithm.
-    ///
-    /// @return Encrypted phrase/password
-    public String encrypt() throws GeneralSecurityException, UnsupportedEncodingException {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
-        return new String(Base64.getEncoder().encode(cipher.doFinal(phrase)), StandardCharsets.UTF_8);
-    }
-
-    /// Decrypts the set phrase/password which was encrypted via [Password#encrypt()].
+    /// Decrypts the set phrase/password, which was encrypted by an older JabRef version.
     ///
     /// @return Decrypted phrase/password
     public String decrypt() throws GeneralSecurityException, UnsupportedEncodingException {
