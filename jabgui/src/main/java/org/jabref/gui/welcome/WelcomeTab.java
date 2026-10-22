@@ -222,7 +222,6 @@ public class WelcomeTab extends Tab {
             grid.getProperties().put("quicksettingsBox", quicksettingsBox);
             grid.getProperties().put("walkthroughsBox", walkthroughsBox);
         } else {
-
             startBox = (Node) grid.getProperties().get("startBox");
             recentBox = (Node) grid.getProperties().get("recentBox");
             quicksettingsBox = (Node) grid.getProperties().get("quicksettingsBox");
