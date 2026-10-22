@@ -203,6 +203,13 @@
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `- [x]` (done), `- [ ]` (yet to be done) or `- [/]` (not applicable).
     Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1).
+- jobName: 'MIT license confirmed'
+  workflowName: 'Check PR Format'
+  always: true
+  message: >
+    The checkbox "I own the copyright of the code submitted and I license it under the MIT license" in the pull request description is not ticked.
+    We cannot merge code without the permission to license it under MIT.
+    If you own the code, please tick the box (`- [x]`). Otherwise, please explain the origin of the code in the description.
 - jobName: 'Determine issue number'
   workflowName: 'Link PR to Issue'
   always: true
