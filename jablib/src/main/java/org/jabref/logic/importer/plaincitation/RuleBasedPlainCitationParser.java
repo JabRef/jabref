@@ -218,8 +218,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
                 && doi.isEmpty();
     }
 
-    /// @param originalCitation the citation as entered by the user. It is stored in the `comment` field so that
-    ///                         nothing is lost, and so that no internal placeholder token ends up there.
+    /// Builds the entry from the parsed fields. `originalCitation` is the citation as entered by the user. It is
+    /// stored in the `comment` field so that nothing is lost, and so that no internal placeholder token ends up there.
     private Optional<BibEntry> generateEntity(String originalCitation) {
         EntryType type = isArticle ? StandardEntryType.Article : StandardEntryType.Book;
         // An empty value does not create the field (see BibEntry#setField), so missing data yields no empty field
@@ -253,9 +253,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     ///
     /// Called before [#findUrls] so a `doi.org` link is recorded as a DOI rather
     /// than being swallowed by the generic URL rule.
-    ///
-    /// @param input raw citation text
-    /// @return the input with the DOI stripped, or the original input if no DOI was found
+    /// If no DOI is found, `input` is returned unchanged.
     private String findDoi(String input) {
         // [impl->req~import.plain-citation.doi~1]
         return DOI.findInText(input)
