@@ -61,7 +61,7 @@ dependencies.constraints {
     api("com.github.javaparser:javaparser-core:3.28.2")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
-    api("com.google.errorprone:error_prone_core:2.50.0")
+    api("com.google.errorprone:error_prone_core:2.51.0")
     api("com.google.guava:guava:33.7.2-jre")
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
