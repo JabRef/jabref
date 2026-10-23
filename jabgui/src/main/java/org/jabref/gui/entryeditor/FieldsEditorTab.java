@@ -6,17 +6,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedSet;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javafx.collections.ObservableList;
-import javafx.geometry.Bounds;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -37,7 +36,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -145,7 +143,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
-            setRegularRowLayout(gridPane);
+            setRegularRowLayout(gridPane, fields.size());
         }
     }
 
@@ -168,20 +166,29 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         return new FieldNameLabel(field);
     }
 
-    private void setRegularRowLayout(GridPane gridPane) {
-        double totalWeight = fields.stream()
-                                   .mapToDouble(field -> editors.get(field).getWeight())
-                                   .sum();
-        List<RowConstraints> constraints = fields
-                .stream()
-                .map(field -> {
+    static void setRegularRowLayout(GridPane gridPane, int rowCount) {
+        gridPane.getChildren().forEach(FieldsEditorTab::useComputedPreferredHeight);
+        List<RowConstraints> constraints = IntStream.range(0, rowCount)
+                .mapToObj(_ -> {
                     RowConstraints rowExpand = new RowConstraints();
                     rowExpand.setVgrow(Priority.ALWAYS);
                     rowExpand.setValignment(VPos.TOP);
-                    rowExpand.setPercentHeight(100 * editors.get(field).getWeight() / totalWeight);
+                    rowExpand.setMaxHeight(Double.MAX_VALUE);
                     return rowExpand;
                 }).toList();
         gridPane.getRowConstraints().addAll(constraints);
+    }
+
+    /// Percentage rows ignore child minimum heights. With natural rows, infinite preferred heights
+    /// from field labels and text inputs must use their computed sizes so the grid can size each row.
+    private static void useComputedPreferredHeight(Node node) {
+        if (node instanceof Region region && region.getPrefHeight() == Double.POSITIVE_INFINITY) {
+            region.setPrefHeight(Region.USE_COMPUTED_SIZE);
+            region.setMaxHeight(Double.MAX_VALUE);
+        }
+        if (node instanceof Parent parent) {
+            parent.getChildrenUnmodifiable().forEach(FieldsEditorTab::useComputedPreferredHeight);
+        }
     }
 
     protected static void setCompressedRowLayout(GridPane gridPane, int rows) {
@@ -246,10 +253,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
             scrollPane.setContent(getEditorContent());
             scrollPane.setFitToWidth(true);
             scrollPane.setFitToHeight(stretchContentToTabHeight());
-            // For testing
-            scrollPane.addEventFilter(MouseEvent.MOUSE_PRESSED, _ -> printLayoutMeasurements(scrollPane));
-            // For testing
-
             SplitPane container = new SplitPane(scrollPane);
             setContent(container);
 
@@ -262,51 +265,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                                                   .subscribeToValues(this::savePreviewWidthDividerPosition);
         }
     }
-
-    // Temporary diagnostic method for testing entry editor field layout; remove after measuring.
-    private void printLayoutMeasurements(ScrollPane scrollPane) {
-        if (!editors.containsKey(StandardField.KEYWORDS)
-                || !editors.containsKey(StandardField.EPRINT)
-                || !editors.containsKey(StandardField.FILE)) {
-            LOGGER.info("LAYOUT skipped: this tab does not contain Keywords, Eprint, and File; fields={}", fields);
-            return;
-        }
-
-        List<Field> orderedFields = new ArrayList<>(fields);
-        int keywordsRow = orderedFields.indexOf(StandardField.KEYWORDS);
-        int fileRow = orderedFields.indexOf(StandardField.FILE);
-
-        Node keywords = editors.get(StandardField.KEYWORDS).getNode();
-        Node eprint = editors.get(StandardField.EPRINT).getNode();
-        Node file = editors.get(StandardField.FILE).getNode();
-
-        Bounds keywordsCell = gridPane.getCellBounds(1, keywordsRow);
-        Bounds fileCell = gridPane.getCellBounds(1, fileRow);
-        Bounds keywordsBounds = keywords.getBoundsInParent();
-        Bounds eprintBounds = eprint.getBoundsInParent();
-        Bounds fileBounds = file.getBoundsInParent();
-
-        Region keywordsRegion = (Region) keywords;
-        double keywordsWidth = keywordsBounds.getWidth();
-
-        LOGGER.info(
-                "LAYOUT viewport={} grid={} | "
-                        + "Keywords row={} node={} min={} pref={} | "
-                        + "Keywords bottom={} Eprint top={} gap={} | "
-                        + "File row={} node={}",
-                scrollPane.getViewportBounds().getHeight(),
-                gridPane.getHeight(),
-                keywordsCell.getHeight(),
-                keywordsBounds.getHeight(),
-                keywordsRegion.minHeight(keywordsWidth),
-                keywordsRegion.prefHeight(keywordsWidth),
-                keywordsBounds.getMaxY(),
-                eprintBounds.getMinY(),
-                eprintBounds.getMinY() - keywordsBounds.getMaxY(),
-                fileCell.getHeight(),
-                fileBounds.getHeight());
-    }
-    // For testing
 
     private void addPreviewPanel() {
         assert this.getContent() instanceof SplitPane;
