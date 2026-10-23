@@ -2,15 +2,19 @@ package org.jabref.gui.importer.actions;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -21,8 +25,11 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
@@ -33,15 +40,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
+import org.mockito.InOrder;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -206,6 +216,41 @@ public class OpenDatabaseActionTest {
         assertEquals(Optional.of("TestGroup"), entry.getField(StandardField.GROUPS));
         assertTrue(parserResult.getChangedOnMigration());
         verify(dialogService).notify(Localization.lang("Migrating library '%0' to the current version", library.toAbsolutePath().toString()));
+    }
+
+    /// The tab added last is the selected one when several libraries are opened at once. The backup dialog of another
+    /// library must not be shown on top of it.
+    @Test
+    void loadDatabaseShowsTabOfLibraryBeforeItsBackupDialog(@TempDir Path tempDir) throws Exception {
+        Path library = Files.writeString(tempDir.resolve("library.bib"), "@article{a, title = {Original}}\n");
+        Path backupDir = tempDir.resolve("backups");
+        Path backup = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(library, BackupFileType.BACKUP, backupDir);
+        Files.writeString(backup, "@article{a, title = {Backup}}\n");
+        Files.setLastModifiedTime(backup, FileTime.from(Files.getLastModifiedTime(library).toInstant().plusSeconds(60)));
+        mockPreferencesForLoad(backupDir);
+        when(guiPreferences.getExternalApplicationsPreferences()).thenReturn(mock(ExternalApplicationsPreferences.class));
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.IGNORE_BACKUP));
+
+        LibraryTab tabOfLibrary = libraryTabFor(library);
+        LibraryTab tabOfOtherLibrary = libraryTabFor(tempDir.resolve("other.bib"));
+        when(libraryTabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(tabOfLibrary, tabOfOtherLibrary));
+
+        openDatabaseAction.loadDatabase(library);
+
+        JavaFxExtension.awaitEvents();
+        InOrder inOrder = inOrder(libraryTabContainer, dialogService);
+        inOrder.verify(libraryTabContainer).showLibraryTab(tabOfLibrary);
+        inOrder.verify(dialogService).showCustomDialogAndWait(any(BackupResolverDialog.class));
+        verify(libraryTabContainer, never()).showLibraryTab(tabOfOtherLibrary);
+    }
+
+    private static LibraryTab libraryTabFor(Path file) {
+        BibDatabaseContext context = new BibDatabaseContext();
+        context.setDatabasePath(file);
+        LibraryTab libraryTab = mock(LibraryTab.class);
+        when(libraryTab.getBibDatabaseContext()).thenReturn(context);
+        return libraryTab;
     }
 
     @Test
