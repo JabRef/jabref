@@ -414,6 +414,7 @@ class BibtexParserTest {
         assertEquals(List.of(), result.warnings());
     }
 
+    // [utest->req~import.bibtex.citation-key-parentheses~1]
     @ParameterizedTest
     @ValueSource(strings = {"key)", "key(with)parentheses"})
     void parsePreservesParenthesesInBracedCitationKeys(String key) throws IOException {

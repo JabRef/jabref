@@ -1045,12 +1045,10 @@ public class BibtexParser implements Parser {
             if (((character != closingBracket) || (openParentheses > 0)) && !Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
                     || (character == ':') || ("#{}~,=\uFFFD".indexOf(character) == -1))) {
                 token.append((char) character);
-                if (closingBracket == ')') {
-                    if (character == '(') {
-                        openParentheses++;
-                    } else if (character == ')') {
-                        openParentheses--;
-                    }
+                if (character == '(') {
+                    openParentheses++;
+                } else if (character == ')') {
+                    openParentheses--;
                 }
             } else {
                 if ((character == '=') || (Character.isWhitespace((char) character) && isEqualsSignNext())) {
