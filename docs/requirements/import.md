@@ -27,6 +27,16 @@ Needs: impl, utest
 `req~import.bibtex.key-leading-whitespace~1`
 
 This includes LF, CRLF, and multiple line breaks immediately after the entry's opening brace.
+
+For example, the following entry retains the citation key `somebody2023` and title `Example` without warnings:
+
+```bibtex
+@inproceedings{
+somebody2023,
+  title = {Example}
+}
+```
+
 Origin: <https://github.com/JabRef/jabref/issues/9622>
 
 Needs: impl, utest
@@ -38,6 +48,18 @@ Recovery includes entries where both the key and its comma are omitted before th
 Empty entries enclosed in braces or parentheses are retained, including an entry ending at the end of the file.
 Fields are retained even with long custom field names or extensive whitespace before `=`.
 Recovered assignments produce a warning naming the line of the first field; diagnostics for a missing key refer to the complete entry.
+
+For example, the following entry omits both the citation key and its comma:
+
+```bibtex
+@article{
+  author = {Ed von Test},
+  title = {Test}
+}
+```
+
+The importer retains both fields, leaves the citation key empty, and reports `Line 2: Found entry without citation key.`.
+
 Context: <https://github.com/JabRef/jabref/pull/17496>
 
 Needs: impl, utest
