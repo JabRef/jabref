@@ -54,9 +54,6 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
                     "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};']*)",
             Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
 
-    /// Punctuation that ends a sentence or a bracket, but is not part of the URL in front of it.
-    private static final Pattern TRAILING_URL_PUNCTUATION_PATTERN = Pattern.compile("[.,;:!?'\")\\]}]+$");
-
     /// A four-digit number that is not part of a longer number, optionally followed by a second one to form a
     /// range (`2019–2021`). Only the first number is the year.
     private static final Pattern YEAR_PATTERN = Pattern.compile(
@@ -239,7 +236,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         Matcher matcher = URL_PATTERN.matcher(input);
         while (matcher.find()) {
             String url = input.substring(matcher.start(1), matcher.end());
-            urls.add(TRAILING_URL_PUNCTUATION_PATTERN.matcher(url).replaceFirst(""));
+            urls.add(stripTrailingUrlPunctuation(url));
         }
         return fixSpaces(matcher.replaceAll(URL_TAG));
     }
@@ -303,6 +300,31 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     private static String collapseWhitespace(String input) {
         return WHITESPACE_PATTERN.matcher(input).replaceAll(" ").strip();
+    }
+
+    /// Removes punctuation at the end of `url` that belongs to the sentence around it. A closing bracket is only
+    /// removed if the URL has no opening partner for it: `https://en.wikipedia.org/wiki/Foo_(bar)` keeps its `)`,
+    /// while `(see https://example.com/page)` loses it.
+    private static String stripTrailingUrlPunctuation(String url) {
+        String result = url;
+        while (!result.isEmpty()) {
+            char last = result.charAt(result.length() - 1);
+            int bracketIndex = ")]}".indexOf(last);
+            if (bracketIndex >= 0) {
+                char opening = "([{".charAt(bracketIndex);
+                if (count(result, opening) >= count(result, last)) {
+                    break;
+                }
+            } else if (".,;:!?'\"".indexOf(last) < 0) {
+                break;
+            }
+            result = result.substring(0, result.length() - 1);
+        }
+        return result;
+    }
+
+    private static long count(String text, char character) {
+        return text.chars().filter(c -> c == character).count();
     }
 
     /// Finds the publication year. A year in parentheses (`(1993)`, `(1991a)`) is preferred. Otherwise, the last

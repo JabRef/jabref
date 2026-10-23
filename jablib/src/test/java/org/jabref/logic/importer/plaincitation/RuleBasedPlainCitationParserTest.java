@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -140,6 +141,17 @@ class RuleBasedPlainCitationParserTest {
     @Test
     void urlDoesNotIncludeSentencePeriod() throws FetcherException {
         assertEquals(Optional.of("https://example.com/page"), parseField("Smith, J. A title. Journal, 2020. https://example.com/page.", StandardField.URL));
+    }
+
+    /// A closing bracket that closes a bracket inside the URL is part of the URL. One without an opening partner
+    /// belongs to the text around it.
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+            "https://en.wikipedia.org/wiki/Foo_(bar)|Smith, J. A title. Journal, 2020. https://en.wikipedia.org/wiki/Foo_(bar)",
+            "https://en.wikipedia.org/wiki/Foo_(bar)|Smith, J. A title. Journal, 2020. https://en.wikipedia.org/wiki/Foo_(bar).",
+            "https://example.com/page|Smith, J. A title. Journal, 2020 (see https://example.com/page)."})
+    void keepsOnlyBalancedClosingBracketsInUrl(String expectedUrl, String citation) throws FetcherException {
+        assertEquals(Optional.of(expectedUrl), parseField(citation, StandardField.URL));
     }
 
     /// The url field holds one value, so several URLs are joined with `, `.
