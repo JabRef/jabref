@@ -60,4 +60,14 @@ class JabRefGuiPreferencesTest {
                                 {"My tab":["author",{"pattern":"doi","extract":true}]}
                                 """));
     }
+
+    @Test
+    void parseCustomTabsKeepsCasingOfCustomField() {
+        assertEquals(
+                List.of(new EntryEditorTabModel.CustomizedFieldsTab("General", List.of("HALid"))),
+                JabRefGuiPreferences.parseCustomTabs(
+                        """
+                                {"General":["HALid"]}
+                                """));
+    }
 }
