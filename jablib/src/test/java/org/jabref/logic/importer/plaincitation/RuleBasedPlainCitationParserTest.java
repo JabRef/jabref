@@ -196,6 +196,16 @@ class RuleBasedPlainCitationParserTest {
                         entry.flatMap(e -> e.getField(StandardField.TITLE))));
     }
 
+    /// IEEE reference lists put a reference number in front of each citation. It is neither part of the authors
+    /// nor of the title.
+    @Test
+    void findsAuthorsBehindReferenceNumber() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("[1] J. Smith, \"Improving AI systems,\" Journal of Computer Science, 2020.");
+        assertEquals(List.of(Optional.of("Smith, J."), Optional.of("Improving AI systems")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.AUTHOR)),
+                        entry.flatMap(e -> e.getField(StandardField.TITLE))));
+    }
+    
     /// `\w` only matches ASCII letters by default, which cuts surnames with accented letters, hyphens or
     /// apostrophes short. Hyphenated initials (`K.-K.`) must stay whole as well.
     static Stream<Arguments> findsAuthorWithNonAsciiOrPunctuatedName() {

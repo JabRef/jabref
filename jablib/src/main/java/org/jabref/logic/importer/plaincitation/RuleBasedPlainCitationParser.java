@@ -35,6 +35,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String YEAR_GROUP = "YEAR";
 
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
+    private static final Pattern REFERENCE_LABEL_PATTERN = Pattern.compile("\\s*\\[\\d+]\\s*");
 
     /// `doi:`, `urn:doi:` or a `doi.org` link directly in front of a DOI
     private static final Pattern DOI_PREFIX_AT_END_PATTERN = Pattern.compile(
@@ -348,10 +349,13 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// (`Smith, J. and A. Doe`); `et al.` becomes `others`.
     private String findAuthors(String input) {
         // [impl->req~import.plain-citation.authors~1]
+        Matcher labelMatcher = REFERENCE_LABEL_PATTERN.matcher(input);          // new
+        int labelEnd = labelMatcher.lookingAt() ? labelMatcher.end() : 0;
+
         Matcher lastNameFirstMatcher = LASTNAME_FIRST_AUTHOR_PATTERN.matcher(input);
         Matcher initialsFirstMatcher = INITIALS_FIRST_AUTHOR_PATTERN.matcher(input);
 
-        int authorsEnd = 0;
+        int authorsEnd = labelEnd;
         while (true) {
             lastNameFirstMatcher.region(authorsEnd, input.length());
             initialsFirstMatcher.region(authorsEnd, input.length());
@@ -369,7 +373,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         }
 
         if (authors.isEmpty()) {
-            return findFullNameAuthors(input);
+            return findFullNameAuthors(input.substring(labelEnd));     
         }
 
         String rest = input.substring(authorsEnd);
