@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -188,6 +189,17 @@ public sealed interface EntryEditorTabModel
             return PLAIN_FIELD_NAME.matcher(fieldPattern).matches()
                     && (KNOWN_FIELD_NAMES.contains(fieldPattern.toLowerCase(Locale.ROOT))
                     || !(FieldFactory.parseField(fieldPattern) instanceof UnknownField));
+        }
+
+        /// The label the entry editor shows for the field of a plain field-name pattern, so that the
+        /// preferences list a field under the same name as the entry editor: a built-in field under its
+        /// fixed display name (`url` as "URL"), a custom field in the casing it was entered (`HALid`).
+        /// A regular expression names no single field and is returned as entered.
+        public static String fieldDisplayName(String fieldPattern) {
+            if (!PLAIN_FIELD_NAME.matcher(fieldPattern).matches()) {
+                return fieldPattern;
+            }
+            return FieldsUtil.getDisplayName(FieldFactory.parseField(fieldPattern));
         }
 
         private SequencedSet<Field> resolve(List<String> patterns, BibEntry entry) {
