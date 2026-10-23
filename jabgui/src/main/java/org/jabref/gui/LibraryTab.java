@@ -191,6 +191,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private BackgroundTask<?> dataLoadingTask;
 
+    public void importEntriesWithDuplicateCheck(List<BibEntry> entries) {
+        importHandler.importEntriesWithDuplicateCheck(null, entries);
+    }
+
     static final class SharedDatabaseLoadingCallbacks {
         private final LibraryTab tab;
         private final BiConsumer<LibraryTab, BibDatabaseContext> onSuccess;
