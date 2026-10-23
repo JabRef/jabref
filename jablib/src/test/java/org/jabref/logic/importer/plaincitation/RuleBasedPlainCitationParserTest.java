@@ -41,7 +41,7 @@ class RuleBasedPlainCitationParserTest {
     }
 
     // DOI
-
+    // [utest->req~import.plain-citation.doi~1]
     /// A DOI is found with a `doi:` or `DOI:` prefix and as a `doi.org` link. Punctuation right after it
     /// (`.`, `,`, `;`) is not part of it, and of two DOIs only the first is kept.
     static Stream<Arguments> findsDoi() {
@@ -156,7 +156,7 @@ class RuleBasedPlainCitationParserTest {
     }
 
     // Authors
-
+     // [utest->req~import.plain-citation.authors~1]
     /// Both author patterns, surname first and initials first, produce the BibTeX form `Last, I.`.
     @ParameterizedTest
     @ValueSource(strings = {"Smith, J. A title. Journal, 2020.",
@@ -270,7 +270,7 @@ class RuleBasedPlainCitationParserTest {
     }
 
     // Year
-
+     // [utest->req~import.plain-citation.year-and-pages~1]
     /// 1701 is the lowest year accepted.
     @ParameterizedTest
     @ValueSource(ints = {1701, 2020})
@@ -374,7 +374,7 @@ class RuleBasedPlainCitationParserTest {
     }
 
     // Pages
-
+    // [utest->req~import.plain-citation.year-and-pages~1]
     /// The `p.`/`pp.` prefix is dropped. Hyphen, en dash and BibTeX `--` ranges and a single page are stored
     /// with the BibTeX range separator `--` (a single page has no separator).
     static Stream<Arguments> findsPages() {

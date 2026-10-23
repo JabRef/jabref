@@ -257,6 +257,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// @param input raw citation text
     /// @return the input with the DOI stripped, or the original input if no DOI was found
     private String findDoi(String input) {
+        // [impl->req~import.plain-citation.doi~1]
         return DOI.findInText(input)
                   .map(found -> {
                       doi = found.asString();
@@ -311,6 +312,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     ///
     /// Only the chosen occurrence is replaced by [#YEAR_TAG], so other occurrences (in the title) stay untouched.
     private String findYear(String input) {
+        // [impl->req~import.plain-citation.year-and-pages~1]
         Matcher parenthesesMatcher = YEAR_IN_PARENTHESES_CANDIDATE_PATTERN.matcher(input);
         while (parenthesesMatcher.find()) {
             if (isValidYear(parenthesesMatcher.group(YEAR_GROUP))) {
@@ -347,6 +349,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Replaces the authors block at the beginning of `input` by [#AUTHOR_TAG]. Both name orders may be mixed
     /// (`Smith, J. and A. Doe`); `et al.` becomes `others`.
     private String findAuthors(String input) {
+        // [impl->req~import.plain-citation.authors~1]
         Matcher lastNameFirstMatcher = LASTNAME_FIRST_AUTHOR_PATTERN.matcher(input);
         Matcher initialsFirstMatcher = INITIALS_FIRST_AUTHOR_PATTERN.matcher(input);
 
@@ -422,6 +425,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     ///
     /// Pages are stored with the BibTeX range separator `--`.
     private String findPages(String input) {
+        // [impl->req~import.plain-citation.year-and-pages~1]
         int start = -1;
         int end = -1;
         String foundPages = "";
