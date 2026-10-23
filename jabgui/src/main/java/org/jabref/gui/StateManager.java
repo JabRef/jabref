@@ -119,6 +119,9 @@ public interface StateManager extends SrvStateManager {
 
     void removeAiChatWindowForGroup(BibDatabaseContext context, String groupName);
 
+    /// Closes the group chat windows of a library that is closing and releases their registrations.
+    void closeAiChatWindows(BibDatabaseContext context);
+
     BooleanProperty getEditorShowing();
 
     void setActiveWalkthrough(Walkthrough walkthrough);

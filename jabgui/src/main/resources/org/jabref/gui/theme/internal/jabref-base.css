@@ -1743,6 +1743,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-family: 'JetBrains Mono';
 }
 
+.bibtex-code-area Text,
+.bibtex-code-area .text {
+    -fx-fill: -color-fg-default;
+}
+
 .bibtex-code-area .bibtex-keyword {
     -fx-fill: -color-bibtex-keyword !important;
 }
@@ -1758,6 +1763,22 @@ We want to have a look that matches our icons in the tool-bar */
 .bibtex-code-area .search-highlight {
     -fx-fill: -color-warning-subtle !important;
     -fx-stroke: transparent !important;
+}
+
+.text-search-highlight {
+    -fx-fill: -color-warning-subtle;
+    -fx-stroke: transparent;
+}
+
+.text-search-highlight.current {
+    -fx-fill: -color-selection;
+    -fx-stroke: -color-accent;
+    -fx-stroke-width: 1.5;
+}
+
+.text-selection-highlight {
+    -fx-fill: -color-selection;
+    -fx-stroke: transparent;
 }
 
 .flashing-danger {

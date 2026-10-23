@@ -986,6 +986,17 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         stateManager.removeUndoManager(bibDatabaseContext);
 
         try {
+            stateManager.closeAiChatWindows(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when closing AI chat windows", e);
+        }
+        try {
+            aiService.releaseLibrary(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when releasing AI chat histories", e);
+        }
+
+        try {
             AutosaveManager.shutdown(bibDatabaseContext);
         } catch (Throwable e) {
             LOGGER.error("Problem when shutting down autosave manager", e);

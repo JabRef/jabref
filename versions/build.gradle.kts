@@ -27,13 +27,13 @@ val jbang = "0.142.0"
 extra["jbangVersion"] = jbang
 
 dependencies {
-    api(platform("ai.djl:bom:0.38.0"))
+    api(platform("ai.djl:bom:0.39.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.22.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.3"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.3"))
-    api(platform("tools.jackson:jackson-bom:3.2.3"))
+    api(platform("tools.jackson:jackson-bom:3.2.4"))
 }
 
 dependencies.constraints {
@@ -66,8 +66,10 @@ dependencies.constraints {
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.10.1")
-    api("com.konghq:unirest-modules-gson:4.10.1")
+    api("com.konghq:unirest-java-core:4.10.2")
+    api("com.konghq:unirest-modules-gson:4.10.2")
+    api("com.nimbusds:oauth2-oidc-sdk:11.38.2")
+    api("com.nimbusds:nimbus-jose-jwt:10.10")
     api("com.squareup.okhttp3:mockwebserver3:5.5.0")
     api("com.squareup.okhttp3:okhttp:5.5.0")
     api("com.squareup.okio:okio-jvm:3.18.2")
@@ -91,7 +93,7 @@ dependencies.constraints {
     api("info.picocli:picocli:4.7.7")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
     api("io.github.classgraph:classgraph:6.0.0")
-    api("io.github.java-diff-utils:java-diff-utils:4.17")
+    api("io.github.java-diff-utils:java-diff-utils:4.18")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
     api("io.github.thibaultmeyer:cuid:2.0.5")
@@ -108,6 +110,7 @@ dependencies.constraints {
     api("net.java.dev.jna:jna-platform:5.19.1")
     api("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")
     api("net.ltgt.nullaway:nullaway:2.3.0")
+    api("net.minidev:json-smart:2.6.0")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.1")
@@ -155,7 +158,7 @@ dependencies.constraints {
     api("org.libreoffice:libreoffice:26.2.2")
     api("org.libreoffice:unoloader:26.2.2")
     api("org.mockito:mockito-core:5.24.0")
-    api("org.ow2.asm:asm:9.11")
+    api("org.ow2.asm:asm:9.11.1")
     api("org.postgresql:postgresql:42.7.14")
     api("org.slf4j:jul-to-slf4j:2.0.20")
     api("org.slf4j:slf4j-api:2.0.20")
