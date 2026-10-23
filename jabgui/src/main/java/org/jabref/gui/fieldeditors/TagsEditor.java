@@ -254,6 +254,26 @@ public abstract class TagsEditor extends HBox implements FieldEditorFX {
     protected void customizeTag(Label tagLabel, Keyword tag) {
     }
 
+    private double singleRowHeight() {
+        return snappedTopInset() + tagsField.prefHeight(-1) + snappedBottomInset();
+    }
+
+    @Override
+    protected double computeMinHeight(double width) {
+        if (tagsField.getWidth() <= 0) {
+            return singleRowHeight();
+        }
+        return super.computeMinHeight(width);
+    }
+
+    @Override
+    protected double computePrefHeight(double width) {
+        if (tagsField.getWidth() <= 0) {
+            return singleRowHeight();
+        }
+        return super.computePrefHeight(width);
+    }
+
     @Override
     public Parent getNode() {
         return this;
