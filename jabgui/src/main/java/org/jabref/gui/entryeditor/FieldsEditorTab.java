@@ -9,12 +9,14 @@ import java.util.SequencedSet;
 import java.util.stream.Stream;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -35,6 +37,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -243,6 +246,13 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
             scrollPane.setContent(getEditorContent());
             scrollPane.setFitToWidth(true);
             scrollPane.setFitToHeight(stretchContentToTabHeight());
+            // For testing
+            scrollPane.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+                if (event.isAltDown()) {
+                    printLayoutMeasurements(scrollPane);
+                }
+            });
+            // For testing
 
             SplitPane container = new SplitPane(scrollPane);
             setContent(container);
@@ -256,6 +266,50 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                                                   .subscribeToValues(this::savePreviewWidthDividerPosition);
         }
     }
+
+    // Temporary diagnostic method for testing entry editor field layout; remove after measuring.
+    private void printLayoutMeasurements(ScrollPane scrollPane) {
+        if (!editors.containsKey(StandardField.KEYWORDS)
+                || !editors.containsKey(StandardField.EPRINT)
+                || !editors.containsKey(StandardField.FILE)) {
+            return;
+        }
+
+        List<Field> orderedFields = new ArrayList<>(fields);
+        int keywordsRow = orderedFields.indexOf(StandardField.KEYWORDS);
+        int fileRow = orderedFields.indexOf(StandardField.FILE);
+
+        Node keywords = editors.get(StandardField.KEYWORDS).getNode();
+        Node eprint = editors.get(StandardField.EPRINT).getNode();
+        Node file = editors.get(StandardField.FILE).getNode();
+
+        Bounds keywordsCell = gridPane.getCellBounds(1, keywordsRow);
+        Bounds fileCell = gridPane.getCellBounds(1, fileRow);
+        Bounds keywordsBounds = keywords.getBoundsInParent();
+        Bounds eprintBounds = eprint.getBoundsInParent();
+        Bounds fileBounds = file.getBoundsInParent();
+
+        Region keywordsRegion = (Region) keywords;
+        double keywordsWidth = keywordsBounds.getWidth();
+
+        LOGGER.info(
+                "LAYOUT viewport={} grid={} | "
+                        + "Keywords row={} node={} min={} pref={} | "
+                        + "Keywords bottom={} Eprint top={} gap={} | "
+                        + "File row={} node={}",
+                scrollPane.getViewportBounds().getHeight(),
+                gridPane.getHeight(),
+                keywordsCell.getHeight(),
+                keywordsBounds.getHeight(),
+                keywordsRegion.minHeight(keywordsWidth),
+                keywordsRegion.prefHeight(keywordsWidth),
+                keywordsBounds.getMaxY(),
+                eprintBounds.getMinY(),
+                eprintBounds.getMinY() - keywordsBounds.getMaxY(),
+                fileCell.getHeight(),
+                fileBounds.getHeight());
+    }
+    // For testing
 
     private void addPreviewPanel() {
         assert this.getContent() instanceof SplitPane;
