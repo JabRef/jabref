@@ -247,11 +247,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
             scrollPane.setFitToWidth(true);
             scrollPane.setFitToHeight(stretchContentToTabHeight());
             // For testing
-            scrollPane.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
-                if (event.isAltDown()) {
-                    printLayoutMeasurements(scrollPane);
-                }
-            });
+            scrollPane.addEventFilter(MouseEvent.MOUSE_PRESSED, _ -> printLayoutMeasurements(scrollPane));
             // For testing
 
             SplitPane container = new SplitPane(scrollPane);
@@ -272,6 +268,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         if (!editors.containsKey(StandardField.KEYWORDS)
                 || !editors.containsKey(StandardField.EPRINT)
                 || !editors.containsKey(StandardField.FILE)) {
+            LOGGER.info("LAYOUT skipped: this tab does not contain Keywords, Eprint, and File; fields={}", fields);
             return;
         }
 
