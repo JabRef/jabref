@@ -398,6 +398,21 @@ class ThemeManagerTest {
         assertEquals("-fx-fill: red;", style);
     }
 
+    @Test
+    void resetIconSizeKeepsRelativeFontSize() {
+        var workSpacePreferences = WorkspacePreferences.getDefault();
+        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
+        var themeManager = createThemeManager(workSpacePreferences);
+        var icon = new FontIcon(MaterialDesignA.ACCOUNT);
+        JavaFxExtension.invokeAndWait(() -> icon.setStyle("-fx-font-size: 2em;"));
+        var stage = showIcon(themeManager, icon);
+
+        changeFontSize(workSpacePreferences, 20);
+        JavaFxExtension.invokeAndWait(stage::close);
+
+        assertEquals("-fx-font-size: 2em;", icon.getStyle());
+    }
+
     private static int styleClassChangesOnNewScene(int timesShown) {
         StackPane root = new StackPane();
         AtomicInteger styleClassChanges = new AtomicInteger();
@@ -465,5 +480,4 @@ class ThemeManagerTest {
         });
         return size.get();
     }
-
 }
