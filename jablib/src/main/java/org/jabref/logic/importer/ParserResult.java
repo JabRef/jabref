@@ -32,7 +32,7 @@ public class ParserResult {
     /// up by its context: a change recorded while the library is still loading (e.g., an accepted backup change) has
     /// to land in the journal of the tab that later shows the library.
     /// [impl->req~jabgui.autosaveandbackup.accepted-backup-changes-undoable~1]
-    private BibDatabaseContext databaseContext;
+    @NonNull private BibDatabaseContext databaseContext;
     private boolean invalid;
     private boolean changedOnMigration = false;
 
