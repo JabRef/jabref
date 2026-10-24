@@ -10,10 +10,12 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.pdf.AnnotationArea;
 
 import com.dlsc.pdfviewfx.PDFView;
 import com.tobiasdiez.easybind.EasyBind;
@@ -54,7 +56,18 @@ public class PdfDocumentViewer extends StackPane {
         return highlightText;
     }
 
+    /// Call once the document is shown, so the marker belongs to the page being rendered.
+    public void centerOn(int pageIndex, AnnotationArea area) {
+        currentPage.set(pageIndex);
+        pdfView.setSelectedSearchResult(new PDFView.SearchResult(
+                "", "", pageIndex, new Rectangle2D(area.x(), area.y(), area.width(), area.height())));
+    }
+
     public void show(Path document) {
+        // A marker belongs to the document it was placed in, and would otherwise keep floating
+        // over whatever is shown next.
+        pdfView.setSelectedSearchResult(null);
+
         if (document != null) {
             pdfView.setVisible(false);
             placeholderLabel.setText(Localization.lang("Loading PDF..."));

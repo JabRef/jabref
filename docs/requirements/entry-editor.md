@@ -123,6 +123,25 @@ Special fields (ranking, priority, read status, printed, quality, relevance) are
 
 Needs: impl
 
+## User can open PDF at position of selected annotation
+`feat~entry-editor.file-annotations.open-at-annotation~1`
+
+Triggered from the "File annotations" tab, by the open button or by double-clicking an annotation.
+
+When the application configured for the PDF file type is a reader JabRef knows, that reader is
+launched at the annotation's page. When it is configured but unknown, or on macOS, where no
+command-line route to a page exists, the file opens without a position and the user is notified.
+With no application configured, JabRef cannot tell which reader the operating system would pick, so
+its own document viewer opens, marks the annotation and centers the viewport on it.
+
+External readers are told the page only. They open a document with the page fitted into the window,
+and a viewport that already shows the whole page has nothing left to scroll, so a position within
+the page would only take effect after forcing a zoom level on the user.
+
+<https://github.com/JabRef/jabref/issues/16585>
+
+Needs: impl, utest
+
 ## Source tab must replace content atomically when entry selection changes
 `req~entry-editor.source-tab.atomic-replacement~1`
 
