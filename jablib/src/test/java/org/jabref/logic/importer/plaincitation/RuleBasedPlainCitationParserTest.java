@@ -372,6 +372,7 @@ class RuleBasedPlainCitationParserTest {
         return Stream.of(
                 Arguments.of("Improving AI: A survey", "Journal of AI", "Smith, J. Improving AI: A survey. Journal of AI, 2020."),
                 Arguments.of("Is AI safe?", "Journal of AI", "Smith, J. Is AI safe? Journal of AI, 2020."),
+                Arguments.of("Deep learning for AI", "Nature", "Smith, J. Deep learning for AI. Nature, 2020."),
                 Arguments.of("A title", "J. Comp. Sci.", "Smith, J. A title. J. Comp. Sci., 2020."),
                 Arguments.of("A journal of my travels", "Travel Review", "Smith, J. A journal of my travels. Travel Review, 2020."),
                 Arguments.of("Proceedings of the past", "History Review", "Smith, J. Proceedings of the past. History Review, 2020."));
