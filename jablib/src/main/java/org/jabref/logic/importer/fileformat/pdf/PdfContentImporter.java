@@ -24,6 +24,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -37,7 +38,8 @@ import org.jspecify.annotations.Nullable;
 
 import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 
-/// Parses data of the first page of the PDF and creates a BibTeX entry.
+/// Parses book information page and creates a BibTeX entry from validated ISBN.
+/// If no page qualifies, falls back to parsing research paper information from the first page of the PDF and creates a BibTeX entry.
 ///
 /// Currently, Springer, and IEEE formats are supported.
 ///
@@ -205,6 +207,26 @@ public class PdfContentImporter extends PdfImporter {
 
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException {
+        List<String> pageTexts = PdfPageScanner.scanPages(document);
+        Optional<String> bibliographicPages = BibliographicPageDetector.findBibliographicPage(pageTexts);
+        if (bibliographicPages.isEmpty()) {
+            return importPaperContent(document);
+        }
+        List<ISBN> isbns = ISBN.findAllInText(bibliographicPages.orElseThrow());
+        if (isbns.isEmpty()) {
+            return importPaperContent(document);
+        }
+        if (isbns.size() > 1) {
+            ParserResult result = new ParserResult();
+            result.addWarning(Localization.lang("More than one ISBN found"));
+            return result;
+        }
+        BibEntry bookEntry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.ISBN, isbns.getFirst().asString());
+        return new ParserResult(List.of(bookEntry));
+    }
+
+    private ParserResult importPaperContent(PDDocument document) throws IOException {
         List<BibEntry> result = new ArrayList<>(1);
         String firstPageContents = PdfUtils.getFirstPageContents(document);
         Optional<String> titleByFontSize = extractTitleFromDocument(document);
