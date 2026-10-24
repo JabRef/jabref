@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Window;
 
@@ -27,6 +29,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +54,8 @@ public class ThemeManager {
     public static final StyleSheet JABREF_BASE_STYLE_SHEET = StyleSheet.create("internal/jabref-base.css").orElseThrow();
 
     private static final String FONT_SIZE_STYLE_CLASS_PREFIX = "font-size-";
+
+    private static final Pattern INLINE_FONT_SIZE = Pattern.compile("-fx-font-size:[^;]*;?");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
@@ -120,6 +125,16 @@ public class ThemeManager {
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
             scene.getRoot().getStyleClass().add(FONT_SIZE_STYLE_CLASS_PREFIX + workspacePreferences.getMainFontSize());
+            resetIconSize(scene.getRoot());
+        }
+    }
+
+    private static void resetIconSize(Node node) {
+        if (node instanceof FontIcon icon && icon.getStyle() != null) {
+            icon.setStyle(INLINE_FONT_SIZE.matcher(icon.getStyle()).replaceAll(""));
+        }
+        if (node instanceof Parent parent) {
+            parent.getChildrenUnmodifiable().forEach(ThemeManager::resetIconSize);
         }
     }
 
