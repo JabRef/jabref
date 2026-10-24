@@ -46,6 +46,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.action.ImportCited;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
@@ -70,11 +71,11 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jabref.logic.openoffice.action.ImportCited;
-
+@NullMarked
 /// Pane to manage the interaction between JabRef and OpenOffice.
 public class OpenOfficePanel {
 
@@ -377,9 +378,6 @@ public class OpenOfficePanel {
 
     private void importEntries() {
         LibraryTab targetTab = tabContainer.getCurrentLibraryTab();
-        if (targetTab == null) {
-            return;
-        }
 
         String errorTitle = Localization.lang("Unable to import cited entries");
         OOResult<XTextDocument, OOError> documentResult = ooBase.getXTextDocument();
@@ -399,7 +397,7 @@ public class OpenOfficePanel {
 
             targetTab.importEntriesWithDuplicateCheck(citedEntries.newEntries());
         } catch (NoDocumentException ex) {
-            OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
+            LOGGER.info("Could not import", ex);
         }
     }
 
