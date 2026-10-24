@@ -14,12 +14,16 @@ import java.util.concurrent.atomic.AtomicReference;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.jabref.gui.WorkspacePreferences;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.IkonliIcon;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -361,57 +365,85 @@ class ThemeManagerTest {
 
     @Test
     void iconSizeFollowsFontSizeChanges() {
+        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).getGraphicNode();
+        assertIconSizeFollowsFontSize(icon);
+    }
+
+    @Test
+    void colouredThemeSizedIconSizeFollowsFontSizeChanges() {
+        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).withColor(Color.AQUA).getGraphicNode();
+        assertIconSizeFollowsFontSize(icon);
+    }
+
+    @Test
+    void iconLaterCreatedFollowsFontSizeChanges() {
         var workSpacePreferences = WorkspacePreferences.getDefault();
         workSpacePreferences.setShouldOverrideDefaultFontSize(true);
         var themeManager = createThemeManager(workSpacePreferences);
+        changeFontSize(workSpacePreferences, 20);
         var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).getGraphicNode();
-        var stage = showIcon(themeManager, icon);
+        showNode(themeManager, icon);
+
+        changeFontSize(workSpacePreferences, 9);
+
+        assertEquals(12, applyCssAndGetIconSize(icon)); // 9pt -> 12px
+    }
+
+    @Test
+    void explicitlySizedIconKeepsItsSize() {
+        var workSpacePreferences = WorkspacePreferences.getDefault();
+        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
+        var themeManager = createThemeManager(workSpacePreferences);
+        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).withSize(27).getGraphicNode();
+        showNode(themeManager, icon);
+
+        changeFontSize(workSpacePreferences, 20);
+        changeFontSize(workSpacePreferences, 9);
+
+        assertEquals(27, applyCssAndGetIconSize(icon));
+    }
+
+    @Test
+    void cssSizedIconKeepsItsSize() {
+        var workSpacePreferences = WorkspacePreferences.getDefault();
+        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
+        var themeManager = createThemeManager(workSpacePreferences);
+        var icon = (FontIcon) IconTheme.JabRefIcons.OPEN_LINK.getGraphicNode(); // Like FieldValueCell#createOpenLinkButton
+        icon.getStyleClass().add("action-icon");
+        HBox cell = new HBox(icon);
+        cell.getStyleClass().add("merge-field-value"); // From jabref-base.css
+        showNode(themeManager, cell);
+
+        changeFontSize(workSpacePreferences, 20);
+        changeFontSize(workSpacePreferences, 9);
+
+        assertEquals(14, applyCssAndGetIconSize(icon)); // 14px
+    }
+
+    private void assertIconSizeFollowsFontSize(FontIcon icon) {
+        var workSpacePreferences = WorkspacePreferences.getDefault();
+        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
+        var themeManager = createThemeManager(workSpacePreferences);
+        showNode(themeManager, icon);
 
         double sizeBefore = applyCssAndGetIconSize(icon);
         changeFontSize(workSpacePreferences, 20);
         double sizeIncrease = applyCssAndGetIconSize(icon);
         changeFontSize(workSpacePreferences, 9);
         double sizeAfter = applyCssAndGetIconSize(icon);
-        JavaFxExtension.invokeAndWait(stage::close);
 
         assertTrue(sizeIncrease > sizeBefore);
         assertEquals(sizeBefore, sizeAfter);
     }
 
-    @Test
-    void resetIconSizeRemovesOldFontSize() {
-        var workSpacePreferences = WorkspacePreferences.getDefault();
-        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
-        var themeManager = createThemeManager(workSpacePreferences);
-        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).getGraphicNode();
-        var stage = showIcon(themeManager, icon);
-
-        double sizeBefore = applyCssAndGetIconSize(icon);
-        changeFontSize(workSpacePreferences, 20);
-        JavaFxExtension.invokeAndWait(() -> icon.setStyle("-fx-fill: red;-fx-font-size: 30px;"));
-
-        changeFontSize(workSpacePreferences, 9);
-        String style = icon.getStyle();
-        double sizeAfter = applyCssAndGetIconSize(icon);
-        JavaFxExtension.invokeAndWait(stage::close);
-
-        assertEquals(sizeBefore, sizeAfter);
-        assertEquals("-fx-fill: red;", style);
-    }
-
-    @Test
-    void resetIconSizeKeepsRelativeFontSize() {
-        var workSpacePreferences = WorkspacePreferences.getDefault();
-        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
-        var themeManager = createThemeManager(workSpacePreferences);
-        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).getGraphicNode();
-        JavaFxExtension.invokeAndWait(() -> icon.setStyle("-fx-font-size: 2em;"));
-        var stage = showIcon(themeManager, icon);
-
-        changeFontSize(workSpacePreferences, 20);
-        JavaFxExtension.invokeAndWait(stage::close);
-
-        assertEquals("-fx-font-size: 2em;", icon.getStyle());
+    private void showNode(ThemeManager themeManager, Node node) {
+        JavaFxExtension.invokeAndWait(() -> {
+            var scene = new Scene(new StackPane(node));
+            themeManager.updateCssOnScene(scene);
+            var stage = new Stage();
+            stage.setScene(scene);
+            stage.show();
+        });
     }
 
     private static int styleClassChangesOnNewScene(int timesShown) {
