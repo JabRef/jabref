@@ -7,20 +7,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Window;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.IkonliIcon;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -54,10 +51,6 @@ public class ThemeManager {
     public static final StyleSheet JABREF_BASE_STYLE_SHEET = StyleSheet.create("internal/jabref-base.css").orElseThrow();
 
     private static final String FONT_SIZE_STYLE_CLASS_PREFIX = "font-size-";
-
-    private static final Pattern INLINE_FONT_SIZE = Pattern.compile("-fx-font-size:[^;]*px;");
-
-    private static final String THEME_SIZED_ICON_SELECTOR = "." + IkonliIcon.THEME_SIZED_STYLE_CLASS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
@@ -127,13 +120,7 @@ public class ThemeManager {
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
             scene.getRoot().getStyleClass().add(FONT_SIZE_STYLE_CLASS_PREFIX + workspacePreferences.getMainFontSize());
-            resetIconSize(scene.getRoot());
         }
-    }
-
-    private static void resetIconSize(Parent root) {
-        root.lookupAll(THEME_SIZED_ICON_SELECTOR)
-            .forEach(icon -> icon.setStyle(INLINE_FONT_SIZE.matcher(icon.getStyle()).replaceAll("")));
     }
 
     private void initializeWindowThemeUpdater() {
