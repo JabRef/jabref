@@ -123,6 +123,7 @@ public class BackupUIManager {
                     // The library is still being opened, so no tab exists for it yet - the active tab (if any) belongs to another
                     // library. Its change monitor is set up when the tab is created. The tab installs this very context once
                     // loading finished, so the merge lands in the journal that drives its modified marker and undo.
+                    // [impl->req~jabgui.autosaveandbackup.accepted-backup-changes-undoable~1]
                     stateManager.getUndoManager(originalDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
                             resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
 

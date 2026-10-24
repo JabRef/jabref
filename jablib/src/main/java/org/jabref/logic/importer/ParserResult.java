@@ -31,6 +31,7 @@ public class ParserResult {
     /// Handed out as is, so that everyone working on the result works on the same library. An undo journal is looked
     /// up by its context: a change recorded while the library is still loading (e.g., an accepted backup change) has
     /// to land in the journal of the tab that later shows the library.
+    /// [impl->req~jabgui.autosaveandbackup.accepted-backup-changes-undoable~1]
     private BibDatabaseContext databaseContext;
     private boolean invalid;
     private boolean changedOnMigration = false;

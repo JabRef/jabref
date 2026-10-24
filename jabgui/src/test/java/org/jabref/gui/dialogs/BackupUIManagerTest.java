@@ -145,6 +145,7 @@ class BackupUIManagerTest extends JavaFxTest {
     /// Accepted changes make the library differ from the file on disk. Once loading finished, the tab installs the
     /// context of the returned result, and that context's journal drives both the modified marker and undo. If the
     /// merge is recorded on a journal the tab never sees, the restored library looks saved and closes without asking.
+    /// [utest->req~jabgui.autosaveandbackup.accepted-backup-changes-undoable~1]
     @Test
     void loadedLibraryCanUndoAcceptedBackupChanges(@TempDir Path tempDir) throws IOException {
         Path backupDir = tempDir.resolve("backups");
