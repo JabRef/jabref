@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.websearch;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.BrowserExtensionProvider;
+import org.jabref.logic.importer.fetcher.BrowserExtensionProviderDiscovery;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
@@ -69,6 +72,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     private final ObservableList<SearchEngineItem> searchEngines = FXCollections.observableArrayList();
 
+    private final ObservableList<BrowserExtensionProvider> externalFetchers = FXCollections.observableArrayList();
+    private final Map<BrowserExtensionProvider, StringProperty> externalFetcherStatus = new HashMap<>();
+
     private final DOIPreferences doiPreferences;
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
@@ -99,6 +105,27 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
         setupPlainCitationParsers();
         setupSearchEngines();
+        setupExternalFetchers();
+    }
+
+    private void setupExternalFetchers() {
+        externalFetchers.setAll(BrowserExtensionProviderDiscovery.discover());
+        for (BrowserExtensionProvider provider : externalFetchers) {
+            StringProperty status = new SimpleStringProperty(Localization.lang("Checking..."));
+            externalFetcherStatus.put(provider, status);
+            BackgroundTask.wrap(() -> BrowserExtensionProviderDiscovery.isReachable(provider))
+                          .onSuccess(reachable -> status.set(reachable ? Localization.lang("Reachable") : Localization.lang("Not running")))
+                          .executeWith(taskExecutor);
+        }
+    }
+
+    /// Result of the provider's health check, so a discovery file left behind by a stopped bridge is visible.
+    public StringProperty externalFetcherStatus(BrowserExtensionProvider provider) {
+        return externalFetcherStatus.get(provider);
+    }
+
+    public ObservableList<BrowserExtensionProvider> getExternalFetchers() {
+        return externalFetchers;
     }
 
     private void setupPlainCitationParsers() {
