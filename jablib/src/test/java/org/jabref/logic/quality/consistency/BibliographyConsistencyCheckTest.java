@@ -409,6 +409,7 @@ class BibliographyConsistencyCheckTest {
         BibEntry a = new BibEntry(StandardEntryType.Misc, "a")
                 .withField(StandardField.COMMENT, "note")
                 .withField(StandardField.PDF, "file.pdf")
+                .withField(StandardField.FILE, "test.pdf")
                 .withField(new UserSpecificCommentField("XYZ"), "foo")
                 .withField(SpecialField.PRIORITY, "high");
         BibEntry b = new BibEntry(StandardEntryType.Misc, "b")
@@ -425,6 +426,32 @@ class BibliographyConsistencyCheckTest {
 
         assertEquals(Map.of(), result.entryTypeToResultMap(),
                 "Differences only in filtered fields must be ignored");
+    }
+
+    @Test
+    void requiredExcludedFieldIsIgnored() {
+        BibEntryType typeRequiringFile = new BibEntryTypeBuilder()
+                .withType(CUSTOM_TYPE)
+                .withRequiredFields(StandardField.AUTHOR, StandardField.FILE)
+                .build();
+        entryTypesManager.addCustomOrModifiedType(typeRequiringFile, BibDatabaseMode.BIBTEX);
+
+        BibEntry withFile = new BibEntry(CUSTOM_TYPE, "1")
+                .withField(StandardField.AUTHOR, "Knuth")
+                .withField(StandardField.FILE, "test.pdf");
+        BibEntry withoutFile = new BibEntry(CUSTOM_TYPE, "2")
+                .withField(StandardField.AUTHOR, "Knuth");
+
+        BibDatabase bibDatabase = new BibDatabase(List.of(withFile, withoutFile));
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+        bibContext.setMode(BibDatabaseMode.BIBTEX);
+
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
+                .check(bibContext, entryTypesManager, (_, _) -> {
+                });
+
+        assertEquals(Map.of(), result.entryTypeToResultMap(),
+                "A missing required field that is excluded from the check must not be reported");
     }
 
     @Test
