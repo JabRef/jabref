@@ -94,4 +94,30 @@ The definition the user accepts is the one from the library file, and it replace
 
 Needs: impl, utest
 
+## Plain citation parser must extract the DOI
+`req~import.plain-citation.doi~1`
+
+The rule-based plain citation parser finds a DOI written with a `doi:`, `DOI:` or `urn:doi:` prefix or as a `doi.org` link, and stores it in the `doi` field.
+Punctuation directly behind the DOI is not part of it, and if a citation contains several DOIs, the first one is kept.
+The DOI is removed from the text before the other fields are parsed, so a `doi.org` link is not stored as a URL and the digits of the DOI are not taken as year or pages.
+
+Needs: impl, utest
+
+## Plain citation parser must recognize common author formats
+`req~import.plain-citation.authors~1`
+
+The rule-based plain citation parser reads the authors block at the start of a citation in the formats `Lastname, I. J.`, `I. J. Lastname` and a mix of both, separated by commas, `&` or `and`.
+Name particles stay with the family name, and `et al.` becomes `and others`.
+Full names (`Firstname Lastname`) are only taken as authors if a separate title follows, so that a capitalized title is not mistaken for an author.
+
+Needs: impl, utest
+
+## Plain citation parser must distinguish year and pages
+`req~import.plain-citation.year-and-pages~1`
+
+The rule-based plain citation parser prefers a year in parentheses (APA style) as the publication year and ignores years that are part of a URL, of the title, or not plausible as a publication year.
+A page range is not taken as a year, a year is not taken as pages, and volume and issue numbers are not taken as pages.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
