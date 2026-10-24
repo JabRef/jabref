@@ -238,7 +238,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryTypesManager,
                 clipBoardManager,
                 journalAbbreviationRepository,
-                gitHandlerRegistry);
+                gitHandlerRegistry,
+                this::closeIfAllowed);
 
         MainMenu mainMenu = new MainMenu(
                 this,
@@ -837,6 +838,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         });
     }
 
+    /// Closes the window unless the user keeps JabRef open, e.g. to save a library first; whether it closed.
+    boolean closeIfAllowed() {
+        if (!viewModel.close()) {
+            return false;
+        }
+        mainStage.close();
+        return true;
+    }
+
     /// The action concerned with closing the window.
     static protected class CloseAction extends SimpleCommand {
 
@@ -848,9 +858,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         @Override
         public void execute() {
-            if (frame.viewModel.close()) {
-                frame.mainStage.close();
-            }
+            frame.closeIfAllowed();
         }
     }
 
