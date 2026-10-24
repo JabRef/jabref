@@ -165,13 +165,28 @@ public class JabRefFrameViewModel {
             return false;
         }
 
-        new SharedDatabaseSessionService().persistConnections(sharedDatabases);
-        storeLastOpenedFiles(openedLibraries, focusedLibraries, List.copyOf(sharedDatabases.keySet())); // store only if successfully having closed the libraries
-
-        ProcessingLibraryDialog processingLibraryDialog = new ProcessingLibraryDialog(dialogService);
-        processingLibraryDialog.showAndWait(tabContainer.getLibraryTabs());
+        runAfterLibrariesClosed("storing the shared database connections",
+                () -> new SharedDatabaseSessionService().persistConnections(sharedDatabases));
+        runAfterLibrariesClosed("storing the last opened libraries",
+                () -> storeLastOpenedFiles(openedLibraries, focusedLibraries, List.copyOf(sharedDatabases.keySet()))); // store only if successfully having closed the libraries
+        runAfterLibrariesClosed("waiting for saving to finish",
+                () -> new ProcessingLibraryDialog(dialogService).showAndWait(tabContainer.getLibraryTabs()));
 
         return true;
+    }
+
+    /// Runs a step of quitting that comes after the libraries were closed. From then on, quitting must succeed: a
+    /// failing step would otherwise leave JabRef open behind an "Uncaught exception" dialog that reappears on every
+    /// further attempt to quit, so the step's failure is only logged.
+    ///
+    /// [Throwable] is caught because the typical failure is an [Error], such as a [NoClassDefFoundError] when the
+    /// classpath vanished under a running JVM.
+    private static void runAfterLibrariesClosed(String step, Runnable action) {
+        try {
+            action.run();
+        } catch (Throwable e) {
+            LOGGER.error("Problem when {} while quitting", step, e);
+        }
     }
 
     /// Handles commands submitted by the command line or by the remote host to be executed in the ui
