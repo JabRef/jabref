@@ -197,7 +197,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// We need to get the new group tree and update the view
     private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
         disposeDisplayedGroups();
-        currentDatabase = newDatabase;
         MetaData newMetaData = newDatabase.map(BibDatabaseContext::getMetaData).orElse(null);
         if (newMetaData != observedMetaData) {
             if (observedMetaData != null) {
@@ -209,6 +208,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             }
         }
         if (newDatabase.isEmpty()) {
+            currentDatabase = newDatabase;
             rootGroup.setValue(null);
             return;
         }
@@ -228,6 +228,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                             .map(selectedGroup -> newRoot.findGroupNodeViewModel(selectedGroup)
                                                          .orElseGet(() -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences)))
                             .toList());
+        currentDatabase = newDatabase;
     }
 
     private void disposeDisplayedGroups() {
