@@ -29,6 +29,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 
@@ -356,6 +358,25 @@ class ThemeManagerTest {
         assertEquals(List.of(styleClassChanges.getFirst(), styleClassChanges.getFirst(), styleClassChanges.getFirst()), styleClassChanges);
     }
 
+    @Test
+    void iconSizeFollowsFontSizeChanges() {
+        var workSpacePreferences = WorkspacePreferences.getDefault();
+        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
+        var themeManager = createThemeManager(workSpacePreferences);
+        var icon = new FontIcon(MaterialDesignA.ACCOUNT);
+        var stage = showIcon(themeManager, icon);
+
+        double sizeBefore = applyCssAndGetIconSize(icon);
+        changeFontSize(workSpacePreferences, 20);
+        double sizeIncrease = applyCssAndGetIconSize(icon);
+        changeFontSize(workSpacePreferences, 9);
+        double sizeAfter = applyCssAndGetIconSize(icon);
+        JavaFxExtension.invokeAndWait(stage::close);
+
+        assertTrue(sizeIncrease > sizeBefore);
+        assertEquals(sizeBefore, sizeAfter);
+    }
+
     private static int styleClassChangesOnNewScene(int timesShown) {
         StackPane root = new StackPane();
         AtomicInteger styleClassChanges = new AtomicInteger();
@@ -396,4 +417,32 @@ class ThemeManagerTest {
         assertEquals(styleSheet.orElseThrow(), customTheme);
         assertEquals(customCss.toString(), customTheme.getName());
     }
+
+    private Stage showIcon(ThemeManager themeManager, FontIcon icon) {
+        AtomicReference<Stage> stage = new AtomicReference<>();
+        JavaFxExtension.invokeAndWait(() -> {
+            var scene = new Scene(new StackPane(icon));
+            themeManager.updateCssOnScene(scene);
+            var newStage = new Stage();
+            newStage.setScene(scene);
+            newStage.show();
+            stage.set(newStage);
+        });
+        return stage.get();
+    }
+
+    private void changeFontSize(WorkspacePreferences workspacePreferences, int fontSize) {
+        JavaFxExtension.invokeAndWait(() -> workspacePreferences.setMainFontSize(fontSize));
+        JavaFxExtension.awaitEvents();
+    }
+
+    private double applyCssAndGetIconSize(FontIcon icon) {
+        AtomicReference<Double> size = new AtomicReference<>();
+        JavaFxExtension.invokeAndWait(() -> {
+            icon.getScene().getRoot().applyCss();
+            size.set(icon.getFont().getSize());
+        });
+        return size.get();
+    }
+
 }
