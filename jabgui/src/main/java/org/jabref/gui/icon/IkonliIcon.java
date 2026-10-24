@@ -31,7 +31,7 @@ public final class IkonliIcon implements JabRefIcon {
     /// Ikonli's own default, so an icon that was never given a size renders as it always has.
     private static final int DEFAULT_SIZE = 8;
 
-    /// Marker for icons to take size from theme, @{@link org.jabref.gui.theme.ThemeManager,} can find them
+    /// Marker for icons to take size from theme, @{@link org.jabref.gui.theme.ThemeManager} can find them
     /// Icon without thus follows the stylesheets. No CSS rule use this class
     public static final String THEME_SIZED_STYLE_CLASS = "theme-sized-icon";
 
