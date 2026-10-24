@@ -366,5 +366,4 @@ class GroupTreeViewModelTest {
 
         assertEquals(new GroupNodeViewModel(secondDatabase, stateManager, taskExecutor, new AllEntriesGroup("All entries"), new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
     }
-
 }
