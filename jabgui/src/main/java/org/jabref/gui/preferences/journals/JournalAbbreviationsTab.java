@@ -48,7 +48,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     public JournalAbbreviationsTab() {
         viewModel = new JournalAbbreviationsTabViewModel(
-                preferences.getAbbreviationPreferences(),
+                preferences.getJournalAbbreviationPreferences(),
                 dialogService,
                 taskExecutor,
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class));

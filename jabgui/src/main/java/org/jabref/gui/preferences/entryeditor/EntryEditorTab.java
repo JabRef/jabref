@@ -62,7 +62,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                 dialogService,
                 preferences.getEntryEditorPreferences(),
                 preferences.getMrDlibPreferences(),
-                preferences.getAbbreviationPreferences(),
+                preferences.getJournalAbbreviationPreferences(),
                 taskExecutor);
         this.localDragboard = Injector.instantiateModelOrService(StateManager.class).getLocalDragboard();
         buildView();

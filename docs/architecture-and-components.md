@@ -293,6 +293,23 @@ This component relates to the built-in PDF viewer functionality in JabRef, inclu
 
 This component covers all aspects of configuration settings for features, appearance, and behavior.
 
+Abbreviation settings share external list handling through `AbbreviationPreferences`.
+`JournalAbbreviationPreferences` retains the journal settings and the existing MSC keyword description setting;
+`ConferenceAbbreviationPreferences` in `org.jabref.logic.conferences` maintains a separate list of conference files.
+`CliPreferences` exposes each settings object separately. The backing keys remain `externalJournalLists`
+for journals and `externalConferenceLists` for conferences, so existing journal configurations remain readable.
+
+`AbbreviationRepository` provides shared storage and lookup for journal and conference records.
+`JournalAbbreviationRepository` retains LTWA support and the existing demonstration fallback.
+`ConferenceAbbreviationRepository` starts empty or reads a conference MVStore file and does not require LTWA data.
+Conference title normalization and field cleanup are separate from these repositories.
+
+`AbbreviationLoader` shares resource extraction and external CSV loading between journal and conference loaders.
+The journal loader also loads LTWA and retains its lazy background loading API.
+The conference loader reads `/conferences/conference-list.mv` when available and otherwise starts with an empty
+repository before reading configured external lists. External list order is preserved in the preferences.
+The conference data resource and its build integration are separate work.
+
 ### Search
 
 - Open issues: [component: search](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22component%3A+search%22)
