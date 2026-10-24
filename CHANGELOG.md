@@ -71,6 +71,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the AI summary tab was blank for entries with only remote files. [#17203](https://github.com/JabRef/jabref/issues/17203)
 - We fixed an issue where legacy group memberships, markings, and special fields were no longer migrated when opening a library. [#17019](https://github.com/JabRef/jabref/pull/17019)
 - We fixed an issue where saving an SLR study overwrote different per-query native queries. [#17307](https://github.com/JabRef/jabref/pull/17307)
+- We fixed an issue where the field controls in the entry types preferences were not aligned. [#16994](https://github.com/JabRef/jabref/issues/16994)
 - We fixed an issue where AI chats were lost when JabRef did not quit regularly. [#17177](https://github.com/JabRef/jabref/pull/17177)
 - We fixed an issue where the links at the bottom of the Welcome tab were cut off in small windows. [#17015](https://github.com/JabRef/jabref/issues/17015)
 - We fixed an issue where saving the "Custom entry types" preferences removed custom fields from the non-wrapped fields. [#17121](https://github.com/JabRef/jabref/pull/17121)
