@@ -29,6 +29,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.GrobidUrlMigration;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.strings.StringUtil;
@@ -41,6 +42,9 @@ import com.github.javakeyring.Keyring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.databind.ObjectMapper;
+
+import static org.jabref.gui.preferences.JabRefGuiPreferences.PREVIEW_STYLE;
+import static org.jabref.gui.preferences.JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED;
 
 public class PreferencesMigrations {
 
@@ -450,9 +454,8 @@ public class PreferencesMigrations {
     /// - Since v5.0-alpha the custom preview layout shows the 'comment' field instead of the 'review' field (<a href="https://github.com/JabRef/jabref/pull/4100">#4100</a>).
     /// - Since v5.1 a marker enables markdown in comments (<a href="https://github.com/JabRef/jabref/pull/6232">#6232</a>).
     /// - Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).
-    ///
     protected static void upgradePreviewStyle(JabRefGuiPreferences prefs) {
-        String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE, TextBasedPreviewLayout.DEFAULT);
+        String currentPreviewStyle = prefs.get(PREVIEW_STYLE, TextBasedPreviewLayout.DEFAULT);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
                                                   .replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
                                                   .replace("\\format[Markdown,HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}")
@@ -465,7 +468,7 @@ public class PreferencesMigrations {
                                                           \\begin{url}<BR>URL <a href="\\url">\\url</a>\\end{url}__NEWLINE__\
                                                           \\begin{abstract}\
                                                           """);
-        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE, migratedStyle);
+        prefs.put(PREVIEW_STYLE, migratedStyle);
     }
 
     /// Since v6-alpha6 built in preview style will be stored by internal identifier instead by display name.
@@ -743,5 +746,43 @@ public class PreferencesMigrations {
         }
 
         preferences.getWorkspacePreferences().setCustomTheme(StyleSheet.create(theme));
+    }
+
+    // Intended to migrate the old PREVIEW_STYLE value into CustomizedPreviewStyle list. Then stores the new key immediately so this only runs once
+    static public List<CustomizedPreviewStyle> migrateLegacyCustomLayout(List<CustomizedPreviewStyle> defaults, JabRefGuiPreferences preferences) {
+        preferences.putBoolean(PREVIEW_STYLE_CUSTOMIZED_MIGRATED, true);    // key is marked so we don't attempt to migrate legacy layout again (i.e. if the list is empty again)
+        if (preferences.hasKey(PREVIEW_STYLE)) {
+            String legacyText = preferences.get(PREVIEW_STYLE, "").replace("__NEWLINE__", "\n");
+            if (StringUtil.isNotBlank(legacyText)) {
+                // Legacy PREVIEW_CYCLE reference TextBasedPreviewLayout.NAME (reference PreferencesMigrations.upgradeBuiltinPreviewName)
+                // set migrated id to this default value, else cycle inherited from before this change silently drops the customized layout on load
+                CustomizedPreviewStyle migrated = new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME,
+                        TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME, legacyText);
+                preferences.storeCustomizedPreviewStyle(List.of(migrated));
+                return List.of(migrated);
+            }
+        }
+        return defaults;
+    }
+
+    /// The customized preview styles are stored as a numbered series (`previewStyleCustomizedId0`, ...).
+    /// Before that, a single customized style lived under `previewStyle`; it is moved into the series once.
+    /// JabRefGuiPreferences#PREVIEW_STYLE_CUSTOMIZED_MIGRATED is written once and never purged, so an
+    /// emptied list is not migrated again on a later startup.
+    static public void upgradeLegacyCustomPreviewStyle(JabRefCliPreferences prefs) {
+        if (prefs.hasKey(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_ID + "0")
+                || prefs.getBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, false)) {
+            return;
+        }
+        prefs.putBoolean(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_MIGRATED, true);
+
+        String legacyText = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE, "");
+        if (StringUtil.isBlank(legacyText) || TextBasedPreviewLayout.DEFAULT.equals(legacyText)) {
+            return;
+        }
+        // Legacy PREVIEW_CYCLE entries reference TextBasedPreviewLayout.NAME, so it doubles as the migrated id
+        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_ID + "0", TextBasedPreviewLayout.NAME);
+        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_NAME + "0", TextBasedPreviewLayout.DEFAULT_DISPLAY_NAME);
+        prefs.put(JabRefGuiPreferences.PREVIEW_STYLE_CUSTOMIZED_TEXT + "0", legacyText.replace("\n", "__NEWLINE__"));
     }
 }
