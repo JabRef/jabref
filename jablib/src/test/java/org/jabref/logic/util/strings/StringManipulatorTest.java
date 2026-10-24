@@ -13,6 +13,32 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StringManipulatorTest {
 
+    @ParameterizedTest
+    @MethodSource("killLineTestData")
+    void killLinePreservesFollowingLines(String text, int caretPosition, String expectedText) {
+        ResultingStringState result = StringManipulator.killLine(caretPosition, text);
+
+        assertEquals(expectedText, result.text);
+        assertEquals(caretPosition, result.caretPosition);
+    }
+
+    private static Stream<Arguments> killLineTestData() {
+        return Stream.of(
+                Arguments.of("", 0, ""),
+                Arguments.of("Example text", 0, ""),
+                Arguments.of("Example text", 7, "Example"),
+                Arguments.of("Example text", 12, "Example text"),
+                Arguments.of("First\nSecond\nThird", 2, "Fi\nSecond\nThird"),
+                Arguments.of("First\nSecond\nThird", 5, "FirstSecond\nThird"),
+                Arguments.of("First\nSecond\nThird", 6, "First\n\nThird"),
+                Arguments.of("First\nSecond\nThird", 9, "First\nSec\nThird"),
+                Arguments.of("First\nSecond\nThird", 15, "First\nSecond\nTh"),
+                Arguments.of("First\nSecond\nThird", 18, "First\nSecond\nThird"),
+                Arguments.of("First\n\nThird", 6, "First\nThird"),
+                Arguments.of("First\n", 5, "First"),
+                Arguments.of("First\n", 6, "First\n"));
+    }
+
     @Test
     void capitalizePreservesNewlines() {
         int caretPosition = 5; // Position of the caret, between the two ll in the first hellO"

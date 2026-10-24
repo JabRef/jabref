@@ -228,4 +228,12 @@ The groups walkthrough must open its bundled example library, display the Groups
 
 Needs: impl
 
+## Text editing shortcuts respect line boundaries
+`req~ux.text-editing.line-boundaries~1`
+
+In multiline entry fields, beginning-of-line and end-of-line shortcuts move within the current newline-delimited line.
+Document navigation shortcuts continue to move to the beginning or end of the whole field.
+In entry fields and the source editor, kill-line removes text from the caret to the next newline, preserving subsequent lines.
+At a line end, kill-line removes the newline and joins the following line; at the document end, it leaves the text unchanged.
+
 <!-- markdownlint-disable-file MD022 -->
