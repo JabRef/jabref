@@ -92,6 +92,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
     private final BooleanProperty synchronizeLocalLibraries = new SimpleBooleanProperty();
+    private final BooleanProperty mergeConflictedCopies = new SimpleBooleanProperty();
 
     private final BooleanProperty createBackupProperty = new SimpleBooleanProperty();
     private final StringProperty backupDirectoryProperty = new SimpleStringProperty("");
@@ -244,6 +245,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         alwaysReformatBibProperty.setValue(libraryPreferences.shouldAlwaysReformatOnSave());
         autosaveLocalLibraries.setValue(libraryPreferences.shouldAutoSave());
         synchronizeLocalLibraries.setValue(libraryPreferences.shouldSynchronizeWithFile());
+        mergeConflictedCopies.setValue(libraryPreferences.shouldMergeConflictedCopies());
 
         createBackupProperty.setValue(filePreferences.shouldCreateBackup());
         backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
@@ -295,6 +297,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         libraryPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
         libraryPreferences.setSynchronizeWithFile(synchronizeLocalLibraries.getValue());
+        libraryPreferences.setMergeConflictedCopies(mergeConflictedCopies.getValue());
 
         filePreferences.setCreateBackup(createBackupProperty.getValue());
         filePreferences.setBackupDirectory(Path.of(backupDirectoryProperty.getValue()));
@@ -504,6 +507,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty synchronizeLocalLibrariesProperty() {
         return synchronizeLocalLibraries;
+    }
+
+    public BooleanProperty mergeConflictedCopiesProperty() {
+        return mergeConflictedCopies;
     }
 
     public BooleanProperty createBackupProperty() {
