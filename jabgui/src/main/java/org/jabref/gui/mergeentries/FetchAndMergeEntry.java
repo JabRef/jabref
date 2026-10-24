@@ -8,12 +8,14 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
@@ -24,6 +26,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +83,12 @@ public class FetchAndMergeEntry {
                                                          .onSuccess(fetchedEntry -> {
                                                              ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
                                                              if (fetchedEntry.isPresent()) {
+                                                                 JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+                                                                 AbbreviateCleanupFactory.abbreviateCleanup(
+                                                                         bibDatabaseContext.getDatabase(),
+                                                                         repository,
+                                                                         preferences.getAbbreviationPreferences()
+                                                                 ).ifPresent(cleanupJob -> cleanupJob.cleanup(fetchedEntry.get()));
                                                                  cleanup.doPostCleanup(fetchedEntry.get());
                                                                  showMergeDialog(entry, fetchedEntry.get(), idBasedFetcher);
                                                              } else {
@@ -126,6 +135,12 @@ public class FetchAndMergeEntry {
         BackgroundTask.wrap(() -> fetcher.performSearch(entry).stream().findFirst())
                       .onSuccess(fetchedEntry -> {
                           if (fetchedEntry.isPresent()) {
+                              JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+                              AbbreviateCleanupFactory.abbreviateCleanup(
+                                      bibDatabaseContext.getDatabase(),
+                                      repository,
+                                      preferences.getAbbreviationPreferences()
+                              ).ifPresent(cleanupJob -> cleanupJob.cleanup(fetchedEntry.get()));
                               ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
                               cleanup.doPostCleanup(fetchedEntry.get());
                               showMergeDialog(entry, fetchedEntry.get(), fetcher);
