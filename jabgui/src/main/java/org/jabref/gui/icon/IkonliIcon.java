@@ -31,10 +31,6 @@ public final class IkonliIcon implements JabRefIcon {
     /// Ikonli's own default, so an icon that was never given a size renders as it always has.
     private static final int DEFAULT_SIZE = 8;
 
-    /// Marker for icons to take size from theme, @{@link org.jabref.gui.theme.ThemeManager} can find them
-    /// Icon without thus follows the stylesheets. No CSS rule use this class
-    public static final String THEME_SIZED_STYLE_CLASS = "theme-sized-icon";
-
     private final List<Ikon> icons;
     private final @Nullable Color color;
     private final int size;
@@ -102,6 +98,18 @@ public final class IkonliIcon implements JabRefIcon {
         }
     }
 
+    /// [@FontIcon] with size control from stylesheets
+    private static final class ThemeSizedFontIcon extends FontIcon {
+        public ThemeSizedFontIcon(Ikon iconCode) {
+            super(iconCode);
+        }
+
+        @Override
+        public void setIconSize(int size) {
+            // Ignored deliberately to let stylesheets decide the size
+        }
+    }
+
     @Override
     public Node getGraphicNode() {
         if (icons.size() == 1) {
@@ -119,11 +127,16 @@ public final class IkonliIcon implements JabRefIcon {
     private FontIcon buildFontIcon(Ikon ikon) {
         // An explicit color (via withColor/disabled) has to survive the theme's .glyph-icon rules, which is what
         // JabRefFontIcon takes care of. Without one, those rules are what colors the icon.
-        FontIcon fontIcon = color == null ? FontIcon.of(ikon, size) : new JabRefFontIcon(ikon, size, color);
-        fontIcon.getStyleClass().add("glyph-icon");
-        if (!fontIcon.getStyle().contains("-fx-font-size")) {
-            fontIcon.getStyleClass().add(THEME_SIZED_STYLE_CLASS);
+        boolean themeSized = size == DEFAULT_SIZE;
+        FontIcon fontIcon;
+        if (color != null) {
+            fontIcon = new JabRefFontIcon(ikon, size, color, themeSized);
+        } else if (themeSized) {
+            fontIcon = new ThemeSizedFontIcon(ikon);
+        } else {
+            fontIcon = FontIcon.of(ikon, size);
         }
+        fontIcon.getStyleClass().add("glyph-icon");
         return fontIcon;
     }
 
