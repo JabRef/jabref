@@ -52,6 +52,10 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabaseAction.class);
 
+    /// Libraries are loaded in parallel. Their backup dialogs are modal, so a second one would open on top of the first
+    /// and be left behind another library's tab once the first is closed.
+    private static final Object BACKUP_DIALOG_LOCK = new Object();
+
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
     private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = List.of(
@@ -253,6 +257,19 @@ public class OpenDatabaseAction extends SimpleCommand {
         tabContainer.addTab(newTab, true);
     }
 
+    /// When several libraries are opened at once, every tab is selected as it is added, so the selected tab belongs to the
+    /// library that was added last. The backup dialog of another library would then be shown on top of the wrong tab.
+    ///
+    /// Queued before the dialog is, so the tab is already shown when the dialog opens. Only holds when the dialogs of
+    /// several libraries do not stack on each other, which is why they are shown one at a time, see [#BACKUP_DIALOG_LOCK].
+    private void showTabOfLibrary(Path file) {
+        UiTaskExecutor.runInJavaFXThread(() ->
+                tabContainer.getLibraryTabs().stream()
+                            .filter(libraryTab -> libraryTab.getBibDatabaseContext().getDatabasePath().filter(file::equals).isPresent())
+                            .findFirst()
+                            .ifPresent(tabContainer::showLibraryTab));
+    }
+
     @VisibleForTesting
     ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
         Path fileToLoad = file.toAbsolutePath();
@@ -264,10 +281,13 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         ParserResult parserResult = null;
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
-            // In case the backup differs, ask the user what to do.
-            // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, stateManager)
-                                          .orElse(null);
+            synchronized (BACKUP_DIALOG_LOCK) {
+                showTabOfLibrary(file);
+                // In case the backup differs, ask the user what to do.
+                // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
+                parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, stateManager)
+                                              .orElse(null);
+            }
         }
 
         try {

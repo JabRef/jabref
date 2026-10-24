@@ -38,6 +38,16 @@ When creating a backup, a serialization failure must not replace a previous back
 
 Needs: impl, utest
 
+## Changes accepted from a backup must be recorded in the undo history of the restored library
+`req~jabgui.autosaveandbackup.accepted-backup-changes-undoable~1`
+
+Issue: [#15846](https://github.com/JabRef/jabref/issues/15846)
+
+When a library is opened and the user accepts changes while reviewing its backup, the merge must be recorded in the undo history of the tab that shows the library.
+Then the library is marked as modified and the merge can be undone; otherwise, the restored library looks saved and the restored content is lost when it is closed.
+
+Needs: impl, utest
+
 ## Autosave must trigger save automatically upon library changes
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 
