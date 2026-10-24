@@ -46,6 +46,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.action.ImportCited;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
@@ -59,6 +60,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.uno.NoDocumentException;
+import org.jabref.model.openoffice.uno.UnoReferenceMark;
 import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -66,10 +69,13 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
+import com.sun.star.text.XTextDocument;
 import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 /// Pane to manage the interaction between JabRef and OpenOffice.
 public class OpenOfficePanel {
 
@@ -88,6 +94,7 @@ public class OpenOfficePanel {
     private final Button merge = new Button(Localization.lang("Merge citations"));
     private final Button unmerge = new Button(Localization.lang("Separate citations"));
     private final Button manageCitations = new Button(Localization.lang("Manage citations"));
+    private final Button importCitations = new Button(Localization.lang("Import cited"));
     private final Button exportCitations = new Button(Localization.lang("Export cited"));
     private final Button modifyBibliographyProperties = new Button(Localization.lang("Bibliography properties"));
     private final Button settingsB = new Button(Localization.lang("Settings"));
@@ -272,6 +279,7 @@ public class OpenOfficePanel {
         citeEmpty.setOnAction(_ -> cite(CitationType.INVISIBLE_CIT, false));
         citeEmpty.setMaxWidth(Double.MAX_VALUE);
         openOfficePreferences.zoteroCompatibilityModeProperty().addListener((_, _, _) -> updateButtonAvailability());
+        stateManager.activeTabProperty().addListener((_, _, _) -> updateButtonAvailability());
         citeSpecial.setTooltip(new Tooltip(Localization.lang("Cite selected entries with extra information")));
         citeSpecial.setOnAction(_ -> cite(CitationType.AUTHORYEAR_INTEXT, true));
         citeSpecial.setMaxWidth(Double.MAX_VALUE);
@@ -318,6 +326,10 @@ public class OpenOfficePanel {
         exportCitations.setTooltip(new Tooltip(Localization.lang("Collect cited entries into a new library")));
         exportCitations.setOnAction(_ -> exportEntries());
 
+        importCitations.setMaxWidth(Double.MAX_VALUE);
+        importCitations.setTooltip(new Tooltip(Localization.lang("Import cited")));
+        importCitations.setOnAction(_ -> importEntries());
+
         updateButtonAvailability();
 
         HBox hbox = new HBox();
@@ -331,7 +343,7 @@ public class OpenOfficePanel {
         flow.setPrefWrapLength(200);
         flow.getChildren().addAll(setStyleFile, cite, citeInText, inferStyle);
         flow.getChildren().addAll(citeSpecial, citeEmpty, merge, unmerge);
-        flow.getChildren().addAll(manageCitations, exportCitations, modifyBibliographyProperties, settingsB);
+        flow.getChildren().addAll(manageCitations, exportCitations, importCitations, modifyBibliographyProperties, settingsB);
 
         vbox.setFillWidth(true);
         vbox.getChildren().addAll(hbox, flow);
@@ -361,6 +373,31 @@ public class OpenOfficePanel {
                     taskExecutor,
                     gitHandlerRegistry);
             tabContainer.addTab(libraryTab, true);
+        }
+    }
+
+    private void importEntries() {
+        LibraryTab targetTab = tabContainer.getCurrentLibraryTab();
+
+        String errorTitle = Localization.lang("Unable to import cited entries");
+        OOResult<XTextDocument, OOError> documentResult = ooBase.getXTextDocument();
+        if (ooBase.testDialog(errorTitle, documentResult.asVoidResult())) {
+            return;
+        }
+
+        try {
+            List<String> markNames = UnoReferenceMark.getListOfNames(documentResult.get());
+            ImportCited.CitedEntries citedEntries =
+                    ImportCited.collectCitedEntries(markNames, targetTab.getDatabase());
+
+            if (citedEntries.newEntries().isEmpty()) {
+                dialogService.notify(Localization.lang("No new cited entries to import"));
+                return;
+            }
+
+            targetTab.importEntriesWithDuplicateCheck(citedEntries.newEntries());
+        } catch (NoDocumentException ex) {
+            LOGGER.info("Could not import", ex);
         }
     }
 
@@ -449,6 +486,9 @@ public class OpenOfficePanel {
                 && !jStyle.isCitationKeyCiteMarkers();
         boolean canGenerateBibliography = (isConnectedToDocument && hasDatabase)
                 && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography()));
+        boolean canImportCited = isConnectedToDocument
+                && tabContainer.getCurrentLibraryTab() != null
+                && openOfficePreferences.getZoteroCompatibilityMode();
 
         selectDocument.setDisable(!isConnectedToDocument);
         setStyleFile.setDisable(!isConnectedToDocument);
@@ -464,6 +504,7 @@ public class OpenOfficePanel {
         unmerge.setDisable(!isConnectedToDocument || !jstyleSelected);
         manageCitations.setDisable(!isConnectedToDocument || !jstyleSelected);
         exportCitations.setDisable(!(isConnectedToDocument && hasDatabase));
+        importCitations.setDisable(!canImportCited);
         modifyBibliographyProperties.setDisable(!canGenerateBibliography);
     }
 

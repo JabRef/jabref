@@ -94,4 +94,11 @@ The definition the user accepts is the one from the library file, and it replace
 
 Needs: impl, utest
 
+## User can import cited entries from Zotero-compatible LibreOffice documents
+`feat~import.libreoffice.cited-entries~1`
+
+When a LibreOffice document contains Zotero-compatible reference marks, the user can import their cited entries into the active library. Marks in other formats do not provide the data needed for this import.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
