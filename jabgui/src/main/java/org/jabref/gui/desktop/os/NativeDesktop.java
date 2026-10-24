@@ -23,9 +23,11 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -263,18 +265,24 @@ public abstract class NativeDesktop {
     }
 
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        // normalize white spaces
-        command = command.replaceAll("\\s+", " ");
+        List<String> subcommands = CommandLineParser.toArguments(command, absolutePath);
+        if (subcommands.isEmpty()) {
+            return;
+        }
 
-        // replace the placeholder if used
-        command = command.replace("%DIR", absolutePath);
-
-        LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
+        LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", subcommands);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
-        String[] subcommands = command.split(" ");
         try {
-            new ProcessBuilder(subcommands).start();
+            ProcessBuilder processBuilder = new ProcessBuilder(subcommands);
+            processBuilder.directory(Path.of(absolutePath).toFile());
+            Process process = processBuilder.start();
+
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
+
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
         } catch (IOException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error during command execution", exception);
             dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
