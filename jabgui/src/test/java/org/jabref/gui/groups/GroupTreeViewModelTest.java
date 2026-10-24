@@ -356,4 +356,15 @@ class GroupTreeViewModelTest {
 
         assertEquals(0, groups.size());
     }
+
+    @Test
+    void switchingDatabaseUpdatesRootAndSelectedGroups() {
+        BibDatabaseContext secondDatabase = new BibDatabaseContext();
+        when(stateManager.getSelectedGroups(secondDatabase)).thenReturn(FXCollections.observableArrayList());
+
+        activeDatabase.setValue(Optional.of(secondDatabase));
+
+        assertEquals(new GroupNodeViewModel(secondDatabase, stateManager, taskExecutor, new AllEntriesGroup("All entries"), new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
+    }
+
 }
