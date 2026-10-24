@@ -62,6 +62,22 @@ If an entry's `doi` field is empty and another field contains a DOI, JabRef make
 
 Needs: impl, utest
 
+## PDF import keeps only authors the document prints
+`req~import.pdf.author-confirmed-by-text~1`
+
+When importing a PDF, JabRef keeps an author taken from document properties only if the PDF's leading pages confirm it; otherwise it prefers a confirmed byline or drops the author.
+
+Needs: impl, utest
+
+## PDF import extracts only plausible years
+`req~import.pdf.plausible-year~1`
+
+When extracting a year from a PDF's first page, JabRef accepts a standalone four-digit number outside a year range, between 1500 and two years after the current year.
+
+Rationale: The first page can contain postal codes, ISSNs, and page ranges that look like years but describe something else.
+
+Needs: impl, utest
+
 ## Legacy libraries are migrated when opened
 `req~import.bibtex.legacy-migrations~1`
 
