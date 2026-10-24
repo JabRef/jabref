@@ -48,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -366,4 +367,28 @@ class GroupTreeViewModelTest {
 
         assertEquals(new GroupNodeViewModel(secondDatabase, stateManager, taskExecutor, new AllEntriesGroup("All entries"), new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
     }
+
+    @Test
+    void selectionOfNewDatabaseSurvivesSwitch() {
+        BibDatabaseContext secondDatabase = new BibDatabaseContext();
+        var group = groupTree.rootGroupProperty().getValue().getGroupNode();
+        var storeo = FXCollections.observableArrayList(group);
+
+        when(stateManager.getSelectedGroups(secondDatabase)).thenReturn(storeo);
+        doAnswer(_ -> { // creates a fake that remembers the selection rom secondDatabase
+            storeo.clear();return null;
+        }).when(stateManager).clearSelectedGroups(secondDatabase);
+
+
+        groupTree.selectedGroupsProperty().setAll(groupTree.rootGroupProperty().getValue()); // something needs to be selected
+
+        groupTree.rootGroupProperty().addListener((_, _, _) -> groupTree.selectedGroupsProperty().clear());
+        // (Above Line) Fires when the rootGroupProperty's val is replaced with a different root obj
+        activeDatabase.setValue(Optional.of(secondDatabase));
+
+        assertEquals(List.of(group), storeo);
+    }
+
+
+
 }
