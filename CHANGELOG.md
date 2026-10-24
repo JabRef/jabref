@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
 - We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
 - We added text search to AI chats. [#17183](https://github.com/JabRef/jabref/pull/17183)
+- We added restoring of the library tab and entry that were selected when JabRef was closed. [#16911](https://github.com/JabRef/jabref/pull/16911)
 
 ### Changed
 
@@ -75,6 +76,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the links at the bottom of the Welcome tab were cut off in small windows. [#17015](https://github.com/JabRef/jabref/issues/17015)
 - We fixed an issue where saving the "Custom entry types" preferences removed custom fields from the non-wrapped fields. [#17121](https://github.com/JabRef/jabref/pull/17121)
 - We fixed an issue where "Automatically set file links" did not work when no external file types were configured. [#15084](https://github.com/JabRef/jabref/issues/15084)
+- We fixed an issue where libraries opened or saved shortly before JabRef was killed were missing from recent libraries. [#16911](https://github.com/JabRef/jabref/pull/16911)
 
 ### Removed
 
