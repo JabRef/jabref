@@ -30,7 +30,6 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.GrobidUrlMigration;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
-import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
@@ -38,6 +37,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.databind.ObjectMapper;
@@ -687,10 +687,14 @@ public class PreferencesMigrations {
         if (!keys.isEmpty() && names.size() == keys.size()) {
             try (final Keyring keyring = Keyring.create()) {
                 for (int i = 0; i < names.size(); i++) {
-                    keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
-                            keys.get(i),
-                            preferences.getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .encrypt());
+                    if (!StringUtil.isBlank(keys.get(i))) {
+                        keyring.setPassword("org.jabref.apikeys", names.get(i), keys.get(i).trim());
+                    }
+                    try {
+                        keyring.deletePassword("org.jabref.customapikeys", names.get(i));
+                    } catch (PasswordAccessException _) {
+                        // Already absent, nothing to clear
+                    }
                 }
                 preferences.deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
             } catch (Exception ex) {
