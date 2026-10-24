@@ -1,10 +1,12 @@
 package org.jabref.model.search.query;
 
 import java.util.EnumSet;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchBaseVisitor;
@@ -25,6 +27,7 @@ public class SearchQuery {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchQuery.class);
 
     private final String searchExpression;
+    private String normalizedSearchExpression = "";
     private final EnumSet<SearchFlags> searchFlags;
     private SearchParser.StartContext context;
     private boolean isValidExpression;
@@ -37,19 +40,29 @@ public class SearchQuery {
     public SearchQuery(@NonNull String searchExpression, EnumSet<SearchFlags> searchFlags) {
         this.searchExpression = searchExpression;
         this.searchFlags = searchFlags;
+        String resolved = normalizeDoi(searchExpression, searchFlags);
         try {
-            this.context = getStartContext(searchExpression);
+            this.context = getStartContext(resolved);
+            this.normalizedSearchExpression = resolved;
             isValidExpression = containsOnlyValidRegularExpressions(context, searchFlags);
         } catch (ParseCancellationException e) {
             // We use getCause here as the real exception is nested and this avoids that the stack trace get too large
             // and we don't see the root cause
             LOGGER.debug("Search query Parsing error", e.getCause());
+            this.normalizedSearchExpression = searchExpression;
             isValidExpression = false;
         }
     }
 
+    /// Returns the original, user-facing search expression.
     public String getSearchExpression() {
         return searchExpression;
+    }
+
+    /// Returns the normalized search expression used for parsing and matching
+    /// (e.g., with full DOI links normalized to plain DOI identifiers).
+    public String getNormalizedSearchExpression() {
+        return normalizedSearchExpression;
     }
 
     public SearchResults getSearchResults() {
@@ -107,6 +120,27 @@ public class SearchQuery {
 
     private static boolean containsOnlyValidRegularExpressions(SearchParser.StartContext context, EnumSet<SearchFlags> searchFlags) {
         return new SearchRegularExpressionValidator(searchFlags).visit(context);
+    }
+
+    /// [impl->req~search.doi-link-normalization~1]
+    /// Normalizes full DOI URLs to plain DOI identifiers (e.g., "https://doi.org/10.1000/182" -> "10.1000/182").
+    /// Normalizing to the plain DOI allows matching both entries storing clean DOIs and entries retaining
+    /// full HTTP links (since the plain DOI is a substring of the full URL).
+    /// Regex mode is skipped because `DOI.parse` strips backslashes and special characters, mutating regex syntax.
+    private static String normalizeDoi(String searchExpression, EnumSet<SearchFlags> searchFlags) {
+        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION) || searchExpression.trim().contains(" ")) {
+            return searchExpression;
+        }
+        String trimmed = searchExpression.trim();
+        String lowerCased = trimmed.toLowerCase(Locale.ROOT);
+        if (lowerCased.startsWith("http://") || lowerCased.startsWith("https://")
+                || lowerCased.startsWith("doi.org/") || lowerCased.startsWith("doi:")) {
+            String toParse = lowerCased.startsWith("doi.org/") ? "https://" + trimmed : trimmed;
+            return DOI.parse(toParse)
+                      .map(DOI::asString)
+                      .orElse(searchExpression);
+        }
+        return searchExpression;
     }
 
     /// Unescapes search value based on the Search grammar rules.
