@@ -20,6 +20,7 @@ import javafx.stage.Window;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.IkonliIcon;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -56,7 +57,7 @@ public class ThemeManager {
 
     private static final Pattern INLINE_FONT_SIZE = Pattern.compile("-fx-font-size:[^;]*px;");
 
-    private static final String IKONLI_ICON_SELECTOR = ".ikonli-font-icon";
+    private static final String THEME_SIZED_ICON_SELECTOR = "." + IkonliIcon.THEME_SIZED_STYLE_CLASS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
@@ -131,8 +132,8 @@ public class ThemeManager {
     }
 
     private static void resetIconSize(Parent root) {
-        root.lookupAll(IKONLI_ICON_SELECTOR)
-                .forEach(icon -> icon.setStyle(INLINE_FONT_SIZE.matcher(icon.getStyle()).replaceAll("")));
+        root.lookupAll(THEME_SIZED_ICON_SELECTOR)
+            .forEach(icon -> icon.setStyle(INLINE_FONT_SIZE.matcher(icon.getStyle()).replaceAll("")));
     }
 
     private void initializeWindowThemeUpdater() {

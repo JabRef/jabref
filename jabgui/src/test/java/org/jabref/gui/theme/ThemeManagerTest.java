@@ -20,6 +20,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import org.jabref.gui.WorkspacePreferences;
+import org.jabref.gui.icon.IkonliIcon;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateListener;
@@ -363,7 +364,7 @@ class ThemeManagerTest {
         var workSpacePreferences = WorkspacePreferences.getDefault();
         workSpacePreferences.setShouldOverrideDefaultFontSize(true);
         var themeManager = createThemeManager(workSpacePreferences);
-        var icon = new FontIcon(MaterialDesignA.ACCOUNT);
+        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).getGraphicNode();
         var stage = showIcon(themeManager, icon);
 
         double sizeBefore = applyCssAndGetIconSize(icon);
@@ -382,7 +383,7 @@ class ThemeManagerTest {
         var workSpacePreferences = WorkspacePreferences.getDefault();
         workSpacePreferences.setShouldOverrideDefaultFontSize(true);
         var themeManager = createThemeManager(workSpacePreferences);
-        var icon = new FontIcon(MaterialDesignA.ACCOUNT);
+        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).getGraphicNode();
         var stage = showIcon(themeManager, icon);
 
         double sizeBefore = applyCssAndGetIconSize(icon);
@@ -403,7 +404,7 @@ class ThemeManagerTest {
         var workSpacePreferences = WorkspacePreferences.getDefault();
         workSpacePreferences.setShouldOverrideDefaultFontSize(true);
         var themeManager = createThemeManager(workSpacePreferences);
-        var icon = new FontIcon(MaterialDesignA.ACCOUNT);
+        var icon = (FontIcon) new IkonliIcon(MaterialDesignA.ACCOUNT).getGraphicNode();
         JavaFxExtension.invokeAndWait(() -> icon.setStyle("-fx-font-size: 2em;"));
         var stage = showIcon(themeManager, icon);
 
