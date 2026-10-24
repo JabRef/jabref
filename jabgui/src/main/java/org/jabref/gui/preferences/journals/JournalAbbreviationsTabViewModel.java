@@ -16,8 +16,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -51,11 +51,11 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
-    private final AbbreviationPreferences abbreviationsPreferences;
+    private final JournalAbbreviationPreferences abbreviationsPreferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private boolean shouldWriteLists;
 
-    public JournalAbbreviationsTabViewModel(AbbreviationPreferences abbreviationsPreferences,
+    public JournalAbbreviationsTabViewModel(JournalAbbreviationPreferences abbreviationsPreferences,
                                             @NonNull DialogService dialogService,
                                             @NonNull TaskExecutor taskExecutor,
                                             @NonNull JournalAbbreviationRepository journalAbbreviationRepository) {
@@ -116,7 +116,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     /// Read all saved file paths and read their abbreviations.
     public void createFileObjects() {
-        List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
+        List<String> externalFiles = abbreviationsPreferences.getExternalLists();
         externalFiles.forEach(name -> openFile(Path.of(name)));
     }
 
@@ -309,7 +309,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                                                                  .map(path -> path.getAbsolutePath().get().toAbsolutePath().toString())
                                                                  .collect(Collectors.toList());
 
-                    abbreviationsPreferences.setExternalJournalLists(journalStringList);
+                    abbreviationsPreferences.setExternalLists(journalStringList);
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
 
                     if (shouldWriteLists) {

@@ -45,7 +45,7 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
     @Override
     public String format(@NonNull String text) {
         JabRefCliPreferences preferences = getCliPreferences();
-        if (text.isEmpty() || !preferences.getAbbreviationPreferences().shouldEnableMscKeywordDescriptions()) {
+        if (text.isEmpty() || !preferences.getJournalAbbreviationPreferences().shouldEnableMscKeywordDescriptions()) {
             return text;
         }
 
