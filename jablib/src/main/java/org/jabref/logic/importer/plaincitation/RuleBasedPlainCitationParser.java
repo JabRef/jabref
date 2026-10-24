@@ -330,6 +330,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Finds the publication year. A year in parentheses (`(1993)`, `(1991a)`) is preferred. Otherwise, the last
     /// valid year wins, because the publication year usually stands behind the title, which may mention a year, too.
     /// A year range (`2019–2021`) counts as its first year, and a number behind `p.`/`pp.` is a page, not a year.
+    /// A range behind an already found year (`2020, 1725-1730`) is a page range and is left for [#findPages].
     ///
     /// Only the chosen occurrence is replaced by [#YEAR_TAG], so other occurrences (in the title) stay untouched.
     private String findYear(String input) {
@@ -350,6 +351,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         while (matcher.find()) {
             if (!isValidYear(matcher.group(YEAR_GROUP))
                     || PAGES_PREFIX_AT_END_PATTERN.matcher(input.substring(0, matcher.start())).find()) {
+                continue;
+            }
+            boolean isRange = matcher.end(YEAR_GROUP) < matcher.end();
+            if (isRange && (start != -1)) {
                 continue;
             }
             year = matcher.group(YEAR_GROUP);

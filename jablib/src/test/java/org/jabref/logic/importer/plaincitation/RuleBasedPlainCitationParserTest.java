@@ -458,6 +458,15 @@ class RuleBasedPlainCitationParserTest {
                         entry.flatMap(e -> e.getField(StandardField.PAGES))));
     }
 
+    /// An unmarked page range of four-digit numbers behind the year is taken as pages, not as the year.
+    @Test
+    void unmarkedPageRangeAfterYearIsNotTakenAsYear() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. A title. Journal, 2020, 1725-1730.");
+        assertEquals(List.of(Optional.of("2020"), Optional.of("1725--1730")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.YEAR)),
+                        entry.flatMap(e -> e.getField(StandardField.PAGES))));
+    }
+
     // Full citation
 
     /// Complete citations in IEEE, APA and double-slash style, and one book: every field and the entry type must match.
