@@ -142,6 +142,22 @@ public class ImportHandler {
         return fileLinker;
     }
 
+    public boolean confirmBibFileImportIfNecessary(List<Path> files) {
+        boolean containsBibFile = files.stream().anyMatch(FileUtil::isBibFile);
+
+        if (!containsBibFile || !preferences.getImporterPreferences().shouldWarnAboutBibFileImport()) {
+            return true;
+        }
+
+        return dialogService.showConfirmationDialogWithOptOutAndWait(
+                Localization.lang("Import BibTeX file"),
+                Localization.lang("Are you sure you want to import entries from the dropped BibTeX file(s) into the current library?"),
+                Localization.lang("Import"),
+                Localization.lang("Do not import"),
+                Localization.lang("Do not ask again"),
+                optOut -> preferences.getImporterPreferences().setWarnAboutBibFileImport(!optOut));
+    }
+
     /// Checks whether the given file should be imported as bibliographic entries rather than attached as a file to an existing entry.
     /// Excludes PDFs and generic document/data file extensions (.txt, .xml, .yml, .yaml) which are intended to be attached as files.
     public boolean canImportAsBibEntry(Path file) {
@@ -334,7 +350,6 @@ public class ImportHandler {
 
     record AutoDetectionImportOutcome(List<BibEntry> entriesToAdd, boolean success, String message) {
     }
-
     /// Cleans up the given entries and adds them to the library.
     ///
     /// Actions include generating a citation key if configured
