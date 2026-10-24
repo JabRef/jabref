@@ -377,6 +377,27 @@ class ThemeManagerTest {
         assertEquals(sizeBefore, sizeAfter);
     }
 
+    @Test
+    void resetIconSizeRemovesOldFontSize() {
+        var workSpacePreferences = WorkspacePreferences.getDefault();
+        workSpacePreferences.setShouldOverrideDefaultFontSize(true);
+        var themeManager = createThemeManager(workSpacePreferences);
+        var icon = new FontIcon(MaterialDesignA.ACCOUNT);
+        var stage = showIcon(themeManager, icon);
+
+        double sizeBefore = applyCssAndGetIconSize(icon);
+        changeFontSize(workSpacePreferences, 20);
+        JavaFxExtension.invokeAndWait(() -> icon.setStyle("-fx-fill: red;-fx-font-size: 30px;"));
+
+        changeFontSize(workSpacePreferences, 9);
+        String style = icon.getStyle();
+        double sizeAfter = applyCssAndGetIconSize(icon);
+        JavaFxExtension.invokeAndWait(stage::close);
+
+        assertEquals(sizeBefore, sizeAfter);
+        assertEquals("-fx-fill: red;", style);
+    }
+
     private static int styleClassChangesOnNewScene(int timesShown) {
         StackPane root = new StackPane();
         AtomicInteger styleClassChanges = new AtomicInteger();
