@@ -47,6 +47,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
+    private final StringProperty libraryNameProperty = new SimpleStringProperty("");
+    private final StringProperty libraryDescriptionProperty = new SimpleStringProperty("");
 
     private final Validator librarySpecificFileDirectoryValidator;
     private final Validator userSpecificFileDirectoryValidator;
@@ -91,6 +93,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         userSpecificFileDirectoryProperty.setValue(metaData.getUserFileDirectory(preferences.getFilePreferences().getUserAndHost()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(metaData.getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost()).map(Path::toString).orElse(""));
         keywordSeparatorProperty.setValue(metaData.getKeywordSeparator().map(Object::toString).orElse(""));
+        libraryNameProperty.setValue(metaData.getLibraryName().orElse(""));
+        libraryDescriptionProperty.setValue(metaData.getLibraryDescription().orElse(""));
     }
 
     @Override
@@ -117,6 +121,20 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             metaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else if (laTexFileDirectoryStatus().isValid()) {
             metaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
+        }
+
+        String libraryName = libraryNameProperty.getValue().trim();
+        if (libraryName.isEmpty()) {
+            metaData.clearLibraryName();
+        } else {
+            metaData.setLibraryName(libraryName);
+        }
+
+        String libraryDescription = libraryDescriptionProperty.getValue().trim();
+        if (libraryDescription.isEmpty()) {
+            metaData.clearLibraryDescription();
+        } else {
+            metaData.setLibraryDescription(libraryDescription);
         }
 
         storeKeywordSeparator(metaData);
@@ -223,6 +241,14 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     public StringProperty keywordSeparatorProperty() {
         return this.keywordSeparatorProperty;
+    }
+
+    public StringProperty libraryNameProperty() {
+        return this.libraryNameProperty;
+    }
+
+    public StringProperty libraryDescriptionProperty() {
+        return this.libraryDescriptionProperty;
     }
 
     private Path getBrowseDirectory(String configuredDir) {
