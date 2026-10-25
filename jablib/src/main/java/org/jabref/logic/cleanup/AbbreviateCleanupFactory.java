@@ -21,9 +21,11 @@ public class AbbreviateCleanupFactory {
 
         JournalMode journalMode = abbreviationPreferences.getJournalMode();
         AbbreviationType abbreviationType = abbreviationPreferences.getAbbreviationType();
-        if (journalMode == JournalMode.NONE)
-            return Optional.empty();
 
+        if (journalMode == JournalMode.NONE) {
+            return Optional.empty();
+        }
+        
         if (journalMode == JournalMode.ABBREVIATE) {
             return Optional.of(new AbbreviateJournalCleanup(database, repository, abbreviationType,
                     abbreviationPreferences.shouldUseFJournalField()));
