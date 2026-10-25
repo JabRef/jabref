@@ -618,7 +618,14 @@ public class DBMSProcessor {
                     if (selectEntryResultSet.getInt("SHARED_ID") > lastId) {
                         int sharedId = selectEntryResultSet.getInt("shared_id");
                         int version = selectEntryResultSet.getInt("version");
-                        EntryType entrytype = EntryTypeFactory.parse(selectEntryResultSet.getString("entrytype"));
+                        String rawEntryType = selectEntryResultSet.getString("entrytype");
+                        EntryType entrytype;
+                        if (rawEntryType == null || rawEntryType.isBlank()) {
+                            LOGGER.warn("Shared entry {} has missing or blank entry type; falling back to 'misc'", sharedId);
+                            entrytype = StandardEntryType.Misc;
+                        } else {
+                            entrytype = EntryTypeFactory.parse(rawEntryType);
+                        }
 
                         bibEntry = new BibEntry(entrytype);
                         bibEntry.getSharedBibEntryData().setSharedId(sharedId);
