@@ -94,4 +94,11 @@ A shared database identified by its DBMS type, normalized host, port, and databa
 
 Needs: impl, utest
 
+## Shared database must reject entries without an entry type
+`req~shared-database.entry-type-required~1`
+
+The shared database must reject inserting or updating any entry any entry whose entry type is missing or blank. When JabRef connects to a shared database, any existing entries with a missing or blank entry type must have their type set to `misc` while retaining all fields.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
