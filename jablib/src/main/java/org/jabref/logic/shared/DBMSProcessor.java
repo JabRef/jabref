@@ -157,10 +157,11 @@ public class DBMSProcessor {
         connection.createStatement().executeUpdate("SET search_path TO jabref");
 
         // TODO: entrytype should be moved to table "field" (org.jabref.model.entry.field.InternalField.TYPE_HEADER)
+        // [impl->req~shared-database.entry-type-required~1]
         connection.createStatement().executeUpdate("""
                     CREATE TABLE IF NOT EXISTS entry (
                         shared_id SERIAL PRIMARY KEY,
-                        entrytype VARCHAR,
+                        entrytype VARCHAR NOT NULL CONSTRAINT entry_entrytype_not_blank CHECK (btrim(entrytype) <> ''),
                         version INTEGER DEFAULT 1
                     )
                 """);
@@ -262,7 +263,7 @@ public class DBMSProcessor {
                 return;
             }
             connection.createStatement().executeUpdate(
-                    "INSERT INTO entry (shared_id, entrytype, version) SELECT \"SHARED_ID\", \"TYPE\", \"VERSION\" FROM %s.\"ENTRY\"".formatted(oldSchema.get()));
+                    "INSERT INTO entry (shared_id, entrytype, version) SELECT \"SHARED_ID\", COALESCE(NULLIF(btrim(\"TYPE\"), ''), 'misc'), \"VERSION\" FROM %s.\"ENTRY\"".formatted(oldSchema.get()));
             connection.createStatement().executeUpdate(
                     "INSERT INTO field (entry_shared_id, name, value) SELECT \"ENTRY_SHARED_ID\", \"NAME\", \"VALUE\" FROM %s.\"FIELD\"".formatted(oldSchema.get()));
             connection.createStatement().executeUpdate(
