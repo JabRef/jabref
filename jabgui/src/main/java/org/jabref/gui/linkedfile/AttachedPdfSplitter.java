@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 ///
 /// A proceedings entry gets one new entry per paper. Any other entry gets a copy of just its own pages.
 @NullMarked
+// [impl->req~logic.pdf.split-proceedings-outline~1]
+// [impl->req~logic.pdf.extract-paper-page-range~1]
 public class AttachedPdfSplitter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AttachedPdfSplitter.class);

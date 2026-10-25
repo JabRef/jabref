@@ -16,6 +16,7 @@ import org.jspecify.annotations.NullMarked;
 
 /// Copies the pages named by an entry out of a longer PDF, leaving the original file in place.
 @NullMarked
+// [impl->req~logic.pdf.extract-paper-page-range~1]
 public final class PdfPaperExtractor {
 
     private PdfPaperExtractor() {
