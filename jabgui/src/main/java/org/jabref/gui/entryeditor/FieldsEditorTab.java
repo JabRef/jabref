@@ -181,10 +181,11 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     /// Percentage rows ignore child minimum heights. With natural rows, infinite preferred heights
     /// from field labels and text inputs must use their computed sizes so the grid can size each row.
+    /// Labels keep their computed height so they align with controls at the top of tall rows.
     private static void useComputedPreferredHeight(Node node) {
         if (node instanceof Region region && region.getPrefHeight() == Double.POSITIVE_INFINITY) {
             region.setPrefHeight(Region.USE_COMPUTED_SIZE);
-            region.setMaxHeight(Double.MAX_VALUE);
+            region.setMaxHeight(node instanceof FieldNameLabel ? Region.USE_PREF_SIZE : Double.MAX_VALUE);
         }
         if (node instanceof Parent parent) {
             parent.getChildrenUnmodifiable().forEach(FieldsEditorTab::useComputedPreferredHeight);
