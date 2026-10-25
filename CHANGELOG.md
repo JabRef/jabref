@@ -33,7 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We moved the "Show diff" button to the Git commit dialog's button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
 - We changed the HTTP server to list linked PDF files per entry at `GET /libraries/{id}/entries/{citationKey}/files` instead of `entries/pdffiles`. [#17567](https://github.com/JabRef/jabref/pull/17567)
 - We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
-- The main table tooltip now stays visible while the mouse stays over the entry. [#17502](https://github.com/JabRef/jabref/issues/17502)
+- We changed the main table tooltip to stay visible while the mouse stays over the entry. [#17502](https://github.com/JabRef/jabref/issues/17502)
 
 ### Fixed
 
