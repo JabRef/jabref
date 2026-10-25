@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -218,7 +219,7 @@ public class PdfContentImporter extends PdfImporter {
         }
         if (isbns.size() > 1) {
             ParserResult result = new ParserResult();
-            result.addWarning(Localization.lang("More than one ISBN found"));
+            result.addWarning(Localization.lang("More than one ISBN found: Found %0. Not adding.", isbns.stream().map(ISBN::asString).collect(Collectors.joining(", "))));
             return result;
         }
         BibEntry bookEntry = new BibEntry(StandardEntryType.Book)
