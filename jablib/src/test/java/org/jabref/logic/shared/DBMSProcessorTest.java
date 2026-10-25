@@ -129,6 +129,7 @@ class DBMSProcessorTest {
         }
     }
 
+    // [utest->req~shared-database.entry-type-required~1]
     @Test
     void entryWithNullTypeIsRejected() {
         SQLException exception = assertThrows(SQLException.class, () ->
@@ -137,6 +138,7 @@ class DBMSProcessorTest {
         assertEquals("23502", exception.getSQLState()); // not_null_violation
     }
 
+    // [utest->req~shared-database.entry-type-required~1]
     @ParameterizedTest
     @ValueSource(strings = {"", "   "})
     void blankEntryTypeIsRejected(String entryType) {
@@ -202,6 +204,7 @@ class DBMSProcessorTest {
         assertEquals(2, dbmsProcessor.getSharedEntries().size());
     }
 
+    // [utest->req~shared-database.entry-type-required~1]
     @Test
     void migrationFromV1StructureWithMissingType() throws SQLException {
         Connection connection = dbmsConnection.getConnection();
@@ -244,6 +247,7 @@ class DBMSProcessorTest {
         assertEquals(List.of(expectedEntry), dbmsProcessor.getSharedEntries());
     }
 
+    // [utest->req~shared-database.entry-type-required~1]
     @Test
     void setupRepairsExistingGhostEntries() throws SQLException {
         Connection connection = dbmsConnection.getConnection();
