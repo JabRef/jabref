@@ -14,10 +14,12 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class Date {
 
     public static final String DATE_REGEX;
@@ -83,8 +85,8 @@ public class Date {
     }
 
     private final TemporalAccessor date;
-    private final TemporalAccessor endDate;
-    private final Season season;
+    private final @Nullable TemporalAccessor endDate;
+    private final @Nullable Season season;
 
     public Date(int year, int month, int dayOfMonth) {
         this(LocalDate.of(year, month, dayOfMonth));
@@ -124,7 +126,7 @@ public class Date {
     ///
     /// @param dateString the string to extract the date information
     /// @throws DateTimeParseException if dataString is mal-formatted
-    public static Optional<Date> parse(@NonNull String dateString) {
+    public static Optional<Date> parse(String dateString) {
         dateString = dateString.strip();
 
         if (dateString.isEmpty()) {
