@@ -37,7 +37,7 @@ public class AiGroupChatView extends StackPane {
     }
 
     private void setupBindings() {
-        // [pp->feat~ai.chatting.groups~1]
+        // [impl->req~ai.chatting.groups.privacy-policy~1]
         privacyNotice.managedProperty().bind(privacyNotice.visibleProperty());
         aiChatView.managedProperty().bind(aiChatView.visibleProperty());
 

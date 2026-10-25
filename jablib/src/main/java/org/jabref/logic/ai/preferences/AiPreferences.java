@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 /// AI preferences.
 ///
 /// Quick note about [#aiFeaturesEnabledInitially] and [#aiFeaturesEnabledCurrently]:
-/// As per `req~ai.general.enabling.restart~1`, when enabled property is changed, a restart required. This implies that
+/// When the enabled property is changed, a restart is required. This implies that
 /// AI processes should start and work only if they were initially enabled. So whenever you want to guard some code from
 /// executing only if AI is enabled, please use [#aiFeaturesEnabledInitially] via [#getAiFeaturesEnabled()]`.
 public class AiPreferences {
