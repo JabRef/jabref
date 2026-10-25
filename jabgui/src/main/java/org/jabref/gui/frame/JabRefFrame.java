@@ -17,6 +17,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
@@ -42,6 +43,8 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.keyboard.SearchShortcutTarget;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
@@ -57,6 +60,7 @@ import org.jabref.gui.welcome.WelcomeTab;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -105,6 +109,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final TaskExecutor taskExecutor;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final OAuthSessionRegistry oAuthSessionRegistry;
 
     private final JabRefFrameViewModel viewModel;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
@@ -129,7 +134,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
                        GitHandlerRegistry gitHandlerRegistry,
-                       JournalAbbreviationRepository journalAbbreviationRepository) {
+                       JournalAbbreviationRepository journalAbbreviationRepository,
+                       OAuthSessionRegistry oAuthSessionRegistry) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -141,6 +147,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.oAuthSessionRegistry = oAuthSessionRegistry;
 
         setId("frame");
 
@@ -250,7 +257,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 aiService,
                 entryEditor,
                 gitHandlerRegistry,
-                journalAbbreviationRepository
+                journalAbbreviationRepository,
+                oAuthSessionRegistry
         );
 
         VBox head = new VBox(0, mainMenu, mainToolBar);
@@ -336,8 +344,34 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
+    /// The frame captures shortcuts before child views; a view that handles Search must receive it itself.
+    // [impl->req~ai.chat.find.unavailable~1]
+    static boolean handleSearchKeyBinding(KeyEvent event, KeyBindingRepository keyBindings, Runnable focusLibrarySearch) {
+        if (!keyBindings.matches(event, KeyBinding.SEARCH)) {
+            return false;
+        }
+
+        if (event.getTarget() instanceof Node target && hasSearchShortcutTarget(target)) {
+            return true;
+        }
+        focusLibrarySearch.run();
+        event.consume();
+        return true;
+    }
+
+    private static boolean hasSearchShortcutTarget(Node node) {
+        if (node instanceof SearchShortcutTarget searchTarget) {
+            return searchTarget.canHandleSearch();
+        }
+        return Optional.ofNullable(node.getParent()).map(JabRefFrame::hasSearchShortcutTarget).orElse(false);
+    }
+
     private void initKeyBindings() {
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            // Check search before the switch, which only sees the first matching key binding.
+            if (handleSearchKeyBinding(event, preferences.getKeyBindingRepository(), globalSearchBar::requestFocus)) {
+                return;
+            }
             Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
@@ -356,9 +390,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case PREVIOUS_LIBRARY:
                         tabbedPane.getSelectionModel().selectPrevious();
                         event.consume();
-                        break;
-                    case SEARCH:
-                        globalSearchBar.requestFocus();
                         break;
                     case OPEN_GLOBAL_SEARCH_DIALOG:
                         globalSearchBar.openGlobalSearchDialog();
