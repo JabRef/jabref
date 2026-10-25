@@ -32,4 +32,10 @@ public class AiChatTab extends EntryEditorTab {
         BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
         aiEntryChatView.selectedEntryProperty().set(new FullBibEntry(bibDatabaseContext, entry));
     }
+
+    @Override
+    protected void dispose() {
+        aiEntryChatView.dispose();
+        super.dispose();
+    }
 }
