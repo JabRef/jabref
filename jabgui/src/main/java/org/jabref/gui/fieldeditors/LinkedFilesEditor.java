@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -47,6 +48,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingDispatcher;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
 import org.jabref.gui.linkedfile.OcrLinkedFileAction;
@@ -330,72 +332,44 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     }
 
     private void setUpKeyBindings() {
-        listView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
-            if (keyBinding.isPresent()) {
-                switch (keyBinding.get()) {
-                    case DELETE_ENTRY -> {
-                        deleteAttachedFilesWithConfirmation();
-                        event.consume();
-                    }
-                    case RENAME_FILE_TO_NAME -> {
-                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
-                        if (selectedFile != null) {
-                            new ContextAction(StandardActions.RENAME_FILE_TO_NAME, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute();
-                            event.consume();
-                        }
-                    }
-                    case OPEN_FILE -> {
-                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
-                        if (selectedFile != null) {
-                            new ContextAction(StandardActions.OPEN_FILE, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute();
-                            event.consume();
-                        }
-                    }
-                    case PERFORM_OCR -> {
-                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
-                        if (selectedFile != null) {
-                            new OcrLinkedFileAction(
-                                    selectedFile.getFile(),
-                                    selectedFile.getLinkedEntries(),
-                                    databaseContext,
-                                    dialogService,
-                                    preferences,
-                                    taskExecutor,
-                                    fileUpdateMonitor,
-                                    undoManager,
-                                    stateManager
-                            ).execute();
-                            event.consume();
-                        }
-                    }
-                    case OPEN_FOLDER -> {
-                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
-                        if (selectedFile != null) {
-                            new ContextAction(StandardActions.OPEN_FOLDER, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute();
-                            event.consume();
-                        }
-                    }
-                    case OPEN_CLOSE_ENTRY_EDITOR -> {
-                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
-                        if (selectedFile != null) {
-                            new ContextAction(StandardActions.EDIT_FILE_LINK, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute();
-                            event.consume();
-                        }
-                    }
-                    case COPY -> {
-                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
-                        if (selectedFile != null) {
-                            new CopyLinkedFilesAction(selectedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences()).execute();
-                            event.consume();
-                        }
-                    }
-                    default -> {
-                        // Pass other keys to children
-                    }
-                }
-            }
-        });
+        KeyBindingDispatcher keyBindingDispatcher = new KeyBindingDispatcher(preferences.getKeyBindingRepository())
+                .on(KeyBinding.DELETE_ENTRY, this::deleteAttachedFilesWithConfirmation)
+                .onConditionally(KeyBinding.RENAME_FILE_TO_NAME, () -> executeOnSelectedFile(selectedFile ->
+                        new ContextAction(StandardActions.RENAME_FILE_TO_NAME, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute()))
+                .onConditionally(KeyBinding.OPEN_FILE, () -> executeOnSelectedFile(selectedFile ->
+                        new ContextAction(StandardActions.OPEN_FILE, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute()))
+                .onConditionally(KeyBinding.PERFORM_OCR, () -> executeOnSelectedFile(selectedFile ->
+                        new OcrLinkedFileAction(
+                                selectedFile.getFile(),
+                                selectedFile.getLinkedEntries(),
+                                databaseContext,
+                                dialogService,
+                                preferences,
+                                taskExecutor,
+                                fileUpdateMonitor,
+                                undoManager,
+                                stateManager
+                        ).execute()))
+                .onConditionally(KeyBinding.OPEN_FOLDER, () -> executeOnSelectedFile(selectedFile ->
+                        new ContextAction(StandardActions.OPEN_FOLDER, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute()))
+                .onConditionally(KeyBinding.OPEN_CLOSE_ENTRY_EDITOR, () -> executeOnSelectedFile(selectedFile ->
+                        new ContextAction(StandardActions.EDIT_FILE_LINK, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute()))
+                .onConditionally(KeyBinding.COPY, () -> executeOnSelectedFile(selectedFile ->
+                        new CopyLinkedFilesAction(selectedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences()).execute()));
+
+        listView.addEventFilter(KeyEvent.KEY_PRESSED, keyBindingDispatcher::handle);
+    }
+
+    /// Without a selected file, the key is left to the parent nodes.
+    ///
+    /// @return whether a file was selected
+    private boolean executeOnSelectedFile(Consumer<LinkedFileViewModel> action) {
+        return Optional.ofNullable(listView.getSelectionModel().getSelectedItem())
+                       .map(selectedFile -> {
+                           action.accept(selectedFile);
+                           return true;
+                       })
+                       .orElse(false);
     }
 
     private void deleteAttachedFilesWithConfirmation() {
