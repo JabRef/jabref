@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -50,6 +51,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // org.jabref.gui.groups.GroupNodeViewModel.refreshGroup is used, which uses "Platform.runlater"
@@ -371,24 +374,26 @@ class GroupTreeViewModelTest {
     @Test
     void selectionOfNewDatabaseSurvivesSwitch() {
         BibDatabaseContext secondDatabase = new BibDatabaseContext();
-        var group = groupTree.rootGroupProperty().getValue().getGroupNode();
-        var storeo = FXCollections.observableArrayList(group);
+        // equals() compares the path, so this keeps the second library distinct from the active one
+        secondDatabase.setDatabasePath(Path.of("second.bib"));
 
-        when(stateManager.getSelectedGroups(secondDatabase)).thenReturn(storeo);
-        doAnswer(_ -> { // creates a fake that remembers the selection rom secondDatabase
-            storeo.clear();return null;
+        var group = groupTree.rootGroupProperty().getValue().getGroupNode();
+        var storedSelection = FXCollections.observableArrayList(group);
+
+        when(stateManager.getSelectedGroups(secondDatabase)).thenReturn(storedSelection);
+        doAnswer(_ -> {
+            storedSelection.clear();
+            return null;
         }).when(stateManager).clearSelectedGroups(secondDatabase);
 
+        groupTree.selectedGroupsProperty().setAll(groupTree.rootGroupProperty().getValue());
 
-        groupTree.selectedGroupsProperty().setAll(groupTree.rootGroupProperty().getValue()); // something needs to be selected
+        // Listener fires on every root replacement, like the tree view's binding
+        groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
 
-        groupTree.rootGroupProperty().addListener((_, _, _) -> groupTree.selectedGroupsProperty().clear());
-        // (Above Line) Fires when the rootGroupProperty's val is replaced with a different root obj
         activeDatabase.setValue(Optional.of(secondDatabase));
 
-        assertEquals(List.of(group), storeo);
+        verify(stateManager, never()).clearSelectedGroups(secondDatabase);
+        assertEquals(List.of(group), storedSelection);
     }
-
-
-
 }
