@@ -27,6 +27,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -185,6 +186,7 @@ public class DBMSProcessor {
         connection.createStatement().executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS idx_metadata_key ON METADATA (key);");
 
         migrateFromOldStructure();
+        enforceEntryTypeRequired();
 
         Map<String, String> metadata = getSharedMetaData();
 
@@ -272,6 +274,51 @@ public class DBMSProcessor {
             connection.createStatement().execute(
                     "SELECT setval(pg_get_serial_sequence('entry', 'shared_id'), COALESCE((SELECT MAX(shared_id) FROM entry), 0) + 1, false)");
         });
+    }
+
+    /// Upgrades pre-existing shared databases that lack the entry type constraint.
+    /// Any existing entries with a missing or blank type are defaulted to `misc` before
+    /// the constraint is applied. Runs at most once per database.
+    // [impl->req~shared-database.entry-type-required~1]
+    private void enforceEntryTypeRequired() throws SQLException {
+        if (entryTypeConstraintExists()) {
+            return;
+        }
+
+        inTransaction(() -> {
+            // Serializes concurrent connections; the lock is released at commit/rollback
+            connection.createStatement().execute("SELECT pg_advisory_xact_lock(" + MIGRATION_ADVISORY_LOCK_ID + ")");
+            if (entryTypeConstraintExists()) {
+                // Another client added the constraint while we waited for the lock
+                return;
+            }
+
+            int repairedRows = connection.createStatement().executeUpdate(
+                    "UPDATE entry SET entrytype = 'misc' WHERE entrytype IS NULL OR btrim(entrytype) = ''");
+            if (repairedRows > 0) {
+                LOGGER.warn("Repaired {} shared database entries with missing or blank entry type to 'misc'", repairedRows);
+            }
+
+            connection.createStatement().executeUpdate(
+                    "ALTER TABLE entry ALTER COLUMN entrytype SET NOT NULL");
+            connection.createStatement().executeUpdate(
+                    "ALTER TABLE entry ADD CONSTRAINT entry_entrytype_not_blank CHECK (btrim(entrytype) <> '')");
+        });
+    }
+
+    /// Checks whether `jabref.entry` already has the `entry_entrytype_not_blank` check constraint.
+    private boolean entryTypeConstraintExists() throws SQLException {
+        String sql = """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM pg_constraint
+                    WHERE conname = 'entry_entrytype_not_blank'
+                      AND conrelid = 'jabref.entry'::regclass
+                )""";
+        try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
+            resultSet.next();
+            return resultSet.getBoolean(1);
+        }
     }
 
     @FunctionalInterface
