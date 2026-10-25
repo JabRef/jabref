@@ -11,12 +11,14 @@ import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
+@NullMarked
 class MainTableTooltipTest extends JavaFxTest {
 
     @Test
