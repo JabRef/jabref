@@ -15,7 +15,7 @@ JabRef generally localizes all text visible to the user automatically.
 
 The problem is that these messages are built at runtime from up to three optional parts, and each part needs its own singular or plural form.
 
-So the question is: should these generated messages be localized, and if yes, how it should be done?
+The question is: should these generated messages be localized, and if yes, how it should be done?
 
 ## Decision Drivers
 
