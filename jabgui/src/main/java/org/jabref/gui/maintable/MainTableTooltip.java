@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -22,6 +23,9 @@ public class MainTableTooltip extends Tooltip {
     public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, taskExecutor);
+
+        // Keep the tooltip open while the cursor stays on the cell, so that long abstracts can be read
+        setShowDuration(Duration.INDEFINITE);
 
         preview.resizeForTooltipContent();
 
