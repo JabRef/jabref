@@ -184,11 +184,12 @@
 
     Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀
 
-- jobName: 'PR title must not contain "issue <number>"'
+- jobName: 'PR title describes the change'
   workflowName: 'Check PR Format'
   always: true
   message: >
-    The title of the pull request must not start with "Fix for issue xyz".
+    The title of the pull request must describe the change.
+    It must neither reference an issue number (such as "Fix for issue xyz" or "fix-for-issue-xyz") nor be a branch name or a single word.
     Please use a concise one-line summary that explains what the fix or change actually does.
     Example of a good title: "Prevent crash when importing malformed BibTeX entries".
 - jobName: 'Mandatory Checklist present'

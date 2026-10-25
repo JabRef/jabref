@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   check_title_format:
-    name: PR title must not contain "issue <number>"
+    name: PR title describes the change
     if: >
       (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
@@ -30,8 +30,15 @@ jobs:
           TITLE=$(gh pr view "${{ github.event.number }}" --json title --template '{{.title}}')
           echo "Title: $TITLE"
 
-          if echo "$TITLE" | grep -Eiq 'issue ?#?[0-9]+|fix(es|ed)? ?(for ?)?#[0-9]+'; then
+          # Matches "issue 123", "issue-123", "issue_#123", "Fix for #123", "fix-for-issue-123", "Resolves #123", ...
+          if echo "$TITLE" | grep -Eiq 'issue[-_ ]?#?[0-9]+|(fix(es|ed)?|resolve[sd]?|close[sd]?)[-_ ]?(for[-_ ]?)?#[0-9]+'; then
             echo "❌ Title references an issue number instead of describing the change — not allowed."
+            exit 1
+          fi
+
+          # A title without any whitespace is a single word or a branch name (e.g., "fix-for-issue-123") — not a description
+          if ! echo "$TITLE" | grep -q '[[:space:]]'; then
+            echo "❌ Title looks like a branch name or a single word instead of describing the change — not allowed."
             exit 1
           fi
 
