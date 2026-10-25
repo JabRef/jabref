@@ -1,8 +1,10 @@
 package org.jabref.logic.shared;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,6 +34,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -126,6 +130,30 @@ class DBMSProcessorTest {
     }
 
     @Test
+    void entryWithNullTypeIsRejected() {
+        SQLException exception = assertThrows(SQLException.class, () ->
+                dbmsConnection.getConnection().createStatement()
+                              .executeUpdate("INSERT INTO jabref.entry (entrytype) VALUES (NULL)"));
+        assertEquals("23502", exception.getSQLState()); // not_null_violation
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    void blankEntryTypeIsRejected(String entryType) {
+        String sql = "INSERT INTO jabref.entry (entrytype) VALUES (?)";
+
+        Connection connection = dbmsConnection.getConnection();
+        SQLException exception = assertThrows(SQLException.class, () -> {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, entryType);
+                preparedStatement.executeUpdate();
+            }
+        });
+
+        assertEquals("23514", exception.getSQLState());
+    }
+
+    @Test
     void migrationFromV1Structure() throws SQLException {
         // Recreate the structure of JabRef 5.x/6.0-alpha (structure version 1) with one entry
         Connection connection = dbmsConnection.getConnection();
@@ -172,6 +200,105 @@ class DBMSProcessorTest {
         // A reconnect does not migrate again into the used database
         dbmsProcessor.setupSharedDatabase();
         assertEquals(2, dbmsProcessor.getSharedEntries().size());
+    }
+
+    @Test
+    void migrationFromV1StructureWithMissingType() throws SQLException {
+        Connection connection = dbmsConnection.getConnection();
+
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
+
+            statement.executeUpdate("""
+                CREATE TABLE jabref."ENTRY" (
+                    "SHARED_ID" SERIAL PRIMARY KEY,
+                    "TYPE" VARCHAR,
+                    "VERSION" INT DEFAULT 1
+                )""");
+
+            statement.executeUpdate("""
+                CREATE TABLE jabref."FIELD" (
+                    "ENTRY_SHARED_ID" INT REFERENCES jabref."ENTRY"("SHARED_ID") ON DELETE CASCADE,
+                    "NAME" VARCHAR,
+                    "VALUE" TEXT
+                )""");
+
+            statement.executeUpdate("""
+                CREATE TABLE jabref."METADATA" (
+                    "KEY" VARCHAR,
+                    "VALUE" TEXT
+                )""");
+
+            // Insert a legacy entry with NULL TYPE instead of 'article'
+            statement.executeUpdate("""
+                INSERT INTO jabref."ENTRY" ("TYPE") VALUES (NULL)""");
+            statement.executeUpdate("""
+                INSERT INTO jabref."FIELD" ("ENTRY_SHARED_ID", "NAME", "VALUE") VALUES (1, 'author', 'Ada Lovelace')""");
+        }
+
+        dbmsProcessor.setupSharedDatabase();
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Ada Lovelace");
+
+        assertEquals(List.of(expectedEntry), dbmsProcessor.getSharedEntries());
+    }
+
+    @Test
+    void setupRepairsExistingGhostEntries() throws SQLException {
+        Connection connection = dbmsConnection.getConnection();
+
+        try (Statement statement = connection.createStatement()) {
+            // 1. Recreate the old, unconstrained column
+            statement.executeUpdate("ALTER TABLE jabref.entry DROP CONSTRAINT IF EXISTS entry_entrytype_not_blank");
+            statement.executeUpdate("ALTER TABLE jabref.entry ALTER COLUMN entrytype DROP NOT NULL");
+
+            // 2. Insert ghost rows (NULL and empty string) and attach fields
+            int ghost1Id;
+            int ghost2Id;
+
+            try (ResultSet rs = statement.executeQuery("INSERT INTO jabref.entry (entrytype) VALUES (NULL) RETURNING shared_id")) {
+                assertTrue(rs.next());
+                ghost1Id = rs.getInt(1);
+            }
+            try (ResultSet rs = statement.executeQuery("INSERT INTO jabref.entry (entrytype) VALUES ('') RETURNING shared_id")) {
+                assertTrue(rs.next());
+                ghost2Id = rs.getInt(1);
+            }
+
+            try (PreparedStatement fieldStmt = connection.prepareStatement(
+                    "INSERT INTO jabref.field (entry_shared_id, name, value) VALUES (?, ?, ?)")) {
+                fieldStmt.setInt(1, ghost1Id);
+                fieldStmt.setString(2, "title");
+                fieldStmt.setString(3, "Ghost 1");
+                fieldStmt.executeUpdate();
+
+                fieldStmt.setInt(1, ghost2Id);
+                fieldStmt.setString(2, "title");
+                fieldStmt.setString(3, "Ghost 2");
+                fieldStmt.executeUpdate();
+            }
+        }
+
+        // 3. Reconnect / re-run setup to repair existing entries and add the constraint back
+        dbmsProcessor.setupSharedDatabase();
+
+        // 4a. Assert entries were repaired to Misc and retained their titles
+        List<BibEntry> entries = dbmsProcessor.getSharedEntries();
+        assertEquals(2, entries.size());
+
+        BibEntry expectedGhost1 = new BibEntry(StandardEntryType.Misc).withField(StandardField.TITLE, "Ghost 1");
+        BibEntry expectedGhost2 = new BibEntry(StandardEntryType.Misc).withField(StandardField.TITLE, "Ghost 2");
+        assertEquals(List.of(expectedGhost1, expectedGhost2), entries);
+
+        // 4b. Assert inserting a blank type now fails due to the restored constraint
+        SQLException exception = assertThrows(SQLException.class, () -> {
+            try (PreparedStatement ps = connection.prepareStatement("INSERT INTO jabref.entry (entrytype) VALUES (?)")) {
+                ps.setString(1, "");
+                ps.executeUpdate();
+            }
+        });
+        assertEquals("23514", exception.getSQLState());
     }
 
     private static BibEntry getBibEntryExample() {
