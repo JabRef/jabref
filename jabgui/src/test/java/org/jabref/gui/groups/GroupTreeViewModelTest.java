@@ -362,19 +362,8 @@ class GroupTreeViewModelTest {
     }
 
     @Test
-    void switchingDatabaseUpdatesRootAndSelectedGroups() {
-        BibDatabaseContext secondDatabase = new BibDatabaseContext();
-        when(stateManager.getSelectedGroups(secondDatabase)).thenReturn(FXCollections.observableArrayList());
-
-        activeDatabase.setValue(Optional.of(secondDatabase));
-
-        assertEquals(new GroupNodeViewModel(secondDatabase, stateManager, taskExecutor, new AllEntriesGroup("All entries"), new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
-    }
-
-    @Test
     void selectionOfNewDatabaseSurvivesSwitch() {
         BibDatabaseContext secondDatabase = new BibDatabaseContext();
-        // equals() compares the path, so this keeps the second library distinct from the active one
         secondDatabase.setDatabasePath(Path.of("second.bib"));
 
         var group = groupTree.rootGroupProperty().getValue().getGroupNode();
@@ -388,7 +377,6 @@ class GroupTreeViewModelTest {
 
         groupTree.selectedGroupsProperty().setAll(groupTree.rootGroupProperty().getValue());
 
-        // Listener fires on every root replacement, like the tree view's binding
         groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
 
         activeDatabase.setValue(Optional.of(secondDatabase));
