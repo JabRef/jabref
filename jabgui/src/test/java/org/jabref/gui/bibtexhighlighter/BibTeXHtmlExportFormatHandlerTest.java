@@ -23,7 +23,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -66,8 +65,17 @@ class BibTeXHtmlExportFormatHandlerTest extends JavaFxTest {
             source.copy();
             Element pre = Jsoup.parse(clipboard.getHtml()).selectFirst("pre");
             assertEquals(SOURCE, pre.wholeText());
-            assertTrue(pre.attr("style").contains("monospace"));
+            assertEquals("font-family: 'Courier New', monospace;", pre.attr("style"));
             assertEquals(SOURCE, clipboard.getString());
+        });
+    }
+
+    @Test
+    void selectionStartingAtLineEndKeepsLeadingLineBreak() {
+        interact(() -> {
+            source.select(TextPos.ofLeading(0, 21), TextPos.ofLeading(1, 8));
+            source.copy();
+            assertEquals("\n  author", Jsoup.parse(clipboard.getHtml()).selectFirst("pre").wholeText());
         });
     }
 

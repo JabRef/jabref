@@ -3,9 +3,7 @@ package org.jabref.gui.bibtexhighlighter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javafx.scene.input.DataFormat;
 import javafx.scene.paint.Color;
@@ -15,11 +13,8 @@ import jfx.incubator.scene.control.richtext.TextPos;
 import jfx.incubator.scene.control.richtext.model.DataFormatHandler;
 import jfx.incubator.scene.control.richtext.model.StyleAttributeMap;
 import jfx.incubator.scene.control.richtext.model.StyledInput;
-import jfx.incubator.scene.control.richtext.model.StyledOutput;
-import jfx.incubator.scene.control.richtext.model.StyledSegment;
 import jfx.incubator.scene.control.richtext.model.StyledTextModel;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 /// Exports BibTeX source as RTF for rich-text applications such as Pages, Microsoft Word, and LibreOffice Writer.
 ///
@@ -55,11 +50,9 @@ public class BibTeXRtfExportFormatHandler extends DataFormatHandler {
 
     private static String export(StyledTextModel model, StyleResolver resolver, TextPos start, TextPos end) throws IOException {
         // The color table comes before the text, so collect the text first
-        List<Run> runs = new ArrayList<>();
-        model.export(start, end, new RunCollector(resolver, runs));
+        List<TextRun> runs = TextRun.collect(model, resolver, start, end);
         List<Color> colors = runs.stream()
-                                 .map(Run::color)
-                                 .filter(Objects::nonNull)
+                                 .flatMap(run -> run.color().stream())
                                  .distinct()
                                  .toList();
 
@@ -72,41 +65,19 @@ public class BibTeXRtfExportFormatHandler extends DataFormatHandler {
                .append(';');
         }
         rtf.append("}\n\\f0 ");
-        for (Run run : runs) {
+        for (TextRun run : runs) {
             appendRun(rtf, run, colors);
         }
         return rtf.append('}').toString();
     }
 
-    private static void appendRun(StringBuilder rtf, Run run, List<Color> colors) {
-        StringBuilder controls = new StringBuilder();
-        Color color = run.color();
-        if (color != null) {
+    private static void appendRun(StringBuilder rtf, TextRun run, List<Color> colors) {
+        run.color().ifPresentOrElse(color -> {
             // Index 0 of the color table is the default color
-            controls.append("\\cf").append(colors.indexOf(color) + 1);
-        }
-        StyleAttributeMap attributes = run.attributes();
-        if (attributes != null) {
-            if (attributes.isBold()) {
-                controls.append("\\b");
-            }
-            if (attributes.isItalic()) {
-                controls.append("\\i");
-            }
-            if (attributes.isUnderline()) {
-                controls.append("\\ul");
-            }
-            if (attributes.isStrikeThrough()) {
-                controls.append("\\strike");
-            }
-        }
-        if (controls.isEmpty()) {
+            rtf.append("{\\cf").append(colors.indexOf(color) + 1).append(' ');
             appendEscaped(rtf, run.text());
-            return;
-        }
-        rtf.append('{').append(controls).append(' ');
-        appendEscaped(rtf, run.text());
-        rtf.append('}');
+            rtf.append('}');
+        }, () -> appendEscaped(rtf, run.text()));
     }
 
     private static void appendEscaped(StringBuilder rtf, String text) {
@@ -134,36 +105,5 @@ public class BibTeXRtfExportFormatHandler extends DataFormatHandler {
 
     private static int toByte(double component) {
         return (int) Math.round(component * 255);
-    }
-
-    /// A piece of text with its style; a line break is a run of `"\n"`.
-    private record Run(String text, @Nullable StyleAttributeMap attributes) {
-        @Nullable Color color() {
-            return attributes == null ? null : attributes.getTextColor();
-        }
-    }
-
-    private record RunCollector(StyleResolver resolver, List<Run> runs) implements StyledOutput {
-
-        @Override
-        public void consume(StyledSegment segment) {
-            switch (segment.getType()) {
-                case TEXT ->
-                        runs.add(new Run(segment.getText(), segment.getStyleAttributeMap(resolver)));
-                case LINE_BREAK ->
-                        runs.add(new Run("\n", null));
-                default -> {
-                    // Code areas contain no images, paragraph attributes, or document properties
-                }
-            }
-        }
-
-        @Override
-        public void flush() {
-        }
-
-        @Override
-        public void close() {
-        }
     }
 }
