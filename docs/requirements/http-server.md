@@ -45,7 +45,7 @@ The HTTP server exposes `GET /libraries/{id}/entries/{citationKey}/files` return
 Only files of type PDF are returned; online links are skipped.
 An unknown citation key yields `404`.
 
-The files are served per entry (and not for the whole library at once), because in JabMap, PDF nodes are attached to the BibEntry node they belong to.
+The files are served per entry (and not for the whole library at once), because in [JabMap](https://github.com/JabRef/jabmap), PDF nodes are attached to the BibEntry node they belong to.
 
 Needs: impl, utest
 
