@@ -400,7 +400,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         }
 
         if (authors.isEmpty()) {
-            return findFullNameAuthors(input.substring(labelEnd));     
+            return findFullNameAuthors(input.substring(labelEnd));
         }
 
         String rest = input.substring(authorsEnd);
