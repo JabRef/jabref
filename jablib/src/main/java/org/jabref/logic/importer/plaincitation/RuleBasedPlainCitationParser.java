@@ -273,13 +273,12 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Only whitespace is collapsed here. [#fixSpaces] would insert spaces into a URL that is still in the text
     /// (`https://x.org` -> `https: //x. org`), so no URL could be found afterwards.
     private String removeDoi(String input) {
-        Matcher doiMatcher = Pattern.compile(Pattern.quote(doi), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)
-                                    .matcher(input);
         boolean found = false;
-        while (doiMatcher.find()) {
+        int index = indexOfIgnoreCase(input, doi, 0);
+        while (index != -1) {
             found = true;
-            String beforeDoi = input.substring(0, doiMatcher.start());
-            String afterDoi = input.substring(doiMatcher.end());
+            String beforeDoi = input.substring(0, index);
+            String afterDoi = input.substring(index + doi.length());
 
             // Checked first: a doi.org link also looks like the beginning of a URL
             Matcher prefixMatcher = DOI_PREFIX_AT_END_PATTERN.matcher(beforeDoi);
@@ -289,6 +288,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             if (!URL_BEFORE_DOI_PATTERN.matcher(beforeDoi).find()) {
                 return collapseWhitespace(beforeDoi + " " + afterDoi);
             }
+            index = indexOfIgnoreCase(input, doi, index + doi.length());
         }
         if (found) {
             // The DOI only occurs inside other URLs. They stay whole, and findUrls takes them.
@@ -296,6 +296,18 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         }
         // The DOI is written differently than its canonical form (for example percent-encoded)
         return collapseWhitespace(DOI.replaceInText(input, ""));
+    }
+
+    /// Finds `needle` in `text` ignoring case, starting at `fromIndex`. The result is an offset in `text` itself
+    /// (no lowercased copy is made, so offsets cannot shift). Returns -1 if there is no match.
+    private static int indexOfIgnoreCase(String text, String needle, int fromIndex) {
+        int lastStart = text.length() - needle.length();
+        for (int i = fromIndex; i <= lastStart; i++) {
+            if (text.regionMatches(true, i, needle, 0, needle.length())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private static String collapseWhitespace(String input) {
@@ -376,7 +388,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// (`Smith, J. and A. Doe`); `et al.` becomes `others`.
     private String findAuthors(String input) {
         // [impl->req~import.plain-citation.authors~1]
-        Matcher labelMatcher = REFERENCE_LABEL_PATTERN.matcher(input);          // new
+        Matcher labelMatcher = REFERENCE_LABEL_PATTERN.matcher(input);
         int labelEnd = labelMatcher.lookingAt() ? labelMatcher.end() : 0;
 
         Matcher lastNameFirstMatcher = LASTNAME_FIRST_AUTHOR_PATTERN.matcher(input);
