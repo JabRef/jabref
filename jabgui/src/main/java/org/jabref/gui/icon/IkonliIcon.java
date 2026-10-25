@@ -127,6 +127,7 @@ public final class IkonliIcon implements JabRefIcon {
     private FontIcon buildFontIcon(Ikon ikon) {
         // An explicit color (via withColor/disabled) has to survive the theme's .glyph-icon rules, which is what
         // JabRefFontIcon takes care of. Without one, those rules are what colors the icon.
+        // And @ThemeSizedFontIcon takes care of icon size
         boolean themeSized = size == DEFAULT_SIZE;
         FontIcon fontIcon;
         if (color != null) {

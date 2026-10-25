@@ -420,6 +420,12 @@ class ThemeManagerTest {
         assertEquals(14, applyCssAndGetIconSize(icon)); // 14px
     }
 
+    @Test
+    void defaultIconSizeMatchesIkonliDefault() {
+        // IkonliIcon.DEFAULT_SIZE = 8
+        assertEquals(8, new FontIcon().getIconSize(), "Default icon size of JabRef should match Ikonli default");
+    }
+
     private void assertIconSizeFollowsFontSize(FontIcon icon) {
         var workSpacePreferences = WorkspacePreferences.getDefault();
         workSpacePreferences.setShouldOverrideDefaultFontSize(true);
