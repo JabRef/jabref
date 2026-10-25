@@ -87,11 +87,6 @@ public class DoclingEngine implements OcrEngine {
     }
 
     private OcrResult embedText(Path jsonOutputPath, Path originalPdf) throws IOException {
-        // This is added to prevent infinite running until Docling fixes the exit code when the file format can't be OCRed.
-        if (!Files.exists(jsonOutputPath)) {
-            LOGGER.error("Docling output JSON file not found: {}", jsonOutputPath);
-            return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
-        }
         DoclingDocument doclingDocument = JSON_MAPPER.readValue(jsonOutputPath.toFile(), DoclingDocument.class);
 
         Map<Integer, ArrayList<DoclingText>> pageTextMap = new HashMap<>();
