@@ -50,7 +50,7 @@ class PdfMergeMetadataWarningsTest {
             ParserResult result = importer.importDatabase(tempDir.resolve("book.pdf"), document);
 
             assertEquals(List.of(), result.getDatabase().getEntries());
-            assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+            assertEquals(ambiguousBookWarnings(), result.warnings());
         }
     }
 
@@ -64,7 +64,7 @@ class PdfMergeMetadataWarningsTest {
             assertEquals(1, result.getDatabase().getEntries().size());
             assertEquals(Optional.of("Book title from PDF metadata"), result.getDatabase().getEntries().getFirst().getTitle());
             assertEquals(Optional.empty(), result.getDatabase().getEntries().getFirst().getField(StandardField.ISBN));
-            assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+            assertEquals(ambiguousBookWarnings(), result.warnings());
         }
     }
 
@@ -73,7 +73,7 @@ class PdfMergeMetadataWarningsTest {
         try (PDDocument ambiguousBook = createAmbiguousBook();
              PDDocument cleanDocument = new PDDocument()) {
             ParserResult ambiguousResult = importer.importDatabase(tempDir.resolve("ambiguous.pdf"), ambiguousBook);
-            assertEquals(List.of(Localization.lang("More than one ISBN found")), ambiguousResult.warnings());
+            assertEquals(ambiguousBookWarnings(), ambiguousResult.warnings());
 
             cleanDocument.addPage(new PDPage());
             ParserResult emptyResult = importer.importDatabase(tempDir.resolve("empty.pdf"), cleanDocument);
@@ -107,5 +107,10 @@ class PdfMergeMetadataWarningsTest {
         }
 
         return document;
+    }
+
+    private List<String> ambiguousBookWarnings() {
+        return List.of(Localization.lang("More than one ISBN found: Found %0. Not adding.",
+                "9780596520687, 9780134685991"));
     }
 }

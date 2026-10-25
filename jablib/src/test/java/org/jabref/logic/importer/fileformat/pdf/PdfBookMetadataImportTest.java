@@ -95,7 +95,8 @@ public class PdfBookMetadataImportTest {
         ParserResult result = importFixture("imprint-multiple-isbns.pdf");
 
         assertEquals(List.of(), result.getDatabase().getEntries());
-        assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+        assertEquals(List.of(Localization.lang("More than one ISBN found: Found %0. Not adding.",
+                "9780596520687, 9780134685991, 0596520689")), result.warnings());
     }
 
     @Test
