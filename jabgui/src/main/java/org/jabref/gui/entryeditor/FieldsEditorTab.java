@@ -16,6 +16,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -36,6 +37,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -143,7 +145,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
-            setRegularRowLayout(gridPane, fields.size());
+            setRegularRowLayout(gridPane, List.copyOf(fields));
         }
     }
 
@@ -166,14 +168,15 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         return new FieldNameLabel(field);
     }
 
-    static void setRegularRowLayout(GridPane gridPane, int rowCount) {
+    static void setRegularRowLayout(GridPane gridPane, List<Field> fields) {
         gridPane.getChildren().forEach(FieldsEditorTab::useComputedPreferredHeight);
-        List<RowConstraints> constraints = IntStream.range(0, rowCount)
-                .mapToObj(_ -> {
+        List<RowConstraints> constraints = IntStream.range(0, fields.size())
+                .mapToObj(row -> {
                     RowConstraints rowExpand = new RowConstraints();
-                    rowExpand.setVgrow(Priority.ALWAYS);
+                    boolean fileRow = fields.get(row) == StandardField.FILE;
+                    rowExpand.setVgrow(fileRow ? Priority.NEVER : Priority.ALWAYS);
                     rowExpand.setValignment(VPos.TOP);
-                    rowExpand.setMaxHeight(Double.MAX_VALUE);
+                    rowExpand.setMaxHeight(fileRow ? Region.USE_PREF_SIZE : Double.MAX_VALUE);
                     return rowExpand;
                 }).toList();
         gridPane.getRowConstraints().addAll(constraints);
@@ -182,10 +185,14 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     /// Percentage rows ignore child minimum heights. With natural rows, infinite preferred heights
     /// from field labels and text inputs must use their computed sizes so the grid can size each row.
     /// Labels keep their computed height so they align with controls at the top of tall rows.
+    /// Text inputs with a zero preferred height can still grow to fill those rows.
     private static void useComputedPreferredHeight(Node node) {
         if (node instanceof Region region && region.getPrefHeight() == Double.POSITIVE_INFINITY) {
             region.setPrefHeight(Region.USE_COMPUTED_SIZE);
             region.setMaxHeight(node instanceof FieldNameLabel ? Region.USE_PREF_SIZE : Double.MAX_VALUE);
+        }
+        if (node instanceof TextInputControl textInput) {
+            textInput.setMaxHeight(Double.MAX_VALUE);
         }
         if (node instanceof Parent parent) {
             parent.getChildrenUnmodifiable().forEach(FieldsEditorTab::useComputedPreferredHeight);
