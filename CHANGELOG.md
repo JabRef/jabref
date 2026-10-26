@@ -36,7 +36,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
 
 ### Fixed
-
+- Make the side panels scrollable when the application window has limited vertical space. [#17470](https://github.com/JabRef/jabref/issues/17470)
 - We fixed exports to RIS, CSV, HTML, and other template-based formats in native JabKit. [#17408](https://github.com/JabRef/jabref/issues/17408)
 - We fixed an issue where JabRef showed an "Executor has been shut down" error on Windows after resuming from suspend. [#17144](https://github.com/JabRef/jabref/pull/17144)
 - We fixed the BibTeX source dialog background in the Citation Relations tab for dark themes. [#13599](https://github.com/JabRef/jabref/issues/13599)
