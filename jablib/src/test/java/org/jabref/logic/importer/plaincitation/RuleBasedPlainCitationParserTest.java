@@ -393,6 +393,10 @@ class RuleBasedPlainCitationParserTest {
                 Arguments.of("Is AI safe?", "Journal of AI", "Smith, J. Is AI safe? Journal of AI, 2020."),
                 Arguments.of("Deep learning for AI", "Nature", "Smith, J. Deep learning for AI. Nature, 2020."),
                 Arguments.of("A title", "J. Comp. Sci.", "Smith, J. A title. J. Comp. Sci., 2020."),
+                Arguments.of("A title", "eLife", "Smith, J. A title. eLife, 2020."),
+                Arguments.of("A title", "eLife", "Smith, J. A title. 2020. eLife"),
+                Arguments.of("A study by J. de Vries", "eLife", "Smith, J. A study by J. de Vries. eLife, 2020."),
+                Arguments.of("A study by Dr. van Dijk", "eLife", "Smith, J. A study by Dr. van Dijk. eLife, 2020."),
                 Arguments.of("A journal of my travels", "Travel Review", "Smith, J. A journal of my travels. Travel Review, 2020."),
                 Arguments.of("Proceedings of the past", "History Review", "Smith, J. Proceedings of the past. History Review, 2020."));
     }
