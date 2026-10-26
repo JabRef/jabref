@@ -174,6 +174,6 @@ dependencies.constraints {
     api("tools.maran:svg-materialdesign:1.0.0")
     api("tools.maran:svgnode:2.0.1")
     // jfx-static-libs must match the JavaFX version above
-    api("us.hebi.graalvm:jfx-static-feature:1.0")
+    api("us.hebi.graalvm:jfx-static-feature:1.1.1")
     api("us.hebi.graalvm:jfx-static-libs:27-2")
 }
