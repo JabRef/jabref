@@ -609,8 +609,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             Path databasePath = file.get();
             // A custom library name replaces the file name as the tab label; the file itself is never renamed
             String displayName = bibDatabaseContext.getMetaData().getLibraryName()
-                                                    .filter(name -> !name.isBlank())
-                                                    .orElse(databasePath.getFileName().toString());
+                                                   .filter(name -> !name.isBlank())
+                                                   .orElse(databasePath.getFileName().toString());
             tabTitle.append(displayName);
             Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
             // Unicode codepoint deliberately chosen to avoid semantical confusion
