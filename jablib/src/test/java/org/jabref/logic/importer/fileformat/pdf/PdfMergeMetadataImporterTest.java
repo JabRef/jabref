@@ -157,8 +157,9 @@ class PdfMergeMetadataImporterTest {
 
         List<BibEntry> result = importer.importDatabase(file, database, preferences).getDatabase().getEntries();
 
+        // No author: the document properties of minimal.pdf name "1", which the cross-check against the
+        // document text discards as a non-author
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
-                .withField(StandardField.AUTHOR, "1 ")
                 .withField(StandardField.TITLE, "Hello World")
                 // Expecting relative path
                 .withField(StandardField.FILE, ":minimal.pdf:PDF");

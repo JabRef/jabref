@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added ISBN extraction from bibliographic pages in PDF books. [#12874](https://github.com/JabRef/jabref/issues/12874)
 - We added a dark appearance variant of the macOS application icon. [#17290](https://github.com/JabRef/jabref/issues/17290)
 - We added ARM64 Flatpak builds and nightly, beta, and stable channels. [#13349](https://github.com/JabRef/jabref/issues/13349)
 - We added ARM64 Flatpak builds, nightly, beta, and stable channels, and host editor integration. [#13349](https://github.com/JabRef/jabref/issues/13349)
@@ -33,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We moved the "Show diff" button to the Git commit dialog's button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
 - We changed the HTTP server to list linked PDF files per entry at `GET /libraries/{id}/entries/{citationKey}/files` instead of `entries/pdffiles`. [#17567](https://github.com/JabRef/jabref/pull/17567)
 - We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
+- We changed single-line entry fields to return focus to the editor when <kbd>Enter</kbd> is pressed. [#17445](https://github.com/JabRef/jabref/issues/17445)
 - We changed the welcome tab layout and put everything into a horizontal line. [#17015](https://github.com/JabRef/jabref/issues/17015)
 
 ### Fixed
@@ -72,6 +74,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 - We fixed an issue where JabRef asked to store a library's custom entry types at every start. [#9930](https://github.com/JabRef/jabref/issues/9930)
 - We fixed an issue where the AI chat tab still said "Unable to chat" after attaching a file. [#17157](https://github.com/JabRef/jabref/pull/17157)
+- We fixed an issue where importing a PDF could set the exporter's account name as author. [#16247](https://github.com/JabRef/jabref/pull/16247)
+- We fixed an issue where importing a PDF could set an implausible year, such as a postal code. [#16247](https://github.com/JabRef/jabref/pull/16247)
+- We fixed an issue where importing a PDF with Grobid enabled merged the works cited in the PDF into the new entry. [#16247](https://github.com/JabRef/jabref/pull/16247)
 - We fixed an issue where the AI summary tab was blank for entries with only remote files. [#17203](https://github.com/JabRef/jabref/issues/17203)
 - We fixed an issue where legacy group memberships, markings, and special fields were no longer migrated when opening a library. [#17019](https://github.com/JabRef/jabref/pull/17019)
 - We fixed an issue where saving an SLR study overwrote different per-query native queries. [#17307](https://github.com/JabRef/jabref/pull/17307)
