@@ -165,7 +165,8 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         );
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
-                .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
+                .withTooltipText(linkedFile -> linkedFile.linkProperty().flatMap(_ ->
+                        linkedFile.descriptionProperty().map(_ -> linkedFile.getDescriptionAndLink())))
                 .withPseudoClass(PseudoClass.getPseudoClass("auto-found"), LinkedFileViewModel::isAutomaticallyFoundProperty)
                 .withGraphic(this::createFileDisplay)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
