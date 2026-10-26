@@ -63,7 +63,7 @@ Consequences of getting these visual coordinates and using them to order the cit
 
 ## JabRef
 
-Jabref uses the following steps for sorting citation markers (providing `globalOrder`):
+JabRef uses the following steps for sorting citation markers (providing `globalOrder`):
 
 1. the textranges of citation marks in footnotes are replaced by the textranges of the footnote marks.
 2. get the positions (coordinates) of these marks
