@@ -61,10 +61,9 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final Pattern YEAR_PATTERN = Pattern.compile(
             "(?<!\\d)(?<" + YEAR_GROUP + ">\\d{4})(?:\\s*[-‐‑‒–—]\\s*\\d{4})?(?!\\d)");
 
-    /// A year in parentheses, optionally with a disambiguation letter: `(1991a)`. This is the APA style and the
-    /// most reliable place for the publication year.
+    /// An APA publication date before the title, optionally with a disambiguation letter: `(1991a).`.
     private static final Pattern YEAR_IN_PARENTHESES_CANDIDATE_PATTERN = Pattern.compile(
-            "\\(\\s*(?<" + YEAR_GROUP + ">\\d{4})\\s*[a-z]?\\s*\\)");
+            "^\\s*(?:" + Pattern.quote(AUTHOR_TAG) + "\\s*)?\\(\\s*(?<" + YEAR_GROUP + ">\\d{4})\\s*[a-z]?\\s*\\)(?=\\s*\\.)");
 
     /// `p.`, `pp.` or `pages` at the end of a text: the number behind it is a page, not a year.
     private static final Pattern PAGES_PREFIX_AT_END_PATTERN = Pattern.compile(
@@ -81,7 +80,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     /// Punctuation and year tokens in front of the title (for example the `. ` in `(1993). Title`).
     private static final Pattern LEADING_NOISE_PATTERN = Pattern.compile(
-            "^(?:[\\s.,;:&()\\-]|" + Pattern.quote(YEAR_TAG) + ")+");
+            "^(?:[\\s.,;:&\\-]|" + Pattern.quote(YEAR_TAG) + ")+");
 
     private static final String NAME_PARTICLE_REGEX = "(?:de|der|den|van|von|di|da|del|dos|du|la|le|ten|ter)";
 
@@ -158,11 +157,16 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             "\\b(?:pages?|pp?)\\.?\\s*(?<" + PAGE_GROUP + ">\\d+)",
             Pattern.CASE_INSENSITIVE);
 
-    /// End of a sentence: a period (or `?`/`!`) after a word of at least three letters or digits (`... of 2020.`)
+    private static final String SENTENCE_END_REGEX =
+            "(?<=[\\p{L}\\d]{3}\\)?|(?<![\\p{L}\\d])\\p{Lu}{2})[.?!]\\s+";
+
+    private static final Pattern SENTENCE_END_PATTERN = Pattern.compile(SENTENCE_END_REGEX);
+
+    /// End of a sentence: a period (or `?`/`!`) after a word of at least three letters or digits (`... of 2020).`)
     /// or after an acronym of two capitals (`... for AI.`), followed by a letter, optionally after the
     /// extracted year and its punctuation. Single letters (initials, `U.S.`) do not end the title.
     private static final Pattern TITLE_END_PATTERN = Pattern.compile(
-            "(?<=[\\p{L}\\d]{3}|(?<![\\p{L}\\d])\\p{Lu}{2})[.?!]\\s+(?:" + Pattern.quote(YEAR_TAG) + "[\\s.,;:]*)?(?=\\p{L})");
+            SENTENCE_END_REGEX + "(?:" + Pattern.quote(YEAR_TAG) + "[\\s.,;:]*)?(?=\\p{L})");
 
     private static final Pattern QUOTED_TITLE_PATTERN = Pattern.compile("^[\"“](?<" + TITLE_GROUP + ">[^\"”]+)[\"”]");
 
@@ -346,10 +350,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         return text.chars().filter(c -> c == character).count();
     }
 
-    /// Finds the publication year. A year in parentheses (`(1993)`, `(1991a)`) is preferred. Otherwise, the last
+    /// Finds the publication year. A leading APA date (`(1993).`, `(1991a).`) is preferred. Otherwise, the last
     /// valid year wins, because the publication year usually stands behind the title, which may mention a year, too.
     /// A year range (`2019–2021`) counts as its first year, and a number behind `p.`/`pp.` is a page, not a year.
-    /// A range behind an already found year (`2020, 1725-1730`) is a page range and is left for [#findPages].
+    /// A range behind a publication year (`2020, 1725-1730`) is left for [#findPages]; a title year does not take precedence.
     ///
     /// Only the chosen occurrence is replaced by [#YEAR_TAG], so other occurrences (in the title) stay untouched.
     private String findYear(String input) {
@@ -366,6 +370,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
         int start = -1;
         int end = -1;
+        int titleEnd = findTitleEnd(input);
         Matcher matcher = YEAR_PATTERN.matcher(input);
         while (matcher.find()) {
             if (!isValidYear(matcher.group(YEAR_GROUP))
@@ -373,7 +378,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
                 continue;
             }
             boolean isRange = matcher.end(YEAR_GROUP) < matcher.end();
-            if (isRange && (start != -1)) {
+            if (isRange && (start != -1) && ((start >= titleEnd) || (titleEnd == input.length()))) {
                 continue;
             }
             year = matcher.group(YEAR_GROUP);
@@ -389,6 +394,29 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static boolean isValidYear(String candidate) {
         int value = Integer.parseInt(candidate);
         return (value > 1700) && (value <= Year.now().getValue());
+    }
+
+    private static int findTitleEnd(String input) {
+        String afterAuthors = (input.startsWith(AUTHOR_TAG) ? input.substring(AUTHOR_TAG.length()) : input).stripLeading();
+        Matcher dateMatcher = YEAR_IN_PARENTHESES_PATTERN.matcher(afterAuthors);
+        if (dateMatcher.lookingAt()) {
+            afterAuthors = afterAuthors.substring(dateMatcher.end());
+        }
+        afterAuthors = LEADING_NOISE_PATTERN.matcher(afterAuthors).replaceFirst("");
+        Matcher quotedTitleMatcher = QUOTED_TITLE_PATTERN.matcher(afterAuthors);
+        if (quotedTitleMatcher.find()) {
+            return input.length() - afterAuthors.length() + quotedTitleMatcher.end();
+        }
+        int delimiterIndex = input.lastIndexOf("//");
+        if (delimiterIndex != -1) {
+            return delimiterIndex;
+        }
+        Matcher sentenceEndMatcher = SENTENCE_END_PATTERN.matcher(input);
+        if (sentenceEndMatcher.find()) {
+            return sentenceEndMatcher.start();
+        }
+        int commaIndex = input.indexOf(',');
+        return commaIndex == -1 ? input.length() : commaIndex;
     }
 
     /// Replaces the authors block at the beginning of `input` by [#AUTHOR_TAG]. Both name orders may be mixed
@@ -490,9 +518,14 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         int start = -1;
         int end = -1;
         String foundPages = "";
+        int titleEnd = findTitleEnd(input);
 
         Matcher rangeMatcher = PAGES_RANGE_PATTERN.matcher(input);
         while (rangeMatcher.find()) {
+            if ((rangeMatcher.start() < titleEnd) && (titleEnd < input.length())
+                    && !PAGES_PREFIX_AT_END_PATTERN.matcher(input.substring(rangeMatcher.start(), rangeMatcher.start(FROM_GROUP))).find()) {
+                continue;
+            }
             start = rangeMatcher.start();
             end = rangeMatcher.end();
             foundPages = rangeMatcher.group(FROM_GROUP) + "--" + rangeMatcher.group(TO_GROUP);

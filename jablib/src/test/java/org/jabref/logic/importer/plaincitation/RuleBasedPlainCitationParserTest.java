@@ -371,9 +371,34 @@ class RuleBasedPlainCitationParserTest {
     }
 
     /// In APA style the year comes first, in parentheses; a later year in the title must not replace it.
-    @Test
-    void findsYearInParenthesesBeforeTitle() throws FetcherException {
-        assertEquals(Optional.of("2021"), parseField("Smith, J. (2021). Lessons from 2019. Journal, 12, 45-60.", StandardField.YEAR));
+    @ParameterizedTest
+    @ValueSource(strings = {"Smith, J. (2021). Lessons from 2019. Journal, 12, 45-60.",
+            "Smith, J. (2021a). Lessons from 2019. Journal, 12, 45-60.",
+            "(2021a). Lessons from 2019. Journal, 12, 45-60."})
+    void findsYearInParenthesesBeforeTitle(String citation) throws FetcherException {
+        assertEquals(Optional.of("2021"), parseField(citation, StandardField.YEAR));
+    }
+
+    static Stream<Arguments> publicationYearTakesPrecedenceOverTitleYear() {
+        return Stream.of(
+                Arguments.of("Lessons from (2019) revisited", "2021", "Smith, J. Lessons from (2019) revisited. Journal, 2021."),
+                Arguments.of("Lessons from (2019)", "2021", "Smith, J. Lessons from (2019). Journal, 2021."),
+                Arguments.of("(2019) in review", "2021", "Smith, J. (2019) in review. Journal, 2021."),
+                Arguments.of("Lessons from 2018", "2019", "Smith, J. Lessons from 2018. Journal, 2019–2021."),
+                Arguments.of("Lessons from (2018)", "2019", "Smith, J. Lessons from (2018). Journal, 2019–2021."),
+                Arguments.of("Lessons from 2018–2019", "2021", "Smith, J. Lessons from 2018–2019. Journal, 2021."),
+                Arguments.of("Lessons from (2019)", "2021", "Smith, J. \"Lessons from (2019)\" Journal, 2021."),
+                Arguments.of("Part one. Lessons from 2018–2019", "2021", "Smith, J. (2021). \"Part one. Lessons from 2018–2019\" Journal."));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void publicationYearTakesPrecedenceOverTitleYear(String expectedTitle, String expectedYear, String citation) throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation(citation);
+        assertEquals(List.of(Optional.of(expectedTitle), Optional.of(expectedYear), Optional.empty()),
+                List.of(entry.flatMap(e -> e.getField(StandardField.TITLE)),
+                        entry.flatMap(e -> e.getField(StandardField.YEAR)),
+                        entry.flatMap(e -> e.getField(StandardField.PAGES))));
     }
 
     /// A future year in the title is out of range, so the publication year after it is used.
@@ -509,6 +534,19 @@ class RuleBasedPlainCitationParserTest {
     void unmarkedPageRangeAfterYearIsNotTakenAsYear() throws FetcherException {
         Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. A title. Journal, 2020, 1725-1730.");
         assertEquals(List.of(Optional.of("2020"), Optional.of("1725--1730")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.YEAR)),
+                        entry.flatMap(e -> e.getField(StandardField.PAGES))));
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {"2020|1725--1730|Smith, J. Lessons from 2018. Journal, 2020, 1725-1730.",
+            "2020|1998--2005|Smith, J. Lessons from (2018). Journal, 2020, pp. 1998-2005.",
+            "2020|1725--1730|Smith, J. (2020). Lessons from 2018. Journal, 1725-1730.",
+            "2019|1725--1730|Smith, J. Lessons from 2018. Journal, 2019–2021, 1725-1730.",
+            "2019|1725--1730|Smith, J. Lessons from 2018. Journal, pp. 1725-1730, 2019–2021."})
+    void titleYearDoesNotDisplacePublicationYearBeforePages(String expectedYear, String expectedPages, String citation) throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation(citation);
+        assertEquals(List.of(Optional.of(expectedYear), Optional.of(expectedPages)),
                 List.of(entry.flatMap(e -> e.getField(StandardField.YEAR)),
                         entry.flatMap(e -> e.getField(StandardField.PAGES))));
     }
