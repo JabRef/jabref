@@ -31,6 +31,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String INITIALS_GROUP = "INITIALS";
     private static final String LASTNAME_GROUP = "LASTNAME";
     private static final String PAGE_GROUP = "PAGE";
+    private static final String SUFFIX_GROUP = "SUFFIX";
     private static final String TITLE_GROUP = "TITLE";
     private static final String TO_GROUP = "TO";
     private static final String YEAR_GROUP = "YEAR";
@@ -84,6 +85,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     private static final String NAME_PARTICLE_REGEX = "(?:de|der|den|van|von|di|da|del|dos|du|la|le|ten|ter)";
 
+    private static final String NAME_SUFFIX_REGEX = "(?:Jr|Sr|II|III|IV)";
+
     /// A capitalized word of a name, with hyphens or apostrophes (`Garcia-Molina`, `O'Brien`).
     /// Unicode aware, in contrast to `\w`.
     private static final String NAME_WORD_REGEX = "\\p{Lu}[\\p{L}'’\\-]+";
@@ -121,7 +124,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// the same. Thus, it is only used if neither of the patterns above found an author and a separate title
     /// boundary follows the authors block.
     private static final String FULL_NAME_REGEX =
-            NAME_WORD_REGEX + "(?:\\s+(?:\\p{Lu}\\.|" + NAME_PARTICLE_REGEX + "|" + NAME_WORD_REGEX + ")){1,3}?";
+            NAME_WORD_REGEX + "(?:\\s+(?:\\p{Lu}\\.|" + NAME_PARTICLE_REGEX + "|" + NAME_WORD_REGEX + ")){1,3}?" +
+                    "(?:\\s+" + NAME_SUFFIX_REGEX + "\\.?)?";
 
     private static final String FULL_NAME_SEPARATOR_REGEX = "(?:\\s*(?:,|&|\\band\\b))+\\s*";
 
@@ -134,7 +138,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     /// Splits one full name into first name(s) and family name. The first name is as short as possible.
     private static final Pattern FULL_NAME_PATTERN = Pattern.compile(
-            "^(?<" + FIRSTNAME_GROUP + ">.+?)\\s+" + LASTNAME_REGEX + "$");
+            "^(?<" + FIRSTNAME_GROUP + ">.+?)\\s+" + LASTNAME_REGEX +
+                    "(?:\\s+(?<" + SUFFIX_GROUP + ">" + NAME_SUFFIX_REGEX + ")\\.?)?$");
 
     /// Initials without periods (`Smith JK.`) look like a family name in capitals
     private static final Pattern INITIALS_WITHOUT_PERIODS_PATTERN = Pattern.compile("\\p{Lu}{1,3}");
@@ -448,8 +453,15 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
                     || INITIALS_WITHOUT_PERIODS_PATTERN.matcher(nameMatcher.group(LASTNAME_GROUP)).matches()) {
                 return input;
             }
-            fullNameAuthors.add(collapseWhitespace(nameMatcher.group(LASTNAME_GROUP))
-                    + ", " + collapseWhitespace(nameMatcher.group(FIRSTNAME_GROUP)));
+            String familyName = collapseWhitespace(nameMatcher.group(LASTNAME_GROUP));
+            if (nameMatcher.start(SUFFIX_GROUP) >= 0) {
+                String suffix = nameMatcher.group(SUFFIX_GROUP);
+                familyName += ", " + switch (suffix) {
+                    case "Jr", "Sr" -> suffix + ".";
+                    default -> suffix;
+                };
+            }
+            fullNameAuthors.add(familyName + ", " + collapseWhitespace(nameMatcher.group(FIRSTNAME_GROUP)));
         }
 
         if (blockMatcher.start(ET_AL_GROUP) >= 0) {

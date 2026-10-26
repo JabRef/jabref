@@ -249,6 +249,27 @@ class RuleBasedPlainCitationParserTest {
         assertEquals(Optional.of("Smith, John"), parseField("John Smith. A title. Journal, 2020.", StandardField.AUTHOR));
     }
 
+    static Stream<Arguments> keepsSuffixWithFullNameAuthor() {
+        return Stream.of(
+                Arguments.of("Smith, Jr., John", "John Smith Jr."),
+                Arguments.of("Smith, Sr., John", "John Smith Sr."),
+                Arguments.of("Smith, II, John", "John Smith II."),
+                Arguments.of("Smith, III, John", "John Smith III."),
+                Arguments.of("Smith, IV, John", "John Smith IV."),
+                Arguments.of("van Beethoven, Jr., Ludwig", "Ludwig van Beethoven Jr."),
+                Arguments.of("Smith, Jr., John and Tan, Mary", "John Smith Jr. and Mary Tan."),
+                Arguments.of("Smith, Jr., John and others", "John Smith Jr. et al."));
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void keepsSuffixWithFullNameAuthor(String expectedAuthor, String authorBlock) throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation(authorBlock + " A title. Journal, 2020.");
+        assertEquals(List.of(Optional.of(expectedAuthor), Optional.of("A title")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.AUTHOR)),
+                        entry.flatMap(e -> e.getField(StandardField.TITLE))));
+    }
+
     @Test
     void capitalizedTitleIsNotTakenAsFullNameAuthor() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
