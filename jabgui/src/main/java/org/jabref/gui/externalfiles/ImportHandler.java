@@ -29,6 +29,7 @@ import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
 import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
@@ -42,6 +43,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.undo.UndoManager;
@@ -339,6 +341,7 @@ public class ImportHandler {
     ///
     /// Actions include generating a citation key if configured
     public void importEntries(List<BibEntry> entries) {
+        applyJournalAbbreviation(entries);
         ImportCleanup cleanup = ImportCleanup.targeting(targetBibDatabaseContext.getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(entries);
         importCleanedEntries(null, entries);
@@ -458,8 +461,20 @@ public class ImportHandler {
         return entry;
     }
 
+    private void applyJournalAbbreviation(List<BibEntry> entries) {
+        JournalAbbreviationRepository repository =
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+
+        AbbreviateCleanupFactory.abbreviateCleanup(
+                targetBibDatabaseContext.getDatabase(),
+                repository,
+                preferences.getAbbreviationPreferences()
+        ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
+    }
+
     @VisibleForTesting
     BibEntry cleanUpEntry(BibEntry entry) {
+        applyJournalAbbreviation(List.of(entry));
         ImportCleanup cleanup = ImportCleanup.targeting(targetBibDatabaseContext.getMode(), preferences.getFieldPreferences());
         return cleanup.doPostCleanup(entry);
     }

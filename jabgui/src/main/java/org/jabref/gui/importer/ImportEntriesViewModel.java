@@ -26,6 +26,7 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
@@ -33,6 +34,7 @@ import org.jabref.logic.groups.GroupsHelper;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.undo.UndoManager;
@@ -44,6 +46,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,8 +110,10 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         task.onSuccess(parserResult -> {
             // store the complete parser result (to import groups, ... later on)
             this.parserResult = parserResult;
+            List<BibEntry> fetchedEntries = parserResult.getDatabase().getEntries();
+            applyJournalAbbreviation(fetchedEntries);
             // fill in the list for the user, where one can select the entries to import
-            entries.addAll(parserResult.getDatabase().getEntries());
+            entries.addAll(fetchedEntries);
             loadEntries(entries);
             updatePagedEntries();
             updateTotalPages();
@@ -181,6 +186,17 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             return entry.getParsedSerialization();
         }
         return writer.toString();
+    }
+
+    private void applyJournalAbbreviation(List<BibEntry> entries) {
+        JournalAbbreviationRepository repository =
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+
+        AbbreviateCleanupFactory.abbreviateCleanup(
+                databaseContext.getDatabase(),
+                repository,
+                preferences.getAbbreviationPreferences()
+        ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
     }
 
     /// Called after the user selected the entries to import. Does the real import stuff.
@@ -302,6 +318,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                     })
                     .onSuccess(newEntries -> {
                         if (newEntries != null && !newEntries.isEmpty()) {
+                            applyJournalAbbreviation(newEntries);
                             allEntries.addAll(newEntries);
                             updateTotalPages();
                             goToNextPage();
