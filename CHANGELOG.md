@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the native macOS text-editing shortcuts (Control+A, E, F, B, P, N, O, T) as default key bindings in text fields and the BibTeX source editor. [#16529](https://github.com/JabRef/jabref/issues/16529)
 - We added a dark appearance variant of the macOS application icon. [#17290](https://github.com/JabRef/jabref/issues/17290)
 - We added ARM64 Flatpak builds and nightly, beta, and stable channels. [#13349](https://github.com/JabRef/jabref/issues/13349)
 - We added ARM64 Flatpak builds, nightly, beta, and stable channels, and host editor integration. [#13349](https://github.com/JabRef/jabref/issues/13349)

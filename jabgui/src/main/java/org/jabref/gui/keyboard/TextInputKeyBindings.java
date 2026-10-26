@@ -1,7 +1,10 @@
 package org.jabref.gui.keyboard;
 
 import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.control.skin.TextAreaSkin;
+import javafx.scene.control.skin.TextInputControlSkin;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.logic.util.strings.StringManipulator;
@@ -34,17 +37,34 @@ public class TextInputKeyBindings {
                         focusedTextField.nextWord();
                         event.consume();
                     }
-                    case EDITOR_BEGINNING,
-                         EDITOR_UP,
-                         EDITOR_BEGINNING_DOC -> {
+                    case EDITOR_BEGINNING -> {
+                        moveCaretByLine(focusedTextField, TextInputControlSkin.Direction.BEGINNING);
+                        event.consume();
+                    }
+                    case EDITOR_UP -> {
+                        moveCaretByLine(focusedTextField, TextInputControlSkin.Direction.UP);
+                        event.consume();
+                    }
+                    case EDITOR_BEGINNING_DOC -> {
                         focusedTextField.home();
                         event.consume();
                     }
-                    case EDITOR_END,
-                         EDITOR_DOWN,
-                         EDITOR_END_DOC -> {
+                    case EDITOR_END -> {
+                        moveCaretByLine(focusedTextField, TextInputControlSkin.Direction.END);
+                        event.consume();
+                    }
+                    case EDITOR_DOWN -> {
+                        moveCaretByLine(focusedTextField, TextInputControlSkin.Direction.DOWN);
+                        event.consume();
+                    }
+                    case EDITOR_END_DOC -> {
                         focusedTextField.end();
                         event.consume();
+                    }
+                    case EDITOR_INSERT_LINE_AFTER -> {
+                        if (insertLineAfterCaret(focusedTextField)) {
+                            event.consume();
+                        }
                     }
                     case EDITOR_TRANSPOSE_CHARACTERS -> {
                         if (focusedTextField.getSelection().getLength() == 0) {
@@ -104,6 +124,37 @@ public class TextInputKeyBindings {
         }
     }
 
+    /// Moves the caret by one visual line (UP, DOWN) or to the start/end of the current visual line (BEGINNING, END)
+    /// in a multi-line [TextArea], using the public line navigation of its skin.
+    /// Single-line inputs fall back to the start or end of the text, which is the same position for a single line.
+    static void moveCaretByLine(TextInputControl textInput, TextInputControlSkin.Direction direction) {
+        if (textInput instanceof TextArea && textInput.getSkin() instanceof TextAreaSkin skin) {
+            skin.moveCaret(TextInputControlSkin.TextUnit.LINE, direction, false);
+            return;
+        }
+        if (direction == TextInputControlSkin.Direction.UP || direction == TextInputControlSkin.Direction.BEGINNING) {
+            textInput.home();
+        } else if (direction == TextInputControlSkin.Direction.DOWN || direction == TextInputControlSkin.Direction.END) {
+            textInput.end();
+        } else {
+            throw new IllegalArgumentException("Unsupported direction: " + direction);
+        }
+    }
+
+    /// macOS Ctrl+O: inserts a line break at the caret without moving the caret.
+    /// Only editable text areas are supported, because single-line fields cannot contain line breaks.
+    ///
+    /// @return true if a line break was inserted
+    static boolean insertLineAfterCaret(TextInputControl textInput) {
+        if (!(textInput instanceof TextArea) || !textInput.isEditable()) {
+            return false;
+        }
+        int caret = textInput.getCaretPosition();
+        textInput.insertText(caret, "\n");
+        textInput.positionCaret(caret);
+        return true;
+    }
+
     static void transposeCharacters(TextInputControl textInput) {
         String text = textInput.getText();
         int caret = textInput.getCaretPosition();
@@ -115,7 +166,7 @@ public class TextInputKeyBindings {
         int nextCharacterEnd = text.offsetByCodePoints(caret, 1);
         String replacement = text.substring(caret, nextCharacterEnd) + text.substring(previousCharacterStart, caret);
         textInput.replaceText(previousCharacterStart, nextCharacterEnd, replacement);
-        textInput.positionCaret(previousCharacterStart + nextCharacterEnd - caret);
+        textInput.positionCaret(nextCharacterEnd);
     }
 
 }

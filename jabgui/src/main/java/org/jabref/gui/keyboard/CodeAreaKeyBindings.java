@@ -46,7 +46,7 @@ public class CodeAreaKeyBindings {
                     event.consume();
                 }
                 case EDITOR_UP -> {
-                    codeArea.moveParagraphStart();
+                    codeArea.moveUp();
                     event.consume();
                 }
                 case EDITOR_BEGINNING -> {
@@ -58,7 +58,7 @@ public class CodeAreaKeyBindings {
                     event.consume();
                 }
                 case EDITOR_DOWN -> {
-                    codeArea.moveParagraphEnd();
+                    codeArea.moveDown();
                     event.consume();
                 }
                 case EDITOR_END -> {
@@ -113,6 +113,11 @@ public class CodeAreaKeyBindings {
                     codeArea.select(offsetToTextPos(codeArea, res.caretPosition));
                     event.consume();
                 }
+                // EDITOR_CENTER_CARET (Ctrl+L) is not handled: the incubator CodeArea has no public API to scroll or center the viewport
+                case EDITOR_INSERT_LINE_AFTER -> {
+                    insertLineAfterCaret(codeArea);
+                    event.consume();
+                }
                 case EDITOR_TRANSPOSE_CHARACTERS -> {
                     if (!codeArea.hasNonEmptySelection()) {
                         transposeCharacters(codeArea);
@@ -121,6 +126,17 @@ public class CodeAreaKeyBindings {
                 }
             }
         });
+    }
+
+    /// macOS Ctrl+O: inserts a line break at the caret without moving the caret,
+    /// so the caret stays at the end of the first part of the split line.
+    static void insertLineAfterCaret(CodeArea codeArea) {
+        TextPos caret = codeArea.getCaretPosition();
+        if (caret == null || !codeArea.isEditable()) {
+            return;
+        }
+        codeArea.replaceText(caret, caret, "\n");
+        codeArea.select(caret);
     }
 
     static void transposeCharacters(CodeArea codeArea) {
@@ -137,7 +153,7 @@ public class CodeAreaKeyBindings {
                 offsetToTextPos(codeArea, previousCharacterStart),
                 offsetToTextPos(codeArea, nextCharacterEnd),
                 replacement);
-        codeArea.select(offsetToTextPos(codeArea, previousCharacterStart + nextCharacterEnd - caret));
+        codeArea.select(offsetToTextPos(codeArea, nextCharacterEnd));
     }
 
     private static void handleMacCursorMovementShortcuts(CodeArea codeArea, KeyEvent event) {

@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(JavaFxExtension.class)
 @NullMarked
-// [utest->req~macos.text-editing-shortcuts~1]
+        // [utest->req~macos.text-editing-shortcuts~1]
 class CodeAreaKeyBindingsTest {
 
     @Test
@@ -226,5 +226,92 @@ class CodeAreaKeyBindingsTest {
 
         verifyNoInteractions(codeArea);
         assertFalse(event.isConsumed());
+    }
+
+    @Test
+    void ctrlPMovesCaretUpOneLine() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyBindingRepository repository = new KeyBindingRepository();
+        repository.put(KeyBinding.EDITOR_UP, "ctrl+P");
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.P, false, true, false, false);
+
+        CodeAreaKeyBindings.call(codeArea, event, repository);
+
+        verify(codeArea).moveUp();
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void ctrlNMovesCaretDownOneLine() {
+        CodeArea codeArea = mock(CodeArea.class);
+        KeyBindingRepository repository = new KeyBindingRepository();
+        repository.put(KeyBinding.EDITOR_DOWN, "ctrl+N");
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.N, false, true, false, false);
+
+        CodeAreaKeyBindings.call(codeArea, event, repository);
+
+        verify(codeArea).moveDown();
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void insertLineAfterCaretSplitsLineAndKeepsCaret() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("  title = {Hello}");
+        codeArea.select(TextPos.ofLeading(0, 8));
+
+        CodeAreaKeyBindings.insertLineAfterCaret(codeArea);
+
+        assertEquals(2, codeArea.getParagraphCount());
+        assertEquals("  title ", codeArea.getPlainText(0));
+        assertEquals("= {Hello}", codeArea.getPlainText(1));
+        assertEquals(0, codeArea.getCaretPosition().index());
+        assertEquals(8, codeArea.getCaretPosition().offset());
+    }
+
+    @Test
+    void insertLineAfterCaretAtEndOfLineKeepsCaretOnSameLine() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("abc");
+        codeArea.select(TextPos.ofLeading(0, 3));
+
+        CodeAreaKeyBindings.insertLineAfterCaret(codeArea);
+
+        assertEquals(2, codeArea.getParagraphCount());
+        assertEquals("abc", codeArea.getPlainText(0));
+        assertEquals("", codeArea.getPlainText(1));
+        assertEquals(0, codeArea.getCaretPosition().index());
+        assertEquals(3, codeArea.getCaretPosition().offset());
+    }
+
+    @Test
+    void insertLineAfterCaretDoesNothingWhenNotEditable() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("abc");
+        codeArea.select(TextPos.ofLeading(0, 1));
+        codeArea.setEditable(false);
+
+        CodeAreaKeyBindings.insertLineAfterCaret(codeArea);
+
+        assertEquals(1, codeArea.getParagraphCount());
+        assertEquals("abc", codeArea.getPlainText(0));
+    }
+
+    @Test
+    void ctrlOInsertsLineAfterCaret() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("abcdef");
+        codeArea.select(TextPos.ofLeading(0, 3));
+        KeyBindingRepository repository = new KeyBindingRepository();
+        repository.put(KeyBinding.EDITOR_INSERT_LINE_AFTER, "ctrl+O");
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.O, false, true, false, false);
+
+        CodeAreaKeyBindings.call(codeArea, event, repository);
+
+        assertTrue(event.isConsumed());
+        assertEquals("abc", codeArea.getPlainText(0));
+        assertEquals("def", codeArea.getPlainText(1));
+        assertEquals(0, codeArea.getCaretPosition().index());
+        assertEquals(3, codeArea.getCaretPosition().offset());
     }
 }
