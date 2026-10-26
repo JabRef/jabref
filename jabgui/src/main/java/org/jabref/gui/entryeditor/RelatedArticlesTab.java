@@ -72,12 +72,18 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private void applyJournalAbbreviation(List<BibEntry> entries, BibDatabaseContext databaseContext) {
         JournalAbbreviationRepository repository =
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
-
-        AbbreviateCleanupFactory.abbreviateCleanup(
-                databaseContext.getDatabase(),
-                repository,
-                preferences.getAbbreviationPreferences()
-        ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
+        if (databaseContext == null) {
+            AbbreviateCleanupFactory.abbreviateCleanup(
+                    repository,
+                    preferences.getAbbreviationPreferences()
+            ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
+        } else {
+            AbbreviateCleanupFactory.abbreviateCleanup(
+                    databaseContext.getDatabase(),
+                    repository,
+                    preferences.getAbbreviationPreferences()
+            ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
+        }
     }
 
     /// Gets a StackPane of related article information to be displayed in the Related Articles tab
@@ -106,8 +112,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
                 .onSuccess(relatedArticles -> {
-                    databaseContext.ifPresent(context ->
-                            applyJournalAbbreviation(relatedArticles, context));
+                    applyJournalAbbreviation(relatedArticles, databaseContext.orElse(null));
                     ImportCleanup cleanup = ImportCleanup.targeting(mode, preferences.getFieldPreferences());
                     cleanup.doPostCleanup(relatedArticles);
                     progress.setVisible(false);
