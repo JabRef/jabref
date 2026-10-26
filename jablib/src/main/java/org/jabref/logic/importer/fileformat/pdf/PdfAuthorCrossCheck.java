@@ -22,8 +22,9 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// The "merged author" is the first author value chosen by [PdfMergeMetadataImporter].
-/// This class looks for its family names on the PDF's leading pages and may replace it with a later candidate
-/// whose family names appear there.
+/// Without page text, it is preserved. Otherwise a plausible merged author confirmed by the PDF text is kept;
+/// bibliographic evidence also protects an unconfirmed author. Remaining candidates are scored by confirmed
+/// family names, and a lone unconfirmed author is removed if no candidate matches.
 @NullMarked
 class PdfAuthorCrossCheck {
 
@@ -44,6 +45,7 @@ class PdfAuthorCrossCheck {
     /// pages. Bibliographic metadata and authors without extractable page text are preserved.
     ///
     /// [impl->req~import.pdf.author-confirmed-by-text~1]
+    /// [impl->req~import.pdf.author-preserved-without-text~1]
     static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, @Nullable String leadingPagesText) {
         if (StringUtil.isBlank(leadingPagesText)) {
             return;
@@ -61,6 +63,8 @@ class PdfAuthorCrossCheck {
     /// the candidate with the most confirmed family names, or removes a lone unconfirmed author.
     /// The first author-bearing candidate identifies the merged author's source because merging keeps its value.
     // [impl->adr~conservative-pdf-author-evidence~1]
+    // [impl->req~import.pdf.author-candidate-plausible~1,req~import.pdf.author-best-confirmed-candidate~1]
+    // [impl->req~import.pdf.author-unconfirmed-single-removed~1,req~import.pdf.author-unconfirmed-multiple-retained~1]
     private static void crossCheckMergedAuthor(BibEntry entry, String mergedAuthor, List<BibEntry> candidates,
                                                DocumentWords documentWords) {
         // A sentence mis-parsed as author ("Written by Alice Smith") is not confirmed by one of its names
@@ -68,16 +72,17 @@ class PdfAuthorCrossCheck {
             return;
         }
 
-        boolean sourceFound = false;
+        boolean firstAuthorSourceFound = false;
         Optional<ScoredAuthor> bestConfirmed = Optional.empty();
         for (BibEntry candidate : candidates) {
             Optional<String> candidateAuthor = candidate.getField(StandardField.AUTHOR);
             if (candidateAuthor.isEmpty()) {
                 continue;
             }
-            if (!sourceFound) {
-                sourceFound = true;
+            if (!firstAuthorSourceFound) {
+                firstAuthorSourceFound = true;
                 // The first author-bearing candidate supplied the merged author
+                // [impl->req~import.pdf.author-preserved-with-citation-key~1,req~import.pdf.author-preserved-with-entry-type~1]
                 if (candidate.getCitationKey().isPresent() || isKnownNonDefaultType(candidate.getType())) {
                     return;
                 }
@@ -92,7 +97,7 @@ class PdfAuthorCrossCheck {
             }
         }
 
-        if (sourceFound) {
+        if (firstAuthorSourceFound) {
             bestConfirmed.ifPresentOrElse(
                     scored -> entry.setField(StandardField.AUTHOR, scored.value()),
                     () -> {

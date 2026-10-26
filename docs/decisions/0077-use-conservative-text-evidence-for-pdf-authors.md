@@ -32,6 +32,7 @@ The plausibility check uses capitalization for scripts with case and allows comm
 
 ## More Information
 
+* [PDF import requirements](../requirements/pdf-import.md) specify the author and year rules.
 * [PR 16247](https://github.com/JabRef/jabref/pull/16247) introduced the author cross-check.
 
 <!-- markdownlint-disable-file MD022 -->
