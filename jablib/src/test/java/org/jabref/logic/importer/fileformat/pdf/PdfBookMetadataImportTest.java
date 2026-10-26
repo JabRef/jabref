@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,33 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mockStatic;
 
 public class PdfBookMetadataImportTest {
+
+    @Test
+    void extractsSyrotiukTextbookLocallyFromPageThreeText() throws IOException, URISyntaxException {
+        String pageText = Files.readString(Path.of(getClass().getResource(
+                "/pdfs/PdfBookMetadataImport/syrotiuk-page3.txt").toURI()));
+        String citation = BookCitationBlock.find(pageText).orElseThrow();
+        assertEquals("""
+                Сиротюк, В. Д.
+                С 40 Фізика: підруч. для 11 кл. загальноосвіт. навч. закл.: (рівень стан\u00AD
+                дарту) / В. Д. Сиротюк, В. І. Баштовий. - Харків : Сиция, 2011. - 304 с.""",
+                citation.strip());
+
+        try (PDDocument document = new PDDocument();
+             MockedStatic<PdfPageScanner> scanner = mockStatic(PdfPageScanner.class)) {
+            scanner.when(() -> PdfPageScanner.scanPages(document)).thenReturn(List.of(pageText));
+
+            ParserResult result = new PdfContentImporter().importDatabase(Path.of("textbook-excerpt.pdf"), document);
+            BibEntry expected = new BibEntry(StandardEntryType.Book)
+                    .withField(StandardField.AUTHOR, "В. Д. Сиротюк and В. І. Баштовий")
+                    .withField(StandardField.TITLE, "Фізика: підруч. для 11 кл. загальноосвіт. навч. закл.: (рівень стандарту)")
+                    .withField(StandardField.ISBN, "9789662542028")
+                    .withField(StandardField.PUBLISHER, "Сиция")
+                    .withField(StandardField.YEAR, "2011");
+            assertEquals(List.of(expected), result.getDatabase().getEntries());
+            assertEquals(List.of(), result.warnings());
+        }
+    }
 
     @Test
     void extractsIsbnFromFrontBibliographicPage() throws IOException, URISyntaxException {

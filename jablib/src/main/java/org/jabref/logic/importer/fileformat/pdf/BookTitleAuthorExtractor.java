@@ -19,7 +19,7 @@ final class BookTitleAuthorExtractor {
 
     private static final Pattern AREA_SEPARATOR = Pattern.compile("\\.\\h*[—–-]\\h+");
 
-    private static final Pattern CATALOGUE_CODE = Pattern.compile("^\\s*[\\p{Lu}\\p{N}]{1,4}\\d{1,3}\\s+");
+    private static final Pattern CATALOGUE_CODE = Pattern.compile("^\\s*(?:\\p{Lu}[\\p{Lu}\\p{N}]{0,3}\\d{1,3}|[\\p{IsCyrillic}&&\\p{Lu}]\\h+\\d{2,3})\\h+");
 
     private static final Pattern AUTHOR_HEADING = Pattern.compile("\\p{Lu}[\\p{L}'’ʼ-]+,?\\h+\\p{Lu}\\.(?:\\h*\\p{Lu}\\.)?");
 
@@ -28,6 +28,8 @@ final class BookTitleAuthorExtractor {
     private static final Pattern LINE_BREAK = Pattern.compile("\\R");
 
     private static final Pattern NON_AUTHOR_LABEL = Pattern.compile("(?iu)^(?:рецензент(?:и)?|reviewer(?:s)?|isbn|удк|ббк)\\b");
+
+    private static final Pattern SOFT_HYPHEN = Pattern.compile("(?<=\\p{L})\\u00AD" + SPACE + "*(?=\\p{L})");
 
     private static final Pattern SPACES = Pattern.compile(SPACE + "+");
 
@@ -50,6 +52,7 @@ final class BookTitleAuthorExtractor {
 
         String title = prefix.orElseThrow().replace('\n', ' ').strip();
         title = CATALOGUE_CODE.matcher(title).replaceFirst("");
+        title = SOFT_HYPHEN.matcher(title).replaceAll("");
         title = SPACES.matcher(title).replaceAll(" ").strip();
 
         return title.isEmpty()

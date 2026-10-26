@@ -17,6 +17,33 @@ class BookTitleAuthorExtractorTest {
             К56 Збірник задач з фізики для 8 класу / О. П. Коваль, Н. І. Ткач. — 2-ге вид., перероб. — Харків : Ранок, 2010. — 176 с.
             """;
 
+    @ParameterizedTest
+    @ValueSource(strings = {"С40", "С 40", "С\u00A040"})
+    void removesCyrillicCatalogueCode(String code) {
+        assertEquals(Optional.of("Фізика"),
+                BookTitleAuthorExtractor.findTitle(code + " Фізика / В. Д. Сиротюк. - Харків : Сиция, 2011."));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Windows 11", "ISO 9001", "C 40", "С 40-річчям", "40 задач", "Фізика С 40"})
+    void preservesLegitimateTitleText(String title) {
+        assertEquals(Optional.of(title),
+                BookTitleAuthorExtractor.findTitle(title + " / В. Д. Сиротюк. - Харків : Сиция, 2011."));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"стан\u00ADдарту", "стан\u00AD дарту", "стан\u00AD\nдарту", "стан\u00AD\r\nдарту"})
+    void joinsWordsBrokenBySoftHyphen(String word) {
+        assertEquals(Optional.of("Фізика: (рівень стандарту)"),
+                BookTitleAuthorExtractor.findTitle("Фізика: (рівень " + word + ") / В. Д. Сиротюк. - Харків : Сиция, 2011."));
+    }
+
+    @Test
+    void preservesOrdinaryHyphensAndWordBoundaries() {
+        assertEquals(Optional.of("Фізико-математичні задачі для 11-го класу"),
+                BookTitleAuthorExtractor.findTitle("Фізико-математичні задачі\nдля 11-го класу / В. Д. Сиротюк. - Харків : Сиция, 2011."));
+    }
+
     @Test
     void extractsBookTitle() {
         assertEquals(
