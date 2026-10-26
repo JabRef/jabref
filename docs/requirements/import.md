@@ -153,4 +153,26 @@ The individual terms are insufficient for exclusion. This rule recognizes a spec
 
 Needs: impl, utest
 
+## Book publication details must come only from the citation's publication area
+`req~import.pdf.book-citation-publication~1`
+
+For the book-import work in [JabRef issue #12874](https://github.com/JabRef/jabref/issues/12874), the publisher and year of a book are read only from the publication area ("Place : Publisher, Year") of the Ukrainian cataloguing-in-publication record on its bibliographic page. Dates and names from approval notices, copyright lines, print details, and reviewer lists are never used.
+
+If the page has no publication area or more than one, neither field is filled. If the area names several publishers, the publisher stays empty.
+
+Needs: impl, utest
+
+## PDF book imports must select an ambiguous ISBN only when local metadata identifies one candidate
+`req~import.pdf.book-isbn-resolution~1`
+
+For [JabRef issue #12874](https://github.com/JabRef/jabref/issues/12874), equivalent ISBN-10 and ISBN-13 forms count as one candidate. Online resolution considers at most four distinct candidates, using the citation's title, authors (or explicit editors), publisher, and publication year. All four fields must be present in both the local entry and each lookup result. Each lookup must also identify the requested ISBN.
+
+Selection requires one candidate to match all four fields after normalizing Unicode, case, punctuation, whitespace, and contributor names. Years must contain a single four-digit value; ranges and uncertain dates do not provide sufficient evidence. Every alternative must either match the title and contributors but have a different publication year, or differ in all four fields. An explicit local edition must agree with the fetched edition before a candidate can be assessed. A publisher difference alone does not establish a different book.
+
+Missing or failed lookups, incomplete evidence, and multiple matches leave the ISBN unselected. The import retains locally extracted metadata and reports the existing ambiguity warning. Matching metadata cannot distinguish formats that share these fields.
+
+Needs: impl, utest
+
+Implementation note: `PdfContentImporter` returns local metadata and validated candidates together through `BookExtraction`. Standalone content import performs no network lookup. `PdfMergeMetadataImporter` retrieves candidate metadata through the existing ISBN fetcher and delegates comparison to `BookIsbnResolver`. Lookup results, including misses, are cached only for the current document. Only the selected candidate's fetched metadata enters the merge, and the warning is produced after resolution.
+
 <!-- markdownlint-disable-file MD022 -->
