@@ -3,84 +3,84 @@ parent: Requirements
 ---
 # Shared SQL database
 
-## Live propagation of changes
+## Shared database must propagate changes live to connected clients
 `req~shared-database.live-propagation~1`
 
 Changes made by one client — entry modifications, groups, and library settings — appear in all other connected clients without any manual action.
 
 Needs: impl, utest
 
-## Shared metadata snapshots are atomic
+## Shared database must provide atomic metadata snapshots
 `req~shared-database.atomic-metadata-snapshots~1`
 
 When a client changes shared metadata, other clients observe either the complete previous snapshot or the complete new snapshot, never an intermediate subset of the change.
 
 Needs: impl, utest
 
-## Change content travels in the notification
+## Change notifications must contain full mutation details
 `req~shared-database.change-content-in-notification~1`
 
 A field change notification carries the change itself (entry id, field, old and new value, entry version), so receivers apply it directly. Receivers fall back to pulling from the database whenever the notification does not exactly match their local state.
 
 Needs: impl
 
-## Micro-edits are batched
+## Shared database client must batch keystroke-level micro-edits
 `req~shared-database.micro-edit-batching~1`
 
 Keystroke-level edits are not written per keystroke: they are buffered and flushed on the next major change or when the library is closed. A flush notifies the other clients.
 
 Needs: impl
 
-## Concurrent edits of one entry are detected
+## Shared database client must detect concurrent edits on entries
 `req~shared-database.concurrent-edit-detection~1`
 
 Two clients editing the same entry cannot overwrite each other unnoticed: the second write is refused and offered for merging, even if both writes happen at the same moment. A refused edit keeps its local state until it is merged.
 
 Needs: impl
 
-## Conflicts are resolved by the user in the merge dialog
+## Shared database client must offer merge dialog on conflicting edits
 `req~shared-database.conflict-merge-dialog~1`
 
 When a local change is refused because the shared entry has a newer version, the user is told which versions collide and is offered the merge entries dialog showing the local and the shared entry side by side. The merged entry replaces the shared one and becomes the local one. Until the user has decided, the local entry keeps its unsynchronized state; cancelling leaves it unsynchronized.
 
 Needs: impl
 
-## Changes made without connection are not lost
+## Shared database client must preserve offline changes locally
 `req~shared-database.offline-changes~1`
 
 When the connection to the shared database is lost, the user keeps working: every change is kept locally, survives closing and reopening JabRef, and is synchronized on the next connect to the same database. A kept change whose shared entry was changed meanwhile is offered for merging.
 
 Needs: impl
 
-## The connection is re-established automatically
+## Shared database client must reconnect automatically after connection loss
 `req~shared-database.automatic-reconnect~1`
 
 After a connection loss, JabRef reconnects by itself with increasing intervals for as long as the library is open. The user is informed when the connection is lost and when it is back, without being interrupted.
 
 Needs: impl
 
-## A shared database's loading state is indicated
+## Library tab must display loading indicator while connecting to shared database
 `req~shared-database.loading-indicator~1`
 
 While JabRef opens or reconnects a shared database, its library tab displays a loading indicator until the connection completes or fails.
 
 Needs: impl
 
-## Existing databases are migrated
+## Shared database client must migrate legacy database schemas on connect
 `req~shared-database.migration~1`
 
 Connecting to a database created by an earlier JabRef version copies its content into the current table structure. The old tables are kept, so older JabRef versions continue to work.
 
 Needs: impl
 
-## Connection details can be pasted as a URL
+## Shared database login dialog must accept connection URLs
 `req~shared-database.connection-url~1`
 
 The login dialog accepts a connection URL as handed out by hosting providers (`postgres://user:password@host:port/database?...`) or a JDBC URL and fills in the connection details from it. Parameters JabRef has no dedicated setting for are passed on to the driver unchanged.
 
 Needs: impl
 
-## Connected databases are reopened on startup
+## JabRef must reopen connected shared databases on startup
 `req~shared-database.reopen-on-startup~1`
 
 A shared database that is still connected when JabRef closes is reconnected on the next start, like the last opened local libraries. This also covers connections that are not backed by a local file.

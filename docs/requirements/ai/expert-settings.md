@@ -35,14 +35,14 @@ User needs to adjust the underlying prompt structures to refine AI outputs.
 
 Needs: impl
 
-## Dynamic discovery of embedding model download size
+## User can view dynamically discovered embedding model download size
 `feat~ai.expert-settings.embedding-model-size~1`
 
 The download size of an embedding model is discovered dynamically at runtime.
 
 Needs: impl
 
-## Dynamic discovery of embedding model maximum snippet length
+## User can view dynamically discovered embedding model maximum snippet length
 `feat~ai.expert-settings.embedding-model-token-limit~1`
 
 The maximum snippet length in tokens for an embedding model is discovered dynamically at runtime.
