@@ -91,9 +91,12 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     /// 2. Run [PdfImporter]s, and store extracted candidates in the list.
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
-        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document);
+        List<String> warnings = new ArrayList<>();
+        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document, warnings);
         if (extractedCandidates.isEmpty()) {
-            return new ParserResult();
+            ParserResult result = new ParserResult();
+            warnings.forEach(result::addWarning);
+            return result;
         }
 
         List<BibEntry> fetchedCandidates = fetchIdsOfCandidates(extractedCandidates);
@@ -105,7 +108,9 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         // We use the absolute path here as we do not know the context where this import will be used.
         // The caller is responsible for making the path relative if necessary.
         entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
-        return new ParserResult(List.of(entry));
+        ParserResult result = new ParserResult(List.of(entry));
+        warnings.forEach(result::addWarning);
+        return result;
     }
 
     /// Text of the first two pages for the author cross-check; empty if the text cannot be extracted
@@ -118,12 +123,14 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         }
     }
 
-    private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document) {
+    private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document, List<String> warnings) {
         List<BibEntry> candidates = new ArrayList<>();
 
         for (PdfImporter metadataImporter : metadataImporters) {
             try {
-                List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, document).getDatabase().getEntries();
+                ParserResult importerResult = metadataImporter.importDatabase(filePath, document);
+                warnings.addAll(importerResult.warnings());
+                List<BibEntry> extractedEntries = importerResult.getDatabase().getEntries();
                 LOGGER.debug("Importer {} extracted {}", metadataImporter.getName(), extractedEntries);
                 candidates.addAll(extractedEntries);
             } catch (ParseException | IOException e) {
