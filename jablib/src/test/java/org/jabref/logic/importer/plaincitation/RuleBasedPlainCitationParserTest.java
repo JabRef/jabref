@@ -277,13 +277,29 @@ class RuleBasedPlainCitationParserTest {
     static Stream<Arguments> convertsEtAlToOthers() {
         return Stream.of(
                 Arguments.of("Smith, J. and others", "Smith, J., et al. Improving AI systems. Journal of Computer Science, 2024."),
-                Arguments.of("Smith, J. and others", "Smith, J. et al Improving AI systems. Journal of Computer Science, 2024."));
+                Arguments.of("Smith, J. and others", "Smith, J. et al Improving AI systems. Journal of Computer Science, 2024."),
+                Arguments.of("Smith, John and others", "John Smith et al. Improving AI systems. Journal of Computer Science, 2024."),
+                Arguments.of("Smith, John and others", "John Smith, et al. Improving AI systems. Journal of Computer Science, 2024."),
+                Arguments.of("Smith, John and others", "John Smith ET AL. Improving AI systems. Journal of Computer Science, 2024."),
+                Arguments.of("Smith, John and Tan, Mary and others", "John Smith and Mary Tan et al. Improving AI systems. Journal of Computer Science, 2024."));
     }
 
     @ParameterizedTest(name = "{1}")
     @MethodSource
     void convertsEtAlToOthers(String expectedAuthor, String citation) throws FetcherException {
         assertEquals(Optional.of(expectedAuthor), parseField(citation, StandardField.AUTHOR));
+    }
+
+    @Test
+    void fullNameAuthorsWithEtAlAreRemovedBeforeParsingTitle() throws FetcherException {
+        String citation = "John Smith and Mary Tan et al. Improving AI systems. Journal of Computer Science, 2024.";
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Smith, John and Tan, Mary and others")
+                .withField(StandardField.TITLE, "Improving AI systems")
+                .withField(StandardField.JOURNAL, "Journal of Computer Science")
+                .withField(StandardField.YEAR, "2024")
+                .withField(StandardField.COMMENT, citation);
+        assertEquals(Optional.of(expected), parser.parsePlainCitation(citation));
     }
 
     /// The author patterns are case-sensitive, so a lowercase word is never taken as initial:

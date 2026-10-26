@@ -25,6 +25,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String PAGES_TAG = "[pages_tag]";
 
     private static final String AUTHORS_GROUP = "AUTHORS";
+    private static final String ET_AL_GROUP = "ETAL";
     private static final String FIRSTNAME_GROUP = "FIRSTNAME";
     private static final String FROM_GROUP = "FROM";
     private static final String INITIALS_GROUP = "INITIALS";
@@ -120,13 +121,14 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// the same. Thus, it is only used if neither of the patterns above found an author and a separate title
     /// boundary follows the authors block.
     private static final String FULL_NAME_REGEX =
-            NAME_WORD_REGEX + "(?:\\s+(?:\\p{Lu}\\.|" + NAME_PARTICLE_REGEX + "|" + NAME_WORD_REGEX + ")){1,3}";
+            NAME_WORD_REGEX + "(?:\\s+(?:\\p{Lu}\\.|" + NAME_PARTICLE_REGEX + "|" + NAME_WORD_REGEX + ")){1,3}?";
 
     private static final String FULL_NAME_SEPARATOR_REGEX = "(?:\\s*(?:,|&|\\band\\b))+\\s*";
 
     private static final Pattern FULL_NAME_AUTHORS_PATTERN = Pattern.compile(
             "^\\s*(?<" + AUTHORS_GROUP + ">" + FULL_NAME_REGEX +
-                    "(?:" + FULL_NAME_SEPARATOR_REGEX + FULL_NAME_REGEX + ")*)\\.(?=\\s|$)");
+                    "(?:" + FULL_NAME_SEPARATOR_REGEX + FULL_NAME_REGEX + ")*)" +
+                    "(?:,?\\s+(?<" + ET_AL_GROUP + ">(?i:et\\s+al)))?\\.(?=\\s|$)");
 
     private static final Pattern FULL_NAME_SEPARATOR_PATTERN = Pattern.compile(FULL_NAME_SEPARATOR_REGEX);
 
@@ -450,6 +452,9 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
                     + ", " + collapseWhitespace(nameMatcher.group(FIRSTNAME_GROUP)));
         }
 
+        if (blockMatcher.start(ET_AL_GROUP) >= 0) {
+            fullNameAuthors.add("others");
+        }
         authors.addAll(fullNameAuthors);
         return fixSpaces(AUTHOR_TAG + " " + remainder);
     }
