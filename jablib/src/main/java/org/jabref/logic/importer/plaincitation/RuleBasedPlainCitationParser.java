@@ -70,6 +70,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             "(?:\\bpages?|\\bpp?)\\.?\\s*$",
             Pattern.CASE_INSENSITIVE);
 
+    private static final Pattern VOLUME_OR_ISSUE_PREFIX_AT_END_PATTERN = Pattern.compile(
+            "\\b(?:vol(?:ume)?|no|nr|issue)\\.?\\s*$",
+            Pattern.CASE_INSENSITIVE);
+
     /// Matches any of the internal placeholder tokens.
     private static final Pattern TAG_PATTERN = Pattern.compile("\\[(?:author|url|year|pages)_tag\\]");
 
@@ -522,6 +526,9 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
         Matcher rangeMatcher = PAGES_RANGE_PATTERN.matcher(input);
         while (rangeMatcher.find()) {
+            if (VOLUME_OR_ISSUE_PREFIX_AT_END_PATTERN.matcher(input.substring(0, rangeMatcher.start(FROM_GROUP))).find()) {
+                continue;
+            }
             if ((rangeMatcher.start() < titleEnd) && (titleEnd < input.length())
                     && !PAGES_PREFIX_AT_END_PATTERN.matcher(input.substring(rangeMatcher.start(), rangeMatcher.start(FROM_GROUP))).find()) {
                 continue;

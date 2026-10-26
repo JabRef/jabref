@@ -514,6 +514,23 @@ class RuleBasedPlainCitationParserTest {
         assertEquals(Optional.of("45--60"), parseField(citation, StandardField.PAGES));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"vol. 12-13", "volume 12-13", "issue 2-3", "no. 2-3", "nr. 2-3", "VOL. 12–13"})
+    void volumeAndIssueRangesAreNotTakenAsPages(String volumeOrIssue) throws FetcherException {
+        assertEquals(Optional.empty(), parseField("Smith, J. A title. Journal, 2020, " + volumeOrIssue + ".", StandardField.PAGES));
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {"45--60|vol. 12-13, pp. 45-60",
+            "45--60|pp. 45-60, vol. 12-13",
+            "45--60|45-60, issue 2-3",
+            "45--60|issue 2-3, 45-60",
+            "5|p. 5, vol. 12-13",
+            "5|issue 2-3, p. 5"})
+    void volumeAndIssueRangesDoNotReplacePages(String expectedPages, String publicationDetails) throws FetcherException {
+        assertEquals(Optional.of(expectedPages), parseField("Smith, J. A title. Journal, 2020, " + publicationDetails + ".", StandardField.PAGES));
+    }
+
     /// A DOI right after the page range must not change it.
     @Test
     void findsPagesFollowedByDoi() throws FetcherException {
