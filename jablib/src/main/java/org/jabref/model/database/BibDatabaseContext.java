@@ -239,8 +239,10 @@ public class BibDatabaseContext {
                                               .findFirst();
     }
 
-    /// @return The absolute path for the given directory
-    private Path getFileDirectoryPath(String directory) {
+    /// Resolves a file directory as it is stored in the metadata of this library.
+    ///
+    /// @return The absolute path for the given directory. A relative directory stays relative if this library has not been saved yet.
+    public Path getFileDirectoryPath(String directory) {
         Path path = Path.of(directory);
         if (path.isAbsolute()) {
             return path;

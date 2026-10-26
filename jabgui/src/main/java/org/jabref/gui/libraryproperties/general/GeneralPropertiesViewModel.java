@@ -269,8 +269,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return this.laTexFileDirectoryPromptProperty;
     }
 
-    /// Resolves a directory entered in this tab the way [BibDatabaseContext] resolves the stored one:
-    /// a relative path is relative to the directory of the `.bib` file.
+    /// Resolves a directory entered in this tab the same way [BibDatabaseContext] resolves the stored one.
     ///
     /// @return the absolute directory, or an empty optional if the input is blank, not a valid path, or relative to an unsaved library
     private Optional<Path> resolveDirectory(String directory) {
@@ -278,19 +277,14 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             return Optional.empty();
         }
 
-        Path path;
+        Path resolvedDirectory;
         try {
-            path = Path.of(directory.trim());
+            resolvedDirectory = databaseContext.getFileDirectoryPath(directory.trim());
         } catch (InvalidPathException e) {
             LOGGER.debug("Could not resolve directory {}", directory, e);
             return Optional.empty();
         }
-
-        if (path.isAbsolute()) {
-            return Optional.of(path.normalize());
-        }
-        return databaseContext.getDatabaseDirectory()
-                              .map(databaseDirectory -> databaseDirectory.resolve(path).normalize());
+        return Optional.of(resolvedDirectory).filter(Path::isAbsolute);
     }
 
     private Path getBrowseDirectory(String configuredDir) {
