@@ -21,6 +21,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,10 +32,13 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -79,6 +85,46 @@ class PdfBookIsbnResolutionTest {
         verify(isbnFetcher).performSearchById(MATCHING_ISBN);
         verify(isbnFetcher).performSearchById(OTHER_ISBN);
         verifyNoMoreInteractions(isbnFetcher);
+    }
+
+    @Test
+    void resolvesBookIsbnAndMergesGrobidHeaderMetadataTogether() throws IOException, ParseException, FetcherException {
+        ImportFormatPreferences preferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(preferences.grobidPreferences().isGrobidEnabled()).thenReturn(true);
+        BibEntry matching = localBook().withField(StandardField.ISBN, MATCHING_ISBN);
+        when(isbnFetcher.performSearchById(MATCHING_ISBN)).thenReturn(Optional.of(matching));
+        when(isbnFetcher.performSearchById(OTHER_ISBN)).thenReturn(Optional.of(differentYearBook()));
+        BibEntry header = new BibEntry().withField(StandardField.NOTE, "Grobid header metadata");
+
+        try (MockedConstruction<PdfGrobidHeaderImporter> headers = mockConstruction(PdfGrobidHeaderImporter.class,
+                (grobid, _) -> when(grobid.importDatabase(any(Path.class), any(PDDocument.class)))
+                        .thenReturn(new ParserResult(List.of(header))))) {
+            importer = new PdfMergeMetadataImporter(preferences, isbnFetcher);
+
+            ParserResult result = importBook(AMBIGUOUS_ISBNS);
+
+            BibEntry expected = new BibEntry(matching).withField(StandardField.NOTE, "Grobid header metadata");
+            assertEquals(List.of(withPdf(expected)), result.getDatabase().getEntries());
+            assertEquals(List.of(), result.warnings());
+            assertEquals(1, headers.constructed().size());
+            verify(headers.constructed().getFirst()).importDatabase(any(Path.class), any(PDDocument.class));
+            verify(isbnFetcher).performSearchById(MATCHING_ISBN);
+            verify(isbnFetcher).performSearchById(OTHER_ISBN);
+            verifyNoMoreInteractions(isbnFetcher);
+        }
+    }
+
+    @Test
+    void preservesSingleBookAuthorAbsentFromLeadingPages() throws IOException, ParseException {
+        String pageText = citationPage("").replace(", Н. І. Ткач", "");
+
+        ParserResult result = importPage(pageText);
+
+        BibEntry expected = localBook().withField(StandardField.AUTHOR, "О. П. Коваль");
+        assertEquals(List.of(withPdf(expected)), result.getDatabase().getEntries());
+        assertEquals(List.of(), result.warnings());
+        verifyNoInteractions(isbnFetcher);
     }
 
     // [utest->req~import.pdf.book-isbn-resolution~1]
@@ -233,6 +279,13 @@ class PdfBookIsbnResolutionTest {
         try (PDDocument document = new PDDocument();
              MockedStatic<PdfPageScanner> scanner = mockStatic(PdfPageScanner.class)) {
             document.addPage(new PDPage());
+            try (PDPageContentStream content = new PDPageContentStream(document, document.getPage(0))) {
+                content.beginText();
+                content.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                content.newLineAtOffset(50, 700);
+                content.showText("Cover page without bibliographic authors");
+                content.endText();
+            }
             scanner.when(() -> PdfPageScanner.scanPages(document)).thenReturn(List.of(pageText));
 
             ParserResult result = importer.importDatabase(tempDir.resolve("book.pdf"), document);
