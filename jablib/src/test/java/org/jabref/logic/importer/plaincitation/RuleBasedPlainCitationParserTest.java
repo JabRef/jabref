@@ -608,13 +608,28 @@ class RuleBasedPlainCitationParserTest {
                                 .withField(StandardField.YEAR, "2015")
                                 .withField(StandardField.PAGES, "10--20"),
                         DOUBLE_SLASH_ARTICLE),
+                Arguments.of("double-slash article with numbered journal section",
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Ivanov, I. I.")
+                                .withField(StandardField.TITLE, "Title of the paper")
+                                .withField(StandardField.JOURNAL, "Journal Name")
+                                .withField(StandardField.YEAR, "2015")
+                                .withField(StandardField.PAGES, "10--20"),
+                        "Ivanov, I. I. Title of the paper // Journal Name, Section 2, 2015. P. 10-20."),
                 Arguments.of("book",
                         new BibEntry(StandardEntryType.Book)
                                 .withField(StandardField.AUTHOR, "Smith, J.")
                                 .withField(StandardField.TITLE, "Some book")
                                 .withField(StandardField.PUBLISHER, "Springer")
                                 .withField(StandardField.YEAR, "2010"),
-                        BOOK));
+                        BOOK),
+                Arguments.of("book with numbered imprint location",
+                        new BibEntry(StandardEntryType.Book)
+                                .withField(StandardField.AUTHOR, "Smith, J.")
+                                .withField(StandardField.TITLE, "Some book")
+                                .withField(StandardField.PUBLISHER, "Springer")
+                                .withField(StandardField.YEAR, "2010"),
+                        "Smith, J. Some book. Springer, Berlin 2, 2010."));
     }
 
     @ParameterizedTest(name = "{0}")

@@ -185,7 +185,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     /// A comma-separated part that only consists of volume/issue/number information, such as `41`, `4(2)` or `vol. 3`
     private static final Pattern NUMERIC_PART_PATTERN = Pattern.compile(
-            "^(?:(?:vol(?:ume)?|no|nr|issue|pp?|pages?)\\.?\\s*)?[\\d\\s().:/\\-]*\\d[\\d\\s().:/\\-]*$",
+            "^(?:(?:vol(?:ume)?|no|nr|issue|section|pp?|pages?)\\.?\\s*)?[\\d\\s().:/\\-]*\\d[\\d\\s().:/\\-]*$",
             Pattern.CASE_INSENSITIVE);
 
     private List<String> urls;
