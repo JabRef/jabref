@@ -17,7 +17,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 final class BookIsbnResolver {
 
-    static final int MAX_CANDIDATES = 5;
+    static final int MAX_CANDIDATES = 4;
     private static final Pattern SEPARATORS = Pattern.compile("[\\p{P}\\p{Z}\\s]+");
     private static final Pattern YEAR = Pattern.compile("[0-9]{4}");
 
@@ -33,6 +33,7 @@ final class BookIsbnResolver {
                    .allMatch(field -> normalizedField(localBook, field).isPresent());
     }
 
+    // [impl->req~import.pdf.book-isbn-resolution~1]
     Optional<ISBN> resolve(BibEntry localBook, Map<ISBN, Optional<BibEntry>> candidates) {
         if (!hasRequiredMetadata(localBook) || candidates.size() < 2 || candidates.size() > MAX_CANDIDATES) {
             return Optional.empty();

@@ -1,4 +1,3 @@
-
 package org.jabref.logic.importer.fileformat.pdf;
 
 import java.util.Optional;
@@ -7,12 +6,10 @@ import java.util.regex.Pattern;
 
 import org.jspecify.annotations.NullMarked;
 
-/**
- * Extracts a book title and contributors from a Ukrainian
- * cataloguing-in-publication citation block.
- *
- * The input is the String returned by BookCitationBlock.find().
- */
+/// Extracts a book title and contributors from a Ukrainian
+/// cataloguing-in-publication citation block.
+///
+/// The input is the String returned by [BookCitationBlock#find].
 @NullMarked
 final class BookTitleAuthorExtractor {
 
@@ -28,6 +25,8 @@ final class BookTitleAuthorExtractor {
 
     private static final Pattern EDITOR_LABEL = Pattern.compile("(?iu)^(?:за\\s+ред(?:акцією)?\\.?|під\\s+ред(?:акцією)?\\.?|ред(?:актор(?:и)?)?\\.?)\\s*[:.]?\\s*(.+)$");
 
+    private static final Pattern LINE_BREAK = Pattern.compile("\\R");
+
     private static final Pattern NON_AUTHOR_LABEL = Pattern.compile("(?iu)^(?:рецензент(?:и)?|reviewer(?:s)?|isbn|удк|ббк)\\b");
 
     private static final Pattern SPACES = Pattern.compile(SPACE + "+");
@@ -35,15 +34,13 @@ final class BookTitleAuthorExtractor {
     private BookTitleAuthorExtractor() {
     }
 
-    /**
-     * Extracts the title before the " / " separator.
-     *
-     * Removes the author heading and catalogue code,
-     * and joins wrapped title lines.
-     *
-     * @param citationBlock the citation block text
-     * @return the extracted title, or empty if not found
-     */
+    /// Extracts the title before the " / " separator.
+    ///
+    /// Removes the author heading and catalogue code,
+    /// and joins wrapped title lines.
+    ///
+    /// @param citationBlock the citation block text
+    /// @return the extracted title, or empty if not found
     static Optional<String> findTitle(String citationBlock) {
         Optional<String> prefix = beforeSlash(citationBlock);
 
@@ -51,7 +48,7 @@ final class BookTitleAuthorExtractor {
             return Optional.empty();
         }
 
-        String title = prefix.get().replace('\n', ' ').strip();
+        String title = prefix.orElseThrow().replace('\n', ' ').strip();
         title = CATALOGUE_CODE.matcher(title).replaceFirst("");
         title = SPACES.matcher(title).replaceAll(" ").strip();
 
@@ -60,15 +57,13 @@ final class BookTitleAuthorExtractor {
                 : Optional.of(title);
     }
 
-    /**
-     * Extracts authors appearing after the " / " separator.
-     *
-     * Excludes edition and publication areas.
-     * Explicitly labelled editors are not treated as authors.
-     *
-     * @param citationBlock the citation block text
-     * @return the author string, or empty if not found
-     */
+    /// Extracts authors appearing after the " / " separator.
+    ///
+    /// Excludes edition and publication areas.
+    /// Explicitly labelled editors are not treated as authors.
+    ///
+    /// @param citationBlock the citation block text
+    /// @return the author string, or empty if not found
     static Optional<String> findAuthors(String citationBlock) {
         Optional<String> suffix = afterSlash(citationBlock);
 
@@ -76,7 +71,7 @@ final class BookTitleAuthorExtractor {
             return Optional.empty();
         }
 
-        String contributors = suffix.get();
+        String contributors = suffix.orElseThrow();
 
         Matcher editionOrPublication =
                 AREA_SEPARATOR.matcher(contributors);
@@ -98,12 +93,10 @@ final class BookTitleAuthorExtractor {
         return Optional.of(contributors);
     }
 
-    /**
-     * Extracts explicitly labelled editors.
-     *
-     * @param citationBlock the citation block text
-     * @return the editor names, or empty if not found
-     */
+    /// Extracts explicitly labelled editors.
+    ///
+    /// @param citationBlock the citation block text
+    /// @return the editor names, or empty if not found
     static Optional<String> findEditors(String citationBlock) {
         Optional<String> suffix = afterSlash(citationBlock);
 
@@ -111,7 +104,7 @@ final class BookTitleAuthorExtractor {
             return Optional.empty();
         }
 
-        String contributors = suffix.get();
+        String contributors = suffix.orElseThrow();
 
         Matcher end = AREA_SEPARATOR.matcher(contributors);
 
@@ -133,11 +126,9 @@ final class BookTitleAuthorExtractor {
                 : Optional.of(names);
     }
 
-    /**
-     * Returns the title portion before the author separator.
-     */
+    /// Returns the title portion before the author separator.
     private static Optional<String> beforeSlash(String citationBlock) {
-        String text = citationBlock.replaceAll("\\R", "\n").strip();
+        String text = LINE_BREAK.matcher(citationBlock).replaceAll("\n").strip();
 
         Matcher slash = TITLE_AUTHOR_SEPARATOR.matcher(text);
 
@@ -171,9 +162,7 @@ final class BookTitleAuthorExtractor {
                 : Optional.of(result.toString());
     }
 
-    /**
-     * Returns the contributor portion after the author separator.
-     */
+    /// Returns the contributor portion after the author separator.
     private static Optional<String> afterSlash(String citationBlock) {
         Matcher slash = TITLE_AUTHOR_SEPARATOR.matcher(citationBlock);
 

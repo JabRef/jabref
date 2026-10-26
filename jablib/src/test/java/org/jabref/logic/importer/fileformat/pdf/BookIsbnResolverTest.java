@@ -47,6 +47,22 @@ class BookIsbnResolverTest {
         assertEquals(Optional.of(MATCHING_ISBN), resolver.resolve(localBook(), candidates));
     }
 
+    // [utest->req~import.pdf.book-isbn-resolution~1]
+    @ParameterizedTest
+    @ValueSource(ints = {4, 5})
+    void resolvesAtMostFourCandidates(int candidateCount) {
+        List<ISBN> isbns = List.of(MATCHING_ISBN, OTHER_ISBN, new ISBN("9780306406157"),
+                new ISBN("9789660800007"), new ISBN("9798602405453"));
+        Map<ISBN, Optional<BibEntry>> candidates = new LinkedHashMap<>();
+        candidates.put(MATCHING_ISBN, Optional.of(matchingBook()));
+        for (ISBN isbn : isbns.subList(1, candidateCount)) {
+            candidates.put(isbn, Optional.of(differentYearBook().withField(StandardField.ISBN, isbn.asString())));
+        }
+
+        assertEquals(candidateCount == 4 ? Optional.of(MATCHING_ISBN) : Optional.empty(),
+                resolver.resolve(localBook(), candidates));
+    }
+
     @Test
     void normalizesPunctuationCaseAndContributorOrderWithinNames() {
         BibEntry candidate = matchingBook()

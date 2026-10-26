@@ -154,6 +154,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return contentImporter.importBook(book);
     }
 
+    // [impl->req~import.pdf.book-isbn-resolution~1]
     private BookExtraction resolveBookIsbn(BookExtraction book, Map<String, Optional<BibEntry>> isbnCache) {
         if (book.localBook().isEmpty() || book.isbnCandidates().size() < 2
                 || book.isbnCandidates().size() > BookIsbnResolver.MAX_CANDIDATES) {

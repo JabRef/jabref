@@ -1,10 +1,11 @@
-
 package org.jabref.logic.importer.fileformat.pdf;
 
 import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -119,9 +120,10 @@ class BookTitleAuthorExtractorTest {
                 BookTitleAuthorExtractor.findAuthors(citation));
     }
 
-    @Test
-    void handlesWindowsLineBreaks() {
-        String citation = CITATION.replace("\n", "\r\n");
+    @ParameterizedTest
+    @ValueSource(strings = {"\n", "\r\n", "\r", "\u0085", "\u2028", "\u2029"})
+    void handlesLineBreaks(String lineBreak) {
+        String citation = CITATION.replace("\n", lineBreak);
 
         assertEquals(
                 Optional.of("Збірник задач з фізики для 8 класу"),

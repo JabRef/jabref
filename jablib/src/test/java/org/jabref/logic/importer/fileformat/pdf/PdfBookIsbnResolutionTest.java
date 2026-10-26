@@ -26,6 +26,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.MockedStatic;
 
@@ -77,6 +79,36 @@ class PdfBookIsbnResolutionTest {
         verify(isbnFetcher).performSearchById(MATCHING_ISBN);
         verify(isbnFetcher).performSearchById(OTHER_ISBN);
         verifyNoMoreInteractions(isbnFetcher);
+    }
+
+    // [utest->req~import.pdf.book-isbn-resolution~1]
+    @ParameterizedTest
+    @ValueSource(ints = {4, 5})
+    void looksUpAtMostFourCandidates(int candidateCount) throws IOException, ParseException, FetcherException {
+        List<String> isbns = List.of(MATCHING_ISBN, OTHER_ISBN, "9780306406157", "9789660800007", "9798602405453")
+                                 .subList(0, candidateCount);
+        if (candidateCount == 4) {
+            when(isbnFetcher.performSearchById(MATCHING_ISBN))
+                    .thenReturn(Optional.of(localBook().withField(StandardField.ISBN, MATCHING_ISBN)));
+            for (String isbn : isbns.subList(1, candidateCount)) {
+                when(isbnFetcher.performSearchById(isbn))
+                        .thenReturn(Optional.of(differentYearBook().withField(StandardField.ISBN, isbn)));
+            }
+        }
+
+        ParserResult result = importBook("ISBN " + String.join(", ", isbns));
+
+        if (candidateCount == 4) {
+            assertEquals(List.of(withPdf(localBook().withField(StandardField.ISBN, MATCHING_ISBN))), result.getDatabase().getEntries());
+            assertEquals(List.of(), result.warnings());
+            for (String isbn : isbns) {
+                verify(isbnFetcher).performSearchById(isbn);
+            }
+            verifyNoMoreInteractions(isbnFetcher);
+        } else {
+            assertUnresolved(result);
+            verifyNoInteractions(isbnFetcher);
+        }
     }
 
     @Test
