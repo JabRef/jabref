@@ -6,9 +6,12 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.testutils.JavaFxExtension;
 
 import jfx.incubator.scene.control.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.TextPos;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -16,7 +19,38 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(JavaFxExtension.class)
+@NullMarked
+// [utest->req~macos.text-editing-shortcuts~1]
 class CodeAreaKeyBindingsTest {
+
+    @Test
+    void transposeCharactersAroundCaret() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("abcd");
+        codeArea.select(TextPos.ofLeading(0, 2));
+        KeyBindingRepository repository = new KeyBindingRepository();
+        repository.put(KeyBinding.EDITOR_TRANSPOSE_CHARACTERS, "ctrl+T");
+        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.T, false, true, false, false);
+
+        CodeAreaKeyBindings.call(codeArea, event, repository);
+
+        assertEquals("acbd", codeArea.getText());
+        assertEquals(TextPos.ofLeading(0, 3), codeArea.getCaretPosition());
+        assertTrue(event.isConsumed());
+    }
+
+    @Test
+    void transposeCharactersDoesNothingAtDocumentStart() {
+        CodeArea codeArea = new CodeArea();
+        codeArea.setText("abcd");
+        codeArea.select(TextPos.ofLeading(0, 0));
+
+        CodeAreaKeyBindings.transposeCharacters(codeArea);
+
+        assertEquals("abcd", codeArea.getText());
+        assertEquals(TextPos.ofLeading(0, 0), codeArea.getCaretPosition());
+    }
+
 
     @Test
     void nonMacOsDoesNothing() {

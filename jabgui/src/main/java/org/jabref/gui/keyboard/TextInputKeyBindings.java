@@ -9,6 +9,7 @@ import org.jabref.model.util.ResultingStringState;
 
 public class TextInputKeyBindings {
 
+    // [impl->req~macos.text-editing-shortcuts~1]
     public static void call(Scene scene, KeyEvent event, KeyBindingRepository keyBindingRepository) {
         if (scene.focusOwnerProperty().get() instanceof TextInputControl focusedTextField) {
             keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
@@ -44,6 +45,12 @@ public class TextInputKeyBindings {
                          EDITOR_END_DOC -> {
                         focusedTextField.end();
                         event.consume();
+                    }
+                    case EDITOR_TRANSPOSE_CHARACTERS -> {
+                        if (focusedTextField.getSelection().getLength() == 0) {
+                            transposeCharacters(focusedTextField);
+                            event.consume();
+                        }
                     }
                     case EDITOR_CAPITALIZE -> {
                         int pos = focusedTextField.getCaretPosition();
@@ -96,4 +103,19 @@ public class TextInputKeyBindings {
             });
         }
     }
+
+    static void transposeCharacters(TextInputControl textInput) {
+        String text = textInput.getText();
+        int caret = textInput.getCaretPosition();
+        if (caret == 0 || caret >= text.length()) {
+            return;
+        }
+
+        int previousCharacterStart = text.offsetByCodePoints(caret, -1);
+        int nextCharacterEnd = text.offsetByCodePoints(caret, 1);
+        String replacement = text.substring(caret, nextCharacterEnd) + text.substring(previousCharacterStart, caret);
+        textInput.replaceText(previousCharacterStart, nextCharacterEnd, replacement);
+        textInput.positionCaret(previousCharacterStart + nextCharacterEnd - caret);
+    }
+
 }

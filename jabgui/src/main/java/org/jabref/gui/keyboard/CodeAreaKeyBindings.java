@@ -12,6 +12,7 @@ import jfx.incubator.scene.control.richtext.TextPos;
 
 public class CodeAreaKeyBindings {
 
+    // [impl->req~macos.text-editing-shortcuts~1]
     public static void call(CodeArea codeArea, KeyEvent event, KeyBindingRepository keyBindingRepository) {
         handleMacCursorMovementShortcuts(codeArea, event);
         if (event.isConsumed()) {
@@ -112,8 +113,31 @@ public class CodeAreaKeyBindings {
                     codeArea.select(offsetToTextPos(codeArea, res.caretPosition));
                     event.consume();
                 }
+                case EDITOR_TRANSPOSE_CHARACTERS -> {
+                    if (!codeArea.hasNonEmptySelection()) {
+                        transposeCharacters(codeArea);
+                        event.consume();
+                    }
+                }
             }
         });
+    }
+
+    static void transposeCharacters(CodeArea codeArea) {
+        String text = codeArea.getText();
+        int caret = textPosToOffset(codeArea, codeArea.getCaretPosition());
+        if (caret == 0 || caret >= text.length()) {
+            return;
+        }
+
+        int previousCharacterStart = text.offsetByCodePoints(caret, -1);
+        int nextCharacterEnd = text.offsetByCodePoints(caret, 1);
+        String replacement = text.substring(caret, nextCharacterEnd) + text.substring(previousCharacterStart, caret);
+        codeArea.replaceText(
+                offsetToTextPos(codeArea, previousCharacterStart),
+                offsetToTextPos(codeArea, nextCharacterEnd),
+                replacement);
+        codeArea.select(offsetToTextPos(codeArea, previousCharacterStart + nextCharacterEnd - caret));
     }
 
     private static void handleMacCursorMovementShortcuts(CodeArea codeArea, KeyEvent event) {

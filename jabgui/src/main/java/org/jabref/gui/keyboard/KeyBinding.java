@@ -8,25 +8,29 @@ import org.jabref.logic.os.OS;
 /// @implNote Cannot be sorted alphabetically, as [KeyBindingRepository#getKeyCombination(KeyBinding)] iterates over the enum in order and returns the first match.
 /// Use `shortcut` for OS independent mapping of `ctrl` on Windows and `cmd`(meta)` on macOS
 /// See also the description at [javafx.scene.input.KeyCombination]
+// [impl->req~macos.text-editing-shortcuts~1]
 public enum KeyBinding {
-    EDITOR_DELETE("Delete", Localization.lang("Delete text"), "", KeyBindingCategory.EDITOR),
+    EDITOR_DELETE("Delete", Localization.lang("Delete text"), "", "ctrl+D", KeyBindingCategory.EDITOR),
     // DELETE BACKWARDS = Rubout
-    EDITOR_BACKWARD("Move caret left", Localization.lang("Move caret left"), "", KeyBindingCategory.EDITOR),
-    EDITOR_FORWARD("Move caret right", Localization.lang("Move caret right"), "", KeyBindingCategory.EDITOR),
-    EDITOR_WORD_BACKWARD("Move caret to previous word", Localization.lang("Move caret to previous word"), "", KeyBindingCategory.EDITOR),
-    EDITOR_WORD_FORWARD("Move caret to next word", Localization.lang("Move caret to next word"), "", KeyBindingCategory.EDITOR),
-    EDITOR_BEGINNING("Move caret to beginning of line", Localization.lang("Move caret to beginning of line"), "", KeyBindingCategory.EDITOR),
-    EDITOR_END("Move caret to  of line", Localization.lang("Move caret to end of line"), "", KeyBindingCategory.EDITOR),
-    EDITOR_BEGINNING_DOC("Move caret to beginning of text", Localization.lang("Move the caret to the beginning of text"), "", KeyBindingCategory.EDITOR),
-    EDITOR_END_DOC("Move caret to end of text", Localization.lang("Move the caret to the end of text"), "", KeyBindingCategory.EDITOR),
-    EDITOR_UP("Move caret up", Localization.lang("Move the caret up"), "", KeyBindingCategory.EDITOR),
-    EDITOR_DOWN("Move caret down", Localization.lang("Move the caret down"), "", KeyBindingCategory.EDITOR),
+    EDITOR_BACKWARD("Move caret left", Localization.lang("Move caret left"), "", "ctrl+B", KeyBindingCategory.EDITOR),
+    EDITOR_FORWARD("Move caret right", Localization.lang("Move caret right"), "", "ctrl+F", KeyBindingCategory.EDITOR),
+    EDITOR_WORD_BACKWARD("Move caret to previous word", Localization.lang("Move caret to previous word"), "", "alt+LEFT", KeyBindingCategory.EDITOR),
+    EDITOR_WORD_FORWARD("Move caret to next word", Localization.lang("Move caret to next word"), "", "alt+RIGHT", KeyBindingCategory.EDITOR),
+    EDITOR_BEGINNING("Move caret to beginning of line", Localization.lang("Move caret to beginning of line"), "", "ctrl+A", KeyBindingCategory.EDITOR),
+    EDITOR_END("Move caret to  of line", Localization.lang("Move caret to end of line"), "", "ctrl+E", KeyBindingCategory.EDITOR),
+    EDITOR_BEGINNING_DOC("Move caret to beginning of text", Localization.lang("Move the caret to the beginning of text"), "", "shortcut+UP", KeyBindingCategory.EDITOR),
+    EDITOR_END_DOC("Move caret to end of text", Localization.lang("Move the caret to the end of text"), "", "shortcut+DOWN", KeyBindingCategory.EDITOR),
+    EDITOR_UP("Move caret up", Localization.lang("Move the caret up"), "", "ctrl+P", KeyBindingCategory.EDITOR),
+    EDITOR_DOWN("Move caret down", Localization.lang("Move the caret down"), "", "ctrl+N", KeyBindingCategory.EDITOR),
     EDITOR_CAPITALIZE("Capitalize word", Localization.lang("Capitalize current word"), "", KeyBindingCategory.EDITOR),
     EDITOR_LOWERCASE("Lowercase word", Localization.lang("Make current word lowercase"), "", KeyBindingCategory.EDITOR),
     EDITOR_UPPERCASE("Uppercase word", Localization.lang("Make current word uppercase"), "", KeyBindingCategory.EDITOR),
-    EDITOR_KILL_LINE("Remove all characters caret to end of line", Localization.lang("Remove line after caret"), "", KeyBindingCategory.EDITOR),
+    EDITOR_KILL_LINE("Remove all characters caret to end of line", Localization.lang("Remove line after caret"), "", "ctrl+K", KeyBindingCategory.EDITOR),
     EDITOR_KILL_WORD("Remove characters until next word", Localization.lang("Remove characters until next word"), "", KeyBindingCategory.EDITOR),
-    EDITOR_KILL_WORD_BACKWARD("Characters until previous word", Localization.lang("Remove the current word backwards"), "", KeyBindingCategory.EDITOR),
+    EDITOR_KILL_WORD_BACKWARD("Characters until previous word", Localization.lang("Remove the current word backwards"), "", "alt+BACK_SPACE", KeyBindingCategory.EDITOR),
+    EDITOR_CENTER_CARET("Center caret in visible area", Localization.lang("Center caret in visible area"), "", "ctrl+L", KeyBindingCategory.EDITOR),
+    EDITOR_INSERT_LINE_AFTER("Insert line after caret", Localization.lang("Insert line after caret"), "", "ctrl+O", KeyBindingCategory.EDITOR),
+    EDITOR_TRANSPOSE_CHARACTERS("Transpose characters", Localization.lang("Transpose characters"), "", "ctrl+T", KeyBindingCategory.EDITOR),
 
     AUTOGENERATE_CITATION_KEYS("Autogenerate citation keys", Localization.lang("Autogenerate citation keys"), "shortcut+G", KeyBindingCategory.QUALITY),
     ACCEPT("Accept", Localization.lang("Accept"), "shortcut+ENTER", KeyBindingCategory.EDIT),
