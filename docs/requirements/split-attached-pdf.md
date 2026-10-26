@@ -10,7 +10,7 @@ Issue: [#8128](https://github.com/JabRef/jabref/issues/8128)
 ## Resolve PDF file and start page through cross-referenced entries
 `req~logic.externalfiles.pdf-location-resolver~1`
 
-When an entry does not have its own linked PDF, the system resolves the PDF and the opening page from cross-referenced parent entries (e.g., proceedings or books). The start page must be parsed from the entry's `pages` field and shifted by any `pageoffset` defined in the parent entry.
+The target PDF file and opening page are identified from `crossref` or parent entries. The page is computed from the entry's `pages` field and shifted by the parent's `pageoffset`.
 
 Needs: impl, utest
 

@@ -15,8 +15,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jspecify.annotations.NullMarked;
 
 /// Copies the pages named by an entry out of a longer PDF, leaving the original file in place.
-@NullMarked
 // [impl->req~logic.pdf.extract-paper-page-range~1]
+@NullMarked
 public final class PdfPaperExtractor {
 
     private PdfPaperExtractor() {

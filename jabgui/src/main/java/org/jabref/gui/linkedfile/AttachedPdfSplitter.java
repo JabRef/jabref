@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
 /// Splits a PDF that was just attached to an entry. The original file stays where it is.
 ///
 /// A proceedings entry gets one new entry per paper. Any other entry gets a copy of just its own pages.
-@NullMarked
 // [impl->req~logic.pdf.split-proceedings-outline~1]
 // [impl->req~logic.pdf.extract-paper-page-range~1]
+@NullMarked
 public class AttachedPdfSplitter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AttachedPdfSplitter.class);
