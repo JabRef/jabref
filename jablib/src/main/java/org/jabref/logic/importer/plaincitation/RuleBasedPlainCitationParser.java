@@ -529,8 +529,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             if (VOLUME_OR_ISSUE_PREFIX_AT_END_PATTERN.matcher(input.substring(0, rangeMatcher.start(FROM_GROUP))).find()) {
                 continue;
             }
-            if ((rangeMatcher.start() < titleEnd) && (titleEnd < input.length())
-                    && !PAGES_PREFIX_AT_END_PATTERN.matcher(input.substring(rangeMatcher.start(), rangeMatcher.start(FROM_GROUP))).find()) {
+            if ((rangeMatcher.start() < titleEnd) && (titleEnd < input.length())) {
                 continue;
             }
             start = rangeMatcher.start();
@@ -540,10 +539,14 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
         if (start == -1) {
             Matcher singleMatcher = PAGES_SINGLE_PATTERN.matcher(input);
-            if (singleMatcher.find()) {
+            while (singleMatcher.find()) {
+                if ((singleMatcher.start() < titleEnd) && (titleEnd < input.length())) {
+                    continue;
+                }
                 start = singleMatcher.start();
                 end = singleMatcher.end();
                 foundPages = singleMatcher.group(PAGE_GROUP);
+                break;
             }
         }
 

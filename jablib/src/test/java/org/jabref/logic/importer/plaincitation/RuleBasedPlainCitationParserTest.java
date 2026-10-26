@@ -487,6 +487,29 @@ class RuleBasedPlainCitationParserTest {
         assertEquals(Optional.of(expectedPages), parseField("Smith, J. A title. Journal, 2020, " + writtenPages + ".", StandardField.PAGES));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"p. 5", "pp. 5-10", "page 5", "pages 5-10"})
+    void pageMarkersInTitleAreNotTakenAsPages(String pageMarker) throws FetcherException {
+        String expectedTitle = "A guide to " + pageMarker + " notation";
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. " + expectedTitle + ". Journal, 2020.");
+        assertEquals(List.of(Optional.of(expectedTitle), Optional.empty()),
+                List.of(entry.flatMap(parsedEntry -> parsedEntry.getField(StandardField.TITLE)),
+                        entry.flatMap(parsedEntry -> parsedEntry.getField(StandardField.PAGES))));
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {"p. 5|12|p. 12",
+            "pp. 5-10|12|p. 12",
+            "p. 5|20--30|pp. 20-30",
+            "pp. 5-10|20--30|pp. 20-30"})
+    void pageMarkersInTitleDoNotDisplacePublicationPages(String titlePageMarker, String expectedPages, String publicationPages) throws FetcherException {
+        String expectedTitle = "A guide to " + titlePageMarker + " notation";
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. " + expectedTitle + ". Journal, 2020, " + publicationPages + ".");
+        assertEquals(List.of(Optional.of(expectedTitle), Optional.of(expectedPages)),
+                List.of(entry.flatMap(parsedEntry -> parsedEntry.getField(StandardField.TITLE)),
+                        entry.flatMap(parsedEntry -> parsedEntry.getField(StandardField.PAGES))));
+    }
+
     /// Year extraction runs before page extraction, so the year does not end up in pages.
     @Test
     void yearIsNotTakenAsPages() throws FetcherException {
