@@ -457,8 +457,11 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             if (nameMatcher.start(SUFFIX_GROUP) >= 0) {
                 String suffix = nameMatcher.group(SUFFIX_GROUP);
                 familyName += ", " + switch (suffix) {
-                    case "Jr", "Sr" -> suffix + ".";
-                    default -> suffix;
+                    case "Jr",
+                         "Sr" ->
+                            suffix + ".";
+                    default ->
+                            suffix;
                 };
             }
             fullNameAuthors.add(familyName + ", " + collapseWhitespace(nameMatcher.group(FIRSTNAME_GROUP)));
