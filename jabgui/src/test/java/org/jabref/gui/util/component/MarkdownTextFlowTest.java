@@ -1,10 +1,13 @@
 package org.jabref.gui.util.component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.collections.ListChangeListener;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
@@ -15,8 +18,10 @@ import javafx.scene.control.Separator;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.robot.Robot;
+import javafx.scene.shape.Path;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -35,6 +40,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -708,6 +714,115 @@ class MarkdownTextFlowTest extends JavaFxTest {
             }
         });
         return boundsReference.get() == null ? new BoundingBox(0, 0, 0, 0) : boundsReference.get();
+    }
+
+    // [utest->req~ai.chat.find.matches~1]
+    @Test
+    void highlightOccurrencesFindsAllCaseInsensitive() {
+        MarkdownTextFlow flow = markdownTextFlow();
+        AtomicReference<Integer> count = new AtomicReference<>();
+        interact(() -> flow.setMarkdown("Chocolate is **chocolate**, CHOCOLATE!"));
+        awaitEvents();
+        interact(() -> count.set(flow.highlightOccurrences("chocolate", 1)));
+
+        assertEquals(3, count.get());
+        assertTrue(flow.getCurrentOccurrence().isPresent());
+    }
+
+    // [utest->req~ai.chat.find.matches~1]
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "[Chocolate](https://example.org)",
+            "Hot [choco](https://example.org)**late**",
+            """
+                    | Flavor |
+                    | --- |
+                    | Chocolate |
+                    """,
+            """
+                    | Flavor |
+                    | --- |
+                    | [Chocolate](https://example.org) |
+                    """
+    })
+    void highlightOccurrencesIncludesEmbeddedMarkdown(String markdown) {
+        MarkdownTextFlow flow = markdownTextFlow();
+        interact(() -> {
+            flow.setMarkdown(markdown);
+            rootPane.applyCss();
+            rootPane.layout();
+
+            assertEquals(1, flow.highlightOccurrences("chocolate", 0));
+            assertTrue(flow.getCurrentOccurrence().isPresent());
+            assertEquals(0, flow.highlightOccurrences("", 0));
+            assertEquals(Optional.empty(), flow.getCurrentOccurrence());
+        });
+    }
+
+    // [utest->req~ai.chat.find.matches~1]
+    @Test
+    void highlightOccurrencesFollowsReadingOrderAcrossTables() {
+        MarkdownTextFlow flow = markdownTextFlow();
+        interact(() -> {
+            flow.setMarkdown("""
+                    Chocolate before
+
+                    | Flavor |
+                    | --- |
+                    | Chocolate inside |
+
+                    Chocolate after
+                    """);
+            rootPane.applyCss();
+            rootPane.layout();
+
+            assertEquals(3, flow.highlightOccurrences("chocolate", 1));
+            Node current = flow.getCurrentOccurrence().orElseThrow();
+            assertInstanceOf(GridPane.class, current.getParent().getParent());
+            assertEquals(3, flow.highlightOccurrences("chocolate", 2));
+            assertEquals(flow.getParent(), flow.getCurrentOccurrence().orElseThrow().getParent());
+        });
+    }
+
+    @Test
+    void changingQueryWhileTextRewrapsDoesNotDuplicateHighlights() {
+        MarkdownTextFlow flow = markdownTextFlow();
+        interact(() -> {
+            flow.setMarkdown("""
+                    Chocolate appears in plain text and **CHOCOLATE** in bold.
+
+                    Here is a [Chocolate citation](https://example.org/chocolate).
+
+                    | Flavor | Note |
+                    | --- | --- |
+                    | Chocolate | Table match |
+                    | [Chocolate source](https://example.org/source) | Link in table |
+
+                    The final chocolate occurrence is below the table.
+                    """);
+            rootPane.applyCss();
+            rootPane.layout();
+            flow.highlightOccurrences("c", 0);
+            flow.getBoundsInParent();
+            Pane content = (Pane) flow.getParent();
+            AtomicBoolean moveOnRemoval = new AtomicBoolean(true);
+            content.getChildren().addListener((ListChangeListener<Node>) change -> {
+                while (change.next()) {
+                    if (change.wasRemoved() && moveOnRemoval.compareAndSet(true, false)) {
+                        flow.setTranslateX(1);
+                    }
+                }
+            });
+            for (int length = 1; length <= "chocolate".length(); length++) {
+                rootPane.resize(240 + (length % 2) * 100, 300);
+                flow.highlightOccurrences("chocolate".substring(0, length), 0);
+                rootPane.applyCss();
+                rootPane.layout();
+            }
+            assertEquals(6, flow.highlightOccurrences("chocolate", 0));
+            assertEquals(4L, content.getChildren().stream().filter(Path.class::isInstance).count());
+        });
+        awaitEvents();
     }
 
     private static class RecordingClipBoardManager extends ClipBoardManager {
