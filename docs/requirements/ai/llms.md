@@ -64,7 +64,7 @@ Covers:
 ### JabRef must support dummy LLM provider
 `req~ai.llms.providers.dummy~1`
 
-Allows testing and debugging of AI features without external API calls or credentials.
+Rationale: Allows testing and debugging of AI features without external API calls or credentials.
 
 Needs: impl
 
