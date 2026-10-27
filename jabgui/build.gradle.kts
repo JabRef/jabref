@@ -39,6 +39,7 @@ testModuleInfo {
     runtimeOnly("com.tngtech.archunit.junit5.engine")
 
     requires("org.apache.lucene.core")
+    requires("org.apache.lucene.highlighter")
 }
 
 tasks.named<Test>("test") {
