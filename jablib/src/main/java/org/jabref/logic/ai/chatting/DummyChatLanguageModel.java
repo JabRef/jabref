@@ -45,17 +45,17 @@ public class DummyChatLanguageModel implements ChatModel {
         }
 
         String systemMessage = messages.stream()
-                .filter(SystemMessage.class::isInstance)
-                .map(SystemMessage.class::cast)
-                .map(SystemMessage::text)
-                .collect(Collectors.joining("\n"));
+                                       .filter(SystemMessage.class::isInstance)
+                                       .map(SystemMessage.class::cast)
+                                       .map(SystemMessage::text)
+                                       .collect(Collectors.joining("\n"));
 
         String userMessage = messages.stream()
-                .filter(UserMessage.class::isInstance)
-                .map(UserMessage.class::cast)
-                .map(UserMessage::singleText)
-                .reduce((_, second) -> second)
-                .orElse("");
+                                     .filter(UserMessage.class::isInstance)
+                                     .map(UserMessage.class::cast)
+                                     .map(UserMessage::singleText)
+                                     .reduce((_, second) -> second)
+                                     .orElse("");
 
         String response = """
                 Hi! I am a dummy AI provider, I am made to test and debug the AI features.
