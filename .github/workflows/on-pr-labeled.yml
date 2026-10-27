@@ -24,8 +24,8 @@ jobs:
     steps:
       - name: Approve a port PR
         # jabref-machine cannot approve its own PRs (ports, opened from the other repository);
-        # github-actions[bot] does it instead
-        if: github.event.pull_request.user.login == 'jabref-machine'
+        # github-actions[bot] does it instead - for ports only
+        if: github.event.pull_request.user.login == 'jabref-machine' && startsWith(github.event.pull_request.head.ref, 'port-')
         run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
