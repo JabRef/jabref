@@ -515,7 +515,7 @@ class JournalAbbreviationsViewModelTabTest {
     @Test
     void loadJournalAbbreviationOption() {
         when(abbreviationPreferences.getExternalJournalLists())
-                .thenReturn(FXCollections.<>observableArrayList());
+                .thenReturn(FXCollections.<String>observableArrayList());
         when(abbreviationPreferences.useJournalAbbreviationMode()).thenReturn(JournalMode.ABBREVIATE);
         when(abbreviationPreferences.shouldUseFJournalField()).thenReturn(false);
 
@@ -528,7 +528,7 @@ class JournalAbbreviationsViewModelTabTest {
     @Test
     void storeJournalAbbreviationOption() {
         when(abbreviationPreferences.getExternalJournalLists())
-                .thenReturn(FXCollections.<>observableArrayList());
+                .thenReturn(FXCollections.<String>observableArrayList());
         when(abbreviationPreferences.useJournalAbbreviationMode())
                 .thenReturn(JournalMode.ABBREVIATE);
         when(abbreviationPreferences.useAbbreviationTypeOnFetch())
