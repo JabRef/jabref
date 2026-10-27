@@ -293,6 +293,27 @@ public record ZoteroReferenceMark(
         return Optional.empty();
     }
 
+    /// Returns an identity for the Zotero item that is independent of its bibliographic fields.
+    ///
+    /// The item data ID is preferred because the citation-item ID can be local to the mark. A Zotero URI is used
+    /// when neither item ID is available.
+    static Optional<String> getItemIdentity(ZoteroCitationData.CitationItemData citationItem) {
+        if (citationItem.itemData != null && !StringUtil.isBlank(citationItem.itemData.id)) {
+            return Optional.of("id:" + normalizeZoteroItemId(citationItem.itemData.id));
+        }
+
+        if (!StringUtil.isBlank(citationItem.id)) {
+            return Optional.of("id:" + normalizeZoteroItemId(citationItem.id));
+        }
+
+        return Optional.ofNullable(citationItem.uris)
+                       .orElse(List.of())
+                       .stream()
+                       .filter(ZoteroReferenceMark::isZoteroUri)
+                       .findFirst()
+                       .map(uri -> "uri:" + uri.trim());
+    }
+
     static String createJabRefUri(String citationKey) {
         return JABREF_URI_PREFIX + citationKey;
     }

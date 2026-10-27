@@ -1,9 +1,9 @@
 package org.jabref.logic.openoffice.action;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.SequencedSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.openoffice.ReferenceMark;
@@ -23,6 +23,14 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ImportCited {
 
+    private enum IdentityType {
+        CITATION_KEY,
+        ZOTERO_ITEM
+    }
+
+    private record CitationIdentity(IdentityType type, String value) {
+    }
+
     private ImportCited() {
     }
 
@@ -41,18 +49,23 @@ public class ImportCited {
     /// @param targetDatabase     the library the entries are to be imported into
     // [impl->feat~import.libreoffice.cited-entries~1]
     public static CitedEntries collectCitedEntries(List<String> referenceMarkNames, BibDatabase targetDatabase) {
-        SequencedSet<BibEntry> citedEntries = new LinkedHashSet<>();
-        Set<String> citedCitationKeys = new HashSet<>();
+        List<BibEntry> citedEntries = new ArrayList<>();
+        Set<CitationIdentity> citedIdentities = new HashSet<>();
         for (String referenceMarkName : referenceMarkNames) {
             if (!ReferenceMark.isZoteroReferenceMarkName(referenceMarkName)) {
                 continue;
             }
 
             String cslJson = ZoteroReferenceMark.getCSLJson(referenceMarkName);
-            for (BibEntry entry : ZoteroCitationMarkParser.parseCslCitationJsonForImport(cslJson)) {
-                entry.getCitationKey().ifPresentOrElse(
-                        citationKey -> {
-                            if (citedCitationKeys.add(citationKey)) {
+            for (ZoteroCitationMarkParser.ParsedEntry parsedEntry : ZoteroCitationMarkParser.parseCslCitationJsonForImportWithIdentity(cslJson)) {
+                BibEntry entry = parsedEntry.entry();
+                Optional<CitationIdentity> identity = entry.getCitationKey()
+                                                           .map(key -> new CitationIdentity(IdentityType.CITATION_KEY, key))
+                                                           .or(() -> parsedEntry.itemIdentity()
+                                                                               .map(itemId -> new CitationIdentity(IdentityType.ZOTERO_ITEM, itemId)));
+                identity.ifPresentOrElse(
+                        citationIdentity -> {
+                            if (citedIdentities.add(citationIdentity)) {
                                 citedEntries.add(entry);
                             }
                         },

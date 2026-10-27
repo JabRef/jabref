@@ -78,10 +78,32 @@ class ImportCitedTest {
     @Test
     void collectsZoteroOnlyEntryCitedTwiceOnce() {
         ImportCited.CitedEntries citedEntries = ImportCited.collectCitedEntries(
-                List.of(citeWithZotero("RNDabcdefghij"), citeWithZotero("RNDklmnopqrst")),
+                List.of(citeWithZotero("587", "Cited from Zotero", "RNDabcdefghij"),
+                        citeWithZotero("587", "Cited from Zotero", "RNDklmnopqrst")),
                 new BibDatabase());
 
         assertEquals(List.of(Optional.of("Cited from Zotero")), titlesOf(citedEntries.newEntries()));
+    }
+
+    @Test
+    void keepsFirstDataWhenKeylessZoteroItemMetadataChanges() {
+        ImportCited.CitedEntries citedEntries = ImportCited.collectCitedEntries(
+                List.of(citeWithZotero("587", "Original title", "RNDabcdefghij"),
+                        citeWithZotero("587", "Updated title", "RNDklmnopqrst")),
+                new BibDatabase());
+
+        assertEquals(List.of(Optional.of("Original title")), titlesOf(citedEntries.newEntries()));
+    }
+
+    @Test
+    void keepsDistinctKeylessZoteroItemsWithIdenticalMetadata() {
+        ImportCited.CitedEntries citedEntries = ImportCited.collectCitedEntries(
+                List.of(citeWithZotero("587", "Same title", "RNDabcdefghij"),
+                        citeWithZotero("588", "Same title", "RNDklmnopqrst")),
+                new BibDatabase());
+
+        assertEquals(List.of(Optional.of("Same title"), Optional.of("Same title")), titlesOf(citedEntries.newEntries()));
+        assertEquals(List.of(Optional.empty(), Optional.empty()), citationKeysOf(citedEntries.newEntries()));
     }
 
     @Test
@@ -145,7 +167,15 @@ class ImportCitedTest {
 
     /// Builds the name of a reference mark as Zotero writes it: the item carries a Zotero URI, but no JabRef URI and no citation key.
     private static String citeWithZotero(String randomSuffix) {
-        return ZoteroReferenceMark.PREFIX + ZOTERO_ONLY_CITATION_JSON + " " + randomSuffix;
+        return citeWithZotero("587", "Cited from Zotero", randomSuffix);
+    }
+
+    private static String citeWithZotero(String itemId, String title, String randomSuffix) {
+        String citationJson = """
+                {"citationItems": [{"id": %s, "uris": ["http://zotero.org/users/123/items/%s"],
+                "itemData": {"id": %s, "type": "article-journal", "title": "%s", "author": [{"family": "Doe", "given": "John"}]}}]}
+                """.formatted(itemId, itemId, itemId, title);
+        return ZoteroReferenceMark.PREFIX + citationJson + " " + randomSuffix;
     }
 
     private static List<Optional<String>> citationKeysOf(List<BibEntry> entries) {
