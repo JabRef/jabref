@@ -76,6 +76,7 @@ import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -125,8 +126,12 @@ import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
+import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -302,6 +307,8 @@ public class JabRefCliPreferences implements CliPreferences {
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
+    private static final String DECLINED_CUSTOM_ENTRY_TYPES = "declinedCustomEntryTypes";
+
     // region (Linked)FilePreferences
     private static final String FILES_MAIN_DIRECTORY = "fileDirectory";
     private static final String FILES_STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
@@ -343,6 +350,15 @@ public class JabRefCliPreferences implements CliPreferences {
     // PROXY_PASSWORD = "proxyPassword" handled by KeyRing
     private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
     // endregion
+
+    // CiteDrive
+    // RefreshToken
+    private static final String CITE_DRIVE_KEYRING_SERVICE = "org.jabref";
+    private static final String CITE_DRIVE_KEYRING_ACCOUNT = "citedrive";
+    private static final String CITE_DRIVE_ENABLED = "citeDriveEnabled";
+    private static final String CITE_DRIVE_PERSIST_TOKEN = "citeDrivePersistToken";
+    private static final String CITE_DRIVE_API_BASE_URL = "citeDriveApiBaseUrl";
+    private static final String CITE_DRIVE_APP_BASE_URL = "citeDriveAppBaseUrl";
 
     // SSL
     private static final String SSL_TRUSTSTORE_PATH = "truststorePath";
@@ -483,6 +499,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private FilePreferences filePreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
+    private CiteDrivePreferences citeDrivePreferences;
     private SSLPreferences sslPreferences;
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
@@ -1082,6 +1099,7 @@ public class JabRefCliPreferences implements CliPreferences {
     @Override
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
+        removeDeclinedCustomEntryTypes();
         clearCitationKeyPatterns();
         clearTruststoreFromCustomCertificates();
         clearCustomFetcherKeys();
@@ -1091,6 +1109,9 @@ public class JabRefCliPreferences implements CliPreferences {
         initializeAll();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
+
+        // CiteDrive preferences are not registered in allBindings (they persist via the keyring), so reset them explicitly.
+        getCiteDrivePreferences().setAll(CiteDrivePreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -1104,6 +1125,9 @@ public class JabRefCliPreferences implements CliPreferences {
         initializeAll();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
+
+        // CiteDrive preferences are not registered in allBindings (the token lives in the keyring), so reload them explicitly.
+        getCiteDrivePreferences().setAll(getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences.getDefault()));
     }
 
     /// Instantiates every preference group so its bindings are registered in [#allBindings] before a bulk reset/import
@@ -1139,15 +1163,29 @@ public class JabRefCliPreferences implements CliPreferences {
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences()));
     }
 
-    private static void importPreferencesToBackingStore(Path path) throws JabRefException {
+    private void importPreferencesToBackingStore(Path path) throws JabRefException {
         LOGGER.debug("Importing preferences {}", path.toAbsolutePath());
+        // Importing merges into the current preferences, but the declined decisions must come from the imported file only.
+        // They are restored if the file cannot be imported.
+        Set<String> declinedBeforeImport = getDeclinedCustomEntryTypes();
+        removeDeclinedCustomEntryTypes();
         try (InputStream is = Files.newInputStream(path)) {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
+            removeDeclinedCustomEntryTypes();
+            addDeclinedCustomEntryTypes(declinedBeforeImport);
             throw new JabRefException(
                     "Could not import preferences",
                     Localization.lang("Could not import preferences"),
                     ex);
+        }
+    }
+
+    private void removeDeclinedCustomEntryTypes() {
+        try {
+            PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).removeNode();
+        } catch (BackingStoreException e) {
+            LOGGER.info("Clearing declined custom entry types failed.", e);
         }
     }
 
@@ -1322,6 +1360,28 @@ public class JabRefCliPreferences implements CliPreferences {
             prefsNodev2.flush();
         } catch (BackingStoreException e) {
             LOGGER.info("Updating stored custom entry types failed.", e);
+        }
+    }
+
+    @Override
+    public Set<String> getDeclinedCustomEntryTypes() {
+        try {
+            return Set.of(PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES).keys());
+        } catch (BackingStoreException e) {
+            LOGGER.info("Reading declined custom entry types failed.", e);
+            return Set.of();
+        }
+    }
+
+    /// Stores each fingerprint as a key without a value: a key is limited to 80 characters, a value to 8192.
+    @Override
+    public void addDeclinedCustomEntryTypes(Collection<String> declinedEntryTypes) {
+        Preferences node = PREFS_NODE.node(DECLINED_CUSTOM_ENTRY_TYPES);
+        declinedEntryTypes.forEach(declined -> node.put(declined, ""));
+        try {
+            node.flush();
+        } catch (BackingStoreException e) {
+            LOGGER.info("Storing declined custom entry types failed.", e);
         }
     }
 
@@ -1593,6 +1653,97 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return citationKeyPatternPreferences;
     }
+
+    // region: CiteDrive Preferences
+    @Override
+    public CiteDrivePreferences getCiteDrivePreferences() {
+        if (citeDrivePreferences != null) {
+            return citeDrivePreferences;
+        }
+
+        citeDrivePreferences = getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences.getDefault());
+
+        EasyBind.listen(citeDrivePreferences.persistRefreshTokenProperty(), (_, _, newValue) -> {
+            putBoolean(CITE_DRIVE_PERSIST_TOKEN, newValue);
+            setCiteDriveToken(newValue ? citeDrivePreferences.getRefreshToken() : null);
+        });
+
+        EasyBind.listen(citeDrivePreferences.enabledProperty(), (_, _, newValue) -> putBoolean(CITE_DRIVE_ENABLED, newValue));
+        EasyBind.listen(citeDrivePreferences.apiBaseUrlProperty(), (_, _, newValue) -> put(CITE_DRIVE_API_BASE_URL, newValue));
+        EasyBind.listen(citeDrivePreferences.appBaseUrlProperty(), (_, _, newValue) -> put(CITE_DRIVE_APP_BASE_URL, newValue));
+
+        EasyBind.listen(citeDrivePreferences.getRefreshTokenProperty(), (_, _, newValue) -> {
+            if (citeDrivePreferences.shouldPersistRefreshToken()) {
+                setCiteDriveToken(newValue);
+            }
+        });
+
+        return citeDrivePreferences;
+    }
+
+    private CiteDrivePreferences getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences defaults) {
+        boolean persistToken = getBoolean(CITE_DRIVE_PERSIST_TOKEN, defaults.shouldPersistRefreshToken());
+        String apiBaseUrl = get(CITE_DRIVE_API_BASE_URL, defaults.getApiBaseUrl());
+        return new CiteDrivePreferences(
+                getBoolean(CITE_DRIVE_ENABLED, defaults.isEnabled()),
+                persistToken ? getCiteDriveToken(apiBaseUrl) : null,
+                persistToken,
+                apiBaseUrl,
+                get(CITE_DRIVE_APP_BASE_URL, defaults.getAppBaseUrl())
+        );
+    }
+
+    /// The refresh token lives in the system keyring only: never in the preferences, which can be exported as plain text
+    private @Nullable RefreshToken getCiteDriveToken(String apiBaseUrl) {
+        try (final Keyring keyring = Keyring.create()) {
+            return parseCiteDriveToken(keyring.getPassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT), apiBaseUrl);
+        } catch (PasswordAccessException _) {
+            LOGGER.debug("No CiteDrive token stored in keyring");
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to read CiteDrive token from keyring", ex);
+        }
+        return null;
+    }
+
+    /// If the keyring is not available, the token is kept in memory only (login needed after restart)
+    private void setCiteDriveToken(@Nullable RefreshToken refreshToken) {
+        try (final Keyring keyring = Keyring.create()) {
+            if (refreshToken == null) {
+                keyring.deletePassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT);
+            } else {
+                keyring.setPassword(CITE_DRIVE_KEYRING_SERVICE, CITE_DRIVE_KEYRING_ACCOUNT, serializeCiteDriveToken(refreshToken, citeDrivePreferences.getApiBaseUrl()));
+            }
+        } catch (PasswordAccessException _) {
+            LOGGER.debug("No CiteDrive token stored in keyring, nothing to remove");
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to update CiteDrive token in keyring", ex);
+        }
+    }
+
+    static String serializeCiteDriveToken(RefreshToken refreshToken, String apiBaseUrl) {
+        JSONObject json = refreshToken.toJSONObject();
+        json.put("api_base_url", apiBaseUrl);
+        return json.toJSONString();
+    }
+
+    // [impl->req~citedrive.credentials.server~1]
+    static @Nullable RefreshToken parseCiteDriveToken(@Nullable String json, String apiBaseUrl) {
+        if (StringUtil.isBlank(json)) {
+            return null;
+        }
+
+        try {
+            JSONObject jsonObject = (JSONObject) new JSONParser(JSONParser.MODE_PERMISSIVE).parse(json);
+            if (!apiBaseUrl.equals(jsonObject.get("api_base_url"))) {
+                return null;
+            }
+            return RefreshToken.parse(jsonObject);
+        } catch (ParseException | net.minidev.json.parser.ParseException e) {
+            LOGGER.warn("Invalid CiteDrive refresh token JSON", e);
+            return null;
+        }
+    }
+    // endRegion: CiteDrive Preferences
 
     private @NonNull GlobalCitationKeyPatterns getGlobalCitationKeyPattern(CitationKeyPatternPreferences defaults) {
         GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(
@@ -2462,7 +2613,6 @@ public class JabRefCliPreferences implements CliPreferences {
         for (int i = 0; i < names.size(); i++) {
             fetcherApiKeys.add(new FetcherApiKey(
                     names.get(i),
-                    // i < uses.size() ? Boolean.parseBoolean(uses.get(i)) : false
                     (i < uses.size()) && Boolean.parseBoolean(uses.get(i)),
                     i < keys.size() ? keys.get(i) : ""));
         }
