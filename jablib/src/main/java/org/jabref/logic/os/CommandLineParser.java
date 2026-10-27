@@ -17,15 +17,14 @@ public class CommandLineParser {
     private CommandLineParser() {
     }
 
-    // [impl->adr~custom-application-command-parsing~1]
-    public static List<String> toArguments(String commandLine, String directory) {
+    public static List<String> withDirectory(List<String> arguments, String directory) {
         String replacement = Matcher.quoteReplacement(directory);
-        return splitCommandLine(commandLine).stream()
-                                            .map(argument -> DIRECTORY_PLACEHOLDER.matcher(argument).replaceAll(replacement))
-                                            .toList();
+        return arguments.stream()
+                        .map(argument -> DIRECTORY_PLACEHOLDER.matcher(argument).replaceAll(replacement))
+                        .toList();
     }
 
-    private static List<String> splitCommandLine(String commandLine) {
+    public static List<String> splitLegacyCommandLine(String commandLine) {
         List<String> tokens = new ArrayList<>();
         if (StringUtil.isBlank(commandLine)) {
             return tokens;
@@ -43,7 +42,7 @@ public class CommandLineParser {
                 i++;
                 currentToken.append(commandLine.charAt(i));
                 argumentStarted = true;
-            } else if (c == '\'' && !inDoubleQuotes) {
+            } else if (c == '\'' && !inDoubleQuotes && !isEmbeddedApostrophe(commandLine, i)) {
                 inSingleQuotes = !inSingleQuotes;
                 argumentStarted = true;
             } else if (c == '"' && !inSingleQuotes) {
@@ -61,6 +60,10 @@ public class CommandLineParser {
             }
         }
 
+        if (inSingleQuotes || inDoubleQuotes) {
+            return List.of();
+        }
+
         if (argumentStarted) {
             tokens.add(currentToken.toString());
         }
@@ -74,5 +77,11 @@ public class CommandLineParser {
         }
         char character = commandLine.charAt(index);
         return character == '\'' || character == '"' || Character.isWhitespace(character);
+    }
+
+    private static boolean isEmbeddedApostrophe(String commandLine, int index) {
+        return index > 0 && index + 1 < commandLine.length()
+                && Character.isUnicodeIdentifierPart(commandLine.charAt(index - 1))
+                && Character.isUnicodeIdentifierPart(commandLine.charAt(index + 1));
     }
 }

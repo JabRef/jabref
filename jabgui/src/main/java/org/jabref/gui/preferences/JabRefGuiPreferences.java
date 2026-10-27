@@ -60,6 +60,7 @@ import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
@@ -170,12 +171,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region ExternalApplicationsPreferences
     private static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     private static final String CONSOLE_COMMAND = "consoleCommand";
+    private static final String CONSOLE_COMMAND_ARGUMENTS = "consoleCommandArguments";
+    private static final String LEGACY_WINDOWS_CONSOLE_COMMAND = "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"";
     private static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
     private static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
     private static final String EMAIL_SUBJECT = "emailSubject";
     private static final String KINDLE_EMAIL = "kindleEmail";
     private static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
     private static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
+    private static final String FILE_BROWSER_COMMAND_ARGUMENTS = "fileBrowserCommandArguments";
     // endregion
 
     // region Auto completion
@@ -876,24 +880,72 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder()),
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))),
                 !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaultValues.useCustomTerminal()), // mind the !
-                get(CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand()),
+                getCommandArguments(CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand()),
                 !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaultValues.useCustomFileBrowser()), // mind the !
-                get(FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand()),
+                getCommandArguments(FILE_BROWSER_COMMAND_ARGUMENTS, FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand()),
                 get(KINDLE_EMAIL, defaultValues.getKindleEmail())
         );
 
         bindString(externalApplicationsPreferences.eMailSubjectProperty(), EMAIL_SUBJECT, defaultValues.getEmailSubject());
         bindBoolean(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(), OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder());
         bindBooleanInverted(externalApplicationsPreferences.useCustomTerminalProperty(), USE_DEFAULT_CONSOLE_APPLICATION, defaultValues.useCustomTerminal());
-        bindString(externalApplicationsPreferences.customTerminalCommandProperty(), CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand());
+        bindCustom(externalApplicationsPreferences.customTerminalCommandProperty(), CONSOLE_COMMAND_ARGUMENTS, defaultValues.getCustomTerminalCommand(),
+                (_, _, value) -> put(CONSOLE_COMMAND_ARGUMENTS, OBJECT_MAPPER.writeValueAsString(value)),
+                () -> externalApplicationsPreferences.setCustomTerminalCommand(getCommandArguments(CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand())),
+                () -> externalApplicationsPreferences.setCustomTerminalCommand(defaultValues.getCustomTerminalCommand()));
         bindBooleanInverted(externalApplicationsPreferences.useCustomFileBrowserProperty(), USE_DEFAULT_FILE_BROWSER_APPLICATION, defaultValues.useCustomFileBrowser());
-        bindString(externalApplicationsPreferences.customFileBrowserCommandProperty(), FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand());
+        bindCustom(externalApplicationsPreferences.customFileBrowserCommandProperty(), FILE_BROWSER_COMMAND_ARGUMENTS, defaultValues.getCustomFileBrowserCommand(),
+                (_, _, value) -> put(FILE_BROWSER_COMMAND_ARGUMENTS, OBJECT_MAPPER.writeValueAsString(value)),
+                () -> externalApplicationsPreferences.setCustomFileBrowserCommand(getCommandArguments(FILE_BROWSER_COMMAND_ARGUMENTS, FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand())),
+                () -> externalApplicationsPreferences.setCustomFileBrowserCommand(defaultValues.getCustomFileBrowserCommand()));
         bindString(externalApplicationsPreferences.kindleEmailProperty(), KINDLE_EMAIL, defaultValues.getKindleEmail());
         bindSet(externalApplicationsPreferences.getExternalFileTypes(), EXTERNAL_FILE_TYPES, defaultValues.getExternalFileTypes(),
                 set -> put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(set)),
                 () -> ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))));
 
         return externalApplicationsPreferences;
+    }
+
+    private List<String> getCommandArguments(String key, String legacyKey, List<String> defaultArguments) {
+        if (hasKey(key)) {
+            try {
+                JsonNode storedCommand = OBJECT_MAPPER.readTree(get(key, "[]"));
+                if (!storedCommand.isArray()) {
+                    LOGGER.warn("External application command arguments are not a list");
+                    return defaultArguments;
+                }
+                List<String> arguments = new ArrayList<>();
+                for (JsonNode argument : storedCommand) {
+                    if (!argument.isString()) {
+                        LOGGER.warn("External application command argument is not a string");
+                        return defaultArguments;
+                    }
+                    arguments.add(argument.asString());
+                }
+                return List.copyOf(arguments);
+            } catch (JacksonException e) {
+                LOGGER.warn("Could not read external application command arguments", e);
+                return defaultArguments;
+            }
+        }
+
+        if (!hasKey(legacyKey)) {
+            return defaultArguments;
+        }
+
+        List<String> arguments = migrateLegacyCommand(get(legacyKey, ""), defaultArguments);
+        if (!arguments.isEmpty()) {
+            put(key, OBJECT_MAPPER.writeValueAsString(arguments));
+        }
+        return arguments;
+    }
+
+    @VisibleForTesting
+    static List<String> migrateLegacyCommand(String command, List<String> defaultArguments) {
+        if (!defaultArguments.isEmpty() && LEGACY_WINDOWS_CONSOLE_COMMAND.equals(command)) {
+            return defaultArguments;
+        }
+        return CommandLineParser.splitLegacyCommandLine(command);
     }
     // endregion
 

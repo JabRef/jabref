@@ -230,8 +230,8 @@ public abstract class NativeDesktop {
             return;
         }
         String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-        String command = externalApplicationsPreferences.getCustomFileBrowserCommand();
-        if (command.isEmpty()) {
+        List<String> command = externalApplicationsPreferences.getCustomFileBrowserCommand();
+        if (command.isEmpty() || command.getFirst().isBlank()) {
             LoggerFactory.getLogger(NativeDesktop.class).info("No custom file browser command defined");
             get().openFolderAndSelectFile(fileLink);
             return;
@@ -254,9 +254,8 @@ public abstract class NativeDesktop {
             get().openConsole(absolutePath, dialogService);
             return;
         }
-        String command = preferences.getExternalApplicationsPreferences().getCustomTerminalCommand();
-        command = command.trim();
-        if (command.isEmpty()) {
+        List<String> command = preferences.getExternalApplicationsPreferences().getCustomTerminalCommand();
+        if (command.isEmpty() || command.getFirst().isBlank()) {
             get().openConsole(absolutePath, dialogService);
             LoggerFactory.getLogger(NativeDesktop.class).info("Preference for custom terminal is empty. Using default terminal.");
             return;
@@ -264,14 +263,11 @@ public abstract class NativeDesktop {
         executeCommand(command, absolutePath, dialogService);
     }
 
-    private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        List<String> subcommands = CommandLineParser.toArguments(command, absolutePath);
-        if (subcommands.isEmpty()) {
-            return;
-        }
-
+    private static void executeCommand(List<String> command, String absolutePath, DialogService dialogService) {
+        // [impl->adr~store-custom-application-arguments~1]
+        List<String> subcommands = CommandLineParser.withDirectory(command, absolutePath);
         LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", subcommands);
-        dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
+        dialogService.notify(Localization.lang("Executing command \"%0\"...", String.join(" ", subcommands)));
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(subcommands);
@@ -285,7 +281,7 @@ public abstract class NativeDesktop {
             HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
         } catch (IOException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error during command execution", exception);
-            dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
+            dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", String.join(" ", subcommands)));
         }
     }
 

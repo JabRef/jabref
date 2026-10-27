@@ -60,4 +60,20 @@ class JabRefGuiPreferencesTest {
                                 {"My tab":["author",{"pattern":"doi","extract":true}]}
                                 """));
     }
+
+    @Test
+    void migrateLegacyWindowsConsoleCommandKeepsExecutableWithSpaces() {
+        List<String> expected = List.of("C:\\Program Files\\ConEmu\\ConEmu64.exe", "/single", "/dir", "%DIR");
+
+        assertEquals(expected, JabRefGuiPreferences.migrateLegacyCommand(
+                "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"", expected));
+    }
+
+    @Test
+    void migrateLegacyIssueCommandKeepsDirectoryAsOneArgument() {
+        assertEquals(
+                List.of("/usr/bin/gnome-terminal", "--working-directory=%DIR"),
+                JabRefGuiPreferences.migrateLegacyCommand(
+                        "/usr/bin/gnome-terminal --working-directory='%DIR'", List.of()));
+    }
 }
