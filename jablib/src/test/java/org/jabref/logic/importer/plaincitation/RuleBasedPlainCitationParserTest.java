@@ -103,10 +103,38 @@ class RuleBasedPlainCitationParserTest {
 
     /// A DOI inside a publisher URL belongs to that URL: removing it would truncate the URL.
     /// The explicit `doi:` reference is the one that is removed.
-    @Test
-    void doiInsidePublisherUrlKeepsUrlIntact() throws FetcherException {
+    @ParameterizedTest
+    @ValueSource(strings = {"10.1000/xyz123", "10.1000/different"})
+    void doiInsidePublisherUrlKeepsUrlIntact(String explicitDoi) throws FetcherException {
         Optional<BibEntry> entry = parser.parsePlainCitation(
-                "Smith, J. A title. Journal, 2020. https://publisher.example.com/10.1000/xyz123 doi:10.1000/xyz123");
+                "Smith, J. A title. Journal, 2020. https://publisher.example.com/10.1000/xyz123 doi:" + explicitDoi);
+        assertEquals(List.of(Optional.of(explicitDoi), Optional.of("https://publisher.example.com/10.1000/xyz123")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.DOI)),
+                        entry.flatMap(e -> e.getField(StandardField.URL))));
+    }
+
+    @Test
+    void firstStandaloneDoiAfterPublisherUrlWins() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation(
+                "Smith, J. A title. Journal, 2020. https://publisher.example.com/10.1000/xyz123 doi:10.1000/different doi:10.1000/xyz123");
+        assertEquals(List.of(Optional.of("10.1000/different"), Optional.of("https://publisher.example.com/10.1000/xyz123")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.DOI)),
+                        entry.flatMap(e -> e.getField(StandardField.URL))));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"10.1000/different, https://doi.org/10.1000/different", "10/abcde, https://doi.org/abcde"})
+    void doiResolverAfterPublisherUrlKeepsUrlIntact(String expectedDoi, String resolverUrl) throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation(
+                "Smith, J. A title. Journal, 2020. https://publisher.example.com/10.1000/xyz123 " + resolverUrl);
+        assertEquals(List.of(Optional.of(expectedDoi), Optional.of("https://publisher.example.com/10.1000/xyz123")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.DOI)),
+                        entry.flatMap(e -> e.getField(StandardField.URL))));
+    }
+
+    @Test
+    void doiInsidePublisherUrlIsUsedWhenNoStandaloneDoiExists() throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation("Smith, J. A title. Journal, 2020. https://publisher.example.com/10.1000/xyz123");
         assertEquals(List.of(Optional.of("10.1000/xyz123"), Optional.of("https://publisher.example.com/10.1000/xyz123")),
                 List.of(entry.flatMap(e -> e.getField(StandardField.DOI)),
                         entry.flatMap(e -> e.getField(StandardField.URL))));

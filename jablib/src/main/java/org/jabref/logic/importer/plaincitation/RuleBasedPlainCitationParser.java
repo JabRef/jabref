@@ -277,7 +277,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
                   .orElse(input);
     }
 
-    /// Removes exactly one occurrence of [#doi] and its prefix. `DOI.replaceInText` would remove a neighbouring URL, too.
+    /// Removes exactly one standalone DOI and its prefix. `DOI.replaceInText` would remove a neighbouring URL, too.
     ///
     /// The occurrences are searched case-insensitively in `input` itself, not in a lowercased copy: lowercasing can
     /// change the length of a text (`İ` becomes two chars), which would shift all offsets behind it.
@@ -288,29 +288,37 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Only whitespace is collapsed here. [#fixSpaces] would insert spaces into a URL that is still in the text
     /// (`https://x.org` -> `https: //x. org`), so no URL could be found afterwards.
     private String removeDoi(String input) {
-        boolean found = false;
-        int index = indexOfIgnoreCase(input, doi, 0);
-        while (index != -1) {
-            found = true;
+        int searchStart = 0;
+        while (searchStart < input.length()) {
+            String remainingInput = input.substring(searchStart);
+            Optional<DOI> candidate = DOI.findInText(remainingInput);
+            if (candidate.isEmpty()) {
+                break;
+            }
+            String candidateDoi = candidate.orElseThrow().asString();
+            int index = indexOfIgnoreCase(input, candidateDoi, searchStart);
+            if (index == -1) {
+                // The DOI is written differently than its canonical form (for example percent-encoded)
+                doi = candidateDoi;
+                return collapseWhitespace(input.substring(0, searchStart) + DOI.replaceInText(remainingInput, ""));
+            }
             String beforeDoi = input.substring(0, index);
-            String afterDoi = input.substring(index + doi.length());
+            String afterDoi = input.substring(index + candidateDoi.length());
 
             // Checked first: a doi.org link also looks like the beginning of a URL
             Matcher prefixMatcher = DOI_PREFIX_AT_END_PATTERN.matcher(beforeDoi);
             if (prefixMatcher.find()) {
+                doi = candidateDoi;
                 return collapseWhitespace(prefixMatcher.replaceFirst("") + " " + afterDoi);
             }
             if (!URL_BEFORE_DOI_PATTERN.matcher(beforeDoi).find()) {
+                doi = candidateDoi;
                 return collapseWhitespace(beforeDoi + " " + afterDoi);
             }
-            index = indexOfIgnoreCase(input, doi, index + doi.length());
+            searchStart = index + candidateDoi.length();
         }
-        if (found) {
-            // The DOI only occurs inside other URLs. They stay whole, and findUrls takes them.
-            return input;
-        }
-        // The DOI is written differently than its canonical form (for example percent-encoded)
-        return collapseWhitespace(DOI.replaceInText(input, ""));
+        // The DOI only occurs inside other URLs. They stay whole, and findUrls takes them.
+        return input;
     }
 
     /// Finds `needle` in `text` ignoring case, starting at `fromIndex`. The result is an offset in `text` itself
