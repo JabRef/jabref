@@ -15,7 +15,7 @@ public enum AiProvider implements Serializable {
     // [impl->req~ai.llms.providers.huggingface~1]
     HUGGING_FACE("https://router.huggingface.co/v1", "https://huggingface.co/privacy"),
     // [impl->req~ai.llms.providers.dummy~1]
-    DUMMY("", "");
+    DUMMY("http://localhost", "");
 
     private final String apiUrl;
     private final String privacyPolicyUrl;
