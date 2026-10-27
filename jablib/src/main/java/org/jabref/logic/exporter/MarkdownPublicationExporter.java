@@ -89,7 +89,7 @@ public class MarkdownPublicationExporter extends Exporter {
                 MarkdownPublicationExporter.class.getResourceAsStream(
                         "/resource/layout/markdown-publications/publication.layout"))
                                .orElseThrow(() ->
-                                       new IOException("Cannot find Markdown publication layout."));
+                                       new IOException(Localization.lang("Cannot find Markdown publication layout.")));
 
         Layout layout;
         try (Reader reader =
@@ -102,11 +102,11 @@ public class MarkdownPublicationExporter extends Exporter {
             );
             layout = Optional.ofNullable(helper.getLayoutFromText())
                              .orElseThrow(() ->
-                                     new IOException("Cannot load Markdown publication layout."));
+                                     new IOException(Localization.lang("Cannot load Markdown publication layout.")));
         }
 
         StringBuilder markdown = new StringBuilder();
-        markdown.append("## Recent publications\n\n");
+        markdown.append("## ").append(Localization.lang("Recent publications")).append("\n\n");
 
         appendPublications(
                 markdown,
@@ -117,7 +117,7 @@ public class MarkdownPublicationExporter extends Exporter {
                 file
         );
 
-        markdown.append("\n## All publications\n\n");
+        markdown.append("\n## ").append(Localization.lang("All publications")).append("\n\n");
 
         appendPublications(
                 markdown,
