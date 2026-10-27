@@ -11,7 +11,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We fixed an issue where disabling Automatically index all linked files for fulltext search did not stop running indexes. [#17577](https://github.com/JabRef/jabref/issues/17577)
 - We added a dark appearance variant of the macOS application icon. [#17290](https://github.com/JabRef/jabref/issues/17290)
 - We added ARM64 Flatpak builds and nightly, beta, and stable channels. [#13349](https://github.com/JabRef/jabref/issues/13349)
 - We added ARM64 Flatpak builds, nightly, beta, and stable channels, and host editor integration. [#13349](https://github.com/JabRef/jabref/issues/13349)
@@ -30,7 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We Fixed an issue where te citationcount , day and dayfiled columns sorted alphabetically instead of numerically. [#17459](https://github.com/JabRef/jabref/issues/17459)
+-- We fixed an issue where disabling "Automatically index all linked files for fulltext search" did not stop running indexes. [#17577](https://github.com/JabRef/jabref/issues/17577)
 - We fixed exports to RIS, CSV, HTML, and other template-based formats in native JabKit. [#17408](https://github.com/JabRef/jabref/issues/17408)
 - We fixed an issue where JabRef showed an "Executor has been shut down" error on Windows after resuming from suspend. [#17144](https://github.com/JabRef/jabref/pull/17144)
 - We fixed the BibTeX source dialog background in the Citation Relations tab for dark themes. [#13599](https://github.com/JabRef/jabref/issues/13599)

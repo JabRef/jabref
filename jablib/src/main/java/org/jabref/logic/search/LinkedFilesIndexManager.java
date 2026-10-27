@@ -31,7 +31,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /// Maintains the Lucene index for linked files independently of the metadata search backend.
 @NullMarked
 public class LinkedFilesIndexManager {
@@ -71,13 +70,6 @@ public class LinkedFilesIndexManager {
 
     private void bindToPreferences(boolean newValue) {
         if (newValue) {
-            //            new BackgroundTask<>() {
-            //                @Override
-            //                public Void call() {
-            //                    linkedFilesIndexer.updateOnStart(this);
-            //                    return null;
-            //                }
-            //            }.executeWith(taskExecutor);
             runIndexingTask(linkedFilesIndexer::updateOnStart);
         } else {
             indexUpdateThrottler.cancel();
@@ -91,11 +83,22 @@ public class LinkedFilesIndexManager {
         BackgroundTask<Void> task = new BackgroundTask<>() {
             @Override
             public Void call() {
+                if (!shouldIndexLinkedFiles.get()) {
+                    return null;
+                }
                 work.accept(this);
+                if (!shouldIndexLinkedFiles.get()) {
+                    linkedFilesIndexer.removeAllFromIndex();
+                }
                 return null;
             }
         };
         runningTasks.add(task);
+        task.isCancelledProperty().addListener((_, _, cancelled) -> {
+            if (cancelled) {
+                runningTasks.remove(task);
+            }
+        });
         task.onFinished(() -> runningTasks.remove(task))
             .executeWith(taskExecutor);
     }
