@@ -170,7 +170,7 @@ jobs:
           BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
 
           if ! CHECKLIST=$(printf '%s\n' "$BODY" | awk '
-            /^### Checklist$/ { found = 1; in_checklist = 1; next }
+            /^### Checklist[[:space:]]*$/ { found = 1; in_checklist = 1; next }
             /^#+ / { in_checklist = 0 }
             in_checklist { print }
             END { if (!found) exit 1 }
