@@ -360,8 +360,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        record ApiKeyValidationInput(AiProvider provider, String apiKey) { }
-
         // A result only holds for the values it was tested with.
         Stream.of(selectedAiProvider, currentChatModel, currentApiKey, currentApiBaseUrl, customizeExpertSettings)
               .forEach(property -> property.addListener((_, _, _) -> {
@@ -370,19 +368,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
               }));
 
         this.apiKeyValidator = new FunctionBasedValidator<>(
-                Bindings.createObjectBinding(
-                        () -> new ApiKeyValidationInput(selectedAiProvider.get(), currentApiKey.get()),
-                        selectedAiProvider, currentApiKey),
-                input -> input.provider() == AiProvider.DUMMY || !StringUtil.isBlank(input.apiKey()),
+                currentApiKey,
+                token -> !StringUtil.isBlank(token),
                 ValidationMessage.error(Localization.lang("An API key has to be provided")));
 
-        record ChatModelValidationInput(AiProvider provider, String chatModel) { }
-
         this.chatModelValidator = new FunctionBasedValidator<>(
-                Bindings.createObjectBinding(
-                        () -> new ChatModelValidationInput(selectedAiProvider.get(), currentChatModel.get()),
-                        selectedAiProvider, currentChatModel),
-                input -> input.provider() == AiProvider.DUMMY || !StringUtil.isBlank(input.chatModel()),
+                currentChatModel,
+                chatModel -> !StringUtil.isBlank(chatModel),
                 ValidationMessage.error(Localization.lang("Chat model has to be provided")));
 
         this.apiBaseUrlValidator = new FunctionBasedValidator<>(

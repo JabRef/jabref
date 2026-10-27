@@ -236,36 +236,4 @@ class AiTabViewModelTest {
         viewModel.documentSplitterChunkSizeProperty().set(300);
         assertTrue(viewModel.getDocumentSplitterOverlapSizeValidationStatus().isValid());
     }
-
-    @Test
-    void apiKeyValidForDummyProviderWhenBlank() {
-        viewModel.selectedAiProviderProperty().set(AiProvider.DUMMY);
-        viewModel.apiKeyProperty().set("");
-
-        assertTrue(viewModel.getApiTokenValidationStatus().isValid());
-    }
-
-    @Test
-    void apiKeyInvalidForOpenAiWhenBlank() {
-        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
-        viewModel.apiKeyProperty().set("");
-
-        assertFalse(viewModel.getApiTokenValidationStatus().isValid());
-    }
-
-    @Test
-    void chatModelValidForDummyProviderWhenBlank() {
-        viewModel.selectedAiProviderProperty().set(AiProvider.DUMMY);
-        viewModel.selectedChatModelProperty().set("");
-
-        assertTrue(viewModel.getChatModelValidationStatus().isValid());
-    }
-
-    @Test
-    void chatModelInvalidForOpenAiWhenBlank() {
-        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
-        viewModel.selectedChatModelProperty().set("");
-
-        assertFalse(viewModel.getChatModelValidationStatus().isValid());
-    }
 }
