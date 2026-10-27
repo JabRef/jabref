@@ -392,7 +392,10 @@ public class OpenOfficePanel {
                     ImportCited.collectCitedEntries(markNames, targetTab.getDatabase());
 
             if (citedEntries.newEntries().isEmpty()) {
-                dialogService.notify(Localization.lang("No new cited entries to import"));
+                String notification = citedEntries.entriesAlreadyInLibrary().isEmpty()
+                        ? Localization.lang("No Zotero-compatible citations found. Only Zotero-compatible citations can be imported.")
+                        : Localization.lang("No new cited entries to import");
+                dialogService.notify(notification);
                 return;
             }
 
@@ -488,8 +491,7 @@ public class OpenOfficePanel {
         boolean canGenerateBibliography = (isConnectedToDocument && hasDatabase)
                 && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography()));
         boolean canImportCited = isConnectedToDocument
-                && tabContainer.getCurrentLibraryTab() != null
-                && openOfficePreferences.getZoteroCompatibilityMode();
+                && tabContainer.getCurrentLibraryTab() != null;
 
         selectDocument.setDisable(!isConnectedToDocument);
         setStyleFile.setDisable(!isConnectedToDocument);
