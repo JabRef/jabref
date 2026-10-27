@@ -514,6 +514,34 @@ class MarkdownPublicationExporterTest {
                 """, recentSection(output));
     }
 
+    @Test
+    void preservesIncludingGroupMembership(@TempDir Path tempDir) throws Exception {
+        GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup("All entries"));
+        GroupTreeNode exportGroup = root.addSubgroup(group("Export"));
+        GroupTreeNode parent = exportGroup.addSubgroup(
+                new ExplicitGroup("Parent", GroupHierarchyType.INCLUDING, ';')
+        );
+        GroupTreeNode child = parent.addSubgroup(group("Child"));
+
+        BibEntry parentEntry = publication("Parent paper", 2024);
+        BibEntry childEntry = publication("Child paper", 2025);
+        parent.addEntriesToGroup(List.of(parentEntry));
+        child.addEntriesToGroup(List.of(childEntry));
+
+        String markdown = export(tempDir, root, List.of(parentEntry, childEntry));
+
+        assertEquals("""
+                ### Parent
+
+                * Child paper. 2025
+                * Parent paper. 2024
+
+                #### Child
+
+                * Child paper. 2025
+                """, markdown.substring(markdown.indexOf("### Parent\n")));
+    }
+
     private MarkdownPublicationExporter createExporter() {
         LayoutFormatterPreferences preferences = LayoutFormatterPreferences.getDefault();
 
