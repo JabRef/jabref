@@ -104,7 +104,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty currentApiBaseUrl = new SimpleStringProperty();
     private final BooleanProperty disableApiBaseUrl = new SimpleBooleanProperty(true); // HuggingFaceChatModel and GoogleAiGeminiChatModel don't support setting an API base URL
-    private final BooleanProperty disableApiKey = new SimpleBooleanProperty(false);
 
     private final StringProperty openAiApiBaseUrl = new SimpleStringProperty();
     private final StringProperty mistralAiApiBaseUrl = new SimpleStringProperty();
@@ -218,7 +217,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             List<String> models = PredefinedChatModelUtil.getAvailableModels(newValue);
 
             disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI || newValue == AiProvider.DUMMY);
-            disableApiKey.set(newValue == AiProvider.DUMMY);
 
             // When we setAll on Hugging Face, models are empty, and currentChatModel become null.
             // It becomes null because `currentChatModel` is bound to combobox, and this combobox becomes empty.
@@ -378,9 +376,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 input -> input.provider() == AiProvider.DUMMY || !StringUtil.isBlank(input.apiKey()),
                 ValidationMessage.error(Localization.lang("An API key has to be provided")));
 
+        record ChatModelValidationInput(AiProvider provider, String chatModel) { }
+
         this.chatModelValidator = new FunctionBasedValidator<>(
-                currentChatModel,
-                chatModel -> !StringUtil.isBlank(chatModel),
+                Bindings.createObjectBinding(
+                        () -> new ChatModelValidationInput(selectedAiProvider.get(), currentChatModel.get()),
+                        selectedAiProvider, currentChatModel),
+                input -> input.provider() == AiProvider.DUMMY || !StringUtil.isBlank(input.chatModel()),
                 ValidationMessage.error(Localization.lang("Chat model has to be provided")));
 
         this.apiBaseUrlValidator = new FunctionBasedValidator<>(
@@ -481,7 +483,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         selectedAiProvider.setValue(workingAiPreferences.getAiProvider());
         disableApiBaseUrl.set(selectedAiProvider.get() == AiProvider.HUGGING_FACE || selectedAiProvider.get() == AiProvider.GEMINI || selectedAiProvider.get() == AiProvider.DUMMY);
-        disableApiKey.set(selectedAiProvider.get() == AiProvider.DUMMY);
 
         customizeExpertSettings.setValue(workingAiPreferences.getCustomizeExpertSettings());
 
@@ -752,10 +753,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty apiKeyProperty() {
         return currentApiKey;
-    }
-
-    public BooleanProperty disableApiKeyProperty() {
-        return disableApiKey;
     }
 
     public BooleanProperty customizeExpertSettingsProperty() {
