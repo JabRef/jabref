@@ -455,6 +455,28 @@ class MarkdownPublicationExporterTest {
                 """, recentSection(output));
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "https://example.org/a>b, https://example.org/a%3Eb",
+            "https://example.org/a<b, https://example.org/a%3Cb",
+            "https://example.org/a b, https://example.org/a%20b"
+    })
+    void encodesMarkdownTitleLinkDestination(
+            String url,
+            String expectedUrl,
+            @TempDir Path tempDir) throws Exception {
+        BibEntry entry = publication("Example paper")
+                .withField(StandardField.URL, url);
+
+        assertEquals("""
+                        ## Recent publications
+
+                        * [Example paper](<%s>). 2025
+
+                        """.formatted(expectedUrl),
+                exportRecentSection(tempDir, entry));
+    }
+
     private MarkdownPublicationExporter createExporter() {
         LayoutFormatterPreferences preferences = LayoutFormatterPreferences.getDefault();
 
