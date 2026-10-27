@@ -479,6 +479,23 @@ class RuleBasedPlainCitationParserTest {
 
     // Title and journal
 
+    // [utest->req~import.plain-citation.leading-in~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"Smith, J. A title. In Vitro, 2020.",
+            "Smith, J. \"A title\" In Vitro, 2020.",
+            "Smith, J. A title // In Vitro, 2020.",
+            "Smith, J. A title, In Vitro, 2020."})
+    void preservesLeadingInInJournalName(String citation) throws FetcherException {
+        assertEquals(Optional.of("In Vitro"), parseField(citation, StandardField.JOURNAL));
+    }
+
+    // [utest->req~import.plain-citation.leading-in~1]
+    @Test
+    void removesInBeforeProceedings() throws FetcherException {
+        assertEquals(Optional.of("Proceedings of the Conference"),
+                parseField("Smith, J. A title. In Proceedings of the Conference, 2020.", StandardField.JOURNAL));
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"Title. 2020. Journal Name", "Title. 2020, Journal Name",
             "Title. 2020; Journal Name", "Title. 2020 Journal Name"})

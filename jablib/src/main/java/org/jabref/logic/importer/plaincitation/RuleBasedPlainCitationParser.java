@@ -183,7 +183,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     /// Same as [#TRAILING_FIELD_PUNCTUATION_PATTERN], but keeps a trailing period
     private static final Pattern TRAILING_FIELD_PUNCTUATION_WITHOUT_PERIOD_PATTERN = Pattern.compile("[\\s,;:\"“”]+$");
 
-    private static final Pattern LEADING_VENUE_NOISE_PATTERN = Pattern.compile("^[\\s,.;:]*(?:In\\s+)?");
+    private static final Pattern LEADING_VENUE_NOISE_PATTERN = Pattern.compile("^[\\s,.;:]*(?:In\\s+(?=Proceedings\\b))?");
 
     /// A comma-separated part that only consists of volume/issue/number information, such as `41`, `4(2)` or `vol. 3`
     private static final Pattern NUMERIC_PART_PATTERN = Pattern.compile(
@@ -634,6 +634,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         if (tagMatcher.find()) {
             venuePart = venuePart.substring(0, tagMatcher.start());
         }
+        // [impl->req~import.plain-citation.leading-in~1]
         venuePart = LEADING_VENUE_NOISE_PATTERN.matcher(venuePart).replaceFirst("");
 
         List<String> venueParts = Arrays.stream(venuePart.split(","))

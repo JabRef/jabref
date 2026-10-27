@@ -180,4 +180,12 @@ A page range is not taken as a year, a year is not taken as pages, and volume an
 
 Needs: impl, utest
 
+## Plain citation parser must preserve leading In in ordinary journal names
+`req~import.plain-citation.leading-in~1`
+
+Journal names such as `In Vitro` retain their leading `In`.
+Only `In` directly before `Proceedings` is treated as a proceedings introducer and removed from the venue.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
