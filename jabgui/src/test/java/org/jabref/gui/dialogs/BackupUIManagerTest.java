@@ -94,6 +94,7 @@ class BackupUIManagerTest extends JavaFxTest {
                 dialogService,
                 originalFile,
                 preferences,
+                new BibEntryTypesManager(),
                 mock(FileUpdateMonitor.class),
                 mock(StateManager.class)));
 
@@ -150,6 +151,7 @@ class BackupUIManagerTest extends JavaFxTest {
                 dialogService,
                 originalFile,
                 preferences,
+                new BibEntryTypesManager(),
                 mock(FileUpdateMonitor.class),
                 new JabRefGuiStateManager());
 

@@ -6,8 +6,13 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypeBuilder;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.junit.jupiter.api.Test;
 
@@ -16,9 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class BibDatabaseDiffTest {
 
+    private static final EntryType MEASUREMENT = new UnknownEntryType("measurement");
+
+    private final BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
+
     @Test
     void compareOfEmptyDatabasesReportsNoDifferences() {
-        BibDatabaseDiff diff = BibDatabaseDiff.compare(new BibDatabaseContext(), new BibDatabaseContext());
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(new BibDatabaseContext(), new BibDatabaseContext(), entryTypesManager);
 
         assertEquals(Optional.empty(), diff.getPreambleDifferences());
         assertEquals(Optional.empty(), diff.getMetaDataDifferences());
@@ -99,7 +108,7 @@ class BibDatabaseDiffTest {
         BibDatabaseContext databaseOne = new BibDatabaseContext(new BibDatabase(List.of(entryOne)));
         BibDatabaseContext databaseTwo = new BibDatabaseContext(new BibDatabase(Arrays.asList(entryTwo, entryThree)));
 
-        BibDatabaseDiff diff = BibDatabaseDiff.compare(databaseOne, databaseTwo);
+        BibDatabaseDiff diff = BibDatabaseDiff.compare(databaseOne, databaseTwo, entryTypesManager);
 
         // three different entries between the databases
         assertEquals(3, diff.getEntryDifferences().size(), "incorrect amount of different entries");
@@ -134,10 +143,43 @@ class BibDatabaseDiffTest {
         assertEquals(entryTwo, diff.getEntryDifferences().getFirst().newEntry(), "there is another value as newEntry");
     }
 
+    @Test
+    void compareOfEntriesOfUnknownTypeWithOnlyOneEqualFieldReportsRemovalAndAddition() {
+        BibEntry entryOne = createMeasurement("first reading", "lab A");
+        BibEntry entryTwo = createMeasurement("totally other", "lab B");
+
+        BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
+
+        assertEquals(List.of(new BibEntryDiff(entryOne, null), new BibEntryDiff(null, entryTwo)), diff.getEntryDifferences());
+    }
+
+    // [utest->req~ux.external-library-changes.custom-entry-types~1]
+    @Test
+    void compareOfEntriesOfCustomTypeWithEqualRequiredFieldReportsOneModification() {
+        entryTypesManager.addCustomOrModifiedType(
+                new BibEntryTypeBuilder().withType(MEASUREMENT)
+                                         .withRequiredFields(StandardField.NUMBER)
+                                         .build(),
+                BibDatabaseMode.BIBLATEX);
+        BibEntry entryOne = createMeasurement("first reading", "lab A");
+        BibEntry entryTwo = createMeasurement("totally other", "lab B");
+
+        BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
+
+        assertEquals(List.of(new BibEntryDiff(entryOne, entryTwo)), diff.getEntryDifferences());
+    }
+
+    private BibEntry createMeasurement(String title, String note) {
+        return new BibEntry(MEASUREMENT)
+                .withField(StandardField.NUMBER, "M-42")
+                .withField(StandardField.TITLE, title)
+                .withField(StandardField.NOTE, note);
+    }
+
     private BibDatabaseDiff compareEntries(BibEntry entryOne, BibEntry entryTwo) {
         BibDatabaseContext databaseOne = new BibDatabaseContext(new BibDatabase(List.of(entryOne)));
         BibDatabaseContext databaseTwo = new BibDatabaseContext(new BibDatabase(List.of(entryTwo)));
 
-        return BibDatabaseDiff.compare(databaseOne, databaseTwo);
+        return BibDatabaseDiff.compare(databaseOne, databaseTwo, entryTypesManager);
     }
 }

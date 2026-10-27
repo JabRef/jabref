@@ -146,6 +146,16 @@ Since inspecting a library file means parsing it completely, the inspection is s
 
 Needs: impl
 
+## Library comparison must use customized entry types to match modified entries
+`req~ux.external-library-changes.custom-entry-types~1`
+
+When JabRef compares a library with another version of it (the file on disk, a backup, a library to merge, or a Git revision), it must judge whether two entries are the same publication by the required fields of the entry types configured by the user.
+Otherwise, a modified entry of a custom or modified entry type is reported as removed and added instead of as changed.
+
+See <https://github.com/JabRef/jabref/issues/9566>.
+
+Needs: impl, utest
+
 ## Bulk entry deletion must keep main table responsive
 `req~ux.large-library.bulk-entry-removal~1`
 

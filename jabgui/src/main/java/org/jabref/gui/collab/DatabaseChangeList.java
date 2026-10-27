@@ -19,6 +19,7 @@ import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.bibtex.comparator.BibStringDiff;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 public final class DatabaseChangeList {
     private DatabaseChangeList() {
@@ -30,10 +31,10 @@ public final class DatabaseChangeList {
     /// @param originalDatabase This is the original database
     /// @param otherDatabase    This is the other database.
     /// @return an unmodifiable list of `DatabaseChange` required to change `originalDatabase` into `otherDatabase`
-    public static List<DatabaseChange> compareAndGetChanges(BibDatabaseContext originalDatabase, BibDatabaseContext otherDatabase, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+    public static List<DatabaseChange> compareAndGetChanges(BibDatabaseContext originalDatabase, BibDatabaseContext otherDatabase, BibEntryTypesManager entryTypesManager, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
         List<DatabaseChange> changes = new ArrayList<>();
 
-        BibDatabaseDiff differences = BibDatabaseDiff.compare(originalDatabase, otherDatabase);
+        BibDatabaseDiff differences = BibDatabaseDiff.compare(originalDatabase, otherDatabase, entryTypesManager);
 
         differences.getMetaDataDifferences().ifPresent(diff -> {
             changes.add(new MetadataChange(diff, originalDatabase, databaseChangeResolverFactory));

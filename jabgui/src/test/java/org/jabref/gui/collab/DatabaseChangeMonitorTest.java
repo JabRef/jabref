@@ -21,6 +21,7 @@ import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -60,6 +61,7 @@ class DatabaseChangeMonitorTest {
                 mock(TaskExecutor.class),
                 mock(DialogService.class),
                 mock(GuiPreferences.class),
+                new BibEntryTypesManager(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(LibraryTab.class));
@@ -81,6 +83,7 @@ class DatabaseChangeMonitorTest {
                 taskExecutor,
                 mock(DialogService.class),
                 mock(GuiPreferences.class),
+                new BibEntryTypesManager(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(LibraryTab.class));
@@ -204,6 +207,7 @@ class DatabaseChangeMonitorTest {
                 mock(TaskExecutor.class),
                 mock(DialogService.class),
                 mock(GuiPreferences.class),
+                new BibEntryTypesManager(),
                 undoManager,
                 mock(StateManager.class),
                 libraryTab);
@@ -236,6 +240,7 @@ class DatabaseChangeMonitorTest {
                 mock(TaskExecutor.class),
                 mock(DialogService.class),
                 mock(GuiPreferences.class),
+                new BibEntryTypesManager(),
                 undoManager,
                 mock(StateManager.class),
                 libraryTab);
@@ -267,6 +272,7 @@ class DatabaseChangeMonitorTest {
                 mock(TaskExecutor.class),
                 mock(DialogService.class),
                 mock(GuiPreferences.class),
+                new BibEntryTypesManager(),
                 undoManager,
                 mock(StateManager.class),
                 libraryTab);
@@ -302,6 +308,7 @@ class DatabaseChangeMonitorTest {
                 mock(TaskExecutor.class),
                 dialogService,
                 mock(GuiPreferences.class),
+                new BibEntryTypesManager(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
                 mock(LibraryTab.class));
