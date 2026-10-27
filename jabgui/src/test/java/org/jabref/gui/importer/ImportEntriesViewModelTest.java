@@ -120,7 +120,7 @@ class ImportEntriesViewModelTest {
             "NONE, Journal of Foo, Journal of Foo",
             "NONE, J. Foo, J. Foo"
     })
-    void additionalFetchedEntriesFollowJournalPreference(JournalMode mode, String input, String expected) throws FetcherException {
+    void fetchMoreEntriesFollowsJournalPreference(JournalMode mode, String input, String expected) throws FetcherException {
         abbreviationPreferences.setJournalMode(mode);
 
         List<BibEntry> initialEntries = new ArrayList<>();
