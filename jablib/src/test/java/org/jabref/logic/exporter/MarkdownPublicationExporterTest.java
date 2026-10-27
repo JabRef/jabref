@@ -414,6 +414,30 @@ class MarkdownPublicationExporterTest {
                 """, recentSection(output));
     }
 
+    @Test
+    void exportsInvalidCalendarDateLast(@TempDir Path tempDir) throws Exception {
+        BibEntry invalid = publication(2026)
+                .withField(StandardField.TITLE, "Invalid date paper")
+                .withField(StandardField.MONTH, "feb")
+                .withField(StandardField.DAY, "31");
+
+        Path output = tempDir.resolve("invalid-date.md");
+
+        createExporter().export(
+                new BibDatabaseContext(),
+                output,
+                List.of(invalid, publication(2025))
+        );
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025
+                * Invalid date paper. 2026
+
+                """, recentSection(output));
+    }
+
     private MarkdownPublicationExporter createExporter() {
         LayoutFormatterPreferences preferences = LayoutFormatterPreferences.getDefault();
 

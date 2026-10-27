@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.time.DateTimeException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -327,21 +328,25 @@ public class MarkdownPublicationExporter extends Exporter {
 
     // [impl->req~export.markdown-publications.date-order~1]
     private long publicationDateKey(BibEntry entry) {
-        return entry.getPublicationDate()
-                    .or(() -> Date.parse(
-                            entry.getField(StandardField.YEAR),
-                            entry.getField(StandardField.MONTH),
-                            entry.getField(StandardField.DAY)))
-                    .filter(date -> date.getYear().isPresent())
-                    .map(date -> {
-                        long year = date.getYear().orElseThrow();
-                        int month = date.getMonth()
-                                        .map(Month::getNumber)
-                                        .orElse(0);
-                        int day = date.getDay().orElse(0);
+        try {
+            return entry.getPublicationDate()
+                        .or(() -> Date.parse(
+                                entry.getField(StandardField.YEAR),
+                                entry.getField(StandardField.MONTH),
+                                entry.getField(StandardField.DAY)))
+                        .filter(date -> date.getYear().isPresent())
+                        .map(date -> {
+                            long year = date.getYear().orElseThrow();
+                            int month = date.getMonth()
+                                            .map(Month::getNumber)
+                                            .orElse(0);
+                            int day = date.getDay().orElse(0);
 
-                        return year * 10000L + month * 100L + day;
-                    })
-                    .orElse(Long.MIN_VALUE);
+                            return year * 10000L + month * 100L + day;
+                        })
+                        .orElse(Long.MIN_VALUE);
+        } catch (DateTimeException _) {
+            return Long.MIN_VALUE;
+        }
     }
 }
