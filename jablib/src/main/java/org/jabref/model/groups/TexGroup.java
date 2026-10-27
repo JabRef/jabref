@@ -16,17 +16,16 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @AllowedToUseLogic("because it needs access to aux parser")
+@NullMarked
 public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
-
     private final Path filePath;
-    private Set<String> keysUsedInAux;
+    // Lazily computed value, therefore, nullable.
+    private @Nullable Set<String> keysUsedInAux;
     private final FileUpdateMonitor fileMonitor;
     private final AuxParser auxParser;
     private final MetaData metaData;
@@ -34,7 +33,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     TexGroup(String name,
              GroupHierarchyType context,
-             @NonNull Path filePath,
+             Path filePath,
              AuxParser auxParser,
              FileUpdateMonitor fileMonitor,
              MetaData metaData,
@@ -94,7 +93,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

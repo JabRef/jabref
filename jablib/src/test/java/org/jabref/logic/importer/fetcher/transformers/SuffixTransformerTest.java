@@ -91,7 +91,7 @@ public abstract class SuffixTransformerTest<T extends AbstractQueryTransformer> 
     }
 
     @Test
-    public void notOperatorSufix() throws QueryNodeParseException {
+    public void notOperatorSuffix() throws QueryNodeParseException {
         String queryString = "!(author=\"Igor Steinmacher\" OR author=\"Christoph Treude\")";
         SearchQuery searchQuery = new SearchQuery(queryString);
         BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());

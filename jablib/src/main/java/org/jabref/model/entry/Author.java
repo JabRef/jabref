@@ -28,7 +28,7 @@ public class Author {
     private final String nameSuffix;
     private Author latexFreeAuthor;
 
-    /// Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
+    /// Creates the Author object. If any part of the name is absent, `null` must be passed; otherwise other methods may return erroneous results.
     ///
     /// In case only the last part is passed, enclosing braces are
     ///
@@ -217,7 +217,7 @@ public class Author {
         return Optional.ofNullable(nameSuffix);
     }
 
-    /// Returns von-part followed by last name ("von Last"). If both fields were specified as <CODE>null</CODE>, the empty string <CODE>""</CODE> is returned.
+    /// Returns von-part followed by last name ("von Last"). If both fields were specified as `null`, the empty string `""` is returned.
     ///
     /// @return 'von Last'
     public String getNamePrefixAndFamilyName() {
@@ -230,8 +230,8 @@ public class Author {
 
     /// Returns the author's name in form 'von Last, Jr., First' with the first name full or abbreviated depending on parameter.
     ///
-    /// @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> - do not abbreviate
-    /// @return 'von Last, Jr., First' (if <CODE>abbr==false</CODE>) or 'von Last, Jr., F.' (if <CODE>abbr==true</CODE>)
+    /// @param abbr `true` - abbreviate first name, `false` - do not abbreviate
+    /// @return 'von Last, Jr., First' (if `abbr==false`) or 'von Last, Jr., F.' (if `abbr==true`)
     public String getFamilyGiven(boolean abbr) {
         StringBuilder res = new StringBuilder(getNamePrefixAndFamilyName());
         getNameSuffix().ifPresent(jr -> res.append(", ").append(jr));
@@ -245,8 +245,8 @@ public class Author {
 
     /// Returns the author's name in form 'First von Last, Jr.' with the first name full or abbreviated depending on parameter.
     ///
-    /// @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> - do not abbreviate
-    /// @return 'First von Last, Jr.' (if <CODE>abbr==false</CODE>) or 'F. von Last, Jr.' (if <CODE>abbr==true</CODE>)
+    /// @param abbr `true` - abbreviate first name, `false` - do not abbreviate
+    /// @return 'First von Last, Jr.' (if `abbr==false`) or 'F. von Last, Jr.' (if `abbr==true`)
     public String getGivenFamily(boolean abbr) {
         StringBuilder res = new StringBuilder();
         if (abbr) {

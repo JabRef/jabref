@@ -11,12 +11,22 @@ import java.util.Set;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class BibStringDiff {
 
-    private final BibtexString originalString;
-    private final BibtexString newString;
+    // Both [#originalString] and [#newString] can be null, which makes no sense,
+    // but this is not possible to represent in Java type system (that at least one of them should be non-null).
+    //
+    // These fields are then analyzed in [DatabaseChangeList] which creates a detailed representation of changes and
+    // skips empty diffs.
 
-    BibStringDiff(BibtexString originalString, BibtexString newString) {
+    @Nullable private final BibtexString originalString;
+    @Nullable private final BibtexString newString;
+
+    BibStringDiff(@Nullable BibtexString originalString, @Nullable BibtexString newString) {
         this.originalString = originalString;
         this.newString = newString;
     }
@@ -80,16 +90,16 @@ public class BibStringDiff {
         return differences;
     }
 
-    public BibtexString getOriginalString() {
-        return originalString;
+    public Optional<BibtexString> getOriginalString() {
+        return Optional.ofNullable(originalString);
     }
 
-    public BibtexString getNewString() {
-        return newString;
+    public Optional<BibtexString> getNewString() {
+        return Optional.ofNullable(newString);
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (this == other) {
             return true;
         }

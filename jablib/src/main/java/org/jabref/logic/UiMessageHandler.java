@@ -4,7 +4,7 @@ import java.util.List;
 
 /// Specifies an interface that can process either cli or remote commands to the ui
 ///
-/// See {@link org.jabref.logic.remote.server.RemoteMessageHandler}
+/// See [org.jabref.logic.remote.server.RemoteMessageHandler]
 public interface UiMessageHandler {
     /// Null object bound by the standalone HTTP server, which runs without a GUI.
     ///
@@ -16,7 +16,7 @@ public interface UiMessageHandler {
     ///
     /// Calling [#handleUiCommands] on it means the GUI check was skipped (a programming error), so it
     /// fails fast rather than silently swallowing the command.
-    UiMessageHandler NONE = uiCommands -> {
+    UiMessageHandler NONE = _ -> {
         throw new UnsupportedOperationException("No GUI is connected to the JabRef HTTP server");
     };
 

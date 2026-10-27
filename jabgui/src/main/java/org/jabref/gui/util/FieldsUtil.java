@@ -1,12 +1,9 @@
 package org.jabref.gui.util;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.util.StringConverter;
 
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
@@ -34,11 +31,22 @@ public class FieldsUtil {
         }
     };
 
-    public static String getNameWithType(Field field, CliPreferences preferences, UndoManager undoManager) {
+    /// Display name for UI labels. Unlike [FieldTextMapper#getDisplayName(Field)], resolves
+    /// special fields to their localized name instead of the raw field name — do not use where
+    /// the result is parsed back into a [Field].
+    public static String getDisplayName(Field field) {
+        if (field instanceof SpecialField specialField) {
+            return SpecialFieldViewModel.getAction(specialField).getText();
+        }
+        return FieldTextMapper.getDisplayName(field);
+    }
+
+    /// [#getDisplayName(Field)] plus the kind of field in brackets, for pickers that list fields of
+    /// several kinds side by side.
+    public static String getNameWithType(Field field) {
         return switch (field) {
-            case SpecialField specialField ->
-                    new SpecialFieldViewModel(specialField, preferences, undoManager).getLocalization()
-                            + " (" + Localization.lang("Special") + ")";
+            case SpecialField _ ->
+                    getDisplayName(field) + " (" + Localization.lang("Special") + ")";
             case IEEEField _ ->
                     FieldTextMapper.getDisplayName(field) + " (" + Localization.lang("IEEE") + ")";
             case InternalField _ ->

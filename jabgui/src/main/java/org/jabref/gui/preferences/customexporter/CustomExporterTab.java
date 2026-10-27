@@ -1,29 +1,24 @@
 package org.jabref.gui.preferences.customexporter;
 
-import javafx.fxml.FXML;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.exporter.ExporterViewModel;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 
-import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 
-public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterTabViewModel> implements PreferencesTab {
+import static org.jabref.gui.preferences.forms.FormMetrics.BUTTON_WIDTH;
 
-    @FXML private TableView<ExporterViewModel> exporterTable;
-    @FXML private TableColumn<ExporterViewModel, String> nameColumn;
-    @FXML private TableColumn<ExporterViewModel, String> layoutColumn;
-    @FXML private TableColumn<ExporterViewModel, String> extensionColumn;
+public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterTabViewModel> {
 
     public CustomExporterTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        viewModel = new CustomExporterTabViewModel(preferences.getExportPreferences(), dialogService);
+        buildView();
     }
 
     @Override
@@ -31,30 +26,35 @@ public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterT
         return Localization.lang("Custom export formats");
     }
 
-    @FXML
-    private void initialize() {
-        viewModel = new CustomExporterTabViewModel(preferences, dialogService);
+    private void buildView() {
+        setContent(form()
+                .table(buildExporterTable())
+                .buttonRow(
+                        ControlHelper.labelledIconButton(IconTheme.JabRefIcons.ADD_NOBOX, Localization.lang("Add"), BUTTON_WIDTH, viewModel::addExporter),
+                        ControlHelper.labelledIconButton(IconTheme.JabRefIcons.EDIT, Localization.lang("Modify"), BUTTON_WIDTH, viewModel::modifyExporter),
+                        ControlHelper.labelledIconButton(IconTheme.JabRefIcons.REMOVE_NOBOX, Localization.lang("Remove"), BUTTON_WIDTH, viewModel::removeExporters))
+                .build());
+    }
 
+    private TableView<ExporterViewModel> buildExporterTable() {
+        TableView<ExporterViewModel> exporterTable = new TableView<>();
+        exporterTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());
         EasyBind.bindContent(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());
+
+        TableColumn<ExporterViewModel, String> nameColumn = new TableColumn<>(Localization.lang("Export name"));
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().name());
+
+        TableColumn<ExporterViewModel, String> layoutColumn = new TableColumn<>(Localization.lang("Main layout file"));
         layoutColumn.setCellValueFactory(cellData -> cellData.getValue().layoutFileName());
+
+        TableColumn<ExporterViewModel, String> extensionColumn = new TableColumn<>(Localization.lang("Extension"));
         extensionColumn.setCellValueFactory(cellData -> cellData.getValue().extension());
-    }
 
-    @FXML
-    private void add() {
-        viewModel.addExporter();
-    }
-
-    @FXML
-    private void modify() {
-        viewModel.modifyExporter();
-    }
-
-    @FXML
-    private void remove() {
-        viewModel.removeExporters();
+        exporterTable.getColumns().add(nameColumn);
+        exporterTable.getColumns().add(layoutColumn);
+        exporterTable.getColumns().add(extensionColumn);
+        return exporterTable;
     }
 }

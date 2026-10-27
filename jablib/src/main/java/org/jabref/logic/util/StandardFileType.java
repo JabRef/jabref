@@ -30,7 +30,6 @@ public enum StandardFileType implements FileType {
     IMAGE("Image", "png", "jpg", "jpeg", "gif", "bmp", "tiff", "webp"),
     ISI("Isi", "isi", "txt"),
     JAR("JAR", "jar"),
-    JAVA_KEYSTORE("Java Keystore", "jks"),
     JSON("JSON", "json"),
     JSTYLE("JStyle", "jstyle"),
     LAYOUT("Custom Exporter format", "layout"),

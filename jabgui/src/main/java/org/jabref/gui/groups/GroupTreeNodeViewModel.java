@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.UndoManager;
-
-import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
@@ -127,8 +125,6 @@ public class GroupTreeNodeViewModel {
 
     public void changeEntriesTo(List<BibEntry> entries, UndoManager undoManager) {
         AbstractGroup group = node.getGroup();
-        List<FieldChange> changesRemove = new ArrayList<>();
-        List<FieldChange> changesAdd = new ArrayList<>();
 
         // Sort entries into current members and non-members of the group
         // Current members will be removed
@@ -145,26 +141,16 @@ public class GroupTreeNodeViewModel {
             }
         }
 
-        // If there are entries to remove
-        if (!toRemove.isEmpty()) {
-            changesRemove = removeEntriesFromGroup(toRemove);
-        }
-        // If there are entries to add
-        if (!toAdd.isEmpty()) {
-            changesAdd = addEntriesToGroup(toAdd);
-        }
-
-        // Remember undo information
-        if (!changesRemove.isEmpty()) {
-            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesRemove);
-            if (!changesAdd.isEmpty() && (undoRemove != null)) {
-                // we removed and added entries
-                undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
+        // Removing and adding is one action to the user, so it is one undo step. Nothing is
+        // pushed when neither list yields a change.
+        undoManager.addEdit(Localization.lang("change entries of group"), edit -> {
+            if (!toRemove.isEmpty()) {
+                edit.addAll(removeEntriesFromGroup(toRemove));
             }
-            undoManager.addEdit(undoRemove);
-        } else if (!changesAdd.isEmpty()) {
-            undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
-        }
+            if (!toAdd.isEmpty()) {
+                edit.addAll(addEntriesToGroup(toAdd));
+            }
+        });
     }
 
     public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
@@ -173,17 +159,6 @@ public class GroupTreeNodeViewModel {
 
     public boolean isAllEntriesGroup() {
         return getNode().getGroup() instanceof AllEntriesGroup;
-    }
-
-    public void addNewGroup(AbstractGroup newGroup, CountingUndoManager undoManager) {
-        GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
-        this.getNode().addChild(newNode);
-
-        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
-                this,
-                new GroupTreeNodeViewModel(newNode),
-                UndoableAddOrRemoveGroup.ADD_NODE);
-        undoManager.addEdit(undo);
     }
 
     /// Adds the given entries to this node's group.

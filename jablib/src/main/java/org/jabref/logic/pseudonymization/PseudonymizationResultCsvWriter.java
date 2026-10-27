@@ -39,7 +39,7 @@ public class PseudonymizationResultCsvWriter {
     private static int extractNumber(String key) {
         try {
             return Integer.parseInt(key.substring(key.lastIndexOf('-') + 1));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             return Integer.MAX_VALUE;
         }
     }

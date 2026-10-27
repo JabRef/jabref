@@ -1,28 +1,17 @@
 package org.jabref.model.strings;
 
-import java.text.Normalizer;
-import java.util.Optional;
-import java.util.regex.Pattern;
+import org.jabref.latexconv.LatexConv;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.tomtung.latex2unicode.LaTeX2Unicode;
-import fastparse.Parsed;
 import org.jspecify.annotations.NonNull;
 
-/// Adapter class for the latex2unicode lib. This is an alternative to our LatexToUnicode class.
+/// Caching adapter for the [latex-conv](https://github.com/JabRef/latex-conv) library: field
+/// values are converted repeatedly (every cell render), while the set of distinct values is
+/// small enough to cache.
 public class LatexToUnicodeAdapter {
     private static final int CACHE_SIZE = 50_000;
 
-    private static final Pattern UNDERSCORE_MATCHER = Pattern.compile("_(?!\\{)");
-
-    private static final Pattern TILDE_MATCHER = Pattern.compile("(?<!\\\\)~");
-
-    private static final String NO_BREAK_SPACE = "\u00a0";
-
-    private static final String REPLACEMENT_CHAR = "\uFFFD";
-
-    private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER = Pattern.compile(REPLACEMENT_CHAR);
     private static final Cache<String, String> FORMAT_CACHE = Caffeine.newBuilder()
                                                                       .maximumSize(CACHE_SIZE)
                                                                       .build();
@@ -30,28 +19,8 @@ public class LatexToUnicodeAdapter {
     /// Attempts to resolve all LaTeX in the given string.
     ///
     /// @param inField a string containing LaTeX
-    /// @return a string with LaTeX resolved into Unicode, or the original string if the LaTeX could not be parsed.
+    /// @return a string with LaTeX resolved into Unicode, or the NFC-normalized input if the LaTeX could not be parsed.
     public static String format(@NonNull String inField) {
-        return FORMAT_CACHE.get(inField, LatexToUnicodeAdapter::computeFormattedText);
-    }
-
-    private static String computeFormattedText(@NonNull String inField) {
-        return parse(inField).orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));
-    }
-
-    /// Attempts to resolve all LaTeX in the String.
-    ///
-    /// @param inField a String containing LaTeX
-    /// @return an `Optional<String>` with LaTeX resolved into Unicode or `empty` on failure.
-    public static Optional<String> parse(@NonNull String inField) {
-        String toFormat = TILDE_MATCHER.matcher(inField).replaceAll(NO_BREAK_SPACE);
-        toFormat = UNDERSCORE_MATCHER.matcher(toFormat).replaceAll(REPLACEMENT_CHAR);
-        Parsed<String> parsingResult = LaTeX2Unicode.parse(toFormat);
-        if (parsingResult instanceof Parsed.Success) {
-            String text = parsingResult.get().value();
-            toFormat = Normalizer.normalize(text, Normalizer.Form.NFC);
-            return Optional.of(UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll("_"));
-        }
-        return Optional.empty();
+        return FORMAT_CACHE.get(inField, LatexConv::toUnicode);
     }
 }

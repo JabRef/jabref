@@ -62,16 +62,6 @@ public class RemotePreferences {
         return new RemotePreferences();
     }
 
-    public void setAll(RemotePreferences preferences) {
-        enableRemoteServer.setValue(preferences.shouldEnableRemoteServer());
-        remoteServerPort.setValue(preferences.getRemoteServerPort());
-        enableHttpServer.setValue(preferences.shouldEnableHttpServer());
-        httpServerPort.setValue(preferences.getHttpServerPort());
-        enableLanguageServer.setValue(preferences.shouldEnableLanguageServer());
-        languageServerPort.setValue(preferences.getLanguageServerPort());
-        directHttpImport.setValue(preferences.directHttpImport());
-    }
-
     public boolean shouldEnableRemoteServer() {
         return enableRemoteServer.getValue();
     }

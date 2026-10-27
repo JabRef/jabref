@@ -1,9 +1,8 @@
 package org.jabref.logic.crawler;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -41,20 +40,19 @@ class StudyCatalogToFetcherConverter {
     private List<SearchBasedFetcher> getFetchersFromLibraryEntries(List<StudyCatalog> libraryEntries) {
         return libraryEntries.parallelStream()
                              .map(this::createFetcherFromLibraryEntry)
-                             .filter(Objects::nonNull)
-                             .collect(Collectors.toList());
+                             .flatMap(Optional::stream)
+                             .toList();
     }
 
     /// Transforms a library entry into a SearchBasedFetcher instance. This only works if the library entry specifies a supported fetcher.
     ///
     /// @param studyCatalog the entry that will be converted
     /// @return An instance of the fetcher defined by the library entry.
-    private SearchBasedFetcher createFetcherFromLibraryEntry(StudyCatalog studyCatalog) {
+    private Optional<SearchBasedFetcher> createFetcherFromLibraryEntry(StudyCatalog studyCatalog) {
         Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences);
         String libraryNameFromFetcher = studyCatalog.getName();
         return searchBasedFetchers.stream()
                                   .filter(searchBasedFetcher -> searchBasedFetcher.getName().equalsIgnoreCase(libraryNameFromFetcher))
-                                  .findAny()
-                                  .orElse(null);
+                                  .findAny();
     }
 }

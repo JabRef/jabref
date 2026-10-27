@@ -74,7 +74,7 @@ public final class ChatHistoryUtils {
     /// Finds the last user message in the chat history by iterating backwards.
     ///
     /// @param chatHistory the chat history to search
-    /// @return the last user messag, or empty if no user message is found
+    /// @return the last user message, or empty if no user message is found
     public static Optional<ChatMessage> getLastUserMessage(List<ChatMessage> chatHistory) {
         for (int i = chatHistory.size() - 1; i >= 0; i--) {
             if (chatHistory.get(i).role() == ChatMessage.Role.USER) {

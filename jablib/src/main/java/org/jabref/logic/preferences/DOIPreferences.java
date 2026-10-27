@@ -25,11 +25,6 @@ public class DOIPreferences {
         return new DOIPreferences();
     }
 
-    public void setAll(DOIPreferences preferences) {
-        this.useCustom.set(preferences.shouldUseCustom());
-        this.defaultBaseURI.set(preferences.getDefaultBaseURI());
-    }
-
     public boolean shouldUseCustom() {
         return useCustom.get();
     }

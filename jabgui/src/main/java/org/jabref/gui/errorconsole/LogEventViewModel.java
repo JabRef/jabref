@@ -19,7 +19,12 @@ public class LogEventViewModel {
     }
 
     public String getDisplayText() {
-        return logEvent.getMessage();
+        String message = logEvent.getMessage();
+        String fileContext = logEvent.getContext().get("file");
+        if (fileContext != null && !fileContext.isEmpty()) {
+            return message + " [linked file: " + fileContext + "]";
+        }
+        return message;
     }
 
     public String getStyleClass() {

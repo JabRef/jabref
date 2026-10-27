@@ -8,11 +8,11 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.jabref.logic.search.query.SearchFieldConstants;
-import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
@@ -91,7 +91,7 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
     @Override
     public Boolean visitComparison(SearchParser.ComparisonContext ctx) {
-        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
+        String term = SearchQuery.unescapeSearchValue(ctx.searchValue());
 
         if (ctx.FIELD() == null) {
             // Unfielded bareword: apply search-bar flags

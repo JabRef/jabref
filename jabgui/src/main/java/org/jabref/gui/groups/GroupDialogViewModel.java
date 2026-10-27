@@ -86,6 +86,11 @@ public class GroupDialogViewModel {
     private final BooleanProperty typeTexProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeEntryTypeProperty = new SimpleBooleanProperty();
 
+    // Explicit Groups
+    private final BooleanProperty explicitIncludeSelectedProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty editingGroupProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty selectedEntriesAvailableProperty = new SimpleBooleanProperty(false);
+
     // Option Groups
     private final StringProperty keywordGroupSearchTermProperty = new SimpleStringProperty("");
     private final StringProperty keywordGroupSearchFieldProperty = new SimpleStringProperty("");
@@ -157,11 +162,11 @@ public class GroupDialogViewModel {
 
         nameContainsDelimiterValidator = new FunctionBasedValidator<>(
                 nameProperty,
-                name -> !name.contains(Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())),
+                name -> !name.contains(Character.toString(currentDatabase.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))),
                 ValidationMessage.warning(
                         Localization.lang(
                                 "The group name contains the keyword separator \"%0\" and thus probably does not work as expected.",
-                                Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())
+                                Character.toString(currentDatabase.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()))
                         )));
 
         sameNameValidator = new FunctionBasedValidator<>(
@@ -306,10 +311,15 @@ public class GroupDialogViewModel {
         try {
             String groupName = nameProperty.getValue().trim();
             if (Boolean.TRUE.equals(typeExplicitProperty.getValue())) {
-                resultingGroup = new ExplicitGroup(
+                // [impl->req~ux.groups.create-explicit-from-selection~1]
+                ExplicitGroup explicitGroup = new ExplicitGroup(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
-                        preferences.getBibEntryPreferences().getKeywordSeparator());
+                        currentDatabase.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()));
+                if (Boolean.TRUE.equals(explicitIncludeSelectedProperty.getValue())) {
+                    explicitGroup.add(stateManager.getSelectedEntries());
+                }
+                resultingGroup = explicitGroup;
             } else if (Boolean.TRUE.equals(typeKeywordsProperty.getValue())) {
                 if (Boolean.TRUE.equals(keywordGroupRegexProperty.getValue())) {
                     resultingGroup = new RegexKeywordGroup(
@@ -325,7 +335,7 @@ public class GroupDialogViewModel {
                             FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
                             keywordGroupSearchTermProperty.getValue().trim(),
                             keywordGroupCaseSensitiveProperty.getValue(),
-                            preferences.getBibEntryPreferences().getKeywordSeparator(),
+                            currentDatabase.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()),
                             false);
                 }
             } else if (Boolean.TRUE.equals(typeSearchProperty.getValue())) {
@@ -413,6 +423,7 @@ public class GroupDialogViewModel {
 
     public void setValues() {
         groupHierarchyListProperty.setValue(FXCollections.observableArrayList(GroupHierarchyType.values()));
+        selectedEntriesAvailableProperty.set(!stateManager.getSelectedEntries().isEmpty());
 
         if (editedGroup == null) {
             // creating new group -> defaults!
@@ -425,9 +436,10 @@ public class GroupDialogViewModel {
                           .getIconName()
                           .filter(iconName -> !GroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON.equals(iconName))
                           .ifPresent(iconProperty::setValue);
-                parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
+                parentNode.getGroup().getColor().ifPresent(_ -> colorUseProperty.setValue(true));
             }
             typeExplicitProperty.setValue(true);
+            explicitIncludeSelectedProperty.setValue(selectedEntriesAvailableProperty.get() && preferences.getGroupsPreferences().shouldAutoIncludeSelectedEntries());
             groupHierarchySelectedProperty.setValue(preferences.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
 
@@ -436,6 +448,7 @@ public class GroupDialogViewModel {
             dateGroupOptionProperty.setValue(DateGranularity.YEAR);
             dateGroupIncludeEmptyProperty.setValue(false);
         } else {
+            editingGroupProperty.set(true);
             nameProperty.setValue(editedGroup.getName());
             colorUseProperty.setValue(editedGroup.getColor().isPresent());
             colorProperty.setValue(editedGroup.getColor().map(Color::valueOf).orElse(IconTheme.DEFAULT_GROUP_COLOR));
@@ -569,7 +582,7 @@ public class GroupDialogViewModel {
         return keywordSearchTermEmptyValidator.getValidationStatus();
     }
 
-    public ValidationStatus texGroupFilePathValidatonStatus() {
+    public ValidationStatus texGroupFilePathValidationStatus() {
         return texGroupFilePathValidator.getValidationStatus();
     }
 
@@ -623,6 +636,18 @@ public class GroupDialogViewModel {
 
     public BooleanProperty typeEntryTypeProperty() {
         return typeEntryTypeProperty;
+    }
+
+    public BooleanProperty explicitIncludeSelectedProperty() {
+        return explicitIncludeSelectedProperty;
+    }
+
+    public BooleanProperty editingGroupProperty() {
+        return editingGroupProperty;
+    }
+
+    public BooleanProperty selectedEntriesAvailableProperty() {
+        return selectedEntriesAvailableProperty;
     }
 
     public StringProperty keywordGroupSearchTermProperty() {

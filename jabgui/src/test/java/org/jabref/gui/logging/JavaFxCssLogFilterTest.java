@@ -22,8 +22,8 @@ class JavaFxCssLogFilterTest {
 
     @Test
     void filtersBaseCssLookupWarnings() {
-        String msg = "Could not resolve '-jr-gray-2' while resolving lookups for '-fx-prompt-text-fill' "
-                + "from rule '*.text-input' in stylesheet file:/D:/git-repositories/JabRef/build/resources/main/org/jabref/gui/jabref-theme.css";
+        String msg = "Could not resolve '-color-fg-subtle' while resolving lookups for '-fx-prompt-text-fill' "
+                + "from rule '*.text-input' in stylesheet file:/D:/git-repositories/JabRef/build/resources/main/org/jabref/gui/theme/internal/jabref-base.css";
         LogRecord rec = new LogRecord(Level.WARNING, msg);
         assertFalse(filter.isLoggable(rec));
     }

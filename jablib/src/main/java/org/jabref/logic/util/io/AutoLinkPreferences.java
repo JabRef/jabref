@@ -59,12 +59,6 @@ public class AutoLinkPreferences {
         return new AutoLinkPreferences();
     }
 
-    public void setAll(AutoLinkPreferences preferences) {
-        this.citationKeyDependency.set(preferences.getCitationKeyDependency());
-        this.regularExpression.set(preferences.getRegularExpression());
-        this.askAutoNamingPdfs.set(preferences.shouldAskAutoNamingPdfs());
-    }
-
     public CitationKeyDependency getCitationKeyDependency() {
         return citationKeyDependency.getValue();
     }
@@ -103,15 +97,5 @@ public class AutoLinkPreferences {
 
     public Character getKeywordSeparator() {
         return keywordSeparator.getValue();
-    }
-
-    public AutoLinkPreferences withKeywordSeparator(ReadOnlyObjectProperty<Character> newSeparator) {
-        if (newSeparator == null) {
-            this.keywordSeparator.bind(DEFAULT_KEYWORD_SEPARATOR);
-        } else {
-            this.keywordSeparator.bind(newSeparator);
-        }
-
-        return this;
     }
 }

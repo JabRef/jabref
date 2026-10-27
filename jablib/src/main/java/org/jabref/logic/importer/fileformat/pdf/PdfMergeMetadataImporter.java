@@ -23,6 +23,7 @@ import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.PdfUtils;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -30,13 +31,15 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Tries to import BibTeX data trying multiple {@link PdfImporter}s and merging the results.
-/// See {@link PdfMergeMetadataImporter#metadataImporters} for the list of importers used.
+/// Tries to import BibTeX data trying multiple [PdfImporter]s and merging the results.
+/// See [PdfMergeMetadataImporter#metadataImporters] for the list of importers used.
 ///
 /// After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
 public class PdfMergeMetadataImporter extends PdfImporter {
@@ -60,7 +63,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         ));
 
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
-            this.metadataImporters.add(2, new PdfGrobidImporter(importFormatPreferences));
+            this.metadataImporters.add(2, new PdfGrobidHeaderImporter(importFormatPreferences));
         }
         doiFetcher = new DoiFetcher(importFormatPreferences);
         arXivFetcher = new ArXivFetcher(importFormatPreferences);
@@ -79,37 +82,55 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return Pattern.compile("(?i)(.*\\.(" + extensions + ")$|microsoft (word|powerpoint|excel).*|.*\\\\.*)");
     }
 
-    /// Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfImporter}).
+    /// Makes [BibEntry] out of PDF file via merging results of several PDF analysis steps ([PdfImporter]).
     ///
     /// Algorithm:
-    /// 1. Store all candidates (possible {@link BibEntry}ies) in a list. First elements in this list will have higher
+    ///
+    /// 1. Store all candidates (possible [BibEntry]ies) in a list. First elements in this list will have higher
     /// priority for merging, which means that more fields will be stored for first entries, rather than last.
-    /// 2. Run {@link PdfImporter}s, and store extracted candidates in the list.
+    /// 2. Run [PdfImporter]s, and store extracted candidates in the list.
     @Override
     public ParserResult importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
-        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document);
+        List<String> warnings = new ArrayList<>();
+        List<BibEntry> extractedCandidates = extractCandidatesFromPdf(filePath, document, warnings);
         if (extractedCandidates.isEmpty()) {
-            return new ParserResult();
+            ParserResult result = new ParserResult();
+            warnings.forEach(result::addWarning);
+            return result;
         }
 
         List<BibEntry> fetchedCandidates = fetchIdsOfCandidates(extractedCandidates);
 
         List<BibEntry> allCandidates = new ArrayList<>(fetchedCandidates);
         allCandidates.addAll(extractedCandidates);
-        BibEntry entry = mergeCandidates(allCandidates);
+        BibEntry entry = mergeCandidates(allCandidates, extractLeadingPagesText(document));
 
         // We use the absolute path here as we do not know the context where this import will be used.
         // The caller is responsible for making the path relative if necessary.
         entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
-        return new ParserResult(List.of(entry));
+        ParserResult result = new ParserResult(List.of(entry));
+        warnings.forEach(result::addWarning);
+        return result;
     }
 
-    private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document) {
+    /// Text of the first two pages for the author cross-check; empty if the text cannot be extracted
+    private static String extractLeadingPagesText(PDDocument document) {
+        try {
+            return PdfUtils.getLeadingPagesContents(document, 2);
+        } catch (IOException e) {
+            LOGGER.debug("Could not extract text for the author plausibility check", e);
+            return "";
+        }
+    }
+
+    private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document, List<String> warnings) {
         List<BibEntry> candidates = new ArrayList<>();
 
         for (PdfImporter metadataImporter : metadataImporters) {
             try {
-                List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, document).getDatabase().getEntries();
+                ParserResult importerResult = metadataImporter.importDatabase(filePath, document);
+                warnings.addAll(importerResult.warnings());
+                List<BibEntry> extractedEntries = importerResult.getDatabase().getEntries();
                 LOGGER.debug("Importer {} extracted {}", metadataImporter.getName(), extractedEntries);
                 candidates.addAll(extractedEntries);
             } catch (ParseException | IOException e) {
@@ -169,7 +190,13 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return FILENAME_TITLE_PATTERN.matcher(title.trim()).matches();
     }
 
-    private static BibEntry mergeCandidates(List<BibEntry> candidates) {
+    /// Merges PDF metadata candidates in priority order, replaces filename-like titles, checks the author
+    /// against the PDF text, and retains only online file links.
+    ///
+    /// @param candidates       candidate entries ordered by descending priority
+    /// @param leadingPagesText text of the PDF's leading pages; `null` or empty leaves the author unchanged
+    @VisibleForTesting
+    static BibEntry mergeCandidates(List<BibEntry> candidates, @Nullable String leadingPagesText) {
         final BibEntry entry = new BibEntry();
         candidates.forEach(entry::mergeWith);
 
@@ -182,6 +209,8 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                       .findFirst()
                       .ifPresent(betterTitle -> entry.setField(StandardField.TITLE, betterTitle));
         }
+
+        PdfAuthorCrossCheck.crossCheckAuthor(entry, candidates, leadingPagesText);
 
         // Retain online links only
         List<LinkedFile> onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();

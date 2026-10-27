@@ -14,7 +14,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 /// Exports an AI summary to JSON format.
 ///
 /// Internally constructs a single-message dummy chat containing the summary content
-/// and delegates to {@link AiChatJsonExporter}.
+/// and delegates to [AiChatJsonExporter].
 public class AiSummaryJsonExporter implements AiSummaryExporter {
     private final AiChatJsonExporter chatExporter;
 

@@ -16,8 +16,8 @@ import org.jabref.model.openoffice.style.CitationGroup;
 import org.jabref.model.openoffice.style.CitationGroupId;
 import org.jabref.model.openoffice.style.CitationGroups;
 import org.jabref.model.openoffice.style.CitationPath;
-import org.jabref.model.openoffice.style.CitedKey;
-import org.jabref.model.openoffice.style.CitedKeys;
+import org.jabref.model.openoffice.style.CitedReference;
+import org.jabref.model.openoffice.style.CitedReferences;
 
 public class OOFormatBibliography {
     private static final OOPreFormatter POSTFORMATTER = new OOPreFormatter();
@@ -28,7 +28,7 @@ public class OOFormatBibliography {
 
     /// @return The formatted bibliography, including its title.
     public static OOText formatBibliography(CitationGroups citationGroups,
-                                            CitedKeys bibliography,
+                                            CitedReferences bibliography,
                                             JStyle style,
                                             boolean alwaysAddCitedOnPages) {
 
@@ -39,14 +39,14 @@ public class OOFormatBibliography {
 
     /// @return Formatted body of the bibliography. Excludes the title.
     public static OOText formatBibliographyBody(CitationGroups citationGroups,
-                                                CitedKeys bibliography,
+                                                CitedReferences bibliography,
                                                 JStyle style,
                                                 boolean alwaysAddCitedOnPages) {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (CitedKey citedKey : bibliography.values()) {
-            OOText entryText = formatBibliographyEntry(citationGroups, citedKey, style, alwaysAddCitedOnPages);
+        for (CitedReference citedReference : bibliography.values()) {
+            OOText entryText = formatBibliographyEntry(citationGroups, citedReference, style, alwaysAddCitedOnPages);
             stringBuilder.append(entryText.toString());
         }
 
@@ -55,25 +55,25 @@ public class OOFormatBibliography {
 
     /// @return A paragraph. Includes label and "Cited on pages".
     public static OOText formatBibliographyEntry(CitationGroups citationGroups,
-                                                 CitedKey citedKey,
+                                                 CitedReference citedReference,
                                                  JStyle style,
                                                  boolean alwaysAddCitedOnPages) {
         StringBuilder stringBuilder = new StringBuilder();
 
         // insert marker "[1]"
         if (style.isNumberEntries()) {
-            stringBuilder.append(style.getNumCitationMarkerForBibliography(citedKey).toString());
+            stringBuilder.append(style.getNumCitationMarkerForBibliography(citedReference).toString());
         } else {
             // !style.isNumberEntries() : emit no prefix
             // Note: We might want [citationKey] prefix for style.isCitationKeyCiteMarkers();
         }
 
         // Add entry body
-        stringBuilder.append(formatBibliographyEntryBody(citedKey, style).toString());
+        stringBuilder.append(formatBibliographyEntryBody(citedReference, style).toString());
 
         // Add "Cited on pages"
-        if (citedKey.getLookupResult().isEmpty() || alwaysAddCitedOnPages) {
-            stringBuilder.append(formatCitedOnPages(citationGroups, citedKey).toString());
+        if (citedReference.getLookupResult().isEmpty() || alwaysAddCitedOnPages) {
+            stringBuilder.append(formatCitedOnPages(citationGroups, citedReference).toString());
         }
 
         // Add paragraph
@@ -83,20 +83,20 @@ public class OOFormatBibliography {
     }
 
     /// @return just the body of a bibliography entry. No label, "Cited on pages" or paragraph.
-    public static OOText formatBibliographyEntryBody(CitedKey citedKey, JStyle style) {
-        if (citedKey.getLookupResult().isEmpty()) {
+    public static OOText formatBibliographyEntryBody(CitedReference citedReference, JStyle style) {
+        if (citedReference.getLookupResult().isEmpty()) {
             // Unresolved entry
-            return OOText.fromString("Unresolved(%s)".formatted(citedKey.citationKey));
+            return OOText.fromString("Unresolved(%s)".formatted(citedReference.citationKey));
         } else {
             // Resolved entry, use the layout engine
-            BibEntry bibentry = citedKey.getLookupResult().get().entry;
-            Layout layout = style.getReferenceFormat(bibentry.getType());
+            BibEntry bibEntry = citedReference.getLookupResult().get().entry;
+            Layout layout = style.getReferenceFormat(bibEntry.getType());
             layout.setPostFormatter(POSTFORMATTER);
 
             return formatFullReferenceOfBibEntry(layout,
-                    bibentry,
-                    citedKey.getLookupResult().get().database,
-                    citedKey.getUniqueLetter().orElse(null));
+                    bibEntry,
+                    citedReference.getLookupResult().get().database,
+                    citedReference.getUniqueLetter().orElse(null));
         }
     }
 
@@ -135,13 +135,13 @@ public class OOFormatBibliography {
         return formattedText;
     }
 
-    /// Format links to citations of the source (citedKey).
+    /// Format links to citations of the source (citedReference).
     ///
     /// Requires reference marks for the citation groups.
     ///
     /// - The links are created as references that show page numbers of the reference marks.
     /// - We do not control the text shown, that is provided by OpenOffice.
-    private static OOText formatCitedOnPages(CitationGroups citationGroups, CitedKey citedKey) {
+    private static OOText formatCitedOnPages(CitationGroups citationGroups, CitedReference citedReference) {
         if (!citationGroups.citationGroupsProvideReferenceMarkNameForLinking()) {
             return OOText.fromString("");
         }
@@ -153,7 +153,7 @@ public class OOFormatBibliography {
         stringBuilder.append(prefix);
 
         List<CitationGroup> filteredList = new ArrayList<>();
-        for (CitationPath path : citedKey.getCitationPaths()) {
+        for (CitationPath path : citedReference.getCitationPaths()) {
             CitationGroupId groupId = path.group;
             Optional<CitationGroup> group = citationGroups.getCitationGroup(groupId);
             if (group.isEmpty()) {

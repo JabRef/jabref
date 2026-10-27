@@ -14,13 +14,13 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.NoSelectionModel;
@@ -72,21 +72,25 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private final Validator columnsNotEmptyValidator;
 
     private final DialogService dialogService;
-    private final GuiPreferences preferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
     private ColumnPreferences initialColumnPreferences;
     private final SpecialFieldsPreferences specialFieldsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final MainTablePreferences mainTablePreferences;
 
-    public TableTabViewModel(DialogService dialogService, GuiPreferences preferences) {
+    public TableTabViewModel(DialogService dialogService,
+                             SpecialFieldsPreferences specialFieldsPreferences,
+                             NameDisplayPreferences nameDisplayPreferences,
+                             MainTablePreferences mainTablePreferences,
+                             ExternalApplicationsPreferences externalApplicationsPreferences) {
         this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
-        this.nameDisplayPreferences = preferences.getNameDisplayPreferences();
-        this.mainTablePreferences = preferences.getMainTablePreferences();
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
+        this.specialFieldsPreferences = specialFieldsPreferences;
+        this.nameDisplayPreferences = nameDisplayPreferences;
+        this.mainTablePreferences = mainTablePreferences;
 
-        specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
+        specialFieldsEnabledProperty.addListener((_, _, newValue) -> {
             if (newValue) {
                 insertSpecialFieldColumns();
             } else {
@@ -94,7 +98,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        extraFileColumnsEnabledProperty.addListener((observable, oldValue, newValue) -> {
+        extraFileColumnsEnabledProperty.addListener((_, _, newValue) -> {
             if (newValue) {
                 insertExtraFileColumns();
             } else {
@@ -189,10 +193,10 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     private void insertExtraFileColumns() {
-        preferences.getExternalApplicationsPreferences().getExternalFileTypes().stream()
-                   .map(ExternalFileType::getName)
-                   .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, name))
-                   .forEach(item -> availableColumnsProperty.getValue().add(item));
+        externalApplicationsPreferences.getExternalFileTypes().stream()
+                                       .map(ExternalFileType::getName)
+                                       .map(name -> new MainTableColumnModel(MainTableColumnModel.Type.EXTRAFILE, name))
+                                       .forEach(item -> availableColumnsProperty.getValue().add(item));
     }
 
     private void removeExtraFileColumns() {
@@ -202,6 +206,11 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     public void insertColumnInList() {
         if (addColumnProperty.getValue() == null) {
+            return;
+        }
+
+        if (!addColumnProperty.getValue().isConfigurable()) {
+            addColumnProperty.setValue(null);
             return;
         }
 
@@ -241,7 +250,9 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        mainTablePreferences.getColumnPreferences().setColumns(columnsListProperty.getValue());
+        mainTablePreferences.getColumnPreferences().setColumns(columnsListProperty.getValue().stream()
+                                                                                  .filter(MainTableColumnModel::isConfigurable)
+                                                                                  .toList());
         mainTablePreferences.setResizeColumnsToFit(autoResizeColumnsProperty.getValue());
         mainTablePreferences.setExtraFileColumnsEnabled(extraFileColumnsEnabledProperty.getValue());
 

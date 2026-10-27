@@ -58,6 +58,11 @@ Requires JDK 25 or later to run Gradle. Gradle downloads the necessary JDK by it
 ./gradlew :jabgui:jpackage   # Package as installer
 ```
 
+When adding or changing dependencies, follow [docs/code-howtos/dependency-management.md](docs/code-howtos/dependency-management.md).
+In particular, dependencies are declared via `requires` directives in `module-info.java` (versions live in `versions/build.gradle.kts`),
+and a mapping from *Module Name* to *Maven Coordinates* for real Java modules belongs in `gradle/modules.properties` —
+not in ad-hoc blocks in `build-logic`.
+
 ---
 
 ## General Principles
@@ -128,12 +133,13 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
-- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code code}`, and `[ClassName]` instead of `{@link ClassName}`.
+- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax instead of JavaDoc inline tags or HTML formatting tags: `` `code` `` instead of `{@code code}` or `<code>code</code>`, `[ClassName]` instead of `{@link ClassName}`, and fenced code blocks (```` ``` ````) instead of `<pre><code>`.
 
 ### Comments
 
 - Do not add trivial comments just restating the code line in plain English.
 - When commenting, focus on the "why" and general idea.
+- Reference issues and pull requests by full URL (`https://github.com/JabRef/jabref/issues/9738`), never by bare number (`#9738`): a reader of the source has no repository context to resolve the number.
 
 Example for trivial comments (to be avoided):
 
@@ -236,6 +242,7 @@ Both comments must not be added.
   - `findMissingLocalizationKeys` failing → its output lists ready-to-paste `key=value` lines to **add** to `jablib/src/main/resources/l10n/JabRef_en.properties`. Place each near semantically related keys; reuse an existing similar key when one exists.
   - `findObsoleteLocalizationKeys` failing → its output lists keys to **remove** from `JabRef_en.properties` (after confirming each is truly unused).
   - Only edit `JabRef_en.properties`. Translated `JabRef_<lang>.properties` files are maintained by translators via Crowdin — never hand-edit them.
+- Deleting or renaming code orphans its keys, so run the test after such a change — and do not trust a green run you did not force. `LocalizationParser` walks `src/main/java` of every module (`jablib`, `jabkit`, `jabsrv`, `jabgui`, `jabls`) at test runtime, so those sources are not declared inputs of `:jablib:test`. The task is cacheable, and a `FROM-CACHE` or `UP-TO-DATE` result can hide a key that a deletion in another module just orphaned. Force it: `./gradlew :jablib:test --tests "*LocalizationConsistencyTest*" --rerun-tasks`
 - JabRef is a multilingual program, When you write any user-facing text, it should be localized.
 
    To do this in Java code, call `Localization.lang` method, like this:
@@ -249,7 +256,7 @@ Both comments must not be added.
    Note: This rule is not applied for logging. Logging strings should stay in English. I.e., LOGGER.error(\"...\") should contain English text.
 - All labels and texts in the UI should be sentence case (and not title case)
 - Avoid exclamation marks at the end of a sentence. They are more for screaming. Use a dot to end the sentence.
-- Use "BibTeX" as spelling for bibtex in Java strings. In variable names "Bibtex" should be used.
+- Use "BibTeX" as spelling for `bibtex` in Java strings. In variable names, `Bibtex` should be used.
 - New strings should be consistent to other strings. They should also be grouped semantically together.
 - Existing strings should be reused instead of introducing slightly different strings.
 - User dialogs should have proper button labels: NOT yes/no/cancel, but indicating the action which happens when pressing the button
@@ -270,6 +277,7 @@ Both comments must not be added.
 
 #### Testing / JUnit
 
+- Name test classes `...Test` (singular), not `...Tests` — e.g. `JabSrvArchitectureTest`, not `JabSrvArchitectureTests`. This holds even for ArchUnit classes that bundle several `@ArchTest` rules.
 - In JabRef, we don't use `@DisplayName`, we typically just write method name as is. The method name itself should be comprehensive enough.
 - Instead of `Files.createTempDirectory` `@TempDir` JUnit5 annotation should be used.
 - If `@TempDir` is used, there is no need to clean it up
@@ -380,7 +388,9 @@ npx markdownlint-cli2 "*.md"
 Tests requiring external resources have dedicated tasks:
 
 - `./gradlew databaseTest` — requires PostgreSQL
-- `./gradlew fetcherTest` — hits live external APIs
+- `./gradlew externalServicesTest` — hits live external APIs
+
+Fetcher tests must always hit the live endpoints — do not mock or stub the remote API in fetcher tests.
 
 Quick check of core library:
 
@@ -392,38 +402,59 @@ Quick check of core library:
 
 ## Requirements tracing (OpenFastTrace)
 
-JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) to trace requirements to implementation and tests.
+JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT) to trace requirements to implementation and tests.
+Requirements capture what JabRef should do as a structured representation of issues and features, enabling bidirectional traceability.
 
-For a new feature or significant bug fix, **at minimum add the requirement** to the appropriate `docs/requirements/<area>.md` file. Full tracing (`Needs: impl` + implementation comments) is encouraged but can be skipped if the effort is disproportionate.
+For a new feature or significant bug fix, add the requirement to the appropriate `docs/requirements/<area>.md` file.
 
-**Defining a requirement** in `docs/requirements/<area>.md`:
+Read and use the [`openfasttrace`](https://github.com/itsallcode/openfasttrace-ai-skills/blob/main/skills/openfasttrace/SKILL.md) skill.
 
-```markdown
-### Example
-`req~ai.example~1`
+In JabRef we use OFT this way:
 
-Description of the requirement.
-```
+- The requirements are put in `docs/requirements/<area>.md`.
+- The requirements are grouped by areas: `docs/requirements/ui.md`, `docs/requirements/git.md`, etc.
+- Title style:
+  - `req~` → **"Subject must verb"** (e.g., `## GitHub personal access token push access must be verifiable before sharing`).
+  - `feat~` → **"User can verb"** (e.g., `## User can share library via GitHub`).
+  - Avoid nominalizations: Write "must be verified" instead of "verification".
+  - One item, one requirement: If a title needs "and", split it into two separate requirements.
+  - The title carries the full normative statement: Anyone reading only the heading should understand the complete requirement constraint.
+- Use the description only for details that the title cannot carry:
+  - Triggering condition.
+  - Edge cases and boundary behavior.
+  - Brief rationale (if needed).
+  - Relevant GitHub issue link or context.
 
-The identifier must follow the heading with no blank line between them. Add `<!-- markdownlint-disable-file MD022 -->` at the end of the file.
+Artifact types used:
 
-**Optionally — linking an implementation** to a requirement (full trace):
+- `feat`: User-facing capability or broad feature ("User can verb").
+- `req`: Specific constraint, nuance, cross-cutting requirement, or bug fix the system must satisfy ("Subject must verb").
+- `impl`: Code implementation.
+- `utest`: Unit test.
+- `adr`: Architectural Decision Record.
 
-```markdown
-Needs: impl
-```
+### Traceability chains
 
-```java
-// [impl->req~ai.example~1]
-```
+In JabRef, we use these traceability chains:
 
-**Checking coverage:**
+- `feat` --> `impl`/`utest`
+- `req` --> `impl`/`utest`
+- `feat` --> `req` --> `impl`/`utest`
+- `adr` --> `impl`/`utest`
+
+Additional guidelines:
+
+- Link the issue the requirement originates from (if there is).
+- Respect INVEST criteria. Prefer high-level requirements over overly detailed ones.
+- For ideas or planned requirements not yet implemented, mark them as draft so they are preserved without failing coverage checks: `Status: draft`.
+
+Checking coverage:
 
 ```bash
-./gradlew traceRequirements   # output: build/tracing.txt
+./gradlew traceRequirements   # output: build/reports/tracing.txt
 ```
 
-See `docs/requirements/` for existing requirements and `docs/requirements/index.md` for full guidance.
+See `docs/requirements/` for existing requirements and [docs/code-howtos/requirements.md](docs/code-howtos/requirements.md) for full guidance. Also refer to the `openfasttrace` skill.
 
 ---
 
@@ -434,6 +465,23 @@ When a significant design or implementation decision is made, create a new MADR 
 1. Copy `docs/decisions/adr-template.md` to `docs/decisions/<NNNN>-<short-title>.md` (next free number).
 2. Fill in **Context and Problem Statement**, **Considered Options**, and **Decision Outcome**.
 3. Add an entry to `docs/decisions/index.md`.
+
+To link code to a decision, give the ADR an OpenFastTrace identifier directly below its title (no blank line in between)
+and declare what has to cover it:
+
+```markdown
+# Hardcode `StandardField` names
+`adr~hardcode-fieldnames~1`
+
+Needs: impl
+```
+
+```java
+// [impl->adr~hardcode-fieldnames~1]
+```
+
+The identifier's name part must not start with a digit, so drop the file's number prefix.
+Add `<!-- markdownlint-disable-file MD022 -->` at the end of the ADR.
 
 See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.md) for the rationale and [adr-template.md](docs/decisions/adr-template.md) for the full template.
 
@@ -453,11 +501,17 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 - Plain `git pull` is acceptable for updating the branch as long as your local config does not set `pull.rebase=true` (the enforcement hook blocks the explicit rebase variants regardless).
 - Resolve conflicts inside the merge commit. Do not squash or reorder existing commits.
+- Before committing the merge, make sure no conflict marker is left: with `merge.conflictStyle=diff3` (the default here) a hunk has **four** markers — `<<<<<<<`, `|||||||` (the common-ancestor block), `=======`, `>>>>>>>` — and a resolution that only removes the outer ones leaves the ancestor block in the file. `git diff --cached --check` reports every leftover marker; run it after staging the resolved files.
+
+### Branches
+
+- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes; CI labels a PR `dev: into-stable` when it links a bug issue (maintainers may add or remove the label by hand) and ports it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
 
 ### Commits
 
 - One logical change per commit
 - Clear, technical commit messages
+- Wrap annotations and other `@`-words in backticks in commit messages and PR texts (`` `@Nullable` ``); GitHub turns a plain `@Nullable` into a mention of that user
 - Do not reference issues in commits
 - Avoid force-pushes
 - No generated artifacts unless required
@@ -473,23 +527,50 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 1. Read `.github/PULL_REQUEST_TEMPLATE.md`.
 2. Fill every section: \"Related issues and pull requests\", \"PR Description\", \"Steps to test\", \"AI usage\".
 3. The PR Description must explain **intent**, not implementation trivia. Do not list modified classes one by one.
-4. Fill \"AI usage\": disclose every AI tool used **and the exact model ID** (for example `Claude Code (model claude-opus-4-7)`).
-5. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
-6. Remove **all** HTML comments before opening the PR.
-7. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
-8. If the CHANGELOG.md entry used a `TODO` placeholder (no issue existed), immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change.
+4. \"Steps to test\" is a numbered list of concrete steps ending in what the reviewer should see, plus a screenshot cropped to the relevant UI area for every visible change. Never a video: reviewers relate a failure to a step number (\"at step 3 I could not click X\"), which a video does not allow. A video is acceptable only when the interaction involves another program (drag and drop from a file manager, push to a word processor, ...) and the steps are still listed.
+5. Write keyboard shortcuts anywhere in the body with `<kbd>` tags: `<kbd>Ctrl</kbd> + <kbd>,</kbd>`, not `Ctrl+,`.
+6. Fill \"AI usage\": disclose every AI tool used **and the exact model ID** (for example `Claude Code (model claude-opus-4-7)`).
+7. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
+8. Remove **all** HTML comments before opening the PR.
+9. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
+10. Only if the CHANGELOG.md entry used a `TODO` placeholder (meaning no issue has been confidently identified yet — an existing issue link always stays): create the PR with `--draft` (an automated review starts as soon as a PR is ready and would flag the placeholder), immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change, then mark the PR ready (`gh pr ready <number>`). If an issue is identified or created later, switch the link to the issue per the precedence rule above.
 
 ---
 
 ## Documentation
 
 - Add a CHANGELOG.md entry only if the change is visible to the user.
+- Do not add an entry when fixing something that was itself introduced after the last release (e.g. a bug in a feature that only exists in `## [Unreleased]`) — users of the last release never saw the bug. Instead, update the existing unreleased entry if the fix changes what it should say.
 - The CHANGELOG.md entry should be for end users (and not programmers).
+- **One sentence, maximum 20 words.** No sub-bullets, no code blocks.
+- **Describe what changed for the user, never why or how it was implemented.** No class names, method names, or internals.
+- Start the entry with `We added` / `We changed` / `We fixed` / `We removed`, and place it under the matching `### Added` / `### Changed` / `### Fixed` / `### Removed` heading in `## [Unreleased]`.
+- Within the section, sort the entry in next to existing entries about the same component or feature (e.g. a jabkit fix goes next to the other jabkit fixes) instead of appending it at the end.
 - Do not add extra blank lines in CHANGELOG.md
+- Do not reorder or reword existing entries (except the unreleased entry your fix relates to, per the rule above), and do not create a new version heading.
+- CHANGELOG.md entries link the issue number when an issue exists; the PR number is used only as a fallback when there is no issue.
 - When no issue is known and the PR is not yet created, use `TODO` as the issue/PR reference placeholder — never invent a fake number.
 - Before using `TODO`, search <https://github.com/JabRef/jabref/issues> and <https://github.com/JabRef/jabref-koppor/issues> for a matching issue. Link it only on a confident match; otherwise list candidates for human review and keep `TODO`. Never use `closes`/`fixes` keywords for a merely-similar issue.
 - User documentation is available in a separate repository <https://github.com/JabRef/user-documentation>.
 - No AI-disclosure comments inside source code
+- Keyboard shortcuts in Markdown (CHANGELOG.md, `docs/`, PR descriptions, issue and review comments) use one `<kbd>` tag per key, first letter capitalized, keys joined by ` + ` (e.g. `<kbd>Ctrl</kbd> + <kbd>Enter</kbd>`).
+
+### CHANGELOG.md example
+
+Good:
+
+```markdown
+- We fixed an issue where the entry editor lost focus after saving a library. [#1234](https://github.com/JabRef/jabref/issues/1234)
+```
+
+Bad — explains the implementation, names internals, too long:
+
+```markdown
+- We fixed a bug in the entry editor where, due to a race condition in the JavaFX
+  focus handling inside `EntryEditor#setFocus`, the focus was lost after the library
+  was saved. This was especially annoying for users who ... The fix introduces a
+  guard flag that ...
+```
 
 ### Developer documentation
 
@@ -501,6 +582,10 @@ For complex flows or new architecture, consider adding a Mermaid sequence or cla
 - `docs/code-howtos/` — localization, testing, fetchers, tools
 - `docs/decisions/` — Architecture Decision Records
 - `docs/requirements/` — Requirements (OpenFastTrace)
+
+When adding a package or changing a package's or module's public surface, add or update its `package-info.java` / `module-info.java` Javadoc following [skills/developers/module-documentation/SKILL.md](skills/developers/module-documentation/SKILL.md).
+
+When adding or editing a `uses:` line in a workflow, follow [skills/developers/github-actions/SKILL.md](skills/developers/github-actions/SKILL.md) — external actions are pinned to a full commit SHA.
 
 ---
 

@@ -20,24 +20,32 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.application.Platform;
+
 import org.jabref.support.DisabledOnCIServerWindows;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Need to run on JavaFX thread since we are parsing FXML files
-@ExtendWith(ApplicationExtension.class)
 @DisabledOnCIServerWindows("Needs DISPLAY variable to be set")
 @ResourceLock("Localization.lang")
 class LocalizationConsistencyTest {
+
+    @BeforeAll
+    static void initializeJavaFx() {
+        try {
+            Platform.startup(() -> Platform.setImplicitExit(false));
+        } catch (IllegalStateException _) {
+            Platform.setImplicitExit(false);
+        }
+    }
 
     @Test
     void allFilesMustBeInLanguages() throws IOException {
@@ -96,10 +104,10 @@ class LocalizationConsistencyTest {
     @Test
     void languageKeysShouldNotContainUnderscoresForSpaces() throws IOException {
         final List<LocalizationEntry> quotedEntries = LocalizationParser
-                .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
+                .findLocalizationParametersStringsInJavaFiles()
                 .stream()
                 .filter(key -> key.getKey().contains("\\_"))
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(List.of(), quotedEntries,
                 "Language keys must not use underscores for spaces! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
                         "Please correct the following entries:\n" +
@@ -112,10 +120,10 @@ class LocalizationConsistencyTest {
     @Test
     void languageKeysShouldNotContainHtmlBrAndHtmlP() throws IOException {
         final List<LocalizationEntry> entriesWithHtml = LocalizationParser
-                .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
+                .findLocalizationParametersStringsInJavaFiles()
                 .stream()
                 .filter(key -> key.getKey().contains("<br>") || key.getKey().contains("<p>"))
-                .collect(Collectors.toList());
+                .toList();
         assertEquals(List.of(), entriesWithHtml,
                 "Language keys must not contain HTML <br> or <p>. Use \\n for a line break.\n" +
                         "Please correct the following entries:\n" +
@@ -127,7 +135,7 @@ class LocalizationConsistencyTest {
 
     @Test
     void findMissingLocalizationKeys() throws IOException {
-        List<LocalizationEntry> missingKeys = new ArrayList<>(LocalizationParser.findMissingKeys(LocalizationBundleForTest.LANG));
+        List<LocalizationEntry> missingKeys = new ArrayList<>(LocalizationParser.findMissingKeys());
         assertEquals(List.of(), missingKeys,
                 missingKeys.stream()
                            .map(key -> LocalizationKey.fromKey(key.getKey()))
@@ -148,7 +156,7 @@ class LocalizationConsistencyTest {
 
     @Test
     void findObsoleteLocalizationKeys() throws IOException {
-        Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTest.LANG);
+        Set<String> obsoleteKeys = LocalizationParser.findObsolete();
         assertEquals(Set.of(), obsoleteKeys,
                 obsoleteKeys.stream().collect(Collectors.joining("\n",
                         "Obsolete keys found in language properties file: \n\n",
@@ -168,16 +176,11 @@ class LocalizationConsistencyTest {
         // - Localization.lang("test %1", var)
         // - Localization.lang("Problem downloading from %1", address)
         // - Localization.lang("test %1 %2", var1, var2)
-        Set<LocalizationEntry> keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG);
+        Set<LocalizationEntry> keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles();
         for (LocalizationEntry e : keys) {
             // TODO: Forbidden Localization.lang("test" + var2) not covered by the test
             //       In case this kind of code is found, an error should be reported
             //       JabRef's infrastructure only supports Localization.lang("Some Message"); and not something else.
-            assertTrue(e.getKey().startsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
-        }
-
-        keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.MENU);
-        for (LocalizationEntry e : keys) {
             assertTrue(e.getKey().startsWith("\""), "Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey());
         }
     }

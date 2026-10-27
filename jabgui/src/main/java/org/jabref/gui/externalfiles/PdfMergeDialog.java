@@ -10,7 +10,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
-import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
+import org.jabref.logic.importer.fileformat.pdf.PdfGrobidHeaderImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
@@ -19,16 +19,16 @@ import org.jabref.model.entry.BibEntry;
 
 public class PdfMergeDialog {
 
-    /// Constructs a merge dialog for a PDF file. This dialog calls various {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s, collects the results, and lets the user choose between them.
+    /// Constructs a merge dialog for a PDF file. This dialog calls various [org.jabref.logic.importer.fileformat.pdf.PdfImporter]s, collects the results, and lets the user choose between them.
     ///
-    /// {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s try to extract a {@link BibEntry} out of a PDF file,
+    /// [org.jabref.logic.importer.fileformat.pdf.PdfImporter]s try to extract a [BibEntry] out of a PDF file,
     /// but it does not perform this 100% perfectly, it is only a set of heuristics that in some cases might work, in others not.
-    /// Thus, JabRef provides this merge dialog that collects the results of all {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s
+    /// Thus, JabRef provides this merge dialog that collects the results of all [org.jabref.logic.importer.fileformat.pdf.PdfImporter]s
     /// and gives user a choice between field values.
     ///
     /// @param entry        the entry to merge with
-    /// @param filePath     the path to the PDF file. This PDF is used as the source for the {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s.
-    /// @param preferences  the preferences to use. Full preference object is required, because of current implementation of {@link MultiMergeEntriesView}.
+    /// @param filePath     the path to the PDF file. This PDF is used as the source for the [org.jabref.logic.importer.fileformat.pdf.PdfImporter]s.
+    /// @param preferences  the preferences to use. Full preference object is required, because of current implementation of [MultiMergeEntriesView].
     /// @param taskExecutor the task executor to use when the multi merge dialog executes the importers.
     public static MultiMergeEntriesView createMergeDialog(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
         MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);
@@ -53,10 +53,11 @@ public class PdfMergeDialog {
         dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));
         dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
         if (preferences.getGrobidPreferences().isGrobidEnabled()) {
-            dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidHeaderImporter(preferences.getImportFormatPreferences()), filePath));
         }
         dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
         dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(), filePath));
+        dialog.enableAutomaticIdentifierFetching();
     }
 
     private static Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
@@ -67,7 +68,7 @@ public class PdfMergeDialog {
                     return null;
                 }
                 return parserResult.getDatabase().getEntries().getFirst();
-            } catch (IOException e) {
+            } catch (IOException _) {
                 return null;
             }
         };

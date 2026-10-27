@@ -4,17 +4,17 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.testutils.JavaFxExtension;
 
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationMessage;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(ApplicationExtension.class)
+@ExtendWith(JavaFxExtension.class)
 public class IconValidationDecoratorTest {
     static Object[][] decorationTestData() {
         return new Object[][] {

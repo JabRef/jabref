@@ -1,10 +1,15 @@
 package org.jabref.logic.ai.models;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
+import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.model.ai.llm.AiProvider;
+import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
+import dev.langchain4j.data.message.UserMessage;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -30,11 +35,11 @@ public class AiModelService {
         List<String> dynamicModels = fetchModelsSynchronously(aiProvider, apiBaseUrl, apiKey);
 
         if (!dynamicModels.isEmpty()) {
-            LOGGER.info("Using {} dynamic models for {}", dynamicModels.size(), aiProvider.name());
+            LOGGER.debug("Using {} dynamic models for {}", dynamicModels.size(), aiProvider.name());
             return dynamicModels;
         }
 
-        List<String> staticModels = PredefinedChatModelUtil.getAvailableModels(aiProvider);
+        List<String> staticModels = getStaticModels(aiProvider);
         LOGGER.debug("Using {} hardcoded models for {}", staticModels.size(), aiProvider.name());
         return staticModels;
     }
@@ -45,6 +50,23 @@ public class AiModelService {
     /// @return A list of available model names
     public List<String> getStaticModels(AiProvider aiProvider) {
         return PredefinedChatModelUtil.getAvailableModels(aiProvider);
+    }
+
+    /// Sends a minimal chat request, which verifies provider, model name, API key, and API base URL in one call.
+    /// A chat request is used instead of listing models, because it works for every provider.
+    ///
+    /// @return the reply of the model
+    public String testConnection(AiProvider aiProvider, String modelName, String apiKey, double temperature, String apiBaseUrl, int contextWindowSize, TokenEstimatorKind tokenEstimatorKind) {
+        try (ChatModel chatModel = ChatModelFactory.create(aiProvider, modelName, apiKey, temperature, apiBaseUrl, contextWindowSize, tokenEstimatorKind)) {
+            return chatModel.chat(List.of(UserMessage.from("Reply with OK."))).aiMessage().text();
+        }
+    }
+
+    /// Servers report a model they do not have with a "not found" message, e.g., Ollama: `model 'gpt-oss20b' not found`.
+    public static boolean isModelNotFound(Exception exception) {
+        return Optional.ofNullable(exception.getMessage())
+                       .map(message -> message.contains("not found"))
+                       .orElse(false);
     }
 
     /// Synchronously fetches the list of available models from the API.
@@ -58,7 +80,7 @@ public class AiModelService {
         for (AiModelProvider provider : modelProviders) {
             if (provider.supports(aiProvider)) {
                 List<String> models = provider.fetchModels(aiProvider, apiBaseUrl, apiKey);
-                if (models.isEmpty()) {
+                if (!models.isEmpty()) {
                     return models;
                 }
             }

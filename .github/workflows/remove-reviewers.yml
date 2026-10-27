@@ -14,21 +14,24 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/pr-gate
         id: gate
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           ci-running-message: >
-            Do not request reviews while the CI is running.
-            CI checks need to be completed and passed.
+            Do not request reviews while the CI or the automatic review is running.
+            They need to be completed and passed.
           changes-required-message: |
             Do not request reviews if changes are required.
             Address the changes first.
       - name: Remove reviewer
         if: ${{ steps.gate.outputs.skip-check != 'true' && (steps.gate.outputs.ci_running == 'true' || steps.gate.outputs.changes_required == 'true') }}
+        # The workflow token suffices for the REST endpoint (unlike the GraphQL draft conversion in
+        # remove-ready-for-review.yml), and the timeline then shows the bot as actor instead of the
+        # maintainer who owns the PAT.
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN_ADAPT_REVIEW }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           reviewer="${{ github.event.requested_reviewer.login }}"
           gh api \

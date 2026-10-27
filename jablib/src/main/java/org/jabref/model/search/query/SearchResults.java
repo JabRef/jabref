@@ -19,7 +19,7 @@ public class SearchResults {
     }
 
     public void addSearchResult(String entryId, SearchResult result) {
-        searchResults.computeIfAbsent(entryId, k -> new ArrayList<>()).add(result);
+        searchResults.computeIfAbsent(entryId, _ -> new ArrayList<>()).add(result);
     }
 
     public void addSearchResult(Collection<String> entries, SearchResult result) {
@@ -44,7 +44,7 @@ public class SearchResults {
         if (searchResults.containsKey(entry.getId())) {
             for (SearchResult result : searchResults.get(entry.getId())) {
                 if (result.hasFulltextResults()) {
-                    results.computeIfAbsent(result.getPath(), k -> new ArrayList<>()).add(result);
+                    results.computeIfAbsent(result.getPath(), _ -> new ArrayList<>()).add(result);
                 }
             }
         }

@@ -31,7 +31,7 @@ class Check implements Callable<Integer> {
     protected JabKit jabKit;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     /// Optional positional input file. When supplied directly to `check` (without a
     /// `consistency` or `integrity` subcommand), both checks run against it.

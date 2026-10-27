@@ -12,11 +12,6 @@ import org.jabref.model.entry.event.EntriesEventSource;
 public class EntriesRemovedEvent extends EntriesEvent {
 
     /// @param bibEntries `List` of `BibEntry` objects which are being removed.
-    public EntriesRemovedEvent(List<BibEntry> bibEntries) {
-        super(bibEntries);
-    }
-
-    /// @param bibEntries `List` of `BibEntry` objects which are being removed.
     /// @param location   Location affected by this event
     public EntriesRemovedEvent(List<BibEntry> bibEntries, EntriesEventSource location) {
         super(bibEntries, location);

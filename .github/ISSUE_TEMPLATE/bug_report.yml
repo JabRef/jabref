@@ -1,6 +1,7 @@
 name: "Bug report"
 description: Create a report to help us improve
 type: Bug
+labels: ["status: needs-triage"]
 body:
   - type: markdown
     attributes:
@@ -14,7 +15,7 @@ body:
       label: JabRef version
       options:
         - "5.15 (latest release)"
-        - "6.0-alpha.6"
+        - "6.0-beta.1"
         - Latest development branch build (please note build date below)
         - Other (please describe below)
       description: The version as shown in the about dialog.

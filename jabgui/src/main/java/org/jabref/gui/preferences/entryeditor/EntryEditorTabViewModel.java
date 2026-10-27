@@ -1,27 +1,23 @@
 package org.jabref.gui.preferences.entryeditor;
 
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
@@ -32,9 +28,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.URLUtil;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -53,32 +47,12 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableMscKeywordDescriptionsProperty = new SimpleBooleanProperty();
     private final ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty = new SimpleObjectProperty<>();
+    private final ListProperty<CitationCountFetcherType> citationCountFetcherTypes =
+            new SimpleListProperty<>(FXCollections.observableArrayList(CitationCountFetcherType.values()));
 
     /// Working copy of tab configurations — not the live preferences list.
-    /// Written to preferences only in {@link #storeSettings()}.
-    private final ObservableList<EntryEditorTabModel> tabModels = FXCollections.observableArrayList();
-
-    /// The tab currently selected in the list view. Drives {@link #selectedTabName} and
-    /// {@link #selectedTabFields}. Updated by the view via {@code EasyBind.subscribe} on the
-    /// list's {@code selectedItemProperty}. Changing it commits the previous FieldSet edit first.
-    private final ObjectProperty<EntryEditorTabModel> selectedTab = new SimpleObjectProperty<>();
-
-    /// Staging property for the name of the currently selected field-set tab.
-    /// Not written to {@link #tabModels} until selection changes or {@link #storeSettings()} is called.
-    private final StringProperty selectedTabName = new SimpleStringProperty("");
-
-    /// Staging list for the fields of the currently selected field-set tab.
-    private final ObservableList<Field> selectedTabFields = FXCollections.observableArrayList();
-
-    private final BooleanProperty fieldSetTabSelected = new SimpleBooleanProperty(false);
-    private final BooleanProperty canRemoveSelectedTab = new SimpleBooleanProperty(false);
-
-    /// All known fields, sorted by name, provided as suggestions in the fields editor.
-    private final List<Field> allKnownFields = Stream.<Field>concat(
-                                                             java.util.Arrays.stream(StandardField.values()),
-                                                             java.util.Arrays.stream(SpecialField.values()))
-                                                     .sorted(Comparator.comparing(Field::getName))
-                                                     .toList();
+    /// Written to preferences only in [#storeSettings()]. Excludes the Preview tab (see [#setValues()]).
+    private final ObservableList<EditorTabViewModel> tabs = FXCollections.observableArrayList();
 
     private final DialogService dialogService;
     private final EntryEditorPreferences entryEditorPreferences;
@@ -87,59 +61,28 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final TaskExecutor taskExecutor;
     private boolean mscKeywordDescriptionsInitialized;
 
-    public EntryEditorTabViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
+    public EntryEditorTabViewModel(DialogService dialogService,
+                                   EntryEditorPreferences entryEditorPreferences,
+                                   MrDlibPreferences mrDlibPreferences,
+                                   AbbreviationPreferences abbreviationPreferences,
+                                   TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
-        this.mrDlibPreferences = preferences.getMrDlibPreferences();
-        this.abbreviationPreferences = preferences.getAbbreviationPreferences();
+        this.entryEditorPreferences = entryEditorPreferences;
+        this.mrDlibPreferences = mrDlibPreferences;
+        this.abbreviationPreferences = abbreviationPreferences;
         this.taskExecutor = taskExecutor;
 
-        selectedTab.addListener((_, oldItem, newItem) -> {
-            commitCurrentEdit(oldItem);
-            loadSelection(newItem);
-        });
-
         EasyBind.subscribe(enableMscKeywordDescriptionsProperty, this::onMscKeywordDescriptionsChanged);
-    }
-
-    /// Commits any pending name/fields edit for {@code oldItem} back into {@link #tabModels}.
-    private void commitCurrentEdit(EntryEditorTabModel oldItem) {
-        if (!(oldItem instanceof EntryEditorTabModel.CustomizedFieldsTab)) {
-            return;
-        }
-        int index = tabModels.indexOf(oldItem);
-        if (index < 0) {
-            return;
-        }
-        tabModels.set(index, new EntryEditorTabModel.CustomizedFieldsTab(
-                selectedTabName.get(), new LinkedHashSet<>(selectedTabFields)));
-    }
-
-    private void loadSelection(EntryEditorTabModel newItem) {
-        if (newItem instanceof EntryEditorTabModel.CustomizedFieldsTab(
-                String name,
-                Set<Field> fields
-        )) {
-            selectedTabName.set(name);
-            selectedTabFields.setAll(fields);
-            fieldSetTabSelected.set(true);
-            canRemoveSelectedTab.set(true);
-        } else {
-            selectedTabName.set("");
-            selectedTabFields.clear();
-            fieldSetTabSelected.set(false);
-            canRemoveSelectedTab.set(false);
-        }
     }
 
     @Override
     public void setValues() {
         // The Preview tab is configured via the "show preview as a separate tab" preference, not here,
         // so it is omitted from the configurable tab list (its model visibility bit is unused).
-        tabModels.setAll(entryEditorPreferences.getTabModels().stream()
-                                               .filter(model -> !model.isPreview())
-                                               .toList());
-        selectedTab.set(null);
+        tabs.setAll(entryEditorPreferences.getTabModels().stream()
+                                          .filter(model -> !model.isPreview())
+                                          .map(EditorTabViewModel::fromModel)
+                                          .toList());
 
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
         defaultSourceProperty.setValue(entryEditorPreferences.showSourceTabByDefault());
@@ -153,57 +96,66 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         mscKeywordDescriptionsInitialized = true;
     }
 
+    /// Restores the default tab set: every built-in tab visible in default order, no custom tabs.
     public void resetToDefaults() {
-        // Enable visibility of built-in tabs
-        for (int i = 0; i < tabModels.size(); i++) {
-            if (tabModels.get(i) instanceof EntryEditorTabModel.BuiltInTab builtIn && !builtIn.isVisible()) {
-                tabModels.set(i, builtIn.withVisible(true));
-            }
-        }
-
-        // Reload default custom field-set tabs
-        tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldsTab);
-        List<EntryEditorTabModel> defaultFieldSets = EntryEditorPreferences.getDefaultEntryEditorTabs()
-                                                                           .entrySet().stream()
-                                                                           .<EntryEditorTabModel>map(e -> new EntryEditorTabModel.CustomizedFieldsTab(e.getKey(), e.getValue()))
-                                                                           .toList();
-        tabModels.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(tabModels), defaultFieldSets);
-        // selectedTab is cleared automatically when the ListView loses the old selected item
+        tabs.setAll(EntryEditorPreferences.getDefault().getTabModels().stream()
+                                          .filter(model -> !model.isPreview())
+                                          .map(EditorTabViewModel::fromModel)
+                                          .toList());
     }
 
-    public void addFieldSetTab() {
-        int insertIndex = EntryEditorTabModel.indexAfterBuiltInFieldSets(tabModels);
-        for (int i = 0; i < tabModels.size(); i++) {
-            if (tabModels.get(i) instanceof EntryEditorTabModel.CustomizedFieldsTab) {
-                insertIndex = i + 1;
-            }
+    /// Adds a custom tab with the given name, or returns the existing tab when one with that name
+    /// (custom or built-in, compared case-insensitively) is already present. Empty for a blank name.
+    public Optional<EditorTabViewModel> addCustomTab(String name) {
+        if (StringUtil.isBlank(name)) {
+            return Optional.empty();
         }
-        EntryEditorTabModel newTab = new EntryEditorTabModel.CustomizedFieldsTab(
-                Localization.lang("New tab"), Set.of());
-        tabModels.add(insertIndex, newTab);
-        selectedTab.set(newTab); // commits old, loads new empty state; view mirrors via EasyBind
+        String trimmed = name.trim();
+        Optional<EditorTabViewModel> existing = tabs.stream()
+                                                    .filter(tab -> tab.getDisplayName().equalsIgnoreCase(trimmed))
+                                                    .findFirst();
+        if (existing.isPresent()) {
+            return existing;
+        }
+        EditorTabViewModel tab = EditorTabViewModel.newCustomTab(trimmed);
+        tabs.add(tab);
+        return Optional.of(tab);
     }
 
-    public void removeSelectedFieldSetTab() {
-        if (selectedTab.get() instanceof EntryEditorTabModel.CustomizedFieldsTab toRemove) {
-            tabModels.remove(toRemove);
-            // ListView auto-updates selection; view listener propagates it back to selectedTab
+    public void removeTab(EditorTabViewModel tab) {
+        if (tab.isCustom()) {
+            tabs.remove(tab);
         }
     }
 
-    /// Toggles the visibility of a feature or built-in field-set tab. Called by the cell's checkbox.
-    public void toggleFeatureTabVisibility(EntryEditorTabModel config) {
-        int index = tabModels.indexOf(config);
-        if (index < 0) {
-            return;
+    /// Adds a field pattern to the given custom tab; `false` if the pattern is blank or already on that tab.
+    public boolean addFieldPattern(EditorTabViewModel tab, String pattern) {
+        if (StringUtil.isBlank(pattern)) {
+            return false;
         }
-        switch (config) {
-            case EntryEditorTabModel.BuiltInTab builtIn ->
-                    tabModels.set(index, builtIn.withVisible(!builtIn.isVisible()));
-            case EntryEditorTabModel.CustomizedFieldsTab ignored -> {
-                // Custom tabs are always visible; toggled only by adding/removing them.
-            }
+        String trimmed = pattern.trim();
+        if (containsIgnoreCase(tab.getFieldPatterns(), trimmed)) {
+            return false;
         }
+        tab.getFieldPatterns().add(trimmed);
+        return true;
+    }
+
+    public void removeFieldPattern(EditorTabViewModel tab, String pattern) {
+        tab.getFieldPatterns().remove(pattern);
+    }
+
+    /// `true` if the pattern occurs on more than one tab (duplicates within one tab are prevented on add) —
+    /// the fields table shows a warning sign on such rows. Literal comparison only; overlap between a regex
+    /// pattern and the field names it captures is not detected.
+    public boolean isFieldPatternDuplicated(String pattern) {
+        return tabs.stream()
+                   .filter(tab -> containsIgnoreCase(tab.getFieldPatterns(), pattern))
+                   .count() > 1;
+    }
+
+    private static boolean containsIgnoreCase(List<String> patterns, String pattern) {
+        return patterns.stream().anyMatch(existing -> existing.equalsIgnoreCase(pattern));
     }
 
     @Override
@@ -220,68 +172,20 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         entryEditorPreferences.setCitationCountFetcherType(citationCountFetcherTypeProperty.getValue());
         abbreviationPreferences.setShouldEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
 
-        // Write feature- and built-in field-set-tab visibility from working copy. Customized field-set
-        // Tabs have no key (always visible) and are persisted separately below.
-        for (EntryEditorTabModel tabModel : tabModels) {
-            if (tabModel instanceof EntryEditorTabModel.BuiltInTab(
-                    EntryEditorTabModel.BuiltIn key,
-                    boolean _
-            )) {
-                entryEditorPreferences.setTabVisible(key, tabModel.isVisible());
-            }
-        }
-
-        // Write customized field-set tabs. The currently selected one may have pending edits that have
-        // not yet been committed to tabConfigs (they only commit on navigation). Read them directly
-        // from the staging properties so nothing is lost when the user clicks Apply without switching tabs.
-        EntryEditorTabModel pendingItem = selectedTab.get();
-        int pendingIndex = (pendingItem instanceof EntryEditorTabModel.CustomizedFieldsTab)
-                           ? tabModels.indexOf(pendingItem) : -1;
-
-        Map<String, Set<Field>> fieldSetMap = new LinkedHashMap<>();
-        for (int i = 0; i < tabModels.size(); i++) {
-            if (tabModels.get(i) instanceof EntryEditorTabModel.CustomizedFieldsTab(
-                    String name,
-                    Set<Field> fields
-            )) {
-                if (i == pendingIndex) {
-                    fieldSetMap.put(selectedTabName.get(), new LinkedHashSet<>(selectedTabFields));
-                } else {
-                    fieldSetMap.put(name, fields);
-                }
-            }
-        }
-        entryEditorPreferences.setCustomizedFieldSets(fieldSetMap);
+        // Replace the tab list wholesale from the working copy: the Preview tab (filtered out in
+        // setValues()) stays in front, everything else takes the working copy's order and content.
+        List<EntryEditorTabModel> newModels = new ArrayList<>();
+        entryEditorPreferences.getTabModels().stream()
+                              .filter(EntryEditorTabModel::isPreview)
+                              .forEach(newModels::add);
+        tabs.stream().map(EditorTabViewModel::toModel).forEach(newModels::add);
+        entryEditorPreferences.getTabModels().setAll(newModels);
     }
 
     // region Properties
 
-    public ObservableList<EntryEditorTabModel> getTabModels() {
-        return tabModels;
-    }
-
-    public ObjectProperty<EntryEditorTabModel> selectedTabProperty() {
-        return selectedTab;
-    }
-
-    public StringProperty selectedTabNameProperty() {
-        return selectedTabName;
-    }
-
-    public ObservableList<Field> getSelectedTabFields() {
-        return selectedTabFields;
-    }
-
-    public List<Field> getAllKnownFields() {
-        return allKnownFields;
-    }
-
-    public BooleanProperty fieldSetTabSelectedProperty() {
-        return fieldSetTabSelected;
-    }
-
-    public BooleanProperty canRemoveSelectedTabProperty() {
-        return canRemoveSelectedTab;
+    public ObservableList<EditorTabViewModel> getTabs() {
+        return tabs;
     }
 
     public BooleanProperty openOnNewEntryProperty() {
@@ -318,6 +222,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
         return citationCountFetcherTypeProperty;
+    }
+
+    public ReadOnlyListProperty<CitationCountFetcherType> citationCountFetcherTypes() {
+        return citationCountFetcherTypes;
     }
 
     // endregion

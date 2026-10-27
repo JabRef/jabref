@@ -15,7 +15,7 @@ public class GrobidPreferences {
         this(
                 false,                          // Grobid enabled
                 false,                          // Grobid use asked
-                "http://grobid.jabref.org:8070" // Grobid URL
+                "https://grobid.jabref.org" // Grobid URL
         );
     }
 
@@ -29,12 +29,6 @@ public class GrobidPreferences {
 
     public static GrobidPreferences getDefault() {
         return new GrobidPreferences();
-    }
-
-    public void setAll(GrobidPreferences preferences) {
-        this.grobidEnabled.set(preferences.isGrobidEnabled());
-        this.grobidUseAsked.set(preferences.isGrobidUseAsked());
-        this.grobidURL.set(preferences.getGrobidURL());
     }
 
     public boolean isGrobidEnabled() {

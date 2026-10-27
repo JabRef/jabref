@@ -15,8 +15,9 @@ import org.slf4j.LoggerFactory;
 
 public class FetcherException extends JabRefException {
     private static final Logger LOGGER = LoggerFactory.getLogger(FetcherException.class);
-    private static final String API_KEY_PARAM_NAME = "apiKeyParamName";
-    private static final Pattern API_KEY_PATTERN = Pattern.compile("(?i)(?<" + API_KEY_PARAM_NAME + ">api|key|api[-_]?key)=[^&]*");
+    private static final String SENSITIVE_PARAM_NAME = "sensitiveParamName";
+    private static final Pattern SENSITIVE_PARAM_PATTERN = Pattern.compile("(?i)(?<" + SENSITIVE_PARAM_NAME + ">api|key|api[-_]?key|mailto|email)=[^&]*");
+    private static final Pattern USERINFO_PATTERN = Pattern.compile("(?<=://)[^/@]+@");
     private static final String REDACTED_STRING = "[REDACTED]";
 
     @Nullable
@@ -95,7 +96,8 @@ public class FetcherException extends JabRefException {
     }
 
     public static String getRedactedUrl(String source) {
-        return API_KEY_PATTERN.matcher(source).replaceAll("${" + API_KEY_PARAM_NAME + "}=" + REDACTED_STRING);
+        String withoutUserInfo = USERINFO_PATTERN.matcher(source).replaceAll("");
+        return SENSITIVE_PARAM_PATTERN.matcher(withoutUserInfo).replaceAll("${" + SENSITIVE_PARAM_NAME + "}=" + REDACTED_STRING);
     }
 
     private String getPrefix() {

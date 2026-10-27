@@ -77,7 +77,7 @@ public abstract class Importer implements Comparable<Importer> {
     ///
     /// @param extension the extension to check, without leading dot
     public boolean supportsFileExtension(String extension) {
-        return getFileType().getExtensions().contains(extension);
+        return getFileType().getExtensions().stream().anyMatch(extension::equalsIgnoreCase);
     }
 
     /// Parse the database in the source.
@@ -90,9 +90,10 @@ public abstract class Importer implements Comparable<Importer> {
     ///
     /// If your format is binary-based (PDF, ZIP-based, or others), then you should not solely override this method.
     /// For binary formats do this:
-    /// 1. Throw {@link UnsupportedOperationException} in this method.
-    /// 2. Override the method {@link Importer#importDatabase(Path)}.
-    /// Example of this workaround is in: {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}.
+    ///
+    /// 1. Throw [UnsupportedOperationException] in this method.
+    /// 2. Override the method [Importer#importDatabase(Path)].
+    /// Example of this workaround is in: [org.jabref.logic.importer.fileformat.pdf.PdfImporter].
     ///
     /// @param input the input to read from - there is no reset done. "BufferedReader" is only a convenience for the implementation
     public abstract ParserResult importDatabase(BufferedReader input) throws IOException;
@@ -133,13 +134,19 @@ public abstract class Importer implements Comparable<Importer> {
                 return defaultCharSet;
             }
 
-            // if we have utf8 with 100 confidence we assume that the file is in utf8, more likely
-            if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()) || ("UTF-8".equals(charset.getName()) && charset.getConfidence() == 100))) {
-                return defaultCharSet;
-            }
-
             if (matches[0] != null) {
-                return Charset.forName(matches[0].getName());
+                /// ICU orders candidates by confidence. UTF-16 input can still produce a lower-confidence ASCII
+                /// candidate because of its alternating zero bytes, so a UTF-16 top candidate must take precedence.
+                String topMatch = matches[0].getName();
+                if ("UTF-16BE".equals(topMatch) || "UTF-16LE".equals(topMatch)) {
+                    return Charset.forName(topMatch);
+                }
+
+                // If we have UTF-8 with 100 confidence or any ASCII candidate, UTF-8 is the safer fallback.
+                if (Arrays.stream(matches).anyMatch(charset -> "ASCII".equals(charset.getName()) || ("UTF-8".equals(charset.getName()) && charset.getConfidence() == 100))) {
+                    return defaultCharSet;
+                }
+                return Charset.forName(topMatch);
             }
         } catch (IOException e) {
             LOGGER.error("Could not determine charset. Using default one.", e);
@@ -150,7 +157,7 @@ public abstract class Importer implements Comparable<Importer> {
     /// Parse the database in the specified string.
     ///
     /// Importer having the facilities to detect the correct encoding of a string should overwrite this method, determine
-    /// the encoding and then call {@link #importDatabase(BufferedReader)}.
+    /// the encoding and then call [#importDatabase(BufferedReader)].
     ///
     /// @param data the string which should be imported
     /// @return the parsed result
@@ -199,14 +206,14 @@ public abstract class Importer implements Comparable<Importer> {
     /// -
     /// what kind of entries from what sources and based on what specification it is able to import
     /// -
-    /// by what criteria it {@link #isRecognizedFormat(BufferedReader)} recognizes an import format
+    /// by what criteria it [#isRecognizedFormat(BufferedReader)] recognizes an import format
     ///
     /// @return description of the import format
     public abstract String getDescription();
 
     /// Returns the type of files that this importer can read
     ///
-    /// @return {@link FileType} corresponding to the importer
+    /// @return [FileType] corresponding to the importer
     public abstract FileType getFileType();
 
     @Override

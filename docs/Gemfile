@@ -15,7 +15,7 @@ gem 'jekyll-sitemap'
 
 gem "jekyll-remote-theme"
 
-# Added, because defualt layout with path "**/*.md" does not work at Jekyll
+# Added, because default layout with path "**/*.md" does not work at Jekyll
 #   Source: https://jekyllrb.com/docs/configuration/front-matter-defaults/#glob-patterns-in-front-matter-defaults
 # Homepage: https://github.com/benbalter/jekyll-default-layout#jekyll-default-layout
 gem 'jekyll-default-layout'

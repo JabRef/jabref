@@ -21,6 +21,12 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+/// Parsed executable program of one specific `.bst` file.
+///
+/// [BstVM] cannot be used as a static, style-agnostic machine because each instance holds the
+/// parse tree of one concrete `.bst` program. It also keeps the latest execution context for
+/// testing/debugging, so callers should treat it as style-specific runtime state rather than a
+/// global utility.
 @NullMarked
 public class BstVM {
 
@@ -86,6 +92,23 @@ public class BstVM {
 
     public String render(List<BibEntry> bibEntries) {
         return render(bibEntries, new BibDatabase(bibEntries));
+    }
+
+    public boolean hasSortCommand() {
+        return containsSortCommand(tree);
+    }
+
+    private boolean containsSortCommand(ParseTree parseTree) {
+        if (parseTree instanceof BstParser.SortCommandContext) {
+            return true;
+        }
+
+        for (int i = 0; i < parseTree.getChildCount(); i++) {
+            if (containsSortCommand(parseTree.getChild(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @VisibleForTesting

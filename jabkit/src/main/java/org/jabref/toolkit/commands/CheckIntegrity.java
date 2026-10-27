@@ -39,7 +39,7 @@ class CheckIntegrity implements Callable<Integer> {
     private Check check;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Mixin
     private InputOption inputOption = new InputOption();
@@ -53,7 +53,7 @@ class CheckIntegrity implements Callable<Integer> {
 
     @Override
     public Integer call() throws ImportServiceException {
-        return execute(inputOption.getInputFile(), outputFormat, allowIntegerEdition, sharedOptions.porcelain, check.jabKit);
+        return execute(inputOption.getInputFile(check.jabKit.cliPreferences), outputFormat, allowIntegerEdition, sharedOptions.porcelain, check.jabKit);
     }
 
     /// Runs the integrity check on `inputFile` and writes the findings to `System.out`.

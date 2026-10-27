@@ -11,8 +11,6 @@
 //REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
-// see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
-//DEPS io.github.adr:e-adr:2.0.0
 
 // Pin JavaFX 26 to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
 // Required because jabsrv CAYW endpoint calls Platform.startup(); mixing javafx.graphics:20 with
@@ -27,42 +25,44 @@
 
 // from jabsrv
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.22
-//DEPS com.github.ben-manes.caffeine:caffeine:3.2.4
-//DEPS com.google.guava:guava:33.6.0-jre
-//DEPS com.konghq:unirest-modules-gson:4.10.0
-//DEPS de.undercouch:citeproc-java:3.5.0
+//DEPS com.github.ben-manes.caffeine:caffeine:3.3.1
+//DEPS com.google.guava:guava:33.7.2-jre
+//DEPS com.konghq:unirest-modules-gson:4.10.3
+//DEPS de.undercouch:citeproc-java:3.5.2
 //DEPS info.picocli:picocli:4.7.7
 //DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS net.harawata:appdirs:1.5.0
-//DEPS org.apache.commons:commons-lang3:3.20.0
-//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.0
-//DEPS org.bouncycastle:bcprov-jdk18on:1.84
-//DEPS org.postgresql:postgresql:42.7.11
-//DEPS org.slf4j:slf4j-api:2.0.18
-//DEPS org.slf4j:jul-to-slf4j:2.0.18
-//DEPS org.tinylog:slf4j-tinylog:2.7.0
-//DEPS org.tinylog:tinylog-impl:2.7.0
-//DEPS org.glassfish.grizzly:grizzly-framework:5.0.2
-//DEPS org.glassfish.grizzly:grizzly-http-server:5.0.2
-//DEPS org.glassfish.hk2:hk2-api:4.0.1
-//DEPS org.glassfish.hk2:hk2-locator:4.0.1
-//DEPS org.glassfish.hk2:hk2-utils:4.0.1
-//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.2
-//DEPS org.glassfish.jersey.core:jersey-server:4.0.2
-//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.2
-//DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
+//DEPS org.apache.commons:commons-lang3:3.21.0
+//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.1
+//DEPS org.bouncycastle:bcprov-jdk18on:1.86
+//DEPS org.postgresql:postgresql:42.7.14
+//DEPS org.slf4j:slf4j-api:2.0.20
+//DEPS org.slf4j:jul-to-slf4j:2.0.20
+//DEPS org.tinylog:slf4j-tinylog:2.8.1
+//DEPS org.tinylog:tinylog-impl:2.8.1
+//DEPS org.glassfish.grizzly:grizzly-framework:5.0.3
+//DEPS org.glassfish.grizzly:grizzly-http-server:5.0.3
+//DEPS org.glassfish.hk2:hk2-api:4.0.3
+//DEPS org.glassfish.hk2:hk2-locator:4.0.3
+//DEPS org.glassfish.hk2:hk2-utils:4.0.3
+//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.3
+//DEPS org.glassfish.jersey.core:jersey-server:4.0.3
+//DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.3
+//DEPS org.hibernate.validator:hibernate-validator:9.1.5.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS tools.jackson.core:jackson-core:3.2.0
-//DEPS tools.jackson.core:jackson-databind:3.2.0
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.0
+//DEPS tools.jackson.core:jackson-core:3.2.4
+//DEPS tools.jackson.core:jackson-databind:3.2.4
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.2.4
+//DEPS com.nimbusds:oauth2-oidc-sdk:11.38.2
+//DEPS net.minidev:json-smart:2.6.0
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GroupDTO.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyReader.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyWriter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryMatch.java
@@ -70,6 +70,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryResponse.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryResult.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/UncheckedFetcherException.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/AbstractSrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefSrvStateManager.java
@@ -88,15 +89,17 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/SimpleJsonFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CAYWEntry.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CitationPropertiesPopup.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/IconThemeHelper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchDialog.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchField.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchResultContainer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SelectedItemsContainer.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/Command.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/CommandResource.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/FocusCommand.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/OpenLibrariesCommand.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/callback/CallbackResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/Command.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/FocusCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/OpenLibrariesCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/CommandResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/CitationsResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesQueryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
@@ -114,6 +117,7 @@
 // new jablib sources not yet in the 6.0-SNAPSHOT artifact
 //SOURCES ../jablib/src/main/java/org/jabref/logic/importer/plaincitation/PlainCitationParserFactory.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/UiCommand.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/citedrive/OAuthSessionRegistry.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/LibrarySearcher.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/NoOpSearchBackend.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchBackend.java

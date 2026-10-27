@@ -42,6 +42,7 @@ public class OOBibBaseConnect {
 
     private final DialogService dialogService;
     private final XDesktop xDesktop;
+    private final XComponentContext componentContext;
 
     /// Created when connected to a document.
     ///
@@ -54,16 +55,14 @@ public class OOBibBaseConnect {
             CreationException, IOException, InterruptedException {
 
         this.dialogService = dialogService;
-        this.xDesktop = simpleBootstrap(loPath);
+        this.componentContext = Bootstrap.bootstrap(loPath);
+        this.xDesktop = createDesktop(componentContext);
     }
 
-    private XDesktop simpleBootstrap(Path loPath)
+    private XDesktop createDesktop(XComponentContext context)
             throws
-            CreationException,
-            BootstrapException, IOException, InterruptedException {
+            CreationException {
 
-        // Get the office component context:
-        XComponentContext context = Bootstrap.bootstrap(loPath);
         XMultiComponentFactory sem = context.getServiceManager();
 
         // Create the desktop, which is the root frame of the
@@ -75,6 +74,10 @@ public class OOBibBaseConnect {
             throw new CreationException(e.getMessage());
         }
         return UnoCast.cast(XDesktop.class, desktop).get();
+    }
+
+    XComponentContext getComponentContext() {
+        return componentContext;
     }
 
     /// Close any open office connection, if none exists does nothing

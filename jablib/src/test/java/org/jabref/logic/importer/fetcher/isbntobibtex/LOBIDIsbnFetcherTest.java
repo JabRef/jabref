@@ -38,12 +38,12 @@ class LOBIDIsbnFetcherTest extends AbstractIsbnFetcherTest {
                 .withField(StandardField.LANGUAGE, "Englisch")
                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
                 .withField(StandardField.LOCATION, "Upper Saddle River, NJ [u.a.]")
-                .withField(StandardField.EDITION, "2. ed")
+                .withField(StandardField.EDITION, "2. ed., rev. and updated for Java SE 6, 14. print")
                 .withField(StandardField.ISBN, "9780321356680")
                 .withField(StandardField.TYPE, "BibliographicResource, Book")
-                .withField(StandardField.KEYWORDS, "Java Standard Edition 6, Java <Programmiersprache>")
-                .withField(StandardField.URL, "http://lobid.org/resources/991000506229708980")
-                .withField(StandardField.TITLEADDON, "[revised and updated for Java SE 6]");
+                .withField(StandardField.KEYWORDS, "Java (Programmiersprache)")
+                .withField(StandardField.URL, "http://lobid.org/resources/990212853550206441")
+                .withField(StandardField.ABSTRACT, "Mit Literaturangaben");
 
         fetcher = new LOBIDIsbnFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }

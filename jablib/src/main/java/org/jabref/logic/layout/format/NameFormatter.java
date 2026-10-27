@@ -26,6 +26,7 @@ import org.jspecify.annotations.NonNull;
 /// The cases must be in strictly increasing order with `*` in the last position.
 ///
 /// Example:
+///
 /// - `case1 = 2`
 /// - `case2 = 3`
 /// - `case3 = *`
@@ -34,17 +35,20 @@ import org.jspecify.annotations.NonNull;
 /// Negative integers start from the end (`-1` = last author).
 ///
 /// Example with `Joe Doe and Mary Jane and Bruce Bar and Arthur Kay`:
+///
 /// - `1..3` → Joe, Mary, Bruce
 /// - `4..4` → Arthur
 /// - `*` → all authors
 /// - `2..-1` → Mary, Bruce, Arthur
 ///
 /// The `<format>` uses the BibTeX formatter syntax:
+///
 /// - The letters `v`, `f`, `l`, `j` indicate name parts (von, first, last, jr). Use them inside `{}` for full form.
 /// - A single letter (`v`, `f`, `l`, `j`) abbreviates the part.
 /// - Quotes must be escaped as `\"` (not fully supported yet).
 ///
 /// Example:
+///
 /// - `"{ll},{f}."` → `"Joe Doe"` becomes `"Doe, J."`
 ///
 /// Complete example:

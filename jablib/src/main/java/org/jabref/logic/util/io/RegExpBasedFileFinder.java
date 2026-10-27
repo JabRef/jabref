@@ -149,6 +149,7 @@ class RegExpBasedFileFinder implements FileFinder {
     /// http://sourceforge.net/tracker/index.php?func=detail&aid=1503410&group_id=92314&atid=600309
     ///
     /// Requirements:
+    ///
     /// - Be able to find the associated PDF in a set of given directories.
     /// - Be able to return a relative path or absolute path.
     /// - Be fast.

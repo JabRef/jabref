@@ -7,6 +7,9 @@ date: 2026-05-27
 ---
 <!-- markdownlint-disable-next-line MD025 -->
 # Reload edited libraries in jabsrv via mtime polling
+`adr~jabsrv-reload-via-mtime-polling~1`
+
+Needs: impl
 
 ## Context and Problem Statement
 
@@ -72,3 +75,5 @@ A new class inside `jabsrv` that implements `FileUpdateMonitor`, mirroring `Defa
 * Bad, because ~80 lines of code are duplicated from `DefaultFileUpdateMonitor`.
 * Bad, because two implementations of the same interface drift over time.
 * Bad, because all the async/sync and `WatchService`-degradation downsides of option 2 apply.
+
+<!-- markdownlint-disable-file MD022 -->

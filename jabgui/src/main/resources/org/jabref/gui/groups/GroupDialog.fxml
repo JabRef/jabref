@@ -30,11 +30,11 @@
             </padding>
             <VBox>
                 <Label text="%Name"/>
-                <TextField fx:id="nameField"/>
+                <TextField fx:id="nameField" id="group-name"/>
             </VBox>
             <VBox>
                 <Label text="%Description"/>
-                <TextField fx:id="descriptionField"/>
+                <TextField fx:id="descriptionField" id="group-description"/>
             </VBox>
             <HBox spacing="10.0">
                 <VBox HBox.hgrow="SOMETIMES">
@@ -66,10 +66,10 @@
                     </VBox>
                 </VBox>
             </HBox>
-            <Label text="%Collect by" styleClass="sectionHeader"/>
+            <Label text="%Collect by" styleClass="h4,padding-top-12"/>
             <HBox>
                 <VBox spacing="10.0">
-                    <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
+                    <RadioButton fx:id="explicitRadioButton" id="group-explicit-radio" toggleGroup="$type" wrapText="true"
                                  text="%Explicit selection">
                         <tooltip>
                             <Tooltip text="%Statically group entries by manual assignment"/>
@@ -81,16 +81,16 @@
                             <Tooltip text="%Dynamically group entries by searching a field for a keyword"/>
                         </tooltip>
                     </RadioButton>
-                    <RadioButton fx:id="searchRadioButton" toggleGroup="$type" wrapText="true"
-                                 text="%Free search expression">
-                        <tooltip>
-                            <Tooltip text="%Dynamically group entries by a free-form search expression"/>
-                        </tooltip>
-                    </RadioButton>
                     <RadioButton fx:id="autoRadioButton" toggleGroup="$type" wrapText="true"
                                  text="%Specified keywords">
                         <tooltip>
                             <Tooltip text="%Automatically create groups"/>
+                        </tooltip>
+                    </RadioButton>
+                    <RadioButton fx:id="searchRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Free search expression">
+                        <tooltip>
+                            <Tooltip text="%Dynamically group entries by a free-form search expression"/>
                         </tooltip>
                     </RadioButton>
                     <RadioButton fx:id="texRadioButton" toggleGroup="$type" wrapText="true"
@@ -114,6 +114,9 @@
                 </VBox>
                 <Separator orientation="VERTICAL"/>
                 <StackPane HBox.hgrow="ALWAYS">
+                    <VBox visible="${explicitRadioButton.selected}" spacing="10.0">
+                        <CheckBox fx:id="explicitIncludeSelected" text="%Include selected entries in created group"/>
+                    </VBox>
                     <VBox visible="${keywordsRadioButton.selected}" spacing="10.0">
                         <VBox>
                             <Label text="%Field"/>

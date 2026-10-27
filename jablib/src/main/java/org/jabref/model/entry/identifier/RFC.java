@@ -54,7 +54,7 @@ public class RFC extends EprintIdentifier {
     public Optional<URI> getExternalURI() {
         try {
             return Optional.of(new URI("https://www.rfc-editor.org/rfc/" + rfcString));
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException _) {
             return Optional.empty();
         }
     }

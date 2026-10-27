@@ -2,6 +2,7 @@ package org.jabref.logic.ai.embedding;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.embedding.Embedding;
@@ -15,7 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.jabref.logic.ai.ingestion.logic.EmbeddingsCleaner.FILE_HASH_METADATA_KEY;
+import static org.jabref.logic.ai.ingestion.logic.ingestion.FileIngestor.PAGE_NUMBER_METADATA_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MVStoreEmbeddingStoreTest {
@@ -55,6 +58,46 @@ class MVStoreEmbeddingStoreTest {
 
         assertEquals(1, result.matches().size());
         assertEquals("hello world", result.matches().getFirst().embedded().text());
+    }
+
+    @Test
+    void addAndSearchPreservesPageNumberMetadata() {
+        Embedding embedding = unitEmbedding(1.0f, 0.0f, 0.0f);
+        TextSegment segment = new TextSegment("page text", new Metadata(Map.of(
+                FILE_HASH_METADATA_KEY, "hash-abc",
+                PAGE_NUMBER_METADATA_KEY, 5
+        )));
+        store.add(embedding, segment);
+
+        EmbeddingSearchRequest request = EmbeddingSearchRequest.builder()
+                                                               .queryEmbedding(embedding)
+                                                               .maxResults(5)
+                                                               .minScore(0.0)
+                                                               .build();
+
+        EmbeddingSearchResult<TextSegment> result = store.search(request);
+
+        assertEquals(1, result.matches().size());
+        assertEquals(5, result.matches().getFirst().embedded().metadata().getInteger(PAGE_NUMBER_METADATA_KEY));
+        assertEquals("hash-abc", result.matches().getFirst().embedded().metadata().getString(FILE_HASH_METADATA_KEY));
+    }
+
+    @Test
+    void addAndSearchWithoutPageNumberReturnsNullPageNumber() {
+        Embedding embedding = unitEmbedding(1.0f, 0.0f, 0.0f);
+        TextSegment segment = segmentWithHash("hello world", "hash-abc");
+        store.add(embedding, segment);
+
+        EmbeddingSearchRequest request = EmbeddingSearchRequest.builder()
+                                                               .queryEmbedding(embedding)
+                                                               .maxResults(5)
+                                                               .minScore(0.0)
+                                                               .build();
+
+        EmbeddingSearchResult<TextSegment> result = store.search(request);
+
+        assertEquals(1, result.matches().size());
+        assertNull(result.matches().getFirst().embedded().metadata().getInteger(PAGE_NUMBER_METADATA_KEY));
     }
 
     @Test

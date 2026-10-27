@@ -12,7 +12,7 @@
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.libraryproperties.constants.ConstantsPropertiesView">
     <HBox alignment="BOTTOM_LEFT" spacing="8.0">
-        <Label styleClass="sectionHeader" text="%String constants"/>
+        <Label styleClass="h4,padding-top-12" text="%String constants"/>
         <Button onAction="#openHelp" styleClass="icon-button,narrow">
             <graphic>
                 <JabRefIconView glyph="HELP"/>

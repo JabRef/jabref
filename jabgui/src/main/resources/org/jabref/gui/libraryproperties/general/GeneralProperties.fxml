@@ -27,9 +27,10 @@
             <RowConstraints/>
             <RowConstraints/>
             <RowConstraints/>
+            <RowConstraints/>
         </rowConstraints>
 
-        <Label styleClass="sectionHeader" text="%Override default file directories"
+        <Label styleClass="h4,padding-top-12" text="%Override default file directories"
                GridPane.columnSpan="3" GridPane.rowIndex="0"/>
         <Label text="%Library-specific file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="1"/>
@@ -120,7 +121,7 @@
             </tooltip>
         </Button>
 
-        <Label styleClass="sectionHeader" text="%General"
+        <Label styleClass="h4,padding-top-12" text="%General"
                GridPane.columnSpan="3" GridPane.rowIndex="4"/>
         <Label text="%Library mode"
                GridPane.columnIndex="0" GridPane.rowIndex="5"/>
@@ -130,6 +131,10 @@
                GridPane.columnIndex="0" GridPane.rowIndex="6"/>
         <ComboBox fx:id="encoding" prefWidth="150.0"
                   GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6"/>
+        <Label text="%Keyword separator"
+               GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+        <TextField fx:id="keywordSeparator" prefWidth="50.0" maxWidth="50.0"
+                   GridPane.columnIndex="1" GridPane.rowIndex="7"/>
 
     </GridPane>
 </fx:root>

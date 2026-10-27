@@ -13,7 +13,7 @@ public class PushToApplicationCell extends ListCell<GuiPushToApplication> {
 
     public PushToApplicationCell(ObservableSet<GuiPushToApplication> detectedApplications) {
         this.detectedApplications = detectedApplications;
-        this.getStyleClass().add("application-item");
+        this.getStyleClass().addAll("application-item", "padding-8");
 
         InvalidationListener listener = _ -> updateDetectionStyle();
         this.itemProperty().addListener(listener);

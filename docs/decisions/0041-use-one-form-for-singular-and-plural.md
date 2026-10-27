@@ -44,9 +44,9 @@ Chosen option: "Use one form only (no explicit pluralization)", because it is th
 
 Example:
 
-- `Imported 0 entry(s)`
-- `Imported 1 entry(s)`
-- `Imported 12 entry(s)`
+* `Imported 0 entry(s)`
+* `Imported 1 entry(s)`
+* `Imported 12 entry(s)`
 
 There are sub alternatives here:
 
@@ -62,9 +62,9 @@ These arguments are for the general case of using a single text for all kinds of
 
 Example:
 
-- `Imported 0 entries`
-- `Imported 1 entry`
-- `Imported 12 entries`
+* `Imported 0 entries`
+* `Imported 1 entry`
+* `Imported 12 entries`
 
 * Good, because reads well in English
 * Bad, because all localizations need to take an `if` check for the count
@@ -74,9 +74,9 @@ Example:
 
 Example:
 
-- `Imported 0 entries`
-- `Imported 1 entry`
-- `Imported 12 entries`
+* `Imported 0 entries`
+* `Imported 1 entry`
+* `Imported 12 entries`
 
 Code: `Localization.lang("Imported %0 entries", "Imported %0 entry.", "Imported %0 entries.", "Imported %0 entries.", "Imported %0 entries.", "Imported %0 entries.", count)`
 
@@ -87,10 +87,10 @@ Code: `Localization.lang("Imported %0 entries", "Imported %0 entry.", "Imported 
 
 ## More Information
 
-- [Pluralization: A Guide to Localizing Plurals](https://phrase.com/blog/posts/pluralization/)
-- [Language Plural Rules](https://www.unicode.org/cldr/charts/43/supplemental/language_plural_rules.html)
-- [Unicode CLDR Project's Plural Rules](https://cldr.unicode.org/index/cldr-spec/plural-rules)
-- [Implementation in Mozilla Firefox](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/PluralRules)
-- [SX discussion on plural forms](https://english.stackexchange.com/a/90283/66058)
+* [Pluralization: A Guide to Localizing Plurals](https://phrase.com/blog/posts/pluralization/)
+* [Language Plural Rules](https://www.unicode.org/cldr/charts/43/supplemental/language_plural_rules.html)
+* [Unicode CLDR Project's Plural Rules](https://cldr.unicode.org/index/cldr-spec/plural-rules)
+* [Implementation in Mozilla Firefox](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/PluralRules)
+* [SX discussion on plural forms](https://english.stackexchange.com/a/90283/66058)
 
 <!-- markdownlint-disable-file MD004 -->

@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.util.Optional;
 
-import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcherTest;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 class OpenLibraryIsbnFetcherTest extends AbstractIsbnFetcherTest {
@@ -67,11 +65,11 @@ class OpenLibraryIsbnFetcherTest extends AbstractIsbnFetcherTest {
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
-    /// Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
     @Test
-    void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() {
+    void searchForNonExistingIsbnReturnsEmpty() throws FetcherException {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
-        // However, the ISBN number must not be assigned to a real book
-        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("9785646216541"));
+        // However, the ISBN number is not assigned to a real book (OpenLibrary returns 404)
+        assertEquals(Optional.empty(), fetcher.performSearchById("9785646216541"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("978-3-6957-1304-2"));
     }
 }

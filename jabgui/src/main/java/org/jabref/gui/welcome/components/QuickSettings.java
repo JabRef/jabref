@@ -1,6 +1,8 @@
 package org.jabref.gui.welcome.components;
 
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -10,6 +12,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.welcome.quicksettings.EntryTableConfigurationDialog;
 import org.jabref.gui.welcome.quicksettings.LargeLibraryOptimizationDialog;
 import org.jabref.gui.welcome.quicksettings.MainFileDirectoryDialog;
@@ -22,6 +25,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.controlsfx.control.ToggleSwitch;
 
 public class QuickSettings extends VBox {
+    private static final int MIN_VISIBLE_SETTINGS = 3;
+
     private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -34,10 +39,11 @@ public class QuickSettings extends VBox {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        getStyleClass().add("welcome-section");
+        setSpacing(12);
+        getStyleClass().add("align-top-left");
 
         header = new Label(Localization.lang("Quick settings"));
-        header.getStyleClass().add("welcome-header-label");
+        header.getStyleClass().addAll(StyleClasses.WELCOME_HEADER);
         enableScroll();
     }
 
@@ -76,7 +82,7 @@ public class QuickSettings extends VBox {
                 this::showMainFileDirectoryDialog);
 
         Button themeButton = createButton(
-                Localization.lang("Change visual theme"),
+                Localization.lang("Change appearance"),
                 IconTheme.JabRefIcons.PREFERENCES,
                 this::showThemeDialog);
 
@@ -100,7 +106,7 @@ public class QuickSettings extends VBox {
                 IconTheme.JabRefIcons.TOGGLE_GROUPS,
                 this::showEntryTableConfigurationDialog);
 
-        VBox newContent = new VBox(
+        VBox newContent = new VBox(4,
                 httpServerToggle,
                 coverImagesDownloadToggle,
                 mainFileDirButton,
@@ -109,7 +115,7 @@ public class QuickSettings extends VBox {
                 entryTableButton,
                 pushApplicationButton,
                 onlineServicesButton);
-        newContent.getStyleClass().add("quick-settings-container");
+        newContent.getStyleClass().add("align-top-left");
         return newContent;
     }
 
@@ -120,6 +126,11 @@ public class QuickSettings extends VBox {
         scrollPane.setFitToWidth(true);
         scrollPane.getStyleClass().add("quick-settings-scroll-pane");
         scrollPane.setMaxHeight(Double.MAX_VALUE);
+        // Retain visibility of the first few items of QuickSettings, in case the height of the welcome tab exceeds the height of the window.
+        Node lastVisibleSetting = contentPane.getChildren().get(MIN_VISIBLE_SETTINGS - 1);
+        scrollPane.minViewportHeightProperty().bind(Bindings.createDoubleBinding(
+                () -> lastVisibleSetting.getBoundsInParent().getMaxY(),
+                lastVisibleSetting.boundsInParentProperty()));
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
         return scrollPane;
     }
@@ -127,9 +138,9 @@ public class QuickSettings extends VBox {
     private Button createButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
         Button button = new Button(text);
         button.setGraphic(icon.getGraphicNode());
-        button.getStyleClass().add("quick-settings-button");
+        button.getStyleClass().addAll("quick-settings-button", "padding-12", "align-center-left");
         button.setMaxWidth(Double.MAX_VALUE);
-        button.setOnAction(event -> action.run());
+        button.setOnAction(_ -> action.run());
         return button;
     }
 

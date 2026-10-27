@@ -14,7 +14,7 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.icon.JabRefIcon;
 
-/// Constructs a {@link javafx.scene.control.TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
+/// Constructs a [javafx.scene.control.TreeTableCell] based on the view model of the row and a bunch of specified converter methods.
 ///
 /// @param <T> cell value
 public class ViewModelTreeCellFactory<T> implements Callback<TreeView<T>, TreeCell<T>> {

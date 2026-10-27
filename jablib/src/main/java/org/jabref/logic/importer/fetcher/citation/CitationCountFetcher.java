@@ -9,9 +9,9 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public interface CitationCountFetcher {
-    /// Get the paper details that includes citation count field for a given {@link BibEntry}.
+    /// Get the paper details that includes citation count field for a given [BibEntry].
     ///
     /// @param entry entry to search citation count field
-    /// @return returns a {@link Integer} for citation count field (may be empty)
+    /// @return returns a [Integer] for citation count field (may be empty)
     Optional<Integer> getCitationCount(BibEntry entry) throws FetcherException;
 }

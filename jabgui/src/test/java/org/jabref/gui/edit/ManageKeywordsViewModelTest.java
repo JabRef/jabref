@@ -6,8 +6,8 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.undo.JabRefUndoManager;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -15,14 +15,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ManageKeywordsViewModelTest {
 
-    private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
+    private final JabRefUndoManager undoManager = new JabRefUndoManager();
     private ManageKeywordsViewModel keywordsViewModel;
+    private List<BibEntry> entries;
 
     @BeforeEach
     void setUp() {
@@ -49,11 +50,9 @@ class ManageKeywordsViewModelTest {
                 .withField(StandardField.TITLE, "Chatbots as conversational healthcare services")
                 .withField(StandardField.KEYWORDS, "Chatbot, Medical services, Internet, Data collection, Medical diagnostic imaging, Automation, Vocabulary");
 
-        List<BibEntry> entries = List.of(entryOne, entryTwo);
+        entries = List.of(entryOne, entryTwo);
 
-        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
-
-        keywordsViewModel = new ManageKeywordsViewModel(bibEntryPreferences, entries);
+        keywordsViewModel = new ManageKeywordsViewModel(',', entries, undoManager);
     }
 
     @Test
@@ -78,5 +77,36 @@ class ManageKeywordsViewModelTest {
         keywordsViewModel.removeKeyword("Human-machine interaction");
 
         assertNotEquals(FXCollections.observableList(originalKeywordsList), modifiedKeywords, "compared lists are identical");
+    }
+
+    @Test
+    void savedChangesArePushedToUndoManager() {
+        keywordsViewModel.removeKeyword("Automation");
+        keywordsViewModel.saveChanges();
+
+        assertTrue(undoManager.canUndo());
+    }
+
+    @Test
+    void undoRestoresTheKeywordsOfEveryAffectedEntry() {
+        List<String> keywordsBefore = entries.stream()
+                                             .map(entry -> entry.getField(StandardField.KEYWORDS).orElse(""))
+                                             .toList();
+
+        keywordsViewModel.removeKeyword("Automation");
+        keywordsViewModel.saveChanges();
+        undoManager.undo();
+
+        List<String> keywordsAfterUndo = entries.stream()
+                                                .map(entry -> entry.getField(StandardField.KEYWORDS).orElse(""))
+                                                .toList();
+        assertEquals(keywordsBefore, keywordsAfterUndo);
+    }
+
+    @Test
+    void savingWithoutChangesLeavesTheUndoStackUntouched() {
+        keywordsViewModel.saveChanges();
+
+        assertFalse(undoManager.canUndo());
     }
 }

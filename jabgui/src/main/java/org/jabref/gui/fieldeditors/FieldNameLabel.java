@@ -9,12 +9,11 @@ import javafx.stage.Screen;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldTextMapper;
 
 public class FieldNameLabel extends Label {
 
     public FieldNameLabel(Field field) {
-        setText(FieldTextMapper.getDisplayName(field));
+        setText(FieldsUtil.getDisplayName(field));
         setPadding(new Insets(4, 0, 0, 0));
         setAlignment(Pos.CENTER);
         setPrefHeight(Double.POSITIVE_INFINITY);

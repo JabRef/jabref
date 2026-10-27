@@ -99,6 +99,47 @@ TI  - Targeted RIS import
 PY  - 2021
 ER  -
 
+### Import CSL-JSON to the active library (`current`)
+
+// Consumes application/vnd.citationstyles.csl+json. The CSL item type is mapped to the correct
+// entry type via the citation-js-based mapping (ADR 0064), so this becomes an @InProceedings with
+// booktitle = {Proc. of Test}, not a flat @article. Entries get no citation key; JabRef generates one.
+
+POST http://localhost:23119/libraries/current/entries
+Content-Type: application/vnd.citationstyles.csl+json
+
+{
+  "type": "paper-conference",
+  "title": "A conference paper added via CSL-JSON",
+  "container-title": "Proc. of Test",
+  "author": [
+    { "family": "Doe", "given": "Jane" }
+  ],
+  "issued": { "date-parts": [["2021", 5]] },
+  "DOI": "10.1000/demo"
+}
+
+### Import a CSL-JSON array (mixed item types) to a specific library
+
+// An array adds several entries in one request; each item type maps independently
+// (book -> @Book, chapter -> @InBook, thesis -> @Thesis with publisher -> institution).
+
+POST http://localhost:23119/libraries/{{libraryId}}/entries
+Content-Type: application/vnd.citationstyles.csl+json
+
+[
+  { "type": "book", "title": "A book", "publisher": "Test Press", "issued": { "date-parts": [["2020"]] } },
+  { "type": "chapter", "title": "A chapter", "container-title": "The book", "page": "10-20" },
+  { "type": "thesis", "title": "A thesis", "publisher": "Test University" }
+]
+
+### Import CSL-JSON and also assign it to a group (created if missing)
+
+POST http://localhost:23119/libraries/current/entries?group=import-test-group
+Content-Type: application/vnd.citationstyles.csl+json
+
+{ "type": "webpage", "title": "A web page", "URL": "https://example.org" }
+
 ###
 
 # Creation — error cases
@@ -115,6 +156,13 @@ Content-Type: application/x-bibtex
 POST http://localhost:23119/libraries/{{libraryId}}/entries
 Content-Type: application/x-bibtex
 
+
+### Add unparseable CSL-JSON -> 400 Bad Request
+
+POST http://localhost:23119/libraries/current/entries
+Content-Type: application/vnd.citationstyles.csl+json
+
+not json
 
 ## Cached plain-citation lookup, then add
 
@@ -137,6 +185,22 @@ Smith, J. (2020). On the nature of chocolate. Journal of Sweets, 12(3), 45-67.
 @cacheKey = paste-parserCacheKey-from-the-lookup-response
 
 POST http://localhost:23119/libraries/current/citations/{{cacheKey}}
+
+### Batched citation lookup (SumatraPDF page-scan flow)
+
+// One round-trip for every citation on a PDF page. Each `results[i]` aligns with `citations[i]`;
+// blank slots and parser failures come back as `matchScope: "none"` without failing the batch.
+
+POST http://localhost:23119/libraries/{{libraryId}}/citations/lookup:batch
+Content-Type: application/json
+
+{
+  "citations": [
+    "Smith, J. (2020). On the nature of chocolate. Journal of Sweets, 12(3), 45-67.",
+    "Doe, J. (2019). Cocoa cultivation. Plant Sci, 5(1), 1-10.",
+    ""
+  ]
+}
 
 ### Lookup against an unknown library id -> 404 Not Found
 

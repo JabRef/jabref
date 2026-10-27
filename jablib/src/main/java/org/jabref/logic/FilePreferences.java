@@ -118,29 +118,6 @@ public class FilePreferences {
         return new FilePreferences();
     }
 
-    public void setAll(FilePreferences preferences) {
-        // userAndHost is always bound to InternalPreferences.getUserAndHost
-        this.mainFileDirectory.set(preferences.mainFileDirectoryProperty().get());
-        this.storeFilesRelativeToBibFile.set(preferences.shouldStoreFilesRelativeToBibFile());
-        this.autoRenameFilesOnChange.set(preferences.shouldAutoRenameFilesOnChange());
-        this.fileNamePattern.set(preferences.getFileNamePattern());
-        this.fileDirectoryPattern.set(preferences.getFileDirectoryPattern());
-        this.downloadLinkedFiles.set(preferences.shouldDownloadLinkedFiles());
-        this.fulltextIndexLinkedFiles.set(preferences.shouldFulltextIndexLinkedFiles());
-        this.workingDirectory.set(preferences.getWorkingDirectory());
-        this.createBackup.set(preferences.shouldCreateBackup());
-        this.backupDirectory.set(preferences.getBackupDirectory());
-        this.confirmDeleteLinkedFile.set(preferences.confirmDeleteLinkedFile());
-        this.moveToTrash.set(preferences.moveToTrash());
-        this.adjustFileLinksOnTransfer.set(preferences.shouldAdjustFileLinksOnTransfer());
-        this.copyLinkedFilesOnTransfer.set(preferences.shouldCopyLinkedFilesOnTransfer());
-        this.moveLinkedFilesOnTransfer.set(preferences.shouldMoveLinkedFilesOnTransfer());
-        this.shouldKeepDownloadUrl.set(preferences.shouldKeepDownloadUrl());
-        this.lastUsedDirectory.set(preferences.getLastUsedDirectory());
-        this.openFileExplorerInFileDirectory.set(preferences.shouldOpenFileExplorerInFileDirectory());
-        this.openFileExplorerInLastUsedDirectory.set(preferences.shouldOpenFileExplorerInLastUsedDirectory());
-    }
-
     public String getUserAndHost() {
         return userAndHost.getValue().getUserHostString();
     }
@@ -371,25 +348,5 @@ public class FilePreferences {
 
     public void setOpenFileExplorerInLastUsedDirectory(boolean value) {
         this.openFileExplorerInLastUsedDirectory.set(value);
-    }
-
-    public FilePreferences withUserHostInfo(ReadOnlyObjectProperty<UserHostInfo> newUserHostInfo) {
-        this.userAndHost.bind(newUserHostInfo);
-        return this;
-    }
-
-    public FilePreferences withMoveToTrash(boolean moveToTrash) {
-        this.moveToTrash.set(moveToTrash);
-        return this;
-    }
-
-    public FilePreferences withMainFileDirectory(Path lastUsedDirectory) {
-        this.mainFileDirectory.set(lastUsedDirectory);
-        return this;
-    }
-
-    public FilePreferences withLastUsedDirectory(Path lastUsedDirectory) {
-        this.lastUsedDirectory.set(lastUsedDirectory);
-        return this;
     }
 }

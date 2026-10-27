@@ -5,12 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.l10n.Localization;
 
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.WindowCache;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.RepositoryCache;
@@ -29,8 +32,10 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("git")
@@ -82,6 +87,7 @@ class GitStatusCheckerTest {
     @BeforeEach
     void setup(@TempDir Path tempDir) throws Exception {
         GitPreferences gitPreferences = mock(GitPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(gitPreferences.getPat()).thenReturn("");
         gitHandlerRegistry = new GitHandlerRegistry(gitPreferences);
         Path remoteDir = tempDir.resolve("remote.git");
         remoteGit = Git.init().setBare(true).setDirectory(remoteDir.toFile()).call();
@@ -193,6 +199,48 @@ class GitStatusCheckerTest {
     }
 
     @Test
+    void remoteEmptinessCheckPropagatesRemoteErrors(@TempDir Path tempDir) throws Exception {
+        localGit.getRepository().getConfig().setString("remote", "origin", "url", tempDir.resolve("missing.git").toUri().toString());
+        localGit.getRepository().getConfig().save();
+
+        GitHandler gitHandler = gitHandlerRegistry.get(localLibrary.getParent());
+
+        assertThrows(GitAPIException.class, () -> GitStatusChecker.isRemoteEmpty(gitHandler));
+    }
+
+    @Test
+    void uncommittedChangesDetectedWhenNoRemoteConfigured(@TempDir Path tempDir) throws Exception {
+        Path repoDir = tempDir.resolve("noRemote");
+        try (Git git = Git.init().setInitialBranch("main").setDirectory(repoDir.toFile()).call()) {
+            Path file = repoDir.resolve("library.bib");
+            Files.writeString(file, baseContent, StandardCharsets.UTF_8);
+            git.add().addFilepattern("library.bib").call();
+            git.commit().setAuthor(author).setMessage("Initial commit").call();
+            Files.writeString(file, localUpdatedContent, StandardCharsets.UTF_8);
+        }
+
+        GitHandler gitHandler = gitHandlerRegistry.get(repoDir);
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
+
+        assertTrue(snapshot.uncommittedChanges());
+        assertEquals(SyncStatus.UNKNOWN, snapshot.syncStatus());
+    }
+
+    @Test
+    void uncommittedChangesDetectedWhenRemoteIsUnreachable() throws Exception {
+        localGit.getRepository().getConfig().setString("remote", "origin", "url", "https://example.com");
+        localGit.getRepository().getConfig().unsetSection("branch", "main");
+        localGit.getRepository().getConfig().save();
+        Files.writeString(localLibrary, localUpdatedContent, StandardCharsets.UTF_8);
+
+        GitHandler gitHandler = gitHandlerRegistry.get(localLibrary.getParent());
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
+
+        assertTrue(snapshot.uncommittedChanges());
+        assertEquals(SyncStatus.UNKNOWN, snapshot.syncStatus());
+    }
+
+    @Test
     void divergedStatusWhenBothSidesHaveCommits(@TempDir Path tempDir) throws Exception {
         commitFile(localGit, localUpdatedContent, "Local update");
 
@@ -213,6 +261,23 @@ class GitStatusCheckerTest {
         GitHandler gitHandler = gitHandlerRegistry.get(localLibrary.getParent());
         GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
         assertEquals(SyncStatus.DIVERGED, snapshot.syncStatus());
+    }
+
+    @Test
+    void invalidHeadIsReportedAsJabRefException(@TempDir Path tempDir) throws Exception {
+        Path repoDir = tempDir.resolve("broken");
+        try (Git git = Git.init().setInitialBranch("main").setDirectory(repoDir.toFile()).call()) {
+            Path file = repoDir.resolve("library.bib");
+            Files.writeString(file, baseContent, StandardCharsets.UTF_8);
+            git.add().addFilepattern("library.bib").call();
+            git.commit().setAuthor(author).setMessage("Initial commit").call();
+        }
+        Files.writeString(repoDir.resolve(".git").resolve("refs").resolve("heads").resolve("main"), "0000000000000000000000000000000000000000");
+
+        GitHandler gitHandler = gitHandlerRegistry.get(repoDir);
+        JabRefException exception = assertThrows(JabRefException.class, () -> GitStatusChecker.checkStatusOrThrow(gitHandler));
+
+        assertEquals(Localization.lang("The local Git repository is incomplete or corrupted. Remove the broken .git directory in that folder or choose another folder, then try again."), exception.getLocalizedMessage());
     }
 
     private RevCommit commitFile(Git git, String content, String message) throws Exception {

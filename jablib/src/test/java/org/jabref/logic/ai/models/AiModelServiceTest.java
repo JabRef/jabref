@@ -2,14 +2,13 @@ package org.jabref.logic.ai.models;
 
 import java.util.List;
 
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.ai.llm.AiProvider;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,20 +16,20 @@ class AiModelServiceTest {
 
     private AiModelService aiModelService;
 
-    @BeforeAll
-    static void ensureUnirestInitialized() {
-        // Ensure URLDownload's static initializer runs before any tests
-        // This configures Unirest and prevents UnirestConfigException
-        try {
-            Class.forName(URLDownload.class.getName());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to initialize URLDownload", e);
-        }
-    }
-
     @BeforeEach
     void setUp() {
         aiModelService = new AiModelService();
+    }
+
+    @Test
+    void isModelNotFoundDetectsOllamaMessage() {
+        assertTrue(AiModelService.isModelNotFound(new RuntimeException("404 - message: model 'gpt-oss20b' not found, type: not_found_error")));
+    }
+
+    @Test
+    void isModelNotFoundIgnoresOtherErrors() {
+        assertFalse(AiModelService.isModelNotFound(new RuntimeException("java.net.ConnectException")));
+        assertFalse(AiModelService.isModelNotFound(new RuntimeException()));
     }
 
     @Test

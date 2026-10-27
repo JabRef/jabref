@@ -44,8 +44,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ISIDOREFetcher.class);
 
     private static final String SOURCE_WEB_SEARCH = "https://api.isidore.science/resource/search";
-
-    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+    private static final String DISALLOW_DOCTYPE_DECLARATION = "http://apache.org/xml/features/disallow-doctype-decl";
 
     @Override
     public Parser getParser() {
@@ -64,7 +63,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
                 }
 
                 pushbackInputStream.unread(data);
-                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
+                DocumentBuilder builder = createDocumentBuilder();
                 Document document = builder.parse(pushbackInputStream);
 
                 // Assuming the root element represents an entry
@@ -84,6 +83,12 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         };
     }
 
+    private static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setFeature(DISALLOW_DOCTYPE_DECLARATION, true);
+        return documentBuilderFactory.newDocumentBuilder();
+    }
+
     @Override
     public URLDownload getUrlDownload(URL url) {
         URLDownload download = new URLDownload(url);
@@ -95,19 +100,33 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
         ISIDOREQueryTransformer queryTransformer = new ISIDOREQueryTransformer();
         String transformedQuery = queryTransformer.transformSearchQuery(queryNode).orElse("");
+        URIBuilder uriBuilder = new URIBuilder(buildSearchURL(transformedQuery, pageNumber).toURI());
+        queryTransformer.getParameterMap().forEach(uriBuilder::addParameter);
+
+        URL url = uriBuilder.build().toURL();
+        LOGGER.debug("URl for query {}", url);
+        return url;
+    }
+
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the search URL for the given query string
+    ///
+    /// The query is sent as the `q` parameter, so raw queries
+    /// bypass [ISIDOREQueryTransformer] and are passed unchanged to the catalog
+    private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
-        uriBuilder.addParameter("q", transformedQuery);
+        uriBuilder.addParameter("q", query);
         if (pageNumber > 1) {
             uriBuilder.addParameter("page", String.valueOf(pageNumber));
         }
         uriBuilder.addParameter("replies", String.valueOf(getPageSize()));
         uriBuilder.addParameter("lang", "en");
         uriBuilder.addParameter("output", "xml");
-        queryTransformer.getParameterMap().forEach(uriBuilder::addParameter);
-
-        URL url = uriBuilder.build().toURL();
-        LOGGER.debug("URl for query {}", url);
-        return url;
+        return uriBuilder.build().toURL();
     }
 
     private List<BibEntry> parseXMl(Element element) {

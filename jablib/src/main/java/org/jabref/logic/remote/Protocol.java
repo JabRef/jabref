@@ -1,6 +1,7 @@
 package org.jabref.logic.remote;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -13,7 +14,7 @@ import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// @implNote The first byte of every message identifies its type as a {@link RemoteMessage}.
+/// @implNote The first byte of every message identifies its type as a [RemoteMessage].
 /// Every message is terminated with '\0'.
 public class Protocol implements AutoCloseable {
     public static final String IDENTIFIER = "jabref";
@@ -25,9 +26,20 @@ public class Protocol implements AutoCloseable {
     private final ObjectInputStream in;
 
     public Protocol(Socket socket) throws IOException {
+        this(socket, socket.getInputStream());
+    }
+
+    /// Creates a protocol using a previously inspected input stream.
+    ///
+    /// The remote listener uses this overload after checking whether the connection is a
+    /// plain-text health check rather than a serialized remote-operation request.
+    ///
+    /// @param socket      the connection to communicate over; only its output stream is used
+    /// @param inputStream the stream to read requests from — a wrapper around the socket's input stream that supports non-destructive probing, restored to the start of the request
+    public Protocol(Socket socket, InputStream inputStream) throws IOException {
         this.socket = socket;
         this.out = new ObjectOutputStream(socket.getOutputStream());
-        this.in = new ObjectInputStream(socket.getInputStream());
+        this.in = new ObjectInputStream(inputStream);
     }
 
     public void sendMessage(RemoteMessage type) throws IOException {

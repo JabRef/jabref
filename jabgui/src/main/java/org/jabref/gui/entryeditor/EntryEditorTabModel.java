@@ -1,15 +1,29 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.SequencedSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.UnknownField;
 
-/// Discriminated union of the kinds of tabs that appear in the entry editor.
+/// Model of the tabs that appear in the entry editor.
 ///
-/// {@link BuiltInTab}         — a fixed tab identified by a {@link BuiltIn} constant.
-/// {@link CustomizedFieldsTab} — user-customizable tab backed by an explicit, named set of fields.
+/// [BuiltInTab] — a fixed tab (the single scroll-list "Main" tab of issue #12711 and the
+/// feature tabs) identified by a [BuiltIn] constant; users only toggle visibility and order.
+/// [CustomizedFieldsTab] — a user-defined tab backed by a named, ordered list of field patterns.
 public sealed interface EntryEditorTabModel
         permits EntryEditorTabModel.BuiltInTab, EntryEditorTabModel.CustomizedFieldsTab {
 
@@ -24,21 +38,18 @@ public sealed interface EntryEditorTabModel
         ) && type == BuiltIn.PREVIEW;
     }
 
-    static int indexAfterLeadingPreview(List<? extends EntryEditorTabModel> models) {
-        return !models.isEmpty() && models.getFirst().isPreview() ? 1 : 0;
-    }
-
-    static int indexAfterBuiltInFieldSets(List<? extends EntryEditorTabModel> models) {
-        int lastFieldSet = -1;
-        for (int i = 0; i < models.size(); i++) {
-            if (models.get(i) instanceof BuiltInTab(
-                    BuiltIn type,
-                    boolean _
-            ) && type.isFieldSet()) {
-                lastFieldSet = i;
+    /// Union of the fields resolved by all [CustomizedFieldsTab]s' *extracted* patterns in the given
+    /// tab list. An extracted field is *moved* to its custom tab: the Main tab uses this to exclude
+    /// it from its field list and add-chips, so no field is displayed twice. Non-extracted patterns
+    /// (the default) leave the Main tab untouched.
+    static Set<Field> extractedFieldsOnCustomTabs(List<EntryEditorTabModel> tabModels, BibEntry entry) {
+        Set<Field> result = new LinkedHashSet<>();
+        for (EntryEditorTabModel model : tabModels) {
+            if (model instanceof CustomizedFieldsTab customTab) {
+                result.addAll(customTab.resolveExtractedFields(entry));
             }
         }
-        return lastFieldSet >= 0 ? lastFieldSet + 1 : indexAfterLeadingPreview(models);
+        return result;
     }
 
     /// Every fixed tab in the entry editor, in display order.
@@ -46,12 +57,8 @@ public sealed interface EntryEditorTabModel
         // Preview tab visibility controlled by preference option
         PREVIEW,
 
-        // Built-in field-set tabs: fields computed dynamically from the entry type
-        REQUIRED_FIELDS,
-        IMPORTANT_OPTIONAL_FIELDS,
-        DETAIL_OPTIONAL_FIELDS,
-        DEPRECATED_FIELDS,
-        OTHER_FIELDS,
+        // The single scroll-list tab showing all fields (issue #12711)
+        ALL_FIELDS,
 
         // Feature tabs: fixed implementations
         RELATED_ARTICLES,
@@ -60,29 +67,18 @@ public sealed interface EntryEditorTabModel
         FILE_ANNOTATIONS,
         LATEX_CITATIONS,
         CITATION_INFORMATION,
-        COMMENTS,
-        MATH_SCI_NET,
         SOURCE,
         FULLTEXT_SEARCH_RESULTS;
 
-        private static final Set<BuiltIn> FIELD_SETS = Set.of(
-                REQUIRED_FIELDS, IMPORTANT_OPTIONAL_FIELDS, DETAIL_OPTIONAL_FIELDS, DEPRECATED_FIELDS, OTHER_FIELDS);
+        private static final Set<BuiltIn> FIELD_SETS = Set.of(ALL_FIELDS);
 
         // Create displayName dynamically for language preference change
         public String displayName() {
             return switch (this) {
                 case PREVIEW ->
                         Localization.lang("Preview");
-                case REQUIRED_FIELDS ->
-                        Localization.lang("Required fields");
-                case IMPORTANT_OPTIONAL_FIELDS ->
-                        Localization.lang("Optional fields");
-                case DETAIL_OPTIONAL_FIELDS ->
-                        Localization.lang("Optional fields 2");
-                case DEPRECATED_FIELDS ->
-                        Localization.lang("Deprecated fields");
-                case OTHER_FIELDS ->
-                        Localization.lang("Other fields");
+                case ALL_FIELDS ->
+                        Localization.lang("Main");
                 case RELATED_ARTICLES ->
                         Localization.lang("Related articles");
                 case AI_SUMMARY ->
@@ -95,10 +91,6 @@ public sealed interface EntryEditorTabModel
                         Localization.lang("LaTeX citations");
                 case CITATION_INFORMATION ->
                         Localization.lang("Citations");
-                case COMMENTS ->
-                        Localization.lang("Comments");
-                case MATH_SCI_NET ->
-                        Localization.lang("MathSciNet Review");
                 case SOURCE ->
                         Localization.lang("Source");
                 case FULLTEXT_SEARCH_RESULTS ->
@@ -124,10 +116,41 @@ public sealed interface EntryEditorTabModel
         }
     }
 
-    /// Always shown; toggled only by being added to or removed from the tab list, so it carries no
-    /// visibility flag (unlike {@link BuiltInTab}).
-    record CustomizedFieldsTab(String name, Set<Field> fields)
+    /// A user-defined tab showing an explicit, ordered list of field patterns. Always shown while its
+    /// pattern list resolves to at least one field; toggled only by being added to or removed from the
+    /// tab list, so it carries no visibility flag (unlike [BuiltInTab]).
+    ///
+    /// A pattern is either a plain field name (always shown, even while unset on the entry) or a
+    /// regular expression (contains regex metacharacters), which captures every *set* field of the
+    /// entry whose name matches it — e.g. `comment-.*` for all user-specific comment fields.
+    ///
+    /// A pattern in `extractedFieldPatterns` is additionally *extracted*: the fields it resolves
+    /// to leave the Main tab. Patterns are not extracted by default, so a custom tab initially only
+    /// mirrors its fields.
+    record CustomizedFieldsTab(String name, List<String> fieldPatterns, Set<String> extractedFieldPatterns)
             implements EntryEditorTabModel {
+
+        /// A pattern without any regex metacharacter is a plain field name.
+        private static final Pattern PLAIN_FIELD_NAME = Pattern.compile("[^\\\\^$.|?*+()\\[\\]{}]+");
+
+        /// See [#compiledRegex]; empty marks an invalid regex.
+        private static final Map<String, Optional<Pattern>> COMPILED_REGEXES = new ConcurrentHashMap<>();
+
+        /// Lower-cased names of every registered field (see [#appearsOnMainTab]).
+        private static final Set<String> KNOWN_FIELD_NAMES = FieldFactory.getAllFieldsWithOutInternal().stream()
+                                                                         .map(field -> field.getName().toLowerCase(Locale.ROOT))
+                                                                         .collect(Collectors.toUnmodifiableSet());
+
+        public CustomizedFieldsTab {
+            fieldPatterns = List.copyOf(fieldPatterns);
+            extractedFieldPatterns = Set.copyOf(extractedFieldPatterns);
+        }
+
+        /// A tab with no extracted patterns (the default for newly configured fields).
+        public CustomizedFieldsTab(String name, List<String> fieldPatterns) {
+            this(name, fieldPatterns, Set.of());
+        }
+
         @Override
         public boolean isVisible() {
             return true;
@@ -136,6 +159,65 @@ public sealed interface EntryEditorTabModel
         @Override
         public EntryEditorTabModel withVisible(boolean visible) {
             return this;
+        }
+
+        /// Resolves [#fieldPatterns] against the given entry, keeping the configured pattern order;
+        /// the fields captured by one regex pattern are sorted by name. Invalid regexes resolve to nothing.
+        // [impl->req~entry-editor.custom-tabs~1]
+        public SequencedSet<Field> resolveFields(BibEntry entry) {
+            return resolve(fieldPatterns, entry);
+        }
+
+        /// Resolves only the *extracted* patterns — the fields the Main tab must no longer show.
+        // [impl->req~entry-editor.custom-tabs.extract-field~1]
+        public SequencedSet<Field> resolveExtractedFields(BibEntry entry) {
+            return resolve(fieldPatterns.stream()
+                                        .filter(pattern -> extractedFieldPatterns.contains(pattern) || !appearsOnMainTab(pattern))
+                                        .toList(), entry);
+        }
+
+        /// Whether the "Extract field" choice applies to the pattern: only a plain name of a known
+        /// field is a field the Main tab shows on its own. A regex pattern or an unknown field name
+        /// is always extracted — the custom tab is the only place curating such fields — so the
+        /// preferences UI shows its checkbox checked and disabled.
+        ///
+        /// Checked against the catalog of all registered fields, not via a type-less
+        /// [FieldFactory#parseField(String)]: type-scoped BibLaTeX software/APA fields (`license`,
+        /// `article`, …) parse as unknown without an entry type but are known fields nonetheless.
+        public static boolean appearsOnMainTab(String fieldPattern) {
+            return PLAIN_FIELD_NAME.matcher(fieldPattern).matches()
+                    && (KNOWN_FIELD_NAMES.contains(fieldPattern.toLowerCase(Locale.ROOT))
+                    || !(FieldFactory.parseField(fieldPattern) instanceof UnknownField));
+        }
+
+        private SequencedSet<Field> resolve(List<String> patterns, BibEntry entry) {
+            SequencedSet<Field> result = new LinkedHashSet<>();
+            for (String pattern : patterns) {
+                if (PLAIN_FIELD_NAME.matcher(pattern).matches()) {
+                    result.add(FieldFactory.parseField(entry.getType(), pattern));
+                    continue;
+                }
+                compiledRegex(pattern).ifPresent(compiled ->
+                        entry.getFields().stream()
+                             .filter(field -> compiled.matcher(field.getName()).matches())
+                             .sorted(Comparator.comparing(Field::getName))
+                             .forEach(result::add));
+            }
+            return result;
+        }
+
+        /// Regex patterns are resolved on every Main-tab and custom-tab rebuild, so the compiled
+        /// form is cached (the cache stays small: it only ever holds the user's configured patterns).
+        private static Optional<Pattern> compiledRegex(String pattern) {
+            return COMPILED_REGEXES.computeIfAbsent(pattern, key -> {
+                try {
+                    return Optional.of(Pattern.compile(key, Pattern.CASE_INSENSITIVE));
+                } catch (PatternSyntaxException _) {
+                    // Invalid regex: resolves to no fields; the preferences UI accepts any string, so
+                    // a broken pattern must not break rendering the tab.
+                    return Optional.empty();
+                }
+            });
         }
     }
 }

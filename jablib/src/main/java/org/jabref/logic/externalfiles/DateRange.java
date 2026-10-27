@@ -18,7 +18,7 @@ public enum DateRange {
     public static DateRange parse(String name) {
         try {
             return DateRange.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return ALL_TIME;
         }
     }

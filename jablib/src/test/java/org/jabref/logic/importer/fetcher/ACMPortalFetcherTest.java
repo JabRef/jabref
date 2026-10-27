@@ -14,14 +14,14 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.support.DisabledOnCIServer;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@FetcherTest
+@ExternalServicesTest
 @DisabledOnCIServer("ACM replied with 403 Forbidden on 2025-03-17")
 class ACMPortalFetcherTest {
     ACMPortalFetcher fetcher;
@@ -57,6 +57,18 @@ class ACMPortalFetcherTest {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
         assertEquals(Optional.of(searchEntry), fetchedEntries.stream().findFirst());
+    }
+
+    @Test
+    void performRawSearchQueryFindsEntry() throws FetcherException {
+        List<BibEntry> fetchedEntries = fetcher.performRawSearchQuery("The relationship of code churn and architectural violations in the open source software JabRef");
+        assertEquals(Optional.of("10.1145/3129790.3129810"),
+                fetchedEntries.stream().findFirst().flatMap(entry -> entry.getField(StandardField.DOI)));
+    }
+
+    @Test
+    void performRawSearchQueryReturnsEmptyForBlankQuery() throws FetcherException {
+        assertEquals(List.of(), fetcher.performRawSearchQuery("  "));
     }
 
     @Test

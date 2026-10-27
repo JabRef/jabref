@@ -30,7 +30,7 @@ public class CliImportHelper {
     public static Optional<ParserResult> importFile(String location,
                                                     CliPreferences cliPreferences,
                                                     boolean porcelain) {
-        LOGGER.debug("Importing file from locaiton {}", location);
+        LOGGER.debug("Importing file from location {}", location);
         String[] data = location.split(",");
 
         String address = data[0];

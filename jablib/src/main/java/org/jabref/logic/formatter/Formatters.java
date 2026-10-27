@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.formatter.bibtexfields.AddBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.ConvertMSCCodesFormatter;
@@ -18,7 +19,9 @@ import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeEnDashesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeIssn;
+import org.jabref.logic.formatter.bibtexfields.NormalizeKeywordDelimitersFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -83,12 +86,15 @@ public class Formatters {
 
     public static List<Formatter> getOthers() {
         return Arrays.asList(
+                new AddBracesFormatter(),
                 new ClearFormatter(),
                 new CleanupUrlFormatter(),
                 new LatexCleanupFormatter(),
                 new MinifyNameListFormatter(),
                 new NormalizeDateFormatter(),
+                new NormalizeEnDashesFormatter(),
                 new NormalizeIssn(),
+                new NormalizeKeywordDelimitersFormatter(),
                 new NormalizeMonthFormatter(),
                 new NormalizeNamesFormatter(),
                 new NormalizePagesFormatter(),

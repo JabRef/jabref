@@ -36,8 +36,8 @@ class ContentSelectorViewModelTest {
     @BeforeEach
     void setUp() {
         databaseContext = new BibDatabaseContext();
-        viewModel = new ContentSelectorViewModel(databaseContext, dialogService);
-        viewModel.setValues();
+        viewModel = new ContentSelectorViewModel(dialogService);
+        viewModel.setValues(databaseContext.getMetaData());
     }
 
     @Test
@@ -123,7 +123,7 @@ class ContentSelectorViewModelTest {
         addField(testField);
         addKeyword(testField, "test1");
         addKeyword(testField, "test2");
-        viewModel.storeSettings();
+        viewModel.storeSettings(databaseContext.getMetaData());
 
         List<String> result = databaseContext.getMetaData()
                                              .getContentSelectorValuesForField(testField);

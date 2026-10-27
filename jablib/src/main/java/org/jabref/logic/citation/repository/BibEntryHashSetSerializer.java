@@ -44,7 +44,7 @@ class BibEntryHashSetSerializer extends BasicDataType<LinkedHashSet<BibEntry>> {
     @Override
     public LinkedHashSet<BibEntry> read(ByteBuffer buff) {
         return IntStream.range(0, buff.getInt())
-                        .mapToObj(it -> this.bibEntryDataType.read(buff))
+                        .mapToObj(_ -> this.bibEntryDataType.read(buff))
                         .filter(entry -> !entry.isEmpty())
                         .collect(Collectors.toCollection(LinkedHashSet::new));
     }

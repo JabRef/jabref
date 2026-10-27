@@ -19,6 +19,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.LastFilesOpenedPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.UserHostInfo;
 
 import com.google.gson.Gson;
@@ -105,12 +106,21 @@ public abstract class ServerTest extends JerseyTest {
         });
     }
 
+    protected void addEntryTypesManagerToResourceConfig(ResourceConfig resourceConfig) {
+        resourceConfig.register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(new BibEntryTypesManager()).to(BibEntryTypesManager.class);
+            }
+        });
+    }
+
     /// Restarts the Jersey test container so the state manager is rebuilt with the new
     /// files. Necessary because the state manager snapshots the file list at
     /// `configure()` time (see [#filesToServe]).
     ///
     /// Calls `super.setUp()` rather than this class's `setUp()` because the latter resets
-    /// {@link #filesToServe} to the default, which would discard the caller's selection.
+    /// [#filesToServe] to the default, which would discard the caller's selection.
     protected void setAvailableLibraries(EnumSet<TestBibFile> files) {
         try {
             tearDown();

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -35,6 +33,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.entryeditor.citationrelationtab.BibEntryView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -61,9 +60,10 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jakarta.inject.Inject;
+import jfx.incubator.scene.control.richtext.CodeArea;
 import org.controlsfx.control.CheckListView;
-import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.Nullable;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
@@ -99,11 +99,11 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
-    @Inject private UndoManager undoManager;
     @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     /// Creates an import dialog for entries from file sources.
     /// This constructor is used for importing entries from local files, BibTeX files,
@@ -115,13 +115,13 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         this(database, task, null);
     }
 
-    /// Variant that pre-selects {@code targetGroup} in the group picker. The group is created and
-    /// assigned by the caller only after the dialog is confirmed (see {@link #getImportedEntries()}
-    /// / {@link #getImportTarget()}).
+    /// Variant that pre-selects `targetGroup` in the group picker. The group is created and
+    /// assigned by the caller only after the dialog is confirmed (see [#getImportedEntries()]
+    /// / [#getImportTarget()]).
     ///
     /// @param database    the database to import into
     /// @param task        the task executed for parsing the selected files(s).
-    /// @param targetGroup name of the group to pre-select, or {@code null} for none
+    /// @param targetGroup name of the group to pre-select, or `null` for none
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, @Nullable String targetGroup) {
         this.database = database;
         this.task = task;
@@ -151,7 +151,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor, searchBasedFetcher, query);
+        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, stateManager.getUndoManager(database), preferences, stateManager, entryTypesManager, fileUpdateMonitor, searchBasedFetcher, query);
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
@@ -202,14 +202,14 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                             addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
                         }
                     });
-                    addToggle.getStyleClass().add("addEntryButton");
+                    addToggle.getStyleClass().addAll("addEntryButton", "h1");
                     addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
                     Node entryNode = BibEntryView.getEntryNode(entry);
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox container = new HBox(entryNode, separator, addToggle);
-                    container.getStyleClass().add("entry-container");
+                    container.getStyleClass().add("padding-4-0");
                     container.prefWidthProperty().bind(entriesListView.widthProperty().subtract(25));
 
                     BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {
@@ -231,7 +231,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
                     return container;
                 })
-                .withOnMouseClickedEvent((entry, event) -> {
+                .withOnMouseClickedEvent((entry, _) -> {
                     entriesListView.getCheckModel().toggleCheckState(entry);
                     displayBibTeX(entry, viewModel.getSourceString(entry));
                 })
@@ -451,8 +451,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         if (viewModel.getCheckedEntries().contains(entry)) {
             bibTeXData.clear();
             bibTeXData.appendText(bibTeX);
-            bibTeXData.moveTo(0);
-            bibTeXData.requestFollowCaret();
+            bibTeXData.moveDocumentStart();
         } else {
             bibTeXData.clear();
         }
@@ -462,10 +461,11 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         bibTeXDataLabel.setText(Localization.lang("%0 source", "BibTeX"));
         bibTeXData.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         bibTeXData.setPadding(new Insets(5.0));
-        showEntryInformation.selectedProperty().addListener((observableValue, old_val, new_val) -> {
+        showEntryInformation.selectedProperty().addListener((_, _, new_val) -> {
             bibTeXDataBox.setVisible(new_val);
             bibTeXDataBox.setManaged(new_val);
         });
+        bibTeXData.setSyntaxDecorator(new BibTeXHighlighter(stateManager, bibTeXSyntaxHighlighter));
     }
 
     public void unselectAll() {

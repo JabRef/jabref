@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
@@ -13,6 +11,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -26,11 +25,11 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
 
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
-    @Inject private UndoManager undoManager;
 
     public OwnerEditor(Field field,
                        SuggestionProvider<?> suggestionProvider,
                        FieldCheckers fieldCheckers,
+                       UndoManager undoManager,
                        UndoAction undoAction,
                        RedoAction redoAction) {
         ViewLoader.view(this)

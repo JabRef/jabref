@@ -20,7 +20,7 @@ class SharedBibEntryDataTest {
     void equalsReturnsFalseWhenSharedIDsDiffer() {
         SharedBibEntryData data1 = new SharedBibEntryData();
         SharedBibEntryData data2 = new SharedBibEntryData();
-        data2.setSharedID(42);
+        data2.setSharedId(42);
 
         assertNotEquals(data1, data2);
     }

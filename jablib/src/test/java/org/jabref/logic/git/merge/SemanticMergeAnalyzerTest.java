@@ -8,26 +8,32 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.merge.planning.SemanticMergeAnalyzer;
 import org.jabref.logic.git.model.MergeAnalysis;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("git")
@@ -52,6 +58,22 @@ public class SemanticMergeAnalyzerTest {
                                      Consumer<MergeAnalysis> verify) {
         MergeAnalysis analysis = SemanticMergeAnalyzer.analyze(baseDb, localDb, remoteDb);
         verify.accept(analysis);
+    }
+
+    @Test
+    void noConflictWhenOnlyLineEndingsDiffer() throws JabRefException {
+        String lf = "@article{a,\n  comment = {line1\n\nline3\n\nline5},\n}\n";
+        String crlf = lf.replace("\n", "\r\n");
+
+        MergeAnalysis analysis = SemanticMergeAnalyzer.analyze(parse(lf), parse(crlf), parse(lf));
+
+        assertNoConflicts(analysis);
+    }
+
+    private static BibDatabaseContext parse(String content) throws JabRefException {
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        return BibDatabaseContext.of(content, importFormatPreferences);
     }
 
     static Stream<Arguments> semanticEntryLevelConflicts() {

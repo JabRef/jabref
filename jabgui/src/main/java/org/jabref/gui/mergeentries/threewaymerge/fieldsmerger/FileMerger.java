@@ -7,7 +7,7 @@ import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.LinkedFile;
 
-/// A merger for the {@link org.jabref.model.entry.field.StandardField#FILE} field
+/// A merger for the [org.jabref.model.entry.field.StandardField#FILE] field
 public class FileMerger implements FieldMerger {
     @Override
     public String merge(String filesA, String filesB) {

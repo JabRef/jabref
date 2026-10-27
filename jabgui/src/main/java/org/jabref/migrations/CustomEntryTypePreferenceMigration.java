@@ -46,7 +46,7 @@ class CustomEntryTypePreferenceMigration {
     /// (old implementation which has been copied)
     private static Optional<BibEntryType> getBibEntryType(int number, JabRefCliPreferences preferences) {
         String nr = String.valueOf(number);
-        String name = preferences.get(CUSTOM_TYPE_NAME + nr);
+        String name = preferences.get(CUSTOM_TYPE_NAME + nr, null);
         if (name == null) {
             return Optional.empty();
         }

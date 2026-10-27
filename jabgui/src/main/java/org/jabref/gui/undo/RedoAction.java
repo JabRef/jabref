@@ -1,46 +1,56 @@
 package org.jabref.gui.undo;
 
-import java.util.function.Supplier;
-
-import javax.swing.undo.CannotRedoException;
-
-import javafx.beans.binding.Bindings;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.UndoStep;
 
-import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+import org.jspecify.annotations.NullMarked;
 
-/// @implNote See also {@link UndoAction}
+import static org.jabref.gui.actions.ActionHelper.needsRedo;
+
+/// Re-applies the last change undone in the library the user is looking at.
+///
+/// Reads the library when it runs, for the same reason as [UndoAction].
+@NullMarked
 public class RedoAction extends SimpleCommand {
-    private final Supplier<LibraryTab> tabSupplier;
+
     private final DialogService dialogService;
-    private final CountingUndoManager undoManager;
+    private final StateManager stateManager;
 
-    public RedoAction(Supplier<LibraryTab> tabSupplier, CountingUndoManager undoManager, DialogService dialogService, StateManager stateManager) {
-        this.tabSupplier = tabSupplier;
+    public RedoAction(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
-        this.undoManager = undoManager;
+        this.stateManager = stateManager;
 
-        this.executable.bind(Bindings.and(needsDatabase(stateManager), undoManager.getRedoableProperty()));
+        this.executable.bind(needsRedo(stateManager));
     }
 
     @Override
     public void execute() {
-        LibraryTab libraryTab = this.tabSupplier.get();
-        try {
-            if (undoManager.canRedo()) {
-                undoManager.redo();
-                dialogService.notify(Localization.lang("Redo"));
-            } else {
-                throw new CannotRedoException();
-            }
-        } catch (CannotRedoException ex) {
-            dialogService.notify(Localization.lang("Nothing to redo") + '.');
+        if (stateManager.activeTabProperty().get().isEmpty()) {
+            return;
         }
-        libraryTab.markChangedOrUnChanged();
+
+        LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
+        GuiUndoManager undoManager = stateManager.getUndoManager(libraryTab.getBibDatabaseContext());
+
+        // See UndoAction: a suspension makes canRedo() false without the stack being empty.
+        undoManager.suspendedBy().ifPresentOrElse(
+                command -> dialogService.notify(Localization.lang("Cannot redo while %0 is running", command)),
+                () -> redo(undoManager));
+    }
+
+    private void redo(GuiUndoManager undoManager) {
+        undoManager.redo().ifPresentOrElse(
+                step -> dialogService.notify(message(step)),
+                () -> dialogService.notify(Localization.lang("Nothing to redo") + '.'));
+    }
+
+    private static String message(UndoStep step) {
+        return step.complete()
+               ? Localization.lang("Redone: %0", step.name())
+               : Localization.lang("Redone: %0 (some changes could not be applied)", step.name());
     }
 }

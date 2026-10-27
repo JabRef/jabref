@@ -22,7 +22,7 @@
                 </HBox>
             </bottom>
             <top>
-                <HBox spacing="20">
+                <HBox spacing="12">
                     <TextField fx:id="searchField" promptText="%Search"/>
                     <VBox alignment="CENTER">
                         <CheckBox fx:id="showOnlyDeviatingPreferenceOptions"
@@ -40,7 +40,7 @@
                         <TableColumn fx:id="columnDefaultValue" text="%default"/>
                     </columns>
                     <padding>
-                        <Insets bottom="30.0"/>
+                        <Insets bottom="16.0"/>
                     </padding>
                 </TableView>
             </center>

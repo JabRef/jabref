@@ -102,6 +102,10 @@ public class Launcher {
             JabRefGUI.setup(uiCommands, preferences);
             JabRefGUI.launch(JabRefGUI.class, args);
         } catch (Throwable throwable) {
+            if (LOGGER == null) {
+                // initLogging itself failed; fall back to an unconfigured logger so the cause is not hidden by a NullPointerException
+                LOGGER = LoggerFactory.getLogger(Launcher.class);
+            }
             LOGGER.error("Could not launch JabRef", throwable);
             throw throwable;
         }
@@ -125,7 +129,7 @@ public class Launcher {
                 handler.setFilter(cssFilter);
             }
             java.util.logging.Logger.getLogger("javafx.css").setFilter(cssFilter);
-        } catch (Throwable ex) {
+        } catch (Throwable _) {
             // If anything goes wrong, do not fail startup because of logging
         }
 

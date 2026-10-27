@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-
-import javax.swing.undo.UndoManager;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
@@ -16,8 +15,9 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrEngine;
-import org.jabref.logic.ocr.OcrMyPdfEngine;
+import org.jabref.logic.ocr.OcrEngineFactory;
 import org.jabref.logic.ocr.OcrResult;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -37,7 +37,6 @@ public class OcrLinkedFileAction extends SimpleCommand {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
-    private final OcrEngine ocrEngine;
     private final List<BibEntry> linkedEntries;
     private final ImportHandler importHandler;
 
@@ -56,7 +55,6 @@ public class OcrLinkedFileAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        this.ocrEngine = new OcrMyPdfEngine(preferences.getOcrPreferences());
         this.importHandler = new ImportHandler(
                 databaseContext,
                 preferences,
@@ -75,6 +73,8 @@ public class OcrLinkedFileAction extends SimpleCommand {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not find a file to OCR"));
             return;
         }
+        OcrEngine ocrEngine = OcrEngineFactory.create(preferences.getOcrPreferences());
+
         BackgroundTask<OcrResult> ocrTask = BackgroundTask.wrap(() -> ocrEngine.performOcrAndEmbedText(pdfPath.get()));
 
         ocrTask.titleProperty().set(Localization.lang("Performing OCR"));
@@ -89,8 +89,15 @@ public class OcrLinkedFileAction extends SimpleCommand {
                     }
                 }
                 case OcrResult.Failure failure -> {
-                    String failureReason = getFailureResult(failure);
-                    dialogService.showErrorDialogAndWait(Localization.lang("OCR failed"), failureReason);
+                    String failureReason = failure.reason().getMessage(
+                            ocrEngine.getName(),
+                            preferences.getOcrPreferences().getOcrEnginePath());
+
+                    String detailedMessage = buildFailureMessage(failureReason, failure);
+
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("OCR failed"),
+                            detailedMessage);
                 }
             }
         });
@@ -101,19 +108,25 @@ public class OcrLinkedFileAction extends SimpleCommand {
         taskExecutor.execute(ocrTask);
     }
 
-    String getFailureResult(OcrResult.Failure failure) {
-        return switch (failure.reason()) {
-            case NOT_AVAILABLE ->
-                    Localization.lang("OCRmyPDF is not available at: %0", preferences.getOcrPreferences().getOcrEnginePath());
-            case TIMEOUT ->
-                    Localization.lang("OCR timed out");
-            case NON_ZERO_EXIT ->
-                    Localization.lang("OCR process failed");
-            case IO_ERROR ->
-                    Localization.lang("Could not start OCR process");
-            case INTERRUPTED ->
-                    Localization.lang("OCR was cancelled");
-        };
+    static String buildFailureMessage(String failureReason, OcrResult.Failure failure) {
+        String detailedMessage = failureReason;
+
+        if (!failure.command().isEmpty()) {
+            detailedMessage += "\n\n"
+                    + Localization.lang("Command\n%0", formatCommand(failure.command()));
+        }
+
+        if (!failure.output().isBlank()) {
+            detailedMessage += "\n\n"
+                    + Localization.lang("Output\n%0", failure.output());
+        }
+
+        return detailedMessage;
+    }
+
+    static String formatCommand(List<String> command) {
+        return command.stream()
+                      .collect(Collectors.joining(" ", "\"", "\""));
     }
 
     private class OcredFileSuccessNotification extends Notifications.FileNotification {

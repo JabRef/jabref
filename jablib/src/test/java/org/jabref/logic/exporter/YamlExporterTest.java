@@ -40,7 +40,7 @@ class YamlExporterTest {
                 "CSL YAML",
                 "yaml",
                 "yaml",
-                null,
+                "",
                 StandardFileType.YAML,
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder(),

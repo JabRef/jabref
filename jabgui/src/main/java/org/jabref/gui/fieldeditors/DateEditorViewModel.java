@@ -5,12 +5,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
@@ -49,7 +48,7 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
                 if (StringUtil.isNotBlank(string)) {
                     try {
                         return dateFormatter.parse(string);
-                    } catch (DateTimeParseException exception) {
+                    } catch (DateTimeParseException _) {
                         // We accept all kinds of dates (not just in the format specified)
                         return Date.parse(string).map(Date::toTemporalAccessor).orElse(null);
                     }

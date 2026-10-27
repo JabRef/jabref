@@ -14,7 +14,7 @@ jobs:
       issues: write
     steps:
       - name: Move Issue to "Free to take" Column in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues@main
+        uses: m7kvqbe1/github-action-move-issues@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -24,7 +24,7 @@ jobs:
           default-column: "Free to take"
           skip-if-not-in-project: true
       - name: Move Issue to "Free to take" Column in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues@main
+        uses: m7kvqbe1/github-action-move-issues@1e0e8ac3ab57afe93ddec45b2d48cbe2f1a6595b # main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -33,7 +33,7 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Remove all assignees
         run: |
           ASSIGNEES=$(gh issue view ${{ github.event.issue.number }} --json assignees --template '{{range .assignees}}{{.login}} {{end}}')

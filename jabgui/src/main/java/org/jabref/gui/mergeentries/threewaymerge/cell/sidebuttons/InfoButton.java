@@ -33,7 +33,7 @@ public class InfoButton extends Button {
     public InfoButton(String infoMessage) {
         this.infoMessage.setValue(infoMessage);
         configureButton();
-        EasyBind.subscribe(this.infoMessage, newWarningMessage -> configureButton());
+        EasyBind.subscribe(this.infoMessage, _ -> configureButton());
     }
 
     private void configureButton() {

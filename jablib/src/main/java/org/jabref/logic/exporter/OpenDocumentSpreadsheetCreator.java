@@ -2,7 +2,6 @@ package org.jabref.logic.exporter;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -80,16 +79,18 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
             throws IOException {
 
         // First store the xml formatted content to a temporary file.
-        File tmpFile = File.createTempFile("opendocument", null);
+        Path tmpFile = Files.createTempFile("opendocument", null);
         OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheetXML(tmpFile, database, entries);
 
         // Then add the content to the zip file:
-        try (BufferedInputStream in = new BufferedInputStream(Files.newInputStream(tmpFile.toPath()))) {
+        try (BufferedInputStream in = new BufferedInputStream(Files.newInputStream(tmpFile))) {
             OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(file, in);
         }
         // Delete the temporary file:
-        if (!tmpFile.delete()) {
-            LOGGER.info("Cannot delete temporary export file");
+        try {
+            Files.delete(tmpFile);
+        } catch (IOException e) {
+            LOGGER.info("Cannot delete temporary export file", e);
         }
     }
 
@@ -102,10 +103,10 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
         }
     }
 
-    private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, List<BibEntry> entries) {
+    private static void exportOpenDocumentSpreadsheetXML(Path tmpFile, BibDatabase database, List<BibEntry> entries) {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, entries);
 
-        try (Writer ps = new OutputStreamWriter(Files.newOutputStream(tmpFile.toPath()), StandardCharsets.UTF_8)) {
+        try (Writer ps = new OutputStreamWriter(Files.newOutputStream(tmpFile), StandardCharsets.UTF_8)) {
             DOMSource source = new DOMSource(od.getDOMrepresentation());
             StreamResult result = new StreamResult(ps);
             Transformer trans = TransformerFactory.newInstance().newTransformer();

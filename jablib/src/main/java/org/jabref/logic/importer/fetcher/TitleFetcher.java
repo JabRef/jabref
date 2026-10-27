@@ -6,6 +6,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
@@ -15,9 +16,15 @@ import org.jabref.model.entry.identifier.DOI;
 public class TitleFetcher implements IdBasedFetcher {
 
     private final ImportFormatPreferences preferences;
+    private final ImporterPreferences importerPreferences;
 
     public TitleFetcher(ImportFormatPreferences preferences) {
+        this(preferences, ImporterPreferences.getDefault());
+    }
+
+    public TitleFetcher(ImportFormatPreferences preferences, ImporterPreferences importerPreferences) {
         this.preferences = preferences;
+        this.importerPreferences = importerPreferences;
     }
 
     @Override
@@ -38,7 +45,7 @@ public class TitleFetcher implements IdBasedFetcher {
 
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, identifier);
 
-        Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entry);
+        Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class, importerPreferences).findIdentifier(entry);
         if (doi.isEmpty()) {
             return Optional.empty();
         }

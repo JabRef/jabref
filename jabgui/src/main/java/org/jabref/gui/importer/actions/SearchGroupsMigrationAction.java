@@ -60,7 +60,7 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
                 } else {
                     showAskForNewSearchExpressionDialog(dialogService, searchGroup);
                 }
-            } catch (ParseCancellationException e) {
+            } catch (ParseCancellationException _) {
                 showAskForNewSearchExpressionDialog(dialogService, searchGroup);
             }
         }

@@ -18,6 +18,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
@@ -149,6 +150,9 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
 
     @Override
     public void doPostCleanup(BibEntry entry) {
+        // [impl->req~import.doi-from-other-fields~1]
+        new DoiCleanup().cleanup(entry);
+
         new FieldFormatterCleanup(new UnknownField("journal-abbreviation"), new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup(new UnknownField("status"), new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup(new UnknownField("copyright"), new ClearFormatter()).cleanup(entry);
@@ -196,29 +200,39 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
 
     @Override
     public @NonNull List<BibEntry> performSearch(@NonNull BaseQueryNode queryNode) throws FetcherException {
-        List<BibEntry> entryList;
         MedlineQueryTransformer transformer = new MedlineQueryTransformer();
         Optional<String> transformedQuery = transformer.transformSearchQuery(queryNode);
 
         if (transformedQuery.isEmpty() || transformedQuery.get().isBlank()) {
             return List.of();
-        } else {
-            // searching for pubmed ids matching the query
-            List<String> idList = getPubMedIdsFromQuery(transformedQuery.get());
-
-            if (idList.isEmpty()) {
-                LOGGER.info("No results found.");
-                return List.of();
-            }
-            if (numberOfResultsFound > NUMBER_TO_FETCH) {
-                LOGGER.info("{} results found. Only 50 relevant results will be fetched by default.", numberOfResultsFound);
-            }
-
-            // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
-            entryList = fetchMedline(idList);
-
-            return entryList;
         }
+        return searchForEntries(transformedQuery.get());
+    }
+
+    /// The raw query is sent as the `term` parameter of PubMed's esearch API (see SEARCH_URL)
+    @Override
+    public @NonNull List<BibEntry> performRawSearchQuery(@NonNull String rawQuery) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return List.of();
+        }
+        return searchForEntries(rawQuery);
+    }
+
+    /// Searches PubMed for IDs matching the query, then fetches the corresponding entries
+    private List<BibEntry> searchForEntries(String query) throws FetcherException {
+        // searching for pubmed ids matching the query
+        List<String> idList = getPubMedIdsFromQuery(query);
+
+        if (idList.isEmpty()) {
+            LOGGER.info("No results found.");
+            return List.of();
+        }
+        if (numberOfResultsFound > NUMBER_TO_FETCH) {
+            LOGGER.info("{} results found. Only 50 relevant results will be fetched by default.", numberOfResultsFound);
+        }
+
+        // pass the list of ids to fetchMedline to download them, like an id fetcher for multiple ids
+        return fetchMedline(idList);
     }
 
     @Override
@@ -227,7 +241,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
             URLDownload urlDownload = new URLDownload(getTestUrl(apiKey));
             int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
             return (statusCode >= 200) && (statusCode < 300);
-        } catch (IOException | UnirestException e) {
+        } catch (IOException | UnirestException _) {
             return false;
         }
     }

@@ -90,19 +90,6 @@ public class CitationKeyPatternPreferences {
         return new CitationKeyPatternPreferences();
     }
 
-    public void setAll(CitationKeyPatternPreferences preferences) {
-        this.shouldTransliterateFieldsForCitationKey.set(preferences.shouldTransliterateFieldsForCitationKey.get());
-        this.shouldAvoidOverwriteCiteKey.set(preferences.shouldAvoidOverwriteCiteKey.get());
-        this.shouldWarnBeforeOverwriteCiteKey.set(preferences.shouldWarnBeforeOverwriteCiteKey.get());
-        this.shouldGenerateCiteKeysBeforeSaving.set(preferences.shouldGenerateCiteKeysBeforeSaving.get());
-        this.keySuffix.set(preferences.keySuffix.get());
-        this.keyPatternRegex.set(preferences.keyPatternRegex.get());
-        this.keyPatternReplacement.set(preferences.keyPatternReplacement.get());
-        this.unwantedCharacters.set(preferences.unwantedCharacters.get());
-        this.keyPatterns.set(preferences.keyPatterns.get());
-        // keywordDelimiter is always bound to BibEntryPreferences#keywordDelimiter
-    }
-
     public boolean shouldTransliterateFieldsForCitationKey() {
         return shouldTransliterateFieldsForCitationKey.get();
     }
@@ -213,15 +200,5 @@ public class CitationKeyPatternPreferences {
 
     public Character getKeywordSeparator() {
         return keywordSeparator.get();
-    }
-
-    public CitationKeyPatternPreferences withKeywordSeparator(ReadOnlyObjectProperty<Character> newDelimiter) {
-        if (newDelimiter == null) {
-            this.keywordSeparator.bind(DEFAULT_KEYWORD_SEPARATOR);
-        } else {
-            this.keywordSeparator.bind(newDelimiter);
-        }
-
-        return this;
     }
 }

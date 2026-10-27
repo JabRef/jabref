@@ -22,11 +22,11 @@ import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddings.GenerateEmbeddingsTask;
-import org.jabref.logic.ai.rag.logic.AnswerEngine;
+import org.jabref.logic.ai.rag.logic.ResponseEngine;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.identifiers.FullBibEntry;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -35,25 +35,28 @@ import jakarta.inject.Inject;
 /// Displays status and metadata for an AI chat session.
 ///
 /// This component provides information about:
+///
 /// - The currently selected chat model
-/// - The answer engine in use
+/// - The response engine in use
 /// - Entries included in the chat context
 /// - The ingestion status of linked files, including any errors encountered
 ///
 /// It also offers actions to:
+///
 /// - Export the chat history
 /// - Clear the chat history
 ///
 /// Typical usage:
 /// This component is primarily used within the AiChatView, where:
-/// - The chat model and answer engine are bound to this component
+///
+/// - The chat model and response engine are bound to this component
 /// - The chat history is provided by the AI chat and displayed here
 ///
 /// Future plans:
 /// The component is intended to support configuration of chat parameters,
 /// such as selecting a different chat model per session instead of relying
-/// on global preferences. Currently, only the answer engine can be modified.
-// [impl->req~ai.chat.ingestion-status~1]
+/// on global preferences. Currently, only the response engine can be modified.
+// [impl->feat~ai.chat.ingestion-status~1]
 public class AiChatStatusView extends VBox {
     // [impl->req~ai.chat.model-visibility~1]
     @FXML private Label chatModelLabel;
@@ -67,7 +70,7 @@ public class AiChatStatusView extends VBox {
     @FXML private TableColumn<AiChatStatusViewModel.IngestionStatusRow, AiChatStatusViewModel.FileStatus> statusColumn;
     @FXML private TableColumn<AiChatStatusViewModel.IngestionStatusRow, AiChatStatusViewModel.IngestionStatusRow> actionColumn;
 
-    @FXML private ComboBox<AnswerEngineKind> answerEngineComboBox;
+    @FXML private ComboBox<ResponseEngineKind> responseEngineComboBox;
 
     @Inject private GuiPreferences preferences;
     @Inject private AiService aiService;
@@ -150,8 +153,7 @@ public class AiChatStatusView extends VBox {
 
     private Button constructErrorButton(AiChatStatusViewModel.IngestionStatusRow row) {
         Button errorButton = new Button(Localization.lang("Show Error"));
-        errorButton.getStyleClass().add("text-button");
-        errorButton.setOnAction(event ->
+        errorButton.setOnAction(_ ->
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Ingestion Error"),
                         row.getError()
@@ -163,11 +165,11 @@ public class AiChatStatusView extends VBox {
     private void setupRest() {
         chatModelLabel.textProperty().bind(viewModel.chatModelProperty().map(AiChatStatusView::formatChatModelLabel));
 
-        new ViewModelListCellFactory<AnswerEngineKind>()
+        new ViewModelListCellFactory<ResponseEngineKind>()
                 .withText(AiNamingUtils::getDisplayName)
-                .install(answerEngineComboBox);
-        answerEngineComboBox.setItems(viewModel.answerEngineKindsProperty());
-        answerEngineComboBox.valueProperty().bindBidirectional(viewModel.selectedAnswerEngineKindProperty());
+                .install(responseEngineComboBox);
+        responseEngineComboBox.setItems(viewModel.responseEngineKindsProperty());
+        responseEngineComboBox.valueProperty().bindBidirectional(viewModel.selectedResponseEngineKindProperty());
     }
 
     private static String formatChatModelLabel(ChatModel model) {
@@ -177,8 +179,8 @@ public class AiChatStatusView extends VBox {
         return Localization.lang("%0 %1", AiNamingUtils.getDisplayName(model.getAiProvider()), model.getName());
     }
 
-    public void setAnswerEngine(AnswerEngine answerEngine) {
-        viewModel.setAnswerEngine(answerEngine);
+    public void setResponseEngine(ResponseEngine responseEngine) {
+        viewModel.setResponseEngine(responseEngine);
     }
 
     @FXML
@@ -191,7 +193,7 @@ public class AiChatStatusView extends VBox {
         viewModel.exportMarkdown();
     }
 
-    // [impl->req~ai.chat.clear-history~1]
+    // [impl->feat~ai.chat.clear-history~1]
     @FXML
     private void clearChatHistory() {
         viewModel.clearChatHistory();
@@ -205,8 +207,8 @@ public class AiChatStatusView extends VBox {
         return viewModel.chatHistoryProperty();
     }
 
-    public ObjectProperty<AnswerEngine> answerEngineProperty() {
-        return viewModel.answerEngineProperty();
+    public ObjectProperty<ResponseEngine> responseEngineProperty() {
+        return viewModel.responseEngineProperty();
     }
 
     public ListProperty<FullBibEntry> entriesProperty() {

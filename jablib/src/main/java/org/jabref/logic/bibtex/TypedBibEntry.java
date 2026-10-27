@@ -12,7 +12,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/// Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode}-dependent results
+/// Wrapper around a [BibEntry] offering methods for [BibDatabaseMode]-dependent results
 public class TypedBibEntry {
 
     private final BibEntry entry;

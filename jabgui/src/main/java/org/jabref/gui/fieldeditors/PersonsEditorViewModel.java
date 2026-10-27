@@ -2,8 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Collection;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
@@ -12,6 +10,7 @@ import org.jabref.gui.autocompleter.AutoCompletionStrategy;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.field.Field;
 

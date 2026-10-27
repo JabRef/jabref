@@ -1,9 +1,8 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-
 plugins {
     id("org.jabref.gradle.module")
-    id("org.jabref.gradle.feature.shadowjar")
     id("application")
+    id("org.jabref.gradle.feature.nativecompile")
+    id("org.jabref.gradle.feature.shadowjar")
 }
 
 group = "org.jabref.jabsrv"
@@ -11,10 +10,6 @@ version = providers.gradleProperty("projVersion")
     .orElse(providers.environmentVariable("VERSION"))
     .orElse("100.0.0")
     .get()
-
-mainModuleInfo {
-    annotationProcessor("info.picocli.codegen")
-}
 
 application{
     mainClass = "org.jabref.http.server.cli.ServerCli"
@@ -30,11 +25,6 @@ application{
 }
 
 tasks.test {
-    testLogging {
-        // set options for log level LIFECYCLE
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
-    }
     maxParallelForks = 1
 }
 
@@ -61,5 +51,14 @@ javaModulePackaging {
     }
     targetsWithOs("macos") {
         packageTypes = listOf("app-image")
+    }
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName.set("jabsrv")
+            mainClass.set("org.jabref.http.server.cli.ServerCli")
+        }
     }
 }

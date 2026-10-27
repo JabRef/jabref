@@ -18,12 +18,21 @@ public enum GroupHierarchyType {
     }
 
     /// Returns the hierarchy type from its position in this enum.
-    /// If the specified position is out of the enums bounds, then {@link #INDEPENDENT} is returned.
+    /// If the specified position is out of the enums bounds, then [#INDEPENDENT] is returned.
     public static GroupHierarchyType getByNumberOrDefault(int type) {
         GroupHierarchyType[] types = values();
         if (type >= 0 && type < types.length) {
             return types[type];
         } else {
+            return INDEPENDENT;
+        }
+    }
+
+    /// Parses a constant by name, falling back to [#INDEPENDENT] for unknown/corrupted values.
+    public static GroupHierarchyType safeValueOf(String name) {
+        try {
+            return GroupHierarchyType.valueOf(name);
+        } catch (IllegalArgumentException _) {
             return INDEPENDENT;
         }
     }

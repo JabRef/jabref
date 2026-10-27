@@ -23,7 +23,7 @@ How source data is processed:
 3. **Splitting**: the string from previous step is split into parts (because LLM has fixed context window, meaning
 it cannot handle big documents).
 4. **Embedding generation**: a vector consisting of float values is generated out of chunks. This vector represents meaning
-of text and the main propety of such vectors is that chunks with similar meaning has vectors that are close to.
+of text and the main property of such vectors is that chunks with similar meaning has vectors that are close to.
 Generation of such a vector is achieved by using a separate model called *embedding model*.
 5. **Store**: chunks with relevant metadata (for example, from which document they were generated) and embedding vector are stored in a vector database.
 
@@ -56,7 +56,7 @@ required to install some separate software (or even Python runtime).
 
 ## Decision Outcome
 
-Chosen option: mix of "Use a hand-crafted RAG" and "Use a third-party Java library".
+Chosen option: mix of "Use a hand-crafted RAG" and "Use a third-party Java library", because third-party libraries provide the machinery for connecting to an LLM and extracting text, while some parts still need to be hand-crafted (see below).
 
 Third-party libraries provide excellent resources for connecting to an LLM or extracting text from PDF files. For RAG,
 we mostly used all the machinery provided by `langchain4j`, but there were moments that should be hand-crafted:

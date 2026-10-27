@@ -47,7 +47,7 @@ jvmDependencyConflicts {
 
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
-listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-web", "javafx-media", "jdk-jsobject").forEach { jfxModule ->
+listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-media", "jfx-incubator-input", "jfx-incubator-richtext").forEach { jfxModule ->
     addJfxTarget(jfxModule, "", "none", "none") // matches the empty Jars: to get better errors
     addJfxTarget(jfxModule, "linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
     addJfxTarget(jfxModule, "linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
@@ -57,19 +57,8 @@ listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "java
 }
 
 fun addJfxTarget(jfxModule: String, name: String, os: String, arch: String) {
-    if (jfxModule == "javafx-web" && name.isNotEmpty()) {
-        // Special treatment of 'javafx-web' for the time being due to https://bugs.openjdk.org/browse/JDK-8342623.
-        // Can be remove once Java 26 is the minimum version JabRef is built with.
-        dependencies.components.withModule<JDKjsobjectDependencyMetadataRule>("org.openjfx:$jfxModule") {
-            params(name, os, arch, 11)
-        }
-        dependencies.components.withModule<JDKjsobjectDependencyMetadataRule>("org.openjfx:$jfxModule") {
-            params(name, os, arch, 26)
-        }
-    } else {
-        jvmDependencyConflicts.patch.module("org.openjfx:$jfxModule") {
-            addTargetPlatformVariant(name, os, arch)
-        }
+    jvmDependencyConflicts.patch.module("org.openjfx:$jfxModule") {
+        addTargetPlatformVariant(name, os, arch)
     }
 }
 
@@ -107,8 +96,11 @@ jvmDependencyConflicts.patch {
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
 
-    module("org.testfx:testfx-core") {
-        removeDependency("org.osgi:org.osgi.core")
+    listOf("org.apache.sshd:sshd-osgi", "org.apache.sshd:sshd-sftp").forEach { sshd ->
+        module(sshd) {
+            // sshd logs via slf4j directly; the declared JCL bridge conflicts with commons-logging (needed by pdfbox)
+            removeDependency("org.slf4j:jcl-over-slf4j")
+        }
     }
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
@@ -116,11 +108,15 @@ jvmDependencyConflicts.patch {
     module("dev.langchain4j:langchain4j-core") {
         addRuntimeOnlyDependency("com.knuddels:jtokkit")
     }
+
     module("org.jabref:afterburner.fx") {
         // POM pins javafx-* to 20; strip and re-add without version so :versions platform resolves them to current
         removeDependency("org.openjfx:javafx-controls")
         removeDependency("org.openjfx:javafx-fxml")
         removeDependency("org.openjfx:javafx-swing")
+        // javafx-web (WebView/WebEngine) is intentionally NOT wanted: it bundles a full WebKit, bloating the
+        // distribution and blocking native-image. HTML rendering is done via the html-to-node library instead.
+        // Keep it removed here and do not add it as a dependency anywhere. Enforced by CommonArchitectureTest.doNotUseJavaFXWeb.
         removeDependency("org.openjfx:javafx-web")
         // metadata decared these as runtime only, but they are 'requires transitive' in module-info
         addApiDependency("org.openjfx:javafx-fxml")
@@ -129,6 +125,12 @@ jvmDependencyConflicts.patch {
     module("org.libreoffice:libreoffice") {
         // no dependency in metadata, but 'requires org.libreoffice.unoloader' in module-info
         addRuntimeOnlyDependency("org.libreoffice:unoloader")
+    }
+    module("io.zonky.test:embedded-postgres") {
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64-alpine")
     }
 }
 
@@ -140,6 +142,7 @@ extraJavaModuleInfo {
 
     knownModule("com.github.hypfvieh:dbus-java-core", "org.freedesktop.dbus")
     knownModule("com.github.hypfvieh:dbus-java-transport-native-unixsocket", "org.freedesktop.dbus.transport.jre")
+    knownModule("org.checkerframework:checker-qual", "org.checkerframework.checker.qual")
 
     module("ai.djl.huggingface:tokenizers", "ai.djl.tokenizers") {
         exportAllPackages()
@@ -174,29 +177,6 @@ extraJavaModuleInfo {
 
     module("com.github.javakeyring:java-keyring", "java.keyring")
 
-    module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
-    module("com.lihaoyi:fastparse_2.13", "fastparse") {
-        overrideModuleName() // fastparse_2.13 is not a valid name
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("scala.library")
-    }
-    module("com.lihaoyi:sourcecode_2.13", "com.lihaoyi.sourcecode") {
-        overrideModuleName() // sourcecode_2.13 is not a valid name
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("scala.library")
-    }
-    module("com.lihaoyi:geny_2.13", "com.lihaoyi.geny") {
-        overrideModuleName() // geny_2.13 is not a valid name
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("scala.library")
-    }
-
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")
     module("com.ibm.icu:icu4j", "com.ibm.icu")
     module("com.knuddels:jtokkit", "jtokkit")
@@ -206,6 +186,34 @@ extraJavaModuleInfo {
         uses("kong.unirest.core.json.JsonEngine")
     }
     module("com.konghq:unirest-modules-gson", "unirest.modules.gson")
+
+    // region nimbusdl
+    // required by nimbusdl
+    module("com.github.stephenc.jcip:jcip-annotations", "jcip.annotations") {
+        exportAllPackages()
+    }
+    module("net.minidev:json-smart", "json.smart") {
+        exportAllPackages()
+    }
+    module("com.nimbusds:content-type", "nimbusds.contenttype") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    knownModule("com.nimbusds:nimbus-jose-jwt", "com.nimbusds.jose.jwt")
+    module("com.nimbusds:lang-tag", "nimbusds.langtag") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("com.nimbusds:oauth2-oidc-sdk", "nimbusds.oauth2.oidc.sdk") {
+        overrideModuleName()
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    // endregion
+
+    module("com.squareup.okhttp3:mockwebserver3", "mockwebserver3") {
+        preserveExisting()
+    }
     module("com.squareup.okhttp3:okhttp", "okhttp3")
     module("com.squareup.okhttp3:okhttp-jvm-sse", "okhttp3.sse")
     module("com.squareup.okio:okio", "okio")
@@ -250,6 +258,7 @@ extraJavaModuleInfo {
         // requires("jackson.annotations")
     }
     module("dev.langchain4j:langchain4j", "langchain4j")
+    module("dev.langchain4j:langchain4j-jackson3", "langchain4j.jackson3")
     module("dev.langchain4j:langchain4j-core", "langchain4j.core") {
         // workaround for https://github.com/langchain4j/langchain4j/issues/3668
         patchRealModule()
@@ -261,6 +270,10 @@ extraJavaModuleInfo {
         mergeJar("dev.langchain4j:langchain4j-google-ai-gemini")
         requires("java.net.http")
         uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
+        uses("dev.langchain4j.spi.json.ProviderJsonCodecFactory")
+        // Loaded by MistralAiChatModel.builder() and build(); missing uses crashes JabRef start with Mistral AI selected
+        uses("dev.langchain4j.model.mistralai.spi.MistralAiChatModelBuilderFactory")
+        uses("dev.langchain4j.model.mistralai.internal.client.MistralAiClientBuilderFactory")
         exportAllPackages()
         requireAllDefinedDependencies()
     }
@@ -270,6 +283,11 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-hugging-face", "langchain4j.hugging.face")
     module("dev.langchain4j:langchain4j-mistral-ai", "langchain4j.mistral.ai")
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
+
+    module("io.smallrye.reactive:mutiny-zero", "io.smallrye.mutiny.zero") {
+        preserveExisting()
+    }
+
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
@@ -303,11 +321,43 @@ extraJavaModuleInfo {
         requires("org.apache.commons.logging")
     }
     module("org.apache.pdfbox:pdfbox-io", "org.apache.pdfbox.io")
+    module("org.apache.sshd:sshd-osgi", "org.apache.sshd.osgi") {
+        exportAllPackages()
+        requires("java.logging")
+        requires("java.management") // Reason: ExceptionUtils unwraps javax.management exceptions
+        requires("java.rmi") // Reason: ExceptionUtils unwraps java.rmi exceptions
+        requires("java.security.jgss")
+        requires("org.slf4j")
+        uses("org.apache.sshd.common.io.IoServiceFactoryFactory")
+    }
+    module("org.apache.sshd:sshd-sftp", "org.apache.sshd.sftp") {
+        exportAllPackages()
+        requires("org.apache.sshd.osgi")
+        requires("org.slf4j")
+    }
     module("org.apache.velocity:velocity-engine-core", "velocity.engine.core")
     module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit") {
         exportAllPackages()
         requires("org.slf4j")
         uses("org.eclipse.jgit.lib.SignerFactory")
+        uses("org.eclipse.jgit.transport.SshSessionFactory")
+    }
+    module("org.eclipse.jgit:org.eclipse.jgit.ssh.apache", "org.eclipse.jgit.ssh.apache") {
+        exportAllPackages()
+        requires("org.apache.sshd.osgi")
+        requires("org.apache.sshd.sftp")
+        requires("org.eclipse.jgit")
+        requires("java.security.jgss")
+        requires("org.slf4j")
+        uses("org.eclipse.jgit.transport.sshd.agent.ConnectorFactory")
+    }
+    module("org.eclipse.jgit:org.eclipse.jgit.ssh.apache.agent", "org.eclipse.jgit.ssh.apache.agent") {
+        exportAllPackages()
+        requires("com.sun.jna")
+        requires("com.sun.jna.platform")
+        requires("org.eclipse.jgit")
+        requires("org.eclipse.jgit.ssh.apache")
+        requires("org.slf4j")
     }
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "wellbehavedfx") {
@@ -316,21 +366,14 @@ extraJavaModuleInfo {
     }
     module("org.javassist:javassist", "org.javassist")
     module("org.jbibtex:jbibtex", "jbibtex")
-    module("org.scala-lang:scala-library", "scala.library")
+    module("org.scilab.forge:jlatexmath", "jlatexmath") {
+        exportAllPackages()
+        mergeJar("org.scilab.forge:jlatexmath-font-greek")
+        mergeJar("org.scilab.forge:jlatexmath-font-cyrillic")
+        requiresTransitive("java.desktop")
+        requiresTransitive("java.xml")
+    }
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
-
-    module("org.testfx:testfx-core", "org.testfx") {
-        exportAllPackages()
-        // Content based on https://github.com/TestFX/TestFX/commit/bf4a08aa82c008fdd3c296aaafee1d222f3824cb
-        requires("java.desktop")
-        requiresTransitive("javafx.controls")
-        requiresTransitive("org.hamcrest")
-    }
-    module("org.testfx:testfx-junit5", "org.testfx.junit5") {
-        exportAllPackages()
-        requires("org.junit.jupiter.api")
-        requiresTransitive("org.testfx")
-    }
 
     module("org.xmlunit:xmlunit-core", "org.xmlunit") {
         exportAllPackages()
@@ -460,6 +503,7 @@ extraJavaModuleInfo {
         requires("java.management")
         requires("java.naming")
         requires("java.sql")
+        requires("java.security.jgss")
     }
     module("org.apache.pdfbox:pdfbox", "org.apache.pdfbox") {
         exportAllPackages()
@@ -495,7 +539,6 @@ extraJavaModuleInfo {
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         preserveExisting()
         exports("com.sun.javafx.scene")
-        opens("com.sun.javafx.application", "org.testfx")
         opens("javafx.scene", "org.controlsfx.controls")
     }
 
@@ -512,8 +555,6 @@ extraJavaModuleInfo {
         opens("javafx.scene.control.cell")
         opens("javafx.scene.control.skin")
         exports("com.sun.javafx.scene.control")
-        // required for ActionFactory#enableTooltips
-        opens("com.sun.javafx.scene.control")
     }
 
     module("org.hamcrest:hamcrest", "org.hamcrest")

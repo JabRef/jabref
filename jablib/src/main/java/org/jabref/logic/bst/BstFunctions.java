@@ -551,8 +551,13 @@ public class BstFunctions {
         }
         Object o1 = stack.pop();
 
+        if (o1 == null) {
+            stack.push(BstVM.TRUE);
+            return;
+        }
+
         if (!(o1 instanceof String)) {
-            LOGGER.warn("Not a string or missing field in operation missing$ (line {})", ctx.start.getLine());
+            LOGGER.warn("Expected a field value in operation missing$ (line {})", ctx.start.getLine());
             stack.push(BstVM.TRUE);
             return;
         }

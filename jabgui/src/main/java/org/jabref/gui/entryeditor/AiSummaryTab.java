@@ -29,7 +29,7 @@ public class AiSummaryTab extends EntryEditorTab {
         setContent(aiSummaryView);
     }
 
-    /// @implNote Method similar to {@link AiChatTab#bindToEntry(BibEntry)}
+    /// @implNote Method similar to [AiChatTab#bindToEntry(BibEntry)]
     @Override
     protected void bindToEntry(BibEntry entry) {
         BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());

@@ -66,7 +66,7 @@ public class MapResource {
         return Files.readString(jabMapPath);
     }
 
-    /// At http://localhost:23119/libraries/{id}/map <br><br>
+    /// At http://localhost:23119/libraries/{id}/map
     ///
     /// Saves the mindmap next to its associated library.
     ///

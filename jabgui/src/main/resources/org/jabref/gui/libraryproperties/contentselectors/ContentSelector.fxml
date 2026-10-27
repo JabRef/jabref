@@ -11,7 +11,7 @@
          fx:controller="org.jabref.gui.libraryproperties.contentselectors.ContentSelectorView">
     <HBox spacing="10.0" VBox.vgrow="ALWAYS">
         <VBox spacing="10.0" HBox.hgrow="ALWAYS">
-            <Label styleClass="sectionHeader" text="%Field names"/>
+            <Label styleClass="h4,padding-top-12" text="%Field names"/>
             <ListView fx:id="fieldsListView" VBox.vgrow="ALWAYS"/>
             <HBox spacing="10.0" alignment="BASELINE_RIGHT">
                 <Button text="%Add" onAction="#addNewFieldName">
@@ -28,7 +28,7 @@
         </VBox>
 
         <VBox spacing="10.0" HBox.hgrow="ALWAYS">
-            <Label styleClass="sectionHeader" text="%Keywords"/>
+            <Label styleClass="h4,padding-top-12" text="%Keywords"/>
             <ListView fx:id="keywordsListView" VBox.vgrow="ALWAYS"/>
             <HBox spacing="10.0" alignment="BASELINE_RIGHT">
                 <Button fx:id="addKeywordButton" text="%Add" onAction="#addNewKeyword">

@@ -19,7 +19,7 @@ public enum DiffMode {
     public static DiffMode parse(String name) {
         try {
             return DiffMode.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return WORD; // default
         }
     }

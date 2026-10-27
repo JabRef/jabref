@@ -19,7 +19,7 @@ jobs:
           cd build
           wget -q -m -r -nH --cut-dirs 2 --no-parent --show-progress --accept=tar.gz,dmg,pkg,deb,rpm,zip,msi https://builds.jabref.org/tags/
       - name: Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
         with:
           draft: true
           files: build/**

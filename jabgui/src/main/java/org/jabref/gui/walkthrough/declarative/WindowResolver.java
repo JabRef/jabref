@@ -6,8 +6,6 @@ import java.util.Optional;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-import org.jabref.logic.l10n.Localization;
-
 import org.jspecify.annotations.NonNull;
 
 /// Resolves windows using various strategies.
@@ -20,14 +18,14 @@ public interface WindowResolver {
 
     /// Creates a resolver that finds a window by its title.
     ///
-    /// @param key the language key of the window title
+    /// @param title the already localized window title
     /// @return a resolver that finds the window by title
-    static WindowResolver title(@NonNull String key) {
+    static WindowResolver title(@NonNull String title) {
         return () -> Window.getWindows().stream()
                            .filter(Window::isShowing)
                            .filter(Stage.class::isInstance)
                            .map(Stage.class::cast)
-                           .filter(stage -> stage.getTitle().contains(Localization.lang(key)))
+                           .filter(stage -> stage.getTitle().contains(title))
                            .map(Window.class::cast)
                            .findFirst();
     }

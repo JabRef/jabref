@@ -77,18 +77,19 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     @Override
     public Integer visitReadCommand(BstParser.ReadCommandContext ctx) {
         FieldWriter fieldWriter = new FieldWriter(new FieldPreferences(true, List.of(StandardField.MONTH), List.of()));
-        for (BstEntry e : bstVMContext.entries()) {
-            for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
-                Field field = FieldFactory.parseField(mEntry.getKey());
-                e.entry.getResolvedFieldOrAlias(field, bstVMContext.bibDatabase())
-                       .map(content -> normalizeFieldValue(content, fieldWriter, field))
-                       .ifPresent(mEntry::setValue);
+        for (BstEntry bstEntry : bstVMContext.entries()) {
+            if (!bstEntry.fields.containsKey(StandardField.CROSSREF.getName())) {
+                String crossref = bstEntry.entry.getResolvedFieldOrAlias(StandardField.CROSSREF, bstVMContext.bibDatabase())
+                                                .map(content -> normalizeFieldValue(content, fieldWriter, StandardField.CROSSREF))
+                                                .orElse(null);
+                bstEntry.fields.put(StandardField.CROSSREF.getName(), crossref);
             }
-        }
 
-        for (BstEntry e : bstVMContext.entries()) {
-            if (!e.fields.containsKey(StandardField.CROSSREF.getName())) {
-                e.fields.put(StandardField.CROSSREF.getName(), null);
+            for (Map.Entry<String, @Nullable String> fieldMapEntry : bstEntry.fields.entrySet()) {
+                Field field = FieldFactory.parseField(fieldMapEntry.getKey());
+                bstEntry.entry.getResolvedFieldOrAlias(field, bstVMContext.bibDatabase())
+                              .map(content -> normalizeFieldValue(content, fieldWriter, field))
+                              .ifPresent(fieldMapEntry::setValue);
             }
         }
 

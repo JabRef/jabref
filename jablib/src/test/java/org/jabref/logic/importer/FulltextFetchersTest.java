@@ -11,7 +11,7 @@ import org.jabref.logic.importer.fetcher.TrustLevel;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@FetcherTest
+@ExternalServicesTest
 class FulltextFetchersTest {
 
     /// Required for testing the FulltextFetchers class.
@@ -33,7 +33,7 @@ class FulltextFetchersTest {
     @Test
     void acceptPdfUrls() throws MalformedURLException {
         URL pdfUrl = URLUtil.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
-        FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
+        FulltextFetcherWithTrustLevel finder = _ -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
     }
@@ -41,7 +41,7 @@ class FulltextFetchersTest {
     @Test
     void rejectNonPdfUrls() throws MalformedURLException {
         URL pdfUrl = URLUtil.create("https://github.com/JabRef/jabref/blob/master/README.md");
-        FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
+        FulltextFetcherWithTrustLevel finder = _ -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
         assertEquals(Optional.empty(), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));
@@ -50,7 +50,7 @@ class FulltextFetchersTest {
     @Test
     void noTrustLevel() throws MalformedURLException {
         URL pdfUrl = URLUtil.create("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
-        FulltextFetcherWithTrustLevel finder = e -> Optional.of(pdfUrl);
+        FulltextFetcherWithTrustLevel finder = _ -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
 
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(new BibEntry()).map(FetcherResult::source));

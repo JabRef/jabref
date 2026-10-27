@@ -82,12 +82,12 @@ public class DefaultLatexParser implements LatexParser {
                 matchBibFile(latexFile, line, latexParserResult);
                 matchNestedFile(latexFile, line, latexParserResult);
             }
-        } catch (ClosedChannelException e) {
+        } catch (ClosedChannelException _) {
             // User changed the underlying LaTeX file
             // We ignore this error and just continue with parsing
             LOGGER.info("Parsing has been interrupted");
         } catch (IOException | UncheckedIOException e) {
-            // Some weired error during reading
+            // Some weird error during reading
             // We ignore this error and just continue with parsing
             LOGGER.info("Error while parsing file {}", latexFile, e);
         }

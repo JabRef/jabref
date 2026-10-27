@@ -1,11 +1,11 @@
 package org.jabref.gui;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.swing.undo.UndoManager;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -15,6 +15,8 @@ import javafx.concurrent.Task;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -31,16 +33,17 @@ import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.gui.util.WebViewStore;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.gui.walkthrough.WalkthroughPane;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
+import org.jabref.logic.git.GitSsh;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -65,7 +68,11 @@ import com.dlsc.gemsfx.PowerPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import kong.unirest.core.Unirest;
+import org.controlsfx.control.decoration.Decorator;
+import org.controlsfx.control.decoration.GraphicDecoration;
+import org.controlsfx.dialog.ExceptionDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,16 +92,19 @@ public class JabRefGUI extends Application {
     private static FileUpdateMonitor fileUpdateMonitor;
     private static StateManager stateManager;
     private static ThemeManager themeManager;
-    private static CountingUndoManager countingUndoManager;
     private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
+    private static final String BIBTEX_EDITOR_FONT_RESOURCE = "fonts/JetBrainsMono-Regular.ttf";
+
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
     private static GitHandlerRegistry gitHandlerRegistry;
     private static JournalAbbreviationRepository journalAbbreviationRepository;
+    private static BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
+    private static OAuthSessionRegistry oAuthSessionRegistry;
     private static LanguageServerController languageServerController;
 
     private Stage mainStage;
@@ -107,8 +117,15 @@ public class JabRefGUI extends Application {
 
     @Override
     public void start(Stage stage) {
+        // Installed before the try block below (not after) so background threads started during
+        // initialize() are also covered, not just ones started once the main window is up.
+        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() ->
+                showCriticalErrorDialog(Localization.lang("Uncaught exception occurred in %0", thread.toString()), exception)));
+
         try {
             this.mainStage = stage;
+            // Load JavaFX stylesheet now instead of loading it later when the first Control is initialized.
+            setUserAgentStylesheet(null);
             Injector.setModelOrService(Stage.class, mainStage);
 
             initialize();
@@ -120,12 +137,12 @@ public class JabRefGUI extends Application {
                     preferences,
                     aiService,
                     stateManager,
-                    countingUndoManager,
                     Injector.instantiateModelOrService(BibEntryTypesManager.class),
                     clipBoardManager,
                     taskExecutor,
                     gitHandlerRegistry,
-                    journalAbbreviationRepository);
+                    journalAbbreviationRepository,
+                    oAuthSessionRegistry);
 
             openWindow();
 
@@ -153,13 +170,31 @@ public class JabRefGUI extends Application {
             setupProxy();
         } catch (Throwable throwable) {
             LOGGER.error("Error during initialization", throwable);
+            showCriticalErrorDialog(Localization.lang("Unhandled exception occurred."), throwable);
             throw throwable;
         }
+    }
 
-        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
-            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
-        }));
+    /// [impl->req~ux.startup.critical-error-dialog~1]
+    ///
+    /// Used both for startup failures (from [#start(Stage)]'s catch block) and for uncaught
+    /// exceptions on other threads ([FallbackExceptionHandler], installed before [#initialize()]
+    /// so it also covers background threads started during startup). In both cases, [DialogService]
+    /// or [Scene] may not exist yet: [DialogService] is only set up in [#initialize()], and `Scene`
+    /// is only set in [#openWindow()]. Calling [DialogService] or `Dialog.initOwner` before then
+    /// throws a NullPointerException, so this falls back to an ownerless [ExceptionDialog] instead.
+    private void showCriticalErrorDialog(String header, Throwable throwable) {
+        try {
+            if (mainStage != null && mainStage.getScene() != null) {
+                Injector.instantiateModelOrService(DialogService.class).showErrorDialogAndWait(header, throwable);
+                return;
+            }
+            ExceptionDialog exceptionDialog = new ExceptionDialog(throwable);
+            exceptionDialog.setHeaderText(header);
+            exceptionDialog.showAndWait();
+        } catch (Throwable dialogFailure) {
+            LOGGER.error("Could not show critical error dialog", dialogFailure);
+        }
     }
 
     public void initialize() {
@@ -172,11 +207,9 @@ public class JabRefGUI extends Application {
 
         journalAbbreviationRepository = JournalAbbreviationLoader.loadRepositoryInBackground(preferences.getAbbreviationPreferences(), taskExecutor);
 
-        WebViewStore.init();
-
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
-        HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+        HeadlessExecutorService.INSTANCE.executeInterruptibleTask(fileUpdateMonitor, "FileUpdateMonitor");
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
 
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
@@ -198,6 +231,9 @@ public class JabRefGUI extends Application {
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
+        JabRefGUI.oAuthSessionRegistry = new OAuthSessionRegistry();
+        Injector.setModelOrService(OAuthSessionRegistry.class, JabRefGUI.oAuthSessionRegistry);
+
         JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
         Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
 
@@ -208,10 +244,6 @@ public class JabRefGUI extends Application {
                 fileUpdateMonitor
         );
         Injector.setModelOrService(ThemeManager.class, themeManager);
-
-        JabRefGUI.countingUndoManager = new CountingUndoManager();
-        Injector.setModelOrService(UndoManager.class, countingUndoManager);
-        Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
@@ -250,6 +282,28 @@ public class JabRefGUI extends Application {
                 dialogService
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
+
+        loadBundledFonts();
+
+        JabRefGUI.bibTeXSyntaxHighlighter = new BibTeXSyntaxHighlighter();
+        Injector.setModelOrService(BibTeXSyntaxHighlighter.class, bibTeXSyntaxHighlighter);
+    }
+
+    /// Registers bundled fonts so they can be referenced by family name in CSS.
+    private void loadBundledFonts() {
+        try (InputStream stream = JabRefGUI.class.getClassLoader().getResourceAsStream(BIBTEX_EDITOR_FONT_RESOURCE)) {
+            if (stream == null) {
+                LOGGER.warn("Could not find bundled font {}", BIBTEX_EDITOR_FONT_RESOURCE);
+                return;
+            }
+
+            Font font = Font.loadFont(stream, -1);
+            if (font == null) {
+                LOGGER.warn("Could not load bundled font {}, falling back to the platform default", BIBTEX_EDITOR_FONT_RESOURCE);
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Could not load bundled font {}", BIBTEX_EDITOR_FONT_RESOURCE, e);
+        }
     }
 
     private void setupProxy() {
@@ -325,11 +379,15 @@ public class JabRefGUI extends Application {
         powerpane.setContent(JabRefGUI.mainFrame);
         powerpane.getInfoCenterPane().setInfoCenterViewPos(InfoCenterViewPos.BOTTOM_RIGHT);
         powerpane.getInfoCenterPane().autoHideProperty().bind(Bindings.isEmpty(dialogService.getPersistentNotifications()));
+        // PowerPane is a StackPane, so the walkthrough draws into a sibling of the info center pane
+        // rather than into a wrapper around the scene root.
+        powerpane.getChildren().add(new WalkthroughPane());
 
         Scene scene = new Scene(powerpane);
+        installControlsFxDecorationPane(powerpane);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCssOnScene(scene);
+        themeManager.updateCssOnScene(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -339,7 +397,7 @@ public class JabRefGUI extends Application {
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
-        mainStage.getIcons().addAll(IconTheme.getLogoSet());
+        IconTheme.applyLogo(mainStage);
         mainStage.setScene(scene);
         mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
@@ -353,6 +411,20 @@ public class JabRefGUI extends Application {
         Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
 
         // Lifecycle note: after this method, #onShowing will be called
+    }
+
+    // [impl->req~entry-editor.validation-decoration.startup~1]
+
+    /// Installs ControlsFX's decoration root before validation is first used.
+    ///
+    /// ControlsFX injects its internal `DecorationPane` as the scene root on the first
+    /// decoration. Doing that during startup avoids replacing the root while opening the entry
+    /// editor, which would otherwise trigger a large CSS reapplication on the critical path.
+    private static void installControlsFxDecorationPane(PowerPane powerpane) {
+        Region probeNode = new Region();
+        GraphicDecoration probeDecoration = new GraphicDecoration(probeNode);
+        Decorator.addDecoration(powerpane, probeDecoration);
+        Decorator.removeDecoration(powerpane, probeDecoration);
     }
 
     public void onShowing(WindowEvent event) {
@@ -465,7 +537,7 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.shouldEnableHttpServer()) {
-            httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
+            httpServerManager.start(preferences, stateManager, mainFrame, oAuthSessionRegistry, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.shouldEnableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
@@ -478,7 +550,7 @@ public class JabRefGUI extends Application {
             // stop in all cases, because the port might have changed
             httpServerManager.stop();
             if (newValue) {
-                httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
+                httpServerManager.start(preferences, stateManager, mainFrame, oAuthSessionRegistry, remotePreferences.getHttpServerUri());
             }
         });
     }
@@ -535,6 +607,17 @@ public class JabRefGUI extends Application {
                 LOGGER.trace("Stopping background tasks");
                 Unirest.shutDown();
                 LOGGER.trace("Unirest shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Closing Git SSH session factory");
+                try {
+                    GitSsh.shutdown();
+                } catch (RuntimeException e) {
+                    // Log only: the submitted task's future is never read (a rethrow would vanish) and the UI is already gone
+                    LOGGER.error("Unable to close Git SSH session factory", e);
+                }
+                LOGGER.trace("Git SSH session factory closed");
             });
 
             // region All threading related shutdowns

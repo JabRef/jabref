@@ -14,7 +14,7 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
     public final String citationKey;
 
     /// Result from database lookup. Optional.empty() if not found.
-    private Optional<CitationLookupResult> db;
+    private Optional<CitationLookupResult> citationLookupResult;
 
     /// The number used for numbered citation styles .
     private Optional<Integer> number;
@@ -30,7 +30,7 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
 
     public Citation(String citationKey) {
         this.citationKey = citationKey;
-        this.db = Optional.empty();
+        this.citationLookupResult = Optional.empty();
         this.number = Optional.empty();
         this.uniqueLetter = Optional.empty();
         this.pageInfo = Optional.empty();
@@ -54,7 +54,7 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
 
     @Override
     public Optional<BibEntry> getBibEntry() {
-        return db.map(citationLookupResult -> citationLookupResult.entry);
+        return citationLookupResult.map(citationLookupResult -> citationLookupResult.entry);
     }
 
     public static Optional<CitationLookupResult> lookup(BibDatabase database, String key) {
@@ -72,19 +72,19 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
     }
 
     public void lookupInDatabases(List<BibDatabase> databases) {
-        db = Citation.lookup(databases, citationKey);
+        citationLookupResult = Citation.lookup(databases, citationKey);
     }
 
     public Optional<CitationLookupResult> getLookupResult() {
-        return db;
+        return citationLookupResult;
     }
 
-    public void setLookupResult(Optional<CitationLookupResult> db) {
-        this.db = db;
+    public void setLookupResult(Optional<CitationLookupResult> citationLookupResult) {
+        this.citationLookupResult = citationLookupResult;
     }
 
     public boolean isUnresolved() {
-        return db.isEmpty();
+        return citationLookupResult.isEmpty();
     }
 
     @Override
@@ -94,10 +94,6 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
 
     public void setNumber(Optional<Integer> number) {
         this.number = number;
-    }
-
-    public int getNumberOrThrow() {
-        return number.get();
     }
 
     public Optional<String> getUniqueLetter() {
@@ -124,17 +120,17 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
      * Setters for CitationGroups.distribute()
      */
     public static void setLookupResult(OOPair<Citation, Optional<CitationLookupResult>> pair) {
-        Citation citation = pair.a;
-        citation.db = pair.b;
+        Citation citation = pair.a();
+        citation.citationLookupResult = pair.b();
     }
 
     public static void setNumber(OOPair<Citation, Optional<Integer>> pair) {
-        Citation citation = pair.a;
-        citation.number = pair.b;
+        Citation citation = pair.a();
+        citation.number = pair.b();
     }
 
     public static void setUniqueLetter(OOPair<Citation, Optional<String>> pair) {
-        Citation citation = pair.a;
-        citation.uniqueLetter = pair.b;
+        Citation citation = pair.a();
+        citation.uniqueLetter = pair.b();
     }
 }

@@ -3,6 +3,8 @@ package org.jabref.gui.slr;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +36,7 @@ import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyCatalog;
 import org.jabref.model.study.StudyQuery;
@@ -58,6 +61,8 @@ public class ManageStudyDefinitionViewModel {
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
     private final ObservableList<StudyQuery> queries = FXCollections.observableArrayList();
+    /// Catalogs with different overrides per query at load, mapped to the shown value
+    private final Map<String, String> mixedNativeQueries = new HashMap<>();
 
     // Observe changes to each item's enabledProperty so bindings re-evaluate when catalogs are toggled
     private final ObservableList<StudyCatalogItem> catalogs = FXCollections.observableArrayList(
@@ -132,7 +137,8 @@ public class ManageStudyDefinitionViewModel {
                                        StudyCatalog savedCatalog = catalogsByName.get(name);
                                        boolean enabled = savedCatalog != null && savedCatalog.isEnabled();
                                        String reason = savedCatalog != null ? savedCatalog.getReason() : "";
-                                       return new StudyCatalogItem(name, enabled, reason);
+                                       String nativeQuery = loadNativeQuery(name);
+                                       return new StudyCatalogItem(name, enabled, reason, nativeQuery);
                                    })
                                    .toList());
 
@@ -141,6 +147,22 @@ public class ManageStudyDefinitionViewModel {
         this.dialogService = dialogService;
 
         initializeValidationBindings();
+    }
+
+    /// Returns the native query to show for the catalog and records it if the queries differ.
+    private String loadNativeQuery(String catalogName) {
+        List<String> nativeQueries = queries.stream()
+                                            .map(query -> query.getCatalogOverride(catalogName).orElse(""))
+                                            .distinct()
+                                            .toList();
+        String nativeQuery = nativeQueries.stream()
+                                          .filter(StringUtil::isNotBlank)
+                                          .findFirst()
+                                          .orElse("");
+        if (nativeQueries.size() > 1) {
+            mixedNativeQueries.put(catalogName, nativeQuery);
+        }
+        return nativeQuery;
     }
 
     private void initializeValidationBindings() {
@@ -233,7 +255,7 @@ public class ManageStudyDefinitionViewModel {
         final String studyDirectoryAsString = directory.getValueSafe();
         try {
             studyDirectory = Path.of(studyDirectoryAsString);
-        } catch (InvalidPathException e) {
+        } catch (InvalidPathException _) {
             LOGGER.error("Invalid path was provided: {}", studyDirectoryAsString);
             dialogService.notify(Localization.lang("Unable to write to %0.", studyDirectoryAsString));
             // We do not assume another path - we return that there is an invalid object.
@@ -262,17 +284,38 @@ public class ManageStudyDefinitionViewModel {
         return new SlrStudyAndDirectory(study, studyDirectory);
     }
 
-    /// Builds a {@link Study} from the current UI state without persisting it.
+    /// Builds a [Study] from the current UI state without persisting it.
     public Study buildStudy() {
         return new Study(
                 authors,
                 title.getValueSafe(),
                 researchQuestions,
-                queries.stream().toList(),
+                buildQueries(),
                 catalogs.stream()
                         .filter(StudyCatalogItem::isEnabled)
                         .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason()))
                         .toList());
+    }
+
+    /// Returns copies of the queries with the edited native queries applied
+    private List<StudyQuery> buildQueries() {
+        // Keep differing per-query overrides unless the user edited the cell
+        List<StudyCatalogItem> catalogsToApply = catalogs.stream()
+                                                         .filter(StudyCatalogItem::isEnabled)
+                                                         .filter(catalog -> !catalog.getNativeQuery().equals(mixedNativeQueries.get(catalog.getName())))
+                                                         .toList();
+        return queries.stream().map(query -> {
+            Map<String, String> catalogSpecific = new LinkedHashMap<>(query.getCatalogSpecific());
+            for (StudyCatalogItem catalog : catalogsToApply) {
+                catalogSpecific.keySet().removeIf(key -> key.equalsIgnoreCase(catalog.getName()));
+                if (StringUtil.isNotBlank(catalog.getNativeQuery())) {
+                    catalogSpecific.put(catalog.getName(), catalog.getNativeQuery());
+                }
+            }
+            StudyQuery copy = new StudyQuery(query.getQuery());
+            copy.setCatalogSpecific(catalogSpecific);
+            return copy;
+        }).toList();
     }
 
     public Property<String> titleProperty() {

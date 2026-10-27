@@ -6,13 +6,14 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import org.jabref.gui.fieldeditors.EditorTextField;
+import org.jabref.gui.testutils.JavaFxTest;
 
 import org.junit.jupiter.api.Test;
-import org.testfx.api.FxAssert;
-import org.testfx.framework.junit5.ApplicationTest;
-import org.testfx.matcher.base.NodeMatchers;
 
-class IdentifierEditorTest extends ApplicationTest {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class IdentifierEditorTest extends JavaFxTest {
 
     private Button fetchButton;
     private EditorTextField textField;
@@ -36,12 +37,12 @@ class IdentifierEditorTest extends ApplicationTest {
     @Test
     void fetchButtonTogglesVisibilityBasedOnText() {
         interact(() -> textField.setText(""));
-        FxAssert.verifyThat("#fetchInformationByIdentifierButton", NodeMatchers.isInvisible());
+        assertFalse(fetchButton.isVisible());
 
-        clickOn(textField).write("10.1001/jama.2017.18444");
-        FxAssert.verifyThat("#fetchInformationByIdentifierButton", NodeMatchers.isVisible());
+        interact(() -> textField.setText("10.1001/jama.2017.18444"));
+        assertTrue(fetchButton.isVisible());
 
         interact(() -> textField.setText(""));
-        FxAssert.verifyThat("#fetchInformationByIdentifierButton", NodeMatchers.isInvisible());
+        assertFalse(fetchButton.isVisible());
     }
 }

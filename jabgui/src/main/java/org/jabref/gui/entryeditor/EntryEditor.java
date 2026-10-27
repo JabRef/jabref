@@ -33,10 +33,9 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewControls;
 import org.jabref.gui.preview.PreviewPanel;
-import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.logic.ai.AiService;
@@ -54,6 +53,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -61,12 +61,12 @@ import org.jspecify.annotations.Nullable;
 /// GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on
 /// an entry in the table)
 ///
-/// It hosts the tabs (required, general, optional) and the buttons to the left.
+/// It hosts the tabs (Main, LaTeX citations, Source, …) and the buttons to the left.
 ///
 /// EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling
 /// the text fields to update themselves if the change is made from somewhere else.
 ///
-/// The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
+/// The editors for fields are created via [org.jabref.gui.fieldeditors.FieldEditors].
 public class EntryEditor extends BorderPane implements PreviewControls {
     private final Supplier<LibraryTab> tabSupplier;
     private final ExternalFilesEntryLinker fileLinker;
@@ -74,6 +74,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
     private final EntryEditorViewModel viewModel;
     private final EntryEditorFocusUtils focusUtils;
+
+    private @Nullable JumpToFieldDialog jumpToFieldDialog;
 
     @FXML private TabPane tabbed;
 
@@ -86,15 +88,14 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private TaskExecutor taskExecutor;
     @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
-    @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
     @Inject private DirectoryMonitor directoryMonitor;
-    @Inject private CountingUndoManager undoManager;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
     @Inject private AiService aiService;
     @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
+    @Inject private BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     public EntryEditor(Supplier<LibraryTab> tabSupplier, UndoAction undoAction, RedoAction redoAction) {
         this.tabSupplier = tabSupplier;
@@ -113,7 +114,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 dialogService,
                 preferences.getKeyBindingRepository(),
                 preferences,
-                themeManager,
                 taskExecutor,
                 stateManager);
 
@@ -126,21 +126,20 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 taskExecutor,
                 preferences,
                 stateManager,
-                themeManager,
                 fileMonitor,
                 directoryMonitor,
-                undoManager,
                 bibEntryTypesManager,
                 journalAbbreviationRepository,
                 keyBindingRepository,
-                searchCitationsRelationsService);
+                searchCitationsRelationsService,
+                bibTeXSyntaxHighlighter
+        );
 
         this.viewModel = new EntryEditorViewModel(
                 stateManager,
                 preferences,
                 taskExecutor,
                 dialogService,
-                undoManager,
                 journalAbbreviationRepository,
                 tabSupplier,
                 tabFactory);
@@ -148,7 +147,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         typeLabel.textProperty().bind(viewModel.typeLabelTextProperty());
         Bindings.bindContent(tabbed.getTabs(), viewModel.visibleTabs());
 
-        this.focusUtils = new EntryEditorFocusUtils(tabbed, this);
+        this.focusUtils = new EntryEditorFocusUtils(tabbed, this, dialogService);
 
         setupKeyBindings();
         setupDragAndDrop();
@@ -251,14 +250,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                         tabSupplier.get().selectPreviousEntry();
                         event.consume();
                     }
-                    case JUMP_TO_FIELD -> {
-                        if (getCurrentlyEditedEntry() != null) {
-                            JumpToFieldDialog dialog = new JumpToFieldDialog(this);
-                            dialog.initModality(Modality.NONE);
-                            dialog.show();
-                        }
-                        event.consume();
-                    }
                     case HELP -> {
                         new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute();
                         event.consume();
@@ -295,6 +286,27 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     }
 
     @FXML
+    private void jumpToFieldButton() {
+        openJumpToFieldDialog();
+    }
+
+    /// Shows the jump-to-field dialog for the currently edited entry.
+    /// Handled globally in [org.jabref.gui.frame.JabRefFrame] so that it works regardless of where the keyboard focus lies.
+    public void openJumpToFieldDialog() {
+        if (jumpToFieldDialog != null && jumpToFieldDialog.isShowing()) {
+            BaseDialog.bringToFront(jumpToFieldDialog);
+            return;
+        }
+
+        Optional.ofNullable(getCurrentlyEditedEntry()).ifPresent(_ -> {
+            jumpToFieldDialog = new JumpToFieldDialog(this);
+            jumpToFieldDialog.initModality(Modality.NONE);
+            jumpToFieldDialog.setOnHidden(_ -> jumpToFieldDialog = null);
+            jumpToFieldDialog.show();
+        });
+    }
+
+    @FXML
     private void generateCleanupButton() {
         viewModel.cleanup();
     }
@@ -311,10 +323,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
     public @Nullable BibEntry getCurrentlyEditedEntry() {
         return viewModel.getCurrentlyEditedEntry();
-    }
-
-    public List<EntryEditorTab> getAllPossibleTabs() {
-        return viewModel.getAllPossibleTabs();
     }
 
     private void onEntryChanged(@NonNull BibEntry entry) {
@@ -363,7 +371,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         ContextMenu typeMenu = new ChangeEntryTypeMenu(
                 entry == null ? List.of() : List.of(entry),
                 tabSupplier.get().getBibDatabaseContext(),
-                undoManager,
+                tabSupplier.get().getUndoManager(),
                 bibEntryTypesManager
         ).asContextMenu();
 
@@ -381,7 +389,10 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     }
 
     public void selectField(String fieldName) {
-        focusUtils.setFocusToField(FieldFactory.parseField(fieldName));
+        Optional.ofNullable(viewModel.getCurrentlyEditedEntry())
+                .ifPresent(entry -> {
+                    focusUtils.focusOrAddField(FieldFactory.parseField(entry.getType(), fieldName));
+                });
     }
 
     public void setFocusToField(Field field) {

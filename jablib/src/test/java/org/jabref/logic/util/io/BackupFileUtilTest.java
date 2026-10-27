@@ -3,6 +3,7 @@ package org.jabref.logic.util.io;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.Directories;
@@ -52,8 +53,20 @@ class BackupFileUtilTest {
                     testPath,
                     BackupFileType.BACKUP,
                     backupDir);
-            // The intended fallback behavior is to put the .bak file in the same directory as the .bib file
-            assertEquals(Path.of("tmp", "test.bib.bak"), result);
+            // The intended fallback behavior is to put the backup file next to the library, using the same name pattern
+            assertEquals(Path.of("tmp").toAbsolutePath(), result.getParent());
+            String fileNameWithoutTimestamp = result.getFileName().toString().replaceAll("\\d{4}-\\d{2}-\\d{2}--\\d{2}\\.\\d{2}\\.\\d{2}", "<timestamp>");
+            assertEquals(BackupFileUtil.getUniqueFilePrefix(testPath) + "--test.bib--<timestamp>.bib", fileNameWithoutTimestamp);
         }
+    }
+
+    @Test
+    void latestBackupNextToLibraryIsFoundWhenBackupDirectoryIsAbsent(@TempDir Path tempDir) throws IOException {
+        Path library = tempDir.resolve("test.bib");
+        String prefix = BackupFileUtil.getUniqueFilePrefix(library) + "--test.bib--";
+        Files.writeString(tempDir.resolve(prefix + "2024-01-01--00.00.00.bib"), "");
+        Path latestBackup = Files.writeString(tempDir.resolve(prefix + "2025-01-01--00.00.00.bib"), "");
+
+        assertEquals(Optional.of(latestBackup), BackupFileUtil.getPathOfLatestExistingBackupFile(library, tempDir.resolve("missing")));
     }
 }

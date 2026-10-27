@@ -26,10 +26,16 @@ public class AiChatTab extends EntryEditorTab {
         setContent(aiEntryChatView);
     }
 
-    /// @implNote Method similar to {@link AiSummaryTab#bindToEntry(BibEntry)}
+    /// @implNote Method similar to [AiSummaryTab#bindToEntry(BibEntry)]
     @Override
     protected void bindToEntry(BibEntry entry) {
         BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
         aiEntryChatView.selectedEntryProperty().set(new FullBibEntry(bibDatabaseContext, entry));
+    }
+
+    @Override
+    protected void dispose() {
+        aiEntryChatView.dispose();
+        super.dispose();
     }
 }

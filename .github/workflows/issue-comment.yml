@@ -17,7 +17,7 @@ on:
 
 jobs:
   comment:
-    if: ${{ github.repository == 'JabRef/jabref' }}
+    if: ${{ github.repository == 'JabRef/jabref' && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request')) }}
     runs-on: ubuntu-slim
     permissions:
       actions: read
@@ -41,7 +41,7 @@ jobs:
 
       - name: Download PR number
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         continue-on-error: true
         with:
           name: pr_number
@@ -62,7 +62,7 @@ jobs:
         id: pr_data
         env:
           PR_NUMBER: ${{ steps.read-pr_number.outputs.pr_number }}
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           script: |
             const {owner, repo} = context.repo;
@@ -82,10 +82,11 @@ jobs:
           echo "PR Number: $PR_NUMBER"
           echo "PR URL: $PR_URL"
           echo "PR [#$PR_NUMBER]($PR_URL)" >> $GITHUB_STEP_SUMMARY
-          cat <<EOF
-          PR Body:
-          $PR_BODY
-          EOF
+          # Not a heredoc: PR bodies are attacker-controlled, and an unquoted
+          # heredoc expands backticks and $(...) in them - code execution in a
+          # workflow that holds "issues: write".
+          echo "PR Body:"
+          printf '%s\n' "$PR_BODY"
           ticketNumber=$(printf '%s\n' "$PR_BODY" \
             | grep -Eio '(fixes|closes|resolves)\s+(https://github.com/JabRef/jabref/issues/)?#?[0-9]+' \
             | grep -Eo '[0-9]+' \
@@ -97,7 +98,7 @@ jobs:
 
       - name: Comment on issue (no build available)
         if: ${{ (steps.read-pr_number.outputs.pr_number != '') && (steps.get_issue_number.outputs.ticketNumber != '') }}
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@e4a76dd2b0a3c2027c3fd84147a67c22ee4c90fa # v3
         with:
           pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           message: >

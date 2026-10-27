@@ -32,7 +32,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,18 +44,27 @@ public class ClipBoardManager {
 
     private static Clipboard clipboard;
 
-    private static java.awt.datatransfer.Clipboard primary;
+    private static java.awt.datatransfer.@Nullable Clipboard primary;
 
     private final StateManager stateManager;
 
     public ClipBoardManager(StateManager stateManager) {
-        this(stateManager, Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection());
+        this(stateManager, Clipboard.getSystemClipboard(), getPrimarySelection());
     }
 
-    public ClipBoardManager(StateManager stateManager, Clipboard clipboard, java.awt.datatransfer.Clipboard primary) {
+    public ClipBoardManager(StateManager stateManager, Clipboard clipboard, java.awt.datatransfer.@Nullable Clipboard primary) {
         ClipBoardManager.clipboard = clipboard;
         ClipBoardManager.primary = primary;
         this.stateManager = stateManager;
+    }
+
+    private static java.awt.datatransfer.@Nullable Clipboard getPrimarySelection() {
+        if (!OS.LINUX) {
+            // The primary selection exists only on X11. AWT reports no system selection on the other platforms,
+            // so they do not need to initialize the AWT toolkit at startup for it.
+            return null;
+        }
+        return Toolkit.getDefaultToolkit().getSystemSelection();
     }
 
     /// Add X11 clipboard support to a text input control. It is necessary to call this method in every input where you
@@ -70,7 +78,7 @@ public class ClipBoardManager {
     public static void addX11Support(TextInputControl input) {
         input.selectedTextProperty().addListener(
                 // using InvalidationListener because of https://bugs.openjdk.java.net/browse/JDK-8176270
-                observable -> Platform.runLater(() -> {
+                _ -> Platform.runLater(() -> {
                     String newValue = input.getSelectedText();
                     if (!newValue.isEmpty() && (primary != null)) {
                         primary.setContents(new StringSelection(newValue), null);
@@ -86,29 +94,20 @@ public class ClipBoardManager {
     /// Get the String residing on the system clipboard.
     ///
     /// @return any text found on the Clipboard; if none found, return an empty String.
-    public static @NonNull String getContents() {
-        String result = clipboard.getString();
-        if (result == null) {
-            return "";
-        }
-        return result;
+    public static String getContents() {
+        return Optional.ofNullable(clipboard.getString()).orElse("");
     }
 
-    public @Nullable TransferInformation getJabRefClipboardTransferData() {
+    public Optional<TransferInformation> getJabRefClipboardTransferData() {
         return Optional.ofNullable(clipboard.getContent(DATAFORMAT_JABREF_DATA))
                        .filter(String.class::isInstance)
                        .map(String.class::cast)
                        .map(JabRefClipboardData::fromJson)
-                       .flatMap(data -> data.toTransferInformation(stateManager))
-                       .orElse(null);
+                       .flatMap(data -> data.toTransferInformation(stateManager));
     }
 
-    public static @NonNull String getHtmlContents() {
-        String result = clipboard.getHtml();
-        if (result == null) {
-            return "";
-        }
-        return result;
+    public static String getHtmlContents() {
+        return Optional.ofNullable(clipboard.getHtml()).orElse("");
     }
 
     public static boolean hasHtml() {
@@ -118,7 +117,7 @@ public class ClipBoardManager {
     /// Get the String residing on the primary clipboard (if it exists).
     ///
     /// @return any text found on the primary Clipboard; if none found, try with the system clipboard.
-    public static @NonNull String getContentsPrimary() {
+    public static String getContentsPrimary() {
         if (primary != null) {
             Transferable contents = primary.getContents(null);
             if ((contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
@@ -175,7 +174,7 @@ public class ClipBoardManager {
         StringBuilder builder = new StringBuilder();
         if (!stringConstants.isEmpty()) {
             stringConstants.forEach(strConst -> {
-                builder.append(strConst.getParsedSerialization() == null ? "" : strConst.getParsedSerialization());
+                builder.append(strConst.getParsedSerialization());
                 builder.append(OS.NEWLINE);
             });
             builder.append(OS.NEWLINE);

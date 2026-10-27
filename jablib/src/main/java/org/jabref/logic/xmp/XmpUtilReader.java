@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 /// Readings on XMP are available at docs/code-howtos/xmp-parsing.md
 ///
-/// See also {@link org.jabref.logic.xmp.XmpUtilWriter#writeDocumentInformation}
+/// See also [org.jabref.logic.xmp.XmpUtilWriter#writeDocumentInformation]
 public class XmpUtilReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilReader.class);

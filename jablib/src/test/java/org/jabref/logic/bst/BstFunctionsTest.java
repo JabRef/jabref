@@ -22,11 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// For additional tests see for
 ///
-/// -  purify: {@link org.jabref.logic.bst.util.BstPurifierTest}
-/// -  width: {@link org.jabref.logic.bst.util.BstWidthCalculatorTest}
-/// -  format.name: {@link org.jabref.logic.bst.util.BstNameFormatterTest}
-/// -  change.case: {@link org.jabref.logic.bst.util.BstCaseChangersTest}
-/// -  prefix: {@link org.jabref.logic.bst.util.BstTextPrefixerTest}
+/// -  purify: [org.jabref.logic.bst.util.BstPurifierTest]
+/// -  width: [org.jabref.logic.bst.util.BstWidthCalculatorTest]
+/// -  format.name: [org.jabref.logic.bst.util.BstNameFormatterTest]
+/// -  change.case: [org.jabref.logic.bst.util.BstCaseChangersTest]
+/// -  prefix: [org.jabref.logic.bst.util.BstTextPrefixerTest]
 ///
 class BstFunctionsTest {
     @Test
@@ -146,6 +146,27 @@ class BstFunctionsTest {
         assertEquals(BstVM.TRUE, vm.getContext().stack().pop());          // missing title
         assertEquals("canh05", vm.getContext().stack().pop());    // cite
         assertEquals(BstVM.FALSE, vm.getContext().stack().pop());         // missing title
+        assertEquals(0, vm.getContext().stack().size());
+    }
+
+    @Test
+    void missingCrossrefWithoutEntryDeclaration() throws RecognitionException {
+        BstVM vm = new BstVM("""
+                ENTRY { title } { } { }
+                READ
+                FUNCTION { test } { crossref missing$ }
+                ITERATE { test }
+                """);
+        List<BibEntry> testEntries = List.of(
+                new BibEntry(StandardEntryType.InProceedings)
+                        .withCitationKey("child")
+                        .withField(StandardField.CROSSREF, "parent"),
+                BstVMTest.defaultTestEntry());
+
+        vm.render(testEntries);
+
+        assertEquals(BstVM.TRUE, vm.getContext().stack().pop());
+        assertEquals(BstVM.FALSE, vm.getContext().stack().pop());
         assertEquals(0, vm.getContext().stack().size());
     }
 
@@ -593,7 +614,7 @@ class BstFunctionsTest {
         assertEquals(0, vm.getContext().stack().size());
     }
 
-    /// See also {@link org.jabref.logic.bst.util.BstWidthCalculatorTest}
+    /// See also [org.jabref.logic.bst.util.BstWidthCalculatorTest]
     @Test
     void width() throws RecognitionException {
         BstVM vm = new BstVM("""

@@ -89,10 +89,12 @@ public class AutoSetFileLinksUtil {
     }
 
     /// Source of associated not linked files:
+    ///
     ///   - Part A. match file name with CitationKey, (START, EXACT, REGEX) configured by user
     ///   - Part B. match file name with broken linked file names, currently silently happen
     ///
     /// The auto-link process:
+    ///
     ///   - Prolog: we only consider the file with a unique name
     ///       - if a file's name is found multiple times in Part A, we do not consider it in Step 1
     ///       - if a file's name is found multiple times in Part B, we do not consider it in Step 2
@@ -158,7 +160,7 @@ public class AutoSetFileLinksUtil {
             if (isBrokenLinkedFile(linkedFile)
                     && files.containsKey(fileName)
                     && extension.isPresent()
-                    && extension.get().equalsIgnoreCase(files.get(fileName).getFileType())
+                    && extension.get().equalsIgnoreCase(FileUtil.getFileExtension(files.get(fileName).getLink()).orElse(""))
             ) {
                 linkedFile.setLink(files.get(fileName).getLink());
                 updated.add(linkedFile);
@@ -203,9 +205,10 @@ public class AutoSetFileLinksUtil {
 
     /// Scans for missing files which should be linked to the given entry.
     ///
-    /// Related: {@link org.jabref.gui.externalfiles.UnlinkedFilesCrawler} for scanning files missing at all entries
+    /// Related: [org.jabref.gui.externalfiles.UnlinkedFilesCrawler] for scanning files missing at all entries
     ///
     /// NOTE:
+    ///
     /// 1. This method does not check if the file is already linked to another entry.
     /// 2. This method does not guarantee how the returned files are ordered. Order by how they appear in BibEntry does
     ///    not work since findAssociatedFilesByBrokenLinkedFile may return multiple files (with the same name) for one
@@ -251,19 +254,24 @@ public class AutoSetFileLinksUtil {
         return new LinkedFile("", relativeFilePath, strType);
     }
 
+    /// Falls back to the default file types if the user has not configured any, see #15084
+    private Collection<ExternalFileType> getFileTypes() {
+        Collection<ExternalFileType> fileTypes = externalApplicationsPreferences.getExternalFileTypes();
+        if (fileTypes.isEmpty()) {
+            return ExternalFileTypes.getDefaultExternalFileTypes();
+        }
+        return fileTypes;
+    }
+
     private List<String> getConfiguredExtensions() {
-        return externalApplicationsPreferences
-                .getExternalFileTypes()
-                .stream().map(ExternalFileType::getExtension).toList();
+        return getFileTypes().stream().map(ExternalFileType::getExtension).toList();
     }
 
     private String checkAndGetFileType(Path associatedFile) {
         return FileUtil.getFileExtension(associatedFile)
-                       .flatMap(extension ->
-                               ExternalFileTypes.getExternalFileTypeByExt(
-                                       extension,
-                                       externalApplicationsPreferences
-                               ))
+                       .flatMap(extension -> getFileTypes().stream()
+                                                           .filter(type -> type.getExtension().equalsIgnoreCase(extension))
+                                                           .findFirst())
                        .map(ExternalFileType::getName).orElse("");
     }
 

@@ -58,6 +58,7 @@ public class Pseudonymization {
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);
         result.setMode(bibDatabaseContext.getMode());
+        bibDatabaseContext.getMetaData().getKeywordSeparator().ifPresent(result.getMetaData()::setKeywordSeparator);
 
         pseudonymizedGroups.ifPresent(newGroups -> result.getMetaData().setGroups(newGroups));
 
@@ -84,18 +85,18 @@ public class Pseudonymization {
                     continue;
                 }
 
-                Map<String, Integer> valueToIdMap = fieldToValueToIdMap.computeIfAbsent(field, k -> new HashMap<>());
+                Map<String, Integer> valueToIdMap = fieldToValueToIdMap.computeIfAbsent(field, _ -> new HashMap<>());
                 // TODO: Use {@link org.jabref.model.entry.field.FieldProperty} to distinguish cases.
                 //       See {@link org.jabref.model.entry.field.StandardField} for usages.
                 String fieldContent = entry.getField(field).get();
-                Integer id = valueToIdMap.computeIfAbsent(fieldContent, k -> valueToIdMap.size() + 1);
+                Integer id = valueToIdMap.computeIfAbsent(fieldContent, _ -> valueToIdMap.size() + 1);
                 newEntry.setField(field, field.getName() + "-" + id);
             }
         }
         return newEntries;
     }
 
-    /// Pseudonymizes the {@link StandardField#GROUPS} field content.
+    /// Pseudonymizes the [StandardField#GROUPS] field content.
     /// Groups not present in the group tree are also pseudonymized.
     private String pseudonymizeGroupsField(String fieldContent,
                                            Map<String, String> groupNameMapping,

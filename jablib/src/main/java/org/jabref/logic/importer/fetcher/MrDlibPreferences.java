@@ -30,13 +30,6 @@ public class MrDlibPreferences {
         return new MrDlibPreferences();
     }
 
-    public void setAll(MrDlibPreferences preferences) {
-        this.acceptRecommendations.set(preferences.shouldAcceptRecommendations());
-        this.sendLanguage.set(preferences.shouldSendLanguage());
-        this.sendOs.set(preferences.shouldSendOs());
-        this.sendTimezone.set(preferences.shouldSendTimezone());
-    }
-
     public boolean shouldAcceptRecommendations() {
         return acceptRecommendations.get();
     }

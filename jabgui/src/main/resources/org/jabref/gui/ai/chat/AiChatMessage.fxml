@@ -39,7 +39,7 @@
 
     <VBox fx:id="buttons"
           alignment="TOP_CENTER"
-          spacing="5">
+          spacing="4">
         <Button fx:id="deleteButton"
                 onAction="#onDeleteClick"
                 styleClass="icon-button,narrow">

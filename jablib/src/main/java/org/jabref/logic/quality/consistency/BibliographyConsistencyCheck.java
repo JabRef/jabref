@@ -65,6 +65,14 @@ public class BibliographyConsistencyCheck {
                      .collect(Collectors.toSet());
     }
 
+    /// Returns whether none of the given (alternative) required fields is set in the entry.
+    ///
+    /// Aliases are taken into account. For instance, `year` satisfies a required `date`.
+    static boolean isMissing(OrFields requiredFields, BibEntry entry) {
+        return requiredFields.getFields().stream()
+                             .allMatch(field -> entry.getFieldOrAlias(field).isEmpty());
+    }
+
     /// Filters the given entries to those that violate consistency:
     ///
     /// - Fields not set (but set in other entries of the same type)
@@ -78,7 +86,7 @@ public class BibliographyConsistencyCheck {
                           // This removes entries that have all differing fields set (could be confusing to the user)
                           boolean hasDifferingFields = !Collections.disjoint(filterExcludedFields(entry.getFields()), differingFields);
                           boolean hasMissingRequiredFields = requiredFields.stream()
-                                                                           .anyMatch(orFields -> Collections.disjoint(orFields.getFields(), entry.getFields()));
+                                                                           .anyMatch(orFields -> isMissing(orFields, entry));
                           return hasDifferingFields || hasMissingRequiredFields;
                       })
                       .sorted(new FieldComparatorStack<>(List.of(
@@ -101,9 +109,9 @@ public class BibliographyConsistencyCheck {
     ///
     /// This class **does** check if required fields are set for an entry type but **does not** check if the fields are valid for the entry type.
     ///
-    /// That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of {@link BibliographyConsistencyCheckResultCsvWriter#writeFindings}
+    /// That result can a) be retrieved by using the JabRef UI and b) by checking the CSV output of [BibliographyConsistencyCheckResultCsvWriter#writeFindings]
     ///
-    /// @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
+    /// @implNote This class does not implement [org.jabref.logic.integrity.DatabaseChecker], because it returns a list of [org.jabref.logic.integrity.IntegrityMessage], which are too fine-grained.
     public Result check(BibDatabaseContext bibContext, BibEntryTypesManager bibEntryTypesManager, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
         Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();

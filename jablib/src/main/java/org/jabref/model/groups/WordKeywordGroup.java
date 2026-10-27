@@ -122,6 +122,11 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
                 caseSensitive, keywordSeparator, onlySplitWordsAtSeparator);
     }
 
+    public WordKeywordGroup withKeywordSeparator(Character newKeywordSeparator) {
+        return new WordKeywordGroup(getName(), getHierarchicalContext(), searchField, searchExpression,
+                caseSensitive, newKeywordSeparator, onlySplitWordsAtSeparator);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(getName(),

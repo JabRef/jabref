@@ -3,8 +3,6 @@ package org.jabref.gui.frame;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -14,6 +12,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.gui.undo.GuiUndoManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.TaskExecutor;
@@ -25,7 +25,6 @@ import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
-import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -33,7 +32,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class JabRefFrameViewModelTest extends ApplicationTest {
+class JabRefFrameViewModelTest extends JavaFxTest {
 
     private JabRefFrameViewModel viewModel;
     private LibraryTabContainer tabContainer;
@@ -53,7 +52,7 @@ class JabRefFrameViewModelTest extends ApplicationTest {
         Supplier<OpenDatabaseAction> openDatabaseAction = mock(Supplier.class);
         BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
         FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
-        UndoManager undoManager = mock(UndoManager.class);
+        GuiUndoManager undoManager = mock(GuiUndoManager.class);
         ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
         taskExecutor = mock(TaskExecutor.class);
 
@@ -65,9 +64,9 @@ class JabRefFrameViewModelTest extends ApplicationTest {
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
-        Injector.setModelOrService(UndoManager.class, undoManager);
 
         when(stateManager.getOpenDatabases()).thenReturn(FXCollections.observableArrayList());
+        when(stateManager.getUndoManager(any())).thenReturn(undoManager);
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
 
         viewModel = new JabRefFrameViewModel(
@@ -79,7 +78,6 @@ class JabRefFrameViewModelTest extends ApplicationTest {
                 openDatabaseAction,
                 entryTypesManager,
                 fileUpdateMonitor,
-                undoManager,
                 clipBoardManager,
                 taskExecutor
         );

@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -15,7 +16,7 @@
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="680.0"
             prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171"
             fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView"
-            id="styleSelectDialog">
+            id="style-select-dialog">
     <content>
         <VBox spacing="10.0">
             <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
@@ -25,7 +26,7 @@
                             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                         </padding>
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <Label text="%Available" styleClass="sectionHeader"/>
+                            <Label text="%Available" styleClass="h4,padding-top-12"/>
                             <HBox HBox.hgrow="ALWAYS" />
                             <Button fx:id="addCslButton" text="%Add .csl file" onAction="#addCslStyleFile"/>
                         </HBox>
@@ -41,7 +42,7 @@
                             </columnResizePolicy>
                         </TableView>
                         <VBox spacing="4.0">
-                            <Label text="%Preview" styleClass="sectionHeader"/>
+                            <Label text="%Preview" styleClass="h4,padding-top-12"/>
                             <VBox fx:id="cslPreviewBox" prefHeight="200.0" spacing="4.0"/>
                         </VBox>
                     </VBox>
@@ -52,7 +53,7 @@
                             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                         </padding>
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <Label text="%Available" styleClass="sectionHeader"/>
+                            <Label text="%Available" styleClass="h4,padding-top-12"/>
                             <HBox HBox.hgrow="ALWAYS" />
                             <Button fx:id="addJStyleButton" text="%Add .jstyle file" onAction="#addJStyleFile"/>
                         </HBox>
@@ -68,8 +69,42 @@
                             </columnResizePolicy>
                         </TableView>
                         <VBox spacing="4.0">
-                            <Label text="%Preview" styleClass="sectionHeader"/>
+                            <Label text="%Preview" styleClass="h4,padding-top-12"/>
                             <VBox fx:id="jStylePreviewBox" prefHeight="200.0" prefWidth="665.0"/>
+                        </VBox>
+                    </VBox>
+                </Tab>
+                <Tab fx:id="bstStyleTab" text="BST Styles">
+                    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                        <padding>
+                            <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                        </padding>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="%Available" styleClass="h4,padding-top-12"/>
+                            <HBox HBox.hgrow="ALWAYS" />
+                            <Button fx:id="addBstStyleButton" text="%Add .bst file" onAction="#addBstStyleFile"/>
+                        </HBox>
+                        <Label fx:id="bstPandocWarning"
+                                wrapText="true" />
+                        <TableView fx:id="bstStylesTable" VBox.vgrow="ALWAYS" prefHeight="300.0">
+                            <columns>
+                                <TableColumn fx:id="bstNameColumn" text="%Name" minWidth="200.0" prefWidth="-1.0"/>
+                                <TableColumn fx:id="bstFileColumn" text="%File" minWidth="100.0" prefWidth="-1.0"/>
+                                <TableColumn fx:id="bstDeleteColumn" minWidth="30.0" maxWidth="30.0" resizable="false"/>
+                            </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
+                        </TableView>
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <Label text="%Citation format"/>
+                            <RadioButton fx:id="numericFormatButton" text="%Numeric [1]"/>
+                            <RadioButton fx:id="authorYearFormatButton" text="%Author-year"/>
+                            <RadioButton fx:id="styleDefinedFormatButton" text="%Style-defined"/>
+                        </HBox>
+                        <VBox spacing="4.0">
+                            <Label text="%Preview" styleClass="h4,padding-top-12"/>
+                            <VBox fx:id="bstPreviewBox" prefHeight="150.0" spacing="4.0"/>
                         </VBox>
                     </VBox>
                 </Tab>
@@ -78,8 +113,8 @@
                 <padding>
                     <Insets left="10.0" right="10.0" bottom="10.0"/>
                 </padding>
-                <Label text="%Currently set style:" styleClass="currentStyleLabel"/>
-                <Label fx:id="currentStyleNameLabel" styleClass="currentStyleNameLabel"/>
+                <Label text="%Currently set style:"/>
+                <Label fx:id="currentStyleNameLabel" styleClass="bold,text-accent"/>
             </HBox>
         </VBox>
     </content>

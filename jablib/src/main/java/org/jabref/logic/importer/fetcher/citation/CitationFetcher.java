@@ -9,7 +9,7 @@ import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Searches web resources for citing related articles based on a {@link BibEntry}.
+/// Searches web resources for citing related articles based on a [BibEntry].
 @NullMarked
 public interface CitationFetcher extends CitationCountFetcher {
 
@@ -31,16 +31,16 @@ public interface CitationFetcher extends CitationCountFetcher {
     /// @return the localized name
     String getName();
 
-    /// Looks for hits which are cited by the given {@link BibEntry}. This typically is the "References" (or "Bibliography" or "Literature") section of a paper.
+    /// Looks for hits which are cited by the given [BibEntry]. This typically is the "References" (or "Bibliography" or "Literature") section of a paper.
     ///
     /// @param entry entry to search articles for
-    /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+    /// @return a list of [BibEntry], which are matched by the query (may be empty)
     List<BibEntry> getReferences(BibEntry entry) throws FetcherException;
 
-    /// Looks for hits which are citing the given {@link BibEntry}.
+    /// Looks for hits which are citing the given [BibEntry].
     ///
     /// @param entry entry to search articles for
-    /// @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+    /// @return a list of [BibEntry], which are matched by the query (may be empty)
     List<BibEntry> getCitations(BibEntry entry) throws FetcherException;
 
     /// Returns the API URL for fetching references

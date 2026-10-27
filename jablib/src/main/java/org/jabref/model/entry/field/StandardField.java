@@ -137,7 +137,7 @@ public enum StandardField implements Field {
     YEAR("year", FieldProperty.NUMERIC, FieldProperty.YEAR),
     YEARDIVISION("yeardivision"),
     YEARFILED("yearfiled", FieldProperty.NUMERIC, FieldProperty.YEAR),
-    MR_NUMBER("mrnumber"),
+    MR_NUMBER("mrnumber", FieldProperty.IDENTIFIER),
     ZBL_NUMBER("zbl"), // needed for fetcher
     XDATA("xdata", FieldProperty.MULTIPLE_ENTRY_LINK),
     XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
@@ -149,7 +149,7 @@ public enum StandardField implements Field {
     ICORERANKING("icore"),
     OWNER("owner"),
 
-    // Timestamp-realted
+    // Timestamp-related
     CREATIONDATE("creationdate", FieldProperty.DATE),
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE),
     TIMESTAMP("timestamp", FieldProperty.DATE);

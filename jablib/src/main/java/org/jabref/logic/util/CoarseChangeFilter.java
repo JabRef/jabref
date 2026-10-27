@@ -14,6 +14,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Filters change events and only relays major changes.
+///
+/// This asks the same question as [org.jabref.logic.undo.CoalescingPolicy] — is this change the
+/// continuation of a run of typing? — for a different consumer, and the two answers are not
+/// interchangeable. The policy decides how much one Ctrl+Z takes back, where being wrong costs a
+/// keystroke either way. Here a change marked filtered arms no backup and is held back from the
+/// shared database until the next major change (see [org.jabref.logic.shared.DBMSSynchronizer]),
+/// so filtering too eagerly delays what other clients see, while filtering too little only writes
+/// a backup more often. That is why this stays with the conservative rule below — a change to
+/// another field or entry, or more than one character at once, is major — instead of the policy's
+/// contiguity and word rules.
+///
+/// The `charactersChangedCount` test is a guess at what the caller now says outright: a keystroke
+/// records as [org.jabref.logic.undo.EditSource#TYPING], everything else as a command. Should the
+/// two granularities ever have to agree, that source is the thing to carry into the event, rather
+/// than either side re-deriving it.
 public class CoarseChangeFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CoarseChangeFilter.class);
 
@@ -44,10 +59,11 @@ public class CoarseChangeFilter {
             boolean isChangedEntry = lastEntryChanged.filter(e -> !e.equals(fieldChange.getBibEntry())).isPresent();
             boolean isEditChanged = !isNewEdit && (isChangedField || isChangedEntry);
             // Only deltas of 1 when typing in manually, major change means pasting something (more than one character)
-            boolean isMajorChange = fieldChange.getMajorCharacterChange() > 1;
+            boolean isMajorChange = fieldChange.charactersChangedCount() > 1;
 
-            fieldChange.setFilteredOut(!(isEditChanged || isMajorChange));
+            fieldChange.setFiltered(!(isEditChanged || isMajorChange));
             // Post each FieldChangedEvent - even the ones being marked as "filtered"
+            // Explanation at https://github.com/JabRef/jabref/pull/6868. - especially necessary for BackupManager and AutoSaveManager
             eventBus.post(fieldChange);
 
             lastFieldChanged = Optional.of(fieldChange.getField());

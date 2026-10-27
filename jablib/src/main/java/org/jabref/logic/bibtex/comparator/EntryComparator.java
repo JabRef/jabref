@@ -87,7 +87,7 @@ public class EntryComparator implements Comparator<BibEntry> {
                 // Ok, parsing was successful. Update f1 and f2:
                 f1 = i1;
                 f2 = i2;
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException _) {
                 // Parsing failed. Give up treating these as numbers.
                 // TODO: should we check which of them failed, and sort based on that?
             }

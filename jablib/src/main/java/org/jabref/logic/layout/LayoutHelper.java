@@ -14,12 +14,10 @@ import org.jspecify.annotations.NonNull;
 
 /// Helper class to get a Layout object.
 ///
-/// <pre>
-/// <code>
+/// ```java
 /// LayoutHelper helper = new LayoutHelper(...a reader...);
 /// Layout layout = helper.getLayoutFromText();
-/// </code>
-/// </pre>
+/// ```
 public class LayoutHelper {
 
     public static final int IS_LAYOUT_TEXT = 1;
@@ -191,7 +189,7 @@ public class LayoutHelper {
 
                 if (start) {
                     // changed section begin - arudert
-                    // keep the backslash so we know wether this is a fieldname or an ordinary parameter
+                    // keep the backslash so we know whether this is a fieldname or an ordinary parameter
                     // if (c != '\\') {
                     buffer.append((char) c);
                     // }

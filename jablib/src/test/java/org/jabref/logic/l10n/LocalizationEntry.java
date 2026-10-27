@@ -8,12 +8,10 @@ class LocalizationEntry implements Comparable<LocalizationEntry> {
 
     private final Path path;
     private final String key;
-    private final LocalizationBundleForTest bundle;
 
-    LocalizationEntry(Path path, String key, LocalizationBundleForTest bundle) {
+    LocalizationEntry(Path path, String key) {
         this.path = path;
         this.key = key;
-        this.bundle = bundle;
     }
 
     public Path getPath() {
@@ -22,10 +20,6 @@ class LocalizationEntry implements Comparable<LocalizationEntry> {
 
     public String getKey() {
         return key;
-    }
-
-    public String getId() {
-        return "%s___%s".formatted(bundle, key);
     }
 
     @Override
@@ -38,29 +32,21 @@ class LocalizationEntry implements Comparable<LocalizationEntry> {
         }
 
         LocalizationEntry that = (LocalizationEntry) o;
-
-        if (!Objects.equals(key, that.key)) {
-            return false;
-        }
-        return bundle == that.bundle;
+        return Objects.equals(key, that.key);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key, bundle);
-    }
-
-    public LocalizationBundleForTest getBundle() {
-        return bundle;
+        return Objects.hash(key);
     }
 
     @Override
     public String toString() {
-        return "%s (%s %s)".formatted(key, path, bundle);
+        return "%s (%s)".formatted(key, path);
     }
 
     @Override
     public int compareTo(LocalizationEntry o) {
-        return getId().compareTo(o.getId());
+        return key.compareTo(o.key);
     }
 }

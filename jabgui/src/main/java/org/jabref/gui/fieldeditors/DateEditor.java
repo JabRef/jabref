@@ -5,8 +5,6 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
@@ -20,6 +18,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.component.TemporalAccessorPicker;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.undo.UndoManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
@@ -33,7 +32,6 @@ public class DateEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextField textField;
     @FXML private TemporalAccessorPicker datePicker;
 
-    @Inject private UndoManager undoManager;
     @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
 
@@ -43,6 +41,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
                       DateTimeFormatter dateFormatter,
                       SuggestionProvider<?> suggestionProvider,
                       FieldCheckers fieldCheckers,
+                      UndoManager undoManager,
                       UndoAction undoAction,
                       RedoAction redoAction) {
         ViewLoader.view(this)
@@ -62,7 +61,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
                 acceptCommittedText(formatDate(newValue));
             }
         });
-        textField.setOnAction(event -> commitTextFieldValue());
+        textField.setOnAction(_ -> commitTextFieldValue());
         textField.focusedProperty().addListener((_, _, newValue) -> {
             if (!newValue) {
                 commitTextFieldValue();

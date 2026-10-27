@@ -25,6 +25,7 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.GrobidUrlMigration;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.BuildInfo;
@@ -52,9 +53,9 @@ import picocli.CommandLine;
 /// See [Command Line Interface Guidelines](https://clig.dev/) for general guidelines how to design a good CLI interface.
 ///
 /// It does not open any GUI.
-/// For the GUI application see {@link org.jabref.Launcher}.
+/// For the GUI application see [org.jabref.Launcher].
 ///
-/// Does not do any preference migrations.
+/// Does not run GUI-specific preference migrations.
 public class JabKitLauncher {
     // J.U.L. bridge to SLF4J must be initialized before any logger is created, see initLogging()
     private static Logger LOGGER;
@@ -70,6 +71,7 @@ public class JabKitLauncher {
 
         try {
             final JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
+            GrobidUrlMigration.migrate(preferences);
             Injector.setModelOrService(CliPreferences.class, preferences);
 
             BuildInfo buildInfo = new BuildInfo();
@@ -79,7 +81,7 @@ public class JabKitLauncher {
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
             JabKit jabKit = new JabKit(preferences, entryTypesManager);
-            CommandLine commandLine = new CommandLine(jabKit);
+            CommandLine commandLine = new CommandLine(jabKit, JabKit.createFactory());
             commandLine.setExecutionExceptionHandler(new CliExceptionHandler(commandLine.getExecutionExceptionHandler()));
             // [impl->req~jabkit.cli.banner-shown~1]
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
@@ -169,9 +171,9 @@ public class JabKitLauncher {
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug or --porcelain
-        boolean isPorcelain = Arrays.stream(args).anyMatch("--porcelain"::equalsIgnoreCase);
+        boolean isPorcelain = Arrays.stream(args).anyMatch(arg -> "--porcelain".equalsIgnoreCase(arg) || "-p".equalsIgnoreCase(arg));
         Level logLevel;
-        if (Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase)) {
+        if (Arrays.stream(args).anyMatch(arg -> "--debug".equalsIgnoreCase(arg) || "-d".equalsIgnoreCase(arg))) {
             logLevel = Level.DEBUG;
         } else {
             logLevel = Level.INFO;

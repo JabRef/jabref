@@ -1,5 +1,7 @@
 package org.jabref.gui.documentviewer;
 
+import java.util.Objects;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -46,6 +48,12 @@ public class DocumentViewerView extends BaseDialog<Void> {
         // Remove button bar at bottom, but add close button to keep the dialog closable by clicking the "x" window symbol
         getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
         getDialogPane().getChildren().removeIf(ButtonBar.class::isInstance);
+
+        setOnHidden(_ -> {
+            if (viewModel != null) {
+                viewModel.dispose();
+            }
+        });
     }
 
     @FXML
@@ -115,7 +123,23 @@ public class DocumentViewerView extends BaseDialog<Void> {
     }
 
     public void switchToFile(LinkedFile file) {
-        fileChoice.getSelectionModel().select(file);
+        if (fileChoice.getItems() != null && !fileChoice.getItems().isEmpty()) {
+            fileChoice.getItems().stream()
+                      .filter(f -> Objects.equals(f.getLink(), file.getLink()))
+                      .findFirst()
+                      .ifPresentOrElse(
+                              f -> fileChoice.getSelectionModel().select(f),
+                              () -> {
+                                  viewModel.switchToFile(file);
+                                  fileChoice.getSelectionModel().select(file);
+                              }
+                      );
+        } else {
+            viewModel.switchToFile(file);
+            if (fileChoice.getItems() != null) {
+                fileChoice.getSelectionModel().select(file);
+            }
+        }
     }
 
     public void gotoPage(int pageNumber) {

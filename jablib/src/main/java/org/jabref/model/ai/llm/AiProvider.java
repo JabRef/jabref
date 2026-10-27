@@ -36,7 +36,7 @@ public enum AiProvider implements Serializable {
     public static AiProvider safeValueOf(String name) {
         try {
             return AiProvider.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return AiDefaultEnums.AI_PROVIDER;
         }
     }

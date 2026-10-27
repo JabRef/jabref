@@ -48,6 +48,7 @@ public class WalkthroughResolver {
     ///
     /// @implNote 1. The entire resolve process finishes within 2.5 seconds or when the
     /// nodes are all shown, whichever comes first.
+    ///
     /// 2. The resolver first tries to resolve the window, then resolves the node from
     /// the scene on the window using an event-based approach. Specifically:
     ///    1. Re-resolution of window is triggered upon creation or deletion of a

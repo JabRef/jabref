@@ -12,10 +12,10 @@ public record TalliesResponse(
         int unclassified,
         int citingPublications) {
 
-    /// Creates a {@link TalliesResponse} from a JSONObject (dictionary/map)
+    /// Creates a [TalliesResponse] from a JSONObject (dictionary/map)
     ///
     /// @param jsonObject The JSON object holding the tally values
-    /// @return a new {@link TalliesResponse}
+    /// @return a new [TalliesResponse]
     public static TalliesResponse fromJSONObject(JSONObject jsonObject) {
         return new TalliesResponse(
                 jsonObject.getString("doi"),

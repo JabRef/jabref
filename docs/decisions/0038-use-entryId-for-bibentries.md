@@ -6,6 +6,9 @@ parent: Decision Records
 
 <!-- markdownlint-disable-next-line MD025 -->
 # Use `BibEntry.getId` for BibEntries at Indexing
+`adr~use-entryid-for-bibentries~1`
+
+Needs: impl
 
 ## Context and Problem Statement
 
@@ -29,3 +32,5 @@ This, however, is not useful in the UI, where equal entries are not the same ent
 ## Decision Outcome
 
 Chosen option: "Use `BibEntry.getId` for indexing `BibEntry`", because is the "natural" thing to ensure distinction between two instances of a `BibEntry` object - regardless of equality.
+
+<!-- markdownlint-disable-file MD022 -->

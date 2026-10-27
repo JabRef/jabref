@@ -39,7 +39,7 @@ public record SimpleHttpResponse(int statusCode, String responseMessage, String 
         int statusCode;
         try {
             statusCode = connection.getResponseCode();
-        } catch (IOException e) {
+        } catch (IOException _) {
             statusCode = -1;
         }
         return statusCode;
@@ -49,7 +49,7 @@ public record SimpleHttpResponse(int statusCode, String responseMessage, String 
         String responseMessage;
         try {
             responseMessage = connection.getResponseMessage();
-        } catch (IOException e) {
+        } catch (IOException _) {
             responseMessage = "";
         }
         return responseMessage;
@@ -59,7 +59,7 @@ public record SimpleHttpResponse(int statusCode, String responseMessage, String 
         String responseBody;
         try {
             responseBody = getResponseBody(connection);
-        } catch (IOException e) {
+        } catch (IOException _) {
             responseBody = "";
         }
         return responseBody;

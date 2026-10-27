@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,9 +24,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
@@ -36,6 +34,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.undo.UndoableInsertEntries;
+import org.jabref.model.undo.UndoableRemoveEntries;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -45,6 +45,7 @@ public class DuplicateSearch extends SimpleCommand {
     private final BlockingQueue<List<BibEntry>> duplicates = new LinkedBlockingQueue<>();
 
     private final AtomicBoolean libraryAnalyzed = new AtomicBoolean();
+    private final AtomicBoolean duplicateSearchCancelled = new AtomicBoolean();
     private final AtomicBoolean autoRemoveExactDuplicates = new AtomicBoolean();
     private final AtomicInteger duplicateCount = new AtomicInteger();
     private final SimpleStringProperty duplicateCountObservable = new SimpleStringProperty();
@@ -54,11 +55,12 @@ public class DuplicateSearch extends SimpleCommand {
     private final StateManager stateManager;
 
     private final GuiPreferences preferences;
-    private final BibEntryTypesManager entryTypesManager;
+    private final DuplicateCheck duplicateCheck;
     private final TaskExecutor taskExecutor;
 
     // For "apply to all entries" functionality.
     private DuplicateResolverResult rememberedDecision;
+    private Future<?> duplicateSearchTask;
 
     public DuplicateSearch(Supplier<LibraryTab> tabSupplier,
                            DialogService dialogService,
@@ -70,7 +72,7 @@ public class DuplicateSearch extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
-        this.entryTypesManager = entryTypesManager;
+        this.duplicateCheck = new DuplicateCheck(entryTypesManager);
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(stateManager));
@@ -84,6 +86,7 @@ public class DuplicateSearch extends SimpleCommand {
         List<BibEntry> entries = database.getEntries();
         duplicates.clear();
         libraryAnalyzed.set(false);
+        duplicateSearchCancelled.set(false);
         autoRemoveExactDuplicates.set(false);
         duplicateCount.set(0);
         rememberedDecision = null;
@@ -92,9 +95,9 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
-        duplicateCountObservable.addListener((obj, oldValue, newValue) -> UiTaskExecutor.runAndWaitInJavaFXThread(() -> duplicateTotal.set(newValue)));
+        duplicateCountObservable.addListener((_, _, newValue) -> UiTaskExecutor.runAndWaitInJavaFXThread(() -> duplicateTotal.set(newValue)));
 
-        HeadlessExecutorService.INSTANCE.executeInterruptableTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
+        duplicateSearchTask = HeadlessExecutorService.INSTANCE.executeInterruptibleTask(() -> searchPossibleDuplicates(entries, database.getMode()), "DuplicateSearcher");
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(taskExecutor);
@@ -103,14 +106,14 @@ public class DuplicateSearch extends SimpleCommand {
     private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
         for (int i = 0; i < (entries.size() - 1); i++) {
             for (int j = i + 1; j < entries.size(); j++) {
-                if (Thread.interrupted()) {
+                if (duplicateSearchCancelled.get() || Thread.interrupted()) {
                     return;
                 }
 
                 BibEntry first = entries.get(i);
                 BibEntry second = entries.get(j);
 
-                if (new DuplicateCheck(entryTypesManager).isDuplicate(first, second, databaseMode)) {
+                if (duplicateCheck.isDuplicate(first, second, databaseMode)) {
                     duplicates.add(Arrays.asList(first, second));
                     duplicateCountObservable.set(String.valueOf(duplicateCount.incrementAndGet()));
                 }
@@ -130,7 +133,7 @@ public class DuplicateSearch extends SimpleCommand {
                 if (dups == null) {
                     continue;
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException _) {
                 return null;
             }
 
@@ -192,13 +195,22 @@ public class DuplicateSearch extends SimpleCommand {
             result.remove(first);
             result.replace(second, dialog.getNewRightEntry());
         } else if (resolverResult == DuplicateResolverResult.BREAK) {
-            libraryAnalyzed.set(true);
-            duplicates.clear();
+            cancelDuplicateSearch();
         } else if (resolverResult == DuplicateResolverResult.KEEP_MERGE) {
             result.replace(first, second, dialog.getMergedEntry());
         } else if (resolverResult == DuplicateResolverResult.KEEP_BOTH) {
             result.replace(first, dialog.getNewLeftEntry());
             result.replace(second, dialog.getNewRightEntry());
+        }
+    }
+
+    private void cancelDuplicateSearch() {
+        duplicateSearchCancelled.set(true);
+        libraryAnalyzed.set(true);
+        duplicates.clear();
+
+        if (duplicateSearchTask != null) {
+            duplicateSearchTask.cancel(true);
         }
     }
 
@@ -208,31 +220,28 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         LibraryTab libraryTab = tabSupplier.get();
-        final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("duplicate removal"));
-        // Now, do the actual removal:
-        if (!result.getToRemove().isEmpty()) {
-            compoundEdit.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
-            libraryTab.getDatabase().removeEntries(result.getToRemove());
-            libraryTab.markBaseChanged();
-        }
-        // and adding merged entries:
-        if (!result.getToAdd().isEmpty()) {
-            compoundEdit.addEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
-            libraryTab.getDatabase().insertEntries(result.getToAdd());
-            libraryTab.markBaseChanged();
-        }
+        // Named for the effect, not for the command: "Find duplicates" started this, but what a
+        // reader undoes is the removal and the merges their review of each pair produced.
+        libraryTab.getUndoManager().addEdit(Localization.lang("duplicate removal"), edit -> {
+            // Now, do the actual removal:
+            if (!result.getToRemove().isEmpty()) {
+                edit.applyEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
+            }
+            // and adding merged entries:
+            if (!result.getToAdd().isEmpty()) {
+                edit.applyEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
+            }
+        });
 
         duplicateProgress.set(0);
 
         dialogService.notify(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
                 + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
-        compoundEdit.end();
-        libraryTab.getUndoManager().addEdit(compoundEdit);
     }
 
     /// Result of a duplicate search.
-    /// Uses {@link System#identityHashCode(Object)} for identifying objects for removal, as completely identical
-    /// {@link BibEntry BibEntries} are equal to each other.
+    /// Uses [System#identityHashCode(Object)] for identifying objects for removal, as completely identical
+    /// [BibEntries][BibEntry] are equal to each other.
     static class DuplicateSearchResult {
 
         private final Map<String, BibEntry> toRemove = new HashMap<>();

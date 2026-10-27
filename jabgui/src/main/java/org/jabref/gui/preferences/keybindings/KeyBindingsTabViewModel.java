@@ -18,7 +18,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingCategory;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preferences.keybindings.presets.BashKeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
@@ -30,8 +29,9 @@ import org.jspecify.annotations.NonNull;
 
 public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
+    /// Working copy the tab edits; written back to [#liveKeyBindingRepository] on store.
     private final KeyBindingRepository keyBindingRepository;
-    private final GuiPreferences preferences;
+    private final KeyBindingRepository liveKeyBindingRepository;
     private final OptionalObjectProperty<KeyBindingViewModel> selectedKeyBinding = OptionalObjectProperty.empty();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
     private final ListProperty<KeyBindingPreset> keyBindingPresets = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -41,11 +41,10 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     private final List<String> restartWarning = new ArrayList<>();
 
     public KeyBindingsTabViewModel(@NonNull KeyBindingRepository keyBindingRepository,
-                                   @NonNull DialogService dialogService,
-                                   @NonNull GuiPreferences preferences) {
+                                   @NonNull DialogService dialogService) {
         this.keyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
+        this.liveKeyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
-        this.preferences = preferences;
 
         keyBindingPresets.add(new BashKeyBindingPreset());
         keyBindingPresets.add(new NewEntryBindingPreset());
@@ -114,7 +113,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        KeyBindingRepository prefsRepo = preferences.getKeyBindingRepository();
+        KeyBindingRepository prefsRepo = liveKeyBindingRepository;
 
         if (prefsRepo.equals(keyBindingRepository)) {
             return;

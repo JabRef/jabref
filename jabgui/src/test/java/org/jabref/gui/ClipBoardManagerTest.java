@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.input.Clipboard;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.TransferMode;
@@ -25,13 +26,12 @@ import com.airhacks.afterburner.injection.Injector;
 import org.jooq.lambda.Unchecked;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testfx.framework.junit5.ApplicationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ClipBoardManagerTest extends ApplicationTest {
+class ClipBoardManagerTest extends JavaFxTest {
 
     private BibEntryTypesManager entryTypesManager;
     private ClipBoardManager clipBoardManager;

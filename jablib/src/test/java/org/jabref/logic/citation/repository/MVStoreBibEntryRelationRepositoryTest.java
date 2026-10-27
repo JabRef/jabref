@@ -91,7 +91,7 @@ class MVStoreBibEntryRelationRepositoryTest {
                 .withField(StandardField.DOI, "10.1234/5678" + i);
     }
 
-    /// Create a fake list of relations for a bibEntry based on the {@link org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails#toBibEntry()} logic
+    /// Create a fake list of relations for a bibEntry based on the [org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails#toBibEntry()] logic
     /// that corresponds to this use case: we want to make sure that relations coming from SemanticScholar
     /// and mapped as BibEntry will be serializable by the MVStore.
     ///
@@ -100,7 +100,7 @@ class MVStoreBibEntryRelationRepositoryTest {
     private List<BibEntry> createRelations(BibEntry entry) {
         return entry
                 .getCitationKey()
-                .map(key -> RandomGenerator.StreamableGenerator
+                .map(_ -> RandomGenerator.StreamableGenerator
                         .of("L128X256MixRandom").ints(12) // 12 is arbitrary here. We just want some relations. We do not do any "load" testing.
                         .mapToObj(i -> new BibEntry(StandardEntryType.Book)
                                 .withField(StandardField.TITLE, "A title: " + i)

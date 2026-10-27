@@ -28,8 +28,8 @@
             </VBox>
             <VBox spacing="5.0">
                 <HBox spacing="10.0">
-                    <Button fx:id="selectAllButton" text="%Select all" styleClass="text-button" onAction="#selectAll"/>
-                    <Button fx:id="unselectAllButton" text="%Unselect all" styleClass="text-button"
+                    <Button fx:id="selectAllButton" text="%Select all" onAction="#selectAll"/>
+                    <Button fx:id="unselectAllButton" text="%Unselect all"
                             onAction="#unselectAll"/>
                 </HBox>
             </VBox>

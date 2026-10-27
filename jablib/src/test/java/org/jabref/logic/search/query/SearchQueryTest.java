@@ -1,8 +1,14 @@
 package org.jabref.logic.search.query;
 
+import java.util.EnumSet;
+import java.util.stream.Stream;
+
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SearchQueryTest {
     @ParameterizedTest
     @ValueSource(strings = {
+            "",
             "term",
             "term1 term2",
             "term1 term2 term3",
@@ -61,5 +68,34 @@ public class SearchQueryTest {
     })
     public void invalidSearchQuery(String searchExpression) {
         assertFalse(new SearchQuery(searchExpression).isValid());
+    }
+
+    private static Stream<Arguments> validRegularExpressionSearchQuery() {
+        return Stream.of(
+                Arguments.of("term.*", EnumSet.of(SearchFlags.REGULAR_EXPRESSION)),
+                Arguments.of("field =~ term.*", EnumSet.noneOf(SearchFlags.class)),
+                Arguments.of("field !=~ term.*", EnumSet.noneOf(SearchFlags.class))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void validRegularExpressionSearchQuery(String searchExpression, EnumSet<SearchFlags> searchFlags) {
+        assertTrue(new SearchQuery(searchExpression, searchFlags).isValid());
+    }
+
+    private static Stream<Arguments> invalidRegularExpressionSearchQuery() {
+        return Stream.of(
+                Arguments.of("*", EnumSet.of(SearchFlags.REGULAR_EXPRESSION)),
+                Arguments.of("field =~ *", EnumSet.noneOf(SearchFlags.class)),
+                Arguments.of("field !=~ [", EnumSet.noneOf(SearchFlags.class)),
+                Arguments.of("field =~ \\", EnumSet.noneOf(SearchFlags.class))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void invalidRegularExpressionSearchQuery(String searchExpression, EnumSet<SearchFlags> searchFlags) {
+        assertFalse(new SearchQuery(searchExpression, searchFlags).isValid());
     }
 }

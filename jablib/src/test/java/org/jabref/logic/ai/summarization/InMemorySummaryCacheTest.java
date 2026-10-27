@@ -126,7 +126,7 @@ class InMemorySummaryCacheTest {
         assertEquals("updated", cache.get(entry).get().content());
     }
 
-    /// Minimal in-memory implementation of {@link SummariesRepository} for testing.
+    /// Minimal in-memory implementation of [SummariesRepository] for testing.
     private static class FakeSummariesRepository implements SummariesRepository {
 
         private final Map<String, AiSummary> store = new HashMap<>();

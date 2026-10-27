@@ -8,15 +8,17 @@ import java.util.Map;
 import java.util.SequencedSet;
 import java.util.stream.Stream;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -26,6 +28,7 @@ import javafx.scene.layout.RowConstraints;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
@@ -56,7 +59,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private final RedoAction redoAction;
     private final GuiPreferences preferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private final UndoManager undoManager;
 
     private Collection<Field> fields = new ArrayList<>();
 
@@ -64,7 +66,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private Subscription dividerPositionSubscription;
 
     public FieldsEditorTab(boolean compressed,
-                           @NonNull UndoManager undoManager,
                            UndoAction undoAction,
                            RedoAction redoAction,
                            @NonNull GuiPreferences preferences,
@@ -73,7 +74,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                            PreviewPanel previewPanel) {
         super(stateManager, previewPanel);
         this.isCompressed = compressed;
-        this.undoManager = undoManager;
         this.undoAction = undoAction;
         this.redoAction = redoAction;
         this.preferences = preferences;
@@ -99,6 +99,12 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
             return;
         }
 
+        // The dropped editors need no explicit disposal. The direction that decides this is the one
+        // from the entry: AbstractEditorViewModel binds via EasyBind's valueAt, which registers a
+        // weak listener on the entry's field map, so nothing outside these two collections roots a
+        // discarded editor. (A view model does hold its entry strongly, but that edge points the
+        // other way and dies with the editor.)
+        // Verified by AllFieldsTabTest#discardedEditorsAreNotRetainedAfterRebuild.
         editors.clear();
         gridPane.getChildren().clear();
         gridPane.getColumnConstraints().clear();
@@ -111,6 +117,12 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                 .map(field -> createLabelAndEditor(bibDatabaseContext, entry, field))
                 .toList();
 
+        layoutEditors(bibDatabaseContext, entry, compressed, labels);
+    }
+
+    /// Arranges the created labels and editors inside [#gridPane]. The default layout stretches the
+    /// editors to fill the tab height (one or two columns). Subclasses may override for other layouts.
+    protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
         ColumnConstraints columnExpand = new ColumnConstraints();
         columnExpand.setHgrow(Priority.ALWAYS);
 
@@ -150,10 +162,28 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                 databaseContext,
                 entry.getType(),
                 suggestionProviders,
-                undoManager,
+                stateManager.getUndoManager(databaseContext),
                 undoAction,
                 redoAction);
         fieldEditor.bindToEntry(entry);
+        // [impl->req~entry-editor.accept-single-line-value~1]
+        fieldEditor.getNode().addEventHandler(ActionEvent.ACTION, event -> {
+            if (event.getTarget() instanceof EditorTextField) {
+                gridPane.requestFocus();
+                event.consume();
+            }
+        });
+        // Commit before moving focus: the combo box would otherwise commit on key release.
+        fieldEditor.getNode().addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER
+                    && event.getTarget() instanceof ComboBox<?> comboBox
+                    && comboBox.isEditable()
+                    && !comboBox.isShowing()) {
+                comboBox.commitValue();
+                gridPane.requestFocus();
+                event.consume();
+            }
+        });
         editors.put(field, fieldEditor);
         return new FieldNameLabel(field);
     }
@@ -191,6 +221,19 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         }
     }
 
+    /// `true` (default): content fills the tab height, rows share the space (classic category tabs).
+    /// `false`: content keeps its natural height and the tab scrolls vertically (single-list tab).
+    protected boolean stretchContentToTabHeight() {
+        return true;
+    }
+
+    /// The node placed inside the tab's ScrollPane. By default the field grid itself;
+    /// subclasses may wrap [#gridPane] in a larger structure (e.g. with collapsible
+    /// sections) and return that instead. Called once from `initPanel()`.
+    protected Node getEditorContent() {
+        return gridPane;
+    }
+
     public void requestFocus(Field fieldName) {
         if (editors.containsKey(fieldName)) {
             editors.get(fieldName).focus();
@@ -214,15 +257,15 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private void initPanel() {
         if (gridPane == null) {
             gridPane = new GridPane();
-            gridPane.getStyleClass().add("editorPane");
+            gridPane.getStyleClass().addAll("editorPane", "gap-8", "padding-4");
 
             // Wrap everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
             scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-            scrollPane.setContent(gridPane);
+            scrollPane.setContent(getEditorContent());
             scrollPane.setFitToWidth(true);
-            scrollPane.setFitToHeight(true);
+            scrollPane.setFitToHeight(stretchContentToTabHeight());
 
             SplitPane container = new SplitPane(scrollPane);
             setContent(container);

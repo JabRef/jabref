@@ -5,7 +5,7 @@ import java.io.Writer;
 
 import org.jabref.logic.util.strings.StringUtil;
 
-/// Class to write to a .bib file. Used by {@link BibDatabaseWriter}
+/// Class to write to a .bib file. Used by [BibDatabaseWriter]
 public class BibWriter {
 
     private final String newLineSeparator;

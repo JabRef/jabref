@@ -24,11 +24,11 @@ public class MainTableFieldValueFormatter {
         this.bibDatabase = bibDatabaseContext.getDatabase();
     }
 
-    /// Format fields for {@link BibEntryTableViewModel}, according to user preferences and with latex translated to
+    /// Format fields for [BibEntryTableViewModel], according to user preferences and with latex translated to
     /// unicode if possible.
     ///
-    /// @param fields the fields argument of {@link BibEntryTableViewModel#getFields(OrFields)}.
-    /// @param entry  the BibEntry of {@link BibEntryTableViewModel}.
+    /// @param fields the fields argument of [BibEntryTableViewModel#getFields(OrFields)].
+    /// @param entry  the BibEntry of [BibEntryTableViewModel].
     /// @return The formatted name field.
     public String formatFieldsValues(final OrFields fields, final BibEntry entry) {
         for (Field field : fields.getFields()) {

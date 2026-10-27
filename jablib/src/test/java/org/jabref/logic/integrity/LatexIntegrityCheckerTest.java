@@ -145,8 +145,8 @@ class LatexIntegrityCheckerTest {
     }
 
     /// This method provides inputs containing invalid LaTeX syntax which no LaTeX parser should be able to parse
-    /// without errors. The inputs are bundled with the {@link uk.ac.ed.ph.snuggletex.ErrorCode} output by the internal
-    /// LaTeX parsers {@link uk.ac.ed.ph.snuggletex.SnuggleSession}.
+    /// without errors. The inputs are bundled with the [uk.ac.ed.ph.snuggletex.ErrorCode] output by the internal
+    /// LaTeX parsers [uk.ac.ed.ph.snuggletex.SnuggleSession].
     private static Stream<Arguments> provideUnacceptedInputs() {
         return Stream.of(
 

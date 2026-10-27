@@ -16,8 +16,8 @@ The need for an [exporter](https://github.com/JabRef/jabref/issues/10661) to [CF
 ## Considered Options
 
 * When exporting:
-  * Export non-`software` entries with dummy topmost `sofware` and entries as `preferred-citation`
-  * Export non-`software` entries with dummy topmost `sofware` and entries as `references`
+  * Export non-`software` entries with dummy topmost `software` and entries as `preferred-citation`
+  * Export non-`software` entries with dummy topmost `software` and entries as `references`
   * Forbid exporting multiple entries at once
   * Forbid exporting more than one software entry at once
   * Export entries in several files (i.e. one / file)
@@ -31,6 +31,8 @@ The need for an [exporter](https://github.com/JabRef/jabref/issues/10661) to [CF
 
 ## Decision Outcome
 
+Chosen option: export with a dummy topmost `software` element and all other entries as `references` (with per-type variations), because this keeps exported files compatible with official CFF tools while keeping the export behavior predictable for users.
+
 The decision outcome is the following.
 
 * When exporting, JabRef will have a different behavior depending on entries type.
@@ -38,7 +40,7 @@ The decision outcome is the following.
   * If several entries including a `software` or `dataset` one are selected, then exporter uses this one as topmost element and the others as `references`, adding a potential `preferred-citation` for the potential `cites` element of the topmost `software` entry.
   * If several entries including several `software` ones are selected, then exporter uses a dummy topmost element, and selected entries are exported as `references`. The `cites` or `related` fields won't be exported in this case.
   * JabRef will not handle `cites` or `related` fields for non-`software` elements.
-* When importing, JabRef will create several entries: one main entry for the `software` and other entries for the potential `preferred-citation` and `references` fields. JabRef will link main entry to the preferred citation using a `cites` from the main entry, and wil link main entry to the references using a `related` from the main entry.
+* When importing, JabRef will create several entries: one main entry for the `software` and other entries for the potential `preferred-citation` and `references` fields. JabRef will link main entry to the preferred citation using a `cites` from the main entry, and will link main entry to the references using a `related` from the main entry.
 
 ### Positive Consequences
 

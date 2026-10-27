@@ -88,7 +88,7 @@ public class FileFilterConverter {
         return file -> {
             try {
                 return filter.accept(file.toPath());
-            } catch (IOException e) {
+            } catch (IOException _) {
                 return false;
             }
         };
