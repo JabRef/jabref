@@ -279,7 +279,11 @@ public record ZoteroReferenceMark(
     /// Returns the citation key that the citation item names itself: the key in its JabRef URI, else its `citation-key`.
     /// Unlike [#getCitationKey(ZoteroCitationData.CitationItemData)], this does not fall back to a placeholder derived from the Zotero item id.
     static Optional<String> getExplicitCitationKey(ZoteroCitationData.CitationItemData citationItem) {
-        for (String uri : Optional.of(citationItem.uris).orElse(List.of())) {
+        for (String uri : Optional.ofNullable(citationItem.uris).orElse(List.of())) {
+            if (StringUtil.isBlank(uri)) {
+                continue;
+            }
+
             String citationKey = getCitationKeyFromJabRefUri(uri);
             if (!StringUtil.isBlank(citationKey)) {
                 return Optional.of(citationKey);
@@ -309,6 +313,7 @@ public record ZoteroReferenceMark(
         return Optional.ofNullable(citationItem.uris)
                        .orElse(List.of())
                        .stream()
+                       .filter(uri -> !StringUtil.isBlank(uri))
                        .filter(ZoteroReferenceMark::isZoteroUri)
                        .findFirst()
                        .map(uri -> "uri:" + uri.trim());

@@ -70,10 +70,14 @@ public class ZoteroCitationMarkParser {
         try {
             ZoteroCitationData citationData = GSON.fromJson(cslJson, ZoteroCitationData.class);
             List<ParsedEntry> entries = new ArrayList<>();
-            List<ZoteroCitationData.CitationItemData> citationItemDataList = Optional.ofNullable(citationData.citationItems).orElse(List.of());
+            List<ZoteroCitationData.CitationItemData> citationItemDataList = Optional.ofNullable(citationData)
+                                                                                       .map(data -> Optional.ofNullable(data.citationItems).orElse(List.of()))
+                                                                                       .orElse(List.of());
             for (ZoteroCitationData.CitationItemData citationItem : citationItemDataList) {
-                toBibEntry(citationItem, getCitationKey)
-                        .ifPresent(entry -> entries.add(new ParsedEntry(entry, ZoteroReferenceMark.getItemIdentity(citationItem))));
+                Optional.ofNullable(citationItem)
+                        .flatMap(item -> toBibEntry(item, getCitationKey)
+                                .map(entry -> new ParsedEntry(entry, ZoteroReferenceMark.getItemIdentity(item))))
+                        .ifPresent(entries::add);
             }
 
             return entries;
@@ -123,10 +127,11 @@ public class ZoteroCitationMarkParser {
 
     private static Optional<BibEntry> toBibEntry(ZoteroCitationData.CitationItemData citationItem,
                                                  Function<ZoteroCitationData.CitationItemData, Optional<String>> getCitationKey) {
-        return toBibEntry(citationItem.itemData)
-                .map(entry -> getCitationKey.apply(citationItem)
-                                            .map(entry::withCitationKey)
-                                            .orElse(entry));
+        return Optional.ofNullable(citationItem.itemData)
+                       .flatMap(itemData -> toBibEntry(itemData)
+                               .map(entry -> getCitationKey.apply(citationItem)
+                                                           .map(entry::withCitationKey)
+                                                           .orElse(entry)));
     }
 
     private static Optional<BibEntry> toBibEntry(ZoteroCitationData.ItemData itemData) {

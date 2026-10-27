@@ -114,6 +114,11 @@ class ZoteroCitationMarkParserTest {
     }
 
     @Test
+    void parseCslCitationJsonForImportReturnsEmptyForNullRoot() {
+        assertEquals(List.of(), ZoteroCitationMarkParser.parseCslCitationJsonForImport("null"));
+    }
+
+    @Test
     void parseCslCitationJsonForImportKeepsJabRefUriCitationKey() {
         List<BibEntry> entries = ZoteroCitationMarkParser.parseCslCitationJsonForImport("""
                 {

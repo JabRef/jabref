@@ -128,6 +128,37 @@ class ImportCitedTest {
     }
 
     @Test
+    void continuesCollectingAfterCitationMarkWithNullStructuralValues() {
+        String markWithNullValues = ZoteroReferenceMark.PREFIX + """
+                {
+                  "citationItems": [
+                    null,
+                    {
+                      "id": 900,
+                      "uris": [null],
+                      "itemData": null
+                    },
+                    {
+                      "id": 901,
+                      "uris": null,
+                      "itemData": {
+                        "id": 901,
+                        "type": "article-journal",
+                        "title": "Null URIs"
+                      }
+                    }
+                  ]
+                }
+                """ + " RNDabcdefghij";
+
+        ImportCited.CitedEntries citedEntries = ImportCited.collectCitedEntries(
+                List.of(markWithNullValues, citeWithZotero("RNDklmnopqrst")),
+                new BibDatabase());
+
+        assertEquals(List.of(Optional.of("Null URIs"), Optional.of("Cited from Zotero")), titlesOf(citedEntries.newEntries()));
+    }
+
+    @Test
     void collectsNothingFromDocumentWithoutReferenceMarks() {
         ImportCited.CitedEntries citedEntries = ImportCited.collectCitedEntries(List.of(), new BibDatabase());
 
