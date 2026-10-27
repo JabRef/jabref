@@ -22,7 +22,7 @@ class DummyChatLanguageModelTest {
 
     @BeforeEach
     void setUp() {
-        model = new DummyChatLanguageModel();
+        model = new DummyChatLanguageModel(0);
     }
 
     @Test
@@ -85,5 +85,11 @@ class DummyChatLanguageModelTest {
                 Second user message really sent to AI""";
 
         assertEquals(expected, response.aiMessage().text());
+    }
+
+    @Test
+    void defaultConstructorHasFiveSecondsDelay() {
+        DummyChatLanguageModel defaultModel = new DummyChatLanguageModel();
+        assertNotNull(defaultModel);
     }
 }

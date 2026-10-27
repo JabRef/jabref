@@ -19,10 +19,30 @@ import org.slf4j.LoggerFactory;
 @NullMarked
 public class DummyChatLanguageModel implements ChatModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DummyChatLanguageModel.class);
+    private static final long DEFAULT_DELAY_MS = 5000;
+
+    private final long delayMs;
+
+    public DummyChatLanguageModel() {
+        this(DEFAULT_DELAY_MS);
+    }
+
+    public DummyChatLanguageModel(long delayMs) {
+        this.delayMs = delayMs;
+    }
 
     @Override
     public ChatResponse chat(List<ChatMessage> messages) {
         LOGGER.debug("Generating response from dummy chat model with {} messages: {}", messages.size(), messages);
+
+        if (delayMs > 0) {
+            try {
+                Thread.sleep(delayMs);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                LOGGER.debug("Interrupted while waiting for dummy AI answer", e);
+            }
+        }
 
         String systemMessage = messages.stream()
                 .filter(SystemMessage.class::isInstance)
