@@ -8,7 +8,12 @@ permissions:
 jobs:
   automerge:
     runs-on: ubuntu-slim
-    if: github.repository == 'JabRef/jabref' || github.repository == 'JabRef/jabref-black-forest'
+    # In JabRef/jabref, on-pr-opened-updated.yml removes "automerge" when a human pushes; the black-forest
+    # repository has no such cleanup, so a human push there must not be acted on with a stale label.
+    if: >
+      github.repository == 'JabRef/jabref' ||
+      (github.repository == 'JabRef/jabref-black-forest' &&
+       !(github.event.action == 'synchronize' && github.event.sender.login != 'dependabot[bot]' && github.event.sender.login != 'jabref-machine'))
     # Serialize with on-pr-labeled.yml's automerge job (same group) so the
     # approve guard never races: the second run starts only after the first
     # finished and its approval is visible.
