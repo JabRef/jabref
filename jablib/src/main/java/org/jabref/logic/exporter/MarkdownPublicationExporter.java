@@ -320,7 +320,7 @@ public class MarkdownPublicationExporter extends Exporter {
                     new URI(null, null, portablePath, null)
                             .toASCIIString()
             );
-        } catch (IllegalArgumentException | URISyntaxException exception) {
+        } catch (IllegalArgumentException | URISyntaxException _) {
             // Different Windows drives cannot form a relative path.
             return Optional.empty();
         }
