@@ -47,7 +47,7 @@ final class BookIsbnResolver {
 
             BibEntry fetchedEntry = candidate.getValue().orElseThrow();
             Optional<ISBN> returnedIsbn = fetchedEntry.getField(StandardField.ISBN)
-                                                     .flatMap(value -> ISBN.findInText("ISBN " + value));
+                                                      .flatMap(value -> ISBN.findInText("ISBN " + value));
             if (!returnedIsbn.equals(Optional.of(candidate.getKey()))) {
                 return Optional.empty();
             }

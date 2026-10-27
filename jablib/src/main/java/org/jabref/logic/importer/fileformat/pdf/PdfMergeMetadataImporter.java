@@ -134,7 +134,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     private List<BibEntry> extractCandidatesFromPdf(Path filePath, PDDocument document, List<String> warnings,
-                                                   Map<String, Optional<BibEntry>> isbnCache) {
+                                                    Map<String, Optional<BibEntry>> isbnCache) {
         List<BibEntry> candidates = new ArrayList<>();
 
         for (PdfImporter metadataImporter : metadataImporters) {

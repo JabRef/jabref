@@ -273,23 +273,23 @@ public class PdfContentImporter extends PdfImporter {
         BibEntry bookEntry = new BibEntry(StandardEntryType.Book);
 
         BookTitleAuthorExtractor.findTitle(block)
-                .ifPresent(title -> bookEntry.withField(StandardField.TITLE, title));
+                                .ifPresent(title -> bookEntry.withField(StandardField.TITLE, title));
         BookTitleAuthorExtractor.findAuthors(block)
-                .ifPresent(authors -> {
-                    String formattedAuthors = streamlineNames(authors);
-                    bookEntry.withField(StandardField.AUTHOR, formattedAuthors);
-                });
+                                .ifPresent(authors -> {
+                                    String formattedAuthors = streamlineNames(authors);
+                                    bookEntry.withField(StandardField.AUTHOR, formattedAuthors);
+                                });
         BookTitleAuthorExtractor.findEditors(block)
-                .ifPresent(editors -> {
-                    String formattedEditors = streamlineNames(editors);
-                    bookEntry.withField(StandardField.EDITOR, formattedEditors);
-                });
+                                .ifPresent(editors -> {
+                                    String formattedEditors = streamlineNames(editors);
+                                    bookEntry.withField(StandardField.EDITOR, formattedEditors);
+                                });
         BookCitationBlock.findPublisher(block)
-                .ifPresent(publisher -> bookEntry.withField(StandardField.PUBLISHER, publisher));
+                         .ifPresent(publisher -> bookEntry.withField(StandardField.PUBLISHER, publisher));
         BookCitationBlock.findYear(block)
-                .ifPresent(year -> bookEntry.withField(StandardField.YEAR, year));
+                         .ifPresent(year -> bookEntry.withField(StandardField.YEAR, year));
         BookCitationBlock.findEdition(block)
-                .ifPresent(edition -> bookEntry.withField(StandardField.EDITION, edition));
+                         .ifPresent(edition -> bookEntry.withField(StandardField.EDITION, edition));
         return Optional.of(bookEntry);
     }
 

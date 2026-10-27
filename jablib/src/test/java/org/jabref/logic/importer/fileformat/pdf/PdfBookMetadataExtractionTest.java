@@ -49,7 +49,7 @@ class PdfBookMetadataExtractionTest {
             "citation-valid-and-invalid-isbns.pdf",
             "citation-competing-dates.pdf"
     })
-    // [utest->req~import.pdf.book-citation-publication~1]
+        // [utest->req~import.pdf.book-citation-publication~1]
     void extractsCompleteCitationIndependentlyOfIsbnSelection(String fileName) throws IOException, URISyntaxException {
         String citation = BookCitationBlock.find(bibliographicPage(fileName)).orElseThrow();
 
@@ -91,7 +91,7 @@ class PdfBookMetadataExtractionTest {
     }
 
     @Test
-    // [utest->req~import.pdf.book-citation-publication~1]
+        // [utest->req~import.pdf.book-citation-publication~1]
     void rejectsIncompleteCitationDespiteClassificationAndIsbn() throws IOException, URISyntaxException {
         String page = bibliographicPage("incomplete-citation.pdf");
 
@@ -102,7 +102,7 @@ class PdfBookMetadataExtractionTest {
     }
 
     @Test
-    // [utest->req~import.pdf.conference-article-exclusion~1]
+        // [utest->req~import.pdf.conference-article-exclusion~1]
     void excludesConferenceArticleDespiteValidProceedingsIsbn() throws IOException, URISyntaxException {
         try (PDDocument document = loadFixture("conference-paper.pdf")) {
             assertEquals(List.of("9780134685991"),

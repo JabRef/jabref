@@ -56,8 +56,8 @@ final class BookTitleAuthorExtractor {
         title = SPACES.matcher(title).replaceAll(" ").strip();
 
         return title.isEmpty()
-                ? Optional.empty()
-                : Optional.of(title);
+               ? Optional.empty()
+               : Optional.of(title);
     }
 
     /// Extracts authors appearing after the " / " separator.
@@ -85,7 +85,7 @@ final class BookTitleAuthorExtractor {
         }
 
         contributors = SPACES.matcher(contributors)
-                .replaceAll(" ").strip();
+                             .replaceAll(" ").strip();
 
         if (contributors.isEmpty()
                 || NON_AUTHOR_LABEL.matcher(contributors).find()
@@ -125,8 +125,8 @@ final class BookTitleAuthorExtractor {
         String names = editor.group(1).strip();
 
         return names.isEmpty()
-                ? Optional.empty()
-                : Optional.of(names);
+               ? Optional.empty()
+               : Optional.of(names);
     }
 
     /// Returns the title portion before the author separator.
@@ -161,8 +161,8 @@ final class BookTitleAuthorExtractor {
         }
 
         return result.isEmpty()
-                ? Optional.empty()
-                : Optional.of(result.toString());
+               ? Optional.empty()
+               : Optional.of(result.toString());
     }
 
     /// Returns the contributor portion after the author separator.

@@ -39,9 +39,9 @@ public class PdfBookMetadataImportTest {
                 "/pdfs/PdfBookMetadataImport/syrotiuk-page3.txt").toURI()));
         String citation = BookCitationBlock.find(pageText).orElseThrow();
         assertEquals("""
-                Сиротюк, В. Д.
-                С 40 Фізика: підруч. для 11 кл. загальноосвіт. навч. закл.: (рівень стан\u00AD
-                дарту) / В. Д. Сиротюк, В. І. Баштовий. - Харків : Сиция, 2011. - 304 с.""",
+                        Сиротюк, В. Д.
+                        С 40 Фізика: підруч. для 11 кл. загальноосвіт. навч. закл.: (рівень стан\u00AD
+                        дарту) / В. Д. Сиротюк, В. І. Баштовий. - Харків : Сиция, 2011. - 304 с.""",
                 citation.strip());
 
         try (PDDocument document = new PDDocument();

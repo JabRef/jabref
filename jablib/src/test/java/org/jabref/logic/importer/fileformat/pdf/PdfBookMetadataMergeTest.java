@@ -109,7 +109,8 @@ class PdfBookMetadataMergeTest {
 
     @Test
     void retainsLocalBookWithoutLookupWhenNoIsbnIsSelected() throws IOException, ParseException, FetcherException {
-        assertMergedBook(new ParserResult(List.of(localBook())), (_, _) -> { }, localBook());
+        assertMergedBook(new ParserResult(List.of(localBook())), (_, _) -> {
+        }, localBook());
     }
 
     @Test
@@ -117,7 +118,8 @@ class PdfBookMetadataMergeTest {
         ParserResult extracted = new ParserResult(List.of(localBook()));
         extracted.addWarning(Localization.lang("More than one ISBN found"));
 
-        assertMergedBook(extracted, (_, _) -> { }, localBook());
+        assertMergedBook(extracted, (_, _) -> {
+        }, localBook());
     }
 
     private BibEntry localBook() {

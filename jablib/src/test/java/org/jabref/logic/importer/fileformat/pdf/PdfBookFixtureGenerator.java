@@ -148,7 +148,7 @@ final class PdfBookFixtureGenerator {
     }
 
     private static void writeCitationFixture(Path fontPath, Path outputDirectory, String fileName,
-                                            int bibliographicPage, String text) throws IOException {
+                                             int bibliographicPage, String text) throws IOException {
         Path outputPath = outputDirectory.resolve(fileName);
         writeFixture(fontPath, outputPath, Map.of(bibliographicPage, text));
         try (PDDocument document = Loader.loadPDF(outputPath.toFile())) {
