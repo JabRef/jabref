@@ -167,10 +167,11 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final Pattern SENTENCE_END_PATTERN = Pattern.compile(SENTENCE_END_REGEX);
 
     /// End of a sentence: a period (or `?`/`!`) after a word of at least three letters or digits (`... of 2020).`)
-    /// or after an acronym of two capitals (`... for AI.`), followed by a letter, optionally after the
-    /// extracted year and its punctuation. Single letters (initials, `U.S.`) do not end the title.
+    /// or after an acronym of two capitals (`... for AI.`), followed by a letter with optional leading digits
+    /// (`2D Materials`), optionally after the extracted year and its punctuation.
+    /// Single letters (initials, `U.S.`) do not end the title.
     private static final Pattern TITLE_END_PATTERN = Pattern.compile(
-            SENTENCE_END_REGEX + "(?:" + Pattern.quote(YEAR_TAG) + "[\\s.,;:]*)?(?=\\p{L})");
+            SENTENCE_END_REGEX + "(?:" + Pattern.quote(YEAR_TAG) + "[\\s.,;:]*)?(?=\\d*\\p{L})");
 
     private static final Pattern QUOTED_TITLE_PATTERN = Pattern.compile("^[\"“](?<" + TITLE_GROUP + ">[^\"”]+)[\"”]");
 
