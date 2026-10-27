@@ -188,6 +188,7 @@ class ShowDocumentViewerActionTest extends JavaFxTest {
     }
 
     /// An entry without a PDF opens the PDF of its cross-referenced entry, at the entry's page plus the offset of the entry owning the PDF.
+    // [utest->req~jabgui.documentviewer.open-crossref-pdf-at-page~1]
     @Test
     void executeOpensCrossrefPdfAtResolvedPageAfterConfirmation() throws IOException {
         BibEntry paper = addProceedingsAndPaper(100);

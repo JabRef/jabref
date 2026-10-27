@@ -24,6 +24,7 @@ import org.jspecify.annotations.NullMarked;
 /// The page is the first arabic page number written in the entry's own `pages` field, plus [PAGE_OFFSET] on the entry that owns the PDF.
 /// A missing offset is `0`, so the printed page and the PDF page are the same.
 /// When `pages` does not start with an arabic number, or the computed page is less than 1, the PDF is still returned and the page is empty.
+// [impl->req~logic.externalfiles.pdf-location-resolver~1]
 @NullMarked
 public final class PdfLocationResolver {
 

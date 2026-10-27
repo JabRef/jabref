@@ -92,6 +92,7 @@ class LinkedFilesEditorViewModelTest {
         assertEquals(1, viewModel.getFiles().size(), "ViewModel files should update reactively when entry files are updated");
     }
 
+    // [utest->req~logic.pdf.extract-paper-page-range~1]
     @Test
     void addingAProceedingsPdfAlsoLinksTheEntrysPages(@TempDir Path tempDir) throws IOException {
         Path proceedings = tempDir.resolve("proceedings.pdf");
@@ -123,6 +124,7 @@ class LinkedFilesEditorViewModelTest {
         assertEquals(Optional.of(tempDir.resolve("proceedings-p2-3.pdf")), viewModel.getFiles().get(1).getFile().findIn(List.of(tempDir)));
     }
 
+    // [utest->req~logic.pdf.split-proceedings-outline~1]
     @Test
     void addingAPdfToProceedingsCreatesAnEntryPerPaper(@TempDir Path tempDir) throws IOException {
         proceedingsEditor(tempDir, 18);

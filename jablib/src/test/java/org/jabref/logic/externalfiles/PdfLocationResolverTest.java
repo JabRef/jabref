@@ -24,6 +24,7 @@ class PdfLocationResolverTest {
     private static final LinkedFile PROCEEDINGS_PDF = new LinkedFile("Proceedings", "proc.pdf", StandardFileType.PDF);
     private static final LinkedFile PAPER_PDF = new LinkedFile("Paper", "paper.pdf", StandardFileType.PDF);
 
+    // [utest->req~logic.externalfiles.pdf-location-resolver~1]
     @Test
     void usesTheEntrysOwnPdfAndFirstPage() {
         BibEntry paper = paper("186--206").withFiles(List.of(PAPER_PDF));
@@ -47,6 +48,7 @@ class PdfLocationResolverTest {
         assertSame(paper, location.fileOwner());
     }
 
+    // [utest->req~logic.externalfiles.pdf-location-resolver~1]
     @Test
     void usesTheCrossReferencedPdfAndItsOffset() {
         BibEntry proceedings = proceedings().withField(PdfLocationResolver.PAGE_OFFSET, "14");

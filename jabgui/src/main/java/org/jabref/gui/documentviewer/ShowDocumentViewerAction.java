@@ -15,6 +15,7 @@ import com.airhacks.afterburner.injection.Injector;
 
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
+// [impl->req~jabgui.documentviewer.open-crossref-pdf-at-page~1]
 public class ShowDocumentViewerAction extends SimpleCommand {
     private final DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
     private final StateManager stateManager;
@@ -52,4 +53,3 @@ public class ShowDocumentViewerAction extends SimpleCommand {
         dialogService.showCustomDialog(documentViewerView);
     }
 }
-

@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 ///
 /// A single paper's outline can look like a volume's, with its own sections in place of papers.
 /// So the outline is only trusted when most papers start on a title page and, if they have sections, share a section name.
+// [impl->req~logic.pdf.split-proceedings-outline~1]
 @NullMarked
 public final class PdfOutlineSplitter {
 
