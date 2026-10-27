@@ -16,6 +16,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@NullMarked
 class MarkdownPublicationExporterTest {
 
     // [utest->feat~export.markdown-publications~1]
@@ -201,11 +203,11 @@ class MarkdownPublicationExporterTest {
         BibEntry entry = publication(2025);
 
         if (!doi.isBlank()) {
-            entry.setField(StandardField.DOI, doi);
+            entry = entry.withField(StandardField.DOI, doi);
         }
 
         if (!url.isBlank()) {
-            entry.setField(StandardField.URL, url);
+            entry = entry.withField(StandardField.URL, url);
         }
 
         Path output = tempDir.resolve("publications.md");

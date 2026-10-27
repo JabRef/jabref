@@ -85,13 +85,11 @@ public class MarkdownPublicationExporter extends Exporter {
                                                        entry.getField(StandardField.TITLE).orElse("")))
                                        .toList();
 
-        var resource = MarkdownPublicationExporter.class.getResourceAsStream(
-                "/resource/layout/markdown-publications/publication.layout"
-        );
-
-        if (resource == null) {
-            throw new IOException("Cannot find Markdown publication layout.");
-        }
+        var resource = Optional.ofNullable(
+                MarkdownPublicationExporter.class.getResourceAsStream(
+                        "/resource/layout/markdown-publications/publication.layout"))
+                               .orElseThrow(() ->
+                                       new IOException("Cannot find Markdown publication layout."));
 
         Layout layout;
         try (Reader reader =
@@ -102,11 +100,9 @@ public class MarkdownPublicationExporter extends Exporter {
                     layoutPreferences,
                     abbreviationRepository
             );
-            layout = helper.getLayoutFromText();
-        }
-
-        if (layout == null) {
-            throw new IOException("Cannot load Markdown publication layout.");
+            layout = Optional.ofNullable(helper.getLayoutFromText())
+                             .orElseThrow(() ->
+                                     new IOException("Cannot load Markdown publication layout."));
         }
 
         StringBuilder markdown = new StringBuilder();
@@ -136,8 +132,9 @@ public class MarkdownPublicationExporter extends Exporter {
                                                              .getGroups()
                                                              .flatMap(root -> root.findGroupByName("Export"));
 
-        if (exportGroup.isPresent()) {
-            for (GroupTreeNode subgroup : exportGroup.get().getChildren()) {
+        for (GroupTreeNode subgroup : exportGroup.stream()
+                                                      .flatMap(group -> group.getChildren().stream())
+                                                      .toList()) {
                 appendGroupSection(
                         markdown,
                         subgroup,
@@ -148,7 +145,6 @@ public class MarkdownPublicationExporter extends Exporter {
                         fileDirectories,
                         file
                 );
-            }
         }
 
         try (AtomicFileWriter writer =
