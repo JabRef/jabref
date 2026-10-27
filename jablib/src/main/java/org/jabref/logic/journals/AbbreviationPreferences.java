@@ -10,13 +10,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class AbbreviationPreferences {
-
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
     private final BooleanProperty shouldEnableMscKeywordDescriptions;
     private final BooleanProperty convertJournalOnFetch;
     private final BooleanProperty abbreviateOnFetch;
     private final ObjectProperty<AbbreviationType> abbreviationTypeOnFetch;
+
+    private JournalMode mode;
+
+    private AbbreviationType abbreviationType;
 
     public AbbreviationPreferences(List<String> externalJournalLists,
                                    boolean useFJournalField,
@@ -28,6 +31,8 @@ public class AbbreviationPreferences {
         this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
         this.shouldEnableMscKeywordDescriptions = new SimpleBooleanProperty(shouldEnableMscKeywordDescriptions);
+        this.mode = JournalMode.NONE;
+        this.abbreviationType = AbbreviationType.DEFAULT;
         this.convertJournalOnFetch = new SimpleBooleanProperty(convertJournalOnFetch);
         this.abbreviateOnFetch = new SimpleBooleanProperty(abbreviateOnFetch);
         this.abbreviationTypeOnFetch = new SimpleObjectProperty<>(abbreviationTypeOnFetch);
@@ -50,6 +55,22 @@ public class AbbreviationPreferences {
 
     public ObservableList<String> getExternalJournalLists() {
         return externalJournalLists;
+    }
+
+    public AbbreviationType getAbbreviationType() {
+        return abbreviationType;
+    }
+
+    public void setAbbreviationType(AbbreviationType abbreviationType) {
+        this.abbreviationType = abbreviationType;
+    }
+
+    public JournalMode getJournalMode() {
+        return mode;
+    }
+
+    public void setJournalMode(JournalMode mode) {
+        this.mode = mode;
     }
 
     public void setExternalJournalLists(List<String> list) {

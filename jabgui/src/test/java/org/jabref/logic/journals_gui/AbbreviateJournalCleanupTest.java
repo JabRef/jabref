@@ -1,0 +1,98 @@
+package org.jabref.logic.journals_gui;
+
+import java.util.Optional;
+
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
+import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
+import org.jabref.logic.cleanup.CleanupJob;
+import org.jabref.logic.cleanup.UnabbreviateJournalCleanup;
+import org.jabref.logic.journals.AbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationType;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalMode;
+import org.jabref.model.database.BibDatabase;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+class AbbreviateCleanupFactoryTest {
+
+    @Test
+    void abbreviateCleanupReturnsEmptyWhenRepositoryIsNull() {
+        AbbreviationPreferences preferences = mock(AbbreviationPreferences.class);
+        Optional<CleanupJob> result = AbbreviateCleanupFactory.abbreviateCleanup(
+                null,
+                preferences);
+        assertEquals(Optional.empty(), result);
+    }
+
+    @Test
+    void abbreviateCleanupReturnsEmptyWhenPreferencesAreNull() {
+        JournalAbbreviationRepository repository = mock(JournalAbbreviationRepository.class);
+        Optional<CleanupJob> result = AbbreviateCleanupFactory.abbreviateCleanup(
+                repository,
+                null);
+        assertEquals(Optional.empty(), result);
+    }
+
+    @Test
+    void abbreviateCleanupReturnsEmptyWhenJournalModeIsNone() {
+        JournalAbbreviationRepository repository = mock(JournalAbbreviationRepository.class);
+        AbbreviationPreferences preferences = preferencesWithMode(JournalMode.NONE);
+        Optional<CleanupJob> result = AbbreviateCleanupFactory.abbreviateCleanup(
+                repository,
+                preferences);
+        assertEquals(Optional.empty(), result);
+    }
+
+    @Test
+    void abbreviateCleanupCreatesAbbreviateJobWhenJournalModeIsAbbreviate() {
+        JournalAbbreviationRepository repository = mock(JournalAbbreviationRepository.class);
+        AbbreviationPreferences preferences = preferencesWithMode(JournalMode.ABBREVIATE);
+        Optional<CleanupJob> result = AbbreviateCleanupFactory.abbreviateCleanup(repository, preferences);
+        assertTrue(result.isPresent());
+        assertInstanceOf(AbbreviateJournalCleanup.class, result.orElseThrow());
+    }
+
+    @Test
+    void abbreviateCleanupCreatesUnabbreviateJobWhenJournalModeIsUnabbreviate() {
+        JournalAbbreviationRepository repository = mock(JournalAbbreviationRepository.class);
+        AbbreviationPreferences preferences = preferencesWithMode(JournalMode.UNABBREVIATE);
+        Optional<CleanupJob> result = AbbreviateCleanupFactory.abbreviateCleanup(repository, preferences);
+        assertTrue(result.isPresent());
+        assertInstanceOf(UnabbreviateJournalCleanup.class, result.orElseThrow());
+    }
+
+    @Test
+    void abbreviateCleanupWithDatabaseAbbreviateJobWhenDatabaseIsProvided() {
+        BibDatabase database = new BibDatabase();
+        JournalAbbreviationRepository repository = mock(JournalAbbreviationRepository.class);
+        AbbreviationPreferences preferences = preferencesWithMode(JournalMode.ABBREVIATE);
+        Optional<CleanupJob> result = AbbreviateCleanupFactory.abbreviateCleanup(database, repository, preferences);
+        assertTrue(result.isPresent());
+        assertInstanceOf(AbbreviateJournalCleanup.class, result.orElseThrow());
+    }
+
+    @Test
+    void abbreviateCleanupWithDatabaseUnabbreviateJobWhenDatabaseIsProvided() {
+        BibDatabase database = new BibDatabase();
+        JournalAbbreviationRepository repository = mock(JournalAbbreviationRepository.class);
+        AbbreviationPreferences preferences = preferencesWithMode(JournalMode.UNABBREVIATE);
+        Optional<CleanupJob> result = AbbreviateCleanupFactory.abbreviateCleanup(database, repository, preferences);
+        assertTrue(result.isPresent());
+        assertInstanceOf(UnabbreviateJournalCleanup.class, result.orElseThrow());
+    }
+
+    private static AbbreviationPreferences preferencesWithMode(JournalMode journalMode) {
+        AbbreviationPreferences preferences = mock(AbbreviationPreferences.class);
+        when(preferences.getJournalMode()).thenReturn(journalMode);
+        when(preferences.getAbbreviationType()).thenReturn(AbbreviationType.values()[0]);
+        when(preferences.shouldUseFJournalField()).thenReturn(false);
+        return preferences;
+    }
+}

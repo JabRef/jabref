@@ -9,7 +9,7 @@
 //DEPS org.jooq:jool:0.9.15
 //DEPS org.jspecify:jspecify:1.0.1
 // Keep this version in sync with versions/build.gradle.kts.
-//DEPS org.openjfx:javafx-base:27
+//DEPS org.openjfx:javafx-base:27.0.1
 //DEPS org.slf4j:slf4j-api:2.0.20
 //DEPS org.slf4j:slf4j-simple:2.0.20
 
@@ -18,6 +18,8 @@
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationParser.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationPreferences.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationType.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalMode.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/*.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/BackgroundTask.java

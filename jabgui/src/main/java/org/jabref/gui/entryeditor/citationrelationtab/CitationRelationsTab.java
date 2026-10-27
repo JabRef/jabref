@@ -31,7 +31,6 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -54,6 +53,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.bibtexhighlighter.BibTeXCodeArea;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
@@ -71,11 +71,13 @@ import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
@@ -93,10 +95,10 @@ import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import org.controlsfx.control.CheckListView;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +115,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
     private final DuplicateCheck duplicateCheck;
     private final BibEntryTypesManager entryTypesManager;
+    private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
     private final StateManager stateManager;
 
     private final ProgressIndicator progressIndicator;
@@ -131,9 +134,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
                                 BibEntryTypesManager bibEntryTypesManager,
-                                SearchCitationsRelationsService searchCitationsRelationsService) {
+                                SearchCitationsRelationsService searchCitationsRelationsService,
+                                BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
@@ -715,31 +720,25 @@ public class CitationRelationsTab extends EntryEditorTab {
         return writer.toString();
     }
 
+    // [impl->req~entry-editor.citations.source-highlighting~1]
     private void showEntrySourceDialog(BibEntry entry) {
-        CodeArea ca = new CodeArea();
-        ca.getStyleClass().add("source-preview-code-area");
+        BibTeXCodeArea codeArea = new BibTeXCodeArea(stateManager, bibTeXSyntaxHighlighter);
         try {
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
-            ca.appendText(getSourceString(entry, mode, preferences.getFieldPreferences(), this.entryTypesManager));
+            codeArea.appendText(getSourceString(entry, mode, preferences.getFieldPreferences(), this.entryTypesManager));
         } catch (IOException e) {
             LOGGER.warn("Incorrect entry, could not load source:", e);
             return;
         }
 
-        ca.setWrapText(true);
-        ca.setPadding(new Insets(0, 10, 0, 10));
-        ca.showParagraphAtTop(0);
-
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setContent(new VirtualizedScrollPane<>(ca));
+        codeArea.setPadding(new Insets(0, 10, 0, 10));
+        codeArea.moveDocumentStart();
 
         DialogPane dialogPane = new DialogPane();
         dialogPane.setPrefSize(800, 400);
-        dialogPane.setContent(scrollPane);
-        String title = Localization.lang("Show BibTeX source");
+        dialogPane.setContent(codeArea);
+        String title = Localization.lang("BibTeX source");
 
         dialogService.showCustomDialogAndWait(title, dialogPane, ButtonType.OK);
     }
@@ -962,8 +961,11 @@ public class CitationRelationsTab extends EntryEditorTab {
             BackgroundTask<List<CitationRelationItem>> self = selfReference.get();
             return (self != null) && self.isCancelled();
         };
-        BackgroundTask<List<CitationRelationItem>> task = BackgroundTask.wrap(
-                () -> matchAgainstLibrary(fetch.fetch(isCancelled), libraryEntries, databaseMode, isCancelled));
+        BackgroundTask<List<CitationRelationItem>> task = BackgroundTask.wrap(() -> {
+            List<BibEntry> fetchedEntries = fetch.fetch(isCancelled);
+            applyJournalCleanup(fetchedEntries);
+            return matchAgainstLibrary(fetchedEntries, libraryEntries, databaseMode, isCancelled);
+        });
         selfReference.set(task);
         return task;
     }
@@ -1057,6 +1059,24 @@ public class CitationRelationsTab extends EntryEditorTab {
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
+    }
+
+    private void applyJournalCleanup(List<BibEntry> entries) {
+        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+        JournalAbbreviationRepository repository =
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+        if (databaseContext.isEmpty()) {
+            AbbreviateCleanupFactory.abbreviateCleanup(
+                    null,
+                    repository,
+                    preferences.getAbbreviationPreferences()
+            ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
+        }
+        AbbreviateCleanupFactory.abbreviateCleanup(
+                databaseContext.get().getDatabase(),
+                repository,
+                preferences.getAbbreviationPreferences()
+        ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
     }
 
     private void handleRefresh(CitationComponents citationComponents, CitationComponents otherCitationComponents) {
