@@ -123,9 +123,9 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             Pattern.CASE_INSENSITIVE);
 
     /// `Firstname [Middle] Lastname`, as in `Marc Shapiro and Susan Horwitz.`: the complete authors block, which has to
-    /// end with a period. This pattern is the most ambiguous one, because a title such as `Machine Learning.` looks
-    /// the same. Thus, it is only used if neither of the patterns above found an author and a separate title
-    /// boundary follows the authors block.
+    /// end with a period or before a parenthesized year. This pattern is the most ambiguous one, because a title
+    /// such as `Machine Learning.` looks the same. Thus, it is only used if neither of the patterns above found an
+    /// author and a separate title boundary follows the authors block.
     private static final String FULL_NAME_REGEX =
             NAME_WORD_REGEX + "(?:\\s+(?:\\p{Lu}\\.|" + NAME_PARTICLE_REGEX + "|" + NAME_WORD_REGEX + ")){1,3}?" +
                     "(?:\\s+" + NAME_SUFFIX_REGEX + "\\.?)?";
@@ -135,7 +135,8 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final Pattern FULL_NAME_AUTHORS_PATTERN = Pattern.compile(
             "^\\s*(?<" + AUTHORS_GROUP + ">" + FULL_NAME_REGEX +
                     "(?:" + FULL_NAME_SEPARATOR_REGEX + FULL_NAME_REGEX + ")*)" +
-                    "(?:,?\\s+(?<" + ET_AL_GROUP + ">(?i:et\\s+al)))?\\.(?=\\s|$)");
+                    "(?:,?\\s+(?<" + ET_AL_GROUP + ">(?i:et\\s+al)))?" +
+                    "(?:\\.(?=\\s|$)|(?=\\s*\\(\\s*\\d{4}\\s*[a-z]?\\s*\\)\\s*\\.))");
 
     private static final Pattern FULL_NAME_SEPARATOR_PATTERN = Pattern.compile(FULL_NAME_SEPARATOR_REGEX);
 
@@ -481,9 +482,14 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         }
 
         String remainder = input.substring(blockMatcher.end()).stripLeading();
-        if (!TITLE_END_PATTERN.matcher(remainder).find()
-                && !QUOTED_TITLE_PATTERN.matcher(remainder).find()
-                && !remainder.contains("//")) {
+        String titleCandidate = remainder;
+        Matcher yearMatcher = YEAR_IN_PARENTHESES_CANDIDATE_PATTERN.matcher(remainder);
+        if (yearMatcher.lookingAt()) {
+            titleCandidate = LEADING_NOISE_PATTERN.matcher(remainder.substring(yearMatcher.end())).replaceFirst("");
+        }
+        if (!TITLE_END_PATTERN.matcher(titleCandidate).find()
+                && !QUOTED_TITLE_PATTERN.matcher(titleCandidate).find()
+                && !titleCandidate.contains("//")) {
             return input;
         }
 

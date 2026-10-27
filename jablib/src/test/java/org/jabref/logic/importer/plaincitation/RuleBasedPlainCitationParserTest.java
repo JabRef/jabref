@@ -277,6 +277,39 @@ class RuleBasedPlainCitationParserTest {
         assertEquals(Optional.of("Smith, John"), parseField("John Smith. A title. Journal, 2020.", StandardField.AUTHOR));
     }
 
+    static Stream<Arguments> findsFullNameAuthorsBeforeParenthesizedYear() {
+        return Stream.of(
+                Arguments.of("Smith, John", "John Smith (2020). A title. Journal."),
+                Arguments.of("Smith, John", "John Smith(2020). A title. Journal."),
+                Arguments.of("Smith, John", "John Smith ( 2020a ). A title. Journal."),
+                Arguments.of("Smith, John", "John Smith (2020). A title. Journal, 2021."),
+                Arguments.of("Smith, John and Tan, Mary", "John Smith and Mary Tan (2020). A title. Journal."),
+                Arguments.of("Smith, Jr., John", "John Smith Jr. (2020). A title. Journal."),
+                Arguments.of("Smith, John and others", "John Smith et al. (2020). A title. Journal."),
+                Arguments.of("Smith, John", "John Smith (2020). \"A title\" Journal."),
+                Arguments.of("Smith, John", "John Smith (2020). A title // Journal."));
+    }
+
+    // [utest->req~import.plain-citation.authors~1]
+    @ParameterizedTest
+    @MethodSource
+    void findsFullNameAuthorsBeforeParenthesizedYear(String expectedAuthor, String citation) throws FetcherException {
+        Optional<BibEntry> entry = parser.parsePlainCitation(citation);
+        assertEquals(List.of(Optional.of(expectedAuthor), Optional.of("2020"), Optional.of("A title")),
+                List.of(entry.flatMap(e -> e.getField(StandardField.AUTHOR)),
+                        entry.flatMap(e -> e.getField(StandardField.YEAR)),
+                        entry.flatMap(e -> e.getField(StandardField.TITLE))));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Machine Learning (2020). Nature.",
+            "Machine Learning. (2020). Nature.",
+            "John Smith (2020).",
+            "John Smith (2020). A title"})
+    void parenthesizedYearDoesNotReplaceSeparateTitleBoundary(String citation) throws FetcherException {
+        assertEquals(Optional.empty(), parseField(citation, StandardField.AUTHOR));
+    }
+
     static Stream<Arguments> keepsSuffixWithFullNameAuthor() {
         return Stream.of(
                 Arguments.of("Smith, Jr., John", "John Smith Jr."),

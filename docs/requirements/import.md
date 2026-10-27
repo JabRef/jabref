@@ -168,6 +168,7 @@ Needs: impl, utest
 The rule-based plain citation parser reads the authors block at the start of a citation in the formats `Lastname, I. J.`, `I. J. Lastname` and a mix of both, separated by commas, `&` or `and`.
 Name particles stay with the family name, and `et al.` becomes `and others`.
 Full names (`Firstname Lastname`) are only taken as authors if a separate title follows, so that a capitalized title is not mistaken for an author.
+A parenthesized publication year may separate the full names from the title.
 
 Needs: impl, utest
 
