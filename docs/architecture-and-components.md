@@ -303,6 +303,18 @@ for journals and `externalConferenceLists` for conferences, so existing journal 
 `JournalAbbreviationRepository` retains LTWA support and the existing demonstration fallback.
 `ConferenceAbbreviationRepository` starts empty or reads a conference MVStore file and does not require LTWA data.
 Conference title normalization and field cleanup are separate from these repositories.
+`AbbreviateJournalCleanup` and `UnabbreviateJournalCleanup` accept both repositories and reuse their
+field conversion logic for `booktitle`, using only the conference repository for that field.
+Default, dotless, and shortest unique forms use the existing lookup rules, including fuzzy matching.
+LTWA and `fjournal` remain journal-specific. The original constructors retain journal-only behavior;
+callers can pass a conference repository through the new `CleanupWorker` constructor to enable book title cleanup.
+The cleanup dialog snapshots conference preferences before starting its task and loads the conference repository
+once per operation. Each entry is processed through the existing cleanup and undo flow.
+Journal and conference preference pages share the abbreviation editor while persisting independent external lists;
+only the journal page exposes `fjournal`. Saving an edited CSV reloads its corresponding repository.
+`IntegrityCheck` accepts a conference repository and registers `AbbreviationChecker` for book title fields.
+The GUI integrity action loads configured conference lists in its background task; JabKit loads the same
+preferences for integrity checks. Journal integrity checks retain the journal repository.
 
 `AbbreviationLoader` shares resource extraction and external CSV loading between journal and conference loaders.
 The journal loader also loads LTWA and retains its lazy background loading API.

@@ -16,6 +16,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class ConferenceAbbreviationLoader extends AbbreviationLoader<ConferenceAbbreviationRepository> {
+    // [impl->req~abbreviations.conference-store~1]
     public ConferenceAbbreviationLoader() {
         super("conferences", "conference-list.mv");
     }

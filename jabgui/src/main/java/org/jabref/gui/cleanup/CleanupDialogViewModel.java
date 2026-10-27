@@ -21,6 +21,9 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
 import org.jabref.logic.cleanup.CleanupWorker;
+import org.jabref.logic.conferences.ConferenceAbbreviationLoader;
+import org.jabref.logic.conferences.ConferenceAbbreviationPreferences;
+import org.jabref.logic.conferences.ConferenceAbbreviationRepository;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -129,11 +132,13 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         CleanupPreferences cleanupPreset = new CleanupPreferences(EnumSet.copyOf(selectedTab.selectedJobs()));
         selectedTab.formatters().ifPresent(cleanupPreset::setFieldFormatterCleanups);
 
+        ConferenceAbbreviationPreferences conferencePreferences = new ConferenceAbbreviationPreferences(
+                List.copyOf(preferences.getConferenceAbbreviationPreferences().getExternalLists()));
         if (taskExecutor != null) {
             new BackgroundTask<Void>() {
                 @Override
                 public Void call() {
-                    cleanupWithProgress(cleanupPreset, entriesToProcess, this);
+                    cleanupWithProgress(cleanupPreset, entriesToProcess, this, conferencePreferences);
                     return null;
                 }
             }
@@ -145,7 +150,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                     .onFailure(dialogService::showErrorDialogAndWait)
                     .executeWith(taskExecutor);
         } else {
-            cleanup(cleanupPreset, entriesToProcess);
+            cleanup(cleanupPreset, entriesToProcess, conferencePreferences);
             if (showFeedback) {
                 showResults();
             }
@@ -156,7 +161,8 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     ///
     /// @param mutationScheduler routes BibEntry field mutations to the correct thread
     /// @return true iff entry was modified
-    private boolean doCleanup(CleanupPreferences preset,
+    private boolean doCleanup(ConferenceAbbreviationRepository conferenceRepository,
+                              CleanupPreferences preset,
                               BibEntry entry,
                               CompoundEdit compoundEdit,
                               List<JabRefException> failures,
@@ -166,9 +172,8 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                 preferences.getFilePreferences(),
                 preferences.getTimestampPreferences(),
                 preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
-                journalAbbreviationRepository
-        );
-
+                journalAbbreviationRepository,
+                conferenceRepository);
         List<FieldChange> changes = cleaner.cleanup(preset, entry, mutationScheduler);
 
         compoundEdit.addAll(changes);
@@ -178,18 +183,28 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         return !changes.isEmpty();
     }
 
+    // [impl->req~abbreviations.conference-cleanup-ui~1]
+    private ConferenceAbbreviationRepository loadConferenceRepository(CleanupPreferences preset, ConferenceAbbreviationPreferences conferencePreferences) {
+        boolean usesConferenceList = preset.getActiveJobs().stream().anyMatch(step -> switch (step) {
+            case ABBREVIATE_DEFAULT, ABBREVIATE_DOTLESS, ABBREVIATE_SHORTEST_UNIQUE, UNABBREVIATE -> true;
+            default -> false;
+        });
+        return usesConferenceList ? ConferenceAbbreviationLoader.loadRepository(conferencePreferences) : new ConferenceAbbreviationRepository();
+    }
+
     private void showResults() {
         dialogService.notify(Localization.lang("%0 entry(s) needed a clean up", Integer.toString(modifiedEntriesCount)));
     }
 
-    private void cleanup(CleanupPreferences cleanupPreferences, List<BibEntry> entries) {
+    private void cleanup(CleanupPreferences cleanupPreferences, List<BibEntry> entries, ConferenceAbbreviationPreferences conferencePreferences) {
+        ConferenceAbbreviationRepository conferenceRepository = loadConferenceRepository(cleanupPreferences, conferencePreferences);
         List<JabRefException> failures = new ArrayList<>();
 
         String editName = Localization.lang("Clean up entry(s)");
         // undo granularity is on a set of all entries
         undoManager.addEdit(editName, edit -> {
             for (BibEntry entry : entries) {
-                if (doCleanup(cleanupPreferences, entry, edit, failures, Runnable::run)) {
+                if (doCleanup(conferenceRepository, cleanupPreferences, entry, edit, failures, Runnable::run)) {
                     modifiedEntriesCount++;
                 }
             }
@@ -202,7 +217,9 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
     private void cleanupWithProgress(CleanupPreferences cleanupPreferences,
                                      List<BibEntry> entries,
-                                     BackgroundTask<?> task) {
+                                     BackgroundTask<?> task,
+                                     ConferenceAbbreviationPreferences conferencePreferences) {
+        ConferenceAbbreviationRepository conferenceRepository = loadConferenceRepository(cleanupPreferences, conferencePreferences);
         int count = entries.size();
         if (count > 1) {
             task.showToUser(true);
@@ -221,7 +238,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
                 // BibEntry uses ObservableMap which fires FX listeners on mutation.
                 // Heavy computation stays on this background thread; only field mutations are dispatched
                 // to the FX thread via UiTaskExecutor::runAndWaitInJavaFXThread (blocking).
-                if (doCleanup(cleanupPreferences, entries.get(i), edit, failures, UiTaskExecutor::runAndWaitInJavaFXThread)) {
+                if (doCleanup(conferenceRepository, cleanupPreferences, entries.get(i), edit, failures, UiTaskExecutor::runAndWaitInJavaFXThread)) {
                     modifiedEntriesCount++;
                 }
 

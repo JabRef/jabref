@@ -24,10 +24,31 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @NullMarked
 class ConferenceAbbreviationLoaderTest {
     private static final String CONFERENCE_NAME = "International Conference on Business Process Management";
+
+    // [utest->req~abbreviations.conference-store~1]
+    @Test
+    void packagesSeparateConferenceStore() {
+        assertNotNull(ConferenceAbbreviationLoader.class.getResource("/conferences/conference-list.mv"));
+        assertEquals(List.of(), List.copyOf(ConferenceAbbreviationLoader.loadBuiltInRepository().getCustomAbbreviations()));
+    }
+
+    @Test
+    void explicitIndinRecordSupportsDefaultAndShortestForms(@TempDir Path directory) throws IOException {
+        String fullName = "2023 {IEEE} 21st International Conference on Industrial Informatics ({INDIN})";
+        Path csv = directory.resolve("conferences.csv");
+        Files.writeString(csv, "\"" + fullName + "\",\"21st INDIN\",\"INDIN\"");
+
+        ConferenceAbbreviationRepository repository = ConferenceAbbreviationLoader.loadRepository(
+                new ConferenceAbbreviationPreferences(List.of(csv.toString())));
+
+        assertEquals(Optional.of("21st INDIN"), repository.getDefaultAbbreviation(fullName));
+        assertEquals(Optional.of(new Abbreviation(fullName, "21st INDIN", "INDIN")), repository.get("INDIN"));
+    }
 
     @Test
     void loadsExternalConferenceCsv(@TempDir Path directory) throws IOException {

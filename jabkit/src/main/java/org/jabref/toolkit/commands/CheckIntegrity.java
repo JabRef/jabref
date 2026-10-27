@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.conferences.ConferenceAbbreviationLoader;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityCheckResultCsvWriter;
@@ -78,6 +79,7 @@ class CheckIntegrity implements Callable<Integer> {
                 jabKit.cliPreferences.getFilePreferences(),
                 jabKit.cliPreferences.getCitationKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadRepository(jabKit.cliPreferences.getJournalAbbreviationPreferences()),
+                ConferenceAbbreviationLoader.loadRepository(jabKit.cliPreferences.getConferenceAbbreviationPreferences()),
                 allowIntegerEdition
         );
 

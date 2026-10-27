@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Contribute to JabRef" to the Help menu, linking to [contribute.jabref.org](https://contribute.jabref.org). [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
+- We added conference abbreviation preferences and support for abbreviating, expanding, and checking conference names. [#12728](https://github.com/JabRef/jabref/issues/12728)
 - We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
 
 ### Changed

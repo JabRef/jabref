@@ -42,21 +42,21 @@ public class CleanupJournalRelatedPanel extends VBox implements CleanupPanel {
     }
 
     private void initialize() {
-        cleanupJournalAbbreviationsLabel.setText(Localization.lang("Manage journal abbreviations"));
+        cleanupJournalAbbreviationsLabel.setText(Localization.lang("Manage journal and conference abbreviations"));
 
-        abbreviateDefault.setText(Localization.lang("Abbreviate (default)"));
+        abbreviateDefault.setText(Localization.lang("Abbreviate journals and book titles (default)"));
         abbreviateDefault.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
 
-        abbreviateDottles.setText(Localization.lang("Abbreviate (dotless)"));
+        abbreviateDottles.setText(Localization.lang("Abbreviate journals and book titles (dotless)"));
         abbreviateDottles.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS);
 
-        abbreviateShortestUnique.setText(Localization.lang("Abbreviate (shortest unique)"));
+        abbreviateShortestUnique.setText(Localization.lang("Abbreviate journals and book titles (shortest unique)"));
         abbreviateShortestUnique.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE);
 
-        abbreviateLTWA.setText(Localization.lang("Abbreviate (LTWA)"));
+        abbreviateLTWA.setText(Localization.lang("Abbreviate journal names (LTWA)"));
         abbreviateLTWA.setUserData(CleanupPreferences.CleanupStep.ABBREVIATE_LTWA);
 
-        unabbreviate.setText(Localization.lang("Unabbreviate"));
+        unabbreviate.setText(Localization.lang("Expand journals and book titles"));
         unabbreviate.setUserData(CleanupPreferences.CleanupStep.UNABBREVIATE);
     }
 

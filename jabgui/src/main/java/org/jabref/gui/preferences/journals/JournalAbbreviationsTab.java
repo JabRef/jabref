@@ -4,6 +4,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -26,20 +27,30 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.conferences.ConferenceAbbreviationLoader;
+import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
+import org.jspecify.annotations.NullMarked;
 
 import static org.jabref.gui.preferences.forms.FormMetrics.GAP;
 
 /// Tab for managing journal abbreviation lists.
 public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAbbreviationsTabViewModel> {
 
+    @NullMarked
+    protected enum AbbreviationListType {
+        CONFERENCES,
+        JOURNALS
+    }
+
+    private final AbbreviationListType listType;
     private final TableView<AbbreviationViewModel> journalAbbreviationsTable = new TableView<>();
-    private final TableColumn<AbbreviationViewModel, String> journalTableNameColumn = new TableColumn<>(Localization.lang("Full journal name"));
+    private final TableColumn<AbbreviationViewModel, String> journalTableNameColumn = new TableColumn<>();
     private final CustomTextField searchBox = new CustomTextField();
 
     private final FilteredList<AbbreviationViewModel> filteredAbbreviations;
@@ -47,11 +58,20 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     private Timeline invalidateSearch;
 
     public JournalAbbreviationsTab() {
+        this(AbbreviationListType.JOURNALS);
+    }
+
+    protected JournalAbbreviationsTab(AbbreviationListType listType) {
+        this.listType = listType;
         viewModel = new JournalAbbreviationsTabViewModel(
-                preferences.getJournalAbbreviationPreferences(),
+                listType == AbbreviationListType.JOURNALS
+                ? preferences.getJournalAbbreviationPreferences() : preferences.getConferenceAbbreviationPreferences(),
                 dialogService,
                 taskExecutor,
-                Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+                listType == AbbreviationListType.JOURNALS
+                ? Injector.instantiateModelOrService(JournalAbbreviationRepository.class) : ConferenceAbbreviationLoader.loadBuiltInRepository());
+        journalTableNameColumn.setText(listType == AbbreviationListType.JOURNALS
+                ? Localization.lang("Full journal name") : Localization.lang("Full conference name"));
         filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty());
 
         buildView();
@@ -60,16 +80,19 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @Override
     public String getTabName() {
-        return Localization.lang("Journal abbreviations");
+        return listType == AbbreviationListType.JOURNALS
+               ? Localization.lang("Journal abbreviations") : Localization.lang("Conference abbreviations");
     }
 
     private void buildView() {
-        setContent(form()
+        var builder = form()
                 .custom(buildFileChooserRow())
                 .custom(buildAbbreviationsEditor())
-                .custom(buildAddAbbreviationRow())
-                .checkbox(Localization.lang("Use the field FJournal to store the full journal name for (un)abbreviations in the entry"), viewModel.useFJournalProperty())
-                .build());
+                .custom(buildAddAbbreviationRow());
+        if (listType == AbbreviationListType.JOURNALS) {
+            builder.checkbox(Localization.lang("Use the field FJournal to store the full journal name for (un)abbreviations in the entry"), viewModel.useFJournalProperty());
+        }
+        setContent(builder.build());
     }
 
     private Node buildFileChooserRow() {
@@ -86,7 +109,8 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         Button removeList = toolButton(IconTheme.JabRefIcons.REMOVE_ABBREVIATION_LIST, Localization.lang("Remove list"), viewModel::removeCurrentFile);
         removeList.disableProperty().bind(viewModel.isFileRemovableProperty().not());
 
-        HBox row = new HBox(4.0, new Label(Localization.lang("Journal lists:")), journalFilesBox, addList, openList, removeList);
+        HBox row = new HBox(4.0, new Label(listType == AbbreviationListType.JOURNALS
+                ? Localization.lang("Journal lists") : Localization.lang("Conference lists")), journalFilesBox, addList, openList, removeList);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
     }
@@ -123,16 +147,22 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         journalTableNameColumn.setPrefWidth(400.0);
         journalTableNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         journalTableNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        journalTableNameColumn.setOnEditCommit(event -> viewModel.editAbbreviation(event.getRowValue(), new Abbreviation(
+                event.getNewValue(), event.getRowValue().getAbbreviation(), event.getRowValue().getShortestUniqueAbbreviation())));
 
         TableColumn<AbbreviationViewModel, String> abbreviationColumn = new TableColumn<>(Localization.lang("Abbreviation name"));
         abbreviationColumn.setPrefWidth(200.0);
         abbreviationColumn.setCellValueFactory(cellData -> cellData.getValue().abbreviationProperty());
         abbreviationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        abbreviationColumn.setOnEditCommit(event -> viewModel.editAbbreviation(event.getRowValue(), new Abbreviation(
+                event.getRowValue().getName(), event.getNewValue(), event.getRowValue().getShortestUniqueAbbreviation())));
 
         TableColumn<AbbreviationViewModel, String> shortestUniqueAbbreviationColumn = new TableColumn<>(Localization.lang("Shortest unique abbreviation"));
         shortestUniqueAbbreviationColumn.setPrefWidth(200.0);
         shortestUniqueAbbreviationColumn.setCellValueFactory(cellData -> cellData.getValue().shortestUniqueAbbreviationProperty());
         shortestUniqueAbbreviationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        shortestUniqueAbbreviationColumn.setOnEditCommit(event -> viewModel.editAbbreviation(event.getRowValue(), new Abbreviation(
+                event.getRowValue().getName(), event.getRowValue().getAbbreviation(), event.getNewValue())));
 
         TableColumn<AbbreviationViewModel, String> actionsColumn = new TableColumn<>();
         actionsColumn.setMinWidth(30.0);
@@ -143,7 +173,8 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         new ValueTableCellFactory<AbbreviationViewModel, String>()
                 .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove journal '%0'", name))
+                .withTooltip(name -> listType == AbbreviationListType.JOURNALS
+                        ? Localization.lang("Remove journal '%0'", name) : Localization.lang("Remove conference '%0'", name))
                 .withDisableExpression(_ -> viewModel.isEditableAndRemovableProperty().not())
                 .withVisibleExpression(_ -> viewModel.isEditableAndRemovableProperty())
                 .withOnMouseClickedEvent(_ -> _ ->
@@ -161,7 +192,9 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
         Label loadingLabel = new Label(Localization.lang("Loading built in lists"));
         loadingLabel.setMaxHeight(30.0);
-        loadingLabel.visibleProperty().bind(viewModel.isLoadingProperty());
+        loadingLabel.textProperty().bind(Bindings.when(viewModel.isLoadingProperty())
+                .then(Localization.lang("Loading built in lists"))
+                .otherwise(Localization.lang("No abbreviation files loaded")));
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setMaxHeight(30.0);
         progressIndicator.setOpacity(0.4);
