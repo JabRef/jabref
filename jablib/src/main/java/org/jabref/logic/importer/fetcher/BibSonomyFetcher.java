@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -111,5 +112,35 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_BIBSONOMY);
+    }
+
+    @Override
+    public boolean isValidKey(String apiKey) {
+        String usernameAndApiKey = apiKey.strip();
+        if (!hasUsernameAndApiKey(usernameAndApiKey)) {
+            return false;
+        }
+        try {
+            URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
+            uriBuilder.addParameter("resourcetype", "publication");
+            uriBuilder.addParameter("format", "bibtex");
+            uriBuilder.addParameter("start", "0");
+            uriBuilder.addParameter("end", "1");
+            URLDownload download = new URLDownload(uriBuilder.build().toURL());
+            download.addHeader("Authorization", basicAuthHeader(usernameAndApiKey));
+            // openConnection() throws FetcherException for 4xx/5xx, e.g. 401 wrong key, 400 bad format
+            if (download.openConnection() instanceof HttpURLConnection connection) {
+                connection.disconnect();
+            }
+            return true;
+        } catch (FetcherException | URISyntaxException | MalformedURLException _) {
+            return false;
+        }
+    }
+
+    /// `username:apikey` needs text on both sides of the colon
+    static boolean hasUsernameAndApiKey(String key) {
+        int colon = key.indexOf(':');
+        return colon > 0 && colon < key.length() - 1;
     }
 }

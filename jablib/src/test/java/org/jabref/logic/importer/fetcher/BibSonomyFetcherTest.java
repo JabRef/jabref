@@ -16,13 +16,15 @@ import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExternalServicesTest
 class BibSonomyFetcherTest {
 
     private final BuildInfo buildInfo = new BuildInfo();
@@ -46,6 +48,7 @@ class BibSonomyFetcherTest {
     }
 
     @Test
+    @ExternalServicesTest
     /* To check to real search returns the correct paper, field by field */
     void searchByQueryFindsEntry() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
@@ -60,14 +63,23 @@ class BibSonomyFetcherTest {
     }
 
     @Test
+    @ExternalServicesTest
     /* To check a search with no matches gives an empty list, not an error */
     void searchWithNonsenseQueryReturnsEmptyList() throws FetcherException {
         assertEquals(List.of(), fetcher.performSearch("xqzvwplkjhgfdsa1234567890"));
     }
 
     @Test
+    @ExternalServicesTest
     /* To check an empty search box gives an empty list */
     void searchWithEmptyQueryReturnsEmptyList() throws FetcherException {
         assertEquals(List.of(), fetcher.performSearch(""));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"abc", ":", "user:", ":key", "", "   "})
+    /* To check keys without both a username and an API key are rejected before any request */
+    void malformedKeyIsInvalid(String key) {
+        assertFalse(fetcher.isValidKey(key));
     }
 }
