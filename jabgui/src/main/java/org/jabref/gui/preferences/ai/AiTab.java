@@ -267,7 +267,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     private void initializeApiKey() {
         apiKeyTextField.textProperty().bindBidirectional(viewModel.apiKeyProperty());
-        apiKeyTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+        apiKeyTextField.disableProperty().bind(Bindings.or(viewModel.disableBasicSettingsProperty(), viewModel.disableApiKeyProperty()));
 
         Button revealApiKeyButton = ControlHelper.iconButton(IconTheme.JabRefIcons.PASSWORD_REVEALED);
         revealApiKeyButton.disableProperty().bind(apiKeyTextField.disableProperty());

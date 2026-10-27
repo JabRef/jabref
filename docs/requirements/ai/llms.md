@@ -56,6 +56,15 @@ Needs: impl
 
 Covers: `feat~ai.llms.providers~1`
 
+### Support dummy LLM provider
+`req~ai.llms.providers.dummy~1`
+
+Rationale: allows testing and debugging of AI features without external API calls or credentials
+
+Needs: impl
+
+Covers: `feat~ai.llms.providers~1`
+
 ## Support local and custom LLM connections
 `feat~ai.llms.custom~1`
 

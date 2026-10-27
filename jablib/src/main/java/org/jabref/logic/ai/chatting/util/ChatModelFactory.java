@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.chatting.DummyChatLanguageModel;
 import org.jabref.logic.ai.chatting.JvmOpenAiChatLanguageModel;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.ai.tokenization.logic.TokenEstimator;
@@ -77,6 +78,8 @@ public final class ChatModelFactory {
                                            .temperature(temperature)
                                            .logRequestsAndResponses(true)
                                            .build();
+            case DUMMY ->
+                    new DummyChatLanguageModel();
         };
 
         return new ChatModelImpl(langchainModel, tokenEstimator, provider, modelName, contextWindowSize, httpClient, executorService);

@@ -51,7 +51,8 @@ public class AiPreferences {
             AiProvider.OPEN_AI, PredefinedChatModel.GPT_4O_MINI,
             AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
             AiProvider.GEMINI, PredefinedChatModel.GEMINI_1_5_FLASH,
-            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
+            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE,
+            AiProvider.DUMMY, PredefinedChatModel.DUMMY
     );
 
     /// Controls whether the AI features should start/work in a JabRef session.
@@ -69,6 +70,7 @@ public class AiPreferences {
     private final StringProperty mistralAiChatModel;
     private final StringProperty geminiChatModel;
     private final StringProperty huggingFaceChatModel;
+    private final StringProperty dummyChatModel;
 
     private final BooleanProperty customizeExpertSettings;
 
@@ -76,6 +78,7 @@ public class AiPreferences {
     private final StringProperty mistralAiApiBaseUrl;
     private final StringProperty geminiApiBaseUrl;
     private final StringProperty huggingFaceApiBaseUrl;
+    private final StringProperty dummyApiBaseUrl;
 
     private final ObjectProperty<SummarizatorKind> summarizatorKind;
     private final ObjectProperty<TokenEstimatorKind> tokenEstimatorKind;
@@ -114,6 +117,7 @@ public class AiPreferences {
                 DEFAULT_CHAT_MODEL.get(AiProvider.MISTRAL_AI).getName(),                     // Mistral AI chat model
                 DEFAULT_CHAT_MODEL.get(AiProvider.GEMINI).getName(),                         // Gemini chat model
                 DEFAULT_CHAT_MODEL.get(AiProvider.HUGGING_FACE).getName(),                   // HuggingFace chat model
+                DEFAULT_CHAT_MODEL.get(AiProvider.DUMMY).getName(),                          // Dummy chat model
 
                 false,                                                                       // Customize expert settings
 
@@ -121,6 +125,7 @@ public class AiPreferences {
                 AiProvider.MISTRAL_AI.getApiUrl(),                                           // Mistral AI API base URL
                 AiProvider.GEMINI.getApiUrl(),                                               // Gemini API base URL
                 AiProvider.HUGGING_FACE.getApiUrl(),                                         // HuggingFace API base URL
+                AiProvider.DUMMY.getApiUrl(),                                                // Dummy API base URL
 
                 AiDefaultExpertSettings.SUMMARIZATOR_KIND,                                   // Summarizator kind
                 AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND,                                // Token estimator kind
@@ -159,11 +164,13 @@ public class AiPreferences {
             String mistralAiChatModel,
             String geminiChatModel,
             String huggingFaceChatModel,
+            String dummyChatModel,
             boolean customizeExpertSettings,
             String openAiApiBaseUrl,
             String mistralAiApiBaseUrl,
             String geminiApiBaseUrl,
             String huggingFaceApiBaseUrl,
+            String dummyApiBaseUrl,
             SummarizatorKind summarizatorKind,
             TokenEstimatorKind tokenEstimatorKind,
             PredefinedEmbeddingModel embeddingModel,
@@ -197,6 +204,7 @@ public class AiPreferences {
         this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
         this.geminiChatModel = new SimpleStringProperty(geminiChatModel);
         this.huggingFaceChatModel = new SimpleStringProperty(huggingFaceChatModel);
+        this.dummyChatModel = new SimpleStringProperty(dummyChatModel);
 
         this.customizeExpertSettings = new SimpleBooleanProperty(customizeExpertSettings);
 
@@ -204,6 +212,7 @@ public class AiPreferences {
         this.mistralAiApiBaseUrl = new SimpleStringProperty(mistralAiApiBaseUrl);
         this.geminiApiBaseUrl = new SimpleStringProperty(geminiApiBaseUrl);
         this.huggingFaceApiBaseUrl = new SimpleStringProperty(huggingFaceApiBaseUrl);
+        this.dummyApiBaseUrl = new SimpleStringProperty(dummyApiBaseUrl);
 
         this.summarizatorKind = new SimpleObjectProperty<>(summarizatorKind);
         this.tokenEstimatorKind = new SimpleObjectProperty<>(tokenEstimatorKind);
@@ -262,6 +271,7 @@ public class AiPreferences {
         this.mistralAiChatModel.set(preferences.getMistralAiChatModel());
         this.geminiChatModel.set(preferences.getGeminiChatModel());
         this.huggingFaceChatModel.set(preferences.getHuggingFaceChatModel());
+        this.dummyChatModel.set(preferences.getDummyChatModel());
 
         this.customizeExpertSettings.set(preferences.getCustomizeExpertSettings());
 
@@ -269,6 +279,7 @@ public class AiPreferences {
         this.mistralAiApiBaseUrl.set(preferences.getMistralAiApiBaseUrl());
         this.geminiApiBaseUrl.set(preferences.getGeminiApiBaseUrl());
         this.huggingFaceApiBaseUrl.set(preferences.getHuggingFaceApiBaseUrl());
+        this.dummyApiBaseUrl.set(preferences.getDummyApiBaseUrl());
 
         this.summarizatorKind.set(preferences.getSummarizatorKind());
         this.tokenEstimatorKind.set(preferences.getTokenEstimatorKind());
@@ -431,6 +442,18 @@ public class AiPreferences {
         this.huggingFaceChatModel.set(huggingFaceChatModel);
     }
 
+    public StringProperty dummyChatModelProperty() {
+        return dummyChatModel;
+    }
+
+    public String getDummyChatModel() {
+        return dummyChatModel.get();
+    }
+
+    public void setDummyChatModel(String dummyChatModel) {
+        this.dummyChatModel.set(dummyChatModel);
+    }
+
     public BooleanProperty customizeExpertSettingsProperty() {
         return customizeExpertSettings;
     }
@@ -531,6 +554,18 @@ public class AiPreferences {
         this.huggingFaceApiBaseUrl.set(huggingFaceApiBaseUrl);
     }
 
+    public StringProperty dummyApiBaseUrlProperty() {
+        return dummyApiBaseUrl;
+    }
+
+    public String getDummyApiBaseUrl() {
+        return dummyApiBaseUrl.get();
+    }
+
+    public void setDummyApiBaseUrl(String dummyApiBaseUrl) {
+        this.dummyApiBaseUrl.set(dummyApiBaseUrl);
+    }
+
     public DoubleProperty temperatureProperty() {
         return temperature;
     }
@@ -564,6 +599,8 @@ public class AiPreferences {
                         PredefinedChatModelUtil.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
                 case GEMINI ->
                         PredefinedChatModelUtil.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
+                case DUMMY ->
+                        PredefinedChatModelUtil.getContextWindowSize(AiProvider.DUMMY, dummyChatModel.get());
             };
         }
     }
@@ -670,11 +707,11 @@ public class AiPreferences {
     }
 
     private List<Property<?>> getChatModelNamesProperties() {
-        return List.of(openAiChatModel, mistralAiChatModel, huggingFaceChatModel, geminiChatModel);
+        return List.of(openAiChatModel, mistralAiChatModel, huggingFaceChatModel, geminiChatModel, dummyChatModel);
     }
 
     private List<Property<?>> getApiBaseUrlsProperties() {
-        return List.of(openAiApiBaseUrl, mistralAiApiBaseUrl, huggingFaceApiBaseUrl, geminiApiBaseUrl);
+        return List.of(openAiApiBaseUrl, mistralAiApiBaseUrl, huggingFaceApiBaseUrl, geminiApiBaseUrl, dummyApiBaseUrl);
     }
 
     public List<Property<?>> getChatProperties() {
@@ -723,6 +760,8 @@ public class AiPreferences {
                     huggingFaceChatModel.get();
             case GEMINI ->
                     geminiChatModel.get();
+            case DUMMY ->
+                    dummyChatModel.get();
         };
     }
 
@@ -737,6 +776,8 @@ public class AiPreferences {
                         huggingFaceApiBaseUrl.get();
                 case GEMINI ->
                         geminiApiBaseUrl.get();
+                case DUMMY ->
+                        dummyApiBaseUrl.get();
             };
         } else {
             return aiProvider.get().getApiUrl();

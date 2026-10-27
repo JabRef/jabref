@@ -359,12 +359,14 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_MISTRAL_AI_CHAT_MODEL = "aiMistralAiChatModel";
     private static final String AI_GEMINI_CHAT_MODEL = "aiGeminiChatModel";
     private static final String AI_HUGGING_FACE_CHAT_MODEL = "aiHuggingFaceChatModel";
+    private static final String AI_DUMMY_CHAT_MODEL = "aiDummyChatModel";
     private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
     private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
     private static final String AI_OPEN_AI_API_BASE_URL = "aiOpenAiApiBaseUrl";
     private static final String AI_MISTRAL_AI_API_BASE_URL = "aiMistralAiApiBaseUrl";
     private static final String AI_GEMINI_API_BASE_URL = "aiGeminiApiBaseUrl";
     private static final String AI_HUGGING_FACE_API_BASE_URL = "aiHuggingFaceApiBaseUrl";
+    private static final String AI_DUMMY_API_BASE_URL = "aiDummyApiBaseUrl";
     private static final String AI_SUMMARIZATOR_KIND = "aiSummarizatorKind";
     private static final String AI_TOKEN_ESTIMATOR_KIND = "aiTokenEstimatorKind";
     private static final String AI_TEMPERATURE = "aiTemperature";
@@ -1889,6 +1891,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.mistralAiChatModelProperty(), (_, _, newValue) -> put(AI_MISTRAL_AI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.geminiChatModelProperty(), (_, _, newValue) -> put(AI_GEMINI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (_, _, newValue) -> put(AI_HUGGING_FACE_CHAT_MODEL, newValue));
+        EasyBind.listen(aiPreferences.dummyChatModelProperty(), (_, _, newValue) -> put(AI_DUMMY_CHAT_MODEL, newValue));
 
         EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (_, _, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
@@ -1896,6 +1899,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.mistralAiApiBaseUrlProperty(), (_, _, newValue) -> put(AI_MISTRAL_AI_API_BASE_URL, newValue));
         EasyBind.listen(aiPreferences.geminiApiBaseUrlProperty(), (_, _, newValue) -> put(AI_GEMINI_API_BASE_URL, newValue));
         EasyBind.listen(aiPreferences.huggingFaceApiBaseUrlProperty(), (_, _, newValue) -> put(AI_HUGGING_FACE_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.dummyApiBaseUrlProperty(), (_, _, newValue) -> put(AI_DUMMY_API_BASE_URL, newValue));
 
         EasyBind.listen(aiPreferences.summarizatorKindProperty(), (_, _, newValue) -> put(AI_SUMMARIZATOR_KIND, newValue.name()));
         EasyBind.listen(aiPreferences.tokenEstimatorKindProperty(), (_, _, newValue) -> put(AI_TOKEN_ESTIMATOR_KIND, newValue.name()));
@@ -1936,11 +1940,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(AI_MISTRAL_AI_CHAT_MODEL, defaults.getMistralAiChatModel()),
                 get(AI_GEMINI_CHAT_MODEL, defaults.getGeminiChatModel()),
                 get(AI_HUGGING_FACE_CHAT_MODEL, defaults.getHuggingFaceChatModel()),
+                get(AI_DUMMY_CHAT_MODEL, defaults.getDummyChatModel()),
                 getBoolean(AI_CUSTOMIZE_SETTINGS, defaults.getCustomizeExpertSettings()),
                 get(AI_OPEN_AI_API_BASE_URL, defaults.getOpenAiApiBaseUrl()),
                 get(AI_MISTRAL_AI_API_BASE_URL, defaults.getMistralAiApiBaseUrl()),
                 get(AI_GEMINI_API_BASE_URL, defaults.getGeminiApiBaseUrl()),
                 get(AI_HUGGING_FACE_API_BASE_URL, defaults.getHuggingFaceApiBaseUrl()),
+                get(AI_DUMMY_API_BASE_URL, defaults.getDummyApiBaseUrl()),
                 SummarizatorKind.safeValueOf(get(AI_SUMMARIZATOR_KIND, defaults.getSummarizatorKind().name())),
                 TokenEstimatorKind.safeValueOf(get(AI_TOKEN_ESTIMATOR_KIND, defaults.getTokenEstimatorKind().name())),
                 PredefinedEmbeddingModel.safeValueOf(get(AI_EMBEDDING_MODEL, defaults.embeddingModelProperty().get().name())),

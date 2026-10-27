@@ -1,0 +1,89 @@
+package org.jabref.logic.ai.chatting;
+
+import java.util.List;
+
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.model.chat.response.ChatResponse;
+import dev.langchain4j.model.output.FinishReason;
+import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@NullMarked
+class DummyChatLanguageModelTest {
+
+    private DummyChatLanguageModel model;
+
+    @BeforeEach
+    void setUp() {
+        model = new DummyChatLanguageModel();
+    }
+
+    @Test
+    void chatReturnsExpectedResponseWithSystemAndUserMessage() {
+        List<ChatMessage> messages = List.of(
+                new SystemMessage("You are a helpful research assistant."),
+                new UserMessage("Summarize the methodology.")
+        );
+
+        ChatResponse response = model.chat(messages);
+
+        String expected = """
+                Hi! I am a dummy AI provider, I am made to test and debug the AI features.
+
+                I have this system message:
+                You are a helpful research assistant.
+
+                And I received this user message:
+                Summarize the methodology.""";
+
+        assertEquals(expected, response.aiMessage().text());
+        assertEquals(FinishReason.STOP, response.finishReason());
+        assertNotNull(response.tokenUsage());
+    }
+
+    @Test
+    void chatReturnsExpectedResponseWithoutSystemMessage() {
+        List<ChatMessage> messages = List.of(
+                new UserMessage("Generate 3 follow-up questions.")
+        );
+
+        ChatResponse response = model.chat(messages);
+
+        String expected = "Hi! I am a dummy AI provider, I am made to test and debug the AI features.\n\n"
+                + "I have this system message:\n\n\n"
+                + "And I received this user message:\n"
+                + "Generate 3 follow-up questions.";
+
+        assertEquals(expected, response.aiMessage().text());
+    }
+
+    @Test
+    void chatUsesLastUserMessageWhenHistoryPresent() {
+        List<ChatMessage> messages = List.of(
+                new SystemMessage("System prompt"),
+                new UserMessage("First user message"),
+                new AiMessage("First AI response"),
+                new UserMessage("Second user message really sent to AI")
+        );
+
+        ChatResponse response = model.chat(messages);
+
+        String expected = """
+                Hi! I am a dummy AI provider, I am made to test and debug the AI features.
+
+                I have this system message:
+                System prompt
+
+                And I received this user message:
+                Second user message really sent to AI""";
+
+        assertEquals(expected, response.aiMessage().text());
+    }
+}
