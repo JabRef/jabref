@@ -25,10 +25,10 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
-
-import com.dlsc.gemsfx.infocenter.NotificationAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.dlsc.gemsfx.infocenter.NotificationAction;
 
 public class OcrLinkedFileAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrLinkedFileAction.class);
@@ -66,8 +66,8 @@ public class OcrLinkedFileAction extends SimpleCommand {
                 taskExecutor
         );
         boolean fileExists = linkedFile.findIn(databaseContext, preferences.getFilePreferences())
-                               .filter(Files::isRegularFile)
-                               .isPresent();
+                                       .filter(Files::isRegularFile)
+                                       .isPresent();
         this.setExecutable(fileExists);
     }
 
