@@ -909,4 +909,9 @@ public class AuthorListTest {
                 throw new IllegalArgumentException("Unknown author list: " + name);
         }
     }
+
+    @Test
+    void getNamedAuthorsSkipsOthers() {
+        assertEquals(List.of(new Author("John", "J.", null, "Smith", null)), AuthorList.parse("John Smith and others").getNamedAuthors());
+    }
 }
