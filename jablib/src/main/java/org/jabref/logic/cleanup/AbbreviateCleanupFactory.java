@@ -26,12 +26,12 @@ public final class AbbreviateCleanupFactory {
             return Optional.empty();
         }
 
-        JournalMode journalMode = abbreviationPreferences.getJournalMode();
+        JournalMode journalMode = abbreviationPreferences.useJournalAbbreviationMode();
         if (journalMode == JournalMode.NONE) {
             return Optional.empty();
         }
 
-        AbbreviationType abbreviationType = abbreviationPreferences.getAbbreviationType();
+        AbbreviationType abbreviationType = abbreviationPreferences.useAbbreviationTypeOnFetch();
 
         if (journalMode == JournalMode.ABBREVIATE) {
             CleanupJob cleanupJob = database == null ? new AbbreviateJournalCleanup(repository, abbreviationType, abbreviationPreferences.shouldUseFJournalField())

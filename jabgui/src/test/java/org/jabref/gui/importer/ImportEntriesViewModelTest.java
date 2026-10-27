@@ -64,8 +64,8 @@ class ImportEntriesViewModelTest {
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
 
         guiPreferences = mock(GuiPreferences.class);
-        abbreviationPreferences = new AbbreviationPreferences(List.of(), false, false);
-        abbreviationPreferences.setAbbreviationType(AbbreviationType.DEFAULT);
+        abbreviationPreferences = new AbbreviationPreferences(List.of(), false, false, JournalMode.NONE, AbbreviationType.DEFAULT);
+        abbreviationPreferences.setAbbreviationTypeOnFetch(AbbreviationType.DEFAULT);
         when(guiPreferences.getAbbreviationPreferences()).thenReturn(abbreviationPreferences);
 
         databaseContext = new BibDatabaseContext();
@@ -87,7 +87,7 @@ class ImportEntriesViewModelTest {
             "NONE, J. Foo, J. Foo",
     })
     void initialFetchedEntriesFollowJournalPreference(JournalMode mode, String input, String expected) {
-        abbreviationPreferences.setJournalMode(mode);
+        abbreviationPreferences.setJournalAbbreviationMode(mode);
 
         BibEntry fetchedEntry = new BibEntry().withField(StandardField.JOURNAL, input);
 
@@ -121,7 +121,7 @@ class ImportEntriesViewModelTest {
             "NONE, J. Foo, J. Foo"
     })
     void fetchMoreEntriesFollowsJournalPreference(JournalMode mode, String input, String expected) throws FetcherException {
-        abbreviationPreferences.setJournalMode(mode);
+        abbreviationPreferences.setJournalAbbreviationMode(mode);
 
         List<BibEntry> initialEntries = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -161,7 +161,7 @@ class ImportEntriesViewModelTest {
             "UNABBREVIATE, J. Foo"
     })
     void initialNonFetchedEntriesKeepJournalDespiteConversionPreference(JournalMode mode, String journal) {
-        abbreviationPreferences.setJournalMode(mode);
+        abbreviationPreferences.setJournalAbbreviationMode(mode);
 
         BibEntry importedEntry = new BibEntry().withField(StandardField.JOURNAL, journal);
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> new ParserResult(List.of(importedEntry)));

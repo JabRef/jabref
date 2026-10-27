@@ -90,8 +90,8 @@ class AbbreviateCleanupFactoryTest {
 
     private static AbbreviationPreferences preferencesWithMode(JournalMode journalMode) {
         AbbreviationPreferences preferences = mock(AbbreviationPreferences.class);
-        when(preferences.getJournalMode()).thenReturn(journalMode);
-        when(preferences.getAbbreviationType()).thenReturn(AbbreviationType.values()[0]);
+        when(preferences.useJournalAbbreviationMode()).thenReturn(journalMode);
+        when(preferences.useAbbreviationTypeOnFetch()).thenReturn(AbbreviationType.DEFAULT);
         when(preferences.shouldUseFJournalField()).thenReturn(false);
         return preferences;
     }

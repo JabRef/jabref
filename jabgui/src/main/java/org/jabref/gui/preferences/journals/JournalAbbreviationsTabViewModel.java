@@ -20,6 +20,7 @@ import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalMode;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
@@ -118,9 +119,10 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         addBuiltInList();
 
         useFJournal.set(abbreviationsPreferences.shouldUseFJournalField());
-        convertJournalOnFetch.set(abbreviationsPreferences.shouldConvertJournalOnFetch());
-        abbreviateOnFetch.set(abbreviationsPreferences.shouldAbbreviateOnFetch());
-        unAbbreviateOnFetch.set(!abbreviationsPreferences.shouldAbbreviateOnFetch());
+        JournalMode mode = abbreviationsPreferences.useJournalAbbreviationMode();
+        convertJournalOnFetch.set(mode != JournalMode.NONE);
+        abbreviateOnFetch.set(mode != JournalMode.UNABBREVIATE);
+        unAbbreviateOnFetch.set(mode == JournalMode.UNABBREVIATE);
         abbreviationTypeOnFetch.set(abbreviationsPreferences.useAbbreviationTypeOnFetch());
     }
 
@@ -321,8 +323,10 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
                     abbreviationsPreferences.setExternalJournalLists(journalStringList);
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
-                    abbreviationsPreferences.setConvertJournalOnFetch(convertJournalOnFetch.get());
-                    abbreviationsPreferences.setAbbreviateOnFetch(abbreviateOnFetch.get());
+                    JournalMode mode = !convertJournalOnFetch.get()
+                                       ? JournalMode.NONE
+                                       : abbreviateOnFetch.get() ? JournalMode.ABBREVIATE : JournalMode.UNABBREVIATE;
+                    abbreviationsPreferences.setJournalAbbreviationMode(mode);
                     abbreviationsPreferences.setAbbreviationTypeOnFetch(abbreviationTypeOnFetch.get());
 
                     if (shouldWriteLists) {

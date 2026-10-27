@@ -73,6 +73,7 @@ import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalMode;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -368,8 +369,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
     private static final String ENABLE_MSC_KEYWORD_DESCRIPTIONS = "enableMscKeywordDescriptions";
-    private static final String CONVERT_JOURNAL_ON_FETCH = "shouldConvertJournalOnFetch";
-    private static final String ABBREVIATE_ON_FETCH = "shouldAbbreviateOnFetch";
+    private static final String JOURNAL_ABBREVIATION_MODE = "journalAbbreviationMode";
     private static final String ABBREVIATION_TYPE_ON_FETCH = "useAbbreviationTypeOnFetch";
 
     // Protected terms
@@ -1214,8 +1214,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaultValues.getExternalJournalLists()))),
                 getBoolean(USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get()),
                 getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions()),
-                getBoolean(CONVERT_JOURNAL_ON_FETCH, defaultValues.shouldConvertJournalOnFetch()),
-                getBoolean(ABBREVIATE_ON_FETCH, defaultValues.shouldAbbreviateOnFetch()),
+                JournalMode.safeValueOf(get(JOURNAL_ABBREVIATION_MODE, defaultValues.useJournalAbbreviationMode().name())),
                 AbbreviationType.safeValueOf(get(ABBREVIATION_TYPE_ON_FETCH, defaultValues.useAbbreviationTypeOnFetch().name()))
         );
 
@@ -1223,8 +1222,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindBoolean(abbreviationPreferences.useFJournalFieldProperty(), USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get());
         bindBoolean(abbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(), ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions());
-        bindBoolean(abbreviationPreferences.convertJournalOnFetchProperty(), CONVERT_JOURNAL_ON_FETCH, defaultValues.shouldConvertJournalOnFetch());
-        bindBoolean(abbreviationPreferences.getAbbreviateOnFetch(), ABBREVIATE_ON_FETCH, defaultValues.shouldAbbreviateOnFetch());
+        bindObject(abbreviationPreferences.getJournalAbbreviationMode(), JOURNAL_ABBREVIATION_MODE, defaultValues.useJournalAbbreviationMode(), JournalMode::name, JournalMode::safeValueOf);
         bindObject(abbreviationPreferences.getAbbreviationTypeOnFetch(), ABBREVIATION_TYPE_ON_FETCH, defaultValues.useAbbreviationTypeOnFetch(), AbbreviationType::name, AbbreviationType::safeValueOf);
         return abbreviationPreferences;
     }

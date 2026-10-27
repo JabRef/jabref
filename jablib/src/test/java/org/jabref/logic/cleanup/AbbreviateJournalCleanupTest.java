@@ -312,8 +312,8 @@ public class AbbreviateJournalCleanupTest {
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Long Name");
         AbbreviateJournalCleanup dotlessCleanup = withDatabase
-                ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DOTLESS, false)
-                : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.DOTLESS, false);
+                                                  ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DOTLESS, false)
+                                                  : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.DOTLESS, false);
 
         List<FieldChange> changes = dotlessCleanup.cleanup(entry);
 
@@ -335,8 +335,8 @@ public class AbbreviateJournalCleanupTest {
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Long Name");
         AbbreviateJournalCleanup dotlessCleanup = withDatabase
-                ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DOTLESS, true)
-                : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.DOTLESS, true);
+                                                  ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.DOTLESS, true)
+                                                  : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.DOTLESS, true);
 
         List<FieldChange> changes = dotlessCleanup.cleanup(entry);
 
@@ -360,8 +360,8 @@ public class AbbreviateJournalCleanupTest {
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Physical Review Letters");
         AbbreviateJournalCleanup shortestCleanup = withDatabase
-                ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.SHORTEST_UNIQUE, false)
-                : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.SHORTEST_UNIQUE, false);
+                                                   ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.SHORTEST_UNIQUE, false)
+                                                   : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.SHORTEST_UNIQUE, false);
 
         List<FieldChange> changes = shortestCleanup.cleanup(entry);
 
@@ -383,8 +383,8 @@ public class AbbreviateJournalCleanupTest {
 
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Physical Review Letters");
         AbbreviateJournalCleanup shortestCleanup = withDatabase
-                ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.SHORTEST_UNIQUE, true)
-                : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.SHORTEST_UNIQUE, true);
+                                                   ? new AbbreviateJournalCleanup(databaseMock, repositoryMock, AbbreviationType.SHORTEST_UNIQUE, true)
+                                                   : new AbbreviateJournalCleanup(repositoryMock, AbbreviationType.SHORTEST_UNIQUE, true);
 
         List<FieldChange> changes = shortestCleanup.cleanup(entry);
 
@@ -412,8 +412,8 @@ public class AbbreviateJournalCleanupTest {
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "A \\& B");
         BibEntry expected = new BibEntry(entry).withField(AMSField.FJOURNAL, "Aachen \\& Berlin");
         UnabbreviateJournalCleanup unabbreviateCleanup = withDatabase
-                ? new UnabbreviateJournalCleanup(databaseMock, repositoryMock)
-                : new UnabbreviateJournalCleanup(repositoryMock);
+                                                         ? new UnabbreviateJournalCleanup(databaseMock, repositoryMock)
+                                                         : new UnabbreviateJournalCleanup(repositoryMock);
         AbbreviateJournalCleanup abbreviateCleanup = withDatabase ? cleanupWithFJournal : cleanupWithoutDatabase;
         unabbreviateCleanup.cleanup(entry);
         abbreviateCleanup.cleanup(entry);

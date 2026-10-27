@@ -13,38 +13,28 @@ public class AbbreviationPreferences {
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
     private final BooleanProperty shouldEnableMscKeywordDescriptions;
-    private final BooleanProperty convertJournalOnFetch;
-    private final BooleanProperty abbreviateOnFetch;
     private final ObjectProperty<AbbreviationType> abbreviationTypeOnFetch;
-
-    private JournalMode mode;
-
-    private AbbreviationType abbreviationType;
-
+    private final ObjectProperty<JournalMode> journalAbbreviationMode;
+    
     public AbbreviationPreferences(List<String> externalJournalLists,
                                    boolean useFJournalField,
                                    boolean shouldEnableMscKeywordDescriptions,
-                                   boolean convertJournalOnFetch,
-                                   boolean abbreviateOnFetch,
+                                   JournalMode journalAbbreviationMode,
                                    AbbreviationType abbreviationTypeOnFetch
     ) {
         this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
         this.shouldEnableMscKeywordDescriptions = new SimpleBooleanProperty(shouldEnableMscKeywordDescriptions);
-        this.mode = JournalMode.NONE;
-        this.abbreviationType = AbbreviationType.DEFAULT;
-        this.convertJournalOnFetch = new SimpleBooleanProperty(convertJournalOnFetch);
-        this.abbreviateOnFetch = new SimpleBooleanProperty(abbreviateOnFetch);
+        this.journalAbbreviationMode = new SimpleObjectProperty<>(journalAbbreviationMode);
         this.abbreviationTypeOnFetch = new SimpleObjectProperty<>(abbreviationTypeOnFetch);
     }
 
     private AbbreviationPreferences() {
         this(
-                List.of(), // externalJournalLists
-                true,      // useFJournalField
-                false,      // Enable MSC codes as Keyword
-                false,      // dont edit journal title by default
-                true,      // abbreviate is on
+                List.of(),               // externalJournalLists
+                true,                    // useFJournalField
+                false,                   // Enable MSC codes as Keyword
+                JournalMode.NONE,        // Do NOT change journal title on fetch
                 AbbreviationType.DEFAULT // use the default option
         );
     }
@@ -55,22 +45,6 @@ public class AbbreviationPreferences {
 
     public ObservableList<String> getExternalJournalLists() {
         return externalJournalLists;
-    }
-
-    public AbbreviationType getAbbreviationType() {
-        return abbreviationType;
-    }
-
-    public void setAbbreviationType(AbbreviationType abbreviationType) {
-        this.abbreviationType = abbreviationType;
-    }
-
-    public JournalMode getJournalMode() {
-        return mode;
-    }
-
-    public void setJournalMode(JournalMode mode) {
-        this.mode = mode;
     }
 
     public void setExternalJournalLists(List<String> list) {
@@ -102,28 +76,16 @@ public class AbbreviationPreferences {
         return shouldEnableMscKeywordDescriptions;
     }
 
-    public BooleanProperty convertJournalOnFetchProperty() {
-        return convertJournalOnFetch;
+    public JournalMode useJournalAbbreviationMode() {
+        return journalAbbreviationMode.get();
     }
 
-    public boolean shouldConvertJournalOnFetch() {
-        return convertJournalOnFetch.get();
+    public void setJournalAbbreviationMode(JournalMode mode) {
+        this.journalAbbreviationMode.set(mode);
     }
 
-    public void setConvertJournalOnFetch(boolean value) {
-        this.convertJournalOnFetch.set(value);
-    }
-
-    public BooleanProperty getAbbreviateOnFetch() {
-        return abbreviateOnFetch;
-    }
-
-    public boolean shouldAbbreviateOnFetch() {
-        return abbreviateOnFetch.get();
-    }
-
-    public void setAbbreviateOnFetch(boolean value) {
-        this.abbreviateOnFetch.set(value);
+    public ObjectProperty<JournalMode> getJournalAbbreviationMode() {
+        return journalAbbreviationMode;
     }
 
     public ObjectProperty<AbbreviationType> getAbbreviationTypeOnFetch() {
