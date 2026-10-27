@@ -25,10 +25,10 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dlsc.gemsfx.infocenter.NotificationAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OcrLinkedFileAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrLinkedFileAction.class);
