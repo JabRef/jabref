@@ -28,6 +28,9 @@ import org.jabref.model.search.query.SearchResults;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.highlight.Highlighter;
+import org.apache.lucene.search.highlight.QueryScorer;
+import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,8 +70,10 @@ class FulltextSearchResultsTabTest {
         assertEquals(0, content.getChildren().size());
 
         SearchResults linkedFileResults = new SearchResults();
+        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"),
+                new QueryScorer(new TermQuery(new Term("content", "term"))));
         linkedFileResults.addSearchResult(entry.getId(), new SearchResult(
-                "paper.pdf", "before term after", "", 3, new TermQuery(new Term("content", "term"))));
+                "paper.pdf", "before term after", "", 3, highlighter));
         results.set(Optional.of(linkedFileResults));
 
         List<String> renderedText = content.getChildren().stream()
