@@ -104,45 +104,52 @@ class KeyBindingsTabModelTest {
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
     }
 
+    // [utest->req~ux.keybindings.duplicate-warning~1]
     @Test
     void cancelLeavesExistingShortcutsUntouched() {
         KeyEvent shortcutKeyEvent = createShortcutKeyEvent("J", KeyCode.J);
-        setKeyBindingViewModel(KeyBinding.PASTE);
+        model.setValues();
+        selectRow(KeyBinding.PASTE);
         model.setNewBindingForCurrent(shortcutKeyEvent);
         clickButton("Cancel");
 
-        KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.MERGE_ENTRIES);
+        KeyBindingViewModel selected = selectRow(KeyBinding.MERGE_ENTRIES);
         model.setNewBindingForCurrent(shortcutKeyEvent);
         model.storeSettings();
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, shortcutKeyEvent));
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
-        assertEquals(KeyBinding.MERGE_ENTRIES.getDefaultKeyBinding(), viewModel.getBinding());
+        assertEquals(KeyBinding.MERGE_ENTRIES.getDefaultKeyBinding(), selected.getBinding());
     }
 
+    // [utest->req~ux.keybindings.duplicate-warning~1]
     @Test
     void replaceMovesShortcutToSelectedAction() {
         KeyEvent shortcutKeyEvent = createShortcutKeyEvent("J", KeyCode.J);
-        setKeyBindingViewModel(KeyBinding.PASTE);
+        model.setValues();
+        KeyBindingViewModel pasteRow = selectRow(KeyBinding.PASTE);
         model.setNewBindingForCurrent(shortcutKeyEvent);
         clickButton("Replace");
 
-        setKeyBindingViewModel(KeyBinding.MERGE_ENTRIES);
+        selectRow(KeyBinding.MERGE_ENTRIES);
         model.setNewBindingForCurrent(shortcutKeyEvent);
         model.storeSettings();
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.MERGE_ENTRIES, shortcutKeyEvent));
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, shortcutKeyEvent));
+        assertEquals("", pasteRow.getBinding());
     }
 
+    // [utest->req~ux.keybindings.duplicate-warning~1]
     @Test
     void keepBothAssignsShortcutToBothActions() {
         KeyEvent shortcutKeyEvent = createShortcutKeyEvent("J", KeyCode.J);
-        setKeyBindingViewModel(KeyBinding.PASTE);
+        model.setValues();
+        selectRow(KeyBinding.PASTE);
         model.setNewBindingForCurrent(shortcutKeyEvent);
         clickButton("Keep both");
 
-        setKeyBindingViewModel(KeyBinding.MERGE_ENTRIES);
+        selectRow(KeyBinding.MERGE_ENTRIES);
         model.setNewBindingForCurrent(shortcutKeyEvent);
         model.storeSettings();
 
@@ -231,8 +238,18 @@ class KeyBindingsTabModelTest {
         return viewModel;
     }
 
+    private KeyBindingViewModel selectRow(KeyBinding binding) {
+        KeyBindingViewModel row = model.rootKeyBindingProperty().get().getChildren().stream()
+                                       .flatMap(category -> category.getChildren().stream())
+                                       .filter(candidate -> candidate.getKeyBinding() == binding)
+                                       .findFirst()
+                                       .orElseThrow();
+        model.selectedKeyBindingProperty().set(Optional.of(row));
+        return row;
+    }
+
     private void clickButton(String label) {
-        when(dialogService.showCustomButtonDialogAndWait(any(), any(), any(), any(), any(), any()))
+        when(dialogService.showCustomButtonDialogWithTooltipsAndWait(any(), any(), any(), any(), any(), any(), any()))
                 .thenAnswer(invocation -> Stream.of(invocation.getArguments())
                                                 .filter(ButtonType.class::isInstance)
                                                 .map(ButtonType.class::cast)

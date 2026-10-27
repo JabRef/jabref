@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.keybindings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -133,16 +134,19 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private ButtonBar.ButtonData askForResolution(String combination, List<KeyBinding> conflictingKeyBindings) {
         String names = conflictingKeyBindings.stream()
-                                             .map(KeyBinding::getLocalization)
+                                             .map(keyBinding -> "'" + keyBinding.getLocalization() + "'")
                                              .collect(Collectors.joining(", "));
         ButtonType replace = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OK_DONE);
         ButtonType keepBoth = new ButtonType(Localization.lang("Keep both"), ButtonBar.ButtonData.OTHER);
         ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
-        return dialogService.showCustomButtonDialogAndWait(
+        Map<ButtonType, String> tooltips = Map.of(
+                keepBoth, Localization.lang("Both actions keep the shortcut. This only works if they are used in different places."));
+        return dialogService.showCustomButtonDialogWithTooltipsAndWait(
                                     Alert.AlertType.WARNING,
                                     Localization.lang("Shortcut already in use"),
-                                    Localization.lang("The shortcut %0 is already used by '%1'. Replace it or keep both?",
+                                    Localization.lang("The shortcut %0 is already used by %1. Replace it or keep both?",
                                             combination, names),
+                                    tooltips,
                                     replace, keepBoth, cancel)
                             .map(ButtonType::getButtonData)
                             .orElse(ButtonBar.ButtonData.CANCEL_CLOSE);
