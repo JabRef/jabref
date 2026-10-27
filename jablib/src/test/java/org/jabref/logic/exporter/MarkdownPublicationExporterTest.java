@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -475,6 +476,42 @@ class MarkdownPublicationExporterTest {
 
                         """.formatted(expectedUrl),
                 exportRecentSection(tempDir, entry));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void resolvesPdfFromConfiguredDirectory(
+            boolean libraryDirectory,
+            @TempDir Path tempDir) throws Exception {
+        Path attachmentDirectory = Files.createDirectory(tempDir.resolve("attachments"));
+        Files.createFile(attachmentDirectory.resolve("paper.pdf"));
+
+        FilePreferences filePreferences = FilePreferences.getDefault();
+        BibDatabaseContext context = new BibDatabaseContext();
+
+        if (libraryDirectory) {
+            context.getMetaData().setLibrarySpecificFileDirectory(attachmentDirectory.toString());
+        } else {
+            filePreferences.setStoreFilesRelativeToBibFile(false);
+            filePreferences.setMainFileDirectory(attachmentDirectory);
+        }
+
+        BibEntry entry = publication(2025).withFiles(List.of(
+                new LinkedFile("Full text", "paper.pdf", "PDF")
+        ));
+        Path output = tempDir.resolve("publications.md");
+
+        new MarkdownPublicationExporter(
+                LayoutFormatterPreferences.getDefault(),
+                filePreferences
+        ).export(context, output, List.of(entry));
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025 [PDF](<attachments/paper.pdf>)
+
+                """, recentSection(output));
     }
 
     private MarkdownPublicationExporter createExporter() {

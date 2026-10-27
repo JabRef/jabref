@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -33,15 +34,23 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class MarkdownPublicationExporter extends Exporter {
 
+    private final FilePreferences filePreferences;
     private final LayoutFormatterPreferences layoutPreferences;
 
     public MarkdownPublicationExporter(
             LayoutFormatterPreferences layoutPreferences) {
+        this(layoutPreferences, FilePreferences.getDefault());
+    }
+
+    public MarkdownPublicationExporter(
+            LayoutFormatterPreferences layoutPreferences,
+            FilePreferences filePreferences) {
         super(
                 "markdown-publications",
                 Localization.lang("Markdown publications"),
                 StandardFileType.MARKDOWN
         );
+        this.filePreferences = filePreferences;
         this.layoutPreferences = layoutPreferences;
     }
 
@@ -50,10 +59,7 @@ public class MarkdownPublicationExporter extends Exporter {
             BibDatabaseContext databaseContext,
             Path file,
             List<BibEntry> entries) throws IOException {
-        List<Path> directories = databaseContext.getDatabasePath()
-                                                .map(path -> path.toAbsolutePath().getParent())
-                                                .map(List::of)
-                                                .orElseGet(List::of);
+        List<Path> directories = databaseContext.getFileDirectories(filePreferences);
 
         export(
                 databaseContext,
