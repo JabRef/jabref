@@ -22,6 +22,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.BibSonomyQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -50,6 +51,10 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
 
     @Override
     public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
+        String usernameAndApiKey = importerPreferences.getApiKey(FETCHER_NAME).map(String::strip).orElse("");
+        if (!hasUsernameAndApiKey(usernameAndApiKey)) {
+            throw new FetcherException(Localization.lang("BibSonomy needs your username and API key. Enter them as 'username:apikey' in Preferences > Web search > BibSonomy."));
+        }
         // BibSonomy cannot filter by year, so the transformer only records the requested years and we filter here
         BibSonomyQueryTransformer transformer = new BibSonomyQueryTransformer();
         transformer.transformSearchQuery(queryNode);
