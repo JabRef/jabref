@@ -34,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We moved the "Show diff" button to the Git commit dialog's button row. [#16730](https://github.com/JabRef/jabref/issues/16730)
 - We changed the HTTP server to list linked PDF files per entry at `GET /libraries/{id}/entries/{citationKey}/files` instead of `entries/pdffiles`. [#17567](https://github.com/JabRef/jabref/pull/17567)
 - We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
+- We changed single-line entry fields to return focus to the editor when <kbd>Enter</kbd> is pressed. [#17445](https://github.com/JabRef/jabref/issues/17445)
 
 ### Fixed
 
@@ -42,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JabRef showed an "Executor has been shut down" error on Windows after resuming from suspend. [#17144](https://github.com/JabRef/jabref/pull/17144)
 - We fixed the BibTeX source dialog background in the Citation Relations tab for dark themes. [#13599](https://github.com/JabRef/jabref/issues/13599)
 - We fixed unreadable linked-file paths and indistinguishable selection backgrounds in the entry editor when using dark mode. [#17364](https://github.com/JabRef/jabref/issues/17364)
+- We fixed the linked file tooltip showing the old file name after renaming or moving the file. [#9277](https://github.com/JabRef/jabref/issues/9277)
 - We fixed an issue where Backspace could not be registered as a keyboard shortcut. [#17241](https://github.com/JabRef/jabref/issues/17241)
 - We re-enabled the [Grobid](https://github.com/grobidOrg/grobid) citation fetcher again. It is now reachable via https. [#16668](https://github.com/JabRef/jabref/issues/16668)
 - We fixed an issue where the AI chat lost its scroll position when switching back to an entry. [#17172](https://github.com/JabRef/jabref/pull/17172)
@@ -73,6 +75,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where back navigation selected a deleted entry instead of skipping it. [#17353](https://github.com/JabRef/jabref/issues/17353)
 - We fixed an issue where JabRef asked to store a library's custom entry types at every start. [#9930](https://github.com/JabRef/jabref/issues/9930)
 - We fixed an issue where the AI chat tab still said "Unable to chat" after attaching a file. [#17157](https://github.com/JabRef/jabref/pull/17157)
+- We fixed an issue where importing a PDF could set the exporter's account name as author. [#16247](https://github.com/JabRef/jabref/pull/16247)
+- We fixed an issue where importing a PDF could set an implausible year, such as a postal code. [#16247](https://github.com/JabRef/jabref/pull/16247)
+- We fixed an issue where importing a PDF with Grobid enabled merged the works cited in the PDF into the new entry. [#16247](https://github.com/JabRef/jabref/pull/16247)
 - We fixed an issue where the AI summary tab was blank for entries with only remote files. [#17203](https://github.com/JabRef/jabref/issues/17203)
 - We fixed an issue where legacy group memberships, markings, and special fields were no longer migrated when opening a library. [#17019](https://github.com/JabRef/jabref/pull/17019)
 - We fixed an issue where saving an SLR study overwrote different per-query native queries. [#17307](https://github.com/JabRef/jabref/pull/17307)
