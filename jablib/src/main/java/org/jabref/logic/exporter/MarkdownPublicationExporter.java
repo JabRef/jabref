@@ -86,8 +86,8 @@ public class MarkdownPublicationExporter extends Exporter {
                                        .toList();
 
         var resource = Optional.ofNullable(
-                MarkdownPublicationExporter.class.getResourceAsStream(
-                        "/resource/layout/markdown-publications/publication.layout"))
+                                       MarkdownPublicationExporter.class.getResourceAsStream(
+                                               "/resource/layout/markdown-publications/publication.layout"))
                                .orElseThrow(() ->
                                        new IOException(Localization.lang("Cannot find Markdown publication layout.")));
 
@@ -133,18 +133,18 @@ public class MarkdownPublicationExporter extends Exporter {
                                                              .flatMap(root -> root.findGroupByName("Export"));
 
         for (GroupTreeNode subgroup : exportGroup.stream()
-                                                      .flatMap(group -> group.getChildren().stream())
-                                                      .toList()) {
-                appendGroupSection(
-                        markdown,
-                        subgroup,
-                        3,
-                        sorted,
-                        layout,
-                        databaseContext,
-                        fileDirectories,
-                        file
-                );
+                                                 .flatMap(group -> group.getChildren().stream())
+                                                 .toList()) {
+            appendGroupSection(
+                    markdown,
+                    subgroup,
+                    3,
+                    sorted,
+                    layout,
+                    databaseContext,
+                    fileDirectories,
+                    file
+            );
         }
 
         try (AtomicFileWriter writer =

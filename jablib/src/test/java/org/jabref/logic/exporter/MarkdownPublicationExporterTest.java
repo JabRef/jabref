@@ -856,11 +856,11 @@ class MarkdownPublicationExporterTest {
                 .withField(StandardField.URL, "https://example.org/paper");
 
         assertEquals("""
-                ## Recent publications
+                        ## Recent publications
 
-                * [%s](<https://example.org/paper>) 2025
+                        * [%s](<https://example.org/paper>) 2025
 
-                """.formatted(title),
+                        """.formatted(title),
                 exportRecentSection(tempDir, entry));
     }
 
@@ -873,11 +873,11 @@ class MarkdownPublicationExporterTest {
             String title,
             @TempDir Path tempDir) throws Exception {
         assertEquals("""
-                ## Recent publications
+                        ## Recent publications
 
-                * %s 2025
+                        * %s 2025
 
-                """.formatted(title),
+                        """.formatted(title),
                 exportRecentSection(tempDir, publication(title)));
     }
 
@@ -909,11 +909,11 @@ class MarkdownPublicationExporterTest {
                 .withField(StandardField.URL, "https://example.org/paper");
 
         assertEquals("""
-                ## Recent publications
+                        ## Recent publications
 
-                * [%s](<https://example.org/paper>) 2025
+                        * [%s](<https://example.org/paper>) 2025
 
-                """.formatted(title.stripTrailing()),
+                        """.formatted(title.stripTrailing()),
                 exportRecentSection(tempDir, entry));
     }
 
@@ -928,11 +928,11 @@ class MarkdownPublicationExporterTest {
             String title,
             @TempDir Path tempDir) throws Exception {
         assertEquals("""
-                ## Recent publications
+                        ## Recent publications
 
-                * %s 2025
+                        * %s 2025
 
-                """.formatted(title.stripTrailing()),
+                        """.formatted(title.stripTrailing()),
                 exportRecentSection(tempDir, publication(title)));
     }
 }
