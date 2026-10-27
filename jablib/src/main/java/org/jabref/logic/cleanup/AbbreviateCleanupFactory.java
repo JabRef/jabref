@@ -15,16 +15,13 @@ public final class AbbreviateCleanupFactory {
     private AbbreviateCleanupFactory() {
     }
 
-    public static Optional<CleanupJob> abbreviateCleanup(
-            JournalAbbreviationRepository repository,
-            AbbreviationPreferences abbreviationPreferences) {
+    public static Optional<CleanupJob> abbreviateCleanup(JournalAbbreviationRepository repository, AbbreviationPreferences abbreviationPreferences) {
         return abbreviateCleanup(null, repository, abbreviationPreferences);
     }
 
-    public static Optional<CleanupJob> abbreviateCleanup(
-            @Nullable BibDatabase database,
-            JournalAbbreviationRepository repository,
-            AbbreviationPreferences abbreviationPreferences) {
+    public static Optional<CleanupJob> abbreviateCleanup(@Nullable BibDatabase database,
+                                                         JournalAbbreviationRepository repository,
+                                                         AbbreviationPreferences abbreviationPreferences) {
         if (repository == null || abbreviationPreferences == null) {
             return Optional.empty();
         }
@@ -34,8 +31,7 @@ public final class AbbreviateCleanupFactory {
             return Optional.empty();
         }
 
-        AbbreviationType abbreviationType =
-                abbreviationPreferences.getAbbreviationType();
+        AbbreviationType abbreviationType = abbreviationPreferences.getAbbreviationType();
 
         if (journalMode == JournalMode.ABBREVIATE) {
             CleanupJob cleanupJob = database == null ? new AbbreviateJournalCleanup(repository, abbreviationType, abbreviationPreferences.shouldUseFJournalField())
