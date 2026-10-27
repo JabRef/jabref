@@ -44,7 +44,7 @@ Add the changelog entry once, in the branch the pull request targets; do not add
 - Regular release: prepare `CHANGELOG.md` on `main` as before (rename `## [Unreleased]` to the version and add a fresh `## [Unreleased]`), then merge `main` into `black-forest` and tag on `black-forest`. Always take `main`'s `CHANGELOG.md` in that merge; the union merge attribute would otherwise combine both unreleased blocks silently instead of reporting a conflict:
 
   ```bash
-  git fetch origin black-forest
+  git fetch black-forest
   git switch -c black-forest black-forest/black-forest
   git merge --no-commit origin/main
   git checkout origin/main -- CHANGELOG.md

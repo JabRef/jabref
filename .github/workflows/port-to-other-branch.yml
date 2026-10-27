@@ -188,14 +188,14 @@ jobs:
       - name: Auto-merge a clean port
         if: steps.port.outputs.was_successful == 'true'
         env:
-          # The port PR lives in the other repository, where only the PAT has rights
+          # The port PR lives in the other repository, where only the PAT has rights. The label
+          # triggers "On PR labeled" there, which approves the port and enables auto-merge.
           GH_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           GH_REPO: JabRef/${{ env.TARGET_REPO }}
           CREATED: ${{ steps.port.outputs.created_pull_numbers }}
         run: |
           for pr in $CREATED; do
             gh pr edit "$pr" --add-label automerge
-            gh pr merge --auto --squash "$pr"
             echo "✅ Port PR $GH_REPO#$pr opened with auto-merge" >> "$GITHUB_STEP_SUMMARY"
           done
       - name: Report a conflicting port
