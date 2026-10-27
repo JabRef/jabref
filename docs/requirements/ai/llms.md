@@ -15,7 +15,7 @@ Needs: impl
 
 Different providers offer varying trade-offs between cost, performance, privacy, and reasoning capabilities.
 
-Needs: feat, req, impl
+Needs: req, impl
 
 ### JabRef must support OpenAI LLM provider
 `req~ai.llms.providers.openai~1`
@@ -61,10 +61,10 @@ Covers:
 
 - feat~ai.llms.providers~1
 
-### User can use dummy LLM provider
-`feat~ai.llms.providers.dummy~1`
+### JabRef must support dummy LLM provider
+`req~ai.llms.providers.dummy~1`
 
-Rationale: allows testing and debugging of AI features without external API calls or credentials.
+Allows testing and debugging of AI features without external API calls or credentials.
 
 Needs: impl
 
