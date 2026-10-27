@@ -28,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MarkdownPublicationExporterTest {
 
+    // [utest->feat~export.markdown-publications~1]
+    // [utest->req~export.markdown-publications.date-order~1]
     @Test
     void exportsFiveMostRecentPublicationsFirst(@TempDir Path tempDir)
             throws Exception {
@@ -432,6 +434,7 @@ class MarkdownPublicationExporterTest {
         );
     }
 
+    // [utest->req~export.markdown-publications.groups~1]
     @Test
     void usesDescriptionAndIncludesOnlyMatchingEntriesInDateOrder(
             @TempDir Path tempDir) throws Exception {
@@ -779,6 +782,7 @@ class MarkdownPublicationExporterTest {
                 """.formatted(fileName), recentSection(output));
     }
 
+    // [utest->req~export.markdown-publications.links~1]
     @Test
     void relativePdfLinkSurvivesMovingExportAndAttachmentsTogether(
             @TempDir Path tempDir) throws Exception {

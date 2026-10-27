@@ -28,6 +28,7 @@ import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
 
+// [impl->feat~export.markdown-publications~1]
 @NullMarked
 public class MarkdownPublicationExporter extends Exporter {
 
@@ -174,6 +175,7 @@ public class MarkdownPublicationExporter extends Exporter {
         }
     }
 
+    // [impl->req~export.markdown-publications.groups~1]
     private void appendGroupSection(
             StringBuilder markdown,
             GroupTreeNode group,
@@ -236,6 +238,7 @@ public class MarkdownPublicationExporter extends Exporter {
                     .anyMatch(child -> hasMatchingPublications(child, entries));
     }
 
+    // [impl->req~export.markdown-publications.links~1]
     private String renderPublication(
             BibEntry entry,
             Layout layout,
@@ -326,6 +329,7 @@ public class MarkdownPublicationExporter extends Exporter {
         }
     }
 
+    // [impl->req~export.markdown-publications.date-order~1]
     private long publicationDateKey(BibEntry entry) {
         return entry.getPublicationDate()
                     .or(() -> Date.parse(
