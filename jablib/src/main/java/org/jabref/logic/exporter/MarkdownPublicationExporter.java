@@ -11,6 +11,8 @@ import java.time.DateTimeException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -112,75 +114,68 @@ public class MarkdownPublicationExporter extends Exporter {
                                      new IOException(Localization.lang("Cannot load Markdown publication layout.")));
         }
 
-        StringBuilder markdown = new StringBuilder();
-        markdown.append("## ").append(Localization.lang("Recent publications")).append("\n\n");
-
-        appendPublications(
-                markdown,
+        StringJoiner sections = new StringJoiner("\n\n", "", "\n");
+        sections.add("## " + Localization.lang("Recent publications") + "\n\n"
+                + renderPublications(
                 sorted.stream().limit(5).toList(),
                 layout,
                 databaseContext,
                 fileDirectories,
                 file
-        );
-
-        markdown.append("\n## ").append(Localization.lang("All publications")).append("\n\n");
-
-        appendPublications(
-                markdown,
+        ));
+        sections.add("## " + Localization.lang("All publications") + "\n\n"
+                + renderPublications(
                 sorted,
                 layout,
                 databaseContext,
                 fileDirectories,
                 file
-        );
+        ));
 
-        Optional<GroupTreeNode> exportGroup = databaseContext.getMetaData()
-                                                             .getGroups()
-                                                             .flatMap(root -> root.findGroupByName("Export"));
-
-        for (GroupTreeNode subgroup : exportGroup.stream()
-                                                 .flatMap(group -> group.getChildren().stream())
-                                                 .toList()) {
-            appendGroupSection(
-                    markdown,
-                    subgroup,
-                    3,
-                    sorted,
-                    layout,
-                    databaseContext,
-                    fileDirectories,
-                    file
-            );
-        }
+        databaseContext.getMetaData().getGroups()
+                       .flatMap(root -> root.findGroupByName("Export"))
+                       .ifPresent(exportGroup -> {
+                           for (GroupTreeNode subgroup : exportGroup.getChildren()) {
+                               appendGroupSection(
+                                       sections,
+                                       subgroup,
+                                       3,
+                                       sorted,
+                                       layout,
+                                       databaseContext,
+                                       fileDirectories,
+                                       file
+                               );
+                           }
+                       });
 
         try (AtomicFileWriter writer =
                      new AtomicFileWriter(file, StandardCharsets.UTF_8)) {
-            writer.write(markdown.toString());
+            writer.write(sections.toString());
         }
     }
 
-    private void appendPublications(
-            StringBuilder markdown,
+    private String renderPublications(
             List<BibEntry> entries,
             Layout layout,
             BibDatabaseContext databaseContext,
             List<Path> fileDirectories,
             Path outputFile) {
-        for (BibEntry entry : entries) {
-            markdown.append(renderPublication(
-                    entry,
-                    layout,
-                    databaseContext,
-                    fileDirectories,
-                    outputFile
-            ));
-        }
+        return entries.stream()
+                      .map(entry -> renderPublication(
+                              entry,
+                              layout,
+                              databaseContext,
+                              fileDirectories,
+                              outputFile
+                      ))
+                      .collect(Collectors.joining())
+                      .stripTrailing();
     }
 
     // [impl->req~export.markdown-publications.groups~1]
     private void appendGroupSection(
-            StringBuilder markdown,
+            StringJoiner sections,
             GroupTreeNode group,
             int headingLevel,
             List<BibEntry> sorted,
@@ -198,27 +193,24 @@ public class MarkdownPublicationExporter extends Exporter {
                               .replace('\r', ' ')
                               .replace('\n', ' ');
 
-        if (!markdown.toString().endsWith("\n\n")) {
-            markdown.append("\n");
-        }
+        StringJoiner section = new StringJoiner("\n\n");
+        section.add("#".repeat(Math.min(headingLevel, 6)) + " " + heading);
 
-        markdown.append("#".repeat(Math.min(headingLevel, 6)))
-                .append(" ")
-                .append(heading)
-                .append("\n\n");
-
-        appendPublications(
-                markdown,
+        String publications = renderPublications(
                 group.findMatches(sorted),
                 layout,
                 databaseContext,
                 fileDirectories,
                 outputFile
         );
+        if (!publications.isEmpty()) {
+            section.add(publications);
+        }
+        sections.add(section.toString());
 
         for (GroupTreeNode child : group.getChildren()) {
             appendGroupSection(
-                    markdown,
+                    sections,
                     child,
                     headingLevel + 1,
                     sorted,
