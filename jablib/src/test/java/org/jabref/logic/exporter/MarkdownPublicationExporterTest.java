@@ -438,6 +438,23 @@ class MarkdownPublicationExporterTest {
                 """, recentSection(output));
     }
 
+    @Test
+    void addsHttpsSchemeToWwwPdfLink(@TempDir Path tempDir) throws Exception {
+        BibEntry entry = publication(2025).withFiles(List.of(
+                new LinkedFile("Full text", "www.example.org/paper.pdf", "PDF")
+        ));
+        Path output = tempDir.resolve("www-pdf.md");
+
+        createExporter().export(new BibDatabaseContext(), output, List.of(entry));
+
+        assertEquals("""
+                ## Recent publications
+
+                * Paper 2025. 2025 [PDF](<https://www.example.org/paper.pdf>)
+
+                """, recentSection(output));
+    }
+
     private MarkdownPublicationExporter createExporter() {
         LayoutFormatterPreferences preferences = LayoutFormatterPreferences.getDefault();
 

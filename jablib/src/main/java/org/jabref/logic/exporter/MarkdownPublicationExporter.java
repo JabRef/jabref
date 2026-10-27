@@ -285,11 +285,15 @@ public class MarkdownPublicationExporter extends Exporter {
             List<Path> fileDirectories,
             Path outputFile) {
         if (linkedFile.isOnlineLink()) {
+            String link = linkedFile.getLink();
+            if (link.regionMatches(true, 0, "www.", 0, 4)) {
+                link = "https://" + link;
+            }
             return Optional.of(
-                    linkedFile.getLink()
-                              .replace(" ", "%20")
-                              .replace("<", "%3C")
-                              .replace(">", "%3E")
+                    link
+                            .replace(" ", "%20")
+                            .replace("<", "%3C")
+                            .replace(">", "%3E")
             );
         }
 
