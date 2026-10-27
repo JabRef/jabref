@@ -72,11 +72,12 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@NullMarked
 /// Pane to manage the interaction between JabRef and OpenOffice.
+@NullMarked
 public class OpenOfficePanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficePanel.class);
@@ -118,10 +119,10 @@ public class OpenOfficePanel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final GitHandlerRegistry gitHandlerRegistry;
-    private OOBibBase ooBase;
-    private OOStyle currentStyle;
+    private @Nullable OOBibBase ooBase;
+    private @Nullable OOStyle currentStyle;
 
-    private final SimpleObjectProperty<OOStyle> currentStyleProperty;
+    private final SimpleObjectProperty<@Nullable OOStyle> currentStyleProperty;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            GuiPreferences preferences,
@@ -754,7 +755,7 @@ public class OpenOfficePanel {
         return contextMenu;
     }
 
-    private void updatePreferences(OOStyle currentStyle) {
+    private void updatePreferences(@Nullable OOStyle currentStyle) {
         if (!(currentStyle instanceof CitationStyle)) {
             openOfficePreferences.setZoteroCompatibilityMode(false);
             openOfficePreferences.setInferCslStyleFromDocument(false);
