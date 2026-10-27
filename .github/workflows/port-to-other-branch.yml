@@ -152,6 +152,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          # The action pushes the port branch with the credential this checkout persists; the
+          # repository's own token cannot push to the other repository, the PAT can
+          token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
           fetch-depth: 0
           submodules: 'false'
           show-progress: 'false'
