@@ -12,6 +12,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
@@ -423,6 +424,7 @@ class ImportHandlerTest {
         BibDatabase database = new BibDatabase(List.of(existingWang));
         BibDatabaseContext databaseContext = new BibDatabaseContext(database);
         when(preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()).thenReturn(true);
+        when(preferences.getMergeDialogPreferences()).thenReturn(mock(MergeDialogPreferences.class));
         GlobalCitationKeyPatterns keyPatterns = GlobalCitationKeyPatterns.fromPattern("[auth:transliterate:camel][year]");
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(
                 false,
@@ -442,9 +444,46 @@ class ImportHandlerTest {
                 List.of(existingWang.getCitationKey(), importedWang.getCitationKey()));
     }
 
+    @Test
+    void importCitedEntriesPreservesExplicitKeysWhenGenerateNewKeyOnImportIsEnabled() {
+        BibDatabase database = new BibDatabase();
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        when(preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()).thenReturn(true);
+        when(preferences.getMergeDialogPreferences()).thenReturn(mock(MergeDialogPreferences.class));
+        GlobalCitationKeyPatterns keyPatterns = GlobalCitationKeyPatterns.fromPattern("[auth:transliterate:camel][year]");
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
+                keyPatterns,
+                new SimpleObjectProperty<>(',')));
+
+        BibEntry entryWithDocumentKey = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("DocumentKey")
+                .withField(StandardField.AUTHOR, "Smith, Jane")
+                .withField(StandardField.YEAR, "2024");
+        BibEntry keylessZoteroEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Doe, John")
+                .withField(StandardField.YEAR, "2025");
+
+        handlerFor(databaseContext, new JabRefUndoManager())
+                .importEntriesWithDuplicateCheckPreservingCitationKeys(List.of(entryWithDocumentKey, keylessZoteroEntry));
+
+        assertEquals(2, database.getEntries().size(), database.getEntries().toString());
+        assertEquals(List.of("DocumentKey", "Doe2025"), database.getEntries().stream()
+                                                                       .map(entry -> entry.getCitationKey().orElseThrow())
+                                                                       .toList());
+    }
+
     private ImportHandler handlerFor(BibDatabaseContext databaseContext, JabRefUndoManager journal) {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
         return new ImportHandler(
                 databaseContext,
                 preferences,

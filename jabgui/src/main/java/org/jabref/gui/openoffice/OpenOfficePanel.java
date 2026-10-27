@@ -395,7 +395,7 @@ public class OpenOfficePanel {
                 return;
             }
 
-            targetTab.importEntriesWithDuplicateCheck(citedEntries.newEntries());
+            targetTab.importCitedEntriesWithDuplicateCheck(citedEntries.newEntries());
         } catch (NoDocumentException ex) {
             LOGGER.info("Could not import", ex);
         }
