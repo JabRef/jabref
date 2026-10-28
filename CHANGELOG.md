@@ -87,6 +87,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where saving the "Custom entry types" preferences removed custom fields from the non-wrapped fields. [#17121](https://github.com/JabRef/jabref/pull/17121)
 - We fixed an issue where "Automatically set file links" did not work when no external file types were configured. [#15084](https://github.com/JabRef/jabref/issues/15084)
 - We fixed an issue where citing organisations in JStyle format was not sorting or displaying properly in LibreOffice. [#11725](https://github.com/JabRef/jabref/issues/11725)
+- We fixed an issue where "Perform OCR" button remained enabled for broken or missing linked files. [#16736](https://github.com/JabRef/jabref/issues/16736)
 - We fixed an issue where disabling "Automatically index all linked files for fulltext search" did not stop running indexes. [#17577](https://github.com/JabRef/jabref/issues/17577)
 - We Fixed an issue where te citationcount , day and dayfiled columns sorted alphabetically instead of numerically. [#17459](https://github.com/JabRef/jabref/issues/17459)
 
