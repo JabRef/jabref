@@ -368,7 +368,6 @@ class GroupTreeViewModelTest {
     void selectionOfNewDatabaseSurvivesSwitch() {
         BibDatabaseContext secondDatabase = new BibDatabaseContext();
         secondDatabase.setDatabasePath(Path.of("second.bib"));
-
         GroupTreeNode groupA = setUpLibraryWithGroup(databaseContext, "A");
         GroupTreeNode groupB = setUpLibraryWithGroup(secondDatabase, "B");
         var storedSelectionA = stateManager.getSelectedGroups(databaseContext);
@@ -382,7 +381,6 @@ class GroupTreeViewModelTest {
         activeDatabase.setValue(Optional.of(secondDatabase));
         assertEquals(List.of(groupB), selectedGroupNodes());
         activeDatabase.setValue(Optional.of(databaseContext));
-
         assertEquals(List.of(groupA), selectedGroupNodes());
         assertEquals(List.of(groupA), storedSelectionA);
 
@@ -399,6 +397,7 @@ class GroupTreeViewModelTest {
             return null;
         }).when(stateManager).clearSelectedGroups(library);
         // the root is attached last otherwise refresh will overlap with stubbing
+        // the second invokeAndWait() waits for the refresh queued by setGroups to finish
         JavaFxExtension.invokeAndWait(() -> library.getMetaData().setGroups(root));
         JavaFxExtension.invokeAndWait(() -> { });
         return group;
