@@ -228,6 +228,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                             .map(selectedGroup -> newRoot.findGroupNodeViewModel(selectedGroup)
                                                          .orElseGet(() -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences)))
                             .toList());
+        // [impl->req~ux.groups.library-switch-preserves-selection~1]
         // currentDatabase has to be set after the root swap so the guard in onSelectedGroupChanged blocks the transient empty selection
         currentDatabase = newDatabase;
     }

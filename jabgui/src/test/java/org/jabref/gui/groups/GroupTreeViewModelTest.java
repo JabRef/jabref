@@ -364,6 +364,7 @@ class GroupTreeViewModelTest {
     }
 
     @Test
+    // [utest->req~ux.groups.library-switch-preserves-selection~1]
     void selectionOfNewDatabaseSurvivesSwitch() {
         BibDatabaseContext secondDatabase = new BibDatabaseContext();
         secondDatabase.setDatabasePath(Path.of("second.bib"));

@@ -228,4 +228,11 @@ The groups walkthrough must open its bundled example library, display the Groups
 
 Needs: impl
 
+## Library tab switches must preserve each library's selected groups
+`req~ux.groups.library-switch-preserves-selection~1`
+
+Rationale: The user must be able to switch between libraries and still see the same groups selected ([#1104](https://github.com/JabRef/jabref/issues/1104)).
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
