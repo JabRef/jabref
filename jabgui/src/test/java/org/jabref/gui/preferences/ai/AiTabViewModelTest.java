@@ -30,6 +30,7 @@ class AiTabViewModelTest {
 
     private EmbeddingModelMetadataService embeddingModelMetadataService;
     private AiModelService aiModelService;
+    private AiPreferences workingAiPreferences;
     private AiTabViewModel viewModel;
 
     @BeforeEach
@@ -42,7 +43,7 @@ class AiTabViewModelTest {
         );
 
         AiPreferences aiPreferences = AiPreferences.getDefault();
-        AiPreferences workingAiPreferences = AiPreferences.getDefault();
+        workingAiPreferences = AiPreferences.getDefault();
 
         viewModel = new AiTabViewModel(
                 aiPreferences,
@@ -235,5 +236,21 @@ class AiTabViewModelTest {
 
         viewModel.documentSplitterChunkSizeProperty().set(300);
         assertTrue(viewModel.getDocumentSplitterOverlapSizeValidationStatus().isValid());
+    }
+
+    @Test
+    void dummyProviderNotShownInAiProviders() {
+        assertFalse(viewModel.aiProvidersProperty().contains(AiProvider.DUMMY));
+    }
+
+    @Test
+    void enableAiDebugProviderStoredAndReset() {
+        viewModel.setValues();
+        viewModel.enableAiDebugProviderProperty().set(true);
+        viewModel.storeSettings();
+        assertTrue(workingAiPreferences.getEnableAiDebugProvider());
+
+        viewModel.resetExpertSettings();
+        assertFalse(viewModel.enableAiDebugProviderProperty().get());
     }
 }

@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.ai;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -39,6 +40,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.LocalizedNumbersUtils;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.ai.AiDefaultEnums;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
@@ -72,7 +74,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableAutoGenerateSummaries = new SimpleBooleanProperty();
 
     private final ListProperty<AiProvider> aiProvidersList =
-            new SimpleListProperty<>(FXCollections.observableArrayList(AiProvider.values()));
+            new SimpleListProperty<>(FXCollections.observableArrayList(
+                    Arrays.stream(AiProvider.values())
+                          .filter(provider -> provider != AiProvider.DUMMY)
+                          .toList()));
     private final ObjectProperty<AiProvider> selectedAiProvider = new SimpleObjectProperty<>();
 
     private final ListProperty<String> chatModelsList =
@@ -84,7 +89,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final StringProperty mistralAiChatModel = new SimpleStringProperty();
     private final StringProperty geminiChatModel = new SimpleStringProperty();
     private final StringProperty huggingFaceChatModel = new SimpleStringProperty();
-    private final StringProperty dummyChatModel = new SimpleStringProperty();
 
     private final StringProperty currentApiKey = new SimpleStringProperty();
 
@@ -92,9 +96,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final StringProperty mistralAiApiKey = new SimpleStringProperty();
     private final StringProperty geminiAiApiKey = new SimpleStringProperty();
     private final StringProperty huggingFaceApiKey = new SimpleStringProperty();
-    private final StringProperty dummyApiKey = new SimpleStringProperty();
 
     private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
+    private final BooleanProperty enableAiDebugProvider = new SimpleBooleanProperty();
 
     private final ListProperty<String> embeddingModelsList =
             new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -109,7 +113,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final StringProperty mistralAiApiBaseUrl = new SimpleStringProperty();
     private final StringProperty geminiApiBaseUrl = new SimpleStringProperty();
     private final StringProperty huggingFaceApiBaseUrl = new SimpleStringProperty();
-    private final StringProperty dummyApiBaseUrl = new SimpleStringProperty();
 
     private final StringProperty chattingSystemMessageTemplate = new SimpleStringProperty();
     private final StringProperty chattingUserMessageTemplate = new SimpleStringProperty();
@@ -216,7 +219,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
             List<String> models = PredefinedChatModelUtil.getAvailableModels(newValue);
 
-            disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI || newValue == AiProvider.DUMMY);
+            disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
 
             // When we setAll on Hugging Face, models are empty, and currentChatModel become null.
             // It becomes null because `currentChatModel` is bound to combobox, and this combobox becomes empty.
@@ -247,9 +250,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         huggingFaceApiBaseUrl.set(currentApiBaseUrl.get());
                     }
                     case DUMMY -> {
-                        dummyChatModel.set(oldChatModel);
-                        dummyApiKey.set(currentApiKey.get());
-                        dummyApiBaseUrl.set(currentApiBaseUrl.get());
                     }
                 }
             }
@@ -276,9 +276,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                     currentApiBaseUrl.set(huggingFaceApiBaseUrl.get());
                 }
                 case DUMMY -> {
-                    currentChatModel.set(dummyChatModel.get());
-                    currentApiKey.set(dummyApiKey.get());
-                    currentApiBaseUrl.set(dummyApiBaseUrl.get());
                 }
             }
 
@@ -313,8 +310,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         geminiChatModel.set(newValue);
                 case HUGGING_FACE ->
                         huggingFaceChatModel.set(newValue);
-                case DUMMY ->
-                        dummyChatModel.set(newValue);
+                case DUMMY -> {
+                }
             }
 
             contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(aiProvider, newValue));
@@ -335,8 +332,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         geminiAiApiKey.set(newValue);
                 case HUGGING_FACE ->
                         huggingFaceApiKey.set(newValue);
-                case DUMMY ->
-                        dummyApiKey.set(newValue);
+                case DUMMY -> {
+                }
             }
         });
 
@@ -355,13 +352,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         geminiApiBaseUrl.set(newValue);
                 case HUGGING_FACE ->
                         huggingFaceApiBaseUrl.set(newValue);
-                case DUMMY ->
-                        dummyApiBaseUrl.set(newValue);
+                case DUMMY -> {
+                }
             }
         });
 
         // A result only holds for the values it was tested with.
-        Stream.of(selectedAiProvider, currentChatModel, currentApiKey, currentApiBaseUrl, customizeExpertSettings)
+        Stream.of(selectedAiProvider, currentChatModel, currentApiKey, currentApiBaseUrl, customizeExpertSettings, enableAiDebugProvider)
               .forEach(property -> property.addListener((_, _, _) -> {
                   connectionTestState.set(ConnectionTestState.IDLE);
                   connectionTestDetails.set("");
@@ -455,28 +452,30 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         mistralAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
         geminiAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.GEMINI));
         huggingFaceApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
-        dummyApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.DUMMY));
 
         openAiApiBaseUrl.setValue(workingAiPreferences.getOpenAiApiBaseUrl());
         mistralAiApiBaseUrl.setValue(workingAiPreferences.getMistralAiApiBaseUrl());
         geminiApiBaseUrl.setValue(workingAiPreferences.getGeminiApiBaseUrl());
         huggingFaceApiBaseUrl.setValue(workingAiPreferences.getHuggingFaceApiBaseUrl());
-        dummyApiBaseUrl.setValue(workingAiPreferences.getDummyApiBaseUrl());
 
         openAiChatModel.setValue(workingAiPreferences.getOpenAiChatModel());
         mistralAiChatModel.setValue(workingAiPreferences.getMistralAiChatModel());
         geminiChatModel.setValue(workingAiPreferences.getGeminiChatModel());
         huggingFaceChatModel.setValue(workingAiPreferences.getHuggingFaceChatModel());
-        dummyChatModel.setValue(workingAiPreferences.getDummyChatModel());
 
         enableAi.setValue(workingAiPreferences.getAiFeaturesEnabledCurrently());
         autoGenerateSummaries.setValue(workingAiPreferences.getAutoGenerateSummaries());
         autoGenerateEmbeddings.setValue(workingAiPreferences.getAutoGenerateEmbeddings());
 
-        selectedAiProvider.setValue(workingAiPreferences.getAiProvider());
-        disableApiBaseUrl.set(selectedAiProvider.get() == AiProvider.HUGGING_FACE || selectedAiProvider.get() == AiProvider.GEMINI || selectedAiProvider.get() == AiProvider.DUMMY);
+        AiProvider provider = workingAiPreferences.getAiProvider();
+        if (provider == AiProvider.DUMMY) {
+            provider = AiDefaultEnums.AI_PROVIDER;
+        }
+        selectedAiProvider.setValue(provider);
+        disableApiBaseUrl.set(selectedAiProvider.get() == AiProvider.HUGGING_FACE || selectedAiProvider.get() == AiProvider.GEMINI);
 
         customizeExpertSettings.setValue(workingAiPreferences.getCustomizeExpertSettings());
+        enableAiDebugProvider.setValue(workingAiPreferences.getEnableAiDebugProvider());
 
         selectedEmbeddingModel.setValue(workingAiPreferences.getEmbeddingModel());
 
@@ -520,15 +519,14 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         workingAiPreferences.setMistralAiChatModel(mistralAiChatModel.get() == null ? "" : mistralAiChatModel.get());
         workingAiPreferences.setGeminiChatModel(geminiChatModel.get() == null ? "" : geminiChatModel.get());
         workingAiPreferences.setHuggingFaceChatModel(huggingFaceChatModel.get() == null ? "" : huggingFaceChatModel.get());
-        workingAiPreferences.setDummyChatModel(dummyChatModel.get() == null ? "" : dummyChatModel.get());
 
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.OPEN_AI, openAiApiKey.get() == null ? "" : openAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.MISTRAL_AI, mistralAiApiKey.get() == null ? "" : mistralAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.GEMINI, geminiAiApiKey.get() == null ? "" : geminiAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE, huggingFaceApiKey.get() == null ? "" : huggingFaceApiKey.get());
-        aiPreferences.storeAiApiKeyInKeyring(AiProvider.DUMMY, dummyApiKey.get() == null ? "" : dummyApiKey.get());
 
         workingAiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
+        workingAiPreferences.setEnableAiDebugProvider(enableAiDebugProvider.get());
 
         workingAiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
 
@@ -536,7 +534,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         workingAiPreferences.setMistralAiApiBaseUrl(mistralAiApiBaseUrl.get() == null ? "" : mistralAiApiBaseUrl.get());
         workingAiPreferences.setGeminiApiBaseUrl(geminiApiBaseUrl.get() == null ? "" : geminiApiBaseUrl.get());
         workingAiPreferences.setHuggingFaceApiBaseUrl(huggingFaceApiBaseUrl.get() == null ? "" : huggingFaceApiBaseUrl.get());
-        workingAiPreferences.setDummyApiBaseUrl(dummyApiBaseUrl.get() == null ? "" : dummyApiBaseUrl.get());
 
         workingAiPreferences.setChattingSystemMessageTemplate(chattingSystemMessageTemplate.get());
         workingAiPreferences.setChattingUserMessageTemplate(chattingUserMessageTemplate.get());
@@ -614,6 +611,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         documentSplitterOverlapSize.set(AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE);
         ragMaxResultsCount.set(AiDefaultExpertSettings.RAG_MAX_RESULTS_COUNT);
         ragMinScore.set(LocalizedNumbersUtils.doubleToString(AiDefaultExpertSettings.RAG_MIN_SCORE));
+        enableAiDebugProvider.set(AiDefaultExpertSettings.ENABLE_AI_DEBUG_PROVIDER);
     }
 
     public void resetTemplates() {
@@ -749,6 +747,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty customizeExpertSettingsProperty() {
         return customizeExpertSettings;
+    }
+
+    public BooleanProperty enableAiDebugProviderProperty() {
+        return enableAiDebugProvider;
     }
 
     public ReadOnlyListProperty<String> embeddingModelsProperty() {

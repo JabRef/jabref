@@ -86,6 +86,18 @@ public final class ChatModelFactory {
     }
 
     public static ChatModel create(AiPreferences aiPreferences) {
+        if (aiPreferences.getEnableAiDebugProvider()) {
+            // [impl->req~ai.llms.providers.dummy~1]
+            return create(
+                    AiProvider.DUMMY,
+                    "dummy",
+                    "",
+                    aiPreferences.getTemperature(),
+                    AiProvider.DUMMY.getApiUrl(),
+                    aiPreferences.getContextWindowSize(),
+                    aiPreferences.getTokenEstimatorKind()
+            );
+        }
         return create(
                 aiPreferences.getAiProvider(),
                 aiPreferences.getSelectedChatModel(),

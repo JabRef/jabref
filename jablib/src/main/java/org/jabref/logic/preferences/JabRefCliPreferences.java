@@ -404,14 +404,13 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_MISTRAL_AI_CHAT_MODEL = "aiMistralAiChatModel";
     private static final String AI_GEMINI_CHAT_MODEL = "aiGeminiChatModel";
     private static final String AI_HUGGING_FACE_CHAT_MODEL = "aiHuggingFaceChatModel";
-    private static final String AI_DUMMY_CHAT_MODEL = "aiDummyChatModel";
     private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
     private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
     private static final String AI_OPEN_AI_API_BASE_URL = "aiOpenAiApiBaseUrl";
     private static final String AI_MISTRAL_AI_API_BASE_URL = "aiMistralAiApiBaseUrl";
     private static final String AI_GEMINI_API_BASE_URL = "aiGeminiApiBaseUrl";
     private static final String AI_HUGGING_FACE_API_BASE_URL = "aiHuggingFaceApiBaseUrl";
-    private static final String AI_DUMMY_API_BASE_URL = "aiDummyApiBaseUrl";
+    private static final String AI_ENABLE_DEBUG_PROVIDER = "aiEnableDebugProvider";
     private static final String AI_SUMMARIZATOR_KIND = "aiSummarizatorKind";
     private static final String AI_TOKEN_ESTIMATOR_KIND = "aiTokenEstimatorKind";
     private static final String AI_TEMPERATURE = "aiTemperature";
@@ -2246,13 +2245,12 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(AI_MISTRAL_AI_CHAT_MODEL, defaultValues.getMistralAiChatModel()),
                 get(AI_GEMINI_CHAT_MODEL, defaultValues.getGeminiChatModel()),
                 get(AI_HUGGING_FACE_CHAT_MODEL, defaultValues.getHuggingFaceChatModel()),
-                get(AI_DUMMY_CHAT_MODEL, defaultValues.getDummyChatModel()),
                 getBoolean(AI_CUSTOMIZE_SETTINGS, defaultValues.getCustomizeExpertSettings()),
                 get(AI_OPEN_AI_API_BASE_URL, defaultValues.getOpenAiApiBaseUrl()),
                 get(AI_MISTRAL_AI_API_BASE_URL, defaultValues.getMistralAiApiBaseUrl()),
                 get(AI_GEMINI_API_BASE_URL, defaultValues.getGeminiApiBaseUrl()),
                 get(AI_HUGGING_FACE_API_BASE_URL, defaultValues.getHuggingFaceApiBaseUrl()),
-                get(AI_DUMMY_API_BASE_URL, defaultValues.getDummyApiBaseUrl()),
+                getBoolean(AI_ENABLE_DEBUG_PROVIDER, defaultValues.getEnableAiDebugProvider()),
                 SummarizatorKind.safeValueOf(get(AI_SUMMARIZATOR_KIND, defaultValues.getSummarizatorKind().name())),
                 TokenEstimatorKind.safeValueOf(get(AI_TOKEN_ESTIMATOR_KIND, defaultValues.getTokenEstimatorKind().name())),
                 get(AI_EMBEDDING_MODEL, defaultValues.embeddingModelProperty().get()),
@@ -2285,7 +2283,6 @@ public class JabRefCliPreferences implements CliPreferences {
         bindString(aiPreferences.mistralAiChatModelProperty(), AI_MISTRAL_AI_CHAT_MODEL, defaultValues.getMistralAiChatModel());
         bindString(aiPreferences.geminiChatModelProperty(), AI_GEMINI_CHAT_MODEL, defaultValues.getGeminiChatModel());
         bindString(aiPreferences.huggingFaceChatModelProperty(), AI_HUGGING_FACE_CHAT_MODEL, defaultValues.getHuggingFaceChatModel());
-        bindString(aiPreferences.dummyChatModelProperty(), AI_DUMMY_CHAT_MODEL, defaultValues.getDummyChatModel());
 
         bindBoolean(aiPreferences.customizeExpertSettingsProperty(), AI_CUSTOMIZE_SETTINGS, defaultValues.getCustomizeExpertSettings());
 
@@ -2293,7 +2290,8 @@ public class JabRefCliPreferences implements CliPreferences {
         bindString(aiPreferences.mistralAiApiBaseUrlProperty(), AI_MISTRAL_AI_API_BASE_URL, defaultValues.getMistralAiApiBaseUrl());
         bindString(aiPreferences.geminiApiBaseUrlProperty(), AI_GEMINI_API_BASE_URL, defaultValues.getGeminiApiBaseUrl());
         bindString(aiPreferences.huggingFaceApiBaseUrlProperty(), AI_HUGGING_FACE_API_BASE_URL, defaultValues.getHuggingFaceApiBaseUrl());
-        bindString(aiPreferences.dummyApiBaseUrlProperty(), AI_DUMMY_API_BASE_URL, defaultValues.getDummyApiBaseUrl());
+
+        bindBoolean(aiPreferences.enableAiDebugProviderProperty(), AI_ENABLE_DEBUG_PROVIDER, defaultValues.getEnableAiDebugProvider());
 
         bindObject(aiPreferences.summarizatorKindProperty(), AI_SUMMARIZATOR_KIND, defaultValues.getSummarizatorKind(), SummarizatorKind::name, SummarizatorKind::safeValueOf);
         bindObject(aiPreferences.tokenEstimatorKindProperty(), AI_TOKEN_ESTIMATOR_KIND, defaultValues.getTokenEstimatorKind(), TokenEstimatorKind::name, TokenEstimatorKind::safeValueOf);

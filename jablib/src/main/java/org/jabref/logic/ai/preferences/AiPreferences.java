@@ -69,7 +69,6 @@ public class AiPreferences {
     private final StringProperty mistralAiChatModel;
     private final StringProperty geminiChatModel;
     private final StringProperty huggingFaceChatModel;
-    private final StringProperty dummyChatModel;
 
     private final BooleanProperty customizeExpertSettings;
 
@@ -77,7 +76,8 @@ public class AiPreferences {
     private final StringProperty mistralAiApiBaseUrl;
     private final StringProperty geminiApiBaseUrl;
     private final StringProperty huggingFaceApiBaseUrl;
-    private final StringProperty dummyApiBaseUrl;
+
+    private final BooleanProperty enableAiDebugProvider;
 
     private final ObjectProperty<SummarizatorKind> summarizatorKind;
     private final ObjectProperty<TokenEstimatorKind> tokenEstimatorKind;
@@ -116,7 +116,6 @@ public class AiPreferences {
                 DEFAULT_CHAT_MODEL.get(AiProvider.MISTRAL_AI).getName(),                     // Mistral AI chat model
                 DEFAULT_CHAT_MODEL.get(AiProvider.GEMINI).getName(),                         // Gemini chat model
                 DEFAULT_CHAT_MODEL.get(AiProvider.HUGGING_FACE).getName(),                   // HuggingFace chat model
-                DEFAULT_CHAT_MODEL.get(AiProvider.DUMMY).getName(),                          // Dummy chat model
 
                 false,                                                                       // Customize expert settings
 
@@ -124,7 +123,8 @@ public class AiPreferences {
                 AiProvider.MISTRAL_AI.getApiUrl(),                                           // Mistral AI API base URL
                 AiProvider.GEMINI.getApiUrl(),                                               // Gemini API base URL
                 AiProvider.HUGGING_FACE.getApiUrl(),                                         // HuggingFace API base URL
-                AiProvider.DUMMY.getApiUrl(),                                                // Dummy API base URL
+
+                AiDefaultExpertSettings.ENABLE_AI_DEBUG_PROVIDER,                             // Enable dummy AI provider for debugging
 
                 AiDefaultExpertSettings.SUMMARIZATOR_KIND,                                   // Summarizator kind
                 AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND,                                // Token estimator kind
@@ -163,13 +163,12 @@ public class AiPreferences {
             String mistralAiChatModel,
             String geminiChatModel,
             String huggingFaceChatModel,
-            String dummyChatModel,
             boolean customizeExpertSettings,
             String openAiApiBaseUrl,
             String mistralAiApiBaseUrl,
             String geminiApiBaseUrl,
             String huggingFaceApiBaseUrl,
-            String dummyApiBaseUrl,
+            boolean enableAiDebugProvider,
             SummarizatorKind summarizatorKind,
             TokenEstimatorKind tokenEstimatorKind,
             String embeddingModel,
@@ -203,7 +202,6 @@ public class AiPreferences {
         this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
         this.geminiChatModel = new SimpleStringProperty(geminiChatModel);
         this.huggingFaceChatModel = new SimpleStringProperty(huggingFaceChatModel);
-        this.dummyChatModel = new SimpleStringProperty(dummyChatModel);
 
         this.customizeExpertSettings = new SimpleBooleanProperty(customizeExpertSettings);
 
@@ -211,7 +209,8 @@ public class AiPreferences {
         this.mistralAiApiBaseUrl = new SimpleStringProperty(mistralAiApiBaseUrl);
         this.geminiApiBaseUrl = new SimpleStringProperty(geminiApiBaseUrl);
         this.huggingFaceApiBaseUrl = new SimpleStringProperty(huggingFaceApiBaseUrl);
-        this.dummyApiBaseUrl = new SimpleStringProperty(dummyApiBaseUrl);
+
+        this.enableAiDebugProvider = new SimpleBooleanProperty(enableAiDebugProvider);
 
         this.summarizatorKind = new SimpleObjectProperty<>(summarizatorKind);
         this.tokenEstimatorKind = new SimpleObjectProperty<>(tokenEstimatorKind);
@@ -283,7 +282,6 @@ public class AiPreferences {
         setMistralAiChatModel(other.getMistralAiChatModel());
         setGeminiChatModel(other.getGeminiChatModel());
         setHuggingFaceChatModel(other.getHuggingFaceChatModel());
-        setDummyChatModel(other.getDummyChatModel());
 
         setCustomizeExpertSettings(other.getCustomizeExpertSettings());
 
@@ -291,7 +289,8 @@ public class AiPreferences {
         setMistralAiApiBaseUrl(other.getMistralAiApiBaseUrl());
         setGeminiApiBaseUrl(other.getGeminiApiBaseUrl());
         setHuggingFaceApiBaseUrl(other.getHuggingFaceApiBaseUrl());
-        setDummyApiBaseUrl(other.getDummyApiBaseUrl());
+
+        setEnableAiDebugProvider(other.getEnableAiDebugProvider());
 
         setSummarizatorKind(other.getSummarizatorKind());
         setTokenEstimatorKind(other.getTokenEstimatorKind());
@@ -457,18 +456,6 @@ public class AiPreferences {
         this.huggingFaceChatModel.set(huggingFaceChatModel);
     }
 
-    public StringProperty dummyChatModelProperty() {
-        return dummyChatModel;
-    }
-
-    public String getDummyChatModel() {
-        return dummyChatModel.get();
-    }
-
-    public void setDummyChatModel(String dummyChatModel) {
-        this.dummyChatModel.set(dummyChatModel);
-    }
-
     public BooleanProperty customizeExpertSettingsProperty() {
         return customizeExpertSettings;
     }
@@ -569,16 +556,16 @@ public class AiPreferences {
         this.huggingFaceApiBaseUrl.set(huggingFaceApiBaseUrl);
     }
 
-    public StringProperty dummyApiBaseUrlProperty() {
-        return dummyApiBaseUrl;
+    public BooleanProperty enableAiDebugProviderProperty() {
+        return enableAiDebugProvider;
     }
 
-    public String getDummyApiBaseUrl() {
-        return dummyApiBaseUrl.get();
+    public boolean getEnableAiDebugProvider() {
+        return enableAiDebugProvider.get();
     }
 
-    public void setDummyApiBaseUrl(String dummyApiBaseUrl) {
-        this.dummyApiBaseUrl.set(dummyApiBaseUrl);
+    public void setEnableAiDebugProvider(boolean enableAiDebugProvider) {
+        this.enableAiDebugProvider.set(enableAiDebugProvider);
     }
 
     public DoubleProperty temperatureProperty() {
@@ -615,7 +602,7 @@ public class AiPreferences {
                 case GEMINI ->
                         PredefinedChatModelUtil.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
                 case DUMMY ->
-                        PredefinedChatModelUtil.getContextWindowSize(AiProvider.DUMMY, dummyChatModel.get());
+                        PredefinedChatModel.DUMMY.getContextWindowSize();
             };
         }
     }
@@ -723,16 +710,16 @@ public class AiPreferences {
     }
 
     private List<Property<?>> getChatModelNamesProperties() {
-        return List.of(openAiChatModel, mistralAiChatModel, huggingFaceChatModel, geminiChatModel, dummyChatModel);
+        return List.of(openAiChatModel, mistralAiChatModel, huggingFaceChatModel, geminiChatModel);
     }
 
     private List<Property<?>> getApiBaseUrlsProperties() {
-        return List.of(openAiApiBaseUrl, mistralAiApiBaseUrl, huggingFaceApiBaseUrl, geminiApiBaseUrl, dummyApiBaseUrl);
+        return List.of(openAiApiBaseUrl, mistralAiApiBaseUrl, huggingFaceApiBaseUrl, geminiApiBaseUrl);
     }
 
     public List<Property<?>> getChatProperties() {
         return (List<Property<?>>) Stream.of(
-                List.of(aiFeaturesEnabledCurrently, aiProvider, customizeExpertSettings, temperature, contextWindowSize, tokenEstimatorKind),
+                List.of(aiFeaturesEnabledCurrently, aiProvider, enableAiDebugProvider, customizeExpertSettings, temperature, contextWindowSize, tokenEstimatorKind),
                 getChatModelNamesProperties(),
                 getApiBaseUrlsProperties()
         ).flatMap(List::stream).toList();
@@ -777,7 +764,7 @@ public class AiPreferences {
             case GEMINI ->
                     geminiChatModel.get();
             case DUMMY ->
-                    dummyChatModel.get();
+                    PredefinedChatModel.DUMMY.getName();
         };
     }
 
@@ -793,7 +780,7 @@ public class AiPreferences {
                 case GEMINI ->
                         geminiApiBaseUrl.get();
                 case DUMMY ->
-                        dummyApiBaseUrl.get();
+                        AiProvider.DUMMY.getApiUrl();
             };
         } else {
             return aiProvider.get().getApiUrl();

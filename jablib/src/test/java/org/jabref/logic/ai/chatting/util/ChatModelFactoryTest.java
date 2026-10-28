@@ -67,7 +67,7 @@ class ChatModelFactoryTest {
     @Test
     void createDummyChatModelFromPreferences() {
         AiPreferences preferences = AiPreferences.getDefault();
-        preferences.setAiProvider(AiProvider.DUMMY);
+        preferences.setEnableAiDebugProvider(true);
 
         try (ChatModel chatModel = ChatModelFactory.create(preferences)) {
             assertNotNull(chatModel);
