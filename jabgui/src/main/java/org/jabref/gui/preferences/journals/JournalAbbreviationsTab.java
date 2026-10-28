@@ -71,7 +71,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 listType == AbbreviationListType.JOURNALS
                 ? Injector.instantiateModelOrService(JournalAbbreviationRepository.class) : ConferenceAbbreviationLoader.loadBuiltInRepository());
         journalTableNameColumn.setText(listType == AbbreviationListType.JOURNALS
-                ? Localization.lang("Full journal name") : Localization.lang("Full conference name"));
+                                       ? Localization.lang("Full journal name") : Localization.lang("Full conference name"));
         filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty());
 
         buildView();
@@ -110,7 +110,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         removeList.disableProperty().bind(viewModel.isFileRemovableProperty().not());
 
         HBox row = new HBox(4.0, new Label(listType == AbbreviationListType.JOURNALS
-                ? Localization.lang("Journal lists") : Localization.lang("Conference lists")), journalFilesBox, addList, openList, removeList);
+                                           ? Localization.lang("Journal lists") : Localization.lang("Conference lists")), journalFilesBox, addList, openList, removeList);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
     }
@@ -174,7 +174,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         new ValueTableCellFactory<AbbreviationViewModel, String>()
                 .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> listType == AbbreviationListType.JOURNALS
-                        ? Localization.lang("Remove journal '%0'", name) : Localization.lang("Remove conference '%0'", name))
+                                     ? Localization.lang("Remove journal '%0'", name) : Localization.lang("Remove conference '%0'", name))
                 .withDisableExpression(_ -> viewModel.isEditableAndRemovableProperty().not())
                 .withVisibleExpression(_ -> viewModel.isEditableAndRemovableProperty())
                 .withOnMouseClickedEvent(_ -> _ ->
@@ -193,8 +193,8 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         Label loadingLabel = new Label(Localization.lang("Loading built in lists"));
         loadingLabel.setMaxHeight(30.0);
         loadingLabel.textProperty().bind(Bindings.when(viewModel.isLoadingProperty())
-                .then(Localization.lang("Loading built in lists"))
-                .otherwise(Localization.lang("No abbreviation files loaded")));
+                                                 .then(Localization.lang("Loading built in lists"))
+                                                 .otherwise(Localization.lang("No abbreviation files loaded")));
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setMaxHeight(30.0);
         progressIndicator.setOpacity(0.4);

@@ -186,8 +186,13 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     // [impl->req~abbreviations.conference-cleanup-ui~1]
     private ConferenceAbbreviationRepository loadConferenceRepository(CleanupPreferences preset, ConferenceAbbreviationPreferences conferencePreferences) {
         boolean usesConferenceList = preset.getActiveJobs().stream().anyMatch(step -> switch (step) {
-            case ABBREVIATE_DEFAULT, ABBREVIATE_DOTLESS, ABBREVIATE_SHORTEST_UNIQUE, UNABBREVIATE -> true;
-            default -> false;
+            case ABBREVIATE_DEFAULT,
+                 ABBREVIATE_DOTLESS,
+                 ABBREVIATE_SHORTEST_UNIQUE,
+                 UNABBREVIATE ->
+                    true;
+            default ->
+                    false;
         });
         return usesConferenceList ? ConferenceAbbreviationLoader.loadRepository(conferencePreferences) : new ConferenceAbbreviationRepository();
     }

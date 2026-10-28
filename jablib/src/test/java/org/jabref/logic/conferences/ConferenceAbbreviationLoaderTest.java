@@ -106,6 +106,6 @@ class ConferenceAbbreviationLoaderTest {
         ConferenceAbbreviationLoader.loadRepository(new ConferenceAbbreviationPreferences(List.of(csv.toString())));
 
         assertEquals(Optional.empty(), JournalAbbreviationLoader.loadRepository(JournalAbbreviationPreferences.getDefault())
-                .get("Test Conference for Loader Isolation"));
+                                                                .get("Test Conference for Loader Isolation"));
     }
 }

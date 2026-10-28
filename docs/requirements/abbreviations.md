@@ -5,8 +5,8 @@ parent: Requirements
 > This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
 >
 > Read and follow:
-> • [AGENTS.md](./AGENTS.md)
-> • [CONTRIBUTING.md](./CONTRIBUTING.md)
+> • [AGENTS.md](../../AGENTS.md)
+> • [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
 # Abbreviations
 
@@ -68,4 +68,4 @@ Issue: <https://github.com/JabRef/jabref/issues/12728>
 
 Needs: impl, utest
 
-<!-- markdownlint-disable-file MD013 MD022 MD033 -->
+<!-- markdownlint-disable-file MD013 MD022 MD033 MD041 -->

@@ -90,7 +90,7 @@ class ConferenceAbbreviationsTabTest extends JavaFxTest {
         Files.writeString(csv, "International Conference on Business Process Management,BPM");
         when(dialogService.showFileOpenDialog(any())).thenReturn(Optional.of(csv));
         Button open = JavaFxExtension.lookup(root, ".button", Button.class, button -> Optional.ofNullable(button.getTooltip())
-                .map(Tooltip::getText).filter(Localization.lang("Open existing list")::equals).isPresent());
+                                                                                              .map(Tooltip::getText).filter(Localization.lang("Open existing list")::equals).isPresent());
         interact(open::fire);
         interact(() -> assertEquals(List.of("BPM"), table().getItems().stream().map(AbbreviationViewModel::getAbbreviation).toList()));
 
@@ -103,7 +103,7 @@ class ConferenceAbbreviationsTabTest extends JavaFxTest {
 
         assertEquals(List.of(csv.toAbsolutePath().toString()), preferences.getExternalLists());
         assertEquals(Optional.of("BPM edited"), ConferenceAbbreviationLoader.loadRepository(preferences)
-                .getDefaultAbbreviation("International Conference on Business Process Management"));
+                                                                            .getDefaultAbbreviation("International Conference on Business Process Management"));
     }
 
     @SuppressWarnings("unchecked")

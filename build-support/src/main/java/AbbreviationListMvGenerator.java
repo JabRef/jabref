@@ -93,9 +93,9 @@ public class AbbreviationListMvGenerator {
         Files.createDirectories(abbreviationListMvFile.getParent());
 
         try (MVStore store = new MVStore.Builder().
-                     fileName(abbreviationListMvFile.toString()).
-                     compressHigh().
-                     open()) {
+                fileName(abbreviationListMvFile.toString()).
+                compressHigh().
+                open()) {
             MVMap<String, Abbreviation> fullToAbbreviation = store.openMap("FullToAbbreviation");
             fullToAbbreviation.clear();
             if (!Files.isDirectory(abbreviationsDirectory)) {

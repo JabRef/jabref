@@ -179,7 +179,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
         if (journalFiles.contains(abbreviationsFile)) {
             dialogService.showErrorDialogAndWait(abbreviationsPreferences instanceof ConferenceAbbreviationPreferences
-                    ? Localization.lang("Duplicate conference file") : Localization.lang("Duplicated Journal File"),
+                                                 ? Localization.lang("Duplicate conference file") : Localization.lang("Duplicated Journal File"),
                     abbreviationsPreferences instanceof ConferenceAbbreviationPreferences
                     ? Localization.lang("Conference file %0 already added", filePath.toString())
                     : Localization.lang("Journal file %s already added", filePath.toString()));
@@ -227,7 +227,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviationObject);
         if (abbreviations.contains(abbreviationViewModel)) {
             dialogService.showErrorDialogAndWait(abbreviationsPreferences instanceof ConferenceAbbreviationPreferences
-                    ? Localization.lang("Duplicate conference abbreviation") : Localization.lang("Duplicated Journal Abbreviation"),
+                                                 ? Localization.lang("Duplicate conference abbreviation") : Localization.lang("Duplicated Journal Abbreviation"),
                     abbreviationsPreferences instanceof ConferenceAbbreviationPreferences
                     ? Localization.lang("Abbreviation '%0' for conference '%1' already defined.", abbreviationObject.getAbbreviation(), abbreviationObject.getName())
                     : Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviationObject.getAbbreviation(), abbreviationObject.getName()));
@@ -259,10 +259,10 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     setCurrentAbbreviationNameAndAbbreviationIfValid(abbreviationObject);
                 } else {
                     dialogService.showErrorDialogAndWait(abbreviationsPreferences instanceof ConferenceAbbreviationPreferences
-                    ? Localization.lang("Duplicate conference abbreviation") : Localization.lang("Duplicated Journal Abbreviation"),
+                                                         ? Localization.lang("Duplicate conference abbreviation") : Localization.lang("Duplicated Journal Abbreviation"),
                             abbreviationsPreferences instanceof ConferenceAbbreviationPreferences
-                    ? Localization.lang("Abbreviation '%0' for conference '%1' already defined.", abbreviationObject.getAbbreviation(), abbreviationObject.getName())
-                    : Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviationObject.getAbbreviation(), abbreviationObject.getName()));
+                            ? Localization.lang("Abbreviation '%0' for conference '%1' already defined.", abbreviationObject.getAbbreviation(), abbreviationObject.getName())
+                            : Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviationObject.getAbbreviation(), abbreviationObject.getName()));
                 }
             } else {
                 setCurrentAbbreviationNameAndAbbreviationIfValid(abbreviationObject);
@@ -352,9 +352,12 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                         shouldWriteLists = false;
                     }
                     return switch (abbreviationsPreferences) {
-                        case JournalAbbreviationPreferences journalPreferences -> JournalAbbreviationLoader.loadRepository(journalPreferences);
-                        case ConferenceAbbreviationPreferences conferencePreferences -> ConferenceAbbreviationLoader.loadRepository(conferencePreferences);
-                        default -> abbreviationRepository;
+                        case JournalAbbreviationPreferences journalPreferences ->
+                                JournalAbbreviationLoader.loadRepository(journalPreferences);
+                        case ConferenceAbbreviationPreferences conferencePreferences ->
+                                ConferenceAbbreviationLoader.loadRepository(conferencePreferences);
+                        default ->
+                                abbreviationRepository;
                     };
                 })
                 .onSuccess(repository -> {
