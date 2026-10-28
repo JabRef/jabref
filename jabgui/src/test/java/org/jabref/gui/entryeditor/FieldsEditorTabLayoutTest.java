@@ -23,12 +23,14 @@ import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@NullMarked
 @ExtendWith(JavaFxExtension.class)
 class FieldsEditorTabLayoutTest {
 
