@@ -880,9 +880,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder()),
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))),
                 !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaultValues.useCustomTerminal()), // mind the !
-                getCommandArguments(CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand()),
+                getCommandArguments(this, CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand()),
                 !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaultValues.useCustomFileBrowser()), // mind the !
-                getCommandArguments(FILE_BROWSER_COMMAND_ARGUMENTS, FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand()),
+                getCommandArguments(this, FILE_BROWSER_COMMAND_ARGUMENTS, FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand()),
                 get(KINDLE_EMAIL, defaultValues.getKindleEmail())
         );
 
@@ -890,13 +890,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindBoolean(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(), OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder());
         bindBooleanInverted(externalApplicationsPreferences.useCustomTerminalProperty(), USE_DEFAULT_CONSOLE_APPLICATION, defaultValues.useCustomTerminal());
         bindCustom(externalApplicationsPreferences.customTerminalCommandProperty(), CONSOLE_COMMAND_ARGUMENTS, defaultValues.getCustomTerminalCommand(),
-                (_, _, value) -> put(CONSOLE_COMMAND_ARGUMENTS, OBJECT_MAPPER.writeValueAsString(value)),
-                () -> externalApplicationsPreferences.setCustomTerminalCommand(getCommandArguments(CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand())),
+                (_, _, value) -> putStringList(CONSOLE_COMMAND_ARGUMENTS, value),
+                () -> externalApplicationsPreferences.setCustomTerminalCommand(getCommandArguments(this, CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand())),
                 () -> externalApplicationsPreferences.setCustomTerminalCommand(defaultValues.getCustomTerminalCommand()));
         bindBooleanInverted(externalApplicationsPreferences.useCustomFileBrowserProperty(), USE_DEFAULT_FILE_BROWSER_APPLICATION, defaultValues.useCustomFileBrowser());
         bindCustom(externalApplicationsPreferences.customFileBrowserCommandProperty(), FILE_BROWSER_COMMAND_ARGUMENTS, defaultValues.getCustomFileBrowserCommand(),
-                (_, _, value) -> put(FILE_BROWSER_COMMAND_ARGUMENTS, OBJECT_MAPPER.writeValueAsString(value)),
-                () -> externalApplicationsPreferences.setCustomFileBrowserCommand(getCommandArguments(FILE_BROWSER_COMMAND_ARGUMENTS, FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand())),
+                (_, _, value) -> putStringList(FILE_BROWSER_COMMAND_ARGUMENTS, value),
+                () -> externalApplicationsPreferences.setCustomFileBrowserCommand(getCommandArguments(this, FILE_BROWSER_COMMAND_ARGUMENTS, FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand())),
                 () -> externalApplicationsPreferences.setCustomFileBrowserCommand(defaultValues.getCustomFileBrowserCommand()));
         bindString(externalApplicationsPreferences.kindleEmailProperty(), KINDLE_EMAIL, defaultValues.getKindleEmail());
         bindSet(externalApplicationsPreferences.getExternalFileTypes(), EXTERNAL_FILE_TYPES, defaultValues.getExternalFileTypes(),
@@ -906,36 +906,19 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return externalApplicationsPreferences;
     }
 
-    private List<String> getCommandArguments(String key, String legacyKey, List<String> defaultArguments) {
-        if (hasKey(key)) {
-            try {
-                JsonNode storedCommand = OBJECT_MAPPER.readTree(get(key, "[]"));
-                if (!storedCommand.isArray()) {
-                    LOGGER.warn("External application command arguments are not a list");
-                    return defaultArguments;
-                }
-                List<String> arguments = new ArrayList<>();
-                for (JsonNode argument : storedCommand) {
-                    if (!argument.isString()) {
-                        LOGGER.warn("External application command argument is not a string");
-                        return defaultArguments;
-                    }
-                    arguments.add(argument.asString());
-                }
-                return List.copyOf(arguments);
-            } catch (JacksonException e) {
-                LOGGER.warn("Could not read external application command arguments", e);
-                return defaultArguments;
-            }
+    @VisibleForTesting
+    static List<String> getCommandArguments(JabRefCliPreferences preferences, String key, String legacyKey, List<String> defaultArguments) {
+        if (preferences.hasKey(key)) {
+            return preferences.getStringList(key);
         }
 
-        if (!hasKey(legacyKey)) {
+        if (!preferences.hasKey(legacyKey)) {
             return defaultArguments;
         }
 
-        List<String> arguments = migrateLegacyCommand(get(legacyKey, ""), defaultArguments);
+        List<String> arguments = migrateLegacyCommand(preferences.get(legacyKey, ""), defaultArguments);
         if (!arguments.isEmpty()) {
-            put(key, OBJECT_MAPPER.writeValueAsString(arguments));
+            preferences.putStringList(key, arguments);
         }
         return arguments;
     }
