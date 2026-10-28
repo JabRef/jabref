@@ -86,9 +86,9 @@ class PdfAuthorCrossCheck {
                 // The first author-bearing candidate supplied the merged author
                 if (
                     // [impl->req~import.pdf.author-preserved-with-citation-key~1]
-                    candidate.getCitationKey().isPresent() ||
-                    // [impl->req~import.pdf.author-preserved-with-entry-type~1]
-                    isKnownNonDefaultType(candidate.getType())) {
+                        candidate.getCitationKey().isPresent() ||
+                                // [impl->req~import.pdf.author-preserved-with-entry-type~1]
+                                isKnownNonDefaultType(candidate.getType())) {
                     return;
                 }
             }
