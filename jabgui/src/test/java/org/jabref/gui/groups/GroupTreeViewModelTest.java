@@ -364,7 +364,7 @@ class GroupTreeViewModelTest {
     }
 
     @Test
-    // [utest->req~ux.groups.library-switch-preserves-selection~1]
+        // [utest->req~ux.groups.library-switch-preserves-selection~1]
     void selectionOfNewDatabaseSurvivesSwitch() {
         BibDatabaseContext secondDatabase = new BibDatabaseContext();
         secondDatabase.setDatabasePath(Path.of("second.bib"));
@@ -399,7 +399,8 @@ class GroupTreeViewModelTest {
         // the root is attached last otherwise refresh will overlap with stubbing
         // the second invokeAndWait() waits for the refresh queued by setGroups to finish
         JavaFxExtension.invokeAndWait(() -> library.getMetaData().setGroups(root));
-        JavaFxExtension.invokeAndWait(() -> { });
+        JavaFxExtension.invokeAndWait(() -> {
+        });
         return group;
     }
 
