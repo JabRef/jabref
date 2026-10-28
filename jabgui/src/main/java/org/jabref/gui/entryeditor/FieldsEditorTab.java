@@ -194,14 +194,14 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     static void setRegularRowLayout(GridPane gridPane, List<Field> fields) {
         gridPane.getChildren().forEach(FieldsEditorTab::useComputedPreferredHeight);
         List<RowConstraints> constraints = IntStream.range(0, fields.size())
-                .mapToObj(row -> {
-                    RowConstraints rowExpand = new RowConstraints();
-                    boolean fileRow = fields.get(row) == StandardField.FILE;
-                    rowExpand.setVgrow(fileRow ? Priority.NEVER : Priority.ALWAYS);
-                    rowExpand.setValignment(VPos.TOP);
-                    rowExpand.setMaxHeight(fileRow ? Region.USE_PREF_SIZE : Double.MAX_VALUE);
-                    return rowExpand;
-                }).toList();
+                                                    .mapToObj(row -> {
+                                                        RowConstraints rowExpand = new RowConstraints();
+                                                        boolean fileRow = fields.get(row) == StandardField.FILE;
+                                                        rowExpand.setVgrow(fileRow ? Priority.NEVER : Priority.ALWAYS);
+                                                        rowExpand.setValignment(VPos.TOP);
+                                                        rowExpand.setMaxHeight(fileRow ? Region.USE_PREF_SIZE : Double.MAX_VALUE);
+                                                        return rowExpand;
+                                                    }).toList();
         gridPane.getRowConstraints().addAll(constraints);
     }
 

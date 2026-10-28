@@ -132,10 +132,14 @@ class FieldsEditorTabLayoutTest {
         FieldNameLabel ownerLabel = new FieldNameLabel(StandardField.OWNER);
         for (int row = 0; row < editors.length; row++) {
             Label label = switch (row) {
-                case 3 -> urlLabel;
-                case 4 -> fileLabel;
-                case 6 -> ownerLabel;
-                default -> new Label("Field " + row);
+                case 3 ->
+                        urlLabel;
+                case 4 ->
+                        fileLabel;
+                case 6 ->
+                        ownerLabel;
+                default ->
+                        new Label("Field " + row);
             };
             label.setPrefHeight(Double.POSITIVE_INFINITY);
             grid.addRow(row, label, editors[row]);

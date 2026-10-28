@@ -128,8 +128,8 @@ class UserDefinedFieldsTabLayoutTest {
 
     private LayoutSnapshot layout(TestContext context, int keywordCount, double height) {
         String keywords = String.join(", ", IntStream.rangeClosed(1, keywordCount)
-                                                    .mapToObj(index -> "longkeyword" + index)
-                                                    .toList());
+                                                     .mapToObj(index -> "longkeyword" + index)
+                                                     .toList());
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.KEYWORDS, keywords)
                 .withField(StandardField.FILE, ":one.pdf:PDF;:two.pdf:PDF")
