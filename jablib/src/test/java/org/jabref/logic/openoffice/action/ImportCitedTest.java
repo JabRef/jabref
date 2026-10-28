@@ -3,6 +3,7 @@ package org.jabref.logic.openoffice.action;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationType;
@@ -107,6 +108,37 @@ class ImportCitedTest {
     }
 
     @Test
+    void keepsKeylessZoteroItemsWithSameItemIdFromDifferentLibraries() {
+        // Two co-authors cite from their own Zotero libraries, where the item ids are only unique per library
+        ImportCited.CitedEntries citedEntries = ImportCited.collectCitedEntries(
+                List.of(citeWithZotero("587", List.of("http://zotero.org/users/123/items/ABCD1234"), "From library of user 123", "RNDabcdefghij"),
+                        citeWithZotero("587", List.of("http://zotero.org/users/456/items/WXYZ9876"), "From library of user 456", "RNDklmnopqrst")),
+                new BibDatabase());
+
+        assertEquals(List.of(Optional.of("From library of user 123"), Optional.of("From library of user 456")), titlesOf(citedEntries.newEntries()));
+    }
+
+    @Test
+    void collectsKeylessZoteroItemWithSameUriOnceEvenIfItemIdsDiffer() {
+        ImportCited.CitedEntries citedEntries = ImportCited.collectCitedEntries(
+                List.of(citeWithZotero("587", List.of("http://zotero.org/users/123/items/ABCD1234"), "Cited from Zotero", "RNDabcdefghij"),
+                        citeWithZotero("601", List.of("http://zotero.org/users/123/items/ABCD1234"), "Cited from Zotero", "RNDklmnopqrst")),
+                new BibDatabase());
+
+        assertEquals(List.of(Optional.of("Cited from Zotero")), titlesOf(citedEntries.newEntries()));
+    }
+
+    @Test
+    void collectsKeylessZoteroItemWithoutUriOnceByItemId() {
+        ImportCited.CitedEntries citedEntries = ImportCited.collectCitedEntries(
+                List.of(citeWithZotero("587", List.of(), "Original title", "RNDabcdefghij"),
+                        citeWithZotero("587", List.of(), "Updated title", "RNDklmnopqrst")),
+                new BibDatabase());
+
+        assertEquals(List.of(Optional.of("Original title")), titlesOf(citedEntries.newEntries()));
+    }
+
+    @Test
     void skipsEntryWhoseCitationKeyIsInLibrary() {
         BibDatabase library = new BibDatabase(List.of(smithEntry()));
 
@@ -202,10 +234,17 @@ class ImportCitedTest {
     }
 
     private static String citeWithZotero(String itemId, String title, String randomSuffix) {
+        return citeWithZotero(itemId, List.of("http://zotero.org/users/123/items/" + itemId), title, randomSuffix);
+    }
+
+    private static String citeWithZotero(String itemId, List<String> uris, String title, String randomSuffix) {
+        String urisJson = uris.stream()
+                              .map(uri -> "\"" + uri + "\"")
+                              .collect(Collectors.joining(", ", "[", "]"));
         String citationJson = """
-                {"citationItems": [{"id": %s, "uris": ["http://zotero.org/users/123/items/%s"],
+                {"citationItems": [{"id": %s, "uris": %s,
                 "itemData": {"id": %s, "type": "article-journal", "title": "%s", "author": [{"family": "Doe", "given": "John"}]}}]}
-                """.formatted(itemId, itemId, itemId, title);
+                """.formatted(itemId, urisJson, itemId, title);
         return ZoteroReferenceMark.PREFIX + citationJson + " " + randomSuffix;
     }
 

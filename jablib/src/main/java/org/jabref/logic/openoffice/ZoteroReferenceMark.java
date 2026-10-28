@@ -260,20 +260,8 @@ public record ZoteroReferenceMark(
     }
 
     static Optional<String> getCitationKey(ZoteroCitationData.CitationItemData citationItem) {
-        Optional<String> explicitCitationKey = getExplicitCitationKey(citationItem);
-        if (explicitCitationKey.isPresent()) {
-            return explicitCitationKey;
-        }
-
-        if (citationItem.itemData != null && !StringUtil.isBlank(citationItem.itemData.id)) {
-            return Optional.of(normalizeZoteroItemId(citationItem.itemData.id));
-        }
-
-        if (!StringUtil.isBlank(citationItem.id)) {
-            return Optional.of(normalizeZoteroItemId(citationItem.id));
-        }
-
-        return Optional.empty();
+        return getExplicitCitationKey(citationItem)
+                .or(() -> getZoteroItemId(citationItem).map(ZoteroReferenceMark::normalizeZoteroItemId));
     }
 
     /// Returns the citation key that the citation item names itself: the key in its JabRef URI, else its `citation-key`.
@@ -290,33 +278,38 @@ public record ZoteroReferenceMark(
             }
         }
 
-        if (citationItem.itemData != null && !StringUtil.isBlank(citationItem.itemData.citationKey)) {
-            return Optional.of(citationItem.itemData.citationKey);
-        }
-
-        return Optional.empty();
+        return Optional.ofNullable(citationItem.itemData)
+                       .map(itemData -> itemData.citationKey)
+                       .filter(citationKey -> !StringUtil.isBlank(citationKey));
     }
 
     /// Returns an identity for the Zotero item that is independent of its bibliographic fields.
     ///
-    /// The item data ID is preferred because the citation-item ID can be local to the mark. A Zotero URI is used
-    /// when neither item ID is available.
+    /// The Zotero URI is preferred, because it identifies the item across Zotero libraries,
+    /// whereas a Zotero item id is only unique within one library. The item id is used when the citation item has no Zotero URI.
     static Optional<String> getItemIdentity(ZoteroCitationData.CitationItemData citationItem) {
-        if (citationItem.itemData != null && !StringUtil.isBlank(citationItem.itemData.id)) {
-            return Optional.of("id:" + normalizeZoteroItemId(citationItem.itemData.id));
-        }
+        return getZoteroUri(citationItem)
+                .map(uri -> "uri:" + uri)
+                .or(() -> getZoteroItemId(citationItem).map(itemId -> "id:" + normalizeZoteroItemId(itemId)));
+    }
 
-        if (!StringUtil.isBlank(citationItem.id)) {
-            return Optional.of("id:" + normalizeZoteroItemId(citationItem.id));
-        }
-
+    private static Optional<String> getZoteroUri(ZoteroCitationData.CitationItemData citationItem) {
         return Optional.ofNullable(citationItem.uris)
                        .orElse(List.of())
                        .stream()
                        .filter(uri -> !StringUtil.isBlank(uri))
                        .filter(ZoteroReferenceMark::isZoteroUri)
                        .findFirst()
-                       .map(uri -> "uri:" + uri.trim());
+                       .map(String::trim);
+    }
+
+    /// Returns the Zotero item id of the citation item: the id of its item data, else its own id.
+    private static Optional<String> getZoteroItemId(ZoteroCitationData.CitationItemData citationItem) {
+        return Optional.ofNullable(citationItem.itemData)
+                       .map(itemData -> itemData.id)
+                       .filter(itemId -> !StringUtil.isBlank(itemId))
+                       .or(() -> Optional.ofNullable(citationItem.id)
+                                         .filter(itemId -> !StringUtil.isBlank(itemId)));
     }
 
     static String createJabRefUri(String citationKey) {
