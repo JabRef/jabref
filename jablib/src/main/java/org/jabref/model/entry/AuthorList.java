@@ -268,6 +268,11 @@ public class AuthorList implements Iterable<Author> {
         return authors;
     }
 
+    /// Returns the authors without the "et al." placeholder [Author#OTHERS]
+    public List<Author> getNamedAuthors() {
+        return authors.stream().filter(author -> !Author.OTHERS.equals(author)).toList();
+    }
+
     /// Returns a LaTeX-free version of this `AuthorList`.
     public AuthorList latexFree() {
         if (latexFreeAuthors == null) {
