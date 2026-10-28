@@ -239,8 +239,8 @@ class AiTabViewModelTest {
     }
 
     @Test
-    void dummyProviderNotShownInAiProviders() {
-        assertFalse(viewModel.aiProvidersProperty().contains(AiProvider.DUMMY));
+    void debugProviderNotShownInAiProviders() {
+        assertFalse(viewModel.aiProvidersProperty().contains(AiProvider.DEBUG));
     }
 
     @Test

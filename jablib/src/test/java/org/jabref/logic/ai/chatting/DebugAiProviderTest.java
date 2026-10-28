@@ -16,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @NullMarked
-class DummyChatLanguageModelTest {
+class DebugAiProviderTest {
 
-    private DummyChatLanguageModel model;
+    private DebugAiProvider model;
 
     @BeforeEach
     void setUp() {
-        model = new DummyChatLanguageModel(0);
+        model = new DebugAiProvider(0);
     }
 
     @Test
@@ -89,7 +89,7 @@ class DummyChatLanguageModelTest {
 
     @Test
     void defaultConstructorHasFiveSecondsDelay() {
-        DummyChatLanguageModel defaultModel = new DummyChatLanguageModel();
+        DebugAiProvider defaultModel = new DebugAiProvider();
         assertNotNull(defaultModel);
     }
 }

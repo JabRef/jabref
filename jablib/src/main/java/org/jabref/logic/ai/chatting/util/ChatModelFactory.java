@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.chatting.ChatModel;
-import org.jabref.logic.ai.chatting.DummyChatLanguageModel;
+import org.jabref.logic.ai.chatting.DebugAiProvider;
 import org.jabref.logic.ai.chatting.JvmOpenAiChatLanguageModel;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.ai.tokenization.logic.TokenEstimator;
@@ -78,8 +78,8 @@ public final class ChatModelFactory {
                                            .temperature(temperature)
                                            .logRequestsAndResponses(true)
                                            .build();
-            case DUMMY ->
-                    new DummyChatLanguageModel();
+            case DEBUG ->
+                    new DebugAiProvider();
         };
 
         return new ChatModelImpl(langchainModel, tokenEstimator, provider, modelName, contextWindowSize, httpClient, executorService);
@@ -87,13 +87,13 @@ public final class ChatModelFactory {
 
     public static ChatModel create(AiPreferences aiPreferences) {
         if (aiPreferences.getEnableAiDebugProvider()) {
-            // [impl->req~ai.llms.providers.dummy~1]
+            // [impl->req~ai.llms.providers.debug~1]
             return create(
-                    AiProvider.DUMMY,
-                    "dummy",
+                    AiProvider.DEBUG,
+                    "debug",
                     "",
                     aiPreferences.getTemperature(),
-                    AiProvider.DUMMY.getApiUrl(),
+                    AiProvider.DEBUG.getApiUrl(),
                     aiPreferences.getContextWindowSize(),
                     aiPreferences.getTokenEstimatorKind()
             );

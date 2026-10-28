@@ -15,19 +15,19 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// A dummy AI chat model used for testing and debugging AI features without external API calls.
+/// A debug AI chat model used for testing and debugging AI features without external API calls.
 @NullMarked
-public class DummyChatLanguageModel implements ChatModel {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DummyChatLanguageModel.class);
+public class DebugAiProvider implements ChatModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DebugAiProvider.class);
     private static final long DEFAULT_DELAY_MS = 5000;
 
     private final long delayMs;
 
-    public DummyChatLanguageModel() {
+    public DebugAiProvider() {
         this(DEFAULT_DELAY_MS);
     }
 
-    public DummyChatLanguageModel(long delayMs) {
+    public DebugAiProvider(long delayMs) {
         this.delayMs = delayMs;
     }
 

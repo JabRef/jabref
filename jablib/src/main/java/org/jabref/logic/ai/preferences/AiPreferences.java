@@ -51,7 +51,7 @@ public class AiPreferences {
             AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
             AiProvider.GEMINI, PredefinedChatModel.GEMINI_1_5_FLASH,
             AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE,
-            AiProvider.DUMMY, PredefinedChatModel.DUMMY
+            AiProvider.DEBUG, PredefinedChatModel.DEBUG
     );
 
     /// Controls whether the AI features should start/work in a JabRef session.
@@ -601,8 +601,8 @@ public class AiPreferences {
                         PredefinedChatModelUtil.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
                 case GEMINI ->
                         PredefinedChatModelUtil.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
-                case DUMMY ->
-                        PredefinedChatModel.DUMMY.getContextWindowSize();
+                case DEBUG ->
+                        PredefinedChatModel.DEBUG.getContextWindowSize();
             };
         }
     }
@@ -763,8 +763,8 @@ public class AiPreferences {
                     huggingFaceChatModel.get();
             case GEMINI ->
                     geminiChatModel.get();
-            case DUMMY ->
-                    PredefinedChatModel.DUMMY.getName();
+            case DEBUG ->
+                    PredefinedChatModel.DEBUG.getName();
         };
     }
 
@@ -779,8 +779,8 @@ public class AiPreferences {
                         huggingFaceApiBaseUrl.get();
                 case GEMINI ->
                         geminiApiBaseUrl.get();
-                case DUMMY ->
-                        AiProvider.DUMMY.getApiUrl();
+                case DEBUG ->
+                        AiProvider.DEBUG.getApiUrl();
             };
         } else {
             return aiProvider.get().getApiUrl();

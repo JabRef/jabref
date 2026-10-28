@@ -31,10 +31,10 @@ class ChatModelFactoryTest {
     }
 
     @Test
-    void createDummyChatModel() {
+    void createDebugChatModel() {
         try (ChatModel chatModel = ChatModelFactory.create(
-                AiProvider.DUMMY,
-                "dummy",
+                AiProvider.DEBUG,
+                "debug",
                 "",
                 0.7,
                 "",
@@ -42,8 +42,8 @@ class ChatModelFactoryTest {
                 TokenEstimatorKind.WORDS
         )) {
             assertNotNull(chatModel);
-            assertEquals(AiProvider.DUMMY, chatModel.getAiProvider());
-            assertEquals("dummy", chatModel.getName());
+            assertEquals(AiProvider.DEBUG, chatModel.getAiProvider());
+            assertEquals("debug", chatModel.getName());
             assertEquals(128000, chatModel.getContextWindowSize());
 
             ChatResponse response = chatModel.chat(List.of(
@@ -65,14 +65,14 @@ class ChatModelFactoryTest {
     }
 
     @Test
-    void createDummyChatModelFromPreferences() {
+    void createDebugChatModelFromPreferences() {
         AiPreferences preferences = AiPreferences.getDefault();
         preferences.setEnableAiDebugProvider(true);
 
         try (ChatModel chatModel = ChatModelFactory.create(preferences)) {
             assertNotNull(chatModel);
-            assertEquals(AiProvider.DUMMY, chatModel.getAiProvider());
-            assertEquals("dummy", chatModel.getName());
+            assertEquals(AiProvider.DEBUG, chatModel.getAiProvider());
+            assertEquals("debug", chatModel.getName());
         }
     }
 }

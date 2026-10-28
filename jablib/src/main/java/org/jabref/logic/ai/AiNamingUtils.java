@@ -23,8 +23,8 @@ public final class AiNamingUtils {
                     "Gemini";
             case HUGGING_FACE ->
                     "Hugging Face";
-            case DUMMY ->
-                    Localization.lang("Dummy");
+            case DEBUG ->
+                    Localization.lang("Debug");
         };
     }
 
