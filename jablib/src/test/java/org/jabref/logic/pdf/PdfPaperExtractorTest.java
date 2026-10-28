@@ -12,11 +12,13 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@NullMarked
 class PdfPaperExtractorTest {
 
     @TempDir
