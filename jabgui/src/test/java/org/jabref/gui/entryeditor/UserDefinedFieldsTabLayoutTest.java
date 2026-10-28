@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 import javafx.collections.FXCollections;
@@ -97,6 +98,83 @@ class UserDefinedFieldsTabLayoutTest {
         });
     }
 
+    @Test
+    void weightedEditorsReceiveMoreExtraHeightThanRegularEditors(@TempDir Path fileDirectory) {
+        TestContext context = setUp(fileDirectory);
+        List<Field> weightedFields = List.of(
+                StandardField.KEYWORDS, StandardField.EPRINT, StandardField.GROUPS, StandardField.FILE);
+        JavaFxExtension.invokeAndWait(() -> {
+            LayoutSnapshot shortEditor = layout(context, 1, 127, weightedFields);
+            LayoutSnapshot tallEditor = layout(context, 1, 734, weightedFields);
+            LayoutSnapshot manyKeywords = layout(context, 24, 734, weightedFields);
+
+            assertTrue(tallEditor.keywordsHeight() > tallEditor.eprintHeight() * 1.4);
+            assertTrue(tallEditor.groupsHeight() > tallEditor.eprintHeight() * 1.4);
+            assertTrue(manyKeywords.keywordsHeight() > manyKeywords.eprintHeight());
+            assertTrue(manyKeywords.groupsHeight() > manyKeywords.eprintHeight());
+            assertEquals(shortEditor.fileHeight(), tallEditor.fileHeight(), 1);
+        });
+    }
+
+    @Test
+    void openingTabLaysOutRowsOnFirstPass(@TempDir Path fileDirectory) {
+        TestContext context = setUp(fileDirectory);
+        List<Field> fields = List.of(StandardField.KEYWORDS, StandardField.EPRINT,
+                StandardField.EPRINTTYPE, StandardField.URL, StandardField.FILE,
+                StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP);
+        JavaFxExtension.invokeAndWait(() -> {
+            var model = new EntryEditorTabModel.CustomizedFieldsTab(
+                    "Layout test", fields.stream().map(Field::getName).toList());
+            var tab = new UserDefinedFieldsTab(model, mock(UndoAction.class), mock(RedoAction.class),
+                    context.preferences(), context.journals(), context.stateManager(), mock(PreviewPanel.class));
+            tab.bindToEntry(ryanEntryWithKeywords(24));
+            StackPane root = new StackPane(tab.getContent());
+            new Scene(root, 850, 830);
+            root.applyCss();
+            root.layout();
+            LayoutSnapshot opened = snapshot(tab.gridPane, fields);
+            assertTrue(opened.keywordsHeight() < 400, opened.toString());
+            assertTrue(opened.eprintHeight() > 40, opened.toString());
+            root.getChildren().clear();
+            tab.dispose();
+        });
+    }
+
+    @Test
+    void switchingEntriesRecalculatesRowsWithoutResizing(@TempDir Path fileDirectory) {
+        TestContext context = setUp(fileDirectory);
+        List<Field> fields = List.of(StandardField.KEYWORDS, StandardField.EPRINT,
+                StandardField.EPRINTTYPE, StandardField.URL, StandardField.FILE,
+                StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP);
+        AtomicReference<UserDefinedFieldsTab> tabRef = new AtomicReference<>();
+        AtomicReference<StackPane> rootRef = new AtomicReference<>();
+        JavaFxExtension.invokeAndWait(() -> {
+            var model = new EntryEditorTabModel.CustomizedFieldsTab(
+                    "Layout test", fields.stream().map(Field::getName).toList());
+            var tab = new UserDefinedFieldsTab(model, mock(UndoAction.class), mock(RedoAction.class),
+                    context.preferences(), context.journals(), context.stateManager(), mock(PreviewPanel.class));
+            tab.bindToEntry(ryanEntryWithKeywords(8));
+            StackPane root = new StackPane(tab.getContent());
+            new Scene(root, 850, 830);
+            root.applyCss();
+            root.layout();
+            tabRef.set(tab);
+            rootRef.set(root);
+        });
+        JavaFxExtension.invokeAndWait(() -> {
+            UserDefinedFieldsTab tab = tabRef.get();
+            StackPane root = rootRef.get();
+            tab.bindToEntry(ryanEntryWithKeywords(24));
+            root.applyCss();
+            root.layout();
+            LayoutSnapshot switched = snapshot(tab.gridPane, fields);
+            assertTrue(switched.keywordsHeight() < 400, switched.toString());
+            assertTrue(switched.eprintHeight() > 40, switched.toString());
+            root.getChildren().clear();
+            tab.dispose();
+        });
+    }
+
     private TestContext setUp(Path fileDirectory) {
         GuiPreferences preferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getOwnerPreferences().getDefaultOwner()).thenReturn("tester");
@@ -134,19 +212,13 @@ class UserDefinedFieldsTabLayoutTest {
     }
 
     private LayoutSnapshot layout(TestContext context, int keywordCount, double height) {
-        String keywords = String.join(", ", IntStream.rangeClosed(1, keywordCount)
-                                                     .mapToObj(index -> "longkeyword" + index)
-                                                     .toList());
-        BibEntry entry = new BibEntry(StandardEntryType.Misc)
-                .withField(StandardField.KEYWORDS, keywords)
-                .withField(StandardField.FILE, ":one.pdf:PDF;:two.pdf:PDF")
-                .withField(StandardField.GROUPS, "group1, group2, group3")
-                .withField(StandardField.NOTE, "long note line\n".repeat(20))
-                .withField(StandardField.ABSTRACT, "long abstract line\n".repeat(20))
-                .withField(StandardField.URL, "https://example.org/test")
-                .withField(StandardField.OWNER, "tester");
+        return layout(context, keywordCount, height, FIELDS);
+    }
+
+    private LayoutSnapshot layout(TestContext context, int keywordCount, double height, List<Field> fields) {
+        BibEntry entry = entryWithKeywords(keywordCount);
         var model = new EntryEditorTabModel.CustomizedFieldsTab(
-                "Layout test", FIELDS.stream().map(Field::getName).toList());
+                "Layout test", fields.stream().map(Field::getName).toList());
         var tab = new UserDefinedFieldsTab(model, mock(UndoAction.class), mock(RedoAction.class),
                 context.preferences(), context.journals(), context.stateManager(), mock(PreviewPanel.class));
         tab.bindToEntry(entry);
@@ -161,7 +233,7 @@ class UserDefinedFieldsTabLayoutTest {
         ScrollPane scroll = (ScrollPane) ((SplitPane) tab.getContent()).getItems().getFirst();
         assertTrue(scroll.getViewportBounds().getHeight() > 0);
         assertTrue(scroll.getViewportBounds().getHeight() <= height);
-        assertEquals(FIELDS.size(), tab.editors.size());
+        assertEquals(fields.size(), tab.editors.size());
         if (height == 127) {
             assertTrue(grid.getHeight() > scroll.getViewportBounds().getHeight());
         }
@@ -170,8 +242,8 @@ class UserDefinedFieldsTabLayoutTest {
         assertEquals(8, eprintBounds.getMinY() - keywordsBounds.getMaxY(), 1);
 
         double previousBottom = Double.NEGATIVE_INFINITY;
-        for (int row = 0; row < FIELDS.size(); row++) {
-            Field field = FIELDS.get(row);
+        for (int row = 0; row < fields.size(); row++) {
+            Field field = fields.get(row);
             Bounds cell = grid.getCellBounds(1, row);
             Bounds editor = tab.editors.get(field).getNode().getBoundsInParent();
             String contextMessage = field + " keywords=" + keywordCount + " height=" + height;
@@ -181,18 +253,54 @@ class UserDefinedFieldsTabLayoutTest {
             previousBottom = editor.getMaxY();
         }
 
-        LayoutSnapshot snapshot = new LayoutSnapshot(
-                grid.getCellBounds(1, FIELDS.indexOf(StandardField.KEYWORDS)).getHeight(),
-                grid.getCellBounds(1, FIELDS.indexOf(StandardField.FILE)).getHeight());
+        LayoutSnapshot snapshot = snapshot(grid, fields);
         root.getChildren().clear();
         tab.dispose();
         return snapshot;
+    }
+
+    private BibEntry entryWithKeywords(int keywordCount) {
+        String keywords = String.join(", ", IntStream.rangeClosed(1, keywordCount)
+                                                     .mapToObj(index -> "longkeyword" + index)
+                                                     .toList());
+        return new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.KEYWORDS, keywords)
+                .withField(StandardField.FILE, ":one.pdf:PDF;:two.pdf:PDF")
+                .withField(StandardField.GROUPS, "group1, group2, group3")
+                .withField(StandardField.NOTE, "long note line\n".repeat(20))
+                .withField(StandardField.ABSTRACT, "long abstract line\n".repeat(20))
+                .withField(StandardField.URL, "https://example.org/test")
+                .withField(StandardField.OWNER, "tester");
+    }
+
+    private BibEntry ryanEntryWithKeywords(int keywordCount) {
+        String keywords = String.join(", ", IntStream.rangeClosed(1, keywordCount)
+                                                     .mapToObj(index -> "longkeyword%02d".formatted(index))
+                                                     .toList());
+        return new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.KEYWORDS, keywords)
+                .withField(StandardField.EPRINT, "2401.01234")
+                .withField(StandardField.EPRINTTYPE, "arxiv")
+                .withField(StandardField.URL, "https://example.org/test")
+                .withField(StandardField.GROUPS, "mygroup")
+                .withField(StandardField.OWNER, "tester")
+                .withField(StandardField.TIMESTAMP, "2026-10-20");
+    }
+
+    private LayoutSnapshot snapshot(GridPane grid, List<Field> fields) {
+        return new LayoutSnapshot(
+                grid.getCellBounds(1, fields.indexOf(StandardField.KEYWORDS)).getHeight(),
+                grid.getCellBounds(1, fields.indexOf(StandardField.EPRINT)).getHeight(),
+                fields.contains(StandardField.GROUPS)
+                ? grid.getCellBounds(1, fields.indexOf(StandardField.GROUPS)).getHeight() : 0,
+                grid.getCellBounds(1, fields.indexOf(StandardField.FILE)).getHeight());
     }
 
     private record TestContext(GuiPreferences preferences, StateManager stateManager,
                                JournalAbbreviationRepository journals) {
     }
 
-    private record LayoutSnapshot(double keywordsHeight, double fileHeight) {
+    private record LayoutSnapshot(double keywordsHeight, double eprintHeight,
+                                  double groupsHeight, double fileHeight) {
     }
 }

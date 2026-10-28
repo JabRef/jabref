@@ -9,6 +9,7 @@ import java.util.SequencedSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.VPos;
@@ -57,6 +58,11 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     protected GridPane gridPane;
+    private ScrollPane editorScrollPane;
+    private List<Label> regularRowLabels = List.of();
+    private boolean regularRowLayoutActive;
+    private boolean regularRowLayoutQueued;
+    private boolean measuringRegularRows;
     private final boolean isCompressed;
     private final UndoAction undoAction;
     private final RedoAction redoAction;
@@ -112,6 +118,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         gridPane.getChildren().clear();
         gridPane.getColumnConstraints().clear();
         gridPane.getRowConstraints().clear();
+        regularRowLayoutActive = false;
 
         fields = determineFieldsToShow(entry);
 
@@ -150,7 +157,12 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
+            regularRowLabels = List.copyOf(labels);
             setRegularRowLayout(gridPane, List.copyOf(fields));
+            regularRowLayoutActive = true;
+            editors.values().forEach(editor -> editor.getNode().layoutBoundsProperty()
+                                                     .addListener((_, _, _) -> redistributeRegularRowHeights()));
+            redistributeRegularRowHeights();
         }
     }
 
@@ -204,6 +216,94 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                                                         return rowExpand;
                                                     }).toList();
         gridPane.getRowConstraints().addAll(constraints);
+    }
+
+    /// Keep the natural height of each editor before distributing only the available extra height
+    /// according to editor weights. Percentage row heights can shrink below the content minimum
+    /// when the pane is short, causing neighboring fields to overlap.
+    private void redistributeRegularRowHeights() {
+        if (measuringRegularRows || !regularRowLayoutActive || fields.isEmpty()
+                || gridPane.getWidth() <= 0 || editorScrollPane == null) {
+            return;
+        }
+
+        double viewportHeight = editorScrollPane.getViewportBounds().getHeight();
+        if (viewportHeight <= 0) {
+            return;
+        }
+
+        measuringRegularRows = true;
+        try {
+            redistributeRegularRowHeightsForCurrentSize(viewportHeight);
+        } finally {
+            measuringRegularRows = false;
+        }
+    }
+
+    private void redistributeRegularRowHeightsForCurrentSize(double viewportHeight) {
+        List<Field> rows = List.copyOf(fields);
+        double[] naturalHeights = new double[rows.size()];
+        double naturalTotal = gridPane.getInsets().getTop() + gridPane.getInsets().getBottom()
+                + Math.max(0, rows.size() - 1) * gridPane.getVgap();
+        double labelWidth = regularRowLabels.stream().mapToDouble(label -> label.prefWidth(-1)).max().orElse(0);
+        double availableEditorWidth = gridPane.getWidth() - gridPane.getInsets().getLeft() - gridPane.getInsets().getRight()
+                - labelWidth - gridPane.getHgap();
+        double totalWeight = 0;
+        for (int row = 0; row < rows.size(); row++) {
+            Field field = rows.get(row);
+            Node node = editors.get(field).getNode();
+            double width = node.getLayoutBounds().getWidth();
+            if (width <= 0) {
+                width = availableEditorWidth;
+                if (node instanceof Region region && width > 0) {
+                    // Tag editors need their width before they can wrap tags and report a useful height.
+                    region.applyCss();
+                    region.resize(width, region.prefHeight(width));
+                    region.layout();
+                }
+            }
+            if (width <= 0) {
+                return;
+            }
+            double naturalHeight = node instanceof Region region
+                                   ? Math.max(region.minHeight(width), region.prefHeight(width))
+                                   : node.getLayoutBounds().getHeight();
+            Label label = regularRowLabels.get(row);
+            naturalHeight = Math.max(naturalHeight, label.prefHeight(label.getWidth()));
+            naturalHeights[row] = naturalHeight;
+            naturalTotal += naturalHeight;
+            if (field != StandardField.FILE) {
+                totalWeight += editors.get(field).getWeight();
+            }
+        }
+
+        double extraHeight = Math.max(0, viewportHeight - naturalTotal);
+        boolean rowHeightsChanged = false;
+        for (int row = 0; row < rows.size(); row++) {
+            Field field = rows.get(row);
+            RowConstraints constraint = gridPane.getRowConstraints().get(row);
+            double extra = field == StandardField.FILE || totalWeight == 0
+                           ? 0 : extraHeight * editors.get(field).getWeight() / totalWeight;
+            double targetHeight = naturalHeights[row] + extra;
+            if (Math.abs(constraint.getPrefHeight() - targetHeight) > 0.5) {
+                constraint.setMinHeight(naturalHeights[row]);
+                constraint.setPrefHeight(targetHeight);
+                constraint.setVgrow(Priority.NEVER);
+                rowHeightsChanged = true;
+            }
+        }
+        if (rowHeightsChanged && !regularRowLayoutQueued) {
+            // A field can change its preferred height during the current layout pass. Defer the
+            // next pass so GridPane uses the new row constraints without requiring a resize.
+            regularRowLayoutQueued = true;
+            Platform.runLater(() -> {
+                regularRowLayoutQueued = false;
+                if (regularRowLayoutActive) {
+                    gridPane.requestLayout();
+                    gridPane.layout();
+                }
+            });
+        }
     }
 
     /// Percentage rows ignore child minimum heights. With natural rows, infinite preferred heights
@@ -275,16 +375,25 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     private void initPanel() {
         if (gridPane == null) {
-            gridPane = new GridPane();
+            gridPane = new GridPane() {
+                @Override
+                protected void layoutChildren() {
+                    redistributeRegularRowHeights();
+                    super.layoutChildren();
+                }
+            };
             gridPane.getStyleClass().addAll("editorPane", "gap-8", "padding-4");
 
             // Wrap everything in a scroll-pane
             ScrollPane scrollPane = new ScrollPane();
+            editorScrollPane = scrollPane;
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
             scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
             scrollPane.setContent(getEditorContent());
             scrollPane.setFitToWidth(true);
             scrollPane.setFitToHeight(stretchContentToTabHeight());
+            scrollPane.viewportBoundsProperty().addListener((_, _, _) -> redistributeRegularRowHeights());
+            gridPane.widthProperty().addListener((_, _, _) -> redistributeRegularRowHeights());
             SplitPane container = new SplitPane(scrollPane);
             setContent(container);
 
