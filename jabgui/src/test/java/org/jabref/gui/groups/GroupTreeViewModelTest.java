@@ -49,6 +49,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -366,22 +368,42 @@ class GroupTreeViewModelTest {
         BibDatabaseContext secondDatabase = new BibDatabaseContext();
         secondDatabase.setDatabasePath(Path.of("second.bib"));
 
-        var group = groupTree.rootGroupProperty().getValue().getGroupNode();
-        var storedSelection = FXCollections.observableArrayList(group);
+        GroupTreeNode groupA = setUpLibraryWithGroup(databaseContext, "A");
+        GroupTreeNode groupB = setUpLibraryWithGroup(secondDatabase, "B");
+        var storedSelectionA = stateManager.getSelectedGroups(databaseContext);
 
-        when(stateManager.getSelectedGroups(secondDatabase)).thenReturn(storedSelection);
-        doAnswer(_ -> {
-            storedSelection.clear();
-            return null;
-        }).when(stateManager).clearSelectedGroups(secondDatabase);
-
-        groupTree.selectedGroupsProperty().setAll(groupTree.rootGroupProperty().getValue());
+        assertEquals(List.of(groupA), selectedGroupNodes());
 
         groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
 
-        activeDatabase.setValue(Optional.of(secondDatabase));
+        clearInvocations(stateManager);
 
-        verify(stateManager, never()).clearSelectedGroups(secondDatabase);
-        assertEquals(List.of(group), storedSelection);
+        activeDatabase.setValue(Optional.of(secondDatabase));
+        assertEquals(List.of(groupB), selectedGroupNodes());
+        activeDatabase.setValue(Optional.of(databaseContext));
+
+        assertEquals(List.of(groupA), selectedGroupNodes());
+        assertEquals(List.of(groupA), storedSelectionA);
+
+        verify(stateManager, never()).clearSelectedGroups(any(BibDatabaseContext.class));
+    }
+
+    private GroupTreeNode setUpLibraryWithGroup(BibDatabaseContext library, String name) {
+        var root = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        GroupTreeNode group = root.addSubgroup(new ExplicitGroup(name, GroupHierarchyType.INDEPENDENT, ','));
+        var storedSelection = FXCollections.observableArrayList(group);
+        when(stateManager.getSelectedGroups(library)).thenReturn(storedSelection);
+        doAnswer(_ -> {
+            storedSelection.clear();
+            return null;
+        }).when(stateManager).clearSelectedGroups(library);
+        // the root is attached last otherwise refresh will overlap with stubbing
+        JavaFxExtension.invokeAndWait(() -> library.getMetaData().setGroups(root));
+        JavaFxExtension.invokeAndWait(() -> { });
+        return group;
+    }
+
+    private List<GroupTreeNode> selectedGroupNodes() {
+        return groupTree.selectedGroupsProperty().stream().map(GroupNodeViewModel::getGroupNode).toList();
     }
 }
