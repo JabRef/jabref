@@ -43,18 +43,19 @@ class PdfAuthorCrossCheck {
 
     /// Replaces an unconfirmed creator-style author with the best author list confirmed by the PDF's leading
     /// pages. Bibliographic metadata and authors without extractable page text are preserved.
-    ///
-    /// [impl->req~import.pdf.author-confirmed-by-text~1]
-    /// [impl->req~import.pdf.author-preserved-without-text~1]
+    // [impl->req~import.pdf.author-confirmed-by-text~1]
     static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, @Nullable String leadingPagesText) {
+        // [impl->req~import.pdf.author-preserved-without-text~1]
         if (StringUtil.isBlank(leadingPagesText)) {
             return;
         }
+
         DocumentWords documentWords = DocumentWords.of(leadingPagesText);
         if (documentWords.isBlank()) {
             // A text of digits or punctuation confirms nothing
             return;
         }
+
         entry.getField(StandardField.AUTHOR)
              .ifPresent(mergedAuthor -> crossCheckMergedAuthor(entry, mergedAuthor, candidates, documentWords));
     }
@@ -63,8 +64,6 @@ class PdfAuthorCrossCheck {
     /// the candidate with the most confirmed family names, or removes a lone unconfirmed author.
     /// The first author-bearing candidate identifies the merged author's source because merging keeps its value.
     // [impl->adr~conservative-pdf-author-evidence~1]
-    // [impl->req~import.pdf.author-candidate-plausible~1,req~import.pdf.author-best-confirmed-candidate~1]
-    // [impl->req~import.pdf.author-unconfirmed-single-removed~1,req~import.pdf.author-unconfirmed-multiple-retained~1]
     private static void crossCheckMergedAuthor(BibEntry entry, String mergedAuthor, List<BibEntry> candidates,
                                                DocumentWords documentWords) {
         // A sentence mis-parsed as author ("Written by Alice Smith") is not confirmed by one of its names
@@ -73,39 +72,49 @@ class PdfAuthorCrossCheck {
         }
 
         boolean firstAuthorSourceFound = false;
-        Optional<ScoredAuthor> bestConfirmed = Optional.empty();
+        Optional<String> bestConfirmedAuthor = Optional.empty();
+        int maxConfirmedNames = 0;
+
         for (BibEntry candidate : candidates) {
             Optional<String> candidateAuthor = candidate.getField(StandardField.AUTHOR);
             if (candidateAuthor.isEmpty()) {
                 continue;
             }
+
             if (!firstAuthorSourceFound) {
                 firstAuthorSourceFound = true;
                 // The first author-bearing candidate supplied the merged author
-                // [impl->req~import.pdf.author-preserved-with-citation-key~1,req~import.pdf.author-preserved-with-entry-type~1]
-                if (candidate.getCitationKey().isPresent() || isKnownNonDefaultType(candidate.getType())) {
+                if (
+                    // [impl->req~import.pdf.author-preserved-with-citation-key~1]
+                    candidate.getCitationKey().isPresent() ||
+                    // [impl->req~import.pdf.author-preserved-with-entry-type~1]
+                    isKnownNonDefaultType(candidate.getType())) {
                     return;
                 }
             }
 
-            String author = candidateAuthor.orElseThrow();
+            // [impl->req~import.pdf.author-best-confirmed-candidate~1]
+            String author = candidateAuthor.get();
             if (looksLikeAuthorList(author)) {
                 int confirmedNames = countFamilyNamesInText(author, documentWords);
-                if (confirmedNames > bestConfirmed.map(ScoredAuthor::confirmedNames).orElse(0)) {
-                    bestConfirmed = Optional.of(new ScoredAuthor(author, confirmedNames));
+                if (confirmedNames > maxConfirmedNames) {
+                    maxConfirmedNames = confirmedNames;
+                    bestConfirmedAuthor = Optional.of(author);
                 }
             }
         }
 
         if (firstAuthorSourceFound) {
-            bestConfirmed.ifPresentOrElse(
-                    scored -> entry.setField(StandardField.AUTHOR, scored.value()),
-                    () -> {
-                        if (namedAuthors(mergedAuthor).count() == 1) {
-                            entry.clearField(StandardField.AUTHOR);
-                        }
-                    });
+            if (bestConfirmedAuthor.isPresent()) {
+                entry.setField(StandardField.AUTHOR, bestConfirmedAuthor.get());
+            } else if (namedAuthors(mergedAuthor).count() == 1) {
+                // [impl->req~import.pdf.author-unconfirmed-single-removed~1]
+                entry.clearField(StandardField.AUTHOR);
+            }
         }
+
+        // [impl->req~import.pdf.author-unconfirmed-multiple-retained~1]
+        // If no author was confirmed by text, the unconfirmed multiple authors are retained as is, method does nothing.
     }
 
     /// Dublin Core metadata of other tools may carry a generic type such as "Text", which says nothing about
@@ -115,13 +124,15 @@ class PdfAuthorCrossCheck {
         return !BibEntry.DEFAULT_TYPE.equals(type) && !(type instanceof UnknownEntryType);
     }
 
-    private record ScoredAuthor(String value, int confirmedNames) {
-    }
-
-    /// Keeps sentence fragments mis-parsed as author lists (e.g. by this importer's first-page parsing) from
-    /// being promoted by the cross-check: their words trivially occur in the document text. Real name lists
-    /// consist of capitalized words plus name particles and the "and" separator, while prose contains
-    /// other lowercase words and non-letter tokens such as URLs.
+    /// Checks that the value looks like a list of person names rather than prose, so that sentence fragments
+    /// mis-parsed as authors (e.g. `Written by Alice Smith`) are not confirmed merely because their words occur
+    /// in the document text.
+    ///
+    /// Every whitespace-separated word, stripped of surrounding non-letters, must be non-empty and either
+    /// start with an uppercase letter or be a name particle or `and` (see `NAME_LIST_LOWERCASE_WORDS`).
+    /// Caseless scripts such as CJK pass. Example: `Ludwig van Beethoven and others` is accepted;
+    /// `Written by Alice Smith`, `Alice Smith 2024` and URLs are rejected.
+    // [impl->req~import.pdf.author-candidate-plausible~1]
     private static boolean looksLikeAuthorList(String authorField) {
         for (String word : WHITESPACE.split(authorField)) {
             String stripped = LEADING_AND_TRAILING_NON_LETTERS.matcher(word).replaceAll("");
@@ -134,6 +145,7 @@ class PdfAuthorCrossCheck {
         return true;
     }
 
+    /// Checks if the author appears in the document text.
     private static boolean isAuthorConfirmedByText(String authorField, DocumentWords documentWords) {
         if (countFamilyNamesInText(authorField, documentWords) > 0) {
             return true;
