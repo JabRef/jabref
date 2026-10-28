@@ -16,17 +16,25 @@ import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -50,6 +58,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
@@ -62,6 +71,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -136,13 +147,172 @@ class AllFieldsTabTest {
         Injector.setModelOrService(DialogService.class, mock(DialogService.class));
         Injector.setModelOrService(StateManager.class, stateManager);
         Injector.setModelOrService(UndoManager.class, new JabRefUndoManager());
-        Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+        // Reset the static clipboards: another test may have left a cleared Mockito mock behind.
+        ClipBoardManager clipBoardManager = new ClipBoardManager(stateManager, mock(Clipboard.class), new java.awt.datatransfer.Clipboard("entry-editor-test"));
+        Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
         Injector.setModelOrService(KeyBindingRepository.class, new KeyBindingRepository());
         Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
         Injector.setModelOrService(JournalAbbreviationRepository.class, mock(JournalAbbreviationRepository.class));
         Injector.setModelOrService(FileUpdateMonitor.class, new DummyFileUpdateMonitor());
 
         tab = new AllFieldsTab(mock(UndoAction.class), mock(RedoAction.class), preferences, new BibEntryTypesManager(), mock(JournalAbbreviationRepository.class), stateManager, mock(PreviewPanel.class));
+    }
+
+    // [utest->req~entry-editor.accept-single-line-value~1]
+    @Test
+    void enterAcceptsCitationKeyAndFocusesFieldGrid() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Corti2009");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            EditorTextField field = (EditorTextField) tab.editors.get(InternalField.KEY_FIELD).getNode().lookup(".text-field");
+            field.requestFocus();
+            field.setText("Test");
+            field.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+
+            assertEquals(Optional.of("Test"), entry.getCitationKey());
+            assertSame(tab.gridPane, field.getScene().getFocusOwner());
+        });
+    }
+
+    @Test
+    void enterInDateFieldPreservesItsCommitHandler() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Corti2009")
+                                                                .withField(StandardField.DATE, "2009-03");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            EditorTextField field = (EditorTextField) tab.editors.get(StandardField.DATE).getNode().lookup(".text-field");
+            field.requestFocus();
+            field.setText("2026-10-17");
+            field.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+
+            assertEquals(Optional.of("2026-10-17"), entry.getField(StandardField.DATE));
+            assertSame(tab.gridPane, field.getScene().getFocusOwner());
+        });
+    }
+
+    @Test
+    void enterInMultilineFieldInsertsNewlineAndKeepsFocus() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Corti2009")
+                                                                .withField(StandardField.ABSTRACT, "First line");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            TextArea field = (TextArea) tab.editors.get(StandardField.ABSTRACT).getNode().lookup(".text-area");
+            field.requestFocus();
+            field.positionCaret(field.getLength());
+            field.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+
+            assertEquals("First line\n", field.getText());
+            assertSame(field, field.getScene().getFocusOwner());
+        });
+    }
+
+    @Test
+    void consumedEnterDoesNotMoveFocusFromSingleLineField() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("Corti2009");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            EditorTextField field = (EditorTextField) tab.editors.get(InternalField.KEY_FIELD).getNode().lookup(".text-field");
+            field.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    event.consume();
+                }
+            });
+            field.requestFocus();
+            field.selectAll();
+            field.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+
+            assertSame(field, field.getScene().getFocusOwner());
+        });
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "MONTH, #jan#, #feb#",
+            "MONTH, #jan#, #jan#",
+            "LANGUAGE, german, english"
+    })
+    void enterInOptionFieldAcceptsValueAndFocusesFieldGrid(StandardField field, String initialValue, String acceptedValue) {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(field, initialValue);
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            ComboBox<?> comboBox = (ComboBox<?>) tab.editors.get(field).getNode().lookup(".combo-box");
+            comboBox.requestFocus();
+            comboBox.getEditor().setText(acceptedValue);
+            comboBox.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+            comboBox.fireEvent(new KeyEvent(KeyEvent.KEY_RELEASED, "", "", KeyCode.ENTER, false, false, false, false));
+
+            assertEquals(Optional.of(acceptedValue), entry.getField(field));
+            assertEquals(comboBox.getConverter().fromString(acceptedValue), comboBox.getValue());
+            assertSame(tab.gridPane, comboBox.getScene().getFocusOwner());
+        });
+    }
+
+    @Test
+    void selectingOptionDoesNotMoveFocus() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.MONTH, "#jan#");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            ComboBox<?> comboBox = (ComboBox<?>) tab.editors.get(StandardField.MONTH).getNode().lookup(".combo-box");
+            comboBox.requestFocus();
+            comboBox.getSelectionModel().select(1);
+
+            assertEquals(Optional.of("#feb#"), entry.getField(StandardField.MONTH));
+            assertSame(comboBox, comboBox.getScene().getFocusOwner());
+        });
+    }
+
+    @Test
+    void enterInOptionPopupSelectsSuggestionAndKeepsFocus() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.MONTH, "#jan#");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            ComboBox<?> comboBox = (ComboBox<?>) tab.editors.get(StandardField.MONTH).getNode().lookup(".combo-box");
+            comboBox.requestFocus();
+            comboBox.show();
+            ListView<?> options = (ListView<?>) ((ComboBoxListViewSkin<?>) comboBox.getSkin()).getPopupContent();
+            options.getSelectionModel().select(1);
+            options.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+            comboBox.fireEvent(new KeyEvent(KeyEvent.KEY_RELEASED, "", "", KeyCode.ENTER, false, false, false, false));
+
+            assertEquals(Optional.of("#feb#"), entry.getField(StandardField.MONTH));
+            assertFalse(comboBox.isShowing());
+            assertSame(comboBox, comboBox.getScene().getFocusOwner());
+        });
+    }
+
+    @Test
+    void consumedEnterDoesNotMoveFocusFromOptionField() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.MONTH, "#jan#");
+
+        JavaFxExtension.invokeAndWait(() -> {
+            showEntryEditor(entry);
+            ComboBox<?> comboBox = (ComboBox<?>) tab.editors.get(StandardField.MONTH).getNode().lookup(".combo-box");
+            comboBox.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    event.consume();
+                }
+            });
+            comboBox.requestFocus();
+            comboBox.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER, false, false, false, false));
+
+            assertSame(comboBox, comboBox.getScene().getFocusOwner());
+        });
+    }
+
+    private void showEntryEditor(BibEntry entry) {
+        tab.bindToEntry(entry);
+        Stage stage = new Stage();
+        stage.setScene(new Scene((Parent) tab.getContent(), 800, 600));
+        stage.show();
+        stage.getScene().getRoot().applyCss();
+        stage.getScene().getRoot().layout();
     }
 
     @Test
