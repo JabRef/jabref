@@ -1,5 +1,5 @@
 ---
-nav_order: 77
+nav_order: 78
 parent: Decision Records
 ---
 
@@ -20,7 +20,9 @@ The custom terminal and file browser preferences used to store an entire command
 
 ## Decision Outcome
 
-Store each command as a list of strings. In preferences, the first line is the executable, and each following line is one argument. Quotes are not needed to keep spaces within a line. `%DIR` and `%DIR%` are replaced within each argument after the list is assembled. The resulting list is passed directly to `ProcessBuilder`.
+Chosen option: "Store the executable and arguments as a list", because explicit argument boundaries let `ProcessBuilder` launch commands without parsing quotes at runtime.
+
+In preferences, the first line is the executable, and each following line is one argument. Quotes are not needed to keep spaces within a line. `%DIR` and `%DIR%` are replaced within each argument after the list is assembled. The resulting list is passed directly to `ProcessBuilder`.
 
 For the command reported in [issue 12531](https://github.com/JabRef/jabref/issues/12531), the preference is:
 
