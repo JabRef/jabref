@@ -318,13 +318,14 @@ public class BibtexParser implements Parser {
                         }
                 );
             }
-            // After the `jabref-meta:` items, so that what a library says about itself in the newer
-            // form is what holds where it says it in both.
-            jsonMetaData.ifPresent(root -> JsonMetaDataParser.parse(metaData, root));
             parserResult.setMetaData(metaData);
         } catch (ParseException exception) {
             parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), exception);
         }
+        // After the `jabref-meta:` items, so that what a library says about itself in the newer
+        // form is what holds where it says it in both. Outside the try, since the text of the object
+        // is already dropped: an item that fails to parse must not take the object with it.
+        jsonMetaData.ifPresent(root -> JsonMetaDataParser.parse(parserResult.getMetaData(), root));
 
         parseRemainingContent();
 

@@ -215,6 +215,20 @@ class BibtexParserTest {
                 result.warnings());
     }
 
+    /// The text of the JSON comment is dropped once it is read, so a `jabref-meta:` item that fails
+    /// to parse must not take it along: the next save would lose it.
+    @Test
+    void parseKeepsTheJsonMetaDataWhereAMetaDataItemIsUnreadable() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @Comment{jabref-meta: databaseType:bibtex;biblatex;}
+                @Comment{jabref-meta-0.1.0
+                {"somethingElse": 1}
+                }
+                """));
+
+        assertEquals(Map.of("somethingElse", "1"), result.getMetaData().getUnknownJsonMetaData());
+    }
+
     @Test
     void parseForgetsTheJsonMetaDataOfAnEarlierCall() throws IOException {
         parser.parse(Reader.of("""
