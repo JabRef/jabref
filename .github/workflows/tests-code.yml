@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - main-release
-      - stable
+      - black-forest
   pull_request:
   merge_group:
   workflow_dispatch:
