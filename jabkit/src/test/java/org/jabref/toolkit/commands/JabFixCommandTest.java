@@ -361,6 +361,21 @@ class JabFixCommandTest extends AbstractJabKitTest {
         assertTrue(findings.contains("[magic-comment]"), findings);
     }
 
+    /// A formatter run writes every entry anew, and so in braces; the rule is what says why.
+    @Test
+    void checkReportsAnEntryInParentheses(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("parenthesized.bib"), """
+                @Article(key,
+                  author = {Doe, Jane},
+                )
+                """);
+
+        assertEquals(1, commandLine.executeToLog("fix", "--check", "-p", "--rule", "entry-parentheses=check", library.toString()));
+
+        String findings = commandLine.getStandardOutput();
+        assertTrue(findings.contains("entry is enclosed in parentheses instead of braces [entry-parentheses]"), findings);
+    }
+
     /// Switching a rule off for one run is no reason to report the comments that switch it off.
     @Test
     void checkDoesNotReportAMagicCommentNamingARuleTheRunSwitchedOff(@TempDir Path tempDir) throws IOException {

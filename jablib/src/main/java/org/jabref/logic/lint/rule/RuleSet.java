@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.lint.rules.EntryParenthesesRule;
 import org.jabref.logic.lint.rules.RepeatedWhitespaceRule;
 import org.jabref.logic.lint.rules.SurroundingWhitespaceRule;
 import org.jabref.model.entry.field.Field;
@@ -44,12 +45,13 @@ public class RuleSet {
     ///
     /// @param fieldPreferences tells the whitespace rules which fields hold text that may be wrapped
     public static RuleSet builtIn(FieldPreferences fieldPreferences) {
-        List<Rule> whitespace = List.of(
+        List<Rule> shipped = List.of(
                 new SurroundingWhitespaceRule(),
-                new RepeatedWhitespaceRule(fieldPreferences));
-        Set<String> knownIds = Stream.concat(whitespace.stream().map(Rule::id), SaveActionIds.ids().stream())
+                new RepeatedWhitespaceRule(fieldPreferences),
+                new EntryParenthesesRule());
+        Set<String> knownIds = Stream.concat(shipped.stream().map(Rule::id), SaveActionIds.ids().stream())
                                      .collect(Collectors.toUnmodifiableSet());
-        return new RuleSet(Stream.concat(whitespace.stream(), Stream.of(new MagicCommentRule(knownIds))).toList());
+        return new RuleSet(Stream.concat(shipped.stream(), Stream.of(new MagicCommentRule(knownIds))).toList());
     }
 
     /// Every rule a configuration can name: the built-in ones, and one per formatter a Save Action

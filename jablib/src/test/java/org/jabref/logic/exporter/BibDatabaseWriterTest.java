@@ -36,6 +36,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.lint.JabFixMode;
 import org.jabref.logic.lint.rule.Finding;
+import org.jabref.logic.lint.rules.EntryParenthesesRule;
 import org.jabref.logic.os.OS;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -84,6 +85,12 @@ import static org.mockito.Mockito.when;
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("exporter")
 class BibDatabaseWriterTest {
+
+    private static final String IN_PARENTHESES = """
+            @Article( key,
+                title = {A title}
+            )
+            """;
 
     private BibDatabaseWriter databaseWriter;
     private BibDatabase database;
@@ -1407,6 +1414,35 @@ class BibDatabaseWriterTest {
 
         assertEquals(List.of(), databaseWriter.getFindings());
         assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
+    }
+
+    /// A save writes an entry nothing changed back the way it was read, and Save Actions only change
+    /// what a field holds, so neither touches the parentheses.
+    @Test
+    void anEntryInParenthesesOfALibraryAskingForNoRulesKeepsThem() throws IOException {
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(IN_PARENTHESES));
+
+        writeParsed(result);
+
+        assertEquals(IN_PARENTHESES, stringWriter.toString());
+    }
+
+    /// The delimiters are the whole repair: the rest of the entry is still written the way it was
+    /// read, not in the layout a save gives an entry it writes anew.
+    @Test
+    void anEntryInParenthesesIsEnclosedInBracesAndKeepsItsLayout() throws IOException {
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(IN_PARENTHESES));
+        result.getMetaData().setFormatting(LintSettings.of(RuleSelector.of(EntryParenthesesRule.ID), RuleMode.FIX));
+
+        writeParsed(result);
+
+        assertEquals(List.of("@Article{ key,", "    title = {A title}", "}"), stringWriter.toString().lines().limit(3).toList());
+    }
+
+    private void writeParsed(ParserResult result) throws IOException {
+        bibWriter = new BibWriter(stringWriter, "\n");
+        initializeDatabaseWriter();
+        databaseWriter.writePartOfDatabase(new BibDatabaseContext(result.getDatabase(), result.getMetaData()), result.getDatabase().getEntries());
     }
 
     @Test

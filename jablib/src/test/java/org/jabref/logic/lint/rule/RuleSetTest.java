@@ -43,12 +43,12 @@ class RuleSetTest {
 
     @Test
     void builtInContainsEveryBuiltInRule() {
-        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "magic-comment"), RuleSet.builtIn(FIELD_PREFERENCES).ids());
+        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-parentheses", "magic-comment"), RuleSet.builtIn(FIELD_PREFERENCES).ids());
     }
 
     @Test
     void withoutSwitchesTheNamedRuleOff() throws UnknownRuleException {
-        assertEquals(List.of("repeated-whitespace", "magic-comment"),
+        assertEquals(List.of("repeated-whitespace", "entry-parentheses", "magic-comment"),
                 RuleSet.builtIn(FIELD_PREFERENCES).without(List.of("surrounding-whitespace")).ids());
     }
 
@@ -65,18 +65,18 @@ class RuleSetTest {
                 () -> RuleSet.builtIn(FIELD_PREFERENCES).without(List.of("surounding-whitespace", "surrounding-whitespace")));
 
         assertEquals(List.of("surounding-whitespace"), exception.getUnknownIds());
-        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "magic-comment"), exception.getKnownIds());
+        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-parentheses", "magic-comment"), exception.getKnownIds());
     }
 
     @Test
     void withAppendsARuleFromOutsideThisModule() {
-        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "magic-comment", "external"),
+        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-parentheses", "magic-comment", "external"),
                 RuleSet.builtIn(FIELD_PREFERENCES).with(EXTERNAL).ids());
     }
 
     @Test
     void anExternalRuleCanBeSwitchedOffByIdLikeAnyOther() throws UnknownRuleException {
-        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "magic-comment"),
+        assertEquals(List.of("surrounding-whitespace", "repeated-whitespace", "entry-parentheses", "magic-comment"),
                 RuleSet.builtIn(FIELD_PREFERENCES).with(EXTERNAL).without(List.of("external")).ids());
     }
 
@@ -213,8 +213,8 @@ class RuleSetTest {
     void knownHasTheBuiltInRulesAndOneRulePerFormatter() {
         List<String> knownIds = RuleSet.known(FIELD_PREFERENCES).ids();
 
-        assertEquals(RuleSet.builtIn(FIELD_PREFERENCES).ids(), knownIds.subList(0, 3));
-        assertEquals(List.copyOf(SaveActionIds.ids()), knownIds.subList(3, knownIds.size()));
+        assertEquals(RuleSet.builtIn(FIELD_PREFERENCES).ids(), knownIds.subList(0, 4));
+        assertEquals(List.copyOf(SaveActionIds.ids()), knownIds.subList(4, knownIds.size()));
     }
 
     private static RuleSet configuredBy(LintSettings settings) {

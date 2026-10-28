@@ -19,7 +19,9 @@ import org.jspecify.annotations.NullMarked;
 /// whether a value may be padded with whitespace. Serialization is not this class's business: it is
 /// left to JabRef's own [org.jabref.logic.exporter.BibDatabaseWriter], which settles everything that
 /// does *not* survive parsing -- entry type capitalization, whether values are braced or quoted,
-/// field order, indentation -- and which runs this engine when it is given one.
+/// field order, indentation -- and which runs this engine when it is given one. The one exception is
+/// [org.jabref.logic.lint.rules.EntryParenthesesRule], because the writer leaves an entry nothing
+/// changed the way it was read, parentheses included.
 @NullMarked
 public class JabFix {
 

@@ -76,6 +76,7 @@ What a repair changed is reported as a `FieldChange`, the same way a Save Action
 
 A library that carries no settings is saved by the GUI the way it always was; carrying them at all, even an empty block, is what hands it to JabFix.
 Layout is normalized by `BibDatabaseWriter` either way, so a library JabFix has already formatted produces no diff.
+The exception is an entry nothing changed, which a save writes back as it was read, so `entry-parentheses` replaces the `( )` of `@Article( ... )` in what was read rather than leaving it to the writer.
 
 ## Where the settings are stored
 
@@ -162,7 +163,7 @@ Still missing:
 
 - the modes JabFix ships with (the current ones are placeholders),
 - built-in rules beyond whitespace,
-- library-level rules (`Rule#scan` sees one entry),
+- library-level rules (`Rule#scan` sees one entry, so `@String( ... )` and `@Preamble( ... )` keep their parentheses),
 - context for rules (file directories, abbreviation list, key patterns), which citation key generation and journal abbreviation need before they can become rules,
 - rule parameters, so that a rule can take a value and not only a mode,
 - a graphical way to configure the block, which would call `JabFixConfiguration.configure` and so migrate the `saveActions` item in passing,
