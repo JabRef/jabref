@@ -191,6 +191,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         return new FieldNameLabel(field);
     }
 
+    // [impl->req~entry-editor.custom-tabs.row-layout~1]
     static void setRegularRowLayout(GridPane gridPane, List<Field> fields) {
         gridPane.getChildren().forEach(FieldsEditorTab::useComputedPreferredHeight);
         List<RowConstraints> constraints = IntStream.range(0, fields.size())

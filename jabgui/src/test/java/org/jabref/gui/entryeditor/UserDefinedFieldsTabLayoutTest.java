@@ -46,6 +46,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
@@ -73,6 +74,12 @@ class UserDefinedFieldsTabLayoutTest {
             StandardField.OWNER,
             StandardField.DATE);
 
+    @AfterEach
+    void tearDown() {
+        Injector.forgetAll();
+    }
+
+    // [utest->req~entry-editor.custom-tabs.row-layout~1]
     @Test
     void populatedEditorsStayInTheirRowsAndFileKeepsItsNaturalHeight(@TempDir Path fileDirectory) {
         TestContext context = setUp(fileDirectory);
