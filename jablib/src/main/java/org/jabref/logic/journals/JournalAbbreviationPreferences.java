@@ -18,22 +18,22 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class JournalAbbreviationPreferences extends AbbreviationPreferences {
 
-    private final BooleanProperty useFJournalField;
     private final BooleanProperty shouldEnableMscKeywordDescriptions;
+    private final BooleanProperty useFJournalField;
 
     public JournalAbbreviationPreferences(List<String> externalLists,
                                           boolean useFJournalField,
                                           boolean shouldEnableMscKeywordDescriptions) {
         super(externalLists);
-        this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
         this.shouldEnableMscKeywordDescriptions = new SimpleBooleanProperty(shouldEnableMscKeywordDescriptions);
+        this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
     }
 
     private JournalAbbreviationPreferences() {
         this(
-                List.of(), // externalLists
-                true,      // useFJournalField
-                false      // Enable MSC codes as Keyword
+                List.of(),
+                true,
+                false
         );
     }
 

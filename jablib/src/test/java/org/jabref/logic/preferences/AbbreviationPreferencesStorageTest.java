@@ -20,12 +20,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 @NullMarked
 @ResourceLock("Preferences")
 class AbbreviationPreferencesStorageTest {
-    private static final String JOURNAL_LISTS = "externalJournalLists";
     private static final String CONFERENCE_LISTS = "externalConferenceLists";
+    private static final String JOURNAL_LISTS = "externalJournalLists";
     private final Map<String, Optional<String>> savedValues = new HashMap<>();
 
     @BeforeEach
@@ -43,6 +44,14 @@ class AbbreviationPreferencesStorageTest {
         savedValues.forEach((key, value) -> value.ifPresentOrElse(
                 stored -> preferences.put(key, stored),
                 () -> preferences.remove(key)));
+    }
+
+    @Test
+    void reusesBoundPreferenceInstances() {
+        JabRefCliPreferences preferences = new JabRefCliPreferences();
+
+        assertSame(preferences.getConferenceAbbreviationPreferences(), preferences.getConferenceAbbreviationPreferences());
+        assertSame(preferences.getJournalAbbreviationPreferences(), preferences.getJournalAbbreviationPreferences());
     }
 
     @Test

@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.util.strings.StringSimilarity;
@@ -31,12 +30,13 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public abstract class AbbreviationRepository {
     protected static final Pattern QUESTION_MARK = Pattern.compile("\\?");
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
-    private final Map<String, Abbreviation> fullToAbbreviationObject = new HashMap<>();
     private final Map<String, Abbreviation> abbreviationToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
+    private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
+    private final Map<String, Abbreviation> fullToAbbreviationObject = new HashMap<>();
+    private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
     private final StringSimilarity similarity = new StringSimilarity();
 
     protected AbbreviationRepository() {
@@ -102,7 +102,7 @@ public abstract class AbbreviationRepository {
         if (QUESTION_MARK.matcher(input).find()) {
             return false;
         }
-        String name = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
+        String name = input.trim().replace("\\&", "&");
         return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(name, abbreviation))
                 || abbreviationToAbbreviationObject.containsKey(name)
                 || dotlessToAbbreviationObject.containsKey(name)
@@ -114,8 +114,7 @@ public abstract class AbbreviationRepository {
     ///
     /// @param input The name (either full name or abbreviated name).
     public Optional<Abbreviation> get(String input) {
-        // Clean up input: trim and unescape ampersand
-        String name = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
+        String name = input.trim().replace("\\&", "&");
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
                                                                        .filter(abbreviation -> isMatched(name, abbreviation))
@@ -149,8 +148,7 @@ public abstract class AbbreviationRepository {
     ///
     /// To prevent wrong matches, such as Nutrients converted to Nutrition we do fuzzy matching if the title is three words or more (or contains non-ASCII characters)
     private Optional<Abbreviation> findBestFuzzyMatched(Collection<Abbreviation> abbreviations, String input) {
-        // Only one or two words - do not do fuzzy matching
-        if (input.trim().split("\\s+").length <= 1) {
+        if (WHITESPACE.split(input.trim()).length <= 1) {
             // Some Chinese titles do not contain spaces
             boolean isAscii = input.chars().allMatch(c -> c <= 0x7F);
             if (isAscii) {

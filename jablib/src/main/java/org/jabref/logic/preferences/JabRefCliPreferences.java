@@ -512,8 +512,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private XmpPreferences xmpPreferences;
     private CleanupPreferences cleanupPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private ConferenceAbbreviationPreferences conferenceAbbreviationPreferences;
-    private JournalAbbreviationPreferences journalAbbreviationPreferences;
+    private Optional<ConferenceAbbreviationPreferences> conferenceAbbreviationPreferences = Optional.empty();
+    private Optional<JournalAbbreviationPreferences> journalAbbreviationPreferences = Optional.empty();
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private OcrPreferences ocrPreferences;
@@ -1204,39 +1204,41 @@ public class JabRefCliPreferences implements CliPreferences {
     // region JournalAbbreviationPreferences
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        if (journalAbbreviationPreferences != null) {
-            return journalAbbreviationPreferences;
-        }
+        return journalAbbreviationPreferences.orElseGet(this::loadJournalAbbreviationPreferences);
+    }
 
+    private JournalAbbreviationPreferences loadJournalAbbreviationPreferences() {
         JournalAbbreviationPreferences defaultValues = JournalAbbreviationPreferences.getDefault();
 
-        journalAbbreviationPreferences = new JournalAbbreviationPreferences(
+        JournalAbbreviationPreferences preferences = new JournalAbbreviationPreferences(
                 convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaultValues.getExternalLists()))),
                 getBoolean(USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get()),
                 getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions())
         );
 
-        bindCustomList(journalAbbreviationPreferences.getExternalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalLists(),
+        bindCustomList(preferences.getExternalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalLists(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
-        bindBoolean(journalAbbreviationPreferences.useFJournalFieldProperty(), USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get());
-        bindBoolean(journalAbbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(), ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions());
+        bindBoolean(preferences.useFJournalFieldProperty(), USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get());
+        bindBoolean(preferences.shouldEnableMscKeywordDescriptionsProperty(), ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions());
 
-        return journalAbbreviationPreferences;
+        journalAbbreviationPreferences = Optional.of(preferences);
+        return preferences;
     }
     // endregion
 
     @Override
     public ConferenceAbbreviationPreferences getConferenceAbbreviationPreferences() {
-        if (conferenceAbbreviationPreferences != null) {
-            return conferenceAbbreviationPreferences;
-        }
+        return conferenceAbbreviationPreferences.orElseGet(this::loadConferenceAbbreviationPreferences);
+    }
 
+    private ConferenceAbbreviationPreferences loadConferenceAbbreviationPreferences() {
         ConferenceAbbreviationPreferences defaultValues = ConferenceAbbreviationPreferences.getDefault();
-        conferenceAbbreviationPreferences = new ConferenceAbbreviationPreferences(
+        ConferenceAbbreviationPreferences preferences = new ConferenceAbbreviationPreferences(
                 convertStringToList(get(EXTERNAL_CONFERENCE_LISTS, convertListToString(defaultValues.getExternalLists()))));
-        bindCustomList(conferenceAbbreviationPreferences.getExternalLists(), EXTERNAL_CONFERENCE_LISTS, defaultValues.getExternalLists(),
+        bindCustomList(preferences.getExternalLists(), EXTERNAL_CONFERENCE_LISTS, defaultValues.getExternalLists(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
-        return conferenceAbbreviationPreferences;
+        conferenceAbbreviationPreferences = Optional.of(preferences);
+        return preferences;
     }
 
     // region PushToApplicationPreferences
