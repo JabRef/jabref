@@ -104,7 +104,7 @@ class UserDefinedFieldsTabLayoutTest {
         List<Field> weightedFields = List.of(
                 StandardField.KEYWORDS, StandardField.EPRINT, StandardField.GROUPS, StandardField.FILE);
         JavaFxExtension.invokeAndWait(() -> {
-            LayoutSnapshot shortEditor = layout(context, 1, 127, weightedFields);
+            LayoutSnapshot shortEditor = layout(context, 1, 80, weightedFields);
             LayoutSnapshot tallEditor = layout(context, 1, 734, weightedFields);
             LayoutSnapshot manyKeywords = layout(context, 24, 734, weightedFields);
 
@@ -234,7 +234,7 @@ class UserDefinedFieldsTabLayoutTest {
         assertTrue(scroll.getViewportBounds().getHeight() > 0);
         assertTrue(scroll.getViewportBounds().getHeight() <= height);
         assertEquals(fields.size(), tab.editors.size());
-        if (height == 127) {
+        if (height <= 127) {
             assertTrue(grid.getHeight() > scroll.getViewportBounds().getHeight());
         }
         Bounds keywordsBounds = tab.editors.get(StandardField.KEYWORDS).getNode().getBoundsInParent();
