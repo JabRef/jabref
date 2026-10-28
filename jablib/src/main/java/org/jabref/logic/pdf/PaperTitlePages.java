@@ -16,8 +16,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 final class PaperTitlePages {
 
-    private static final float TOP_OF_PAGE = 0.35f;
-    private static final float TITLE_TO_BODY_SIZE = 1.35f;
+    private static final float TOP_OF_PAGE = 0.35F;
+    private static final float TITLE_TO_BODY_SIZE = 1.35F;
     private static final int MIN_TITLE_LENGTH = 15;
 
     private final PDDocument document;

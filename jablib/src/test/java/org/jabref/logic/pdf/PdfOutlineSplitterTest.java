@@ -19,6 +19,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@NullMarked
 class PdfOutlineSplitterTest {
 
     @TempDir
@@ -199,6 +201,40 @@ class PdfOutlineSplitterTest {
 
         assertEquals(List.of(), PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir));
         assertEquals(3, pageCount(source));
+    }
+
+    @Test
+    void splitsTheCyberPhysicalSystemsOfSystemsProceedings() throws IOException {
+        List<String> papers = List.of(
+                "Basic Concepts on Systems of Systems",
+                "Interfaces in Evolving Cyber-Physical Systems-of-Systems",
+                "Emergence in Cyber-Physical Systems-of-Systems (CPSoSs)",
+                "AMADEOS SysML Profile for SoS Conceptual Modeling",
+                "AMADEOS Framework and Supporting Tools",
+                "Time and Resilient Master Clocks in Cyber-Physical Systems",
+                "Managing Dynamicity in SoS",
+                "Case Study Definition and Implementation");
+        Path source = tempDir.resolve("cyber-physical-systems-of-systems.pdf");
+        try (PDDocument document = new PDDocument()) {
+            addPages(document, 4 + papers.size() + 1);
+            PDDocumentOutline outline = new PDDocumentOutline();
+            outline.addLast(bookmark("Foreword", document.getPage(0)));
+            outline.addLast(bookmark("Preface", document.getPage(1)));
+            outline.addLast(bookmark("Acknowledgments", document.getPage(2)));
+            outline.addLast(bookmark("Contents", document.getPage(3)));
+            for (int index = 0; index < papers.size(); index++) {
+                PDOutlineItem paper = paper(papers.get(index), document, 4 + index);
+                paper.addLast(bookmark("1 Introduction", document.getPage(4 + index)));
+                outline.addLast(paper);
+            }
+            outline.addLast(bookmark("Author Index", document.getPage(4 + papers.size())));
+            document.getDocumentCatalog().setDocumentOutline(outline);
+            document.save(source.toFile());
+        }
+
+        List<BibEntry> entries = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir);
+
+        assertEquals(papers, entries.stream().map(entry -> entry.getField(StandardField.TITLE).orElseThrow()).toList());
     }
 
     private Path proceedingsWithPapers() throws IOException {
