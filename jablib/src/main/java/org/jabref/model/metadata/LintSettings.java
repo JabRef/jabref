@@ -1,6 +1,5 @@
 package org.jabref.model.metadata;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -11,19 +10,22 @@ import org.jabref.model.entry.field.Field;
 
 import org.jspecify.annotations.NullMarked;
 
-/// What a library asks JabFix to do when it is saved.
+/// What a library, or one run, asks JabFix to do.
 ///
 /// This is the configuration, not the rules themselves: which rules a run ends up applying is
-/// derived from it, together with the library's Save Actions and the rules JabFix ships with.
+/// derived from it, together with the library's Save Actions -- see
+/// `org.jabref.logic.lint.JabFixConfiguration`.
 ///
-/// A rule runs only where the library asks for it. Carrying these settings at all is what asks for
-/// anything to be done, and within them a rule that is not named does not run -- naming one
-/// [RuleMode#OFF] says the same thing out loud, where a library wants to record that it is
-/// deliberately not run. A library that carries no settings is saved the way it always was.
+/// It may name a mode, a set of rules with their modes that JabFix ships, and it states the mode of
+/// single rules, which outranks what the mode says about them. A rule neither names does not run --
+/// naming one [RuleMode#OFF] says the same thing out loud, which is also how a library switches off
+/// a rule its mode runs.
 ///
 /// One entry per selector is also where the values a rule takes will go, once rules take any: they
 /// belong to the rule they configure, not to a list beside it.
 ///
+/// @param mode        the key of the mode the rules are laid over, if any. A key naming no mode of
+///                    this JabFix is passed over rather than rejected, like a rule it does not know.
 /// @param ruleModes   how far each named selector goes. The order is the one the library wrote them
 ///                    in, so that saving does not reshuffle a configuration somebody edited by hand.
 ///                    A [RuleSelector] naming no rule of this JabFix is passed over rather than
@@ -31,34 +33,34 @@ import org.jspecify.annotations.NullMarked;
 /// @param unreadRules the entries of the configuration this JabFix could not read -- a selector
 ///                    spelled in a way it does not accept, or a mode it does not know -- by key,
 ///                    each as the JSON text of its value. They are written back as they came.
-/// @param unreadKeys  what stood beside the rules in the block and is not a rule at all, such as a
-///                    named set of rules a newer JabFix understands, kept the same way
+/// @param unreadKeys  what stood beside the mode and the rules in the block, kept the same way
 @NullMarked
-public record LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes,
+public record LintSettings(Optional<String> mode,
+                           SequencedMap<RuleSelector, RuleMode> ruleModes,
                            SequencedMap<String, String> unreadRules,
                            SequencedMap<String, String> unreadKeys) {
+    /// Settings that ask for nothing.
+    public static final LintSettings NONE = new LintSettings(new LinkedHashMap<>());
+
     public LintSettings {
         ruleModes = Collections.unmodifiableSequencedMap(new LinkedHashMap<>(ruleModes));
         unreadRules = Collections.unmodifiableSequencedMap(new LinkedHashMap<>(unreadRules));
         unreadKeys = Collections.unmodifiableSequencedMap(new LinkedHashMap<>(unreadKeys));
     }
 
-    /// Settings of modes alone, which is what everything but the reader of a file has.
+    /// Settings of rule modes alone.
     public LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes) {
-        this(ruleModes, new LinkedHashMap<>(), new LinkedHashMap<>());
-    }
-
-    /// Settings naming each of these rules, repairing wherever it looks: what a library that says
-    /// nothing is formatted by.
-    public static LintSettings repairing(Collection<String> ruleIds) {
-        SequencedMap<RuleSelector, RuleMode> modes = new LinkedHashMap<>();
-        ruleIds.forEach(ruleId -> modes.put(RuleSelector.of(ruleId), RuleMode.FIX));
-        return new LintSettings(modes);
+        this(Optional.empty(), ruleModes, new LinkedHashMap<>(), new LinkedHashMap<>());
     }
 
     /// Settings naming one selector, to be extended with [#and].
     public static LintSettings of(RuleSelector selector, RuleMode mode) {
-        return new LintSettings(new LinkedHashMap<>()).and(selector, mode);
+        return NONE.and(selector, mode);
+    }
+
+    /// The same settings, laid over the mode with that key.
+    public LintSettings withMode(String modeKey) {
+        return new LintSettings(Optional.of(modeKey), ruleModes, unreadRules, unreadKeys);
     }
 
     /// The same settings, plus that selector. A selector already named keeps its place and takes
@@ -66,35 +68,50 @@ public record LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes,
     public LintSettings and(RuleSelector selector, RuleMode mode) {
         SequencedMap<RuleSelector, RuleMode> extended = new LinkedHashMap<>(ruleModes);
         extended.put(selector, mode);
-        return new LintSettings(extended, unreadRules, unreadKeys);
+        return new LintSettings(this.mode, extended, unreadRules, unreadKeys);
     }
 
-    /// The same settings, with each of these rules taking the given mode wherever it looks.
+    /// These settings with `other` laid over them, which is how the more specific layer of a
+    /// configuration outranks the broader one.
     ///
-    /// Every selector naming one of them gives way, the field-scoped ones included: something that
-    /// says how far a rule goes in this run outranks what the library says about one of its fields,
-    /// and leaving the field-scoped entry standing would let it win, since it is the more specific.
-    public LintSettings overriddenBy(SequencedMap<String, RuleMode> modesByRuleId) {
+    /// The mode of `other` replaces this one where it names one. A selector of `other` replaces what
+    /// this says about the same rule: all of it, for a selector about every field the rule looks at,
+    /// and otherwise about that one field. Leaving a field-scoped entry standing beside a broader one
+    /// of `other` would let it win, since it is the more specific.
+    public LintSettings overriddenBy(LintSettings other) {
         SequencedMap<RuleSelector, RuleMode> overridden = new LinkedHashMap<>();
-        ruleModes.forEach((selector, mode) -> {
-            if (!modesByRuleId.containsKey(selector.ruleId())) {
-                overridden.put(selector, mode);
+        ruleModes.forEach((selector, ruleMode) -> {
+            if (!other.speaksFor(selector)) {
+                overridden.put(selector, ruleMode);
             }
         });
-        modesByRuleId.forEach((ruleId, mode) -> overridden.put(RuleSelector.of(ruleId), mode));
-        return new LintSettings(overridden, unreadRules, unreadKeys);
+        overridden.putAll(other.ruleModes);
+        return new LintSettings(other.mode.or(() -> mode), overridden, merged(unreadRules, other.unreadRules), merged(unreadKeys, other.unreadKeys));
     }
 
-    /// Whether there is nothing here at all -- no mode, and nothing kept for a newer JabFix. Such a
-    /// configuration is not written, so a library does not gain an empty block by being opened.
+    private boolean speaksFor(RuleSelector selector) {
+        return ruleModes.containsKey(selector)
+                || ruleModes.keySet().stream()
+                            .anyMatch(named -> named.ruleId().equals(selector.ruleId()) && named.coversEveryField());
+    }
+
+    private static SequencedMap<String, String> merged(SequencedMap<String, String> under, SequencedMap<String, String> over) {
+        SequencedMap<String, String> merged = new LinkedHashMap<>(under);
+        merged.putAll(over);
+        return merged;
+    }
+
+    /// Whether there is nothing here at all -- no mode, no rule, and nothing kept for a newer JabFix.
     public boolean isEmpty() {
-        return ruleModes.isEmpty() && unreadRules.isEmpty() && unreadKeys.isEmpty();
+        return mode.isEmpty() && ruleModes.isEmpty() && unreadRules.isEmpty() && unreadKeys.isEmpty();
     }
 
     /// How far the rule goes on that field. The most specific selector wins: one naming the field
     /// beats one about every field, so a library can have a rule repair everywhere and only report
     /// on a single field. Among equally specific selectors the last one named wins, the way a
     /// repeated key in a configuration file does. A rule no selector names does not run.
+    ///
+    /// The mode is not looked at here: it is expanded into rule modes before a run asks this.
     ///
     /// @param field the field a finding is about, or empty for one that is about the whole entry
     public RuleMode modeOf(String ruleId, Optional<Field> field) {
@@ -114,8 +131,7 @@ public record LintSettings(SequencedMap<RuleSelector, RuleMode> ruleModes,
     /// Whether any selector lets this rule do anything, on any field.
     ///
     /// A rule switched off everywhere is left out of the run entirely rather than run and reported
-    /// on no field, which is also what makes it unknown to the magic comments of an entry: naming
-    /// it there is then worth saying out loud.
+    /// on no field.
     public boolean runs(String ruleId) {
         return ruleModes.entrySet().stream()
                         .anyMatch(named -> ruleId.equals(named.getKey().ruleId())

@@ -67,6 +67,14 @@ class JsonMetaDataSerializerTest {
                 }"""), JsonMetaDataSerializer.serialize(metaData));
     }
 
+    @Test
+    void theModeIsWrittenBeforeTheRules() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF).withMode("whitespace");
+
+        assertEquals("{\"mode\":\"whitespace\",\"rules\":{\"surrounding-whitespace\":\"off\"}}",
+                JsonMetaDataSerializer.formatting(settings).toString());
+    }
+
     /// A migration may state a selector whose entry this JabFix could not read; what is stated is
     /// what this JabFix acts on, so it must not be written over.
     @Test
@@ -77,7 +85,7 @@ class JsonMetaDataSerializerTest {
         unreadRules.put("title:lower-case", "\"warn\"");
 
         assertEquals("{\"rules\":{\"title:lower-case\":\"fix\"}}",
-                JsonMetaDataSerializer.formatting(new LintSettings(modes, unreadRules, new LinkedHashMap<>())).toString());
+                JsonMetaDataSerializer.formatting(new LintSettings(Optional.empty(), modes, unreadRules, new LinkedHashMap<>())).toString());
     }
 
     @Test
@@ -85,6 +93,7 @@ class JsonMetaDataSerializerTest {
         SequencedMap<String, String> unreadKeys = new LinkedHashMap<>();
         unreadKeys.put(MetaData.FORMATTING_RULES, "\"recommended\"");
         LintSettings settings = new LintSettings(
+                Optional.empty(),
                 LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX).ruleModes(),
                 new LinkedHashMap<>(),
                 unreadKeys);

@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+
+import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
@@ -31,6 +34,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.lint.JabFixMode;
 import org.jabref.logic.lint.rule.Finding;
 import org.jabref.logic.os.OS;
 import org.jabref.model.FieldChange;
@@ -67,6 +71,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -935,16 +941,27 @@ class BibDatabaseWriterTest {
     }
 
     // [utest->adr~per-rule-modes-in-the-formatting-configuration~1]
-    @Test
-    void aFormattingBlockSurvivesARoundTrip() throws IOException {
-        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX)
-                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK)
-                                           .and(RuleSelector.of("repeated-whitespace"), RuleMode.OFF));
+    @ParameterizedTest
+    @MethodSource
+    void aFormattingBlockSurvivesARoundTrip(LintSettings formatting) throws IOException {
+        metaData.setFormatting(formatting);
 
         databaseWriter.writePartOfDatabase(bibtexContext, List.of());
         ParserResult read = new BibtexParser(importFormatPreferences).parse(Reader.of(stringWriter.toString()));
 
         assertEquals(metaData.getFormatting(), read.getMetaData().getFormatting());
+    }
+
+    /// The empty one included: it says the library enables nothing, which a library without one
+    /// does not say.
+    static Stream<LintSettings> aFormattingBlockSurvivesARoundTrip() {
+        return Stream.of(
+                LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX)
+                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK)
+                            .and(RuleSelector.of("repeated-whitespace"), RuleMode.OFF),
+                LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF).withMode("whitespace"),
+                LintSettings.NONE.withMode("mode-of-a-newer-jabfix"),
+                LintSettings.NONE);
     }
 
     /// A library configured by a newer JabFix still saves here, and is handed back with what it
@@ -1133,7 +1150,8 @@ class BibDatabaseWriterTest {
     }
 
     /// For a library that asks for rules, they are the only thing that changes an entry, so its Save
-    /// Actions run as rules -- reported, and repairing exactly what they reported.
+    /// Actions run as rules -- reported, and repairing exactly what they reported. They are rule
+    /// settings of the library, so they run beside a configuration that does not name them.
     // [utest->req~logic.exporter.lint-on-save~1]
     @Test
     void theLibrarysSaveActionsAreAppliedAsRules() throws IOException {
@@ -1142,7 +1160,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
-        metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
+        metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1209,8 +1227,8 @@ class BibDatabaseWriterTest {
                 .withField(StandardField.AUTHOR, " Doe, Jane ");
         database.insertEntry(entry);
 
-        metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.CHECK)
-                                             .and(RuleSelector.of("upper-case"), RuleMode.FIX)
+        metaData.setFormatting(LintSettings.of(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK)
+                                             .and(RuleSelector.on(StandardField.JOURNAL, "upper-case"), RuleMode.FIX)
                                              .and(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF));
         databaseWriter.writeDatabase(bibtexContext);
 
@@ -1286,33 +1304,94 @@ class BibDatabaseWriterTest {
         assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
     }
 
-    /// Nothing is changed that no rule reported, and no rule generates a key yet.
+    /// A formatter run changes nothing that no rule reported, and no rule generates a key yet.
     // [utest->req~logic.exporter.lint-on-save~1]
     @Test
-    void citationKeysAreNotGeneratedForALibraryThatAsksForRules() throws IOException {
+    void aFormatterRunGeneratesNoCitationKeys() throws IOException {
         when(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()).thenReturn(true);
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Doe, Jane");
+        database.insertEntry(entry);
+
+        databaseWriter.withLintSettings(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX))
+                      .writeDatabase(bibtexContext);
+
+        assertEquals(Optional.empty(), entry.getCitationKey());
+    }
+
+    /// Whoever configured the library did not decide for its other users that their keys go
+    /// ungenerated.
+    // [utest->req~logic.exporter.lint-on-save~1]
+    @Test
+    void anOrdinarySaveOfAConfiguredLibraryStillGeneratesCitationKeys() throws IOException {
+        citationKeyPatternPreferences = new CitationKeyPatternPreferences(false, false, false, true,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A, "", "",
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
+                GlobalCitationKeyPatterns.fromPattern("[auth][year]"), new SimpleObjectProperty<>(','));
+        initializeDatabaseWriter();
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Doe, Jane")
+                .withField(StandardField.YEAR, "2024");
         database.insertEntry(entry);
 
         metaData.setFormatting(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
-        assertEquals(Optional.empty(), entry.getCitationKey());
+        assertEquals(Optional.of("Doe2024"), entry.getCitationKey());
     }
 
     /// What a command asks for outranks what the library says, for that one save.
     @Test
-    void settingsOverridingTheLibrarysAreTheOnesApplied() throws IOException {
+    void settingsOfTheSaveOutrankTheLibrarys() throws IOException {
         metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of(
                 new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, "SOME TITLE");
         database.insertEntry(entry);
 
         metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
-        metaData.overrideLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
-        databaseWriter.writeDatabase(bibtexContext);
+        databaseWriter.withLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX))
+                      .writeDatabase(bibtexContext);
 
         assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
+    }
+
+    /// The settings of one save are not what the library says about itself, so they are not written.
+    @Test
+    void settingsOfTheSaveFormatALibraryWithoutGivingItAConfiguration() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, " Doe, Jane ");
+        database.insertEntry(entry);
+
+        databaseWriter.withLintSettings(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX))
+                      .writeDatabase(bibtexContext);
+
+        assertEquals("Doe, Jane", entry.getField(StandardField.AUTHOR).orElseThrow());
+        assertEquals(Optional.empty(), metaData.getFormatting());
+    }
+
+    @Test
+    void aModeTheLibraryNamesIsApplied() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, " Doe,  Jane ");
+        database.insertEntry(entry);
+
+        metaData.setFormatting(LintSettings.NONE.withMode(JabFixMode.WHITESPACE.getKey()));
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals("Doe, Jane", entry.getField(StandardField.AUTHOR).orElseThrow());
+    }
+
+    /// Off by default: a library that is configured but enables nothing has nothing done to it --
+    /// not even the cleanups a save applies to a library that is not configured.
+    @Test
+    void aConfigurationEnablingNothingChangesNothing() throws IOException {
+        metaData.setSaveActions(new FieldFormatterCleanupActions(false, List.of(
+                new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.TITLE, " SOME TITLE ");
+        entry.setChanged(true);
+        database.insertEntry(entry);
+
+        metaData.setFormatting(LintSettings.NONE);
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals(" SOME TITLE ", entry.getField(StandardField.TITLE).orElseThrow());
     }
 
     /// Carrying no settings at all, that is: the save applies its own Save Actions, as always.

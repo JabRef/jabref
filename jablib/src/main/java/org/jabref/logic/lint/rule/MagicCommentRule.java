@@ -17,8 +17,10 @@ import org.jspecify.annotations.NullMarked;
 ///
 /// A misspelled id in `% jabref-format-ignore` switches nothing off, which is the one thing a user of it
 /// never notices: the entry is repaired as if the comment were not there. The id is therefore held
-/// against the rules of the run, and one that names none of them is reported like any other
-/// finding -- with no fix, since only the person who wrote the comment knows what was meant.
+/// against every rule JabFix knows, and one that names none of them is reported like any other
+/// finding -- with no fix, since only the person who wrote the comment knows what was meant. A rule
+/// that merely is not enabled in this run counts as known, so switching one off does not turn the
+/// comments that name it into findings.
 ///
 /// A token the parser could not take apart, such as `author:` or `author:title:page-ranges`, is
 /// kept as one rule id by [Suppressions] and so lands here as well. A regex is reported when it
@@ -31,18 +33,18 @@ import org.jspecify.annotations.NullMarked;
 /// entry that has no such field is a typo in all but name. A field regex is reported when it
 /// matches neither a field JabRef knows nor one the entry carries.
 ///
-/// The rule is not one of [RuleSet#all]: it needs the ids of the run it belongs to, which
-/// [org.jabref.logic.lint.JabFix] hands it. Its own id counts as known, so `% jabref-format-ignore
-/// magic-comment` silences it where a comment is meant as it is written.
+/// It is one of [RuleSet#builtIn], so it runs where a mode or the rules enable it, like any other.
+/// Its own id counts as known, so `% jabref-format-ignore magic-comment` silences it where a
+/// comment is meant as it is written.
 @NullMarked
 public class MagicCommentRule implements Rule {
-    private static final String ID = "magic-comment";
+    public static final String ID = "magic-comment";
 
     private static final Set<Field> KNOWN_FIELDS = FieldFactory.getAllFieldsWithOutInternal();
 
     private final Set<String> knownRuleIds;
 
-    /// @param knownRuleIds the ids of the rules the run applies
+    /// @param knownRuleIds the ids of every rule JabFix knows
     public MagicCommentRule(Set<String> knownRuleIds) {
         this.knownRuleIds = Stream.concat(knownRuleIds.stream(), Stream.of(ID)).collect(Collectors.toUnmodifiableSet());
     }

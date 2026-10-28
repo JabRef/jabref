@@ -39,10 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class MetaDataOverwriteWithTest {
 
     /// Not contents: the listeners registered on an instance, the binding derived from the group
-    /// root, whether this instance posts at all, and what overrides the library's formatting for
-    /// one save, which belongs to that save and not to the library.
-    private static final Set<String> NOT_COPIED =
-            Set.of("eventBus", "groupsRootBinding", "isEventPropagationEnabled", "lintSettingsOverride");
+    /// root, and whether this instance posts at all.
+    private static final Set<String> NOT_COPIED = Set.of("eventBus", "groupsRootBinding", "isEventPropagationEnabled");
 
     @Test
     void overwriteWithCopiesEveryField() throws IllegalAccessException {

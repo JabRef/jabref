@@ -51,11 +51,11 @@ Needs: impl, utest
 `req~logic.exporter.lint-on-save~1`
 
 A library may ask, in its metadata, for lint rules to be applied when it is saved. The save then applies them to its entries and reports what each rule found, instead of applying the library's Save Actions and its whitespace cleanup itself.
-The rules are the library's own Save Actions together with the ones JabFix ships with.
-Where the library states its Save Actions is whichever place it still has: its `saveActions` metadata item while it has one, and its lint metadata once that item is gone, so that migrating the one into the other leaves a save applying exactly what it applied before.
-A rule runs only where the library names it, and the library says per rule how far it goes: reporting only, or reporting and repairing. A rule that only reports leaves the value as it is, and its findings say that they carry no repair.
+The library names a mode, a set of rules JabFix ships, and says per rule how far it goes: reporting only, or reporting and repairing; what it says about a rule outranks its mode. A rule that only reports leaves the value as it is, and its findings say that they carry no repair.
+The library's Save Actions are rules of its own as long as it has its `saveActions` metadata item, ranking right below the rules of its lint metadata, so that configuring the library, which moves the item into that metadata, leaves a save applying exactly what it applied before.
+A rule that neither the mode nor the rules enable does not run.
 An id naming no rule of this JabRef is passed over, so that a library configured by a newer version still saves.
-The rules are then the only thing that changes an entry: no citation key is generated and no journal abbreviated either, because nothing may be changed that no rule reported.
+Citation keys are still generated and journals abbreviated as before, so that configuring a library does not switch off what its other users rely on. A formatter run, such as `jabkit fix`, does neither, because it changes nothing that no rule reported.
 What a rule repaired is reported as a field change, like a Save Action's, so that it can be undone.
 A library that asks for no rules is saved as before.
 

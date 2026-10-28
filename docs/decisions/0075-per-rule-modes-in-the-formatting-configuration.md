@@ -80,7 +80,7 @@ A mode is spelled in lower case, and only in lower case. Taking `FIX` as well wo
 * Good, because the shape is the one ESLint and markdownlint use, so it needs little explanation and no new vocabulary.
 * Bad, because one key holds either a string or an object, so the parser and any JSON schema carry a union type.
 * Bad, because switching formatting off while keeping the configuration means removing the block or its rules: there is no flag to flip, which a library that wants to stop formatting temporarily would have liked.
-* Neutral, because a command that wants every rule has to name them all: `jabkit fix` asks the library which rules it has and names each of them, since there is nothing to say "everything" with — see the open point below.
+* Neutral, because "everything" is not said by listing rules but by naming a mode — see below.
 
 ### Confirmation
 
@@ -156,17 +156,22 @@ This is the shape ESLint uses for severity and options, and markdownlint for swi
 * Bad, because the same rule can appear twice, which is the contradiction problem again, now without even a precedence rule to state.
 * Bad, because looking a rule up means scanning the list, both for the code and for the person reading the file.
 
-## Open point: how a library says "everything"
+## How a library says "everything"
 
-Because rules are off until named, the chosen shape has no short way to say "run every rule JabFix ships with", which is what a library that simply wants the defaults would say. Listing every id works but goes stale the moment JabFix ships another rule, and the library then silently misses it.
+Because rules are off until named, the shape alone has no short way to say "run what JabFix recommends". The block therefore names a mode beside the rules — a set of rules with their modes that JabFix ships:
 
-This is a question of its own, left open here. The candidates:
+```json
+"formatting": {
+  "mode": "whitespace",
+  "rules": {
+    "repeated-whitespace": "off"
+  }
+}
+```
 
-* a default mode beside the rules — `"default": "fix"`, with the named rules as exceptions, which turns the block back into "everything, except these",
-* a named preset — `"preset": "recommended"`, leaving room for more than one shipped set later,
-* nothing: a library lists what it runs, and a new rule of a new JabFix version is off until someone adds it.
+A rule the block names outranks what the mode says about it, so the mode is a starting point the library narrows down. A command line names a mode and rules the same way, `--mode` taking the place of the library's mode and each rule it names outranking what the library says about that rule; a rule only the library names goes on applying. Nothing that neither a mode nor the rules enable runs, and `jabkit fix` warns when that is everything.
 
-The last is the most predictable — a library saved by a newer JabRef does not suddenly rewrite fields the older one left alone — and the most tedious. It also decides what `jabkit fix` means without a configured library, which today runs every built-in rule.
+Which modes JabFix ships with is still open; the current ones are placeholders.
 
 ## More Information
 
@@ -174,7 +179,7 @@ The per-entry syntax stays as it is: a magic comment above an entry switches rul
 
 The in-memory settings follow this decision: they carry a mode per selector and nothing else, and a rule they do not name does not run.
 
-What a library says about itself and what one run of a command asks for are kept apart, because this block is written back: `jabkit fix --disable lower-case` must not leave the library configured that way, nor give a formatting block to a library that never had one. The library's own configuration is what is serialized; a command overrides it for that save alone.
+What a library says about itself and what one run of a command asks for are kept apart, because this block is written back: `jabkit fix --rule lower-case=off` must not leave the library configured that way, nor give a formatting block to a library that never had one. The library's own configuration is what is serialized; a command overrides it for that save alone, unless it is asked to store what it was given (`--save-config`).
 
 The block is stored in the embedded JSON metadata comment, `@Comment{jabref-meta-0.1.0 ...}`, which <https://github.com/JabRef/jabref/issues/10371> settles on and which a `jabref-meta:` item could not hold: its separator is the same `;` a save action uses inside its own value, so nothing that nests fits.
 

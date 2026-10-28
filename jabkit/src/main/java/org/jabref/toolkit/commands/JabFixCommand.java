@@ -6,30 +6,38 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.SequencedMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.lint.SaveActionsMigration;
+import org.jabref.logic.lint.JabFixConfiguration;
+import org.jabref.logic.lint.JabFixMode;
 import org.jabref.logic.lint.rule.Finding;
 import org.jabref.logic.lint.rule.RuleSet;
 import org.jabref.logic.lint.rule.UnknownRuleException;
 import org.jabref.logic.util.ErrorFormat;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.LintSettings;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.RuleMode;
+import org.jabref.model.metadata.RuleSelector;
+import org.jabref.toolkit.converter.JabFixModeConverter;
 import org.jabref.toolkit.exception.CliException;
 import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ImportService;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -63,22 +71,19 @@ class JabFixCommand implements Callable<Integer> {
     @Option(names = {"--check"}, description = "Report what is wrong without writing anything.")
     private boolean checkOnly;
 
-    @Option(names = {"--migrate-save-actions"},
-            description = "Move the library's save actions into its formatting configuration and drop the old entry. "
-                    + "Together with --in-place this rewrites the library's metadata; without it, the result only goes to standard output.")
-    private boolean migrateSaveActions;
+    @Option(names = {"--mode"}, paramLabel = "MODE", converter = JabFixModeConverter.class,
+            description = "Mode to apply instead of the library's: a set of rules JabFix ships. Rules the library or --rule name still outrank it. The available modes are listed below.")
+    private @Nullable JabFixMode mode;
 
-    @Option(names = {"--enable"}, split = ",", paramLabel = "RULE",
-            description = "Rule to apply, which then are the only ones applied. Repeatable, and accepts a comma-separated list. Without it, every rule the library has is applied. The available rules are listed below.")
-    private List<String> enabledRules = List.of();
+    @Option(names = {"--rule"}, split = ",", paramLabel = "RULE=MODE",
+            description = "How far a rule goes, outranking what the library says about it: off, check (report only) or fix (report and repair). "
+                    + "'field:rule' narrows a rule to one field. Repeatable, and accepts a comma-separated list. The available rules are listed below.")
+    private Map<String, String> ruleModes = new LinkedHashMap<>();
 
-    @Option(names = {"--disable"}, split = ",", paramLabel = "RULE",
-            description = "Rule to switch off. Repeatable, and accepts a comma-separated list. The available rules are listed below.")
-    private List<String> disabledRules = List.of();
-
-    @Option(names = {"--check-only"}, split = ",", paramLabel = "RULE",
-            description = "Rule that only reports what it finds, without repairing it. Repeatable, and accepts a comma-separated list.")
-    private List<String> checkOnlyRules = List.of();
+    @Option(names = {"--save-config"},
+            description = "Store --mode and --rule in the library, moving its save actions there as well, so that later runs and JabRef's saves apply them without options. "
+                    + "Together with --in-place this rewrites the library; without it, the result only goes to standard output.")
+    private boolean saveConfig;
 
     // [impl->req~jabkit.cli.jabfix~1]
     @Override
@@ -97,21 +102,21 @@ class JabFixCommand implements Callable<Integer> {
         ParserResult parserResult = ImportService.importBibTexFile(inputFile, jabKit.cliPreferences, quiet);
 
         BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
-        if (migrateSaveActions) {
-            // Before the rules of the run are worked out, so that this run already applies what the
-            // migrated library asks for rather than what it asked for a moment ago.
-            SaveActionsMigration.migrate(databaseContext, jabKit.cliPreferences.getFieldPreferences());
+        MetaData metaData = databaseContext.getMetaData();
+        // These are the rules of this run and not of the library, so they are laid over what it
+        // says rather than becoming what it says -- unless --save-config makes them what it says.
+        LintSettings runSettings = runSettings();
+        if (saveConfig) {
+            // Storing them leaves what the run applies unchanged, since the run lays them over the
+            // library either way, so it does not matter that this happens before the run.
+            JabFixConfiguration.configure(metaData, metaData.getFormatting().orElse(LintSettings.NONE).overriddenBy(runSettings));
         }
-        // Asking the library to apply the rules is all it takes; the writer builds them. Which
-        // rules there are needs the library, since its own Save Actions are rules of this run and
-        // the options cover them like any other. These are the rules of this run and not of the
-        // library, so they override what it says rather than becoming what it says.
-        databaseContext.getMetaData().overrideLintSettings(configuredBy(databaseContext));
+        warnIfNothingIsEnabled(JabFixConfiguration.applied(metaData, runSettings), metaData);
 
         try {
             // Only the parsed library in memory is changed here; nothing reaches disk unless
             // --in-place says so, which is what lets --check reuse the very same run.
-            SerializedLibrary library = serialize(databaseContext);
+            SerializedLibrary library = serialize(databaseContext, runSettings);
             List<Finding> findings = library.findings();
 
             if (checkOnly) {
@@ -135,41 +140,36 @@ class JabFixCommand implements Callable<Integer> {
         }
     }
 
-    /// What this run applies: what the library asks for, with the options laid over it.
-    ///
-    /// A library that says what it wants done to it is taken at its word, down to the fields it
-    /// names. One that says nothing has every rule it has -- its own Save Actions and the rules
-    /// JabFix ships with -- named and left repairing, which is what makes a bare `jabkit fix`
-    /// format a library nobody has configured.
-    ///
-    /// `--enable` names the rules of the run itself, and then they are the only ones that run,
-    /// whatever the library says. `--check-only` leaves a rule reporting what it finds without
-    /// repairing it, and names it too, so a rule `--enable` left out still runs if `--check-only`
-    /// asks for it; `--disable` takes one out of the run whatever else named it. All three are
-    /// about the rule wherever it looks: an option typed for one run outranks what the library says
-    /// about one of its fields.
+    /// What this run asks for, which the writer lays over what the library asks for -- see
+    /// [JabFixConfiguration#applied]: `--mode` takes the place of the library's mode, and each rule
+    /// `--rule` names outranks what the library says about that rule. A rule `--rule` does not name
+    /// goes on doing what the library says. `--rule` is spelled the way the stored configuration is,
+    /// so a rule named twice takes the later mode, like a repeated key there.
     ///
     /// A misspelled id is a usage error, not something to pass over: leaving it unreported would let
     /// the user believe a rule had been switched off while it kept running. A library's own settings
     /// are treated more leniently -- see [RuleSet#asConfiguredBy].
-    private LintSettings configuredBy(BibDatabaseContext databaseContext) throws CliException {
-        RuleSet rules = RuleSet.forLibrary(databaseContext, jabKit.cliPreferences.getFieldPreferences());
+    private LintSettings runSettings() throws CliException {
+        LintSettings run = Optional.ofNullable(mode)
+                                   .map(chosen -> LintSettings.NONE.withMode(chosen.getKey()))
+                                   .orElse(LintSettings.NONE);
+        rejectUnknownRules(ruleModes.keySet());
+        for (Map.Entry<String, String> rule : ruleModes.entrySet()) {
+            RuleMode ruleMode = knownRuleMode(rule.getValue());
+            // Readable: a key that is not names no rule, and was rejected above.
+            run = run.and(RuleSelector.parse(rule.getKey()).orElseThrow(), ruleMode);
+        }
+        return run;
+    }
+
+    /// Holds the keys the user typed against the rules JabFix knows. One that cannot be read as a
+    /// selector names no rule either, and is reported the same way.
+    private void rejectUnknownRules(Collection<String> keys) throws CliException {
         try {
-            rules.rejectUnknown(Stream.of(enabledRules, checkOnlyRules, disabledRules)
-                                      .flatMap(List::stream)
+            RuleSet.known(jabKit.cliPreferences.getFieldPreferences())
+                   .rejectUnknown(keys.stream()
+                                      .map(key -> RuleSelector.parse(key).map(RuleSelector::ruleId).orElse(key))
                                       .toList());
-
-            // The command line names rules and not fields, so every selector it builds covers every
-            // field the rule looks at.
-            LintSettings applied = enabledRules.isEmpty()
-                    ? databaseContext.getMetaData().getFormatting().orElseGet(() -> LintSettings.repairing(rules.ids()))
-                    : LintSettings.repairing(enabledRules);
-
-            // A rule named by several options is switched off: the strictest of them wins, and
-            // saying so in the one place that reads them all keeps it from being a question
-            // anywhere else.
-            return applied.overriddenBy(modesFor(checkOnlyRules, RuleMode.CHECK))
-                          .overriddenBy(modesFor(disabledRules, RuleMode.OFF));
         } catch (UnknownRuleException e) {
             LOGGER.debug("Rejecting unknown rule id", e);
             throw new CliException(e.getMessage(),
@@ -180,10 +180,21 @@ class JabFixCommand implements Callable<Integer> {
         }
     }
 
-    private static SequencedMap<String, RuleMode> modesFor(List<String> ruleIds, RuleMode mode) {
-        SequencedMap<String, RuleMode> modes = new LinkedHashMap<>();
-        ruleIds.forEach(ruleId -> modes.put(ruleId, mode));
-        return modes;
+    private static RuleMode knownRuleMode(String key) throws CliException {
+        return RuleMode.fromKey(key).orElseThrow(() -> new CliException("Unknown rule mode: " + key,
+                Localization.lang("Unknown rule mode: %0. Available rule modes: %1", key,
+                        Arrays.stream(RuleMode.values()).map(RuleMode::asKey).collect(Collectors.joining(", "))),
+                CommandLine.ExitCode.USAGE));
+    }
+
+    /// Nothing runs unless a mode or a rule is enabled, which is easy to miss: the library is still
+    /// written, and only its layout changes. The way out is one option, so the warning names it.
+    private void warnIfNothingIsEnabled(LintSettings applied, MetaData metaData) {
+        if (RuleSet.configuredBy(applied, metaData, jabKit.cliPreferences.getFieldPreferences()).rules().isEmpty()) {
+            LOGGER.warn("No JabFix mode or rule is enabled, so no rule runs");
+            System.err.println(Localization.lang("No mode or rule is enabled, so nothing is checked or fixed. Choose a mode with --mode (%0), and add --save-config to keep it.",
+                    JabFixModeConverter.availableModes()));
+        }
     }
 
     /// What a save of the library produces: the text, and what the rules reported while producing it.
@@ -195,7 +206,7 @@ class JabFixCommand implements Callable<Integer> {
     ///
     /// Reformatting on save rewrites every entry; without it the writer would keep the serialization
     /// each entry had in the input file, which is exactly what is to be replaced.
-    private SerializedLibrary serialize(BibDatabaseContext databaseContext) throws IOException {
+    private SerializedLibrary serialize(BibDatabaseContext databaseContext, LintSettings runSettings) throws IOException {
         StringWriter stringWriter = new StringWriter();
         SelfContainedSaveConfiguration saveConfiguration =
                 (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration().withReformatOnSave(true);
@@ -205,7 +216,8 @@ class JabFixCommand implements Callable<Integer> {
                 saveConfiguration,
                 jabKit.cliPreferences.getFieldPreferences(),
                 jabKit.cliPreferences.getCitationKeyPatternPreferences(),
-                jabKit.entryTypesManager);
+                jabKit.entryTypesManager)
+                .withLintSettings(runSettings);
         databaseWriter.writeDatabase(databaseContext);
 
         return new SerializedLibrary(stringWriter.toString(), databaseWriter.getFindings());

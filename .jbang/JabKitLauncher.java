@@ -19,6 +19,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CitationFetcherTypeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/ExtractionModeConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/JabFixModeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/KeySuffixConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Check.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java

@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.toolkit.exception.CliExceptionHandler;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,9 @@ import static org.mockito.Mockito.when;
 
 class JabFixCommandTest extends AbstractJabKitTest {
 
+    private static final String NOTHING_ENABLED = Localization.lang("No mode or rule is enabled, so nothing is checked or fixed. Choose a mode with --mode (%0), and add --save-config to keep it.",
+            "whitespace, report, default-save-actions");
+
     private String inputFile;
 
     @BeforeEach
@@ -30,45 +34,62 @@ class JabFixCommandTest extends AbstractJabKitTest {
         inputFile = getClassResourceAsFullyQualifiedString("jabfix-sloppy.bib");
     }
 
+    /// Off by default: a library that asks for nothing has nothing done to it, and the run says so,
+    /// since the library is still written and the missing repairs are easy to overlook.
     @Test
-    void everyRuleRunsByDefault() {
+    void nothingRunsUnlessAModeOrARuleIsEnabled() {
         assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", inputFile));
 
         String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("author = { Knuth, Donald E. },"), formatted);
+        String reported = commandLine.getErrorOutput();
+        assertTrue(reported.contains(NOTHING_ENABLED), reported);
+    }
+
+    @Test
+    void aModeEnablesItsRules() {
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--mode", "whitespace", inputFile));
+
+        String formatted = commandLine.getStandardOutput();
         assertTrue(formatted.contains("author = {Knuth, Donald E.},"), formatted);
+        String reported = commandLine.getErrorOutput();
+        assertFalse(reported.contains(NOTHING_ENABLED), reported);
+    }
+
+    @Test
+    void anUnknownModeIsAUsageError() {
+        assertEquals(CommandLine.ExitCode.USAGE, commandLine.executeToLog("fix", "--mode", "whitespce", inputFile));
+
+        String errors = commandLine.getErrorOutput();
+        assertTrue(errors.contains("Unknown mode: whitespce."), errors);
     }
 
     /// The save action goes on being applied, and the library now states it in the one place that
-    /// says what is done to it -- next to the rules JabFix ships with, which it was formatted by
-    /// before and goes on being formatted by.
+    /// says what is done to it.
     @Test
-    void migrateSaveActionsMovesThemIntoTheFormattingConfiguration() {
+    void saveConfigMovesTheSaveActionsIntoTheConfiguration() {
         assertEquals(CommandLine.ExitCode.OK,
-                commandLine.executeToLog("fix", "--migrate-save-actions",
+                commandLine.executeToLog("fix", "--save-config",
                         getClassResourceAsFullyQualifiedString("jabfix-save-actions.bib")));
 
         String formatted = commandLine.getStandardOutput();
         assertTrue(formatted.contains("title  = {some title},"), formatted);
-        assertTrue(formatted.contains("author = {Knuth, Donald E.},"), formatted);
         assertTrue(formatted.contains("\"title:lower-case\" : \"fix\""), formatted);
-        assertTrue(formatted.contains("\"surrounding-whitespace\" : \"fix\""), formatted);
         assertFalse(formatted.contains("saveActions"), formatted);
     }
 
-    /// A library with no save actions has nothing to move, so it is formatted like any library that
-    /// says nothing and is not given a configuration.
+    /// Nothing to store and nothing to move, so the library is not given a configuration.
     @Test
-    void migrateSaveActionsLeavesALibraryWithoutThemAsItWas() {
-        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--migrate-save-actions", inputFile));
+    void saveConfigLeavesALibraryWithNothingToStoreAsItWas() {
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--save-config", inputFile));
 
         String formatted = commandLine.getStandardOutput();
-        assertTrue(formatted.contains("author = {Knuth, Donald E.},"), formatted);
         assertFalse(formatted.contains("jabref-meta-0.1.0"), formatted);
     }
 
-    /// Without the option the library keeps its save actions item, so opening it changes nothing.
+    /// Nobody is made to move away from Save Actions: the item stays, and goes on being applied.
     @Test
-    void aLibraryKeepsItsSaveActionsItemUntilItIsMigrated() {
+    void aLibraryKeepsItsSaveActionsUntilItIsConfigured() {
         assertEquals(CommandLine.ExitCode.OK,
                 commandLine.executeToLog("fix",
                         getClassResourceAsFullyQualifiedString("jabfix-save-actions.bib")));
@@ -77,6 +98,8 @@ class JabFixCommandTest extends AbstractJabKitTest {
         assertTrue(formatted.contains("title  = {some title},"), formatted);
         assertTrue(formatted.contains("saveActions"), formatted);
         assertFalse(formatted.contains("jabref-meta-0.1.0"), formatted);
+        String reported = commandLine.getErrorOutput();
+        assertFalse(reported.contains(NOTHING_ENABLED), reported);
     }
 
     /// The library says `surrounding-whitespace` only reports, and names no other rule, so the
@@ -94,9 +117,9 @@ class JabFixCommandTest extends AbstractJabKitTest {
 
     /// An option typed for one run outranks what the library says.
     @Test
-    void disableBeatsTheLibrarysFormattingBlock() {
+    void aRuleSwitchedOffBeatsTheLibrarysFormattingBlock() {
         assertEquals(CommandLine.ExitCode.OK,
-                commandLine.executeToLog("fix", "--disable", "surrounding-whitespace",
+                commandLine.executeToLog("fix", "--rule", "surrounding-whitespace=off",
                         getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
 
         String reported = commandLine.getErrorOutput();
@@ -104,71 +127,95 @@ class JabFixCommandTest extends AbstractJabKitTest {
     }
 
     @Test
-    void enableBeatsTheLibrarysFormattingBlock() {
+    void aRuleSetToFixBeatsTheLibrarysFormattingBlock() {
         assertEquals(CommandLine.ExitCode.OK,
-                commandLine.executeToLog("fix", "--enable", "surrounding-whitespace",
+                commandLine.executeToLog("fix", "--rule", "surrounding-whitespace=fix",
                         getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
 
         String formatted = commandLine.getStandardOutput();
         assertTrue(formatted.contains("author = {Knuth, Donald E.},"), formatted);
     }
 
+    /// `--rule` names rules on top of the library's, so a rule only the library names still runs.
+    @Test
+    void aRuleOptionLeavesTheOtherRulesOfTheLibraryInTheRun() {
+        assertEquals(CommandLine.ExitCode.OK,
+                commandLine.executeToLog("fix", "--rule", "repeated-whitespace=fix",
+                        getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("author = { Knuth, Donald E. },"), formatted);
+        String reported = commandLine.getErrorOutput();
+        assertTrue(reported.contains("[surrounding-whitespace]"), reported);
+    }
+
+    /// A mode is broader than a rule the library names, so the rule goes on doing what the library says.
+    @Test
+    void aRuleTheLibraryNamesOutranksTheModeOfTheRun() {
+        assertEquals(CommandLine.ExitCode.OK,
+                commandLine.executeToLog("fix", "--mode", "whitespace",
+                        getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("author = { Knuth, Donald E. },"), formatted);
+    }
+
+    @Test
+    void theModeOfTheRunTakesThePlaceOfTheLibrarys(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("reported.bib"), """
+                @Comment{jabref-meta-0.1.0
+                {
+                  "formatting" : {
+                    "mode" : "report"
+                  }
+                }
+                }
+
+                @Article{key,
+                  author = { Doe, Jane },
+                }
+                """);
+
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--mode", "whitespace", library.toString()));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("author = {Doe, Jane},"), formatted);
+        assertTrue(formatted.contains("\"mode\" : \"report\""), formatted);
+    }
+
     /// The rules of a run are not what the library says about itself, so formatting one must not
     /// leave a configuration behind in a library that never had one.
     @Test
     void formattingALibraryDoesNotGiveItAFormattingBlock() {
-        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", inputFile));
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--mode", "whitespace", inputFile));
 
         String formatted = commandLine.getStandardOutput();
         assertFalse(formatted.contains("jabref-meta-0.1.0"), formatted);
     }
 
-    /// Naming one rule leaves the rest of them out, so the whitespace around the author survives.
+    /// Every formatter a Save Action can use is a rule, so it can be named without the library
+    /// having such a Save Action -- and narrowed to one field.
     @Test
-    void enableNamesTheOnlyRulesThatRun() {
-        assertEquals(CommandLine.ExitCode.OK,
-                commandLine.executeToLog("fix", "--enable", "repeated-whitespace", inputFile));
+    void aRuleOptionTakesAFormatterOnOneField(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("shouting.bib"), """
+                @Article{key,
+                  author = {DOE, JANE},
+                  title  = {SOME TITLE},
+                }
+                """);
+
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--rule", "title:lower-case=fix", library.toString()));
 
         String formatted = commandLine.getStandardOutput();
-        assertTrue(formatted.contains("author = { Knuth, Donald E. },"), formatted);
+        assertTrue(formatted.contains("title  = {some title},"), formatted);
+        assertTrue(formatted.contains("author = {DOE, JANE},"), formatted);
     }
 
-    /// `--check-only` names a rule as well, so one left out of `--enable` still reports.
+    /// One option gives every rule its mode, spelled the way the stored configuration spells it.
     @Test
-    void checkOnlyRunsARuleEnableLeftOut() {
+    void aRuleOptionGivesEachRuleItsMode() {
         assertEquals(CommandLine.ExitCode.OK,
-                commandLine.executeToLog("fix", "--enable", "repeated-whitespace",
-                        "--check-only", "surrounding-whitespace", inputFile));
-
-        String formatted = commandLine.getStandardOutput();
-        assertTrue(formatted.contains("author = { Knuth, Donald E. },"), formatted);
-        String reported = commandLine.getErrorOutput();
-        assertTrue(reported.contains("[surrounding-whitespace]"), reported);
-    }
-
-    @Test
-    void anIdThatNamesNoRuleIsAUsageErrorForEnableToo() {
-        assertEquals(CommandLine.ExitCode.USAGE,
-                commandLine.executeToLog("fix", "--enable", "surounding-whitespace", inputFile));
-
-        String errors = commandLine.getErrorOutput();
-        assertTrue(errors.contains("surounding-whitespace"), errors);
-    }
-
-    @Test
-    void disableSwitchesARuleOff() {
-        assertEquals(CommandLine.ExitCode.OK,
-                commandLine.executeToLog("fix", "--disable", "surrounding-whitespace", inputFile));
-
-        String formatted = commandLine.getStandardOutput();
-        assertTrue(formatted.contains("author = { Knuth, Donald E. },"), formatted);
-    }
-
-    /// The value stays as it was, and the finding is said out loud instead of passing unseen.
-    @Test
-    void checkOnlyReportsARuleWithoutApplyingIt() {
-        assertEquals(CommandLine.ExitCode.OK,
-                commandLine.executeToLog("fix", "--check-only", "surrounding-whitespace", inputFile));
+                commandLine.executeToLog("fix", "--rule", "repeated-whitespace=fix,surrounding-whitespace=check", inputFile));
 
         String formatted = commandLine.getStandardOutput();
         assertTrue(formatted.contains("author = { Knuth, Donald E. },"), formatted);
@@ -176,20 +223,21 @@ class JabFixCommandTest extends AbstractJabKitTest {
         assertTrue(reported.contains("[surrounding-whitespace]"), reported);
     }
 
+    /// A rule outranks a mode, the run's included.
     @Test
-    void anIdThatNamesNoRuleIsAUsageErrorForCheckOnlyToo() {
-        assertEquals(CommandLine.ExitCode.USAGE,
-                commandLine.executeToLog("fix", "--check-only", "surounding-whitespace", inputFile));
+    void aRuleSwitchedOffOutranksTheModeOfTheRun() {
+        assertEquals(CommandLine.ExitCode.OK,
+                commandLine.executeToLog("fix", "--mode", "whitespace", "--rule", "surrounding-whitespace=off", inputFile));
 
-        String errors = commandLine.getErrorOutput();
-        assertTrue(errors.contains("surounding-whitespace"), errors);
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("author = { Knuth, Donald E. },"), formatted);
     }
 
-    /// Split into two ids, of which only the misspelled one is unknown.
+    /// Split into two rules, of which only the misspelled one is unknown.
     @Test
-    void disableTakesACommaSeparatedList() {
+    void aRuleOptionTakesACommaSeparatedList() {
         assertEquals(CommandLine.ExitCode.USAGE,
-                commandLine.executeToLog("fix", "--disable", "surrounding-whitespace,surounding-whitespace", inputFile));
+                commandLine.executeToLog("fix", "--rule", "surrounding-whitespace=off,surounding-whitespace=off", inputFile));
 
         String errors = commandLine.getErrorOutput();
         assertTrue(errors.contains("Unknown rule: surounding-whitespace."), errors);
@@ -200,11 +248,42 @@ class JabFixCommandTest extends AbstractJabKitTest {
     @Test
     void anIdThatNamesNoRuleIsAUsageError() {
         assertEquals(CommandLine.ExitCode.USAGE,
-                commandLine.executeToLog("fix", "--disable", "surounding-whitespace", inputFile));
+                commandLine.executeToLog("fix", "--rule", "surounding-whitespace=off", inputFile));
 
         String errors = commandLine.getErrorOutput();
         assertTrue(errors.contains("surounding-whitespace"), errors);
         assertTrue(errors.contains("surrounding-whitespace"), errors);
+    }
+
+    @Test
+    void anUnknownRuleModeIsAUsageError() {
+        assertEquals(CommandLine.ExitCode.USAGE,
+                commandLine.executeToLog("fix", "--rule", "surrounding-whitespace=repair", inputFile));
+
+        String errors = commandLine.getErrorOutput();
+        assertTrue(errors.contains("Unknown rule mode: repair. Available rule modes: off, check, fix"), errors);
+    }
+
+    /// Set once, the mode is what the library says, so later runs and JabRef's saves need no options.
+    @Test
+    void saveConfigStoresTheModeOfTheRun() {
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--mode", "whitespace", "--save-config", inputFile));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("author = {Knuth, Donald E.},"), formatted);
+        assertTrue(formatted.contains("\"mode\" : \"whitespace\""), formatted);
+    }
+
+    /// What the library said and the run did not touch stays what the library says.
+    @Test
+    void saveConfigKeepsWhatTheLibrarySaidBeside() {
+        assertEquals(CommandLine.ExitCode.OK,
+                commandLine.executeToLog("fix", "--mode", "whitespace", "--save-config",
+                        getClassResourceAsFullyQualifiedString("jabfix-configured.bib")));
+
+        String formatted = commandLine.getStandardOutput();
+        assertTrue(formatted.contains("\"mode\" : \"whitespace\""), formatted);
+        assertTrue(formatted.contains("\"surrounding-whitespace\" : \"check\""), formatted);
     }
 
     /// A finding says where it is, in the `file:line:column:citationKey:field: message` format the
@@ -217,7 +296,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
                 }
                 """);
 
-        assertEquals(1, commandLine.executeToLog("fix", "--check", "-p", library.toString()));
+        assertEquals(1, commandLine.executeToLog("fix", "--check", "-p", "--mode", "whitespace", library.toString()));
 
         assertEquals(List.of(library + ":2:3:knuth1984:author: value has leading or trailing whitespace [surrounding-whitespace]"),
                 commandLine.getStandardOutput().replace("\r\n", "\n").lines()
@@ -235,7 +314,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
                 }
                 """);
 
-        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", library.toString()));
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--mode", "whitespace", library.toString()));
 
         // The database type is written although the input never named it: the importer infers it for
         // a file that declares none, so even a clean library grows this line.
@@ -258,9 +337,9 @@ class JabFixCommandTest extends AbstractJabKitTest {
                 }
                 """);
 
-        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--in-place", library.toString()));
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--in-place", "--mode", "whitespace", library.toString()));
         String once = Files.readString(library);
-        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--in-place", library.toString()));
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--in-place", "--mode", "whitespace", library.toString()));
 
         assertEquals(once, Files.readString(library));
     }
@@ -276,10 +355,26 @@ class JabFixCommandTest extends AbstractJabKitTest {
                 }
                 """);
 
-        assertEquals(1, commandLine.executeToLog("fix", "--check", "-p", library.toString()));
+        assertEquals(1, commandLine.executeToLog("fix", "--check", "-p", "--mode", "whitespace", library.toString()));
 
         String findings = commandLine.getStandardOutput();
         assertTrue(findings.contains("[magic-comment]"), findings);
+    }
+
+    /// Switching a rule off for one run is no reason to report the comments that switch it off.
+    @Test
+    void checkDoesNotReportAMagicCommentNamingARuleTheRunSwitchedOff(@TempDir Path tempDir) throws IOException {
+        Path library = Files.writeString(tempDir.resolve("clean.bib"), """
+                % jabref-format-ignore repeated-whitespace
+                @Article{key,
+                  author = {Doe, Jane},
+                }
+                """);
+
+        commandLine.executeToLog("fix", "--check", "-p", "--mode", "whitespace", "--rule", "repeated-whitespace=off", library.toString());
+
+        String findings = commandLine.getStandardOutput();
+        assertFalse(findings.contains("[magic-comment]"), findings);
     }
 
     /// Trimming is a rule like any other now, so a magic comment keeps that one field as written
@@ -294,7 +389,7 @@ class JabFixCommandTest extends AbstractJabKitTest {
                 }
                 """);
 
-        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", library.toString()));
+        assertEquals(CommandLine.ExitCode.OK, commandLine.executeToLog("fix", "--mode", "whitespace", library.toString()));
 
         String formatted = commandLine.getStandardOutput();
         assertTrue(formatted.contains("author = { Doe, Jane },"), formatted);

@@ -19,6 +19,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.lint.JabFixMode;
 import org.jabref.logic.lint.rule.RuleSet;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
@@ -89,7 +90,7 @@ public class JabKitLauncher {
                     ImportService.getAvailableImportFormats(preferences),
                     ExportService.create(preferences, true).getAvailableExportFormats(),
                     WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()),
-                    RuleSet.all(preferences.getFieldPreferences()));
+                    RuleSet.known(preferences.getFieldPreferences()));
 
             // Show help when no arguments are given. Placed after header and footer setup
             // to ensure output matches --help command
@@ -157,10 +158,15 @@ public class JabKitLauncher {
                                      .filter(name -> !"Search pre-configured".equals(name))
                                      .collect(Collectors.joining(", ")));
 
-        // `fix` is configured by rule id, so the ids -- and what each one does -- have to be
+        // `fix` is configured by mode and rule id, so both -- and what each one does -- have to be
         // discoverable from `--help` alone.
         commandLine.getSubcommands().get("fix")
                    .getCommandSpec().usageMessage().footer("\n"
+                           + Localization.lang("The following modes are available:") + "\n"
+                           + StringUtil.alignStringTable(Arrays.stream(JabFixMode.values())
+                                                              .map(mode -> new Pair<>(mode.getKey(), mode.getDescription()))
+                                                              .toList())
+                           + "\n"
                            + Localization.lang("The following rules are available:") + "\n"
                            + StringUtil.alignStringTable(rules.rules().stream()
                                                               .map(rule -> new Pair<>(rule.id(), rule.description()))

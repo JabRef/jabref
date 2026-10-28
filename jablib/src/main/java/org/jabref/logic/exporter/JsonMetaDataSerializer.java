@@ -54,8 +54,8 @@ public class JsonMetaDataSerializer {
     public static Optional<String> serialize(MetaData metaData) {
         ObjectNode root = MAPPER.createObjectNode();
 
+        // Even an empty block: it says the library is configured, and that nothing is enabled.
         metaData.getFormatting()
-                .filter(settings -> !settings.isEmpty())
                 .ifPresent(settings -> root.set(MetaData.FORMATTING, formatting(settings)));
 
         // Whatever a newer JabRef wrote goes back as it came. That includes a `formatting` this
@@ -70,9 +70,10 @@ public class JsonMetaDataSerializer {
 
     /// What the library asks JabFix to do, as the `formatting` block.
     ///
-    /// The modes this JabFix read are written first, in the order it read them, and what it could
-    /// not read follows. A configuration somebody edited by hand therefore keeps its order, except
-    /// that an entry of a newer JabFix moves to the end of its group -- which beats dropping it.
+    /// The mode comes first. Of the rules, the modes this JabFix read are written first, in the
+    /// order it read them, and what it could not read follows. A configuration somebody edited by
+    /// hand therefore keeps its order, except that an entry of a newer JabFix moves to the end of its
+    /// group -- which beats dropping it.
     ///
     /// Where the library has since stated a key it could not read before -- a migration may have
     /// moved a Save Action onto an entry this JabFix could not read the mode of -- what it states
@@ -83,6 +84,7 @@ public class JsonMetaDataSerializer {
         settings.unreadRules().forEach((key, json) -> putUnlessStated(rules, key, json));
 
         ObjectNode block = MAPPER.createObjectNode();
+        settings.mode().ifPresent(mode -> block.put(MetaData.FORMATTING_MODE, mode));
         if (!rules.isEmpty()) {
             block.set(MetaData.FORMATTING_RULES, rules);
         }

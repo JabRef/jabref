@@ -19,6 +19,7 @@ import org.jspecify.annotations.NullMarked;
 /// is left to [SurroundingWhitespaceRule].
 @NullMarked
 public class RepeatedWhitespaceRule extends CleanupRule {
+    public static final String ID = "repeated-whitespace";
 
     private final NormalizeWhitespacesCleanup cleanup;
 
@@ -29,7 +30,7 @@ public class RepeatedWhitespaceRule extends CleanupRule {
 
     @Override
     public String id() {
-        return "repeated-whitespace";
+        return ID;
     }
 
     @Override

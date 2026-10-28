@@ -5,9 +5,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.IdentityFormatter;
+import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.RuleSelector;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,6 +51,12 @@ class SaveActionIdsTest {
     void theIdentityFormatterIsFoundToo() {
         assertEquals(Optional.of("identity"),
                 SaveActionIds.formatterFor(SaveActionIds.idOf(new IdentityFormatter())).map(Formatter::getKey));
+    }
+
+    @Test
+    void aSaveActionIsSelectedByItsFieldAndTheIdOfItsFormatter() {
+        assertEquals(RuleSelector.on(StandardField.TITLE, "lower-case"),
+                SaveActionIds.selectorOf(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
     }
 
     /// The rules JabFix ships with are not formatters, so nothing may be reconstructed from them.

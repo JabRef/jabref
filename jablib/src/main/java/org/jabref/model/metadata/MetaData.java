@@ -56,9 +56,12 @@ public class MetaData {
     /// asks for and not after what does it, so that the name survives the component being renamed.
     public static final String FORMATTING = "formatting";
 
+    /// The mode inside that block: the key of a named set of rules JabFix ships, which the rules
+    /// beside it are laid over.
+    public static final String FORMATTING_MODE = "mode";
+
     /// The rules inside that block. They are one key of it rather than the block itself, so that
-    /// something which is not a rule can stand beside them later -- a named set of them, say --
-    /// without a reader having to know which keys are rule ids and which are not.
+    /// the mode can stand beside them without a reader having to know which keys are rule ids.
     public static final String FORMATTING_RULES = "rules";
     public static final String LIBRARY_ABBREVIATION_TYPE = "libraryAbbreviationType";
     public static final String KEYWORD_SEPARATOR = "keywordSeparator";
@@ -100,7 +103,6 @@ public class MetaData {
     @Nullable private String defaultCiteKeyPattern;
     @Nullable private FieldFormatterCleanupActions saveActions;
     @Nullable private LintSettings formatting;
-    @Nullable private LintSettings lintSettingsOverride;
     @Nullable private BibDatabaseMode mode;
     @Nullable private AbbreviationType libraryAbbreviationType;
     @Nullable private Character keywordSeparator;
@@ -273,34 +275,18 @@ public class MetaData {
         postChange();
     }
 
-    /// What a save of this library applies: what the library itself asks for, unless something has
-    /// overridden it for this one save. Empty for a library that says nothing and has not been
-    /// overridden, which is saved the way it always was.
-    public Optional<LintSettings> getLintSettings() {
-        return Optional.ofNullable(lintSettingsOverride)
-                       .or(() -> Optional.ofNullable(formatting));
-    }
-
     /// What the library itself asks JabFix to do, which is what is written back to the `.bib` file.
     ///
     /// This is the library's own configuration, so only reading the file and configuring the
-    /// library set it -- not a command that merely wants different rules applied once.
+    /// library set it -- not a command that merely wants different rules applied once, which hands
+    /// them to the writer instead. Configuring a library is `JabFixConfiguration#configure`, which
+    /// moves its Save Actions into the configuration as well.
     public Optional<LintSettings> getFormatting() {
         return Optional.ofNullable(formatting);
     }
 
     public void setFormatting(@NonNull LintSettings formatting) {
         this.formatting = formatting;
-        postChange();
-    }
-
-    /// What to apply instead of what the library asks for, for this save alone.
-    ///
-    /// A command line names the rules of its run, and that is not the library saying anything about
-    /// itself: `jabkit fix --disable lower-case` must not leave the library configured that way.
-    /// This is therefore neither written to the file nor part of what makes two libraries equal.
-    public void overrideLintSettings(@NonNull LintSettings lintSettings) {
-        this.lintSettingsOverride = lintSettings;
         postChange();
     }
 

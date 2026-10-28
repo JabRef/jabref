@@ -30,13 +30,6 @@ class LintSettingsTest {
         assertEquals(RuleMode.FIX, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
     }
 
-    @Test
-    void repairingNamesEachRuleRepairingOnEveryField() {
-        assertEquals(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
-                                 .and(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX),
-                LintSettings.repairing(List.of("lower-case", "surrounding-whitespace")));
-    }
-
     /// The point of naming a field: repair everywhere, report on one field alone.
     @Test
     void aSelectorNamingTheFieldBeatsOneNamingNone() {
@@ -135,8 +128,7 @@ class LintSettingsTest {
         LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK);
 
-        LintSettings overridden = settings.overriddenBy(
-                new LinkedHashMap<>(Map.of("lower-case", RuleMode.OFF)));
+        LintSettings overridden = settings.overriddenBy(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
 
         assertEquals(RuleMode.OFF, overridden.modeOf("lower-case", Optional.of(StandardField.TITLE)));
         assertEquals(RuleMode.OFF, overridden.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
@@ -147,10 +139,46 @@ class LintSettingsTest {
         LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
                                            .and(RuleSelector.of("upper-case"), RuleMode.CHECK);
 
-        LintSettings overridden = settings.overriddenBy(
-                new LinkedHashMap<>(Map.of("lower-case", RuleMode.OFF)));
+        LintSettings overridden = settings.overriddenBy(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
 
         assertEquals(RuleMode.CHECK, overridden.modeOf("upper-case", Optional.of(StandardField.TITLE)));
+    }
+
+    /// An override about one field leaves the rest of the rule to what it overrides.
+    @Test
+    void aFieldScopedOverrideOnlyReplacesThatField() {
+        LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX);
+
+        LintSettings overridden = settings.overriddenBy(LintSettings.of(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK));
+
+        assertEquals(RuleMode.CHECK, overridden.modeOf("lower-case", Optional.of(StandardField.TITLE)));
+        assertEquals(RuleMode.FIX, overridden.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
+    }
+
+    @Test
+    void anOverrideNamingAModeReplacesTheMode() {
+        LintSettings overridden = LintSettings.NONE.withMode("whitespace").overriddenBy(LintSettings.NONE.withMode("report"));
+
+        assertEquals(Optional.of("report"), overridden.mode());
+    }
+
+    @Test
+    void anOverrideNamingNoModeKeepsTheMode() {
+        LintSettings overridden = LintSettings.NONE.withMode("whitespace")
+                                                   .overriddenBy(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
+
+        assertEquals(Optional.of("whitespace"), overridden.mode());
+    }
+
+    /// What a newer JabFix wrote has to survive being laid under or over something.
+    @Test
+    void anOverrideKeepsWhatNeitherSideCouldRead() {
+        LintSettings underneath = new LintSettings(Optional.empty(), new LinkedHashMap<>(),
+                new LinkedHashMap<>(Map.of("a,b:rule", "\"fix\"")), new LinkedHashMap<>());
+
+        LintSettings overridden = underneath.overriddenBy(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX));
+
+        assertEquals(Map.of("a,b:rule", "\"fix\""), overridden.unreadRules());
     }
 
     /// So that saving does not reshuffle a configuration somebody edited by hand.

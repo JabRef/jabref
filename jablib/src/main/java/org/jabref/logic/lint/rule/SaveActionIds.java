@@ -1,13 +1,18 @@
 package org.jabref.logic.lint.rule;
 
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedSet;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.IdentityFormatter;
+import org.jabref.model.metadata.RuleSelector;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -21,7 +26,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class SaveActionIds {
 
-    private static final Map<String, Formatter> BY_ID = byId();
+    private static final SortedMap<String, Formatter> BY_ID = byId();
 
     private SaveActionIds() {
     }
@@ -31,22 +36,37 @@ public final class SaveActionIds {
         return asId(formatter.getKey());
     }
 
+    /// What a configuration says to state this Save Action: its rule, on its field.
+    public static RuleSelector selectorOf(FieldFormatterCleanup saveAction) {
+        return RuleSelector.on(saveAction.getField(), idOf(saveAction.getFormatter()));
+    }
+
     /// The formatter an id names, or nothing where it names none -- which is the case for every
     /// rule JabFix ships with, since those are not formatters.
     public static Optional<Formatter> formatterFor(String ruleId) {
         return Optional.ofNullable(BY_ID.get(ruleId));
     }
 
+    /// The id of every formatter a Save Action can use, in alphabetical order.
+    public static SequencedSet<String> ids() {
+        return Collections.unmodifiableSequencedSet(BY_ID.sequencedKeySet());
+    }
+
+    /// Every formatter a Save Action can use, in the order of [#ids].
+    public static Collection<Formatter> formatters() {
+        return Collections.unmodifiableCollection(BY_ID.values());
+    }
+
     private static String asId(String formatterKey) {
         return formatterKey.replace('_', '-').toLowerCase(Locale.ROOT);
     }
 
-    private static Map<String, Formatter> byId() {
-        Map<String, Formatter> byId = new HashMap<>();
+    private static SortedMap<String, Formatter> byId() {
+        TreeMap<String, Formatter> byId = new TreeMap<>();
         // Not one of the registered formatters, but reachable: a Save Action naming a formatter
         // JabRef cannot resolve is read as this one.
         byId.put(asId(new IdentityFormatter().getKey()), new IdentityFormatter());
         Formatters.getAll().forEach(formatter -> byId.put(asId(formatter.getKey()), formatter));
-        return Map.copyOf(byId);
+        return Collections.unmodifiableSortedMap(byId);
     }
 }

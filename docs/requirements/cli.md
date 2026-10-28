@@ -100,12 +100,11 @@ Needs: impl
 `jabkit fix` checks a library against a set of rules and rewrites it to follow them.
 Each finding says where it is and names the rule that reported it by a stable id.
 Formatting applies exactly the repairs that `--check` reports, and `--check` exits with 1 if the library would change.
-A library that states in its metadata what it wants done to it is taken at its word, down to the fields it names there.
-One that states nothing has every rule it has applied, each repairing what it finds.
-`--enable` names the rules of the run itself, and then they are the only ones that run; `--disable` switches rules off by id and `--check-only` leaves a rule reporting without repairing.
-All three are about the rule wherever it looks, so an option given for one run outranks what the library says about one of its fields, and none of them changes what the library says about itself.
-An id that names no rule is a usage error.
-`--migrate-save-actions` moves the library's save actions into its stored configuration and drops the old metadata item, leaving what `jabkit fix` applies unchanged.
+A rule runs only where a mode or a rule setting enables it, from the library's metadata or from the command line; when nothing is enabled, the command warns.
+`--mode` takes the place of the library's mode, and `--rule RULE=MODE` sets how far a rule goes (`off`, `check` or `fix`), as `rule` or `field:rule`, outranking what the library says about that rule.
+A rule the command line does not name goes on doing what the library says, and a rule setting outranks a mode wherever either comes from.
+None of the options changes what the library says about itself, unless `--save-config` stores them there; storing them moves the library's save actions into its stored configuration as well and drops the old metadata item, leaving what `jabkit fix` applies unchanged.
+An id that names no rule, or no mode, is a usage error.
 
 Needs: impl
 

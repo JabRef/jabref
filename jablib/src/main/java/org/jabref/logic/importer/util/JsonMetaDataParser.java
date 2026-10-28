@@ -68,21 +68,24 @@ public class JsonMetaDataParser {
     /// mode it does not know -- is kept as it stands rather than dropped or guessed at. A newer
     /// JabFix may mean something by it, and this one saving the library must not be what loses it.
     private static LintSettings formatting(JsonNode block) {
+        Optional<String> mode = Optional.empty();
         SequencedMap<RuleSelector, RuleMode> ruleModes = new LinkedHashMap<>();
         SequencedMap<String, String> unreadRules = new LinkedHashMap<>();
         SequencedMap<String, String> unreadKeys = new LinkedHashMap<>();
 
-        block.properties().forEach(item -> {
-            if (MetaData.FORMATTING_RULES.equals(item.getKey()) && item.getValue().isObject()) {
+        for (Map.Entry<String, JsonNode> item : block.properties()) {
+            if (MetaData.FORMATTING_MODE.equals(item.getKey()) && item.getValue().isString()) {
+                mode = Optional.of(item.getValue().stringValue());
+            } else if (MetaData.FORMATTING_RULES.equals(item.getKey()) && item.getValue().isObject()) {
                 item.getValue().properties().forEach(rule -> read(rule.getKey(), rule.getValue())
                         .ifPresentOrElse(
-                                mode -> ruleModes.put(mode.getKey(), mode.getValue()),
+                                ruleMode -> ruleModes.put(ruleMode.getKey(), ruleMode.getValue()),
                                 () -> unreadRules.put(rule.getKey(), rule.getValue().toString())));
             } else {
                 unreadKeys.put(item.getKey(), item.getValue().toString());
             }
-        });
-        return new LintSettings(ruleModes, unreadRules, unreadKeys);
+        }
+        return new LintSettings(mode, ruleModes, unreadRules, unreadKeys);
     }
 
     /// The selector and the mode of one entry, where this JabFix reads both.

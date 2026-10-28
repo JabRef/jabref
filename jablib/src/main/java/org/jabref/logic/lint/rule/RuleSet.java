@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -11,7 +13,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.lint.rules.RepeatedWhitespaceRule;
 import org.jabref.logic.lint.rules.SurroundingWhitespaceRule;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.LintSettings;
@@ -23,8 +24,9 @@ import org.jspecify.annotations.NullMarked;
 
 /// The rules a JabFix run applies, in the order it applies them.
 ///
-/// This is the seam configuration hangs off: [#all] is the built-in default, [#without] switches
-/// individual rules off by id, and [#with] adds a rule that does not ship with JabFix at all.
+/// This is the seam configuration hangs off: [#builtIn] are the rules JabFix ships with,
+/// [#configuredBy] is what a configuration makes of them, [#without] switches individual rules off
+/// by id, and [#with] adds a rule that does not ship with JabFix at all.
 ///
 /// Order is part of the contract, not an implementation detail. Each rule sees what the rules
 /// before it left behind, so rules that tidy a value up belong before rules that pattern-match it:
@@ -38,71 +40,58 @@ public class RuleSet {
         this.rules = List.copyOf(rules);
     }
 
-    /// The default: every rule JabFix ships with, in the order a save has always applied them.
+    /// Every rule JabFix ships with, in the order a save has always applied them.
     ///
     /// @param fieldPreferences tells the whitespace rules which fields hold text that may be wrapped
-    public static RuleSet all(FieldPreferences fieldPreferences) {
-        return new RuleSet(List.of(
+    public static RuleSet builtIn(FieldPreferences fieldPreferences) {
+        List<Rule> whitespace = List.of(
                 new SurroundingWhitespaceRule(),
-                new RepeatedWhitespaceRule(fieldPreferences)));
+                new RepeatedWhitespaceRule(fieldPreferences));
+        Set<String> knownIds = Stream.concat(whitespace.stream().map(Rule::id), SaveActionIds.ids().stream())
+                                     .collect(Collectors.toUnmodifiableSet());
+        return new RuleSet(Stream.concat(whitespace.stream(), Stream.of(new MagicCommentRule(knownIds))).toList());
     }
 
-    /// The rules a save of `databaseContext` applies: the library's own Save Actions first -- a save
-    /// has always applied them before anything else -- and then every rule JabFix ships with.
-    ///
-    /// Save Actions the library switched off contribute no rule, just as they change nothing on save.
-    ///
-    /// Where the library states them is what it still has: its `saveActions` item while it has one,
-    /// and its formatting configuration once that item is gone. A library keeps the item until
-    /// something migrates it, so nothing about an existing library changes by being opened.
-    ///
-    /// The two are not read at once, which is what keeps one entry from meaning two things. While
-    /// the item is there, `title:lower-case` in the configuration says how far the Save Action goes
-    /// on the title; once it is gone, the same entry is what says there is such a Save Action at
-    /// all. That shift happens exactly at the migration, and only there.
+    /// Every rule a configuration can name: the built-in ones, and one per formatter a Save Action
+    /// can use, on every field.
     ///
     /// @param fieldPreferences tells the whitespace rules which fields hold text that may be wrapped
-    public static RuleSet forLibrary(BibDatabaseContext databaseContext, FieldPreferences fieldPreferences) {
-        MetaData metaData = databaseContext.getMetaData();
-        List<FieldFormatterCleanup> saveActions =
-                metaData.getSaveActions()
-                        .map(actions -> configured(metaData, actions))
-                        .orElseGet(() -> statedInFormatting(metaData));
-
+    public static RuleSet known(FieldPreferences fieldPreferences) {
         return new RuleSet(Stream.concat(
-                saveActions.stream().map(SaveActionRule::new),
-                all(fieldPreferences).rules().stream()).toList());
+                builtIn(fieldPreferences).rules().stream(),
+                SaveActionIds.formatters().stream()
+                             .map(formatter -> new SaveActionRule(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, formatter)))).toList());
     }
 
-    /// What the library's `saveActions` item says, which is nothing where the item says they are
-    /// switched off.
-    private static List<FieldFormatterCleanup> configured(MetaData metaData, FieldFormatterCleanupActions actions) {
-        if (!actions.isEnabled()) {
-            return List.of();
-        }
-        return withKeywordSeparatorOf(metaData, actions);
+    /// The rules `settings` ask for, each going as far as they let it on each field: the Save
+    /// Actions they state first -- a save has always applied them before anything else -- and then
+    /// the rules JabFix ships with.
+    ///
+    /// @param settings         what the run applies, with its mode already expanded into rules
+    /// @param metaData         gives a formatter needing it the library's keyword separator
+    /// @param fieldPreferences tells the whitespace rules which fields hold text that may be wrapped
+    public static RuleSet configuredBy(LintSettings settings, MetaData metaData, FieldPreferences fieldPreferences) {
+        return new RuleSet(Stream.concat(
+                statedSaveActions(settings, metaData).stream().map(SaveActionRule::new),
+                builtIn(fieldPreferences).rules().stream()).toList())
+                .asConfiguredBy(settings);
     }
 
-    /// What the library states in its formatting configuration: the Save Actions its entries naming
-    /// a formatter add up to, each on the field the entry names, or on every field where it names
-    /// none.
+    /// The Save Actions the entries of `settings` naming a formatter add up to, each on the field
+    /// the entry names, or on every field where it names none.
     ///
     /// An entry about a field that a broader entry of the same formatter already visits states no
     /// Save Action of its own: `lower-case` together with `title:lower-case` is one Save Action on
     /// every field that only reports on the title, not a second one on the title that would report
     /// the same thing twice. The broader one takes the place of the first entry it covers.
     ///
-    /// An entry switched off states no Save Action rather than a switched-off one, so that a
-    /// `saveActions` item that was switched off migrates to entries saying so and comes back as the
-    /// same nothing.
-    private static List<FieldFormatterCleanup> statedInFormatting(MetaData metaData) {
+    /// An entry switched off states no Save Action.
+    private static List<FieldFormatterCleanup> statedSaveActions(LintSettings settings, MetaData metaData) {
         List<FieldFormatterCleanup> named =
-                metaData.getFormatting()
-                        .map(settings -> settings.ruleModes().entrySet().stream()
-                                                 .filter(entry -> entry.getValue() != RuleMode.OFF)
-                                                 .flatMap(entry -> asSaveAction(entry.getKey()).stream())
-                                                 .toList())
-                        .orElse(List.of());
+                settings.ruleModes().entrySet().stream()
+                        .filter(entry -> entry.getValue() != RuleMode.OFF)
+                        .flatMap(entry -> asSaveAction(entry.getKey()).stream())
+                        .toList();
         List<FieldFormatterCleanup> stated = named.stream()
                                                   .map(saveAction -> broadestCovering(saveAction, named))
                                                   .distinct()
@@ -110,7 +99,10 @@ public class RuleSet {
 
         // Through JabRef's own configuration step, so that a formatter needing the library's
         // keyword separator is given it, exactly as one from the `saveActions` item would be.
-        return withKeywordSeparatorOf(metaData, new FieldFormatterCleanupActions(true, stated));
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(true, stated);
+        return metaData.getKeywordSeparator()
+                       .map(actions::getConfiguredActions)
+                       .orElseGet(actions::getConfiguredActions);
     }
 
     private static Optional<FieldFormatterCleanup> asSaveAction(RuleSelector selector) {
@@ -152,12 +144,6 @@ public class RuleSet {
         return 2;
     }
 
-    private static List<FieldFormatterCleanup> withKeywordSeparatorOf(MetaData metaData, FieldFormatterCleanupActions actions) {
-        return metaData.getKeywordSeparator()
-                       .map(actions::getConfiguredActions)
-                       .orElseGet(actions::getConfiguredActions);
-    }
-
     /// Exactly the given rules, in the given order. An empty set reformats without applying any
     /// rule at all.
     public static RuleSet of(Rule... rules) {
@@ -183,20 +169,21 @@ public class RuleSet {
     ///
     /// @throws UnknownRuleException if any id names no rule in this set
     public void rejectUnknown(Collection<String> ruleIds) throws UnknownRuleException {
+        List<String> knownIds = ids().stream().distinct().toList();
         List<String> unknown = ruleIds.stream()
                                       .distinct()
-                                      .filter(ruleId -> !ids().contains(ruleId))
+                                      .filter(ruleId -> !knownIds.contains(ruleId))
                                       .toList();
         if (!unknown.isEmpty()) {
-            throw new UnknownRuleException(unknown, ids());
+            throw new UnknownRuleException(unknown, knownIds);
         }
     }
 
-    /// The rules of this set the library lets run, each as far as it lets it go on each field: a
-    /// rule it switches off everywhere is dropped, and where it wants one checked only, the repair
+    /// The rules of this set the settings let run, each as far as they let it go on each field: a
+    /// rule they switch off everywhere is dropped, and where they want one checked only, the repair
     /// is taken off what that rule finds there.
     ///
-    /// How far a rule goes cannot be settled once for the whole rule, since the library says it per
+    /// How far a rule goes cannot be settled once for the whole rule, since the settings say it per
     /// field, so each kept rule is wrapped in one that settles it per finding.
     ///
     /// A selector naming no rule of this set is passed over. The settings may have been written by

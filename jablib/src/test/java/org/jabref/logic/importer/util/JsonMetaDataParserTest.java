@@ -2,6 +2,7 @@ package org.jabref.logic.importer.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.metadata.MetaData;
@@ -48,6 +49,27 @@ class JsonMetaDataParserTest {
 
         assertEquals(Map.of("title|booktitle:lower-case", "\"fix\""),
                 metaData.getFormatting().orElseThrow().unreadRules());
+    }
+
+    @Test
+    void theModeIsRead() throws ParseException {
+        MetaData metaData = new MetaData();
+
+        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("""
+                {"formatting": {"mode": "whitespace"}}"""));
+
+        assertEquals(Optional.of("whitespace"), metaData.getFormatting().orElseThrow().mode());
+    }
+
+    /// Not a mode this JabFix can name, so it is kept for the JabFix that wrote it.
+    @Test
+    void aModeThatIsNotAStringIsKeptAsAnUnreadKey() throws ParseException {
+        MetaData metaData = new MetaData();
+
+        JsonMetaDataParser.parse(metaData, JsonMetaDataParser.read("""
+                {"formatting": {"mode": ["whitespace", "report"]}}"""));
+
+        assertEquals(Map.of("mode", "[\"whitespace\",\"report\"]"), metaData.getFormatting().orElseThrow().unreadKeys());
     }
 
     /// The caller keeps the text of a comment it could not read, so saying so is the whole job.

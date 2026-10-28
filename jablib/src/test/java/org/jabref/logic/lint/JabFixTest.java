@@ -14,6 +14,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.lint.rule.Finding;
 import org.jabref.logic.lint.rule.Rule;
 import org.jabref.logic.lint.rule.RuleSet;
+import org.jabref.logic.lint.rule.UnknownRuleException;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -73,14 +74,14 @@ class JabFixTest {
     void repairsWhatTheRulesReport() throws IOException {
         List<BibEntry> entries = parse(SLOPPY);
 
-        new JabFix(RuleSet.all(FIELD_PREFERENCES)).apply(entries);
+        new JabFix(RuleSet.builtIn(FIELD_PREFERENCES)).apply(entries);
 
         assertEquals("Doe, Jane", entries.getFirst().getField(StandardField.AUTHOR).orElseThrow());
     }
 
     @Test
     void reportsWhatItRepaired() throws IOException {
-        JabFixResult result = new JabFix(RuleSet.all(FIELD_PREFERENCES)).apply(parse(SLOPPY));
+        JabFixResult result = new JabFix(RuleSet.builtIn(FIELD_PREFERENCES)).apply(parse(SLOPPY));
 
         assertEquals(List.of("surrounding-whitespace"),
                 result.findings().stream().map(finding -> finding.rule().id()).toList());
@@ -88,7 +89,7 @@ class JabFixTest {
 
     @Test
     void everyFindingCarriesTheEntryAndFieldItConcerns() throws IOException {
-        Finding finding = new JabFix(RuleSet.all(FIELD_PREFERENCES)).apply(parse(SLOPPY)).findings().getFirst();
+        Finding finding = new JabFix(RuleSet.builtIn(FIELD_PREFERENCES)).apply(parse(SLOPPY)).findings().getFirst();
 
         assertEquals("key", finding.citationKey());
         assertEquals("author", finding.field().orElseThrow().getName());
@@ -98,7 +99,7 @@ class JabFixTest {
     /// What a repair changed is what an undo manager collects.
     @Test
     void reportsWhatEveryRepairChanged() throws IOException {
-        JabFixResult result = new JabFix(RuleSet.all(FIELD_PREFERENCES)).apply(parse(SLOPPY));
+        JabFixResult result = new JabFix(RuleSet.builtIn(FIELD_PREFERENCES)).apply(parse(SLOPPY));
 
         assertEquals(List.of(" Doe, Jane "), result.changes().stream().map(FieldChange::oldValue).toList());
         assertEquals(List.of("Doe, Jane"), result.changes().stream().map(FieldChange::newValue).toList());
@@ -121,7 +122,7 @@ class JabFixTest {
         List<BibEntry> entries = parse(SLOPPY);
         AtomicInteger scheduled = new AtomicInteger();
 
-        new JabFix(RuleSet.all(FIELD_PREFERENCES)).apply(entries, mutation -> {
+        new JabFix(RuleSet.builtIn(FIELD_PREFERENCES)).apply(entries, mutation -> {
             scheduled.incrementAndGet();
             mutation.run();
         });
@@ -142,7 +143,7 @@ class JabFixTest {
                 }
                 """);
 
-        JabFixResult result = new JabFix(RuleSet.all(FIELD_PREFERENCES)).apply(entries);
+        JabFixResult result = new JabFix(RuleSet.builtIn(FIELD_PREFERENCES)).apply(entries);
 
         assertEquals(List.of(), result.findings());
         assertEquals(" Doe, Jane ", entries.getFirst().getField(StandardField.AUTHOR).orElseThrow());
@@ -191,8 +192,8 @@ class JabFixTest {
         assertEquals(Set.of("author"), reportedFields(result));
     }
 
-    /// A comment naming no rule of the run switches nothing off, which is reported rather than
-    /// passed over: the entry is repaired as if the comment were not there.
+    /// A comment naming no rule switches nothing off, which is reported rather than passed over:
+    /// the entry is repaired as if the comment were not there.
     @Test
     void aMagicCommentThatNamesNoRuleIsReported() throws IOException {
         List<BibEntry> entries = parse("""
@@ -203,16 +204,29 @@ class JabFixTest {
                 }
                 """);
 
-        JabFixResult result = new JabFix(RuleSet.all(FIELD_PREFERENCES)).apply(entries);
+        JabFixResult result = new JabFix(RuleSet.builtIn(FIELD_PREFERENCES)).apply(entries);
 
-        assertEquals(List.of("magic-comment", "surrounding-whitespace"),
+        assertEquals(List.of("surrounding-whitespace", "magic-comment"),
                 result.findings().stream().map(finding -> finding.rule().id()).toList());
         assertEquals("Doe, Jane", entries.getFirst().getField(StandardField.AUTHOR).orElseThrow());
     }
 
+    /// Switching a rule off for one run must not turn every comment that names it into a finding.
+    @Test
+    void aMagicCommentNamingARuleThatIsNotRunIsNotReported() throws IOException, UnknownRuleException {
+        JabFixResult result = new JabFix(RuleSet.builtIn(FIELD_PREFERENCES).without(List.of("repeated-whitespace"))).apply(parse("""
+                % jabref-format-ignore repeated-whitespace lower-case
+                @ARTICLE{key,
+                author = "Doe, Jane"
+                }
+                """));
+
+        assertEquals(List.of(), result.findings());
+    }
+
     @Test
     void aMagicCommentCanSwitchOffTheReportAboutItself() throws IOException {
-        JabFixResult result = new JabFix(RuleSet.all(FIELD_PREFERENCES)).apply(parse("""
+        JabFixResult result = new JabFix(RuleSet.builtIn(FIELD_PREFERENCES)).apply(parse("""
                 % jabref-format-ignore surounding-whitespace magic-comment
                 @ARTICLE{key,
                 author = " Doe, Jane ",
