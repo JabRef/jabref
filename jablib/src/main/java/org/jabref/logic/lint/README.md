@@ -39,7 +39,7 @@ List<Finding> findings = writer.getFindings();
 The writer resolves the settings into a rule set itself: `JabFixConfiguration.applied` puts the layers below together, and `RuleSet.configuredBy` builds the rules they name, each going as far as they allow.
 
 `setFormatting` is what the library says about itself, and it is what is written back to the file; `JabFixConfiguration.configure` sets it and moves the library's Save Actions into it on the way.
-A command that only wants different rules for one run hands them to the writer with `withLintSettings` instead, so that `jabkit fix --rule lower-case=off` does not leave the library configured that way, and so that formatting a library does not hand it a configuration it never had.
+A command that formats a library hands the rules of its run to the writer with `asFormatterRun` instead, so that `jabkit fix --rule lower-case=off` does not leave the library configured that way, and so that formatting a library does not hand it a configuration it never had.
 
 A run applies four layers, each outranking the ones before it:
 

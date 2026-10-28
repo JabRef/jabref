@@ -1319,7 +1319,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Doe, Jane");
         database.insertEntry(entry);
 
-        databaseWriter.withLintSettings(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX))
+        databaseWriter.asFormatterRun(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX))
                       .writeDatabase(bibtexContext);
 
         assertEquals(Optional.empty(), entry.getCitationKey());
@@ -1355,7 +1355,7 @@ class BibDatabaseWriterTest {
         database.insertEntry(entry);
 
         metaData.setFormatting(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
-        databaseWriter.withLintSettings(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX))
+        databaseWriter.asFormatterRun(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX))
                       .writeDatabase(bibtexContext);
 
         assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1367,7 +1367,7 @@ class BibDatabaseWriterTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, " Doe, Jane ");
         database.insertEntry(entry);
 
-        databaseWriter.withLintSettings(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX))
+        databaseWriter.asFormatterRun(LintSettings.of(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX))
                       .writeDatabase(bibtexContext);
 
         assertEquals("Doe, Jane", entry.getField(StandardField.AUTHOR).orElseThrow());

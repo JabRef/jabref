@@ -217,7 +217,7 @@ class JabFixCommand implements Callable<Integer> {
                 jabKit.cliPreferences.getFieldPreferences(),
                 jabKit.cliPreferences.getCitationKeyPatternPreferences(),
                 jabKit.entryTypesManager)
-                .withLintSettings(runSettings);
+                .asFormatterRun(runSettings);
         databaseWriter.writeDatabase(databaseContext);
 
         return new SerializedLibrary(stringWriter.toString(), databaseWriter.getFindings());

@@ -85,7 +85,8 @@ public class BibDatabaseWriter {
     private final List<Finding> findings = new ArrayList<>();
 
     @Nullable private JournalAbbreviationRepository journalAbbreviationRepository;
-    private Optional<LintSettings> runLintSettings = Optional.empty();
+    /// Present for a formatter run, with the settings it lays over the library's.
+    private Optional<LintSettings> formatterRun = Optional.empty();
     private boolean useFJournalField;
     private Consumer<Runnable> mutationScheduler = Runnable::run;
 
@@ -150,9 +151,10 @@ public class BibDatabaseWriter {
     }
 
     /// Whether JabFix brings the entries into shape: for a library that carries a configuration, and
-    /// for a save given settings of its own. Any other library is saved the way it always was.
+    /// in a formatter run, which reports whatever it applies. Any other library is saved the way it
+    /// always was.
     private boolean appliesRules(BibDatabaseContext bibDatabaseContext) {
-        return runLintSettings.isPresent() || bibDatabaseContext.getMetaData().getFormatting().isPresent();
+        return formatterRun.isPresent() || bibDatabaseContext.getMetaData().getFormatting().isPresent();
     }
 
     /// Brings the entries into the shape the library asks for, before they are written.
@@ -168,7 +170,7 @@ public class BibDatabaseWriter {
     /// field in question -- reported only, or repaired.
     private List<FieldChange> applyRules(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) {
         MetaData metaData = bibDatabaseContext.getMetaData();
-        LintSettings applied = JabFixConfiguration.applied(metaData, runLintSettings.orElse(LintSettings.NONE));
+        LintSettings applied = JabFixConfiguration.applied(metaData, formatterRun.orElse(LintSettings.NONE));
         RuleSet rules = RuleSet.configuredBy(applied, metaData, fieldPreferences);
 
         JabFixResult result = new JabFix(rules).apply(entries, mutationScheduler);
@@ -228,22 +230,26 @@ public class BibDatabaseWriter {
         return this;
     }
 
-    /// Makes this save a formatter run: JabFix brings the entries into shape with `lintSettings`
-    /// laid over what the library asks for, for this save alone, and nothing is changed that no rule
-    /// reported -- no citation key is generated and no journal abbreviated. The library's own
-    /// configuration is left as it is, so this is not written to the file.
-    public BibDatabaseWriter withLintSettings(@NonNull LintSettings lintSettings) {
-        this.runLintSettings = Optional.of(lintSettings);
+    /// Makes this save a formatter run: JabFix brings the entries into shape with `runSettings` laid
+    /// over what the library asks for, for this save alone -- also in a library that carries no
+    /// configuration -- and nothing is changed that no rule reported: no citation key is generated
+    /// and no journal abbreviated. The library's own configuration is left as it is, so
+    /// `runSettings` is not written to the file.
+    ///
+    /// Even [LintSettings#NONE] makes a formatter run, so this is for a command that formats a
+    /// library, not for an ordinary save that only wants rules of its own.
+    public BibDatabaseWriter asFormatterRun(@NonNull LintSettings runSettings) {
+        this.formatterRun = Optional.of(runSettings);
         return this;
     }
 
     /// What the rules reported while writing, in the order they were reported.
     ///
-    /// A library that carries [LintSettings], or is saved with [#withLintSettings], is brought into
-    /// shape by JabFix instead of by the Save Actions and the whitespace cleanup this writer would
-    /// apply itself. Citation keys are still generated and journals abbreviated on an ordinary save,
-    /// as the user's preferences and the library ask: configuring a library must not switch off what
-    /// its other users rely on. Only a formatter run leaves them out.
+    /// A library that carries [LintSettings], or is saved as a formatter run ([#asFormatterRun]), is
+    /// brought into shape by JabFix instead of by the Save Actions and the whitespace cleanup this
+    /// writer would apply itself. Citation keys are still generated and journals abbreviated on an
+    /// ordinary save, as the user's preferences and the library ask: configuring a library must not
+    /// switch off what its other users rely on. Only a formatter run leaves them out.
     ///
     /// @return the findings; empty for a library that JabFix does not format, which is saved as always
     public List<Finding> getFindings() {
@@ -287,7 +293,7 @@ public class BibDatabaseWriter {
         //        The cleanup should be done before the write operation
         saveActionsFieldChanges.addAll(cleanupEntries(bibDatabaseContext, sortedEntries));
 
-        if (runLintSettings.isEmpty() && journalAbbreviationRepository != null && saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
+        if (formatterRun.isEmpty() && journalAbbreviationRepository != null && saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
             bibDatabaseContext.getMetaData().getLibraryAbbreviationType().ifPresent(abbreviationType -> {
                 AbbreviateJournalCleanup cleanup = new AbbreviateJournalCleanup(
                         bibDatabaseContext.getDatabase(), journalAbbreviationRepository, abbreviationType, useFJournalField);
@@ -297,7 +303,7 @@ public class BibDatabaseWriter {
             });
         }
 
-        if (runLintSettings.isEmpty() && keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
+        if (formatterRun.isEmpty() && keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries, mutationScheduler);
             saveActionsFieldChanges.addAll(keyChanges);
         }
