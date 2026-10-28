@@ -38,6 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where entries containing dollar signs or backslashes caused citation style preview and export to fail. [#12799](https://github.com/JabRef/jabref/issues/12799)
 - We fixed exports to RIS, CSV, HTML, and other template-based formats in native JabKit. [#17408](https://github.com/JabRef/jabref/issues/17408)
 - We fixed an issue where JabRef showed an "Executor has been shut down" error on Windows after resuming from suspend. [#17144](https://github.com/JabRef/jabref/pull/17144)
 - We fixed the BibTeX source dialog background in the Citation Relations tab for dark themes. [#13599](https://github.com/JabRef/jabref/issues/13599)
@@ -85,6 +86,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where saving the "Custom entry types" preferences removed custom fields from the non-wrapped fields. [#17121](https://github.com/JabRef/jabref/pull/17121)
 - We fixed an issue where "Automatically set file links" did not work when no external file types were configured. [#15084](https://github.com/JabRef/jabref/issues/15084)
 - We fixed an issue where citing organisations in JStyle format was not sorting or displaying properly in LibreOffice. [#11725](https://github.com/JabRef/jabref/issues/11725)
+- We fixed an issue where "Perform OCR" button remained enabled for broken or missing linked files. [#16736](https://github.com/JabRef/jabref/issues/16736)
 - We reduced the flickering of the entry editor when switching between entries with groups or keywords. [#17229](https://github.com/JabRef/jabref/issues/17229)
 
 ### Removed
