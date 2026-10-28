@@ -62,7 +62,7 @@ public class ImportCited {
                 Optional<CitationIdentity> identity = entry.getCitationKey()
                                                            .map(key -> new CitationIdentity(IdentityType.CITATION_KEY, key))
                                                            .or(() -> parsedEntry.itemIdentity()
-                                                                               .map(itemId -> new CitationIdentity(IdentityType.ZOTERO_ITEM, itemId)));
+                                                                                .map(itemId -> new CitationIdentity(IdentityType.ZOTERO_ITEM, itemId)));
                 identity.ifPresentOrElse(
                         citationIdentity -> {
                             if (citedIdentities.add(citationIdentity)) {

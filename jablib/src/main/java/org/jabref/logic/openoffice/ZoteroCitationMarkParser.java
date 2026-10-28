@@ -34,8 +34,8 @@ public class ZoteroCitationMarkParser {
 
     public static List<BibEntry> parseCslCitationJson(String cslJson) {
         return parseCslCitationJson(cslJson, ZoteroReferenceMark::getCitationKey).stream()
-                                                                                .map(ParsedEntry::entry)
-                                                                                .toList();
+                                                                                 .map(ParsedEntry::entry)
+                                                                                 .toList();
     }
 
     /// Parses the CSL citation JSON of a reference mark into [BibEntry] instances that are to be imported into a library.
@@ -71,8 +71,8 @@ public class ZoteroCitationMarkParser {
             ZoteroCitationData citationData = GSON.fromJson(cslJson, ZoteroCitationData.class);
             List<ParsedEntry> entries = new ArrayList<>();
             List<ZoteroCitationData.CitationItemData> citationItemDataList = Optional.ofNullable(citationData)
-                                                                                       .map(data -> Optional.ofNullable(data.citationItems).orElse(List.of()))
-                                                                                       .orElse(List.of());
+                                                                                     .map(data -> Optional.ofNullable(data.citationItems).orElse(List.of()))
+                                                                                     .orElse(List.of());
             for (ZoteroCitationData.CitationItemData citationItem : citationItemDataList) {
                 Optional.ofNullable(citationItem)
                         .flatMap(item -> toBibEntry(item, getCitationKey)
