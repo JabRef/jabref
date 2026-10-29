@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -18,6 +20,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.BibSonomyQueryTransformer;
@@ -56,12 +59,31 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
         if (!hasUsernameAndApiKey(usernameAndApiKey)) {
             throw new FetcherException(Localization.lang("BibSonomy needs your username and API key. Enter them as 'username:apikey' in Preferences > Web search > BibSonomy."));
         }
-        // BibSonomy cannot filter by year, so the transformer only records the requested years and we filter here
+        // BibSonomy cannot filter by year, so the transformer only records the requested years and we filter here.
+        // The same transformation also gives the search string, so the query is transformed only once.
         BibSonomyQueryTransformer transformer = new BibSonomyQueryTransformer();
-        transformer.transformSearchQuery(queryNode);
-        return SearchBasedParserFetcher.super.performSearch(queryNode).stream()
-                                             .filter(entry -> isInYearRange(entry, transformer))
-                                             .toList();
+        String query = transformer.transformSearchQuery(queryNode).orElse("");
+        return fetchPage(query, 0).stream()
+                                  .filter(entry -> isInYearRange(entry, transformer))
+                                  .toList();
+    }
+
+    private List<BibEntry> fetchPage(String query, int start) throws FetcherException {
+        URL url;
+        try {
+            url = getSearchUrl(query, start);
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Search URI crafted from complex search query is malformed", e);
+        }
+        try (InputStream stream = getUrlDownload(url).asInputStream()) {
+            List<BibEntry> entries = getParser().parseEntries(stream);
+            entries.forEach(this::doPostCleanup);
+            return entries;
+        } catch (IOException e) {
+            throw new FetcherException(url, e);
+        } catch (ParseException e) {
+            throw new FetcherException(url, "An internal parser error occurred while fetching", e);
+        }
     }
 
     /// Entries without a four-digit year are kept, because their year cannot be compared
@@ -76,12 +98,17 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
 
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
+        return getSearchUrl(new BibSonomyQueryTransformer().transformSearchQuery(queryNode).orElse(""), 0);
+    }
+
+    /// One page of up to [#MAX_RESULTS] posts, starting at post number `start`
+    private static URL getSearchUrl(String query, int start) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         uriBuilder.addParameter("resourcetype", "publication");
         uriBuilder.addParameter("format", "bibtex");
-        uriBuilder.addParameter("search", new BibSonomyQueryTransformer().transformSearchQuery(queryNode).orElse(""));
-        uriBuilder.addParameter("start", "0");
-        uriBuilder.addParameter("end", String.valueOf(MAX_RESULTS));
+        uriBuilder.addParameter("search", query);
+        uriBuilder.addParameter("start", String.valueOf(start));
+        uriBuilder.addParameter("end", String.valueOf(start + MAX_RESULTS));
         return uriBuilder.build().toURL();
     }
 
