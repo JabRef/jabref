@@ -245,7 +245,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         double[] naturalHeights = new double[rows.size()];
         double naturalTotal = gridPane.getInsets().getTop() + gridPane.getInsets().getBottom()
                 + Math.max(0, rows.size() - 1) * gridPane.getVgap();
-        double labelWidth = regularRowLabels.stream().mapToDouble(label -> label.prefWidth(-1)).max().orElse(0);
+        double labelWidth = regularRowLabels.stream().mapToDouble(label -> label.prefWidth(-1)).max().orElseThrow();
         double availableEditorWidth = gridPane.getWidth() - gridPane.getInsets().getLeft() - gridPane.getInsets().getRight()
                 - labelWidth - gridPane.getHgap();
         double totalWeight = 0;
