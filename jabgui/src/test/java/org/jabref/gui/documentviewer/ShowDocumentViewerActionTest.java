@@ -32,6 +32,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -87,6 +88,7 @@ class ShowDocumentViewerActionTest extends JavaFxTest {
             view.close();
         }));
         Injector.forgetAll();
+        Mockito.framework().clearInlineMocks();
     }
 
     /// Covers page ranges, single pages, and positive and negative offsets.
