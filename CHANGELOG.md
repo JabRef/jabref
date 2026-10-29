@@ -22,7 +22,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
 - We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
+- We added the cleanup formatter "LaTeX to Unicode-aware LaTeX", which converts LaTeX character commands to Unicode and keeps escaped characters. [#8715](https://github.com/JabRef/jabref/issues/8715)
 - We added text search to AI chats. [#17183](https://github.com/JabRef/jabref/pull/17183)
+- We added indentation and syntax highlighting for JSON in AI chat answers. [#17181](https://github.com/JabRef/jabref/pull/17181)
 - We added restoring of the library tab and entry that were selected when JabRef was closed. [#16911](https://github.com/JabRef/jabref/pull/16911)
 
 ### Changed
@@ -48,6 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where Backspace could not be registered as a keyboard shortcut. [#17241](https://github.com/JabRef/jabref/issues/17241)
 - We re-enabled the [Grobid](https://github.com/grobidOrg/grobid) citation fetcher again. It is now reachable via https. [#16668](https://github.com/JabRef/jabref/issues/16668)
 - We fixed an issue where the AI chat lost its scroll position when switching back to an entry. [#17172](https://github.com/JabRef/jabref/pull/17172)
+- We fixed the import dialog to remember its download choice independently of the web search preference. [#16332](https://github.com/JabRef/jabref/issues/16332)
 - We fixed an issue where the same shared database could be opened in a second tab. [#16967](https://github.com/JabRef/jabref/pull/16967)
 - We fixed DNB MARC imports to preserve abstracts, DOIs, ISBN-13s, ISSNs, parent journal titles, and full-text links. [#17217](https://github.com/JabRef/jabref/pull/17217)
 - We fixed importing BibTeX entries with line breaks before their citation keys. [#9622](https://github.com/JabRef/jabref/issues/9622)
