@@ -62,7 +62,7 @@ class TextInputKeyBindingsTest {
     }
 
     @Test
-    // [utest->req~ux.text-editing.line-boundaries~1]
+        // [utest->req~ux.text-editing.line-boundaries~1]
     void killLinePreservesFollowingLines() {
         TextArea area = new TextArea(MULTILINE_TEXT);
         area.positionCaret(16);
@@ -88,7 +88,7 @@ class TextInputKeyBindingsTest {
 
     @ParameterizedTest
     @MethodSource("killLineTestData")
-    // [utest->req~ux.text-editing.line-boundaries~1]
+        // [utest->req~ux.text-editing.line-boundaries~1]
     void killLinePreservesBoundariesAndCanBeUndone(String text, int caretPosition, String expectedText) {
         TextArea area = new TextArea(text);
         area.positionCaret(caretPosition);
@@ -125,15 +125,15 @@ class TextInputKeyBindingsTest {
 
     private static Stream<Arguments> nullTextTestData() {
         return Stream.of(KeyBinding.EDITOR_BEGINNING, KeyBinding.EDITOR_END,
-                        KeyBinding.EDITOR_BEGINNING_DOC, KeyBinding.EDITOR_END_DOC,
-                        KeyBinding.EDITOR_UP, KeyBinding.EDITOR_DOWN, KeyBinding.EDITOR_KILL_LINE)
+                             KeyBinding.EDITOR_BEGINNING_DOC, KeyBinding.EDITOR_END_DOC,
+                             KeyBinding.EDITOR_UP, KeyBinding.EDITOR_DOWN, KeyBinding.EDITOR_KILL_LINE)
                      .flatMap(binding -> Stream.<Supplier<TextInputControl>>of(TextArea::new, TextField::new)
                                                .map(controlFactory -> Arguments.of(controlFactory, binding)));
     }
 
     @ParameterizedTest
     @MethodSource({"textFieldNavigationTestData", "textAreaNavigationTestData"})
-    // [utest->req~ux.text-editing.line-boundaries~1]
+        // [utest->req~ux.text-editing.line-boundaries~1]
     void navigationRespectsLineAndDocumentBoundaries(Supplier<TextInputControl> controlFactory, String text, int caretPosition, KeyBinding binding, int expectedPosition) {
         TextInputControl control = controlFactory.get();
         control.setText(text);

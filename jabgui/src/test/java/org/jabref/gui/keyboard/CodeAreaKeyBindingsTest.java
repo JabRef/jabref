@@ -32,7 +32,7 @@ class CodeAreaKeyBindingsTest {
 
     @ParameterizedTest
     @MethodSource("killLineTestData")
-    // [utest->req~ux.text-editing.line-boundaries~1]
+        // [utest->req~ux.text-editing.line-boundaries~1]
     void killLinePreservesFollowingLines(LineEnding lineEnding, String text, TextPos caretPosition, String expectedText) {
         JavaFxExtension.invokeAndWait(() -> {
             CodeArea codeArea = new CodeArea();
