@@ -48,8 +48,7 @@ import static org.mockito.Mockito.when;
 @NullMarked
 class MultiPaperPdfImporterTest {
 
-    @TempDir
-    private Path tempDir;
+    @TempDir private Path tempDir;
 
     private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private MultiPaperPdfImporter importer;
@@ -67,23 +66,7 @@ class MultiPaperPdfImporterTest {
 
         List<BibEntry> entries = importer.importDatabase(pdf).getDatabase().getEntries();
 
-        assertEquals(List.of(
-                        new BibEntry(StandardEntryType.InProceedings)
-                                .withField(StandardField.TITLE, "Alpha")
-                                .withField(StandardField.PAGES, "1--2")
-                                .withField(StandardField.CROSSREF, "volume")
-                                .withField(PdfLocationResolver.PAGE_OFFSET, "2"),
-                        new BibEntry(StandardEntryType.InProceedings)
-                                .withField(StandardField.TITLE, "Beta")
-                                .withField(StandardField.PAGES, "3--4")
-                                .withField(StandardField.CROSSREF, "volume")
-                                .withField(PdfLocationResolver.PAGE_OFFSET, "2"),
-                        new BibEntry(StandardEntryType.Proceedings)
-                                .withCitationKey("volume")
-                                .withField(StandardField.TITLE, "volume")
-                                .withField(PdfLocationResolver.PAGE_OFFSET, "2")
-                                .withFiles(List.of(new LinkedFile("", pdf, StandardFileType.PDF.getName())))),
-                entries);
+        assertEquals(List.of(new BibEntry(StandardEntryType.InProceedings).withField(StandardField.TITLE, "Alpha").withField(StandardField.PAGES, "1--2").withField(StandardField.CROSSREF, "volume").withField(PdfLocationResolver.PAGE_OFFSET, "2"), new BibEntry(StandardEntryType.InProceedings).withField(StandardField.TITLE, "Beta").withField(StandardField.PAGES, "3--4").withField(StandardField.CROSSREF, "volume").withField(PdfLocationResolver.PAGE_OFFSET, "2"), new BibEntry(StandardEntryType.Proceedings).withCitationKey("volume").withField(StandardField.TITLE, "volume").withField(PdfLocationResolver.PAGE_OFFSET, "2").withFiles(List.of(new LinkedFile("", pdf, StandardFileType.PDF.getName())))), entries);
     }
 
     // [utest->req~logic.importer.multi-paper-pdf~1]
@@ -93,8 +76,7 @@ class MultiPaperPdfImporterTest {
         BibEntry beta = entries.get(1);
         BibEntry wholePdf = entries.getLast();
 
-        assertEquals(Optional.of(new PdfLocationResolver.PdfLocation(wholePdf.getFiles().getFirst(), Optional.of(5), wholePdf)),
-                PdfLocationResolver.resolve(beta, new BibDatabase(entries)));
+        assertEquals(Optional.of(new PdfLocationResolver.PdfLocation(wholePdf.getFiles().getFirst(), Optional.of(5), wholePdf)), PdfLocationResolver.resolve(beta, new BibDatabase(entries)));
     }
 
     // [utest->req~logic.importer.multi-paper-pdf~1]
@@ -107,10 +89,7 @@ class MultiPaperPdfImporterTest {
     }
 
     private static Stream<Arguments> typesTheWholePdfByItsFrontMatter() {
-        return Stream.of(
-                Arguments.of("Proceedings of the Example Conference", StandardEntryType.Proceedings, StandardEntryType.InProceedings),
-                Arguments.of("Example Studies (Eds.)", StandardEntryType.Collection, StandardEntryType.InCollection),
-                Arguments.of("An Example Monograph", StandardEntryType.Book, StandardEntryType.InBook));
+        return Stream.of(Arguments.of("Proceedings of the Example Conference", StandardEntryType.Proceedings, StandardEntryType.InProceedings), Arguments.of("Example Studies (Eds.)", StandardEntryType.Collection, StandardEntryType.InCollection), Arguments.of("An Example Monograph", StandardEntryType.Book, StandardEntryType.InBook));
     }
 
     // [utest->req~logic.importer.multi-paper-pdf~1]
@@ -123,13 +102,7 @@ class MultiPaperPdfImporterTest {
     }
 
     private static Stream<Arguments> typesTheWholePdfByItsTitlePagesOutlineAndPapers() {
-        return Stream.of(
-                Arguments.of(List.of("Proceedings, Part I"), "Contents", List.of(), StandardEntryType.Proceedings),
-                Arguments.of(List.of(), "Program Committee", List.of(), StandardEntryType.Proceedings),
-                Arguments.of(List.of("Edited by Ada Lovelace"), "Contents", List.of(), StandardEntryType.Collection),
-                Arguments.of(List.of(), "List of Contributors", List.of(), StandardEntryType.Collection),
-                Arguments.of(List.of(), "Contents", List.of("Ada Lovelace, ada@example.org"), StandardEntryType.Collection),
-                Arguments.of(List.of("The series publishes conference and workshop proceedings."), "Contents", List.of(), StandardEntryType.Book));
+        return Stream.of(Arguments.of(List.of("Proceedings, Part I"), "Contents", List.of(), StandardEntryType.Proceedings), Arguments.of(List.of(), "Program Committee", List.of(), StandardEntryType.Proceedings), Arguments.of(List.of("Edited by Ada Lovelace"), "Contents", List.of(), StandardEntryType.Collection), Arguments.of(List.of(), "List of Contributors", List.of(), StandardEntryType.Collection), Arguments.of(List.of(), "Contents", List.of("Ada Lovelace, ada@example.org"), StandardEntryType.Collection), Arguments.of(List.of("The series publishes conference and workshop proceedings."), "Contents", List.of(), StandardEntryType.Book));
     }
 
     // [utest->req~logic.importer.multi-paper-pdf~1]
@@ -138,10 +111,7 @@ class MultiPaperPdfImporterTest {
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
         ImportFormatReader reader = new ImportFormatReader(importerPreferences, importFormatPreferences, mock(CitationKeyPatternPreferences.class), new DummyFileUpdateMonitor());
-        Path pdf = volume("Proceedings of the Example Conference", "Contents", List.of(), true, List.of(
-                "@article{one, author = {Ada Lovelace}, title = {One}, journal = {Journal}, year = {2020}, volume = {1}}",
-                "@article{two, author = {Ada Lovelace}, title = {Two}, journal = {Journal}, year = {2021}, volume = {2}}",
-                "@article{three, author = {Ada Lovelace}, title = {Three}, journal = {Journal}, year = {2022}, volume = {3}}"));
+        Path pdf = volume("Proceedings of the Example Conference", "Contents", List.of(), true, List.of("@article{one, author = {Ada Lovelace}, title = {One}, journal = {Journal}, year = {2020}, volume = {1}}", "@article{two, author = {Ada Lovelace}, title = {Two}, journal = {Journal}, year = {2021}, volume = {2}}", "@article{three, author = {Ada Lovelace}, title = {Three}, journal = {Journal}, year = {2022}, volume = {3}}"));
 
         ImportFormatReader.ImportResult result = reader.importWithAutoDetection(pdf);
 

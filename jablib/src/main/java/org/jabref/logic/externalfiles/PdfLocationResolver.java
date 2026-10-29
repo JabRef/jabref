@@ -34,41 +34,29 @@ public final class PdfLocationResolver {
     }
 
     public static Optional<PdfLocation> resolve(BibEntry entry, BibDatabase database) {
-        return firstPdf(entry)
-                .map(file -> new PdfLocation(file, pdfPage(entry, offsetOwner(entry, file, database)), entry))
-                .or(() -> database.getReferencedEntry(entry)
-                                  .flatMap(referenced -> firstPdf(referenced)
-                                          .map(file -> new PdfLocation(file, pdfPage(entry, referenced), referenced))));
+        return firstPdf(entry).map(file -> new PdfLocation(file, pdfPage(entry, offsetOwner(entry, file, database)), entry)).or(() -> database.getReferencedEntry(entry).flatMap(referenced -> firstPdf(referenced).map(file -> new PdfLocation(file, pdfPage(entry, referenced), referenced))));
     }
 
     private static BibEntry offsetOwner(BibEntry entry, LinkedFile file, BibDatabase database) {
         if (entry.hasField(PAGE_OFFSET)) {
             return entry;
         }
-        return database.getReferencedEntry(entry)
-                       .filter(referenced -> referenced.getFiles().stream().anyMatch(linked -> linked.getLink().equals(file.getLink())))
-                       .orElse(entry);
+        return database.getReferencedEntry(entry).filter(referenced -> referenced.getFiles().stream().anyMatch(linked -> linked.getLink().equals(file.getLink()))).orElse(entry);
     }
 
     private static Optional<LinkedFile> firstPdf(BibEntry entry) {
-        return entry.getFiles().stream()
-                    .filter(PdfLocationResolver::isPdf)
-                    .findFirst();
+        return entry.getFiles().stream().filter(PdfLocationResolver::isPdf).findFirst();
     }
 
     private static boolean isPdf(LinkedFile file) {
         if (StandardFileType.PDF.getName().equals(file.getFileType())) {
             return true;
         }
-        return FileUtil.getFileExtension(file.getLink())
-                       .filter("pdf"::equalsIgnoreCase)
-                       .isPresent();
+        return FileUtil.getFileExtension(file.getLink()).filter("pdf"::equalsIgnoreCase).isPresent();
     }
 
     public static Optional<PageSpan> pdfPageSpan(BibEntry entry, BibEntry fileOwner) {
-        return entry.getField(StandardField.PAGES)
-                    .flatMap(PdfLocationResolver::printedSpan)
-                    .flatMap(printed -> toPdfSpan(printed, pageOffset(fileOwner)));
+        return entry.getField(StandardField.PAGES).flatMap(PdfLocationResolver::printedSpan).flatMap(printed -> toPdfSpan(printed, pageOffset(fileOwner)));
     }
 
     public static BibEntry pageOffsetOwner(BibEntry entry, BibDatabase database) {
@@ -79,11 +67,7 @@ public final class PdfLocationResolver {
     }
 
     public static int pageOffset(BibEntry fileOwner) {
-        return fileOwner.getField(PAGE_OFFSET)
-                        .filter(StringUtil::isNotBlank)
-                        .map(String::trim)
-                        .flatMap(PdfLocationResolver::parseInteger)
-                        .orElse(0);
+        return fileOwner.getField(PAGE_OFFSET).filter(StringUtil::isNotBlank).map(String::trim).flatMap(PdfLocationResolver::parseInteger).orElse(0);
     }
 
     private static Optional<Integer> pdfPage(BibEntry entry, BibEntry fileOwner) {
@@ -91,9 +75,7 @@ public final class PdfLocationResolver {
     }
 
     private static Optional<Integer> firstPrintedPage(BibEntry entry) {
-        return entry.getField(StandardField.PAGES)
-                    .filter(StringUtil::isNotBlank)
-                    .flatMap(PdfLocationResolver::firstArabicPage);
+        return entry.getField(StandardField.PAGES).filter(StringUtil::isNotBlank).flatMap(PdfLocationResolver::firstArabicPage);
     }
 
     private static Optional<PrintedSpan> printedSpan(String pages) {
@@ -109,9 +91,7 @@ public final class PdfLocationResolver {
         if (!separator.lookingAt()) {
             return Optional.of(new PrintedSpan(start, start));
         }
-        return firstArabicPage(rest.substring(separator.end()))
-                .filter(end -> end >= start)
-                .map(end -> new PrintedSpan(start, end));
+        return firstArabicPage(rest.substring(separator.end())).filter(end -> end >= start).map(end -> new PrintedSpan(start, end));
     }
 
     private static int firstPageEnd(String pages) {
@@ -135,8 +115,7 @@ public final class PdfLocationResolver {
     }
 
     private static Optional<PageSpan> toPdfSpan(PrintedSpan printed, int offset) {
-        return toPdfPage(printed.first(), offset).flatMap(first ->
-                toPdfPage(printed.last(), offset).map(last -> new PageSpan(first, last)));
+        return toPdfPage(printed.first(), offset).flatMap(first -> toPdfPage(printed.last(), offset).map(last -> new PageSpan(first, last)));
     }
 
     private static Optional<Integer> toPdfPage(int printedPage, int offset) {

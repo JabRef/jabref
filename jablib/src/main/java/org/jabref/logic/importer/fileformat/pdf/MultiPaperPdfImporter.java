@@ -58,16 +58,10 @@ public class MultiPaperPdfImporter extends PdfImporter {
             if (printedFirst < 1) {
                 continue;
             }
-            entries.add(withPageOffset(new BibEntry(PdfOutlineSplitter.paperType(volume.type()))
-                    .withField(StandardField.TITLE, paper.title())
-                    .withField(StandardField.PAGES, PdfOutlineSplitter.pagesValue(printedFirst, paper.lastPage() - offset))
-                    .withField(StandardField.CROSSREF, key), offset));
+            entries.add(withPageOffset(new BibEntry(PdfOutlineSplitter.paperType(volume.type())).withField(StandardField.TITLE, paper.title()).withField(StandardField.PAGES, PdfOutlineSplitter.pagesValue(printedFirst, paper.lastPage() - offset)).withField(StandardField.CROSSREF, key), offset));
         }
 
-        entries.add(withPageOffset(new BibEntry(volume.type())
-                .withCitationKey(key)
-                .withField(StandardField.TITLE, title(document, fileName))
-                .withFiles(List.of(new LinkedFile("", filePath, StandardFileType.PDF.getName()))), offset));
+        entries.add(withPageOffset(new BibEntry(volume.type()).withCitationKey(key).withField(StandardField.TITLE, title(document, fileName)).withFiles(List.of(new LinkedFile("", filePath, StandardFileType.PDF.getName()))), offset));
         return entries;
     }
 
@@ -79,11 +73,7 @@ public class MultiPaperPdfImporter extends PdfImporter {
     }
 
     private static String title(PDDocument document, String fileName) {
-        return Optional.ofNullable(document.getDocumentInformation().getTitle())
-                       .filter(StringUtil::isNotBlank)
-                       .map(String::trim)
-                       .filter(title -> !FILE_NAME.matcher(title).find())
-                       .orElse(fileName);
+        return Optional.ofNullable(document.getDocumentInformation().getTitle()).filter(StringUtil::isNotBlank).map(String::trim).filter(title -> !FILE_NAME.matcher(title).find()).orElse(fileName);
     }
 
     @Override

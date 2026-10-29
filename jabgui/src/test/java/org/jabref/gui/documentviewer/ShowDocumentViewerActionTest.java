@@ -49,8 +49,7 @@ import static org.mockito.Mockito.when;
 @ResourceLock("Localization.lang")
 class ShowDocumentViewerActionTest extends JavaFxTest {
 
-    @TempDir
-    Path directory;
+    @TempDir Path directory;
 
     private final BibDatabaseContext databaseContext = new BibDatabaseContext();
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
@@ -103,8 +102,7 @@ class ShowDocumentViewerActionTest extends JavaFxTest {
             8,   45--52,  0,   1
             """)
     void executeOpensOwnPdfAtResolvedPage(int totalPages, String pages, String offset, int expectedPage) throws IOException {
-        BibEntry entry = createEntry(totalPages).withField(StandardField.PAGES, pages)
-                                                .withField(PdfLocationResolver.PAGE_OFFSET, offset);
+        BibEntry entry = createEntry(totalPages).withField(StandardField.PAGES, pages).withField(PdfLocationResolver.PAGE_OFFSET, offset);
 
         interact(() -> {
             selectedEntries.setAll(entry);
@@ -229,8 +227,7 @@ class ShowDocumentViewerActionTest extends JavaFxTest {
     @Test
     void isNotExecutableWhenCrossrefEntryHasNoPdf() {
         BibEntry proceedings = new BibEntry().withCitationKey("proceedings");
-        BibEntry paper = new BibEntry().withCitationKey("paper")
-                                       .withField(StandardField.CROSSREF, "proceedings");
+        BibEntry paper = new BibEntry().withCitationKey("paper").withField(StandardField.CROSSREF, "proceedings");
         databaseContext.getDatabase().insertEntries(proceedings, paper);
 
         interact(() -> {
@@ -242,10 +239,8 @@ class ShowDocumentViewerActionTest extends JavaFxTest {
 
     @Test
     void isNotExecutableWhenTheCrossReferencedPdfIsMissing() {
-        BibEntry proceedings = new BibEntry().withCitationKey("proceedings")
-                                             .withFiles(List.of(new LinkedFile("", directory.resolve("missing.pdf"), "PDF")));
-        BibEntry paper = new BibEntry().withCitationKey("paper")
-                                       .withField(StandardField.CROSSREF, "proceedings");
+        BibEntry proceedings = new BibEntry().withCitationKey("proceedings").withFiles(List.of(new LinkedFile("", directory.resolve("missing.pdf"), "PDF")));
+        BibEntry paper = new BibEntry().withCitationKey("paper").withField(StandardField.CROSSREF, "proceedings");
         databaseContext.getDatabase().insertEntries(proceedings, paper);
 
         interact(() -> {
@@ -256,11 +251,8 @@ class ShowDocumentViewerActionTest extends JavaFxTest {
     }
 
     private BibEntry addProceedingsAndPaper(int pageCount) throws IOException {
-        BibEntry proceedings = createEntry(pageCount).withCitationKey("proceedings")
-                                                     .withField(PdfLocationResolver.PAGE_OFFSET, "8");
-        BibEntry paper = new BibEntry().withCitationKey("paper")
-                                       .withField(StandardField.CROSSREF, "proceedings")
-                                       .withField(StandardField.PAGES, "54--86");
+        BibEntry proceedings = createEntry(pageCount).withCitationKey("proceedings").withField(PdfLocationResolver.PAGE_OFFSET, "8");
+        BibEntry paper = new BibEntry().withCitationKey("paper").withField(StandardField.CROSSREF, "proceedings").withField(StandardField.PAGES, "54--86");
         databaseContext.getDatabase().insertEntries(proceedings, paper);
         return paper;
     }
