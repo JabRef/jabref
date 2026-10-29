@@ -34,7 +34,6 @@ final class PdfPageCopier {
         return target;
     }
 
-    /// Deletes `files` after `failure`, adding any failure to delete them to it
     static void deleteQuietly(List<Path> files, IOException failure) {
         files.forEach(file -> deleteQuietly(file, failure));
     }
