@@ -17,6 +17,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -29,16 +30,21 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.http.SimpleHttpResponse;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// Searches publications on [BibSonomy](https://www.bibsonomy.org) via its REST API.
 /// The API requires HTTP Basic authentication; the per-fetcher key holds `username:apikey`.
 @NullMarked
 public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "BibSonomy";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibSonomyFetcher.class);
 
     private static final String SEARCH_URL = "https://www.bibsonomy.org/api/posts";
     private static final int MAX_RESULTS = 50;
@@ -79,6 +85,13 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
             List<BibEntry> entries = getParser().parseEntries(stream);
             entries.forEach(this::doPostCleanup);
             return entries;
+        } catch (FetcherClientException e) {
+            // BibSonomy repeats the rejected username and API key in its 401 response, so that response must not reach the error message
+            if (e.getHttpResponse().map(SimpleHttpResponse::statusCode).filter(status -> status == HttpURLConnection.HTTP_UNAUTHORIZED).isPresent()) {
+                LOGGER.debug("BibSonomy rejected the username or API key");
+                throw new FetcherException(Localization.lang("BibSonomy rejected the username or API key. Check them in Preferences > Web search > BibSonomy."));
+            }
+            throw e;
         } catch (IOException e) {
             throw new FetcherException(url, e);
         } catch (ParseException e) {

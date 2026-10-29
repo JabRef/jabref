@@ -125,4 +125,16 @@ class BibSonomyFetcherTest {
 
         assertThrows(FetcherException.class, () -> fetcherWithoutKey.performSearch("machine learning"));
     }
+
+    @Test
+    @ExternalServicesTest
+    void searchWithWrongCredentialsDoesNotShowThem() {
+        ImporterPreferences wrongKeyPreferences = mock(ImporterPreferences.class);
+        when(wrongKeyPreferences.getApiKey(BibSonomyFetcher.FETCHER_NAME)).thenReturn(Optional.of("jabref-test-user:not-a-real-api-key"));
+        BibSonomyFetcher fetcherWithWrongKey = new BibSonomyFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), wrongKeyPreferences);
+
+        FetcherException exception = assertThrows(FetcherException.class, () -> fetcherWithWrongKey.performSearch("machine learning"));
+
+        assertEquals("BibSonomy rejected the username or API key. Check them in Preferences > Web search > BibSonomy.", exception.getMessage());
+    }
 }
