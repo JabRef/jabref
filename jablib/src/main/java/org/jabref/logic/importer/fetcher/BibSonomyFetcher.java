@@ -93,7 +93,7 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
     @Override
     public URLDownload getUrlDownload(URL url) {
         URLDownload download = new URLDownload(url);
-        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(key -> download.addHeader("Authorization", basicAuthHeader(key)));
+        importerPreferences.getApiKey(FETCHER_NAME).map(String::strip).ifPresent(key -> download.addHeader("Authorization", basicAuthHeader(key)));
         return download;
     }
 
