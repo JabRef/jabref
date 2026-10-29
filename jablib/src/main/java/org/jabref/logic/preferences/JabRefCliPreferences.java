@@ -1025,11 +1025,25 @@ public class JabRefCliPreferences implements CliPreferences {
         return secret;
     }
 
-    private static void deleteFromKeyring(Keyring keyring, String service, String account) {
+    /// Deletes an entry from the keyring.
+    ///
+    /// @return `false` if the entry still exists afterwards
+    private static boolean deleteFromKeyring(Keyring keyring, String service, String account) {
         try {
             keyring.deletePassword(service, account);
+            return true;
         } catch (PasswordAccessException _) {
-            // already absent, nothing to clear
+            // The keyring reports a missing entry the same way as a failed deletion
+            return !existsInKeyring(keyring, service, account);
+        }
+    }
+
+    private static boolean existsInKeyring(Keyring keyring, String service, String account) {
+        try {
+            keyring.getPassword(service, account);
+            return true;
+        } catch (PasswordAccessException _) {
+            return false;
         }
     }
 
@@ -1046,12 +1060,16 @@ public class JabRefCliPreferences implements CliPreferences {
         try (Keyring keyring = Keyring.create()) {
             for (Map.Entry<KeyringSlot, String> entry : secrets.entrySet()) {
                 KeyringSlot slot = entry.getKey();
-                if (StringUtil.isBlank(entry.getValue())) {
+                if (StringUtil.isNotBlank(entry.getValue())) {
+                    keyring.setPassword(slot.service(), slot.account(), entry.getValue().trim());
+                    deleteFromKeyring(keyring, slot.legacyService(), slot.account());
+                } else if (deleteFromKeyring(keyring, slot.legacyService(), slot.account())) {
                     deleteFromKeyring(keyring, slot.service(), slot.account());
                 } else {
-                    keyring.setPassword(slot.service(), slot.account(), entry.getValue().trim());
+                    // An empty value at the new location stops the remaining legacy value from being migrated back
+                    LOGGER.warn("Could not delete the legacy secret for {}/{}", slot.legacyService(), slot.account());
+                    keyring.setPassword(slot.service(), slot.account(), "");
                 }
-                deleteFromKeyring(keyring, slot.legacyService(), slot.account());
             }
         } catch (Exception ex) {
             LOGGER.warn("Could not open keyring", ex);

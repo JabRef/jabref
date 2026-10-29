@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -130,6 +131,21 @@ class KeyringMigrationTest {
             verify(keyring).deletePassword(NEW_SERVICE, ACCOUNT);
             verify(keyring).deletePassword(LEGACY_SERVICE, ACCOUNT);
             verify(keyring, never()).setPassword(anyString(), anyString(), anyString());
+        }
+    }
+
+    @Test
+    void clearingValueKeepsLegacyValueFromComingBackWhenItCannotBeDeleted() throws PasswordAccessException {
+        when(keyring.getPassword(NEW_SERVICE, ACCOUNT)).thenReturn(PLAIN_TEXT);
+        when(keyring.getPassword(LEGACY_SERVICE, ACCOUNT)).thenReturn(LEGACY_CIPHERTEXT);
+        doThrow(new PasswordAccessException("Access denied")).when(keyring).deletePassword(LEGACY_SERVICE, ACCOUNT);
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+
+            createPreferences(LEGACY_KEY).getProxyPreferences().setPassword("");
+
+            verify(keyring).setPassword(NEW_SERVICE, ACCOUNT, "");
         }
     }
 
