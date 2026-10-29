@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+// [utest->feat~fetchers.bibsonomy~1]
 class BibSonomyFetcherTest {
 
     private final BuildInfo buildInfo = new BuildInfo();

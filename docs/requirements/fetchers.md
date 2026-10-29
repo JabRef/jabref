@@ -84,6 +84,6 @@ Needs: impl
 
 The user can search BibSonomy from the web search panel and import the found entries. The user enters their BibSonomy username and API key as `username:apikey` in the web search preferences. Without them, JabRef shows a message asking for these credentials.
 
-Needs: impl
+Needs: impl, utest
 
 <!-- markdownlint-disable-file MD022 -->
