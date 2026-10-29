@@ -526,5 +526,4 @@ class GuiPreferencesMigrationsTest {
         verify(filePreferences).setImportDialogDownloadLinkedFiles(true);
         verify(preferences).putBoolean("importDialogDownloadLinkedFiles", true);
     }
-
 }
