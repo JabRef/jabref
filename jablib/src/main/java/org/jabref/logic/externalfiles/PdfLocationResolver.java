@@ -35,10 +35,19 @@ public final class PdfLocationResolver {
 
     public static Optional<PdfLocation> resolve(BibEntry entry, BibDatabase database) {
         return firstPdf(entry)
-                .map(file -> new PdfLocation(file, pdfPage(entry, entry), entry))
+                .map(file -> new PdfLocation(file, pdfPage(entry, offsetOwner(entry, file, database)), entry))
                 .or(() -> database.getReferencedEntry(entry)
                                   .flatMap(referenced -> firstPdf(referenced)
                                           .map(file -> new PdfLocation(file, pdfPage(entry, referenced), referenced))));
+    }
+
+    private static BibEntry offsetOwner(BibEntry entry, LinkedFile file, BibDatabase database) {
+        if (entry.hasField(PAGE_OFFSET)) {
+            return entry;
+        }
+        return database.getReferencedEntry(entry)
+                       .filter(referenced -> referenced.getFiles().stream().anyMatch(linked -> linked.getLink().equals(file.getLink())))
+                       .orElse(entry);
     }
 
     private static Optional<LinkedFile> firstPdf(BibEntry entry) {

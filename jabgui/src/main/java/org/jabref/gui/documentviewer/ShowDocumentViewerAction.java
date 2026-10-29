@@ -25,7 +25,7 @@ public class ShowDocumentViewerAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.executable.bind(needsEntriesSelected(stateManager).and(
                 ActionHelper.isFilePresentForSelectedEntry(stateManager, preferences)
-                            .or(ActionHelper.isCrossrefPdfPresentForSelectedEntry(stateManager))));
+                            .or(ActionHelper.isCrossrefPdfPresentForSelectedEntry(stateManager, preferences))));
     }
 
     @Override

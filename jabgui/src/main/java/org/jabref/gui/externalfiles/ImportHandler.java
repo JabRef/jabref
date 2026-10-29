@@ -356,6 +356,7 @@ public class ImportHandler {
     ///
     /// Actions include generating a citation key if configured
     public void importEntries(List<BibEntry> entries) {
+        makeCrossReferencedKeysUnique(entries);
         ImportCleanup cleanup = ImportCleanup.targeting(targetBibDatabaseContext.getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(entries);
         importCleanedEntries(null, entries);
@@ -631,6 +632,37 @@ public class ImportHandler {
                .forEach(keyGenerator::generateAndSetKey);
     }
 
+    // [impl->req~jabgui.import.keep-cross-referenced-keys~1]
+    private void makeCrossReferencedKeysUnique(List<BibEntry> entries) {
+        if (!preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()) {
+            return;
+        }
+        BibDatabase database = targetBibDatabaseContext.getDatabase();
+        for (String key : crossReferencedKeys(entries)) {
+            boolean keyOfImportedEntry = entries.stream().anyMatch(entry -> entry.getCitationKey().filter(key::equals).isPresent());
+            if (!keyOfImportedEntry || database.getEntryByCitationKey(key).isEmpty()) {
+                continue;
+            }
+            String uniqueKey = uniqueKey(database, key);
+            for (BibEntry entry : entries) {
+                if (entry.getCitationKey().filter(key::equals).isPresent()) {
+                    entry.setCitationKey(uniqueKey);
+                }
+                if (entry.getField(StandardField.CROSSREF).filter(key::equals).isPresent()) {
+                    entry.setField(StandardField.CROSSREF, uniqueKey);
+                }
+            }
+        }
+    }
+
+    private static String uniqueKey(BibDatabase database, String key) {
+        char suffix = 'a';
+        while (database.getEntryByCitationKey(key + suffix).isPresent()) {
+            suffix++;
+        }
+        return key + suffix;
+    }
+
     private static Set<String> crossReferencedKeys(Collection<BibEntry> entries) {
         return entries.stream()
                       .flatMap(entry -> entry.getField(StandardField.CROSSREF).stream())
@@ -724,6 +756,7 @@ public class ImportHandler {
 
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
         resetBatchDuplicateDecisionState();
+        makeCrossReferencedKeysUnique(entriesToAdd);
         Set<String> keysToKeep = crossReferencedKeys(entriesToAdd);
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {

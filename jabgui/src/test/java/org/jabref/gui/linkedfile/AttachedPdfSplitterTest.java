@@ -67,11 +67,12 @@ class AttachedPdfSplitterTest {
     // [utest->req~logic.pdf.split-proceedings-outline~1]
     // [utest->req~logic.pdf.extract-paper-page-range~1]
     @Test
-    void paperGivenItsProceedingsPdfTakesOverTheirPageOffset() throws IOException {
+    void paperGivenItsProceedingsPdfOpensItAtItsFirstPage() throws IOException {
         Path pdf = blankPdf(20);
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings)
                 .withCitationKey("volume")
-                .withField(PdfLocationResolver.PAGE_OFFSET, "14");
+                .withField(PdfLocationResolver.PAGE_OFFSET, "14")
+                .withFiles(List.of(new LinkedFile("", pdf, "PDF")));
         BibEntry paper = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.PAGES, "2--3")
                 .withField(StandardField.CROSSREF, "volume")
@@ -81,7 +82,30 @@ class AttachedPdfSplitterTest {
         splitter(databaseContext).split(pdf, paper, paper::addFile);
 
         assertEquals(List.of("proceedings.pdf", "proceedings-p16-17.pdf"), paper.getFiles().stream().map(AttachedPdfSplitterTest::fileName).toList());
+        assertEquals(Optional.empty(), paper.getField(PdfLocationResolver.PAGE_OFFSET));
         assertEquals(Optional.of(16), PdfLocationResolver.resolve(paper, databaseContext.getDatabase()).flatMap(PdfLocation::page));
+    }
+
+    // [utest->req~logic.pdf.extract-paper-page-range~1]
+    @Test
+    void copyOpensAtItsFirstPageOnceTheOriginalIsRemoved() throws IOException {
+        Path pdf = blankPdf(20);
+        BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings)
+                .withCitationKey("volume")
+                .withField(PdfLocationResolver.PAGE_OFFSET, "14")
+                .withFiles(List.of(new LinkedFile("", pdf, "PDF")));
+        BibEntry paper = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.PAGES, "1--2")
+                .withField(StandardField.CROSSREF, "volume")
+                .withFiles(List.of(new LinkedFile("", pdf, "PDF")));
+        BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings, paper);
+        splitter(databaseContext).split(pdf, paper, paper::addFile);
+
+        paper.setFiles(List.of(paper.getFiles().getLast()));
+
+        PdfLocation location = PdfLocationResolver.resolve(paper, databaseContext.getDatabase()).orElseThrow();
+        assertEquals("proceedings-p15-16.pdf", fileName(location.file()));
+        assertEquals(Optional.of(1), location.page());
     }
 
     // [utest->req~logic.pdf.split-proceedings-outline~1]

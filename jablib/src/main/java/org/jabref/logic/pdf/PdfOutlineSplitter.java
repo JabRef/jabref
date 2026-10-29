@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.externalfiles.PdfLocationResolver;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
@@ -97,8 +96,7 @@ public final class PdfOutlineSplitter {
                     continue;
                 }
 
-                String fileName = FileUtil.getValidFileName(paper.title() + ".pdf");
-                Path target = targetDirectory.resolve(FileNameUniqueness.generateUniqueFileName(targetDirectory, fileName));
+                Path target = PdfPageCopier.createUniqueFile(targetDirectory, FileUtil.getValidFileName(paper.title() + ".pdf"));
                 PdfPageCopier.copy(document, paper.firstPage(), paper.lastPage(), target);
                 papers.add(paperEntry(parent, paper.title(), printedFirst, printedLast, target));
             }
@@ -275,6 +273,8 @@ public final class PdfOutlineSplitter {
         for (Bookmark bookmark : bookmarks) {
             if (distinct.isEmpty() || (distinct.getLast().page() != bookmark.page())) {
                 distinct.add(bookmark);
+            } else if (!distinct.getLast().hasSections() && bookmark.hasSections()) {
+                distinct.set(distinct.size() - 1, bookmark);
             }
         }
         return distinct;

@@ -92,6 +92,26 @@ class PdfLocationResolverTest {
         assertEquals(Optional.of(186), location.page());
     }
 
+    // [utest->req~logic.externalfiles.pdf-location-resolver~1]
+    @Test
+    void usesTheCrossReferencedOffsetWhenTheEntryHasTheSamePdf() {
+        BibEntry proceedings = proceedings().withField(PdfLocationResolver.PAGE_OFFSET, "14");
+        BibEntry paper = paper("10--12").withFiles(List.of(PROCEEDINGS_PDF));
+
+        PdfLocation location = PdfLocationResolver.resolve(paper, databaseOf(proceedings, paper)).orElseThrow();
+
+        assertEquals(Optional.of(24), location.page());
+        assertSame(paper, location.fileOwner());
+    }
+
+    @Test
+    void ignoresTheCrossReferencedOffsetForAnotherPdf() {
+        BibEntry proceedings = proceedings().withField(PdfLocationResolver.PAGE_OFFSET, "14");
+        BibEntry paper = paper("10--12").withFiles(List.of(PAPER_PDF));
+
+        assertEquals(Optional.of(10), PdfLocationResolver.resolve(paper, databaseOf(proceedings, paper)).flatMap(PdfLocation::page));
+    }
+
     @Test
     void ignoresPageOffsetOnThePaperWhenThePdfBelongsToTheProceedings() {
         BibEntry proceedings = proceedings().withField(PdfLocationResolver.PAGE_OFFSET, "14");

@@ -1,6 +1,7 @@
 package org.jabref.logic.pdf;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
@@ -32,6 +33,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @NullMarked
@@ -238,6 +240,39 @@ class PdfOutlineSplitterTest {
 
         assertEquals(List.of("3--4", "5--6"), split.papers().stream().map(paper -> paper.getField(StandardField.PAGES).orElseThrow()).toList());
         assertEquals(0, split.pageOffset());
+    }
+
+    // [utest->req~logic.pdf.split-proceedings-outline~1]
+    @Test
+    void keepsAPaperThatStartsOnThePageOfAPartHeading() throws IOException {
+        Path source = tempDir.resolve("parts.pdf");
+        try (PDDocument document = new PDDocument()) {
+            addPages(document, 4);
+            PDOutlineItem alpha = paper("Alpha", document, 0);
+            alpha.addLast(bookmark("1 Introduction", document.getPage(0)));
+            PDOutlineItem beta = paper("Beta", document, 2);
+            beta.addLast(bookmark("1 Introduction", document.getPage(2)));
+            PDDocumentOutline outline = new PDDocumentOutline();
+            outline.addLast(bookmark("Part I", document.getPage(0)));
+            outline.addLast(alpha);
+            outline.addLast(beta);
+            document.getDocumentCatalog().setDocumentOutline(outline);
+            document.save(source.toFile());
+        }
+
+        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
+
+        assertEquals(List.of("Alpha", "Beta"), papers.stream().map(paper -> paper.getField(StandardField.TITLE).orElseThrow()).toList());
+    }
+
+    @Test
+    void createsADifferentFileEachTimeForTheSameName() throws IOException {
+        Path first = PdfPageCopier.createUniqueFile(tempDir, "Alpha.pdf");
+        Path second = PdfPageCopier.createUniqueFile(tempDir, "Alpha.pdf");
+
+        assertNotEquals(first, second);
+        assertTrue(Files.exists(first));
+        assertTrue(Files.exists(second));
     }
 
     @Test

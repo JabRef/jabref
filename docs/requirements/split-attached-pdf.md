@@ -31,7 +31,7 @@ Needs: impl, utest
 ## Extract paper page range when attaching PDF
 `req~logic.pdf.extract-paper-page-range~1`
 
-When attaching a PDF to an entry that specifies a page range (e.g., `pages = {10--18}`), the system extracts a copy containing only the entry's pages (adjusted for the entry's `pageoffset`, or else that of the entry it cross-references) and links the extracted PDF to the entry, keeping the source PDF intact. If the PDF already spans only the entry's pages, no extraction is performed. When the offset comes from the cross-referenced entry, the entry takes it over, as the offset is stored on the entry that owns the PDF; the document viewer then opens the attached PDF at the entry's first page.
+When attaching a PDF to an entry that specifies a page range (e.g., `pages = {10--18}`), the system extracts a copy containing only the entry's pages (adjusted for the entry's `pageoffset`, or else that of the entry it cross-references) and links the extracted PDF to the entry, keeping the source PDF intact. If the PDF already spans only the entry's pages, no extraction is performed. An entry without a `pageoffset` of its own opens a PDF that the cross-referenced entry also links with that entry's offset, and any other PDF without an offset, so the document viewer opens the attached PDF, and the copy once the original is removed, at the entry's first page.
 
 Needs: impl, utest
 

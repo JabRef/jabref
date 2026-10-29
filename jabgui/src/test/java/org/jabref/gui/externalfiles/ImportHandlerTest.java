@@ -528,6 +528,34 @@ class ImportHandlerTest {
         assertEquals(Optional.of("Lovelace2026"), laterEntry.getCitationKey());
     }
 
+    // [utest->req~jabgui.import.keep-cross-referenced-keys~1]
+    @Test
+    void importGivesAVolumeAKeyTheLibraryDoesNotUseYet() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(new BibEntry(StandardEntryType.Collection).withCitationKey("volume"))));
+        BibEntry paper = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Alpha")
+                .withField(StandardField.CROSSREF, "volume");
+        BibEntry volume = new BibEntry(StandardEntryType.Collection).withCitationKey("volume");
+        generateNewKeysWithPattern("[auth][year]");
+
+        handlerFor(databaseContext, new JabRefUndoManager()).importEntries(List.of(paper, volume));
+
+        assertEquals(List.of(Optional.of("volumea"), Optional.of("volumea")), List.of(volume.getCitationKey(), paper.getField(StandardField.CROSSREF)));
+    }
+
+    @Test
+    void importKeepsACrossReferenceToAnEntryAlreadyInTheLibrary() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(new BibEntry(StandardEntryType.Collection).withCitationKey("volume"))));
+        BibEntry paper = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Alpha")
+                .withField(StandardField.CROSSREF, "volume");
+        generateNewKeysWithPattern("[auth][year]");
+
+        handlerFor(databaseContext, new JabRefUndoManager()).importEntries(List.of(paper));
+
+        assertEquals(Optional.of("volume"), paper.getField(StandardField.CROSSREF));
+    }
+
     private void generateNewKeysWithPattern(String pattern) {
         when(preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()).thenReturn(true);
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(

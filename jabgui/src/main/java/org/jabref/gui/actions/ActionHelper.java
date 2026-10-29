@@ -137,12 +137,13 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(fileIsPresent);
     }
 
-    public static BooleanExpression isCrossrefPdfPresentForSelectedEntry(StateManager stateManager) {
+    public static BooleanExpression isCrossrefPdfPresentForSelectedEntry(StateManager stateManager, CliPreferences preferences) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         Binding<Boolean> crossrefPdfIsPresent = EasyBind.valueAt(selectedEntries, 0).mapOpt(entry ->
                 stateManager.getActiveDatabase()
-                            .flatMap(database -> PdfLocationResolver.resolve(entry, database.getDatabase()))
-                            .filter(location -> location.fileOwner() != entry)
+                            .flatMap(database -> PdfLocationResolver.resolve(entry, database.getDatabase())
+                                                                    .filter(location -> location.fileOwner() != entry)
+                                                                    .flatMap(location -> location.file().findIn(database, preferences.getFilePreferences())))
                             .isPresent()).orElseOpt(false);
 
         return BooleanExpression.booleanExpression(crossrefPdfIsPresent);

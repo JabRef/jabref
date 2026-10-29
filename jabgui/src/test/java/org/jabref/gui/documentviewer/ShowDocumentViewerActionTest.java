@@ -240,6 +240,21 @@ class ShowDocumentViewerActionTest extends JavaFxTest {
         });
     }
 
+    @Test
+    void isNotExecutableWhenTheCrossReferencedPdfIsMissing() {
+        BibEntry proceedings = new BibEntry().withCitationKey("proceedings")
+                                             .withFiles(List.of(new LinkedFile("", directory.resolve("missing.pdf"), "PDF")));
+        BibEntry paper = new BibEntry().withCitationKey("paper")
+                                       .withField(StandardField.CROSSREF, "proceedings");
+        databaseContext.getDatabase().insertEntries(proceedings, paper);
+
+        interact(() -> {
+            selectedEntries.setAll(paper);
+
+            assertFalse(action.isExecutable());
+        });
+    }
+
     private BibEntry addProceedingsAndPaper(int pageCount) throws IOException {
         BibEntry proceedings = createEntry(pageCount).withCitationKey("proceedings")
                                                      .withField(PdfLocationResolver.PAGE_OFFSET, "8");

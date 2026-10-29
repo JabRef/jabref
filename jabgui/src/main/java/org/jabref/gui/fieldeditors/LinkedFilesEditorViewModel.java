@@ -48,6 +48,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.undo.UndoableFieldChange;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,8 +170,17 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     private void splitAttachedPdf(Path pdf) {
+        BibEntry attachedTo = entry;
         new AttachedPdfSplitter(databaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
-                .split(pdf, entry, paper -> files.add(toViewModel(paper)));
+                .split(pdf, attachedTo, paper -> linkPaper(attachedTo, paper));
+    }
+
+    private void linkPaper(BibEntry attachedTo, LinkedFile paper) {
+        if (entry == attachedTo) {
+            files.add(toViewModel(paper));
+            return;
+        }
+        attachedTo.addFile(paper).ifPresent(change -> undoManager.addEdit(new UndoableFieldChange(change)));
     }
 
     private LinkedFileViewModel toViewModel(LinkedFile linkedFile) {

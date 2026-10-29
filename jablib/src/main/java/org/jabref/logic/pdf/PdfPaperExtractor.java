@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.jabref.logic.externalfiles.PdfLocationResolver;
 import org.jabref.logic.externalfiles.PdfLocationResolver.PageSpan;
-import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 
@@ -42,7 +41,7 @@ public final class PdfPaperExtractor {
 
             String baseName = FileUtil.getBaseName(source.getFileName().toString());
             String proposed = baseName + "-p" + pages.firstPage() + "-" + pages.lastPage() + ".pdf";
-            Path target = targetDirectory.resolve(FileNameUniqueness.generateUniqueFileName(targetDirectory, proposed));
+            Path target = PdfPageCopier.createUniqueFile(targetDirectory, proposed);
             PdfPageCopier.copy(document, pages.firstPage(), pages.lastPage(), target);
             return Optional.of(target);
         }
