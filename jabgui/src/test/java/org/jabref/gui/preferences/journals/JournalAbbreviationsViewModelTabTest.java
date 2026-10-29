@@ -16,8 +16,10 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalMode;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 
@@ -63,6 +65,7 @@ class JournalAbbreviationsViewModelTabTest {
     private Path tempFolder;
     private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
     private DialogService dialogService;
+    private AbbreviationPreferences abbreviationPreferences;
 
     static class TestAbbreviation extends Abbreviation {
 
@@ -174,7 +177,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws IOException {
-        AbbreviationPreferences abbreviationPreferences = mock(AbbreviationPreferences.class);
+        abbreviationPreferences = mock(AbbreviationPreferences.class);
 
         dialogService = mock(DialogService.class);
         this.tempFolder = tempFolder;
@@ -507,6 +510,39 @@ class JournalAbbreviationsViewModelTabTest {
 
         actual = Files.readAllLines(testFile3, StandardCharsets.UTF_8);
         assertEquals(testData.finalContentsOfFile3, actual);
+    }
+
+    @Test
+    void loadJournalAbbreviationOption() {
+        when(abbreviationPreferences.getExternalJournalLists())
+                .thenReturn(FXCollections.<String>observableArrayList());
+        when(abbreviationPreferences.useJournalAbbreviationMode()).thenReturn(JournalMode.ABBREVIATE);
+        when(abbreviationPreferences.shouldUseFJournalField()).thenReturn(false);
+
+        viewModel.setValues();
+
+        assertTrue(viewModel.convertJournalOnFetchProperty().get());
+        assertFalse(viewModel.useFJournalProperty().get());
+    }
+
+    @Test
+    void storeJournalAbbreviationOption() {
+        when(abbreviationPreferences.getExternalJournalLists())
+                .thenReturn(FXCollections.<String>observableArrayList());
+        when(abbreviationPreferences.useJournalAbbreviationMode())
+                .thenReturn(JournalMode.ABBREVIATE);
+        when(abbreviationPreferences.useAbbreviationTypeOnFetch())
+                .thenReturn(AbbreviationType.DOTLESS);
+        when(abbreviationPreferences.shouldUseFJournalField()).thenReturn(false);
+
+        viewModel.setValues();
+
+        assertTrue(viewModel.convertJournalOnFetchProperty().get());
+        assertTrue(viewModel.abbreviateOnFetchProperty().get());
+        assertFalse(viewModel.unAbbreviateOnFetchProperty().get());
+        assertEquals(AbbreviationType.DOTLESS,
+                viewModel.abbreviationTypeOnFetchProperty().get());
+        assertFalse(viewModel.useFJournalProperty().get());
     }
 
     /// Select the last abbreviation in the list of abbreviations
