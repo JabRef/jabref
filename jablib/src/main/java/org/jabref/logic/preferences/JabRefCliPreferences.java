@@ -998,6 +998,7 @@ public class JabRefCliPreferences implements CliPreferences {
     ///
     /// @return the decrypted secret, or "" if there is no legacy value or it cannot be decrypted
     private String migrateLegacySecret(Keyring keyring, KeyringSlot slot) {
+        // [impl->req~keyring.legacy-migration~1]
         String encrypted;
         try {
             encrypted = keyring.getPassword(slot.legacyService(), slot.account());
@@ -1057,6 +1058,8 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Writes each secret as plain text to its slot in a single keyring session. A blank secret clears its slot.
     /// In both cases, a legacy encrypted value of the slot is removed, so that it cannot be migrated later.
     private void writeKeyring(Map<KeyringSlot, String> secrets) {
+        // [impl->req~keyring.plain-text-storage~1]
+        // [impl->req~keyring.legacy-migration~1]
         try (Keyring keyring = Keyring.create()) {
             for (Map.Entry<KeyringSlot, String> entry : secrets.entrySet()) {
                 KeyringSlot slot = entry.getKey();

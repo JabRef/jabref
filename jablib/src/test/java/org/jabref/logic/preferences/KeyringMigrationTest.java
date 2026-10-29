@@ -65,6 +65,7 @@ class KeyringMigrationTest {
 
     @Test
     void readsValueFromNewLocation() throws PasswordAccessException {
+        // [utest->req~keyring.plain-text-storage~1]
         when(keyring.getPassword(NEW_SERVICE, ACCOUNT)).thenReturn(PLAIN_TEXT);
 
         try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class)) {
@@ -78,6 +79,7 @@ class KeyringMigrationTest {
 
     @Test
     void migratesLegacyValueToNewLocation() throws PasswordAccessException {
+        // [utest->req~keyring.legacy-migration~1]
         when(keyring.getPassword(NEW_SERVICE, ACCOUNT)).thenThrow(new PasswordAccessException("Not found"));
         when(keyring.getPassword(LEGACY_SERVICE, ACCOUNT)).thenReturn(LEGACY_CIPHERTEXT);
 
@@ -106,6 +108,7 @@ class KeyringMigrationTest {
 
     @Test
     void discardsLegacyValueThatCannotBeDecrypted() throws PasswordAccessException {
+        // [utest->req~keyring.legacy-migration~1]
         when(keyring.getPassword(NEW_SERVICE, ACCOUNT)).thenThrow(new PasswordAccessException("Not found"));
         when(keyring.getPassword(LEGACY_SERVICE, ACCOUNT)).thenReturn(LEGACY_CIPHERTEXT);
 
@@ -121,6 +124,7 @@ class KeyringMigrationTest {
 
     @Test
     void clearingValueDeletesBothLocations() throws PasswordAccessException {
+        // [utest->req~keyring.plain-text-storage~1]
         when(keyring.getPassword(NEW_SERVICE, ACCOUNT)).thenReturn(PLAIN_TEXT);
 
         try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class)) {
@@ -136,6 +140,7 @@ class KeyringMigrationTest {
 
     @Test
     void clearingValueKeepsLegacyValueFromComingBackWhenItCannotBeDeleted() throws PasswordAccessException {
+        // [utest->req~keyring.legacy-migration~1]
         when(keyring.getPassword(NEW_SERVICE, ACCOUNT)).thenReturn(PLAIN_TEXT);
         when(keyring.getPassword(LEGACY_SERVICE, ACCOUNT)).thenReturn(LEGACY_CIPHERTEXT);
         doThrow(new PasswordAccessException("Access denied")).when(keyring).deletePassword(LEGACY_SERVICE, ACCOUNT);
