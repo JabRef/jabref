@@ -194,6 +194,25 @@ class AttachedPdfSplitterTest {
         assertEquals(List.of(List.of("Alpha.pdf"), List.of("Beta.pdf")), papers(databaseContext).stream().map(paper -> paper.getFiles().stream().map(AttachedPdfSplitterTest::fileName).toList()).toList());
     }
 
+    // [utest->req~logic.pdf.split-proceedings-outline~1]
+    @Test
+    void undoingASplitTakesItsPdfsAwayAndRedoingPutsThemBack() throws IOException {
+        DialogService dialogService = mock(DialogService.class);
+        when(dialogService.showConfirmationDialogAndWait(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
+        BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings).withCitationKey("volume");
+        BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings);
+        JabRefUndoManager journal = new JabRefUndoManager();
+        new AttachedPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), journal)
+                .splitOnRequest(volumePdf(18, false), proceedings);
+
+        journal.undo();
+        List<Boolean> afterUndo = List.of(Files.exists(tempDir.resolve("Alpha.pdf")), Files.exists(tempDir.resolve("Beta.pdf")));
+        journal.redo();
+
+        assertEquals(List.of(List.of(false, false), List.of(true, true), List.of("Alpha", "Beta")),
+                List.of(afterUndo, List.of(Files.exists(tempDir.resolve("Alpha.pdf")), Files.exists(tempDir.resolve("Beta.pdf"))), titles(databaseContext)));
+    }
+
     @Test
     void tellsWhenAPdfSplitOnRequestHoldsOnePaper() throws IOException {
         DialogService dialogService = mock(DialogService.class);

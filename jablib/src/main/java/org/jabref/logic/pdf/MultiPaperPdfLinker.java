@@ -25,6 +25,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.undo.UndoableFileMove;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -124,16 +125,32 @@ public class MultiPaperPdfLinker {
     }
 
     public static void deletePdfs(SplitPapers split) {
-        for (BibEntry paper : split.papers()) {
-            for (LinkedFile file : paper.getFiles()) {
-                Path pdf = Path.of(file.getLink());
-                try {
-                    Files.deleteIfExists(pdf);
-                } catch (IOException exception) {
-                    LOGGER.warn("Could not delete the split PDF {}", pdf, exception);
-                }
+        for (Path pdf : pdfsOf(split)) {
+            try {
+                Files.deleteIfExists(pdf);
+            } catch (IOException exception) {
+                LOGGER.warn("Could not delete the split PDF {}", pdf, exception);
             }
         }
+    }
+
+    /// Call before [#match], which makes the links of `split` relative to the library.
+    ///
+    /// @return the change that, recorded with the split, takes the PDFs of `split` out of their folder on undo and puts them back on redo
+    public static UndoableFileMove undoableFileMove(SplitPapers split) throws IOException {
+        Path holdingDirectory = Files.createTempDirectory("jabref-split-");
+        List<UndoableFileMove.Move> moves = new ArrayList<>();
+        for (Path pdf : pdfsOf(split)) {
+            moves.add(new UndoableFileMove.Move(holdingDirectory.resolve(moves.size() + "-" + pdf.getFileName()), pdf, Files.getLastModifiedTime(pdf)));
+        }
+        return new UndoableFileMove(moves);
+    }
+
+    private static List<Path> pdfsOf(SplitPapers split) {
+        return split.papers().stream()
+                    .flatMap(paper -> paper.getFiles().stream())
+                    .map(file -> Path.of(file.getLink()))
+                    .toList();
     }
 
     private static List<FieldChange> prepareForBibtex(BibEntry volume, List<BibEntry> papers) {

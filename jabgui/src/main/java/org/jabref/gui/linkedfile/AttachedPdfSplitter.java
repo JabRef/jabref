@@ -1,7 +1,9 @@
 package org.jabref.gui.linkedfile;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -22,6 +24,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.undo.UndoableFileMove;
 import org.jabref.model.undo.UndoableInsertEntries;
 
 import org.jspecify.annotations.NullMarked;
@@ -174,8 +177,10 @@ public class AttachedPdfSplitter {
             MultiPaperPdfLinker.deletePdfs(split);
             return;
         }
+        Optional<UndoableFileMove> paperPdfs = undoableFileMove(split);
         PaperMatches matches = linker.match(volume, split);
         undoManager.addEdit(Localization.lang("Split PDF"), edit -> {
+            paperPdfs.ifPresent(edit::addEdit);
             edit.addAll(linker.apply(matches));
             if (!matches.newPapers().isEmpty()) {
                 edit.applyEdit(new UndoableInsertEntries(databaseContext.getDatabase(), matches.newPapers()));
@@ -186,6 +191,15 @@ public class AttachedPdfSplitter {
         }
         if (!matches.existingPapers().isEmpty()) {
             dialogService.notify(Localization.lang("Added split PDFs to %0 entries that were already in the library.", String.valueOf(matches.existingPapers().size())));
+        }
+    }
+
+    private static Optional<UndoableFileMove> undoableFileMove(SplitPapers split) {
+        try {
+            return Optional.of(MultiPaperPdfLinker.undoableFileMove(split));
+        } catch (IOException exception) {
+            LOGGER.warn("Undoing the split will leave its PDFs in place", exception);
+            return Optional.empty();
         }
     }
 

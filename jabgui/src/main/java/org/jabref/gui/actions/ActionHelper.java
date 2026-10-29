@@ -10,6 +10,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
@@ -140,16 +142,26 @@ public class ActionHelper {
     public static BooleanExpression isCrossrefPdfPresentForSelectedEntry(StateManager stateManager, CliPreferences preferences) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         Binding<Boolean> crossrefPdfIsPresent = EasyBind.valueAt(selectedEntries, 0)
-                                                        .mapObservable(entry -> Bindings.createBooleanBinding(
-                                                                () -> stateManager.getActiveDatabase()
-                                                                                  .flatMap(database -> PdfLocationResolver.resolve(entry, database.getDatabase())
-                                                                                                                          .filter(location -> location.fileOwner() != entry)
-                                                                                                                          .flatMap(location -> location.file().findIn(database, preferences.getFilePreferences())))
-                                                                                  .isPresent(),
-                                                                entry.getFieldsObservable()))
+                                                        .mapObservable(entry -> crossrefPdfIsPresent(entry, stateManager, preferences))
                                                         .orElseOpt(false);
 
         return BooleanExpression.booleanExpression(crossrefPdfIsPresent);
+    }
+
+    /// Re-evaluated when the fields of `entry` change, which covers its `crossref`, and when those of the entry it cross-references change, which covers its files
+    // [impl->req~jabgui.documentviewer.open-crossref-pdf-at-page~1]
+    private static ObservableValue<Boolean> crossrefPdfIsPresent(BibEntry entry, StateManager stateManager, CliPreferences preferences) {
+        ObservableValue<Optional<BibEntry>> referencedEntry = Bindings.createObjectBinding(
+                () -> stateManager.getActiveDatabase().flatMap(database -> database.getDatabase().getReferencedEntry(entry)),
+                entry.getFieldsObservable());
+        return referencedEntry.flatMap(referenced -> Bindings.createBooleanBinding(
+                () -> stateManager.getActiveDatabase()
+                                  .flatMap(database -> PdfLocationResolver.resolve(entry, database.getDatabase())
+                                                                          .filter(location -> location.fileOwner() != entry)
+                                                                          .flatMap(location -> location.file().findIn(database, preferences.getFilePreferences())))
+                                  .isPresent(),
+                entry.getFieldsObservable(),
+                referenced.map(BibEntry::getFieldsObservable).orElse(FXCollections.emptyObservableMap())));
     }
 
     public static BooleanExpression isPdfFilePresentForSelectedEntry(StateManager stateManager, CliPreferences preferences) {

@@ -1,6 +1,7 @@
 package org.jabref.model.undo;
 
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -54,6 +55,7 @@ class BibChangeTest {
                 new UndoableStringChange(string, UndoableStringChange.Part.CONTENT, "content", "other"),
                 new UndoableMetaDataChange(new BibDatabaseContext(), new MetaData(), metaDataWithMode()),
                 new UndoableGroupTreeChange(new MetaData(), Optional.of(groupTree("Books")), Optional.of(groupTree("Articles"))),
+                new UndoableFileMove(List.of(new UndoableFileMove.Move(Path.of("held.pdf"), Path.of("paper.pdf"), FileTime.fromMillis(0)))),
                 new ChangeSet("group", List.of(
                         new UndoableFieldChange(entry, StandardField.AUTHOR, "Einstein", "Bohr"),
                         new UndoableChangeType(entry, StandardEntryType.Article, StandardEntryType.Book))));
