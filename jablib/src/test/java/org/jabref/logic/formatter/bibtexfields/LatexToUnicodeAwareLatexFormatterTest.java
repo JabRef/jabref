@@ -105,8 +105,8 @@ class LatexToUnicodeAwareLatexFormatterTest {
                 "\\begin{alignat}{2}\\\"{o}\\end{alignat}",
                 "\\begin{cases}\\\"{o}\\end{cases}",
                 """
-                % \\"{o} stays in the comment
-                """,
+                        % \\"{o} stays in the comment
+                        """,
                 "\\url{https://example.org/~M\\\"uller} \\cite[p.~1]{M\\\"uller} \\label{eq:\\\"o} \\verb|\\\"o|",
                 "\\textbackslash{} \\textunderscore{} \\textless{} \\textasciitilde{}",
                 "\\~{} \\^{} \\\"{}",
