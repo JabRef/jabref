@@ -79,4 +79,11 @@ The user can retrieve a bibliographic entry from the German National Library
 
 Needs: impl
 
+## User can search BibSonomy
+`feat~fetchers.bibsonomy~1`
+
+The user can search BibSonomy from the web search panel and import the found entries. The user enters their BibSonomy username and API key as `username:apikey` in the web search preferences. Without them, JabRef shows a message asking for these credentials.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

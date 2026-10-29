@@ -51,6 +51,7 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
 
     @Override
     public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
+        // [impl->feat~fetchers.bibsonomy~1]
         String usernameAndApiKey = importerPreferences.getApiKey(FETCHER_NAME).map(String::strip).orElse("");
         if (!hasUsernameAndApiKey(usernameAndApiKey)) {
             throw new FetcherException(Localization.lang("BibSonomy needs your username and API key. Enter them as 'username:apikey' in Preferences > Web search > BibSonomy."));
