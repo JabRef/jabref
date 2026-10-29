@@ -17,6 +17,7 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @NullMarked
+// [utest->req~jabkit.cli.citation-key-avoid-overwrite~1]
 class GenerateCitationKeysTest extends AbstractJabKitTest {
 
     private static final String KEYED_ENTRY = """

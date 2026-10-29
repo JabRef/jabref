@@ -96,6 +96,7 @@ class GenerateCitationKeys implements Callable<Integer> {
         CitationKeyPatternPreferences preferencesToUse = getCitationKeyPatternPreferences();
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferencesToUse);
         for (BibEntry entry : databaseContext.getEntries()) {
+            // [impl->req~jabkit.cli.citation-key-avoid-overwrite~1]
             if (!preferencesToUse.shouldAvoidOverwriteCiteKey() || !entry.hasCitationKey()) {
                 keyGenerator.generateAndSetKey(entry);
             }
