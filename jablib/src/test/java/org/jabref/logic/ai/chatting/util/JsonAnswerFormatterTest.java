@@ -68,6 +68,8 @@ class JsonAnswerFormatterTest {
     @ValueSource(strings = {
             "Plain text with a [link](entries/Key).",
             "[@Key](entries/Key) starts this line.",
+            "[1](https://example.org) starts this line.",
+            "[1][reference] starts this line.",
             "```json\n{\"a\": 1}\n```",
             "Explained first.\n{\"a\": 1}\nExplained last."
     })

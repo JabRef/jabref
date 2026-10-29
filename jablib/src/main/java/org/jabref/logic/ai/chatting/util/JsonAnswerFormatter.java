@@ -71,6 +71,9 @@ public class JsonAnswerFormatter {
             // Reading through the parser, not through the mapper, leaves whatever follows untouched.
             String json = WRITER.writeValueAsString(parser.readValueAsTree());
             String afterJson = trimmed.substring((int) parser.currentLocation().getCharOffset());
+            if (!afterJson.isEmpty() && !Character.isWhitespace(afterJson.charAt(0))) {
+                return Optional.empty();
+            }
             String rest = SEPARATOR.matcher(afterJson).replaceFirst("").stripTrailing();
             return Optional.of(new LeadingJson(json, rest));
         } catch (JacksonException e) {

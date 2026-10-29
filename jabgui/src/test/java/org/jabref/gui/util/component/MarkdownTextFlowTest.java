@@ -223,7 +223,12 @@ class MarkdownTextFlowTest extends JavaFxTest {
             textFlow.copySelectedText();
         });
 
-        assertEquals("```json\n{\"a\": 1}\n```", clipBoardManager.stringContent.get());
+        assertEquals("""
+                ```json
+                {
+                  "a": 1
+                }
+                ```""", clipBoardManager.stringContent.get());
         assertTrue(clipBoardManager.htmlContent.get().contains("<code"));
     }
 

@@ -269,7 +269,6 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         for (CopySegment segment : buildCopySegments()) {
             String renderedText = segment.text();
             Node astNode = segment.astNode();
-            String markdownText = getMarkdownRepresentation(astNode, renderedText);
 
             // Layout indices count an embedded hyperlink or table as a single character, see SelectableTextFlow#getTextFlowContent()
             int segmentLength = segment.layoutLength();
@@ -289,7 +288,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 int endInSegment = overlapEnd - segmentStart;
 
                 if (startInSegment == 0 && endInSegment == segmentLength) {
-                    result.add(markdownText);
+                    result.add(getMarkdownRepresentation(astNode, renderedText));
                 } else {
                     String partialText = renderedText.substring(startInSegment, endInSegment);
                     if (astNode instanceof DelimitedNode delimitedNode) {
@@ -426,6 +425,11 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 String info = fencedCodeBlock.getInfo().toString();
                 String openingFence = fencedCodeBlock.getOpeningFence().toString();
                 String closingFence = fencedCodeBlock.getClosingFence().toString();
+                if (highlightJson && JsonAnswerFormatter.leadingJson(renderedText)
+                                                        .filter(json -> json.rest().isEmpty())
+                                                        .isPresent()) {
+                    yield openingFence + info + "\n" + renderedText + "\n" + closingFence;
+                }
                 // The content of a fenced block is its body verbatim, ending with the newline before the fence.
                 yield openingFence + info + "\n" + fencedCodeBlock.getContentChars() + closingFence;
             }
