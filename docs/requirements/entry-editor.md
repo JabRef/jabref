@@ -14,6 +14,16 @@ This holds within one library only: switching to a library tab without a selecte
 
 Needs: impl
 
+## Single-line entry fields must return focus to the editor when <kbd>Enter</kbd> accepts their value
+`req~entry-editor.accept-single-line-value~1`
+
+Applies to single-line text controls in the entry editor after their existing action handlers finish.
+An <kbd>Enter</kbd> key handled by an autocomplete popup continues to select its suggestion.
+
+See <https://github.com/JabRef/jabref/issues/17445>.
+
+Needs: impl, utest
+
 ## GUI must initialize validation decoration during startup
 `req~entry-editor.validation-decoration.startup~1`
 
