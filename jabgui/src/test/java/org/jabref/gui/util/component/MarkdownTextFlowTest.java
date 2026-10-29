@@ -27,9 +27,11 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.chat.JsonCodeBlockFormatter;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.logic.ai.chatting.util.JsonAnswerFormatter;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,6 +76,10 @@ class MarkdownTextFlowTest extends JavaFxTest {
             textFlowReference.set(textFlow);
         });
         return textFlowReference.get();
+    }
+
+    private static void setJsonMarkdown(MarkdownTextFlow textFlow, String text) {
+        textFlow.setMarkdown(JsonAnswerFormatter.fenceJson(text), new JsonCodeBlockFormatter());
     }
 
     /// Text content with tab-separated table cells.
@@ -210,7 +216,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
         interact(() -> {
-            textFlow.setMarkdownWithJsonHighlighting("```json\n{\"a\": 1}\n```");
+            setJsonMarkdown(textFlow, "```json\n{\"a\": 1}\n```");
             rootPane.applyCss();
             rootPane.layout();
             textFlow.applyCss();
@@ -236,7 +242,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
     void jsonAnswerIsHighlighted() {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
-        interact(() -> textFlow.setMarkdownWithJsonHighlighting("{\"a\": 1}"));
+        interact(() -> setJsonMarkdown(textFlow, "{\"a\": 1}"));
 
         assertTrue(hasChildWithStyleClass(textFlow, "json-key"));
     }
@@ -246,7 +252,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
         interact(() -> {
-            textFlow.setMarkdownWithJsonHighlighting("{\"a\": \"**not bold**\"}");
+            setJsonMarkdown(textFlow, "{\"a\": \"**not bold**\"}");
             rootPane.applyCss();
             rootPane.layout();
             textFlow.applyCss();
@@ -267,7 +273,7 @@ class MarkdownTextFlowTest extends JavaFxTest {
         MarkdownTextFlow textFlow = markdownTextFlow();
 
         interact(() -> {
-            textFlow.setMarkdownWithJsonHighlighting("{\"a\": \"```\"}");
+            setJsonMarkdown(textFlow, "{\"a\": \"```\"}");
             rootPane.applyCss();
             rootPane.layout();
             textFlow.applyCss();
@@ -292,13 +298,35 @@ class MarkdownTextFlowTest extends JavaFxTest {
         assertFalse(hasChildWithStyleClass(textFlow, "json-key"));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"replacement", "replacement\n"})
+    void codeBlockFormatterIsScopedToOneMarkdownUpdate(String replacement) {
+        MarkdownTextFlow textFlow = markdownTextFlow();
+
+        interact(() -> {
+            textFlow.setMarkdown("```\noriginal\n```", _ -> Optional.of(List.of(
+                    new MarkdownTextFlow.CodeBlockSegment(replacement, "custom-code"))));
+            assertEquals(replacement, renderedText(textFlow));
+            assertTrue(hasChildWithStyleClass(textFlow, "custom-code"));
+            rootPane.applyCss();
+            rootPane.layout();
+            textFlow.selectAll();
+            textFlow.copySelectedText();
+            assertEquals("```\nreplacement\n```", clipBoardManager.stringContent.get());
+
+            textFlow.setMarkdown("```\noriginal\n```");
+            assertEquals("original\n", renderedText(textFlow));
+            assertFalse(hasChildWithStyleClass(textFlow, "custom-code"));
+        });
+    }
+
     @Test
     void tokenDenseJsonIsNotHighlighted() {
         MarkdownTextFlow textFlow = markdownTextFlow();
         // Short enough to be formatted, but far too many tokens to give each one its own node.
         String hugeJson = "{\"a\": [" + "1, ".repeat(5_000) + "1]}";
 
-        interact(() -> textFlow.setMarkdownWithJsonHighlighting(hugeJson));
+        interact(() -> setJsonMarkdown(textFlow, hugeJson));
 
         assertFalse(hasChildWithStyleClass(textFlow, "json-key"));
     }

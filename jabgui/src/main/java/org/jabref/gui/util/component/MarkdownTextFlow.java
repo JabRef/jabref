@@ -3,7 +3,10 @@ package org.jabref.gui.util.component;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -30,7 +33,6 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.SelectableTextFlow;
-import org.jabref.logic.ai.chatting.util.JsonAnswerFormatter;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.vladsch.flexmark.ast.BlockQuote;
@@ -74,7 +76,6 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     private static final Pattern NUMBERED_LIST_PATTERN = Pattern.compile("^\\s*\\d+\\.\\s+$");
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
-    private static final int MAX_JSON_SEGMENTS = 5_000;
 
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
@@ -85,8 +86,20 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     /// Governs whether copying reproduces Markdown markup or the displayed text verbatim.
     private boolean plainText;
 
-    /// Whether JSON in the current content is indented and syntax highlighted.
-    private boolean highlightJson;
+    private final Set<Node> formattedCodeBlocks = new HashSet<>();
+    private CodeBlockFormatter codeBlockFormatter = _ -> Optional.empty();
+
+    /// Returns styled content for a fenced code block, or empty to retain its original content.
+    @NullMarked
+    @FunctionalInterface
+    public interface CodeBlockFormatter {
+        Optional<List<CodeBlockSegment>> format(String content);
+    }
+
+    /// Text and its optional CSS style class within a formatted code block.
+    @NullMarked
+    public record CodeBlockSegment(String text, String styleClass) {
+    }
 
     public MarkdownTextFlow(Pane parent) {
         super(parent);
@@ -112,22 +125,15 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     }
 
     public void setMarkdown(@NonNull String markdownText) {
-        render(markdownText, false);
+        setMarkdown(markdownText, _ -> Optional.empty());
     }
 
-    /// Displays the given Markdown text, indenting and syntax highlighting a JSON document at its
-    /// beginning or inside a fenced code block — AI models often answer that way, and the raw
-    /// document is hard to read.
-    public void setMarkdownWithJsonHighlighting(@NonNull String markdownText) {
-        // Bare JSON becomes a fenced code block, so that it is rendered and copied like any other one.
-        render(JsonAnswerFormatter.fenceJson(markdownText), true);
-    }
-
-    private void render(String markdownText, boolean highlightJson) {
+    public void setMarkdown(@NonNull String markdownText, CodeBlockFormatter formatter) {
         super.clearSelection();
         getChildren().clear();
+        formattedCodeBlocks.clear();
         plainText = false;
-        this.highlightJson = highlightJson;
+        this.codeBlockFormatter = formatter;
 
         if (markdownText.isBlank()) {
             return;
@@ -140,6 +146,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     public void setPlainText(@NonNull String text) {
         super.clearSelection();
         getChildren().clear();
+        formattedCodeBlocks.clear();
         plainText = true;
 
         if (text.isBlank()) {
@@ -185,35 +192,14 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         getChildren().add(textNode);
     }
 
-    /// Adds the nodes for a code block, with syntax highlighting if the code is JSON.
-    // [impl->feat~ai.chat.json-highlighting~1]
+    /// Adds the nodes for a code block, using the configured formatter when applicable.
     private void addCodeBlockNodes(String content, Node codeBlock) {
-        if (!highlightJson) {
-            addTextNode(content, codeBlock, "markdown-code-block", "font-monospace");
-            return;
-        }
-
-        JsonAnswerFormatter.leadingJson(content)
-                           .filter(leadingJson -> leadingJson.rest().isEmpty())
-                           .ifPresentOrElse(
-                                   leadingJson -> addJsonNodes(leadingJson.json(), codeBlock),
-                                   () -> addTextNode(content, codeBlock, "markdown-code-block", "font-monospace"));
-    }
-
-    /// Adds one text node per JSON token; they are merged back into one segment when copying
-    /// (see buildCopySegments).
-    private void addJsonNodes(String json, Node codeBlock) {
-        List<JsonHighlighter.Segment> segments = JsonHighlighter.tokenize(json);
-
-        // A token-dense document would put tens of thousands of nodes into the scene graph.
-        if (segments.size() > MAX_JSON_SEGMENTS) {
-            addTextNode(json, codeBlock, "markdown-code-block", "font-monospace");
-            return;
-        }
-
-        for (JsonHighlighter.Segment segment : segments) {
-            addTextNode(segment.text(), codeBlock, "markdown-code-block", "font-monospace", segment.styleClass());
-        }
+        codeBlockFormatter.format(content).ifPresentOrElse(segments -> {
+            formattedCodeBlocks.add(codeBlock);
+            for (CodeBlockSegment segment : segments) {
+                addTextNode(segment.text(), codeBlock, "markdown-code-block", "font-monospace", segment.styleClass());
+            }
+        }, () -> addTextNode(content, codeBlock, "markdown-code-block", "font-monospace"));
     }
 
     private void addHyperlinkNode(String text, String url, Node astNode, String... styleClasses) {
@@ -425,10 +411,9 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 String info = fencedCodeBlock.getInfo().toString();
                 String openingFence = fencedCodeBlock.getOpeningFence().toString();
                 String closingFence = fencedCodeBlock.getClosingFence().toString();
-                if (highlightJson && JsonAnswerFormatter.leadingJson(renderedText)
-                                                        .filter(json -> json.rest().isEmpty())
-                                                        .isPresent()) {
-                    yield openingFence + info + "\n" + renderedText + "\n" + closingFence;
+                if (formattedCodeBlocks.contains(fencedCodeBlock)) {
+                    String newline = renderedText.endsWith("\n") ? "" : "\n";
+                    yield openingFence + info + "\n" + renderedText + newline + closingFence;
                 }
                 // The content of a fenced block is its body verbatim, ending with the newline before the fence.
                 yield openingFence + info + "\n" + fencedCodeBlock.getContentChars() + closingFence;

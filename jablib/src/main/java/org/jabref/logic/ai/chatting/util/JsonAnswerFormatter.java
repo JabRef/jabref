@@ -3,6 +3,7 @@ package org.jabref.logic.ai.chatting.util;
 import java.util.Optional;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import tools.jackson.core.util.DefaultIndenter;
 import tools.jackson.core.util.DefaultPrettyPrinter;
 import tools.jackson.core.util.Separators;
 import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectWriter;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -69,13 +71,13 @@ public class JsonAnswerFormatter {
         try (JsonParser parser = MAPPER.createParser(trimmed)) {
             parser.nextToken();
             // Reading through the parser, not through the mapper, leaves whatever follows untouched.
-            String json = WRITER.writeValueAsString(parser.readValueAsTree());
+            JsonNode tree = parser.readValueAsTree();
             String afterJson = trimmed.substring((int) parser.currentLocation().getCharOffset());
             if (!afterJson.isEmpty() && !Character.isWhitespace(afterJson.charAt(0))) {
                 return Optional.empty();
             }
             String rest = SEPARATOR.matcher(afterJson).replaceFirst("").stripTrailing();
-            return Optional.of(new LeadingJson(json, rest));
+            return Optional.of(new LeadingJson(WRITER.writeValueAsString(tree), rest));
         } catch (JacksonException e) {
             LOGGER.debug("Text starting like JSON could not be formatted as JSON", e);
             return Optional.empty();
@@ -87,11 +89,14 @@ public class JsonAnswerFormatter {
     /// The JSON is indented on the way.
     public static String fenceJson(String markdown) {
         return leadingJson(markdown)
-                .map(leadingJson -> leadingJson.rest().isEmpty()
-                                    ? fenced(leadingJson.json())
-                                    : fenced(leadingJson.json()) + "\n\n" + leadingJson.rest())
+                .map(JsonAnswerFormatter::formatLeadingJson)
                 .or(() -> trailingJson(markdown))
                 .orElse(markdown);
+    }
+
+    private static String formatLeadingJson(LeadingJson leadingJson) {
+        String fencedJson = fenced(leadingJson.json());
+        return leadingJson.rest().isEmpty() ? fencedJson : fencedJson + "\n\n" + leadingJson.rest();
     }
 
     private static Optional<String> trailingJson(String markdown) {
@@ -103,11 +108,15 @@ public class JsonAnswerFormatter {
         return JSON_LINE_START.matcher(markdown).results()
                               .map(MatchResult::start)
                               .filter(start -> start > 0)
-                              .flatMap(start -> leadingJson(markdown.substring(start))
-                                      .filter(leadingJson -> leadingJson.rest().isEmpty())
-                                      .map(leadingJson -> markdown.substring(0, start).stripTrailing() + "\n\n" + fenced(leadingJson.json()))
-                                      .stream())
+                              .flatMap(start -> formatTrailingJson(markdown, start))
                               .findFirst();
+    }
+
+    private static Stream<String> formatTrailingJson(String markdown, int start) {
+        return leadingJson(markdown.substring(start))
+                .filter(leadingJson -> leadingJson.rest().isEmpty())
+                .map(leadingJson -> markdown.substring(0, start).stripTrailing() + "\n\n" + fenced(leadingJson.json()))
+                .stream();
     }
 
     /// Indented JSON has no line starting with backticks, so the content cannot close the fence.
