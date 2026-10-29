@@ -279,7 +279,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         sidePaneScroll.setContent(sidePane);
         sidePaneScroll.setFitToWidth(true);
         sidePaneScroll.setFitToHeight(true);
-        sidePaneScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        sidePaneScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         sidePaneScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         sidePaneScroll.getStyleClass().add("side-pane-scroll");
 
