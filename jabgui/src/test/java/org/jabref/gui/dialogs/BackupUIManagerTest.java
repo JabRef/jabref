@@ -219,4 +219,98 @@ class BackupUIManagerTest extends JavaFxTest {
 
         assertFalse(parserResult.isInvalid());
     }
+
+    /// Accepting the backup file changes should prompt the user to save the file when closing JabRef
+    /// The [ParserResult#getChangedOnMigration] flag is what makes the opened library count as modified
+    @Test
+    void acceptingBackupPromptsSavingWhenClosing(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.REVIEW_BACKUP));
+        when(dialogService.showCustomDialogAndWait(any(DatabaseChangesResolverDialog.class)))
+                .thenAnswer(invocation -> {
+                    DatabaseChangesResolverDialog dialog = invocation.getArgument(0);
+                    dialog.getResolvedChanges().forEach(DatabaseChange::accept);
+                    return Optional.of(true);
+                });
+
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+        doReturn(new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
+                .when(previewPreferences).getSelectedPreviewLayout();
+        Injector.setModelOrService(DialogService.class, dialogService);
+        Injector.setModelOrService(GuiPreferences.class, preferences);
+        Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
+        Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));
+        Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@Article{original, title = {Original}}");
+        Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
+        Files.writeString(backupFile, """
+                @Article{original,
+                  title = {Original},
+                }
+                @Article{added,
+                  title = {Added},
+                }
+
+                """);
+
+        Optional<ParserResult> result = BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                new JabRefGuiStateManager());
+
+        assertTrue(result.orElseThrow().getChangedOnMigration());
+    }
+
+    /// Rejecting backup file changes should have no effect on the state of the file, so no save
+    /// prompt should appear when closing because the file should still match the existing one on the disk
+    @Test
+    void rejectingBackupChangesDoesNotPromptSaveOnClosing(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.REVIEW_BACKUP));
+        when(dialogService.showCustomDialogAndWait(any(DatabaseChangesResolverDialog.class)))
+                .thenAnswer(invocation -> {
+                    DatabaseChangesResolverDialog dialog = invocation.getArgument(0);
+                    dialog.getResolvedChanges().forEach(change -> change.setAccepted(false));
+                    return Optional.of(true);
+                });
+
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+        doReturn(new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
+                .when(previewPreferences).getSelectedPreviewLayout();
+        Injector.setModelOrService(DialogService.class, dialogService);
+        Injector.setModelOrService(GuiPreferences.class, preferences);
+        Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
+        Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));
+        Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@Article{original, title = {Original}}");
+        Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
+        Files.writeString(backupFile, """
+                @Article{original,
+                  title = {Original},
+                }
+                @Article{added,
+                  title = {Added},
+                }
+
+                """);
+
+        Optional<ParserResult> result = BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                new JabRefGuiStateManager());
+
+        assertFalse(result.orElseThrow().getChangedOnMigration());
+    }
 }

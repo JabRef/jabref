@@ -128,6 +128,11 @@ public class BackupUIManager {
                     // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
                     markRecoveredIfContentRestored(originalParserResult);
+
+                    // The tab gets a new database context along with its own journal, meaning the undo step won't mark it as changed
+                    if (resolvedChanges.stream().anyMatch(DatabaseChange::isAccepted)) {
+                        originalParserResult.setChangedOnMigration(true);
+                    }
                     return Optional.of(originalParserResult);
                 }
 
