@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jspecify.annotations.NullMarked;
 
-/// Copies a 1-based inclusive page range out of an open PDF. The source document is left unchanged.
 @NullMarked
 final class PdfPageCopier {
 

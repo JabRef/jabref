@@ -8,11 +8,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.scene.input.TransferMode;
@@ -23,6 +25,7 @@ import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.AddGroupImportEntriesAction;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
+import org.jabref.gui.linkedfile.AttachedPdfSplitter;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DragDrop;
@@ -41,6 +44,7 @@ import org.jabref.logic.importer.ImportFormatReader.ImportResult;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.fileformat.pdf.MultiPaperPdfImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
@@ -100,6 +104,7 @@ public class ImportHandler {
     private final Deque<DuplicateDecisionRequest> duplicateDecisionRequests = new ArrayDeque<>();
     private boolean duplicateDecisionDialogInProgress;
     private DuplicateResolverDialog.DuplicateResolverResult rememberedBatchDuplicateDecision = BREAK;
+    private Set<String> crossReferencedKeys = Set.of();
 
     private record DuplicateDecisionRequest(BibEntry originalEntry,
                                             BibEntry duplicateEntry,
@@ -194,7 +199,15 @@ public class ImportHandler {
                     });
 
                     try {
-                        if (FileUtil.isPDFFile(file)) {
+                        List<BibEntry> volumeEntries = FileUtil.isPDFFile(file) ? multiPaperEntries(file) : List.of();
+                        if (!volumeEntries.isEmpty()) {
+                            BibEntry wholePdf = volumeEntries.getLast();
+                            wholePdf.clearField(StandardField.FILE);
+                            DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, wholePdf);
+                            addToImportEntriesGroup(volumeEntries);
+                            entriesToAdd.addAll(volumeEntries);
+                            addResultToList(file, true, Localization.lang("File was imported as %0 papers and an entry for the whole PDF", volumeEntries.size() - 1));
+                        } else if (FileUtil.isPDFFile(file)) {
                             final List<BibEntry> pdfEntriesInFile;
 
                             // Details: See ADR-0043
@@ -293,6 +306,11 @@ public class ImportHandler {
         } finally {
             suspended.close();
         }
+        new AttachedPdfSplitter(targetBibDatabaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager).splitImportedVolumes(entriesToAdd);
+    }
+
+    private List<BibEntry> multiPaperEntries(Path pdf) {
+        return new MultiPaperPdfImporter(preferences.getImportFormatPreferences()).importDatabase(pdf).getDatabase().getEntries();
     }
 
     private BibEntry createEmptyEntryWithLink(Path file) {
@@ -588,15 +606,25 @@ public class ImportHandler {
     /// Generate keys for given entries if globally configured - or citation key is empty
     ///
     /// @param entries entries to generate keys for
+    // [impl->req~jabgui.import.keep-cross-referenced-keys~1]
     private void generateKeys(List<BibEntry> entries) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                 targetBibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
                                                                                      .getKeyPatterns()),
                 targetBibDatabaseContext.getDatabase(),
                 preferences.getCitationKeyPatternPreferences());
+        Set<String> keysToKeep = new HashSet<>(crossReferencedKeys);
+        keysToKeep.addAll(crossReferencedKeys(entries));
         entries.stream()
-               .filter(entry -> entry.getCitationKey().isEmpty() || preferences.getImporterPreferences().shouldGenerateNewKeyOnImport())
+               .filter(entry -> entry.getCitationKey().isEmpty()
+                       || (preferences.getImporterPreferences().shouldGenerateNewKeyOnImport() && entry.getCitationKey().filter(keysToKeep::contains).isEmpty()))
                .forEach(keyGenerator::generateAndSetKey);
+    }
+
+    private static Set<String> crossReferencedKeys(Collection<BibEntry> entries) {
+        return entries.stream()
+                      .flatMap(entry -> entry.getField(StandardField.CROSSREF).stream())
+                      .collect(Collectors.toSet());
     }
 
     public @NonNull List<@NonNull BibEntry> handleBibTeXData(@NonNull String entries) {
@@ -686,6 +714,7 @@ public class ImportHandler {
 
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
         resetBatchDuplicateDecisionState();
+        crossReferencedKeys = crossReferencedKeys(entriesToAdd);
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {

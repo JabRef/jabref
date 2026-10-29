@@ -14,7 +14,6 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jspecify.annotations.NullMarked;
 
-/// Copies the pages named by an entry out of a longer PDF, leaving the original file in place.
 // [impl->req~logic.pdf.extract-paper-page-range~1]
 @NullMarked
 public final class PdfPaperExtractor {
@@ -22,9 +21,10 @@ public final class PdfPaperExtractor {
     private PdfPaperExtractor() {
     }
 
+    /// @param fileOwner the entry whose `pageoffset` numbers the pages of `source`
     /// @return the new PDF, or empty when `entry` does not name a strict sub-range of `source`
-    public static Optional<Path> extractPaper(Path source, BibEntry entry, Path targetDirectory) throws IOException {
-        Optional<PageSpan> span = PdfLocationResolver.pdfPageSpan(entry, entry);
+    public static Optional<Path> extractPaper(Path source, BibEntry entry, BibEntry fileOwner, Path targetDirectory) throws IOException {
+        Optional<PageSpan> span = PdfLocationResolver.pdfPageSpan(entry, fileOwner);
         if (span.isEmpty()) {
             return Optional.empty();
         }

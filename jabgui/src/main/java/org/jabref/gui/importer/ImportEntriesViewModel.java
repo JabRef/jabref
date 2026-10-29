@@ -23,6 +23,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.linkedfile.AttachedPdfSplitter;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
@@ -213,13 +214,16 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 dialogService,
                 taskExecutor);
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, selectedDatabaseContext, entriesToImport.size());
-        if (StringUtil.isNotBlank(targetGroup)) {
-            // Assign the group to the actually imported BibEntry instances (the copies inserted into the
-            // database), not to the originals. The import runs asynchronously, so this must happen in the
-            // tracker's onFinish callback after all entries have been inserted/merged.
-            tracker.setOnFinish(() ->
-                    GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator())));
-        }
+        // Assign the group to the actually imported BibEntry instances (the copies inserted into the
+        // database), not to the originals. The import runs asynchronously, so this must happen in the
+        // tracker's onFinish callback after all entries have been inserted/merged.
+        tracker.setOnFinish(() -> {
+            if (StringUtil.isNotBlank(targetGroup)) {
+                GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()));
+            }
+            new AttachedPdfSplitter(selectedDatabaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
+                    .splitImportedVolumes(tracker.getImportedEntries());
+        });
         importHandler.importEntriesWithDuplicateCheck(null, entriesToImport, tracker);
     }
 

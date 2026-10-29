@@ -16,26 +16,16 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.jspecify.annotations.NullMarked;
 
-/// Resolves which PDF an entry opens and which page of that PDF the entry starts on.
-///
-/// The entry's own PDF is used when it has one. Otherwise the PDF attached to the entry referenced by `crossref` is used.
-/// `xref` is not followed, and only that one reference is resolved, as in [BibDatabase#getReferencedEntry].
-///
-/// The page is the first arabic page number written in the entry's own `pages` field, plus [PAGE_OFFSET] on the entry that owns the PDF.
-/// A missing offset is `0`, so the printed page and the PDF page are the same.
-/// When `pages` does not start with an arabic number, or the computed page is less than 1, the PDF is still returned and the page is empty.
 // [impl->req~logic.externalfiles.pdf-location-resolver~1]
 @NullMarked
 public final class PdfLocationResolver {
 
-    /// How many PDF pages precede printed page 1. Stored on the entry that owns the PDF. The field name is `pageoffset`.
     public static final Field PAGE_OFFSET = FieldFactory.parseField("pageoffset");
 
     private static final Pattern FIRST_PAGE = Pattern.compile("\\s*([A-Za-z]?)([0-9]+|[ivxlcdmIVXLCDM]+)[A-Za-z]?");
 
     private static final Pattern RANGE_SEPARATOR = Pattern.compile("\\s*(?:--|\u2014|\u2013|-)\\s*");
 
-    /// BibTeX `43+` means the pages following 43, which has no last page.
     private static final Pattern FOLLOWING_PAGES = Pattern.compile("\\s*\\+");
 
     private static final Pattern INTEGER = Pattern.compile("-?[0-9]+");
@@ -70,6 +60,13 @@ public final class PdfLocationResolver {
         return entry.getField(StandardField.PAGES)
                     .flatMap(PdfLocationResolver::printedSpan)
                     .flatMap(printed -> toPdfSpan(printed, pageOffset(fileOwner)));
+    }
+
+    public static BibEntry pageOffsetOwner(BibEntry entry, BibDatabase database) {
+        if (entry.hasField(PAGE_OFFSET)) {
+            return entry;
+        }
+        return database.getReferencedEntry(entry).orElse(entry);
     }
 
     public static int pageOffset(BibEntry fileOwner) {
@@ -155,7 +152,6 @@ public final class PdfLocationResolver {
     public record PdfLocation(LinkedFile file, Optional<Integer> page, BibEntry fileOwner) {
     }
 
-    /// Inclusive 1-based pages in a PDF.
     public record PageSpan(int firstPage, int lastPage) {
     }
 

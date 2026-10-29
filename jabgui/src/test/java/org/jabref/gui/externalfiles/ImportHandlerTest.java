@@ -12,6 +12,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
@@ -440,6 +441,74 @@ class ImportHandlerTest {
 
         assertEquals(List.of(Optional.of("Wang2020"), Optional.of("Wang2020a")),
                 List.of(existingWang.getCitationKey(), importedWang.getCitationKey()));
+    }
+
+    // [utest->req~jabgui.import.keep-cross-referenced-keys~1]
+    @Test
+    void importKeepsTheKeyThatOtherImportedEntriesCrossReference() {
+        BibEntry paper = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Lovelace, Ada")
+                .withField(StandardField.YEAR, "2026")
+                .withField(StandardField.CROSSREF, "volume");
+        BibEntry volume = new BibEntry(StandardEntryType.Proceedings)
+                .withCitationKey("volume")
+                .withField(StandardField.TITLE, "Proceedings of the Example Conference");
+        generateNewKeysWithPattern("[auth][year]");
+
+        handlerFor(new BibDatabaseContext(new BibDatabase()), new JabRefUndoManager()).importEntries(List.of(paper, volume));
+
+        assertEquals(List.of(Optional.of("Lovelace2026"), Optional.of("volume"), Optional.of("volume")),
+                List.of(paper.getCitationKey(), volume.getCitationKey(), paper.getField(StandardField.CROSSREF)));
+    }
+
+    // [utest->req~logic.importer.multi-paper-pdf~1]
+    // [utest->req~jabgui.import.keep-cross-referenced-keys~1]
+    @Test
+    void importWithDuplicateCheckKeepsCrossReferencedKeyOfBibtexBook() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.setMode(BibDatabaseMode.BIBTEX);
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
+        when(preferences.getMergeDialogPreferences()).thenReturn(mock(MergeDialogPreferences.class));
+        generateNewKeysWithPattern("[auth][year]");
+        ImportHandler handler = new ImportHandler(
+                databaseContext,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                new JabRefUndoManager(),
+                stateManager,
+                mock(DialogService.class),
+                new CurrentThreadTaskExecutor());
+        BibEntry paper = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Alpha")
+                .withField(StandardField.CROSSREF, "volume");
+        BibEntry volume = new BibEntry(StandardEntryType.Collection)
+                .withCitationKey("volume")
+                .withField(StandardField.TITLE, "Example Studies");
+
+        handler.importEntriesWithDuplicateCheck(null, List.of(paper, volume), new EntryImportHandlerTracker(stateManager, databaseContext, 2));
+
+        BibEntry importedVolume = databaseContext.getDatabase().getEntryByCitationKey("volume").orElseThrow();
+        assertEquals(new BibEntry(StandardEntryType.Book)
+                        .withCitationKey("volume")
+                        .withField(StandardField.TITLE, "Example Studies"),
+                importedVolume);
+    }
+
+    private void generateNewKeysWithPattern(String pattern) {
+        when(preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()).thenReturn(true);
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
+                GlobalCitationKeyPatterns.fromPattern(pattern),
+                new SimpleObjectProperty<>(',')));
     }
 
     private ImportHandler handlerFor(BibDatabaseContext databaseContext, JabRefUndoManager journal) {

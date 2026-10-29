@@ -258,6 +258,22 @@ class PdfLocationResolverTest {
     }
 
     @Test
+    void pageOffsetOwnerIsTheEntryOnceItHasAnOffset() {
+        BibEntry proceedings = proceedings().withField(PdfLocationResolver.PAGE_OFFSET, "14");
+        BibEntry paper = paper("186--206").withField(PdfLocationResolver.PAGE_OFFSET, "0");
+
+        assertSame(paper, PdfLocationResolver.pageOffsetOwner(paper, new BibDatabase(List.of(proceedings, paper))));
+    }
+
+    @Test
+    void pageOffsetOwnerIsTheCrossReferencedEntryWhenTheEntryHasNoOffset() {
+        BibEntry proceedings = proceedings().withField(PdfLocationResolver.PAGE_OFFSET, "14");
+        BibEntry paper = paper("186--206");
+
+        assertSame(proceedings, PdfLocationResolver.pageOffsetOwner(paper, new BibDatabase(List.of(proceedings, paper))));
+    }
+
+    @Test
     void pageSpanUsesTheFirstRangeAndTheFileOwnersOffset() {
         BibEntry paper = paper("186--206");
         BibEntry proceedings = proceedings().withField(PdfLocationResolver.PAGE_OFFSET, "14");

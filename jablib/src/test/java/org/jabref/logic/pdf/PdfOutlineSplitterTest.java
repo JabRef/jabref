@@ -3,11 +3,13 @@ package org.jabref.logic.pdf;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jabref.logic.externalfiles.PdfLocationResolver;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.pdfbox.Loader;
@@ -15,6 +17,8 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDPageLabelRange;
+import org.apache.pdfbox.pdmodel.common.PDPageLabels;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
@@ -22,6 +26,9 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlin
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -39,7 +46,7 @@ class PdfOutlineSplitterTest {
         Path source = proceedingsWithPapers();
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings).withCitationKey("Proc2024");
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, proceedings, tempDir);
+        List<BibEntry> papers = PdfOutlineSplitter.split(source, proceedings, tempDir).papers();
 
         assertEquals(2, papers.size());
         assertEquals(StandardEntryType.InProceedings, papers.getFirst().getType());
@@ -58,12 +65,31 @@ class PdfOutlineSplitterTest {
         assertEquals(1, PdfLocationResolver.resolve(papers.get(1), database).orElseThrow().page().orElseThrow());
     }
 
+    // [utest->req~logic.pdf.split-proceedings-outline~1]
+    @ParameterizedTest
+    @MethodSource
+    void splitsAVolumeIntoPapersOfItsKind(EntryType volumeType, EntryType paperType) throws IOException {
+        List<BibEntry> papers = PdfOutlineSplitter.split(proceedingsWithPapers(), new BibEntry(volumeType), tempDir).papers();
+
+        assertTrue(PdfOutlineSplitter.holdsPapers(volumeType));
+        assertEquals(List.of(paperType, paperType), papers.stream().map(BibEntry::getType).toList());
+    }
+
+    private static Stream<Arguments> splitsAVolumeIntoPapersOfItsKind() {
+        return Stream.of(
+                Arguments.of(StandardEntryType.Proceedings, StandardEntryType.InProceedings),
+                Arguments.of(StandardEntryType.MvProceedings, StandardEntryType.InProceedings),
+                Arguments.of(StandardEntryType.Collection, StandardEntryType.InCollection),
+                Arguments.of(StandardEntryType.MvCollection, StandardEntryType.InCollection),
+                Arguments.of(StandardEntryType.Book, StandardEntryType.InBook),
+                Arguments.of(StandardEntryType.MvBook, StandardEntryType.InBook));
+    }
+
     @Test
-    void splitsOnlyProceedings() {
-        assertTrue(PdfOutlineSplitter.isProceedings(StandardEntryType.Proceedings));
-        assertTrue(PdfOutlineSplitter.isProceedings(StandardEntryType.MvProceedings));
-        assertFalse(PdfOutlineSplitter.isProceedings(StandardEntryType.Book));
-        assertFalse(PdfOutlineSplitter.isProceedings(StandardEntryType.Collection));
+    void splitsOnlyVolumes() {
+        assertFalse(PdfOutlineSplitter.holdsPapers(StandardEntryType.InProceedings));
+        assertFalse(PdfOutlineSplitter.holdsPapers(StandardEntryType.InBook));
+        assertFalse(PdfOutlineSplitter.holdsPapers(StandardEntryType.Article));
     }
 
     @Test
@@ -80,7 +106,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir);
+        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(List.of("Alpha", "Beta"), papers.stream().map(paper -> paper.getField(StandardField.TITLE).orElseThrow()).toList());
     }
@@ -103,7 +129,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir);
+        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(List.of("Alpha", "Beta"), papers.stream().map(paper -> paper.getField(StandardField.TITLE).orElseThrow()).toList());
         assertEquals(List.of("1--3", "4--6"), papers.stream().map(paper -> paper.getField(StandardField.PAGES).orElseThrow()).toList());
@@ -127,7 +153,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir);
+        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(List.of("Alpha", "Beta"), papers.stream().map(paper -> paper.getField(StandardField.TITLE).orElseThrow()).toList());
         assertEquals(List.of("2--3", "4--6"), papers.stream().map(paper -> paper.getField(StandardField.PAGES).orElseThrow()).toList());
@@ -149,7 +175,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir);
+        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(List.of("Alpha", "Beta", "Gamma"), papers.stream().map(paper -> paper.getField(StandardField.TITLE).orElseThrow()).toList());
     }
@@ -173,7 +199,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        assertEquals(List.of(), PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir));
+        assertEquals(List.of(), PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers());
     }
 
     @Test
@@ -188,7 +214,29 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        assertEquals(List.of(), PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir));
+        assertEquals(List.of(), PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers());
+    }
+
+    // [utest->req~logic.pdf.split-proceedings-outline~1]
+    @Test
+    void writesThePrintedPagesFromThePageLabels() throws IOException {
+        Path source = proceedingsWithPageLabels();
+
+        PdfOutlineSplitter.SplitPapers split = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir);
+
+        assertEquals(List.of("1--2", "3--4"), split.papers().stream().map(paper -> paper.getField(StandardField.PAGES).orElseThrow()).toList());
+        assertEquals(2, split.pageOffset());
+    }
+
+    @Test
+    void keepsThePageOffsetStoredOnTheParent() throws IOException {
+        Path source = proceedingsWithPageLabels();
+        BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings).withField(PdfLocationResolver.PAGE_OFFSET, "0");
+
+        PdfOutlineSplitter.SplitPapers split = PdfOutlineSplitter.split(source, proceedings, tempDir);
+
+        assertEquals(List.of("3--4", "5--6"), split.papers().stream().map(paper -> paper.getField(StandardField.PAGES).orElseThrow()).toList());
+        assertEquals(0, split.pageOffset());
     }
 
     @Test
@@ -199,7 +247,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        assertEquals(List.of(), PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir));
+        assertEquals(List.of(), PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers());
         assertEquals(3, pageCount(source));
     }
 
@@ -232,9 +280,30 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> entries = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir);
+        List<BibEntry> entries = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(papers, entries.stream().map(entry -> entry.getField(StandardField.TITLE).orElseThrow()).toList());
+    }
+
+    private Path proceedingsWithPageLabels() throws IOException {
+        Path source = tempDir.resolve("labelled.pdf");
+        try (PDDocument document = new PDDocument()) {
+            addPages(document, 6);
+            PDDocumentOutline outline = new PDDocumentOutline();
+            outline.addLast(paper("Alpha", document, 2));
+            outline.addLast(paper("Beta", document, 4));
+            document.getDocumentCatalog().setDocumentOutline(outline);
+            PDPageLabels labels = new PDPageLabels(document);
+            PDPageLabelRange frontMatter = new PDPageLabelRange();
+            frontMatter.setStyle(PDPageLabelRange.STYLE_ROMAN_LOWER);
+            labels.setLabelItem(0, frontMatter);
+            PDPageLabelRange papers = new PDPageLabelRange();
+            papers.setStyle(PDPageLabelRange.STYLE_DECIMAL);
+            labels.setLabelItem(2, papers);
+            document.getDocumentCatalog().setPageLabels(labels);
+            document.save(source.toFile());
+        }
+        return source;
     }
 
     private Path proceedingsWithPapers() throws IOException {
@@ -266,7 +335,6 @@ class PdfOutlineSplitterTest {
         }
     }
 
-    /// A bookmark to a page that starts with a paper title set larger than the body text
     private static PDOutlineItem paper(String title, PDDocument document, int pageIndex) throws IOException {
         PDPage page = document.getPage(pageIndex);
         try (PDPageContentStream content = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true)) {

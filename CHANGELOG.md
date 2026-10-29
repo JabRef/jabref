@@ -20,7 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added tooltips with action descriptions to menu items. [#9615](https://github.com/JabRef/jabref/issues/9615)
 - We added "Contribute to JabRef" to the Help menu, linking to [contribute.jabref.org](https://contribute.jabref.org). [#17162](https://github.com/JabRef/jabref/pull/17162)
 - We added EasyOCR, PaddleOCR, and AppleOCR as selectable OCR engines, alongside Tesseract and Docling. [#16866](https://github.com/JabRef/jabref/issues/16866)
-- We added splitting proceedings into papers, copying entry pages, and opening the viewer at the first page, including cross-referenced PDFs. [#8128](https://github.com/JabRef/jabref/issues/8128)
+- We added importing and splitting multi-paper PDFs, copying entry pages, and opening papers at their first page, including cross-referenced PDFs. [#8128](https://github.com/JabRef/jabref/issues/8128)
 - We added syntax highlighting to the BibTeX source window of the citations tab. [#17355](https://github.com/JabRef/jabref/issues/17355)
 - We added pushing the current library to [CiteDrive](https://www.citedrive.com/), including logging in to CiteDrive. [#14493](https://github.com/JabRef/jabref/pull/14493)
 - We added text search to AI chats. [#17183](https://github.com/JabRef/jabref/pull/17183)

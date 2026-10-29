@@ -33,6 +33,7 @@ import org.jabref.logic.importer.fileformat.OvidImporter;
 import org.jabref.logic.importer.fileformat.ReferImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
+import org.jabref.logic.importer.fileformat.pdf.MultiPaperPdfImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
@@ -89,6 +90,7 @@ public class ImportFormatReader {
         importers.add(new MedlinePlainImporter(importFormatPreferences));
         importers.add(new ModsImporter(importFormatPreferences));
         importers.add(new MsBibImporter());
+        importers.add(new MultiPaperPdfImporter(importFormatPreferences));
         importers.add(new OvidImporter());
         importers.add(new PdfMergeMetadataImporter(importFormatPreferences));
         importers.add(new PdfVerbatimBibtexImporter(importFormatPreferences));
@@ -167,7 +169,17 @@ public class ImportFormatReader {
     /// This method last attempts to read this file as bibtex.
     ///
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
+    // [impl->req~logic.importer.multi-paper-pdf~1]
     public ImportResult importWithAutoDetection(Path filePath) throws ImportException {
+        if (FileUtil.isPDFFile(filePath)) {
+            MultiPaperPdfImporter multiPaperPdfImporter = new MultiPaperPdfImporter(importFormatPreferences);
+            ParserResult papers = multiPaperPdfImporter.importDatabase(filePath);
+            if (papers.getDatabase().hasEntries()) {
+                addCitedReferences(filePath, papers);
+                papers.setPath(filePath);
+                return new ImportResult(multiPaperPdfImporter.getName(), papers);
+            }
+        }
         ImportResult importResult = importWithAutoDetection(
                 importer -> importer.importDatabase(filePath),
                 importer -> importer.isRecognizedFormat(filePath),
@@ -175,6 +187,15 @@ public class ImportFormatReader {
         );
         importResult.parserResult.setPath(filePath);
         return importResult;
+    }
+
+    private void addCitedReferences(Path pdf, ParserResult papers) {
+        for (Importer importer : importers) {
+            if (importer instanceof PdfGrobidImporter grobid) {
+                papers.getDatabase().insertEntries(grobid.importDatabase(pdf).getDatabase().getEntries());
+                return;
+            }
+        }
     }
 
     /// Tries to import a stream by iterating through the available import filters,
