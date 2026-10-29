@@ -13,7 +13,9 @@ import java.util.stream.Stream;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.PdfLocationResolver;
 import org.jabref.logic.externalfiles.PdfLocationResolver.PageSpan;
+import org.jabref.logic.pdf.PdfOutlineSplitter.PaperPages;
 import org.jabref.logic.pdf.PdfOutlineSplitter.SplitPapers;
+import org.jabref.logic.pdf.PdfOutlineSplitter.Volume;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
@@ -71,6 +73,15 @@ public class MultiPaperPdfLinker {
     public LinkedFile copyPages(Path pdf, PageSpan pages) throws IOException {
         Path copy = PdfPaperExtractor.extractPages(pdf, pages, Optional.ofNullable(pdf.getParent()).orElse(Path.of("")));
         return new LinkedFile("", FileUtil.relativize(copy, databaseContext, filePreferences), StandardFileType.PDF.getName());
+    }
+
+    /// @return `papers` without the papers that the library already holds, under the same title and cross-referencing `volume`, with a PDF of their own
+    public Volume withoutPapersThatHavePdfs(BibEntry volume, Volume papers) {
+        List<BibEntry> papersWithPdfs = papersOf(volume).stream().filter(paper -> firstPdf(paper).isPresent()).toList();
+        List<PaperPages> papersToSplit = papers.papers().stream()
+                                               .filter(paper -> papersWithPdfs.stream().noneMatch(existing -> existing.getField(StandardField.TITLE).filter(paper.title()::equalsIgnoreCase).isPresent()))
+                                               .toList();
+        return new Volume(papers.type(), papersToSplit, papers.printedPageOffset());
     }
 
     public boolean isInLibrary(BibEntry entry) {

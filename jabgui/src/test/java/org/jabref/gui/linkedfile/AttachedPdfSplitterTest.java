@@ -113,6 +113,22 @@ class AttachedPdfSplitterTest {
         assertEquals(Optional.of(1), location.page());
     }
 
+    // [utest->req~logic.pdf.extract-paper-page-range~1]
+    @Test
+    void copyOfALaterRangeOpensAtItsFirstPageOnceTheOriginalIsRemoved() throws IOException {
+        Path pdf = blankPdf(20);
+        BibEntry paper = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.PAGES, "5--8")
+                .withFiles(List.of(new LinkedFile("", pdf, "PDF")));
+        BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, paper);
+        splitter(databaseContext).split(pdf, paper, paper::addFile);
+
+        paper.setFiles(List.of(paper.getFiles().getLast()));
+
+        PdfLocation location = PdfLocationResolver.resolve(paper, databaseContext.getDatabase()).orElseThrow();
+        assertEquals(List.of("proceedings-p5-8.pdf", 1), List.of(fileName(location.file()), location.pageWithin(pageCount(tempDir.resolve("proceedings-p5-8.pdf")))));
+    }
+
     // [utest->req~logic.pdf.split-proceedings-outline~1]
     @Test
     void attachingAPdfToProceedingsCreatesAnEntryPerPaper() throws IOException {
@@ -159,6 +175,23 @@ class AttachedPdfSplitterTest {
         splitter(databaseContext).splitOnRequest(volumePdf(18, false), proceedings);
 
         assertEquals(List.of("Alpha", "Beta"), titles(databaseContext));
+    }
+
+    // [utest->req~logic.pdf.split-proceedings-outline~1]
+    @Test
+    void splittingAgainLeavesOutPapersThatAlreadyHaveAPdf() throws IOException {
+        DialogService dialogService = mock(DialogService.class);
+        when(dialogService.showConfirmationDialogAndWait(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
+        BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings).withCitationKey("volume");
+        BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings);
+        AttachedPdfSplitter splitter = new AttachedPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), new JabRefUndoManager());
+        Path pdf = volumePdf(18, false);
+        splitter.splitOnRequest(pdf, proceedings);
+
+        splitter.splitOnRequest(pdf, proceedings);
+
+        verify(dialogService).notify("All papers in volume.pdf already have a PDF.");
+        assertEquals(List.of(List.of("Alpha.pdf"), List.of("Beta.pdf")), papers(databaseContext).stream().map(paper -> paper.getFiles().stream().map(AttachedPdfSplitterTest::fileName).toList()).toList());
     }
 
     @Test

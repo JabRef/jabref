@@ -139,12 +139,15 @@ public class ActionHelper {
 
     public static BooleanExpression isCrossrefPdfPresentForSelectedEntry(StateManager stateManager, CliPreferences preferences) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-        Binding<Boolean> crossrefPdfIsPresent = EasyBind.valueAt(selectedEntries, 0).mapOpt(entry ->
-                stateManager.getActiveDatabase()
-                            .flatMap(database -> PdfLocationResolver.resolve(entry, database.getDatabase())
-                                                                    .filter(location -> location.fileOwner() != entry)
-                                                                    .flatMap(location -> location.file().findIn(database, preferences.getFilePreferences())))
-                            .isPresent()).orElseOpt(false);
+        Binding<Boolean> crossrefPdfIsPresent = EasyBind.valueAt(selectedEntries, 0)
+                                                        .mapObservable(entry -> Bindings.createBooleanBinding(
+                                                                () -> stateManager.getActiveDatabase()
+                                                                                  .flatMap(database -> PdfLocationResolver.resolve(entry, database.getDatabase())
+                                                                                                                          .filter(location -> location.fileOwner() != entry)
+                                                                                                                          .flatMap(location -> location.file().findIn(database, preferences.getFilePreferences())))
+                                                                                  .isPresent(),
+                                                                entry.getFieldsObservable()))
+                                                        .orElseOpt(false);
 
         return BooleanExpression.booleanExpression(crossrefPdfIsPresent);
     }

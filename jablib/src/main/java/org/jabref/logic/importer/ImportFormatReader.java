@@ -168,31 +168,34 @@ public class ImportFormatReader {
     ///
     /// This method last attempts to read this file as bibtex.
     ///
+    /// A PDF holding several papers is imported like any other PDF, because only the user can decide to split it, see [#importMultiPaperPdf(Path)].
+    ///
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     // [impl->req~logic.importer.multi-paper-pdf~1]
     public ImportResult importWithAutoDetection(Path filePath) throws ImportException {
-        return importWithAutoDetection(filePath, true);
-    }
-
-    /// @param asMultiPaperPdf whether a PDF holding several papers is imported as one entry per paper
-    // [impl->req~logic.importer.multi-paper-pdf~1]
-    public ImportResult importWithAutoDetection(Path filePath, boolean asMultiPaperPdf) throws ImportException {
-        if (asMultiPaperPdf && FileUtil.isPDFFile(filePath)) {
-            MultiPaperPdfImporter multiPaperPdfImporter = new MultiPaperPdfImporter(importFormatPreferences);
-            ParserResult papers = multiPaperPdfImporter.importDatabase(filePath);
-            if (papers.getDatabase().hasEntries()) {
-                addCitedReferences(filePath, papers);
-                papers.setPath(filePath);
-                return new ImportResult(multiPaperPdfImporter.getName(), papers);
-            }
-        }
         ImportResult importResult = importWithAutoDetection(
                 importer -> importer.importDatabase(filePath),
-                importer -> (asMultiPaperPdf || !(importer instanceof MultiPaperPdfImporter)) && importer.isRecognizedFormat(filePath),
+                importer -> !(importer instanceof MultiPaperPdfImporter) && importer.isRecognizedFormat(filePath),
                 () -> OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileUpdateMonitor)
         );
         importResult.parserResult.setPath(filePath);
         return importResult;
+    }
+
+    /// Imports a PDF holding several papers as one entry per paper and an entry for the whole PDF, followed by the references cited in it.
+    /// A PDF without several papers is imported as by [#importWithAutoDetection(Path)].
+    ///
+    /// @throws ImportException if the PDF holds no papers and its import fails
+    // [impl->req~logic.importer.multi-paper-pdf~1]
+    public ImportResult importMultiPaperPdf(Path pdf) throws ImportException {
+        MultiPaperPdfImporter multiPaperPdfImporter = new MultiPaperPdfImporter(importFormatPreferences);
+        ParserResult papers = multiPaperPdfImporter.importDatabase(pdf);
+        if (!papers.getDatabase().hasEntries()) {
+            return importWithAutoDetection(pdf);
+        }
+        addCitedReferences(pdf, papers);
+        papers.setPath(pdf);
+        return new ImportResult(multiPaperPdfImporter.getName(), papers);
     }
 
     /// Imports a PDF holding several papers as one entry, followed by the references cited in it

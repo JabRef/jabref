@@ -41,19 +41,31 @@ class PdfLocationResolverTest {
     // [utest->req~logic.externalfiles.pdf-location-resolver~1]
     @ParameterizedTest
     @CsvSource(textBlock = """
-            45, 100, 45
-            45, 8,   1
-            8,  8,   8
+            45, 52, 100, 45
+            45, 52, 8,   1
+            8,  8,  8,   8
+            15, 53, 39,  1
+            54, 86, 60,  54
             """)
-    void opensTheFirstPageWhenThePagePassesTheEndOfThePdf(int page, int pageCount, int expectedPage) {
-        PdfLocation location = new PdfLocation(PAPER_PDF, Optional.of(page), paper("45--52"));
+    void opensTheFirstPageWhenThePdfHoldsOnlyTheEntryOrEndsBeforeIt(int page, int lastPage, int pageCount, int expectedPage) {
+        PdfLocation location = new PdfLocation(PAPER_PDF, Optional.of(page), Optional.of(lastPage), paper("45--52"));
 
         assertEquals(expectedPage, location.pageWithin(pageCount));
     }
 
     @Test
     void opensTheFirstPageWithoutAPage() {
-        assertEquals(1, new PdfLocation(PAPER_PDF, Optional.empty(), paper("")).pageWithin(8));
+        assertEquals(1, new PdfLocation(PAPER_PDF, Optional.empty(), Optional.empty(), paper("")).pageWithin(8));
+    }
+
+    // [utest->req~logic.externalfiles.pdf-location-resolver~1]
+    @Test
+    void opensAPdfHoldingOnlyTheArticleAtItsFirstPage() {
+        BibEntry article = new BibEntry(StandardEntryType.Article).withField(StandardField.PAGES, "5--24").withFiles(List.of(PAPER_PDF));
+
+        PdfLocation location = PdfLocationResolver.resolve(article, databaseOf(article)).orElseThrow();
+
+        assertEquals(1, location.pageWithin(20));
     }
 
     @Test

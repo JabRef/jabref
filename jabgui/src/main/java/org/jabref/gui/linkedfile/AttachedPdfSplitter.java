@@ -118,19 +118,28 @@ public class AttachedPdfSplitter {
     public void splitOnRequest(Path pdf, BibEntry volume) {
         BackgroundTask.wrap(() -> PdfOutlineSplitter.readVolume(pdf))
                       .onSuccess(papers -> papers.ifPresentOrElse(
-                              found -> {
-                                  if (confirmSplit(pdf, found)) {
-                                      splitIntoPapers(pdf, volume, found);
-                                  }
-                              },
+                              found -> splitOnRequest(pdf, volume, linker.withoutPapersThatHavePdfs(volume, found)),
                               () -> dialogService.notify(Localization.lang("No separate papers were found in %0.", pdf.getFileName().toString()))))
                       .onFailure(exception -> showFailure(pdf, exception))
                       .executeWith(taskExecutor);
     }
 
+    private void splitOnRequest(Path pdf, BibEntry volume, Volume papers) {
+        if (papers.papers().isEmpty()) {
+            dialogService.notify(Localization.lang("All papers in %0 already have a PDF.", pdf.getFileName().toString()));
+            return;
+        }
+        if (confirmSplit(pdf, papers)) {
+            splitIntoPapers(pdf, volume, papers);
+        }
+    }
+
     private void splitIntoPapers(Path pdf, BibEntry volume, boolean confirmed) {
         BackgroundTask.wrap(() -> PdfOutlineSplitter.readVolume(pdf))
-                      .onSuccess(papers -> papers.filter(found -> confirmed || confirmSplit(pdf, found)).ifPresent(found -> splitIntoPapers(pdf, volume, found)))
+                      .onSuccess(papers -> papers.map(found -> linker.withoutPapersThatHavePdfs(volume, found))
+                                                 .filter(found -> !found.papers().isEmpty())
+                                                 .filter(found -> confirmed || confirmSplit(pdf, found))
+                                                 .ifPresent(found -> splitIntoPapers(pdf, volume, found)))
                       .onFailure(exception -> showFailure(pdf, exception))
                       .executeWith(taskExecutor);
     }

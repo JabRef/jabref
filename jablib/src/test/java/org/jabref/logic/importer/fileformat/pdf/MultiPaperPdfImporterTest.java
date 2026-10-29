@@ -76,7 +76,7 @@ class MultiPaperPdfImporterTest {
         BibEntry beta = entries.get(1);
         BibEntry wholePdf = entries.getLast();
 
-        assertEquals(Optional.of(new PdfLocationResolver.PdfLocation(wholePdf.getFiles().getFirst(), Optional.of(5), wholePdf)), PdfLocationResolver.resolve(beta, new BibDatabase(entries)));
+        assertEquals(Optional.of(new PdfLocationResolver.PdfLocation(wholePdf.getFiles().getFirst(), Optional.of(5), Optional.empty(), wholePdf)), PdfLocationResolver.resolve(beta, new BibDatabase(entries)));
     }
 
     // [utest->req~logic.importer.multi-paper-pdf~1]
@@ -107,13 +107,10 @@ class MultiPaperPdfImporterTest {
 
     // [utest->req~logic.importer.multi-paper-pdf~1]
     @Test
-    void autoDetectionImportsThePapersOfAMultiPaperPdf() throws IOException, ImportException {
-        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
-        ImportFormatReader reader = new ImportFormatReader(importerPreferences, importFormatPreferences, mock(CitationKeyPatternPreferences.class), new DummyFileUpdateMonitor());
+    void importsThePapersOfAMultiPaperPdfOnRequest() throws IOException, ImportException {
         Path pdf = volume("Proceedings of the Example Conference", "Contents", List.of(), true, List.of("@article{one, author = {Ada Lovelace}, title = {One}, journal = {Journal}, year = {2020}, volume = {1}}", "@article{two, author = {Ada Lovelace}, title = {Two}, journal = {Journal}, year = {2021}, volume = {2}}", "@article{three, author = {Ada Lovelace}, title = {Three}, journal = {Journal}, year = {2022}, volume = {3}}"));
 
-        ImportFormatReader.ImportResult result = reader.importWithAutoDetection(pdf);
+        ImportFormatReader.ImportResult result = reader().importMultiPaperPdf(pdf);
 
         assertEquals(importer.getName(), result.format());
         assertEquals(List.of("Alpha", "Beta", "volume"), result.parserResult().getDatabase().getEntries().stream().map(entry -> entry.getField(StandardField.TITLE).orElseThrow()).toList());
@@ -121,13 +118,20 @@ class MultiPaperPdfImporterTest {
 
     // [utest->req~logic.importer.multi-paper-pdf~1]
     @Test
-    void importsAMultiPaperPdfAsOneEntryOnRequest() throws IOException {
-        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
-        ImportFormatReader reader = new ImportFormatReader(importerPreferences, importFormatPreferences, mock(CitationKeyPatternPreferences.class), new DummyFileUpdateMonitor());
+    void autoDetectionDoesNotSplitAMultiPaperPdf() throws IOException, ImportException {
         Path pdf = volume("Proceedings of the Example Conference", true);
 
-        List<BibEntry> entries = reader.importPdfAsOneEntry(pdf).parserResult().getDatabase().getEntries();
+        ImportFormatReader.ImportResult result = reader().importWithAutoDetection(pdf);
+
+        assertEquals(List.of(), result.parserResult().getDatabase().getEntries().stream().filter(entry -> entry.hasField(StandardField.CROSSREF)).toList());
+    }
+
+    // [utest->req~logic.importer.multi-paper-pdf~1]
+    @Test
+    void importsAMultiPaperPdfAsOneEntryOnRequest() throws IOException {
+        Path pdf = volume("Proceedings of the Example Conference", true);
+
+        List<BibEntry> entries = reader().importPdfAsOneEntry(pdf).parserResult().getDatabase().getEntries();
 
         assertEquals(List.of(List.of(pdf.toString())), entries.stream().map(entry -> entry.getFiles().stream().map(LinkedFile::getLink).toList()).toList());
     }
@@ -188,6 +192,12 @@ class MultiPaperPdfImporterTest {
         }
 
         assertEquals(List.of(), importer.importDatabase(pdf).getDatabase().getEntries());
+    }
+
+    private ImportFormatReader reader() {
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
+        return new ImportFormatReader(importerPreferences, importFormatPreferences, mock(CitationKeyPatternPreferences.class), new DummyFileUpdateMonitor());
     }
 
     private Path volume(String cover, boolean withPageLabels) throws IOException {

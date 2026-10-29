@@ -34,7 +34,12 @@ public final class PdfLocationResolver {
     }
 
     public static Optional<PdfLocation> resolve(BibEntry entry, BibDatabase database) {
-        return firstPdf(entry).map(file -> new PdfLocation(file, pdfPage(entry, offsetOwner(entry, file, database)), entry)).or(() -> database.getReferencedEntry(entry).flatMap(referenced -> firstPdf(referenced).map(file -> new PdfLocation(file, pdfPage(entry, referenced), referenced))));
+        return firstPdf(entry).map(file -> location(entry, file, offsetOwner(entry, file, database), entry)).or(() -> database.getReferencedEntry(entry).flatMap(referenced -> firstPdf(referenced).map(file -> location(entry, file, referenced, referenced))));
+    }
+
+    private static PdfLocation location(BibEntry entry, LinkedFile file, BibEntry offsetOwner, BibEntry fileOwner) {
+        Optional<Integer> lastPage = offsetOwner.hasField(PAGE_OFFSET) ? Optional.empty() : pdfPageSpan(entry, offsetOwner).map(PageSpan::lastPage);
+        return new PdfLocation(file, pdfPage(entry, offsetOwner), lastPage, fileOwner);
     }
 
     private static BibEntry offsetOwner(BibEntry entry, LinkedFile file, BibDatabase database) {
@@ -137,10 +142,14 @@ public final class PdfLocationResolver {
         }
     }
 
-    public record PdfLocation(LinkedFile file, Optional<Integer> page, BibEntry fileOwner) {
-        /// @return the page to open in the PDF, or the first page when the entry's page lies past the last of `pageCount` pages
+    /// @param lastPage the PDF page the entry ends on, when its `pages` give a range and no `pageoffset` places them in the PDF
+    public record PdfLocation(LinkedFile file, Optional<Integer> page, Optional<Integer> lastPage, BibEntry fileOwner) {
+        /// @return the page to open in the PDF, or the first page when the entry's page lies past the last of `pageCount` pages,
+        /// or when the PDF has no more pages than the entry's range without a `pageoffset`, because then it holds only the entry
         public int pageWithin(int pageCount) {
-            return page.filter(number -> number <= pageCount).orElse(1);
+            return page.filter(number -> number <= pageCount)
+                       .filter(number -> lastPage.filter(last -> last - number + 1 >= pageCount).isEmpty())
+                       .orElse(1);
         }
     }
 

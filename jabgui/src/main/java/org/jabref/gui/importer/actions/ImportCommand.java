@@ -37,6 +37,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NullMarked;
@@ -57,6 +58,7 @@ public class ImportCommand extends SimpleCommand {
 
     private final DialogService dialogService;
     private final CliPreferences preferences;
+    private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
@@ -70,6 +72,7 @@ public class ImportCommand extends SimpleCommand {
         this.tabContainer = tabContainer;
         this.importMethod = importMethod;
         this.preferences = preferences;
+        this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
@@ -148,6 +151,7 @@ public class ImportCommand extends SimpleCommand {
             task.onSuccess(parserResult -> {
                     tabContainer.addTab(parserResult.getDatabaseContext(), true);
                     dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
+                    splitConfirmedPdfs(parserResult.getDatabaseContext(), pdfsToSplit);
                 })
                 .onFailure(ex -> {
                     LOGGER.error("Error importing", ex);
@@ -193,10 +197,10 @@ public class ImportCommand extends SimpleCommand {
                     int paperCount = FileUtil.isPDFFile(filename) ? paperCount(filename) : 0;
                     if (paperCount < 2) {
                         // This import method never throws an IOException
-                        imports.add(importFormatReader.importWithAutoDetection(filename, false));
+                        imports.add(importFormatReader.importWithAutoDetection(filename));
                     } else if (Boolean.TRUE.equals(UiTaskExecutor.runInJavaFXThread(() -> AttachedPdfSplitter.confirmImportAsPapers(dialogService, filename, paperCount)))) {
                         pdfsToSplit.add(filename.toAbsolutePath().normalize());
-                        imports.add(importFormatReader.importWithAutoDetection(filename, true));
+                        imports.add(importFormatReader.importMultiPaperPdf(filename));
                     } else {
                         imports.add(importFormatReader.importPdfAsOneEntry(filename));
                     }
@@ -232,6 +236,12 @@ public class ImportCommand extends SimpleCommand {
         }
 
         return ImportResultsMerger.mergeImportResults(imports, preferences.getBibEntryPreferences().getKeywordSeparator(), preferences.getOwnerPreferences(), preferences.getTimestampPreferences());
+    }
+
+    // [impl->req~logic.importer.multi-paper-pdf~1]
+    private void splitConfirmedPdfs(BibDatabaseContext newLibrary, Set<Path> pdfsToSplit) {
+        AttachedPdfSplitter splitter = new AttachedPdfSplitter(newLibrary, dialogService, preferences.getFilePreferences(), taskExecutor, stateManager.getUndoManager(newLibrary));
+        splitter.splitImportedVolumes(newLibrary.getEntries(), volume -> splitter.linksAnyOf(volume, pdfsToSplit));
     }
 
     // [impl->req~logic.importer.multi-paper-pdf~1]

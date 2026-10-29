@@ -47,9 +47,7 @@ public final class PdfPaperExtractor {
     public static Path extractPages(Path source, PageSpan pages, Path targetDirectory) throws IOException {
         try (PDDocument document = Loader.loadPDF(source.toFile())) {
             String baseName = FileUtil.getBaseName(source.getFileName().toString());
-            Path target = PdfPageCopier.createUniqueFile(targetDirectory, baseName + "-p" + pages.firstPage() + "-" + pages.lastPage() + ".pdf");
-            PdfPageCopier.copy(document, pages.firstPage(), pages.lastPage(), target);
-            return target;
+            return PdfPageCopier.copyToNewFile(document, pages.firstPage(), pages.lastPage(), targetDirectory, baseName + "-p" + pages.firstPage() + "-" + pages.lastPage() + ".pdf");
         }
     }
 }

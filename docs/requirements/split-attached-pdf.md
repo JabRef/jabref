@@ -10,21 +10,21 @@ Issue: [#8128](https://github.com/JabRef/jabref/issues/8128)
 ## Resolve PDF file and start page through cross-referenced entries
 `req~logic.externalfiles.pdf-location-resolver~1`
 
-The target PDF file and opening page are identified from `crossref` or parent entries. The page is computed from the entry's `pages` field and shifted by the parent's `pageoffset`.
+The target PDF file and opening page are identified from `crossref` or parent entries. The page is computed from the entry's `pages` field and shifted by the parent's `pageoffset`. Without a `pageoffset`, a PDF with no more pages than the entry's page range holds only the entry, so it opens at its first page.
 
 Needs: impl, utest
 
 ## Document viewer must open cross-referenced PDF at paper start page
 `req~jabgui.documentviewer.open-crossref-pdf-at-page~1`
 
-The document viewer action is enabled for entries that have a cross-referenced PDF even without their own attached file. When triggered on such an entry, it confirms with the user, opens the parent PDF in the viewer, and jumps directly to the paper's start page.
+The document viewer action is enabled for entries that have a cross-referenced PDF even without their own attached file. When triggered on such an entry, it confirms with the user, opens the parent PDF in the viewer, and jumps directly to the paper's start page. Setting `crossref` on the selected entry enables the action right away, and the viewer does not report a missing PDF for such an entry.
 
 Needs: impl, utest
 
 ## Split attached proceedings PDF into individual paper entries
 `req~logic.pdf.split-proceedings-outline~1`
 
-When attaching a multi-paper PDF to a proceedings, collection or book entry (including their multi-volume types), the system detects individual paper sections via document outlines/bookmarks and title page font-size heuristics. After the user confirms, it creates an entry for each detected paper, typed after the volume (`InProceedings`, `InCollection` or `InBook`), generates a separate PDF containing only that paper's pages, and links it to the new entry without modifying or deleting the original PDF. The papers get their printed pages, read with the volume entry's `pageoffset` or else the PDF's page labels, and the volume entry stores that offset if it has none. A paper already in the library that cross-references the volume entry under the same title gets its PDF instead of a second entry. A PDF already attached to such an entry can be split the same way from the context menu of the file. In a BibTeX library, the volume entry repeats its title as `booktitle`, and a paper in a book is an `InCollection`, because the title of a BibTeX `inbook` is that of the book.
+When attaching a multi-paper PDF to a proceedings, collection or book entry (including their multi-volume types), the system detects individual paper sections via document outlines/bookmarks and title page font-size heuristics. After the user confirms, it creates an entry for each detected paper, typed after the volume (`InProceedings`, `InCollection` or `InBook`), generates a separate PDF containing only that paper's pages, and links it to the new entry without modifying or deleting the original PDF. The papers get their printed pages, read with the volume entry's `pageoffset` or else the PDF's page labels, and the volume entry stores that offset if it has none. A paper already in the library that cross-references the volume entry under the same title gets its PDF instead of a second entry. A PDF already attached to such an entry can be split the same way from the context menu of the file; papers that already have a PDF are left out. A split that fails removes the PDFs it already wrote. In a BibTeX library, the volume entry repeats its title as `booktitle`, and a paper in a book is an `InCollection`, because the title of a BibTeX `inbook` is that of the book.
 
 Needs: impl, utest
 
@@ -38,14 +38,14 @@ Needs: impl, utest
 ## Importing a multi-paper PDF must create one entry per paper that cross-references an entry for the whole PDF
 `req~logic.importer.multi-paper-pdf~1`
 
-Applies to File → Import, Find unlinked files, and dropping a PDF onto the entry table. The papers are detected as for splitting. Before any entry is created, the user chooses between splitting the PDF and importing it as one entry, and only the first creates the entries below. The entry for the whole PDF holds the file. Its type is proceedings when the title pages or the bookmarks name the event or its committees, a collection when they name editors or contributors or the papers give their authors' e-mail addresses, and a book otherwise. Each paper entry holds its title and printed pages. All entries hold the `pageoffset` read from the PDF's page labels. Once the entries are in the library, the PDF is split among the papers as when attaching it to the entry for the whole PDF, so each paper also gets a PDF of its own pages. In a BibTeX library, a collection becomes a book, the entry for the whole PDF repeats its title as `booktitle`, and a paper in a book is an `InCollection`, because BibTeX has no collection type and passes on only fields of the same name.
+Applies to File → Import (into the current or a new library), Find unlinked files, and dropping a PDF onto the entry table. Other imports, such as automatic format detection from the command line, import such a PDF like any other PDF. The papers are detected as for splitting. Before any entry is created, the user chooses between splitting the PDF and importing it as one entry, and only the first creates the entries below. The entry for the whole PDF holds the file. Its type is proceedings when the title pages or the bookmarks name the event or its committees, a collection when they name editors or contributors or the papers give their authors' e-mail addresses, and a book otherwise. Each paper entry holds its title and printed pages. All entries hold the `pageoffset` read from the PDF's page labels. Once the entries are in the library, the PDF is split among the papers as when attaching it to the entry for the whole PDF, so each paper also gets a PDF of its own pages. In a BibTeX library, a collection becomes a book, the entry for the whole PDF repeats its title as `booktitle`, and a paper in a book is an `InCollection`, because BibTeX has no collection type and passes on only fields of the same name.
 
 Needs: impl, utest
 
 ## Import must keep citation keys that other imported entries cross-reference
 `req~jabgui.import.keep-cross-referenced-keys~1`
 
-With "Generate a new key on import" enabled, a new key would break the `crossref` of the entries imported together with it.
+With "Generate a new key on import" enabled, a new key would break the `crossref` of the entries imported together with it, so such a key is kept. If the library or another imported entry already uses it, the entry gets the key with a suffix (`a`, `b`, …, `aa`, …) and the entries imported with it follow, whatever the setting. If duplicate handling keeps the existing entry instead, or merges the two under another key, the entries imported with it cross-reference the key it ends up with.
 
 Needs: impl, utest
 

@@ -13,10 +13,13 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.scene.input.TransferMode;
@@ -106,6 +109,14 @@ public class ImportHandler {
     private final Deque<DuplicateDecisionRequest> duplicateDecisionRequests = new ArrayDeque<>();
     private boolean duplicateDecisionDialogInProgress;
     private DuplicateResolverDialog.DuplicateResolverResult rememberedBatchDuplicateDecision = BREAK;
+
+    /// @param crossReferencedKeys keys that entries of the batch cross-reference
+    /// @param movedKeys           the key each cross-referenced entry of the batch ended up with, when duplicate handling changed it
+    private record ImportBatch(Set<String> crossReferencedKeys, Map<String, String> movedKeys) {
+        private static ImportBatch of(List<BibEntry> entries) {
+            return new ImportBatch(ImportHandler.crossReferencedKeys(entries), new ConcurrentHashMap<>());
+        }
+    }
 
     private record DuplicateDecisionRequest(BibEntry originalEntry,
                                             BibEntry duplicateEntry,
@@ -403,21 +414,22 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry) {
-        importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext), Set.of());
+        importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext), ImportBatch.of(List.of()));
     }
 
     /// Imports an entry into the database with duplicate checking and handling.
     /// Creates a copy of the entry for processing - the original entry parameter is not modified.
     /// The copied entry may be modified during cleanup and duplicate handling.
     ///
-    /// @param entry      the entry to import (original will not be modified)
-    /// @param decision   the duplicate resolution strategy to apply
-    /// @param tracker    tracks the import status of the entry
-    /// @param keysToKeep keys that entries imported in the same batch cross-reference
-    private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker, Set<String> keysToKeep) {
+    /// @param entry    the entry to import (original will not be modified)
+    /// @param decision the duplicate resolution strategy to apply
+    /// @param tracker  tracks the import status of the entry
+    /// @param batch    the entries imported together with `entry`
+    private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker, ImportBatch batch) {
         // The original entry should not be modified
         BibEntry entryCopy = new BibEntry(entry);
         BibEntry entryToInsert = cleanUpEntry(entryCopy);
+        Optional<String> crossReferencedKey = entryToInsert.getCitationKey().filter(batch.crossReferencedKeys()::contains);
 
         BackgroundTask.wrap(() -> findDuplicate(entryToInsert))
                       .onFailure(e -> {
@@ -429,10 +441,12 @@ public class ImportHandler {
                               handleDuplicates(entryToInsert, existingDuplicateInLibrary.get(), decision)
                                       .thenAccept(duplicateHandledEntry -> {
                                           if (duplicateHandledEntry.isEmpty()) {
+                                              crossReferencedKey.ifPresent(key -> existingDuplicateInLibrary.get().getCitationKey()
+                                                                                                            .ifPresent(existingKey -> moveCrossReferences(key, existingKey, batch)));
                                               tracker.markSkipped();
                                               return;
                                           }
-                                          continueImportAfterDuplicateHandling(transferInformation, duplicateHandledEntry.get(), tracker, keysToKeep);
+                                          continueImportAfterDuplicateHandling(transferInformation, duplicateHandledEntry.get(), tracker, batch, crossReferencedKey);
                                       })
                                       .exceptionally(exception -> {
                                           tracker.markSkipped();
@@ -441,20 +455,21 @@ public class ImportHandler {
                                       });
                               return;
                           }
-                          continueImportAfterDuplicateHandling(transferInformation, entryToInsert, tracker, keysToKeep);
+                          continueImportAfterDuplicateHandling(transferInformation, entryToInsert, tracker, batch, crossReferencedKey);
                       }).executeWith(taskExecutor);
     }
 
-    private void continueImportAfterDuplicateHandling(@Nullable TransferInformation transferInformation, BibEntry entryForImport, EntryImportHandlerTracker tracker, Set<String> keysToKeep) {
+    /// @param crossReferencedKey the key that other entries of the batch cross-reference `entryForImport` with
+    private void continueImportAfterDuplicateHandling(@Nullable TransferInformation transferInformation, BibEntry entryForImport, EntryImportHandlerTracker tracker, ImportBatch batch, Optional<String> crossReferencedKey) {
         BackgroundTask.wrap(() -> adjustLinkedFilesForTargetIfRequired(transferInformation, entryForImport))
                       .onFailure(e -> {
                           LOGGER.error("Error adjusting linked files for target", e);
                           dialogService.notify(Localization.lang("Could not adjust linked files. The entry was imported without linked-file adjustments."));
-                          importCleanedEntries(transferInformation, List.of(entryForImport), keysToKeep);
+                          insertFromBatch(transferInformation, entryForImport, batch, crossReferencedKey);
                           tracker.markImported(entryForImport);
                       })
                       .onSuccess(adjustedEntry -> {
-                          importCleanedEntries(transferInformation, List.of(adjustedEntry), keysToKeep);
+                          insertFromBatch(transferInformation, adjustedEntry, batch, crossReferencedKey);
                           tracker.markImported(adjustedEntry);
                           // Remove source entries only once the whole move has succeeded, so a failure partway through doesn't leave already-removed entries unrecoverable
                           if (transferInformation != null && transferInformation.transferMode() == org.jabref.model.TransferMode.MOVE && tracker.getImportedCount() == transferInformation.sourceEntries().size()) {
@@ -643,33 +658,53 @@ public class ImportHandler {
 
     // [impl->req~jabgui.import.keep-cross-referenced-keys~1]
     private void makeCrossReferencedKeysUnique(List<BibEntry> entries) {
-        if (!preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()) {
-            return;
-        }
         BibDatabase database = targetBibDatabaseContext.getDatabase();
+        Set<String> takenKeys = Stream.concat(database.getEntries().stream(), entries.stream())
+                                      .flatMap(entry -> entry.getCitationKey().stream())
+                                      .collect(Collectors.toCollection(HashSet::new));
         for (String key : crossReferencedKeys(entries)) {
-            boolean keyOfImportedEntry = entries.stream().anyMatch(entry -> entry.getCitationKey().filter(key::equals).isPresent());
-            if (!keyOfImportedEntry || database.getEntryByCitationKey(key).isEmpty()) {
+            List<BibEntry> referencedEntries = entries.stream().filter(entry -> entry.getCitationKey().filter(key::equals).isPresent()).toList();
+            if (referencedEntries.isEmpty() || database.getEntryByCitationKey(key).isEmpty()) {
                 continue;
             }
-            String uniqueKey = uniqueKey(database, key);
-            for (BibEntry entry : entries) {
-                if (entry.getCitationKey().filter(key::equals).isPresent()) {
-                    entry.setCitationKey(uniqueKey);
-                }
-                if (entry.getField(StandardField.CROSSREF).filter(key::equals).isPresent()) {
-                    entry.setField(StandardField.CROSSREF, uniqueKey);
-                }
-            }
+            String uniqueKey = uniqueKey(key, takenKeys);
+            takenKeys.add(uniqueKey);
+            referencedEntries.forEach(entry -> entry.setCitationKey(uniqueKey));
+            entries.stream()
+                   .filter(entry -> entry.getField(StandardField.CROSSREF).filter(key::equals).isPresent())
+                   .forEach(entry -> entry.setField(StandardField.CROSSREF, uniqueKey));
         }
     }
 
-    private static String uniqueKey(BibDatabase database, String key) {
-        char suffix = 'a';
-        while (database.getEntryByCitationKey(key + suffix).isPresent()) {
-            suffix++;
+    private static String uniqueKey(String key, Set<String> takenKeys) {
+        int number = 0;
+        while (takenKeys.contains(key + CitationKeyGenerator.getAppendix(number))) {
+            number++;
         }
-        return key + suffix;
+        return key + CitationKeyGenerator.getAppendix(number);
+    }
+
+    private void insertFromBatch(@Nullable TransferInformation transferInformation, BibEntry entry, ImportBatch batch, Optional<String> crossReferencedKey) {
+        entry.getField(StandardField.CROSSREF)
+             .flatMap(key -> Optional.ofNullable(batch.movedKeys().get(key)))
+             .ifPresent(movedKey -> entry.setField(StandardField.CROSSREF, movedKey));
+        importCleanedEntries(transferInformation, List.of(entry), batch.crossReferencedKeys());
+        crossReferencedKey.ifPresent(key -> entry.getCitationKey()
+                                                 .filter(insertedKey -> !insertedKey.equals(key))
+                                                 .ifPresent(insertedKey -> moveCrossReferences(key, insertedKey, batch)));
+    }
+
+    /// Points the entries of the batch that cross-reference `oldKey` to `newKey`, which duplicate handling gave their parent instead
+    // [impl->req~jabgui.import.keep-cross-referenced-keys~1]
+    private void moveCrossReferences(String oldKey, String newKey, ImportBatch batch) {
+        batch.movedKeys().put(oldKey, newKey);
+        List<BibEntry> papers = targetBibDatabaseContext.getDatabase().getEntries().stream()
+                                                        .filter(entry -> entry.getField(StandardField.CROSSREF).filter(oldKey::equals).isPresent())
+                                                        .toList();
+        if (papers.isEmpty()) {
+            return;
+        }
+        undoManager.addEdit(Localization.lang("Import entries"), edit -> papers.forEach(paper -> edit.addEdit(paper.setField(StandardField.CROSSREF, newKey))));
     }
 
     private static Set<String> crossReferencedKeys(Collection<BibEntry> entries) {
@@ -766,22 +801,22 @@ public class ImportHandler {
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
         resetBatchDuplicateDecisionState();
         makeCrossReferencedKeysUnique(entriesToAdd);
-        Set<String> keysToKeep = crossReferencedKeys(entriesToAdd);
+        ImportBatch batch = ImportBatch.of(entriesToAdd);
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
                 LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
-                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker, keysToKeep);
+                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker, batch);
                 firstEntry = false;
                 continue;
             }
             if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
                 DuplicateResolverDialog.DuplicateResolverResult decision = preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
-                importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker, keysToKeep);
+                importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker, batch);
             } else {
                 LOGGER.debug("Not first entry, pref flag is false, we use BREAK");
-                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker, keysToKeep);
+                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker, batch);
             }
         }
     }

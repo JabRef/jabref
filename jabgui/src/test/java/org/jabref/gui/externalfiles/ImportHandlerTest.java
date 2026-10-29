@@ -543,6 +543,74 @@ class ImportHandlerTest {
         assertEquals(List.of(Optional.of("volumea"), Optional.of("volumea")), List.of(volume.getCitationKey(), paper.getField(StandardField.CROSSREF)));
     }
 
+    // [utest->req~jabgui.import.keep-cross-referenced-keys~1]
+    @Test
+    void importGivesAVolumeAFreeKeyAlsoWithoutGeneratingNewKeys() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(new BibEntry(StandardEntryType.Collection).withCitationKey("volume"))));
+        BibEntry paper = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Alpha")
+                .withField(StandardField.CROSSREF, "volume");
+        BibEntry volume = new BibEntry(StandardEntryType.Collection).withCitationKey("volume");
+        generateNewKeysWithPattern("[auth][year]");
+        when(preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()).thenReturn(false);
+
+        handlerFor(databaseContext, new JabRefUndoManager()).importEntries(List.of(paper, volume));
+
+        assertEquals(List.of(Optional.of("volumea"), Optional.of("volumea")), List.of(volume.getCitationKey(), paper.getField(StandardField.CROSSREF)));
+    }
+
+    // [utest->req~jabgui.import.keep-cross-referenced-keys~1]
+    @Test
+    void importGivesAVolumeAKeyThatNoOtherImportedEntryUses() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(new BibEntry(StandardEntryType.Collection).withCitationKey("volume"))));
+        BibEntry paper = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Alpha")
+                .withField(StandardField.CROSSREF, "volume");
+        BibEntry volume = new BibEntry(StandardEntryType.Collection).withCitationKey("volume");
+        BibEntry otherPaper = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Beta")
+                .withField(StandardField.CROSSREF, "volumea");
+        BibEntry otherVolume = new BibEntry(StandardEntryType.Collection).withCitationKey("volumea");
+        generateNewKeysWithPattern("[auth][year]");
+
+        handlerFor(databaseContext, new JabRefUndoManager()).importEntries(List.of(paper, volume, otherPaper, otherVolume));
+
+        assertEquals(List.of(Optional.of("volumeb"), Optional.of("volumeb"), Optional.of("volumea"), Optional.of("volumea")),
+                List.of(volume.getCitationKey(), paper.getField(StandardField.CROSSREF), otherVolume.getCitationKey(), otherPaper.getField(StandardField.CROSSREF)));
+    }
+
+    // [utest->req~jabgui.import.keep-cross-referenced-keys~1]
+    @Test
+    void papersFollowTheExistingVolumeWhenTheImportedVolumeIsSkippedAsADuplicate() {
+        BibEntry existingVolume = new BibEntry(StandardEntryType.Collection).withCitationKey("volume").withField(StandardField.TITLE, "Example Studies");
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(existingVolume)));
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
+        when(preferences.getMergeDialogPreferences()).thenReturn(mock(MergeDialogPreferences.class));
+        generateNewKeysWithPattern("[auth][year]");
+        ImportHandler handler = Mockito.spy(new ImportHandler(
+                databaseContext,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                new JabRefUndoManager(),
+                stateManager,
+                mock(DialogService.class),
+                new CurrentThreadTaskExecutor()));
+        Mockito.doReturn(Optional.empty()).when(handler).findDuplicate(any());
+        Mockito.doReturn(Optional.of(existingVolume)).when(handler).findDuplicate(Mockito.argThat(entry -> entry.getCitationKey().isPresent()));
+        Mockito.doReturn(CompletableFuture.completedFuture(new DuplicateDecisionResult(DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT, null)))
+               .when(handler).getDuplicateDecision(any(), any(), any());
+        BibEntry paper = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Alpha")
+                .withField(StandardField.CROSSREF, "volume");
+        BibEntry volume = new BibEntry(StandardEntryType.Collection).withCitationKey("volume").withField(StandardField.TITLE, "Example Studies");
+
+        handler.importEntriesWithDuplicateCheck(null, List.of(paper, volume), new EntryImportHandlerTracker(stateManager, databaseContext, 2));
+
+        assertEquals(List.of(Optional.empty(), Optional.of("volume")), databaseContext.getDatabase().getEntries().stream().map(entry -> entry.getField(StandardField.CROSSREF)).toList());
+    }
+
     @Test
     void importKeepsACrossReferenceToAnEntryAlreadyInTheLibrary() {
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(new BibEntry(StandardEntryType.Collection).withCitationKey("volume"))));

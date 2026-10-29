@@ -89,16 +89,22 @@ public final class PdfOutlineSplitter {
         try (PDDocument document = Loader.loadPDF(source.toFile())) {
             int offset = parent.hasField(PdfLocationResolver.PAGE_OFFSET) ? PdfLocationResolver.pageOffset(parent) : volume.printedPageOffset();
             List<BibEntry> papers = new ArrayList<>();
-            for (PaperPages paper : volume.papers()) {
-                int printedFirst = paper.firstPage() - offset;
-                int printedLast = paper.lastPage() - offset;
-                if (printedFirst < 1) {
-                    continue;
-                }
+            List<Path> paperPdfs = new ArrayList<>();
+            try {
+                for (PaperPages paper : volume.papers()) {
+                    int printedFirst = paper.firstPage() - offset;
+                    int printedLast = paper.lastPage() - offset;
+                    if (printedFirst < 1) {
+                        continue;
+                    }
 
-                Path target = PdfPageCopier.createUniqueFile(targetDirectory, FileUtil.getValidFileName(paper.title() + ".pdf"));
-                PdfPageCopier.copy(document, paper.firstPage(), paper.lastPage(), target);
-                papers.add(paperEntry(parent, paper.title(), printedFirst, printedLast, target));
+                    Path target = PdfPageCopier.copyToNewFile(document, paper.firstPage(), paper.lastPage(), targetDirectory, FileUtil.getValidFileName(paper.title() + ".pdf"));
+                    paperPdfs.add(target);
+                    papers.add(paperEntry(parent, paper.title(), printedFirst, printedLast, target));
+                }
+            } catch (IOException exception) {
+                PdfPageCopier.deleteQuietly(paperPdfs, exception);
+                throw exception;
             }
             return new SplitPapers(papers, offset);
         }
