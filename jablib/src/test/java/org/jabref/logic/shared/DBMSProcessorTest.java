@@ -285,7 +285,9 @@ class DBMSProcessorTest {
         }
 
         // 3. Reconnect / re-run setup to repair existing entries and add the constraint back
+        assertFalse(dbmsProcessor.checkBaseIntegrity());
         dbmsProcessor.setupSharedDatabase();
+        assertTrue(dbmsProcessor.checkBaseIntegrity());
 
         // 4a. Assert entries were repaired to Misc and retained their titles
         List<BibEntry> entries = dbmsProcessor.getSharedEntries();
@@ -302,6 +304,17 @@ class DBMSProcessorTest {
                 ps.executeUpdate();
             }
         });
+
+        // 4c. The repair must change the stored values, not only how they are read
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT entrytype FROM jabref.entry ORDER BY shared_id")) {
+            assertTrue(resultSet.next());
+            assertEquals("misc", resultSet.getString(1));
+            assertTrue(resultSet.next());
+            assertEquals("misc", resultSet.getString(1));
+            assertFalse(resultSet.next());
+        }
+
         assertEquals("23514", exception.getSQLState());
     }
 

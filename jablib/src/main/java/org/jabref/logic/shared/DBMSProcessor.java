@@ -84,7 +84,9 @@ public class DBMSProcessor {
             return false;
         }
         String metadataVersion = getSharedMetaData().get(MetaData.VERSION_DB_STRUCT);
-        return (metadataVersion != null) && (Integer.parseInt(metadataVersion.replace(";", "")) == getCURRENT_VERSION_DB_STRUCT());
+        return (metadataVersion != null)
+                && (Integer.parseInt(metadataVersion.replace(";", "")) == getCURRENT_VERSION_DB_STRUCT())
+                && entryTypeConstraintExists();
     }
 
     private boolean tableExists(String qualifiedName) throws SQLException {
@@ -313,7 +315,7 @@ public class DBMSProcessor {
                     SELECT 1
                     FROM pg_constraint
                     WHERE conname = 'entry_entrytype_not_blank'
-                      AND conrelid = 'jabref.entry'::regclass
+                      AND conrelid = to_regclass('jabref.entry')
                 )""";
         try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
             resultSet.next();
