@@ -65,6 +65,7 @@ The field formatter "LaTeX to Unicode-aware LaTeX" replaces commands that encode
 It is available in the cleanup dialog and as a save action.
 Unlike "LaTeX to Unicode", it keeps all other LaTeX code: protective braces, math, formatting commands such as `\emph{...}`, and commands without a single-character Unicode equivalent.
 It preserves LaTeX comments and braces protecting uppercase character commands from BibTeX case changes.
+Math preservation recognizes standard math delimiters and a fixed set of common math environments; custom and unlisted environments are not recognized.
 A command whose conversion would introduce a LaTeX special character (such as `\textbackslash{}`) is kept.
 
 See <https://github.com/JabRef/jabref/issues/8715>.
