@@ -1,6 +1,7 @@
 package org.jabref.gui.shared;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -34,11 +35,10 @@ public class SharedDatabaseErrorTab extends Tab {
     static final String MESSAGE_ID = "shared-database-error-message";
 
     private final @Nullable String sharedDatabaseId;
-    private final DBMSConnectionProperties connectionProperties;
+    private DBMSConnectionProperties connectionProperties;
     private final Label message = new Label();
-    private final Button retryButton = new Button(Localization.lang("Retry"));
 
-    private Runnable retryAction = () -> {
+    private Consumer<SharedDatabaseErrorTab> retryAction = _ -> {
     };
     private @Nullable Throwable error;
 
@@ -54,8 +54,9 @@ public class SharedDatabaseErrorTab extends Tab {
         message.setWrapText(true);
         message.setMaxWidth(600);
         message.setTextAlignment(TextAlignment.CENTER);
+        Button retryButton = new Button(Localization.lang("Retry"));
         retryButton.setDefaultButton(true);
-        retryButton.setOnAction(_ -> retryAction.run());
+        retryButton.setOnAction(_ -> retryAction.accept(this));
 
         Label header = new Label(sharedDatabaseId == null
                                  ? Localization.lang("Could not connect to %0.", databaseName)
@@ -82,8 +83,14 @@ public class SharedDatabaseErrorTab extends Tab {
                       .orElseGet(() -> Localization.lang("Shared database connection"));
     }
 
-    public void setRetryAction(Runnable retryAction) {
+    public void setRetryAction(Consumer<SharedDatabaseErrorTab> retryAction) {
         this.retryAction = retryAction;
+    }
+
+    public void updateFailure(SharedDatabaseErrorTab newerFailure) {
+        connectionProperties = newerFailure.connectionProperties;
+        retryAction = newerFailure.retryAction;
+        newerFailure.getError().ifPresent(this::showError);
     }
 
     public Optional<String> getSharedDatabaseId() {

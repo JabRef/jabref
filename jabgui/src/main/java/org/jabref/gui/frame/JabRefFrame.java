@@ -808,6 +808,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     /// Opens a loading tab for a remembered shared database and connects in the background.
     private void reconnectSharedDatabase(SharedDatabaseSessionService sessionService, SharedDatabaseSessionService.Reconnection reconnection) {
+        Optional<LibraryTab> existingTab = SharedDatabaseUIManager.findOpenTab(this, reconnection.connectionProperties());
+        if (existingTab.isPresent()) {
+            showLibraryTab(existingTab.orElseThrow());
+            return;
+        }
         SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
         // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
         // The callbacks check the stage so a connection that completes during shutdown is closed with its loading tab.
@@ -829,6 +834,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 gitHandlerRegistry,
                 (tab, bibDatabaseContext) -> handleSharedDatabaseReconnectionSuccess(sessionService, reconnection, tab, bibDatabaseContext),
                 exception -> handleSharedDatabaseReconnectionFailure(sessionService, reconnection, exception));
+        Optional<LibraryTab> reservedTab = SharedDatabaseUIManager.reserveTab(this, reconnection.connectionProperties(), newTab);
+        if (reservedTab.isPresent()) {
+            showLibraryTab(reservedTab.orElseThrow());
+            return;
+        }
         addTab(newTab, true);
         newTab.startDataLoadingTask();
     }
@@ -856,18 +866,17 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // The tab alone is easy to miss among the libraries that did open, so the failure is announced as well.
         dialogService.notify(Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()));
         SharedDatabaseErrorTab errorTab = new SharedDatabaseErrorTab(reconnection.sharedDatabaseId(), reconnection.connectionProperties());
-        errorTab.setRetryAction(() -> {
-            errorTab.close();
+        errorTab.setRetryAction(tab -> {
+            tab.close();
             reconnectSharedDatabase(sessionService, reconnection);
         });
         errorTab.showError(exception);
-        tabbedPane.getTabs().add(errorTab);
+        addSharedDatabaseErrorTab(errorTab);
     }
 
     @Override
     public void showSharedDatabaseErrorTab(SharedDatabaseErrorTab errorTab) {
-        // A repeated attempt for the same connection does not pile up retries. The tab of a remembered database stays,
-        // its retry keeps the id and so the database stays remembered; it merely shows the newer error.
+        // Keep the remembered id while retrying with the settings from the latest attempt.
         Optional<SharedDatabaseErrorTab> remembered = tabbedPane.getTabs().stream()
                                                                 .filter(SharedDatabaseErrorTab.class::isInstance)
                                                                 .map(SharedDatabaseErrorTab.class::cast)
@@ -875,13 +884,27 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                                                                 .filter(existing -> existing.getSharedDatabaseId().isPresent())
                                                                 .findFirst();
         if (remembered.isPresent()) {
-            errorTab.getError().ifPresent(remembered.get()::showError);
-            tabbedPane.getSelectionModel().select(remembered.get());
+            SharedDatabaseErrorTab rememberedTab = remembered.orElseThrow();
+            rememberedTab.updateFailure(errorTab);
+            tabbedPane.getSelectionModel().select(rememberedTab);
             return;
         }
         removeSharedDatabaseErrorTabsFor(errorTab.getConnectionProperties());
-        tabbedPane.getTabs().add(errorTab);
+        addSharedDatabaseErrorTab(errorTab);
         tabbedPane.getSelectionModel().select(errorTab);
+    }
+
+    private void addSharedDatabaseErrorTab(SharedDatabaseErrorTab errorTab) {
+        addSharedDatabaseErrorTab(tabbedPane, errorTab, this::showWelcomeTab);
+    }
+
+    static void addSharedDatabaseErrorTab(TabPane tabbedPane, SharedDatabaseErrorTab errorTab, Runnable showWelcomeTab) {
+        errorTab.setOnClosed(_ -> {
+            if (tabbedPane.getTabs().isEmpty()) {
+                showWelcomeTab.run();
+            }
+        });
+        tabbedPane.getTabs().add(errorTab);
     }
 
     @Override

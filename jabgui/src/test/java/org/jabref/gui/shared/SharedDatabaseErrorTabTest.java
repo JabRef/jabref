@@ -35,7 +35,7 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
 
         interact(() -> {
             tab = new SharedDatabaseErrorTab("shared-1", connectionProperties);
-            tab.setRetryAction(retries::incrementAndGet);
+            tab.setRetryAction(_ -> retries.incrementAndGet());
             tab.showError(new SQLException("Connection refused"));
         });
     }
@@ -113,6 +113,30 @@ class SharedDatabaseErrorTabTest extends JavaFxTest {
         interact(() -> tab.showError(stillRefused));
 
         assertEquals(Optional.of(stillRefused), tab.getError());
+    }
+
+    @Test
+    void updatingFailureRetriesWithNewSettingsOnTheRememberedTab() {
+        DBMSConnectionProperties updatedProperties = mock(DBMSConnectionProperties.class);
+        when(updatedProperties.getDatabase()).thenReturn("Literature");
+        TabPane tabPane = new TabPane();
+        interact(() -> {
+            tabPane.getTabs().add(tab);
+            SharedDatabaseErrorTab newerFailure = new SharedDatabaseErrorTab(null, updatedProperties);
+            newerFailure.setRetryAction(target -> {
+                retries.incrementAndGet();
+                target.close();
+            });
+            newerFailure.showError(new SQLException("New failure"));
+            tab.updateFailure(newerFailure);
+            retryButton().fire();
+        });
+
+        assertEquals(updatedProperties, tab.getConnectionProperties());
+        assertEquals(Optional.of("shared-1"), tab.getSharedDatabaseId());
+        assertEquals("New failure", message().getText());
+        assertEquals(1, retries.get());
+        assertEquals(List.of(), tabPane.getTabs());
     }
 
     @Test

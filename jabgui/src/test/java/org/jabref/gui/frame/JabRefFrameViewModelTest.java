@@ -144,4 +144,22 @@ class JabRefFrameViewModelTest extends JavaFxTest {
 
         verify(preferences.getLastFilesOpenedPreferences()).setLastSharedDatabasesOpened(List.of("shared-1"));
     }
+
+    @Test
+    void sharedDatabaseStillLoadingAtQuitStaysRemembered() {
+        BibDatabaseContext loadingContext = new BibDatabaseContext();
+        loadingContext.getDatabase().setSharedDatabaseID("shared-1");
+        LibraryTab loadingTab = mock(LibraryTab.class);
+        when(loadingTab.isLoading()).thenReturn(true);
+        when(loadingTab.getBibDatabaseContext()).thenReturn(loadingContext);
+        when(stateManager.getAnyTasksThatWillNotBeRecoveredRunning()).thenReturn(EasyBind.map(new SimpleBooleanProperty(false), Boolean::booleanValue));
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(loadingTab));
+        when(tabContainer.getCurrentLibraryTab()).thenReturn(null);
+        when(tabContainer.closeTabs(any(), eq(false))).thenReturn(true);
+        when(preferences.getWorkspacePreferences().shouldOpenLastEdited()).thenReturn(true);
+
+        interact(() -> assertTrue(viewModel.close()));
+
+        verify(preferences.getLastFilesOpenedPreferences()).setLastSharedDatabasesOpened(List.of("shared-1"));
+    }
 }

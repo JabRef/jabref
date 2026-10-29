@@ -101,4 +101,11 @@ A shared database identified by its DBMS type, normalized host, port, and databa
 
 Needs: impl, utest
 
+## Shared database cleanup must not block other library tabs
+`req~shared-database.background-close~1`
+
+Closing a shared library prepares pending model changes on the JavaFX thread and flushes them in the background. Reopening the same database and application shutdown wait for cleanup to finish.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
