@@ -27,6 +27,7 @@ import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
+import org.jabref.logic.undo.UndoStep;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -109,24 +110,7 @@ class BackupUIManagerTest extends JavaFxTest {
     @Test
     void reviewBackupAcceptingAllChangesWorksWithoutAnActiveTab(@TempDir Path tempDir) throws IOException {
         Path backupDir = tempDir.resolve("backups");
-        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
-        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
-                .thenReturn(Optional.of(BackupResolverDialog.REVIEW_BACKUP));
-        when(dialogService.showCustomDialogAndWait(any(DatabaseChangesResolverDialog.class)))
-                .thenAnswer(invocation -> {
-                    DatabaseChangesResolverDialog dialog = invocation.getArgument(0);
-                    dialog.getResolvedChanges().forEach(DatabaseChange::accept);
-                    return Optional.of(true);
-                });
-        // Sealed, so deep stubs cannot mock it
-        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        doReturn(new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
-                .when(previewPreferences).getSelectedPreviewLayout();
-        Injector.setModelOrService(DialogService.class, dialogService);
-        Injector.setModelOrService(GuiPreferences.class, preferences);
-        Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
-        Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));
-        Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+        acceptAllChangesWhenReviewingBackup(backupDir);
 
         Path originalFile = tempDir.resolve("library.bib");
         Files.writeString(originalFile, "@Article{original, title = {Original}}");
@@ -156,6 +140,55 @@ class BackupUIManagerTest extends JavaFxTest {
         BibDatabaseContext restored = result.orElseThrow().getDatabaseContext();
         assertEquals(2, restored.getDatabase().getEntryCount());
         assertEquals(List.of("TODO"), restored.getMetaData().getGroups().orElseThrow().getChildren().stream().map(GroupTreeNode::getName).toList());
+    }
+
+    /// Accepted changes make the library differ from the file on disk. Once loading finished, the tab installs the
+    /// context of the returned result, and that context's journal drives both the modified marker and undo. If the
+    /// merge is recorded on a journal the tab never sees, the restored library looks saved and closes without asking.
+    /// [utest->req~jabgui.autosaveandbackup.accepted-backup-changes-undoable~1]
+    @Test
+    void loadedLibraryCanUndoAcceptedBackupChanges(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        acceptAllChangesWhenReviewingBackup(backupDir);
+
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@Article{original, title = {Original}}");
+        Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
+        Files.writeString(backupFile, "@Article{original, title = {Restored}}");
+        StateManager stateManager = new JabRefGuiStateManager();
+
+        Optional<ParserResult> result = BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                stateManager);
+
+        // The same call LibraryTab makes when it installs the loaded library
+        BibDatabaseContext loaded = result.orElseThrow().getDatabaseContext();
+        assertEquals(Optional.of(Localization.lang("Merged external changes")),
+                stateManager.getUndoManager(loaded).undo().map(UndoStep::name));
+    }
+
+    private void acceptAllChangesWhenReviewingBackup(Path backupDir) {
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.REVIEW_BACKUP));
+        when(dialogService.showCustomDialogAndWait(any(DatabaseChangesResolverDialog.class)))
+                .thenAnswer(invocation -> {
+                    DatabaseChangesResolverDialog dialog = invocation.getArgument(0);
+                    dialog.getResolvedChanges().forEach(DatabaseChange::accept);
+                    return Optional.of(true);
+                });
+        // Sealed, so deep stubs cannot mock it
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+        doReturn(new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
+                .when(previewPreferences).getSelectedPreviewLayout();
+        Injector.setModelOrService(DialogService.class, dialogService);
+        Injector.setModelOrService(GuiPreferences.class, preferences);
+        Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
+        Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));
+        Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
     }
 
     @Test
