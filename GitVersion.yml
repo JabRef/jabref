@@ -17,3 +17,10 @@ branches:
     # (v6.0-alpha.6 + 956 commits reached 34956, hence 50000 for beta). Stay below 60000: GitVersion always uses that for a stable release.
     # Ignored while `label` is empty.
     pre-release-weight: 50000
+  # Release branch of JabRef/jabref-black-forest; that repository has no `main`, so pull requests there need it as a source
+  black-forest:
+    regex: ^black-forest$
+    label: ''
+    is-main-branch: true
+  pull-request:
+    source-branches: [main, black-forest]
