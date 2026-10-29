@@ -98,6 +98,18 @@ public final class IkonliIcon implements JabRefIcon {
         }
     }
 
+    /// [@FontIcon] with size control from stylesheets
+    private static final class ThemeSizedFontIcon extends FontIcon {
+        public ThemeSizedFontIcon(Ikon iconCode) {
+            super(iconCode);
+        }
+
+        @Override
+        public void setIconSize(int size) {
+            // Ignored deliberately to let stylesheets decide the size
+        }
+    }
+
     @Override
     public Node getGraphicNode() {
         if (icons.size() == 1) {
@@ -115,7 +127,16 @@ public final class IkonliIcon implements JabRefIcon {
     private FontIcon buildFontIcon(Ikon ikon) {
         // An explicit color (via withColor/disabled) has to survive the theme's .glyph-icon rules, which is what
         // JabRefFontIcon takes care of. Without one, those rules are what colors the icon.
-        FontIcon fontIcon = color == null ? FontIcon.of(ikon, size) : new JabRefFontIcon(ikon, size, color);
+        // And @ThemeSizedFontIcon takes care of icon size
+        boolean themeSized = size == DEFAULT_SIZE;
+        FontIcon fontIcon;
+        if (color != null) {
+            fontIcon = new JabRefFontIcon(ikon, size, color, themeSized);
+        } else if (themeSized) {
+            fontIcon = new ThemeSizedFontIcon(ikon);
+        } else {
+            fontIcon = FontIcon.of(ikon, size);
+        }
         fontIcon.getStyleClass().add("glyph-icon");
         return fontIcon;
     }
