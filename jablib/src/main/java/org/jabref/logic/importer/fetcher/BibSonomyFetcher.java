@@ -59,19 +59,19 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
         if (!hasUsernameAndApiKey(usernameAndApiKey)) {
             throw new FetcherException(Localization.lang("BibSonomy needs your username and API key. Enter them as 'username:apikey' in Preferences > Web search > BibSonomy."));
         }
-        // BibSonomy cannot filter by year, so the transformer only records the requested years and we filter here.
-        // The same transformation also gives the search string, so the query is transformed only once.
+        // The transformer gives the search string and records the requested years, so the query is transformed only once.
+        // BibSonomy ignores the year tag when there is no search term, so we also filter by year here.
         BibSonomyQueryTransformer transformer = new BibSonomyQueryTransformer();
         String query = transformer.transformSearchQuery(queryNode).orElse("");
-        return fetchPage(query, 0).stream()
-                                  .filter(entry -> isInYearRange(entry, transformer))
-                                  .toList();
+        return fetchEntries(query, transformer).stream()
+                                               .filter(entry -> isInYearRange(entry, transformer))
+                                               .toList();
     }
 
-    private List<BibEntry> fetchPage(String query, int start) throws FetcherException {
+    private List<BibEntry> fetchEntries(String query, BibSonomyQueryTransformer transformer) throws FetcherException {
         URL url;
         try {
-            url = getSearchUrl(query, start);
+            url = getSearchUrl(query, transformer);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
@@ -98,18 +98,33 @@ public class BibSonomyFetcher implements SearchBasedParserFetcher, CustomizableK
 
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
-        return getSearchUrl(new BibSonomyQueryTransformer().transformSearchQuery(queryNode).orElse(""), 0);
+        BibSonomyQueryTransformer transformer = new BibSonomyQueryTransformer();
+        String query = transformer.transformSearchQuery(queryNode).orElse("");
+        return getSearchUrl(query, transformer);
     }
 
-    /// One page of up to [#MAX_RESULTS] posts, starting at post number `start`
-    private static URL getSearchUrl(String query, int start) throws URISyntaxException, MalformedURLException {
+    private static URL getSearchUrl(String query, BibSonomyQueryTransformer transformer) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         uriBuilder.addParameter("resourcetype", "publication");
         uriBuilder.addParameter("format", "bibtex");
         uriBuilder.addParameter("search", query);
-        uriBuilder.addParameter("start", String.valueOf(start));
-        uriBuilder.addParameter("end", String.valueOf(start + MAX_RESULTS));
+        getYearTag(transformer).ifPresent(yearTag -> uriBuilder.addParameter("tags", yearTag));
+        uriBuilder.addParameter("start", "0");
+        uriBuilder.addParameter("end", String.valueOf(MAX_RESULTS));
         return uriBuilder.build().toURL();
+    }
+
+    /// BibSonomy filters by year through its `sys:year` system tag: `sys:year:2015`, `sys:year:2010-2012`, `sys:year:2010-` or `sys:year:-2012`
+    static Optional<String> getYearTag(BibSonomyQueryTransformer transformer) {
+        Optional<Integer> startYear = transformer.getStartYear();
+        Optional<Integer> endYear = transformer.getEndYear();
+        if (startYear.isEmpty() && endYear.isEmpty()) {
+            return Optional.empty();
+        }
+        if (startYear.equals(endYear)) {
+            return startYear.map(year -> "sys:year:" + year);
+        }
+        return Optional.of("sys:year:" + startYear.map(String::valueOf).orElse("") + "-" + endYear.map(String::valueOf).orElse(""));
     }
 
     @Override
