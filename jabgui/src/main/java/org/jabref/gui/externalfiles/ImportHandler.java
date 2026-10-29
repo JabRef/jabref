@@ -7,8 +7,10 @@ import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -162,6 +164,7 @@ public class ImportHandler {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
             private final List<BibEntry> allEntriesToAdd = new ArrayList<>();
+            private final Set<BibEntry> volumesToSplit = Collections.newSetFromMap(new IdentityHashMap<>());
 
             @Override
             public List<ImportFilesResultItemViewModel> call() {
@@ -199,8 +202,11 @@ public class ImportHandler {
 
                     try {
                         List<BibEntry> volumeEntries = FileUtil.isPDFFile(file) ? multiPaperEntries(file) : List.of();
-                        if (!volumeEntries.isEmpty()) {
+                        // [impl->req~logic.importer.multi-paper-pdf~1]
+                        if (!volumeEntries.isEmpty() && Boolean.TRUE.equals(UiTaskExecutor.runInJavaFXThread(
+                                () -> AttachedPdfSplitter.confirmImportAsPapers(dialogService, file, volumeEntries.size() - 1)))) {
                             BibEntry wholePdf = volumeEntries.getLast();
+                            volumesToSplit.add(wholePdf);
                             wholePdf.clearField(StandardField.FILE);
                             DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, wholePdf);
                             addToImportEntriesGroup(volumeEntries);
@@ -283,7 +289,7 @@ public class ImportHandler {
 
                 // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                 // That method does a clone() on each entry
-                UiTaskExecutor.runInJavaFXThread(() -> insertImported(allEntriesToAdd, suspended));
+                UiTaskExecutor.runInJavaFXThread(() -> insertImported(allEntriesToAdd, volumesToSplit, suspended));
                 return results;
             }
 
@@ -299,13 +305,16 @@ public class ImportHandler {
     /// [#importCleanedEntries] records the insert as one step, so the files imported together are
     /// one Ctrl+Z, and what the insert sets off — group assignment, and the tab's automatic
     /// assignment to the selected groups — is recorded inside that step rather than after it.
-    private void insertImported(List<BibEntry> entriesToAdd, UndoSuspension suspended) {
+    ///
+    /// @param volumesToSplit volumes the user already agreed to split into their papers
+    private void insertImported(List<BibEntry> entriesToAdd, Set<BibEntry> volumesToSplit, UndoSuspension suspended) {
         try {
             importEntries(entriesToAdd);
         } finally {
             suspended.close();
         }
-        new AttachedPdfSplitter(targetBibDatabaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager).splitImportedVolumes(entriesToAdd);
+        new AttachedPdfSplitter(targetBibDatabaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
+                .splitImportedVolumes(entriesToAdd, volumesToSplit::contains);
     }
 
     private List<BibEntry> multiPaperEntries(Path pdf) {
@@ -401,9 +410,9 @@ public class ImportHandler {
     /// Creates a copy of the entry for processing - the original entry parameter is not modified.
     /// The copied entry may be modified during cleanup and duplicate handling.
     ///
-    /// @param entry    the entry to import (original will not be modified)
-    /// @param decision the duplicate resolution strategy to apply
-    /// @param tracker  tracks the import status of the entry
+    /// @param entry      the entry to import (original will not be modified)
+    /// @param decision   the duplicate resolution strategy to apply
+    /// @param tracker    tracks the import status of the entry
     /// @param keysToKeep keys that entries imported in the same batch cross-reference
     private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker, Set<String> keysToKeep) {
         // The original entry should not be modified

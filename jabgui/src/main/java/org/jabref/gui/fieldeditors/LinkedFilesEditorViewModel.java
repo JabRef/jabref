@@ -38,6 +38,7 @@ import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.PdfOutlineSplitter;
 import org.jabref.logic.undo.UndoManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -48,7 +49,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.undo.UndoableFieldChange;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,17 +170,19 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     private void splitAttachedPdf(Path pdf) {
-        BibEntry attachedTo = entry;
         new AttachedPdfSplitter(databaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
-                .split(pdf, attachedTo, paper -> linkPaper(attachedTo, paper));
+                .split(pdf, entry, paper -> files.add(toViewModel(paper)));
     }
 
-    private void linkPaper(BibEntry attachedTo, LinkedFile paper) {
-        if (entry == attachedTo) {
-            files.add(toViewModel(paper));
-            return;
-        }
-        attachedTo.addFile(paper).ifPresent(change -> undoManager.addEdit(new UndoableFieldChange(change)));
+    public boolean canSplitPdf(LinkedFileViewModel linkedFile) {
+        return PdfOutlineSplitter.holdsPapers(entry.getType())
+                && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).filter(FileUtil::isPDFFile).isPresent();
+    }
+
+    public void splitPdf(LinkedFileViewModel linkedFile) {
+        linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences())
+                  .ifPresent(pdf -> new AttachedPdfSplitter(databaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
+                          .splitOnRequest(pdf, entry));
     }
 
     private LinkedFileViewModel toViewModel(LinkedFile linkedFile) {

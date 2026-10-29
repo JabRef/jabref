@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.PdfLocationResolver;
+import org.jabref.logic.externalfiles.PdfLocationResolver.PageSpan;
 import org.jabref.logic.pdf.PdfOutlineSplitter.SplitPapers;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
@@ -61,11 +62,15 @@ public class MultiPaperPdfLinker {
                     .findFirst();
     }
 
-    /// @return a link to a copy of the pages that `entry` names, or empty when `pdf` holds no more than these pages
-    public Optional<LinkedFile> copyPages(Path pdf, BibEntry entry) throws IOException {
-        BibEntry pageOffsetOwner = PdfLocationResolver.pageOffsetOwner(entry, databaseContext.getDatabase());
-        return PdfPaperExtractor.extractPaper(pdf, entry, pageOffsetOwner, pdf.getParent())
-                                .map(copy -> new LinkedFile("", FileUtil.relativize(copy, databaseContext, filePreferences), StandardFileType.PDF.getName()));
+    /// @return the PDF pages that `entry` names, or empty when `pdf` holds no more than these pages
+    public Optional<PageSpan> pagesToCopy(Path pdf, BibEntry entry) throws IOException {
+        return PdfPaperExtractor.pagesToExtract(pdf, entry, PdfLocationResolver.pageOffsetOwner(entry, databaseContext.getDatabase()));
+    }
+
+    /// @return a link to a new PDF next to `pdf` holding `pages`
+    public LinkedFile copyPages(Path pdf, PageSpan pages) throws IOException {
+        Path copy = PdfPaperExtractor.extractPages(pdf, pages, Optional.ofNullable(pdf.getParent()).orElse(Path.of("")));
+        return new LinkedFile("", FileUtil.relativize(copy, databaseContext, filePreferences), StandardFileType.PDF.getName());
     }
 
     public boolean isInLibrary(BibEntry entry) {

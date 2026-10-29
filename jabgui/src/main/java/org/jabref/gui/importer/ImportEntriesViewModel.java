@@ -2,9 +2,11 @@ package org.jabref.gui.importer;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -76,9 +78,11 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final ObservableList<BibEntry> allEntries = FXCollections.observableArrayList();
     private final Optional<SearchBasedFetcher> fetcher;
     private final Optional<String> query;
+    private final Set<Path> pdfsToSplit;
 
     /// @param databaseContext the database to import into
     /// @param task            the task executed for parsing the selected files(s).
+    /// @param pdfsToSplit     PDFs the user already agreed to split into their papers
     public ImportEntriesViewModel(BackgroundTask<ParserResult> task,
                                   TaskExecutor taskExecutor,
                                   BibDatabaseContext databaseContext,
@@ -89,7 +93,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                   BibEntryTypesManager entryTypesManager,
                                   FileUpdateMonitor fileUpdateMonitor,
                                   Optional<SearchBasedFetcher> fetcher,
-                                  Optional<String> query) {
+                                  Optional<String> query,
+                                  Set<Path> pdfsToSplit) {
         this.taskExecutor = taskExecutor;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
@@ -104,6 +109,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.selectedDb = new SimpleObjectProperty<>();
         this.fetcher = fetcher;
         this.query = query;
+        this.pdfsToSplit = pdfsToSplit;
 
         task.onSuccess(parserResult -> {
             // store the complete parser result (to import groups, ... later on)
@@ -221,8 +227,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             if (StringUtil.isNotBlank(targetGroup)) {
                 GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, databaseContext.getKeywordSeparator(preferences.getBibEntryPreferences().getKeywordSeparator()));
             }
-            new AttachedPdfSplitter(selectedDatabaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
-                    .splitImportedVolumes(tracker.getImportedEntries());
+            AttachedPdfSplitter splitter = new AttachedPdfSplitter(selectedDatabaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager);
+            splitter.splitImportedVolumes(tracker.getImportedEntries(), volume -> splitter.linksAnyOf(volume, pdfsToSplit));
         });
         importHandler.importEntriesWithDuplicateCheck(null, entriesToImport, tracker);
     }

@@ -119,6 +119,19 @@ class MultiPaperPdfImporterTest {
         assertEquals(List.of("Alpha", "Beta", "volume"), result.parserResult().getDatabase().getEntries().stream().map(entry -> entry.getField(StandardField.TITLE).orElseThrow()).toList());
     }
 
+    // [utest->req~logic.importer.multi-paper-pdf~1]
+    @Test
+    void importsAMultiPaperPdfAsOneEntryOnRequest() throws IOException {
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
+        ImportFormatReader reader = new ImportFormatReader(importerPreferences, importFormatPreferences, mock(CitationKeyPatternPreferences.class), new DummyFileUpdateMonitor());
+        Path pdf = volume("Proceedings of the Example Conference", true);
+
+        List<BibEntry> entries = reader.importPdfAsOneEntry(pdf).parserResult().getDatabase().getEntries();
+
+        assertEquals(List.of(List.of(pdf.toString())), entries.stream().map(entry -> entry.getFiles().stream().map(LinkedFile::getLink).toList()).toList());
+    }
+
     @Test
     void usesThePdfPagesWhenThePdfHasNoPageLabels() throws IOException {
         Path pdf = volume("Proceedings of the Example Conference", false);

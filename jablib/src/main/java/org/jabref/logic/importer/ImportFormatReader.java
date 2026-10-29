@@ -65,7 +65,7 @@ public class ImportFormatReader {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private BibtexImporter bibtexImporter;
+    private final BibtexImporter bibtexImporter;
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
@@ -75,6 +75,7 @@ public class ImportFormatReader {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+        this.bibtexImporter = new BibtexImporter(importFormatPreferences, fileUpdateMonitor);
         reset();
     }
 
@@ -112,7 +113,6 @@ public class ImportFormatReader {
         importers.addAll(importerPreferences.getCustomImporters());
 
         // BibTeX as last
-        bibtexImporter = new BibtexImporter(importFormatPreferences, fileUpdateMonitor);
         importers.add(bibtexImporter);
     }
 
@@ -171,7 +171,13 @@ public class ImportFormatReader {
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     // [impl->req~logic.importer.multi-paper-pdf~1]
     public ImportResult importWithAutoDetection(Path filePath) throws ImportException {
-        if (FileUtil.isPDFFile(filePath)) {
+        return importWithAutoDetection(filePath, true);
+    }
+
+    /// @param asMultiPaperPdf whether a PDF holding several papers is imported as one entry per paper
+    // [impl->req~logic.importer.multi-paper-pdf~1]
+    public ImportResult importWithAutoDetection(Path filePath, boolean asMultiPaperPdf) throws ImportException {
+        if (asMultiPaperPdf && FileUtil.isPDFFile(filePath)) {
             MultiPaperPdfImporter multiPaperPdfImporter = new MultiPaperPdfImporter(importFormatPreferences);
             ParserResult papers = multiPaperPdfImporter.importDatabase(filePath);
             if (papers.getDatabase().hasEntries()) {
@@ -182,17 +188,31 @@ public class ImportFormatReader {
         }
         ImportResult importResult = importWithAutoDetection(
                 importer -> importer.importDatabase(filePath),
-                importer -> importer.isRecognizedFormat(filePath),
+                importer -> (asMultiPaperPdf || !(importer instanceof MultiPaperPdfImporter)) && importer.isRecognizedFormat(filePath),
                 () -> OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileUpdateMonitor)
         );
         importResult.parserResult.setPath(filePath);
         return importResult;
     }
 
+    /// Imports a PDF holding several papers as one entry, followed by the references cited in it
+    // [impl->req~logic.importer.multi-paper-pdf~1]
+    public ImportResult importPdfAsOneEntry(Path pdf) {
+        PdfMergeMetadataImporter importer = new PdfMergeMetadataImporter(importFormatPreferences);
+        ParserResult pdfEntry = importer.importDatabase(pdf);
+        addCitedReferences(pdf, pdfEntry);
+        pdfEntry.setPath(pdf);
+        return new ImportResult(importer.getName(), pdfEntry);
+    }
+
     private void addCitedReferences(Path pdf, ParserResult papers) {
         for (Importer importer : importers) {
             if (importer instanceof PdfGrobidImporter grobid) {
-                papers.getDatabase().insertEntries(grobid.importDatabase(pdf).getDatabase().getEntries());
+                ParserResult references = grobid.importDatabase(pdf);
+                if (references.hasWarnings()) {
+                    LOGGER.warn("Could not read the references cited in {}: {}", pdf, references.getErrorMessage());
+                }
+                papers.getDatabase().insertEntries(references.getDatabase().getEntries());
                 return;
             }
         }
@@ -254,7 +274,7 @@ public class ImportFormatReader {
         // stores ref to best result, gets updated at the next loop
         List<BibEntry> bestResult = null;
         int bestResultFieldCount = 0;
-        String bestFormatName = null;
+        String bestFormatName = "";
 
         // Cycle through all importers:
         for (Importer importer : importers) {

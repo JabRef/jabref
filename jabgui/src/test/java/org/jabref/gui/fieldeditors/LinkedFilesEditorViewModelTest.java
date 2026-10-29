@@ -35,6 +35,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -90,7 +91,7 @@ class LinkedFilesEditorViewModelTest {
 
     // [utest->req~logic.pdf.extract-paper-page-range~1]
     @Test
-    void copyOfPagesGoesToTheEntryThePdfWasAttachedTo(@TempDir Path tempDir) throws IOException {
+    void attachingAPdfLinksACopyOfTheEntryPages(@TempDir Path tempDir) throws IOException {
         try (PDDocument document = new PDDocument()) {
             for (int page = 0; page < 5; page++) {
                 document.addPage(new PDPage());
@@ -98,28 +99,46 @@ class LinkedFilesEditorViewModelTest {
             document.save(tempDir.resolve("proceedings.pdf").toFile());
         }
         BibEntry paper = new BibEntry(StandardEntryType.InProceedings).withField(StandardField.PAGES, "2--3");
-        BibEntry otherEntry = new BibEntry(StandardEntryType.Article);
         when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(tempDir));
-        when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(paper, otherEntry)));
+        when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(paper)));
         DeferredTaskExecutor taskExecutor = new DeferredTaskExecutor();
-        viewModel = new LinkedFilesEditorViewModel(
+        DialogService dialogService = mock(DialogService.class);
+        when(dialogService.showConfirmationDialogAndWait(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
+        LinkedFilesEditorViewModel paperEditor = editor(dialogService, taskExecutor);
+        paperEditor.bindToEntry(paper);
+        paperEditor.addNewLinkedFile(new LinkedFile("", Path.of("proceedings.pdf"), "PDF"));
+
+        taskExecutor.runPending();
+
+        assertTrue(paper.getFiles().stream().anyMatch(file -> "proceedings-p2-3.pdf".equals(file.getLink())));
+    }
+
+    // [utest->req~logic.pdf.split-proceedings-outline~1]
+    @Test
+    void canSplitThePdfOfAProceedingsEntryOnly(@TempDir Path tempDir) throws IOException {
+        Files.createFile(tempDir.resolve("volume.pdf"));
+        when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(tempDir));
+        LinkedFileViewModel pdf = mock(LinkedFileViewModel.class);
+        when(pdf.getFile()).thenReturn(new LinkedFile("", Path.of("volume.pdf"), "PDF"));
+        LinkedFilesEditorViewModel proceedingsEditor = editor(mock(DialogService.class), new DeferredTaskExecutor());
+        proceedingsEditor.bindToEntry(new BibEntry(StandardEntryType.Proceedings));
+        LinkedFilesEditorViewModel articleEditor = editor(mock(DialogService.class), new DeferredTaskExecutor());
+        articleEditor.bindToEntry(new BibEntry(StandardEntryType.Article));
+
+        assertEquals(List.of(true, false), List.of(proceedingsEditor.canSplitPdf(pdf), articleEditor.canSplitPdf(pdf)));
+    }
+
+    private LinkedFilesEditorViewModel editor(DialogService dialogService, DeferredTaskExecutor taskExecutor) {
+        return new LinkedFilesEditorViewModel(
                 StandardField.FILE,
                 new EmptySuggestionProvider(),
-                mock(DialogService.class),
+                dialogService,
                 bibDatabaseContext,
                 taskExecutor,
                 mock(FieldCheckers.class),
                 preferences,
                 new JabRefUndoManager()
         );
-        viewModel.bindToEntry(paper);
-        viewModel.addNewLinkedFile(new LinkedFile("", Path.of("proceedings.pdf"), "PDF"));
-        viewModel.bindToEntry(otherEntry);
-
-        taskExecutor.runPending();
-
-        assertTrue(paper.getFiles().stream().anyMatch(file -> "proceedings-p2-3.pdf".equals(file.getLink())));
-        assertEquals(List.of(), otherEntry.getFiles());
     }
 
     private static class DeferredTaskExecutor extends CurrentThreadTaskExecutor {
@@ -133,9 +152,9 @@ class LinkedFilesEditorViewModelTest {
         }
 
         void runPending() {
-            List<Runnable> tasks = List.copyOf(pending);
-            pending.clear();
-            tasks.forEach(Runnable::run);
+            while (!pending.isEmpty()) {
+                pending.removeFirst().run();
+            }
         }
     }
 }

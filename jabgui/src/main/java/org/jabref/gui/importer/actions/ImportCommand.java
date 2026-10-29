@@ -6,7 +6,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
@@ -18,6 +20,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.importer.ImportEntriesDialog;
+import org.jabref.gui.linkedfile.AttachedPdfSplitter;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -29,6 +32,7 @@ import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.util.ImportResultsMerger;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.PdfOutlineSplitter;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -131,8 +135,9 @@ public class ImportCommand extends SimpleCommand {
             format = Optional.empty();
         }
 
+        Set<Path> pdfsToSplit = ConcurrentHashMap.newKeySet();
         BackgroundTask<ParserResult> task;
-        task = BackgroundTask.wrap(() -> doImport(files, format.orElse(null)));
+        task = BackgroundTask.wrap(() -> doImport(files, format.orElse(null), pdfsToSplit));
 
         LibraryTab tab = tabContainer.getCurrentLibraryTab();
 
@@ -150,7 +155,7 @@ public class ImportCommand extends SimpleCommand {
                 })
                 .executeWith(taskExecutor);
         } else {
-            ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task);
+            ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task, null, pdfsToSplit);
             dialog.setTitle(Localization.lang("Import"));
             dialogService.showCustomDialogAndWait(dialog);
         }
@@ -159,9 +164,10 @@ public class ImportCommand extends SimpleCommand {
         preferences.getImporterPreferences().setImportWorkingDirectory(files.getLast().getParent());
     }
 
+    /// @param pdfsToSplit collects the PDFs the user chose to import as one entry per paper
     /// @throws IOException of a specified importer
     @NullMarked
-    private ParserResult doImport(List<Path> files, @Nullable Importer importFormat) throws IOException {
+    private ParserResult doImport(List<Path> files, @Nullable Importer importFormat, Set<Path> pdfsToSplit) throws IOException {
         Optional<Importer> importer = Optional.ofNullable(importFormat);
 
         ImportFormatReader importFormatReader = new ImportFormatReader(
@@ -184,8 +190,16 @@ public class ImportCommand extends SimpleCommand {
                         }
                         dialogService.notify(Localization.lang("Importing file %0 as unknown format", filename.getFileName().toString()));
                     });
-                    // This import method never throws an IOException
-                    imports.add(importFormatReader.importWithAutoDetection(filename));
+                    int paperCount = FileUtil.isPDFFile(filename) ? paperCount(filename) : 0;
+                    if (paperCount < 2) {
+                        // This import method never throws an IOException
+                        imports.add(importFormatReader.importWithAutoDetection(filename, false));
+                    } else if (Boolean.TRUE.equals(UiTaskExecutor.runInJavaFXThread(() -> AttachedPdfSplitter.confirmImportAsPapers(dialogService, filename, paperCount)))) {
+                        pdfsToSplit.add(filename.toAbsolutePath().normalize());
+                        imports.add(importFormatReader.importWithAutoDetection(filename, true));
+                    } else {
+                        imports.add(importFormatReader.importPdfAsOneEntry(filename));
+                    }
                 } else {
                     UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (((importer.get() instanceof PdfGrobidImporter) || (importer.get() instanceof PdfMergeMetadataImporter))
@@ -218,5 +232,15 @@ public class ImportCommand extends SimpleCommand {
         }
 
         return ImportResultsMerger.mergeImportResults(imports, preferences.getBibEntryPreferences().getKeywordSeparator(), preferences.getOwnerPreferences(), preferences.getTimestampPreferences());
+    }
+
+    // [impl->req~logic.importer.multi-paper-pdf~1]
+    private int paperCount(Path pdf) {
+        try {
+            return PdfOutlineSplitter.readVolume(pdf).map(volume -> volume.papers().size()).orElse(0);
+        } catch (IOException exception) {
+            LOGGER.warn("Could not look for papers in {}", pdf, exception);
+            return 0;
+        }
     }
 }
