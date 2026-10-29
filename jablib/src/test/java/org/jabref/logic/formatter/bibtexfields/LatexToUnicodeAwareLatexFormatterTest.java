@@ -38,7 +38,8 @@ class LatexToUnicodeAwareLatexFormatterTest {
                 Arguments.of("ç ç š ő ą ğ å ṣ ṯ ṯ", "\\c{c} \\c c \\v{s} \\H{o} \\k{a} \\u{g} \\r{a} \\d{s} \\b{t} \\b t"),
                 Arguments.of("í, ï, í", "\\'\\i, \\\"{\\i}, {\\'{\\i}}"),
                 Arguments.of("Yuriĭ Dmitriĭ ǐ", "Yuri{\\u\\i} Dmitri\\u\\i{} \\v\\i"),
-                Arguments.of("ß ø Å œ ł ı", "\\ss{} \\o{} {\\AA} {\\oe} \\l{} \\i{}"),
+                Arguments.of("ß ø {Å} {œ} ł ı", "\\ss{} \\o{} {\\AA} {\\oe} \\l{} \\i{}"),
+                Arguments.of("{Ö}sterreich", "{\\\"O}sterreich"),
                 Arguments.of("§ ® ™ € – — …", "\\S{} \\textregistered{} \\texttrademark{} \\euro{} \\textendash{} \\textemdash{} \\ldots{}"),
                 Arguments.of("© 2020 Müller", "\\textcopyright{} 2020 M\\\"uller"),
                 Arguments.of("{Müller} and {BibTeX}", "{M\\\"uller} and {BibTeX}")
@@ -101,6 +102,11 @@ class LatexToUnicodeAwareLatexFormatterTest {
                 "$\\pi r^2$ and $\\alpha$",
                 "$$\\sum_i x_i$$ \\(\\beta\\) \\[\\gamma\\]",
                 "$\\\"{o}$ and \\begin{equation*}\\\"{o}\\end{equation*}",
+                "\\begin{alignat}{2}\\\"{o}\\end{alignat}",
+                "\\begin{cases}\\\"{o}\\end{cases}",
+                """
+                % \\"{o} stays in the comment
+                """,
                 "\\url{https://example.org/~M\\\"uller} \\cite[p.~1]{M\\\"uller} \\label{eq:\\\"o} \\verb|\\\"o|",
                 "\\textbackslash{} \\textunderscore{} \\textless{} \\textasciitilde{}",
                 "\\~{} \\^{} \\\"{}",
@@ -124,6 +130,13 @@ class LatexToUnicodeAwareLatexFormatterTest {
         return Stream.of(
                 Arguments.of("Müller \\& Söhne, 50\\%", "M\\\"uller \\& S\\\"ohne, 50\\%"),
                 Arguments.of("\\textbf{a \\% b} ©", "\\textbf{a \\% b} \\textcopyright{}"),
+                Arguments.of("""
+                        \\% ö % \\"o
+                        ö
+                        """, """
+                        \\% \\"o % \\"o
+                        \\"o
+                        """),
                 Arguments.of("Schrödinger: $\\\"{o}$ stays", "Schr\\\"odinger: $\\\"{o}$ stays"),
                 Arguments.of("\\href{https://example.org/\\\"o}{Müller}", "\\href{https://example.org/\\\"o}{M\\\"uller}"),
                 Arguments.of("\\\\ö", "\\\\\\\"o"),

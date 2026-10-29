@@ -35,7 +35,7 @@ public class LatexToUnicodeAwareLatexFormatter extends Formatter {
             "\\$(?:[^$\\\\]|\\\\.)*+\\$",
             "\\\\\\(.*?\\\\\\)",
             "\\\\\\[.*?\\\\\\]",
-            "\\\\begin\\{(?<mathEnvironment>(?:equation|align|gather|multline|eqnarray|math|displaymath)\\*?)\\}.*?\\\\end\\{\\k<mathEnvironment>\\}");
+            "\\\\begin\\{(?<mathEnvironment>(?:equation|align|alignat|flalign|gather|multline|eqnarray|math|displaymath|split|aligned|alignedat|gathered|cases|matrix|pmatrix|bmatrix|Bmatrix|vmatrix|Vmatrix)\\*?)\\}.*?\\\\end\\{\\k<mathEnvironment>\\}");
 
     // URLs, citation keys, labels, and verbatim text, whose characters must not change
     private static final String NON_TEXT_ARGUMENT = String.join("|",
@@ -48,6 +48,7 @@ public class LatexToUnicodeAwareLatexFormatter extends Formatter {
 
     private static final Pattern LATEX_TOKEN = Pattern.compile(
             MATH
+                    + "|%[^\\r\\n]*"
                     + "|" + NON_TEXT_ARGUMENT
                     + "|(?<" + COMMAND_GROUP + ">\\{(?:" + CHARACTER_COMMAND + ")\\}|" + CHARACTER_COMMAND + ")"
                     + "|" + CONTROL_SYMBOL,
@@ -103,7 +104,7 @@ public class LatexToUnicodeAwareLatexFormatter extends Formatter {
         boolean braced = command.startsWith("{");
         String unbracedCommand = braced ? command.substring(1, command.length() - 1) : command;
         boolean needsBraces = braced ? mayBeArgument(precedingOutput) : endsWithControlWord(precedingOutput, precedingOutput.length());
-        return toUnicode(unbracedCommand).map(unicode -> needsBraces ? "{" + unicode + "}" : unicode);
+        return toUnicode(unbracedCommand).map(unicode -> needsBraces || (braced && Character.isUpperCase(unicode.codePointAt(0))) ? "{" + unicode + "}" : unicode);
     }
 
     private static Optional<String> toUnicode(String command) {

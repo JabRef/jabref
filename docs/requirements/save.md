@@ -64,6 +64,7 @@ Needs: impl, utest
 The field formatter "LaTeX to Unicode-aware LaTeX" replaces commands that encode a single character, such as `\textcopyright{}` or `\"{o}`, by the Unicode character, because current LaTeX engines read Unicode directly.
 It is available in the cleanup dialog and as a save action.
 Unlike "LaTeX to Unicode", it keeps all other LaTeX code: protective braces, math, formatting commands such as `\emph{...}`, and commands without a single-character Unicode equivalent.
+It preserves LaTeX comments and braces protecting uppercase character commands from BibTeX case changes.
 A command whose conversion would introduce a LaTeX special character (such as `\textbackslash{}`) is kept.
 
 See <https://github.com/JabRef/jabref/issues/8715>.
