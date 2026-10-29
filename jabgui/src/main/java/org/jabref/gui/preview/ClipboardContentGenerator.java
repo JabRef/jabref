@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.scene.input.ClipboardContent;
 
@@ -16,6 +15,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
+import org.jabref.logic.preview.CustomizedPreviewStyle;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
@@ -132,15 +132,15 @@ public record ClipboardContentGenerator(
     }
 
     private List<String> generateTextBasedPreviewLayoutCitations(List<BibEntry> selectedEntries, BibDatabaseContext bibDatabaseContext) throws IOException {
-        Optional<TextBasedPreviewLayout> layoutOpt = previewPreferences.getLayoutCycle().stream()
-                                                                       .filter(TextBasedPreviewLayout.class::isInstance)
-                                                                       .map(TextBasedPreviewLayout.class::cast)
-                                                                       .findFirst();
-        TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElse(TextBasedPreviewLayout.of(
-                previewPreferences.getCustomPreviewLayout(),
-                layoutFormatterPreferences,
-                abbreviationRepository));
-
+        TextBasedPreviewLayout customPreviewLayout;
+        if (previewPreferences.getSelectedPreviewLayout() instanceof TextBasedPreviewLayout selected) {
+            customPreviewLayout = selected;
+        } else {
+            CustomizedPreviewStyle storedLayout = previewPreferences.getCustomizedPreviewStyles().isEmpty()
+                                                  ? new CustomizedPreviewStyle(TextBasedPreviewLayout.NAME, TextBasedPreviewLayout.DEFAULT)
+                                                  : previewPreferences.getCustomizedPreviewStyles().getFirst();
+            customPreviewLayout = TextBasedPreviewLayout.of(storedLayout.id(), storedLayout.name(), storedLayout.text(), layoutFormatterPreferences, abbreviationRepository);
+        }
         Reader customLayoutReader = Reader.of(customPreviewLayout.getText().replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(customLayoutReader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();
         List<String> citations = new ArrayList<>(selectedEntries.size());
