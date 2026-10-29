@@ -107,8 +107,8 @@ class LibraryTabTest {
         TaskExecutor executor = mock(TaskExecutor.class);
         LibraryTab.SharedDatabaseLoadingCallbacks callbacks = new LibraryTab.SharedDatabaseLoadingCallbacks(
                 mock(LibraryTab.class), executor, (_, _) -> {
-                }, _ -> {
-                });
+        }, _ -> {
+        });
         LibraryTab.SharedDatabaseLoadingTask task = new LibraryTab.SharedDatabaseLoadingTask(() -> connectedContext, callbacks);
 
         task.call();
