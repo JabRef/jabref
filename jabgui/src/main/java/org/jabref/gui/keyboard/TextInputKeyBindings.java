@@ -1,7 +1,6 @@
 package org.jabref.gui.keyboard;
 
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 
@@ -10,6 +9,7 @@ import org.jabref.model.util.ResultingStringState;
 
 public class TextInputKeyBindings {
 
+    // [impl->req~ux.text-editing.line-boundaries~1]
     public static void call(Scene scene, KeyEvent event, KeyBindingRepository keyBindingRepository) {
         if (scene.focusOwnerProperty().get() instanceof TextInputControl focusedTextField) {
             keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
@@ -90,8 +90,13 @@ public class TextInputKeyBindings {
                     case EDITOR_KILL_LINE -> {
                         int pos = focusedTextField.getCaretPosition();
                         String text = focusedTextField.getText(0, focusedTextField.getLength());
-                        ResultingStringState res = StringManipulator.killLine(pos, text);
-                        focusedTextField.deleteText(pos, pos + text.length() - res.text.length());
+                        int lineEnd = text.indexOf('\n', pos);
+                        if (lineEnd == -1) {
+                            lineEnd = text.length();
+                        } else if (lineEnd == pos) {
+                            lineEnd++;
+                        }
+                        focusedTextField.deleteText(pos, lineEnd);
                         event.consume();
                     }
                     case EDITOR_KILL_WORD -> {
@@ -117,13 +122,8 @@ public class TextInputKeyBindings {
     }
 
     private static void moveCaretUp(TextInputControl control) {
-        if (!(control instanceof TextArea)) {
-            control.home();
-            return;
-        }
-
         int caret = control.getCaretPosition();
-        String text = control.getText();
+        String text = control.getText(0, control.getLength());
         int lineStart = text.lastIndexOf('\n', caret - 1) + 1;
         if (lineStart == 0) {
             control.positionCaret(0);
@@ -136,13 +136,8 @@ public class TextInputKeyBindings {
     }
 
     private static void moveCaretDown(TextInputControl control) {
-        if (!(control instanceof TextArea)) {
-            control.end();
-            return;
-        }
-
         int caret = control.getCaretPosition();
-        String text = control.getText();
+        String text = control.getText(0, control.getLength());
         int lineStart = text.lastIndexOf('\n', caret - 1) + 1;
         int lineEnd = text.indexOf('\n', caret);
         if (lineEnd == -1) {

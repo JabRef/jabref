@@ -3,12 +3,14 @@ package org.jabref.gui.keyboard;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.testutils.JavaFxExtension;
 
 import jfx.incubator.scene.control.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.LineEnding;
 import jfx.incubator.scene.control.richtext.TextPos;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,27 +32,42 @@ class CodeAreaKeyBindingsTest {
 
     @ParameterizedTest
     @MethodSource("killLineTestData")
-    void killLinePreservesFollowingLines(TextPos caretPosition, String expectedText) {
-        CodeArea codeArea = new CodeArea();
-        codeArea.setText("First\nSecond\nThird");
-        codeArea.select(caretPosition);
-        KeyBindingRepository repository = mock(KeyBindingRepository.class);
-        when(repository.mapToKeyBinding(any(KeyEvent.class))).thenReturn(Optional.of(KeyBinding.EDITOR_KILL_LINE));
-        KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.K, false, true, false, false);
+    // [utest->req~ux.text-editing.line-boundaries~1]
+    void killLinePreservesFollowingLines(LineEnding lineEnding, String text, TextPos caretPosition, String expectedText) {
+        JavaFxExtension.invokeAndWait(() -> {
+            CodeArea codeArea = new CodeArea();
+            new Scene(codeArea);
+            codeArea.applyCss();
+            codeArea.getModel().setLineEnding(lineEnding);
+            codeArea.setText(text);
+            codeArea.select(caretPosition);
+            KeyBindingRepository repository = mock(KeyBindingRepository.class);
+            when(repository.mapToKeyBinding(any(KeyEvent.class))).thenReturn(Optional.of(KeyBinding.EDITOR_KILL_LINE));
+            KeyEvent event = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.K, false, true, false, false);
 
-        CodeAreaKeyBindings.call(codeArea, event, repository);
+            CodeAreaKeyBindings.call(codeArea, event, repository);
 
-        assertEquals(expectedText, codeArea.getText());
-        assertEquals(caretPosition, codeArea.getCaretPosition());
-        assertTrue(event.isConsumed());
+            assertEquals(expectedText.replace("\n", lineEnding.getText()), codeArea.getText());
+            assertEquals(caretPosition, codeArea.getCaretPosition());
+            assertTrue(event.isConsumed());
+            codeArea.undo();
+            assertEquals(text, codeArea.getText());
+        });
     }
 
     private static Stream<Arguments> killLineTestData() {
-        return Stream.of(
-                Arguments.of(TextPos.ofLeading(0, 3), "Fir\nSecond\nThird"),
-                Arguments.of(TextPos.ofLeading(0, 5), "FirstSecond\nThird"),
-                Arguments.of(TextPos.ofLeading(1, 0), "First\n\nThird"),
-                Arguments.of(TextPos.ofLeading(2, 5), "First\nSecond\nThird"));
+        return Stream.of(LineEnding.LF, LineEnding.CRLF).flatMap(lineEnding -> {
+            String separator = lineEnding.getText();
+            return Stream.of(
+                    Arguments.of(lineEnding, "First" + separator + "Second" + separator + "Third", TextPos.ofLeading(0, 3), "Fir\nSecond\nThird"),
+                    Arguments.of(lineEnding, "First" + separator + "Second" + separator + "Third", TextPos.ofLeading(0, 5), "FirstSecond\nThird"),
+                    Arguments.of(lineEnding, "First" + separator + "Second" + separator + "Third", TextPos.ofLeading(1, 0), "First\n\nThird"),
+                    Arguments.of(lineEnding, "First" + separator + "Second" + separator + "Third", TextPos.ofLeading(1, 3), "First\nSec\nThird"),
+                    Arguments.of(lineEnding, "First" + separator + "Second" + separator + "Third", TextPos.ofLeading(2, 5), "First\nSecond\nThird"),
+                    Arguments.of(lineEnding, "First" + separator, TextPos.ofLeading(0, 5), "First"),
+                    Arguments.of(lineEnding, "First" + separator, TextPos.ofLeading(1, 0), "First\n"),
+                    Arguments.of(lineEnding, "", TextPos.ZERO, ""));
+        });
     }
 
     @Test

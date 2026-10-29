@@ -1,6 +1,7 @@
 package org.jabref.gui.keyboard;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -61,7 +62,8 @@ class TextInputKeyBindingsTest {
     }
 
     @Test
-    void killLineUsesSharedLineDeletion() {
+    // [utest->req~ux.text-editing.line-boundaries~1]
+    void killLinePreservesFollowingLines() {
         TextArea area = new TextArea(MULTILINE_TEXT);
         area.positionCaret(16);
 
@@ -85,9 +87,56 @@ class TextInputKeyBindingsTest {
     }
 
     @ParameterizedTest
-    @MethodSource("navigationTestData")
-    void navigationRespectsLineAndDocumentBoundaries(boolean multiline, String text, int caretPosition, KeyBinding binding, int expectedPosition) {
-        TextInputControl control = multiline ? new TextArea(text) : new TextField(text);
+    @MethodSource("killLineTestData")
+    // [utest->req~ux.text-editing.line-boundaries~1]
+    void killLinePreservesBoundariesAndCanBeUndone(String text, int caretPosition, String expectedText) {
+        TextArea area = new TextArea(text);
+        area.positionCaret(caretPosition);
+
+        applyBinding(area, KeyBinding.EDITOR_KILL_LINE);
+
+        assertEquals(expectedText, area.getText());
+        assertEquals(caretPosition, area.getCaretPosition());
+        area.undo();
+        assertEquals(text, area.getText());
+    }
+
+    private static Stream<Arguments> killLineTestData() {
+        return Stream.of(
+                Arguments.of("", 0, ""),
+                Arguments.of("First\nSecond\nThird", 5, "FirstSecond\nThird"),
+                Arguments.of("First\nSecond\nThird", 6, "First\n\nThird"),
+                Arguments.of("First\nSecond\nThird", 18, "First\nSecond\nThird"),
+                Arguments.of("First\n", 5, "First"),
+                Arguments.of("First\n", 6, "First\n"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("nullTextTestData")
+    void shortcutsAcceptNullText(Supplier<TextInputControl> controlFactory, KeyBinding binding) {
+        TextInputControl control = controlFactory.get();
+        control.setText(null);
+
+        applyBinding(control, binding);
+
+        assertEquals(0, control.getCaretPosition());
+        assertEquals("", control.getText(0, control.getLength()));
+    }
+
+    private static Stream<Arguments> nullTextTestData() {
+        return Stream.of(KeyBinding.EDITOR_BEGINNING, KeyBinding.EDITOR_END,
+                        KeyBinding.EDITOR_BEGINNING_DOC, KeyBinding.EDITOR_END_DOC,
+                        KeyBinding.EDITOR_UP, KeyBinding.EDITOR_DOWN, KeyBinding.EDITOR_KILL_LINE)
+                     .flatMap(binding -> Stream.<Supplier<TextInputControl>>of(TextArea::new, TextField::new)
+                                               .map(controlFactory -> Arguments.of(controlFactory, binding)));
+    }
+
+    @ParameterizedTest
+    @MethodSource({"textFieldNavigationTestData", "textAreaNavigationTestData"})
+    // [utest->req~ux.text-editing.line-boundaries~1]
+    void navigationRespectsLineAndDocumentBoundaries(Supplier<TextInputControl> controlFactory, String text, int caretPosition, KeyBinding binding, int expectedPosition) {
+        TextInputControl control = controlFactory.get();
+        control.setText(text);
         control.positionCaret(caretPosition);
 
         applyBinding(control, binding);
@@ -96,34 +145,57 @@ class TextInputKeyBindingsTest {
         assertEquals(text, control.getText());
     }
 
-    private static Stream<Arguments> navigationTestData() {
-        return Stream.concat(Stream.of(true, false).flatMap(multiline -> Stream.of(
-                        Arguments.of(multiline, "", 0, KeyBinding.EDITOR_BEGINNING, 0),
-                        Arguments.of(multiline, "", 0, KeyBinding.EDITOR_END, 0),
-                        Arguments.of(multiline, "", 0, KeyBinding.EDITOR_BEGINNING_DOC, 0),
-                        Arguments.of(multiline, "", 0, KeyBinding.EDITOR_END_DOC, 0),
-                        Arguments.of(multiline, "Example text", 7, KeyBinding.EDITOR_BEGINNING, 0),
-                        Arguments.of(multiline, "Example text", 3, KeyBinding.EDITOR_END, 12))),
-                Stream.of(
-                        Arguments.of(true, MULTILINE_TEXT, 5, KeyBinding.EDITOR_BEGINNING, 0),
-                        Arguments.of(true, MULTILINE_TEXT, 5, KeyBinding.EDITOR_END, 10),
-                        Arguments.of(true, MULTILINE_TEXT, 10, KeyBinding.EDITOR_BEGINNING, 0),
-                        Arguments.of(true, MULTILINE_TEXT, 10, KeyBinding.EDITOR_END, 10),
-                        Arguments.of(true, MULTILINE_TEXT, 11, KeyBinding.EDITOR_BEGINNING, 11),
-                        Arguments.of(true, MULTILINE_TEXT, 11, KeyBinding.EDITOR_END, 22),
-                        Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_BEGINNING, 11),
-                        Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_END, 22),
-                        Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_BEGINNING_DOC, 0),
-                        Arguments.of(true, MULTILINE_TEXT, 16, KeyBinding.EDITOR_END_DOC, 33),
-                        Arguments.of(true, MULTILINE_TEXT, 28, KeyBinding.EDITOR_UP, 16),
-                        Arguments.of(true, MULTILINE_TEXT, 5, KeyBinding.EDITOR_UP, 0),
-                        Arguments.of(true, MULTILINE_TEXT, 5, KeyBinding.EDITOR_DOWN, 16),
-                        Arguments.of(true, MULTILINE_TEXT, 20, KeyBinding.EDITOR_DOWN, 32),
-                        Arguments.of(true, MULTILINE_TEXT, 28, KeyBinding.EDITOR_DOWN, 33),
-                        Arguments.of(true, "Long line\nx", 6, KeyBinding.EDITOR_DOWN, 11),
-                        Arguments.of(true, MULTILINE_TEXT, 28, KeyBinding.EDITOR_BEGINNING, 23),
-                        Arguments.of(true, MULTILINE_TEXT, 28, KeyBinding.EDITOR_END, 33),
-                        Arguments.of(true, "First\n", 6, KeyBinding.EDITOR_BEGINNING, 6),
-                        Arguments.of(true, "First\n", 6, KeyBinding.EDITOR_END, 6)));
+    private static Stream<Arguments> textFieldNavigationTestData() {
+        Supplier<TextInputControl> controlFactory = TextField::new;
+        return Stream.of(
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_BEGINNING, 0),
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_END, 0),
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_BEGINNING_DOC, 0),
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_END_DOC, 0),
+                Arguments.of(controlFactory, "Example text", 7, KeyBinding.EDITOR_BEGINNING, 0),
+                Arguments.of(controlFactory, "Example text", 3, KeyBinding.EDITOR_END, 12),
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_UP, 0),
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_DOWN, 0),
+                Arguments.of(controlFactory, "Example text", 7, KeyBinding.EDITOR_UP, 0),
+                Arguments.of(controlFactory, "Example text", 3, KeyBinding.EDITOR_DOWN, 12));
+    }
+
+    private static Stream<Arguments> textAreaNavigationTestData() {
+        Supplier<TextInputControl> controlFactory = TextArea::new;
+        return Stream.of(
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_BEGINNING, 0),
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_END, 0),
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_BEGINNING_DOC, 0),
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_END_DOC, 0),
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_UP, 0),
+                Arguments.of(controlFactory, "", 0, KeyBinding.EDITOR_DOWN, 0),
+                Arguments.of(controlFactory, "Example text", 7, KeyBinding.EDITOR_BEGINNING, 0),
+                Arguments.of(controlFactory, "Example text", 3, KeyBinding.EDITOR_END, 12),
+                Arguments.of(controlFactory, "Example text", 7, KeyBinding.EDITOR_UP, 0),
+                Arguments.of(controlFactory, "Example text", 3, KeyBinding.EDITOR_DOWN, 12),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 5, KeyBinding.EDITOR_BEGINNING, 0),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 5, KeyBinding.EDITOR_END, 10),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 10, KeyBinding.EDITOR_BEGINNING, 0),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 10, KeyBinding.EDITOR_END, 10),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 11, KeyBinding.EDITOR_BEGINNING, 11),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 11, KeyBinding.EDITOR_END, 22),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 16, KeyBinding.EDITOR_BEGINNING, 11),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 16, KeyBinding.EDITOR_END, 22),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 16, KeyBinding.EDITOR_BEGINNING_DOC, 0),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 16, KeyBinding.EDITOR_END_DOC, 33),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 28, KeyBinding.EDITOR_UP, 16),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 5, KeyBinding.EDITOR_UP, 0),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 5, KeyBinding.EDITOR_DOWN, 16),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 20, KeyBinding.EDITOR_DOWN, 32),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 28, KeyBinding.EDITOR_DOWN, 33),
+                Arguments.of(controlFactory, "Long line\nx", 6, KeyBinding.EDITOR_DOWN, 11),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 28, KeyBinding.EDITOR_BEGINNING, 23),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 28, KeyBinding.EDITOR_END, 33),
+                Arguments.of(controlFactory, "First\n", 6, KeyBinding.EDITOR_BEGINNING, 6),
+                Arguments.of(controlFactory, "First\n", 6, KeyBinding.EDITOR_END, 6),
+                Arguments.of(controlFactory, "First\n", 6, KeyBinding.EDITOR_UP, 0),
+                Arguments.of(controlFactory, "First\n", 5, KeyBinding.EDITOR_DOWN, 6),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 11, KeyBinding.EDITOR_UP, 0),
+                Arguments.of(controlFactory, MULTILINE_TEXT, 10, KeyBinding.EDITOR_DOWN, 21));
     }
 }

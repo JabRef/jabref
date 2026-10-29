@@ -15,6 +15,7 @@ class StringManipulatorTest {
 
     @ParameterizedTest
     @MethodSource("killLineTestData")
+    // [utest->req~ux.text-editing.line-boundaries~1]
     void killLinePreservesFollowingLines(String text, int caretPosition, String expectedText) {
         ResultingStringState result = StringManipulator.killLine(caretPosition, text);
 
