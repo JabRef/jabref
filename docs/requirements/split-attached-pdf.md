@@ -49,4 +49,13 @@ With "Generate a new key on import" enabled, a new key would break the `crossref
 
 Needs: impl, utest
 
+## A generated paper entry must cross-reference the citation key of its volume entry
+`req~logic.pdf.paper-entry-crossref~1`
+
+The `crossref` of a generated paper entry is the citation key of the entry whose PDF was split.
+
+Issue: [#8128](https://github.com/JabRef/jabref/issues/8128)
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

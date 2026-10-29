@@ -41,6 +41,7 @@ class PdfOutlineSplitterTest {
     private Path tempDir;
 
     // [utest->req~logic.pdf.split-proceedings-outline~1]
+    // [utest->req~logic.pdf.paper-entry-crossref~1]
     @Test
     void createsOneEntryPerPaperBookmarkAndKeepsTheOriginal() throws IOException {
         Path source = proceedingsWithPapers();

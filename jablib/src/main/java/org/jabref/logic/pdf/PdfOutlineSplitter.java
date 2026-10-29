@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // [impl->req~logic.pdf.split-proceedings-outline~1]
+// [impl->adr~split-multipaper-pdfs-by-outline~1]
 @NullMarked
 public final class PdfOutlineSplitter {
 
@@ -226,6 +227,7 @@ public final class PdfOutlineSplitter {
                 .withField(StandardField.TITLE, title)
                 .withField(StandardField.PAGES, pagesValue(printedFirst, printedLast))
                 .withFiles(List.of(new LinkedFile(title, file.toAbsolutePath(), StandardFileType.PDF.getName())));
+        // [impl->req~logic.pdf.paper-entry-crossref~1]
         parent.getCitationKey().ifPresent(key -> paper.withField(StandardField.CROSSREF, key));
         return paper.withField(PdfLocationResolver.PAGE_OFFSET, Integer.toString(1 - printedFirst));
     }
