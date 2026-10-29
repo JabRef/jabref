@@ -35,7 +35,10 @@ class JabRefFontIcon extends FontIcon {
                     .filter(metaData -> !COLOR_PROPERTIES.contains(metaData.getProperty()))
                     .toList();
 
-    JabRefFontIcon(Ikon ikon, int size, Paint color) {
+    private final boolean themeSized;
+
+    JabRefFontIcon(Ikon ikon, int size, Paint color, boolean themeSized) {
+        this.themeSized = themeSized;
         setIconCode(ikon);
         setIconSize(size);
         setIconColor(color);
@@ -48,5 +51,12 @@ class JabRefFontIcon extends FontIcon {
     @Override
     public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
         return CSS_META_DATA;
+    }
+
+    @Override
+    public void setIconSize(int size) {
+        if (!themeSized) {
+            super.setIconSize(size);
+        }
     }
 }

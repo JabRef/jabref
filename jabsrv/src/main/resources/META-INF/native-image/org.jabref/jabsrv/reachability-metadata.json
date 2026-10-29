@@ -896,6 +896,10 @@
       "allDeclaredMethods": true
     },
     {
+      "type": "org.jabref.http.dto.LinkedPdfFileDTO",
+      "allDeclaredFields": true
+    },
+    {
       "type": "org.jabref.http.dto.LibraryQueryMatch",
       "methods": [
         {
