@@ -9,7 +9,7 @@ status: proposed
 Needs: impl
 
 ## Context and Problem Statement
-Conference proceedings are often distributed as one large PDF containing many papers. In a reference manager the user wants one entry per paper, each containing its own PDF and correct page numbers and linked to the proceedings entry.
+Conference proceedings are often distributed as one large PDF containing the papers of a whole conference. In a reference manager the user wants one entry per paper, each containing its own PDF and correct page numbers and linked to the proceedings entry.
 
 Taking on this task manually by hand is slow and tedious. Hence, the program has to find out where each paper begins and ends inside a single PDF, and it has to do so without damaging anything when the PDF is not a proceedings volume.
 
@@ -25,13 +25,13 @@ Users want one entry per paper, each pointing back to the proceedings entry, and
 
 * No new dependency: PDFBox is already used by JabRef
 * Works offline and deterministically, with no external service and no trained model
-* Few wrong splits: 1 long paper with sections must not be taken for a volume of papers
+* Avoid wrong splits: one long paper with sections must not be taken for a volume of papers
 * The original PDF must stay untouched
 * Printed page numbers and PDF page numbers differ because of front matter
 * Prefer doing nothing over splitting wrongly (a false negative is cheap, a false positive litters the library with bogus entries and files)
 * Use only what the file itself states: the outline is the only place where it says where each paper starts
 * Handle real-world messy outlines: an extra root bookmark around the whole volume, front/back matter, duplicate bookmarks on one page, and damaged outlines with cycles
-* Keep 1 consistent, simple model for printed vs PDF page numbers that works both for the original volume and for the extracted papers
+* Keep one consistent, simple model for printed vs PDF page numbers that works both for the original volume and for the extracted papers
 
 ## Considered Options
 
@@ -43,7 +43,7 @@ Users want one entry per paper, each pointing back to the proceedings entry, and
 
 ## Decision Outcome
 
-Chosen option 2 'Use the outline and validate it' because the outline is the only author-provided structure. Moreover, only a few cheap content checks removes the main false-positive case (a single paper) without needing any model or network access.
+Chosen option 2 'Use the outline and validate it' because the outline is the only author-provided structure. Moreover, cheap content checks remove the main false-positive case (a single paper) without needing any model or network access.
 
 For each paper, a new PDF with its pages is written and the original is kept.
 The paper entry has a type that follows the volume (`InProceedings` for a proceedings, `InCollection` for a collection, `InBook` for a book), a title, a `pages` field, a `crossref` to the citation key of the volume entry, and the new PDF as linked file.
@@ -53,7 +53,7 @@ Proceedings, collections and books are split, as are their multi-volume types (`
 ### Finding the papers
 
 1. **Find the paper level of the outline.** Starting at the root, it descends while the level has a single bookmark with children (a wrapper around the whole volume or a part). The bookmarks on the resulting level are the paper candidates; their children are the paper's *sections*. Bookmarks with no resolvable page are skipped, blank titles become `Untitled`, and already-visited bookmarks stop traversal (guards against damaged, cyclic outlines).
-2. **Normalise.** Sort by page; keep only the first bookmark per page.
+2. **Normalise.** Sort by page; keep one bookmark per page, preferring one that has sections.
 3. **Handle front and back matter.** If any candidate has sections, candidates without sections are front or back matter and are not papers.
 
 A PDF without a usable outline is left unsplit.
@@ -92,6 +92,8 @@ The file does not say what kind of volume it is, so the type of the entry for th
 
 In a BibTeX library, a collection becomes a book, the entry for the whole PDF repeats its title as `booktitle`, and a paper in a book is an `InCollection`.
 
+With GROBID enabled, the import also asks the GROBID service for the cited references.
+
 ### Page numbering
 
 ```text
@@ -121,7 +123,7 @@ After splitting, the extracted paper owns an 8-page PDF, printed pages 45-52, so
 * Bad, because a volume that fails the title or section check is not split, even if its outline is correct.
 * Bad, because the outline must have one bookmark per paper. A volume bookmarked per session, with the papers nested below, is usually not split.
 * Bad, possible false positives remain. For example, a book-like PDF whose chapters have large headings and repeated section names ("Summary").
-* Bad, because the text stripper reads the paper start pages and the front matter, so a volume with very many papers may take noticeable time.
+* Bad, because the text stripper reads the paper start pages and the front matter, so the time grows with the number of papers.
 * Bad, heuristic thresholds can miss unusual layouts (small titles, titles not near the top) or accept unusual books.
 
 ### Confirmation
