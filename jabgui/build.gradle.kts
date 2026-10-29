@@ -43,6 +43,7 @@ testModuleInfo {
     runtimeOnly("com.tngtech.archunit.junit5.engine")
 
     requires("org.apache.lucene.core")
+    requires("org.apache.pdfbox")
 }
 
 tasks.named<Test>("test") {

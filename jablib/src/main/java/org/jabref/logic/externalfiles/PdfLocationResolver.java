@@ -76,7 +76,7 @@ public final class PdfLocationResolver {
                         .flatMap(PdfLocationResolver::parseInteger)
                         .orElse(0);
     }
-    
+
     private static Optional<Integer> pdfPage(BibEntry entry, BibEntry fileOwner) {
         return firstPrintedPage(entry).flatMap(printed -> toPdfPage(printed, pageOffset(fileOwner)));
     }
@@ -150,6 +150,10 @@ public final class PdfLocationResolver {
     }
 
     public record PdfLocation(LinkedFile file, Optional<Integer> page, BibEntry fileOwner) {
+        /// @return the page to open in the PDF, or the first page when the entry's page lies past the last of `pageCount` pages
+        public int pageWithin(int pageCount) {
+            return page.filter(number -> number <= pageCount).orElse(1);
+        }
     }
 
     public record PageSpan(int firstPage, int lastPage) {

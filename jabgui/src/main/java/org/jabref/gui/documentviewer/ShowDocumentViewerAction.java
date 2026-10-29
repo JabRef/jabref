@@ -47,7 +47,7 @@ public class ShowDocumentViewerAction extends SimpleCommand {
             }
             pdfLocation.ifPresent(location -> {
                 documentViewerView.switchToFile(location.file());
-                documentViewerView.gotoPage(location.page().orElse(1));
+                documentViewerView.gotoPage(location.pageWithin(documentViewerView.pageCount()));
             });
         }
         dialogService.showCustomDialog(documentViewerView);

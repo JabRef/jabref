@@ -496,6 +496,38 @@ class ImportHandlerTest {
                 importedVolume);
     }
 
+    // [utest->req~jabgui.import.keep-cross-referenced-keys~1]
+    @Test
+    void laterImportGeneratesKeyThatAnEarlierImportCrossReferenced() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
+        when(preferences.getMergeDialogPreferences()).thenReturn(mock(MergeDialogPreferences.class));
+        generateNewKeysWithPattern("[auth][year]");
+        ImportHandler handler = new ImportHandler(
+                databaseContext,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                new JabRefUndoManager(),
+                stateManager,
+                mock(DialogService.class),
+                new CurrentThreadTaskExecutor());
+        BibEntry paper = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Alpha")
+                .withField(StandardField.CROSSREF, "volume");
+        BibEntry volume = new BibEntry(StandardEntryType.Collection).withCitationKey("volume");
+        handler.importEntriesWithDuplicateCheck(null, List.of(paper, volume), new EntryImportHandlerTracker(stateManager, databaseContext, 2));
+        BibEntry laterEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("volume")
+                .withField(StandardField.AUTHOR, "Lovelace, Ada")
+                .withField(StandardField.YEAR, "2026");
+
+        handler.importEntries(List.of(laterEntry));
+
+        assertEquals(Optional.of("Lovelace2026"), laterEntry.getCitationKey());
+    }
+
     private void generateNewKeysWithPattern(String pattern) {
         when(preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()).thenReturn(true);
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(

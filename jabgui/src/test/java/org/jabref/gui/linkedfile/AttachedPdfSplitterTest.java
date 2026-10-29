@@ -193,6 +193,21 @@ class AttachedPdfSplitterTest {
         assertEquals(Optional.of("An Example Monograph"), book.getField(StandardField.BOOKTITLE));
     }
 
+    // [utest->req~logic.importer.multi-paper-pdf~1]
+    @Test
+    void discardsTheSplitOfAVolumeNoLongerInTheLibrary() throws IOException {
+        BibEntry alpha = paper(StandardEntryType.InCollection, "Alpha", "1--2");
+        BibEntry volume = volume(StandardEntryType.Collection);
+        BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, alpha);
+
+        splitter(databaseContext).splitImportedVolumes(List.of(alpha, volume));
+
+        assertEquals(List.of(alpha), databaseContext.getDatabase().getEntries());
+        assertEquals(List.of(), alpha.getFiles());
+        assertFalse(Files.exists(tempDir.resolve("Alpha.pdf")));
+        assertFalse(Files.exists(tempDir.resolve("Beta.pdf")));
+    }
+
     @Test
     void doesNotSplitTheVolumeOfImportedPapersThatHaveFiles() throws IOException {
         BibEntry alpha = paper(StandardEntryType.InCollection, "Alpha", "1--2")

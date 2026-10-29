@@ -54,9 +54,13 @@ public class MultiPaperPdfImporter extends PdfImporter {
 
         List<BibEntry> entries = new ArrayList<>();
         for (PaperPages paper : volume.papers()) {
+            int printedFirst = paper.firstPage() - offset;
+            if (printedFirst < 1) {
+                continue;
+            }
             entries.add(withPageOffset(new BibEntry(PdfOutlineSplitter.paperType(volume.type()))
                     .withField(StandardField.TITLE, paper.title())
-                    .withField(StandardField.PAGES, PdfOutlineSplitter.pagesValue(paper.firstPage() - offset, paper.lastPage() - offset))
+                    .withField(StandardField.PAGES, PdfOutlineSplitter.pagesValue(printedFirst, paper.lastPage() - offset))
                     .withField(StandardField.CROSSREF, key), offset));
         }
 

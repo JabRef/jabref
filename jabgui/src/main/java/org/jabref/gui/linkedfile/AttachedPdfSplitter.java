@@ -1,6 +1,7 @@
 package org.jabref.gui.linkedfile;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,6 +142,10 @@ public class AttachedPdfSplitter {
         if (split.papers().isEmpty()) {
             return;
         }
+        if (!databaseContext.getDatabase().containsEntryWithId(volume.getId())) {
+            split.papers().forEach(AttachedPdfSplitter::deletePdfs);
+            return;
+        }
         FileUtil.relativize(split.papers(), databaseContext, filePreferences);
         List<BibEntry> papersInLibrary = papersOf(volume);
         List<BibEntry> newPapers = new ArrayList<>();
@@ -205,6 +210,17 @@ public class AttachedPdfSplitter {
         return paper.getField(StandardField.TITLE).flatMap(title -> papers.stream()
                                                                           .filter(existing -> existing.getField(StandardField.TITLE).filter(title::equalsIgnoreCase).isPresent())
                                                                           .findFirst());
+    }
+
+    private static void deletePdfs(BibEntry paper) {
+        for (LinkedFile file : paper.getFiles()) {
+            Path pdf = Path.of(file.getLink());
+            try {
+                Files.deleteIfExists(pdf);
+            } catch (IOException exception) {
+                LOGGER.warn("Could not delete the split PDF {}", pdf, exception);
+            }
+        }
     }
 
     private void showFailure(Path pdf, Exception exception) {

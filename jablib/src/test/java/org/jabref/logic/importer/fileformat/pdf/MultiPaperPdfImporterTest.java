@@ -68,21 +68,21 @@ class MultiPaperPdfImporterTest {
         List<BibEntry> entries = importer.importDatabase(pdf).getDatabase().getEntries();
 
         assertEquals(List.of(
-                new BibEntry(StandardEntryType.InProceedings)
-                        .withField(StandardField.TITLE, "Alpha")
-                        .withField(StandardField.PAGES, "1--2")
-                        .withField(StandardField.CROSSREF, "volume")
-                        .withField(PdfLocationResolver.PAGE_OFFSET, "2"),
-                new BibEntry(StandardEntryType.InProceedings)
-                        .withField(StandardField.TITLE, "Beta")
-                        .withField(StandardField.PAGES, "3--4")
-                        .withField(StandardField.CROSSREF, "volume")
-                        .withField(PdfLocationResolver.PAGE_OFFSET, "2"),
-                new BibEntry(StandardEntryType.Proceedings)
-                        .withCitationKey("volume")
-                        .withField(StandardField.TITLE, "volume")
-                        .withField(PdfLocationResolver.PAGE_OFFSET, "2")
-                        .withFiles(List.of(new LinkedFile("", pdf, StandardFileType.PDF.getName())))),
+                        new BibEntry(StandardEntryType.InProceedings)
+                                .withField(StandardField.TITLE, "Alpha")
+                                .withField(StandardField.PAGES, "1--2")
+                                .withField(StandardField.CROSSREF, "volume")
+                                .withField(PdfLocationResolver.PAGE_OFFSET, "2"),
+                        new BibEntry(StandardEntryType.InProceedings)
+                                .withField(StandardField.TITLE, "Beta")
+                                .withField(StandardField.PAGES, "3--4")
+                                .withField(StandardField.CROSSREF, "volume")
+                                .withField(PdfLocationResolver.PAGE_OFFSET, "2"),
+                        new BibEntry(StandardEntryType.Proceedings)
+                                .withCitationKey("volume")
+                                .withField(StandardField.TITLE, "volume")
+                                .withField(PdfLocationResolver.PAGE_OFFSET, "2")
+                                .withFiles(List.of(new LinkedFile("", pdf, StandardFileType.PDF.getName())))),
                 entries);
     }
 
@@ -157,6 +157,41 @@ class MultiPaperPdfImporterTest {
 
         assertEquals(List.of("3--4", "5--6"), entries.subList(0, 2).stream().map(entry -> entry.getField(StandardField.PAGES).orElseThrow()).toList());
         assertEquals(Optional.empty(), entries.getLast().getField(PdfLocationResolver.PAGE_OFFSET));
+    }
+
+    @Test
+    void skipsBookmarksThatStartBeforePrintedPageOne() throws IOException {
+        Path pdf = tempDir.resolve("volume.pdf");
+        try (PDDocument document = new PDDocument()) {
+            addPage(document, "Example Studies", List.of());
+            addPage(document, "Preface to the example studies", List.of());
+            addPage(document, "The paper titled Alpha", List.of());
+            addPage(document);
+            addPage(document, "The paper titled Beta", List.of());
+            addPage(document);
+            PDDocumentOutline outline = new PDDocumentOutline();
+            outline.addLast(bookmark("Preface", document.getPage(1)));
+            outline.addLast(bookmark("Alpha", document.getPage(2)));
+            outline.addLast(bookmark("Beta", document.getPage(4)));
+            document.getDocumentCatalog().setDocumentOutline(outline);
+            PDPageLabels labels = new PDPageLabels(document);
+            PDPageLabelRange cover = new PDPageLabelRange();
+            cover.setStyle(PDPageLabelRange.STYLE_ROMAN_LOWER);
+            labels.setLabelItem(0, cover);
+            PDPageLabelRange preface = new PDPageLabelRange();
+            preface.setPrefix("0");
+            labels.setLabelItem(1, preface);
+            PDPageLabelRange papers = new PDPageLabelRange();
+            papers.setStyle(PDPageLabelRange.STYLE_DECIMAL);
+            labels.setLabelItem(2, papers);
+            document.getDocumentCatalog().setPageLabels(labels);
+            document.save(pdf.toFile());
+        }
+
+        List<BibEntry> entries = importer.importDatabase(pdf).getDatabase().getEntries();
+
+        assertEquals(List.of("Alpha", "Beta", "volume"), entries.stream().map(entry -> entry.getField(StandardField.TITLE).orElseThrow()).toList());
+        assertEquals(List.of("1--2", "3--4"), entries.subList(0, 2).stream().map(entry -> entry.getField(StandardField.PAGES).orElseThrow()).toList());
     }
 
     @Test

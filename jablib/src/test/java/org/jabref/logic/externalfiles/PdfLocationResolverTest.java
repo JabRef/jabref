@@ -28,7 +28,7 @@ class PdfLocationResolverTest {
 
     // [utest->req~logic.externalfiles.pdf-location-resolver~1]
     @Test
-    void usesTheEntrysOwnPdfAndFirstPage() {
+    void usesTheEntryOwnPdfAndFirstPage() {
         BibEntry paper = paper("186--206").withFiles(List.of(PAPER_PDF));
 
         PdfLocation location = PdfLocationResolver.resolve(paper, databaseOf(paper)).orElseThrow();
@@ -36,6 +36,24 @@ class PdfLocationResolverTest {
         assertEquals(PAPER_PDF, location.file());
         assertEquals(Optional.of(186), location.page());
         assertSame(paper, location.fileOwner());
+    }
+
+    // [utest->req~logic.externalfiles.pdf-location-resolver~1]
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            45, 100, 45
+            45, 8,   1
+            8,  8,   8
+            """)
+    void opensTheFirstPageWhenThePagePassesTheEndOfThePdf(int page, int pageCount, int expectedPage) {
+        PdfLocation location = new PdfLocation(PAPER_PDF, Optional.of(page), paper("45--52"));
+
+        assertEquals(expectedPage, location.pageWithin(pageCount));
+    }
+
+    @Test
+    void opensTheFirstPageWithoutAPage() {
+        assertEquals(1, new PdfLocation(PAPER_PDF, Optional.empty(), paper("")).pageWithin(8));
     }
 
     @Test
@@ -86,7 +104,7 @@ class PdfLocationResolverTest {
     }
 
     @Test
-    void prefersTheEntrysOwnPdfOverTheCrossReferencedOne() {
+    void prefersTheEntryOwnPdfOverTheCrossReferencedOne() {
         BibEntry proceedings = proceedings().withField(PdfLocationResolver.PAGE_OFFSET, "14");
         BibEntry paper = paper("10--12").withFiles(List.of(PAPER_PDF));
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -52,6 +53,10 @@ public class PdfDocumentViewer extends StackPane {
 
     public StringProperty highlightTextProperty() {
         return highlightText;
+    }
+
+    public int pageCount() {
+        return Optional.ofNullable(pdfView.getDocument()).map(PDFView.Document::getNumberOfPages).orElse(0);
     }
 
     public void show(Path document) {

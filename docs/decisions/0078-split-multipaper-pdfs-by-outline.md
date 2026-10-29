@@ -111,7 +111,7 @@ Proceedings PDF: 6 PDF pages precede printed page 1, so `pageoffset = 6` on the 
 
 After splitting, the extracted paper owns an 8-page PDF, printed pages 45-52, so it gets `pageoffset = 1 - 45 = -44`, and printed page 45 maps to PDF page 1.
 
-## Consequences
+### Consequences
 
 * Good, because no new dependencies or external services beyond PDFBox are needed.
 * Good, because the original PDF is never changed, extraction writes new files.
@@ -124,7 +124,7 @@ After splitting, the extracted paper owns an 8-page PDF, printed pages 45-52, so
 * Bad, because the text stripper reads the paper start pages and the front matter, so a volume with very many papers may take noticeable time.
 * Bad, heuristic thresholds can miss unusual layouts (small titles, titles not near the top) or accept unusual books.
 
-## Confirmation
+### Confirmation
 
 * `./gradlew traceRequirements` fails if `PdfOutlineSplitter` is missing the marker `// [impl->adr~split-multipaper-pdfs-by-outline~1]`
 * The markers `// [impl->req~…]` and `// [utest->req~…]`, in `PdfOutlineSplitter`, `PdfLocationResolver` and the tests link the code to the requirements in `docs/requirements/split-attached-pdf.md`.

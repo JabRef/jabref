@@ -26,7 +26,7 @@ class PdfPaperExtractorTest {
 
     // [utest->req~logic.pdf.extract-paper-page-range~1]
     @Test
-    void copiesTheEntrysPagesAndLeavesTheOriginalIntact() throws IOException {
+    void copiesTheEntryPagesAndLeavesTheOriginalIntact() throws IOException {
         Path source = blankPdf("proceedings.pdf", 5);
         BibEntry paper = new BibEntry(StandardEntryType.InProceedings).withField(StandardField.PAGES, "2--3");
 
@@ -37,7 +37,7 @@ class PdfPaperExtractorTest {
     }
 
     @Test
-    void shiftsTheRangeByTheEntrysPageOffset() throws IOException {
+    void shiftsTheRangeByTheEntryPageOffset() throws IOException {
         Path source = blankPdf("proceedings.pdf", 20);
         BibEntry paper = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.PAGES, "2--3")

@@ -100,10 +100,11 @@ class ShowDocumentViewerActionTest extends JavaFxTest {
             33,  33,      0,   33
             33,  invalid, 0,   1
             33,  54--86,  -54, 1
+            8,   45--52,  0,   1
             """)
     void executeOpensOwnPdfAtResolvedPage(int totalPages, String pages, String offset, int expectedPage) throws IOException {
         BibEntry entry = createEntry(totalPages).withField(StandardField.PAGES, pages)
-                                               .withField(PdfLocationResolver.PAGE_OFFSET, offset);
+                                                .withField(PdfLocationResolver.PAGE_OFFSET, offset);
 
         interact(() -> {
             selectedEntries.setAll(entry);

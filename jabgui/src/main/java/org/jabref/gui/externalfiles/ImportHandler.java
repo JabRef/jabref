@@ -104,7 +104,6 @@ public class ImportHandler {
     private final Deque<DuplicateDecisionRequest> duplicateDecisionRequests = new ArrayDeque<>();
     private boolean duplicateDecisionDialogInProgress;
     private DuplicateResolverDialog.DuplicateResolverResult rememberedBatchDuplicateDecision = BREAK;
-    private Set<String> crossReferencedKeys = Set.of();
 
     private record DuplicateDecisionRequest(BibEntry originalEntry,
                                             BibEntry duplicateEntry,
@@ -370,6 +369,11 @@ public class ImportHandler {
     /// joins the same step, so taking the import back takes the assignments with it.
     // [impl->req~logic.undo.entry-insert-recorded~1]
     public void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries) {
+        importCleanedEntries(transferInformation, entries, Set.of());
+    }
+
+    /// @param keysToKeep keys that entries imported in the same batch cross-reference
+    private void importCleanedEntries(@Nullable TransferInformation transferInformation, List<BibEntry> entries, Set<String> keysToKeep) {
         if (entries.isEmpty()) {
             // An import that collected nothing - cancelled, or every file failed - is not a step,
             // and must not report the library as changed.
@@ -378,7 +382,7 @@ public class ImportHandler {
         undoManager.addEdit(Localization.lang("Import entries"), edit -> {
             targetBibDatabaseContext.getDatabase().insertEntries(entries);
             edit.addEdit(new UndoableInsertEntries(targetBibDatabaseContext.getDatabase(), entries));
-            generateKeys(entries);
+            generateKeys(entries, keysToKeep);
             setAutomaticFields(entries);
             addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
             addToImportEntriesGroup(entries);
@@ -389,7 +393,7 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry) {
-        importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext));
+        importEntryWithDuplicateCheck(transferInformation, entry, BREAK, new EntryImportHandlerTracker(stateManager, targetBibDatabaseContext), Set.of());
     }
 
     /// Imports an entry into the database with duplicate checking and handling.
@@ -399,7 +403,8 @@ public class ImportHandler {
     /// @param entry    the entry to import (original will not be modified)
     /// @param decision the duplicate resolution strategy to apply
     /// @param tracker  tracks the import status of the entry
-    private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
+    /// @param keysToKeep keys that entries imported in the same batch cross-reference
+    private void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker, Set<String> keysToKeep) {
         // The original entry should not be modified
         BibEntry entryCopy = new BibEntry(entry);
         BibEntry entryToInsert = cleanUpEntry(entryCopy);
@@ -417,7 +422,7 @@ public class ImportHandler {
                                               tracker.markSkipped();
                                               return;
                                           }
-                                          continueImportAfterDuplicateHandling(transferInformation, duplicateHandledEntry.get(), tracker);
+                                          continueImportAfterDuplicateHandling(transferInformation, duplicateHandledEntry.get(), tracker, keysToKeep);
                                       })
                                       .exceptionally(exception -> {
                                           tracker.markSkipped();
@@ -426,20 +431,20 @@ public class ImportHandler {
                                       });
                               return;
                           }
-                          continueImportAfterDuplicateHandling(transferInformation, entryToInsert, tracker);
+                          continueImportAfterDuplicateHandling(transferInformation, entryToInsert, tracker, keysToKeep);
                       }).executeWith(taskExecutor);
     }
 
-    private void continueImportAfterDuplicateHandling(@Nullable TransferInformation transferInformation, BibEntry entryForImport, EntryImportHandlerTracker tracker) {
+    private void continueImportAfterDuplicateHandling(@Nullable TransferInformation transferInformation, BibEntry entryForImport, EntryImportHandlerTracker tracker, Set<String> keysToKeep) {
         BackgroundTask.wrap(() -> adjustLinkedFilesForTargetIfRequired(transferInformation, entryForImport))
                       .onFailure(e -> {
                           LOGGER.error("Error adjusting linked files for target", e);
                           dialogService.notify(Localization.lang("Could not adjust linked files. The entry was imported without linked-file adjustments."));
-                          importCleanedEntries(transferInformation, List.of(entryForImport));
+                          importCleanedEntries(transferInformation, List.of(entryForImport), keysToKeep);
                           tracker.markImported(entryForImport);
                       })
                       .onSuccess(adjustedEntry -> {
-                          importCleanedEntries(transferInformation, List.of(adjustedEntry));
+                          importCleanedEntries(transferInformation, List.of(adjustedEntry), keysToKeep);
                           tracker.markImported(adjustedEntry);
                           // Remove source entries only once the whole move has succeeded, so a failure partway through doesn't leave already-removed entries unrecoverable
                           if (transferInformation != null && transferInformation.transferMode() == org.jabref.model.TransferMode.MOVE && tracker.getImportedCount() == transferInformation.sourceEntries().size()) {
@@ -608,12 +613,17 @@ public class ImportHandler {
     /// @param entries entries to generate keys for
     // [impl->req~jabgui.import.keep-cross-referenced-keys~1]
     private void generateKeys(List<BibEntry> entries) {
+        generateKeys(entries, Set.of());
+    }
+
+    /// @param keysOfBatch keys that entries imported in the same batch cross-reference
+    private void generateKeys(List<BibEntry> entries, Set<String> keysOfBatch) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                 targetBibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
                                                                                      .getKeyPatterns()),
                 targetBibDatabaseContext.getDatabase(),
                 preferences.getCitationKeyPatternPreferences());
-        Set<String> keysToKeep = new HashSet<>(crossReferencedKeys);
+        Set<String> keysToKeep = new HashSet<>(keysOfBatch);
         keysToKeep.addAll(crossReferencedKeys(entries));
         entries.stream()
                .filter(entry -> entry.getCitationKey().isEmpty()
@@ -714,22 +724,22 @@ public class ImportHandler {
 
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
         resetBatchDuplicateDecisionState();
-        crossReferencedKeys = crossReferencedKeys(entriesToAdd);
+        Set<String> keysToKeep = crossReferencedKeys(entriesToAdd);
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
                 LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
-                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
+                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker, keysToKeep);
                 firstEntry = false;
                 continue;
             }
             if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
                 DuplicateResolverDialog.DuplicateResolverResult decision = preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
-                importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker);
+                importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker, keysToKeep);
             } else {
                 LOGGER.debug("Not first entry, pref flag is false, we use BREAK");
-                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
+                importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker, keysToKeep);
             }
         }
     }
