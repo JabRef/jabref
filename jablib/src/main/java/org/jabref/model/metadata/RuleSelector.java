@@ -42,7 +42,7 @@ public record RuleSelector(Optional<Field> field, String ruleId) {
     /// finding of it ever matches, and it would quietly stop running.
     public boolean coversEveryField() {
         return field.map(named -> namesEveryField(InternalField.INTERNAL_ALL_FIELD, named)
-                                || namesEveryField(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, named))
+                            || namesEveryField(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, named))
                     .orElse(true);
     }
 

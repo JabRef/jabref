@@ -1235,8 +1235,8 @@ class BibDatabaseWriterTest {
         database.insertEntry(entry);
 
         metaData.setFormatting(LintSettings.of(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK)
-                                             .and(RuleSelector.on(StandardField.JOURNAL, "upper-case"), RuleMode.FIX)
-                                             .and(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF));
+                                           .and(RuleSelector.on(StandardField.JOURNAL, "upper-case"), RuleMode.FIX)
+                                           .and(RuleSelector.of("surrounding-whitespace"), RuleMode.OFF));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("SOME TITLE", entry.getField(StandardField.TITLE).orElseThrow());
@@ -1252,7 +1252,7 @@ class BibDatabaseWriterTest {
         database.insertEntry(entry);
 
         metaData.setFormatting(LintSettings.of(RuleSelector.of("rule-of-a-newer-jabfix"), RuleMode.CHECK)
-                                             .and(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
+                                           .and(RuleSelector.of("surrounding-whitespace"), RuleMode.FIX));
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("Doe, Jane", entry.getField(StandardField.AUTHOR).orElseThrow());

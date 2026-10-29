@@ -34,7 +34,7 @@ class LintSettingsTest {
     @Test
     void aSelectorNamingTheFieldBeatsOneNamingNone() {
         LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
-                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK);
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK);
 
         assertEquals(RuleMode.CHECK, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
         assertEquals(RuleMode.FIX, settings.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
@@ -44,7 +44,7 @@ class LintSettingsTest {
     @Test
     void theFieldWinsWhereverItStands() {
         LintSettings settings = LintSettings.of(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK)
-                                           .and(RuleSelector.of("lower-case"), RuleMode.FIX);
+                                            .and(RuleSelector.of("lower-case"), RuleMode.FIX);
 
         assertEquals(RuleMode.CHECK, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
     }
@@ -60,7 +60,7 @@ class LintSettingsTest {
     @Test
     void aFindingAboutNoFieldTakesTheSelectorNamingNoField() {
         LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.CHECK)
-                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.FIX);
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.FIX);
 
         assertEquals(RuleMode.CHECK, settings.modeOf("lower-case", Optional.empty()));
     }
@@ -68,7 +68,7 @@ class LintSettingsTest {
     @Test
     void namingASelectorTwiceTakesTheLastMode() {
         LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
-                                           .and(RuleSelector.of("lower-case"), RuleMode.OFF);
+                                            .and(RuleSelector.of("lower-case"), RuleMode.OFF);
 
         assertEquals(RuleMode.OFF, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
     }
@@ -95,7 +95,7 @@ class LintSettingsTest {
     @Test
     void aRuleSwitchedOffOnOneFieldStillRuns() {
         LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
-                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.OFF);
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.OFF);
 
         assertTrue(settings.runs("lower-case"));
     }
@@ -114,8 +114,8 @@ class LintSettingsTest {
     @Test
     void namingAFieldBeatsNamingAWholeClassOfThem() {
         LintSettings settings = LintSettings.of(
-                                        RuleSelector.on(InternalField.INTERNAL_ALL_FIELD, "lower-case"), RuleMode.FIX)
-                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.OFF);
+                                                    RuleSelector.on(InternalField.INTERNAL_ALL_FIELD, "lower-case"), RuleMode.FIX)
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.OFF);
 
         assertEquals(RuleMode.OFF, settings.modeOf("lower-case", Optional.of(StandardField.TITLE)));
         assertEquals(RuleMode.FIX, settings.modeOf("lower-case", Optional.of(StandardField.JOURNAL)));
@@ -126,7 +126,7 @@ class LintSettingsTest {
     @Test
     void anOverrideAlsoGivesWayFromAFieldScopedEntry() {
         LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
-                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK);
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.CHECK);
 
         LintSettings overridden = settings.overriddenBy(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
 
@@ -137,7 +137,7 @@ class LintSettingsTest {
     @Test
     void anOverrideLeavesEveryOtherRuleAlone() {
         LintSettings settings = LintSettings.of(RuleSelector.of("lower-case"), RuleMode.FIX)
-                                           .and(RuleSelector.of("upper-case"), RuleMode.CHECK);
+                                            .and(RuleSelector.of("upper-case"), RuleMode.CHECK);
 
         LintSettings overridden = settings.overriddenBy(LintSettings.of(RuleSelector.of("lower-case"), RuleMode.OFF));
 
@@ -185,8 +185,8 @@ class LintSettingsTest {
     @Test
     void theOrderTheSelectorsWereNamedInIsKept() {
         LintSettings settings = LintSettings.of(RuleSelector.of("upper-case"), RuleMode.FIX)
-                                           .and(RuleSelector.of("lower-case"), RuleMode.CHECK)
-                                           .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.OFF);
+                                            .and(RuleSelector.of("lower-case"), RuleMode.CHECK)
+                                            .and(RuleSelector.on(StandardField.TITLE, "lower-case"), RuleMode.OFF);
 
         assertEquals(List.of(
                         RuleSelector.of("upper-case"),

@@ -164,8 +164,8 @@ public class JabKitLauncher {
                    .getCommandSpec().usageMessage().footer("\n"
                            + Localization.lang("The following modes are available:") + "\n"
                            + StringUtil.alignStringTable(Arrays.stream(JabFixMode.values())
-                                                              .map(mode -> new Pair<>(mode.getKey(), mode.getDescription()))
-                                                              .toList())
+                                                               .map(mode -> new Pair<>(mode.getKey(), mode.getDescription()))
+                                                               .toList())
                            + "\n"
                            + Localization.lang("The following rules are available:") + "\n"
                            + StringUtil.alignStringTable(rules.rules().stream()
