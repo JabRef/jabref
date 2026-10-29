@@ -22,6 +22,7 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -81,5 +82,15 @@ class BibSonomyFetcherTest {
     @ValueSource(strings = {"abc", ":", "user:", ":key", "", "   "})
     void malformedKeyIsInvalid(String key) {
         assertFalse(fetcher.isValidKey(key));
+    }
+
+    /* To check searching without credentials gives a clear error instead of an HTTP failure */
+    @Test
+    void searchWithoutCredentialsThrows() {
+        ImporterPreferences noKeyPreferences = mock(ImporterPreferences.class);
+        when(noKeyPreferences.getApiKey(BibSonomyFetcher.FETCHER_NAME)).thenReturn(Optional.empty());
+        BibSonomyFetcher fetcherWithoutKey = new BibSonomyFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), noKeyPreferences);
+
+        assertThrows(FetcherException.class, () -> fetcherWithoutKey.performSearch("machine learning"));
     }
 }
