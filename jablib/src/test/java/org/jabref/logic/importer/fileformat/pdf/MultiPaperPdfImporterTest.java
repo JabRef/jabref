@@ -133,7 +133,7 @@ class MultiPaperPdfImporterTest {
 
         List<BibEntry> entries = reader().importPdfAsOneEntry(pdf).parserResult().getDatabase().getEntries();
 
-        assertEquals(List.of(List.of(pdf.toString())), entries.stream().map(entry -> entry.getFiles().stream().map(LinkedFile::getLink).toList()).toList());
+        assertEquals(List.of(List.of(new LinkedFile("", pdf, StandardFileType.PDF.getName()))), entries.stream().map(BibEntry::getFiles).toList());
     }
 
     @Test
