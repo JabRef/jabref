@@ -42,13 +42,11 @@ class BibSonomyFetcherTest {
         fetcher = new BibSonomyFetcher(importFormatPreferences, importerPreferences);
     }
 
-    /* To check the name shown in JabRef's dropdown is "BibSonomy" */
     @Test
     void getName() {
         assertEquals("BibSonomy", fetcher.getName());
     }
 
-    /* To check a real search returns the correct paper, field by field */
     @Test
     @ExternalServicesTest
     void searchByQueryFindsEntry() throws FetcherException {
@@ -63,28 +61,24 @@ class BibSonomyFetcherTest {
         assertEquals(Optional.of(expected), fetchedEntries.stream().findFirst());
     }
 
-    /* To check a search with no matches gives an empty list, not an error */
     @Test
     @ExternalServicesTest
     void searchWithNonsenseQueryReturnsEmptyList() throws FetcherException {
         assertEquals(List.of(), fetcher.performSearch("xqzvwplkjhgfdsa1234567890"));
     }
 
-    /* To check an empty search box gives an empty list */
     @Test
     @ExternalServicesTest
     void searchWithEmptyQueryReturnsEmptyList() throws FetcherException {
         assertEquals(List.of(), fetcher.performSearch(""));
     }
 
-    /* To check keys without both a username and an API key are rejected before any request */
     @ParameterizedTest
     @ValueSource(strings = {"abc", ":", "user:", ":key", "", "   "})
     void malformedKeyIsInvalid(String key) {
         assertFalse(fetcher.isValidKey(key));
     }
 
-    /* To check searching without credentials gives a clear error instead of an HTTP failure */
     @Test
     void searchWithoutCredentialsThrows() {
         ImporterPreferences noKeyPreferences = mock(ImporterPreferences.class);
