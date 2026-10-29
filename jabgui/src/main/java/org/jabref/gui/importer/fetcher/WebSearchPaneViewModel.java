@@ -195,6 +195,7 @@ public class WebSearchPaneViewModel {
         } else {
             dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
         }
+        dialog.useWebSearchDownloadPreference();
         dialog.setTitle(fetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }
