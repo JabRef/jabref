@@ -255,11 +255,11 @@ public class AuthorListParser {
         String givenAbbreviated = parts.getOrDefault("given-i", "");
         if (givenAbbreviated.isEmpty() && !given.isEmpty()) {
             givenAbbreviated = new AuthorListParser().parse("Placeholder, " + given)
-                                                       .getAuthor(0).getGivenNameAbbreviated().orElse("");
+                                                     .getAuthor(0).getGivenNameAbbreviated().orElse("");
         }
 
         return new Author(given, givenAbbreviated, parts.getOrDefault("prefix", ""),
-                parts.getOrDefault("family", ""), parts.getOrDefault("suffix", ""));
+                parts.getOrDefault("family", ""), parts.getOrDefault("suffix", ""), parts);
     }
 
     private static void addExtendedNamePart(Map<String, String> parts, String part) {

@@ -1,13 +1,19 @@
 package org.jabref.model.entry;
 
+import java.util.Comparator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 /// This is an immutable class that keeps information regarding single author. It is just a container for the information, with very simple methods to access it.
 ///
 /// Current usage: only methods `getLastOnly`, `getFirstLast`, and `getLastFirst` are used; all other methods are provided for completeness.
@@ -21,11 +27,15 @@ public class Author {
 
     public static final RemoveWordEnclosingAndOuterEnclosingBracesFormatter FORMATTER = new RemoveWordEnclosingAndOuterEnclosingBracesFormatter();
 
+    private static final Set<String> EXTENDED_NAME_KEYS = Set.of(
+            "family", "family-i", "given", "given-i", "prefix", "prefix-i", "suffix", "suffix-i");
+
     private final String givenName;
     private final String givenNameAbbreviated;
     private final String namePrefix;
     private final String familyName;
     private final String nameSuffix;
+    private final Map<String, String> extendedNameParts;
     private Author latexFreeAuthor;
 
     /// Creates the Author object. If any part of the name is absent, `null` must be passed; otherwise other methods may return erroneous results.
@@ -38,6 +48,15 @@ public class Author {
     /// @param familyName           the last name of the author (may consist of several tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
     /// @param nameSuffix           the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
     public Author(String givenName, String givenNameAbbreviated, String namePrefix, String familyName, String nameSuffix) {
+        this(givenName, givenNameAbbreviated, namePrefix, familyName, nameSuffix, Map.of());
+    }
+
+    /// Retains the original labeled values, including name-level options and explicit initials,
+    /// separately from the normalized name parts used for display.
+    public Author(@Nullable String givenName, @Nullable String givenNameAbbreviated,
+                  @Nullable String namePrefix, @Nullable String familyName, @Nullable String nameSuffix,
+                  @NonNull Map<String, String> extendedNameParts) {
+        this.extendedNameParts = Map.copyOf(extendedNameParts);
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
         if (!StringUtil.isBlank(givenName)) {
@@ -159,7 +178,7 @@ public class Author {
 
     @Override
     public int hashCode() {
-        return Objects.hash(givenNameAbbreviated, givenName, nameSuffix, familyName, namePrefix);
+        return Objects.hash(givenNameAbbreviated, givenName, nameSuffix, familyName, namePrefix, extendedNameParts);
     }
 
     /// Compare this object with the given one.
@@ -176,10 +195,32 @@ public class Author {
                     && Objects.equals(givenNameAbbreviated, that.givenNameAbbreviated)
                     && Objects.equals(namePrefix, that.namePrefix)
                     && Objects.equals(familyName, that.familyName)
-                    && Objects.equals(nameSuffix, that.nameSuffix);
+                    && Objects.equals(nameSuffix, that.nameSuffix)
+                    && extendedNameParts.equals(that.extendedNameParts);
         }
 
         return false;
+    }
+
+    /// Returns immutable labeled BibLaTeX values; conventional names have no labeled values.
+    public @NonNull Map<String, String> getExtendedNameParts() {
+        return extendedNameParts;
+    }
+
+    /// Serializes a name without discarding BibLaTeX options, explicit initials or protected values.
+    /// Display formatters should continue to use [#getFamilyGiven(boolean)] or [#getGivenFamily(boolean)].
+    // [impl->req~save.names.preserve-extended-parts~1]
+    public @NonNull String getAsBibtex() {
+        if (extendedNameParts.isEmpty()) {
+            return getFamilyGiven(false);
+        }
+        // Put a name part first so a subsequent parse recognizes the extended syntax even
+        // when an unknown option sorts before all of the standard parts.
+        return extendedNameParts.entrySet().stream()
+                                .sorted(Comparator.comparing((Map.Entry<String, String> part) -> !EXTENDED_NAME_KEYS.contains(part.getKey()))
+                                                  .thenComparing(Map.Entry::getKey))
+                                .map(part -> part.getKey() + "=" + part.getValue())
+                                .collect(Collectors.joining(", "));
     }
 
     /// Returns the first name of the author stored in this object ("First").
@@ -291,7 +332,7 @@ public class Author {
             String von = getNamePrefix().map(LatexToUnicodeAdapter::format).orElse(null);
             String last = getFamilyName().map(LatexToUnicodeAdapter::format).orElse(null);
             String jr = getNameSuffix().map(LatexToUnicodeAdapter::format).orElse(null);
-            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr);
+            latexFreeAuthor = new Author(first, givenNameAbbreviated, von, last, jr, extendedNameParts);
             latexFreeAuthor.latexFreeAuthor = latexFreeAuthor;
         }
         return latexFreeAuthor;

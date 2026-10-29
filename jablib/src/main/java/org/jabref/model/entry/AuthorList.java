@@ -355,6 +355,11 @@ public class AuthorList implements Iterable<Author> {
                            .collect(Collectors.joining(" and "));
     }
 
+    /// Returns the author field for storage, preserving extended BibLaTeX name parts per author.
+    public String getAsBibtex() {
+        return authors.stream().map(Author::getAsBibtex).collect(Collectors.joining(" and "));
+    }
+
     /// Returns a list of authors separated with "and". The first author is formatted with [Author#getFamilyGiven(boolean)] and each subsequent author is formatted with [Author#getGivenFamily(boolean)].
     ///
     /// @param abbreviate first names.
