@@ -26,11 +26,11 @@ public class BibDatabaseDiff {
     private final List<BibStringDiff> bibStringDiffs;
     private final List<BibEntryDiff> entryDiffs;
 
-    private BibDatabaseDiff(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase) {
+    private BibDatabaseDiff(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase, BibEntryTypesManager entryTypesManager) {
         metaDataDiff = MetaDataDiff.compare(originalDatabase.getMetaData(), newDatabase.getMetaData());
         preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase);
         bibStringDiffs = BibStringDiff.compare(originalDatabase.getDatabase(), newDatabase.getDatabase());
-        entryDiffs = getBibEntryDiffs(originalDatabase, newDatabase);
+        entryDiffs = getBibEntryDiffs(originalDatabase, newDatabase, new DuplicateCheck(entryTypesManager));
         if (LOGGER.isDebugEnabled() && !isEmpty()) {
             LOGGER.debug("Differences detected");
             metaDataDiff.ifPresent(diff -> LOGGER.debug("Metadata differences: {}", diff));
@@ -44,7 +44,7 @@ public class BibDatabaseDiff {
         return metaDataDiff.isEmpty() && preambleDiff.isEmpty() && bibStringDiffs.isEmpty() && entryDiffs.isEmpty();
     }
 
-    private List<BibEntryDiff> getBibEntryDiffs(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase) {
+    private List<BibEntryDiff> getBibEntryDiffs(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase, DuplicateCheck duplicateCheck) {
         final List<BibEntryDiff> entryDiffs;
         // Sort both databases according to a common sort key.
         EntryComparator comparator = getEntryComparator();
@@ -55,7 +55,7 @@ public class BibDatabaseDiff {
         originalEntriesSorted.removeIf(BibEntry::isEmpty);
         newEntriesSorted.removeIf(BibEntry::isEmpty);
 
-        entryDiffs = compareEntries(originalEntriesSorted, newEntriesSorted, originalDatabase.getMode());
+        entryDiffs = compareEntries(originalEntriesSorted, newEntriesSorted, originalDatabase.getMode(), duplicateCheck);
         return entryDiffs;
     }
 
@@ -66,7 +66,7 @@ public class BibDatabaseDiff {
         return comparator;
     }
 
-    private static List<BibEntryDiff> compareEntries(List<BibEntry> originalEntries, List<BibEntry> newEntries, BibDatabaseMode mode) {
+    private static List<BibEntryDiff> compareEntries(List<BibEntry> originalEntries, List<BibEntry> newEntries, BibDatabaseMode mode, DuplicateCheck duplicateCheck) {
         List<BibEntryDiff> differences = new ArrayList<>();
 
         // Prevent IndexOutOfBoundException
@@ -100,7 +100,6 @@ public class BibDatabaseDiff {
 
         // We've found all exact matches - and stored the non-matched entries in the notMatched set.
         // Look through the remaining entries, looking for close matches.
-        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         for (BibEntry originalEntry : notMatched) {
             // These two variables will keep track of which entry most closely matches the one we're looking at.
             double bestMatch = 0;
@@ -144,8 +143,9 @@ public class BibDatabaseDiff {
         return oneEntry.hasCitationKey() && twoEntry.hasCitationKey() && oneEntry.getCitationKey().equals(twoEntry.getCitationKey());
     }
 
-    public static BibDatabaseDiff compare(BibDatabaseContext base, BibDatabaseContext changed) {
-        return new BibDatabaseDiff(base, changed);
+    // [impl->req~ux.external-library-changes.custom-entry-types~1]
+    public static BibDatabaseDiff compare(BibDatabaseContext base, BibDatabaseContext changed, BibEntryTypesManager entryTypesManager) {
+        return new BibDatabaseDiff(base, changed, entryTypesManager);
     }
 
     public Optional<MetaDataDiff> getMetaDataDifferences() {
