@@ -388,19 +388,16 @@ public class OpenOfficePanel {
 
         try {
             List<String> markNames = UnoReferenceMark.getListOfNames(documentResult.get());
-            ImportCited.CitedEntries citedEntries =
-                    ImportCited.collectCitedEntries(markNames, targetTab.getDatabase());
+            ImportCited.CitedEntries citedEntries = ImportCited.collectCitedEntries(markNames, targetTab.getDatabase());
 
             if (citedEntries.newEntries().isEmpty()) {
-                String notification = citedEntries.entriesAlreadyInLibrary().isEmpty()
-                        ? Localization.lang("No Zotero-compatible citations found. Only Zotero-compatible citations can be imported.")
-                        : Localization.lang("No new cited entries to import");
-                dialogService.notify(notification);
+                dialogService.notify(Localization.lang("No new cited entries to import"));
                 return;
             }
 
             targetTab.importCitedEntriesWithDuplicateCheck(citedEntries.newEntries());
         } catch (NoDocumentException ex) {
+            dialogService.notify(Localization.lang("Please connect to a document"));
             LOGGER.info("Could not import", ex);
         }
     }
@@ -491,7 +488,8 @@ public class OpenOfficePanel {
         boolean canGenerateBibliography = (isConnectedToDocument && hasDatabase)
                 && (jstyleSelected || bstStyleSelected || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography()));
         boolean canImportCited = isConnectedToDocument
-                && tabContainer.getCurrentLibraryTab() != null;
+                && tabContainer.getCurrentLibraryTab() != null
+                && openOfficePreferences.getZoteroCompatibilityMode();
 
         selectDocument.setDisable(!isConnectedToDocument);
         setStyleFile.setDisable(!isConnectedToDocument);
