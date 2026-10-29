@@ -13,6 +13,7 @@ import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.SearchQuery;
@@ -72,13 +73,21 @@ class BibSonomyFetcherTest {
     void searchByQueryFindsEntry() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Tang, Chunlei and Jia, Xing and Xiong, Yun")
-                .withField(StandardField.TITLE, "From data to value in multimodal learning")
+                .withField(StandardField.TITLE, "From data to value in multimodal learning.")
                 .withField(StandardField.JOURNAL, "Patterns")
-                .withField(StandardField.YEAR, "2026");
+                .withField(StandardField.YEAR, "2026")
+                .withField(StandardField.VOLUME, "7")
+                .withField(StandardField.NUMBER, "8")
+                .withField(StandardField.PAGES, "101615")
+                .withField(StandardField.DOI, "10.1016/j.patter.2026.101615");
+        // Fields such as added-at or interhash belong to the user who posted the entry and may change, so only the bibliographic fields are compared
+        List<Field> bibliographicFields = List.copyOf(expected.getFields());
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("From data to value in multimodal learning");
+        BibEntry firstEntry = fetcher.performSearch("From data to value in multimodal learning").getFirst();
 
-        assertEquals(Optional.of(expected), fetchedEntries.stream().findFirst());
+        assertEquals(expected.getType(), firstEntry.getType());
+        assertEquals(bibliographicFields.stream().map(expected::getField).toList(),
+                bibliographicFields.stream().map(firstEntry::getField).toList());
     }
 
     @Test
