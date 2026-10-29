@@ -24,6 +24,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.LocaleUtil;
 import org.jabref.gui.util.component.MarkdownTextFlow;
+import org.jabref.logic.ai.chatting.util.JsonAnswerFormatter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.chatting.ChatMessage;
 
@@ -134,7 +135,14 @@ public class AiChatMessageView extends HBox {
             return;
         }
 
-        markdownTextFlow.setMarkdown(StringUtil.makeSafe(chatMessage.content()));
+        String content = StringUtil.makeSafe(chatMessage.content());
+
+        // Only the AI answers with JSON; a user message is shown the way it was typed.
+        if (chatMessage.role() == ChatMessage.Role.AI) {
+            markdownTextFlow.setMarkdown(JsonAnswerFormatter.fenceJson(content), new JsonCodeBlockFormatter());
+        } else {
+            markdownTextFlow.setMarkdown(content);
+        }
     }
 
     private static Pos determineAlignment(ChatMessage chatMessage) {

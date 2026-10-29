@@ -1,16 +1,30 @@
 package org.jabref.gui.importer.fetcher;
 
+import java.util.Optional;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InOrder;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.when;
 
 class WebSearchPaneViewModelTest {
 
@@ -32,6 +46,28 @@ class WebSearchPaneViewModelTest {
     void queryConsistingOfASingleAndIsNotValid() {
         viewModel.queryProperty().setValue("AND");
         assertFalse(viewModel.queryValidationStatus().validProperty().getValue());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"test query", "10.1007/JHEP02(2023)082", "arXiv:2110.02957"})
+    void searchSelectsWebSearchDownloadPreferenceBeforeShowingDialog(String query) {
+        // [utest->req~import.dialog.download-linked-files~1]
+        when(preferences.getImporterPreferences().areImporterEnabled()).thenReturn(true);
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(new BibDatabaseContext()));
+        SearchBasedFetcher fetcher = mock(SearchBasedFetcher.class);
+        when(fetcher.getName()).thenReturn("Test fetcher");
+        viewModel.selectedFetcherProperty().set(fetcher);
+        viewModel.queryProperty().set(query);
+
+        try (MockedConstruction<ImportEntriesDialog> dialogs = mockConstruction(ImportEntriesDialog.class)) {
+            viewModel.search();
+
+            assertEquals(1, dialogs.constructed().size());
+            ImportEntriesDialog dialog = dialogs.constructed().getFirst();
+            InOrder order = inOrder(dialog, dialogService);
+            order.verify(dialog).useWebSearchDownloadPreference();
+            order.verify(dialogService).showCustomDialogAndWait(dialog);
+        }
     }
 
     @Test
