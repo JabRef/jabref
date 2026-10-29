@@ -29,6 +29,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +48,11 @@ class BibSonomyFetcherTest {
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importerPreferences.getApiKey(BibSonomyFetcher.FETCHER_NAME)).thenReturn(Optional.of(buildInfo.bibSonomyUsername + ":" + buildInfo.bibSonomyApiKey));
         fetcher = new BibSonomyFetcher(importFormatPreferences, importerPreferences);
+    }
+
+    /// The live tests need the `BibSonomyUsername` and `BibSonomyApiKey` environment variables at build time and are skipped without them
+    private void assumeCredentialsAvailable() {
+        assumeTrue(BibSonomyFetcher.hasUsernameAndApiKey(buildInfo.bibSonomyUsername + ":" + buildInfo.bibSonomyApiKey));
     }
 
     @Test
@@ -71,6 +77,7 @@ class BibSonomyFetcherTest {
     @Test
     @ExternalServicesTest
     void searchByQueryFindsEntry() throws FetcherException {
+        assumeCredentialsAvailable();
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Tang, Chunlei and Jia, Xing and Xiong, Yun")
                 .withField(StandardField.TITLE, "From data to value in multimodal learning.")
@@ -93,12 +100,14 @@ class BibSonomyFetcherTest {
     @Test
     @ExternalServicesTest
     void searchWithNonsenseQueryReturnsEmptyList() throws FetcherException {
+        assumeCredentialsAvailable();
         assertEquals(List.of(), fetcher.performSearch("xqzvwplkjhgfdsa1234567890"));
     }
 
     @Test
     @ExternalServicesTest
     void searchWithEmptyQueryReturnsEmptyList() throws FetcherException {
+        assumeCredentialsAvailable();
         assertEquals(List.of(), fetcher.performSearch(""));
     }
 
