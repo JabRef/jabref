@@ -46,10 +46,12 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -58,6 +60,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableValue;
@@ -376,7 +379,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                         doiButton.setDisable(true);
                         addSource(Localization.lang("From DOI"), () -> {
                             try {
-                                return doiFetcher.performSearchById(content).get();
+                                return applyJournalAbbreviation(doiFetcher.performSearchById(content).get());
                             } catch (FetcherException | NoSuchElementException e) {
                                 LOGGER.warn("Failed to fetch BibEntry for DOI {}", content, e);
                                 return null;
@@ -403,12 +406,21 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     public void addFetchedColumn(String title, IdBasedFetcher fetcher, String id) {
         addSource(title, () -> {
             try {
-                return fetcher.performSearchById(id).orElse(null);
+                return fetcher.performSearchById(id).map(this::applyJournalAbbreviation).orElse(null);
             } catch (FetcherException e) {
                 LOGGER.warn("Failed to fetch BibEntry for {} using {}", id, title, e);
                 return null;
             }
         });
+    }
+
+    private BibEntry applyJournalAbbreviation(BibEntry entry) {
+        JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+
+        AbbreviateCleanupFactory.abbreviateCleanup(repository,
+                preferences.getAbbreviationPreferences()
+        ).ifPresent(cleanupJob -> cleanupJob.cleanup(entry));
+        return entry;
     }
 
     /// Starts automatic identifier fetching for the columns already added via [#addSource]. Must be called after

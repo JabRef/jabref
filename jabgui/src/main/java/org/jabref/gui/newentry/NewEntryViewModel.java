@@ -26,6 +26,7 @@ import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
@@ -39,6 +40,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
@@ -52,6 +54,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -173,6 +176,23 @@ public class NewEntryViewModel {
                 StringUtil::isNotBlank,
                 ValidationMessage.error(Localization.lang("You must specify a Bib(La)TeX source.")));
         bibtexWorker = null;
+    }
+
+    private BibEntry applyJournalAbbreviation(BibEntry entry) {
+        JournalAbbreviationRepository repository =
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+
+        AbbreviateCleanupFactory.abbreviateCleanup(
+                libraryTab.getBibDatabaseContext().getDatabase(),
+                repository,
+                preferences.getAbbreviationPreferences()
+        ).ifPresent(cleanupJob -> cleanupJob.cleanup(entry));
+        return entry;
+    }
+
+    private List<BibEntry> applyJournalAbbreviationToAll(List<BibEntry> entries) {
+        entries.forEach(this::applyJournalAbbreviation);
+        return entries;
     }
 
     public void populateDOICache() {
@@ -377,6 +397,8 @@ public class NewEntryViewModel {
                 return;
             }
 
+            BibEntry fetchedEntry = applyJournalAbbreviation(result.get());
+
             ImportHandler handler = new ImportHandler(
                     libraryTab.getBibDatabaseContext(),
                     preferences,
@@ -385,7 +407,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntryWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), result.get());
+            handler.importEntryWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), fetchedEntry);
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -439,6 +461,8 @@ public class NewEntryViewModel {
                 return;
             }
 
+            List<BibEntry> fetchedEntries = applyJournalAbbreviationToAll(result);
+
             ImportHandler handler = new ImportHandler(
                     libraryTab.getBibDatabaseContext(),
                     preferences,
@@ -447,7 +471,7 @@ public class NewEntryViewModel {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            handler.importEntriesWithDuplicateCheck(null, result);
+            handler.importEntriesWithDuplicateCheck(null, fetchedEntries);
 
             executedSuccessfully.set(true);
             executing.set(false);

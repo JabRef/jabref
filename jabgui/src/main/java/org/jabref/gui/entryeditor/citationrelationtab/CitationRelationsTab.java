@@ -71,11 +71,13 @@ import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
@@ -93,6 +95,7 @@ import org.jabref.model.undo.UndoableInsertEntries;
 import org.jabref.model.undo.UndoableRemoveEntries;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import org.controlsfx.control.CheckListView;
@@ -958,8 +961,11 @@ public class CitationRelationsTab extends EntryEditorTab {
             BackgroundTask<List<CitationRelationItem>> self = selfReference.get();
             return (self != null) && self.isCancelled();
         };
-        BackgroundTask<List<CitationRelationItem>> task = BackgroundTask.wrap(
-                () -> matchAgainstLibrary(fetch.fetch(isCancelled), libraryEntries, databaseMode, isCancelled));
+        BackgroundTask<List<CitationRelationItem>> task = BackgroundTask.wrap(() -> {
+            List<BibEntry> fetchedEntries = fetch.fetch(isCancelled);
+            applyJournalCleanup(fetchedEntries);
+            return matchAgainstLibrary(fetchedEntries, libraryEntries, databaseMode, isCancelled);
+        });
         selfReference.set(task);
         return task;
     }
@@ -1053,6 +1059,24 @@ public class CitationRelationsTab extends EntryEditorTab {
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));
+    }
+
+    private void applyJournalCleanup(List<BibEntry> entries) {
+        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+        JournalAbbreviationRepository repository =
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+        if (databaseContext.isEmpty()) {
+            AbbreviateCleanupFactory.abbreviateCleanup(
+                    null,
+                    repository,
+                    preferences.getAbbreviationPreferences()
+            ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
+        }
+        AbbreviateCleanupFactory.abbreviateCleanup(
+                databaseContext.get().getDatabase(),
+                repository,
+                preferences.getAbbreviationPreferences()
+        ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
     }
 
     private void handleRefresh(CitationComponents citationComponents, CitationComponents otherCitationComponents) {
