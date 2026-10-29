@@ -185,9 +185,13 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     private static final Pattern LEADING_VENUE_NOISE_PATTERN = Pattern.compile("^[\\s,.;:]*(?:In\\s+(?=Proceedings\\b))?");
 
-    /// A comma-separated part that only consists of volume/issue/number information, such as `41`, `4(2)` or `vol. 3`
+    /// A comma-separated part that only consists of volume/issue/number information, such as `41`, `4(2)` or `vol. 3`.
+    ///
+    /// The part has to contain at least one digit (lookahead) and otherwise only consists of the allowed characters.
+    /// There is exactly one repetition over those characters, and the optional prefix is possessive. Thus, a long
+    /// digit sequence that ends in an unexpected character is rejected in linear time instead of backtracking.
     private static final Pattern NUMERIC_PART_PATTERN = Pattern.compile(
-            "^(?:(?:vol(?:ume)?|no|nr|issue|section|pp?|pages?)\\.?\\s*)?[\\d\\s().:/\\-]*\\d[\\d\\s().:/\\-]*$",
+            "^(?:(?:vol(?:ume)?|no|nr|issue|section|pp?|pages?)\\.?+\\s*+)?(?=[^\\d]*\\d)[\\d\\s().:/\\-]+$",
             Pattern.CASE_INSENSITIVE);
 
     private List<String> urls;
@@ -223,14 +227,16 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         return generateEntity(text.strip());
     }
 
-    /// Text without any citation data must not create an empty `@article` entry.
+    /// Text without citation data must not create an entry, otherwise plain prose (`hello`) would be added to the
+    /// library as an `@article`. A title alone is no evidence of a citation, so at least one other field is required.
+    /// A journal or publisher counts, because it is only found behind a title delimiter (`.`, `,`, `//` or a quote).
     private boolean nothingFound() {
         return authors.isEmpty()
                 && urls.isEmpty()
                 && year.isEmpty()
                 && pages.isEmpty()
-                && title.isEmpty()
-                && doi.isEmpty();
+                && doi.isEmpty()
+                && journalOrPublisher.isEmpty();
     }
 
     /// Builds the entry from the parsed fields. `originalCitation` is the citation as entered by the user. It is
