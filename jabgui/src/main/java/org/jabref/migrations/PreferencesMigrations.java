@@ -115,12 +115,14 @@ public class PreferencesMigrations {
         final String WEB_SEARCH_DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
         final String IMPORT_DIALOG_DOWNLOAD_LINKED_FILES = "importDialogDownloadLinkedFiles";
 
-        if (prefs.hasKey(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES) || !prefs.hasKey(WEB_SEARCH_DOWNLOAD_LINKED_FILES)) {
+        if (prefs.hasKey(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES)) {
             return;
         }
 
-        // Set via the preference object (not via putBoolean) so that an already loaded FilePreferences instance is updated, too
-        prefs.getFilePreferences().setImportDialogDownloadLinkedFiles(prefs.getBoolean(WEB_SEARCH_DOWNLOAD_LINKED_FILES, true));
+        boolean initialChoice = prefs.getBoolean(WEB_SEARCH_DOWNLOAD_LINKED_FILES, true);
+        prefs.getFilePreferences().setImportDialogDownloadLinkedFiles(initialChoice);
+        // A property change listener does not persist a value that already equals the default.
+        prefs.putBoolean(IMPORT_DIALOG_DOWNLOAD_LINKED_FILES, initialChoice);
     }
 
     /// Up to and including v6.0-alpha.6, custom entry editor tabs were stored in two parallel numbered

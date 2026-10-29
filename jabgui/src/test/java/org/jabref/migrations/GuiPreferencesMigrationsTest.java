@@ -497,6 +497,7 @@ class GuiPreferencesMigrationsTest {
         PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
 
         verify(filePreferences).setImportDialogDownloadLinkedFiles(webSearchChoice);
+        verify(preferences).putBoolean("importDialogDownloadLinkedFiles", webSearchChoice);
         verify(filePreferences, never()).setDownloadLinkedFiles(anyBoolean());
     }
 
@@ -510,6 +511,7 @@ class GuiPreferencesMigrationsTest {
         PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
 
         verify(filePreferences, never()).setImportDialogDownloadLinkedFiles(anyBoolean());
+        verify(preferences, never()).putBoolean(eq("importDialogDownloadLinkedFiles"), anyBoolean());
     }
 
     @Test
@@ -517,10 +519,12 @@ class GuiPreferencesMigrationsTest {
         FilePreferences filePreferences = mock(FilePreferences.class);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.hasKey("importDialogDownloadLinkedFiles")).thenReturn(false);
-        when(preferences.hasKey("downloadLinkedFiles")).thenReturn(false);
+        when(preferences.getBoolean("downloadLinkedFiles", true)).thenReturn(true);
 
         PreferencesMigrations.upgradeImportDialogDownloadLinkedFiles(preferences);
 
-        verify(filePreferences, never()).setImportDialogDownloadLinkedFiles(anyBoolean());
+        verify(filePreferences).setImportDialogDownloadLinkedFiles(true);
+        verify(preferences).putBoolean("importDialogDownloadLinkedFiles", true);
     }
+
 }
