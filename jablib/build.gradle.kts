@@ -220,6 +220,7 @@ val year = Calendar.getInstance().get(Calendar.YEAR).toString()
 
 val azureInstrumentationKey = providers.environmentVariable("AzureInstrumentationKey").orElse("")
 val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDataSystemAPIKey").orElse("")
+// BibSonomy credentials are a full account login, used only by the fetcher tests. Never set them in binaries.yml.
 val bibSonomyApiKey = providers.environmentVariable("BibSonomyApiKey").orElse("")
 val bibSonomyUsername = providers.environmentVariable("BibSonomyUsername").orElse("")
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
