@@ -5,14 +5,11 @@ import java.util.Optional;
 import org.jabref.logic.util.strings.StringUtil;
 
 import org.jspecify.annotations.NullMarked;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// Translates JabRef's search query into BibSonomy's free-text `search` parameter.
-/// BibSonomy has no fielded search and no `OR`; years are filtered client-side.
+/// BibSonomy has no fielded search; years are filtered client-side.
 @NullMarked
 public class BibSonomyQueryTransformer extends YearAndYearRangeByFilteringQueryTransformer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibSonomyQueryTransformer.class);
 
     @Override
     protected String getLogicalAndOperator() {
@@ -21,8 +18,7 @@ public class BibSonomyQueryTransformer extends YearAndYearRangeByFilteringQueryT
 
     @Override
     protected String getLogicalOrOperator() {
-        LOGGER.warn("BibSonomy does not support the Boolean OR operator, using AND instead.");
-        return " ";
+        return " OR ";
     }
 
     @Override
