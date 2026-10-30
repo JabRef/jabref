@@ -361,7 +361,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 checkCurrentConnection();
                 return;
             }
-            remoteUpdateExecutor.execute(() -> withPullLock(() -> applyRemoteChanges(remoteChanges)));
+            remoteUpdateExecutor.execute(() -> runIfOpen(() -> withPullLock(() -> applyRemoteChanges(remoteChanges))));
         });
     }
 
@@ -416,7 +416,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             checkCurrentConnection();
             return;
         }
-        remoteUpdateExecutor.execute(() -> withPullLock(() -> applyRemoteMetaData(sharedMetaData, localRevisionAtRead)));
+        remoteUpdateExecutor.execute(() -> runIfOpen(() -> withPullLock(() -> applyRemoteMetaData(sharedMetaData, localRevisionAtRead))));
     }
 
     /// Database worker. Transfers only what differs: the id/version mapping plus the entries
@@ -675,7 +675,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Schedules a field update received from another shared-database client.
     public void handleRemoteFieldChange(FieldChange fieldChange) {
-        remoteUpdateExecutor.execute(() -> applyRemoteFieldChange(fieldChange));
+        remoteUpdateExecutor.execute(() -> runIfOpen(() -> applyRemoteFieldChange(fieldChange)));
     }
 
     private void doApplyRemoteFieldChange(FieldChange fieldChange) {
@@ -816,6 +816,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
         LOGGER.info("Synchronizing the changes made while the shared database was unavailable");
         remoteUpdateExecutor.execute(() -> withPullLock(() -> {
+            if (closed) {
+                return;
+            }
             Map<Integer, BibEntry> localEntriesById = new HashMap<>();
             for (BibEntry localEntry : bibDatabase.getEntriesSnapshot()) {
                 localEntriesById.put(localEntry.getSharedBibEntryData().getSharedIdAsInt(), localEntry);
@@ -966,6 +969,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
+    private void runIfOpen(Runnable work) {
+        if (!closed) {
+            work.run();
+        }
+    }
+
     private void withPullLock(Runnable work) {
         pullLock.lock();
         try {
@@ -1016,21 +1025,45 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.dbmsConnection = connection;
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
-        this.dbmsProcessor = new DBMSProcessor(connection);
-        this.notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
-        this.offlineChanges = OfflineChanges.load(offlineChangesDirectory, connection.getProperties());
-        initializeDatabases();
+        boolean initialized = false;
+        try {
+            this.dbmsProcessor = new DBMSProcessor(connection);
+            this.notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
+            this.offlineChanges = OfflineChanges.load(offlineChangesDirectory, connection.getProperties());
+            initializeDatabases();
+            initialized = true;
+        } finally {
+            if (!initialized) {
+                // closeSharedDatabase ignores a synchronizer that never finished opening, so a failed attempt has to
+                // release its connection and listener here; otherwise every retry leaves one of each behind
+                Optional.ofNullable(dbmsProcessor).ifPresent(DBMSProcessor::stopNotificationListener);
+                closeQuietly(currentConnection);
+            }
+        }
         sharedDatabaseOpen = true;
     }
 
     @Override
     public void closeSharedDatabase() {
+        prepareForClose();
+        finishClose();
+    }
+
+    @Override
+    public void prepareForClose() {
+        if (!sharedDatabaseOpen) {
+            return;
+        }
+        applySaveActionsToBufferedEntry();
+        closed = true;
+    }
+
+    @Override
+    public void finishClose() {
         if (!sharedDatabaseOpen) {
             return;
         }
         sharedDatabaseOpen = false;
-        closed = true;
-        applySaveActionsToBufferedEntry();
         BibEntry bufferedEntry = entryWithPendingChanges.get();
         if ((bufferedEntry != null) && isPresentLocalBibEntry(bufferedEntry)) {
             // Recorded before the flush is even attempted: a dead or slow connection must not
