@@ -14,6 +14,12 @@ public interface DatabaseSynchronizer {
 
     void closeSharedDatabase();
 
+    /// Applies pending model changes on the model thread before asynchronous shutdown.
+    void prepareForClose();
+
+    /// Flushes pending changes and closes the connection after [#prepareForClose].
+    void finishClose();
+
     void pullChanges();
 
     void registerListener(Object listener);
