@@ -688,7 +688,15 @@ public class PreferencesMigrations {
             try (final Keyring keyring = Keyring.create()) {
                 for (int i = 0; i < names.size(); i++) {
                     if (!StringUtil.isBlank(keys.get(i))) {
-                        keyring.setPassword("org.jabref.apikeys", names.get(i), keys.get(i).trim());
+                        boolean isStoredAlready;
+                        try {
+                            isStoredAlready = !StringUtil.isBlank(keyring.getPassword("org.jabref.apikeys", names.get(i)));
+                        } catch (PasswordAccessException _){
+                            isStoredAlready = false;
+                        }
+                        if (!isStoredAlready){
+                            keyring.setPassword("org.jabref.apikeys", names.get(i), keys.get(i).trim());
+                        }
                     }
                     try {
                         keyring.deletePassword("org.jabref.customapikeys", names.get(i));
