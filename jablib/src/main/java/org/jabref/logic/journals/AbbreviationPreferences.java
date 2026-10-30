@@ -15,7 +15,7 @@ public class AbbreviationPreferences {
     private final BooleanProperty shouldEnableMscKeywordDescriptions;
     private final ObjectProperty<AbbreviationType> abbreviationTypeOnFetch;
     private final ObjectProperty<JournalMode> journalAbbreviationMode;
-    
+
     public AbbreviationPreferences(List<String> externalJournalLists,
                                    boolean useFJournalField,
                                    boolean shouldEnableMscKeywordDescriptions,
@@ -35,7 +35,7 @@ public class AbbreviationPreferences {
                 true,                    // useFJournalField
                 false,                   // Enable MSC codes as Keyword
                 JournalMode.NONE,        // Do NOT change journal title on fetch
-                AbbreviationType.DEFAULT // use the default option
+                AbbreviationType.DEFAULT
         );
     }
 

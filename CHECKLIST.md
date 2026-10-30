@@ -31,7 +31,7 @@ Read your own diff once, top to bottom, and confirm each point.
 - [/] Regexes use a precompiled `Pattern.compile(...)` constant, not `String.matches(...)`.
 - [x] Keep alphabetical ordering when adding variables or enum items.
 - [/] Background work uses `org.jabref.logic.util.BackgroundTask`, not `new Thread()`.
-- [ ] No commented-out code, no trivial comments restating the code, no AI-disclosure comments in source.
+- [x] No commented-out code, no trivial comments restating the code, no AI-disclosure comments in source.
 - [ ] Markdown Javadoc (`///`) uses Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code}`, `[ClassName]` instead of `{@link}`.
 
 ### User-facing text
