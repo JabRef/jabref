@@ -21,6 +21,7 @@ import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
 import org.jabref.logic.shared.notifications.NotificationListener;
 import org.jabref.logic.shared.notifications.Notifier;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
@@ -327,7 +328,7 @@ public class DBMSProcessor {
     // [impl->req~shared-database.entry-type-required~1]
     private static String entryTypeNameForDatabase(BibEntry bibEntry) {
         String typeName = bibEntry.getType().getName();
-        if (typeName == null || typeName.isBlank()) {
+        if (StringUtil.isBlank(typeName)) {
             LOGGER.warn("Entry {} has missing or blank entry type; storing as 'misc'",
                     bibEntry.getCitationKey().orElse("<no citation key>"));
             return StandardEntryType.Misc.getName();
@@ -634,7 +635,7 @@ public class DBMSProcessor {
                         int version = selectEntryResultSet.getInt("version");
                         String rawEntryType = selectEntryResultSet.getString("entrytype");
                         EntryType entrytype;
-                        if (rawEntryType == null || rawEntryType.isBlank()) {
+                        if (StringUtil.isBlank(rawEntryType)) {
                             LOGGER.warn("Shared entry {} has missing or blank entry type; falling back to 'misc'", sharedId);
                             entrytype = StandardEntryType.Misc;
                         } else {
