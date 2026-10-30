@@ -43,7 +43,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.google.common.base.Throwables;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -207,10 +206,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 .setJdbcUrl(jdbcUrl.getValue())
                 .createDBMSConnectionProperties();
 
-        openSharedDatabase(connectionProperties, rememberPassword.get(), autosave.get(), folder.getValue(), onConnected);
+        openSharedDatabase(connectionProperties, rememberPassword.get(), autosave.get(), folder.getValue(), onConnected, Optional.empty());
     }
 
-    private void openSharedDatabase(DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
+    private void openSharedDatabase(DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected, Optional<String> sharedDatabaseId) {
         SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
                 tabContainer,
                 dialogService,
@@ -227,10 +226,10 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     Localization.lang("You are already connected to a database using entered connection details."));
             tabContainer.showLibraryTab(alreadyOpen);
             onConnected.run();
-        }, () -> connect(manager, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
+        }, () -> connect(manager, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected, sharedDatabaseId));
     }
 
-    private void connect(SharedDatabaseUIManager manager, DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
+    private void connect(SharedDatabaseUIManager manager, DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected, Optional<String> sharedDatabaseId) {
         if (shouldAutosave) {
             Path localFilePath = Path.of(autosavePath);
 
@@ -248,6 +247,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         onConnected.run();
 
         BibDatabaseContext dummyContext = manager.createDummyContext(connectionProperties);
+        sharedDatabaseId.ifPresent(dummyContext.getDatabase()::setSharedDatabaseID);
 
         LibraryTab libraryTab = LibraryTab.createLibraryTab(
                 () -> manager.connect(connectionProperties),
@@ -262,8 +262,11 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 clipBoardManager,
                 taskExecutor,
                 gitHandlerRegistry,
-                (tab, _) -> handleSharedDatabaseConnectionSuccess(tab, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath),
-                exception -> showConnectionFailure(exception, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
+                (tab, context) -> {
+                    sharedDatabaseId.ifPresent(context.getDatabase()::setSharedDatabaseID);
+                    handleSharedDatabaseConnectionSuccess(tab, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath);
+                },
+                exception -> showConnectionFailure(exception, connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected, sharedDatabaseId));
         Optional<LibraryTab> alreadyReserved = SharedDatabaseUIManager.reserveTab(tabContainer, connectionProperties, libraryTab);
         if (alreadyReserved.isPresent()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Shared database connection"),
@@ -298,7 +301,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         }
     }
 
-    private void showConnectionFailure(Exception exception, DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected) {
+    private void showConnectionFailure(Exception exception, DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath, Runnable onConnected, Optional<String> sharedDatabaseId) {
         if (exception instanceof DatabaseNotSupportedException) {
             ButtonType openHelp = new ButtonType(Localization.lang("Open help"), ButtonData.OTHER);
 
@@ -312,24 +315,18 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     ButtonType.OK, openHelp);
 
             result.filter(btn -> btn.equals(openHelp)).ifPresent(_ -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
-            result.filter(ButtonType.OK::equals).ifPresent(_ -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected));
+            result.filter(ButtonType.OK::equals).ifPresent(_ -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, onConnected, sharedDatabaseId));
             return;
         }
-        // The driver's own message is generic ("The connection attempt failed."); the reason is at the end of the cause chain
-        String reason = Optional.ofNullable(Throwables.getRootCause(exception).getLocalizedMessage()).orElse(exception.toString());
-        dialogService.showErrorDialogAndWait(
-                Localization.lang("Connection error"),
-                Localization.lang("Could not connect to %0.\n\n%1", connectionEndpoint(connectionProperties), reason),
-                exception);
-    }
-
-    private String connectionEndpoint(DBMSConnectionProperties connectionProperties) {
-        if (!connectionProperties.isUseExpertMode()) {
-            return connectionProperties.getHost() + ":" + connectionProperties.getPort();
-        }
-        return DBMSConnectionUrl.parse(connectionProperties.getJdbcUrl())
-                                .map(url -> url.host() + ":" + url.port())
-                                .orElse(connectionProperties.getJdbcUrl());
+        // [impl->req~shared-database.reconnect-retry~1]
+        // The failed loading tab has already closed itself; an error tab with a retry takes its place instead of a dialog.
+        // A retry of a remembered database keeps its id; a new connection has none yet.
+        LOGGER.error("Could not connect to shared database {}", connectionProperties.getDatabase(), exception);
+        SharedDatabaseErrorTab errorTab = new SharedDatabaseErrorTab(sharedDatabaseId.orElse(null), connectionProperties);
+        // The tab goes only once the attempt really starts: `openSharedDatabase` can still bail out before that
+        errorTab.setRetryAction(tab -> openSharedDatabase(connectionProperties, shouldRememberPassword, shouldAutosave, autosavePath, tab::close, tab.getSharedDatabaseId()));
+        errorTab.showError(exception);
+        tabContainer.showSharedDatabaseErrorTab(errorTab);
     }
 
     private void setPreferences(DBMSConnectionProperties connectionProperties, boolean shouldRememberPassword, boolean shouldAutosave, String autosavePath) {
