@@ -89,7 +89,7 @@ In either case, the code becomes littered with exception handling code.
 We might push the try-catch into its own function.\
 If the wrapper is called multiple times, this may reduce duplication of the catch-and-assign-message part.
 
-We can show an error dialog here: `title` carries some information from the caller, the exeption caught brings some from below.
+We can show an error dialog here: `title` carries some information from the caller, the exception caught brings some from below.
 
 We still need to notify the action handler (the caller) about failure. Since we have shown the dialog, we do not need to provide a message.
 
@@ -366,7 +366,7 @@ Constraints:
 * `JabRefException` expects a localized message. Or we need to remember which `JabRefException` instances are localized and which need to be caught for localizing the message.
 * At the bottom we usually have very little information on higher level contexts: at a failure like `NoSuchProperty` we cannot tell which set of properties did we look in and why.\
   For messages originating too deeply, we might want to override or extend the message anyway.
-* for each exeption we might want to handle programmatically, we need a variant based on `JabRefException`
+* for each exception we might want to handle programmatically, we need a variant based on `JabRefException`
 
 So we might end up:
 

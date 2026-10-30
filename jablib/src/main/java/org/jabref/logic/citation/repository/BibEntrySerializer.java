@@ -41,7 +41,7 @@ class BibEntrySerializer extends BasicDataType<BibEntry> {
     private String toString(BibEntry entry) {
         // BibEntry is not Java serializable. Thus, we need to do the serialization manually
         // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here
-        // Furthermore, storing a string also enables other applications to work wih the data
+        // Furthermore, storing a string also enables other applications to work with the data
         BibEntryWriter writer = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager);
         try {
             return writer.write(List.of(entry), BibDatabaseMode.BIBTEX);

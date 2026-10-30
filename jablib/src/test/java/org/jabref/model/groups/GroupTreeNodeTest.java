@@ -59,17 +59,17 @@ public class GroupTreeNodeTest {
                 .addSubgroup(new ExplicitGroup("ExplicitGrandParent", GroupHierarchyType.INDEPENDENT, ','));
         root.addSubgroup(getKeywordGroup("KeywordA"));
 
-        grandParent.addSubgroup(getExplict("ExplicitB"));
+        grandParent.addSubgroup(getExplicit("ExplicitB"));
         GroupTreeNode parent = grandParent.addSubgroup(getKeywordGroup("KeywordParent"));
         grandParent.addSubgroup(getSearchGroup("SearchB"));
         grandParent.addSubgroup(getKeywordGroup("KeywordB"));
 
         GroupTreeNode node = parent.addSubgroup(getKeywordGroup("KeywordNode"));
         parent.addSubgroup(getSearchGroup("SearchC"));
-        parent.addSubgroup(getExplict("ExplicitC"));
+        parent.addSubgroup(getExplicit("ExplicitC"));
         parent.addSubgroup(getKeywordGroup("KeywordC"));
 
-        node.addSubgroup(getExplict("ExplicitChild"));
+        node.addSubgroup(getExplicit("ExplicitChild"));
         return node;
     }
 
@@ -81,7 +81,7 @@ public class GroupTreeNodeTest {
         return new SearchGroup(name, GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchFlags.CASE_SENSITIVE));
     }
 
-    private static AbstractGroup getExplict(String name) {
+    private static AbstractGroup getExplicit(String name) {
         return new ExplicitGroup(name, GroupHierarchyType.REFINING, ',');
     }
 

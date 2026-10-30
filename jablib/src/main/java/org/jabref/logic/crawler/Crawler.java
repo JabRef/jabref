@@ -15,7 +15,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-/// This class provides a service for SLR support by conducting an automated search and persistance
+/// This class provides a service for SLR support by conducting an automated search and persistence
 /// of studies using the queries and E-Libraries specified in the provided study definition file.
 ///
 /// It composes a StudyRepository for repository management,
