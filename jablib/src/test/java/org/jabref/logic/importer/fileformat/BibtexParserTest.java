@@ -562,6 +562,29 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseIgnoresAndWarnsAboutEntryWithUnclosedFieldBraceFollowedByFurtherFields() throws IOException {
+        ParserResult result = parser.parse(Reader.of("""
+                @Article{Centeno2022,
+                author={Centeno, Eduarda Gervini Zampieri and Moreni, Giulia and Vriend, Chris and Douw, Linda and Santos,
+                Fernando Antônio Nóbrega,
+                title={A hands-on tutorial on network and topological neuroscience},
+                journaltitle={Brain Structure and Function},
+                date={2022-04-01},
+                volume={227},
+                number={3},
+                pages={741--762},
+                abstract={The brain is an extraordinarily complex system.},
+                issn={1863-2661},
+                doi={10.1007/s00429-021-02435-0},
+                }
+                """));
+
+        assertEquals(List.of(), result.getDatabase().getEntries());
+        assertEquals(List.of("Error occurred when parsing entry: 'Error in line 14: EOF in mid-string'. \n\nJabRef skipped the entry."),
+                result.warnings());
+    }
+
+    @Test
     void parseContinuesAfterEntryWithUnmatchedOpenBracket() throws IOException {
         ParserResult result = parser.parse(Reader.of("""
                 @article{broken,

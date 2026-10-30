@@ -562,7 +562,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 // - Bottom + top -> import entries
                 case TOP,
                      BOTTOM ->
-                        importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
+                        importHandler.importFilesInBackground(files, transferMode)
+                                     .onSuccess(importHandler::showImportErrors)
+                                     .executeWith(taskExecutor);
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
                     Map<Boolean, List<Path>> partitionedFiles = files.stream()
@@ -571,7 +573,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     List<Path> otherFiles = partitionedFiles.get(false);
 
                     if (!importableFiles.isEmpty()) {
-                        importHandler.importFilesInBackground(importableFiles, transferMode).executeWith(taskExecutor);
+                        importHandler.importFilesInBackground(importableFiles, transferMode)
+                                     .onSuccess(importHandler::showImportErrors)
+                                     .executeWith(taskExecutor);
                     }
                     if (!otherFiles.isEmpty()) {
                         BibEntry entry = target.getEntry();
@@ -598,6 +602,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                     .toList();
             importHandler
                     .importFilesInBackground(files, event.getTransferMode())
+                    .onSuccess(importHandler::showImportErrors)
                     .executeWith(taskExecutor);
             success = true;
         }
