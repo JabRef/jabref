@@ -450,7 +450,6 @@ public class PreferencesMigrations {
     /// - Since v5.0-alpha the custom preview layout shows the 'comment' field instead of the 'review' field (<a href="https://github.com/JabRef/jabref/pull/4100">#4100</a>).
     /// - Since v5.1 a marker enables markdown in comments (<a href="https://github.com/JabRef/jabref/pull/6232">#6232</a>).
     /// - Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).
-    ///
     protected static void upgradePreviewStyle(JabRefGuiPreferences prefs) {
         String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE, TextBasedPreviewLayout.DEFAULT);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
@@ -690,11 +689,12 @@ public class PreferencesMigrations {
                     if (!StringUtil.isBlank(keys.get(i))) {
                         boolean isStoredAlready;
                         try {
-                            isStoredAlready = !StringUtil.isBlank(keyring.getPassword("org.jabref.apikeys", names.get(i)));
-                        } catch (PasswordAccessException _){
+                            keyring.getPassword("org.jabref.apikeys", names.get(i));
+                            isStoredAlready = true;
+                        } catch (PasswordAccessException _) {
                             isStoredAlready = false;
                         }
-                        if (!isStoredAlready){
+                        if (!isStoredAlready) {
                             keyring.setPassword("org.jabref.apikeys", names.get(i), keys.get(i).trim());
                         }
                     }
