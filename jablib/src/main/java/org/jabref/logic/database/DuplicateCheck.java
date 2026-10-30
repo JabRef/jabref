@@ -320,7 +320,7 @@ public class DuplicateCheck {
                 && !one.getType().equals(StandardEntryType.Misc)
                 && !two.getType().equals(StandardEntryType.Misc)) {
             comparison = firstType.flatMap(first -> entryTypesManager.enrich(two.getType(), bibDatabaseMode)
-                    .map(second -> isDuplicateForType(first, one, two) && isDuplicateForType(second, one, two)));
+                                                                     .map(second -> isDuplicateForType(first, one, two) && isDuplicateForType(second, one, two)));
         } else {
             comparison = firstType.filter(type -> isDuplicateForType(type, one, two)).map(_ -> true);
         }
