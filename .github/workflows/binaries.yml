@@ -399,6 +399,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
       jabkit-native-matrix: ${{ steps.set.outputs.jabkit-native-matrix }}
+      jabgui-native-matrix: ${{ steps.set.outputs.jabgui-native-matrix }}
     steps:
       - id: set
         name: Compute Matrix
@@ -502,6 +503,41 @@ jobs:
           fi
 
           echo "jabkit-native-matrix=$NATIVE_MATRIX_JSON" >> "$GITHUB_OUTPUT"
+
+          # jabgui native is built for Linux (x64, arm64), Windows (x64) and macOS (Apple silicon)
+          JABGUI_NATIVE_MATRIX_JSON='{
+            "include": [
+              {
+                "os": "ubuntu-22.04",
+                "displayName": "linux-amd64",
+                "archiveNative": "tar -c -C jabgui/build/native jabgui | gzip > jabgui/build/native-dist/jabgui-native_linux.tar.gz"
+              },
+              {
+                "os": "ubuntu-22.04-arm",
+                "displayName": "linux-arm",
+                "archiveNative": "tar -c -C jabgui/build/native jabgui | gzip > jabgui/build/native-dist/jabgui-native_linux_arm64.tar.gz"
+              },
+              {
+                "os": "windows-latest",
+                "displayName": "windows-amd64",
+                "archiveNative": "7z a -r jabgui/build/native-dist/jabgui-native_windows.zip ./jabgui/build/native/jabgui"
+              },
+              {
+                "os": "macos-15",
+                "displayName": "macOS-silicon",
+                "archiveNative": "ditto -c -k --keepParent jabgui/build/native/jabgui jabgui/build/native-dist/jabgui-native_macos-silicon.zip"
+              }
+            ]
+          }'
+
+          if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "merge_group" ]]; then
+            # Same reason as for jabkit native above
+            JABGUI_NATIVE_MATRIX_JSON="$(jq -c '.include |= map(select(.os != "macos-15"))' <<<"$JABGUI_NATIVE_MATRIX_JSON")"
+          else
+            JABGUI_NATIVE_MATRIX_JSON="$(jq -c . <<<"$JABGUI_NATIVE_MATRIX_JSON")"
+          fi
+
+          echo "jabgui-native-matrix=$JABGUI_NATIVE_MATRIX_JSON" >> "$GITHUB_OUTPUT"
 
   pre-build:
     needs: [ conditions, disk-space-check ]
@@ -1134,6 +1170,82 @@ jobs:
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
+
+  jabgui-native:
+    needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
+    strategy:
+      fail-fast: false
+      matrix:
+        ${{ fromJSON(needs.compute-matrix.outputs.jabgui-native-matrix) }}
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.displayName }} jabgui native binary
+    steps:
+      - name: Skip native binary build because it is not needed for this event
+        if: needs.conditions.outputs.should-build != 'true'
+        run: echo "Skipping native binary build because it is not needed for this event."
+      - name: Checkout
+        if: needs.conditions.outputs.should-build == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 1
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+        if: needs.conditions.outputs.should-build == 'true'
+      # Matches org.graalvm.sdk:nativeimage in versions/build.gradle.kts
+      - name: Set up GraalVM CE 25.4
+        if: needs.conditions.outputs.should-build == 'true'
+        uses: graalvm/setup-graalvm@27b360dbb857524eaf0b4c4cef364d38e5b4f173 # v1
+        with:
+          distribution: 'graalvm-community'
+          version: '25.4'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      # StaticFX links JavaFX statically, so native-image needs the GTK/X11/GL development libraries
+      - name: Install JavaFX link libraries (Linux)
+        if: ${{ needs.conditions.outputs.should-build == 'true' && runner.os == 'Linux' }}
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libxtst-dev libxxf86vm-dev libgl-dev
+      - name: Build JabGui native binary
+        if: needs.conditions.outputs.should-build == 'true'
+        run: gradle :jabgui:nativeCompile
+        env:
+          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
+      # The folder holds the binary and the JDK libraries it loads at runtime, so the whole folder is shipped
+      - name: Package JabGui native binary
+        if: needs.conditions.outputs.should-build == 'true'
+        shell: bash
+        run: |
+          set -eo pipefail
+          mv jabgui/build/native/nativeCompile jabgui/build/native/jabgui
+          mkdir -p jabgui/build/native-dist
+          ${{ matrix.archiveNative }}
+      - name: Upload jabgui native to GitHub artifacts store
+        if: ${{ needs.conditions.outputs.should-build == 'true' && github.event.inputs.upload-as-artifact == 'true' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: jabgui-native (${{ matrix.displayName }})
+          path: jabgui/build/native-dist/*.*
+          if-no-files-found: error
+      - name: Setup SSH key
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.disk-space-check.outputs.available == 'true' }}
+        shell: bash
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Setup rsync (macOS)
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        run: brew install rsync
+      - name: Setup rsync (Windows)
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        # Same as in the build job: v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
+        run: choco install rsync --version=6.4.4
+      # The macOS binary is not signed or notarized yet
+      - name: Upload jabgui native to builds.jabref.org
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.disk-space-check.outputs.available == 'true' }}
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
 
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
