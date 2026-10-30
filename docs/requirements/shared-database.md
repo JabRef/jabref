@@ -87,10 +87,24 @@ A shared database that is still connected when JabRef closes is reconnected on t
 
 Needs: impl
 
+## A failed connection can be retried
+`req~shared-database.reconnect-retry~1`
+
+If connecting fails, on startup or from the connection dialog, the database is shown as a tab carrying the error and a retry button instead of an error dialog. A remembered database stays remembered when JabRef is closed while that tab is open.
+
+Needs: impl
+
 ## A database is open in one tab only
 `req~shared-database.single-tab~1`
 
 A shared database identified by its DBMS type, normalized host, port, and database name is never opened in a second tab, whichever way the connection is entered (form fields, JDBC URL, a library file carrying its id, or a remembered connection at startup). Instead, the tab that is already connected or connecting is shown.
+
+Needs: impl, utest
+
+## Shared database cleanup must not block other library tabs
+`req~shared-database.background-close~1`
+
+Closing a shared library prepares pending model changes on the JavaFX thread and flushes them in the background. Reopening the same database and application shutdown wait for cleanup to finish.
 
 Needs: impl, utest
 
