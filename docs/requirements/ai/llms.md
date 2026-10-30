@@ -66,7 +66,7 @@ Covers:
 
 Rationale: Allows testing and debugging of AI features without external API calls or credentials.
 
-Needs: impl
+Needs: impl, utest
 
 Covers:
 

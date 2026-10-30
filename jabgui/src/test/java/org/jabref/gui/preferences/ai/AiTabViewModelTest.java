@@ -9,7 +9,9 @@ import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.models.AiModelService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.model.ai.AiDefaultEnums;
 import org.jabref.model.ai.llm.AiProvider;
+import org.jabref.model.ai.llm.PredefinedChatModel;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeEach;
@@ -240,11 +242,13 @@ class AiTabViewModelTest {
 
     @Test
     void debugProviderNotShownInAiProviders() {
+        // [utest->req~ai.llms.providers.debug~1]
         assertFalse(viewModel.aiProvidersProperty().contains(AiProvider.DEBUG));
     }
 
     @Test
     void enableAiDebugProviderStoredAndReset() {
+        // [utest->req~ai.llms.providers.debug~1]
         viewModel.setValues();
         viewModel.enableAiDebugProviderProperty().set(true);
         viewModel.storeSettings();
@@ -252,5 +256,25 @@ class AiTabViewModelTest {
 
         viewModel.resetExpertSettings();
         assertFalse(viewModel.enableAiDebugProviderProperty().get());
+    }
+
+    @Test
+    void connectionTaskUsesDebugProviderWhenDebuggingEnabled() throws Exception {
+        // [utest->req~ai.llms.providers.debug~1]
+        viewModel.selectedAiProviderProperty().set(AiProvider.OPEN_AI);
+        viewModel.customizeExpertSettingsProperty().set(true);
+        viewModel.enableAiDebugProviderProperty().set(true);
+        when(aiModelService.testConnection(eq(AiProvider.DEBUG), eq(PredefinedChatModel.DEBUG.getName()), eq(""), anyDouble(), eq(AiProvider.DEBUG.getApiUrl()), anyInt(), any()))
+                .thenReturn("OK");
+
+        assertEquals("OK", viewModel.testConnectionTask().call());
+    }
+
+    @Test
+    void setValuesWithDebugProviderFallsBackToDefault() {
+        // [utest->req~ai.llms.providers.debug~1]
+        workingAiPreferences.setAiProvider(AiProvider.DEBUG);
+        viewModel.setValues();
+        assertEquals(AiDefaultEnums.AI_PROVIDER, viewModel.selectedAiProviderProperty().get());
     }
 }

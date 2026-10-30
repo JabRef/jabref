@@ -3,6 +3,8 @@ package org.jabref.logic.ai.chatting;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.l10n.Localization;
+
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -21,14 +23,29 @@ public class DebugAiProvider implements ChatModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DebugAiProvider.class);
     private static final long DEFAULT_DELAY_MS = 5000;
 
+    @FunctionalInterface
+    public interface Sleeper {
+        void sleep(long millis) throws InterruptedException;
+    }
+
     private final long delayMs;
+    private final Sleeper sleeper;
 
     public DebugAiProvider() {
-        this(DEFAULT_DELAY_MS);
+        this(DEFAULT_DELAY_MS, Thread::sleep);
     }
 
     public DebugAiProvider(long delayMs) {
+        this(delayMs, Thread::sleep);
+    }
+
+    public DebugAiProvider(long delayMs, Sleeper sleeper) {
         this.delayMs = delayMs;
+        this.sleeper = sleeper;
+    }
+
+    public long getDelayMs() {
+        return delayMs;
     }
 
     @Override
@@ -37,7 +54,7 @@ public class DebugAiProvider implements ChatModel {
 
         if (delayMs > 0) {
             try {
-                Thread.sleep(delayMs);
+                sleeper.sleep(delayMs);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 LOGGER.debug("Interrupted while waiting for dummy AI answer", e);
@@ -57,14 +74,11 @@ public class DebugAiProvider implements ChatModel {
                                      .reduce((_, second) -> second)
                                      .orElse("");
 
-        String response = """
-                Hi! I am a dummy AI provider, I am made to test and debug the AI features.
-
-                I have this system message:
-                %s
-
-                And I received this user message:
-                %s""".formatted(systemMessage, userMessage);
+        String response = Localization.lang(
+                "Hi! I am a dummy AI provider, I am made to test and debug the AI features.\n\nI have this system message:\n%0\n\nAnd I received this user message:\n%1",
+                systemMessage,
+                userMessage
+        );
 
         return new ChatResponse.Builder()
                 .aiMessage(new AiMessage(response))

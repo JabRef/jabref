@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.chatting;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -27,6 +28,7 @@ class DebugAiProviderTest {
 
     @Test
     void chatReturnsExpectedResponseWithSystemAndUserMessage() {
+        // [utest->req~ai.llms.providers.debug~1]
         List<ChatMessage> messages = List.of(
                 new SystemMessage("You are a helpful research assistant."),
                 new UserMessage("Summarize the methodology.")
@@ -89,7 +91,17 @@ class DebugAiProviderTest {
 
     @Test
     void defaultConstructorHasFiveSecondsDelay() {
+        // [utest->req~ai.llms.providers.debug~1]
         DebugAiProvider defaultModel = new DebugAiProvider();
-        assertNotNull(defaultModel);
+        assertEquals(5000, defaultModel.getDelayMs());
+    }
+
+    @Test
+    void chatInvokesSleeperWithConfiguredDelay() {
+        // [utest->req~ai.llms.providers.debug~1]
+        AtomicLong sleptTime = new AtomicLong();
+        DebugAiProvider debugModel = new DebugAiProvider(5000, sleptTime::set);
+        debugModel.chat(List.of(new UserMessage("Hello")));
+        assertEquals(5000, sleptTime.get());
     }
 }

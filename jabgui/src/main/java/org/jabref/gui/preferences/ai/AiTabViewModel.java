@@ -40,7 +40,9 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.LocalizedNumbersUtils;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.ai.AiDefaultEnums;
 import org.jabref.model.ai.llm.AiProvider;
+import org.jabref.model.ai.llm.PredefinedChatModel;
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
@@ -474,6 +476,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         AiProvider provider = workingAiPreferences.getAiProvider();
         if (provider == AiProvider.DEBUG) {
             // Will never be executed, as DEBUG should not appear in the AI provider selection.
+            selectedAiProvider.setValue(AiDefaultEnums.AI_PROVIDER);
         } else {
             selectedAiProvider.setValue(provider);
         }
@@ -519,7 +522,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         if (selectedAiProvider.get() == AiProvider.DEBUG) {
             // Will never be executed, as DEBUG should not appear in the AI provider selection.
-        } else {
+        } else if (selectedAiProvider.get() != null) {
             workingAiPreferences.setAiProvider(selectedAiProvider.get());
         }
 
@@ -572,10 +575,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     /// Tests the connection with the values currently entered in the dialog, not the stored preferences.
     public BackgroundTask<String> testConnectionTask() {
-        AiProvider provider = selectedAiProvider.get();
-        String modelName = currentChatModel.get();
-        String apiKey = currentApiKey.get();
-        String baseUrl = customizeExpertSettings.get() ? currentApiBaseUrl.get() : provider.getApiUrl();
+        boolean isDebug = customizeExpertSettings.get() && enableAiDebugProvider.get();
+        AiProvider provider = isDebug ? AiProvider.DEBUG : (selectedAiProvider.get() != null ? selectedAiProvider.get() : AiDefaultEnums.AI_PROVIDER);
+        String modelName = isDebug ? PredefinedChatModel.DEBUG.getName() : currentChatModel.get();
+        String apiKey = isDebug ? "" : currentApiKey.get();
+        String baseUrl = isDebug ? AiProvider.DEBUG.getApiUrl() : (customizeExpertSettings.get() ? currentApiBaseUrl.get() : provider.getApiUrl());
         double temperatureValue = LocalizedNumbersUtils.stringToDouble(temperature.get()).orElse((double) AiDefaultExpertSettings.TEMPERATURE);
         int contextWindow = contextWindowSize.get();
         TokenEstimatorKind tokenEstimatorKind = tokenEstimationAlgorithmProperty.get();

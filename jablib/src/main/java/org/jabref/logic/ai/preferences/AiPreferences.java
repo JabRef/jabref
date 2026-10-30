@@ -561,7 +561,11 @@ public class AiPreferences {
     }
 
     public boolean getEnableAiDebugProvider() {
-        return enableAiDebugProvider.get();
+        if (getCustomizeExpertSettings()) {
+            return enableAiDebugProvider.get();
+        } else {
+            return AiDefaultExpertSettings.ENABLE_AI_DEBUG_PROVIDER;
+        }
     }
 
     public void setEnableAiDebugProvider(boolean enableAiDebugProvider) {

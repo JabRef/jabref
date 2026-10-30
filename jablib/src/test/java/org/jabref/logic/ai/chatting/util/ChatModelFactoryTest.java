@@ -32,6 +32,7 @@ class ChatModelFactoryTest {
 
     @Test
     void createDebugChatModel() {
+        // [utest->req~ai.llms.providers.debug~1]
         try (ChatModel chatModel = ChatModelFactory.create(
                 AiProvider.DEBUG,
                 "debug",
@@ -66,13 +67,28 @@ class ChatModelFactoryTest {
 
     @Test
     void createDebugChatModelFromPreferences() {
+        // [utest->req~ai.llms.providers.debug~1]
         AiPreferences preferences = AiPreferences.getDefault();
+        preferences.setCustomizeExpertSettings(true);
         preferences.setEnableAiDebugProvider(true);
 
         try (ChatModel chatModel = ChatModelFactory.create(preferences)) {
             assertNotNull(chatModel);
             assertEquals(AiProvider.DEBUG, chatModel.getAiProvider());
             assertEquals("debug", chatModel.getName());
+        }
+    }
+
+    @Test
+    void debugProviderIgnoredWhenExpertSettingsDisabled() {
+        // [utest->req~ai.llms.providers.debug~1]
+        AiPreferences preferences = AiPreferences.getDefault();
+        preferences.setCustomizeExpertSettings(false);
+        preferences.setEnableAiDebugProvider(true);
+
+        try (ChatModel chatModel = ChatModelFactory.create(preferences)) {
+            assertNotNull(chatModel);
+            assertEquals(AiProvider.OPEN_AI, chatModel.getAiProvider());
         }
     }
 }
