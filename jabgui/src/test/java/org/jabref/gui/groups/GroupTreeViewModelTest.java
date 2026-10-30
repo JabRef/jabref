@@ -214,7 +214,6 @@ class GroupTreeViewModelTest {
     }
 
     @Test
-    // [utest->req~ui.dialogs.confirmation.naming~1]
     void removingSubgroupsIsConfirmedWithTheRemoveLabel() {
         GroupNodeViewModel root = rootWithTwoSubgroups();
         when(dialogService.showConfirmationDialogAndWait(
@@ -229,7 +228,6 @@ class GroupTreeViewModelTest {
     }
 
     @Test
-    // [utest->req~ui.dialogs.confirmation.naming~1]
     void cancellingTheRemoveSubgroupsDialogKeepsTheSubgroups() {
         GroupNodeViewModel root = rootWithTwoSubgroups();
         when(dialogService.showConfirmationDialogAndWait(
