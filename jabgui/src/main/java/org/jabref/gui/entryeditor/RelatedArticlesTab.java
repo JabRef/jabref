@@ -39,7 +39,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,14 +70,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
         setTooltip(new Tooltip(Localization.lang("Related articles")));
     }
 
-    private void applyJournalAbbreviation(List<BibEntry> entries, @Nullable BibDatabaseContext databaseContext) {
+    private void applyJournalAbbreviation(List<BibEntry> entries, Optional<BibDatabaseContext> databaseContext) {
         JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
-        Optional<CleanupJob> cleanupJob = Optional.ofNullable(databaseContext)
-                                                  .map(context -> AbbreviateCleanupFactory.abbreviateCleanup(
-                                                          context.getDatabase(), repository,
-                                                          preferences.getAbbreviationPreferences()))
-                                                  .orElseGet(() -> AbbreviateCleanupFactory.abbreviateCleanup(
-                                                          repository, preferences.getAbbreviationPreferences()));
+
+        Optional<CleanupJob> cleanupJob = AbbreviateCleanupFactory.abbreviateCleanup(
+                databaseContext.map(BibDatabaseContext::getDatabase), repository,
+                preferences.getAbbreviationPreferences());
+
         cleanupJob.ifPresent(job -> entries.forEach(job::cleanup));
     }
 
@@ -108,7 +106,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
                 .onSuccess(relatedArticles -> {
-                    applyJournalAbbreviation(relatedArticles, databaseContext.orElse(null));
+                    applyJournalAbbreviation(relatedArticles, databaseContext);
                     ImportCleanup cleanup = ImportCleanup.targeting(mode, preferences.getFieldPreferences());
                     cleanup.doPostCleanup(relatedArticles);
                     progress.setVisible(false);

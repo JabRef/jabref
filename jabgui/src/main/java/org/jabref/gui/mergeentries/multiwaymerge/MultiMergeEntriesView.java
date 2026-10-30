@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javafx.beans.value.ChangeListener;
@@ -417,7 +418,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     private BibEntry applyJournalAbbreviation(BibEntry entry) {
         JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
 
-        AbbreviateCleanupFactory.abbreviateCleanup(repository,
+        AbbreviateCleanupFactory.abbreviateCleanup(Optional.empty(), repository,
                 preferences.getAbbreviationPreferences()
         ).ifPresent(cleanupJob -> cleanupJob.cleanup(entry));
         return entry;

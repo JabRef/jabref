@@ -50,7 +50,7 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
 
         AbbreviateCleanupFactory.abbreviateCleanup(
-                databaseContext.getDatabase(),
+                Optional.of(databaseContext.getDatabase()),
                 repository,
                 guiPreferences.getAbbreviationPreferences()
         ).ifPresent(cleanupJob -> cleanupJob.cleanup(entry));

@@ -183,10 +183,11 @@ public class NewEntryViewModel {
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
 
         AbbreviateCleanupFactory.abbreviateCleanup(
-                libraryTab.getBibDatabaseContext().getDatabase(),
+                Optional.of(libraryTab.getBibDatabaseContext().getDatabase()),
                 repository,
                 preferences.getAbbreviationPreferences()
         ).ifPresent(cleanupJob -> cleanupJob.cleanup(entry));
+
         return entry;
     }
 
