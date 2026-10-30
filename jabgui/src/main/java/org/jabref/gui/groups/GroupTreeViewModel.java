@@ -624,6 +624,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         boolean confirmation = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remove subgroups"),
                 Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()),
+                // [impl->req~ui.dialogs.confirmation.naming~1]
                 Localization.lang("Remove"));
         if (confirmation) {
             recordTreeChange(Localization.lang("Remove subgroups"), edit -> {
