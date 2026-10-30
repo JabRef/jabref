@@ -23,9 +23,11 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -228,8 +230,8 @@ public abstract class NativeDesktop {
             return;
         }
         String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-        String command = externalApplicationsPreferences.getCustomFileBrowserCommand();
-        if (command.isEmpty()) {
+        List<String> command = externalApplicationsPreferences.getCustomFileBrowserCommand();
+        if (command.isEmpty() || command.getFirst().isBlank()) {
             LoggerFactory.getLogger(NativeDesktop.class).info("No custom file browser command defined");
             get().openFolderAndSelectFile(fileLink);
             return;
@@ -252,9 +254,8 @@ public abstract class NativeDesktop {
             get().openConsole(absolutePath, dialogService);
             return;
         }
-        String command = preferences.getExternalApplicationsPreferences().getCustomTerminalCommand();
-        command = command.trim();
-        if (command.isEmpty()) {
+        List<String> command = preferences.getExternalApplicationsPreferences().getCustomTerminalCommand();
+        if (command.isEmpty() || command.getFirst().isBlank()) {
             get().openConsole(absolutePath, dialogService);
             LoggerFactory.getLogger(NativeDesktop.class).info("Preference for custom terminal is empty. Using default terminal.");
             return;
@@ -262,22 +263,25 @@ public abstract class NativeDesktop {
         executeCommand(command, absolutePath, dialogService);
     }
 
-    private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        // normalize white spaces
-        command = command.replaceAll("\\s+", " ");
+    private static void executeCommand(List<String> command, String absolutePath, DialogService dialogService) {
+        // [impl->adr~store-custom-application-arguments~1]
+        List<String> subcommands = CommandLineParser.withDirectory(command, absolutePath);
+        LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", subcommands);
+        dialogService.notify(Localization.lang("Executing command \"%0\"...", String.join(" ", subcommands)));
 
-        // replace the placeholder if used
-        command = command.replace("%DIR", absolutePath);
-
-        LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
-        dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
-
-        String[] subcommands = command.split(" ");
         try {
-            new ProcessBuilder(subcommands).start();
+            ProcessBuilder processBuilder = new ProcessBuilder(subcommands);
+            processBuilder.directory(Path.of(absolutePath).toFile());
+            Process process = processBuilder.start();
+
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(NativeDesktop.class)::debug);
+
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
         } catch (IOException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error during command execution", exception);
-            dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
+            dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", String.join(" ", subcommands)));
         }
     }
 

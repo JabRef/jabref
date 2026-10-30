@@ -94,6 +94,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where "Perform OCR" button remained enabled for broken or missing linked files. [#16736](https://github.com/JabRef/jabref/issues/16736)
 - We fixed an issue where icons kept a large size after lowering the font size until JabRef was restarted. [#17556](https://github.com/JabRef/jabref/issues/17556)
 - We fixed an issue where the "Backup found" dialog appeared while another library's tab was selected. [#16919](https://github.com/JabRef/jabref/pull/16919)
+- We fixed custom terminal and file browser commands failing when library directories contain spaces. [#12531](https://github.com/JabRef/jabref/issues/12531)
 
 ### Removed
 
