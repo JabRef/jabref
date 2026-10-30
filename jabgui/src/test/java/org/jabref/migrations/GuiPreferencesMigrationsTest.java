@@ -292,7 +292,6 @@ class GuiPreferencesMigrationsTest {
         when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenReturn("CurrentA");
         when(keyring.getPassword("org.jabref.apikeys", "FetcherB")).thenThrow(new PasswordAccessException("No entry stored"));
 
-
         try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
             keyringFactory.when(Keyring::create).thenReturn(keyring);
             PreferencesMigrations.moveApiKeysToKeyring(preferences);
