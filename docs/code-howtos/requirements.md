@@ -151,7 +151,14 @@ We use these artifact types:
 - `uman`: a user manual page or section;
 - `adr`: an Architectural Decision Record.
 
-Throughout development, you will mainly work with `feat`, `req`, `impl`, and `utest`. Please try to use these four types, as the others are rarely needed and we do not have good examples for them.
+And we have these traceability chains:
+
+- `feat` --> `impl`/`utest`;
+- `req` --> `impl`/`utest`;
+- `feat` --> `req` --> `impl`/`utest`;
+- `adr` --> `impl`/`utest`.
+
+Throughout development, you will mainly work with `feat`, `req`, `impl`, and `utest` artifact types. Please try to use these four types, as the others are rarely needed and we do not have good examples for them.
 
 We would really like to use the `uman` artifact type, as new features often also need to be explained to users. At the time of writing, please do not write them in the requirements, as we do not have a cross-repository setup for OFT.
 
@@ -201,7 +208,7 @@ access token has push access to the configured GitHub repository before
 sharing a library.
 ```
 
-There is no modal verb in the title, and the subject-first structure is missing. The normative content is buried in the paragraph instead of the title.
+The title has no modal verb, and the subject-first structure is missing. The normative content is buried in the paragraph instead of the title.
 
 **Good**:
 

@@ -314,6 +314,12 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     }
 
     @Override
+    public void closeAiChatWindows(BibDatabaseContext context) {
+        Optional.ofNullable(groupAiChatWindows.remove(context.getUid()))
+                .ifPresent(windows -> List.copyOf(windows.values()).forEach(AiGroupChatWindow::close));
+    }
+
+    @Override
     public BooleanProperty getEditorShowing() {
         return editorShowing;
     }
