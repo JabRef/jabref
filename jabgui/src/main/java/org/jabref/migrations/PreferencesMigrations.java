@@ -450,6 +450,7 @@ public class PreferencesMigrations {
     /// - Since v5.0-alpha the custom preview layout shows the 'comment' field instead of the 'review' field (<a href="https://github.com/JabRef/jabref/pull/4100">#4100</a>).
     /// - Since v5.1 a marker enables markdown in comments (<a href="https://github.com/JabRef/jabref/pull/6232">#6232</a>).
     /// - Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).
+    ///
     protected static void upgradePreviewStyle(JabRefGuiPreferences prefs) {
         String currentPreviewStyle = prefs.get(JabRefGuiPreferences.PREVIEW_STYLE, TextBasedPreviewLayout.DEFAULT);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
@@ -686,22 +687,24 @@ public class PreferencesMigrations {
         if (!keys.isEmpty() && names.size() == keys.size()) {
             try (final Keyring keyring = Keyring.create()) {
                 for (int i = 0; i < names.size(); i++) {
-                    if (!StringUtil.isBlank(keys.get(i))) {
-                        boolean isStoredAlready;
-                        try {
-                            keyring.getPassword("org.jabref.apikeys", names.get(i));
-                            isStoredAlready = true;
-                        } catch (PasswordAccessException _) {
-                            isStoredAlready = false;
-                        }
-                        if (!isStoredAlready) {
-                            keyring.setPassword("org.jabref.apikeys", names.get(i), keys.get(i).trim());
-                        }
-                    }
+                    boolean hasNewEntry;
                     try {
-                        keyring.deletePassword("org.jabref.customapikeys", names.get(i));
+                        keyring.getPassword("org.jabref.apikeys", names.get(i));
+                        hasNewEntry = true;
                     } catch (PasswordAccessException _) {
-                        // Already absent, nothing to clear
+                        hasNewEntry = false;
+                    }
+                    if (!hasNewEntry && StringUtil.isNotBlank(keys.get(i))) {
+                        keyring.setPassword("org.jabref.apikeys", names.get(i), keys.get(i).trim());
+                        hasNewEntry = true;
+                    }
+                    // Without an entry at the new location, the legacy entry is kept, so that it is migrated when it is read
+                    if (hasNewEntry) {
+                        try {
+                            keyring.deletePassword("org.jabref.customapikeys", names.get(i));
+                        } catch (PasswordAccessException _) {
+                            // Already absent, nothing to clear
+                        }
                     }
                 }
                 preferences.deleteKey(V5_9_FETCHER_CUSTOM_KEYS);

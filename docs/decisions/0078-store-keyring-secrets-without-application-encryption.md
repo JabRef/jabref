@@ -75,3 +75,5 @@ The behaviour is described in `req~keyring.plain-text-storage~1` and `req~keyrin
 * Good, because plain-text and legacy values are clearly separated.
 * Good, because migration happens automatically the first time a secret is read.
 * Neutral, because the legacy location is still checked when the new location is empty.
+
+<!-- markdownlint-disable-file MD022 -->

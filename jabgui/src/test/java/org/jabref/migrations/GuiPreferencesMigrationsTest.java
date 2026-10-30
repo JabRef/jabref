@@ -309,6 +309,26 @@ class GuiPreferencesMigrationsTest {
     }
 
     @Test
+    void moveApiKeysToKeyRingKeepsLegacyEntryWithoutNewValue() throws PasswordAccessException {
+        final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
+        final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
+        final Keyring keyring = mock(Keyring.class);
+
+        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA"));
+        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of(""));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenThrow(new PasswordAccessException("No entry stored"));
+
+        try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
+            keyringFactory.when(Keyring::create).thenReturn(keyring);
+            PreferencesMigrations.moveApiKeysToKeyring(preferences);
+
+            verify(keyring, never()).setPassword(anyString(), anyString(), anyString());
+            verify(keyring, never()).deletePassword(anyString(), anyString());
+            verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
+        }
+    }
+
+    @Test
     void upgradeCleanupsRemovesRemovedIssnCleanupJob() {
         when(preferences.hasKey(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(true);
         when(preferences.getStringList(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(List.of("CLEAN_UP_DOI", "CLEAN_UP_ISSN", "RENAME_PDF"));
