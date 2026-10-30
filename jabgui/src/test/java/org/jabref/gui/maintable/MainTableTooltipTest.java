@@ -34,6 +34,7 @@ class MainTableTooltipTest extends JavaFxTest {
 
         assertEquals(Duration.INDEFINITE, tooltip.get().getShowDuration());
     }
+
     @Test
     void configuredDurationAppliesWhenTooltipIsCreated() {
         Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
