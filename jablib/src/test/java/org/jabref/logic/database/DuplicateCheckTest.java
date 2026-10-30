@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -86,6 +87,40 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
     }
 
+    @ParameterizedTest
+    @EnumSource(BibDatabaseMode.class)
+    void miscAndArticleUseFirstEntryDefinition(BibDatabaseMode mode) {
+        BibEntry misc = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Billy Bob")
+                .withField(StandardField.TITLE, "A title")
+                .withField(StandardField.JOURNAL, "First journal")
+                .withField(StandardField.JOURNALTITLE, "First journal")
+                .withField(StandardField.DATE, "2001");
+        BibEntry article = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Billy Bob")
+                .withField(StandardField.TITLE, "A title")
+                .withField(StandardField.JOURNAL, "Second journal")
+                .withField(StandardField.JOURNALTITLE, "Second journal")
+                .withField(StandardField.DATE, "2025");
+
+        assertTrue(duplicateChecker.isDuplicate(misc, article, mode));
+        assertFalse(duplicateChecker.isDuplicate(article, misc, mode));
+    }
+
+    @ParameterizedTest
+    @EnumSource(BibDatabaseMode.class)
+    void miscAndManualUseFirstEntryDefinition(BibDatabaseMode mode) {
+        BibEntry misc = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Billy Bob")
+                .withField(StandardField.TITLE, "A title");
+        BibEntry manual = new BibEntry(StandardEntryType.Manual)
+                .withField(StandardField.AUTHOR, "James Joyce")
+                .withField(StandardField.TITLE, "A title");
+
+        assertFalse(duplicateChecker.isDuplicate(misc, manual, mode));
+        assertEquals(mode == BibDatabaseMode.BIBTEX, duplicateChecker.isDuplicate(manual, misc, mode));
+    }
+
     private static Stream<Arguments> compatibleEntryTypes() {
         return Stream.of(StandardEntryType.Conference, StandardEntryType.InBook, StandardEntryType.InCollection, StandardEntryType.InProceedings)
                      .flatMap(first -> Stream.of(StandardEntryType.Conference, StandardEntryType.InBook, StandardEntryType.InCollection, StandardEntryType.InProceedings)
@@ -107,7 +142,7 @@ public class DuplicateCheckTest {
                 Arguments.of(StandardEntryType.InCollection, StandardEntryType.InProceedings));
     }
 
-    // [utest->req~duplicate-detection.compatible-entry-types~2]
+    // [utest->req~duplicate-detection.compatible-entry-types~1]
     @ParameterizedTest
     @MethodSource("compatibleEntryTypes")
     void compatibleTypesWithSamePublicationAreDuplicates(StandardEntryType first, StandardEntryType second, BibDatabaseMode mode) {
@@ -117,7 +152,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(one, two, mode));
     }
 
-    // [utest->req~duplicate-detection.compatible-entry-types~2]
+    // [utest->req~duplicate-detection.compatible-entry-types~1]
     @ParameterizedTest
     @MethodSource("inProceedingsAndInCollectionOrders")
     void compatibleTypesRequireBothFieldDefinitionsToMatch(StandardEntryType first, StandardEntryType second) {

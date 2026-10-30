@@ -89,7 +89,7 @@ public class DuplicateCheck {
                                         .orElse(false));
     }
 
-    // [impl->req~duplicate-detection.compatible-entry-types~2]
+    // [impl->req~duplicate-detection.compatible-entry-types~1]
     private static boolean areCompatibleTypes(final BibEntry one, final BibEntry two) {
         return one.getType().equals(two.getType())
                 || one.getType().equals(StandardEntryType.Misc)
@@ -313,25 +313,16 @@ public class DuplicateCheck {
             return true;
         }
 
-        // [impl->req~duplicate-detection.compatible-entry-types~2]
+        // [impl->req~duplicate-detection.compatible-entry-types~1]
+        Optional<BibEntryType> firstType = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
         Optional<Boolean> comparison;
-        if (one.getType().equals(two.getType())) {
-            comparison = entryTypesManager.enrich(one.getType(), bibDatabaseMode)
-                                          .filter(type -> isDuplicateForType(type, one, two))
-                                          .map(_ -> true);
-        } else if (one.getType().equals(StandardEntryType.Misc)) {
-            comparison = entryTypesManager.enrich(two.getType(), bibDatabaseMode)
-                                          .filter(type -> isDuplicateForType(type, one, two))
-                                          .map(_ -> true);
-        } else if (two.getType().equals(StandardEntryType.Misc)) {
-            comparison = entryTypesManager.enrich(one.getType(), bibDatabaseMode)
-                                          .filter(type -> isDuplicateForType(type, one, two))
-                                          .map(_ -> true);
+        if (!one.getType().equals(two.getType())
+                && !one.getType().equals(StandardEntryType.Misc)
+                && !two.getType().equals(StandardEntryType.Misc)) {
+            comparison = firstType.flatMap(first -> entryTypesManager.enrich(two.getType(), bibDatabaseMode)
+                    .map(second -> isDuplicateForType(first, one, two) && isDuplicateForType(second, one, two)));
         } else {
-            comparison = entryTypesManager.enrich(one.getType(), bibDatabaseMode)
-                                          .flatMap(firstType -> entryTypesManager.enrich(two.getType(), bibDatabaseMode)
-                                                                                 .map(secondType -> isDuplicateForType(firstType, one, two)
-                                                                                         && isDuplicateForType(secondType, one, two)));
+            comparison = firstType.filter(type -> isDuplicateForType(type, one, two)).map(_ -> true);
         }
         return comparison.orElseGet(() -> compareAllFields(one, two));
     }
