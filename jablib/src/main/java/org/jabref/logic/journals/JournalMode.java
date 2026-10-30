@@ -2,10 +2,13 @@ package org.jabref.logic.journals;
 
 import java.util.Arrays;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public enum JournalMode {
     ABBREVIATE,
-    UNABBREVIATE,
-    NONE;
+    NONE,
+    UNABBREVIATE;
 
     public static JournalMode safeValueOf(String name) {
         return Arrays.stream(values())
