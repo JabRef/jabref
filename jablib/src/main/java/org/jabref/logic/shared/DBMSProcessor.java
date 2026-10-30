@@ -323,6 +323,18 @@ public class DBMSProcessor {
         }
     }
 
+    /// Returns the entry's type name for storage, falling back to `misc` if the type name is blank.
+    // [impl->req~shared-database.entry-type-required~1]
+    private static String entryTypeNameForDatabase(BibEntry bibEntry) {
+        String typeName = bibEntry.getType().getName();
+        if (typeName == null || typeName.isBlank()) {
+            LOGGER.warn("Entry {} has missing or blank entry type; storing as 'misc'",
+                    bibEntry.getCitationKey().orElse("<no citation key>"));
+            return StandardEntryType.Misc.getName();
+        }
+        return typeName;
+    }
+
     @FunctionalInterface
     private interface SqlWork<T> {
         T run() throws SQLException;
@@ -433,7 +445,7 @@ public class DBMSProcessor {
                 insertIntoEntryQuery.toString(),
                 Statement.RETURN_GENERATED_KEYS)) {
             for (int i = 0; i < bibEntries.size(); i++) {
-                preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
+                preparedEntryStatement.setString(i + 1, entryTypeNameForDatabase(bibEntries.get(i)));
             }
             preparedEntryStatement.executeUpdate();
 
@@ -516,7 +528,7 @@ public class DBMSProcessor {
                         RETURNING version
                     """;
             try (PreparedStatement statement = connection.prepareStatement(updateEntryQuery)) {
-                statement.setString(1, localBibEntry.getType().getName());
+                statement.setString(1, entryTypeNameForDatabase(localBibEntry));
                 statement.setInt(2, sharedId);
                 statement.setInt(3, localBibEntry.getSharedBibEntryData().getVersion());
                 try (ResultSet resultSet = statement.executeQuery()) {
