@@ -57,6 +57,9 @@ On first connect, JabRef copies version-1 data into the version-2 tables (only w
 The old tables are kept, so older JabRef versions can still work with them; they can be dropped manually once the migration is verified.
 The structure version in use is recorded in the `metadata` table under the key `VersionDBStructure`.
 
+When connecting to an existing shared database that lacks the `entry_entrytype_not_blank` constraint, JabRef repairs any entries with a `NULL` or blank `entrytype` to `misc` and adds the constraint automatically.
+Entries whose type is blank (e.g. from malformed BibTeX such as `@{key, ...}`) are written as `misc`.
+
 ### Entry identity
 
 `entry.shared_id` is a database-assigned `SERIAL` (32-bit int, allocated per insert attempt) - a deliberate bridge, not the end state:
@@ -70,7 +73,7 @@ erDiagram
     ENTRY ||--o{ FIELD : contains
     ENTRY {
         serial shared_id
-        varchar type
+        varchar entrytype "NOT NULL, not blank"
         int version
     }
     FIELD {

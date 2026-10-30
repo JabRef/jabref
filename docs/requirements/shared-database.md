@@ -97,7 +97,7 @@ Needs: impl, utest
 ## Shared database must reject entries without an entry type
 `req~shared-database.entry-type-required~1`
 
-The shared database must reject inserting or updating any entry whose entry type is missing or blank. When JabRef connects to a shared database, any existing entries with a missing or blank entry type must have their type set to `misc` while retaining all fields.
+The shared database must reject inserting or updating any entry whose entry type is missing or blank. When JabRef connects to a shared database, any existing entries with a missing or blank entry type must have their type set to `misc` while retaining all fields. Entries with a blank entry type are written as `misc`.
 
 Needs: impl, utest
 
