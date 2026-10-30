@@ -17,7 +17,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
+import org.jabref.gui.fieldeditors.EditorTextArea;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.model.entry.field.Field;
@@ -43,6 +45,29 @@ class FieldsEditorTabLayoutTest {
             StandardField.GROUPS,
             StandardField.OWNER,
             StandardField.TIMESTAMP);
+
+    @Test
+    void multilineEditorRecomputesHeightWhenTextOrWidthChanges() {
+        JavaFxExtension.invokeAndWait(() -> {
+            EditorTextArea area = new EditorTextArea();
+            Pane root = new Pane(area);
+            new Scene(root, 400, 400);
+            root.applyCss();
+            area.setGrowWithContent(200, 1000);
+            area.setText("A long entry with many words to wrap. ".repeat(30));
+
+            double wideHeight = area.prefHeight(300);
+            assertEquals(wideHeight, area.prefHeight(300), 0.1);
+            assertTrue(area.prefHeight(100) > wideHeight);
+
+            area.setText("Short entry");
+            assertTrue(area.prefHeight(100) < wideHeight);
+
+            double shortHeight = area.prefHeight(100);
+            area.setFont(Font.font(24));
+            assertTrue(area.prefHeight(100) > shortHeight);
+        });
+    }
 
     @Test
     void keywordGrowthKeepsFollowingFieldsSeparateAndFileRowStableInShortEditor() {
