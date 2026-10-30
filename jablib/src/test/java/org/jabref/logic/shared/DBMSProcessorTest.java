@@ -26,6 +26,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.support.DatabaseTest;
 
@@ -153,6 +154,19 @@ class DBMSProcessorTest {
         });
 
         assertEquals("23514", exception.getSQLState());
+    }
+
+    // [utest->req~shared-database.entry-type-required~1]
+    @Test
+    void insertEntryWithBlankTypeIsStoredAsMisc() throws SQLException {
+        BibEntry entry = new BibEntry(new UnknownEntryType(""))
+                .withField(StandardField.TITLE, "Ghost insert");
+
+        dbmsProcessor.insertEntry(entry);
+
+        BibEntry expected = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.TITLE, "Ghost insert");
+        assertEquals(List.of(expected), dbmsProcessor.getSharedEntries());
     }
 
     @Test
@@ -354,6 +368,21 @@ class DBMSProcessorTest {
 
         Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedIdAsInt());
         assertEquals(Optional.of(expectedEntry), actualEntry);
+    }
+
+    // [utest->req~shared-database.entry-type-required~1]
+    @Test
+    void updateEntryWithBlankTypeIsStoredAsMisc() throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Ghost update");
+        dbmsProcessor.insertEntry(entry);
+
+        entry.setType(new UnknownEntryType(""));
+        dbmsProcessor.updateEntry(entry);
+
+        BibEntry expected = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.TITLE, "Ghost update");
+        assertEquals(List.of(expected), dbmsProcessor.getSharedEntries());
     }
 
     @Test
