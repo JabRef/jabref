@@ -9,7 +9,9 @@ import org.jabref.logic.journals.JournalMode;
 import org.jabref.model.database.BibDatabase;
 
 import jakarta.annotation.Nullable;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class AbbreviateCleanupFactory {
 
     private AbbreviateCleanupFactory() {

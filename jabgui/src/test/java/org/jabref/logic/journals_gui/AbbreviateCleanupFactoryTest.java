@@ -12,6 +12,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.journals.JournalMode;
 import org.jabref.model.database.BibDatabase;
 
+import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@NullMarked
 class AbbreviateCleanupFactoryTest {
 
     @Test
