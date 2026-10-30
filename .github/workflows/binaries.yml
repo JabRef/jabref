@@ -1229,7 +1229,9 @@ jobs:
               echo "JabRef exited before the screenshot"
               exit 1
             fi
-            kill "$pid"
+            # Kill without a shutdown: xvfb-run removes the display right after this script, and a JavaFX shutdown
+            # without a display can log errors that the log check would report
+            kill -9 "$pid"
           '
       # jabref.exe is a GUI-subsystem binary (StaticFX links it with /SUBSYSTEM:WINDOWS):
       # a plain redirect does not capture its output, so the run uses Start-Process
