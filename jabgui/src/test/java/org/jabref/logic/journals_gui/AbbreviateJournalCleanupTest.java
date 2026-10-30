@@ -21,25 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class AbbreviateCleanupFactoryTest {
-
-    @Test
-    void abbreviateCleanupReturnsEmptyWhenRepositoryIsNull() {
-        AbbreviationPreferences preferences = mock(AbbreviationPreferences.class);
-        Optional<CleanupJob> result = AbbreviateCleanupFactory.abbreviateCleanup(
-                null,
-                preferences);
-        assertEquals(Optional.empty(), result);
-    }
-
-    @Test
-    void abbreviateCleanupReturnsEmptyWhenPreferencesAreNull() {
-        JournalAbbreviationRepository repository = mock(JournalAbbreviationRepository.class);
-        Optional<CleanupJob> result = AbbreviateCleanupFactory.abbreviateCleanup(
-                repository,
-                null);
-        assertEquals(Optional.empty(), result);
-    }
-
     @Test
     void abbreviateCleanupReturnsEmptyWhenJournalModeIsNone() {
         JournalAbbreviationRepository repository = mock(JournalAbbreviationRepository.class);

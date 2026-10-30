@@ -24,6 +24,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
+import org.jabref.logic.cleanup.CleanupJob;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
@@ -38,6 +39,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,21 +71,15 @@ public class RelatedArticlesTab extends EntryEditorTab {
         setTooltip(new Tooltip(Localization.lang("Related articles")));
     }
 
-    private void applyJournalAbbreviation(List<BibEntry> entries, BibDatabaseContext databaseContext) {
-        JournalAbbreviationRepository repository =
-                Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
-        if (databaseContext == null) {
-            AbbreviateCleanupFactory.abbreviateCleanup(
-                    repository,
-                    preferences.getAbbreviationPreferences()
-            ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
-        } else {
-            AbbreviateCleanupFactory.abbreviateCleanup(
-                    databaseContext.getDatabase(),
-                    repository,
-                    preferences.getAbbreviationPreferences()
-            ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
-        }
+    private void applyJournalAbbreviation(List<BibEntry> entries, @Nullable BibDatabaseContext databaseContext) {
+        JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+        Optional<CleanupJob> cleanupJob = Optional.ofNullable(databaseContext)
+                                                  .map(context -> AbbreviateCleanupFactory.abbreviateCleanup(
+                                                          context.getDatabase(), repository,
+                                                          preferences.getAbbreviationPreferences()))
+                                                  .orElseGet(() -> AbbreviateCleanupFactory.abbreviateCleanup(
+                                                          repository, preferences.getAbbreviationPreferences()));
+        cleanupJob.ifPresent(job -> entries.forEach(job::cleanup));
     }
 
     /// Gets a StackPane of related article information to be displayed in the Related Articles tab

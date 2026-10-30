@@ -8,24 +8,22 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.journals.JournalMode;
 import org.jabref.model.database.BibDatabase;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public final class AbbreviateCleanupFactory {
 
     private AbbreviateCleanupFactory() {
     }
 
-    public static Optional<CleanupJob> abbreviateCleanup(JournalAbbreviationRepository repository, AbbreviationPreferences abbreviationPreferences) {
+    public static Optional<CleanupJob> abbreviateCleanup(@NonNull JournalAbbreviationRepository repository,
+                                                         @NonNull AbbreviationPreferences abbreviationPreferences) {
         return abbreviateCleanup(null, repository, abbreviationPreferences);
     }
 
     public static Optional<CleanupJob> abbreviateCleanup(@Nullable BibDatabase database,
-                                                         JournalAbbreviationRepository repository,
-                                                         AbbreviationPreferences abbreviationPreferences) {
-        if (repository == null || abbreviationPreferences == null) {
-            return Optional.empty();
-        }
-
+                                                         @NonNull JournalAbbreviationRepository repository,
+                                                         @NonNull AbbreviationPreferences abbreviationPreferences) {
         JournalMode journalMode = abbreviationPreferences.useJournalAbbreviationMode();
         if (journalMode == JournalMode.NONE) {
             return Optional.empty();
@@ -34,12 +32,14 @@ public final class AbbreviateCleanupFactory {
         AbbreviationType abbreviationType = abbreviationPreferences.useAbbreviationTypeOnFetch();
 
         if (journalMode == JournalMode.ABBREVIATE) {
-            CleanupJob cleanupJob = database == null ? new AbbreviateJournalCleanup(repository, abbreviationType, abbreviationPreferences.shouldUseFJournalField())
-                                                     : new AbbreviateJournalCleanup(database, repository, abbreviationType, abbreviationPreferences.shouldUseFJournalField());
-            return Optional.of(cleanupJob);
+            return Optional.of(Optional.ofNullable(database).<CleanupJob>map(db -> new AbbreviateJournalCleanup(
+                                               db, repository, abbreviationType,
+                                               abbreviationPreferences.shouldUseFJournalField()))
+                                       .orElseGet(() -> new AbbreviateJournalCleanup(
+                                               repository, abbreviationType,
+                                               abbreviationPreferences.shouldUseFJournalField())));
         }
-
-        CleanupJob cleanupJob = database == null ? new UnabbreviateJournalCleanup(repository) : new UnabbreviateJournalCleanup(database, repository);
-        return Optional.of(cleanupJob);
+        return Optional.of(Optional.ofNullable(database).<CleanupJob>map(db -> new UnabbreviateJournalCleanup(db, repository))
+                                   .orElseGet(() -> new UnabbreviateJournalCleanup(repository)));
     }
 }
