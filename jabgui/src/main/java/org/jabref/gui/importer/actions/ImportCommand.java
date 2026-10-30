@@ -20,7 +20,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.importer.ImportEntriesDialog;
-import org.jabref.gui.linkedfile.AttachedPdfSplitter;
+import org.jabref.gui.linkedfile.MultiPaperPdfSplitter;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -138,9 +138,9 @@ public class ImportCommand extends SimpleCommand {
             format = Optional.empty();
         }
 
-        Set<Path> pdfsToSplit = ConcurrentHashMap.newKeySet();
+        Set<Path> confirmedPdfs = ConcurrentHashMap.newKeySet();
         BackgroundTask<ParserResult> task;
-        task = BackgroundTask.wrap(() -> doImport(files, format.orElse(null), pdfsToSplit));
+        task = BackgroundTask.wrap(() -> doImport(files, format.orElse(null), confirmedPdfs));
 
         LibraryTab tab = tabContainer.getCurrentLibraryTab();
 
@@ -151,7 +151,7 @@ public class ImportCommand extends SimpleCommand {
             task.onSuccess(parserResult -> {
                     tabContainer.addTab(parserResult.getDatabaseContext(), true);
                     dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
-                    splitConfirmedPdfs(parserResult.getDatabaseContext(), pdfsToSplit);
+                    splitConfirmedPdfs(parserResult.getDatabaseContext(), confirmedPdfs);
                 })
                 .onFailure(ex -> {
                     LOGGER.error("Error importing", ex);
@@ -159,7 +159,8 @@ public class ImportCommand extends SimpleCommand {
                 })
                 .executeWith(taskExecutor);
         } else {
-            ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task, null, pdfsToSplit);
+            ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task);
+            dialog.markSplitConfirmed(confirmedPdfs);
             dialog.setTitle(Localization.lang("Import"));
             dialogService.showCustomDialogAndWait(dialog);
         }
@@ -168,10 +169,10 @@ public class ImportCommand extends SimpleCommand {
         preferences.getImporterPreferences().setImportWorkingDirectory(files.getLast().getParent());
     }
 
-    /// @param pdfsToSplit collects the PDFs the user chose to import as one entry per paper
+    /// @param confirmedPdfs collects the PDFs the user chose to import as one entry per paper
     /// @throws IOException of a specified importer
     @NullMarked
-    private ParserResult doImport(List<Path> files, @Nullable Importer importFormat, Set<Path> pdfsToSplit) throws IOException {
+    private ParserResult doImport(List<Path> files, @Nullable Importer importFormat, Set<Path> confirmedPdfs) throws IOException {
         Optional<Importer> importer = Optional.ofNullable(importFormat);
 
         ImportFormatReader importFormatReader = new ImportFormatReader(
@@ -198,8 +199,8 @@ public class ImportCommand extends SimpleCommand {
                     if (paperCount < 2) {
                         // This import method never throws an IOException
                         imports.add(importFormatReader.importWithAutoDetection(filename));
-                    } else if (Boolean.TRUE.equals(UiTaskExecutor.runInJavaFXThread(() -> AttachedPdfSplitter.confirmImportAsPapers(dialogService, filename, paperCount)))) {
-                        pdfsToSplit.add(filename.toAbsolutePath().normalize());
+                    } else if (Boolean.TRUE.equals(UiTaskExecutor.runInJavaFXThread(() -> MultiPaperPdfSplitter.confirmImportAsPapers(dialogService, filename, paperCount)))) {
+                        confirmedPdfs.add(filename.toAbsolutePath().normalize());
                         imports.add(importFormatReader.importMultiPaperPdf(filename));
                     } else {
                         imports.add(importFormatReader.importPdfAsOneEntry(filename));
@@ -239,9 +240,9 @@ public class ImportCommand extends SimpleCommand {
     }
 
     // [impl->req~logic.importer.multi-paper-pdf~1]
-    private void splitConfirmedPdfs(BibDatabaseContext newLibrary, Set<Path> pdfsToSplit) {
-        AttachedPdfSplitter splitter = new AttachedPdfSplitter(newLibrary, dialogService, preferences.getFilePreferences(), taskExecutor, stateManager.getUndoManager(newLibrary));
-        splitter.splitImportedVolumes(newLibrary.getEntries(), volume -> splitter.linksAnyOf(volume, pdfsToSplit));
+    private void splitConfirmedPdfs(BibDatabaseContext newLibrary, Set<Path> confirmedPdfs) {
+        MultiPaperPdfSplitter splitter = new MultiPaperPdfSplitter(newLibrary, dialogService, preferences.getFilePreferences(), taskExecutor, stateManager.getUndoManager(newLibrary));
+        splitter.splitImportedVolumes(newLibrary.getEntries(), volume -> splitter.linksAnyOf(volume, confirmedPdfs));
     }
 
     // [impl->req~logic.importer.multi-paper-pdf~1]

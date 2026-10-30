@@ -30,7 +30,7 @@ import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.AddGroupImportEntriesAction;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
-import org.jabref.gui.linkedfile.AttachedPdfSplitter;
+import org.jabref.gui.linkedfile.MultiPaperPdfSplitter;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DragDrop;
@@ -176,7 +176,7 @@ public class ImportHandler {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
             private final List<BibEntry> allEntriesToAdd = new ArrayList<>();
-            private final Set<BibEntry> volumesToSplit = Collections.newSetFromMap(new IdentityHashMap<>());
+            private final Set<BibEntry> confirmedVolumes = Collections.newSetFromMap(new IdentityHashMap<>());
 
             @Override
             public List<ImportFilesResultItemViewModel> call() {
@@ -216,9 +216,9 @@ public class ImportHandler {
                         List<BibEntry> volumeEntries = FileUtil.isPDFFile(file) ? multiPaperEntries(file) : List.of();
                         // [impl->req~logic.importer.multi-paper-pdf~1]
                         if (!volumeEntries.isEmpty() && Boolean.TRUE.equals(UiTaskExecutor.runInJavaFXThread(
-                                () -> AttachedPdfSplitter.confirmImportAsPapers(dialogService, file, volumeEntries.size() - 1)))) {
+                                () -> MultiPaperPdfSplitter.confirmImportAsPapers(dialogService, file, volumeEntries.size() - 1)))) {
                             BibEntry wholePdf = volumeEntries.getLast();
-                            volumesToSplit.add(wholePdf);
+                            confirmedVolumes.add(wholePdf);
                             wholePdf.clearField(StandardField.FILE);
                             DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, wholePdf);
                             addToImportEntriesGroup(volumeEntries);
@@ -301,7 +301,7 @@ public class ImportHandler {
 
                 // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                 // That method does a clone() on each entry
-                UiTaskExecutor.runInJavaFXThread(() -> insertImported(allEntriesToAdd, volumesToSplit, suspended));
+                UiTaskExecutor.runInJavaFXThread(() -> insertImported(allEntriesToAdd, confirmedVolumes, suspended));
                 return results;
             }
 
@@ -318,15 +318,15 @@ public class ImportHandler {
     /// one Ctrl+Z, and what the insert sets off — group assignment, and the tab's automatic
     /// assignment to the selected groups — is recorded inside that step rather than after it.
     ///
-    /// @param volumesToSplit volumes the user already agreed to split into their papers
-    private void insertImported(List<BibEntry> entriesToAdd, Set<BibEntry> volumesToSplit, UndoSuspension suspended) {
+    /// @param confirmedVolumes volumes the user already agreed to split into their papers
+    private void insertImported(List<BibEntry> entriesToAdd, Set<BibEntry> confirmedVolumes, UndoSuspension suspended) {
         try {
             importEntries(entriesToAdd);
         } finally {
             suspended.close();
         }
-        new AttachedPdfSplitter(targetBibDatabaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
-                .splitImportedVolumes(entriesToAdd, volumesToSplit::contains);
+        new MultiPaperPdfSplitter(targetBibDatabaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
+                .splitImportedVolumes(entriesToAdd, confirmedVolumes::contains);
     }
 
     private List<BibEntry> multiPaperEntries(Path pdf) {

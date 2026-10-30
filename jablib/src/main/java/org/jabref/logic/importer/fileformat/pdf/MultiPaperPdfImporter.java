@@ -88,6 +88,6 @@ public class MultiPaperPdfImporter extends PdfImporter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Imports the papers of a proceedings or collection PDF as entries that cross-reference an entry for the whole PDF.");
+        return Localization.lang("Imports the papers of a proceedings, collection or book PDF as entries that cross-reference an entry for the whole PDF.");
     }
 }

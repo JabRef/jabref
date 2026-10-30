@@ -142,7 +142,7 @@ public class ActionHelper {
     public static BooleanExpression isCrossrefPdfPresentForSelectedEntry(StateManager stateManager, CliPreferences preferences) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         Binding<Boolean> crossrefPdfIsPresent = EasyBind.valueAt(selectedEntries, 0)
-                                                        .mapObservable(entry -> crossrefPdfIsPresent(entry, stateManager, preferences))
+                                                        .mapObservable(entry -> hasCrossrefPdf(entry, stateManager, preferences))
                                                         .orElseOpt(false);
 
         return BooleanExpression.booleanExpression(crossrefPdfIsPresent);
@@ -150,7 +150,7 @@ public class ActionHelper {
 
     /// Re-evaluated when the fields of `entry` change, which covers its `crossref`, and when those of the entry it cross-references change, which covers its files
     // [impl->req~jabgui.documentviewer.open-crossref-pdf-at-page~1]
-    private static ObservableValue<Boolean> crossrefPdfIsPresent(BibEntry entry, StateManager stateManager, CliPreferences preferences) {
+    private static ObservableValue<Boolean> hasCrossrefPdf(BibEntry entry, StateManager stateManager, CliPreferences preferences) {
         ObservableValue<Optional<BibEntry>> referencedEntry = Bindings.createObjectBinding(
                 () -> stateManager.getActiveDatabase().flatMap(database -> database.getDatabase().getReferencedEntry(entry)),
                 entry.getFieldsObservable());

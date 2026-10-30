@@ -98,7 +98,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     /// group (if missing) and assigns the entries. An explicit selection in the picker overrides it.
     /// The group is only ever created on confirm, so cancelling imports nothing.
     private final @Nullable String targetGroup;
-    private final Set<Path> pdfsToSplit;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
@@ -126,15 +125,9 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     /// @param task        the task executed for parsing the selected files(s).
     /// @param targetGroup name of the group to pre-select, or `null` for none
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, @Nullable String targetGroup) {
-        this(database, task, targetGroup, Set.of());
-    }
-
-    /// @param pdfsToSplit PDFs the user already agreed to split into their papers
-    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, @Nullable String targetGroup, Set<Path> pdfsToSplit) {
         this.database = database;
         this.task = task;
         this.targetGroup = targetGroup;
-        this.pdfsToSplit = pdfsToSplit;
         this.searchBasedFetcher = Optional.empty();
         this.query = Optional.empty();
 
@@ -152,7 +145,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         this.database = database;
         this.task = task;
         this.targetGroup = null;
-        this.pdfsToSplit = Set.of();
         this.searchBasedFetcher = Optional.of(fetcher);
         this.query = Optional.of(query);
 
@@ -161,7 +153,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, stateManager.getUndoManager(database), preferences, stateManager, entryTypesManager, fileUpdateMonitor, searchBasedFetcher, query, pdfsToSplit);
+        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, stateManager.getUndoManager(database), preferences, stateManager, entryTypesManager, fileUpdateMonitor, searchBasedFetcher, query);
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
@@ -360,6 +352,11 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public void useWebSearchDownloadPreference() {
         viewModel.useWebSearchDownloadPreference();
         downloadLinkedOnlineFiles.setSelected(viewModel.shouldDownloadLinkedFiles());
+    }
+
+    /// @param pdfs PDFs the user already agreed to split into their papers, which are then split without asking again
+    public void markSplitConfirmed(Set<Path> pdfs) {
+        viewModel.markSplitConfirmed(pdfs);
     }
 
     private void setupPaginationBindings() {

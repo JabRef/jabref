@@ -38,8 +38,8 @@ public final class PdfLocationResolver {
     }
 
     private static PdfLocation location(BibEntry entry, LinkedFile file, BibEntry offsetOwner, BibEntry fileOwner) {
-        Optional<Integer> lastPage = offsetOwner.hasField(PAGE_OFFSET) ? Optional.empty() : pdfPageSpan(entry, offsetOwner).map(PageSpan::lastPage);
-        return new PdfLocation(file, pdfPage(entry, offsetOwner), lastPage, fileOwner);
+        Optional<Integer> lastPageWithoutOffset = offsetOwner.hasField(PAGE_OFFSET) ? Optional.empty() : pdfPageSpan(entry, offsetOwner).map(PageSpan::lastPage);
+        return new PdfLocation(file, pdfPage(entry, offsetOwner), lastPageWithoutOffset, fileOwner);
     }
 
     private static BibEntry offsetOwner(BibEntry entry, LinkedFile file, BibDatabase database) {
@@ -142,13 +142,13 @@ public final class PdfLocationResolver {
         }
     }
 
-    /// @param lastPage the PDF page the entry ends on, when its `pages` give a range and no `pageoffset` places them in the PDF
-    public record PdfLocation(LinkedFile file, Optional<Integer> page, Optional<Integer> lastPage, BibEntry fileOwner) {
+    /// @param lastPageWithoutOffset the PDF page the entry ends on, when its `pages` give a range and no `pageoffset` places them in the PDF
+    public record PdfLocation(LinkedFile file, Optional<Integer> page, Optional<Integer> lastPageWithoutOffset, BibEntry fileOwner) {
         /// @return the page to open in the PDF, or the first page when the entry's page lies past the last of `pageCount` pages,
         /// or when the PDF has no more pages than the entry's range without a `pageoffset`, because then it holds only the entry
         public int pageWithin(int pageCount) {
             return page.filter(number -> number <= pageCount)
-                       .filter(number -> lastPage.filter(last -> last - number + 1 >= pageCount).isEmpty())
+                       .filter(number -> lastPageWithoutOffset.filter(last -> last - number + 1 >= pageCount).isEmpty())
                        .orElse(1);
         }
     }

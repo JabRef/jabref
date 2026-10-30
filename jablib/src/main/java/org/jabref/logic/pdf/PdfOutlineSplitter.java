@@ -75,15 +75,6 @@ public final class PdfOutlineSplitter {
         return PAPER_TYPES.getOrDefault(volumeType, StandardEntryType.InBook);
     }
 
-    /// @return no papers when the outline does not mark at least two papers, or the PDF holds a single paper
-    public static SplitPapers split(Path source, BibEntry parent, Path targetDirectory) throws IOException {
-        Optional<Volume> volume = readVolume(source);
-        if (volume.isEmpty()) {
-            return new SplitPapers(List.of(), 0);
-        }
-        return split(source, parent, volume.orElseThrow(), targetDirectory);
-    }
-
     /// @param volume the papers that [#readVolume(Path)] found in `source`
     public static SplitPapers split(Path source, BibEntry parent, Volume volume, Path targetDirectory) throws IOException {
         try (PDDocument document = Loader.loadPDF(source.toFile())) {

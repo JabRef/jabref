@@ -21,16 +21,6 @@ public final class PdfPaperExtractor {
     }
 
     /// @param fileOwner the entry whose `pageoffset` numbers the pages of `source`
-    /// @return the new PDF, or empty when `entry` does not name a strict sub-range of `source`
-    public static Optional<Path> extractPaper(Path source, BibEntry entry, BibEntry fileOwner, Path targetDirectory) throws IOException {
-        Optional<PageSpan> pages = pagesToExtract(source, entry, fileOwner);
-        if (pages.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(extractPages(source, pages.orElseThrow(), targetDirectory));
-    }
-
-    /// @param fileOwner the entry whose `pageoffset` numbers the pages of `source`
     /// @return the PDF pages that `entry` names, or empty when they are not a strict sub-range of `source`
     public static Optional<PageSpan> pagesToExtract(Path source, BibEntry entry, BibEntry fileOwner) throws IOException {
         Optional<PageSpan> span = PdfLocationResolver.pdfPageSpan(entry, fileOwner);

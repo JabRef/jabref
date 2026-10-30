@@ -49,6 +49,7 @@ For each paper, a new PDF with its pages is written and the original is kept.
 The paper entry has a type that follows the volume (`InProceedings` for a proceedings, `InCollection` for a collection, `InBook` for a book), a title, a `pages` field, a `crossref` to the citation key of the volume entry, and the new PDF as linked file.
 The `pageoffset` field of the entry that owns the PDF is added to the printed page number to get the PDF page. If the volume entry has none, the offset is read from the page labels of the PDF, and the volume entry then stores it.
 Proceedings, collections and books are split, as are their multi-volume types (`MvProceedings`, `MvCollection`, `MvBook`).
+JabRef asks the user before it splits a PDF or copies the pages of an entry. A PDF already attached to such an entry can be split from the context menu of the file, and papers that already have a PDF are left out.
 
 ### Finding the papers
 
@@ -86,7 +87,7 @@ Authors, abstract, and other metadata are **not** extracted. Papers whose first 
 
 ### Importing a multi-paper PDF
 
-A PDF can also be imported instead of attached to an entry. `MultiPaperPdfImporter` finds the papers in the same way and creates one entry for the whole PDF, which holds the file, and one entry per paper that cross-references it. The PDF is then split among the papers as when it is attached.
+A PDF can also be imported instead of attached to an entry. `MultiPaperPdfImporter` finds the papers in the same way and creates one entry for the whole PDF, which holds the file, and one entry per paper that cross-references it. Before any entry is created, the user chooses between splitting the PDF and importing it as one entry, and only the first creates these entries. The PDF is then split among the papers as when it is attached, without asking again.
 
 The file does not say what kind of volume it is, so the type of the entry for the whole PDF is guessed from the front matter. It is a proceedings when the title pages or the bookmarks name the event or its committees, a collection when they name editors or contributors or the papers give author e-mail addresses, and a book otherwise.
 
@@ -102,7 +103,8 @@ PDF page = first printed page in the entry's own `pages` field + pageoffset of t
 
 * `pageoffset` (field name `pageoffset`) is **the number of PDF pages before printed page 1**. Missing = `0`.
 * It lives on the entry that **owns the PDF**: the proceedings entry for papers that cross-reference it, or the paper itself for papers extracted by the splitter.
-* When a page range is extracted for an entry that has no `pageoffset` of its own, the offset of the entry it cross-references is used, and the entry takes it over.
+* When a page range is extracted for an entry that has no `pageoffset` of its own, the offset of the entry it cross-references is used. The entry stays without a `pageoffset`.
+* Without a `pageoffset`, a PDF with no more pages than the range in `pages` holds only the entry, so it opens at its first page.
 * The first page is read from the start of `pages` (optional letter prefix allowed, for example `A12`). Only arabic numbers are mapped.
 * The page is empty, but the PDF is still returned, when `pages` is missing, starts with a roman numeral, or the computed page is below 1.
 
@@ -119,6 +121,7 @@ After splitting, the extracted paper owns an 8-page PDF, printed pages 45-52, so
 * Good, because the original PDF is never changed, extraction writes new files.
 * Good, because a single paper with sections is not split into false papers.
 * Good, because one offset model serves both the volume and the extracted papers, and keeps links usable after splitting.
+* Good, because undoing a split also moves its PDFs out of the folder, and redoing it puts them back, unless a PDF changed in between.
 * Bad, because a PDF without bookmarks cannot be split automatically.
 * Bad, because a volume that fails the title or section check is not split, even if its outline is correct.
 * Bad, because the outline must have one bookmark per paper. A volume bookmarked per session, with the papers nested below, is usually not split.
@@ -130,7 +133,7 @@ After splitting, the extracted paper owns an 8-page PDF, printed pages 45-52, so
 
 * `./gradlew traceRequirements` fails if `PdfOutlineSplitter` is missing the marker `// [impl->adr~split-multipaper-pdfs-by-outline~1]`
 * The markers `// [impl->req~…]` and `// [utest->req~…]`, in `PdfOutlineSplitter`, `PdfLocationResolver` and the tests link the code to the requirements in `docs/requirements/split-attached-pdf.md`.
-* `PdfOutlineSplitterTest`, `PdfPaperExtractorTest`, `PdfLocationResolverTest`, `AttachedPdfSplitterTest`, `MultiPaperPdfImporterTest` and `ImportHandlerTest` test the splitting, the extraction, the page offset and the import.
+* `PdfOutlineSplitterTest`, `PdfPaperExtractorTest`, `PdfLocationResolverTest`, `MultiPaperPdfSplitterTest`, `MultiPaperPdfImporterTest` and `ImportHandlerTest` test the splitting, the extraction, the page offset and the import.
 
 ## More Information
 

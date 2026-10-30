@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.logic.externalfiles.PdfLocationResolver;
+import org.jabref.logic.externalfiles.PdfLocationResolver.PageSpan;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -30,7 +31,7 @@ class PdfPaperExtractorTest {
         Path source = blankPdf("proceedings.pdf", 5);
         BibEntry paper = new BibEntry(StandardEntryType.InProceedings).withField(StandardField.PAGES, "2--3");
 
-        Optional<Path> extracted = PdfPaperExtractor.extractPaper(source, paper, paper, tempDir);
+        Optional<Path> extracted = extractPaper(source, paper, paper);
 
         assertEquals(2, pageCount(extracted.orElseThrow()));
         assertEquals(5, pageCount(source));
@@ -43,7 +44,7 @@ class PdfPaperExtractorTest {
                 .withField(StandardField.PAGES, "2--3")
                 .withField(PdfLocationResolver.PAGE_OFFSET, "14");
 
-        Optional<Path> extracted = PdfPaperExtractor.extractPaper(source, paper, paper, tempDir);
+        Optional<Path> extracted = extractPaper(source, paper, paper);
 
         assertEquals(2, pageCount(extracted.orElseThrow()));
         assertEquals("proceedings-p16-17.pdf", extracted.orElseThrow().getFileName().toString());
@@ -60,7 +61,7 @@ class PdfPaperExtractorTest {
                 .withField(StandardField.PAGES, "2--3")
                 .withField(StandardField.CROSSREF, "volume");
 
-        Optional<Path> extracted = PdfPaperExtractor.extractPaper(source, paper, volume, tempDir);
+        Optional<Path> extracted = extractPaper(source, paper, volume);
 
         assertEquals("proceedings-p16-17.pdf", extracted.orElseThrow().getFileName().toString());
     }
@@ -70,7 +71,7 @@ class PdfPaperExtractorTest {
         Path source = blankPdf("paper.pdf", 4);
         BibEntry paper = new BibEntry(StandardEntryType.InProceedings).withField(StandardField.PAGES, "1--4");
 
-        assertEquals(Optional.empty(), PdfPaperExtractor.extractPaper(source, paper, paper, tempDir));
+        assertEquals(Optional.empty(), extractPaper(source, paper, paper));
         assertEquals(4, pageCount(source));
     }
 
@@ -79,7 +80,15 @@ class PdfPaperExtractorTest {
         Path source = blankPdf("proceedings.pdf", 5);
         BibEntry paper = new BibEntry(StandardEntryType.InProceedings).withField(StandardField.PAGES, "43+");
 
-        assertEquals(Optional.empty(), PdfPaperExtractor.extractPaper(source, paper, paper, tempDir));
+        assertEquals(Optional.empty(), extractPaper(source, paper, paper));
+    }
+
+    private Optional<Path> extractPaper(Path source, BibEntry entry, BibEntry fileOwner) throws IOException {
+        Optional<PageSpan> pages = PdfPaperExtractor.pagesToExtract(source, entry, fileOwner);
+        if (pages.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(PdfPaperExtractor.extractPages(source, pages.orElseThrow(), tempDir));
     }
 
     private Path blankPdf(String name, int pages) throws IOException {

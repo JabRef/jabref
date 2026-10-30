@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
 // [impl->req~logic.pdf.split-proceedings-outline~1]
 // [impl->req~logic.pdf.extract-paper-page-range~1]
 @NullMarked
-public class AttachedPdfSplitter {
+public class MultiPaperPdfSplitter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AttachedPdfSplitter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MultiPaperPdfSplitter.class);
 
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
@@ -45,7 +45,7 @@ public class AttachedPdfSplitter {
     private final FilePreferences filePreferences;
     private final MultiPaperPdfLinker linker;
 
-    public AttachedPdfSplitter(BibDatabaseContext databaseContext,
+    public MultiPaperPdfSplitter(BibDatabaseContext databaseContext,
                                DialogService dialogService,
                                FilePreferences filePreferences,
                                TaskExecutor taskExecutor,
@@ -59,12 +59,12 @@ public class AttachedPdfSplitter {
     }
 
     /// @param linkPaper links the copy of the entry's own pages to the entry
-    public void split(Path pdf, BibEntry entry, Consumer<LinkedFile> linkPaper) {
+    public void offerSplitOrCopy(Path pdf, BibEntry entry, Consumer<LinkedFile> linkPaper) {
         if (!FileUtil.isPDFFile(pdf)) {
             return;
         }
         if (PdfOutlineSplitter.holdsPapers(entry.getType())) {
-            splitIntoPapers(pdf, entry, false);
+            confirmAndSplit(pdf, entry, false);
             return;
         }
         BackgroundTask.wrap(() -> linker.pagesToCopy(pdf, entry))
@@ -99,16 +99,11 @@ public class AttachedPdfSplitter {
                 Localization.lang("Import as one entry"));
     }
 
-    // [impl->req~logic.importer.multi-paper-pdf~1]
-    public void splitImportedVolumes(List<BibEntry> importedEntries) {
-        splitImportedVolumes(importedEntries, _ -> false);
-    }
-
     /// @param confirmed whether the user already agreed to split the PDF of a volume
     // [impl->req~logic.importer.multi-paper-pdf~1]
     public void splitImportedVolumes(List<BibEntry> importedEntries, Predicate<BibEntry> confirmed) {
         MultiPaperPdfLinker.volumesToSplit(importedEntries)
-                           .forEach(volume -> linker.firstPdf(volume).ifPresent(pdf -> splitIntoPapers(pdf, volume, confirmed.test(volume))));
+                           .forEach(volume -> linker.firstPdf(volume).ifPresent(pdf -> confirmAndSplit(pdf, volume, confirmed.test(volume))));
     }
 
     /// @return whether `volume` links one of `pdfs`
@@ -137,11 +132,11 @@ public class AttachedPdfSplitter {
         }
     }
 
-    private void splitIntoPapers(Path pdf, BibEntry volume, boolean confirmed) {
+    private void confirmAndSplit(Path pdf, BibEntry volume, boolean alreadyConfirmed) {
         BackgroundTask.wrap(() -> PdfOutlineSplitter.readVolume(pdf))
                       .onSuccess(papers -> papers.map(found -> linker.withoutPapersThatHavePdfs(volume, found))
                                                  .filter(found -> !found.papers().isEmpty())
-                                                 .filter(found -> confirmed || confirmSplit(pdf, found))
+                                                 .filter(found -> alreadyConfirmed || confirmSplit(pdf, found))
                                                  .ifPresent(found -> splitIntoPapers(pdf, volume, found)))
                       .onFailure(exception -> showFailure(pdf, exception))
                       .executeWith(taskExecutor);

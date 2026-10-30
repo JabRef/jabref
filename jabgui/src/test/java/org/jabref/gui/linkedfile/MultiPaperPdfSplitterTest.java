@@ -50,7 +50,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @NullMarked
-class AttachedPdfSplitterTest {
+class MultiPaperPdfSplitterTest {
 
     @TempDir
     private Path tempDir;
@@ -63,9 +63,9 @@ class AttachedPdfSplitterTest {
         Path pdf = blankPdf(5);
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings).withField(StandardField.PAGES, "2--3");
 
-        splitter(library(BibDatabaseMode.BIBLATEX, entry)).split(pdf, entry, linkedPapers::add);
+        splitter(library(BibDatabaseMode.BIBLATEX, entry)).offerSplitOrCopy(pdf, entry, linkedPapers::add);
 
-        assertEquals(List.of("proceedings-p2-3.pdf"), linkedPapers.stream().map(AttachedPdfSplitterTest::fileName).toList());
+        assertEquals(List.of("proceedings-p2-3.pdf"), linkedPapers.stream().map(MultiPaperPdfSplitterTest::fileName).toList());
         assertEquals(2, pageCount(tempDir.resolve("proceedings-p2-3.pdf")));
     }
 
@@ -84,9 +84,9 @@ class AttachedPdfSplitterTest {
                 .withFiles(List.of(new LinkedFile("", pdf, "PDF")));
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings, paper);
 
-        splitter(databaseContext).split(pdf, paper, paper::addFile);
+        splitter(databaseContext).offerSplitOrCopy(pdf, paper, paper::addFile);
 
-        assertEquals(List.of("proceedings.pdf", "proceedings-p16-17.pdf"), paper.getFiles().stream().map(AttachedPdfSplitterTest::fileName).toList());
+        assertEquals(List.of("proceedings.pdf", "proceedings-p16-17.pdf"), paper.getFiles().stream().map(MultiPaperPdfSplitterTest::fileName).toList());
         assertEquals(Optional.empty(), paper.getField(PdfLocationResolver.PAGE_OFFSET));
         assertEquals(Optional.of(16), PdfLocationResolver.resolve(paper, databaseContext.getDatabase()).flatMap(PdfLocation::page));
     }
@@ -104,7 +104,7 @@ class AttachedPdfSplitterTest {
                 .withField(StandardField.CROSSREF, "volume")
                 .withFiles(List.of(new LinkedFile("", pdf, "PDF")));
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings, paper);
-        splitter(databaseContext).split(pdf, paper, paper::addFile);
+        splitter(databaseContext).offerSplitOrCopy(pdf, paper, paper::addFile);
 
         paper.setFiles(List.of(paper.getFiles().getLast()));
 
@@ -121,7 +121,7 @@ class AttachedPdfSplitterTest {
                 .withField(StandardField.PAGES, "5--8")
                 .withFiles(List.of(new LinkedFile("", pdf, "PDF")));
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, paper);
-        splitter(databaseContext).split(pdf, paper, paper::addFile);
+        splitter(databaseContext).offerSplitOrCopy(pdf, paper, paper::addFile);
 
         paper.setFiles(List.of(paper.getFiles().getLast()));
 
@@ -135,7 +135,7 @@ class AttachedPdfSplitterTest {
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings);
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings);
 
-        splitter(databaseContext).split(volumePdf(18, false), proceedings, linkedPapers::add);
+        splitter(databaseContext).offerSplitOrCopy(volumePdf(18, false), proceedings, linkedPapers::add);
 
         assertEquals(List.of("Alpha", "Beta"), titles(databaseContext));
         assertEquals("Alpha.pdf", fileName(databaseContext.getDatabase().getEntries().get(1)));
@@ -148,7 +148,7 @@ class AttachedPdfSplitterTest {
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings);
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings);
 
-        splitter(databaseContext, false).split(volumePdf(18, false), proceedings, linkedPapers::add);
+        splitter(databaseContext, false).offerSplitOrCopy(volumePdf(18, false), proceedings, linkedPapers::add);
 
         assertEquals(List.of(proceedings), databaseContext.getDatabase().getEntries());
         assertFalse(Files.exists(tempDir.resolve("Alpha.pdf")));
@@ -160,7 +160,7 @@ class AttachedPdfSplitterTest {
         Path pdf = blankPdf(5);
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings).withField(StandardField.PAGES, "2--3");
 
-        splitter(library(BibDatabaseMode.BIBLATEX, entry), false).split(pdf, entry, linkedPapers::add);
+        splitter(library(BibDatabaseMode.BIBLATEX, entry), false).offerSplitOrCopy(pdf, entry, linkedPapers::add);
 
         assertEquals(List.of(), linkedPapers);
         assertFalse(Files.exists(tempDir.resolve("proceedings-p2-3.pdf")));
@@ -184,14 +184,14 @@ class AttachedPdfSplitterTest {
         when(dialogService.showConfirmationDialogAndWait(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings).withCitationKey("volume");
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings);
-        AttachedPdfSplitter splitter = new AttachedPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), new JabRefUndoManager());
+        MultiPaperPdfSplitter splitter = new MultiPaperPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), new JabRefUndoManager());
         Path pdf = volumePdf(18, false);
         splitter.splitOnRequest(pdf, proceedings);
 
         splitter.splitOnRequest(pdf, proceedings);
 
         verify(dialogService).notify("All papers in volume.pdf already have a PDF.");
-        assertEquals(List.of(List.of("Alpha.pdf"), List.of("Beta.pdf")), papers(databaseContext).stream().map(paper -> paper.getFiles().stream().map(AttachedPdfSplitterTest::fileName).toList()).toList());
+        assertEquals(List.of(List.of("Alpha.pdf"), List.of("Beta.pdf")), papers(databaseContext).stream().map(paper -> paper.getFiles().stream().map(MultiPaperPdfSplitterTest::fileName).toList()).toList());
     }
 
     // [utest->req~logic.pdf.split-proceedings-outline~1]
@@ -202,7 +202,7 @@ class AttachedPdfSplitterTest {
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings).withCitationKey("volume");
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings);
         JabRefUndoManager journal = new JabRefUndoManager();
-        new AttachedPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), journal)
+        new MultiPaperPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), journal)
                 .splitOnRequest(volumePdf(18, false), proceedings);
 
         journal.undo();
@@ -218,7 +218,7 @@ class AttachedPdfSplitterTest {
         DialogService dialogService = mock(DialogService.class);
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings);
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings);
-        AttachedPdfSplitter splitter = new AttachedPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), new JabRefUndoManager());
+        MultiPaperPdfSplitter splitter = new MultiPaperPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), new JabRefUndoManager());
 
         splitter.splitOnRequest(volumePdf(10, false), proceedings);
 
@@ -231,7 +231,7 @@ class AttachedPdfSplitterTest {
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings);
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings);
 
-        splitter(databaseContext).split(volumePdf(10, false), proceedings, linkedPapers::add);
+        splitter(databaseContext).offerSplitOrCopy(volumePdf(10, false), proceedings, linkedPapers::add);
 
         assertEquals(List.of(proceedings), databaseContext.getDatabase().getEntries());
     }
@@ -242,7 +242,7 @@ class AttachedPdfSplitterTest {
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings);
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, proceedings);
 
-        splitter(databaseContext).split(volumePdf(18, true), proceedings, linkedPapers::add);
+        splitter(databaseContext).offerSplitOrCopy(volumePdf(18, true), proceedings, linkedPapers::add);
 
         assertEquals(List.of("3--4", "5--6"), papers(databaseContext).stream().map(paper -> paper.getField(StandardField.PAGES).orElseThrow()).toList());
         assertEquals(Optional.of("-2"), proceedings.getField(PdfLocationResolver.PAGE_OFFSET));
@@ -255,10 +255,10 @@ class AttachedPdfSplitterTest {
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings).withCitationKey("volume");
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, alpha, proceedings);
 
-        splitter(databaseContext).split(volumePdf(18, true), proceedings, linkedPapers::add);
+        splitter(databaseContext).offerSplitOrCopy(volumePdf(18, true), proceedings, linkedPapers::add);
 
         assertEquals(List.of("Alpha", "Beta"), titles(databaseContext));
-        assertEquals(List.of("Alpha.pdf"), alpha.getFiles().stream().map(AttachedPdfSplitterTest::fileName).toList());
+        assertEquals(List.of("Alpha.pdf"), alpha.getFiles().stream().map(MultiPaperPdfSplitterTest::fileName).toList());
         assertEquals(Optional.of(1), PdfLocationResolver.resolve(alpha, databaseContext.getDatabase()).flatMap(PdfLocation::page));
     }
 
@@ -269,7 +269,7 @@ class AttachedPdfSplitterTest {
         BibEntry volume = new BibEntry(volumeType).withCitationKey("volume").withField(StandardField.TITLE, "Example Volume");
         BibDatabaseContext databaseContext = library(mode, volume);
 
-        splitter(databaseContext).split(volumePdf(18, false), volume, linkedPapers::add);
+        splitter(databaseContext).offerSplitOrCopy(volumePdf(18, false), volume, linkedPapers::add);
 
         assertEquals(List.of(paperType, paperType), papers(databaseContext).stream().map(BibEntry::getType).toList());
     }
@@ -289,7 +289,7 @@ class AttachedPdfSplitterTest {
                 .withCitationKey("volume")
                 .withField(StandardField.TITLE, "Proceedings of the Example Conference");
 
-        splitter(library(BibDatabaseMode.BIBTEX, proceedings)).split(volumePdf(18, false), proceedings, linkedPapers::add);
+        splitter(library(BibDatabaseMode.BIBTEX, proceedings)).offerSplitOrCopy(volumePdf(18, false), proceedings, linkedPapers::add);
 
         assertEquals(Optional.of("Proceedings of the Example Conference"), proceedings.getField(StandardField.BOOKTITLE));
     }
@@ -301,7 +301,7 @@ class AttachedPdfSplitterTest {
         BibEntry beta = paper(StandardEntryType.InCollection, "Beta", "3--4");
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, alpha, beta, volume(StandardEntryType.Collection));
 
-        splitter(databaseContext).splitImportedVolumes(databaseContext.getDatabase().getEntries());
+        splitter(databaseContext).splitImportedVolumes(databaseContext.getDatabase().getEntries(), _ -> false);
 
         assertEquals(3, databaseContext.getDatabase().getEntryCount());
         assertEquals(List.of("Alpha.pdf", "Beta.pdf"), List.of(fileName(alpha), fileName(beta)));
@@ -316,7 +316,7 @@ class AttachedPdfSplitterTest {
         BibEntry book = volume(StandardEntryType.Book).withField(StandardField.TITLE, "An Example Monograph");
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBTEX, alpha, beta, book);
 
-        splitter(databaseContext).splitImportedVolumes(databaseContext.getDatabase().getEntries());
+        splitter(databaseContext).splitImportedVolumes(databaseContext.getDatabase().getEntries(), _ -> false);
 
         assertEquals(List.of(StandardEntryType.InCollection, StandardEntryType.InCollection), List.of(alpha.getType(), beta.getType()));
         assertEquals(Optional.of("An Example Monograph"), book.getField(StandardField.BOOKTITLE));
@@ -329,7 +329,7 @@ class AttachedPdfSplitterTest {
         BibEntry volume = volume(StandardEntryType.Collection);
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, alpha);
 
-        splitter(databaseContext).splitImportedVolumes(List.of(alpha, volume));
+        splitter(databaseContext).splitImportedVolumes(List.of(alpha, volume), _ -> false);
 
         assertEquals(List.of(alpha), databaseContext.getDatabase().getEntries());
         assertEquals(List.of(), alpha.getFiles());
@@ -345,7 +345,7 @@ class AttachedPdfSplitterTest {
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, alpha, volume);
         DialogService dialogService = mock(DialogService.class);
 
-        new AttachedPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), new JabRefUndoManager())
+        new MultiPaperPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), new JabRefUndoManager())
                 .splitImportedVolumes(databaseContext.getDatabase().getEntries(), volume::equals);
 
         assertEquals("Alpha.pdf", fileName(alpha));
@@ -355,7 +355,7 @@ class AttachedPdfSplitterTest {
     @Test
     void knowsWhichPdfAVolumeLinks() throws IOException {
         BibEntry volume = volume(StandardEntryType.Collection);
-        AttachedPdfSplitter splitter = splitter(library(BibDatabaseMode.BIBLATEX, volume));
+        MultiPaperPdfSplitter splitter = splitter(library(BibDatabaseMode.BIBLATEX, volume));
 
         assertEquals(List.of(true, false), List.of(
                 splitter.linksAnyOf(volume, Set.of(tempDir.resolve("volume.pdf").toAbsolutePath().normalize())),
@@ -368,7 +368,7 @@ class AttachedPdfSplitterTest {
                 .withFiles(List.of(new LinkedFile("", Path.of("alpha.pdf"), "PDF")));
         BibDatabaseContext databaseContext = library(BibDatabaseMode.BIBLATEX, alpha, volume(StandardEntryType.Collection));
 
-        splitter(databaseContext).splitImportedVolumes(databaseContext.getDatabase().getEntries());
+        splitter(databaseContext).splitImportedVolumes(databaseContext.getDatabase().getEntries(), _ -> false);
 
         assertEquals(List.of("alpha.pdf"), alpha.getFiles().stream().map(LinkedFile::getLink).toList());
         assertFalse(Files.exists(tempDir.resolve("Alpha.pdf")));
@@ -393,14 +393,14 @@ class AttachedPdfSplitterTest {
         return databaseContext;
     }
 
-    private static AttachedPdfSplitter splitter(BibDatabaseContext databaseContext) {
+    private static MultiPaperPdfSplitter splitter(BibDatabaseContext databaseContext) {
         return splitter(databaseContext, true);
     }
 
-    private static AttachedPdfSplitter splitter(BibDatabaseContext databaseContext, boolean confirm) {
+    private static MultiPaperPdfSplitter splitter(BibDatabaseContext databaseContext, boolean confirm) {
         DialogService dialogService = mock(DialogService.class);
         when(dialogService.showConfirmationDialogAndWait(anyString(), anyString(), anyString(), anyString())).thenReturn(confirm);
-        return new AttachedPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), new JabRefUndoManager());
+        return new MultiPaperPdfSplitter(databaseContext, dialogService, mock(FilePreferences.class), new CurrentThreadTaskExecutor(), new JabRefUndoManager());
     }
 
     private static List<BibEntry> papers(BibDatabaseContext databaseContext) {

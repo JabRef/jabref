@@ -91,8 +91,8 @@ public class AttachFileAction extends SimpleCommand {
                              fieldChange.ifPresent(change -> {
                                  libraryTab.getUndoManager().addEdit(new UndoableFieldChange(change));
                              });
-                             new AttachedPdfSplitter(databaseContext, dialogService, filePreferences, taskExecutor, libraryTab.getUndoManager())
-                                     .split(newFile, entry, paper -> entry.addFile(paper).ifPresent(change ->
+                             new MultiPaperPdfSplitter(databaseContext, dialogService, filePreferences, taskExecutor, libraryTab.getUndoManager())
+                                     .offerSplitOrCopy(newFile, entry, paper -> entry.addFile(paper).ifPresent(change ->
                                              libraryTab.getUndoManager().addEdit(new UndoableFieldChange(change))));
                          });
         });

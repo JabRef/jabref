@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.externalfiles.PdfLocationResolver;
@@ -49,7 +50,7 @@ class PdfOutlineSplitterTest {
         Path source = proceedingsWithPapers();
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings).withCitationKey("Proc2024");
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, proceedings, tempDir).papers();
+        List<BibEntry> papers = split(source, proceedings, tempDir).papers();
 
         assertEquals(2, papers.size());
         assertEquals(StandardEntryType.InProceedings, papers.getFirst().getType());
@@ -72,7 +73,7 @@ class PdfOutlineSplitterTest {
     @ParameterizedTest
     @MethodSource
     void splitsAVolumeIntoPapersOfItsKind(EntryType volumeType, EntryType paperType) throws IOException {
-        List<BibEntry> papers = PdfOutlineSplitter.split(proceedingsWithPapers(), new BibEntry(volumeType), tempDir).papers();
+        List<BibEntry> papers = split(proceedingsWithPapers(), new BibEntry(volumeType), tempDir).papers();
 
         assertTrue(PdfOutlineSplitter.holdsPapers(volumeType));
         assertEquals(List.of(paperType, paperType), papers.stream().map(BibEntry::getType).toList());
@@ -109,7 +110,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
+        List<BibEntry> papers = split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(List.of("Alpha", "Beta"), papers.stream().map(paper -> paper.getField(StandardField.TITLE).orElseThrow()).toList());
     }
@@ -132,7 +133,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
+        List<BibEntry> papers = split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(List.of("Alpha", "Beta"), papers.stream().map(paper -> paper.getField(StandardField.TITLE).orElseThrow()).toList());
         assertEquals(List.of("1--3", "4--6"), papers.stream().map(paper -> paper.getField(StandardField.PAGES).orElseThrow()).toList());
@@ -156,7 +157,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
+        List<BibEntry> papers = split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(List.of("Alpha", "Beta"), papers.stream().map(paper -> paper.getField(StandardField.TITLE).orElseThrow()).toList());
         assertEquals(List.of("2--3", "4--6"), papers.stream().map(paper -> paper.getField(StandardField.PAGES).orElseThrow()).toList());
@@ -178,7 +179,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
+        List<BibEntry> papers = split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(List.of("Alpha", "Beta", "Gamma"), papers.stream().map(paper -> paper.getField(StandardField.TITLE).orElseThrow()).toList());
     }
@@ -202,7 +203,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        assertEquals(List.of(), PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers());
+        assertEquals(List.of(), split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers());
     }
 
     @Test
@@ -217,7 +218,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        assertEquals(List.of(), PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers());
+        assertEquals(List.of(), split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers());
     }
 
     // [utest->req~logic.pdf.split-proceedings-outline~1]
@@ -225,7 +226,7 @@ class PdfOutlineSplitterTest {
     void writesThePrintedPagesFromThePageLabels() throws IOException {
         Path source = proceedingsWithPageLabels();
 
-        PdfOutlineSplitter.SplitPapers split = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir);
+        PdfOutlineSplitter.SplitPapers split = split(source, new BibEntry(StandardEntryType.Proceedings), tempDir);
 
         assertEquals(List.of("1--2", "3--4"), split.papers().stream().map(paper -> paper.getField(StandardField.PAGES).orElseThrow()).toList());
         assertEquals(2, split.pageOffset());
@@ -236,7 +237,7 @@ class PdfOutlineSplitterTest {
         Path source = proceedingsWithPageLabels();
         BibEntry proceedings = new BibEntry(StandardEntryType.Proceedings).withField(PdfLocationResolver.PAGE_OFFSET, "0");
 
-        PdfOutlineSplitter.SplitPapers split = PdfOutlineSplitter.split(source, proceedings, tempDir);
+        PdfOutlineSplitter.SplitPapers split = split(source, proceedings, tempDir);
 
         assertEquals(List.of("3--4", "5--6"), split.papers().stream().map(paper -> paper.getField(StandardField.PAGES).orElseThrow()).toList());
         assertEquals(0, split.pageOffset());
@@ -260,7 +261,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> papers = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
+        List<BibEntry> papers = split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(List.of("Alpha", "Beta"), papers.stream().map(paper -> paper.getField(StandardField.TITLE).orElseThrow()).toList());
     }
@@ -283,7 +284,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        assertEquals(List.of(), PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers());
+        assertEquals(List.of(), split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers());
         assertEquals(3, pageCount(source));
     }
 
@@ -316,7 +317,7 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
 
-        List<BibEntry> entries = PdfOutlineSplitter.split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
+        List<BibEntry> entries = split(source, new BibEntry(StandardEntryType.Proceedings), tempDir).papers();
 
         assertEquals(papers, entries.stream().map(entry -> entry.getField(StandardField.TITLE).orElseThrow()).toList());
     }
@@ -353,6 +354,14 @@ class PdfOutlineSplitterTest {
             document.save(source.toFile());
         }
         return source;
+    }
+
+    private static PdfOutlineSplitter.SplitPapers split(Path source, BibEntry parent, Path targetDirectory) throws IOException {
+        Optional<PdfOutlineSplitter.Volume> volume = PdfOutlineSplitter.readVolume(source);
+        if (volume.isEmpty()) {
+            return new PdfOutlineSplitter.SplitPapers(List.of(), 0);
+        }
+        return PdfOutlineSplitter.split(source, parent, volume.orElseThrow(), targetDirectory);
     }
 
     private static void addPages(PDDocument document, int count) throws IOException {

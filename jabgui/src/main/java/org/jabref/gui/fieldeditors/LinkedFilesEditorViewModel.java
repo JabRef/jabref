@@ -30,7 +30,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
-import org.jabref.gui.linkedfile.AttachedPdfSplitter;
+import org.jabref.gui.linkedfile.MultiPaperPdfSplitter;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.bibtex.FileFieldWriter;
@@ -166,12 +166,12 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     public void addNewLinkedFile(LinkedFile linkedFile) {
         files.add(toViewModel(linkedFile));
         linkedFile.findIn(databaseContext, preferences.getFilePreferences())
-                  .ifPresent(this::splitAttachedPdf);
+                  .ifPresent(this::offerSplitOrCopy);
     }
 
-    private void splitAttachedPdf(Path pdf) {
-        new AttachedPdfSplitter(databaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
-                .split(pdf, entry, paper -> files.add(toViewModel(paper)));
+    private void offerSplitOrCopy(Path pdf) {
+        new MultiPaperPdfSplitter(databaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
+                .offerSplitOrCopy(pdf, entry, paper -> files.add(toViewModel(paper)));
     }
 
     public boolean canSplitPdf(LinkedFileViewModel linkedFile) {
@@ -181,7 +181,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     public void splitPdf(LinkedFileViewModel linkedFile) {
         linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences())
-                  .ifPresent(pdf -> new AttachedPdfSplitter(databaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
+                  .ifPresent(pdf -> new MultiPaperPdfSplitter(databaseContext, dialogService, preferences.getFilePreferences(), taskExecutor, undoManager)
                           .splitOnRequest(pdf, entry));
     }
 

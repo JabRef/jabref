@@ -30,11 +30,11 @@ public record UndoableFileMove(List<Move> moves) implements BibChange {
 
     @Override
     public ApplyResult apply() {
-        List<String> filesLeftInPlace = moves.stream().flatMap(move -> move.perform().stream()).toList();
-        if (filesLeftInPlace.isEmpty()) {
+        List<String> reasonsLeftInPlace = moves.stream().flatMap(move -> move.perform().stream()).toList();
+        if (reasonsLeftInPlace.isEmpty()) {
             return ApplyResult.SUCCESS;
         }
-        return ApplyResult.of(this, String.join("; ", filesLeftInPlace));
+        return ApplyResult.of(this, String.join("; ", reasonsLeftInPlace));
     }
 
     /// @param lastModified when the file was last written, which tells whether it changed since
