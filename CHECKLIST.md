@@ -12,26 +12,26 @@ Read your own diff once, top to bottom, and confirm each point.
 ### Nullability and control flow
 
 - [ ] No `== null` / `!= null` checks — JSpecify annotations (`@NullMarked`, `@Nullable`, `@NonNull`) used instead.
-- [x] No `Objects.requireNonNull(...)` — nullability expressed via JSpecify annotations.
-- [x] New classes annotated with `@NullMarked` (`org.jspecify.annotations.NullMarked`).
-- [/] New packages annotated with `@NullMarked` (`org.jspecify.annotations.NullMarked`).
-- [x] `Optional` consumed with `ifPresent` / `ifPresentOrElse` / `map` / `orElseThrow` — never `orElse(unusedValue)` nor an `isPresent()` + `get()` block.
-- [/] `StringUtil.isBlank(...)` used instead of `s == null || s.isBlank()`.
+- [ ] No `Objects.requireNonNull(...)` — nullability expressed via JSpecify annotations.
+- [ ] New classes annotated with `@NullMarked` (`org.jspecify.annotations.NullMarked`).
+- [ ] New packages annotated with `@NullMarked` (`org.jspecify.annotations.NullMarked`).
+- [ ] `Optional` consumed with `ifPresent` / `ifPresentOrElse` / `map` / `orElseThrow` — never `orElse(unusedValue)` nor an `isPresent()` + `get()` block.
+- [ ] `StringUtil.isBlank(...)` used instead of `s == null || s.isBlank()`.
 
 ### Exceptions
 
-- [x] No `catch (Exception e)` — only specific exceptions are caught.
-- [x] No `throw new RuntimeException(...)` / `IllegalStateException(...)` — these tear down the whole application.
-- [/] Logged exceptions are passed as the **last** logger argument (`LOGGER.info("...", e)`), not concatenated into the message string.
+- [ ] No `catch (Exception e)` — only specific exceptions are caught.
+- [ ] No `throw new RuntimeException(...)` / `IllegalStateException(...)` — these tear down the whole application.
+- [ ] Logged exceptions are passed as the **last** logger argument (`LOGGER.info("...", e)`), not concatenated into the message string.
 
 ### Style and idioms
 
-- [x] New `BibEntry` objects built with withers (`withField`, not `setField`).
-- [x] Modern Java used: `List.of()` / `Map.of()` / `Set.of()`, `Path.of()`, `SequencedCollection` / `SequencedSet`, text blocks.
-- [/] Regexes use a precompiled `Pattern.compile(...)` constant, not `String.matches(...)`.
-- [x] Keep alphabetical ordering when adding variables or enum items.
-- [/] Background work uses `org.jabref.logic.util.BackgroundTask`, not `new Thread()`.
-- [x] No commented-out code, no trivial comments restating the code, no AI-disclosure comments in source.
+- [ ] New `BibEntry` objects built with withers (`withField`, not `setField`).
+- [ ] Modern Java used: `List.of()` / `Map.of()` / `Set.of()`, `Path.of()`, `SequencedCollection` / `SequencedSet`, text blocks.
+- [ ] Regexes use a precompiled `Pattern.compile(...)` constant, not `String.matches(...)`.
+- [ ] Keep alphabetical ordering when adding variables or enum items.
+- [ ] Background work uses `org.jabref.logic.util.BackgroundTask`, not `new Thread()`.
+- [ ] No commented-out code, no trivial comments restating the code, no AI-disclosure comments in source.
 - [ ] Markdown Javadoc (`///`) uses Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code}`, `[ClassName]` instead of `{@link}`.
 
 ### User-facing text
