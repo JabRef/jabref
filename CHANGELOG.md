@@ -38,7 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed saving custom entry types to ask for a restart, so the entry editor shows the changes. [#17121](https://github.com/JabRef/jabref/pull/17121)
 - We changed single-line entry fields to return focus to the editor when <kbd>Enter</kbd> is pressed. [#17445](https://github.com/JabRef/jabref/issues/17445)
 - We changed failed shared database connections to show a tab with "Retry" instead of an error dialog. [#16968](https://github.com/JabRef/jabref/pull/16968)
-- We changed the main table tooltip to stay visible while the mouse stays over the entry. [#17502](https://github.com/JabRef/jabref/issues/17502)
+- We changed the main table tooltip to stay visible while hovered, with a configurable duration. [#17502](https://github.com/JabRef/jabref/issues/17502)
 
 ### Fixed
 
