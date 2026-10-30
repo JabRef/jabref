@@ -269,6 +269,10 @@ class GuiPreferencesMigrationsTest {
         when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
         when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
 
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenThrow(new PasswordAccessException("No entry stored"));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherB")).thenThrow(new PasswordAccessException("No entry stored"));
+        when(keyring.getPassword("org.jabref.apikeys", "FetcherC")).thenThrow(new PasswordAccessException("No entry stored"));
+
         try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
             keyringFactory.when(Keyring::create).thenReturn(keyring);
 
