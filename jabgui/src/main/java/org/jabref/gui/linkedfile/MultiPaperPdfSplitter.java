@@ -46,10 +46,10 @@ public class MultiPaperPdfSplitter {
     private final MultiPaperPdfLinker linker;
 
     public MultiPaperPdfSplitter(BibDatabaseContext databaseContext,
-                               DialogService dialogService,
-                               FilePreferences filePreferences,
-                               TaskExecutor taskExecutor,
-                               UndoManager undoManager) {
+                                 DialogService dialogService,
+                                 FilePreferences filePreferences,
+                                 TaskExecutor taskExecutor,
+                                 UndoManager undoManager) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
