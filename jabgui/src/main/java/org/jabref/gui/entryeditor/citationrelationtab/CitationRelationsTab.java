@@ -963,8 +963,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         };
         BackgroundTask<List<CitationRelationItem>> task = BackgroundTask.wrap(() -> {
             List<BibEntry> fetchedEntries = fetch.fetch(isCancelled);
+            List<CitationRelationItem> matches = matchAgainstLibrary(fetchedEntries, libraryEntries, databaseMode, isCancelled);
             applyJournalCleanup(fetchedEntries);
-            return matchAgainstLibrary(fetchedEntries, libraryEntries, databaseMode, isCancelled);
+            return matches;
         });
         selfReference.set(task);
         return task;
