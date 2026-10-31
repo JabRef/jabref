@@ -55,5 +55,5 @@ This is implemented for the SQL database synchronization, which is described at 
 
 See <https://automerge.org/blog/automerge-2/> for details.
 
-* Bad, because one needs to locally store a lot more metadata (e.g. for operational CRDTs you essentially need to have the full history of all edits). So you would need another file next to the bib file to store these.
+* Bad, because one needs to locally store a lot more metadata (e.g. for operational CRDTs you essentially need to have the full history of all edits). This requires another file next to the bib file to store these.
 * Bad, because CRDTs are mainly used when you need low latency and high frequency of edits (e.g. multi-user chat or text editing). Not really something we care about.
