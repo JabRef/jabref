@@ -90,10 +90,10 @@ class DebugAiProviderTest {
     }
 
     @Test
-    void defaultConstructorHasFiveSecondsDelay() {
+    void defaultConstructorHasHalfSecondDelay() {
         // [utest->req~ai.llms.providers.debug~1]
         DebugAiProvider defaultModel = new DebugAiProvider();
-        assertEquals(5000, defaultModel.getDelayMs());
+        assertEquals(500, defaultModel.getDelayMs());
     }
 
     @Test
