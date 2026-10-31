@@ -10,6 +10,7 @@ import org.jabref.gradle.useLibericaJdkFull
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
+    id("org.jabref.gradle.feature.nativecompile")
     id("application")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
@@ -33,10 +34,15 @@ testModuleInfo {
     requires("org.junit.jupiter.params")
     requires("org.mockito")
 
+    // Reachability assertions (JMemoryBuddy)
+    requires("one.jpro.jmemorybuddy")
+
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
 
     runtimeOnly("com.tngtech.archunit.junit5.engine")
+
+    requires("org.apache.lucene.core")
 }
 
 tasks.named<Test>("test") {
@@ -322,7 +328,7 @@ tasks.test {
 
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
-        "--enable-native-access=javafx.graphics,com.sun.jna"
+        "--enable-native-access=javafx.graphics,com.sun.jna,org.apache.lucene.core"
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"
@@ -411,3 +417,35 @@ val generateThemePreviews = tasks.register("generateThemePreviews") {
 }
 sourceSets["main"].resources.srcDir(generateThemePreviews)
 // endregion
+
+// StaticFX (https://github.com/HebiRobotics/jfx-static-feature): JavaFX metadata, static libraries and Feature.
+// Only on the native-image classpath, so the JVM module path stays unchanged.
+val nativeImageOnly = configurations.create("nativeImageOnly")
+dependencies {
+    nativeImageOnly(platform(project(":versions")))
+    nativeImageOnly("us.hebi.graalvm:jfx-static-libs")
+    nativeImageOnly("us.hebi.graalvm:jfx-static-feature")
+}
+
+val nativeImageFeatures = sourceSets.create("nativeImageFeatures")
+dependencies {
+    "nativeImageFeaturesCompileOnly"("org.graalvm.sdk:nativeimage")
+    "nativeImageFeaturesCompileOnly"("org.jspecify:jspecify")
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            classpath(nativeImageOnly, nativeImageFeatures.output)
+            buildArgs.add("--features=org.jabref.nativeimage.JabRefViewsFeature")
+            imageName.set("jabref")
+            mainClass.set("org.jabref.Launcher")
+            resources {
+                includedPatterns.add(".*\\.fxml$")
+                includedPatterns.add(".*\\.css$")
+                includedPatterns.add("build\\.properties")
+                includedPatterns.add("org/jabref/gui/theme/preview/.*\\.png$")
+            }
+        }
+    }
+}

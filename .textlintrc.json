@@ -1,5 +1,11 @@
 {
   "rules": {
-    "common-misspellings": true
+    "common-misspellings": true,
+    "terminology": {
+      "defaultTerms": false,
+      "terms": [
+        ["bibtex", "BibTeX"]
+      ]
+    }
   }
 }

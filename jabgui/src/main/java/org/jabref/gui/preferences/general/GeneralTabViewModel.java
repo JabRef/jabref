@@ -33,11 +33,12 @@ import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.gui.theme.ThemePreset;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -83,7 +84,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldAskForIncludingCrossReferencesProperty = new SimpleBooleanProperty();
     private final BooleanProperty hideTabBarProperty = new SimpleBooleanProperty();
-    private final BooleanProperty donationNeverShowProperty = new SimpleBooleanProperty();
 
     private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
     private final ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty = new SimpleObjectProperty<>();
@@ -108,6 +108,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final HttpServerManager httpServerManager;
     private final LanguageServerController languageServerController;
     private final UiMessageHandler uiMessageHandler;
+    private final OAuthSessionRegistry oAuthSessionRegistry;
     private final RemoteListenerServerManager remoteListenerServerManager;
     private final StateManager stateManager;
 
@@ -132,6 +133,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                                HttpServerManager httpServerManager,
                                LanguageServerController languageServerController,
                                UiMessageHandler uiMessageHandler,
+                               OAuthSessionRegistry oAuthSessionRegistry,
                                RemoteListenerServerManager remoteListenerServerManager,
                                StateManager stateManager) {
         this.dialogService = dialogService;
@@ -144,6 +146,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.httpServerManager = httpServerManager;
         this.languageServerController = languageServerController;
         this.uiMessageHandler = uiMessageHandler;
+        this.oAuthSessionRegistry = oAuthSessionRegistry;
         this.remoteListenerServerManager = remoteListenerServerManager;
         this.stateManager = stateManager;
 
@@ -233,7 +236,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
         shouldAskForIncludingCrossReferencesProperty.setValue(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences());
         hideTabBarProperty.setValue(workspacePreferences.shouldHideTabBar());
-        donationNeverShowProperty.setValue(preferences.getDonationPreferences().isNeverShowAgain());
 
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(libraryPreferences.getDefaultBibDatabaseMode());
@@ -286,7 +288,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
         preferences.getCopyToPreferences().setShouldAskForIncludingCrossReferences(shouldAskForIncludingCrossReferencesProperty.getValue());
         workspacePreferences.setHideTabBar(confirmHideTabBarProperty().getValue());
-        preferences.getDonationPreferences().setNeverShowAgain(donationNeverShowProperty.getValue());
 
         libraryPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
 
@@ -334,7 +335,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (enableHttpServerProperty.getValue()) {
             remotePreferences.setEnableHttpServer(true);
             URI uri = remotePreferences.getHttpServerUri();
-            httpServerManager.start(preferences, stateManager, uiMessageHandler, uri);
+
+            httpServerManager.start(preferences, stateManager, uiMessageHandler, oAuthSessionRegistry, uri);
         } else {
             remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();
@@ -478,10 +480,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty confirmHideTabBarProperty() {
         return this.hideTabBarProperty;
-    }
-
-    public BooleanProperty donationNeverShowProperty() {
-        return this.donationNeverShowProperty;
     }
 
     public ListProperty<BibDatabaseMode> biblatexModeListProperty() {
