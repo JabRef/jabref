@@ -32,6 +32,14 @@
                 <MenuItem
                         text="%Copy to clipboard"
                         onAction="#onCopyContextMenuClick"/>
+                <MenuItem
+                        fx:id="deleteMenuItem"
+                        text="%Delete"
+                        onAction="#onDeleteClick"/>
+                <MenuItem
+                        fx:id="regenerateMenuItem"
+                        text="%Retry"
+                        onAction="#onRegenerateClick"/>
             </items>
         </ContextMenu>
 
