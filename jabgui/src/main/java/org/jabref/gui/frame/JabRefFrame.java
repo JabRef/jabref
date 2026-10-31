@@ -286,6 +286,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         SplitPane.setResizableWithParent(sidePaneScroll, false);
         sidePane.widthProperty().addListener(_ -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
+        sidePane.getChildren().addListener((ListChangeListener<Node>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    Platform.runLater(() -> sidePaneScroll.setVvalue(0));
+                    return;
+                }
+            }
+        });
         updateSidePane();
         setCenter(horizontalSplit);
     }
