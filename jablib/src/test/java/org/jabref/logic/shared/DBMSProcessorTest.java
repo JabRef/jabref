@@ -224,30 +224,7 @@ class DBMSProcessorTest {
         Connection connection = dbmsConnection.getConnection();
 
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
-
-            statement.executeUpdate("""
-                        CREATE TABLE jabref."ENTRY" (
-                            "SHARED_ID" SERIAL PRIMARY KEY,
-                            "TYPE" VARCHAR,
-                            "VERSION" INT DEFAULT 1
-                        )
-                    """);
-
-            statement.executeUpdate("""
-                        CREATE TABLE jabref."FIELD" (
-                            "ENTRY_SHARED_ID" INT REFERENCES jabref."ENTRY"("SHARED_ID") ON DELETE CASCADE,
-                            "NAME" VARCHAR,
-                            "VALUE" TEXT
-                        )
-                    """);
-
-            statement.executeUpdate("""
-                        CREATE TABLE jabref."METADATA" (
-                            "KEY" VARCHAR,
-                            "VALUE" TEXT
-                        )
-                    """);
+            createV1Structure(statement);
 
             // Insert a legacy entry with NULL TYPE instead of 'article'
             statement.executeUpdate("INSERT INTO jabref.\"ENTRY\" (\"TYPE\") VALUES (NULL)");
@@ -260,6 +237,56 @@ class DBMSProcessorTest {
                 .withField(StandardField.AUTHOR, "Ada Lovelace");
 
         assertEquals(List.of(expectedEntry), dbmsProcessor.getSharedEntries());
+    }
+
+    // [utest->req~shared-database.entry-type-required~1]
+    @Test
+    void migrationFromV1StructureKeepsNonBlankTypeUnchanged() throws SQLException {
+        Connection connection = dbmsConnection.getConnection();
+
+        try (Statement statement = connection.createStatement()) {
+            createV1Structure(statement);
+
+            // Surrounding whitespace is part of the legacy value and must survive the migration
+            statement.executeUpdate("INSERT INTO jabref.\"ENTRY\" (\"TYPE\") VALUES (' article ')");
+        }
+
+        dbmsProcessor.setupSharedDatabase();
+
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT entrytype FROM jabref.entry")) {
+            assertTrue(resultSet.next());
+            assertEquals(" article ", resultSet.getString(1));
+            assertFalse(resultSet.next());
+        }
+    }
+
+    /// Recreates the empty table structure of JabRef 5.x/6.0-alpha (structure version 1).
+    private static void createV1Structure(Statement statement) throws SQLException {
+        statement.executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
+
+        statement.executeUpdate("""
+                    CREATE TABLE jabref."ENTRY" (
+                        "SHARED_ID" SERIAL PRIMARY KEY,
+                        "TYPE" VARCHAR,
+                        "VERSION" INT DEFAULT 1
+                    )
+                """);
+
+        statement.executeUpdate("""
+                    CREATE TABLE jabref."FIELD" (
+                        "ENTRY_SHARED_ID" INT REFERENCES jabref."ENTRY"("SHARED_ID") ON DELETE CASCADE,
+                        "NAME" VARCHAR,
+                        "VALUE" TEXT
+                    )
+                """);
+
+        statement.executeUpdate("""
+                    CREATE TABLE jabref."METADATA" (
+                        "KEY" VARCHAR,
+                        "VALUE" TEXT
+                    )
+                """);
     }
 
     // [utest->req~shared-database.entry-type-required~1]
