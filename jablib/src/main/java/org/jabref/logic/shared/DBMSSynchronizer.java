@@ -52,6 +52,7 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -519,6 +520,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             dbmsProcessor.updateEntry(bibEntry);
             sharedIdsInConflict.remove(sharedId);
             offlineChanges.forget(List.of(bibEntry));
+            alignBlankEntryTypesWithSharedDatabase(List.of(bibEntry));
             return true;
         } catch (OfflineLockException exception) {
             sharedIdsInConflict.add(sharedId);
@@ -541,9 +543,31 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         bibEntries.stream()
                   .filter(bibEntry -> bibEntry.getSharedBibEntryData().getSharedIdAsInt() == -1)
                   .forEach(bibEntry -> bibEntry.getSharedBibEntryData().setVersion(1));
-        return writeOrRecord("Could not insert entries into the shared database",
+        boolean written = writeOrRecord("Could not insert entries into the shared database",
                 () -> dbmsProcessor.insertEntries(bibEntries),
                 () -> offlineChanges.recordInsert(bibEntries));
+        if (written) {
+            alignBlankEntryTypesWithSharedDatabase(bibEntries);
+        }
+        return written;
+    }
+
+    /// Database worker, after a successful write. The shared database stores a blank entry type
+    /// as `misc` (see [DBMSProcessor]), so the written local entries are brought in line with it.
+    /// This happens on the model thread as a [EntriesEventSource#SHARED] change, which is not
+    /// written back to the shared database.
+    // [impl->req~shared-database.entry-type-required~1]
+    private void alignBlankEntryTypesWithSharedDatabase(List<BibEntry> writtenEntries) {
+        List<BibEntry> blankTypedEntries = writtenEntries.stream()
+                                                         .filter(DBMSProcessor::hasBlankEntryType)
+                                                         .toList();
+        if (blankTypedEntries.isEmpty()) {
+            return;
+        }
+        remoteUpdateExecutor.execute(() -> runIfOpen(() -> withPullLock(() ->
+                blankTypedEntries.stream()
+                                 .filter(DBMSProcessor::hasBlankEntryType)
+                                 .forEach(entry -> entry.setType(StandardEntryType.Misc, EntriesEventSource.SHARED)))));
     }
 
     /// Database worker

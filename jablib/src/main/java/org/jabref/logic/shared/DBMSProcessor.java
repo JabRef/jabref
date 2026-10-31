@@ -359,12 +359,17 @@ public class DBMSProcessor {
     // [impl->req~shared-database.entry-type-required~1]
     private static String entryTypeNameForDatabase(BibEntry bibEntry) {
         String typeName = bibEntry.getType().getName();
-        if (StringUtil.isBlank(typeName)) {
+        if (hasBlankEntryType(bibEntry)) {
             LOGGER.warn("Entry {} has missing or blank entry type; storing as 'misc'",
                     bibEntry.getCitationKey().orElse("<no citation key>"));
             return StandardEntryType.Misc.getName();
         }
         return typeName;
+    }
+
+    /// Whether the entry's type name is blank; such an entry is stored as `misc`.
+    static boolean hasBlankEntryType(BibEntry bibEntry) {
+        return StringUtil.isBlank(bibEntry.getType().getName());
     }
 
     @FunctionalInterface

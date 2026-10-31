@@ -41,6 +41,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -126,6 +127,37 @@ class DBMSSynchronizerTest {
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
         assertEquals(List.of(expectedEntry), actualEntries);
+    }
+
+    // [utest->req~shared-database.entry-type-required~1]
+    @Test
+    void insertedEntryWithBlankTypeIsAlignedToMisc() throws SQLException {
+        BibEntry entry = new BibEntry(new UnknownEntryType(""))
+                .withField(StandardField.TITLE, "Missing type");
+
+        bibDatabase.insertEntry(entry);
+
+        assertEquals(StandardEntryType.Misc, entry.getType());
+        List<BibEntry> sharedEntries = dbmsProcessor.getSharedEntries();
+        assertEquals(List.of(entry), sharedEntries);
+        // Aligning the local entry is not written back as a second update
+        assertEquals(1, sharedEntries.getFirst().getSharedBibEntryData().getVersion());
+    }
+
+    // [utest->req~shared-database.entry-type-required~1]
+    @Test
+    void updatedEntryWithBlankTypeIsAlignedToMisc() throws SQLException {
+        BibEntry entry = createExampleBibEntry(1);
+        // The library relays the entry's changes to the synchronizer; no extra listener, so each change is written once
+        bibDatabase.insertEntry(entry);
+
+        entry.setType(new UnknownEntryType(""));
+
+        assertEquals(StandardEntryType.Misc, entry.getType());
+        List<BibEntry> sharedEntries = dbmsProcessor.getSharedEntries();
+        assertEquals(List.of(entry), sharedEntries);
+        // One update for the type change; aligning the local entry is not written back
+        assertEquals(2, sharedEntries.getFirst().getSharedBibEntryData().getVersion());
     }
 
     @Test
