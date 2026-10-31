@@ -300,9 +300,9 @@ class DBMSProcessorTest {
         }
 
         // 3. Reconnect / re-run setup to repair existing entries and add the constraint back
-        assertFalse(dbmsProcessor.checkBaseIntegrity());
+        assertTrue(dbmsProcessor.needsSchemaUpgrade());
         dbmsProcessor.setupSharedDatabase();
-        assertTrue(dbmsProcessor.checkBaseIntegrity());
+        assertFalse(dbmsProcessor.needsSchemaUpgrade());
 
         // 4a. Assert entries were repaired to Misc and retained their titles
         List<BibEntry> entries = dbmsProcessor.getSharedEntries();
@@ -345,10 +345,10 @@ class DBMSProcessorTest {
             statement.executeUpdate("INSERT INTO jabref.field (entry_shared_id, name, value) SELECT shared_id, 'title', 'Ghost' FROM jabref.entry");
         }
 
-        assertFalse(dbmsProcessor.checkBaseIntegrity());
+        assertTrue(dbmsProcessor.needsSchemaUpgrade());
 
         dbmsProcessor.setupSharedDatabase();
-        assertTrue(dbmsProcessor.checkBaseIntegrity());
+        assertFalse(dbmsProcessor.needsSchemaUpgrade());
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT entrytype FROM jabref.entry")) {
@@ -379,10 +379,10 @@ class DBMSProcessorTest {
             preparedStatement.executeUpdate();
         }
 
-        assertFalse(dbmsProcessor.checkBaseIntegrity());
+        assertTrue(dbmsProcessor.needsSchemaUpgrade());
 
         dbmsProcessor.setupSharedDatabase();
-        assertTrue(dbmsProcessor.checkBaseIntegrity());
+        assertFalse(dbmsProcessor.needsSchemaUpgrade());
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT entrytype FROM jabref.entry")) {

@@ -1,6 +1,7 @@
 package org.jabref.logic.shared;
 
 import java.nio.file.Path;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.when;
 class SharedDatabaseExportTest {
 
     private ConnectorTest connectorTest;
+    private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
     private DBMSConnectionUrl connectionUrl;
     private CliPreferences preferences;
@@ -44,7 +46,7 @@ class SharedDatabaseExportTest {
     @BeforeEach
     void setup() throws Exception {
         connectorTest = new ConnectorTest();
-        DBMSConnection dbmsConnection = connectorTest.getTestDBMSConnection();
+        dbmsConnection = connectorTest.getTestDBMSConnection();
         dbmsProcessor = new DBMSProcessor(dbmsConnection);
         TestManager.clearTables(dbmsConnection);
 
@@ -98,5 +100,24 @@ class SharedDatabaseExportTest {
                                 .withField(StandardField.AUTHOR, "Bob")),
                 parserResult.getDatabase().getEntries());
         assertEquals(Optional.of(BibDatabaseMode.BIBLATEX), parserResult.getMetaData().getMode());
+    }
+
+    // [utest->req~shared-database.entry-type-required~1]
+    @Test
+    void pullWorksOnDatabaseCreatedBeforeEntryTypeConstraint() throws Exception {
+        dbmsProcessor.setupSharedDatabase();
+        dbmsProcessor.insertEntries(List.of(new BibEntry(StandardEntryType.Article).withCitationKey("first")));
+        // Structure version 2 as created by earlier JabRef versions, without the entry type requirements
+        try (Statement statement = dbmsConnection.getConnection().createStatement()) {
+            statement.executeUpdate("ALTER TABLE jabref.entry DROP CONSTRAINT entry_entrytype_not_blank");
+            statement.executeUpdate("ALTER TABLE jabref.entry ALTER COLUMN entrytype DROP NOT NULL");
+        }
+
+        Path pulled = SharedDatabaseExport.pullToTemporaryBib(connectionUrl, preferences);
+
+        ParserResult parserResult = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor())
+                .importDatabase(pulled);
+        assertEquals(List.of(new BibEntry(StandardEntryType.Article).withCitationKey("first")),
+                parserResult.getDatabase().getEntries());
     }
 }

@@ -294,15 +294,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     ///
     /// @throws DatabaseNotSupportedException if the version of shared database does not match the version of current shared database support ([DBMSProcessor]).
     public void initializeDatabases() throws DatabaseNotSupportedException, SQLException {
-        if (!dbmsProcessor.checkBaseIntegrity()) {
-            LOGGER.info("Integrity check failed. Fixing...");
+        if (dbmsProcessor.needsSchemaUpgrade()) {
+            LOGGER.info("Shared database structure is missing or outdated. Fixing...");
 
             // This check should only be performed once on initial database setup.
             if (dbmsProcessor.databaseIsAtMostJabRef35()) {
                 throw new DatabaseNotSupportedException();
             }
 
-            // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.checkBaseIntegrity() be true.
+            // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.needsSchemaUpgrade() be false.
             dbmsProcessor.setupSharedDatabase();
         }
 

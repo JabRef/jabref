@@ -88,9 +88,17 @@ public class DBMSProcessor {
             return false;
         }
         String metadataVersion = getSharedMetaData().get(MetaData.VERSION_DB_STRUCT);
-        return (metadataVersion != null)
-                && (Integer.parseInt(metadataVersion.replace(";", "")) == getCURRENT_VERSION_DB_STRUCT())
-                && entryTypeRequirementsMet();
+        return (metadataVersion != null) && (Integer.parseInt(metadataVersion.replace(";", "")) == getCURRENT_VERSION_DB_STRUCT());
+    }
+
+    /// Checks whether [#setupSharedDatabase()] has to run before the database is used for editing:
+    /// either the structure does not match ([#checkBaseIntegrity()]), or a database created by an
+    /// earlier JabRef version still lacks the entry type requirements.
+    ///
+    /// Reading (e.g. exporting) does not need the upgrade: blank entry types are read as `misc`.
+    // [impl->req~shared-database.entry-type-required~1]
+    public boolean needsSchemaUpgrade() throws SQLException {
+        return !checkBaseIntegrity() || !entryTypeRequirementsMet();
     }
 
     private boolean tableExists(String qualifiedName) throws SQLException {
@@ -144,7 +152,7 @@ public class DBMSProcessor {
     public void setupSharedDatabase() throws SQLException {
         setUp();
 
-        if (!checkBaseIntegrity()) {
+        if (needsSchemaUpgrade()) {
             // can only happen with users direct intervention on shared database
             LOGGER.error("Corrupt_shared_database_structure.");
         }
