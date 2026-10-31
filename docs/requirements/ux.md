@@ -235,6 +235,19 @@ JabRef asks for a donation six months after the first launch and every six month
 Dismissing the prompt hides it until the next time; "Dismiss forever" stops it for good.
 
 Needs: impl
+## Library tab switches must preserve each library's selected groups
+`req~ux.groups.library-switch-preserves-selection~1`
+
+Rationale: The user must be able to switch between libraries and still see the same groups selected ([#1104](https://github.com/JabRef/jabref/issues/1104)).
+
+Needs: impl, utest
+
+## Shared library group updates must preserve selected groups
+`req~ux.groups.shared-update-preserves-selection~1`
+
+When a shared library receives a group-tree update, groups that remain in the updated tree must remain selected.
+
+Needs: impl, utest
 
 ## Assigning an already used keyboard shortcut must require confirmation
 `req~ux.keybindings.duplicate-warning~1`
