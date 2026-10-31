@@ -399,6 +399,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
       jabkit-native-matrix: ${{ steps.set.outputs.jabkit-native-matrix }}
+      jabgui-native-matrix: ${{ steps.set.outputs.jabgui-native-matrix }}
     steps:
       - id: set
         name: Compute Matrix
@@ -502,6 +503,31 @@ jobs:
           fi
 
           echo "jabkit-native-matrix=$NATIVE_MATRIX_JSON" >> "$GITHUB_OUTPUT"
+
+          # jabgui native is built for Linux (x64, arm64) and Windows (x64).
+          # No macOS yet: native-image peaks at about 8.7 GB, the standard macOS arm runner has 7 GB.
+          JABGUI_NATIVE_MATRIX_JSON='{
+            "include": [
+              {
+                "os": "ubuntu-22.04",
+                "displayName": "linux-amd64",
+                "archiveNative": "tar -c -C jabgui/build/native jabgui | gzip > jabgui/build/native-dist/jabgui-native_linux.tar.gz"
+              },
+              {
+                "os": "ubuntu-22.04-arm",
+                "displayName": "linux-arm",
+                "archiveNative": "tar -c -C jabgui/build/native jabgui | gzip > jabgui/build/native-dist/jabgui-native_linux_arm64.tar.gz"
+              },
+              {
+                "os": "windows-latest",
+                "displayName": "windows-amd64",
+                "archiveNative": "7z a -r jabgui/build/native-dist/jabgui-native_windows.zip ./jabgui/build/native/jabgui"
+              }
+            ]
+          }'
+          JABGUI_NATIVE_MATRIX_JSON="$(jq -c . <<<"$JABGUI_NATIVE_MATRIX_JSON")"
+
+          echo "jabgui-native-matrix=$JABGUI_NATIVE_MATRIX_JSON" >> "$GITHUB_OUTPUT"
 
   pre-build:
     needs: [ conditions, disk-space-check ]
@@ -1134,6 +1160,156 @@ jobs:
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
+
+  jabgui-native:
+    needs: [ compute-matrix, conditions, disk-space-check, pre-build ]
+    strategy:
+      fail-fast: false
+      matrix:
+        ${{ fromJSON(needs.compute-matrix.outputs.jabgui-native-matrix) }}
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.displayName }} jabgui native binary
+    # The build takes 15 to 25 minutes; on a runner that is short of memory it would otherwise hang for hours
+    timeout-minutes: 60
+    steps:
+      - name: Skip native binary build because it is not needed for this event
+        if: needs.conditions.outputs.should-build != 'true'
+        run: echo "Skipping native binary build because it is not needed for this event."
+      - name: Checkout
+        if: needs.conditions.outputs.should-build == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 1
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+        if: needs.conditions.outputs.should-build == 'true'
+      # Matches org.graalvm.sdk:nativeimage in versions/build.gradle.kts
+      - name: Set up GraalVM CE 25.4
+        if: needs.conditions.outputs.should-build == 'true'
+        uses: graalvm/setup-graalvm@27b360dbb857524eaf0b4c4cef364d38e5b4f173 # v1
+        with:
+          distribution: 'graalvm-community'
+          version: '25.4'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      # StaticFX links JavaFX statically, so native-image needs the GTK/X11/GL development libraries.
+      # Xvfb, Openbox and ImageMagick run the smoke test on a virtual display with a window manager
+      # (title bars, maximized main window) and take its screenshot.
+      - name: Install JavaFX link libraries, Xvfb, Openbox and ImageMagick (Linux)
+        if: ${{ needs.conditions.outputs.should-build == 'true' && runner.os == 'Linux' }}
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libxtst-dev libxxf86vm-dev libgl-dev xvfb openbox imagemagick
+      - name: Build JabGui native binary
+        if: needs.conditions.outputs.should-build == 'true'
+        run: gradle :jabgui:nativeCompile
+        env:
+          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
+
+      # Smoke test: start the binary with a test library, keep it running for a minute, take a screenshot and check the log
+      - name: Prepare JabGui smoke test
+        if: needs.conditions.outputs.should-build == 'true'
+        shell: bash
+        run: |
+          # The test library lives outside the smoke folder, which is uploaded
+          mkdir -p "$RUNNER_TEMP/smoke" "$RUNNER_TEMP/testlib"
+          cp jablib/src/test/resources/testbib/complex.bib "$RUNNER_TEMP/testlib/complex.bib"
+      # The virtual display has no OpenGL, so JavaFX renders in software
+      - name: Run JabGui smoke test (Linux)
+        if: ${{ needs.conditions.outputs.should-build == 'true' && runner.os == 'Linux' }}
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" bash -c '
+            openbox --config-file jabgui/src/test/nativeimage/openbox-rc.xml &
+            sleep 2
+            jabgui/build/native/nativeCompile/jabref -Dprism.order=sw "$RUNNER_TEMP/testlib/complex.bib" > "$RUNNER_TEMP/smoke/jabref.log" 2>&1 &
+            pid=$!
+            sleep 60
+            import -window root "$RUNNER_TEMP/smoke/screenshot.png"
+            if ! kill -0 "$pid" 2>/dev/null; then
+              echo "JabRef exited before the screenshot"
+              exit 1
+            fi
+            # Kill without a shutdown: xvfb-run removes the display right after this script, and a JavaFX shutdown
+            # without a display can log errors that the log check would report
+            kill -9 "$pid"
+          '
+      # jabref.exe is a GUI-subsystem binary (StaticFX links it with /SUBSYSTEM:WINDOWS):
+      # a plain redirect does not capture its output, so the run uses Start-Process
+      - name: Run JabGui smoke test (Windows)
+        if: ${{ needs.conditions.outputs.should-build == 'true' && runner.os == 'Windows' }}
+        shell: pwsh
+        run: |
+          $out = "$env:RUNNER_TEMP\smoke"
+          $p = Start-Process -FilePath jabgui\build\native\nativeCompile\jabref.exe -ArgumentList "$env:RUNNER_TEMP\testlib\complex.bib" `
+            -RedirectStandardOutput "$out\stdout.txt" -RedirectStandardError "$out\stderr.txt" -PassThru
+          $null = $p.Handle  # keeps ExitCode readable after the process has ended
+          $exited = $p.WaitForExit(60000)
+
+          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+          $bitmap = New-Object System.Drawing.Bitmap $bounds.Width, $bounds.Height
+          [System.Drawing.Graphics]::FromImage($bitmap).CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+          $bitmap.Save("$out\screenshot.png")
+
+          if (-not $exited) {
+            Stop-Process -Id $p.Id -Force
+            Start-Sleep -Seconds 2
+          }
+          Get-Content "$out\stdout.txt", "$out\stderr.txt" | Set-Content "$out\jabref.log"
+          Remove-Item "$out\stdout.txt", "$out\stderr.txt"
+          if ($exited) {
+            "JabRef exited before the screenshot, exit code $($p.ExitCode)"
+            exit 1
+          }
+      - name: Check JabGui smoke test log
+        if: needs.conditions.outputs.should-build == 'true'
+        shell: bash
+        run: |
+          log="$RUNNER_TEMP/smoke/jabref.log"
+          cat "$log"
+          grep -q "Starting JabRef" "$log" || { echo "JabRef did not start"; exit 1; }
+          if grep -E "^ERROR:|NoClassDefFoundError|NoSuchMethodError|UnsatisfiedLinkError|MissingReflectionRegistrationError|MissingJNIRegistrationError|MissingResourceRegistrationError|Fatal error" "$log"; then
+            echo "Found errors in the JabRef log"
+            exit 1
+          fi
+      - name: Upload JabGui smoke test screenshot and log
+        if: ${{ always() && needs.conditions.outputs.should-build == 'true' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: jabgui-native-smoke-test (${{ matrix.displayName }})
+          path: ${{ runner.temp }}/smoke/
+          if-no-files-found: warn
+      # The folder holds the binary and the JDK libraries it loads at runtime, so the whole folder is shipped
+      - name: Package JabGui native binary
+        if: needs.conditions.outputs.should-build == 'true'
+        shell: bash
+        run: |
+          set -eo pipefail
+          mv jabgui/build/native/nativeCompile jabgui/build/native/jabgui
+          mkdir -p jabgui/build/native-dist
+          ${{ matrix.archiveNative }}
+      - name: Upload jabgui native to GitHub artifacts store
+        if: ${{ needs.conditions.outputs.should-build == 'true' && github.event.inputs.upload-as-artifact == 'true' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: jabgui-native (${{ matrix.displayName }})
+          path: jabgui/build/native-dist/*.*
+          if-no-files-found: error
+      - name: Setup SSH key
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.disk-space-check.outputs.available == 'true' }}
+        shell: bash
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Setup rsync (Windows)
+        if: ${{ needs.conditions.outputs.should-build == 'true' && (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        # Same as in the build job: v6.4.5 misses "lib\rsync\tools\bin\ssh.exe"
+        run: choco install rsync --version=6.4.4
+      - name: Upload jabgui native to builds.jabref.org
+        if: ${{ needs.conditions.outputs.should-build == 'true' && needs.disk-space-check.outputs.available == 'true' }}
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
 
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
