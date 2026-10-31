@@ -103,4 +103,14 @@ are parsed correctly by the GitHub Actions runner.
 
 Needs: impl
 
+## JabKit must preserve existing citation keys when overwrite avoidance is enabled
+`req~jabkit.cli.citation-key-avoid-overwrite~1`
+
+For `citationkeys generate`, when the effective overwrite-avoidance preference is enabled, entries
+with an existing citation key retain it, while entries without a key still receive a generated one.
+When overwrite avoidance is disabled, existing keys may be regenerated. See
+[issue 17458](https://github.com/JabRef/jabref/issues/17458).
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

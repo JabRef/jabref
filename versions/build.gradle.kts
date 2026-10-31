@@ -23,7 +23,7 @@ val pdfbox = "3.0.8"
 
 // Pinned instead of the dev.jbang plugin default "latest": a PATH miss would otherwise fetch
 // https://www.jbang.dev/releases/latest/download/version.txt (10 s timeout, no retries).
-val jbang = "0.142.0"
+val jbang = "0.143.0"
 extra["jbangVersion"] = jbang
 
 dependencies {
