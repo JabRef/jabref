@@ -48,7 +48,6 @@ class AutoSetFileLinksUtilTest {
         // which is not properly set up and is out of the unit test scope
         entry.setFiles(newLinkedFiles);
     };
-
     @BeforeEach
     void setUp(@TempDir Path folder) throws IOException {
         path = folder.resolve("CiteKey.pdf");
@@ -185,6 +184,31 @@ class AutoSetFileLinksUtilTest {
     @Nested
     @DisplayName("linkAssociatedFiles")
     class linkAssociatedFiles {
+
+        @Test
+        void doesNotChangeValidExistingFileLink(@TempDir Path tempDir) throws IOException {
+            Path filePath = tempDir.resolve("CiteKey.pdf");
+            Files.createFile(filePath);
+
+            LinkedFile existingFile = new LinkedFile("", Path.of("CiteKey.pdf"), "PDF");
+            BibEntry entryWithExistingFile = new BibEntry(StandardEntryType.Article)
+                    .withCitationKey("CiteKey")
+                    .withFiles(List.of(existingFile));
+
+            when(databaseContext.getFileDirectories(any())).thenReturn(List.of(tempDir));
+
+            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                    databaseContext,
+                    externalApplicationsPreferences,
+                    filePreferences,
+                    autoLinkPrefs);
+
+            AutoSetFileLinksUtil.LinkFilesResult result =
+                    util.linkAssociatedFiles(List.of(entryWithExistingFile), onLinkedFilesUpdated);
+
+            assertEquals(List.of(existingFile), entryWithExistingFile.getFiles());
+            assertEquals(List.of(), result.getChangedEntries());
+        }
 
         @Nested
         @DisplayName("byCitationKeyOnly")
