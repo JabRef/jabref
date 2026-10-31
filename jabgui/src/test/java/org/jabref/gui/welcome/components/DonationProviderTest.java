@@ -8,6 +8,7 @@ import org.jabref.gui.Notifications;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
 import org.jabref.gui.welcome.DonationPreferences;
+import org.jabref.logic.l10n.Localization;
 
 import com.dlsc.gemsfx.infocenter.Notification.OnClickBehaviour;
 import com.dlsc.gemsfx.infocenter.NotificationAction;
@@ -24,9 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DonationProviderTest extends JavaFxTest {
-
-    private static final int DISMISS_FOREVER = 0;
-    private static final int DISMISS = 1;
 
     private final DialogService dialogService = mock(DialogService.class);
     private final GuiPreferences preferences = mock(GuiPreferences.class);
@@ -81,7 +79,7 @@ class DonationProviderTest extends JavaFxTest {
         donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
         interact(donationProvider::showIfNeeded);
 
-        assertEquals(OnClickBehaviour.HIDE_AND_REMOVE, triggerAction(DISMISS));
+        assertEquals(OnClickBehaviour.HIDE_AND_REMOVE, triggerAction(Localization.lang("Dismiss")));
         assertEquals((int) LocalDate.now().plusMonths(6).toEpochDay(), donationPreferences.getNextNotificationEpochDay());
     }
 
@@ -90,7 +88,7 @@ class DonationProviderTest extends JavaFxTest {
         donationPreferences.setNextNotificationEpochDay((int) LocalDate.now().minusDays(1).toEpochDay());
         interact(donationProvider::showIfNeeded);
 
-        assertEquals(OnClickBehaviour.HIDE_AND_REMOVE, triggerAction(DISMISS_FOREVER));
+        captureNotification().getOnDismissForever().run();
         assertTrue(donationPreferences.isNeverShowAgain());
     }
 
@@ -106,11 +104,18 @@ class DonationProviderTest extends JavaFxTest {
 
     /// GemsFX declares the actions as a raw list, hence the unchecked cast.
     @SuppressWarnings("unchecked")
-    private OnClickBehaviour triggerAction(int index) {
+    private OnClickBehaviour triggerAction(String actionText) {
+        Notifications.DonationNotification notification = captureNotification();
+        NotificationAction<Object> action = (NotificationAction<Object>) notification.getActions().stream()
+                                                                                       .filter(candidate -> candidate.getText().equals(actionText))
+                                                                                       .findFirst()
+                                                                                       .orElseThrow();
+        return action.getOnAction().call(notification);
+    }
+
+    private Notifications.DonationNotification captureNotification() {
         ArgumentCaptor<Notifications.DonationNotification> captor = ArgumentCaptor.forClass(Notifications.DonationNotification.class);
         verify(dialogService).notify(captor.capture());
-        Notifications.DonationNotification notification = captor.getValue();
-        NotificationAction<Object> action = notification.getActions().get(index);
-        return action.getOnAction().call(notification);
+        return captor.getValue();
     }
 }
