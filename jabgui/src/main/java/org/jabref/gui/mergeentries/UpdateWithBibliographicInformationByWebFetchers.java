@@ -9,13 +9,17 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+
+import com.airhacks.afterburner.injection.Injector;
 
 public class UpdateWithBibliographicInformationByWebFetchers extends SimpleCommand {
 
@@ -41,6 +45,19 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
         stateManager.getActiveDatabase().ifPresent(this::updateSelectedEntryIn);
     }
 
+    private BibEntry applyJournalAbbreviation(BibEntry entry, BibDatabaseContext databaseContext) {
+        JournalAbbreviationRepository repository =
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+
+        AbbreviateCleanupFactory.abbreviateCleanup(
+                Optional.of(databaseContext.getDatabase()),
+                repository,
+                guiPreferences.getAbbreviationPreferences()
+        ).ifPresent(cleanupJob -> cleanupJob.cleanup(entry));
+
+        return entry;
+    }
+
     private void updateSelectedEntryIn(BibDatabaseContext databaseContext) {
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
 
@@ -58,7 +75,8 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
         for (EntryBasedFetcher webFetcher : webFetchers) {
             mergedEntriesView.addSource(webFetcher.getName(), () -> {
                 try {
-                    return webFetcher.performSearch(originalEntry).stream().findFirst().orElse(null);
+                    return webFetcher.performSearch(originalEntry).stream().findFirst().
+                                     map(entry -> applyJournalAbbreviation(entry, databaseContext)).orElse(null);
                 } catch (FetcherException _) {
                     return null;
                 }

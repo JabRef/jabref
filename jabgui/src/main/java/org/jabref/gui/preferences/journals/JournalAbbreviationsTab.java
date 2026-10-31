@@ -26,6 +26,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.theme.StyleClasses;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 
@@ -63,12 +64,40 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         return Localization.lang("Journal abbreviations");
     }
 
+    // [impl->feat~fetchers.journal-title-automatic-abbreviation~1]
     private void buildView() {
         setContent(form()
                 .custom(buildFileChooserRow())
                 .custom(buildAbbreviationsEditor())
                 .custom(buildAddAbbreviationRow())
                 .checkbox(Localization.lang("Use the field FJournal to store the full journal name for (un)abbreviations in the entry"), viewModel.useFJournalProperty())
+                .checkbox(Localization.lang("Convert journal titles in fetched entries"), viewModel.convertJournalOnFetchProperty())
+                .group(options -> options
+                                .radioGroup(actions -> actions
+                                        .radio(
+                                                Localization.lang("Unabbreviate"),
+                                                viewModel.unAbbreviateOnFetchProperty())
+                                        .radio(
+                                                Localization.lang("Abbreviate"),
+                                                viewModel.abbreviateOnFetchProperty()))
+                                .combo(
+                                        Localization.lang("Abbreviation style"),
+                                        viewModel.abbreviationTypesProperty(),
+                                        viewModel.abbreviationTypeOnFetchProperty(),
+                                        (AbbreviationType type) -> switch (type) {
+                                            case DEFAULT ->
+                                                    Localization.lang("Default");
+                                            case DOTLESS ->
+                                                    Localization.lang("Dotless");
+                                            case SHORTEST_UNIQUE ->
+                                                    Localization.lang("Shortest unique abbreviation");
+                                            case LTWA ->
+                                                    Localization.lang("LTWA");
+                                        },
+                                        style -> style.disableWhen(
+                                                viewModel.abbreviateOnFetchProperty().not())),
+                        options -> options.disableWhen(
+                                viewModel.convertJournalOnFetchProperty().not()))
                 .build());
     }
 
