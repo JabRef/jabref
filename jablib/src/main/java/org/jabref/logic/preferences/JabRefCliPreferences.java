@@ -530,7 +530,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// The secret is stored as plain text under `service`. Older versions stored it encrypted with [Password] under
     /// `legacyService` (same `account`); such values are migrated when they are read.
     ///
-    /// See [ADR 0078](https://devdocs.jabref.org/decisions/0078-store-keyring-secrets-without-application-encryption.html) for why no extra encryption is used.
+    /// See [ADR 0079](https://devdocs.jabref.org/decisions/0079-store-keyring-secrets-without-application-encryption.html) for why no extra encryption is used.
     private record KeyringSlot(String service, String account, String legacyService) {
         // [impl->adr~keyring.no-application-encryption~1]
         static final KeyringSlot PROXY_PASSWORD = new KeyringSlot("org.jabref.proxy", "proxy", "org.jabref");
