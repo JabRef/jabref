@@ -35,7 +35,6 @@
 
 //SOURCES ../../../../jablib/build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
 
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
