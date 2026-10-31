@@ -1609,6 +1609,30 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -fx-text-base-color;
 }
 
+.json-key {
+    -fx-fill: -color-syntax-attribute;
+}
+
+.json-string {
+    -fx-fill: -color-syntax-string;
+}
+
+.json-string-quotation {
+    -fx-fill: -color-syntax-keyword;
+}
+
+.json-number {
+    -fx-fill: -color-syntax-tag;
+}
+
+.json-literal {
+    -fx-fill: -color-syntax-keyword;
+}
+
+.json-punctuation {
+    -fx-fill: -color-syntax-punctuation;
+}
+
 .markdown-list-bullet {
     -fx-fill: -color-accent;
     -fx-font-weight: bold;
@@ -1763,6 +1787,22 @@ We want to have a look that matches our icons in the tool-bar */
 .bibtex-code-area .search-highlight {
     -fx-fill: -color-warning-subtle !important;
     -fx-stroke: transparent !important;
+}
+
+.text-search-highlight {
+    -fx-fill: -color-warning-subtle;
+    -fx-stroke: transparent;
+}
+
+.text-search-highlight.current {
+    -fx-fill: -color-selection;
+    -fx-stroke: -color-accent;
+    -fx-stroke-width: 1.5;
+}
+
+.text-selection-highlight {
+    -fx-fill: -color-selection;
+    -fx-stroke: transparent;
 }
 
 .flashing-danger {
