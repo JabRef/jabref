@@ -16,6 +16,7 @@ import org.jabref.gui.testutils.JavaFxTest;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,6 +38,11 @@ class BaseDialogTest extends JavaFxTest {
         this.stage = stage;
         stage.setScene(new Scene(new StackPane()));
         Injector.setModelOrService(KeyBindingRepository.class, keyBindingRepository);
+    }
+
+    @AfterEach
+    void tearDown() {
+        Injector.forgetAll();
     }
 
     @Test
