@@ -181,7 +181,7 @@ class SynchronizationSimulatorTest {
         rootOfClientA.addSubgroup(new ExplicitGroup("Group B", GroupHierarchyType.INDEPENDENT, ','));
         clientContextA.getMetaData().setGroups(rootOfClientA);
 
-        waitUntil(() -> clientContextB.getMetaData().getGroups().map(root -> root.getNumberOfChildren() == 2).orElse(false));
+        waitUntil(() -> Optional.of(rootOfClientA).equals(clientContextB.getMetaData().getGroups()));
         assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
     }
 
