@@ -75,4 +75,16 @@ but the user may deliberately want to commit only the saved work.
 
 Needs: impl, utest
 
+## Git commit dialog must prefill a message summary for changed entries
+`req~git.commit.generated-message~1`
+
+When the Git commit window opens, the commit message will be prefilled with a summary of the entries that have been added, modified, or deleted since the last commit; for example: "Add 3 entries, modify 2 entries"
+If only one field within an entry has been modified, the message will display the field name and the citation key; for example: "Modify author of Smith2024"
+If only the citation key of an entry has been changed, the message will show both the old and new keys; for example: "Rename citation key Smith2024 to Smith2025"
+Users may edit this message and any text they have previously entered will be preserved.
+If no entries have been modified (for example, if only a group tree, the preamble or @Strings has been changed), no message will be prefilled.
+The message is provided in English only (refer to the ADR regarding automatically generated commit messages).
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
