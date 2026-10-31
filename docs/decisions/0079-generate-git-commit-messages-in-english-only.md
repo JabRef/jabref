@@ -1,5 +1,5 @@
 ---
-nav_order: 78
+nav_order: 79
 parent: Decision Records
 ---
 # Generate Git commit messages in English only
