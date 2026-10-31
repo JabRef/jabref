@@ -17,6 +17,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
@@ -42,11 +43,14 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.keyboard.SearchShortcutTarget;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
+import org.jabref.gui.shared.SharedDatabaseErrorTab;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
@@ -61,6 +65,9 @@ import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DBMSConnectionProperties;
+import org.jabref.logic.shared.DatabaseConnectionProperties;
+import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.SharedDatabaseSessionService;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -341,8 +348,34 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
     }
 
+    /// The frame captures shortcuts before child views; a view that handles Search must receive it itself.
+    // [impl->req~ai.chat.find.unavailable~1]
+    static boolean handleSearchKeyBinding(KeyEvent event, KeyBindingRepository keyBindings, Runnable focusLibrarySearch) {
+        if (!keyBindings.matches(event, KeyBinding.SEARCH)) {
+            return false;
+        }
+
+        if (event.getTarget() instanceof Node target && hasSearchShortcutTarget(target)) {
+            return true;
+        }
+        focusLibrarySearch.run();
+        event.consume();
+        return true;
+    }
+
+    private static boolean hasSearchShortcutTarget(Node node) {
+        if (node instanceof SearchShortcutTarget searchTarget) {
+            return searchTarget.canHandleSearch();
+        }
+        return Optional.ofNullable(node.getParent()).map(JabRefFrame::hasSearchShortcutTarget).orElse(false);
+    }
+
     private void initKeyBindings() {
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            // Check search before the switch, which only sees the first matching key binding.
+            if (handleSearchKeyBinding(event, preferences.getKeyBindingRepository(), globalSearchBar::requestFocus)) {
+                return;
+            }
             Optional<KeyBinding> keyBinding = preferences.getKeyBindingRepository().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
@@ -361,9 +394,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case PREVIOUS_LIBRARY:
                         tabbedPane.getSelectionModel().selectPrevious();
                         event.consume();
-                        break;
-                    case SEARCH:
-                        globalSearchBar.requestFocus();
                         break;
                     case OPEN_GLOBAL_SEARCH_DIALOG:
                         globalSearchBar.openGlobalSearchDialog();
@@ -649,6 +679,21 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
     }
 
+    @Override
+    public void removeSharedDatabaseErrorTabFor(BibDatabaseContext databaseContext) {
+        // Only a shared database carries a synchronizer, so its absence already rules out a matching placeholder.
+        Optional.ofNullable(databaseContext.getDBMSSynchronizer())
+                .map(DatabaseSynchronizer::getConnectionProperties)
+                .ifPresent(this::removeSharedDatabaseErrorTabsFor);
+    }
+
+    /// Matches by database, not by `equals`: a retry entered in expert mode or with other SSL settings still targets
+    /// the database the placeholder stands for.
+    private void removeSharedDatabaseErrorTabsFor(DatabaseConnectionProperties connectionProperties) {
+        tabbedPane.getTabs().removeIf(tab -> (tab instanceof SharedDatabaseErrorTab errorTab)
+                && DBMSConnectionProperties.isSameDatabase(errorTab.getConnectionProperties(), connectionProperties));
+    }
+
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory();
@@ -757,29 +802,45 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // [impl->req~shared-database.reopen-on-startup~1]
         SharedDatabaseSessionService sessionService = new SharedDatabaseSessionService();
         for (SharedDatabaseSessionService.Reconnection reconnection : sessionService.getDatabasesToReconnect(preferences.getLastFilesOpenedPreferences())) {
-            String sharedDatabaseId = reconnection.sharedDatabaseId();
-            SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
-            // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
-            // The callbacks check the stage so a connection that completes during shutdown is closed with its loading tab.
-            BibDatabaseContext dummyContext = manager.createDummyContext(reconnection.connectionProperties());
-            LibraryTab newTab = LibraryTab.createLibraryTab(
-                    () -> manager.connect(reconnection.connectionProperties()),
-                    dummyContext,
-                    dialogService,
-                    aiService,
-                    preferences,
-                    stateManager,
-                    this,
-                    fileUpdateMonitor,
-                    entryTypesManager,
-                    clipBoardManager,
-                    taskExecutor,
-                    gitHandlerRegistry,
-                    (tab, bibDatabaseContext) -> handleSharedDatabaseReconnectionSuccess(sessionService, reconnection, tab, bibDatabaseContext),
-                    exception -> handleSharedDatabaseReconnectionFailure(reconnection, exception));
-            addTab(newTab, true);
-            newTab.startDataLoadingTask();
+            reconnectSharedDatabase(sessionService, reconnection);
         }
+    }
+
+    /// Opens a loading tab for a remembered shared database and connects in the background.
+    private void reconnectSharedDatabase(SharedDatabaseSessionService sessionService, SharedDatabaseSessionService.Reconnection reconnection) {
+        Optional<LibraryTab> existingTab = SharedDatabaseUIManager.findOpenTab(this, reconnection.connectionProperties());
+        if (existingTab.isPresent()) {
+            showLibraryTab(existingTab.orElseThrow());
+            return;
+        }
+        SharedDatabaseUIManager manager = new SharedDatabaseUIManager(this, dialogService, preferences, aiService, stateManager, entryTypesManager, fileUpdateMonitor, clipBoardManager, taskExecutor, gitHandlerRegistry);
+        // Connecting blocks on the network; on the JavaFX thread an unreachable server would stall the whole startup.
+        // The callbacks check the stage so a connection that completes during shutdown is closed with its loading tab.
+        BibDatabaseContext dummyContext = manager.createDummyContext(reconnection.connectionProperties());
+        // The id keeps the database remembered if JabRef quits while this tab is still loading
+        dummyContext.getDatabase().setSharedDatabaseID(reconnection.sharedDatabaseId());
+        LibraryTab newTab = LibraryTab.createLibraryTab(
+                () -> manager.connect(reconnection.connectionProperties()),
+                dummyContext,
+                dialogService,
+                aiService,
+                preferences,
+                stateManager,
+                this,
+                fileUpdateMonitor,
+                entryTypesManager,
+                clipBoardManager,
+                taskExecutor,
+                gitHandlerRegistry,
+                (tab, bibDatabaseContext) -> handleSharedDatabaseReconnectionSuccess(sessionService, reconnection, tab, bibDatabaseContext),
+                exception -> handleSharedDatabaseReconnectionFailure(sessionService, reconnection, exception));
+        Optional<LibraryTab> reservedTab = SharedDatabaseUIManager.reserveTab(this, reconnection.connectionProperties(), newTab);
+        if (reservedTab.isPresent()) {
+            showLibraryTab(reservedTab.orElseThrow());
+            return;
+        }
+        addTab(newTab, true);
+        newTab.startDataLoadingTask();
     }
 
     private void handleSharedDatabaseReconnectionSuccess(SharedDatabaseSessionService sessionService,
@@ -793,12 +854,65 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         sessionService.restoreSharedDatabaseId(bibDatabaseContext, reconnection.sharedDatabaseId());
     }
 
-    private void handleSharedDatabaseReconnectionFailure(SharedDatabaseSessionService.Reconnection reconnection, Exception exception) {
+    /// The failed loading tab has already closed itself; a [SharedDatabaseErrorTab] takes its place instead of a dialog,
+    /// so the connection can be retried and stays remembered for the next session.
+    private void handleSharedDatabaseReconnectionFailure(SharedDatabaseSessionService sessionService,
+                                                         SharedDatabaseSessionService.Reconnection reconnection,
+                                                         Exception exception) {
         LOGGER.error("Could not reconnect to shared database {}", reconnection.sharedDatabaseId(), exception);
-        if (mainStage.isShowing()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                    Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()), exception);
+        if (!mainStage.isShowing()) {
+            return;
         }
+        // The tab alone is easy to miss among the libraries that did open, so the failure is announced as well.
+        dialogService.notify(Localization.lang("Could not reconnect to shared database %0.", reconnection.connectionProperties().getDatabase()));
+        SharedDatabaseErrorTab errorTab = new SharedDatabaseErrorTab(reconnection.sharedDatabaseId(), reconnection.connectionProperties());
+        errorTab.setRetryAction(tab -> {
+            tab.close();
+            reconnectSharedDatabase(sessionService, reconnection);
+        });
+        errorTab.showError(exception);
+        addSharedDatabaseErrorTab(errorTab);
+    }
+
+    @Override
+    public void showSharedDatabaseErrorTab(SharedDatabaseErrorTab errorTab) {
+        // Keep the remembered id while retrying with the settings from the latest attempt.
+        Optional<SharedDatabaseErrorTab> remembered = tabbedPane.getTabs().stream()
+                                                                .filter(SharedDatabaseErrorTab.class::isInstance)
+                                                                .map(SharedDatabaseErrorTab.class::cast)
+                                                                .filter(existing -> DBMSConnectionProperties.isSameDatabase(existing.getConnectionProperties(), errorTab.getConnectionProperties()))
+                                                                .filter(existing -> existing.getSharedDatabaseId().isPresent())
+                                                                .findFirst();
+        if (remembered.isPresent()) {
+            SharedDatabaseErrorTab rememberedTab = remembered.orElseThrow();
+            rememberedTab.updateFailure(errorTab);
+            tabbedPane.getSelectionModel().select(rememberedTab);
+            return;
+        }
+        removeSharedDatabaseErrorTabsFor(errorTab.getConnectionProperties());
+        addSharedDatabaseErrorTab(errorTab);
+        tabbedPane.getSelectionModel().select(errorTab);
+    }
+
+    private void addSharedDatabaseErrorTab(SharedDatabaseErrorTab errorTab) {
+        addSharedDatabaseErrorTab(tabbedPane, errorTab, this::showWelcomeTab);
+    }
+
+    static void addSharedDatabaseErrorTab(TabPane tabbedPane, SharedDatabaseErrorTab errorTab, Runnable showWelcomeTab) {
+        errorTab.setOnClosed(_ -> {
+            if (tabbedPane.getTabs().isEmpty()) {
+                showWelcomeTab.run();
+            }
+        });
+        tabbedPane.getTabs().add(errorTab);
+    }
+
+    @Override
+    public List<String> getUnconnectedSharedDatabaseIds() {
+        return tabbedPane.getTabs().stream()
+                         .filter(SharedDatabaseErrorTab.class::isInstance)
+                         .flatMap(tab -> ((SharedDatabaseErrorTab) tab).getSharedDatabaseId().stream())
+                         .toList();
     }
 
     @Override
