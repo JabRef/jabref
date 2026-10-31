@@ -1,5 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import javafx.beans.property.ListProperty;
@@ -18,18 +19,23 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.cleanup.AbbreviateCleanupFactory;
+import org.jabref.logic.cleanup.CleanupJob;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.OptionalUtil;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -157,11 +163,13 @@ public class WebSearchPaneViewModel {
             dialogService.notify(Localization.lang("Please enter a search string"));
             return;
         }
-        if (stateManager.getActiveDatabase().isEmpty()) {
+        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+        if (activeDatabase.isEmpty()) {
             dialogService.notify(Localization.lang("Please open or start a new library before searching"));
             return;
         }
 
+        BibDatabaseContext database = activeDatabase.orElseThrow();
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
 
         Callable<ParserResult> parserResultCallable;
@@ -185,15 +193,22 @@ public class WebSearchPaneViewModel {
             parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
         }
 
-        BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
-                                                          .withInitialMessage(Localization.lang("Processing \"%0\"...", query));
+        Optional<CleanupJob> journalCleanup = AbbreviateCleanupFactory.abbreviateCleanup(
+                Optional.of(database.getDatabase()),
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                preferences.getAbbreviationPreferences());
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> {
+            ParserResult result = parserResultCallable.call();
+            journalCleanup.ifPresent(cleanup -> result.getDatabase().getEntries().forEach(cleanup::cleanup));
+            return result;
+        }).withInitialMessage(Localization.lang("Processing \"%0\"...", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog;
         if (effectiveFetcher != null) {
-            dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task, effectiveFetcher, query);
+            dialog = new ImportEntriesDialog(database, task, effectiveFetcher, query);
         } else {
-            dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
+            dialog = new ImportEntriesDialog(database, task);
         }
         dialog.useWebSearchDownloadPreference();
         dialog.setTitle(fetcherName);
