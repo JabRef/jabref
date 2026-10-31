@@ -75,8 +75,8 @@ class ImportEntriesViewModelTest {
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
 
         guiPreferences = mock(GuiPreferences.class);
-        abbreviationPreferences = new AbbreviationPreferences(List.of(), false, false, JournalMode.NONE, AbbreviationType.DEFAULT);
-        abbreviationPreferences.setAbbreviationTypeOnFetch(AbbreviationType.DEFAULT);
+        abbreviationPreferences = mock(AbbreviationPreferences.class);
+        when(abbreviationPreferences.useAbbreviationTypeOnFetch()).thenReturn(AbbreviationType.DEFAULT);
         when(guiPreferences.getAbbreviationPreferences()).thenReturn(abbreviationPreferences);
         when(guiPreferences.getFilePreferences()).thenReturn(FilePreferences.getDefault());
 
@@ -99,7 +99,7 @@ class ImportEntriesViewModelTest {
             "NONE, J. Foo, J. Foo",
     })
     void initialFetchedEntriesFollowJournalPreference(JournalMode mode, String input, String expected) {
-        abbreviationPreferences.setJournalAbbreviationMode(mode);
+        when(abbreviationPreferences.useJournalAbbreviationMode()).thenReturn(mode);
 
         BibEntry fetchedEntry = new BibEntry().withField(StandardField.JOURNAL, input);
 
@@ -133,7 +133,7 @@ class ImportEntriesViewModelTest {
             "NONE, J. Foo, J. Foo"
     })
     void fetchMoreEntriesFollowsJournalPreference(JournalMode mode, String input, String expected) throws FetcherException {
-        abbreviationPreferences.setJournalAbbreviationMode(mode);
+        when(abbreviationPreferences.useJournalAbbreviationMode()).thenReturn(mode);
 
         List<BibEntry> initialEntries = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -173,7 +173,7 @@ class ImportEntriesViewModelTest {
             "UNABBREVIATE, J. Foo"
     })
     void initialNonFetchedEntriesKeepJournalDespiteConversionPreference(JournalMode mode, String journal) {
-        abbreviationPreferences.setJournalAbbreviationMode(mode);
+        when(abbreviationPreferences.useJournalAbbreviationMode()).thenReturn(mode);
 
         BibEntry importedEntry = new BibEntry().withField(StandardField.JOURNAL, journal);
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> new ParserResult(List.of(importedEntry)));
