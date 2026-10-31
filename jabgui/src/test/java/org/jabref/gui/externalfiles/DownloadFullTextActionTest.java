@@ -24,6 +24,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -111,6 +112,19 @@ class DownloadFullTextActionTest {
         completeTask(task);
 
         assertEquals(List.of(entry), action.downloadedEntries);
+    }
+
+    @Test
+    void notifiesWhenNoFullTextDocumentIsFound() throws Exception {
+        RecordingDownloadFullTextAction action =
+                new RecordingDownloadFullTextAction(_ -> Optional.empty());
+
+        BackgroundTask<?> task = captureTask(action);
+        completeTask(task);
+
+        assertEquals(List.of(), action.downloadedEntries);
+        assertEquals(List.of(), entry.getFiles());
+        verify(dialogService).notify(ArgumentMatchers.anyString());
     }
 
     private BackgroundTask<?> captureTask(DownloadFullTextAction action) {
