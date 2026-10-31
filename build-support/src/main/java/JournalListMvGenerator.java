@@ -31,7 +31,6 @@
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/HeadlessExecutorService.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/TaskExecutor.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/strings/StringSimilarity.java
-//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationType.java
 
 //SOURCES ../../../../jablib/build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
 
