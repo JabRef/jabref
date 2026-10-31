@@ -44,6 +44,9 @@ public class DBMSProcessor {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DBMSProcessor.class);
 
+    // An entry type is blank if it consists of whitespace only, including tabs and line breaks (as in `StringUtil.isBlank`)
+    private static final String BLANK_ENTRY_TYPE_REGEX = "^[[:space:]]*$";
+
     private static final Set<String> GROUP_TREE_METADATA_KEYS = Set.of(MetaData.GROUPSTREE, MetaData.GROUPSTREE_LEGACY);
 
     // Arbitrary application-wide id serializing the one-time data migration across clients
@@ -165,10 +168,10 @@ public class DBMSProcessor {
         connection.createStatement().executeUpdate("""
                     CREATE TABLE IF NOT EXISTS entry (
                         shared_id SERIAL PRIMARY KEY,
-                        entrytype VARCHAR NOT NULL CONSTRAINT entry_entrytype_not_blank CHECK (btrim(entrytype) <> ''),
+                        entrytype VARCHAR NOT NULL CONSTRAINT entry_entrytype_not_blank CHECK (entrytype !~ '%s'),
                         version INTEGER DEFAULT 1
                     )
-                """);
+                """.formatted(BLANK_ENTRY_TYPE_REGEX));
 
         connection.createStatement().executeUpdate("""
                     CREATE TABLE IF NOT EXISTS field (
@@ -268,7 +271,7 @@ public class DBMSProcessor {
                 return;
             }
             connection.createStatement().executeUpdate(
-                    "INSERT INTO entry (shared_id, entrytype, version) SELECT \"SHARED_ID\", COALESCE(NULLIF(btrim(\"TYPE\"), ''), 'misc'), \"VERSION\" FROM %s.\"ENTRY\"".formatted(oldSchema.get()));
+                    "INSERT INTO entry (shared_id, entrytype, version) SELECT \"SHARED_ID\", CASE WHEN \"TYPE\" IS NULL OR \"TYPE\" ~ '%s' THEN 'misc' ELSE \"TYPE\" END, \"VERSION\" FROM %s.\"ENTRY\"".formatted(BLANK_ENTRY_TYPE_REGEX, oldSchema.get()));
             connection.createStatement().executeUpdate(
                     "INSERT INTO field (entry_shared_id, name, value) SELECT \"ENTRY_SHARED_ID\", \"NAME\", \"VALUE\" FROM %s.\"FIELD\"".formatted(oldSchema.get()));
             connection.createStatement().executeUpdate(
@@ -298,7 +301,7 @@ public class DBMSProcessor {
             }
 
             int repairedRows = connection.createStatement().executeUpdate(
-                    "UPDATE entry SET entrytype = 'misc' WHERE entrytype IS NULL OR btrim(entrytype) = ''");
+                    "UPDATE entry SET entrytype = 'misc' WHERE entrytype IS NULL OR entrytype ~ '%s'".formatted(BLANK_ENTRY_TYPE_REGEX));
             if (repairedRows > 0) {
                 LOGGER.warn("Repaired {} shared database entries with missing or blank entry type to 'misc'", repairedRows);
             }
@@ -309,7 +312,7 @@ public class DBMSProcessor {
             }
             if (!entryTypeConstraintExists()) {
                 connection.createStatement().executeUpdate(
-                        "ALTER TABLE entry ADD CONSTRAINT entry_entrytype_not_blank CHECK (btrim(entrytype) <> '')");
+                        "ALTER TABLE entry ADD CONSTRAINT entry_entrytype_not_blank CHECK (entrytype !~ '%s')".formatted(BLANK_ENTRY_TYPE_REGEX));
             }
         });
     }

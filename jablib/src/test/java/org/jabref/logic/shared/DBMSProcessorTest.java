@@ -141,7 +141,7 @@ class DBMSProcessorTest {
 
     // [utest->req~shared-database.entry-type-required~1]
     @ParameterizedTest
-    @ValueSource(strings = {"", "   "})
+    @ValueSource(strings = {"", "   ", "\t", "\n", " \t\r\n"})
     void blankEntryTypeIsRejected(String entryType) {
         String sql = "INSERT INTO jabref.entry (entrytype) VALUES (?)";
 
@@ -363,6 +363,33 @@ class DBMSProcessorTest {
             }
         });
         assertEquals("23502", exception.getSQLState());
+    }
+
+    // [utest->req~shared-database.entry-type-required~1]
+    @ParameterizedTest
+    @ValueSource(strings = {"\t", "\n", " \t\r\n"})
+    void setupRepairsWhitespaceOnlyEntryTypes(String entryType) throws SQLException {
+        Connection connection = dbmsConnection.getConnection();
+
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("ALTER TABLE jabref.entry DROP CONSTRAINT entry_entrytype_not_blank");
+        }
+        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO jabref.entry (entrytype) VALUES (?)")) {
+            preparedStatement.setString(1, entryType);
+            preparedStatement.executeUpdate();
+        }
+
+        assertFalse(dbmsProcessor.checkBaseIntegrity());
+
+        dbmsProcessor.setupSharedDatabase();
+        assertTrue(dbmsProcessor.checkBaseIntegrity());
+
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT entrytype FROM jabref.entry")) {
+            assertTrue(resultSet.next());
+            assertEquals("misc", resultSet.getString(1));
+            assertFalse(resultSet.next());
+        }
     }
 
     private static BibEntry getBibEntryExample() {
