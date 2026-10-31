@@ -126,7 +126,6 @@ import org.jabref.model.search.SearchFlags;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.tobiasdiez.easybind.EasyBind;
@@ -583,11 +582,30 @@ public class JabRefCliPreferences implements CliPreferences {
     static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
             // list needs to be mutable in observable preferences
-            // keep consistency with Splitter#splitToList
             return new ArrayList<>();
         }
 
-        return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
+        List<String> result = new ArrayList<>();
+        StringBuilder element = new StringBuilder();
+        for (int i = 0; i < toConvert.length(); i++) {
+            char character = toConvert.charAt(i);
+            if (character == '\\' && i + 1 < toConvert.length()) {
+                char next = toConvert.charAt(i + 1);
+                if (next == '\\' || next == STRINGLIST_DELIMITER) {
+                    element.append(next);
+                    i++;
+                    continue;
+                }
+            }
+            if (character == STRINGLIST_DELIMITER) {
+                result.add(element.toString());
+                element.setLength(0);
+            } else {
+                element.append(character);
+            }
+        }
+        result.add(element.toString());
+        return result;
     }
     // endregion
 
