@@ -40,6 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed single-line entry fields to return focus to the editor when <kbd>Enter</kbd> is pressed. [#17445](https://github.com/JabRef/jabref/issues/17445)
 - We changed failed shared database connections to show a tab with "Retry" instead of an error dialog. [#16968](https://github.com/JabRef/jabref/pull/16968)
 - We changed the main table tooltip to stay visible while hovered, with a configurable duration. [#17502](https://github.com/JabRef/jabref/issues/17502)
+- We changed "OK" to "Remove" button in Remove subgroups, Remove field name and Remove keyword. [#12706](https://github.com/JabRef/jabref/issues/12706)
 
 ### Fixed
 

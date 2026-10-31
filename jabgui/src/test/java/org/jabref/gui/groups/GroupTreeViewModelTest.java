@@ -18,6 +18,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.NoOpSearchBackend;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -49,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 // org.jabref.gui.groups.GroupNodeViewModel.refreshGroup is used, which uses "Platform.runlater"
@@ -209,6 +211,47 @@ class GroupTreeViewModelTest {
 
         assertEquals(List.of(MetaDataChangeSource.JOURNAL),
                 events.stream().map(MetaDataChangedEvent::getSource).distinct().toList());
+    }
+
+    @Test
+    void removingSubgroupsIsConfirmedWithTheRemoveLabel() {
+        GroupNodeViewModel root = rootWithTwoSubgroups();
+        when(dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove subgroups"),
+                Localization.lang("Remove all subgroups of \"%0\"?", root.getDisplayName()),
+                Localization.lang("Remove")))
+                .thenReturn(true);
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.removeSubgroups(root));
+
+        assertEquals(List.of(), childNames());
+    }
+
+    @Test
+    void cancellingTheRemoveSubgroupsDialogKeepsTheSubgroups() {
+        GroupNodeViewModel root = rootWithTwoSubgroups();
+        when(dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove subgroups"),
+                Localization.lang("Remove all subgroups of \"%0\"?", root.getDisplayName()),
+                Localization.lang("Remove")))
+                .thenReturn(false);
+
+        JavaFxExtension.invokeAndWait(() -> groupTree.removeSubgroups(root));
+
+        verify(dialogService).showConfirmationDialogAndWait(
+                Localization.lang("Remove subgroups"),
+                Localization.lang("Remove all subgroups of \"%0\"?", root.getDisplayName()),
+                Localization.lang("Remove"));
+        assertEquals(List.of("A", "B"), childNames());
+    }
+
+    private GroupNodeViewModel rootWithTwoSubgroups() {
+        GroupTreeNode root = GroupTreeNode.fromGroup(new ExplicitGroup("All", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        root.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+        databaseContext.getMetaData().setGroups(root);
+        groupTree = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), new CustomLocalDragboard(), taskExecutor);
+        return groupTree.rootGroupProperty().getValue();
     }
 
     private List<String> childNames() {
