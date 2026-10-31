@@ -48,6 +48,7 @@ class AutoSetFileLinksUtilTest {
         // which is not properly set up and is out of the unit test scope
         entry.setFiles(newLinkedFiles);
     };
+
     @BeforeEach
     void setUp(@TempDir Path folder) throws IOException {
         path = folder.resolve("CiteKey.pdf");
