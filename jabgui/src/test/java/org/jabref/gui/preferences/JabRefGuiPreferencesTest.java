@@ -86,8 +86,8 @@ class JabRefGuiPreferencesTest {
                                 {"General":["HALid"]}
                                 """));
     }
-                  
-    @Test          
+
+    @Test
     void migrateLegacyWindowsConsoleCommandKeepsExecutableWithSpaces() {
         List<String> expected = List.of("C:\\Program Files\\ConEmu\\ConEmu64.exe", "/single", "/dir", "%DIR");
 
