@@ -8,12 +8,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
 /// This is an immutable class that keeps information regarding single author. It is just a container for the information, with very simple methods to access it.
 ///
 /// Current usage: only methods `getLastOnly`, `getFirstLast`, and `getLastFirst` are used; all other methods are provided for completeness.
@@ -29,6 +31,8 @@ public class Author {
 
     private static final Set<String> EXTENDED_NAME_KEYS = Set.of(
             "family", "family-i", "given", "given-i", "prefix", "prefix-i", "suffix", "suffix-i");
+
+    private static final RemoveEnclosingBracesFormatter ENCLOSING_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
     private final String givenName;
     private final String givenNameAbbreviated;
@@ -205,6 +209,47 @@ public class Author {
     /// Returns immutable labeled BibLaTeX values; conventional names have no labeled values.
     public @NonNull Map<String, String> getExtendedNameParts() {
         return extendedNameParts;
+    }
+
+    /// Returns the explicit name-level option, without applying entry or application defaults.
+    /// Absent or invalid values return empty; [#getInvalidUsePrefix()] distinguishes invalid input.
+    /// The original value is retained in [#getExtendedNameParts()] for storage.
+    public @NonNull Optional<Boolean> getUsePrefix() {
+        return getExtendedNameValue("useprefix").flatMap(value -> switch (value) {
+            case "true" -> Optional.of(true);
+            case "false" -> Optional.of(false);
+            default -> Optional.empty();
+        });
+    }
+
+    /// Returns the original invalid value so validation can report it without losing source data.
+    public @NonNull Optional<String> getInvalidUsePrefix() {
+        return Optional.ofNullable(extendedNameParts.get("useprefix"))
+                       .filter(value -> getUsePrefix().isEmpty());
+    }
+
+    /// Returns explicitly supplied initials, without generating initials or changing punctuation.
+    public @NonNull Optional<String> getExplicitGivenNameInitials() {
+        return getExtendedNameValue("given-i");
+    }
+
+    public @NonNull Optional<String> getExplicitFamilyNameInitials() {
+        return getExtendedNameValue("family-i");
+    }
+
+    public @NonNull Optional<String> getExplicitNamePrefixInitials() {
+        return getExtendedNameValue("prefix-i");
+    }
+
+    public @NonNull Optional<String> getExplicitNameSuffixInitials() {
+        return getExtendedNameValue("suffix-i");
+    }
+
+    private Optional<String> getExtendedNameValue(String key) {
+        return Optional.ofNullable(extendedNameParts.get(key))
+                       .map(String::strip)
+                       .map(ENCLOSING_BRACES_FORMATTER::format)
+                       .map(String::strip);
     }
 
     /// Serializes a name without discarding BibLaTeX options, explicit initials or protected values.
