@@ -23,11 +23,11 @@ val pdfbox = "3.0.8"
 
 // Pinned instead of the dev.jbang plugin default "latest": a PATH miss would otherwise fetch
 // https://www.jbang.dev/releases/latest/download/version.txt (10 s timeout, no retries).
-val jbang = "0.142.0"
+val jbang = "0.143.0"
 extra["jbangVersion"] = jbang
 
 dependencies {
-    api(platform("ai.djl:bom:0.38.0"))
+    api(platform("ai.djl:bom:0.39.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.22.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     api(platform("org.junit:junit-bom:6.1.3"))
@@ -61,23 +61,23 @@ dependencies.constraints {
     api("com.github.javaparser:javaparser-core:3.28.2")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
-    api("com.google.errorprone:error_prone_core:2.50.0")
+    api("com.google.errorprone:error_prone_core:2.51.0")
     api("com.google.guava:guava:33.7.2-jre")
     api("com.googlecode.plist:dd-plist:1.30")
     api("com.h2database:h2-mvstore:2.5.252")
     api("com.knuddels:jtokkit:1.1.0")
-    api("com.konghq:unirest-java-core:4.10.2")
-    api("com.konghq:unirest-modules-gson:4.10.2")
+    api("com.konghq:unirest-java-core:4.10.4")
+    api("com.konghq:unirest-modules-gson:4.10.4")
     api("com.nimbusds:oauth2-oidc-sdk:11.38.2")
     api("com.nimbusds:nimbus-jose-jwt:10.10")
-    api("com.squareup.okhttp3:mockwebserver3:5.5.0")
-    api("com.squareup.okhttp3:okhttp:5.5.0")
+    api("com.squareup.okhttp3:mockwebserver3:5.5.1")
+    api("com.squareup.okhttp3:okhttp:5.5.1")
     api("com.squareup.okio:okio-jvm:3.18.2")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit:1.5.1")
     api("com.tngtech.archunit:archunit-junit5-api:1.5.1")
     api("com.tngtech.archunit:archunit-junit5-engine:1.5.1")
-    api("com.uber.nullaway:nullaway:0.14.2")
+    api("com.uber.nullaway:nullaway:0.14.3")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("com.vladsch.flexmark:flexmark-ext-tables:0.64.8")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
@@ -92,7 +92,7 @@ dependencies.constraints {
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
-    api("io.github.classgraph:classgraph:6.0.0")
+    api("io.github.classgraph:classgraph:6.0.1")
     api("io.github.java-diff-utils:java-diff-utils:4.18")
     api("io.github.kusoroadeolu:veneer:1.3.2")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
@@ -104,7 +104,7 @@ dependencies.constraints {
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.18.15")
+    api("net.bytebuddy:byte-buddy:1.18.16")
     api("net.harawata:appdirs:1.5.0")
     api("net.java.dev.jna:jna-jpms:5.19.1")
     api("net.java.dev.jna:jna-platform:5.19.1")
@@ -139,9 +139,10 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-locator:4.0.3")
     api("org.glassfish.hk2:hk2-utils:4.0.3")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
+    api("org.graalvm.sdk:nativeimage:25.4.4.1.1")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.5.Final")
-    api("org.hisp.dhis:json-tree:1.9.5")
+    api("org.hisp.dhis:json-tree:1.12.0")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jabref:html-to-node:0.3.0")
@@ -172,4 +173,7 @@ dependencies.constraints {
     api("tools.maran:svg:1.0.0")
     api("tools.maran:svg-materialdesign:1.0.0")
     api("tools.maran:svgnode:2.0.1")
+    // jfx-static-libs must match the JavaFX version above
+    api("us.hebi.graalvm:jfx-static-feature:1.1.1")
+    api("us.hebi.graalvm:jfx-static-libs:27-2")
 }

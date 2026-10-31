@@ -6,7 +6,7 @@
 //DEPS org.antlr:antlr4-runtime:4.13.2
 //DEPS org.apache.commons:commons-csv:1.14.1
 //DEPS org.jabref:easybind:2.3.0
-//DEPS org.jooq:jool:0.9.15
+//DEPS org.jooq:jool:0.9.16
 //DEPS org.jspecify:jspecify:1.0.1
 // Keep this version in sync with versions/build.gradle.kts.
 //DEPS org.openjfx:javafx-base:27.0.1

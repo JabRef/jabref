@@ -184,11 +184,12 @@
 
     Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀
 
-- jobName: 'PR title must not contain "issue <number>"'
+- jobName: 'PR title describes the change'
   workflowName: 'Check PR Format'
   always: true
   message: >
-    The title of the pull request must not start with "Fix for issue xyz".
+    The title of the pull request must describe the change.
+    It must neither reference an issue number (such as "Fix for issue xyz" or "fix-for-issue-xyz") nor be a branch name or a single word.
     Please use a concise one-line summary that explains what the fix or change actually does.
     Example of a good title: "Prevent crash when importing malformed BibTeX entries".
 - jobName: 'Mandatory Checklist present'
@@ -203,6 +204,13 @@
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `- [x]` (done), `- [ ]` (yet to be done) or `- [/]` (not applicable).
     Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1).
+- jobName: 'MIT license confirmed'
+  workflowName: 'Check PR Format'
+  always: true
+  message: >
+    The checkbox "I own the copyright of the code submitted and I license it under the MIT license" in the pull request description is not ticked, or its `### Checklist` section was not found.
+    We cannot merge code without the permission to license it under MIT.
+    If you own the code, please tick the box (`- [x]`). Otherwise, please explain the origin of the code in the description.
 - jobName: 'Determine issue number'
   workflowName: 'Link PR to Issue'
   always: true
