@@ -119,6 +119,38 @@ class BibDatabaseContextTest {
     }
 
     @Test
+    void getFileDirectoryPathResolvesRelativeDirectoryAgainstBibFileDirectory() {
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(Path.of("/absolute/subdir").resolve("biblio.bib"));
+        assertEquals(Path.of("/absolute/Literature").toAbsolutePath(), database.getFileDirectoryPath("../Literature"));
+    }
+
+    @Test
+    void getFileDirectoryPathKeepsAbsoluteDirectory() {
+        Path directory = Path.of("/other/Literature").toAbsolutePath();
+
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(Path.of("/absolute/subdir").resolve("biblio.bib"));
+        assertEquals(directory, database.getFileDirectoryPath(directory.toString()));
+    }
+
+    @Test
+    void getFileDirectoryPathKeepsRelativeDirectoryOfUnsavedLibrary() {
+        BibDatabaseContext database = new BibDatabaseContext();
+        assertEquals(Path.of("Literature"), database.getFileDirectoryPath("Literature"));
+    }
+
+    @Test
+    void getFallbackFileDirectoryIgnoresInvalidStoredDirectory() {
+        when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(Path.of("/absolute/subdir").resolve("biblio.bib"));
+        database.getMetaData().setLibrarySpecificFileDirectory("invalid\0directory");
+        assertEquals(Optional.of(Path.of("/absolute/subdir").toAbsolutePath()), database.getFallbackFileDirectory(fileDirPrefs));
+    }
+
+    @Test
     void getUserFileDirectoryIfAllAreEmpty() {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         Path userDirJabRef = Directories.getUserDirectory();
