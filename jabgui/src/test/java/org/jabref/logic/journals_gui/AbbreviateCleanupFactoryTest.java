@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+// [utest->feat~fetchers.journal-title-automatic-abbreviation~1]
 @NullMarked
 class AbbreviateCleanupFactoryTest {
     @Test

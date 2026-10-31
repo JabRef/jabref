@@ -10,6 +10,7 @@ import org.jabref.model.database.BibDatabase;
 
 import org.jspecify.annotations.NullMarked;
 
+// [impl->feat~fetchers.journal-title-automatic-abbreviation~1]
 @NullMarked
 public final class AbbreviateCleanupFactory {
 

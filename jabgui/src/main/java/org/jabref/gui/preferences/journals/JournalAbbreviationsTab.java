@@ -64,6 +64,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         return Localization.lang("Journal abbreviations");
     }
 
+    // [impl->feat~fetchers.journal-title-automatic-abbreviation~1]
     private void buildView() {
         setContent(form()
                 .custom(buildFileChooserRow())
