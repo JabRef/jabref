@@ -58,7 +58,7 @@ public class MathSciNetIdentifierEditorViewModel extends BaseIdentifierEditorVie
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
-        EasyBind.subscribe(identifier, ignored -> syncCurrentIdentifier());
+        EasyBind.subscribe(identifier, _ -> syncCurrentIdentifier());
     }
 
     /// Sends the currently shown entry's MathSciNet id to the browser extension, if sync is on and an id is

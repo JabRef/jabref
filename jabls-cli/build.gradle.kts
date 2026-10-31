@@ -11,10 +11,6 @@ version = providers.gradleProperty("projVersion")
     .orElse("100.0.0")
     .get()
 
-mainModuleInfo {
-    annotationProcessor("info.picocli.codegen")
-}
-
 application{
     mainClass = "org.jabref.languageserver.cli.ServerCli"
 

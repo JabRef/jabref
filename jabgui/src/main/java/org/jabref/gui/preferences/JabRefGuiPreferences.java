@@ -60,6 +60,7 @@ import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.CommandLineParser;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
@@ -80,7 +81,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPreferences {
@@ -94,6 +95,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String PREVIEW_CYCLE = "cyclePreview";
     public static final String PREVIEW_AS_TAB = "previewAsTab";
     public static final String PREVIEW_IN_ENTRY_TABLE_TOOLTIP = "previewInEntryTableTooltip";
+    public static final String ENTRY_TABLE_TOOLTIP_DURATION = "entryTableTooltipDuration";
     public static final String PREVIEW_BST_LAYOUT_PATHS = "previewBstLayoutPaths";
     public static final String PREVIEW_COVER_IMAGE_DOWNLOAD = "coverDownload";
     // endregion
@@ -120,11 +122,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiPreferences.class);
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    /// JSON shape of [#ENTRY_EDITOR_CUSTOM_TABS]; Jackson reads JSON objects into insertion-ordered maps,
-    /// so the tabs' display order survives the round-trip.
-    private static final TypeReference<LinkedHashMap<String, List<String>>> CUSTOM_TABS_TYPE = new TypeReference<>() {
-    };
 
     // region WorkspacePreferences
     private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
@@ -175,12 +172,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region ExternalApplicationsPreferences
     private static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     private static final String CONSOLE_COMMAND = "consoleCommand";
+    private static final String CONSOLE_COMMAND_ARGUMENTS = "consoleCommandArguments";
+    private static final String LEGACY_WINDOWS_CONSOLE_COMMAND = "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"";
     private static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
     private static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
     private static final String EMAIL_SUBJECT = "emailSubject";
     private static final String KINDLE_EMAIL = "kindleEmail";
     private static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
     private static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
+    private static final String FILE_BROWSER_COMMAND_ARGUMENTS = "fileBrowserCommandArguments";
     // endregion
 
     // region Auto completion
@@ -457,14 +457,43 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         String storedCustomTabs = get(ENTRY_EDITOR_CUSTOM_TABS, "");
         if (StringUtil.isNotBlank(storedCustomTabs)) {
             try {
-                OBJECT_MAPPER.readValue(storedCustomTabs, CUSTOM_TABS_TYPE).forEach((name, fieldPatterns) ->
-                        tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fieldPatterns)));
+                tabModels.addAll(parseCustomTabs(storedCustomTabs));
             } catch (JacksonException e) {
                 LOGGER.warn("Could not read the custom entry editor tabs, dropping them", e);
             }
         }
 
         return applyStoredTabOrder(tabModels, getStringList(ENTRY_EDITOR_TAB_ORDER));
+    }
+
+    /// Parses [#ENTRY_EDITOR_CUSTOM_TABS]: a JSON object mapping tab name to a pattern list (JSON
+    /// objects keep insertion order, so the tabs' display order survives the round-trip). A list item
+    /// is either a plain pattern string or `{"pattern": ..., "extract": true}` for a pattern whose
+    /// fields are extracted from the Main tab; plain strings keep stores written before the extract
+    /// flag existed readable.
+    @VisibleForTesting
+    static List<EntryEditorTabModel.CustomizedFieldsTab> parseCustomTabs(String storedCustomTabs) {
+        List<EntryEditorTabModel.CustomizedFieldsTab> tabs = new ArrayList<>();
+        JsonNode root = OBJECT_MAPPER.readTree(storedCustomTabs);
+        for (Map.Entry<String, JsonNode> tabEntry : root.properties()) {
+            List<String> fieldPatterns = new ArrayList<>();
+            Set<String> extractedPatterns = new HashSet<>();
+            for (JsonNode item : tabEntry.getValue().values()) {
+                if (item.isObject()) {
+                    String pattern = item.path("pattern").asString("");
+                    if (!pattern.isEmpty()) {
+                        fieldPatterns.add(pattern);
+                        if (item.path("extract").asBoolean(false)) {
+                            extractedPatterns.add(pattern);
+                        }
+                    }
+                } else {
+                    fieldPatterns.add(item.asString());
+                }
+            }
+            tabs.add(new EntryEditorTabModel.CustomizedFieldsTab(tabEntry.getKey(), fieldPatterns, extractedPatterns));
+        }
+        return tabs;
     }
 
     /// Reorders `tabModels` to match `storedOrder` (see [#ENTRY_EDITOR_TAB_ORDER]). The Preview tab stays
@@ -509,11 +538,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     boolean _
             ) ->
                     type.name();
-            case EntryEditorTabModel.CustomizedFieldsTab(
-                    String name,
-                    List<String> _
-            ) ->
-                    "custom:" + name;
+            case EntryEditorTabModel.CustomizedFieldsTab customTab ->
+                    "custom:" + customTab.name();
         };
     }
 
@@ -523,9 +549,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                                                                           .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
                                                                           .toList();
         // Keyed by name, so a duplicate tab name cannot exist in the stored format (the preferences UI
-        // prevents creating duplicates; legacy duplicates merge here, last one wins).
-        SequencedMap<String, List<String>> customTabsByName = new LinkedHashMap<>();
-        customTabs.forEach(tab -> customTabsByName.put(tab.name(), tab.fieldPatterns()));
+        // prevents creating duplicates; legacy duplicates merge here, last one wins). Non-extracted
+        // patterns stay plain strings (see parseCustomTabs), so the store only grows where the new
+        // flag is actually used.
+        SequencedMap<String, List<Object>> customTabsByName = new LinkedHashMap<>();
+        customTabs.forEach(tab -> customTabsByName.put(tab.name(), tab.fieldPatterns().stream()
+                                                                      .<Object>map(pattern -> tab.extractedFieldPatterns().contains(pattern)
+                                                                                              ? Map.of("pattern", pattern, "extract", true)
+                                                                                              : pattern)
+                                                                      .toList()));
         put(ENTRY_EDITOR_CUSTOM_TABS, OBJECT_MAPPER.writeValueAsString(customTabsByName));
 
         putStringList(ENTRY_EDITOR_TAB_ORDER, configs.stream()
@@ -849,24 +881,55 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder()),
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))),
                 !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaultValues.useCustomTerminal()), // mind the !
-                get(CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand()),
+                getCommandArguments(this, CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand()),
                 !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaultValues.useCustomFileBrowser()), // mind the !
-                get(FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand()),
+                getCommandArguments(this, FILE_BROWSER_COMMAND_ARGUMENTS, FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand()),
                 get(KINDLE_EMAIL, defaultValues.getKindleEmail())
         );
 
         bindString(externalApplicationsPreferences.eMailSubjectProperty(), EMAIL_SUBJECT, defaultValues.getEmailSubject());
         bindBoolean(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(), OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder());
         bindBooleanInverted(externalApplicationsPreferences.useCustomTerminalProperty(), USE_DEFAULT_CONSOLE_APPLICATION, defaultValues.useCustomTerminal());
-        bindString(externalApplicationsPreferences.customTerminalCommandProperty(), CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand());
+        bindCustom(externalApplicationsPreferences.customTerminalCommandProperty(), CONSOLE_COMMAND_ARGUMENTS, defaultValues.getCustomTerminalCommand(),
+                (_, _, value) -> putStringList(CONSOLE_COMMAND_ARGUMENTS, value),
+                () -> externalApplicationsPreferences.setCustomTerminalCommand(getCommandArguments(this, CONSOLE_COMMAND_ARGUMENTS, CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand())),
+                () -> externalApplicationsPreferences.setCustomTerminalCommand(defaultValues.getCustomTerminalCommand()));
         bindBooleanInverted(externalApplicationsPreferences.useCustomFileBrowserProperty(), USE_DEFAULT_FILE_BROWSER_APPLICATION, defaultValues.useCustomFileBrowser());
-        bindString(externalApplicationsPreferences.customFileBrowserCommandProperty(), FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand());
+        bindCustom(externalApplicationsPreferences.customFileBrowserCommandProperty(), FILE_BROWSER_COMMAND_ARGUMENTS, defaultValues.getCustomFileBrowserCommand(),
+                (_, _, value) -> putStringList(FILE_BROWSER_COMMAND_ARGUMENTS, value),
+                () -> externalApplicationsPreferences.setCustomFileBrowserCommand(getCommandArguments(this, FILE_BROWSER_COMMAND_ARGUMENTS, FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand())),
+                () -> externalApplicationsPreferences.setCustomFileBrowserCommand(defaultValues.getCustomFileBrowserCommand()));
         bindString(externalApplicationsPreferences.kindleEmailProperty(), KINDLE_EMAIL, defaultValues.getKindleEmail());
         bindSet(externalApplicationsPreferences.getExternalFileTypes(), EXTERNAL_FILE_TYPES, defaultValues.getExternalFileTypes(),
                 set -> put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(set)),
                 () -> ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))));
 
         return externalApplicationsPreferences;
+    }
+
+    @VisibleForTesting
+    static List<String> getCommandArguments(JabRefCliPreferences preferences, String key, String legacyKey, List<String> defaultArguments) {
+        if (preferences.hasKey(key)) {
+            return preferences.getStringList(key);
+        }
+
+        if (!preferences.hasKey(legacyKey)) {
+            return defaultArguments;
+        }
+
+        List<String> arguments = migrateLegacyCommand(preferences.get(legacyKey, ""), defaultArguments);
+        if (!arguments.isEmpty()) {
+            preferences.putStringList(key, arguments);
+        }
+        return arguments;
+    }
+
+    @VisibleForTesting
+    static List<String> migrateLegacyCommand(String command, List<String> defaultArguments) {
+        if (!defaultArguments.isEmpty() && LEGACY_WINDOWS_CONSOLE_COMMAND.equals(command)) {
+            return defaultArguments;
+        }
+        return CommandLineParser.splitLegacyCommandLine(command);
     }
     // endregion
 
@@ -973,6 +1036,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 customPreviewLayout,
                 getBoolean(PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab()),
                 getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip()),
+                Math.clamp(getInt(ENTRY_TABLE_TOOLTIP_DURATION, defaultValues.getTooltipDuration()), 0, 300),
                 bstPaths,
                 getBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, defaultValues.shouldDownloadCovers())
         );
@@ -1000,6 +1064,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 () -> previewPreferences.customPreviewLayoutProperty().set(defaultValues.getCustomPreviewLayout()));
         bindBoolean(previewPreferences.showPreviewAsExtraTabProperty(), PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab());
         bindBoolean(previewPreferences.showPreviewEntryTableTooltip(), PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip());
+        bindInt(previewPreferences.tooltipDurationProperty(), ENTRY_TABLE_TOOLTIP_DURATION, defaultValues.getTooltipDuration());
         bindCustomList(previewPreferences.getBstPreviewLayoutPaths(), PREVIEW_BST_LAYOUT_PATHS, defaultValues.getBstPreviewLayoutPaths(),
                 this::storeBstPaths,
                 () -> hasKey(PREVIEW_BST_LAYOUT_PATHS)
@@ -1202,7 +1267,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     // ASCENDING on unknown/corrupted values so recovery operations (reset/import) do not fail.
                     try {
                         return TableColumn.SortType.valueOf(sortType);
-                    } catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException _) {
                         return TableColumn.SortType.ASCENDING;
                     }
                 }).toList();

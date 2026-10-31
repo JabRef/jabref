@@ -72,7 +72,7 @@ public enum ThemePreset {
 
         try {
             return valueOf(themePreset);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return JABREF;
         }
     }

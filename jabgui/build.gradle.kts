@@ -10,6 +10,7 @@ import org.jabref.gradle.useLibericaJdkFull
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
+    id("org.jabref.gradle.feature.nativecompile")
     id("application")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
@@ -33,10 +34,15 @@ testModuleInfo {
     requires("org.junit.jupiter.params")
     requires("org.mockito")
 
+    // Reachability assertions (JMemoryBuddy)
+    requires("one.jpro.jmemorybuddy")
+
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
 
     runtimeOnly("com.tngtech.archunit.junit5.engine")
+
+    requires("org.apache.lucene.core")
 }
 
 tasks.named<Test>("test") {
@@ -68,8 +74,7 @@ val useLibericaJdkFullJvmArgs = if (useLibericaJdkFull) listOf(
     "--add-opens", "javafx.controls/javafx.scene.control=org.jabref,ALL-UNNAMED",
     "--add-opens", "javafx.controls/javafx.scene.control.cell=org.jabref,ALL-UNNAMED",
     "--add-opens", "javafx.controls/javafx.scene.control.skin=org.jabref,ALL-UNNAMED",
-    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED",
-    "--add-opens", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED"
+    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED"
 ) else emptyList()
 
 // Compile-time counterpart of the JavaFX --add-exports above. When JavaFX is patched Maven jars, those
@@ -122,7 +127,7 @@ application {
         "-XX:+UseStringDeduplication"
 
         // Default garbage collector (G1) is sufficient
-        // More informaiton: https://learn.microsoft.com/en-us/azure/developer/java/containers/overview#understand-jvm-default-ergonomics
+        // More information: https://learn.microsoft.com/en-us/azure/developer/java/containers/overview#understand-jvm-default-ergonomics
         // "-XX:+UseZGC", "-XX:+ZUncommit"
         // "-XX:+UseG1GC"
     )
@@ -158,6 +163,8 @@ val embeddedPostgresDependencyByTarget = mapOf(
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     verbose = true
+    // The packaging plugin appends the target OS directory to this path.
+    jpackageResources = layout.projectDirectory.dir("buildres")
 
     applicationName = "JabRef"
     applicationDescription = "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX."
@@ -168,7 +175,6 @@ javaModulePackaging {
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
     targetsWithOs("windows") {
-        jpackageResources = layout.projectDirectory.dir("buildres").dir("windows")
         appImageOptions.addAll(
             // Generic options, but different for each target
             "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
@@ -176,6 +182,13 @@ javaModulePackaging {
         options.addAll(
             // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // The two-step packaging (app-image, then deb/rpm/msi from it) does not pass these on.
+            // Without "--name", jpackage silently ignores "--file-associations".
+            // https://github.com/JabRef/jabref/issues/17006
+            "--name", applicationName.get(),
+            "--description", applicationDescription.get(),
+            "--vendor", vendor.get(),
 
             // Generic options, but different for each target
             "--icon", "$projectDir\\buildres\\windows\\JabRef.ico",
@@ -199,7 +212,6 @@ javaModulePackaging {
         })
     }
     targetsWithOs("linux") {
-        jpackageResources = layout.projectDirectory.dir("buildres").dir("linux")
         appImageOptions.addAll(
             // Generic options, but different for each target
             "--icon", "$projectDir/buildres/linux/JabRef.png",
@@ -207,6 +219,13 @@ javaModulePackaging {
         options.addAll(
             // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+
+            // The two-step packaging (app-image, then deb/rpm/msi from it) does not pass these on.
+            // Without "--name", jpackage silently ignores "--file-associations".
+            // https://github.com/JabRef/jabref/issues/17006
+            "--name", applicationName.get(),
+            "--description", applicationDescription.get(),
+            "--vendor", vendor.get(),
 
             // Generic options, but different for each target
             "--icon", "$projectDir/buildres/linux/JabRef.png",
@@ -224,22 +243,15 @@ javaModulePackaging {
         })
     }
     targetsWithOs("macos") {
-        jpackageResources = layout.projectDirectory.dir("buildres").dir("macos")
-        appImageOptions.addAll(
-            // Generic options, but different for each target
-            "--icon", "$projectDir/buildres/macos/JabRef.icns",
-        )
         options.addAll(
             // Needs to be listed everyhwere, because of https://github.com/gradlex-org/java-module-packaging/issues/104
             "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
 
-            // Generic options, but different for each target
-            "--icon", "$projectDir/buildres/macos/JabRef.icns",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
             "--resource-dir", layout.projectDirectory.dir("buildres").dir("macos").asFile.absolutePath,
 
             // Target-speccific options
-            "--mac-package-identifier", "JabRef",
+            "--mac-package-identifier", "org.jabref",
             "--mac-package-name", "JabRef"
         )
         if (providers.environmentVariable("OSXCERT").map { it == "true" }.orNull ?: false) {
@@ -279,7 +291,7 @@ embeddedPostgresBinaryByJpackageTask.forEach { (taskName, binary) ->
         // Include the platform-specific Postgres binary module in the jlink runtime image.
         addModules.add(binary.moduleName)
         // Resolve the module when the packaged launcher starts so the binary resource is discoverable.
-        // add will siply replace the existing args!
+        // add will simply replace the existing args!
         javaOptions.set(application.applicationDefaultJvmArgs + "--add-modules=${binary.moduleName}")
         addModules.addAll(sharedJpackageImageModules)
     }
@@ -307,17 +319,41 @@ tasks.test {
     systemProperty("glass.platform", "Headless")
     systemProperty("prism.order", "sw")
 
+    useJUnitPlatform {
+        excludeTags("ExternalServicesTest")
+    }
+
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
 
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
-        "--enable-native-access=javafx.graphics,com.sun.jna"
+        "--enable-native-access=javafx.graphics,com.sun.jna,org.apache.lucene.core"
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"
     ) + useLibericaJdkFullJvmArgs
 
+    maxParallelForks = 1
+}
+
+val testSourceSet = sourceSets.test.get()
+
+tasks.register<Test>("externalServicesTest") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
+    useJUnitPlatform {
+        includeTags("ExternalServicesTest")
+    }
+    systemProperty("glass.platform", "Headless")
+    systemProperty("prism.order", "sw")
+    jvmArgs = listOf(
+        "-javaagent:${configurations.mockitoAgent.get().asPath}",
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        "--enable-native-access=javafx.graphics,com.sun.jna"
+    ) + useLibericaJdkFullJvmArgs
     maxParallelForks = 1
 }
 
@@ -381,3 +417,35 @@ val generateThemePreviews = tasks.register("generateThemePreviews") {
 }
 sourceSets["main"].resources.srcDir(generateThemePreviews)
 // endregion
+
+// StaticFX (https://github.com/HebiRobotics/jfx-static-feature): JavaFX metadata, static libraries and Feature.
+// Only on the native-image classpath, so the JVM module path stays unchanged.
+val nativeImageOnly = configurations.create("nativeImageOnly")
+dependencies {
+    nativeImageOnly(platform(project(":versions")))
+    nativeImageOnly("us.hebi.graalvm:jfx-static-libs")
+    nativeImageOnly("us.hebi.graalvm:jfx-static-feature")
+}
+
+val nativeImageFeatures = sourceSets.create("nativeImageFeatures")
+dependencies {
+    "nativeImageFeaturesCompileOnly"("org.graalvm.sdk:nativeimage")
+    "nativeImageFeaturesCompileOnly"("org.jspecify:jspecify")
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            classpath(nativeImageOnly, nativeImageFeatures.output)
+            buildArgs.add("--features=org.jabref.nativeimage.JabRefViewsFeature")
+            imageName.set("jabref")
+            mainClass.set("org.jabref.Launcher")
+            resources {
+                includedPatterns.add(".*\\.fxml$")
+                includedPatterns.add(".*\\.css$")
+                includedPatterns.add("build\\.properties")
+                includedPatterns.add("org/jabref/gui/theme/preview/.*\\.png$")
+            }
+        }
+    }
+}

@@ -126,7 +126,7 @@ class UnlinkedFilesCrawlerTest {
 
         UnlinkedFilesSearchResult result = newCrawler(
                 testRoot,
-                path -> true,
+                _ -> true,
                 databaseContext,
                 filePreferences).call();
 
@@ -149,7 +149,7 @@ class UnlinkedFilesCrawlerTest {
         when(databaseContext.getDatabase()).thenReturn(database);
         when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(firstDirectory, secondDirectory));
 
-        UnlinkedFilesSearchResult result = newCrawler(testRoot, path -> true, databaseContext, filePreferences).call();
+        UnlinkedFilesSearchResult result = newCrawler(testRoot, _ -> true, databaseContext, filePreferences).call();
 
         assertEquals(List.of(entry), result.relatedEntries(firstFile));
         assertEquals(List.of(entry), result.relatedEntries(secondFile));
@@ -171,7 +171,7 @@ class UnlinkedFilesCrawlerTest {
         when(databaseContext.getDatabase()).thenReturn(database);
         when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(fileDirectory));
 
-        UnlinkedFilesSearchResult result = newCrawler(link, path -> true, databaseContext, filePreferences).call();
+        UnlinkedFilesSearchResult result = newCrawler(link, _ -> true, databaseContext, filePreferences).call();
 
         assertEquals(List.of(entry), result.relatedEntries(link.resolve("citeKey.pdf")));
     }
@@ -189,7 +189,7 @@ class UnlinkedFilesCrawlerTest {
         when(databaseContext.getDatabase()).thenReturn(database);
         when(databaseContext.getFileDirectories(filePreferences)).thenReturn(List.of(testRoot));
 
-        UnlinkedFilesCrawler crawler = newCrawler(testRoot, path -> true, databaseContext, filePreferences);
+        UnlinkedFilesCrawler crawler = newCrawler(testRoot, _ -> true, databaseContext, filePreferences);
         crawler.cancel();
 
         assertEquals(Map.of(), crawler.call().relatedEntriesByFile());

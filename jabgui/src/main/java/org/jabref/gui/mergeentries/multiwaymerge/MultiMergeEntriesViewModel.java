@@ -52,7 +52,7 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
         if (!entrySource.isLoading.getValue()) {
             updateFields(entrySource.entry.get());
         } else {
-            entrySource.isLoading.addListener((observable, oldValue, newValue) -> {
+            entrySource.isLoading.addListener((_, _, newValue) -> {
                 if (!newValue) {
                     updateFields(entrySource.entry.get());
                     if (entrySource.entryProperty().get() == null) {

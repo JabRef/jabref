@@ -9,7 +9,7 @@ import org.jabref.model.entry.field.BiblatexSoftwareField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryType;
-import org.jabref.testutils.category.ExternalServicesTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.BeforeAll;
@@ -56,7 +56,7 @@ public class SwhidFetcherTest {
         assertEquals(Optional.of(BiblatexSoftwareEntryType.SoftwareVersion), fetchedEntry.map(BibEntry::getType));
         assertEquals(Optional.of(PARMAP_SWHID), fetchedEntry.flatMap(entry -> entry.getField(BiblatexSoftwareField.SWHID)));
         assertEquals(Optional.empty(), fetchedEntry.flatMap(entry -> entry.getField(new UnknownField("swhid"))));
-        assertEquals(1, fetchedEntry.get().getFields().stream().filter(f -> "swhid".equalsIgnoreCase("swhid")).count());
+        assertEquals(1, fetchedEntry.get().getFields().stream().filter(_ -> "swhid".equalsIgnoreCase("swhid")).count());
     }
 
     @Test

@@ -17,6 +17,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.importer.fetcher.DnbFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IssnFetcher;
@@ -55,7 +56,12 @@ class WebFetchersTest {
 
     private ImportFormatPreferences importFormatPreferences;
     private ImporterPreferences importerPreferences;
-    private final ClassGraph classGraph = new ClassGraph().enableAllInfo().acceptPackages("org.jabref");
+    private final ClassGraph classGraph = new ClassGraph()
+            .enableClasspath()
+            .enableNonSystemModules()
+            .enableClassInfo()
+            .ignoreClassVisibility()
+            .acceptPackages("org.jabref");
 
     @BeforeEach
     void setUp() {
@@ -76,12 +82,12 @@ class WebFetchersTest {
     }
 
     @Test
-    void getIdBasedFetchersReturnsAllFetcherDerivingFromIdBasedFetcher() {
+    void getIdBasedFetchersReturnsAllFetcherDerivingFromIdBasedFetcher() throws ClassNotFoundException {
         Set<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences, importerPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
-            ClassInfoList controlClasses = scanResult.getClassesImplementing(IdBasedFetcher.class.getCanonicalName());
-            Set<Class<?>> expected = new LinkedHashSet<>(controlClasses.loadClasses());
+            ClassInfoList controlClasses = scanResult.getAllClassesImplementing(IdBasedFetcher.class.getCanonicalName());
+            Set<Class<?>> expected = new LinkedHashSet<>(loadClasses(controlClasses));
 
             // Some classes implement IdBasedFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
@@ -94,6 +100,7 @@ class WebFetchersTest {
             expected.remove(LOBIDIsbnFetcher.class);
             expected.remove(EbookDeIsbnFetcher.class);
             expected.remove(GvkFetcher.class);
+            expected.remove(DnbFetcher.class);
             // Remove special ISSN fetcher only suitable for journal lookup
             expected.remove(IssnFetcher.class);
             // Remove the following, because they don't work at the moment
@@ -106,7 +113,7 @@ class WebFetchersTest {
     }
 
     @Test
-    void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() {
+    void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() throws ClassNotFoundException {
         Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(
                 mock(ImporterPreferences.class),
                 importFormatPreferences,
@@ -114,8 +121,8 @@ class WebFetchersTest {
                 mock(BibDatabaseContext.class));
 
         try (ScanResult scanResult = classGraph.scan()) {
-            ClassInfoList controlClasses = scanResult.getClassesImplementing(EntryBasedFetcher.class.getCanonicalName());
-            Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
+            ClassInfoList controlClasses = scanResult.getAllClassesImplementing(EntryBasedFetcher.class.getCanonicalName());
+            Set<Class<?>> expected = new HashSet<>(loadClasses(controlClasses));
 
             expected.remove(EntryBasedParserFetcher.class);
             expected.remove(MrDLibFetcher.class);
@@ -124,13 +131,13 @@ class WebFetchersTest {
     }
 
     @Test
-    void getSearchBasedFetchersReturnsAllFetcherDerivingFromSearchBasedFetcher() {
+    void getSearchBasedFetchersReturnsAllFetcherDerivingFromSearchBasedFetcher() throws ClassNotFoundException {
         Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences);
         try (ScanResult scanResult = classGraph.scan()) {
-            ClassInfoList controlClasses = scanResult.getClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
+            ClassInfoList controlClasses = scanResult.getAllClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
 
             Set<Class<?>> expected = new TreeSet<>(Comparator.comparing(Class::getName));
-            expected.addAll(controlClasses.loadClasses());
+            expected.addAll(loadClasses(controlClasses));
 
             // Some classes implement SearchBasedFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
@@ -155,12 +162,12 @@ class WebFetchersTest {
     }
 
     @Test
-    void getFullTextFetchersReturnsAllFetcherDerivingFromFullTextFetcher() {
+    void getFullTextFetchersReturnsAllFetcherDerivingFromFullTextFetcher() throws ClassNotFoundException {
         Set<FulltextFetcher> fullTextFetchers = WebFetchers.getFullTextFetchers(importFormatPreferences, importerPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
-            ClassInfoList controlClasses = scanResult.getClassesImplementing(FulltextFetcher.class.getCanonicalName());
-            Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
+            ClassInfoList controlClasses = scanResult.getAllClassesImplementing(FulltextFetcher.class.getCanonicalName());
+            Set<Class<?>> expected = new HashSet<>(loadClasses(controlClasses));
 
             // Some classes implement FulltextFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
@@ -174,12 +181,12 @@ class WebFetchersTest {
     }
 
     @Test
-    void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() {
+    void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() throws ClassNotFoundException {
         Set<IdFetcher<?>> idFetchers = WebFetchers.getIdFetchers(importFormatPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
-            ClassInfoList controlClasses = scanResult.getClassesImplementing(IdFetcher.class.getCanonicalName());
-            Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
+            ClassInfoList controlClasses = scanResult.getAllClassesImplementing(IdFetcher.class.getCanonicalName());
+            Set<Class<?>> expected = new HashSet<>(loadClasses(controlClasses));
 
             // Some classes implement IdFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
@@ -207,5 +214,13 @@ class WebFetchersTest {
         return objects.stream()
                       .map(Object::getClass)
                       .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Class::getName))));
+    }
+
+    private Set<Class<?>> loadClasses(ClassInfoList classInfos) throws ClassNotFoundException {
+        Set<Class<?>> classes = new LinkedHashSet<>();
+        for (String className : classInfos.getNames()) {
+            classes.add(Class.forName(className, false, WebFetchersTest.class.getClassLoader()));
+        }
+        return classes;
     }
 }

@@ -76,9 +76,9 @@ public class FieldRowViewModel {
             setRightFieldValue(rightEntry.getField(field).orElse(""));
         }
 
-        EasyBind.listen(leftFieldValueProperty(), (obs, old, leftValue) -> leftEntry.setField(field, leftValue));
-        EasyBind.listen(rightFieldValueProperty(), (obs, old, rightValue) -> rightEntry.setField(field, rightValue));
-        EasyBind.listen(mergedFieldValueProperty(), (obs, old, mergedFieldValue) -> {
+        EasyBind.listen(leftFieldValueProperty(), (_, _, leftValue) -> leftEntry.setField(field, leftValue));
+        EasyBind.listen(rightFieldValueProperty(), (_, _, rightValue) -> rightEntry.setField(field, rightValue));
+        EasyBind.listen(mergedFieldValueProperty(), (_, _, mergedFieldValue) -> {
             if (field.equals(InternalField.TYPE_HEADER)) {
                 getMergedEntry().setType(EntryTypeFactory.parse(mergedFieldValue));
             } else {
@@ -90,7 +90,7 @@ public class FieldRowViewModel {
 
         selectNonEmptyValue();
 
-        EasyBind.listen(isFieldsMergedProperty(), (obs, old, areFieldsMerged) -> {
+        EasyBind.listen(isFieldsMergedProperty(), (_, _, areFieldsMerged) -> {
             LOGGER.debug("Field are merged: {}", areFieldsMerged);
             if (areFieldsMerged) {
                 selectLeftValue();

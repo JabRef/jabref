@@ -112,7 +112,7 @@ class AbbreviationTest {
     }
 
     @Test
-    void equalAbbrevationsWithFourComponentsAreAlsoCompareZero() {
+    void equalAbbreviationsWithFourComponentsAreAlsoCompareZero() {
         Abbreviation abbreviation1 = new Abbreviation("Long Name", "L. N.", "LN");
         Abbreviation abbreviation2 = new Abbreviation("Long Name", "L. N.", "LN");
         assertEquals(0, abbreviation1.compareTo(abbreviation2));

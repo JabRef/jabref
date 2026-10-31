@@ -27,7 +27,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.testutils.category.DatabaseTest;
+import org.jabref.support.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -144,6 +144,27 @@ class SynchronizationSimulatorTest {
 
         waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
         assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+    }
+
+    // [utest->req~shared-database.live-propagation~1]
+    @Test
+    void simulateLiveGroupTreeDeletionPropagation() throws Exception {
+        GroupTreeNode rootOfClientA = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        rootOfClientA.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        clientContextA.getMetaData().setGroups(rootOfClientA);
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isPresent());
+        assertEquals(Optional.of(rootOfClientA), clientContextB.getMetaData().getGroups());
+
+        clientContextA.getMetaData().clearGroups();
+
+        waitUntil(() -> clientContextB.getMetaData().getGroups().isEmpty());
+        assertEquals(Optional.empty(), clientContextB.getMetaData().getGroups());
+
+        clientContextB.getMetaData().setMode(BibDatabaseMode.BIBLATEX);
+        waitUntil(() -> Optional.of(BibDatabaseMode.BIBLATEX).equals(clientContextA.getMetaData().getMode()));
+        assertEquals(Optional.empty(), clientContextA.getMetaData().getGroups());
+        assertEquals(Optional.empty(), clientContextB.getMetaData().getGroups());
     }
 
     // [utest->req~shared-database.live-propagation~1]

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 /// AI preferences.
 ///
 /// Quick note about [#aiFeaturesEnabledInitially] and [#aiFeaturesEnabledCurrently]:
-/// As per `req~ai.general.enabling.restart~1`, when enabled property is changed, a restart required. This implies that
+/// When the enabled property is changed, a restart is required. This implies that
 /// AI processes should start and work only if they were initially enabled. So whenever you want to guard some code from
 /// executing only if AI is enabled, please use [#aiFeaturesEnabledInitially] via [#getAiFeaturesEnabled()]`.
 public class AiPreferences {
@@ -312,7 +312,7 @@ public class AiPreferences {
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
         try (final Keyring keyring = Keyring.create()) {
             return keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
-        } catch (PasswordAccessException e) {
+        } catch (PasswordAccessException _) {
             LOGGER.debug("No API key stored for provider {}. Returning an empty string", aiProvider.name());
             return "";
         } catch (Exception e) {
@@ -326,7 +326,7 @@ public class AiPreferences {
             if (StringUtil.isNullOrEmpty(newKey)) {
                 try {
                     keyring.deletePassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
-                } catch (PasswordAccessException ex) {
+                } catch (PasswordAccessException _) {
                     LOGGER.debug("API key for provider {} not stored in keyring. JabRef does not store an empty key.", aiProvider.name());
                 }
             } else {
@@ -677,6 +677,7 @@ public class AiPreferences {
 
     public List<Property<?>> getEmbeddingsProperties() {
         return List.of(
+                customizeExpertSettings,
                 embeddingModel,
                 documentSplitterKind,
                 documentSplitterChunkSize,

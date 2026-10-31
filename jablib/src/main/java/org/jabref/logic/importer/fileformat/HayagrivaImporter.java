@@ -317,7 +317,7 @@ public class HayagrivaImporter extends Importer {
         JsonNode root;
         try {
             root = MAPPER.readTree(input);
-        } catch (JacksonException e) {
+        } catch (JacksonException _) {
             return false;
         }
 

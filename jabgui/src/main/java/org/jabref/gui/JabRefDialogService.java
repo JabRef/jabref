@@ -36,7 +36,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -49,6 +48,7 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ZipFileChooser;
+import org.jabref.gui.walkthrough.WalkthroughPane;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -153,7 +153,7 @@ public class JabRefDialogService implements DialogService {
 
     private <T> ChoiceDialog<T> createChoiceDialog(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices) {
         ChoiceDialog<T> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
-        ((Stage) choiceDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefIcon());
+        IconTheme.applyLogo(choiceDialog);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         choiceDialog.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
         choiceDialog.setHeaderText(title);
@@ -178,9 +178,16 @@ public class JabRefDialogService implements DialogService {
         return choiceDialog.showAndWait();
     }
 
+    /// A stock JavaFX dialog, unlike a [BaseDialog], does not bring the pane a walkthrough draws into, and
+    /// the "Download from URL" walkthrough steps into the input dialog.
+    private static void addWalkthroughPane(Dialog<?> dialog) {
+        dialog.getDialogPane().getChildren().add(new WalkthroughPane());
+    }
+
     @Override
     public Optional<String> showInputDialogAndWait(String title, String content) {
         TextInputDialog inputDialog = new TextInputDialog();
+        addWalkthroughPane(inputDialog);
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
@@ -190,6 +197,7 @@ public class JabRefDialogService implements DialogService {
     @Override
     public Optional<String> showInputDialogWithDefaultAndWait(String title, String content, String defaultValue) {
         TextInputDialog inputDialog = new TextInputDialog(defaultValue);
+        addWalkthroughPane(inputDialog);
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
         inputDialog.initOwner(mainWindow);
@@ -394,7 +402,7 @@ public class JabRefDialogService implements DialogService {
         progressDialog.setTitle(title);
         progressDialog.setContentText(content);
         progressDialog.setGraphic(null);
-        ((Stage) progressDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefIcon());
+        IconTheme.applyLogo(progressDialog);
         progressDialog.setOnCloseRequest(_ -> task.cancel());
         DialogPane dialogPane = progressDialog.getDialogPane();
         dialogPane.getButtonTypes().add(ButtonType.CANCEL);

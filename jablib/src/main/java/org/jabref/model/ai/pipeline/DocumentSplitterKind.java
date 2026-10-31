@@ -8,7 +8,7 @@ public enum DocumentSplitterKind {
     public static DocumentSplitterKind safeValueOf(String name) {
         try {
             return DocumentSplitterKind.valueOf(name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return AiDefaultEnums.DOCUMENT_SPLITTER_KIND;
         }
     }

@@ -16,14 +16,17 @@ import org.jabref.gui.walkthrough.effects.Spotlight;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WalkthroughHighlighter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughHighlighter.class);
+
     private final Map<Window, Spotlight> backdropHighlights = new HashMap<>();
     private final Map<Window, Ping> pulseIndicators = new HashMap<>();
     private final Map<Window, FullScreenDarken> fullScreenDarkens = new HashMap<>();
 
     private final Map<Window, EffectState> currentEffects = new HashMap<>();
-    private @Nullable Runnable onBackgroundClickHandler;
 
     /// Applies the specified highlight configuration.
     ///
@@ -52,10 +55,6 @@ public class WalkthroughHighlighter {
     /// Sets a handler to be called when the user clicks on backdrop or darkened areas.
     ///
     /// @param handler The handler to call when the background is clicked. If null, no action will be taken on background clicks. Usually used to support quit walkthrough on clicking the effects.
-    public void setOnBackgroundClick(@Nullable Runnable handler) {
-        this.onBackgroundClickHandler = handler;
-    }
-
     /// Detaches the specified window from all effects. Restore the scene graph on this
     /// window to the state before any effects were applied.
     public void detach(@NonNull Window window) {
@@ -187,23 +186,30 @@ public class WalkthroughHighlighter {
     }
 
     private void applyBackdropHighlight(@NonNull Window window, @NonNull Node targetNode) {
-        WalkthroughPane pane = WalkthroughPane.getInstance(window);
-        Spotlight backdrop = getOrCreateBackdropHighlight(window, pane);
-        backdrop.setOnClick(onBackgroundClickHandler);
-        backdrop.attach(targetNode);
+        WalkthroughPane.of(window).ifPresentOrElse(pane -> {
+            Spotlight backdrop = getOrCreateBackdropHighlight(window, pane);
+            backdrop.attach(targetNode);
+        }, () -> logMissingPane(window));
     }
 
     private void applyPulseAnimation(@NonNull Window window, @NonNull Node targetNode) {
-        WalkthroughPane pane = WalkthroughPane.getInstance(window);
-        Ping ping = getOrCreatePulseIndicator(window, pane);
-        ping.attach(targetNode);
+        WalkthroughPane.of(window).ifPresentOrElse(
+                pane -> getOrCreatePulseIndicator(window, pane).attach(targetNode),
+                () -> logMissingPane(window));
     }
 
     private void applyFullScreenDarken(@NonNull Window window) {
-        WalkthroughPane pane = WalkthroughPane.getInstance(window);
-        FullScreenDarken fullDarken = getOrCreateFullScreenDarken(window, pane);
-        fullDarken.setOnClick(onBackgroundClickHandler);
-        fullDarken.attach();
+        WalkthroughPane.of(window).ifPresentOrElse(pane -> {
+            FullScreenDarken fullDarken = getOrCreateFullScreenDarken(window, pane);
+            fullDarken.attach();
+        }, () -> logMissingPane(window));
+    }
+
+    /// A highlight is decoration: a window that cannot host the pane still gets its step, just without
+    /// the effect.
+    private static void logMissingPane(Window window) {
+        LOGGER.warn("No walkthrough pane available for window: {}. Skipping the highlight effect.",
+                window.getClass().getSimpleName());
     }
 
     private Spotlight getOrCreateBackdropHighlight(@NonNull Window window, @NonNull WalkthroughPane pane) {

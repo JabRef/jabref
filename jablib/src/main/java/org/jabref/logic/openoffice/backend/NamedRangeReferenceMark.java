@@ -167,7 +167,7 @@ public class NamedRangeReferenceMark implements NamedRange {
             NoDocumentException,
             WrappedTargetException {
         return UnoReferenceMark.getAnchor(doc, refMarkName)
-                               .map(entry -> new NamedRangeReferenceMark(refMarkName));
+                               .map(_ -> new NamedRangeReferenceMark(refMarkName));
     }
 
     /// Remove it from the document.
@@ -391,7 +391,7 @@ public class NamedRangeReferenceMark implements NamedRange {
         }
     }
 
-    /// Remove brackets, but if the result would become empty, leave them; if the result would be a single characer, leave the left bracket.
+    /// Remove brackets, but if the result would become empty, leave them; if the result would be a single character, leave the left bracket.
     ///
     /// See: cleanFillCursorForCitationGroup
     @Override

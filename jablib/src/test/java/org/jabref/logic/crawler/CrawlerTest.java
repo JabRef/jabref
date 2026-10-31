@@ -23,7 +23,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.testutils.category.ExternalServicesTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;

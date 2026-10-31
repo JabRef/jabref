@@ -2,7 +2,7 @@ package org.jabref.logic.shared;
 
 import java.sql.SQLException;
 
-import org.jabref.testutils.category.DatabaseTest;
+import org.jabref.support.DatabaseTest;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;

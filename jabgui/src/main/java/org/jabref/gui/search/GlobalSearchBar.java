@@ -165,7 +165,7 @@ public class GlobalSearchBar extends HBox {
         ClipBoardManager.addX11Support(searchField);
 
         searchField.setContextMenu(SearchFieldRightClickMenu.create(stateManager, searchField));
-        stateManager.getWholeSearchHistory().addListener((ListChangeListener.Change<? extends String> change) -> {
+        stateManager.getWholeSearchHistory().addListener((ListChangeListener.Change<? extends String> _) -> {
             searchField.getContextMenu().getItems().removeLast();
             searchField.getContextMenu().getItems().add(SearchFieldRightClickMenu.createSearchFromHistorySubMenu(stateManager, searchField));
         });
@@ -224,7 +224,7 @@ public class GlobalSearchBar extends HBox {
         BindingsHelper.bindBidirectional(
                 stateManager.activeSearchQuery(searchType),
                 searchField.textProperty(),
-                searchTerm -> {
+                _ -> {
                     // Async update
                     searchTask.restart();
                 },
@@ -236,7 +236,7 @@ public class GlobalSearchBar extends HBox {
          * lost (e.g., user selects an entry or triggers the search).
          * The search history should only be filled, if focus is lost.
          */
-        searchField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+        searchField.focusedProperty().addListener((_, oldValue, newValue) -> {
             // Focus lost can be derived by checking that there is no newValue (or the text is empty)
             if (oldValue && !(newValue || searchField.getText().isBlank())) {
                 this.stateManager.addSearchHistory(searchField.textProperty().get());
@@ -256,7 +256,7 @@ public class GlobalSearchBar extends HBox {
             }
         });
 
-        fulltextButton.selectedProperty().addListener((obs, oldVal, newVal) -> {
+        fulltextButton.selectedProperty().addListener((_, _, newVal) -> {
             if (!filePreferences.shouldFulltextIndexLinkedFiles() && newVal) {
                 boolean enableFulltextSearch = dialogService.showConfirmationDialogAndWait(Localization.lang("Fulltext search"), Localization.lang("Fulltext search requires the setting 'Automatically index all linked files for fulltext search' to be enabled. Do you want to enable indexing now?"), Localization.lang("Enable indexing"), Localization.lang("Keep disabled"));
 
@@ -329,9 +329,9 @@ public class GlobalSearchBar extends HBox {
         openGlobalSearchButton.disableProperty().bind(globalSearchActive.or(needsDatabase(stateManager).not()));
         openGlobalSearchButton.setTooltip(new Tooltip(Localization.lang("Search across libraries in a new window")));
         initSearchModifierButton(openGlobalSearchButton);
-        openGlobalSearchButton.setOnAction(evt -> openGlobalSearchDialog());
+        openGlobalSearchButton.setOnAction(_ -> openGlobalSearchDialog());
 
-        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener.Change<? extends SearchFlags> change) -> {
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener.Change<? extends SearchFlags> _) -> {
             regexButton.setSelected(searchPreferences.isRegularExpression());
             caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
             fulltextButton.setSelected(searchPreferences.isFulltext());

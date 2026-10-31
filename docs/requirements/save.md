@@ -3,16 +3,17 @@ parent: Requirements
 ---
 # Saving a Library
 
-## Concurrent modification of the library file is detected on save
+## Library save must detect concurrent modification of library file
 `req~logic.exporter.concurrent-save-detection~1`
 
-Two processes (e.g., two JabRef instances on different machines using a network share) may write the same library file at overlapping times.
 When the target file is modified by another process between the start of a save and its commit, the save must be aborted with an error instead of silently overwriting the other process's changes.
 The detection is best-effort: it is based on the file's size and modification time, so it is subject to the file system's timestamp resolution.
 
+Rationale: Two processes (e.g., two JabRef instances on different machines using a network share) may write the same library file at overlapping times, risking silent data loss.
+
 Needs: impl, utest
 
-## File attributes survive an atomic save
+## Atomic save must preserve existing file attributes
 `req~logic.exporter.preserve-file-attributes~1`
 
 An atomic save replaces the target file with a newly created one.
@@ -21,7 +22,7 @@ This is best-effort: an attribute class the file system does not support, or the
 
 Needs: impl, utest
 
-## PDF metadata writes replace the file atomically
+## PDF metadata writer must replace target file atomically
 `req~logic.xmp.atomic-pdf-write~1`
 
 Writing metadata into a PDF (XMP metadata, embedded bib file, or metadata removal) must never rewrite the original file in place.
@@ -30,29 +31,51 @@ A failed write must leave the original file untouched and must not leave tempora
 
 Needs: impl, utest
 
-## Failed backup writes do not replace recoverable files
+## Backup system must not overwrite valid backups on write failure
 `req~jabgui.autosaveandbackup.complete-backup~1`
 
 When creating a backup, a serialization failure must not replace a previous backup with incomplete content. JabRef must not restore an empty backup over an existing library.
 
 Needs: impl, utest
 
-## Autosave reacts to library changes
+## Autosave must trigger save automatically upon library changes
 `req~jabgui.autosaveandbackup.autosave-listens~1`
 
 While autosave is enabled for a library, every change to the library must lead to the library being saved shortly afterwards without user interaction.
+Entry mutations made by save actions must run on the JavaFX event thread, while formatting and file writing remain in the background.
 
 When the autosave manager is shut down, its periodic task must stop and pending callbacks must not post further autosave events.
 
 Needs: impl, utest
 
-## Keyword delimiter normalization is a cleanup
+## Library cleanup must normalize keyword delimiters using library separator
 `req~save.keywords.normalize-delimiters~1`
 
 Rewriting a keyword field from an accepted import delimiter to the library's keyword separator is a field formatter cleanup ("Normalize keyword delimiters").
 It is part of the default save actions and available in the cleanup dialog, so users see it, can disable it per library, and can run it on demand.
 A field that already uses the library's separator is returned unchanged, including its spacing.
 Cleanups that depend on the keyword separator use the separator declared by the library the entry belongs to and fall back to the global preference when the library declares none.
+
+Needs: impl, utest
+
+## User can convert LaTeX character commands to Unicode-aware LaTeX
+`feat~save.cleanup.latex-to-unicode-aware-latex~1`
+
+The field formatter "LaTeX to Unicode-aware LaTeX" replaces commands that encode a single character, such as `\textcopyright{}` or `\"{o}`, by the Unicode character, because current LaTeX engines read Unicode directly.
+It is available in the cleanup dialog and as a save action.
+Unlike "LaTeX to Unicode", it keeps all other LaTeX code: protective braces, math, formatting commands such as `\emph{...}`, and commands without a single-character Unicode equivalent.
+It preserves LaTeX comments and braces protecting uppercase character commands from BibTeX case changes.
+Math preservation recognizes standard math delimiters and a fixed set of common math environments; custom and unlisted environments are not recognized.
+A command whose conversion would introduce a LaTeX special character (such as `\textbackslash{}`) is kept.
+
+See <https://github.com/JabRef/jabref/issues/8715>.
+
+Needs: impl, utest
+
+## LaTeX to Unicode-aware LaTeX formatter must keep escaped special characters
+`req~save.cleanup.latex-to-unicode-aware-latex.keep-escaped-characters~1`
+
+Escaped LaTeX special characters (`\%`, `\&`, `\$`, `\#`, `\_`, `\{`, `\}`, `\\`) stay escaped, because the unescaped character has a different meaning in LaTeX.
 
 Needs: impl, utest
 

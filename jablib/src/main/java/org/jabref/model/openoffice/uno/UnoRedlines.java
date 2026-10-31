@@ -105,7 +105,7 @@ public class UnoRedlines {
         }
         try {
             return REDLINE_TYPE_DELETE.equals(propertySet.get().getPropertyValue("RedlineType"));
-        } catch (UnknownPropertyException | WrappedTargetException ex) {
+        } catch (UnknownPropertyException | WrappedTargetException _) {
             return false;
         }
     }
@@ -121,7 +121,7 @@ public class UnoRedlines {
         }
         try {
             return UnoCast.cast(XTextRange.class, propertySet.get().getPropertyValue("RedlineStart"));
-        } catch (UnknownPropertyException | WrappedTargetException ex) {
+        } catch (UnknownPropertyException | WrappedTargetException _) {
             return Optional.empty();
         }
     }

@@ -39,7 +39,7 @@ public class Linux extends NativeDesktop {
             try {
                 Desktop.getDesktop().open(Path.of(filePath).toFile());
                 LoggerFactory.getLogger(Linux.class).debug("Open file in default application with Desktop integration");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException _) {
                 LoggerFactory.getLogger(Linux.class).debug("Fail back to xdg-open");
                 try {
                     String[] cmd = {"xdg-open", filePath};
@@ -200,7 +200,7 @@ public class Linux extends NativeDesktop {
             String documentsDirectory = strings.getFirst();
             Path documentsPath = Path.of(documentsDirectory);
             if (!Files.exists(documentsPath)) {
-                LoggerFactory.getLogger(Linux.class).error("xdg-user-dir returned non-existant directory {}", documentsDirectory);
+                LoggerFactory.getLogger(Linux.class).error("xdg-user-dir returned non-existent directory {}", documentsDirectory);
                 return Directories.getUserDirectory();
             }
             LoggerFactory.getLogger(Linux.class).debug("Got documents path {}", documentsPath);

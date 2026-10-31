@@ -10,15 +10,22 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.documentviewer.JumpToEntryPdfAction;
+import org.jabref.gui.edit.OpenBrowserAction;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.LocaleUtil;
 import org.jabref.gui.util.component.MarkdownTextFlow;
+import org.jabref.logic.ai.chatting.util.JsonAnswerFormatter;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.chatting.ChatMessage;
 
@@ -35,6 +42,8 @@ public class AiChatMessageView extends HBox {
     @FXML private Label sourceLabel;
     @FXML private StackPane markdownContentPane;
     @FXML private ContextMenu contextMenu;
+    @FXML private MenuItem deleteMenuItem;
+    @FXML private MenuItem regenerateMenuItem;
 
     @FXML private VBox buttons;
     // [impl->feat~ai.chat.regenerate-response~1]
@@ -43,9 +52,12 @@ public class AiChatMessageView extends HBox {
     @FXML private Button deleteButton;
 
     @Inject private ClipBoardManager clipboardManager;
+    @Inject private DialogService dialogService;
+    @Inject private StateManager stateManager;
+    @Inject private GuiPreferences preferences;
 
     // Tooltip for the whole component.
-    private Tooltip tooltip = new Tooltip();
+    private final Tooltip tooltip = new Tooltip();
     private MarkdownTextFlow markdownTextFlow;
 
     private AiChatMessageViewModel viewModel;
@@ -61,6 +73,7 @@ public class AiChatMessageView extends HBox {
         this.viewModel = new AiChatMessageViewModel(clipboardManager);
 
         markdownTextFlow = new MarkdownTextFlow(markdownContentPane);
+        markdownTextFlow.setHyperlinkHandler(this::handleHyperlink);
         markdownContentPane.getChildren().add(markdownTextFlow);
 
         Tooltip.install(bubble, tooltip);
@@ -84,6 +97,8 @@ public class AiChatMessageView extends HBox {
 
         regenerateButton.visibleProperty().bind(viewModel.showRegenerateProperty());
         deleteButton.visibleProperty().bind(viewModel.showDeleteProperty());
+        regenerateMenuItem.visibleProperty().bind(viewModel.showRegenerateProperty());
+        deleteMenuItem.visibleProperty().bind(viewModel.showDeleteProperty());
 
         setupPseudoClasses();
     }
@@ -125,7 +140,14 @@ public class AiChatMessageView extends HBox {
             return;
         }
 
-        markdownTextFlow.setMarkdown(StringUtil.makeSafe(chatMessage.content()));
+        String content = StringUtil.makeSafe(chatMessage.content());
+
+        // Only the AI answers with JSON; a user message is shown the way it was typed.
+        if (chatMessage.role() == ChatMessage.Role.AI) {
+            markdownTextFlow.setMarkdown(JsonAnswerFormatter.fenceJson(content), new JsonCodeBlockFormatter());
+        } else {
+            markdownTextFlow.setMarkdown(content);
+        }
     }
 
     private static Pos determineAlignment(ChatMessage chatMessage) {
@@ -185,5 +207,18 @@ public class AiChatMessageView extends HBox {
 
     public void setOnRegenerate(EventHandler<ActionEvent> onRegenerate) {
         viewModel.onRegenerateProperty().set(onRegenerate);
+    }
+
+    // [impl->feat~ai.chat.jump-to-entry-pdf~1]
+    void handleHyperlink(String url) {
+        if (JumpToEntryPdfAction.parseUrl(url).isPresent()) {
+            new JumpToEntryPdfAction(url, stateManager, dialogService).execute();
+        } else {
+            new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute();
+        }
+    }
+
+    MarkdownTextFlow getMarkdownTextFlow() {
+        return markdownTextFlow;
     }
 }

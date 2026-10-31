@@ -34,7 +34,6 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddingsforseveral.GenerateEmbeddingsForSeveralTaskRequest;
 import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTaskRequest;
-import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.query.GroupNameFilterVisitor;
@@ -75,8 +74,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
-    private final BibEntryTypesManager entryTypesManager;
-    private final FieldPreferences fieldPreferences;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
@@ -96,6 +93,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return Integer.compare(numChildren1, numChildren2);
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
+    private boolean updatingDisplayedGroups;
 
     public GroupTreeViewModel(@NonNull StateManager stateManager,
                               @NonNull BibEntryTypesManager entryTypesManager,
@@ -106,9 +104,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                               @NonNull TaskExecutor taskExecutor
     ) {
         this.stateManager = stateManager;
-        this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.fieldPreferences = preferences.getFieldPreferences();
         this.dialogService = dialogService;
         this.aiService = aiService;
         this.localDragboard = localDragboard;
@@ -175,8 +171,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Gets invoked if the user selects a different group.
     /// We need to notify the [StateManager] about this change so that the main table gets updated.
     private void onSelectedGroupChanged(ObservableList<GroupNodeViewModel> newValue) {
-        if (!currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
-            // Switch of database occurred -> do nothing
+        if (updatingDisplayedGroups || !currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
+            // Model-driven tree replacement temporarily changes the selection; do not persist that transient state.
             return;
         }
 
@@ -201,7 +197,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Gets invoked if the user changes the active database.
     /// We need to get the new group tree and update the view
     private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
-        currentDatabase = newDatabase;
+        disposeDisplayedGroups();
         MetaData newMetaData = newDatabase.map(BibDatabaseContext::getMetaData).orElse(null);
         if (newMetaData != observedMetaData) {
             if (observedMetaData != null) {
@@ -213,6 +209,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             }
         }
         if (newDatabase.isEmpty()) {
+            currentDatabase = newDatabase;
             rootGroup.setValue(null);
             return;
         }
@@ -223,14 +220,32 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard, preferences))
                 .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard, preferences));
 
-        rootGroup.setValue(newRoot);
-        if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {
-            stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));
+        updatingDisplayedGroups = true;
+        try {
+            rootGroup.setValue(newRoot);
+            if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {
+                stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));
+            }
+            selectedGroups.setAll(
+                    stateManager.getSelectedGroups(newDatabase.get()).stream()
+                                .map(selectedGroup -> newRoot.findGroupNodeViewModel(selectedGroup)
+                                                             .orElseGet(() -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences)))
+                                .toList());
+        } finally {
+            updatingDisplayedGroups = false;
         }
-        selectedGroups.setAll(
-                stateManager.getSelectedGroups(newDatabase.get()).stream()
-                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
-                            .toList());
+        // [impl->req~ux.groups.library-switch-preserves-selection~1]
+        // [impl->req~ux.groups.shared-update-preserves-selection~1]
+        // currentDatabase has to be set after the root swap so the guard in onSelectedGroupChanged blocks the transient empty selection
+        currentDatabase = newDatabase;
+    }
+
+    private void disposeDisplayedGroups() {
+        GroupNodeViewModel root = rootGroup.get();
+        if (root != null) {
+            root.dispose();
+        }
+        selectedGroups.forEach(GroupNodeViewModel::dispose);
     }
 
     /// Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
@@ -245,7 +260,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
             newGroup.ifPresent(group -> recordTreeChange(Localization.lang("Add group"), _ -> {
                 GroupTreeNode newSubgroup = parent.addSubgroup(group);
                 // [impl->req~ux.groups.create-explicit-from-selection~1]
-                selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
+                GroupNodeViewModel newViewModel = parent.findGroupNodeViewModel(newSubgroup)
+                                                        .orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
+                selectedGroups.setAll(newViewModel);
 
                 // TODO: expand the parent so the new group is visible
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
@@ -346,7 +363,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             selectedGroups.setAll(newSuggestedSubgroups
                     .stream()
-                    .map(newSubGroup -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                    .map(newSubGroup -> rootGroup.get() != null
+                                        ? rootGroup.get().findGroupNodeViewModel(newSubGroup).orElseGet(() -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                                        : new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
                     .toList());
 
             writeGroupChangesToMetaData();
@@ -535,7 +554,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         aiChatWindow.groupNodeProperty().set(group);
 
         aiChatWindow.getDialogPane().getScene().getWindow().addEventHandler(
-                WindowEvent.WINDOW_CLOSE_REQUEST,
+                WindowEvent.WINDOW_HIDDEN,
                 _ -> stateManager.removeAiChatWindowForGroup(context, groupName)
         );
 

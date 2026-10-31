@@ -1,12 +1,15 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -17,6 +20,7 @@ import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -77,6 +81,8 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
     @FXML
     private HBox buttonRow;
     @FXML
+    private TextField noFilePlaceholder;
+    @FXML
     private JabRefIconView fulltextFetcher;
     @FXML
     private ProgressIndicator progressIndicator;
@@ -124,12 +130,11 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        // Bind directly to the view model's own list (not a wrapper): JavaFX's bindContentBidirectional
-        // dispatches change events by identity of the lists it was given, so wrapping one side (e.g. in
-        // UiThreadObservableList) makes every Change#getList() report the wrapped delegate instead of the
-        // list JavaFX is tracking, silently breaking the live sync (a Change#getList() identity mismatch).
-        // filesProperty() is only ever mutated on the FX Application Thread, so no extra marshaling is needed.
-        Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
+        // Bind directly to the view model's underlying list (not a wrapper): viewModel.getFiles() rather than viewModel.filesProperty()
+        // a wrapper like viewModel.filesProperty() (SimpleListProperty): JavaFX's Bindings.bindContentBidirectional
+        // dispatches change events based on list instance identity (change.getList()), so wrapping the list
+        // causes an identity mismatch that silently breaks live synchronization.
+        Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.getFiles());
     }
 
     @FXML
@@ -158,7 +163,8 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         );
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
-                .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
+                .withTooltipText(linkedFile -> linkedFile.linkProperty().flatMap(_ ->
+                        linkedFile.descriptionProperty().map(_ -> linkedFile.getDescriptionAndLink())))
                 .withPseudoClass(PseudoClass.getPseudoClass("auto-found"), LinkedFileViewModel::isAutomaticallyFoundProperty)
                 .withGraphic(this::createFileDisplay)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
@@ -192,6 +198,12 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         // The button row acts as the list's trailing row: same height as a list row, buttons only.
         buttonRow.prefHeightProperty().bind(listView.fixedCellSizeProperty());
         buttonRow.minHeightProperty().bind(listView.fixedCellSizeProperty());
+        // Without a file, the row looks like an empty text field with its buttons to the right (as the
+        // identifier editors do); with files, the buttons follow the list as its trailing row.
+        BooleanBinding noFiles = Bindings.isEmpty(listView.getItems());
+        noFilePlaceholder.visibleProperty().bind(noFiles);
+        noFilePlaceholder.managedProperty().bind(noFiles);
+        buttonRow.paddingProperty().bind(Bindings.when(noFiles).then(Insets.EMPTY).otherwise(new Insets(0, 0, 0, 4)));
 
         fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
         progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
@@ -270,7 +282,7 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
         Label label = new Label();
         label.graphicProperty().bind(linkedFile.typeIconProperty());
         label.textProperty().bind(linkedFile.linkProperty());
-        label.getStyleClass().setAll("file-row-text");
+        label.getStyleClass().add("file-row-text");
         label.textOverrunProperty().setValue(OverrunStyle.LEADING_ELLIPSIS);
         EasyBind.subscribe(linkedFile.isAutomaticallyFoundProperty(), found -> label.pseudoClassStateChanged(opacity, found));
 
@@ -409,6 +421,15 @@ public class LinkedFilesEditor extends VBox implements FieldEditorFX {
 
     @FXML
     public void addNewFile() {
+        // A selected suggestion (file found in the file directory, not yet linked) is what the user wants to add,
+        // so "+" links it directly instead of asking for a new file link.
+        List<LinkedFileViewModel> selectedSuggestions = listView.getSelectionModel().getSelectedItems().stream()
+                                                                .filter(LinkedFileViewModel::isAutomaticallyFound)
+                                                                .toList();
+        if (!selectedSuggestions.isEmpty()) {
+            selectedSuggestions.forEach(LinkedFileViewModel::acceptAsLinked);
+            return;
+        }
         dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).filter(file -> !file.isEmpty()).ifPresent(newLinkedFile -> viewModel.addNewLinkedFile(newLinkedFile));
     }
 

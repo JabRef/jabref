@@ -125,7 +125,7 @@ public class BookCoverFetcher {
         try {
             download.toFile(destination);
             deleteNotAvailableFileIfExists(name, directory);
-        } catch (FetcherClientException | FetcherServerException e) {
+        } catch (FetcherClientException | FetcherServerException _) {
             LOGGER.info("Remote book cover does not exist or server returned an error for URL: {}", url);
             LOGGER.info("Flagging book cover as not available");
             flagAsNotAvailable(name, directory);

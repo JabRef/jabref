@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
@@ -1014,6 +1015,25 @@ class BibDatabaseWriterTest {
                         "  note = {some note}," + OS.NEWLINE +
                         "}" + OS.NEWLINE,
                 stringWriter.toString());
+    }
+
+    @Test
+    void saveActionsUseConfiguredMutationScheduler() throws IOException {
+        AtomicInteger scheduledMutations = new AtomicInteger();
+        databaseWriter.withMutationScheduler(mutation -> {
+            scheduledMutations.incrementAndGet();
+            mutation.run();
+        });
+        metaData.setSaveActions(new FieldFormatterCleanupActions(true, List.of(
+                new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()))));
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "SOME TITLE");
+        database.insertEntry(entry);
+
+        databaseWriter.writeDatabase(bibtexContext);
+
+        assertEquals(1, scheduledMutations.get());
+        assertEquals("some title", entry.getField(StandardField.TITLE).orElseThrow());
     }
 
     @Test

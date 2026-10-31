@@ -26,7 +26,7 @@ Chats with AI should be stored somewhere. But where and how?
 Chosen option: "In local user folder", because
 it's very hard to work with a shared library, if two users will work
 simultaneously on one library, then AI chats file will be absolutely arbitrary
-and unmergable.
+and unmergeable.
 
 ## Pros and Cons of the Options
 

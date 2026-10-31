@@ -129,7 +129,7 @@ public class Highlighter {
         List<SearchQueryNode> queryNodes = getSearchQueryNodes(searchQuery);
         Map<Optional<Field>, List<String>> searchTermsMap = new HashMap<>();
         for (SearchQueryNode searchTerm : queryNodes) {
-            searchTermsMap.computeIfAbsent(searchTerm.field(), k -> new ArrayList<>()).add(searchTerm.term());
+            searchTermsMap.computeIfAbsent(searchTerm.field(), _ -> new ArrayList<>()).add(searchTerm.term());
         }
         return searchTermsMap;
     }

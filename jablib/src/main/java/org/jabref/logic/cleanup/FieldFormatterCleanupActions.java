@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.formatter.Formatters;
@@ -106,18 +107,27 @@ public class FieldFormatterCleanupActions {
 
     /// @param libraryKeywordSeparator the separator declared by the library the entry belongs to, or `null` for the global preference
     public List<FieldChange> applySaveActions(BibEntry entry, @Nullable Character libraryKeywordSeparator) {
+        return applySaveActions(entry, libraryKeywordSeparator, Runnable::run);
+    }
+
+    /// @param mutationScheduler routes [BibEntry] field mutations to the correct thread
+    public List<FieldChange> applySaveActions(BibEntry entry,
+                                              @Nullable Character libraryKeywordSeparator,
+                                              Consumer<Runnable> mutationScheduler) {
         if (enabled) {
-            return applyAllActions(entry, libraryKeywordSeparator);
+            return applyAllActions(entry, libraryKeywordSeparator, mutationScheduler);
         } else {
             return List.of();
         }
     }
 
-    private List<FieldChange> applyAllActions(BibEntry entry, @Nullable Character libraryKeywordSeparator) {
+    private List<FieldChange> applyAllActions(BibEntry entry,
+                                              @Nullable Character libraryKeywordSeparator,
+                                              Consumer<Runnable> mutationScheduler) {
         List<FieldChange> result = new ArrayList<>();
 
         for (FieldFormatterCleanup action : getConfiguredActions(libraryKeywordSeparator)) {
-            result.addAll(action.cleanup(entry));
+            result.addAll(action.cleanup(entry, mutationScheduler));
         }
 
         return result;

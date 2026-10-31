@@ -64,7 +64,7 @@ public class CopyFilesAction extends SimpleCommand {
                     exportTask);
 
             uiTaskExecutor.execute(exportTask);
-            exportTask.setOnSucceeded(e -> showDialog(exportTask.getValue()));
+            exportTask.setOnSucceeded(_ -> showDialog(exportTask.getValue()));
         });
     }
 }

@@ -76,7 +76,7 @@ public class SelectedItemsContainer extends FlowPane {
 
             getChildren().addAll(label, removeButton);
 
-            this.setOnMouseClicked(e -> {
+            this.setOnMouseClicked(_ -> {
                 if (activePopup != null && activePopup.isShowing()) {
                     activePopup.hide();
                     return;

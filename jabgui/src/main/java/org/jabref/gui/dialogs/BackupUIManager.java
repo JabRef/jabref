@@ -2,13 +2,19 @@ package org.jabref.gui.dialogs;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupResolverDialog;
@@ -24,27 +30,36 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Stores all user dialogs related to [BackupManager].
 public class BackupUIManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
+    private static final Deque<BackupDialogOwner> OPEN_DIALOGS = new ArrayDeque<>();
+
+    private record BackupDialogOwner(LibraryTabContainer tabContainer, Path path) {
+    }
 
     private BackupUIManager() {
     }
 
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
+                                                                 LibraryTabContainer tabContainer,
                                                                  Path originalPath,
                                                                  GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  StateManager stateManager) {
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
+                tabContainer,
+                stateManager,
                 preferences.getExternalApplicationsPreferences(),
                 originalPath,
                 preferences.getFilePreferences().getBackupDirectory());
@@ -77,22 +92,63 @@ public class BackupUIManager {
                 }
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, stateManager);
+                return showReviewBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
             }
             return Optional.empty();
         });
     }
 
     private static Optional<ButtonType> showBackupResolverDialog(DialogService dialogService,
+                                                                 LibraryTabContainer tabContainer,
+                                                                 StateManager stateManager,
                                                                  ExternalApplicationsPreferences externalApplicationsPreferences,
                                                                  Path originalPath,
                                                                  Path backupDir) {
-        return UiTaskExecutor.runInJavaFXThread(
-                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences)));
+        return UiTaskExecutor.runInJavaFXThread(() -> showForLibrary(tabContainer, stateManager, originalPath,
+                () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences))));
+    }
+
+    private static <T> T showForLibrary(LibraryTabContainer tabContainer, StateManager stateManager, Path path, Supplier<T> showDialog) {
+        BackupDialogOwner owner = new BackupDialogOwner(tabContainer, path);
+        OPEN_DIALOGS.push(owner);
+        // Let the action that selected another tab finish before restoring the dialog's library.
+        ChangeListener<Optional<LibraryTab>> selectionListener = (_, _, _) -> Platform.runLater(() -> {
+            if (OPEN_DIALOGS.peek() == owner) {
+                raiseTabOf(tabContainer, path);
+            }
+        });
+        stateManager.activeTabProperty().addListener(selectionListener);
+        try {
+            raiseTabOf(tabContainer, path);
+            return showDialog.get();
+        } finally {
+            stateManager.activeTabProperty().removeListener(selectionListener);
+            OPEN_DIALOGS.pop();
+            if (!OPEN_DIALOGS.isEmpty()) {
+                BackupDialogOwner outerOwner = OPEN_DIALOGS.peek();
+                raiseTabOf(outerOwner.tabContainer(), outerOwner.path());
+            }
+        }
+    }
+
+    /// Selects the tab of the library the dialog is about, so that the dialog does not appear over an unrelated
+    /// library when several libraries load at once. Must run in the same FX runnable as showing the dialog:
+    /// a separate `runLater` could be interleaved with another loading library's selection.
+    private static void raiseTabOf(LibraryTabContainer tabContainer, Path originalPath) {
+        Path absolutePath = originalPath.toAbsolutePath();
+        Optional<LibraryTab> libraryTab = tabContainer.getLibraryTabs().stream()
+                                                      .filter(tab -> tab.getBibDatabaseContext()
+                                                                        .getDatabasePath()
+                                                                        .map(Path::toAbsolutePath)
+                                                                        .filter(absolutePath::equals)
+                                                                        .isPresent())
+                                                      .findFirst();
+        libraryTab.ifPresent(tabContainer::showLibraryTab);
     }
 
     private static Optional<ParserResult> showReviewBackupDialog(
             DialogService dialogService,
+            LibraryTabContainer tabContainer,
             Path originalPath,
             GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
@@ -116,28 +172,47 @@ public class BackupUIManager {
                         changes,
                         originalDatabase, Localization.lang("Review backup")
                 );
-                Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
+                Optional<Boolean> allChangesResolved = showForLibrary(tabContainer, stateManager, originalPath,
+                        () -> dialogService.showCustomDialogAndWait(reviewBackupDialog));
                 if (allChangesResolved.orElse(false)) {
                     List<DatabaseChange> resolvedChanges = reviewBackupDialog.getResolvedChanges();
-                    LibraryTab saveState = stateManager.activeTabProperty().get().get();
+                    // The library is still being opened, so no tab exists for it yet - the active tab (if any) belongs to another
+                    // library. Its change monitor is set up when the tab is created.
                     stateManager.getUndoManager(originalDatabase).addEdit(Localization.lang("Merged external changes"), edit ->
                             resolvedChanges.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(edit)));
-                    if (reviewBackupDialog.areAllChangesDenied()) {
-                        // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
-                        saveState.resetChangeMonitor();
-                    }
 
                     // In case any change of the backup is accepted, the in-memory file differs from the file on disk (which is not the backup file)
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
+                    markRecoveredIfContentRestored(originalParserResult);
                     return Optional.of(originalParserResult);
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, stateManager);
+                return showRestoreBackupDialog(dialogService, tabContainer, originalPath, preferences, fileUpdateMonitor, stateManager);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);
             return Optional.empty();
+        }
+    }
+
+    /// An original that could not be parsed at all (e.g. it still contains merge conflict markers) leaves its
+    /// [ParserResult] marked invalid, and the caller reports that as an open error and closes the tab. Reviewing a
+    /// backup merges content into that same result, so the flag has to be cleared once something was actually
+    /// recovered - otherwise the recovery is discarded right after the user performed it.
+    ///
+    /// Whether a change was accepted is not a sufficient signal: a backup that differs only in its groups produces
+    /// both a metadata change and a group change, and accepting the metadata change alone restores nothing. So the
+    /// restored content itself is what decides. If nothing was restored the result stays invalid and the unreadable
+    /// original is still reported.
+    @VisibleForTesting
+    static void markRecoveredIfContentRestored(ParserResult parserResult) {
+        BibDatabase database = parserResult.getDatabase();
+        boolean restoredContent = database.hasEntries()
+                || !database.hasNoStrings()
+                || database.getPreamble().isPresent();
+        if (restoredContent) {
+            parserResult.setInvalid(false);
         }
     }
 }

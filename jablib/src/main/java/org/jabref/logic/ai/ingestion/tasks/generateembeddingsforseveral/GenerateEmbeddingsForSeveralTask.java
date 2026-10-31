@@ -43,7 +43,7 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
     private void configure(StringProperty name) {
         showToUser(true);
         titleProperty().set(Localization.lang("Generating embeddings for %0", name.get()));
-        name.addListener((o, oldValue, newValue) -> titleProperty().set(Localization.lang("Generating embeddings for %0", newValue)));
+        name.addListener((_, _, newValue) -> titleProperty().set(Localization.lang("Generating embeddings for %0", newValue)));
 
         progressCounter.increaseWorkMax(request.linkedFiles().size());
         progressCounter.listenToAllProperties(this::updateProgress);

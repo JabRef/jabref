@@ -104,7 +104,7 @@ public class ImportResultsPage extends WizardPane {
 
         HBox buttonBar = new HBox();
         exportButton = new Button(Localization.lang("Export results"));
-        exportButton.setOnAction(e -> viewModel.startExport());
+        exportButton.setOnAction(_ -> viewModel.startExport());
         buttonBar.getChildren().add(exportButton);
 
         contentPane.getChildren().addAll(summaryLabel, resultsTable, buttonBar);
@@ -117,7 +117,7 @@ public class ImportResultsPage extends WizardPane {
         progressPane.managedProperty().bind(viewModel.taskActiveProperty());
         progressPane.visibleProperty().bind(viewModel.taskActiveProperty());
 
-        viewModel.resultTableItems().addListener((ListChangeListener<ImportFilesResultItemViewModel>) c -> {
+        viewModel.resultTableItems().addListener((ListChangeListener<ImportFilesResultItemViewModel>) _ -> {
             if (!viewModel.resultTableItems().isEmpty() && !viewModel.taskActiveProperty().get()) {
                 Platform.runLater(() -> {
                     ((BorderPane) getContent()).setCenter(contentPane);

@@ -100,7 +100,7 @@ class MVStoreBibEntryRelationRepositoryTest {
     private List<BibEntry> createRelations(BibEntry entry) {
         return entry
                 .getCitationKey()
-                .map(key -> RandomGenerator.StreamableGenerator
+                .map(_ -> RandomGenerator.StreamableGenerator
                         .of("L128X256MixRandom").ints(12) // 12 is arbitrary here. We just want some relations. We do not do any "load" testing.
                         .mapToObj(i -> new BibEntry(StandardEntryType.Book)
                                 .withField(StandardField.TITLE, "A title: " + i)

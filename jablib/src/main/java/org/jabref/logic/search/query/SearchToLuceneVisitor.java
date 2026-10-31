@@ -3,6 +3,7 @@ package org.jabref.logic.search.query;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.jabref.model.search.LinkedFilesConstants;
 import org.jabref.model.search.SearchFlags;
@@ -13,6 +14,7 @@ import org.jabref.search.SearchParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
 
 /// Tests are located in `org.jabref.logic.search.query.SearchQueryLuceneConversionTest`.
+// [impl->req~jabgui.search.fulltext.case-sensitive~1]
 public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
     private final EnumSet<SearchFlags> searchFlags;
 
@@ -66,12 +68,10 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         String term = SearchQuery.unescapeSearchValue(ctx.searchValue());
         boolean isQuoted = ctx.searchValue().getStart().getType() == SearchParser.STRING_LITERAL;
 
-        // unfielded expression
+        // unfielded expression - the search bar flags apply
         if (ctx.FIELD() == null) {
-            if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
-                return "/" + term + "/";
-            }
-            return isQuoted ? "\"" + escapeQuotes(term) + "\"" : escapeForLucene(term);
+            String value = buildValue(term, searchFlags.contains(SearchFlags.REGULAR_EXPRESSION), isQuoted);
+            return searchFlags.contains(SearchFlags.CASE_SENSITIVE) ? anyFieldExpression(value) : value;
         }
 
         // TODO: Here, there is no unescaping of the term (e.g., field\=thing=value does not work as expected)
@@ -80,9 +80,9 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             return "";
         }
 
-        field = SearchFieldConstants.ANY_FIELD.equals(field) || SearchFieldConstants.ANY_FIELD_ALIAS.equals(field) ? "" : field + ":";
+        boolean isAnyField = SearchFieldConstants.ANY_FIELD.equals(field) || SearchFieldConstants.ANY_FIELD_ALIAS.equals(field);
         int operator = ctx.operator().getStart().getType();
-        return buildFieldExpression(field, term, operator, isQuoted);
+        return buildFieldExpression(isAnyField ? "" : field, term, operator, isQuoted);
     }
 
     /// A valid field is a field that is supported by the Lucene index.
@@ -92,18 +92,31 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         return SearchFieldConstants.ANY_FIELD.equals(field) || SearchFieldConstants.ANY_FIELD_ALIAS.equals(field) || LinkedFilesConstants.PDF_FIELDS.contains(field);
     }
 
+    /// @param field the Lucene field to search in, or the empty string to search in all of [LinkedFilesConstants#PDF_FIELDS]
     private String buildFieldExpression(String field, String term, int operator, boolean isQuoted) {
-        boolean isRegexOp = isRegexOperator(operator);
-        boolean isNegationOp = isNegationOperator(operator);
-
-        if (isRegexOp) {
-            String expression = field + "/" + term + "/";
-            return isNegationOp ? "NOT " + expression : expression;
+        String value = buildValue(term, isRegexOperator(operator), isQuoted);
+        String expression;
+        if (isCaseSensitiveOperator(operator)) {
+            expression = field.isEmpty() ? anyFieldExpression(value) : LinkedFilesConstants.caseSensitiveFieldOf(field) + ":" + value;
         } else {
-            term = isQuoted ? "\"" + escapeQuotes(term) + "\"" : escapeForLucene(term);
-            String expression = field + term;
-            return isNegationOp ? "NOT " + expression : expression;
+            expression = field.isEmpty() ? value : field + ":" + value;
         }
+        return isNegationOperator(operator) ? "NOT " + expression : expression;
+    }
+
+    private static String buildValue(String term, boolean isRegex, boolean isQuoted) {
+        if (isRegex) {
+            return "/" + term + "/";
+        }
+        return isQuoted ? "\"" + escapeQuotes(term) + "\"" : escapeForLucene(term);
+    }
+
+    /// The default fields of the query parser are analyzed case-insensitively, so a case-sensitive search
+    /// across all fields has to name the case-preserving fields explicitly.
+    private static String anyFieldExpression(String value) {
+        return LinkedFilesConstants.CASE_SENSITIVE_PDF_FIELDS.stream()
+                                                             .map(field -> field + ":" + value)
+                                                             .collect(Collectors.joining(" OR ", "(", ")"));
     }
 
     private static String escapeQuotes(String term) {
@@ -123,6 +136,20 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
                  SearchParser.NEEQUAL,
                  SearchParser.NCEEQUAL,
                  SearchParser.NREQUAL,
+                 SearchParser.NCREEQUAL ->
+                    true;
+            default ->
+                    false;
+        };
+    }
+
+    private static boolean isCaseSensitiveOperator(int operator) {
+        return switch (operator) {
+            case SearchParser.CEQUAL,
+                 SearchParser.CEEQUAL,
+                 SearchParser.CREEQUAL,
+                 SearchParser.NCEQUAL,
+                 SearchParser.NCEEQUAL,
                  SearchParser.NCREEQUAL ->
                     true;
             default ->

@@ -102,7 +102,7 @@ public class BibEntrySummarizator {
             return Optional.empty();
         }
 
-        Optional<String> document = universalFileParser.parse(path.get());
+        Optional<String> document = universalFileParser.parseAsString(path.get());
 
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();

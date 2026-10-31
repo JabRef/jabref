@@ -106,7 +106,7 @@ public class SearchConfigurationPage extends WizardPane {
 
         browseButton = new Button();
         browseButton.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
-        browseButton.setOnAction(e -> viewModel.browseFileDirectory());
+        browseButton.setOnAction(_ -> viewModel.browseFileDirectory());
         browseButton.setMinWidth(30);
         browseButton.setPrefWidth(30);
 

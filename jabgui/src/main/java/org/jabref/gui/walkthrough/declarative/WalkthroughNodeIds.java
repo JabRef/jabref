@@ -44,6 +44,9 @@ public final class WalkthroughNodeIds {
     /// Source URL field of `LinkedFileEditDialog.fxml`.
     public static final String LINKED_FILE_SOURCE_URL = "linked-file-source-url";
 
+    /// File add chip of `AllFieldsTab`.
+    public static final String FILE_ADD_CHIP = "file-add-chip";
+
     /// Group name field of `GroupDialog.fxml`.
     public static final String GROUP_NAME = "group-name";
 

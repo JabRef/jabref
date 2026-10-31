@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import javafx.beans.binding.IntegerBinding;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -14,33 +15,47 @@ import javafx.scene.Node;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.JabRefSvgIcon;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.gui.undo.HeadlessGuiUndoManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
+import org.jabref.logic.search.NoOpSearchBackend;
+import org.jabref.logic.search.SearchContext;
+import org.jabref.logic.search.inmemory.InMemorySearchBackend;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(JavaFxExtension.class)
 class GroupNodeViewModelTest {
 
     private StateManager stateManager;
@@ -54,6 +69,7 @@ class GroupNodeViewModelTest {
         stateManager = mock(StateManager.class);
         when(stateManager.getUndoManager(any())).thenReturn(new HeadlessGuiUndoManager());
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
+        when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
         databaseContext = new BibDatabaseContext();
         taskExecutor = new CurrentThreadTaskExecutor();
         preferences = mock(GuiPreferences.class);
@@ -65,6 +81,12 @@ class GroupNodeViewModelTest {
                 GroupHierarchyType.INDEPENDENT,
                 false
         ));
+        SearchContext searchContext = new SearchContext(
+                new SimpleBooleanProperty(false),
+                NoOpSearchBackend::new,
+                () -> new InMemorySearchBackend(databaseContext, new BibEntryPreferences(','))
+        );
+        when(stateManager.getSearchContext(any())).thenReturn(searchContext);
 
         viewModel = getViewModelForGroup(
                 new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false));
@@ -273,6 +295,27 @@ class GroupNodeViewModelTest {
     }
 
     @Test
+    void hierarchicalCountEvaluatesEachGroupOncePerEntry() {
+        BibEntry entry = new BibEntry();
+        databaseContext.getDatabase().insertEntry(entry);
+        AbstractGroup parentGroup = mock(AbstractGroup.class);
+        when(parentGroup.getName()).thenReturn("Parent");
+        when(parentGroup.getHierarchicalContext()).thenReturn(GroupHierarchyType.INCLUDING);
+        AbstractGroup childGroup = mock(AbstractGroup.class);
+        when(childGroup.getName()).thenReturn("Child");
+        when(childGroup.getHierarchicalContext()).thenReturn(GroupHierarchyType.INDEPENDENT);
+
+        GroupTreeNode root = new GroupTreeNode(parentGroup);
+        root.addChild(new GroupTreeNode(childGroup));
+        GroupNodeViewModel vm = getViewModelForGroup(root);
+
+        vm.ensureMatchedEntriesLoaded();
+
+        verify(parentGroup, times(1)).contains(entry);
+        verify(childGroup, times(1)).contains(entry);
+    }
+
+    @Test
     void hitsIndependentAutomaticGroupIgnoresVmChildren() {
         databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.KEYWORDS, "A > B"));
         databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.KEYWORDS, "A > C"));
@@ -309,6 +352,28 @@ class GroupNodeViewModelTest {
         preferences.getGroupsPreferences().setDisplayGroupCount(true);
         vm.ensureMatchedEntriesLoaded();
         assertEquals(1, vm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void allEntriesCountUsesDatabaseEntryCountWithoutSchedulingFullLibraryMatching() {
+        TaskExecutor recordingTaskExecutor = mock(TaskExecutor.class);
+        GroupNodeViewModel allEntriesViewModel = new GroupNodeViewModel(
+                databaseContext,
+                stateManager,
+                recordingTaskExecutor,
+                new AllEntriesGroup("All entries"),
+                new CustomLocalDragboard(),
+                preferences);
+
+        databaseContext.getDatabase().insertEntries(List.of(new BibEntry(), new BibEntry()));
+        allEntriesViewModel.ensureMatchedEntriesLoaded();
+
+        assertEquals(2, allEntriesViewModel.getHits().getValue().intValue());
+        verify(recordingTaskExecutor, never()).schedule(any(BackgroundTask.class), anyLong(), any(TimeUnit.class));
+
+        databaseContext.getDatabase().insertEntry(new BibEntry());
+
+        assertEquals(3, allEntriesViewModel.getHits().getValue().intValue());
     }
 
     @Test
@@ -381,5 +446,62 @@ class GroupNodeViewModelTest {
         vm.updateMatchedEntries();
 
         assertEquals(2, hits.getValue().intValue());
+    }
+
+    @Test
+    void parentIncludingGroupMatchesAutomaticChildSubgroups() {
+        databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.KEYWORDS, "A > B"));
+        databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.KEYWORDS, "A > C"));
+
+        ExplicitGroup parentGroup = new ExplicitGroup("Parent", GroupHierarchyType.INCLUDING, ',');
+        GroupTreeNode parentNode = new GroupTreeNode(parentGroup);
+        AutomaticKeywordGroup autoGroup = new AutomaticKeywordGroup(
+                "Keywords",
+                GroupHierarchyType.INCLUDING,
+                StandardField.KEYWORDS,
+                ',',
+                '>'
+        );
+        parentNode.addChild(new GroupTreeNode(autoGroup));
+
+        GroupNodeViewModel parentVm = getViewModelForGroup(parentNode);
+        parentVm.ensureMatchedEntriesLoaded();
+
+        assertEquals(2, parentVm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void findGroupNodeViewModelReturnsExactInstanceByIdentityWithDuplicateGroups() {
+        ExplicitGroup parentGroup = new ExplicitGroup("Parent", GroupHierarchyType.INDEPENDENT, ',');
+        GroupTreeNode parentNode = new GroupTreeNode(parentGroup);
+
+        WordKeywordGroup duplicateGroup1 = new WordKeywordGroup("Duplicate", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "tag", true, ',', false);
+        WordKeywordGroup duplicateGroup2 = new WordKeywordGroup("Duplicate", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "tag", true, ',', false);
+
+        GroupTreeNode childNode1 = parentNode.addSubgroup(duplicateGroup1);
+        GroupTreeNode childNode2 = parentNode.addSubgroup(duplicateGroup2);
+
+        GroupNodeViewModel parentVm = getViewModelForGroup(parentNode);
+
+        GroupNodeViewModel foundVm1 = parentVm.findGroupNodeViewModel(childNode1).orElseThrow();
+        GroupNodeViewModel foundVm2 = parentVm.findGroupNodeViewModel(childNode2).orElseThrow();
+
+        assertEquals(childNode1, foundVm1.getGroupNode());
+        assertEquals(childNode2, foundVm2.getGroupNode());
+        assertTrue(foundVm1.getGroupNode() == childNode1);
+        assertTrue(foundVm2.getGroupNode() == childNode2);
+    }
+
+    @Test
+    void disposingCancelsSearchIndexTasksAndPreventsUpdates() {
+        SearchGroup searchGroup = new SearchGroup("Search", GroupHierarchyType.INDEPENDENT, "author=Alice", EnumSet.noneOf(SearchFlags.class));
+        GroupNodeViewModel searchVm = getViewModelForGroup(searchGroup);
+
+        searchVm.dispose();
+
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Alice");
+        databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry)));
+
+        assertEquals(0, searchVm.getHits().getValue().intValue());
     }
 }

@@ -79,7 +79,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        ControlHelper.setAction(connectButton, this.getDialogPane(), event -> openDatabase());
+        ControlHelper.setAction(connectButton, this.getDialogPane(), _ -> openDatabase());
         Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
         // must be set here, because in initializing the button is still null
         btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
@@ -88,7 +88,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         viewModel.applyClipboardConnectionUrl();
         // addEventHandler, not setOnShown: BaseDialog already installs a shown handler
         // runLater: the dialog moves the focus to its default button after the shown event
-        addEventHandler(DialogEvent.DIALOG_SHOWN, event -> Platform.runLater(() -> {
+        addEventHandler(DialogEvent.DIALOG_SHOWN, _ -> Platform.runLater(() -> {
             connectionUrl.requestFocus();
             connectionUrl.selectAll();
         }));
@@ -147,7 +147,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         // Settings a pasted URL or the last login switched on must not stay hidden
         EasyBind.subscribe(viewModel.useSSLProperty(), this::expandAdvancedIf);
         EasyBind.subscribe(viewModel.expertModeProperty(), this::expandAdvancedIf);
-        EasyBind.subscribe(advancedPane.expandedProperty(), expanded -> scheduleResize());
+        EasyBind.subscribe(advancedPane.expandedProperty(), _ -> scheduleResize());
 
         // Must be executed after the initialization of the view, otherwise it doesn't work
         Platform.runLater(() -> {
@@ -157,7 +157,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
             visualizer.initVisualization(viewModel.portValidation(), port, true);
             visualizer.initVisualization(viewModel.userValidation(), user, true);
 
-            EasyBind.subscribe(autosave.selectedProperty(), selected ->
+            EasyBind.subscribe(autosave.selectedProperty(), _ ->
                     visualizer.initVisualization(viewModel.folderValidation(), folder, true));
         });
     }

@@ -9,7 +9,7 @@ checkout-pr pr-id: ensure-gg-cmd
     if command -v gh >/dev/null 2>&1; then gh pr checkout {{pr-id}}; else sh ./gg.cmd jbang https://github.com/JabRef/jabref/blob/main/.jbang/CheckoutPR.java {{pr-id}}; fi
 
 [unix]
-run-brach branch: ensure-gg-cmd
+run-branch branch: ensure-gg-cmd
     sh ./gg.cmd jbang git@jbangdev checkout {{branch}}
     sh ./gg.cmd jbang git@jbangdev fetch origin
     sh ./gg.cmd jbang git@jbangdev merge origin/main

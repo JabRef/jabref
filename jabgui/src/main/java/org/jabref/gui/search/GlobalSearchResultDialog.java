@@ -68,7 +68,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
 
-        resultsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+        resultsTable.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
             } else {
@@ -91,14 +91,14 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                                  : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
         });
 
-        stage.setOnShown(event -> {
+        stage.setOnShown(_ -> {
             stage.setHeight(preferences.getSearchPreferences().getSearchWindowHeight());
             stage.setWidth(preferences.getSearchPreferences().getSearchWindowWidth());
             container.setDividerPositions(preferences.getSearchPreferences().getSearchWindowDividerPosition());
             searchBar.requestFocus();
         });
 
-        stage.setOnHidden(event -> {
+        stage.setOnHidden(_ -> {
             preferences.getSearchPreferences().setSearchWindowHeight(getHeight());
             preferences.getSearchPreferences().setSearchWindowWidth(getWidth());
             preferences.getSearchPreferences().setSearchWindowDividerPosition(container.getDividers().getFirst().getPosition());

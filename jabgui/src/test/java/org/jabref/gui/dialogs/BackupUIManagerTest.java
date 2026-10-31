@@ -4,34 +4,64 @@ import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefGuiStateManager;
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.backup.BackupResolverDialog;
+import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.collab.DatabaseChange;
+import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.testutils.JavaFxTest;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.BackupFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.controlsfx.control.HyperlinkLabel;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
+import org.mockito.InOrder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,6 +80,11 @@ class BackupUIManagerTest extends JavaFxTest {
         when(preferences.getExternalApplicationsPreferences()).thenReturn(mock(ExternalApplicationsPreferences.class));
     }
 
+    @AfterEach
+    void tearDown() {
+        Injector.forgetAll();
+    }
+
     @Test
     void failedRestoreShowsBackupPathAndCause(@TempDir Path tempDir) throws IOException {
         Path backupDir = tempDir.resolve("backups");
@@ -62,18 +97,190 @@ class BackupUIManagerTest extends JavaFxTest {
         Files.writeString(originalFile.resolve("existing-file"), "existing content");
         Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
         Files.writeString(backupFile, "@article{backup}");
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.emptyObservableList());
 
         interact(() -> BackupUIManager.showRestoreBackupDialog(
                 dialogService,
+                tabContainer,
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
-                mock(StateManager.class)));
+                new JabRefGuiStateManager()));
 
         verify(dialogService).showErrorDialogAndWait(
                 eq(Localization.lang("Restore backup")),
                 eq(Localization.lang("Could not restore the backup file '%0'.", backupFile)),
                 any(DirectoryNotEmptyException.class));
+    }
+
+    /// The review runs while the library is still being opened, so no tab exists for it yet and the active tab may be
+    /// absent altogether (welcome tab, startup). The review must not depend on it. The backup adds groups to a library
+    /// without groups, which produces a metadata change and a group change; accepting both has to install the groups.
+    @Test
+    void reviewBackupAcceptingAllChangesWorksWithoutAnActiveTab(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.REVIEW_BACKUP));
+        when(dialogService.showCustomDialogAndWait(any(DatabaseChangesResolverDialog.class)))
+                .thenAnswer(invocation -> {
+                    DatabaseChangesResolverDialog dialog = invocation.getArgument(0);
+                    dialog.getResolvedChanges().forEach(DatabaseChange::accept);
+                    return Optional.of(true);
+                });
+        // Sealed, so deep stubs cannot mock it
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+        doReturn(new TextBasedPreviewLayout("", mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)))
+                .when(previewPreferences).getSelectedPreviewLayout();
+        Injector.setModelOrService(DialogService.class, dialogService);
+        Injector.setModelOrService(GuiPreferences.class, preferences);
+        Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
+        Injector.setModelOrService(TaskExecutor.class, mock(TaskExecutor.class));
+        Injector.setModelOrService(ClipBoardManager.class, mock(ClipBoardManager.class));
+
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@Article{original, title = {Original}}");
+        Path backupFile = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir);
+        Files.writeString(backupFile, """
+                @Article{original,
+                  title = {Original},
+                }
+                @Article{added,
+                  title = {Added},
+                }
+
+                @Comment{jabref-meta: grouping:
+                0 AllEntriesGroup:;
+                1 StaticGroup:TODO\\;0\\;1\\;0x8a8a8aff\\;\\;\\;;
+                }
+                """);
+
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.emptyObservableList());
+
+        // Called off the JavaFX thread, as the library loading task does
+        Optional<ParserResult> result = BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                tabContainer,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                new JabRefGuiStateManager());
+
+        BibDatabaseContext restored = result.orElseThrow().getDatabaseContext();
+        assertEquals(2, restored.getDatabase().getEntryCount());
+        assertEquals(List.of("TODO"), restored.getMetaData().getGroups().orElseThrow().getChildren().stream().map(GroupTreeNode::getName).toList());
+    }
+
+    @Test
+    void resolverDialogRaisesTabOfAffectedLibraryFirst(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
+                .thenReturn(Optional.of(BackupResolverDialog.IGNORE_BACKUP));
+
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@article{original}");
+        Files.writeString(BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir), "@article{backup}");
+
+        LibraryTab affectedTab = tabFor(originalFile);
+        LibraryTab otherTab = tabFor(tempDir.resolve("other.bib"));
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(otherTab, affectedTab));
+
+        interact(() -> BackupUIManager.showRestoreBackupDialog(
+                dialogService,
+                tabContainer,
+                originalFile,
+                preferences,
+                mock(FileUpdateMonitor.class),
+                new JabRefGuiStateManager()));
+
+        InOrder inOrder = inOrder(tabContainer, dialogService);
+        inOrder.verify(tabContainer).showLibraryTab(affectedTab);
+        inOrder.verify(dialogService).showCustomDialogAndWait(any(BackupResolverDialog.class));
+    }
+
+    @Test
+    void closingNestedBackupDialogRaisesOuterLibrary(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        Path outerFile = tempDir.resolve("outer.bib");
+        Path innerFile = tempDir.resolve("inner.bib");
+        for (Path file : List.of(outerFile, innerFile)) {
+            Files.writeString(file, "@article{original}");
+            Files.writeString(BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(file, BackupFileType.BACKUP, backupDir), "@article{backup}");
+        }
+        LibraryTab outerTab = tabFor(outerFile);
+        LibraryTab innerTab = tabFor(innerFile);
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(outerTab, innerTab));
+        AtomicInteger calls = new AtomicInteger();
+        StateManager stateManager = new JabRefGuiStateManager();
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class))).thenAnswer(_ -> {
+            if (calls.getAndIncrement() == 0) {
+                BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, innerFile, preferences,
+                        mock(FileUpdateMonitor.class), stateManager);
+            }
+            return Optional.of(BackupResolverDialog.IGNORE_BACKUP);
+        });
+
+        interact(() -> BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, outerFile, preferences,
+                mock(FileUpdateMonitor.class), stateManager));
+
+        InOrder order = inOrder(tabContainer, dialogService);
+        order.verify(tabContainer).showLibraryTab(outerTab);
+        order.verify(dialogService).showCustomDialogAndWait(any(BackupResolverDialog.class));
+        order.verify(tabContainer).showLibraryTab(innerTab);
+        order.verify(dialogService).showCustomDialogAndWait(any(BackupResolverDialog.class));
+        order.verify(tabContainer).showLibraryTab(outerTab);
+    }
+
+    @Test
+    void backupDialogKeepsItsLibrarySelectedWhenAnotherLibraryOpens(@TempDir Path tempDir) throws IOException {
+        Path backupDir = tempDir.resolve("backups");
+        when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
+        Path originalFile = tempDir.resolve("library.bib");
+        Files.writeString(originalFile, "@article{original}");
+        Files.writeString(BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(originalFile, BackupFileType.BACKUP, backupDir), "@article{backup}");
+
+        LibraryTab affectedTab = tabFor(originalFile);
+        LibraryTab otherTab = tabFor(tempDir.resolve("shared.bib"));
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(affectedTab, otherTab));
+        StateManager stateManager = new JabRefGuiStateManager();
+        doAnswer(invocation -> {
+            LibraryTab tab = invocation.getArgument(0);
+            stateManager.activeTabProperty().set(Optional.of(tab));
+            return null;
+        }).when(tabContainer).showLibraryTab(any());
+        AtomicReference<LibraryTab> selectionDuringDialog = new AtomicReference<>();
+        when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class))).thenAnswer(_ -> {
+            tabContainer.showLibraryTab(otherTab);
+            Object nestedLoop = new Object();
+            Platform.runLater(() -> {
+                selectionDuringDialog.set(stateManager.activeTabProperty().get().orElseThrow());
+                Platform.exitNestedEventLoop(nestedLoop, null);
+            });
+            Platform.enterNestedEventLoop(nestedLoop);
+            return Optional.of(BackupResolverDialog.IGNORE_BACKUP);
+        });
+
+        interact(() -> BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, originalFile, preferences,
+                mock(FileUpdateMonitor.class), stateManager));
+
+        assertEquals(affectedTab, selectionDuringDialog.get());
+        interact(() -> tabContainer.showLibraryTab(otherTab));
+        assertEquals(Optional.of(otherTab), stateManager.activeTabProperty().get());
+    }
+
+    private static LibraryTab tabFor(Path file) {
+        BibDatabaseContext context = new BibDatabaseContext();
+        context.setDatabasePath(file);
+        LibraryTab tab = mock(LibraryTab.class);
+        when(tab.getBibDatabaseContext()).thenReturn(context);
+        return tab;
     }
 
     @Test
@@ -98,5 +305,43 @@ class BackupUIManagerTest extends JavaFxTest {
                 This could indicate that JabRef did not shut down cleanly last time the file was used.
 
                 Do you want to recover the library from the backup file?""".formatted(backupFile.getFileName()), dialogContent.get());
+    }
+
+    /// A conflict-aborted original produces an invalid, empty result. Reviewing the backup merges content into that
+    /// same result, so it has to stop counting as invalid - otherwise the caller reports an open error and closes the
+    /// tab right after the user recovered the library.
+    // [utest->req~import.library.unreadable-reported~1]
+    @Test
+    void recoveredEntryMakesAnInvalidResultValid() {
+        ParserResult parserResult = ParserResult.fromErrorMessage("aborted parse");
+        parserResult.getDatabase().insertEntry(new BibEntry(StandardEntryType.Article).withCitationKey("recovered"));
+
+        BackupUIManager.markRecoveredIfContentRestored(parserResult);
+
+        assertFalse(parserResult.isInvalid());
+    }
+
+    /// Accepting a change is not on its own proof that anything came back: a backup differing only in its groups
+    /// yields a metadata change whose acceptance restores nothing. Such a result must stay invalid, so that an
+    /// unreadable original is still reported instead of opening as an empty library.
+    // [utest->req~import.library.unreadable-reported~1]
+    @Test
+    void resultWithoutRestoredContentStaysInvalid() {
+        ParserResult parserResult = ParserResult.fromErrorMessage("aborted parse");
+
+        BackupUIManager.markRecoveredIfContentRestored(parserResult);
+
+        assertTrue(parserResult.isInvalid());
+    }
+
+    // [utest->req~import.library.unreadable-reported~1]
+    @Test
+    void recoveredStringMakesAnInvalidResultValid() {
+        ParserResult parserResult = ParserResult.fromErrorMessage("aborted parse");
+        parserResult.getDatabase().addString(new BibtexString("name", "content"));
+
+        BackupUIManager.markRecoveredIfContentRestored(parserResult);
+
+        assertFalse(parserResult.isInvalid());
     }
 }

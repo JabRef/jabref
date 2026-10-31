@@ -21,18 +21,19 @@ import javafx.stage.WindowEvent;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.walkthrough.WalkthroughPane;
 
 import com.airhacks.afterburner.injection.Injector;
 
 public class BaseDialog<T> extends Dialog<T> {
 
     protected BaseDialog() {
+        setUpDialogPane(getDialogPane());
         dialogPaneProperty().addListener((_, _, newPane) -> {
             if (newPane != null) {
-                setupKeyBindings(newPane);
+                setUpDialogPane(newPane);
             }
         });
-        setupKeyBindings(getDialogPane());
 
         setDialogIcon(IconTheme.getJabRefIcon());
 
@@ -42,9 +43,9 @@ public class BaseDialog<T> extends Dialog<T> {
         setResizable(true);
     }
 
+    /// [impl->req~ux.dialogs.close-key-binding~1]
     public static boolean closeOnKeyBindingMatch(KeyEvent event, Dialog<?> dialog) {
-        KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-        if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+        if (matchesCloseKeyBinding(event)) {
             dialog.close();
             event.consume();
 
@@ -52,6 +53,13 @@ public class BaseDialog<T> extends Dialog<T> {
         }
 
         return false;
+    }
+
+    /// Key bindings and the pane a walkthrough draws into both belong to the dialog pane, so a dialog that
+    /// swaps in a new one gets them again.
+    private void setUpDialogPane(DialogPane dialogPane) {
+        setupKeyBindings(dialogPane);
+        dialogPane.getChildren().add(new WalkthroughPane());
     }
 
     private Stage getDialogWindow() {
@@ -62,9 +70,19 @@ public class BaseDialog<T> extends Dialog<T> {
         dialogPane.addEventHandler(KeyEvent.KEY_PRESSED, this::handleKeyEvent);
     }
 
+    /// Heavy-weight dialogs such as the PDF viewer override this to keep their state on a stray "Close dialog" key.
+    protected boolean closesOnCloseKeyBinding() {
+        return true;
+    }
+
     private void handleKeyEvent(KeyEvent event) {
-        boolean closed = closeOnKeyBindingMatch(event, this);
-        if (closed) {
+        if (!closesOnCloseKeyBinding()) {
+            // Escape is consumed as well: JavaFX's own stage handler closes a dialog with a cancel button on an unconsumed Escape
+            if (event.getCode() == KeyCode.ESCAPE || matchesCloseKeyBinding(event)) {
+                event.consume();
+                return;
+            }
+        } else if (closeOnKeyBindingMatch(event, this)) {
             return;
         }
 
@@ -83,6 +101,11 @@ public class BaseDialog<T> extends Dialog<T> {
         }
     }
 
+    private static boolean matchesCloseKeyBinding(KeyEvent event) {
+        KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+        return keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event);
+    }
+
     private Optional<Button> getDefaultButton() {
         return Optional.ofNullable((Button) getDialogPane().lookupButton(getDefaultButtonType()));
     }
@@ -95,8 +118,7 @@ public class BaseDialog<T> extends Dialog<T> {
     }
 
     private void setDialogIcon(Image image) {
-        Stage dialogWindow = (Stage) getDialogPane().getScene().getWindow();
-        dialogWindow.getIcons().add(image);
+        IconTheme.applyLogo(this, image);
     }
 
     /// Fits the dialog window around its content.

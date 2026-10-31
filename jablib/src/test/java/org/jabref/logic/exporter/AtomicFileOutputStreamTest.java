@@ -281,7 +281,7 @@ class AtomicFileOutputStreamTest {
                 temporaryFile,
                 Files.newOutputStream(temporaryFile),
                 false,
-                (source, target) -> {
+                (_, _) -> {
                     throw new AssertionError("The aborted save must not commit");
                 },
                 (source, target) -> {
@@ -426,7 +426,7 @@ class AtomicFileOutputStreamTest {
                 Files.newOutputStream(temporaryFile),
                 true,
                 (source, target) -> Files.move(source, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING),
-                (source, target) -> {
+                (_, target) -> {
                     Files.writeString(target, "partial backup");
                     throw new IOException("Simulated interruption while creating backup");
                 });
@@ -531,7 +531,7 @@ class AtomicFileOutputStreamTest {
                      (source, target) -> {
                          throw new AtomicMoveNotSupportedException(source.toString(), target.toString(), "test");
                      },
-                     (source, target) -> {
+                     (_, _) -> {
                          throw new IOException("test");
                      })) {
             atomicFileOutputStream.write(FIVE_THOUSAND_CHARS.getBytes());

@@ -1,5 +1,7 @@
 package org.jabref.logic.ai.ingestion.repositories;
 
+import java.util.Optional;
+
 /// This class is responsible for recording the information about which documents (or documents) have been fully ingested.
 ///
 /// The class tracks files by their SHA-256 hash to detect if a file has been modified since ingestion.
@@ -21,4 +23,9 @@ public interface IngestedDocumentsRepository extends AutoCloseable {
     void unmarkDocumentAsFullyIngested(String fileHash);
 
     void removeAll();
+
+    /// The embedding model the documents were ingested with. Empty for repositories written before this was recorded.
+    Optional<String> getEmbeddingModel();
+
+    void setEmbeddingModel(String embeddingModel);
 }

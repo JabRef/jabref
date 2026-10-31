@@ -184,16 +184,16 @@ public class FileSelectionPage extends WizardPane {
 
         HBox buttonBar = new HBox(4);
         selectAllButton = new Button(Localization.lang("Select all"));
-        selectAllButton.setOnAction(e -> unlinkedFilesList.getCheckModel().checkAll());
+        selectAllButton.setOnAction(_ -> unlinkedFilesList.getCheckModel().checkAll());
 
         unselectAllButton = new Button(Localization.lang("Unselect all"));
-        unselectAllButton.setOnAction(e -> unlinkedFilesList.getCheckModel().clearChecks());
+        unselectAllButton.setOnAction(_ -> unlinkedFilesList.getCheckModel().clearChecks());
 
         expandAllButton = new Button(Localization.lang("Expand all"));
-        expandAllButton.setOnAction(e -> expandTree(unlinkedFilesList.getRoot(), true));
+        expandAllButton.setOnAction(_ -> expandTree(unlinkedFilesList.getRoot(), true));
 
         collapseAllButton = new Button(Localization.lang("Collapse all"));
-        collapseAllButton.setOnAction(e -> expandTree(unlinkedFilesList.getRoot(), false));
+        collapseAllButton.setOnAction(_ -> expandTree(unlinkedFilesList.getRoot(), false));
 
         showPreviewButton = new Button(Localization.lang("Show PDF preview"));
         showPreviewButton.setManaged(false);
@@ -232,9 +232,9 @@ public class FileSelectionPage extends WizardPane {
             }
         });
 
-        unlinkedFilesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        unlinkedFilesList.getSelectionModel().selectedItemProperty().addListener((_, _, _) ->
                 previewThrottler.schedule(() -> UiTaskExecutor.runNowOrInJavaFXThread(this::refreshPreviewForCurrentSelection)));
-        enablePreviewCheckBox.selectedProperty().addListener((observable, oldValue, enabled) -> refreshPreviewForCurrentSelection());
+        enablePreviewCheckBox.selectedProperty().addListener((_, _, _) -> refreshPreviewForCurrentSelection());
 
         invalidProperty().bind(Bindings.isEmpty(viewModel.checkedFileListProperty()).or(viewModel.taskActiveProperty()));
 

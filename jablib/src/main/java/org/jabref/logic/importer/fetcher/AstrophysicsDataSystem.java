@@ -144,7 +144,7 @@ public class AstrophysicsDataSystem
         new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL).cleanup(entry);
         entry.getField(StandardField.ABSTRACT)
              .filter("Not Available <P />"::equals)
-             .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT));
+             .ifPresent(_ -> entry.clearField(StandardField.ABSTRACT));
 
         entry.getField(StandardField.ABSTRACT)
              .map(abstractText -> abstractText.replace("<P />", ""))

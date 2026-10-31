@@ -256,7 +256,7 @@ Both comments must not be added.
    Note: This rule is not applied for logging. Logging strings should stay in English. I.e., LOGGER.error(\"...\") should contain English text.
 - All labels and texts in the UI should be sentence case (and not title case)
 - Avoid exclamation marks at the end of a sentence. They are more for screaming. Use a dot to end the sentence.
-- Use "BibTeX" as spelling for bibtex in Java strings. In variable names "Bibtex" should be used.
+- Use "BibTeX" as spelling for `bibtex` in Java strings. In variable names, `Bibtex` should be used.
 - New strings should be consistent to other strings. They should also be grouped semantically together.
 - Existing strings should be reused instead of introducing slightly different strings.
 - User dialogs should have proper button labels: NOT yes/no/cancel, but indicating the action which happens when pressing the button
@@ -402,38 +402,59 @@ Quick check of core library:
 
 ## Requirements tracing (OpenFastTrace)
 
-JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) to trace requirements to implementation and tests.
+JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) (OFT) to trace requirements to implementation and tests.
+Requirements capture what JabRef should do as a structured representation of issues and features, enabling bidirectional traceability.
 
-For a new feature or significant bug fix, **at minimum add the requirement** to the appropriate `docs/requirements/<area>.md` file. Full tracing (`Needs: impl` + implementation comments) is encouraged but can be skipped if the effort is disproportionate.
+For a new feature or significant bug fix, add the requirement to the appropriate `docs/requirements/<area>.md` file.
 
-**Defining a requirement** in `docs/requirements/<area>.md`:
+Read and use the [`openfasttrace`](https://github.com/itsallcode/openfasttrace-ai-skills/blob/main/skills/openfasttrace/SKILL.md) skill.
 
-```markdown
-### Example
-`req~ai.example~1`
+In JabRef we use OFT this way:
 
-Description of the requirement.
-```
+- The requirements are put in `docs/requirements/<area>.md`.
+- The requirements are grouped by areas: `docs/requirements/ui.md`, `docs/requirements/git.md`, etc.
+- Title style:
+  - `req~` → **"Subject must verb"** (e.g., `## GitHub personal access token push access must be verifiable before sharing`).
+  - `feat~` → **"User can verb"** (e.g., `## User can share library via GitHub`).
+  - Avoid nominalizations: Write "must be verified" instead of "verification".
+  - One item, one requirement: If a title needs "and", split it into two separate requirements.
+  - The title carries the full normative statement: Anyone reading only the heading should understand the complete requirement constraint.
+- Use the description only for details that the title cannot carry:
+  - Triggering condition.
+  - Edge cases and boundary behavior.
+  - Brief rationale (if needed).
+  - Relevant GitHub issue link or context.
 
-The identifier must follow the heading with no blank line between them. Add `<!-- markdownlint-disable-file MD022 -->` at the end of the file.
+Artifact types used:
 
-**Optionally — linking an implementation** to a requirement (full trace):
+- `feat`: User-facing capability or broad feature ("User can verb").
+- `req`: Specific constraint, nuance, cross-cutting requirement, or bug fix the system must satisfy ("Subject must verb").
+- `impl`: Code implementation.
+- `utest`: Unit test.
+- `adr`: Architectural Decision Record.
 
-```markdown
-Needs: impl
-```
+### Traceability chains
 
-```java
-// [impl->req~ai.example~1]
-```
+In JabRef, we use these traceability chains:
 
-**Checking coverage:**
+- `feat` --> `impl`/`utest`
+- `req` --> `impl`/`utest`
+- `feat` --> `req` --> `impl`/`utest`
+- `adr` --> `impl`/`utest`
+
+Additional guidelines:
+
+- Link the issue the requirement originates from (if there is).
+- Respect INVEST criteria. Prefer high-level requirements over overly detailed ones.
+- For ideas or planned requirements not yet implemented, mark them as draft so they are preserved without failing coverage checks: `Status: draft`.
+
+Checking coverage:
 
 ```bash
-./gradlew traceRequirements   # output: build/tracing.txt
+./gradlew traceRequirements   # output: build/reports/tracing.txt
 ```
 
-See `docs/requirements/` for existing requirements and `docs/requirements/index.md` for full guidance.
+See `docs/requirements/` for existing requirements and [docs/code-howtos/requirements.md](docs/code-howtos/requirements.md) for full guidance. Also refer to the `openfasttrace` skill.
 
 ---
 
@@ -484,12 +505,13 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 ### Branches
 
-- `main` is the development branch; pull requests target it. `stable` is the last release plus ported fixes; CI labels a PR `dev: into-stable` when it links a bug issue (maintainers may add or remove the label by hand) and ports it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
+- `main` is the development branch; pull requests target it. `black-forest` in JabRef/jabref-black-forest is the last release plus ported fixes; CI labels a PR `dev: send-to-black-forest` when it links a bug issue (maintainers may add or remove the label by hand) and ports it after the merge. Never add that label to a port PR (`port-<number>-to-<branch>`). See [docs/contributing.md](docs/contributing.md#branching-strategy).
 
 ### Commits
 
 - One logical change per commit
 - Clear, technical commit messages
+- Wrap annotations and other `@`-words in backticks in commit messages and PR texts (`` `@Nullable` ``); GitHub turns a plain `@Nullable` into a mention of that user
 - Do not reference issues in commits
 - Avoid force-pushes
 - No generated artifacts unless required
@@ -506,11 +528,12 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 2. Fill every section: \"Related issues and pull requests\", \"PR Description\", \"Steps to test\", \"AI usage\".
 3. The PR Description must explain **intent**, not implementation trivia. Do not list modified classes one by one.
 4. \"Steps to test\" is a numbered list of concrete steps ending in what the reviewer should see, plus a screenshot cropped to the relevant UI area for every visible change. Never a video: reviewers relate a failure to a step number (\"at step 3 I could not click X\"), which a video does not allow. A video is acceptable only when the interaction involves another program (drag and drop from a file manager, push to a word processor, ...) and the steps are still listed.
-5. Fill \"AI usage\": disclose every AI tool used **and the exact model ID** (for example `Claude Code (model claude-opus-4-7)`).
-6. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
-7. Remove **all** HTML comments before opening the PR.
-8. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
-9. Only if the CHANGELOG.md entry used a `TODO` placeholder (meaning no issue has been confidently identified yet — an existing issue link always stays): create the PR with `--draft` (an automated review starts as soon as a PR is ready and would flag the placeholder), immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change, then mark the PR ready (`gh pr ready <number>`). If an issue is identified or created later, switch the link to the issue per the precedence rule above.
+5. Write keyboard shortcuts anywhere in the body with `<kbd>` tags: `<kbd>Ctrl</kbd> + <kbd>,</kbd>`, not `Ctrl+,`.
+6. Fill \"AI usage\": disclose every AI tool used **and the exact model ID** (for example `Claude Code (model claude-opus-4-7)`).
+7. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
+8. Remove **all** HTML comments before opening the PR.
+9. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
+10. Only if the CHANGELOG.md entry used a `TODO` placeholder (meaning no issue has been confidently identified yet — an existing issue link always stays): create the PR with `--draft` (an automated review starts as soon as a PR is ready and would flag the placeholder), immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change, then mark the PR ready (`gh pr ready <number>`). If an issue is identified or created later, switch the link to the issue per the precedence rule above.
 
 ---
 
@@ -530,6 +553,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 - Before using `TODO`, search <https://github.com/JabRef/jabref/issues> and <https://github.com/JabRef/jabref-koppor/issues> for a matching issue. Link it only on a confident match; otherwise list candidates for human review and keep `TODO`. Never use `closes`/`fixes` keywords for a merely-similar issue.
 - User documentation is available in a separate repository <https://github.com/JabRef/user-documentation>.
 - No AI-disclosure comments inside source code
+- Keyboard shortcuts in Markdown (CHANGELOG.md, `docs/`, PR descriptions, issue and review comments) use one `<kbd>` tag per key, first letter capitalized, keys joined by ` + ` (e.g. `<kbd>Ctrl</kbd> + <kbd>Enter</kbd>`).
 
 ### CHANGELOG.md example
 

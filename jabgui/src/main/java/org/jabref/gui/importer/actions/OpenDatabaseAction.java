@@ -38,6 +38,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.migrations.PerformLoadDatabaseMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -207,7 +208,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 if (Files.exists(theFile) && preferences.getInternalPreferences().isMemoryStickMode()) {
                     try {
                         file = baseDirectoryPath.relativize(file).normalize();
-                    } catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException _) {
                         file = theFile.normalize();
                     }
                 }
@@ -252,7 +253,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         tabContainer.addTab(newTab, true);
     }
 
-    private ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
+    @VisibleForTesting
+    ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
         Path fileToLoad = file.toAbsolutePath();
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
@@ -264,7 +266,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, stateManager)
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, tabContainer, fileToLoad, preferences, fileUpdateMonitor, stateManager)
                                           .orElse(null);
         }
 
@@ -276,15 +278,29 @@ public class OpenDatabaseAction extends SimpleCommand {
                         fileUpdateMonitor);
             }
 
-            if (parserResult.hasWarnings()) {
-                String content = Localization.lang("Please check your library file for wrong syntax.")
-                        + "\n\n" + parserResult.getErrorMessage();
-                UiTaskExecutor.runInJavaFXThread(() ->
-                        dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
-            }
+            // [impl->req~import.bibtex.legacy-migrations~1]
+            PerformLoadDatabaseMigrations.performLoadDatabaseMigrations(
+                    parserResult,
+                    parserResult.getDatabaseContext().getKeywordSeparator(preferences.getImportFormatPreferences().bibEntryPreferences().getKeywordSeparator()),
+                    // [impl->req~import.bibtex.legacy-migrations.announcement~1]
+                    () -> dialogService.notify(Localization.lang("Migrating library '%0' to the current version", fileToLoad.toString())));
         } catch (IOException e) {
             parserResult = ParserResult.fromError(e);
             LOGGER.error("Error opening file '{}'", fileToLoad, e);
+        }
+
+        if (parserResult.isInvalid()) {
+            // The file could not be read at all. LibraryTab closes the tab again after this.
+            // [impl->req~import.library.unreadable-reported~1]
+            String content = Localization.lang("Error opening file '%0'", fileToLoad.toString())
+                    + "\n\n" + parserResult.getErrorMessage();
+            UiTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showErrorDialogAndWait(Localization.lang("Open library error"), content));
+        } else if (parserResult.hasWarnings()) {
+            String content = Localization.lang("Please check your library file for wrong syntax.")
+                    + "\n\n" + parserResult.getErrorMessage();
+            UiTaskExecutor.runInJavaFXThread(() ->
+                    dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
         }
 
         if (parserResult.getDatabase().isShared()) {

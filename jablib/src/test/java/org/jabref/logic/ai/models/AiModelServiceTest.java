@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -18,6 +19,17 @@ class AiModelServiceTest {
     @BeforeEach
     void setUp() {
         aiModelService = new AiModelService();
+    }
+
+    @Test
+    void isModelNotFoundDetectsOllamaMessage() {
+        assertTrue(AiModelService.isModelNotFound(new RuntimeException("404 - message: model 'gpt-oss20b' not found, type: not_found_error")));
+    }
+
+    @Test
+    void isModelNotFoundIgnoresOtherErrors() {
+        assertFalse(AiModelService.isModelNotFound(new RuntimeException("java.net.ConnectException")));
+        assertFalse(AiModelService.isModelNotFound(new RuntimeException()));
     }
 
     @Test

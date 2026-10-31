@@ -122,7 +122,7 @@ class ProtectedTermsLoaderTest {
     }
 
     @Test
-    void initalizedAllInternalDisabled() {
+    void initializedAllInternalDisabled() {
         ProtectedTermsLoader localLoader = new ProtectedTermsLoader(new ProtectedTermsPreferences(
                 List.of(),
                 List.of(),

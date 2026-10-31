@@ -15,15 +15,21 @@ public class StudyCatalogItem {
     private final StringProperty name;
     private final BooleanProperty enabled;
     private final StringProperty reason;
+    private final StringProperty nativeQuery;
 
     public StudyCatalogItem(String name, boolean enabled) {
         this(name, enabled, "");
     }
 
     public StudyCatalogItem(String name, boolean enabled, String reason) {
+        this(name, enabled, reason, "");
+    }
+
+    public StudyCatalogItem(String name, boolean enabled, String reason, String nativeQuery) {
         this.name = new SimpleStringProperty(name);
         this.enabled = new SimpleBooleanProperty(enabled);
         this.reason = new SimpleStringProperty(reason);
+        this.nativeQuery = new SimpleStringProperty(nativeQuery);
     }
 
     public String getName() {
@@ -62,12 +68,25 @@ public class StudyCatalogItem {
         return reason;
     }
 
+    public String getNativeQuery() {
+        return nativeQuery.getValue();
+    }
+
+    public void setNativeQuery(String nativeQuery) {
+        this.nativeQuery.setValue(nativeQuery);
+    }
+
+    public StringProperty nativeQueryProperty() {
+        return nativeQuery;
+    }
+
     @Override
     public String toString() {
         return "StudyCatalogItem{" +
                 "name=" + name.get() +
                 ", enabled=" + enabled.get() +
                 ", reason=" + reason.get() +
+                ", nativeQuery=" + nativeQuery.get() +
                 '}';
     }
 
@@ -82,11 +101,12 @@ public class StudyCatalogItem {
         StudyCatalogItem that = (StudyCatalogItem) o;
         return Objects.equals(getName(), that.getName()) &&
                 Objects.equals(isEnabled(), that.isEnabled()) &&
-                Objects.equals(getReason(), that.getReason());
+                Objects.equals(getReason(), that.getReason()) &&
+                Objects.equals(getNativeQuery(), that.getNativeQuery());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), isEnabled(), getReason());
+        return Objects.hash(getName(), isEnabled(), getReason(), getNativeQuery());
     }
 }

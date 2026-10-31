@@ -50,7 +50,7 @@ public class UnoCrossRef {
         try {
             // Set the SourceName of the GetReference text field to the referenceMarkName
             xFieldProps.setPropertyValue("SourceName", referenceMarkName);
-        } catch (UnknownPropertyException ex) {
+        } catch (UnknownPropertyException _) {
             throw new java.lang.IllegalStateException("The created GetReference does not have property 'SourceName'");
         } catch (PropertyVetoException _) {
             throw new java.lang.IllegalStateException("Caught PropertyVetoException on 'SourceName'");
@@ -60,7 +60,7 @@ public class UnoCrossRef {
             // specify that the source is a reference mark (could also be a footnote,
             // bookmark or sequence field)
             xFieldProps.setPropertyValue("ReferenceFieldSource", ReferenceFieldSource.REFERENCE_MARK);
-        } catch (UnknownPropertyException ex) {
+        } catch (UnknownPropertyException _) {
             throw new java.lang.IllegalStateException("The created GetReference does not have property"
                     + " 'ReferenceFieldSource'");
         } catch (PropertyVetoException _) {
@@ -70,7 +70,7 @@ public class UnoCrossRef {
         try {
             // We want the reference displayed as page number
             xFieldProps.setPropertyValue("ReferenceFieldPart", ReferenceFieldPart.PAGE);
-        } catch (UnknownPropertyException ex) {
+        } catch (UnknownPropertyException _) {
             throw new java.lang.IllegalStateException("The created GetReference does not have property"
                     + " 'ReferenceFieldPart'");
         } catch (PropertyVetoException _) {

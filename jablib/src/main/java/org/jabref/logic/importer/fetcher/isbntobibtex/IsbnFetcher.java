@@ -12,6 +12,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+import org.jabref.logic.importer.fetcher.DnbFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -40,6 +41,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         OpenLibraryIsbnFetcher openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
         this.gvkIsbnFetcher = new GvkFetcher(importFormatPreferences);
         this.retryIsbnFetcher = new ArrayList<>();
+        this.addRetryFetcher(new DnbFetcher(importFormatPreferences));
         this.addRetryFetcher(lobidIsbnFetcher);
         this.addRetryFetcher(openLibraryIsbnFetcher);
     }

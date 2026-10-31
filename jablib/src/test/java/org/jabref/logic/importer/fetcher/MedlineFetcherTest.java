@@ -14,7 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.testutils.category.ExternalServicesTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 @ExternalServicesTest
 class MedlineFetcherTest {
-    // default value is empty string in BulidInfo
+    // default value is empty string in BuildInfo
     private static final Optional<String> API_KEY = Optional.of(new BuildInfo().medlineApiKey).filter(StringUtil::isNotBlank);
 
     private MedlineFetcher fetcher;

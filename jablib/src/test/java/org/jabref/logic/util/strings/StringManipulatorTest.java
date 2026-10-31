@@ -80,7 +80,7 @@ class StringManipulatorTest {
     }
 
     @Test
-    void backwardsKillWordTrimsPreceedingWhitespace() {
+    void backwardsKillWordTrimsPrecedingWhitespace() {
         int caretPosition = 1; // Second space
         String input = "  hello";
         // One space should be preserved since we are deleting everything preceding the second space.

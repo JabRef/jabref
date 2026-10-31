@@ -131,14 +131,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
             String title = entry.getTitle().orElse("");
             String journal = entry.getField(StandardField.JOURNAL).orElse("");
             String authors = entry.getField(StandardField.AUTHOR).orElse("");
-            String year = entry.getField(StandardField.YEAR).orElse("");
 
             Hyperlink titleLink = new Hyperlink(title);
             Text journalText = new Text(journal);
             journalText.setFont(Font.font(Font.getDefault().getFamily(), FontPosture.ITALIC, Font.getDefault().getSize()));
             Text authorsText = new Text(authors);
-            Text yearText = new Text("(" + year + ")");
-            titleLink.setOnAction(event -> {
+
+            titleLink.setOnAction(_ -> {
                 if (entry.getField(StandardField.URL).isPresent()) {
                     try {
                         NativeDesktop.openBrowser(entry.getField(StandardField.URL).get(), preferences.getExternalApplicationsPreferences());
@@ -149,7 +148,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 }
             });
 
-            hBox.getChildren().addAll(titleLink, journalText, authorsText, yearText);
+            hBox.getChildren().addAll(titleLink, journalText, authorsText);
+            entry.getFieldOrAlias(StandardField.YEAR)
+                 .filter(year -> !year.isBlank())
+                 .ifPresent(year -> hBox.getChildren().add(new Text("(" + year + ")")));
+
             vBox.getChildren().add(hBox);
         }
         scrollPane.setContent(vBox);
@@ -203,7 +206,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Text line3 = new Text(Localization.lang("This setting may be changed in preferences at any time."));
         line3.wrappingWidthProperty().bind(rootWidth);
         Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr. DLib for JabRef users."));
-        mdlLink.setOnAction(event -> {
+        mdlLink.setOnAction(_ -> {
             try {
                 NativeDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/", preferences.getExternalApplicationsPreferences());
             } catch (IOException e) {

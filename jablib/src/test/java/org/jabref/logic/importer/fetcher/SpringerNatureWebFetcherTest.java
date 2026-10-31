@@ -14,7 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
-import org.jabref.testutils.category.ExternalServicesTest;
+import org.jabref.support.ExternalServicesTest;
 
 import com.airhacks.afterburner.injection.Injector;
 import kong.unirest.core.json.JSONObject;
@@ -192,7 +192,7 @@ class SpringerNatureWebFetcherTest implements SearchBasedFetcherCapabilityTest, 
     }
 
     @Test
-    @Disabled("Year search is currently broken, because the API returns mutliple years.")
+    @Disabled("Year search is currently broken, because the API returns multiple years.")
     @Override
     public void supportsYearSearch() {
     }

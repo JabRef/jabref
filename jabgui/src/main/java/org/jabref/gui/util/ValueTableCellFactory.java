@@ -44,7 +44,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     }
 
     public ValueTableCellFactory<S, T> withGraphic(Function<T, Node> toGraphic) {
-        this.toGraphic = (rowItem, value) -> toGraphic.apply(value);
+        this.toGraphic = (_, value) -> toGraphic.apply(value);
         return this;
     }
 
@@ -69,7 +69,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     }
 
     public ValueTableCellFactory<S, T> withTooltip(Function<T, String> toTooltip) {
-        this.toTooltip = (rowItem, value) -> toTooltip.apply(value);
+        this.toTooltip = (_, value) -> toTooltip.apply(value);
         return this;
     }
 
@@ -79,7 +79,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     }
 
     public ValueTableCellFactory<S, T> withOnMouseClickedEvent(Function<T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent) {
-        this.toOnMouseClickedEvent = (rowItem, value) -> toOnMouseClickedEvent.apply(value);
+        this.toOnMouseClickedEvent = (_, value) -> toOnMouseClickedEvent.apply(value);
         return this;
     }
 
@@ -156,7 +156,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         });
                     }
 
-                    setOnMouseEntered(event -> {
+                    setOnMouseEntered(_ -> {
                         int rowIndex = getTableRow().getIndex();
                         int totalItems = getTableView().getItems().size();
                         boolean forceShow = showTooltipRegardlessOfTruncation != null && showTooltipRegardlessOfTruncation.getAsBoolean();

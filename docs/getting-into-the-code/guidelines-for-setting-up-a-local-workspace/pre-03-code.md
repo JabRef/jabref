@@ -63,9 +63,13 @@ git fetch --all
 ```
 
 {: .important }
-> `--recurse-submodules` is necessary to have the required files available to JabRef. (Background: It concerns the files from [citation-style-language/styles](https://github.com/citation-style-language/styles) and more).
+> `--recurse-submodules` is necessary to have the required files available to JabRef. (Background: It concerns the files from [citation-style-language/styles](https://github.com/citation-style-language/styles), the journal abbreviations from [abbrv.jabref.org](https://github.com/JabRef/abbrv.jabref.org), the themes from [themes.jabref.org](https://github.com/JabRef/themes.jabref.org) and more).
 >
 > Note that putting the JabRef repository directly on `C:\` or any other drive letter on Windows causes compile errors (**negative example**: `C:\jabref`).
+
+{: .note }
+> JabRef's build output currently stays below the Windows [path limit of 260 characters](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry).
+> If you use a deeper base folder and hit that limit, enable long paths in Windows as described there and run `git config --global core.longpaths true`.
 
 #### Exclude the workspace from Windows Defender
 

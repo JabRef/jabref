@@ -75,7 +75,8 @@ public abstract class AbstractQueryTransformer {
                 return Optional.of(handleTitle(term));
             }
             case "journal" -> {
-                return Optional.of(handleJournal(term));
+                String s = handleJournal(term);
+                return s.isEmpty() ? Optional.empty() : Optional.of(s);
             }
             case "year" -> {
                 String s = handleYear(term);

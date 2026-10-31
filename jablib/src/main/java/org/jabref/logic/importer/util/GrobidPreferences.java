@@ -15,7 +15,7 @@ public class GrobidPreferences {
         this(
                 false,                          // Grobid enabled
                 false,                          // Grobid use asked
-                "http://grobid.jabref.org:8070" // Grobid URL
+                "https://grobid.jabref.org" // Grobid URL
         );
     }
 

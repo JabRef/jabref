@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.ai;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -21,7 +22,9 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.preferences.ai.AiTabViewModel.ConnectionTestState;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
@@ -42,6 +45,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     private final BooleanBinding aiDisabled;
 
     private TabPane templatesTabPane;
+    private ComboBox<String> chatModelCombo;
 
     public AiTab(AiPreferences workingAiPreferences) {
         AiService aiService = Injector.instantiateModelOrService(AiService.class);
@@ -97,7 +101,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                                                 .withClearButton()
                                                                                 .field(),
                                 key -> key.disableWhen(viewModel.disableBasicSettingsProperty())
-                                          .validate(viewModel.getApiTokenValidationStatus())))
+                                          .validate(viewModel.getApiTokenValidationStatus()))
+                        // [impl->req~ai.llms.test-connection~1]
+                        .button(Localization.lang("Test connection"), this::testConnection,
+                                test -> test.disableWhen(Bindings.or(viewModel.disableBasicSettingsProperty(),
+                                                    viewModel.connectionTestStateProperty().isEqualTo(ConnectionTestState.TESTING)))
+                                            .configure(this::bindTestConnectionButton))
+                        .custom(buildTestConnectionDetailsArea(),
+                                details -> details.visibleWhen(viewModel.connectionTestDetailsProperty().isNotEmpty())))
 
                 .section(Localization.lang("Expert settings"), expertSettings -> expertSettings
                                 .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
@@ -175,9 +186,61 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                 .build());
     }
 
+    private void testConnection() {
+        // A typed model name reaches the view model only on commit.
+        chatModelCombo.commitValue();
+        viewModel.testConnection();
+    }
+
+    private void bindTestConnectionButton(Button button) {
+        ReadOnlyObjectProperty<ConnectionTestState> state = viewModel.connectionTestStateProperty();
+        button.textProperty().bind(state.map(value -> switch (value) {
+            case IDLE ->
+                    Localization.lang("Test connection");
+            case TESTING ->
+                    Localization.lang("Testing...");
+            case SUCCESS ->
+                    Localization.lang("Connection successful");
+            case FAILED ->
+                    Localization.lang("Connection failed");
+        }));
+        button.graphicProperty().bind(state.map(value -> switch (value) {
+            case IDLE ->
+                    null;
+            case TESTING ->
+                    IconTheme.JabRefIcons.REFRESH.getGraphicNode();
+            case SUCCESS ->
+                    IconTheme.JabRefIcons.SUCCESS.getGraphicNode();
+            case FAILED ->
+                    IconTheme.JabRefIcons.ERROR.getGraphicNode();
+        }));
+        BindingsHelper.listen(state, value -> {
+            button.getStyleClass().removeAll("text-success", "text-danger");
+            switch (value) {
+                case SUCCESS ->
+                        button.getStyleClass().add("text-success");
+                case FAILED ->
+                        button.getStyleClass().add("text-danger");
+                default -> {
+                }
+            }
+        });
+    }
+
+    /// Read-only text area rather than a label, so that the error message (e.g., the `ollama pull` command) can be copied.
+    private TextArea buildTestConnectionDetailsArea() {
+        TextArea details = new TextArea();
+        details.setEditable(false);
+        details.setWrapText(true);
+        details.setPrefRowCount(2);
+        details.textProperty().bind(viewModel.connectionTestDetailsProperty());
+        return details;
+    }
+
     /// Editable combo whose prompt switches to a model-name hint once Hugging Face is selected.
     private ComboBox<String> buildChatModelCombo() {
         ComboBox<String> combo = new ComboBox<>();
+        chatModelCombo = combo;
         combo.setEditable(true);
         combo.setMaxWidth(Double.MAX_VALUE);
         combo.itemsProperty().bind(viewModel.chatModelsProperty());

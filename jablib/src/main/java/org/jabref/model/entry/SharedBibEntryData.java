@@ -40,7 +40,7 @@ public class SharedBibEntryData implements Comparable<SharedBibEntryData> {
         this.sharedIdAsString = sharedIdAsString;
         try {
             this.sharedIdAsInt = Integer.parseInt(sharedIdAsString);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             this.sharedIdAsInt = Objects.hash(sharedIdAsString);
         }
     }

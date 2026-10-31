@@ -6,7 +6,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.util.Version;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.testutils.category.ExternalServicesTest;
+import org.jabref.support.ExternalServicesTest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,8 +33,8 @@ class MrDLibFetcherTest {
     void performSearch() throws FetcherException {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField(StandardField.TITLE, "lernen");
-        List<BibEntry> bibEntrys = fetcher.performSearch(bibEntry);
-        assertFalse(bibEntrys.isEmpty());
+        List<BibEntry> bibEntries = fetcher.performSearch(bibEntry);
+        assertFalse(bibEntries.isEmpty());
     }
 
     @Test
@@ -54,8 +54,8 @@ class MrDLibFetcherTest {
         bibEntry.setField(StandardField.URL, "http://doi.acm.org/10.1145/1124772.1124838");
         bibEntry.setField(StandardField.YEAR, "2006");
 
-        List<BibEntry> bibEntrys = fetcher.performSearch(bibEntry);
-        assertFalse(bibEntrys.isEmpty());
+        List<BibEntry> bibEntries = fetcher.performSearch(bibEntry);
+        assertFalse(bibEntries.isEmpty());
     }
 
     @Test

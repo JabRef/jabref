@@ -90,7 +90,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         getStyleClass().add("preview-viewer");
         setFitToWidth(true);
-        setFitToHeight(true);
+        // The content sizes to its text (see setUseContentHeight below), so forcing it to the
+        // viewport height would clip long previews and hide the vertical scrollbar
+        setFitToHeight(false);
         // Surrounding layouts (preview panel, dialogs) rely on a stable preferred size,
         // not on the content-dependent one of the rendered nodes
         setPrefSize(800, 600);
@@ -224,7 +226,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void downloadCoverAndRefresh(BibEntry entry, String previewText, long currentUpdateSequence) {
         BackgroundTask.wrap(() -> bookCoverFetcher.downloadCoversForEntry(entry))
-                      .onSuccess((ignored) -> {
+                      .onSuccess(_ -> {
                           if (currentUpdateSequence == updateSequence) {
                               setPreviewText(previewText);
                           }
