@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
+import org.jabref.gui.preview.PreviewPreferences;
 
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,15 @@ class JabRefGuiPreferencesTest {
             new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.ALL_FIELDS, true);
     private static final EntryEditorTabModel SOURCE =
             new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.SOURCE, true);
+
+    @Test
+    void tooltipDurationDefaultsToIndefiniteAndCanBeChanged() {
+        PreviewPreferences preferences = PreviewPreferences.getDefault();
+        assertEquals(0, preferences.getTooltipDuration());
+
+        preferences.tooltipDurationProperty().set(30);
+        assertEquals(30, preferences.getTooltipDuration());
+    }
 
     @Test
     void storedTabOrderIsApplied() {
