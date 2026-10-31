@@ -33,7 +33,8 @@ import static java.util.Objects.requireNonNullElse;
 
 /// Local changes that have not reached the shared database because the connection was down.
 /// Kept in memory and mirrored to one file per database, so that they survive a restart and are
-/// synchronized on the next connect (see [DBMSSynchronizer]).
+/// synchronized on the next connect (see [DBMSSynchronizer]). The last shared metadata snapshot is
+/// persisted alongside them to distinguish a remote group deletion from a group that was never shared.
 // [impl->req~shared-database.offline-changes~1]
 @NullMarked
 public class OfflineChanges {
@@ -77,11 +78,21 @@ public class OfflineChanges {
     ///                       optimistic lock needs it to notice that the shared entry moved on
     /// @param metaDataBase   the shared metadata as last known before the recorded metadata was
     ///                       changed - the merge base for [#mergeMetaDataInto]
+    /// @param lastSharedMetaData the last complete metadata snapshot received from the shared database
     public record Recorded(Map<Integer, EntryState> changedEntries,
                            Map<String, EntryState> newEntries,
                            Map<Integer, Integer> removedEntries,
                            @Nullable Map<String, String> metaData,
-                           @Nullable Map<String, String> metaDataBase) {
+                           @Nullable Map<String, String> metaDataBase,
+                           @Nullable Map<String, String> lastSharedMetaData) {
+        public Recorded(Map<Integer, EntryState> changedEntries,
+                        Map<String, EntryState> newEntries,
+                        Map<Integer, Integer> removedEntries,
+                        @Nullable Map<String, String> metaData,
+                        @Nullable Map<String, String> metaDataBase) {
+            this(changedEntries, newEntries, removedEntries, metaData, metaDataBase, null);
+        }
+
         public boolean isEmpty() {
             return changedEntries.isEmpty() && newEntries.isEmpty() && removedEntries.isEmpty() && (metaData == null);
         }
@@ -109,6 +120,7 @@ public class OfflineChanges {
     private final Map<Integer, Integer> removedEntries = new LinkedHashMap<>();
     private @Nullable Map<String, String> metaData;
     private @Nullable Map<String, String> metaDataBase;
+    private @Nullable Map<String, String> lastSharedMetaData;
 
     private OfflineChanges(Path file) {
         this.file = file;
@@ -132,6 +144,7 @@ public class OfflineChanges {
         removedEntries.clear();
         metaData = null;
         metaDataBase = null;
+        lastSharedMetaData = null;
         if (!Files.exists(file)) {
             return;
         }
@@ -147,6 +160,7 @@ public class OfflineChanges {
             removedEntries.putAll(requireNonNullElse(recorded.removedEntries(), Map.of()));
             metaData = recorded.metaData();
             metaDataBase = recorded.metaDataBase();
+            lastSharedMetaData = recorded.lastSharedMetaData();
         } catch (IOException | JsonParseException e) {
             LOGGER.error("Could not read the changes recorded for the shared database from {}", file, e);
         }
@@ -215,6 +229,15 @@ public class OfflineChanges {
         save();
     }
 
+    /// Records the last complete metadata snapshot received from the shared database.
+    public synchronized void recordSharedMetaData(Map<String, String> serializedMetaData) {
+        reload();
+        if (!Objects.equals(lastSharedMetaData, serializedMetaData)) {
+            lastSharedMetaData = new LinkedHashMap<>(serializedMetaData);
+            save();
+        }
+    }
+
     /// Turns the record of a change into the record of a new entry, because the shared entry it
     /// was recorded against is gone and the entry is inserted afresh instead. One step, so that
     /// no moment exists in which the entry is recorded as neither.
@@ -278,13 +301,13 @@ public class OfflineChanges {
     }
 
     private Recorded snapshot() {
-        return new Recorded(new LinkedHashMap<>(changedEntries), new LinkedHashMap<>(newEntries), new LinkedHashMap<>(removedEntries), metaData, metaDataBase);
+        return new Recorded(new LinkedHashMap<>(changedEntries), new LinkedHashMap<>(newEntries), new LinkedHashMap<>(removedEntries), metaData, metaDataBase, lastSharedMetaData);
     }
 
     private void save() {
         try {
             Recorded recorded = snapshot();
-            if (recorded.isEmpty()) {
+            if (recorded.isEmpty() && (lastSharedMetaData == null)) {
                 Files.deleteIfExists(file);
                 return;
             }

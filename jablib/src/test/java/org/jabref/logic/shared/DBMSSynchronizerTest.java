@@ -683,11 +683,10 @@ class DBMSSynchronizerTest {
             microEdit.setFiltered(true);
             synchronizer.listen(microEdit);
 
-            // The reconnect loop finds the database again and writes them; the records are dropped
-            // one by one as they are written, so the file is gone only once everything arrived
-            Path recordsFile = offlineChangesDirectory.resolve(OfflineChanges.fileName(connection.getProperties()));
-            waitUntil(() -> !Files.exists(recordsFile));
-            assertFalse(Files.exists(recordsFile));
+            // The reconnect loop finds the database again and writes them; the pending records are
+            // dropped one by one as they are written.
+            waitUntil(() -> OfflineChanges.load(offlineChangesDirectory, connection.getProperties()).isEmpty());
+            assertTrue(OfflineChanges.load(offlineChangesDirectory, connection.getProperties()).isEmpty());
             // The local entry (including what was typed since the record) is what reaches the database
             assertEquals(Optional.of("Typed after the record"), dbmsProcessor.getSharedEntry(sharedId).map(shared -> shared.getField(StandardField.TITLE).orElseThrow()));
             assertEquals(2, dbmsProcessor.getSharedEntries().size());
@@ -769,6 +768,37 @@ class DBMSSynchronizerTest {
         synchronizer.openSharedDatabase(connection);
         try {
             assertFalse(dbmsProcessor.getSharedMetaData().containsKey(MetaData.GROUPSTREE));
+            assertEquals(Optional.empty(), context.getMetaData().getGroups());
+        } finally {
+            synchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
+    void remoteGroupDeletionBeforeRestartIsAppliedLocally() throws Exception {
+        GroupTreeNode groupRoot = new GroupTreeNode(new ExplicitGroup("All entries", GroupHierarchyType.INDEPENDENT, ','));
+        groupRoot.addSubgroup(new ExplicitGroup("Group A", GroupHierarchyType.INDEPENDENT, ','));
+        MetaData groupedMetaData = new MetaData();
+        groupedMetaData.setGroups(groupRoot);
+        Map<String, String> groupedSnapshot = MetaDataSerializer.getSerializedStringMap(groupedMetaData, pattern);
+        dbmsProcessor.setSharedMetaData(groupedSnapshot);
+
+        DBMSSynchronizer initialSynchronizer = newSynchronousSynchronizer(new BibDatabaseContext(new BibDatabase()));
+        try {
+            initialSynchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+        } finally {
+            initialSynchronizer.closeSharedDatabase();
+        }
+
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase());
+        context.getMetaData().setGroups(groupRoot);
+        // Another client deletes the groups while this library is closed.
+        dbmsProcessor.setSharedMetaData(Map.of("databaseType", "bibtex;"));
+
+        DBMSConnection connection = connectorTest.getTestDBMSConnection();
+        DBMSSynchronizer synchronizer = newSynchronousSynchronizer(context);
+        synchronizer.openSharedDatabase(connection);
+        try {
             assertEquals(Optional.empty(), context.getMetaData().getGroups());
         } finally {
             synchronizer.closeSharedDatabase();
