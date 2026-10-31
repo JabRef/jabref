@@ -580,26 +580,26 @@ public class JabRefCliPreferences implements CliPreferences {
     static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
             // list needs to be mutable in observable preferences
-            // keep consistency with Splitter#splitToList
             return new ArrayList<>();
         }
 
-        // Inverse of [#convertListToString]: a backslash escapes the next character, so delimiters and backslashes
-        // inside an element survive the round trip.
         List<String> result = new ArrayList<>();
         StringBuilder element = new StringBuilder();
-        boolean escaped = false;
-        for (char c : toConvert.toCharArray()) {
-            if (escaped) {
-                element.append(c);
-                escaped = false;
-            } else if (c == '\\') {
-                escaped = true;
-            } else if (c == STRINGLIST_DELIMITER) {
+        for (int i = 0; i < toConvert.length(); i++) {
+            char character = toConvert.charAt(i);
+            if (character == '\\' && i + 1 < toConvert.length()) {
+                char next = toConvert.charAt(i + 1);
+                if (next == '\\' || next == STRINGLIST_DELIMITER) {
+                    element.append(next);
+                    i++;
+                    continue;
+                }
+            }
+            if (character == STRINGLIST_DELIMITER) {
                 result.add(element.toString());
                 element.setLength(0);
             } else {
-                element.append(c);
+                element.append(character);
             }
         }
         result.add(element.toString());
