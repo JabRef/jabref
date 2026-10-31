@@ -56,7 +56,7 @@ public class DonationProvider {
 
         Notifications.DonationNotification notification = new Notifications.DonationNotification(
                 Localization.lang("Support JabRef"),
-                Localization.lang("You already used JabRef for %0 months. Do you want to buy us a coffee?", String.valueOf(DONATION_INTERVAL_MONTHS)),
+                Localization.lang("You’ve been using JabRef for %0 months. Would you like to buy the JabRef team a coffee?", DONATION_INTERVAL_MONTHS),
                 () -> preferences.getDonationPreferences().setNeverShowAgain(true));
 
         notification.getActions().add(new NotificationAction<>(Localization.lang("Dismiss"), _ -> {
