@@ -136,4 +136,18 @@ class WebSearchPaneViewModelTest {
         viewModel.queryProperty().setValue("this query contains an ArXiv identifier 2110.02957");
         assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
     }
+
+    @Test
+    void queryConsistingOfUrlIsValid() {
+        viewModel.queryProperty().setValue("https://gi-radar.de/397-coding-unterstuetzung-im-lauf-der-zeit/");
+        assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
+        assertEquals("Routing to URL fetcher", viewModel.searchModeIndicatorProperty().getValue());
+    }
+
+    @Test
+    void queryConsistingOfUrlWithDoiRoutesToUrlFetcherIndicator() {
+        viewModel.queryProperty().setValue("https://dl.acm.org/doi/epdf/10.1145/3651640.3651646");
+        assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
+        assertEquals("Routing to URL fetcher", viewModel.searchModeIndicatorProperty().getValue());
+    }
 }

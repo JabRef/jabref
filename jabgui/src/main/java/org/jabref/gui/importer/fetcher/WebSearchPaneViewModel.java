@@ -19,12 +19,14 @@ import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.CompositeIdFetcher;
+import org.jabref.logic.importer.CompositeUrlFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.search.query.SearchQuery;
@@ -79,6 +81,12 @@ public class WebSearchPaneViewModel {
                     if (StringUtil.isBlank(queryText)) {
                         // in case user did not enter something, it is treated as valid (to avoid UI WTFs)
                         searchModeIndicator.set("");
+                        return null;
+                    }
+
+                    String trimmedQuery = queryText.trim();
+                    if (URLUtil.isURL(trimmedQuery)) {
+                        searchModeIndicator.set(Localization.lang("Routing to URL fetcher"));
                         return null;
                     }
 
@@ -169,7 +177,12 @@ public class WebSearchPaneViewModel {
         String fetcherName = activeFetcher.getName();
         SearchBasedFetcher effectiveFetcher = activeFetcher;
 
-        if (DOI.parse(query).isPresent()) {
+        if (URLUtil.isURL(query)) {
+            CompositeUrlFetcher compositeUrlFetcher = new CompositeUrlFetcher(preferences.getImportFormatPreferences());
+            parserResultCallable = () -> new ParserResult(compositeUrlFetcher.performSearch(query));
+            fetcherName = Localization.lang("URL-based web search");
+            effectiveFetcher = null;
+        } else if (DOI.parse(query).isPresent()) {
             // DOI detected — route to DoiFetcher regardless of selected fetcher
             DoiFetcher doiFetcher = new DoiFetcher(preferences.getImportFormatPreferences());
             parserResultCallable = () -> new ParserResult(OptionalUtil.toList(doiFetcher.performSearchById(query)));
