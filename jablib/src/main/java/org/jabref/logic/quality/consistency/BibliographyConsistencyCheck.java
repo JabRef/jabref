@@ -40,6 +40,7 @@ public class BibliographyConsistencyCheck {
             StandardField.COMMENT,
             StandardField.CROSSREF,
             StandardField.CITES,
+            StandardField.FILE,
             StandardField.PDF,
             StandardField.REVIEW,
             StandardField.SORTKEY,
