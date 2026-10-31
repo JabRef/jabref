@@ -1,5 +1,8 @@
 package org.jabref.gui.libraryproperties.saving;
 
+import java.util.function.BooleanSupplier;
+
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -27,6 +30,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
     @FXML private ComboBox<AbbreviationType> journalAbbreviationOnSave;
     @FXML private ComboBox<@Nullable Boolean> synchronizeWithFile;
+    @FXML private ComboBox<@Nullable Boolean> mergeConflictedCopies;
 
     @Inject private GuiPreferences preferences;
 
@@ -86,14 +90,20 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
         });
         journalAbbreviationOnSave.valueProperty().bindBidirectional(viewModel.journalAbbreviationOnSaveProperty());
 
-        synchronizeWithFile.setItems(FXCollections.observableArrayList(null, Boolean.TRUE, Boolean.FALSE));
-        synchronizeWithFile.setConverter(new StringConverter<>() {
+        bindOverride(synchronizeWithFile, viewModel.synchronizeWithFileProperty(), () -> preferences.getLibraryPreferences().shouldSynchronizeWithFile());
+        bindOverride(mergeConflictedCopies, viewModel.mergeConflictedCopiesProperty(), () -> preferences.getLibraryPreferences().shouldMergeConflictedCopies());
+    }
+
+    /// A per-library setting that may follow the global one: `null` stands for "use global setting"
+    private static void bindOverride(ComboBox<@Nullable Boolean> comboBox, ObjectProperty<@Nullable Boolean> property, BooleanSupplier globalSetting) {
+        comboBox.setItems(FXCollections.observableArrayList(null, Boolean.TRUE, Boolean.FALSE));
+        comboBox.setConverter(new StringConverter<>() {
             @Override
-            public String toString(@Nullable Boolean synchronize) {
-                if (synchronize == null) {
-                    return Localization.lang("Use global setting (%0)", onOrOff(preferences.getLibraryPreferences().shouldSynchronizeWithFile()));
+            public String toString(@Nullable Boolean enabled) {
+                if (enabled == null) {
+                    return Localization.lang("Use global setting (%0)", onOrOff(globalSetting.getAsBoolean()));
                 }
-                return onOrOff(synchronize);
+                return onOrOff(enabled);
             }
 
             @Override
@@ -101,7 +111,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
                 return null;
             }
         });
-        synchronizeWithFile.valueProperty().bindBidirectional(viewModel.synchronizeWithFileProperty());
+        comboBox.valueProperty().bindBidirectional(property);
     }
 
     private static String onOrOff(boolean on) {
