@@ -88,6 +88,20 @@ class NormalizeNamesFormatterTest {
     }
 
     @Test
+    void normalizationPreservesExtendedNameOptions() {
+        // Tests for normalization and extended bib name form.
+        String input = "family=Hasselt, given=Hado P., prefix=van, useprefix=false"
+                + " and Arthur Guez";
+        String expected = "family=Hasselt, given=Hado P., prefix=van, useprefix=false"
+                + " and Guez, Arthur";
+
+        String actual = formatter.format(input);
+
+        assertEquals(expected, actual);
+        assertEquals(actual, formatter.format(actual));
+    }
+
+    @Test
     void formatExample() {
         assertEquals("Einstein, Albert and Turing, Alan", formatter.format(formatter.getExampleInput()));
     }

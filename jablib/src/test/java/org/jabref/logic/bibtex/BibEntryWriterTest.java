@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtex;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.List;
@@ -9,10 +10,13 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
@@ -49,6 +53,27 @@ class BibEntryWriterTest {
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
         bibEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), new BibEntryTypesManager());
+    }
+
+    // Tests for noramlization operations and bib exntended name form.
+    @Test
+    void normalizedExtendedNamesSurviveWriteAndRead() throws IOException {
+        String names = "family=Hasselt, given=Hado P., prefix=van, useprefix=false and "
+                + "family=Ree, given=Michiel, prefix=van der, useprefix=true and Guez, Arthur";
+        String normalized = new NormalizeNamesFormatter().format(names);
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Hasselt2016")
+                .withField(StandardField.AUTHOR, normalized)
+                .withField(StandardField.EDITOR, normalized);
+
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBLATEX);
+        BibEntry reloaded = new BibtexParser(importFormatPreferences)
+                .parse(new StringReader(stringWriter.toString()))
+                .getDatabase().getEntries().getFirst();
+
+        assertEquals(normalized, reloaded.getField(StandardField.AUTHOR).orElseThrow());
+        assertEquals(normalized, reloaded.getField(StandardField.EDITOR).orElseThrow());
+        assertEquals(AuthorList.parse(names), AuthorList.parse(reloaded.getField(StandardField.AUTHOR).orElseThrow()));
     }
 
     @Test
