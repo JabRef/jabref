@@ -107,9 +107,9 @@ class DonationProviderTest extends JavaFxTest {
     private OnClickBehaviour triggerAction(String actionText) {
         Notifications.DonationNotification notification = captureNotification();
         NotificationAction<Object> action = (NotificationAction<Object>) notification.getActions().stream()
-                                                                                       .filter(candidate -> candidate.getText().equals(actionText))
-                                                                                       .findFirst()
-                                                                                       .orElseThrow();
+                                                                                     .filter(candidate -> candidate.getText().equals(actionText))
+                                                                                     .findFirst()
+                                                                                     .orElseThrow();
         return action.getOnAction().call(notification);
     }
 
