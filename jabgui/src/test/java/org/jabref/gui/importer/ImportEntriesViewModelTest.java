@@ -7,9 +7,9 @@ import java.util.Optional;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.StateManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
@@ -78,6 +78,7 @@ class ImportEntriesViewModelTest {
         abbreviationPreferences = new AbbreviationPreferences(List.of(), false, false, JournalMode.NONE, AbbreviationType.DEFAULT);
         abbreviationPreferences.setAbbreviationTypeOnFetch(AbbreviationType.DEFAULT);
         when(guiPreferences.getAbbreviationPreferences()).thenReturn(abbreviationPreferences);
+        when(guiPreferences.getFilePreferences()).thenReturn(FilePreferences.getDefault());
 
         databaseContext = new BibDatabaseContext();
         taskExecutor = new CurrentThreadTaskExecutor();
@@ -195,11 +196,6 @@ class ImportEntriesViewModelTest {
         assertEquals(Optional.of(journal), entries.getFirst().getField(StandardField.JOURNAL));
     }
 
-    @AfterEach
-    void tearDown() {
-        Injector.forgetAll();
-    }
-
     @ParameterizedTest
     @CsvSource({"true, true", "true, false", "false, true", "false, false"})
     void importRemembersDialogChoiceAndPassesItToHandlerWithoutChangingWebSearch(boolean choice, boolean webSearchChoice) {
@@ -281,6 +277,11 @@ class ImportEntriesViewModelTest {
         }
         assertEquals(choice, files.shouldDownloadLinkedFiles());
         assertEquals(importChoice, files.shouldImportDialogDownloadLinkedFiles());
+    }
+
+    @AfterEach
+    void tearDown() {
+        Injector.forgetAll();
     }
 }
 
