@@ -26,15 +26,15 @@ public enum StandardField implements Field {
     BOOKSUBTITLE("booksubtitle", FieldProperty.BOOK_NAME),
     BOOKTITLE("booktitle", FieldProperty.BOOK_NAME),
     BOOKTITLEADDON("booktitleaddon"),
-    CHAPTER("chapter"),
+    CHAPTER("chapter", FieldProperty.NUMERIC),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
     // Comments of users are handled at {@link org.jabref.model.entry.field.UserSpecificCommentField}
     COMMENT("comment", FieldProperty.MULTILINE_TEXT, FieldProperty.MARKDOWN),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     CITES("cites", FieldProperty.MULTIPLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
-    DAY("day"),
-    DAYFILED("dayfiled"),
+    DAY("day", FieldProperty.NUMERIC),
+    DAYFILED("dayfiled", FieldProperty.NUMERIC),
     DOI("doi", FieldProperty.VERBATIM, FieldProperty.IDENTIFIER),
     EDITION("edition", FieldProperty.NUMERIC),
     EDITOR("editor", FieldProperty.PERSON_NAMES),
@@ -100,7 +100,7 @@ public enum StandardField implements Field {
     PAGES("pages"),
     PAGETOTAL("pagetotal", FieldProperty.NUMERIC),
     PAGINATION("pagination", FieldProperty.PAGINATION),
-    PART("part"),
+    PART("part", FieldProperty.NUMERIC),
     PDF("pdf"),
     PMID("pmid", FieldProperty.NUMERIC, FieldProperty.IDENTIFIER),
     PS("ps"),
@@ -144,7 +144,7 @@ public enum StandardField implements Field {
 
     // region: JabRef-specific fields
 
-    CITATIONCOUNT("citationcount"),
+    CITATIONCOUNT("citationcount", FieldProperty.NUMERIC),
     GROUPS("groups"),
     ICORERANKING("icore"),
     OWNER("owner"),
