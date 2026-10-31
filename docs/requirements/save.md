@@ -31,11 +31,10 @@ A failed write must leave the original file untouched and must not leave tempora
 
 Needs: impl, utest
 
-## Template exports must commit output only after successful generation
+## Template export failures must preserve the destination file
 `req~logic.exporter.preserve-output-on-template-failure~1`
 
-If loading or rendering a required layout fails, an existing destination remains unchanged and a new destination is not created.
-This includes failures after a header or entry has already been written to the temporary output.
+If loading or rendering a required layout fails, an existing destination remains unchanged and a new destination is not created, even if output has already been generated.
 
 See [JabRef/jabref#17423](https://github.com/JabRef/jabref/issues/17423).
 
