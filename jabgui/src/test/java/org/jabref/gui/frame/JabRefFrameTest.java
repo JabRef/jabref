@@ -2,6 +2,7 @@ package org.jabref.gui.frame;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -20,12 +21,16 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.chat.AiChatView;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.shared.SharedDatabaseErrorTab;
+import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.testutils.JavaFxExtension;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiService;
@@ -33,6 +38,9 @@ import org.jabref.logic.ai.embedding.AsyncEmbeddingModel;
 import org.jabref.logic.ai.embedding.EmbeddingModelCache;
 import org.jabref.logic.ai.embedding.EmbeddingModelMetadataService;
 import org.jabref.logic.ai.preferences.AiPreferences;
+import org.jabref.logic.shared.DBMSConnectionProperties;
+import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
+import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.database.BibDatabaseContext;
@@ -97,6 +105,46 @@ class JabRefFrameTest {
         JabRefFrame.closeSelectedNonLibraryTab(tabbedPane);
 
         assertEquals(List.of(fixedTab), tabbedPane.getTabs());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void closingErrorTabShowsWelcomeOnlyWhenLastTab(boolean lastTab) {
+        JavaFxExtension.invokeAndWait(() -> {
+            TabPane tabbedPane = new TabPane();
+            if (!lastTab) {
+                tabbedPane.getTabs().add(new Tab("Other library"));
+            }
+            DBMSConnectionProperties properties = mock(DBMSConnectionProperties.class);
+            when(properties.getDatabase()).thenReturn("Literature");
+            SharedDatabaseErrorTab errorTab = new SharedDatabaseErrorTab(null, properties);
+            AtomicBoolean welcomeShown = new AtomicBoolean();
+            JabRefFrame.addSharedDatabaseErrorTab(tabbedPane, errorTab, () -> welcomeShown.set(true));
+            tabbedPane.getSelectionModel().select(errorTab);
+
+            JabRefFrame.closeSelectedNonLibraryTab(tabbedPane);
+
+            assertEquals(lastTab, welcomeShown.get());
+        });
+    }
+
+    @Test
+    void reservedRetryIsFoundWhileStillLoading() {
+        LibraryTabContainer container = mock(LibraryTabContainer.class);
+        LibraryTab retryTab = mock(LibraryTab.class);
+        when(retryTab.getLoading()).thenReturn(new SimpleBooleanProperty(true));
+        when(container.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(retryTab));
+        DBMSConnectionProperties properties = new DBMSConnectionPropertiesBuilder()
+                .setType(DBMSType.POSTGRESQL)
+                .setHost("localhost")
+                .setPort(5432)
+                .setDatabase("literature")
+                .setUser("user")
+                .createDBMSConnectionProperties();
+
+        assertEquals(Optional.empty(), SharedDatabaseUIManager.reserveTab(container, properties, retryTab));
+        assertEquals(Optional.of(retryTab), SharedDatabaseUIManager.findOpenTab(container, properties));
+        assertEquals(Optional.of(retryTab), SharedDatabaseUIManager.reserveTab(container, properties, mock(LibraryTab.class)));
     }
 
     // [utest->req~ai.chat.find.unavailable~1]

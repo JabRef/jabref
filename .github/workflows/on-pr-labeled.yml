@@ -10,17 +10,27 @@ jobs:
     name: Auto Merge
     if: >
       github.event.label.name == 'automerge' &&
-      github.repository == 'JabRef/jabref' &&
-      github.event.pull_request.head.repo.full_name == 'JabRef/jabref'
+      (github.repository == 'JabRef/jabref' || github.repository == 'JabRef/jabref-black-forest') &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-slim
+    permissions:
+      contents: read
+      pull-requests: write
     # Same concurrency group as automerge.yml's automerge job: serializes the
     # two workflows per PR so the approve guard below cannot race.
     concurrency:
       group: automerge-pr-${{ github.event.pull_request.number }}
       cancel-in-progress: false
     steps:
+      - name: Approve a port PR
+        # jabref-machine cannot approve its own PRs (ports, opened from the other repository);
+        # github-actions[bot] does it instead - for ports only
+        if: github.event.pull_request.user.login == 'jabref-machine' && startsWith(github.event.pull_request.head.ref, 'port-')
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Approve PR
-        # jabref-machine cannot approve its own PRs (ports); port-to-other-branch.yml approves those
         if: github.event.pull_request.user.login != 'jabref-machine'
         # Guard: automerge.yml (running for a push made just before the label was added)
         # queries labels live and may approve concurrently — skip if an un-dismissed
