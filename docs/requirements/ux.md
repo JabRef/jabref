@@ -132,11 +132,21 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+## The "Close dialog" key binding closes the dialog
+`req~ux.dialogs.close-key-binding~1`
+
+Pressing the "Close dialog" key binding in a dialog closes it ([#8888](https://github.com/JabRef/jabref/issues/8888), [#15133](https://github.com/JabRef/jabref/issues/15133)).
+Its default is <kbd>Esc</kbd>; users can change it in the key binding preferences.
+Heavy-weight dialogs whose content the user builds up over time are exempt, so that a stray key press does not throw that state away.
+Currently, this is only the PDF viewer ("Document viewer").
+
+Needs: impl, utest
+
 ## Open combo box popup must close without closing enclosing dialog on Escape
 `req~ux.combobox.escape-closes-popup-only~1`
 
 When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
-The enclosing dialog must remain open.
+The enclosing dialog must remain open ([#16596](https://github.com/JabRef/jabref/issues/16596)).
 
 ## Library save must maintain filesystem change detection after completion
 `req~ux.external-library-changes.after-save~1`
@@ -227,5 +237,27 @@ Needs: impl
 The groups walkthrough must open its bundled example library, display the Groups pane, and clear the current search before guiding the user.
 
 Needs: impl
+
+## Library tab switches must preserve each library's selected groups
+`req~ux.groups.library-switch-preserves-selection~1`
+
+Rationale: The user must be able to switch between libraries and still see the same groups selected ([#1104](https://github.com/JabRef/jabref/issues/1104)).
+
+Needs: impl, utest
+
+## Shared library group updates must preserve selected groups
+`req~ux.groups.shared-update-preserves-selection~1`
+
+When a shared library receives a group-tree update, groups that remain in the updated tree must remain selected.
+
+Needs: impl, utest
+
+## Assigning an already used keyboard shortcut must require confirmation
+`req~ux.keybindings.duplicate-warning~1`
+
+When a user assigns a keyboard shortcut that is already used by other actions, JabRef warns the user, names these actions and lets the user cancel,
+keep both or replace the existing assignments ([#17240](https://github.com/JabRef/jabref/issues/17240)).
+
+Needs: impl, utest
 
 <!-- markdownlint-disable-file MD022 -->
