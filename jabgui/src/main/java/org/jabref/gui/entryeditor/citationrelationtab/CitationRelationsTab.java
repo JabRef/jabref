@@ -1062,20 +1062,11 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void applyJournalCleanup(List<BibEntry> entries) {
-        Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
-        JournalAbbreviationRepository repository =
-                Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
-        if (databaseContext.isEmpty()) {
-            AbbreviateCleanupFactory.abbreviateCleanup(
-                    null,
-                    repository,
-                    preferences.getAbbreviationPreferences()
-            ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
-        }
+        JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+
         AbbreviateCleanupFactory.abbreviateCleanup(
-                databaseContext.get().getDatabase(),
-                repository,
-                preferences.getAbbreviationPreferences()
+                stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase),
+                repository, preferences.getAbbreviationPreferences()
         ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
     }
 

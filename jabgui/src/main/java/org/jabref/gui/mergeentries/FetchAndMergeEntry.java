@@ -85,9 +85,8 @@ public class FetchAndMergeEntry {
                                                              if (fetchedEntry.isPresent()) {
                                                                  JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
                                                                  AbbreviateCleanupFactory.abbreviateCleanup(
-                                                                         bibDatabaseContext.getDatabase(),
-                                                                         repository,
-                                                                         preferences.getAbbreviationPreferences()
+                                                                         Optional.of(bibDatabaseContext.getDatabase()),
+                                                                         repository, preferences.getAbbreviationPreferences()
                                                                  ).ifPresent(cleanupJob -> cleanupJob.cleanup(fetchedEntry.get()));
                                                                  cleanup.doPostCleanup(fetchedEntry.get());
                                                                  showMergeDialog(entry, fetchedEntry.get(), idBasedFetcher);
@@ -137,9 +136,8 @@ public class FetchAndMergeEntry {
                           if (fetchedEntry.isPresent()) {
                               JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
                               AbbreviateCleanupFactory.abbreviateCleanup(
-                                      bibDatabaseContext.getDatabase(),
-                                      repository,
-                                      preferences.getAbbreviationPreferences()
+                                      Optional.of(bibDatabaseContext.getDatabase()),
+                                      repository, preferences.getAbbreviationPreferences()
                               ).ifPresent(cleanupJob -> cleanupJob.cleanup(fetchedEntry.get()));
                               ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
                               cleanup.doPostCleanup(fetchedEntry.get());

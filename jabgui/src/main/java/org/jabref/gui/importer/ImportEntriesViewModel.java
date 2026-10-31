@@ -195,7 +195,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
 
         AbbreviateCleanupFactory.abbreviateCleanup(
-                databaseContext.getDatabase(),
+                Optional.ofNullable(databaseContext).map(BibDatabaseContext::getDatabase),
                 repository,
                 preferences.getAbbreviationPreferences()
         ).ifPresent(cleanupJob -> entries.forEach(cleanupJob::cleanup));
