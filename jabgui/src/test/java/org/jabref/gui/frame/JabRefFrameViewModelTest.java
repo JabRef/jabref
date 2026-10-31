@@ -1,8 +1,10 @@
 package org.jabref.gui.frame;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -22,6 +24,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -127,6 +130,38 @@ class JabRefFrameViewModelTest extends JavaFxTest {
 
         // Then
         verify(dialogService).showCustomDialogAndWait(any());
+    }
+
+    @Test
+    void unconnectedSharedDatabaseStaysRemembered() {
+        when(stateManager.getAnyTasksThatWillNotBeRecoveredRunning()).thenReturn(EasyBind.map(new SimpleBooleanProperty(false), Boolean::booleanValue));
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList());
+        when(tabContainer.getCurrentLibraryTab()).thenReturn(null);
+        when(tabContainer.closeTabs(any(), eq(false))).thenReturn(true);
+        when(tabContainer.getUnconnectedSharedDatabaseIds()).thenReturn(List.of("shared-1"));
+        when(preferences.getWorkspacePreferences().shouldOpenLastEdited()).thenReturn(true);
+
+        interact(() -> assertTrue(viewModel.close()));
+
+        verify(preferences.getLastFilesOpenedPreferences()).setLastSharedDatabasesOpened(List.of("shared-1"));
+    }
+
+    @Test
+    void sharedDatabaseStillLoadingAtQuitStaysRemembered() {
+        BibDatabaseContext loadingContext = new BibDatabaseContext();
+        loadingContext.getDatabase().setSharedDatabaseID("shared-1");
+        LibraryTab loadingTab = mock(LibraryTab.class);
+        when(loadingTab.isLoading()).thenReturn(true);
+        when(loadingTab.getBibDatabaseContext()).thenReturn(loadingContext);
+        when(stateManager.getAnyTasksThatWillNotBeRecoveredRunning()).thenReturn(EasyBind.map(new SimpleBooleanProperty(false), Boolean::booleanValue));
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(loadingTab));
+        when(tabContainer.getCurrentLibraryTab()).thenReturn(null);
+        when(tabContainer.closeTabs(any(), eq(false))).thenReturn(true);
+        when(preferences.getWorkspacePreferences().shouldOpenLastEdited()).thenReturn(true);
+
+        interact(() -> assertTrue(viewModel.close()));
+
+        verify(preferences.getLastFilesOpenedPreferences()).setLastSharedDatabasesOpened(List.of("shared-1"));
     }
 
     @Test
