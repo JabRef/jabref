@@ -3,8 +3,10 @@ package org.jabref.logic.preferences;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -524,13 +526,19 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /// Identifies a single secret in the system keyring by its `service` and `account`.
-    private record KeyringSlot(String service, String account) {
-        static final KeyringSlot PROXY_PASSWORD = new KeyringSlot("org.jabref", "proxy");
-        static final KeyringSlot GITHUB_PAT = new KeyringSlot("org.jabref", "github");
+    ///
+    /// The secret is stored as plain text under `service`. Older versions stored it encrypted with [Password] under
+    /// `legacyService` (same `account`); such values are migrated when they are read.
+    ///
+    /// See [ADR 0079](https://devdocs.jabref.org/decisions/0079-store-keyring-secrets-without-application-encryption.html) for why no extra encryption is used.
+    private record KeyringSlot(String service, String account, String legacyService) {
+        // [impl->adr~keyring.no-application-encryption~1]
+        static final KeyringSlot PROXY_PASSWORD = new KeyringSlot("org.jabref.proxy", "proxy", "org.jabref");
+        static final KeyringSlot GITHUB_PAT = new KeyringSlot("org.jabref.github", "github", "org.jabref");
 
         /// Slot holding a custom API key for the fetcher with the given name.
         static KeyringSlot customApiKey(String fetcherName) {
-            return new KeyringSlot("org.jabref.customapikeys", fetcherName);
+            return new KeyringSlot("org.jabref.apikeys", fetcherName, "org.jabref.customapikeys");
         }
     }
 
@@ -978,29 +986,88 @@ public class JabRefCliPreferences implements CliPreferences {
                        .filter(StringUtil::isNotBlank);
     }
 
-    /// Reads and decrypts the secrets at the given slots in a single keyring session. On a successful open the result
-    /// holds an entry for **every** requested slot — the decrypted secret, or "" when that slot is empty. Returns an
+    /// Reads the secrets at the given slots in a single keyring session. On a successful open the result
+    /// holds an entry for **every** requested slot — the secret, or "" when that slot is empty. Returns an
     /// empty map if the keyring cannot be opened, so callers tell failure from "all slots empty" by size
     /// (`result.size() == slots.size()` iff the open succeeded; an empty `slots` is a no-op).
     private Map<KeyringSlot, String> readKeyring(List<KeyringSlot> slots) {
         Map<KeyringSlot, String> result = new HashMap<>();
         try (Keyring keyring = Keyring.create()) {
             for (KeyringSlot slot : slots) {
-                try {
-                    result.put(slot, new Password(
-                            keyring.getPassword(slot.service(), slot.account()),
-                            getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .decrypt());
-                } catch (PasswordAccessException _) {
-                    LOGGER.debug("No secret stored in keyring for {}/{}", slot.service(), slot.account());
-                    result.put(slot, "");
-                }
+                result.put(slot, readSecret(keyring, slot));
             }
         } catch (Exception ex) {
             LOGGER.warn("Could not open keyring", ex);
             return Map.of();
         }
         return result;
+    }
+
+    /// Reads the plain-text secret of a slot, migrating a legacy encrypted value first if needed. Returns "" when
+    /// nothing is stored.
+    private String readSecret(Keyring keyring, KeyringSlot slot) {
+        try {
+            return keyring.getPassword(slot.service(), slot.account());
+        } catch (PasswordAccessException _) {
+            return migrateLegacySecret(keyring, slot);
+        }
+    }
+
+    /// Moves a secret stored encrypted by older JabRef versions to the slot's current location as plain text.
+    ///
+    /// The legacy entry is removed only after the new one was written, so a failed write is retried on the next read.
+    /// A legacy value that cannot be decrypted (e.g., because the owner or the host name changed) is discarded.
+    ///
+    /// @return the decrypted secret, or "" if there is no legacy value or it cannot be decrypted
+    private String migrateLegacySecret(Keyring keyring, KeyringSlot slot) {
+        // [impl->req~keyring.legacy-migration~1]
+        String encrypted;
+        try {
+            encrypted = keyring.getPassword(slot.legacyService(), slot.account());
+        } catch (PasswordAccessException _) {
+            LOGGER.debug("No secret stored in keyring for {}/{}", slot.service(), slot.account());
+            return "";
+        }
+
+        String secret;
+        try {
+            secret = new Password(encrypted, getInternalPreferences().getUserHostInfo().getUserHostString()).decrypt();
+        } catch (GeneralSecurityException | UnsupportedEncodingException | IllegalArgumentException e) {
+            LOGGER.warn("Could not decrypt the stored secret for {}/{}. It is discarded and has to be entered again.", slot.legacyService(), slot.account(), e);
+            deleteFromKeyring(keyring, slot.legacyService(), slot.account());
+            return "";
+        }
+
+        try {
+            keyring.setPassword(slot.service(), slot.account(), secret);
+        } catch (PasswordAccessException e) {
+            LOGGER.warn("Could not move the secret for {}/{} to {}", slot.legacyService(), slot.account(), slot.service(), e);
+            return secret;
+        }
+        deleteFromKeyring(keyring, slot.legacyService(), slot.account());
+        return secret;
+    }
+
+    /// Deletes an entry from the keyring.
+    ///
+    /// @return `false` if the entry still exists afterwards
+    private static boolean deleteFromKeyring(Keyring keyring, String service, String account) {
+        try {
+            keyring.deletePassword(service, account);
+            return true;
+        } catch (PasswordAccessException _) {
+            // The keyring reports a missing entry the same way as a failed deletion
+            return !existsInKeyring(keyring, service, account);
+        }
+    }
+
+    private static boolean existsInKeyring(Keyring keyring, String service, String account) {
+        try {
+            keyring.getPassword(service, account);
+            return true;
+        } catch (PasswordAccessException _) {
+            return false;
+        }
     }
 
     /// Writes (or, for a blank secret, clears) a single slot.
@@ -1010,22 +1077,23 @@ public class JabRefCliPreferences implements CliPreferences {
         writeKeyring(single);
     }
 
-    /// Encrypts and writes each secret to its slot in a single keyring session. A blank secret clears its slot.
+    /// Writes each secret as plain text to its slot in a single keyring session. A blank secret clears its slot.
+    /// In both cases, a legacy encrypted value of the slot is removed, so that it cannot be migrated later.
     private void writeKeyring(Map<KeyringSlot, String> secrets) {
+        // [impl->req~keyring.plain-text-storage~1]
+        // [impl->req~keyring.legacy-migration~1]
         try (Keyring keyring = Keyring.create()) {
             for (Map.Entry<KeyringSlot, String> entry : secrets.entrySet()) {
                 KeyringSlot slot = entry.getKey();
-                if (StringUtil.isBlank(entry.getValue())) {
-                    try {
-                        keyring.deletePassword(slot.service(), slot.account());
-                    } catch (PasswordAccessException _) {
-                        // already absent, nothing to clear
-                    }
+                if (StringUtil.isNotBlank(entry.getValue())) {
+                    keyring.setPassword(slot.service(), slot.account(), entry.getValue().trim());
+                    deleteFromKeyring(keyring, slot.legacyService(), slot.account());
+                } else if (deleteFromKeyring(keyring, slot.legacyService(), slot.account())) {
+                    deleteFromKeyring(keyring, slot.service(), slot.account());
                 } else {
-                    keyring.setPassword(slot.service(), slot.account(), new Password(
-                            entry.getValue().trim(),
-                            getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .encrypt());
+                    // An empty value at the new location stops the remaining legacy value from being migrated back
+                    LOGGER.warn("Could not delete the legacy secret for {}/{}", slot.legacyService(), slot.account());
+                    keyring.setPassword(slot.service(), slot.account(), "");
                 }
             }
         } catch (Exception ex) {
