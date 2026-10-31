@@ -155,17 +155,35 @@ class GeneralPropertiesViewModelTest {
     }
 
     @Test
-    void unsavedLibraryKeepsMainFileDirectoryPromptForRelativeLibrarySpecificDirectory(@TempDir Path tempDir) {
-        Path mainFileDirectory = tempDir.resolve("papers");
+    void unsavedLibraryShowsAbsoluteDirectoryForRelativeLibrarySpecificDirectory(@TempDir Path tempDir) {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         FilePreferences filePreferences = createFilePreferences(tempDir.resolve("working"));
-        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(mainFileDirectory));
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(tempDir.resolve("papers")));
         GeneralPropertiesViewModel viewModel = createViewModel(databaseContext, filePreferences);
         viewModel.setValues(databaseContext.getMetaData());
 
         viewModel.librarySpecificDirectoryProperty().set("pdfs");
 
-        assertEquals(mainFileDirectory.toString(), viewModel.userSpecificFileDirectoryPromptProperty().get());
+        assertEquals(Path.of("pdfs").toAbsolutePath().toString(), viewModel.userSpecificFileDirectoryPromptProperty().get());
+    }
+
+    @Test
+    void invalidStoredDirectoryKeepsFieldEditableAndFallsBackInPrompts(@TempDir Path tempDir) {
+        String invalidDirectory = "invalid\0directory";
+        MetaData metaData = new MetaData();
+        metaData.setLibrarySpecificFileDirectory(invalidDirectory);
+        metaData.setUserFileDirectory("user", invalidDirectory);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, tempDir.resolve("demo-tool-hint.bib"));
+        FilePreferences filePreferences = createFilePreferences(tempDir.resolve("working"));
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        GeneralPropertiesViewModel viewModel = createViewModel(databaseContext, filePreferences);
+
+        viewModel.setValues(metaData);
+
+        assertEquals(invalidDirectory, viewModel.librarySpecificDirectoryProperty().get());
+        assertEquals(invalidDirectory, viewModel.userSpecificFileDirectoryProperty().get());
+        assertEquals(tempDir.toString(), viewModel.librarySpecificDirectoryPromptProperty().get());
+        assertEquals(tempDir.toString(), viewModel.userSpecificFileDirectoryPromptProperty().get());
     }
 
     @Test

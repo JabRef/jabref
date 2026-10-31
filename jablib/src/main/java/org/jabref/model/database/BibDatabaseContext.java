@@ -203,20 +203,21 @@ public class BibDatabaseContext {
                                                     .map(this::getFileDirectoryPath)
                                                     .orElse(null);
 
-        Path bibOrMainFileDirectory;
-
-        // BIB file directory or Main file directory (according to (global) preferences)
-        if (preferences.shouldStoreFilesRelativeToBibFile()) {
-            bibOrMainFileDirectory = getDatabaseDirectory().orElse(null);
-        } else {
-            bibOrMainFileDirectory = preferences.getMainFileDirectory().orElse(null);
-        }
-
         return new FileDirectories(
                 userFileDirectory,
                 librarySpecificFileDirectory,
-                bibOrMainFileDirectory
+                getFallbackFileDirectory(preferences).orElse(null)
         );
+    }
+
+    /// Returns the directory used if neither a user-specific nor a library-specific file directory is set:
+    /// the BIB file directory or the main file directory (according to the (global) preferences).
+    /// In contrast to [#getAllFileDirectories(FilePreferences)], this does not read the directories stored in the library.
+    public Optional<Path> getFallbackFileDirectory(FilePreferences preferences) {
+        if (preferences.shouldStoreFilesRelativeToBibFile()) {
+            return getDatabaseDirectory();
+        }
+        return preferences.getMainFileDirectory();
     }
 
     public Optional<Path> getDatabaseDirectory() {

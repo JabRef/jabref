@@ -115,8 +115,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         // [impl->req~jabgui.libraryproperties.file-directory.effective-prompt~1]
         FilePreferences filePreferences = preferences.getFilePreferences();
-        librarySpecificDirectoryPromptProperty.setValue(databaseContext.getAllFileDirectories(filePreferences)
-                                                                       .getFallbackDirectoryOpt()
+        librarySpecificDirectoryPromptProperty.setValue(databaseContext.getFallbackFileDirectory(filePreferences)
                                                                        .map(directory -> directory.toAbsolutePath().toString())
                                                                        .orElse(""));
         // Same fallback as the LaTeX citations tab uses when no LaTeX file directory is set
@@ -269,22 +268,19 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return this.laTexFileDirectoryPromptProperty;
     }
 
-    /// Resolves a directory entered in this tab the same way [BibDatabaseContext] resolves the stored one.
-    ///
-    /// @return the absolute directory, or an empty optional if the input is blank, not a valid path, or relative to an unsaved library
+    /// Resolves a directory entered in this tab to the absolute directory the file lookup uses.
+    /// Blank input and invalid paths resolve to an empty optional.
     private Optional<Path> resolveDirectory(String directory) {
         if (directory.isBlank()) {
             return Optional.empty();
         }
 
-        Path resolvedDirectory;
         try {
-            resolvedDirectory = databaseContext.getFileDirectoryPath(directory.trim());
+            return Optional.of(databaseContext.getFileDirectoryPath(directory.trim()).toAbsolutePath());
         } catch (InvalidPathException e) {
             LOGGER.debug("Could not resolve directory {}", directory, e);
             return Optional.empty();
         }
-        return Optional.of(resolvedDirectory).filter(Path::isAbsolute);
     }
 
     private Path getBrowseDirectory(String configuredDir) {
