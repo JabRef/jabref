@@ -46,7 +46,7 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
         this.settings = ExtensionSettings.getDefaultSettings();
         this.parserHandler = new LspParserHandler();
         this.diagnosticHandler = new LspDiagnosticHandler(this, parserHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager);
-        this.linkHandler = new LspLinkHandler(this, parserHandler, cliPreferences.getFilePreferences());
+        this.linkHandler = new LspLinkHandler(this, parserHandler, cliPreferences.getFilePreferences(), cliPreferences.getImportFormatPreferences());
         this.workspaceService = new BibtexWorkspaceService(this, diagnosticHandler);
         this.textDocumentService = new BibtexTextDocumentService(messageHandler, this, diagnosticHandler, linkHandler);
         this.messageHandler = messageHandler;
@@ -69,6 +69,7 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
         capabilities.setTextDocumentSync(syncOptions);
         capabilities.setWorkspace(new WorkspaceServerCapabilities());
         capabilities.setDefinitionProvider(true);
+        capabilities.setHoverProvider(true);
 
         DocumentLinkOptions linkOptions = new DocumentLinkOptions();
         linkOptions.setResolveProvider(true);

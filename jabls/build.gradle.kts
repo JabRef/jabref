@@ -5,6 +5,7 @@ plugins {
 
 testModuleInfo {
     requires("org.junit.jupiter.api")
+    requires("org.junit.jupiter.params")
     requires("org.mockito")
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
