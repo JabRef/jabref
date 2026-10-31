@@ -345,11 +345,13 @@ class BackupUIManagerTest extends JavaFxTest {
         assertFalse(parserResult.isInvalid());
     }
 
-    /// Accepting the backup file changes should prompt the user to save the file when closing JabRef
-    /// The [ParserResult#getChangedOnMigration] flag is what makes the opened library count as modified
+    /// Accepting the backup file changes should prompt the user to save the file when closing JabRef.
+    /// The [ParserResult#getChangedOnMigration] flag is what makes the opened library count as modified.
     @Test
     void acceptingBackupPromptsSavingWhenClosing(@TempDir Path tempDir) throws IOException {
         Path backupDir = tempDir.resolve("backups");
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.emptyObservableList());
         when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
         when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
                 .thenReturn(Optional.of(BackupResolverDialog.REVIEW_BACKUP));
@@ -384,6 +386,7 @@ class BackupUIManagerTest extends JavaFxTest {
 
         Optional<ParserResult> result = BackupUIManager.showRestoreBackupDialog(
                 dialogService,
+                tabContainer,
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
@@ -393,10 +396,12 @@ class BackupUIManagerTest extends JavaFxTest {
     }
 
     /// Rejecting backup file changes should have no effect on the state of the file, so no save
-    /// prompt should appear when closing because the file should still match the existing one on the disk
+    /// prompt should appear when closing because the file should still match the existing one on the disk.
     @Test
     void rejectingBackupChangesDoesNotPromptSaveOnClosing(@TempDir Path tempDir) throws IOException {
         Path backupDir = tempDir.resolve("backups");
+        LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
+        when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.emptyObservableList());
         when(preferences.getFilePreferences().getBackupDirectory()).thenReturn(backupDir);
         when(dialogService.showCustomDialogAndWait(any(BackupResolverDialog.class)))
                 .thenReturn(Optional.of(BackupResolverDialog.REVIEW_BACKUP));
@@ -431,6 +436,7 @@ class BackupUIManagerTest extends JavaFxTest {
 
         Optional<ParserResult> result = BackupUIManager.showRestoreBackupDialog(
                 dialogService,
+                tabContainer,
                 originalFile,
                 preferences,
                 mock(FileUpdateMonitor.class),
