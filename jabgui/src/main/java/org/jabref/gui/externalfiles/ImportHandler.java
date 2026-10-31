@@ -283,6 +283,17 @@ public class ImportHandler {
         };
     }
 
+    /// Shows a warning listing the files that failed to import, if any.
+    public void showImportErrors(List<ImportFilesResultItemViewModel> results) {
+        List<String> errors = results.stream()
+                                     .filter(result -> !result.isSuccess())
+                                     .map(result -> result.file().get() + ": " + result.message().get())
+                                     .toList();
+        if (!errors.isEmpty()) {
+            dialogService.showWarningDialogAndWait(Localization.lang("Import error"), String.join("\n\n", errors));
+        }
+    }
+
     /// Inserts the imported entries and releases the library the import held.
     ///
     /// [#importCleanedEntries] records the insert as one step, so the files imported together are
