@@ -15,6 +15,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
@@ -31,6 +32,11 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     private int collapsedRows = Integer.MAX_VALUE;
     private boolean expanded;
     private boolean resetPending;
+    private String measuredText;
+    private Font measuredFont;
+    private double measuredWrapWidth = -1;
+    private double measuredRowHeight;
+    private long measuredRows;
     /// Variable that contains user-defined behavior for paste action.
     private Runnable pasteActionHandler = () -> {
         // Set empty paste behavior by default
@@ -121,17 +127,26 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
         if (lookup(".content") instanceof Region content) {
             horizontalInsets += content.snappedLeftInset() + content.snappedRightInset();
         }
-        Text measure = new Text(textProperty().getValueSafe());
-        measure.setFont(getFont());
-        measure.setWrappingWidth(Math.max(0, wrapWidth - horizontalInsets));
-        Text singleRow = new Text("X");
-        singleRow.setFont(getFont());
-        double rowHeight = singleRow.getLayoutBounds().getHeight();
-        long rows = Math.max(1, Math.round(measure.getLayoutBounds().getHeight() / rowHeight));
+        String text = textProperty().getValueSafe();
+        Font font = getFont();
+        double textWrapWidth = Math.max(0, wrapWidth - horizontalInsets);
+        if (measuredText != text || measuredFont != font || measuredWrapWidth != textWrapWidth) {
+            Text measure = new Text(text);
+            measure.setFont(font);
+            measure.setWrappingWidth(textWrapWidth);
+            Text singleRow = new Text("X");
+            singleRow.setFont(font);
+            measuredRowHeight = singleRow.getLayoutBounds().getHeight();
+            measuredRows = Math.max(1, Math.round(measure.getLayoutBounds().getHeight() / measuredRowHeight));
+            measuredText = text;
+            measuredFont = font;
+            measuredWrapWidth = textWrapWidth;
+        }
+        long rows = measuredRows;
         if (!expanded) {
             rows = Math.min(rows, collapsedRows);
         }
-        return oneRow + (rows - 1) * rowHeight;
+        return oneRow + (rows - 1) * measuredRowHeight;
     }
 
     @Override

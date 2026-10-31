@@ -119,6 +119,13 @@ Users can define custom entry editor tabs in the preferences ("Entry editor" →
 
 Needs: impl
 
+## Custom tab fields must remain separate at different editor heights
+`req~entry-editor.custom-tabs.row-layout~1`
+
+Each row in a custom entry editor tab accommodates its field editor's content, even when the tab is shorter than its contents and must scroll. Rows do not overlap. When the tab has extra height, field editors receive space according to their relative weights, while the File row keeps its content height.
+
+Needs: impl, utest
+
 ## Main tab must exclude fields extracted to custom tabs
 `req~entry-editor.custom-tabs.extract-field~1`
 
