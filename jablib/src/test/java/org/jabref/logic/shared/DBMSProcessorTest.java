@@ -127,7 +127,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    // [utest->req~shared-database.missing-entry-type~1]
+        // [utest->req~shared-database.missing-entry-type~1]
     void nullEntryTypeFallsBackToMiscWhenSharedEntriesAreRead() throws SQLException {
         try (Statement statement = dbmsConnection.getConnection().createStatement()) {
             statement.executeUpdate("INSERT INTO jabref.entry (entrytype) VALUES (NULL)");

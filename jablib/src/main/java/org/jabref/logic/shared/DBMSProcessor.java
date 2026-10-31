@@ -574,12 +574,12 @@ public class DBMSProcessor {
                         int version = selectEntryResultSet.getInt("version");
                         String entryTypeName = selectEntryResultSet.getString("entrytype");
                         EntryType entryType = Optional.ofNullable(entryTypeName)
-                                                       .filter(StringUtil::isNotBlank)
-                                                       .map(EntryTypeFactory::parse)
-                                                       .orElseGet(() -> {
-                                                           LOGGER.warn("Shared entry {} has no entry type; using Misc", sharedId);
-                                                           return BibEntry.DEFAULT_TYPE;
-                                                       });
+                                                      .filter(StringUtil::isNotBlank)
+                                                      .map(EntryTypeFactory::parse)
+                                                      .orElseGet(() -> {
+                                                          LOGGER.warn("Shared entry {} has no entry type; using Misc", sharedId);
+                                                          return BibEntry.DEFAULT_TYPE;
+                                                      });
 
                         bibEntry = new BibEntry(entryType);
                         bibEntry.getSharedBibEntryData().setSharedId(sharedId);
