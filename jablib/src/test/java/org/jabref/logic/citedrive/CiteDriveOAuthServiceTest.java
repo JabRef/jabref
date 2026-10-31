@@ -225,8 +225,8 @@ class CiteDriveOAuthServiceTest {
         preferences.setApiBaseUrl("https://other.example/");
         preferences.setAppBaseUrl("https://other-app.example/");
 
-        assertEquals(URI.create("https://api-dev.citedrive.com/jabref/push/"), session.pushEndpoint());
-        assertEquals(URI.create("https://app-dev.citedrive.com/jabref/import/"), session.importPage());
+        assertEquals(URI.create("https://api.citedrive.com/jabref/push/"), session.pushEndpoint());
+        assertEquals(URI.create("https://app.citedrive.com/jabref/import/"), session.importPage());
     }
 
     @Test

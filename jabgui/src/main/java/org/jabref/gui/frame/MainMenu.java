@@ -17,6 +17,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
+import org.jabref.gui.citedrive.CiteDriveImportAction;
 import org.jabref.gui.citedrive.CiteDriveLoginAction;
 import org.jabref.gui.citedrive.CiteDrivePushAction;
 import org.jabref.gui.cleanup.CleanupAction;
@@ -449,6 +450,7 @@ public class MainMenu extends MenuBar {
     /// CiteDrive is opt-in: without it the menu is not shown at all
     private Menu citeDriveMenu(ActionFactory factory) {
         Menu citeDrive = factory.createSubMenu(StandardActions.CITE_DRIVE,
+                factory.createMenuItem(StandardActions.CITE_DRIVE_IMPORT, new CiteDriveImportAction(dialogService, preferences)),
                 factory.createMenuItem(StandardActions.CITE_DRIVE_PUSH, new CiteDrivePushAction(dialogService, stateManager, preferences, oAuthSessionRegistry)),
                 factory.createMenuItem(StandardActions.CITE_DRIVE_LOGIN, new CiteDriveLoginAction(dialogService, preferences, oAuthSessionRegistry)));
         citeDrive.visibleProperty().bind(preferences.getCiteDrivePreferences().enabledProperty());

@@ -30,6 +30,22 @@ After a successful push, JabRef opens the CiteDrive page where the user chooses 
 
 Needs: impl
 
+## CiteDrive import menu entry must open the configured CiteDrive export page
+`req~citedrive.import.open-export-page~1`
+
+The menu entry opens CiteDrive's export page in a browser, where the user selects a project and references to send to JabRef.
+The page uses the configured CiteDrive web address.
+
+Needs: impl, utest
+
+## CiteDrive defaults must use the production service
+`req~citedrive.production-defaults~1`
+
+New installations use CiteDrive's production API and web application addresses.
+Users can override the addresses in preferences for development or testing.
+
+Needs: impl, utest
+
 ## CiteDrive credentials must remain bound to their server
 `req~citedrive.credentials.server~1`
 
