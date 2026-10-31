@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
+import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
@@ -71,7 +72,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         }
 
         URLDownload urlDownload = new URLDownload(importerPreferences, citationsUrl);
-        importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
+        importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
 
         CitationsResponse citationsResponse = GSON.fromJson(urlDownload.asString(), CitationsResponse.class);
 
@@ -98,7 +99,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         }
 
         URLDownload urlDownload = new URLDownload(referencesUrl);
-        importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
+        importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
         String response = urlDownload.asString();
         ReferencesResponse referencesResponse = GSON.fromJson(response, ReferencesResponse.class);
 
@@ -112,7 +113,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
             if (!disclaimer.isBlank()) {
                 LOGGER.debug("Received a disclaimer from Semantic Scholar: {}", disclaimer);
                 if (disclaimer.contains("references")) {
-                    throw new FetcherException(Localization.lang("Restricted access to references: %0", disclaimer));
+                    throw new FetcherException(Localization.lang("Semantic Scholar cannot provide this paper's reference list because of publisher restrictions.\n\n%0", disclaimer));
                 }
             }
             return List.of();
@@ -140,7 +141,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         }
 
         URLDownload urlDownload = new URLDownload(referencesUrl);
-        importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
+        importerPreferences.getApiKey(SemanticScholar.FETCHER_NAME).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
         String result;
         try {
             result = urlDownload.asString();

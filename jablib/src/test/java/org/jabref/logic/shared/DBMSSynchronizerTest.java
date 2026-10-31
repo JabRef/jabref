@@ -149,6 +149,29 @@ class DBMSSynchronizerTest {
     }
 
     @Test
+    void preparedCloseAppliesSaveActionsBeforeFlushingBufferedEdit() throws Exception {
+        BibEntry entry = createExampleBibEntry(1);
+        bibDatabase.insertEntry(entry);
+        int sharedId = entry.getSharedBibEntryData().getSharedIdAsInt();
+        DBMSProcessor reader = new DBMSProcessor(connectorTest.getTestDBMSConnection());
+        MetaData saveActions = new MetaData();
+        saveActions.setSaveActions(new FieldFormatterCleanupActions(true, List.of(new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter()))));
+        dbmsSynchronizer.setMetaData(saveActions);
+        entry.setField(StandardField.AUTHOR, "NEW AUTHOR", EntriesEventSource.SHARED);
+        FieldChangedEvent edit = new FieldChangedEvent(entry, StandardField.AUTHOR, "Wirthlin, Michael J1", "NEW AUTHOR");
+        edit.setFiltered(true);
+        dbmsSynchronizer.listen(edit);
+
+        dbmsSynchronizer.prepareForClose();
+        assertEquals(Optional.of("new author"), entry.getField(StandardField.AUTHOR));
+        try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+            executor.submit(dbmsSynchronizer::finishClose).get(10, TimeUnit.SECONDS);
+        }
+
+        assertEquals(Optional.of("new author"), reader.getSharedEntry(sharedId).flatMap(saved -> saved.getField(StandardField.AUTHOR)));
+    }
+
+    @Test
     void twoLocalFieldChangesAreSynchronizedCorrectly() throws SQLException {
         BibEntry expectedEntry = createExampleBibEntry(1);
         expectedEntry.registerListener(dbmsSynchronizer);
@@ -220,6 +243,34 @@ class DBMSSynchronizerTest {
             assertEquals("Updated title", localEntry.getField(StandardField.TITLE).orElseThrow());
         } finally {
             remoteSynchronizer.closeSharedDatabase();
+        }
+    }
+
+    @Test
+    void queuedRemoteFieldChangeDoesNotMutateClosedLibrary() throws Exception {
+        List<Runnable> remoteUpdates = new ArrayList<>();
+        BibDatabase remoteDatabase = new BibDatabase();
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(
+                new BibDatabaseContext(remoteDatabase), ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(),
+                "UserAndHost", new VirtualThreadTaskExecutor(), remoteUpdates::add, Runnable::run, offlineChangesDirectory);
+        remoteDatabase.registerListener(synchronizer);
+        synchronizer.openSharedDatabase(connectorTest.getTestDBMSConnection());
+        try {
+            BibEntry entry = createExampleBibEntry(1);
+            remoteDatabase.insertEntry(entry);
+            String originalTitle = entry.getField(StandardField.TITLE).orElseThrow();
+            synchronizer.handleRemoteFieldChange(new FieldChange(
+                    "remote", entry.getSharedBibEntryData().getSharedIdAsString(), StandardField.TITLE.getName(),
+                    originalTitle, "Stale remote title", entry.getSharedBibEntryData().getVersion() + 1));
+
+            synchronizer.prepareForClose();
+            remoteUpdates.getFirst().run();
+
+            assertEquals(Optional.of(originalTitle), entry.getField(StandardField.TITLE));
+        } finally {
+            synchronizer.finishClose();
         }
     }
 

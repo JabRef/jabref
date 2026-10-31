@@ -32,16 +32,18 @@ import org.jabref.gui.keyboard.WalkthroughKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
+import org.jabref.gui.shared.SharedDatabaseCleanup;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.walkthrough.WalkthroughPane;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.git.GitSsh;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -103,6 +105,7 @@ public class JabRefGUI extends Application {
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
+    private static OAuthSessionRegistry oAuthSessionRegistry;
     private static LanguageServerController languageServerController;
 
     private Stage mainStage;
@@ -139,7 +142,8 @@ public class JabRefGUI extends Application {
                     clipBoardManager,
                     taskExecutor,
                     gitHandlerRegistry,
-                    journalAbbreviationRepository);
+                    journalAbbreviationRepository,
+                    oAuthSessionRegistry);
 
             openWindow();
 
@@ -227,6 +231,9 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
+
+        JabRefGUI.oAuthSessionRegistry = new OAuthSessionRegistry();
+        Injector.setModelOrService(OAuthSessionRegistry.class, JabRefGUI.oAuthSessionRegistry);
 
         JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
         Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
@@ -391,7 +398,7 @@ public class JabRefGUI extends Application {
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
-        mainStage.getIcons().addAll(IconTheme.getLogoSet());
+        IconTheme.applyLogo(mainStage);
         mainStage.setScene(scene);
         mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
@@ -531,7 +538,7 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.shouldEnableHttpServer()) {
-            httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
+            httpServerManager.start(preferences, stateManager, mainFrame, oAuthSessionRegistry, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.shouldEnableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
@@ -544,7 +551,7 @@ public class JabRefGUI extends Application {
             // stop in all cases, because the port might have changed
             httpServerManager.stop();
             if (newValue) {
-                httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
+                httpServerManager.start(preferences, stateManager, mainFrame, oAuthSessionRegistry, remotePreferences.getHttpServerUri());
             }
         });
     }
@@ -552,6 +559,7 @@ public class JabRefGUI extends Application {
     @Override
     public void stop() {
         LOGGER.trace("Stopping JabRef GUI");
+        SharedDatabaseCleanup.awaitAll();
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             LOGGER.trace("Stopping JabRef GUI using a virtual thread executor");
 
