@@ -113,9 +113,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             // store the complete parser result (to import groups, ... later on)
             this.parserResult = parserResult;
             List<BibEntry> fetchedEntries = parserResult.getDatabase().getEntries();
-            if (isFromWebSearch()) {
-                applyJournalAbbreviation(fetchedEntries);
-            }
             // fill in the list for the user, where one can select the entries to import
             entries.addAll(fetchedEntries);
             loadEntries(entries);
