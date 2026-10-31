@@ -2,9 +2,11 @@ package org.jabref.logic.importer.fileformat.pdf;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -17,14 +19,46 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mockStatic;
 
 public class PdfBookMetadataImportTest {
+
+    @Test
+    void extractsSyrotiukTextbookLocallyFromPageThreeText() throws IOException, URISyntaxException {
+        String pageText = Files.readString(Path.of(getClass().getResource(
+                "/pdfs/PdfBookMetadataImport/syrotiuk-page3.txt").toURI()));
+        String citation = BookCitationBlock.find(pageText).orElseThrow();
+        assertEquals("""
+                        Сиротюк, В. Д.
+                        С 40 Фізика: підруч. для 11 кл. загальноосвіт. навч. закл.: (рівень стан\u00AD
+                        дарту) / В. Д. Сиротюк, В. І. Баштовий. - Харків : Сиция, 2011. - 304 с.""",
+                citation.strip());
+
+        try (PDDocument document = new PDDocument();
+             MockedStatic<PdfPageScanner> scanner = mockStatic(PdfPageScanner.class)) {
+            scanner.when(() -> PdfPageScanner.scanPages(document)).thenReturn(List.of(pageText));
+
+            ParserResult result = new PdfContentImporter().importDatabase(Path.of("textbook-excerpt.pdf"), document);
+            BibEntry expected = new BibEntry(StandardEntryType.Book)
+                    .withField(StandardField.AUTHOR, "В. Д. Сиротюк and В. І. Баштовий")
+                    .withField(StandardField.TITLE, "Фізика: підруч. для 11 кл. загальноосвіт. навч. закл.: (рівень стандарту)")
+                    .withField(StandardField.ISBN, "9789662542028")
+                    .withField(StandardField.PUBLISHER, "Сиция")
+                    .withField(StandardField.YEAR, "2011");
+            assertEquals(List.of(expected), result.getDatabase().getEntries());
+            assertEquals(List.of(), result.warnings());
+        }
+    }
 
     @Test
     void extractsIsbnFromFrontBibliographicPage() throws IOException, URISyntaxException {
@@ -81,6 +115,89 @@ public class PdfBookMetadataImportTest {
         assertImportedBook("imprint-with-distractor.pdf", "9789660800007");
     }
 
+    static Stream<Arguments> citationEditions() {
+        return Stream.of(
+                Arguments.of("front-citation.pdf", Optional.of("2")),
+                Arguments.of("back-citation.pdf", Optional.of("2")),
+                Arguments.of("citation-editor-edition.pdf", Optional.of("2")),
+                Arguments.of("citation-without-isbn.pdf", Optional.of("2")),
+                Arguments.of("citation-ambiguous-isbns.pdf", Optional.of("2")),
+                Arguments.of("citation-missing-optional-fields.pdf", Optional.empty()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("citationEditions")
+    @ResourceLock("Localization.lang")
+    void importsEditionFromCitationWhenPresent(String fileName, Optional<String> expectedEdition) throws URISyntaxException {
+        BibEntry entry = importSingleEntry(fileName);
+
+        assertEquals(StandardEntryType.Book, entry.getType());
+        assertEquals(expectedEdition, entry.getField(StandardField.EDITION));
+    }
+
+    static Stream<Arguments> citationIsbns() {
+        return Stream.of(
+                Arguments.of("ISBN 978-966-08-0000-7", Optional.of("9789660800007")),
+                Arguments.of("ISBN 0-596-52068-9", Optional.of("9780596520687")),
+                Arguments.of("ISBN-10: 0-596-52068-9\nISBN-13: 978-0-596-52068-7", Optional.of("9780596520687")),
+                Arguments.of("", Optional.empty()),
+                Arguments.of("ISBN 978-966-08-0000-8", Optional.empty()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("citationIsbns")
+    void preservesCitationMetadataWithOptionalIsbn(String isbnText, Optional<String> expectedIsbn) throws IOException {
+        String pageText = """
+                УДК 53(075.3)
+                Коваль О. П.
+                К56 Збірник задач з фізики для 8 класу / О. П. Коваль, Н. І. Ткач. — Харків : Ранок, 2010. — 176 с.
+                %s
+                © Коваль О. П., 2008
+                """.formatted(isbnText);
+
+        try (PDDocument document = new PDDocument();
+             MockedStatic<PdfPageScanner> scanner = mockStatic(PdfPageScanner.class)) {
+            scanner.when(() -> PdfPageScanner.scanPages(document)).thenReturn(List.of(pageText));
+
+            ParserResult result = new PdfContentImporter().importDatabase(Path.of("book.pdf"), document);
+            List<BibEntry> entries = result.getDatabase().getEntries();
+
+            assertEquals(1, entries.size());
+            BibEntry entry = entries.getFirst();
+            assertEquals(StandardEntryType.Book, entry.getType());
+            assertEquals(Optional.of("Збірник задач з фізики для 8 класу"), entry.getField(StandardField.TITLE));
+            assertEquals(Optional.of("О. П. Коваль and Н. І. Ткач"), entry.getField(StandardField.AUTHOR));
+            assertEquals(Optional.empty(), entry.getField(StandardField.EDITOR));
+            assertEquals(Optional.of("Ранок"), entry.getField(StandardField.PUBLISHER));
+            assertEquals(Optional.of("2010"), entry.getField(StandardField.YEAR));
+            assertEquals(expectedIsbn, entry.getField(StandardField.ISBN));
+            assertEquals(List.of(), result.warnings());
+        }
+    }
+
+    @Test
+    void importsExplicitEditorWithoutAuthor() throws IOException {
+        String pageText = """
+                УДК 53(075.3)
+                Збірник задач / за ред. О. П. Коваля. — Харків : Ранок, 2010. — 176 с.
+                © Видавництво Ранок, 2010
+                """;
+
+        try (PDDocument document = new PDDocument();
+             MockedStatic<PdfPageScanner> scanner = mockStatic(PdfPageScanner.class)) {
+            scanner.when(() -> PdfPageScanner.scanPages(document)).thenReturn(List.of(pageText));
+
+            ParserResult result = new PdfContentImporter().importDatabase(Path.of("book.pdf"), document);
+            List<BibEntry> entries = result.getDatabase().getEntries();
+
+            assertEquals(1, entries.size());
+            BibEntry entry = entries.getFirst();
+            assertEquals(StandardEntryType.Book, entry.getType());
+            assertEquals(Optional.of("О. П. Коваля"), entry.getField(StandardField.EDITOR));
+            assertEquals(Optional.empty(), entry.getField(StandardField.AUTHOR));
+        }
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
             "imprint-without-isbn.pdf",
@@ -91,12 +208,39 @@ public class PdfBookMetadataImportTest {
     }
 
     @Test
+    @ResourceLock("Localization.lang")
+    void preservesCitationMetadataWithoutIsbnWhenIsbnsAreAmbiguous() throws IOException {
+        String pageText = """
+                УДК 53(075.3)
+                Коваль О. П.
+                К56 Збірник задач з фізики для 8 класу / О. П. Коваль, Н. І. Ткач. — Харків : Ранок, 2010. — 176 с.
+                ISBN 978-0-596-52068-7
+                ISBN 978-0-13-468599-1
+                © Коваль О. П., 2008
+                """;
+        BibEntry expectedBook = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "Збірник задач з фізики для 8 класу")
+                .withField(StandardField.AUTHOR, "О. П. Коваль and Н. І. Ткач")
+                .withField(StandardField.PUBLISHER, "Ранок")
+                .withField(StandardField.YEAR, "2010");
+
+        try (PDDocument document = new PDDocument();
+             MockedStatic<PdfPageScanner> scanner = mockStatic(PdfPageScanner.class)) {
+            scanner.when(() -> PdfPageScanner.scanPages(document)).thenReturn(List.of(pageText));
+
+            ParserResult result = new PdfContentImporter().importDatabase(Path.of("book.pdf"), document);
+
+            assertEquals(List.of(expectedBook), result.getDatabase().getEntries());
+            assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
+        }
+    }
+
+    @Test
     void returnsNoEntriesWhenBibliographicPageHasMultipleValidIsbns() throws URISyntaxException {
         ParserResult result = importFixture("imprint-multiple-isbns.pdf");
 
         assertEquals(List.of(), result.getDatabase().getEntries());
-        assertEquals(List.of(Localization.lang("More than one ISBN found: Found %0. Not adding.",
-                "9780596520687, 9780134685991, 0596520689")), result.warnings());
+        assertEquals(List.of(Localization.lang("More than one ISBN found")), result.warnings());
     }
 
     @Test
