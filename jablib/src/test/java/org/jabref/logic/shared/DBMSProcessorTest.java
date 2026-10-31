@@ -227,30 +227,31 @@ class DBMSProcessorTest {
             statement.executeUpdate("CREATE SCHEMA IF NOT EXISTS jabref");
 
             statement.executeUpdate("""
-                CREATE TABLE jabref."ENTRY" (
-                    "SHARED_ID" SERIAL PRIMARY KEY,
-                    "TYPE" VARCHAR,
-                    "VERSION" INT DEFAULT 1
-                )""");
+                        CREATE TABLE jabref."ENTRY" (
+                            "SHARED_ID" SERIAL PRIMARY KEY,
+                            "TYPE" VARCHAR,
+                            "VERSION" INT DEFAULT 1
+                        )
+                    """);
 
             statement.executeUpdate("""
-                CREATE TABLE jabref."FIELD" (
-                    "ENTRY_SHARED_ID" INT REFERENCES jabref."ENTRY"("SHARED_ID") ON DELETE CASCADE,
-                    "NAME" VARCHAR,
-                    "VALUE" TEXT
-                )""");
+                        CREATE TABLE jabref."FIELD" (
+                            "ENTRY_SHARED_ID" INT REFERENCES jabref."ENTRY"("SHARED_ID") ON DELETE CASCADE,
+                            "NAME" VARCHAR,
+                            "VALUE" TEXT
+                        )
+                    """);
 
             statement.executeUpdate("""
-                CREATE TABLE jabref."METADATA" (
-                    "KEY" VARCHAR,
-                    "VALUE" TEXT
-                )""");
+                        CREATE TABLE jabref."METADATA" (
+                            "KEY" VARCHAR,
+                            "VALUE" TEXT
+                        )
+                    """);
 
             // Insert a legacy entry with NULL TYPE instead of 'article'
-            statement.executeUpdate("""
-                INSERT INTO jabref."ENTRY" ("TYPE") VALUES (NULL)""");
-            statement.executeUpdate("""
-                INSERT INTO jabref."FIELD" ("ENTRY_SHARED_ID", "NAME", "VALUE") VALUES (1, 'author', 'Ada Lovelace')""");
+            statement.executeUpdate("INSERT INTO jabref.\"ENTRY\" (\"TYPE\") VALUES (NULL)");
+            statement.executeUpdate("INSERT INTO jabref.\"FIELD\" (\"ENTRY_SHARED_ID\", \"NAME\", \"VALUE\") VALUES (1, 'author', 'Ada Lovelace')");
         }
 
         dbmsProcessor.setupSharedDatabase();
