@@ -49,6 +49,15 @@ class BaseDialogTest extends JavaFxTest {
     }
 
     @Test
+    // [utest->req~ux.dialogs.close-key-binding~1]
+    void escapeClosesDialogWhenItIsTheCloseKeyBinding() {
+        closeKeyBindingIs(KeyCode.ESCAPE);
+        BaseDialog<Void> dialog = show(true);
+        press(dialog, KeyCode.ESCAPE);
+        interact(() -> assertFalse(dialog.isShowing()));
+    }
+
+    @Test
         // [utest->req~ux.dialogs.close-key-binding~1]
     void closeKeyBindingKeepsOptedOutDialogOpen() {
         closeKeyBindingIs(KeyCode.W);
