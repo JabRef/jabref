@@ -424,6 +424,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         text.append(modeInfo);
     }
 
+    /// Appends the custom library name and description (if set) as additional tooltip lines.
+    private static void addLibraryNameAndDescription(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
+        bibDatabaseContext.getMetaData().getLibraryName().ifPresent(name ->
+                text.append('\n').append(Localization.lang("Library name: %0", name)));
+        bibDatabaseContext.getMetaData().getLibraryDescription().ifPresent(description ->
+                text.append('\n').append(Localization.lang("Library description: %0", description)));
+    }
+
     /// Returns an index for a new untitled library to generate names like "untitled (1)", "untitled (2)", etc.
     private int getUntitledLibraryNumber() {
         // Relies on a fact that a fresh "untitled" library doesn't have a path and that new libraries are added at the end of the list.
@@ -614,11 +622,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
 
             Path databasePath = file.get();
-            tabTitle.append(databasePath.getFileName().toString());
+            // A custom library name replaces the file name as the tab label; the file itself is never renamed
+            String displayName = bibDatabaseContext.getMetaData().getLibraryName()
+                                                   .filter(name -> !name.isBlank())
+                                                   .orElse(databasePath.getFileName().toString());
+            tabTitle.append(displayName);
             Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
             // Unicode codepoint deliberately chosen to avoid semantical confusion
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
             toolTipText.append(databasePath.toAbsolutePath());
+            addLibraryNameAndDescription(toolTipText, bibDatabaseContext);
 
             if (databaseLocation == DatabaseLocation.SHARED) {
                 tabTitle.append(" \u2013 ");
@@ -647,6 +660,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
+            addLibraryNameAndDescription(toolTipText, bibDatabaseContext);
             addModeInfo(toolTipText, bibDatabaseContext);
             if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
                 addChangedInformation(toolTipText);

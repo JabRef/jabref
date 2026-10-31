@@ -45,6 +45,8 @@ public class MetaData {
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
     public static final String SAVE_ACTIONS = "saveActions";
     public static final String LIBRARY_ABBREVIATION_TYPE = "libraryAbbreviationType";
+    public static final String LIBRARY_NAME = "libraryName";
+    public static final String LIBRARY_DESCRIPTION = "libraryDescription";
     public static final String KEYWORD_SEPARATOR = "keywordSeparator";
     public static final String PREFIX_KEYPATTERN = "keypattern_";
     public static final String KEYPATTERNDEFAULT = "keypatterndefault";
@@ -85,6 +87,8 @@ public class MetaData {
     @Nullable private FieldFormatterCleanupActions saveActions;
     @Nullable private BibDatabaseMode mode;
     @Nullable private AbbreviationType libraryAbbreviationType;
+    @Nullable private String libraryName;
+    @Nullable private String libraryDescription;
     @Nullable private Character keywordSeparator;
     private boolean isProtected;
     @Nullable private String librarySpecificFileDirectory;
@@ -288,6 +292,50 @@ public class MetaData {
         postChange();
     }
 
+    /// A custom, user-facing label for the library, shown instead of the file name on the tab; absent if the library uses its file name.
+    public Optional<String> getLibraryName() {
+        return Optional.ofNullable(libraryName);
+    }
+
+    public void setLibraryName(@NonNull String libraryName) {
+        String newValue = libraryName.isBlank() ? null : libraryName.trim();
+        if (Objects.equals(newValue, this.libraryName)) {
+            return;
+        }
+        this.libraryName = newValue;
+        postChange();
+    }
+
+    public void clearLibraryName() {
+        if (this.libraryName == null) {
+            return;
+        }
+        this.libraryName = null;
+        postChange();
+    }
+
+    /// A single-line description of the library, shown in the tab tooltip; absent if none was set.
+    public Optional<String> getLibraryDescription() {
+        return Optional.ofNullable(libraryDescription);
+    }
+
+    public void setLibraryDescription(@NonNull String libraryDescription) {
+        String newValue = libraryDescription.isBlank() ? null : libraryDescription.trim();
+        if (Objects.equals(newValue, this.libraryDescription)) {
+            return;
+        }
+        this.libraryDescription = newValue;
+        postChange();
+    }
+
+    public void clearLibraryDescription() {
+        if (this.libraryDescription == null) {
+            return;
+        }
+        this.libraryDescription = null;
+        postChange();
+    }
+
     /// The separator used in this library's keyword fields; absent if the library does not declare one (then the global preference applies)
     public Optional<Character> getKeywordSeparator() {
         return Optional.ofNullable(keywordSeparator);
@@ -454,6 +502,8 @@ public class MetaData {
         saveActions = other.saveActions;
         mode = other.mode;
         libraryAbbreviationType = other.libraryAbbreviationType;
+        libraryName = other.libraryName;
+        libraryDescription = other.libraryDescription;
         keywordSeparator = other.keywordSeparator;
         isProtected = other.isProtected;
         librarySpecificFileDirectory = other.librarySpecificFileDirectory;
@@ -572,6 +622,8 @@ public class MetaData {
                 && Objects.equals(saveActions, that.saveActions)
                 && (mode == that.mode)
                 && (libraryAbbreviationType == that.libraryAbbreviationType)
+                && Objects.equals(libraryName, that.libraryName)
+                && Objects.equals(libraryDescription, that.libraryDescription)
                 && Objects.equals(keywordSeparator, that.keywordSeparator)
                 && Objects.equals(librarySpecificFileDirectory, that.librarySpecificFileDirectory)
                 && Objects.equals(contentSelectors, that.contentSelectors)
@@ -585,12 +637,13 @@ public class MetaData {
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId, gitAutoPull, gitAutoCommit, gitAutoPush);
+                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, libraryAbbreviationType, libraryName, libraryDescription,
+                keywordSeparator, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId, gitAutoPull, gitAutoCommit, gitAutoPush);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + ", gitAutoPull=" + gitAutoPull + ", gitAutoCommit=" + gitAutoCommit + ", gitAutoPush=" + gitAutoPush + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", libraryAbbreviationType=" + libraryAbbreviationType + ", libraryName=" + libraryName + ", libraryDescription=" + libraryDescription + ", keywordSeparator=" + keywordSeparator + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + ", gitAutoPull=" + gitAutoPull + ", gitAutoCommit=" + gitAutoCommit + ", gitAutoPush=" + gitAutoPush + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {
