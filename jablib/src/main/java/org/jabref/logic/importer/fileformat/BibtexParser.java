@@ -3,9 +3,7 @@ package org.jabref.logic.importer.fileformat;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackReader;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Base64;
@@ -101,8 +99,9 @@ public class BibtexParser implements Parser {
     /// Git writes conflict markers as seven characters at the start of a line, but a botched merge can produce longer runs (https://github.com/JabRef/jabref/issues/9167).
     private static final int CONFLICT_MARKER_LENGTH = 7;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
+    private final Deque<Character> unreadCharacters = new ArrayDeque<>();
     private final ImportFormatPreferences importFormatPreferences;
-    private PushbackReader pushbackReader;
+    private Reader reader;
     private BibDatabase database;
     private Set<BibEntryType> entryTypes;
 
@@ -176,7 +175,8 @@ public class BibtexParser implements Parser {
     ///
     /// Handling of encoding is done at [BibtexImporter]
     public ParserResult parse(@NonNull Reader in) throws IOException {
-        pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
+        reader = in;
+        unreadCharacters.clear();
 
         String newLineSeparator = determineNewLineSeparator();
 
@@ -198,24 +198,26 @@ public class BibtexParser implements Parser {
 
     private String determineNewLineSeparator() throws IOException {
         String newLineSeparator = OS.NEWLINE;
-        StringWriter stringWriter = new StringWriter(BibtexParser.LOOKAHEAD);
-        int i = 0;
-        int currentChar;
-        // @formatter:off
-        do {
-            // @formatter:on
-            currentChar = pushbackReader.read();
-            stringWriter.append((char) currentChar);
-            i++;
-        } while ((i < BibtexParser.LOOKAHEAD) && (currentChar != '\r') && (currentChar != '\n'));
-        if (currentChar == '\r') {
-            newLineSeparator = "\r\n";
-        } else if (currentChar == '\n') {
-            newLineSeparator = "\n";
+        StringBuilder characters = new StringBuilder(BibtexParser.LOOKAHEAD);
+        for (int i = 0; i < BibtexParser.LOOKAHEAD; i++) {
+            int character = reader.read();
+            if (character == -1) {
+                break;
+            }
+            characters.append((char) character);
+            if (character == '\r') {
+                newLineSeparator = "\r\n";
+                break;
+            } else if (character == '\n') {
+                newLineSeparator = "\n";
+                break;
+            }
         }
 
-        // unread all sneaked characters
-        pushbackReader.unread(stringWriter.toString().toCharArray());
+        // The raw lookahead must not change source positions or the parsed serialization.
+        for (int i = characters.length() - 1; i >= 0; i--) {
+            unreadCharacters.push(characters.charAt(i));
+        }
 
         return newLineSeparator;
     }
@@ -676,7 +678,7 @@ public class BibtexParser implements Parser {
     }
 
     private int read() throws IOException {
-        int character = pushbackReader.read();
+        int character = unreadCharacters.isEmpty() ? reader.read() : unreadCharacters.pop();
 
         if (!isEOFCharacter(character)) {
             pureTextFromFile.offerLast((char) character);
@@ -710,14 +712,14 @@ public class BibtexParser implements Parser {
         }
     }
 
-    private void unread(int character) throws IOException {
+    private void unread(int character) {
         if (character == '\n') {
             line--;
             column = highestColumns.pop();
         } else {
             column--;
         }
-        pushbackReader.unread(character);
+        unreadCharacters.push((char) character);
         if (pureTextFromFile.getLast() == character) {
             pureTextFromFile.pollLast();
         }
@@ -758,23 +760,25 @@ public class BibtexParser implements Parser {
         int articleStartColumn = column;
 
         skipWhitespace();
+        char closingBracket = peek() == '(' ? ')' : '}';
         consume('{', '(');
-        int character = peek();
-        if ((character != '\n') && (character != '\r')) {
-            skipWhitespace();
-        }
+        // [impl->req~import.bibtex.key-leading-whitespace~1]
+        skipWhitespace();
         int keyStartLine = line;
         int keyStartColumn = column;
-        String key = parseKey();
+        String key = parseKey(closingBracket);
 
-        ParserResult.Range keyRange = new ParserResult.Range(keyStartLine, keyStartColumn, line, column);
-        parserResult.getFieldRanges().computeIfAbsent(result, _ -> new HashMap<>()).put(InternalField.KEY_FIELD, keyRange);
+        // [impl->req~import.bibtex.missing-key-recovery~1]
+        if (!key.isEmpty()) {
+            ParserResult.Range keyRange = new ParserResult.Range(keyStartLine, keyStartColumn, line, column);
+            parserResult.getFieldRanges().computeIfAbsent(result, _ -> new HashMap<>()).put(InternalField.KEY_FIELD, keyRange);
+        }
 
         result.setCitationKey(key);
         skipWhitespace();
 
         while (true) {
-            character = peek();
+            int character = peek();
             if ((character == '}') || (character == ')')) {
                 break;
             }
@@ -1017,17 +1021,16 @@ public class BibtexParser implements Parser {
     }
 
     /// pushes buffer back into input
-    ///
-    /// @throws IOException can be thrown if buffer is bigger than LOOKAHEAD
-    private void unreadBuffer(StringBuilder stringBuilder) throws IOException {
+    private void unreadBuffer(StringBuilder stringBuilder) {
         for (int i = stringBuilder.length() - 1; i >= 0; --i) {
             unread(stringBuilder.charAt(i));
         }
     }
 
     /// This method is used to parse the citation key of an entry.
-    private String parseKey() throws IOException {
+    private String parseKey(char closingBracket) throws IOException {
         StringBuilder token = new StringBuilder(20);
+        int openParentheses = 0;
 
         while (true) {
             int character = read();
@@ -1038,23 +1041,33 @@ public class BibtexParser implements Parser {
                 return token.toString();
             }
 
-            if (!Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
+            // [impl->req~import.bibtex.citation-key-parentheses~1]
+            if (((character != closingBracket) || (openParentheses > 0)) && !Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
                     || (character == ':') || ("#{}~,=\uFFFD".indexOf(character) == -1))) {
                 token.append((char) character);
+                if (character == '(') {
+                    openParentheses++;
+                } else if (character == ')') {
+                    openParentheses--;
+                }
             } else {
-                if (Character.isWhitespace((char) character)) {
+                if ((character == '=') || (Character.isWhitespace((char) character) && isEqualsSignNext())) {
+                    // [impl->req~import.bibtex.missing-key-recovery~1]
+                    // A field assignment before any comma means that the citation key is missing.
+                    unread(character);
+                    unreadBuffer(token);
+                    parserResult.addWarning(new ParserResult.Range(line, column),
+                            Localization.lang("Line %0: Found entry without citation key.", String.valueOf(line)));
+                    return "";
+                } else if (Character.isWhitespace((char) character)) {
                     // We have encountered white space instead of the comma at
                     // the end of
                     // the key. Possibly the comma is missing, so we try to
                     // return what we
                     // have found, as the key and try to restore the rest in fixKey().
                     return token + fixKey();
-                } else if ((character == ',') || (character == '}')) {
+                } else if ((character == ',') || (character == '}') || (character == closingBracket)) {
                     unread(character);
-                    return token.toString();
-                } else if (character == '=') {
-                    // If we find a '=' sign, it is either an error, or
-                    // the entry lacked a comma signifying the end of the key.
                     return token.toString();
                 } else {
                     throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
@@ -1062,6 +1075,18 @@ public class BibtexParser implements Parser {
                 }
             }
         }
+    }
+
+    /// Distinguishes a missing-key field assignment from a citation key without consuming input.
+    private boolean isEqualsSignNext() throws IOException {
+        StringBuilder whitespace = new StringBuilder();
+        int character = peek();
+        while (Character.isWhitespace((char) character)) {
+            whitespace.append((char) read());
+            character = peek();
+        }
+        unreadBuffer(whitespace);
+        return character == '=';
     }
 
     private String parseBracketedText() throws IOException {
