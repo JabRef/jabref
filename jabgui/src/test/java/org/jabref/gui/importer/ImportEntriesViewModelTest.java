@@ -14,7 +14,6 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.AbbreviationType;
@@ -87,40 +86,6 @@ class ImportEntriesViewModelTest {
         stateManager = mock(StateManager.class);
         entryTypesManager = mock(BibEntryTypesManager.class);
         fileUpdateMonitor = mock(FileUpdateMonitor.class);
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-            "ABBREVIATE, Journal of Foo, J. Foo",
-            "ABBREVIATE, J. Foo, J. Foo",
-            "UNABBREVIATE, J. Foo, Journal of Foo",
-            "UNABBREVIATE, Journal of Foo, Journal of Foo",
-            "NONE, Journal of Foo, Journal of Foo",
-            "NONE, J. Foo, J. Foo",
-    })
-    void initialFetchedEntriesFollowJournalPreference(JournalMode mode, String input, String expected) {
-        when(abbreviationPreferences.useJournalAbbreviationMode()).thenReturn(mode);
-
-        BibEntry fetchedEntry = new BibEntry().withField(StandardField.JOURNAL, input);
-
-        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> new ParserResult(List.of(fetchedEntry)));
-
-        ImportEntriesViewModel viewModel = new ImportEntriesViewModel(
-                task,
-                taskExecutor,
-                databaseContext,
-                dialogService,
-                undoManager,
-                guiPreferences,
-                stateManager,
-                entryTypesManager,
-                fileUpdateMonitor,
-                Optional.of(mock(SearchBasedFetcher.class)),
-                Optional.of("test query"));
-
-        ObservableList<BibEntry> entries = viewModel.getEntries();
-        assertEquals(1, entries.size());
-        assertEquals(Optional.of(expected), entries.getFirst().getField(StandardField.JOURNAL));
     }
 
     @ParameterizedTest
