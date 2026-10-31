@@ -3,17 +3,22 @@ package org.jabref.gui.importer;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javafx.application.Platform;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.newentry.NewEntryDialogTab;
 import org.jabref.gui.newentry.NewEntryView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.types.EntryType;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +106,17 @@ public class NewEntryAction extends SimpleCommand {
         // `null`.
         if (newEntry != null) {
             tabSupplier.get().insertEntry(newEntry);
+            focusCitationKey();
         }
+    }
+
+    /// A new entry is empty, so the citation key is the field the user starts in.
+    // [impl->req~newentry.focus.citation-key~1]
+    private void focusCitationKey() {
+        if (!preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
+            return;
+        }
+        // The entry editor loads the new entry in a later pulse, so the focus request has to queue behind it.
+        Platform.runLater(() -> Injector.instantiateModelOrService(EntryEditor.class).setFocusToField(InternalField.KEY_FIELD));
     }
 }
