@@ -16,9 +16,10 @@ import org.jabref.gui.theme.ThemePreset;
 import org.jabref.gui.theme.ThemePreviewView;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -46,6 +47,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                 Injector.instantiateModelOrService(HttpServerManager.class),
                 Injector.instantiateModelOrService(LanguageServerController.class),
                 Injector.instantiateModelOrService(UiMessageHandler.class),
+                Injector.instantiateModelOrService(OAuthSessionRegistry.class),
                 Injector.instantiateModelOrService(RemoteListenerServerManager.class),
                 Injector.instantiateModelOrService(StateManager.class));
         buildView();
@@ -95,7 +97,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                         .checkbox(Localization.lang("Show confirmation dialog when deleting entries"), viewModel.confirmDeleteProperty())
                         .checkbox(Localization.lang("Ask whether to include cross-references when copying to another library"), viewModel.shouldAskForIncludingCrossReferences())
                         .checkbox(Localization.lang("Hide tab bar when single library is present"), viewModel.confirmHideTabBarProperty())
-                        .checkbox(Localization.lang("Do not show donation prompt again"), viewModel.donationNeverShowProperty())
                         .checkbox(Localization.lang("Experimental search (Postgres)"), viewModel.usePostgresSearchProperty()))
 
                 .section(Localization.lang("Single instance"), singleInstance -> singleInstance

@@ -13,6 +13,7 @@ import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
@@ -28,6 +29,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
     @FXML private TextArea commitMessage;
     @FXML private ButtonType commitButton;
     @FXML private ButtonType commitAndPushButton;
+    @FXML private ButtonType showDiffButtonType;
 
     private GitCommitDialogViewModel viewModel;
 
@@ -44,6 +46,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+        ControlHelper.setAction(showDiffButtonType, getDialogPane(), _ -> showDiff());
     }
 
     @FXML
@@ -59,7 +62,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
 
         commitMessage.textProperty().bindBidirectional(viewModel.commitMessageProperty());
         commitMessage.setPromptText(Localization.lang("Enter commit message here"));
-
+        viewModel.prefillGeneratedCommitMessage();
         this.setResultConverter(button -> {
             if (button != ButtonType.CANCEL) {
                 if (button == commitAndPushButton) {
