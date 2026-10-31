@@ -88,6 +88,43 @@ When a user activates a large library, automatic group construction and group-co
 
 Needs: impl
 
+## Consistency reports must be prepared outside JavaFX application thread
+`req~ux.consistency.report-background~1`
+
+Report preparation includes computing the table columns and field-presence symbols before the dialog is shown.
+
+Needs: impl, utest
+
+## Consistency exports must run outside JavaFX application thread
+`req~ux.consistency.export-background~1`
+
+The user chooses a destination in the GUI before the TXT or CSV report is written in the background.
+
+Needs: impl, utest
+
+## Consistency exports must preserve results shown in dialog
+`req~ux.consistency.export-snapshot~1`
+
+Entry edits or entry-type customizations after the check must not change an exported report.
+
+Needs: impl, utest
+
+## Consistency dialog actions must navigate to original library entries
+`req~ux.consistency.entry-navigation~1`
+
+The dialog uses snapshots to prepare its report without replacing the entries selected for editing.
+
+Needs: impl, utest
+
+## Consistency dialog must display fields missing from every entry
+`req~ux.consistency.missing-field-columns~1`
+
+Reported columns remain visible even when all entries of the selected type have the same field-presence symbol.
+
+Context: [Consistency-check output fixes](https://github.com/JabRef/jabref/pull/17454).
+
+Needs: impl, utest
+
 ## Group creation must allow populating new explicit group from selection
 `req~ux.groups.create-explicit-from-selection~1`
 
@@ -95,11 +132,21 @@ When a user creates a new explicit group, JabRef should allow reusing the curren
 
 Needs: impl
 
+## The "Close dialog" key binding closes the dialog
+`req~ux.dialogs.close-key-binding~1`
+
+Pressing the "Close dialog" key binding in a dialog closes it ([#8888](https://github.com/JabRef/jabref/issues/8888), [#15133](https://github.com/JabRef/jabref/issues/15133)).
+Its default is <kbd>Esc</kbd>; users can change it in the key binding preferences.
+Heavy-weight dialogs whose content the user builds up over time are exempt, so that a stray key press does not throw that state away.
+Currently, this is only the PDF viewer ("Document viewer").
+
+Needs: impl, utest
+
 ## Open combo box popup must close without closing enclosing dialog on Escape
 `req~ux.combobox.escape-closes-popup-only~1`
 
 When a `combobox` or drop-down list (such as a `CheckComboBox`, `ComboBox`, or `ChoiceBox`) is open within a dialog and the user presses Escape, only the drop-down popup must be closed.
-The enclosing dialog must remain open.
+The enclosing dialog must remain open ([#16596](https://github.com/JabRef/jabref/issues/16596)).
 
 ## Library save must maintain filesystem change detection after completion
 `req~ux.external-library-changes.after-save~1`
@@ -199,5 +246,34 @@ Needs: impl
 The groups walkthrough must open its bundled example library, display the Groups pane, and clear the current search before guiding the user.
 
 Needs: impl
+
+## Donation prompt returns every six months
+`req~ux.donation.recurring-prompt~1`
+
+JabRef asks for a donation six months after the first launch and every six months afterwards.
+Dismissing the prompt hides it until the next time; "Dismiss forever" stops it for good.
+
+Needs: impl
+## Library tab switches must preserve each library's selected groups
+`req~ux.groups.library-switch-preserves-selection~1`
+
+Rationale: The user must be able to switch between libraries and still see the same groups selected ([#1104](https://github.com/JabRef/jabref/issues/1104)).
+
+Needs: impl, utest
+
+## Shared library group updates must preserve selected groups
+`req~ux.groups.shared-update-preserves-selection~1`
+
+When a shared library receives a group-tree update, groups that remain in the updated tree must remain selected.
+
+Needs: impl, utest
+
+## Assigning an already used keyboard shortcut must require confirmation
+`req~ux.keybindings.duplicate-warning~1`
+
+When a user assigns a keyboard shortcut that is already used by other actions, JabRef warns the user, names these actions and lets the user cancel,
+keep both or replace the existing assignments ([#17240](https://github.com/JabRef/jabref/issues/17240)).
+
+Needs: impl, utest
 
 <!-- markdownlint-disable-file MD022 -->

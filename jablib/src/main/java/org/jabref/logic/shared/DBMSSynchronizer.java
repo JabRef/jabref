@@ -309,6 +309,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
 
         dbmsProcessor.startNotificationListener(this);
+        OfflineChanges.Recorded recorded = offlineChanges.peek();
+        lastSharedMetaData = Optional.ofNullable(recorded.lastSharedMetaData())
+                                     .orElseGet(() -> Optional.ofNullable(recorded.metaDataBase()).orElse(Map.of()));
         // Synchronously on the caller's thread: the library is not shown before this returns
         long localRevisionAtRead = localMetaDataRevision.get();
         Map<String, String> sharedMetaData = dbmsProcessor.getSharedMetaData();
@@ -364,7 +367,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 checkCurrentConnection();
                 return;
             }
-            remoteUpdateExecutor.execute(() -> withPullLock(() -> applyRemoteChanges(remoteChanges)));
+            remoteUpdateExecutor.execute(() -> runIfOpen(() -> withPullLock(() -> applyRemoteChanges(remoteChanges))));
         });
     }
 
@@ -406,6 +409,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         return dbmsProcessor.getSharedMetaData();
     }
 
+    @VisibleForTesting
+    void writeSharedMetaDataToDatabase(Map<String, String> serializedMetaData) throws SQLException {
+        dbmsProcessor.setSharedMetaData(serializedMetaData);
+    }
+
     private void pullMetaDataFromDatabase() {
         if (!connected.get()) {
             return;
@@ -419,7 +427,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             checkCurrentConnection();
             return;
         }
-        remoteUpdateExecutor.execute(() -> withPullLock(() -> applyRemoteMetaData(sharedMetaData, localRevisionAtRead)));
+        remoteUpdateExecutor.execute(() -> runIfOpen(() -> withPullLock(() -> applyRemoteMetaData(sharedMetaData, localRevisionAtRead))));
     }
 
     /// Database worker. Transfers only what differs: the id/version mapping plus the entries
@@ -562,8 +570,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private boolean writeSharedMetaData(Map<String, String> serializedMetaData) {
         return writeOrRecord("Could not write metadata to the shared database",
                 () -> {
-                    dbmsProcessor.setSharedMetaData(serializedMetaData);
+                    writeSharedMetaDataToDatabase(serializedMetaData);
                     lastSharedMetaData = serializedMetaData;
+                    offlineChanges.recordSharedMetaData(serializedMetaData);
                 },
                 () -> offlineChanges.recordMetaData(serializedMetaData, lastSharedMetaData));
     }
@@ -573,9 +582,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private boolean writeRecordedMetaData(Map<String, String> recordedMetaData, OfflineChanges.Recorded recorded) {
         return writeOrRecord("Could not write metadata to the shared database",
                 () -> {
-                    Map<String, String> merged = recorded.mergeMetaDataInto(dbmsProcessor.getSharedMetaData());
+                    Map<String, String> shared = dbmsProcessor.getSharedMetaData();
+                    Map<String, String> merged = recorded.mergeMetaDataInto(shared);
                     dbmsProcessor.setSharedMetaData(merged);
-                    lastSharedMetaData = merged;
+                    // Not `merged`: the pull ending the replay applies it and must see a recorded group deletion as one
+                    lastSharedMetaData = shared;
                 },
                 () -> offlineChanges.recordMetaData(recordedMetaData, recorded.metaDataBase()));
     }
@@ -625,15 +636,18 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 && (lastAppliedLocalMetaDataRevision == currentLocalRevision)) {
             return;
         }
-        lastSharedMetaData = sharedMetaData;
         try {
             metaData.setEventPropagation(false);
             new MetaDataParser(fileMonitor).parse(metaData, sharedMetaData, keywordSeparator, userAndHost);
-            if (!sharedMetaData.containsKey(MetaData.GROUPSTREE)
-                    && !sharedMetaData.containsKey(MetaData.GROUPSTREE_LEGACY)
+            // Groups that never reached the shared database (e.g., their write failed) are not a remote deletion
+            if (containsGroupTree(lastSharedMetaData)
+                    && !containsGroupTree(sharedMetaData)
                     && metaData.getGroups().isPresent()) {
                 metaData.clearGroups();
             }
+            // Only once applied: a snapshot that failed to parse must not hide an earlier shared group tree
+            lastSharedMetaData = sharedMetaData;
+            offlineChanges.recordSharedMetaData(sharedMetaData);
             lastAppliedRemoteMetaData = Map.copyOf(sharedMetaData);
             lastAppliedLocalMetaDataRevision = currentLocalRevision;
             hasAppliedRemoteMetaData = true;
@@ -642,6 +656,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         } finally {
             metaData.setEventPropagation(true);
         }
+    }
+
+    private static boolean containsGroupTree(Map<String, String> serializedMetaData) {
+        return serializedMetaData.containsKey(MetaData.GROUPSTREE)
+                || serializedMetaData.containsKey(MetaData.GROUPSTREE_LEGACY);
     }
 
     /// Applies the [MetaData] on all local and shared BibEntries.
@@ -678,7 +697,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /// Schedules a field update received from another shared-database client.
     public void handleRemoteFieldChange(FieldChange fieldChange) {
-        remoteUpdateExecutor.execute(() -> applyRemoteFieldChange(fieldChange));
+        remoteUpdateExecutor.execute(() -> runIfOpen(() -> applyRemoteFieldChange(fieldChange)));
     }
 
     private void doApplyRemoteFieldChange(FieldChange fieldChange) {
@@ -819,6 +838,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
         LOGGER.info("Synchronizing the changes made while the shared database was unavailable");
         remoteUpdateExecutor.execute(() -> withPullLock(() -> {
+            if (closed) {
+                return;
+            }
             Map<Integer, BibEntry> localEntriesById = new HashMap<>();
             for (BibEntry localEntry : bibDatabase.getEntriesSnapshot()) {
                 localEntriesById.put(localEntry.getSharedBibEntryData().getSharedIdAsInt(), localEntry);
@@ -969,6 +991,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
     }
 
+    private void runIfOpen(Runnable work) {
+        if (!closed) {
+            work.run();
+        }
+    }
+
     private void withPullLock(Runnable work) {
         pullLock.lock();
         try {
@@ -1019,21 +1047,45 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.dbmsConnection = connection;
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
-        this.dbmsProcessor = new DBMSProcessor(connection);
-        this.notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
-        this.offlineChanges = OfflineChanges.load(offlineChangesDirectory, connection.getProperties());
-        initializeDatabases();
+        boolean initialized = false;
+        try {
+            this.dbmsProcessor = new DBMSProcessor(connection);
+            this.notifier = new Notifier(currentConnection, dbmsProcessor.getProcessorId());
+            this.offlineChanges = OfflineChanges.load(offlineChangesDirectory, connection.getProperties());
+            initializeDatabases();
+            initialized = true;
+        } finally {
+            if (!initialized) {
+                // closeSharedDatabase ignores a synchronizer that never finished opening, so a failed attempt has to
+                // release its connection and listener here; otherwise every retry leaves one of each behind
+                Optional.ofNullable(dbmsProcessor).ifPresent(DBMSProcessor::stopNotificationListener);
+                closeQuietly(currentConnection);
+            }
+        }
         sharedDatabaseOpen = true;
     }
 
     @Override
     public void closeSharedDatabase() {
+        prepareForClose();
+        finishClose();
+    }
+
+    @Override
+    public void prepareForClose() {
+        if (!sharedDatabaseOpen) {
+            return;
+        }
+        applySaveActionsToBufferedEntry();
+        closed = true;
+    }
+
+    @Override
+    public void finishClose() {
         if (!sharedDatabaseOpen) {
             return;
         }
         sharedDatabaseOpen = false;
-        closed = true;
-        applySaveActionsToBufferedEntry();
         BibEntry bufferedEntry = entryWithPendingChanges.get();
         if ((bufferedEntry != null) && isPresentLocalBibEntry(bufferedEntry)) {
             // Recorded before the flush is even attempted: a dead or slow connection must not
