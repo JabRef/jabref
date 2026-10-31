@@ -93,6 +93,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return Integer.compare(numChildren1, numChildren2);
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
+    private boolean updatingDisplayedGroups;
 
     public GroupTreeViewModel(@NonNull StateManager stateManager,
                               @NonNull BibEntryTypesManager entryTypesManager,
@@ -170,8 +171,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Gets invoked if the user selects a different group.
     /// We need to notify the [StateManager] about this change so that the main table gets updated.
     private void onSelectedGroupChanged(ObservableList<GroupNodeViewModel> newValue) {
-        if (!currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
-            // Switch of database occurred -> do nothing
+        if (updatingDisplayedGroups || !currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
+            // Model-driven tree replacement temporarily changes the selection; do not persist that transient state.
             return;
         }
 
@@ -219,16 +220,22 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard, preferences))
                 .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard, preferences));
 
-        rootGroup.setValue(newRoot);
-        if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {
-            stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));
+        updatingDisplayedGroups = true;
+        try {
+            rootGroup.setValue(newRoot);
+            if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {
+                stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));
+            }
+            selectedGroups.setAll(
+                    stateManager.getSelectedGroups(newDatabase.get()).stream()
+                                .map(selectedGroup -> newRoot.findGroupNodeViewModel(selectedGroup)
+                                                             .orElseGet(() -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences)))
+                                .toList());
+        } finally {
+            updatingDisplayedGroups = false;
         }
-        selectedGroups.setAll(
-                stateManager.getSelectedGroups(newDatabase.get()).stream()
-                            .map(selectedGroup -> newRoot.findGroupNodeViewModel(selectedGroup)
-                                                         .orElseGet(() -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences)))
-                            .toList());
         // [impl->req~ux.groups.library-switch-preserves-selection~1]
+        // [impl->req~ux.groups.shared-update-preserves-selection~1]
         // currentDatabase has to be set after the root swap so the guard in onSelectedGroupChanged blocks the transient empty selection
         currentDatabase = newDatabase;
     }

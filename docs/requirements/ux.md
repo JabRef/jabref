@@ -235,4 +235,11 @@ Rationale: The user must be able to switch between libraries and still see the s
 
 Needs: impl, utest
 
+## Shared library group updates must preserve selected groups
+`req~ux.groups.shared-update-preserves-selection~1`
+
+When a shared library receives a group-tree update, groups that remain in the updated tree must remain selected.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

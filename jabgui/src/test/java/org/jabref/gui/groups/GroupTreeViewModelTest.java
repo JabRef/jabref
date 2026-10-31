@@ -387,6 +387,27 @@ class GroupTreeViewModelTest {
         verify(stateManager, never()).clearSelectedGroups(any(BibDatabaseContext.class));
     }
 
+    @Test
+        // [utest->req~ux.groups.shared-update-preserves-selection~1]
+    void sharedDatabaseGroupUpdatePreservesSelection() {
+        GroupTreeNode selectedGroup = setUpLibraryWithGroup(databaseContext, "A");
+        var storedSelection = stateManager.getSelectedGroups(databaseContext);
+        GroupTreeNode updatedRoot = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        updatedRoot.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        updatedRoot.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+
+        groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
+        clearInvocations(stateManager);
+
+        JavaFxExtension.invokeAndWait(() -> databaseContext.getMetaData().setGroups(updatedRoot));
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+
+        assertEquals(List.of(selectedGroup), storedSelection);
+        assertEquals(List.of("A"), selectedGroupNodes().stream().map(GroupTreeNode::getName).toList());
+        verify(stateManager, never()).clearSelectedGroups(databaseContext);
+    }
+
     private GroupTreeNode setUpLibraryWithGroup(BibDatabaseContext library, String name) {
         var root = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
         GroupTreeNode group = root.addSubgroup(new ExplicitGroup(name, GroupHierarchyType.INDEPENDENT, ','));
