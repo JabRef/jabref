@@ -3,8 +3,10 @@ package org.jabref.logic.search;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -41,6 +43,7 @@ public class LinkedFilesIndexManager {
     private final LinkedFilesSearcher linkedFilesSearcher;
     private final DelayTaskThrottler indexUpdateThrottler;
     private final ConcurrentHashMap<String, FileDelta> pendingFileValuesByEntry = new ConcurrentHashMap<>();
+    private final Set<BackgroundTask<?>> runningTasks = ConcurrentHashMap.newKeySet();
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     private record FileDelta(String oldValue, String newValue) {
@@ -67,53 +70,59 @@ public class LinkedFilesIndexManager {
 
     private void bindToPreferences(boolean newValue) {
         if (newValue) {
-            new BackgroundTask<>() {
-                @Override
-                public Void call() {
-                    linkedFilesIndexer.updateOnStart(this);
-                    return null;
-                }
-            }.executeWith(taskExecutor);
+            runIndexingTask(linkedFilesIndexer::updateOnStart);
         } else {
             indexUpdateThrottler.cancel();
             pendingFileValuesByEntry.clear();
+            cancelRunningTasks();
             linkedFilesIndexer.removeAllFromIndex();
         }
     }
 
-    private void updateOnStart() {
-        if (shouldIndexLinkedFiles.get()) {
-            new BackgroundTask<>() {
-                @Override
-                public Void call() {
-                    linkedFilesIndexer.updateOnStart(this);
+    private void runIndexingTask(Consumer<BackgroundTask<?>> work) {
+        BackgroundTask<Void> task = new BackgroundTask<>() {
+            @Override
+            public Void call() {
+                if (!shouldIndexLinkedFiles.get()) {
                     return null;
                 }
-            }.executeWith(taskExecutor);
+                work.accept(this);
+                if (!shouldIndexLinkedFiles.get()) {
+                    linkedFilesIndexer.removeAllFromIndex();
+                }
+                return null;
+            }
+        };
+        runningTasks.add(task);
+        task.isCancelledProperty().addListener((_, _, cancelled) -> {
+            if (cancelled) {
+                runningTasks.remove(task);
+            }
+        });
+        task.onFinished(() -> runningTasks.remove(task))
+            .executeWith(taskExecutor);
+    }
+
+    private void cancelRunningTasks() {
+        runningTasks.forEach(task -> task.cancel(false));
+        runningTasks.clear();
+    }
+
+    private void updateOnStart() {
+        if (shouldIndexLinkedFiles.get()) {
+            runIndexingTask(linkedFilesIndexer::updateOnStart);
         }
     }
 
     public void addToIndex(List<BibEntry> entries) {
         if (shouldIndexLinkedFiles.get()) {
-            new BackgroundTask<>() {
-                @Override
-                public Void call() {
-                    linkedFilesIndexer.addToIndex(entries, this);
-                    return null;
-                }
-            }.executeWith(taskExecutor);
+            runIndexingTask(task -> linkedFilesIndexer.addToIndex(entries, task));
         }
     }
 
     public void removeFromIndex(List<BibEntry> entries) {
         if (shouldIndexLinkedFiles.get()) {
-            new BackgroundTask<>() {
-                @Override
-                public Void call() {
-                    linkedFilesIndexer.removeFromIndex(entries, this);
-                    return null;
-                }
-            }.executeWith(taskExecutor);
+            runIndexingTask(task -> linkedFilesIndexer.removeFromIndex(entries, task));
         }
     }
 
@@ -135,15 +144,8 @@ public class LinkedFilesIndexManager {
                 return;
             }
 
-            Optional.ofNullable(pendingFileValuesByEntry.remove(entryId)).ifPresent(fileValues -> {
-                new BackgroundTask<>() {
-                    @Override
-                    public Void call() {
-                        linkedFilesIndexer.updateEntry(entry, fileValues.oldValue(), fileValues.newValue(), this);
-                        return null;
-                    }
-                }.executeWith(taskExecutor);
-            });
+            Optional.ofNullable(pendingFileValuesByEntry.remove(entryId)).ifPresent(fileValues ->
+                    runIndexingTask(task -> linkedFilesIndexer.updateEntry(entry, fileValues.oldValue(), fileValues.newValue(), task)));
         });
     }
 
@@ -153,13 +155,7 @@ public class LinkedFilesIndexManager {
 
     public void rebuildIndex() {
         if (shouldIndexLinkedFiles.get()) {
-            new BackgroundTask<>() {
-                @Override
-                public Void call() {
-                    linkedFilesIndexer.rebuildIndex(this);
-                    return null;
-                }
-            }.executeWith(taskExecutor);
+            runIndexingTask(linkedFilesIndexer::rebuildIndex);
         }
     }
 
@@ -172,6 +168,7 @@ public class LinkedFilesIndexManager {
             return;
         }
         closeThrottler(false);
+        cancelRunningTasks();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.close();
     }
@@ -181,6 +178,7 @@ public class LinkedFilesIndexManager {
             return;
         }
         closeThrottler(true);
+        cancelRunningTasks();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.closeAndWait();
     }
@@ -188,7 +186,6 @@ public class LinkedFilesIndexManager {
     private void closeThrottler(boolean waitForShutdown) {
         indexUpdateThrottler.cancel();
         pendingFileValuesByEntry.clear();
-
         if (waitForShutdown) {
             indexUpdateThrottler.shutdown();
         } else {
