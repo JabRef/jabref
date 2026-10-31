@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -49,7 +50,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -398,5 +403,71 @@ class GroupTreeViewModelTest {
         List<GroupNodeViewModel> groups = model.rootGroupProperty().getValue().getChildren();
 
         assertEquals(0, groups.size());
+    }
+
+    @Test
+        // [utest->req~ux.groups.library-switch-preserves-selection~1]
+    void selectionOfNewDatabaseSurvivesSwitch() {
+        BibDatabaseContext secondDatabase = new BibDatabaseContext();
+        secondDatabase.setDatabasePath(Path.of("second.bib"));
+        GroupTreeNode groupA = setUpLibraryWithGroup(databaseContext, "A");
+        GroupTreeNode groupB = setUpLibraryWithGroup(secondDatabase, "B");
+        var storedSelectionA = stateManager.getSelectedGroups(databaseContext);
+
+        assertEquals(List.of(groupA), selectedGroupNodes());
+
+        groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
+
+        clearInvocations(stateManager);
+
+        activeDatabase.setValue(Optional.of(secondDatabase));
+        assertEquals(List.of(groupB), selectedGroupNodes());
+        activeDatabase.setValue(Optional.of(databaseContext));
+        assertEquals(List.of(groupA), selectedGroupNodes());
+        assertEquals(List.of(groupA), storedSelectionA);
+
+        verify(stateManager, never()).clearSelectedGroups(any(BibDatabaseContext.class));
+    }
+
+    @Test
+        // [utest->req~ux.groups.shared-update-preserves-selection~1]
+    void sharedDatabaseGroupUpdatePreservesSelection() {
+        GroupTreeNode selectedGroup = setUpLibraryWithGroup(databaseContext, "A");
+        var storedSelection = stateManager.getSelectedGroups(databaseContext);
+        GroupTreeNode updatedRoot = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        updatedRoot.addSubgroup(new ExplicitGroup("A", GroupHierarchyType.INDEPENDENT, ','));
+        updatedRoot.addSubgroup(new ExplicitGroup("B", GroupHierarchyType.INDEPENDENT, ','));
+
+        groupTree.rootGroupProperty().addListener(_ -> groupTree.selectedGroupsProperty().clear());
+        clearInvocations(stateManager);
+
+        JavaFxExtension.invokeAndWait(() -> databaseContext.getMetaData().setGroups(updatedRoot));
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+
+        assertEquals(List.of(selectedGroup), storedSelection);
+        assertEquals(List.of("A"), selectedGroupNodes().stream().map(GroupTreeNode::getName).toList());
+        verify(stateManager, never()).clearSelectedGroups(databaseContext);
+    }
+
+    private GroupTreeNode setUpLibraryWithGroup(BibDatabaseContext library, String name) {
+        var root = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        GroupTreeNode group = root.addSubgroup(new ExplicitGroup(name, GroupHierarchyType.INDEPENDENT, ','));
+        var storedSelection = FXCollections.observableArrayList(group);
+        when(stateManager.getSelectedGroups(library)).thenReturn(storedSelection);
+        doAnswer(_ -> {
+            storedSelection.clear();
+            return null;
+        }).when(stateManager).clearSelectedGroups(library);
+        // the root is attached last otherwise refresh will overlap with stubbing
+        // the second invokeAndWait() waits for the refresh queued by setGroups to finish
+        JavaFxExtension.invokeAndWait(() -> library.getMetaData().setGroups(root));
+        JavaFxExtension.invokeAndWait(() -> {
+        });
+        return group;
+    }
+
+    private List<GroupTreeNode> selectedGroupNodes() {
+        return groupTree.selectedGroupsProperty().stream().map(GroupNodeViewModel::getGroupNode).toList();
     }
 }
