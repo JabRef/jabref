@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -494,8 +495,10 @@ class MainTableDataModelTest {
     private static <V> void executeTask(BackgroundTask<V> task) throws Exception {
         V result = task.call();
 
-        if (task.getOnSuccess() != null) {
-            task.getOnSuccess().accept(result);
+        Consumer<V> onSuccess = task.getOnSuccess();
+        if (onSuccess != null) {
+            // BackgroundTask invokes completion callbacks on the JavaFX thread in production.
+            JavaFxExtension.invokeAndWait(() -> onSuccess.accept(result));
         }
     }
 }
