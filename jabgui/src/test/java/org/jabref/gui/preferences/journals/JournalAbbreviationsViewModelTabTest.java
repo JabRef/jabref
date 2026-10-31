@@ -527,22 +527,50 @@ class JournalAbbreviationsViewModelTabTest {
 
     @Test
     void storeJournalAbbreviationOption() {
-        when(abbreviationPreferences.getExternalJournalLists())
-                .thenReturn(FXCollections.<String>observableArrayList());
-        when(abbreviationPreferences.useJournalAbbreviationMode())
-                .thenReturn(JournalMode.ABBREVIATE);
-        when(abbreviationPreferences.useAbbreviationTypeOnFetch())
-                .thenReturn(AbbreviationType.DOTLESS);
-        when(abbreviationPreferences.shouldUseFJournalField()).thenReturn(false);
+        AbbreviationPreferences savedPreferences =
+                AbbreviationPreferences.getDefault();
 
-        viewModel.setValues();
+        JournalAbbreviationsTabViewModel model =
+                new JournalAbbreviationsTabViewModel(
+                        savedPreferences,
+                        dialogService,
+                        new CurrentThreadTaskExecutor(),
+                        repository);
 
-        assertTrue(viewModel.convertJournalOnFetchProperty().get());
-        assertTrue(viewModel.abbreviateOnFetchProperty().get());
-        assertFalse(viewModel.unAbbreviateOnFetchProperty().get());
+        model.setValues();
+
+        // Choose and save new values.
+        model.convertJournalOnFetchProperty().set(true);
+        model.abbreviateOnFetchProperty().set(true);
+        model.unAbbreviateOnFetchProperty().set(false);
+        model.abbreviationTypeOnFetchProperty()
+             .set(AbbreviationType.DOTLESS);
+        model.useFJournalProperty().set(false);
+
+        model.storeSettings();
+
+        assertEquals(JournalMode.ABBREVIATE,
+                savedPreferences.useJournalAbbreviationMode());
         assertEquals(AbbreviationType.DOTLESS,
-                viewModel.abbreviationTypeOnFetchProperty().get());
-        assertFalse(viewModel.useFJournalProperty().get());
+                savedPreferences.useAbbreviationTypeOnFetch());
+        assertFalse(savedPreferences.shouldUseFJournalField());
+
+        // Change the UI without saving, so reloading must restore it.
+        model.convertJournalOnFetchProperty().set(false);
+        model.abbreviateOnFetchProperty().set(false);
+        model.unAbbreviateOnFetchProperty().set(true);
+        model.abbreviationTypeOnFetchProperty()
+             .set(AbbreviationType.DEFAULT);
+        model.useFJournalProperty().set(true);
+
+        model.setValues();
+
+        assertTrue(model.convertJournalOnFetchProperty().get());
+        assertTrue(model.abbreviateOnFetchProperty().get());
+        assertFalse(model.unAbbreviateOnFetchProperty().get());
+        assertEquals(AbbreviationType.DOTLESS,
+                model.abbreviationTypeOnFetchProperty().get());
+        assertFalse(model.useFJournalProperty().get());
     }
 
     /// Select the last abbreviation in the list of abbreviations
