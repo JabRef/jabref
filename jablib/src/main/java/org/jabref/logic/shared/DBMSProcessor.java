@@ -87,7 +87,7 @@ public class DBMSProcessor {
         String metadataVersion = getSharedMetaData().get(MetaData.VERSION_DB_STRUCT);
         return (metadataVersion != null)
                 && (Integer.parseInt(metadataVersion.replace(";", "")) == getCURRENT_VERSION_DB_STRUCT())
-                && entryTypeConstraintExists();
+                && entryTypeRequirementsMet();
     }
 
     private boolean tableExists(String qualifiedName) throws SQLException {
@@ -279,20 +279,21 @@ public class DBMSProcessor {
         });
     }
 
-    /// Upgrades pre-existing shared databases that lack the entry type constraint.
+    /// Upgrades pre-existing shared databases that lack one of the entry type requirements:
+    /// `NOT NULL` on `entrytype` and the `entry_entrytype_not_blank` check constraint.
     /// Any existing entries with a missing or blank type are defaulted to `misc` before
-    /// the constraint is applied. Runs at most once per database.
+    /// the missing requirements are applied. Does nothing once both are in place.
     // [impl->req~shared-database.entry-type-required~1]
     private void enforceEntryTypeRequired() throws SQLException {
-        if (entryTypeConstraintExists()) {
+        if (entryTypeRequirementsMet()) {
             return;
         }
 
         inTransaction(() -> {
             // Serializes concurrent connections; the lock is released at commit/rollback
             connection.createStatement().execute("SELECT pg_advisory_xact_lock(" + MIGRATION_ADVISORY_LOCK_ID + ")");
-            if (entryTypeConstraintExists()) {
-                // Another client added the constraint while we waited for the lock
+            if (entryTypeRequirementsMet()) {
+                // Another client completed the upgrade while we waited for the lock
                 return;
             }
 
@@ -302,11 +303,38 @@ public class DBMSProcessor {
                 LOGGER.warn("Repaired {} shared database entries with missing or blank entry type to 'misc'", repairedRows);
             }
 
-            connection.createStatement().executeUpdate(
-                    "ALTER TABLE entry ALTER COLUMN entrytype SET NOT NULL");
-            connection.createStatement().executeUpdate(
-                    "ALTER TABLE entry ADD CONSTRAINT entry_entrytype_not_blank CHECK (btrim(entrytype) <> '')");
+            if (!entryTypeColumnIsNotNull()) {
+                connection.createStatement().executeUpdate(
+                        "ALTER TABLE entry ALTER COLUMN entrytype SET NOT NULL");
+            }
+            if (!entryTypeConstraintExists()) {
+                connection.createStatement().executeUpdate(
+                        "ALTER TABLE entry ADD CONSTRAINT entry_entrytype_not_blank CHECK (btrim(entrytype) <> '')");
+            }
         });
+    }
+
+    /// Checks whether `jabref.entry` has both entry type requirements:
+    /// `NOT NULL` on `entrytype` and the `entry_entrytype_not_blank` check constraint.
+    private boolean entryTypeRequirementsMet() throws SQLException {
+        return entryTypeColumnIsNotNull() && entryTypeConstraintExists();
+    }
+
+    /// Checks whether the `entrytype` column of `jabref.entry` is declared `NOT NULL`.
+    private boolean entryTypeColumnIsNotNull() throws SQLException {
+        String sql = """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM pg_attribute
+                    WHERE attrelid = to_regclass('jabref.entry')
+                      AND attname = 'entrytype'
+                      AND attnotnull
+                      AND NOT attisdropped
+                )""";
+        try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
+            resultSet.next();
+            return resultSet.getBoolean(1);
+        }
     }
 
     /// Checks whether `jabref.entry` already has the `entry_entrytype_not_blank` check constraint.

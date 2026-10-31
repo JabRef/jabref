@@ -333,6 +333,38 @@ class DBMSProcessorTest {
         assertEquals("23514", exception.getSQLState());
     }
 
+    // [utest->req~shared-database.entry-type-required~1]
+    @Test
+    void setupRestoresNotNullWhenOnlyCheckConstraintIsPresent() throws SQLException {
+        Connection connection = dbmsConnection.getConnection();
+
+        // Keep the check constraint but drop NOT NULL; the check lets NULL through
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("ALTER TABLE jabref.entry ALTER COLUMN entrytype DROP NOT NULL");
+            statement.executeUpdate("INSERT INTO jabref.entry (entrytype) VALUES (NULL)");
+            statement.executeUpdate("INSERT INTO jabref.field (entry_shared_id, name, value) SELECT shared_id, 'title', 'Ghost' FROM jabref.entry");
+        }
+
+        assertFalse(dbmsProcessor.checkBaseIntegrity());
+
+        dbmsProcessor.setupSharedDatabase();
+        assertTrue(dbmsProcessor.checkBaseIntegrity());
+
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT entrytype FROM jabref.entry")) {
+            assertTrue(resultSet.next());
+            assertEquals("misc", resultSet.getString(1));
+            assertFalse(resultSet.next());
+        }
+
+        SQLException exception = assertThrows(SQLException.class, () -> {
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate("INSERT INTO jabref.entry (entrytype) VALUES (NULL)");
+            }
+        });
+        assertEquals("23502", exception.getSQLState());
+    }
+
     private static BibEntry getBibEntryExample() {
         return new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L")
