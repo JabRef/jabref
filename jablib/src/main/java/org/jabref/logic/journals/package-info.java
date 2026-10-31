@@ -1,11 +1,3 @@
-/* Project policy
- > [!IMPORTANT]
- > This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
- >
- > Read and follow:
- > • [AGENTS.md](./AGENTS.md)
- > • [CONTRIBUTING.md](./CONTRIBUTING.md)
-*/
 /// Shared abbreviation records, parsing and lookup, with journal-specific loading and configuration.
 /// [org.jabref.logic.journals.AbbreviationRepository] provides shared lookup operations;
 /// [org.jabref.logic.journals.JournalAbbreviationRepository] adds LTWA support.
