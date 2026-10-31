@@ -17,7 +17,7 @@ jobs:
   merge_conflict_job:
     name: Find merge conflicts
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -37,7 +37,7 @@ jobs:
 
   no-force-push:
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -95,7 +95,7 @@ jobs:
   other_than_main:
     name: Source branch is other than "main"
     if: >
-      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != github.repository) &&
       !(
         (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
         (
@@ -118,7 +118,7 @@ jobs:
     steps:
       - name: Create pr_number.txt
         run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: pr_number
           path: pr_number.txt

@@ -26,6 +26,7 @@ public class PreviewPreferences {
     private final StringProperty customPreviewLayout;
     private final BooleanProperty showPreviewAsExtraTab;
     private final BooleanProperty showPreviewEntryTableTooltip;
+    private final IntegerProperty tooltipDuration;
     private final ObservableList<Path> bstPreviewLayoutPaths;
 
     private final BooleanProperty shouldDownloadCovers;
@@ -35,6 +36,7 @@ public class PreviewPreferences {
                               String customPreviewLayout,
                               boolean showPreviewAsExtraTab,
                               boolean showPreviewEntryTableTooltip,
+                              int tooltipDuration,
                               List<Path> bstPreviewLayoutPaths,
                               boolean shouldDownloadCovers) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
@@ -42,6 +44,7 @@ public class PreviewPreferences {
         this.customPreviewLayout = new SimpleStringProperty(customPreviewLayout);
         this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
         this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
+        this.tooltipDuration = new SimpleIntegerProperty(tooltipDuration);
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
         this.shouldDownloadCovers = new SimpleBooleanProperty(shouldDownloadCovers);
     }
@@ -53,6 +56,7 @@ public class PreviewPreferences {
                 TextBasedPreviewLayout.DEFAULT,
                 false,      // Show preview as an extra tab
                 false,      // Show the preview entry table tooltip
+                0,          // Zero keeps the tooltip open while hovered
                 List.of(),  // BST-Paths
                 false       // Download cover images disabled per default - similar to Mr. DLib; see [org.jabref.logic.preferences.JabRefCliPreferences.ACCEPT_RECOMMENDATIONS].
         );
@@ -148,6 +152,14 @@ public class PreviewPreferences {
 
     public BooleanProperty showPreviewEntryTableTooltip() {
         return showPreviewEntryTableTooltip;
+    }
+
+    public int getTooltipDuration() {
+        return tooltipDuration.get();
+    }
+
+    public IntegerProperty tooltipDurationProperty() {
+        return tooltipDuration;
     }
 
     public ObservableList<Path> getBstPreviewLayoutPaths() {
