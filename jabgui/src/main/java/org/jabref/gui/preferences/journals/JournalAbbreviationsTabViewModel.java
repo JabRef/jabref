@@ -323,9 +323,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
                     abbreviationsPreferences.setExternalJournalLists(journalStringList);
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
-                    JournalMode mode = !convertJournalOnFetch.get()
-                                       ? JournalMode.NONE
-                                       : abbreviateOnFetch.get() ? JournalMode.ABBREVIATE : JournalMode.UNABBREVIATE;
+                    JournalMode mode = convertJournalOnFetch.get()
+                                       ? abbreviateOnFetch.get() ? JournalMode.ABBREVIATE : JournalMode.UNABBREVIATE
+                                       : JournalMode.NONE;
                     abbreviationsPreferences.setJournalAbbreviationMode(mode);
                     abbreviationsPreferences.setAbbreviationTypeOnFetch(abbreviationTypeOnFetch.get());
 
