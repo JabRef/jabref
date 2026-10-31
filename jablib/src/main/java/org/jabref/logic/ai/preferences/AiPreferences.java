@@ -290,7 +290,7 @@ public class AiPreferences {
         setGeminiApiBaseUrl(other.getGeminiApiBaseUrl());
         setHuggingFaceApiBaseUrl(other.getHuggingFaceApiBaseUrl());
 
-        setEnableAiDebugProvider(other.getEnableAiDebugProvider());
+        setEnableAiDebugProvider(other.enableAiDebugProviderProperty().get());
 
         setSummarizatorKind(other.getSummarizatorKind());
         setTokenEstimatorKind(other.getTokenEstimatorKind());

@@ -282,6 +282,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 }
             }
 
+            if (customizeExpertSettings.get() && enableAiDebugProvider.get()) {
+                return;
+            }
+
             new FetchAiModelsBackgroundTask(aiModelService, newValue, currentApiBaseUrl.get(), currentApiKey.get())
                     .onSuccess(foundModels -> {
                         String current = currentChatModel.get();
@@ -473,6 +477,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         autoGenerateSummaries.setValue(workingAiPreferences.getAutoGenerateSummaries());
         autoGenerateEmbeddings.setValue(workingAiPreferences.getAutoGenerateEmbeddings());
 
+        customizeExpertSettings.setValue(workingAiPreferences.getCustomizeExpertSettings());
+        enableAiDebugProvider.setValue(workingAiPreferences.enableAiDebugProviderProperty().get());
+
         AiProvider provider = workingAiPreferences.getAiProvider();
         if (provider == AiProvider.DEBUG) {
             // Will never be executed, as DEBUG should not appear in the AI provider selection.
@@ -480,9 +487,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         } else {
             selectedAiProvider.setValue(provider);
         }
-
-        customizeExpertSettings.setValue(workingAiPreferences.getCustomizeExpertSettings());
-        enableAiDebugProvider.setValue(workingAiPreferences.getEnableAiDebugProvider());
 
         selectedEmbeddingModel.setValue(workingAiPreferences.getEmbeddingModel());
 

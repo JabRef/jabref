@@ -24,7 +24,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @NullMarked
@@ -32,6 +35,7 @@ class AiTabViewModelTest {
 
     private EmbeddingModelMetadataService embeddingModelMetadataService;
     private AiModelService aiModelService;
+    private AiPreferences aiPreferences;
     private AiPreferences workingAiPreferences;
     private AiTabViewModel viewModel;
 
@@ -44,7 +48,7 @@ class AiTabViewModelTest {
                 Optional.of(new EmbeddingModelMetadata("test-model", OptionalLong.of(1024), OptionalInt.of(256)))
         );
 
-        AiPreferences aiPreferences = AiPreferences.getDefault();
+        aiPreferences = AiPreferences.getDefault();
         workingAiPreferences = AiPreferences.getDefault();
 
         viewModel = new AiTabViewModel(
@@ -247,9 +251,21 @@ class AiTabViewModelTest {
     }
 
     @Test
+    void debugModeDoesNotFetchModelsWhenOpeningPreferencesOrChangingProvider() {
+        aiPreferences.setCustomizeExpertSettings(true);
+        aiPreferences.setEnableAiDebugProvider(true);
+
+        viewModel.setValues();
+        viewModel.selectedAiProviderProperty().set(AiProvider.MISTRAL_AI);
+
+        verify(aiModelService, never()).getAvailableModels(any(), any(), nullable(String.class));
+    }
+
+    @Test
     void enableAiDebugProviderStoredAndReset() {
         // [utest->req~ai.llms.providers.debug~1]
         viewModel.setValues();
+        viewModel.customizeExpertSettingsProperty().set(true);
         viewModel.enableAiDebugProviderProperty().set(true);
         viewModel.storeSettings();
         assertTrue(workingAiPreferences.getEnableAiDebugProvider());
@@ -273,7 +289,7 @@ class AiTabViewModelTest {
     @Test
     void setValuesWithDebugProviderFallsBackToDefault() {
         // [utest->req~ai.llms.providers.debug~1]
-        workingAiPreferences.setAiProvider(AiProvider.DEBUG);
+        aiPreferences.setAiProvider(AiProvider.DEBUG);
         viewModel.setValues();
         assertEquals(AiDefaultEnums.AI_PROVIDER, viewModel.selectedAiProviderProperty().get());
     }
