@@ -117,6 +117,7 @@ public class ThemeManager {
 
     private void updateFontStyleForScene(Scene scene) {
         scene.getRoot().getStyleClass().removeIf(styleClass -> styleClass.startsWith(FONT_SIZE_STYLE_CLASS_PREFIX));
+
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             LOGGER.debug("Overriding font size with user preference to {}pt", workspacePreferences.getMainFontSize());
             scene.getRoot().getStyleClass().add(FONT_SIZE_STYLE_CLASS_PREFIX + workspacePreferences.getMainFontSize());
