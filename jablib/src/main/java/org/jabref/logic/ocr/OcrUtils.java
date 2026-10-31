@@ -3,6 +3,8 @@ package org.jabref.logic.ocr;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -55,9 +57,17 @@ public final class OcrUtils {
             processBuilder.redirectErrorStream(true);
             process = processBuilder.start();
 
+            StringBuilder ocrOutput = new StringBuilder();
+
             // Get the output and the errors of the process
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), line -> {
+                LOGGER.debug(line);
+                ocrOutput.append(line).append(System.lineSeparator());
+            });
+            Future<Void> gobblerFuture = HeadlessExecutorService.INSTANCE.execute(() -> {
+                streamGobblerInput.run();
+                return null;
+            });
 
             boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
             if (!finished) {
@@ -65,10 +75,16 @@ public final class OcrUtils {
                 return OcrResult.failure(OcrFailureReason.TIMEOUT);
             }
 
+            try {
+                gobblerFuture.get();
+            } catch (ExecutionException e) {
+                LOGGER.error("Error while reading OCR process output.", e);
+            }
+
             if (process.exitValue() == 0) {
                 return OcrResult.success(null); // The output file path will be determined by the specific OCR engine implementation
             } else {
-                return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
+                return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT, command, ocrOutput.toString());
             }
         } catch (IOException e) {
             LOGGER.error("Error while running {}.", engineName, e);
