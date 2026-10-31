@@ -262,12 +262,12 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void moveApiKeysToKeyRing() throws PasswordAccessException {
-        final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
-        final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
+        final String v5_9FetcherCustomKeyNames = "fetcherCustomKeyNames";
+        final String v5_9FetcherCustomKeys = "fetcherCustomKeys";
         final Keyring keyring = mock(Keyring.class);
 
-        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
-        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
+        when(preferences.getStringList(v5_9FetcherCustomKeyNames)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
+        when(preferences.getStringList(v5_9FetcherCustomKeys)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
 
         when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenThrow(new PasswordAccessException("No entry stored"));
         when(keyring.getPassword("org.jabref.apikeys", "FetcherB")).thenThrow(new PasswordAccessException("No entry stored"));
@@ -281,18 +281,18 @@ class GuiPreferencesMigrationsTest {
             verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherA"), eq("KeyA"));
             verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherB"), eq("KeyB"));
             verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherC"), eq("KeyC"));
-            verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
+            verify(preferences).deleteKey(v5_9FetcherCustomKeys);
         }
     }
 
     @Test
     void moveApiKeysToKeyRingKeepsExistingKey() throws PasswordAccessException {
-        final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
-        final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
+        final String v5_9FetcherCustomKeyNames = "fetcherCustomKeyNames";
+        final String v5_9FetcherCustomKeys = "fetcherCustomKeys";
         final Keyring keyring = mock(Keyring.class);
 
-        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB"));
-        when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("StaleA", "KeyB"));
+        when(preferences.getStringList(v5_9FetcherCustomKeyNames)).thenReturn(List.of("FetcherA", "FetcherB"));
+        when(preferences.getStringList(v5_9FetcherCustomKeys)).thenReturn(List.of("StaleA", "KeyB"));
         when(keyring.getPassword("org.jabref.apikeys", "FetcherA")).thenReturn("CurrentA");
         when(keyring.getPassword("org.jabref.apikeys", "FetcherB")).thenThrow(new PasswordAccessException("No entry stored"));
 
@@ -304,7 +304,7 @@ class GuiPreferencesMigrationsTest {
             verify(keyring).setPassword(eq("org.jabref.apikeys"), eq("FetcherB"), eq("KeyB"));
             verify(keyring).deletePassword(eq("org.jabref.customapikeys"), eq("FetcherA"));
             verify(keyring).deletePassword(eq("org.jabref.customapikeys"), eq("FetcherB"));
-            verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
+            verify(preferences).deleteKey(v5_9FetcherCustomKeys);
         }
     }
 
