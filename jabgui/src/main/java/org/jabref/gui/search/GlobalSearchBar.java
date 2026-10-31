@@ -372,12 +372,12 @@ public class GlobalSearchBar extends HBox {
         String[] parts = description.split("\n", 2);
         Tooltip tooltip = new Tooltip();
         tooltip.textProperty().bind(Bindings.createStringBinding(
-                () -> {String status = button.isSelected()
+                () -> {
+                    String status = button.isSelected()
                                     ? Localization.lang("Enabled")
                                     : Localization.lang("Disabled");
 
-                    return parts[0] + ": " + status
-                            + (parts.length > 1 ? "\n" + parts[1] : "");
+                    return parts[0] + ": " + status + (parts.length > 1 ? "\n" + parts[1] : "");
                 },
                 button.selectedProperty()
         ));
