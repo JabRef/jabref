@@ -243,4 +243,12 @@ The groups walkthrough must open its bundled example library, display the Groups
 
 Needs: impl
 
+## Assigning an already used keyboard shortcut must require confirmation
+`req~ux.keybindings.duplicate-warning~1`
+
+When a user assigns a keyboard shortcut that is already used by other actions, JabRef warns the user, names these actions and lets the user cancel,
+keep both or replace the existing assignments ([#17240](https://github.com/JabRef/jabref/issues/17240)).
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
