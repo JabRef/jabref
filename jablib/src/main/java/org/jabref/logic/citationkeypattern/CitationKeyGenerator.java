@@ -66,7 +66,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     ///
     /// @param number The appendix number.
     /// @return The String to append.
-    private static String getAppendix(int number) {
+    public static String getAppendix(int number) {
         if (number >= APPENDIX_CHARACTERS.length()) {
             int lastChar = number % APPENDIX_CHARACTERS.length();
             return getAppendix((number / APPENDIX_CHARACTERS.length()) - 1) + APPENDIX_CHARACTERS.charAt(lastChar);

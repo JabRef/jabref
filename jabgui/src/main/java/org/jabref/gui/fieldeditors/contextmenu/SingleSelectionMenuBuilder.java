@@ -97,6 +97,10 @@ record SingleSelectionMenuBuilder(
                 new OcrLinkedFileAction(selectedLinkedFile.getFile(), selectedLinkedFile.getLinkedEntries(), databaseContext, dialogService, preferences, taskExecutor, fileUpdateMonitor, undoManager, stateManager)));
 
         items.add(factory.createMenuItem(
+                StandardActions.SPLIT_PDF,
+                new ContextAction(StandardActions.SPLIT_PDF, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
+
+        items.add(factory.createMenuItem(
                 StandardActions.RENAME_FILE_TO_PATTERN,
                 new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
         items.add(factory.createMenuItem(

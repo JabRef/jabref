@@ -146,6 +146,10 @@ public class DocumentViewerView extends BaseDialog<Void> {
         viewModel.showPage(pageNumber);
     }
 
+    public int pageCount() {
+        return viewer.pageCount();
+    }
+
     public void highlightText(String text) {
         viewModel.highlightText(text);
     }
