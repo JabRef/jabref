@@ -45,8 +45,7 @@ public class BaseDialog<T> extends Dialog<T> {
 
     /// [impl->req~ux.dialogs.close-key-binding~1]
     public static boolean closeOnKeyBindingMatch(KeyEvent event, Dialog<?> dialog) {
-        KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
-        if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+        if (matchesCloseKeyBinding(event)) {
             dialog.close();
             event.consume();
 
@@ -78,9 +77,8 @@ public class BaseDialog<T> extends Dialog<T> {
 
     private void handleKeyEvent(KeyEvent event) {
         if (!closesOnCloseKeyBinding()) {
-            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             // Escape is consumed as well: JavaFX's own stage handler closes a dialog with a cancel button on an unconsumed Escape
-            if (event.getCode() == KeyCode.ESCAPE || keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+            if (event.getCode() == KeyCode.ESCAPE || matchesCloseKeyBinding(event)) {
                 event.consume();
                 return;
             }
@@ -101,6 +99,11 @@ public class BaseDialog<T> extends Dialog<T> {
                 event.consume();
             }
         }
+    }
+
+    private static boolean matchesCloseKeyBinding(KeyEvent event) {
+        KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+        return keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event);
     }
 
     private Optional<Button> getDefaultButton() {
