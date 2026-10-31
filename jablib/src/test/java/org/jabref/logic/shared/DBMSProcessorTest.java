@@ -327,9 +327,9 @@ class DBMSProcessorTest {
         }
 
         // 3. Reconnect / re-run setup to repair existing entries and add the constraint back
-        assertTrue(dbmsProcessor.needsSchemaUpgrade());
+        assertFalse(dbmsProcessor.entryTypeRequirementsMet());
         dbmsProcessor.setupSharedDatabase();
-        assertFalse(dbmsProcessor.needsSchemaUpgrade());
+        assertTrue(dbmsProcessor.entryTypeRequirementsMet());
 
         // 4a. Assert entries were repaired to Misc and retained their titles
         List<BibEntry> entries = dbmsProcessor.getSharedEntries();
@@ -372,10 +372,10 @@ class DBMSProcessorTest {
             statement.executeUpdate("INSERT INTO jabref.field (entry_shared_id, name, value) SELECT shared_id, 'title', 'Ghost' FROM jabref.entry");
         }
 
-        assertTrue(dbmsProcessor.needsSchemaUpgrade());
+        assertFalse(dbmsProcessor.entryTypeRequirementsMet());
 
         dbmsProcessor.setupSharedDatabase();
-        assertFalse(dbmsProcessor.needsSchemaUpgrade());
+        assertTrue(dbmsProcessor.entryTypeRequirementsMet());
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT entrytype FROM jabref.entry")) {
@@ -406,10 +406,10 @@ class DBMSProcessorTest {
             preparedStatement.executeUpdate();
         }
 
-        assertTrue(dbmsProcessor.needsSchemaUpgrade());
+        assertFalse(dbmsProcessor.entryTypeRequirementsMet());
 
         dbmsProcessor.setupSharedDatabase();
-        assertFalse(dbmsProcessor.needsSchemaUpgrade());
+        assertTrue(dbmsProcessor.entryTypeRequirementsMet());
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT entrytype FROM jabref.entry")) {
@@ -417,6 +417,34 @@ class DBMSProcessorTest {
             assertEquals("misc", resultSet.getString(1));
             assertFalse(resultSet.next());
         }
+    }
+
+    // [utest->req~shared-database.entry-type-required~1]
+    @Test
+    void entryTypeUpgradeIsSkippedForUserNotOwningTheTables() throws SQLException {
+        Connection connection = dbmsConnection.getConnection();
+
+        try (Statement statement = connection.createStatement()) {
+            // A database created before the entry type requirements, holding an entry with a blank type
+            statement.executeUpdate("ALTER TABLE jabref.entry DROP CONSTRAINT entry_entrytype_not_blank");
+            statement.executeUpdate("ALTER TABLE jabref.entry ALTER COLUMN entrytype DROP NOT NULL");
+            statement.executeUpdate("INSERT INTO jabref.entry (entrytype) VALUES ('')");
+            statement.executeUpdate("INSERT INTO jabref.field (entry_shared_id, name, value) SELECT shared_id, 'title', 'Ghost' FROM jabref.entry");
+
+            // A client that may read and write the tables, but not alter them
+            statement.executeUpdate("CREATE ROLE jabref_client");
+            statement.executeUpdate("GRANT USAGE ON SCHEMA jabref TO jabref_client");
+            statement.executeUpdate("GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA jabref TO jabref_client");
+            statement.executeUpdate("GRANT USAGE ON ALL SEQUENCES IN SCHEMA jabref TO jabref_client");
+            statement.executeUpdate("SET ROLE jabref_client");
+        }
+
+        assertDoesNotThrow(dbmsProcessor::enforceEntryTypeRequired);
+
+        assertFalse(dbmsProcessor.entryTypeRequirementsMet());
+        // The rolled back upgrade did not change the entry, which is still read as misc
+        assertEquals(List.of(new BibEntry(StandardEntryType.Misc).withField(StandardField.TITLE, "Ghost")),
+                dbmsProcessor.getSharedEntries());
     }
 
     private static BibEntry getBibEntryExample() {

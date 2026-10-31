@@ -294,17 +294,20 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     ///
     /// @throws DatabaseNotSupportedException if the version of shared database does not match the version of current shared database support ([DBMSProcessor]).
     public void initializeDatabases() throws DatabaseNotSupportedException, SQLException {
-        if (dbmsProcessor.needsSchemaUpgrade()) {
-            LOGGER.info("Shared database structure is missing or outdated. Fixing...");
+        if (!dbmsProcessor.checkBaseIntegrity()) {
+            LOGGER.info("Integrity check failed. Fixing...");
 
             // This check should only be performed once on initial database setup.
             if (dbmsProcessor.databaseIsAtMostJabRef35()) {
                 throw new DatabaseNotSupportedException();
             }
 
-            // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.needsSchemaUpgrade() be false.
+            // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.checkBaseIntegrity() be true.
             dbmsProcessor.setupSharedDatabase();
         }
+
+        // Databases created by earlier JabRef versions get the entry type requirements; skipped for users who may not alter the tables
+        dbmsProcessor.enforceEntryTypeRequired();
 
         dbmsProcessor.startNotificationListener(this);
         // Synchronously on the caller's thread: the library is not shown before this returns

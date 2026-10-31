@@ -49,6 +49,9 @@ public class DBMSProcessor {
 
     private static final Set<String> GROUP_TREE_METADATA_KEYS = Set.of(MetaData.GROUPSTREE, MetaData.GROUPSTREE_LEGACY);
 
+    // SQLState of PostgreSQL when the current user may not run a statement, e.g. ALTER TABLE without owning the table
+    private static final String INSUFFICIENT_PRIVILEGE_SQL_STATE = "42501";
+
     // Arbitrary application-wide id serializing the one-time data migration across clients
     private static final long MIGRATION_ADVISORY_LOCK_ID = 11_879L;
 
@@ -89,16 +92,6 @@ public class DBMSProcessor {
         }
         String metadataVersion = getSharedMetaData().get(MetaData.VERSION_DB_STRUCT);
         return (metadataVersion != null) && (Integer.parseInt(metadataVersion.replace(";", "")) == getCURRENT_VERSION_DB_STRUCT());
-    }
-
-    /// Checks whether [#setupSharedDatabase()] has to run before the database is used for editing:
-    /// either the structure does not match ([#checkBaseIntegrity()]), or a database created by an
-    /// earlier JabRef version still lacks the entry type requirements.
-    ///
-    /// Reading (e.g. exporting) does not need the upgrade: blank entry types are read as `misc`.
-    // [impl->req~shared-database.entry-type-required~1]
-    public boolean needsSchemaUpgrade() throws SQLException {
-        return !checkBaseIntegrity() || !entryTypeRequirementsMet();
     }
 
     private boolean tableExists(String qualifiedName) throws SQLException {
@@ -152,7 +145,7 @@ public class DBMSProcessor {
     public void setupSharedDatabase() throws SQLException {
         setUp();
 
-        if (needsSchemaUpgrade()) {
+        if (!checkBaseIntegrity()) {
             // can only happen with users direct intervention on shared database
             LOGGER.error("Corrupt_shared_database_structure.");
         }
@@ -294,12 +287,28 @@ public class DBMSProcessor {
     /// `NOT NULL` on `entrytype` and the `entry_entrytype_not_blank` check constraint.
     /// Any existing entries with a missing or blank type are defaulted to `misc` before
     /// the missing requirements are applied. Does nothing once both are in place.
+    ///
+    /// Only the owner of the tables may change them. For any other user the upgrade is rolled back
+    /// and skipped with a warning; blank entry types are still read and written as `misc`, and the
+    /// upgrade happens once the owner connects.
     // [impl->req~shared-database.entry-type-required~1]
-    private void enforceEntryTypeRequired() throws SQLException {
+    public void enforceEntryTypeRequired() throws SQLException {
         if (entryTypeRequirementsMet()) {
             return;
         }
 
+        try {
+            upgradeEntryTypeRequirements();
+        } catch (SQLException e) {
+            if (!INSUFFICIENT_PRIVILEGE_SQL_STATE.equals(e.getSQLState())) {
+                throw e;
+            }
+            LOGGER.warn("Could not add the entry type requirements to the shared database, as only the owner of its tables may change them. Entries without an entry type are still stored as 'misc'.", e);
+        }
+    }
+
+    /// Runs as one transaction, so a failure (e.g. missing privileges) leaves the database unchanged.
+    private void upgradeEntryTypeRequirements() throws SQLException {
         inTransaction(() -> {
             // Serializes concurrent connections; the lock is released at commit/rollback
             connection.createStatement().execute("SELECT pg_advisory_xact_lock(" + MIGRATION_ADVISORY_LOCK_ID + ")");
@@ -327,7 +336,8 @@ public class DBMSProcessor {
 
     /// Checks whether `jabref.entry` has both entry type requirements:
     /// `NOT NULL` on `entrytype` and the `entry_entrytype_not_blank` check constraint.
-    private boolean entryTypeRequirementsMet() throws SQLException {
+    @VisibleForTesting
+    boolean entryTypeRequirementsMet() throws SQLException {
         return entryTypeColumnIsNotNull() && entryTypeConstraintExists();
     }
 

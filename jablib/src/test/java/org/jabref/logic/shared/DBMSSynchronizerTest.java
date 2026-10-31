@@ -3,6 +3,7 @@ package org.jabref.logic.shared;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -551,6 +552,21 @@ class DBMSSynchronizerTest {
         actualMap.remove(MetaData.VERSION_DB_STRUCT);
 
         assertEquals(expectedMap, actualMap);
+    }
+
+    // [utest->req~shared-database.entry-type-required~1]
+    @Test
+    void initializeDatabasesUpgradesDatabaseWithoutEntryTypeRequirements() throws DatabaseNotSupportedException, SQLException {
+        // Structure version 2 as created by earlier JabRef versions: it passes the integrity check
+        try (Statement statement = dbmsConnection.getConnection().createStatement()) {
+            statement.executeUpdate("ALTER TABLE jabref.entry DROP CONSTRAINT entry_entrytype_not_blank");
+            statement.executeUpdate("ALTER TABLE jabref.entry ALTER COLUMN entrytype DROP NOT NULL");
+        }
+        assertTrue(dbmsProcessor.checkBaseIntegrity());
+
+        dbmsSynchronizer.initializeDatabases();
+
+        assertTrue(dbmsProcessor.entryTypeRequirementsMet());
     }
 
     @Test
