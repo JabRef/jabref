@@ -397,7 +397,7 @@ public class OpenOfficePanel {
 
             targetTab.importCitedEntriesWithDuplicateCheck(citedEntries.newEntries());
         } catch (NoDocumentException ex) {
-            dialogService.notify(Localization.lang("Please connect to a document"));
+            dialogService.notify(Localization.lang("Not connected to document"));
             LOGGER.info("Could not import", ex);
         }
     }
