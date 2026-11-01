@@ -1,5 +1,7 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import org.jabref.model.entry.AuthorList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -85,6 +87,34 @@ class NormalizeNamesFormatterTest {
     })
     void concatenationOfAuthorsWithCommas(String expected, String nameList) {
         assertEquals(expected, formatter.format(nameList));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "family=Hasselt, given=Hado P., prefix=van, useprefix=false and Guez, Arthur",
+            "given=Jean, family=Rousse, prefix=de la, useprefix=true, given-i=J., prefix-i=d.l.",
+            "family={Robert and Sons, Inc.}, useprefix=false",
+            "family={García}, given=José, custom-option={a=b, c}",
+            "family=Doe, given=Jane, aaa-option={protected, value}",
+            "Doe, Jane and family=Hasselt, given=Hado P., prefix=van, useprefix=false and others",
+            "family=Hasselt, prefix=van, useprefix=false and family=Ree, prefix=van der, useprefix=true"
+    })
+    void normalizationPreservesExtendedNameParts(String input) {
+        AuthorList original = AuthorList.parse(input);
+        String normalized = formatter.format(input);
+
+        assertEquals(original, AuthorList.parse(normalized));
+        assertEquals(normalized, formatter.format(normalized));
+    }
+
+    @Test
+    void normalizationKeepsDisplayFormattingSeparateFromStorage() {
+        String input = "family=Hasselt, given=Hado P., prefix=van, useprefix=false and Arthur Guez";
+
+        assertEquals("family=Hasselt, given=Hado P., prefix=van, useprefix=false and Guez, Arthur",
+                formatter.format(input));
+        assertEquals("Hasselt, Hado P. van and Guez, Arthur",
+                AuthorList.parse(input).getAsLastFirstNamesWithAnd(false));
     }
 
     @Test

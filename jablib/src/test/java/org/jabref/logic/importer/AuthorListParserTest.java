@@ -55,6 +55,45 @@ class AuthorListParserTest {
     }
 
     @Test
+    void parseBiblatexExtendedNameFollowedByConventionalNames() {
+        AuthorList authors = parser.parse("family=Hasselt, given=Hado P., prefix=van, useprefix=false and Guez, Arthur");
+
+        assertEquals(2, authors.getNumberOfAuthors());
+        assertEquals(Optional.of("Hasselt"), authors.getAuthor(0).getFamilyName());
+        assertEquals(Optional.of("Hado P."), authors.getAuthor(0).getGivenName());
+        assertEquals(Optional.of("van"), authors.getAuthor(0).getNamePrefix());
+        assertEquals(Optional.of("Guez"), authors.getAuthor(1).getFamilyName());
+        assertEquals(Optional.of("Arthur"), authors.getAuthor(1).getGivenName());
+    }
+
+    @Test
+    void parseSingleBiblatexExtendedName() {
+        Author author = parser.parse("given=Jean, prefix=de la, family=Rousse").getAuthor(0);
+
+        assertEquals(Optional.of("Jean"), author.getGivenName());
+        assertEquals(Optional.of("J."), author.getGivenNameAbbreviated());
+        assertEquals(Optional.of("de la"), author.getNamePrefix());
+        assertEquals(Optional.of("Rousse"), author.getFamilyName());
+    }
+
+    @Test
+    void parseConventionalNameFollowedByBiblatexExtendedName() {
+        AuthorList authors = parser.parse("Doe, Jane and given=Simon, family=Beumont");
+
+        assertEquals(2, authors.getNumberOfAuthors());
+        assertEquals(Optional.of("Doe"), authors.getAuthor(0).getFamilyName());
+        assertEquals(Optional.of("Beumont"), authors.getAuthor(1).getFamilyName());
+        assertEquals(Optional.of("Simon"), authors.getAuthor(1).getGivenName());
+    }
+
+    @Test
+    void parseQuotedBiblatexExtendedFamilyContainingComma() {
+        Author author = parser.parse("\"family={Robert and Sons, Inc.}\"").getAuthor(0);
+
+        assertEquals(Optional.of("{Robert and Sons, Inc.}"), author.getFamilyName());
+    }
+
+    @Test
     void dashedNamesWithoutSpaceNormalized() {
         assertEquals(Optional.of("Z. Yao and D. S. Weld and W-P. Chen and H. Sun"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, W-P. Chen, and H. Sun"));
     }
