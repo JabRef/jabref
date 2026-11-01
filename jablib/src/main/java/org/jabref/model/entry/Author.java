@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
@@ -314,11 +316,62 @@ public class Author {
         }
     }
 
+    /// Returns the family-name label for display. Explicit `useprefix=false` excludes the prefix;
+    /// absent or invalid options retain the existing prefix-inclusive display convention.
+    // [impl->req~ui.names.display-extended~1]
+    public String getFamilyNameForDisplay() {
+        if (!getUsePrefix().orElse(true)) {
+            return getFamilyName().orElse("");
+        }
+        return getFullFamilyNameForDisplay();
+    }
+
+    private String getFullFamilyNameForDisplay() {
+        if (extendedNameParts.isEmpty()) {
+            return getNamePrefixAndFamilyName();
+        }
+        String family = getFamilyName().orElse("");
+        return getNamePrefix()
+                .map(prefix -> prefix + ((family.isEmpty() || prefix.endsWith("'") || prefix.endsWith("’")) ? "" : " ") + family)
+                .orElse(family);
+    }
+
+    private Optional<String> getGivenNameForDisplay(boolean abbreviated) {
+        if (!abbreviated) {
+            return getGivenName();
+        }
+        // A latexFree Author keeps the original metadata for serialization; decode only the display value.
+        return getExplicitGivenNameInitials()
+                .map(initials -> latexFreeAuthor == this ? LatexToUnicodeAdapter.format(initials) : initials)
+                .or(this::getGivenNameAbbreviated);
+    }
+
+    private static String joinDisplayParts(String... parts) {
+        return Stream.of(parts).filter(part -> !part.isEmpty()).collect(Collectors.joining(" "));
+    }
+
     /// Returns the author's name in form 'von Last, Jr., First' with the first name full or abbreviated depending on parameter.
+    /// Extended names with `useprefix=false` use 'Last, Jr., First von'; explicit given initials override generated initials.
     ///
     /// @param abbr `true` - abbreviate first name, `false` - do not abbreviate
     /// @return 'von Last, Jr., First' (if `abbr==false`) or 'von Last, Jr., F.' (if `abbr==true`)
     public String getFamilyGiven(boolean abbr) {
+        if (!extendedNameParts.isEmpty()) {
+            StringJoiner result = new StringJoiner(", ");
+            String family = getFamilyNameForDisplay();
+            if (!family.isEmpty()) {
+                result.add(family);
+            }
+            getNameSuffix().ifPresent(result::add);
+            String given = getGivenNameForDisplay(abbr).orElse("");
+            if (!getUsePrefix().orElse(true)) {
+                given = joinDisplayParts(given, getNamePrefix().orElse(""));
+            }
+            if (!given.isEmpty()) {
+                result.add(given);
+            }
+            return result.toString();
+        }
         StringBuilder res = new StringBuilder(getNamePrefixAndFamilyName());
         getNameSuffix().ifPresent(jr -> res.append(", ").append(jr));
         if (abbr) {
@@ -330,10 +383,20 @@ public class Author {
     }
 
     /// Returns the author's name in form 'First von Last, Jr.' with the first name full or abbreviated depending on parameter.
+    /// Prefixes remain part of the full name regardless of `useprefix`; explicit given initials override generated initials.
     ///
     /// @param abbr `true` - abbreviate first name, `false` - do not abbreviate
     /// @return 'First von Last, Jr.' (if `abbr==false`) or 'F. von Last, Jr.' (if `abbr==true`)
     public String getGivenFamily(boolean abbr) {
+        if (!extendedNameParts.isEmpty()) {
+            StringJoiner result = new StringJoiner(", ");
+            String name = joinDisplayParts(getGivenNameForDisplay(abbr).orElse(""), getFullFamilyNameForDisplay());
+            if (!name.isEmpty()) {
+                result.add(name);
+            }
+            getNameSuffix().ifPresent(result::add);
+            return result.toString();
+        }
         StringBuilder res = new StringBuilder();
         if (abbr) {
             getGivenNameAbbreviated().map(firstA -> firstA + ' ').ifPresent(res::append);
