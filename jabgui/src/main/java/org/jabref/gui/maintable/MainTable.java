@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
@@ -68,10 +69,12 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -359,6 +362,26 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                        .map(VirtualFlow::getFirstVisibleCell)
                        .map(cell -> cell.getIndex() == 0)
                        .orElse(true);
+    }
+
+    @Subscribe
+    public void listen(FieldChangedEvent event) {
+        // Wait until JabRef has updated the values of the changed entry before sorting again
+        Platform.runLater(() -> sortAndRevealSelectedEntry(event.getBibEntry()));
+    }
+
+    private void sortAndRevealSelectedEntry(BibEntry changedEntry) {
+        BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
+        if (selectedEntry == null || selectedEntry.getEntry() != changedEntry) {
+            return;
+        }
+        // The sorted list re-sorts as soon as the field changes, before the cached cell values of the entry are updated.
+        // It then sorts with the old value. Sorting again here uses the current value.
+        sort();
+        int selectedIndex = getSelectionModel().getSelectedIndex();
+        // Unlike TableView#scrollTo, this scrolls only as far as needed and does nothing if the row is already fully visible
+        Optional.ofNullable((VirtualFlow<?>) lookup(".virtual-flow"))
+                .ifPresent(flow -> flow.scrollTo(selectedIndex));
     }
 
     private void scrollToNextMatchCategory() {
