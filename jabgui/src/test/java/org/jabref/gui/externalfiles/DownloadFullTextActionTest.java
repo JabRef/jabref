@@ -270,7 +270,7 @@ class DownloadFullTextActionTest {
         assertEquals(1, submittedTasks.size());
 
         // Execute the lookup task.
-        BackgroundTask<?> lookupTask = submittedTasks.get(0);
+        BackgroundTask<?> lookupTask = submittedTasks.getFirst();
         Object downloads = lookupTask.call();
 
         assertEquals(1, finderCalls.get());
@@ -289,7 +289,7 @@ class DownloadFullTextActionTest {
         // Assert: the original entry now has a linked file.
         assertEquals(1, entry.getFiles().size());
 
-        LinkedFile downloadedFile = entry.getFiles().get(0);
+        LinkedFile downloadedFile = entry.getFiles().getFirst();
 
         // Assert: the linked file points to a real local file.
         Path downloadedPath = tempDir.resolve(downloadedFile.getLink());
@@ -405,7 +405,7 @@ class DownloadFullTextActionTest {
         assertEquals(1, submittedTasks.size());
 
         // Execute the lookup task.
-        BackgroundTask<?> lookupTask = submittedTasks.get(0);
+        BackgroundTask<?> lookupTask = submittedTasks.getFirst();
         Object downloads = lookupTask.call();
 
         // Run the success handler.
@@ -567,7 +567,7 @@ class DownloadFullTextActionTest {
             // The first task should be the full-text lookup.
             assertEquals(1, submittedTasks.size());
 
-            BackgroundTask<?> lookupTask = submittedTasks.get(0);
+            BackgroundTask<?> lookupTask = submittedTasks.getFirst();
             Object downloads = lookupTask.call();
 
             runSuccessHandler(lookupTask, downloads);
@@ -675,7 +675,7 @@ class DownloadFullTextActionTest {
 
             assertEquals(1, submittedTasks.size());
 
-            BackgroundTask<?> lookupTask = submittedTasks.get(0);
+            BackgroundTask<?> lookupTask = submittedTasks.getFirst();
             Object downloads = lookupTask.call();
 
             runSuccessHandler(lookupTask, downloads);
