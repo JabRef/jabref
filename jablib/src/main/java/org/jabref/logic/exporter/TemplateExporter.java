@@ -180,7 +180,9 @@ public class TemplateExporter extends Exporter {
             return;
         }
 
-        try (AtomicFileWriter ps = new AtomicFileWriter(file, encodingToUse)) {
+        AtomicFileWriter ps = new AtomicFileWriter(file, encodingToUse);
+        boolean committed = false;
+        try {
             Layout beginLayout = null;
 
             // Check if this export filter has bundled name formatters:
@@ -284,6 +286,13 @@ public class TemplateExporter extends Exporter {
 
             if (!missingFormatters.isEmpty() && LOGGER.isWarnEnabled()) {
                 LOGGER.warn("Formatters {} not found", String.join(", ", missingFormatters));
+            }
+            ps.close();
+            committed = true;
+        } finally {
+            // [impl->req~logic.exporter.preserve-output-on-template-failure~1]
+            if (!committed) {
+                ps.abort();
             }
         }
     }
