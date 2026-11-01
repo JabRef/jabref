@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.jabref.model.pdf.AnnotationArea;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
@@ -18,6 +19,7 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -51,7 +53,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                     if (FileAnnotationType.isMarkedFileAnnotationType(annotation.getSubtype())) {
                         annotationsList.add(createMarkedAnnotations(pageIndex, page, annotation));
                     } else {
-                        FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1);
+                        FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1, extractArea(page, annotation));
                         if ((fileAnnotation.getContent() != null) && !fileAnnotation.getContent().isEmpty()) {
                             annotationsList.add(fileAnnotation);
                         }
@@ -82,10 +84,29 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         return true;
     }
 
+    /// PDF user space counts from the bottom left and the viewer places markers from the top left,
+    /// so the y axis is flipped against the box that gets rendered: the crop box, which falls back
+    /// to the media box when a page declares none. A rotated page is rendered turned, which swaps
+    /// the axes, so no area is reported for one and navigation falls back to the page alone.
+    private Optional<AnnotationArea> extractArea(PDPage page, PDAnnotation annotation) {
+        if (page.getRotation() != 0) {
+            return Optional.empty();
+        }
+
+        PDRectangle renderedBox = page.getCropBox();
+        return Optional.ofNullable(annotation.getRectangle())
+                       .map(rectangle -> new AnnotationArea(
+                               rectangle.getLowerLeftX() - renderedBox.getLowerLeftX(),
+                               renderedBox.getUpperRightY() - rectangle.getUpperRightY(),
+                               rectangle.getWidth(),
+                               rectangle.getHeight()));
+    }
+
     private FileAnnotation createMarkedAnnotations(int pageIndex, PDPage page, PDAnnotation annotation) {
+        Optional<AnnotationArea> area = extractArea(page, annotation);
         FileAnnotation annotationBelongingToMarking = new FileAnnotation(
                 annotation.getCOSObject().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
-                pageIndex + 1, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
+                pageIndex + 1, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty(), area);
 
         if (annotationBelongingToMarking.getAnnotationType().isLinkedFileAnnotationType()) {
             try {
@@ -97,7 +118,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         }
 
         // Marked text that has a sticky note on it should be linked to the sticky note
-        return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
+        return new FileAnnotation(annotation, pageIndex + 1, area, annotationBelongingToMarking);
     }
 
     private boolean validatePath(@NonNull Path path) {
