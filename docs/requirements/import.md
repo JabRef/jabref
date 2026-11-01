@@ -80,6 +80,15 @@ Context: <https://github.com/JabRef/jabref/pull/17496#discussion_r4308280956>
 
 Needs: impl, utest
 
+## Ignore entry markers on percent-prefixed lines
+`req~import.bibtex.percent-comments~1`
+
+Outside BibTeX or BibLaTeX entries, JabRef ignores entry markers on lines whose first non-whitespace character is `%`, including leading library metadata comments.
+
+Immediately adjacent entry markers after legacy encoding declarations remain supported for backwards compatibility.
+
+Needs: impl, utest
+
 ## Library must maintain imported entries sorted by internal id
 `req~import.entries.sorted-by-id~1`
 
