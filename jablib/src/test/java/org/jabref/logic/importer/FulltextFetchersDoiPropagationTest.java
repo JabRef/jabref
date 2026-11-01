@@ -1,6 +1,7 @@
 package org.jabref.logic.importer;
 
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.net.URL;
 import java.util.Optional;
 import java.util.Set;
@@ -61,10 +62,9 @@ class FulltextFetchersDoiPropagationTest {
 
             server.start();
 
-            URL pdfUrl = new URL(
-                    "http://127.0.0.1:"
-                    + server.getAddress().getPort()
-                    + "/paper.pdf");
+            URL pdfUrl = URI.create(
+                    "http://127.0.0.1:" + server.getAddress().getPort() + "/paper.pdf")
+                    .toURL();
 
             when(fulltextFetcher.findFullText(any(BibEntry.class)))
                     .thenReturn(Optional.of(pdfUrl));
@@ -73,8 +73,8 @@ class FulltextFetchersDoiPropagationTest {
             try (MockedStatic<WebFetchers> webFetchers =
                          mockStatic(WebFetchers.class)) {
                 webFetchers.when(() -> WebFetchers.getIdFetcherForIdentifier(
-                                eq(DOI.class), any(ImporterPreferences.class)))
-                        .thenReturn(doiFetcher);
+                        eq(DOI.class), any(ImporterPreferences.class)))
+                           .thenReturn(doiFetcher);
 
                 // Act
                 FulltextFetchers fulltextFetchers =
@@ -95,8 +95,8 @@ class FulltextFetchersDoiPropagationTest {
                 assertEquals(
                         discoveredDoi.asString(),
                         entryCaptor.getValue()
-                                .getField(StandardField.DOI)
-                                .orElseThrow());
+                                   .getField(StandardField.DOI)
+                                   .orElseThrow());
 
                 // Assert: DOI discovery was attempted using the original title
                 ArgumentCaptor<BibEntry> doiEntryCaptor =
@@ -107,8 +107,8 @@ class FulltextFetchersDoiPropagationTest {
                 assertEquals(
                         "Example research paper",
                         doiEntryCaptor.getValue()
-                                .getField(StandardField.TITLE)
-                                .orElseThrow());
+                                   .getField(StandardField.TITLE)
+                                   .orElseThrow());
             }
         } finally {
             server.stop(0);
