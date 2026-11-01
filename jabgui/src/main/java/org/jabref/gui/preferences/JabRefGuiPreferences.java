@@ -95,6 +95,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String PREVIEW_CYCLE = "cyclePreview";
     public static final String PREVIEW_AS_TAB = "previewAsTab";
     public static final String PREVIEW_IN_ENTRY_TABLE_TOOLTIP = "previewInEntryTableTooltip";
+    public static final String ENTRY_TABLE_TOOLTIP_DURATION = "entryTableTooltipDuration";
     public static final String PREVIEW_BST_LAYOUT_PATHS = "previewBstLayoutPaths";
     public static final String PREVIEW_COVER_IMAGE_DOWNLOAD = "coverDownload";
     // endregion
@@ -228,7 +229,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     // region Donation preferences
     private static final String DONATION_NEVER_SHOW = "donationNeverShow";
-    private static final String DONATION_LAST_SHOWN_EPOCH_DAY = "donationLastShownEpochDay";
+    private static final String DONATION_NEXT_NOTIFICATION_EPOCH_DAY = "donationNextNotificationEpochDay";
     // endregion
 
     // region NewEntryPreferences
@@ -1035,6 +1036,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 customPreviewLayout,
                 getBoolean(PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab()),
                 getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip()),
+                Math.clamp(getInt(ENTRY_TABLE_TOOLTIP_DURATION, defaultValues.getTooltipDuration()), 0, 300),
                 bstPaths,
                 getBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, defaultValues.shouldDownloadCovers())
         );
@@ -1062,6 +1064,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 () -> previewPreferences.customPreviewLayoutProperty().set(defaultValues.getCustomPreviewLayout()));
         bindBoolean(previewPreferences.showPreviewAsExtraTabProperty(), PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab());
         bindBoolean(previewPreferences.showPreviewEntryTableTooltip(), PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip());
+        bindInt(previewPreferences.tooltipDurationProperty(), ENTRY_TABLE_TOOLTIP_DURATION, defaultValues.getTooltipDuration());
         bindCustomList(previewPreferences.getBstPreviewLayoutPaths(), PREVIEW_BST_LAYOUT_PATHS, defaultValues.getBstPreviewLayoutPaths(),
                 this::storeBstPaths,
                 () -> hasKey(PREVIEW_BST_LAYOUT_PATHS)
@@ -1386,10 +1389,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         donationPreferences = new DonationPreferences(
                 getBoolean(DONATION_NEVER_SHOW, defaultValues.isNeverShowAgain()),
-                getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaultValues.getLastShownEpochDay()));
+                getInt(DONATION_NEXT_NOTIFICATION_EPOCH_DAY, defaultValues.getNextNotificationEpochDay()));
 
         bindBoolean(donationPreferences.neverShowAgainProperty(), DONATION_NEVER_SHOW, defaultValues.isNeverShowAgain());
-        bindInt(donationPreferences.lastShownEpochDayProperty(), DONATION_LAST_SHOWN_EPOCH_DAY, defaultValues.getLastShownEpochDay());
+        bindInt(donationPreferences.nextNotificationEpochDayProperty(), DONATION_NEXT_NOTIFICATION_EPOCH_DAY, defaultValues.getNextNotificationEpochDay());
 
         return donationPreferences;
     }

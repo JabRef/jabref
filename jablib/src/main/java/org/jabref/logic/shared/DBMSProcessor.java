@@ -21,6 +21,7 @@ import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.logic.shared.exception.SharedEntryNotPresentException;
 import org.jabref.logic.shared.notifications.NotificationListener;
 import org.jabref.logic.shared.notifications.Notifier;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
@@ -567,12 +568,20 @@ public class DBMSProcessor {
                 while (selectEntryResultSet.next()) {
                     // We get a list of field values of bib entries "grouped" by bib entries
                     // Thus, the first change in the shared id leads to a new BibEntry
+                    // [impl->req~shared-database.missing-entry-type~1]
                     if (selectEntryResultSet.getInt("SHARED_ID") > lastId) {
                         int sharedId = selectEntryResultSet.getInt("shared_id");
                         int version = selectEntryResultSet.getInt("version");
-                        EntryType entrytype = EntryTypeFactory.parse(selectEntryResultSet.getString("entrytype"));
+                        String entryTypeName = selectEntryResultSet.getString("entrytype");
+                        EntryType entryType = Optional.ofNullable(entryTypeName)
+                                                      .filter(StringUtil::isNotBlank)
+                                                      .map(EntryTypeFactory::parse)
+                                                      .orElseGet(() -> {
+                                                          LOGGER.warn("Shared entry {} has no entry type; using Misc", sharedId);
+                                                          return BibEntry.DEFAULT_TYPE;
+                                                      });
 
-                        bibEntry = new BibEntry(entrytype);
+                        bibEntry = new BibEntry(entryType);
                         bibEntry.getSharedBibEntryData().setSharedId(sharedId);
                         bibEntry.getSharedBibEntryData().setVersion(version);
 
