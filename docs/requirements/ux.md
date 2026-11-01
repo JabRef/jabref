@@ -274,5 +274,4 @@ The main table displays names given in BibLaTeX extended name format in readable
 
 Needs: impl
 
-
 <!-- markdownlint-disable-file MD022 -->
