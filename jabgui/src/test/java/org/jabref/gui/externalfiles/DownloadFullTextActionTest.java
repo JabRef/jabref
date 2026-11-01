@@ -610,6 +610,95 @@ class DownloadFullTextActionTest {
     }
 
     @Test
+    void doesNotDownloadFullTextWhenDoiCannotBeDiscoveredFromTitle() throws Exception {
+        // Arrange: configure the entry with a title but no DOI.
+        entry.setField(
+                StandardField.TITLE,
+                "A Test Article About Computer Science"
+        );
+
+        LinkedFile missingFile = new LinkedFile(
+                "",
+                Path.of("missing.pdf"),
+                "PDF"
+        );
+
+        entry.setFiles(List.of(missingFile));
+        entry.clearField(StandardField.DOI);
+
+        assertTrue(entry.getField(StandardField.DOI).isEmpty());
+
+        // Arrange: mock DOI discovery to return no DOI.
+        IdFetcher<DOI> doiFetcher = mock(IdFetcher.class);
+
+        when(doiFetcher.findIdentifier(any(BibEntry.class)))
+                .thenReturn(Optional.empty());
+
+        // Arrange: mock full-text retrieval to return no PDF.
+        FulltextFetcher fulltextFetcher = mock(FulltextFetcher.class);
+
+        when(fulltextFetcher.getTrustLevel())
+                .thenReturn(TrustLevel.PUBLISHER);
+
+        when(fulltextFetcher.findFullText(any(BibEntry.class)))
+                .thenReturn(Optional.empty());
+
+        // Arrange: capture background tasks submitted by the workflow.
+        List<BackgroundTask<?>> submittedTasks = new ArrayList<>();
+
+        doAnswer(invocation -> {
+            BackgroundTask<?> submittedTask = invocation.getArgument(0);
+            submittedTasks.add(submittedTask);
+            return CompletableFuture.completedFuture(null);
+        }).when(taskExecutor).execute(any(BackgroundTask.class));
+
+        DownloadFullTextAction action = new DownloadFullTextAction(
+                dialogService,
+                stateManager,
+                preferences,
+                taskExecutor
+        );
+
+        // Act: run DOI discovery and full-text lookup.
+        try (MockedStatic<WebFetchers> webFetchers = mockStatic(WebFetchers.class)) {
+            webFetchers.when(() -> WebFetchers.getIdFetcherForIdentifier(
+                               eq(DOI.class),
+                               nullable(ImporterPreferences.class)))
+                       .thenReturn(doiFetcher);
+
+            webFetchers.when(() -> WebFetchers.getFullTextFetchers(
+                               nullable(ImportFormatPreferences.class),
+                               nullable(ImporterPreferences.class)))
+                       .thenReturn(Set.of(fulltextFetcher));
+
+            action.execute();
+
+            assertEquals(1, submittedTasks.size());
+
+            BackgroundTask<?> lookupTask = submittedTasks.get(0);
+            Object downloads = lookupTask.call();
+
+            runSuccessHandler(lookupTask, downloads);
+
+            // Verify that DOI discovery and full-text retrieval were attempted.
+            verify(doiFetcher).findIdentifier(any(BibEntry.class));
+            verify(fulltextFetcher).findFullText(any(BibEntry.class));
+        }
+
+        // Assert: no download task was submitted.
+        assertEquals(1, submittedTasks.size());
+
+        // Assert: no replacement PDF was attached.
+        assertEquals(List.of(missingFile), entry.getFiles());
+
+        // Assert: the original entry still has no DOI.
+        assertTrue(entry.getField(StandardField.DOI).isEmpty());
+
+        // Assert: the user was notified that no full-text document was found.
+        verify(dialogService).notify(ArgumentMatchers.anyString());
+    }
+
+    @Test
     void queuedOrFinishedTaskLeavesNoFulltextLookupInProgress() throws Exception {
         RecordingDownloadFullTextAction action = new RecordingDownloadFullTextAction(_ -> Optional.empty());
 
