@@ -69,6 +69,18 @@ public abstract class Exporter {
         export(databaseContext, file, entries);
     }
 
+    /// Writes an export to a temporary file that will be copied to standard output.
+    /// Exporters with destination-relative links should override this method: the
+    /// temporary file is not the final destination of redirected output.
+    public void exportToStandardOutput(BibDatabaseContext databaseContext,
+                                       Path temporaryFile,
+                                       List<BibEntry> entries,
+                                       List<Path> fileDirectories,
+                                       JournalAbbreviationRepository abbreviationRepository)
+            throws IOException, SaveException, ParserConfigurationException, TransformerException {
+        export(databaseContext, temporaryFile, entries, fileDirectories, abbreviationRepository);
+    }
+
     /// Exports to all files linked to a given entry
     ///
     /// @param databaseContext        the database to export from
