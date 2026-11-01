@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -52,6 +53,7 @@ import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.model.util.OptionalUtil;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -738,11 +740,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             return String.join(" AND ", queryTerms);
         }
 
-        private static String normalizeForTitleMatching(String title) {
+        @VisibleForTesting
+        static String normalizeForTitleMatching(String title) {
             String normalizedTitle = StringUtil.stripAccents(title);
             normalizedTitle = NON_ALNUM_OR_SPACE_PATTERN.matcher(normalizedTitle).replaceAll(" ");
             normalizedTitle = WHITESPACE_PATTERN.matcher(normalizedTitle).replaceAll(" ");
-            return normalizedTitle.trim().toLowerCase();
+            return normalizedTitle.trim().toLowerCase(Locale.ROOT);
         }
 
         private List<BibEntry> filterYears(List<BibEntry> searchResult, ArXivQueryTransformer transformer) {
