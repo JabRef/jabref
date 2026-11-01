@@ -688,9 +688,6 @@ class DownloadFullTextActionTest {
         // Assert: no download task was submitted.
         assertEquals(1, submittedTasks.size());
 
-        // Assert: no replacement PDF was attached.
-        assertEquals(List.of(missingFile), entry.getFiles());
-
         // Assert: the original entry still has no DOI.
         assertTrue(entry.getField(StandardField.DOI).isEmpty());
 

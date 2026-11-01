@@ -63,8 +63,8 @@ class FulltextFetchersDoiPropagationTest {
             server.start();
 
             URL pdfUrl = URI.create(
-                    "http://127.0.0.1:" + server.getAddress().getPort() + "/paper.pdf")
-                    .toURL();
+                                    "http://127.0.0.1:" + server.getAddress().getPort() + "/paper.pdf")
+                            .toURL();
 
             when(fulltextFetcher.findFullText(any(BibEntry.class)))
                     .thenReturn(Optional.of(pdfUrl));
@@ -73,7 +73,7 @@ class FulltextFetchersDoiPropagationTest {
             try (MockedStatic<WebFetchers> webFetchers =
                          mockStatic(WebFetchers.class)) {
                 webFetchers.when(() -> WebFetchers.getIdFetcherForIdentifier(
-                        eq(DOI.class), any(ImporterPreferences.class)))
+                                   eq(DOI.class), any(ImporterPreferences.class)))
                            .thenReturn(doiFetcher);
 
                 // Act
@@ -107,8 +107,8 @@ class FulltextFetchersDoiPropagationTest {
                 assertEquals(
                         "Example research paper",
                         doiEntryCaptor.getValue()
-                                   .getField(StandardField.TITLE)
-                                   .orElseThrow());
+                                      .getField(StandardField.TITLE)
+                                      .orElseThrow());
             }
         } finally {
             server.stop(0);
