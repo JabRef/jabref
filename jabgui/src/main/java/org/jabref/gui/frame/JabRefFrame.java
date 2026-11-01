@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -290,14 +289,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         SplitPane.setResizableWithParent(sidePaneScroll, false);
         sidePane.widthProperty().addListener(_ -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) _ -> updateSidePane());
-        sidePane.getChildren().addListener((ListChangeListener<Node>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    Platform.runLater(() -> sidePaneScroll.setVvalue(0));
-                    return;
-                }
-            }
-        });
         updateSidePane();
         setCenter(horizontalSplit);
     }
